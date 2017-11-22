@@ -37,6 +37,7 @@ XTCalibrationAlgorithm::XTCalibrationAlgorithm() :  CalibrationAlgorithm("CDCCal
 void XTCalibrationAlgorithm::createHisto()
 {
   readXT();
+
   auto tree = getObjectPtr<TTree>("tree");
 
   int lay, trighit;
@@ -54,11 +55,14 @@ void XTCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("trighit", &trighit);
   tree->SetBranchAddress("ndf", &ndf);
 
+  B2INFO("Num of alpha bins " << m_nAlphaBins);
+  B2INFO("Num of Theta bins " << m_nThetaBins);
+
   /*Create histogram*/
   for (int i = 0; i < 56; ++i) {
     for (int lr = 0; lr < 2; ++lr) {
-      for (int al = 0; al < m_nAlpha; ++al) {
-        for (int th = 0; th < m_nTheta; ++th) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
           hprof[i][lr][al][th] = new TProfile(Form("hprof%d_%d_%d_%d", i, lr, al, th),
                                               Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
                                                    i, lr, ialpha[al], itheta[th]), 210, -20, 600, 0, 1.2, "i");
@@ -93,10 +97,10 @@ void XTCalibrationAlgorithm::createHisto()
     if (Pval < m_Pvalmin) continue;
     if (ndf < m_ndfmin) continue;
 
-    for (int k = 0; k < m_nAlpha; ++k) {
+    for (int k = 0; k < m_nAlphaBins; ++k) {
       if (alpha < u_alpha[k]) {al = k; break;}
     }
-    for (int j = 0; j < m_nTheta; ++j) {
+    for (int j = 0; j < m_nThetaBins; ++j) {
       if (theta < u_theta[j]) {th = j; break;}
     }
     if (dx > 0)
@@ -118,6 +122,10 @@ void XTCalibrationAlgorithm::createHisto()
 
 CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
 {
+  gROOT->SetBatch(1);
+  gErrorIgnoreLevel = 3001;
+  //  createHisto();
+  readXT();
   B2INFO("Start calibration");
   return c_OK;
 }
@@ -131,6 +139,10 @@ void XTCalibrationAlgorithm::storeHisto()
 
 void XTCalibrationAlgorithm::readXT()
 {
-  DBObjPtr<CDCXtRelations> dbXT_old;
+  B2INFO("readXT");
+  //  m_nAlphaBins = dbXT->getNoOfAlphaBins();
+  //  m_nThetaBins = dbXT->getNoOfThetaBins();
+  B2INFO("Num of alpha bins " << m_nAlphaBins);
+  B2INFO("Num of Theta bins " << m_nThetaBins);
 }
 

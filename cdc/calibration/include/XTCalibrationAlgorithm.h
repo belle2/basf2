@@ -79,8 +79,8 @@ namespace Belle2 {
       **********************************/
 
       std::string m_outputXTFileName = "xt_new.dat"; /**< Out put xt filename*/
-      int m_nAlpha; /**<number of alpha bins*/
-      int m_nTheta; /**<number of  theta bins*/
+      int m_nAlphaBins; /**<number of alpha bins*/
+      int m_nThetaBins; /**<number of  theta bins*/
       double u_alpha[18];/**< Upper boundays of alpha bins. */
       double ialpha[18]; /**< represented alphas of alpha bins. */
       double u_theta[7];/**< Upper boundays of theta bins. */

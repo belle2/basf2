@@ -92,10 +92,7 @@ class Calculation:
         not_ran_processes = [p for p in self.process_list if p.already_run is False]
         running_processes = [p for p in self.process_list if self.is_running(p)]
 
-        if max_processes:
-            processes_to_start = max(0, max_processes - len(running_processes))
-        else:
-            processes_to_start = not_ran_processes
+        processes_to_start = max(0, max_processes - len(running_processes))
 
         for process in self.process_list:
             # start processes as long as processes_to_start is larger than zero

@@ -210,9 +210,9 @@ char* TSF::getData(inputToTSFArray input)
 unsigned short TSF::trgTime(int index, int iFirstHit)
 {
   if (m_allPositiveTime) {
-    return (m_cdcHits[iFirstHit]->getTDCCount() - m_cdcHits[index]->getTDCCount()) / 2;
+    return (m_cdcHits[iFirstHit]->getTDCCount() / 2 - m_cdcHits[index]->getTDCCount() / 2);
   } else {
-    short time = (m_TDCCountForT0 - m_cdcHits[index]->getTDCCount()) / 2;
+    short time = (m_TDCCountForT0 / 2 - m_cdcHits[index]->getTDCCount() / 2);
     return (time < 0) ? time + (1 << 9) : time;
   }
 }

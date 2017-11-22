@@ -67,6 +67,10 @@ TSF::CDCTriggerTSFFirmwareModule() :
   addParam("simulateCC", m_simulateCC,
            "Flag to run the front-end clock counter",
            false);
+  std::vector<bool> defaultStub(m_nSubModules, false);
+  addParam("stubLUT", m_stubLUT,
+           "list of flags to run each TSF firmware simulation with dummy L/R LUT (to speed up loading)",
+           defaultStub);
 }
 
 TSF::~CDCTriggerTSFFirmwareModule()
@@ -140,6 +144,9 @@ void TSF::initialize()
       // close the unused ends of the file descriptors
       close(inputFileDescriptor[i][1]);
       close(outputFileDescriptor[i][0]);
+      if (m_stubLUT[i]) {
+        design_libname_post = "_stub" + design_libname_post;
+      }
       string design = design_libname_pre + to_string(i * 2) + design_libname_post;
       string waveform = wdbName_pre + to_string(i * 2) + wdbName_post;
       // execute the standalone worker program

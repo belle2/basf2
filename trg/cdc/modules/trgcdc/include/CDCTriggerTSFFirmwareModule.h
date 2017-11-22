@@ -97,7 +97,7 @@ namespace Belle2 {
     static constexpr size_t timeWidth = 4;
 
   protected:
-    /** Name of the StoreArray containing the input track segment hits. */
+    /** Name of the StoreArray containing the input CDC hits. */
     std::string m_hitCollectionName;
 
     /** Name of the StoreArray holding the found TS hits. */
@@ -105,6 +105,9 @@ namespace Belle2 {
 
     /** Name of the StoreArray holding the raw bit content to 2D trackers. */
     std::string m_outputBitstreamNameTo2D;
+
+    /** Name of the StoreArray holding the raw bit content to ETF. */
+    std::string m_outputBitstreamNameToETF;
 
     /** CDCHit array */
     Belle2::StoreArray<CDCHit> m_cdcHits;
@@ -126,6 +129,9 @@ namespace Belle2 {
 
     /** flag to simulate front-end clock counter */
     bool m_simulateCC;
+
+    /** list of flags to run a TSF firmware simulation with dummy L/R LUT (to speed up loading) */
+    std::vector<bool> m_stubLUT;
 
     /** debug level specified in the steering file */
     int m_debugLevel;

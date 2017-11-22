@@ -6,21 +6,26 @@ from basf2 import *
 from ROOT import Belle2
 from math import pi, tan
 import os
+import socket
 from subprocess import call
 
 read_data = True
 # merger_only = True
 merger_only = False
 save_outout = True
-kekcc = True
-btrgpc09 = False
+fast_tsf = True
 
-if kekcc:
+# set the host-based locations
+hostname = socket.gethostname()
+if 'cc.kek.jp' in hostname:
     lib_source = '/home/belle2/tasheng/tsim/'
     rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
-elif btrgpc09:
+elif 'btrgpc09' == hostname:
     lib_source = '/home/trgadmin/tsim/'
     rdi_path = '/home/trgadmin/Xilinx/Vivado/2017.2/lib/lnx64.o'
+elif 'belle2' '= hostname':
+    lib_source = '/home/ta/tsim/'
+    rdi_path = '/home/ta/Vivado_2017.2/lib/lnx64.o'
 else:
     lib_source = ''
     rdi_path = ''
@@ -68,7 +73,8 @@ particlegun_params = {
 # create path up to trigger #
 # ------------------------- #
 environment = Belle2.Environment.Instance()
-environment.setNumberEventsOverride(evtnum)
+if not environment.getNumberEventsOverride():
+    environment.setNumberEventsOverride(evtnum)
 
 # set random seed
 basf2.set_random_seed(seed)
@@ -102,13 +108,14 @@ if not read_data:
 # CDC trigger and output #
 # ---------------------- #
 
-main.add_module('Gearbox')
-main.add_module('Geometry', components=['BeamPipe',
-                                        'PXD', 'SVD', 'CDC',
-                                        'MagneticFieldConstant4LimitedRCDC'])
-main.add_module('CDCTriggerTSF',
-                InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
-                OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
+if fast_tsf:
+    main.add_module('Gearbox')
+    main.add_module('Geometry', components=['BeamPipe',
+                                            'PXD', 'SVD', 'CDC',
+                                            'MagneticFieldConstant4LimitedRCDC'])
+    main.add_module('CDCTriggerTSF',
+                    InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
+                    OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
 
 firmtsf = register_module('CDCTriggerTSFFirmware')
 firmtsf.param('mergerOnly', merger_only)

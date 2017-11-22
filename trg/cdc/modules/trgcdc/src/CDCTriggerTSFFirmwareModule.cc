@@ -301,7 +301,9 @@ void TSF::initializeMerger()
   auto itr = iAxialHitInClock.begin();
   int clockEdge = 1;
   for (const auto& ihit : iAxialHit) {
-    B2DEBUG(50, "sorted TDC count: " << m_cdcHits[ihit]->getTDCCount());
+    B2DEBUG(20, "sorted TDC count: " << m_cdcHits[ihit]->getTDCCount() <<
+            ", SL" << m_cdcHits[ihit]->getISuperLayer() << ", layer" << m_cdcHits[ihit]->getILayer() <<
+            ", wire " << m_cdcHits[ihit]->getIWire());
     if (trgTime(ihit, iAxialHit.front()) >= clockEdge * clockPeriod) {
       ++clockEdge;
       ++itr;
@@ -417,7 +419,8 @@ void TSF::simulateMerger(unsigned iClock)
             get<MergerOut::secondPriorityHit>(mergerData)[0].set(priTS, ! i);
             priorityHit.insert({priTS, iHit});
             // set the 2nd pri bit to right when T_left == T_right
-          } else if (hitTime.to_ulong() == priorityTime.to_ulong() && i == 1) {
+          } else if (priority(priorityHit[priTS]) == Priority::second &&
+                     hitTime.to_ulong() == priorityTime.to_ulong() && i == 1) {
             get<MergerOut::secondPriorityHit>(mergerData)[0].reset(priTS);
             priorityHit[priTS] = iHit;
           }
@@ -562,6 +565,13 @@ void TSF::saveFastOutput(short iclock)
         foundTS.insert({iTS, iHit});
         if (iHit < 0) {
           B2WARNING("No corresponding priority CDC hit can be found.");
+          B2DEBUG(20, "priority " << decoded[3]);
+          for (int iclkPri = firstClock; iclkPri < lastClock; ++iclkPri) {
+            auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / 16];
+            for (auto& m : priMap) {
+              B2DEBUG(20, "iWire: " << m.first << ", iLayer: " << m_cdcHits[m.second]->getILayer());
+            }
+          }
           if (iclock < 15) {
             B2WARNING("It could be the left over TS hits from the last event.\n" <<
                       "Try increasing m_nClockPerEvent");

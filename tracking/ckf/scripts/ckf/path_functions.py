@@ -1,5 +1,5 @@
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.005,
-                overlap_cut=0.0, use_best_seeds=10, use_best_results=1):
+def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.015,
+                overlap_cut=0.3, use_best_seeds=10, use_best_results=2):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to

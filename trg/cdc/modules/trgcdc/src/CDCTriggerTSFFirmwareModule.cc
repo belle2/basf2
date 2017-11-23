@@ -527,7 +527,7 @@ void TSF::saveFastOutput(short iclock)
         // get global TS ID
         unsigned iTS = decoded[0] + nCellsInSL * iTracker / nTrackers;
         // periodic ID overflow when phi0 > 0 for the 4th tracker
-        if (iTS > nCellsInSL) {
+        if (iTS >= nCellsInSL) {
           iTS -= nCellsInSL;
         }
         // ID in SL8 is shifted by 16

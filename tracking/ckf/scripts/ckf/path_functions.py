@@ -103,9 +103,6 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
     if "SVDSpacePointCreator" not in path:
         path.add_module("SVDSpacePointCreator")
 
-    # Then, add the CKF
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
-
     if use_mc_truth:
         module_parameters = dict(
             firstHighFilter="truth",
@@ -152,8 +149,8 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
-                    hitFilter="distance",
-                    seedFilter="distance",
+                    hitFilter="sensor",
+                    seedFilter="sensor",
 
                     enableOverlapResolving=True,
 

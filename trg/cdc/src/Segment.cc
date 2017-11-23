@@ -488,7 +488,7 @@ namespace Belle2 {
       }
       if (priorityL->signal().active()) {
         if (priorityR->signal().active()) {
-          if ((priorityL->signal()[0]->time()) > (priorityR->signal()[0]->time())) return 1;
+          if ((priorityL->signal()[0]->time()) >= (priorityR->signal()[0]->time())) return 1;
           else return 2;
         } else return 2;
       } else if (priorityR->signal().active()) {
@@ -514,7 +514,7 @@ namespace Belle2 {
       }
       if (priorityL->signal().active(clk0, clk1)) {
         if (priorityR->signal().active(clk0, clk1)) {
-          if ((priorityL->signal()[0]->time()) > (priorityR->signal()[0]->time())) return 1;
+          if ((priorityL->signal()[0]->time()) >= (priorityR->signal()[0]->time())) return 1;
           else return 2;
         } else return 2;
       } else if (priorityR->signal().active(clk0, clk1)) {

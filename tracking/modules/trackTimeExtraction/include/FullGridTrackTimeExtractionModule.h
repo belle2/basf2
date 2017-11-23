@@ -13,12 +13,15 @@
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
 #include <tracking/modules/trackTimeExtraction/FullGridTrackTimeExtraction.h>
+#include <tracking/trackFindingCDC/findlets/wrapper/FindletStoreArrayInput.h>
+#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 namespace Belle2 {
   /**
    * Module implementation using the CDCHitBasedT0Extraction
    */
-  class FullGridTrackTimeExtractionModule : public TrackFindingCDC::FindletModule<FullGridTrackTimeExtraction> {
+  class FullGridTrackTimeExtractionModule : public
+    TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<FullGridTrackTimeExtraction>> {
   public:
     /// Make destructor of interface virtual
     virtual ~FullGridTrackTimeExtractionModule() = default;

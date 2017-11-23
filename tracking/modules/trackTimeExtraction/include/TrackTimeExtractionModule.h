@@ -11,17 +11,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackFindingCDC/findlets/wrapper/FindletStoreArrayInput.h>
 
-#include <tracking/modules/trackTimeExtraction/TrackTimeExtractionFromRecoTracks.h>
-
-#include <tracking/modules/trackTimeExtraction/FindletStoreArrayInput.h>
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 namespace Belle2 {
   /**
    * Module implementation using the CDCHitBasedT0Extraction
    */
-  class TrackTimeExtractionModule : public TrackFindingCDC::FindletModule<FindletStoreArrayInput<TrackTimeExtraction>> {
+  class TrackTimeExtractionModule : public
+    TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<TrackTimeExtraction>> {
   public:
     /// Make destructor of interface virtual
     virtual ~TrackTimeExtractionModule() = default;

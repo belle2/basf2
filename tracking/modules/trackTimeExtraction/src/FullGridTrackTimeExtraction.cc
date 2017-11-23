@@ -220,17 +220,18 @@ FullGridTrackTimeExtraction::FullGridTrackTimeExtractionModule() : Module()
 */
 void FullGridTrackTimeExtraction::initialize()
 {
+  Super::initialize();
+
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
 
   m_eventT0.registerInDataStore();
 }
 
-void FullGridTrackTimeExtraction::apply()
+void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack const*>& recoTracks)
 {
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 
-  if (recoTracks.getEntries() == 0) {
+  if (recoTracks.size() == 0) {
     return;
   }
 
@@ -240,39 +241,40 @@ void FullGridTrackTimeExtraction::apply()
     B2INFO("T0 estimation already present and overwriteExistingEstimation set to false. Skipping.");
     return;
   }
+  /* move to use std vector
 
-  // Try out phase: test 3 data points between t0 min and t0 max and let them extrapolate a bit.
-  std::vector<T0Try> tries;
-  std::vector<T0Try> convergedTries;
+    // Try out phase: test 3 data points between t0 min and t0 max and let them extrapolate a bit.
+    std::vector<T0Try> tries;
+    std::vector<T0Try> convergedTries;
 
-  const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
+    const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
 
-  for (double i = 1; i < m_param_numberOfGrids; i++) {
-    extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,
-                         m_param_minimalT0Shift, m_param_maximalT0Shift);
-  }
-
-  if (not convergedTries.empty()) {
-    // If we have found some "converging" extracted t0s, use the one with the lowest chi2.
-    const auto& minimalChi2 = std::min_element(convergedTries.begin(), convergedTries.end());
-
-    const double extractedTime = minimalChi2->m_extractedT0;
-    // The uncertainty was calculated using a test MC sample
-    m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
-  } else {
-    // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
-    // use this. Else, use the next best guess.
-    std::sort(tries.begin(), tries.end());
-
-    for (const auto& tryOut : tries) {
-      extractTrackTimeFrom(recoTracks, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
-      if (not convergedTries.empty()) {
-        const double extractedTime = convergedTries.back().m_extractedT0;
-        // The uncertainty was calculated using a test MC sample
-        m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
-        break;
-      }
+    for (double i = 1; i < m_param_numberOfGrids; i++) {
+      extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,
+                           m_param_minimalT0Shift, m_param_maximalT0Shift);
     }
-  }
+
+    if (not convergedTries.empty()) {
+      // If we have found some "converging" extracted t0s, use the one with the lowest chi2.
+      const auto& minimalChi2 = std::min_element(convergedTries.begin(), convergedTries.end());
+
+      const double extractedTime = minimalChi2->m_extractedT0;
+      // The uncertainty was calculated using a test MC sample
+      m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+    } else {
+      // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
+      // use this. Else, use the next best guess.
+      std::sort(tries.begin(), tries.end());
+
+      for (const auto& tryOut : tries) {
+        extractTrackTimeFrom(recoTracks, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
+        if (not convergedTries.empty()) {
+          const double extractedTime = convergedTries.back().m_extractedT0;
+          // The uncertainty was calculated using a test MC sample
+          m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+          break;
+        }
+      }
+    }*/
 }
 

@@ -45,7 +45,12 @@ namespace Belle2 {
    *
    * * If no converged point is found at all, set the EventT0 to 0.
    */
-  class FullGridTrackTimeExtraction : public TrackFindingCDC::Findlet<> {
+  class FullGridTrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack const*> {
+
+  private:
+    /// Type of the base class
+    using Super = TrackFindingCDC::Findlet<RecoTrack const*>;
+
   public:
     /// Create a new instance of this module.
     FullGridTrackTimeExtraction() = default;
@@ -56,7 +61,7 @@ namespace Belle2 {
     /// Do the iterative grid-search time extraction described above.
     //void event() override;
 
-    void apply() final override;
+    void apply(std::vector< RecoTrack const*>&) final override;
 
   private:
     /// StoreArray name from which to read the reco tracks.

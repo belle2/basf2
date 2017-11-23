@@ -310,10 +310,10 @@ CDCTriggerNeuroTrainerModule::event()
         try {
           genfit::MeasuredStateOnPlane state =
             recoTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), reps[irep]);
-          TVector3 closestPos = state.getPos();
           reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
-          // flip tracks if necessary, such that all track go outward from the IP
-          if (state.getMom().Dot(closestPos - state.getPos()) < 0) {
+          // flip tracks if necessary, such that trigger tracks and reco tracks
+          // point in the same direction
+          if (state.getMom().Dot(m_tracks[itrack]->getDirection()) < 0) {
             state.setPosMom(state.getPos(), -state.getMom());
             state.setChargeSign(-state.getCharge());
           }

@@ -34,14 +34,17 @@ namespace Belle2 {
     /// Constructor registering the subordinary findlets to the processing signal distribution machinery
     CDCHitBasedT0Extraction() = default;
 
+    /// Make destructor of interface virtual
+    virtual ~CDCHitBasedT0Extraction() = default;
+
     /// Short description of the findlet
-    std::string getDescription() final;
+    std::string getDescription() override final;
 
     /// Expose the parameters to a module
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
     /// Collects all Wire Hits and executes the t0 fit
-    void apply(std::vector<TrackFindingCDC::CDCWireHit>& inputWireHits) final;
+    void apply(std::vector<TrackFindingCDC::CDCWireHit>& inputWireHits) override final;
 
     void initialize() override final;
 

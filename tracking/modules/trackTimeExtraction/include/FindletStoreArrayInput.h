@@ -23,47 +23,60 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include "FindletStoreArrayInput.h"
-
+#include <tuple>
+#include <type_traits>
 
 namespace Belle2 {
 
-  /**
-   * Comparable module to the FullGridTimeExtractionModule, but less well performing.
-   *
-   * Does also extract the event time from an array of reco tracks, but uses a simple iterative approach:
-   * * Try to extract the event time from the reco tracks (by building an average over the whole array) and apply
-   *   this shift to the tracks.
-   * * Refit and extract again until the maximum number of tries is reached or the
-   *   extraction has "converged", meaning the change is below 2 ns (the needed precision).
-   * * If the extraction fails, because e.g. the fit fails, randomize the next time step to try out different
-   *   starting parameters.
-   */
-  class TrackTimeExtractionFromRecoTracks : public TrackFindingCDC::Findlet<> {
+
+  //TWrappedFindlet wi
+  template <class TWrappedFindlet>
+  class FindletStoreArrayInput : public TrackFindingCDC::Findlet<> {
 
   private:
     /// Type of the base class
     using Super = TrackFindingCDC::Findlet<>;
 
   public:
+
+    // this will be something like RecoTrack const * , so string the pointer
+    using DataStoreInputTypePtrType = typename std::tuple_element<0, typename TWrappedFindlet::IOTypes>::type;
+    using DataStoreInputTypeRefType = typename std::remove_pointer<DataStoreInputTypePtrType>::type;
+
     /// Create a new instance of the module.
-    TrackTimeExtractionFromRecoTracks();
+    FindletStoreArrayInput()
+    {
+      addProcessingSignalListener(&m_storeArrayLoader);
+      addProcessingSignalListener(&m_wrappedFindlet);
+    }
 
     /// Expose the parameters to a module
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
+    {
+      Super::exposeParameters(moduleParamList, prefix);
+
+      m_storeArrayLoader.exposeParameters(moduleParamList, prefix);
+      m_wrappedFindlet.exposeParameters(moduleParamList, prefix);
+    }
 
     /// Short description of the findlet
-    std::string getDescription() override final;
-
-    /// Register the store arrays and store obj pointers.
-    //void initialize() override final;
+    std::string getDescription() override final
+    {
+      return m_wrappedFindlet.getDescription();
+    }
 
     /// timing extraction for this findlet
-    void apply() override final;
+    void apply() override final
+    {
+      std::vector<DataStoreInputTypePtrType> storeArrayInput;
+
+      m_storeArrayLoader.apply(storeArrayInput);
+      m_wrappedFindlet.apply(storeArrayInput);
+    }
 
   private:
 
-    TrackFindingCDC::StoreArrayLoader<const RecoTrack> m_recoTracksLoader;
-    TrackTimeExtraction m_trackTimeExtraction;
+    TrackFindingCDC::StoreArrayLoader<DataStoreInputTypeRefType> m_storeArrayLoader;
+    TWrappedFindlet m_wrappedFindlet;
   };
 }

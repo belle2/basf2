@@ -366,6 +366,9 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
+        # ECL T0 extraction
+        path.add_module('ECLEventT0')
+
         # ECL connected region finder
         ecl_crfinder = register_module('ECLCRFinder')
         path.add_module(ecl_crfinder)

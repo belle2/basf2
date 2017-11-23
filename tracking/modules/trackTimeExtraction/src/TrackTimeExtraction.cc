@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/trackTimeExtraction/TrackTimeExtractionModule.h>
+#include <tracking/modules/trackTimeExtraction/TrackTimeExtraction.h>
 #include <tracking/timeExtraction/TimeExtractionUtils.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -16,13 +17,14 @@
 #include <TRandom.h>
 
 using namespace Belle2;
+using namespace TrackFindingCDC;
 
-REG_MODULE(TrackTimeExtraction);
+//REG_MODULE(TrackTimeExtraction);
 
-
+/*
 TrackTimeExtractionModule::TrackTimeExtractionModule() : Module()
 {
-  setDescription("Build the full covariance matrix for RecoTracks.");
+//  setDescription("Build the full covariance matrix for RecoTracks.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray containing the RecoTracks to process",
@@ -54,8 +56,53 @@ TrackTimeExtractionModule::TrackTimeExtractionModule() : Module()
   addParam("t0Uncertainty", m_param_t0Uncertainty, "Use this as sigma t0.",
            m_param_t0Uncertainty);
 }
+*/
 
-void TrackTimeExtractionModule::initialize()
+/// Short description of the findlet
+std::string TrackTimeExtraction::getDescription()
+{
+  return "Build the full covariance matrix for RecoTracks.";
+}
+
+void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+
+  moduleParamList->addParameter(prefixed(prefix, "recoTracksStoreArrayName"), m_param_recoTracksStoreArrayName,
+                                "StoreArray containing the RecoTracks to process",
+                                m_param_recoTracksStoreArrayName);
+
+  moduleParamList->addParameter(prefixed(prefix, "maximalIterations"), m_param_maximalIterations,
+                                "Maximal number of iterations to perform.",
+                                m_param_maximalIterations);
+  moduleParamList->addParameter(prefixed(prefix, "minimalIterations"), m_param_minimalIterations,
+                                "Minimal number of iterations to perform.",
+                                m_param_minimalIterations);
+
+  moduleParamList->addParameter(prefixed(prefix, "minimalTimeDeviation"), m_param_minimalTimeDeviation,
+                                "Minimal deviation between two extractions, to call the extraction as converged.",
+                                m_param_minimalTimeDeviation);
+
+  moduleParamList->addParameter(prefixed(prefix, "randomizeOnError"), m_param_randomizeOnError,
+                                "Whether to randomize the extracted time, when the fit fails.",
+                                m_param_randomizeOnError);
+  moduleParamList->addParameter(prefixed(prefix, "randomizeLimits"), m_param_randomizeLimits,
+                                "The maximal and minimal limit [-l, l] in which to randomize the extracted time on errors.",
+                                m_param_randomizeLimits);
+
+  moduleParamList->addParameter(prefixed(prefix, "overwriteExistingEstimation"), m_param_overwriteExistingEstimation,
+                                "Whether to replace an existing time estimation or not.",
+                                m_param_overwriteExistingEstimation);
+
+  moduleParamList->addParameter(prefixed(prefix, "maximalExtractedT0"), m_param_maximalExtractedT0,
+                                "Hard cut on this value of extracted times in the positive as well as the negative direction.",
+                                m_param_maximalExtractedT0);
+
+  moduleParamList->addParameter(prefixed(prefix, "t0Uncertainty"), m_param_t0Uncertainty, "Use this as sigma t0.",
+                                m_param_t0Uncertainty);
+}
+
+
+void TrackTimeExtraction::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
@@ -63,25 +110,24 @@ void TrackTimeExtractionModule::initialize()
   m_eventT0.registerInDataStore();
 }
 
-void TrackTimeExtractionModule::event()
+void TrackTimeExtraction::apply(std::vector<RecoTrack const*>& recoTracks)
 {
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
+  /*  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 
-  if (not m_eventT0.isValid()) {
-    m_eventT0.create();
-  } else if (not m_param_overwriteExistingEstimation) {
-    B2INFO("T0 estimation already present and overwriteExistingEstimation set to false. Skipping.");
-    return;
-  }
+    if (not m_eventT0.isValid()) {
+      m_eventT0.create();
+    } else if (not m_param_overwriteExistingEstimation) {
+      B2INFO("T0 estimation already present and overwriteExistingEstimation set to false. Skipping.");
+      return;
+    }
 
-  const double extractedTime = extractTrackTimeLoop(recoTracks);
+    const double extractedTime = extractTrackTimeLoop(recoTracks);
 
-  // The uncertainty was calculated using a test MC sample
-  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+    // The uncertainty was calculated using a test MC sample
+    m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);*/
 }
 
-
-double TrackTimeExtractionModule::extractTrackTimeLoop(StoreArray<RecoTrack>& recoTracks) const
+double TrackTimeExtraction::extractTrackTimeLoop(StoreArray<RecoTrack>& recoTracks) const
 {
   TrackFitter trackFitter;
 
@@ -125,7 +171,7 @@ double TrackTimeExtractionModule::extractTrackTimeLoop(StoreArray<RecoTrack>& re
 
 
 
-double TrackTimeExtractionModule::extractTrackTime(StoreArray<RecoTrack>& recoTracks, const double& randomizeLimits) const
+double TrackTimeExtraction::extractTrackTime(StoreArray<RecoTrack>& recoTracks, const double& randomizeLimits) const
 {
   double sumFirstDerivatives = 0;
   double sumSecondDerivatives = 0;

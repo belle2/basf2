@@ -11,6 +11,8 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <framework/dataobjects/EventT0.h>
 #include <framework/core/Module.h>
 
@@ -43,16 +45,18 @@ namespace Belle2 {
    *
    * * If no converged point is found at all, set the EventT0 to 0.
    */
-  class FullGridTrackTimeExtractionModule : public Module {
+  class FullGridTrackTimeExtraction : public TrackFindingCDC::Findlet<> {
   public:
     /// Create a new instance of this module.
-    FullGridTrackTimeExtractionModule();
+    FullGridTrackTimeExtraction() = default;
 
     /// Register the store arrays and store obj pointers.
     void initialize() override;
 
     /// Do the iterative grid-search time extraction described above.
-    void event() override;
+    //void event() override;
+
+    void apply() final override;
 
   private:
     /// StoreArray name from which to read the reco tracks.

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/trackTimeExtraction/FullGridTrackTimeExtractionModule.h>
+#include <tracking/modules/trackTimeExtraction/FullGridTrackTimeExtraction.h>
 #include <tracking/timeExtraction/TimeExtractionUtils.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -16,8 +16,6 @@
 #include <numeric>
 
 using namespace Belle2;
-
-REG_MODULE(FullGridTrackTimeExtraction);
 
 namespace {
   /// Helper Structure holding one extracted time together with their chi^2.
@@ -196,8 +194,8 @@ namespace {
   }
 }
 
-
-FullGridTrackTimeExtractionModule::FullGridTrackTimeExtractionModule() : Module()
+/*
+FullGridTrackTimeExtraction::FullGridTrackTimeExtractionModule() : Module()
 {
   setDescription("Build the full covariance matrix for RecoTracks and extract the event time using the CDC drift time information.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -218,10 +216,9 @@ FullGridTrackTimeExtractionModule::FullGridTrackTimeExtractionModule() : Module(
   addParam("overwriteExistingEstimation", m_param_overwriteExistingEstimation,
            "Whether to replace an existing time estimation or not.",
            m_param_overwriteExistingEstimation);
-
 }
-
-void FullGridTrackTimeExtractionModule::initialize()
+*/
+void FullGridTrackTimeExtraction::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
@@ -229,7 +226,7 @@ void FullGridTrackTimeExtractionModule::initialize()
   m_eventT0.registerInDataStore();
 }
 
-void FullGridTrackTimeExtractionModule::event()
+void FullGridTrackTimeExtraction::apply()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 

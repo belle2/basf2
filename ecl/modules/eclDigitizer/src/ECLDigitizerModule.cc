@@ -50,6 +50,9 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
+  addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits", false);
+  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm", 0u);
+  addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
   addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction.", false);
 }
 
@@ -126,20 +129,22 @@ int ECLDigitizerModule::shapeSignals()
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
 
+  const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
+  const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
+
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
     int j = hit.getCellId() - 1; //0~8735
-    double hitE       = hit.getEnergyDep() * m_calib[j].ascale / Unit::GeV;
-    double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) / Unit::us;
+    double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
+    double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
     if (m_HadronPulseShape == true) {
-      double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale / Unit::GeV;
+      double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
       m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss[2]);//Gamma Component
       m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss[3]); //Hadron Component
       m_adc[j].totalHadron += hit.getHadronEnergyDep();
     } else {
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
     }
-
   }
 
   // add only background hits

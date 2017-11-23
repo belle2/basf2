@@ -141,6 +141,9 @@ namespace Belle2 {
       bool m_background;  /**< background flag */
       bool m_calibration;  /**< calibration flag */
       bool m_inter; /**< internuclear counter effect */
+      bool m_waveformMaker; /**< produce only waveform digits */
+      unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+      std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
       bool m_HadronPulseShape; /**< hadron pulse shape flag */
     };
   }//ECL

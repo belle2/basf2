@@ -1,0 +1,5 @@
+This folder was left intentionally after major cleanup of the code on 2017-11-23. 
+It includes a code which can serve as a good example on how to use GeoTOPTBCreator.
+However, the steering files may not run successfully anymore; the files data/TOP*.xml may also be 
+uncompatible with the code in top package.
+

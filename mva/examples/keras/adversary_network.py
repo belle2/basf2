@@ -80,6 +80,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     def adversary_loss(l, signal):
         """
+        Loss for adversaries outputs
         :param l: Trade off factor for training model 2. FOr model 3 choose -1
         :param signal: If signal or background distribution should be learned.
         :return: Loss function for the discriminator part of the Network.
@@ -111,8 +112,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if state.use_adv:
         for mode in ['signal', 'background']:
             for i in range(number_of_spectators):
-                adversary1 = Dense(units=number_of_features + 1, activation=tanh, trainable=False)(output)
-                adversary2 = Dense(units=number_of_features + 1, activation=tanh, trainable=False)(adversary1)
+                adversary1 = Dense(units=2 * parameters['number_bins'], activation=tanh, trainable=False)(output)
+                adversary2 = Dense(units=2 * parameters['number_bins'], activation=tanh, trainable=False)(adversary1)
                 adversaries.append(Dense(units=parameters['number_bins'], activation=softmax, trainable=False)(adversary2))
 
                 adversary_losses_model1.append(adversary_loss(parameters['lambda'], mode == 'signal'))
@@ -170,8 +171,8 @@ def partial_fit(state, X, S, y, w, epoch):
         # Get bin numbers of S with equal frequency binning
         preprocessor = fast_equal_frequency_binning()
         preprocessor.fit(S, number_of_bins=state.number_bins)
-        S = preprocessor.apply(S) * state.number_bins - 1
-        state.Stest = preprocessor.apply(state.Stest) * state.number_bins - 1
+        S = preprocessor.apply(S) * state.number_bins
+        state.Stest = preprocessor.apply(state.Stest) * state.number_bins
         # Build target for adversary loss function
         target_array = build_adversary_target(y, S)
         target_val_array = build_adversary_target(state.ytest, state.Stest)

@@ -532,6 +532,9 @@ void TSF::saveFastOutput(short iclock)
         }
         // ID in SL8 is shifted by 16
         if (iAx == 4) {
+          if (iTS < 16) {
+            iTS += nCellsInSL;
+          }
           iTS -= 16;
         }
         int iHit = -1;

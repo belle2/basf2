@@ -24,7 +24,9 @@ namespace Belle2 {
     enum Type {
       CHANNEL, /**< Events/energy per channel */
       SHAPER, /**< Events/energy per ShaperDSP */
-      CRATE /**< Events/energy per crate/ECLCollector */
+      CRATE, /**< Events/energy per crate/ECLCollector */
+      PHI,
+      THETA
     };
 
     /**

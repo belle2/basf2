@@ -32,7 +32,7 @@ EclDisplayModule::EclDisplayModule() : Module()
   addParam("displayEnergy", m_displayEnergy,
            "If true, energy distribution per channel (shaper, crate) is displayed. Otherwise, number of counts is displayed", false);
   addParam("displayMode", m_displayMode,
-           "Default display mode. Can be later changed in GUI.", 7);
+           "Default display mode. Can be later changed in GUI.", 9);
   addParam("autoDisplay", m_autoDisplay,
            "If true, events are displayed as soon as they are loaded.", true);
   addParam("InitFileName", m_eclMapperInitFileName,
@@ -47,7 +47,7 @@ EclDisplayModule::~EclDisplayModule()
 
 void EclDisplayModule::initialize()
 {
-  StoreArray<ECLDigit>::required();
+  eclarray.isRequired();
 
   // Loading code from ECLUnpacker
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -87,9 +87,6 @@ void EclDisplayModule::beginRun()
 
 void EclDisplayModule::event()
 {
-  StoreArray<ECLDigit> eclarray;
-//  B2DEBUG(150, "eclarray.getEntries() == " << eclarray.getEntries());
-
   // EclFrame is closed, skipping data reading.
   if (m_frame_closed) return;
 

@@ -13,7 +13,10 @@
 
 #include <TTree.h>
 #include <TH1F.h>
+#include <TFile.h>
+#include <TLeaf.h>
 #include <vector>
+#include <set>
 #include <framework/logging/Logger.h>
 #include <ecl/dataobjects/ECLDigit.h>
 
@@ -80,21 +83,7 @@ namespace Belle2 {
     /**  First crystal id in the beginning of i-th ECL ring.
      *  Taken from basf2/ecl/data/ecl_channels_map (two last columns)
      */
-    const int ring_start_id[70] = {
-      // forward (0-12)
-      1,    49,   97,   161,  225,  289,  385,  481,  577,  673,
-      769,  865,  1009,
-      // barrel (13-58)
-      1153, 1297, 1441, 1585, 1729, 1873, 2017, 2161, 2305, 2449,
-      2593, 2737, 2881, 3025, 3169, 3313, 3457, 3601, 3745, 3889,
-      4033, 4177, 4321, 4465, 4609, 4753, 4897, 5041, 5185, 5329,
-      5473, 5617, 5761, 5905, 6049, 6193, 6337, 6481, 6625, 6769,
-      6913, 7057, 7201, 7345, 7489, 7633,
-      // forward (59-68)
-      7777, 7921, 8065, 8161, 8257, 8353, 8449, 8545, 8609, 8673,
-      // last_crystal+1
-      getCrystalCount() + 1
-    };
+    static const int ring_start_id[70];
 
   public:
     /**  Subsystems of ECL:
@@ -114,11 +103,20 @@ namespace Belle2 {
      * Copy constructor. Resets m_excluded_ch upon copy.
      */
     EclData(const EclData& data);
+    /**
+     * Assignment operator: utilizes copy constructor.
+     */
+    EclData& operator=(const EclData& other);
 
 
     ~EclData();
 
   private:
+    /**
+     * Clone attributes from other EclData.
+     */
+    void cloneFrom(const EclData& other);
+
     /**
      * Initialization of arrays.
      */
@@ -132,7 +130,13 @@ namespace Belle2 {
     /**
      * Get number of crystals in ECL.
      */
-    int getCrystalCount();
+    static int getCrystalCount();
+
+    // TODO: Stop using approximate coefficients, load from database.
+    /**
+     * Convert energy from ADC counts to MeV.
+     */
+    double ampToEnergy(int amp);
 
     /**
      * Returns data contained in EclDisplay.
@@ -247,6 +251,11 @@ namespace Belle2 {
      * Includes specific channel in the count of events and energy.
      */
     void includeChannel(int ch, bool do_update = false);
+
+    /**
+     * Load root file containing ECLDigit data from the specified path.
+     */
+    void loadRootFile(const char* path);
 
     /**
      * Update time_min, time_max, event_counts and amp_sums.

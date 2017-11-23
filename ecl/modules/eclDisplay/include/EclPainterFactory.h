@@ -27,6 +27,8 @@ namespace Belle2 {
     PAINTER_CHANNEL, /**< Event count/energy distribution per channel */
     PAINTER_SHAPER, /**< Event count/energy distribution per shaperDSP */
     PAINTER_COLLECTOR, /**< Event count/energy distribution per crate/ECLCollector */
+    PAINTER_1D_PHI, /**< Event count/energy distribution per phi_id */
+    PAINTER_1D_THETA, /**< Event count/energy distribution per theta_id */
     PAINTER_AMP,  /**< Channel energy distribution */
     PAINTER_AMP_SUM, /**< Event energy distribution */
     PAINTER_TIME, /**< Time distribution */

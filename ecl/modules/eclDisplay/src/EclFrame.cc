@@ -15,6 +15,24 @@
 using namespace Belle2;
 using namespace ECLDisplayUtility;
 
+const char* EclFrame::filetypes[] = {
+  "PDF",                        "*.pdf",
+  "PostScript",                 "*.ps",
+  "Encapsulated PostScript",    "*.eps",
+  "SVG",                        "*.svg",
+  "TeX",                        "*.tex",
+  "GIF",                        "*.gif",
+  "ROOT macros",                "*.C",
+  "ROOT files",                 "*.root",
+  "XML",                        "*.xml",
+  "PNG",                        "*.png",
+  "XPM",                        "*.xpm",
+  "JPEG",                       "*.jpg",
+  "TIFF",                       "*.tiff",
+  "XCF",                        "*.xcf",
+  0,                            0
+};
+
 EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECLChannelMapper* mapper)
 {
   m_open = true;
@@ -38,8 +56,6 @@ EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECLChanne
 
   m_auto_display = auto_display;
 
-  Connect("CloseWindow()", "Belle2::EclFrame", this, "setClosed()");
-
   gStyle->SetOptStat(0);
 
   doDraw();
@@ -61,6 +77,8 @@ void EclFrame::initGUI(int w, int h)
   /* Menu bar */
 
   TGPopupMenu* menu_file = new TGPopupMenu(gClient->GetRoot());
+  menu_file->AddEntry("&Open...", M_FILE_OPEN);
+  menu_file->AddEntry("&Export TTree...", M_FILE_EXPORT_TREE);
   menu_file->AddEntry("&Save As...", M_FILE_SAVE);
   menu_file->AddSeparator();
   menu_file->AddEntry("&Exit", M_FILE_EXIT);
@@ -265,13 +283,35 @@ void EclFrame::handleMenu(int id)
 {
   static TString dir(".");
   TGFileInfo fi;
+  TFile* file;
+
   switch (id) {
+    case M_FILE_OPEN:
+      fi.fFileTypes = 0;
+      fi.fIniDir    = StrDup(dir);
+      new TGFileDialog(gClient->GetRoot(), this, kFDOpen, &fi);
+      m_ecl_data->loadRootFile(fi.fFilename);
+      loadNewData();
+      // doDraw();
+      break;
     case M_FILE_SAVE:
       fi.fFileTypes = filetypes;
       fi.fIniDir    = StrDup(dir);
       new TGFileDialog(gClient->GetRoot(), this, kFDSave, &fi);
-      printf("Save file: %s (dir: %s)\n", fi.fFilename, fi.fIniDir);
+      B2DEBUG(50, "Save file: " << fi.fFilename
+              << "(dir: " << fi.fIniDir << ")");
       m_ecanvas->GetCanvas()->SaveAs(fi.fFilename);
+      break;
+    case M_FILE_EXPORT_TREE:
+      static const char* filetypes_root[] = {"Root", "*.root", 0, 0};
+      fi.fFileTypes = filetypes_root;
+      fi.fIniDir    = StrDup(dir);
+      new TGFileDialog(gClient->GetRoot(), this, kFDSave, &fi);
+      B2DEBUG(50, "Save file: " << fi.fFilename
+              << "(dir: " << fi.fIniDir << ")");
+      file = new TFile(fi.fFilename, "RECREATE");
+      m_ecl_data->getTree()->Write("tree");
+      file->Close();
       break;
     case M_FILE_EXIT:
       CloseWindow();
@@ -510,14 +550,4 @@ void EclFrame::changeType(int type, bool redraw)
     if (redraw)
       doDraw();
   }
-}
-
-bool EclFrame::isOpen()
-{
-  return m_open;
-}
-
-void EclFrame::setClosed()
-{
-  m_open = false;
 }

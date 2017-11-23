@@ -15,11 +15,13 @@ using namespace Belle2;
 const char* EclPainterFactory::titles[types_count] = {
   "Distribution of phi segments",
 //  "Energy per theta",
-  "Distribution of channels",
-  "Distribution of shapers",
-  "Distribution of crates",
   "Amplitude per channel distribution",
-  "Amplitude sum per event distribution",
+  "Amplitude per shaper distribution",
+  "Amplitude per crate distribution",
+  "Amplitude per phi_id distribution",
+  "Amplitude per theta_id distribution",
+  "Amplitude distribution",
+  "Total event amplitude distribution",
   "Time distribution",
   "Event display (channels)",
   "Event display (shapers)"
@@ -49,6 +51,12 @@ EclPainter* EclPainterFactory::createPainter(EclPainterType type, EclData* data,
       break;
     case PAINTER_COLLECTOR:
       painter = new EclPainter1D(data, EclPainter1D::CRATE);
+      break;
+    case PAINTER_1D_PHI:
+      painter = new EclPainter1D(data, EclPainter1D::PHI);
+      break;
+    case PAINTER_1D_THETA:
+      painter = new EclPainter1D(data, EclPainter1D::THETA);
       break;
     case PAINTER_AMP:
       painter = new EclPainterCommon(data, EclPainterCommon::AMP);

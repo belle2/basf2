@@ -303,7 +303,7 @@ void TSF::initializeMerger()
   for (const auto& ihit : iAxialHit) {
     B2DEBUG(20, "sorted TDC count: " << m_cdcHits[ihit]->getTDCCount() <<
             ", SL" << m_cdcHits[ihit]->getISuperLayer() << ", layer" << m_cdcHits[ihit]->getILayer() <<
-            ", wire " << m_cdcHits[ihit]->getIWire());
+            ", wire " << m_cdcHits[ihit]->getIWire() << ", ihit: " << ihit);
     if (trgTime(ihit, iAxialHit.front()) >= clockEdge * clockPeriod) {
       ++clockEdge;
       ++itr;
@@ -501,7 +501,11 @@ void TSF::saveFirmwareOutput()
 void TSF::saveFastOutput(short iclock)
 {
   const int ccWidth = 9;
-  const int widenedClocks = 15;
+  // number of widended clocks in TSF
+  const int widenedClocks = 16;
+  // TSF latency in unit of data clocks
+  const int latency = 3;
+  // N.B. widenedClocks and latency might be inaccurate
 
   int iAx = 0;
   for (const auto& sl : outputToTracker) {
@@ -531,8 +535,6 @@ void TSF::saveFastOutput(short iclock)
           iTS -= 16;
         }
         int iHit = -1;
-        // TSF latency in unit of data clocks
-        const int latency = 0;
         int firstClock = iclock - widenedClocks - latency;
         if (firstClock < 0) {
           firstClock = 0;
@@ -565,11 +567,13 @@ void TSF::saveFastOutput(short iclock)
         foundTS.insert({iTS, iHit});
         if (iHit < 0) {
           B2WARNING("No corresponding priority CDC hit can be found.");
+          B2WARNING("Maybe the latency and number of widened clocks are wrong.");
           B2DEBUG(20, "priority " << decoded[3]);
-          for (int iclkPri = firstClock; iclkPri < lastClock; ++iclkPri) {
+          for (int iclkPri = 0; iclkPri < m_nClockPerEvent; ++iclkPri) {
             auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / 16];
             for (auto& m : priMap) {
-              B2DEBUG(20, "iWire: " << m.first << ", iLayer: " << m_cdcHits[m.second]->getILayer());
+              B2DEBUG(20, "iWire: " << m.first << ", iLayer: " <<
+                      m_cdcHits[m.second]->getILayer() << ", iClock: " << iclkPri);
             }
           }
           if (iclock < 15) {

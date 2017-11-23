@@ -520,6 +520,8 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
         add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                              use_mc_truth=use_mc_truth)
+        add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                    use_mc_truth=use_mc_truth)
 
     elif svd_ckf_mode == "VXDTF2_after":
         add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,

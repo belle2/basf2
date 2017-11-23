@@ -95,8 +95,6 @@ def add_simulation(
         path,
         components=None,
         bkgfiles=None,
-        bkgcomponents=None,
-        bkgscale=1.0,
         bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
@@ -117,12 +115,8 @@ def add_simulation(
         else:
             bkgmixer = register_module('BeamBkgMixer')
             bkgmixer.param('backgroundFiles', bkgfiles)
-            if bkgcomponents:
-                bkgmixer.param('components', bkgcomponents)
-            else:
-                if components:
-                    bkgmixer.param('components', components)
-            bkgmixer.param('overallScaleFactor', bkgscale)
+            if components:
+                bkgmixer.param('components', components)
             path.add_module(bkgmixer)
 
     # geometry parameter database

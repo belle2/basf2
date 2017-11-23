@@ -96,6 +96,9 @@ namespace Belle2 {
     /* bit width for priority time and fast time */
     static constexpr size_t timeWidth = 4;
 
+    /** how many clocks to simulate per event */
+    static constexpr int m_nClockPerEvent = 36;
+
   protected:
     /** Name of the StoreArray containing the input CDC hits. */
     std::string m_hitCollectionName;
@@ -135,9 +138,6 @@ namespace Belle2 {
 
     /** debug level specified in the steering file */
     int m_debugLevel;
-
-    /** how many clocks to simulate per event */
-    static constexpr int m_nClockPerEvent = 32;
 
     int m_TDCCountForT0 = 4988;
 

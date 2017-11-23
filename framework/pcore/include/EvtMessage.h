@@ -6,8 +6,8 @@
 // Date : 24 - Jul - 2008
 // Modified : 4 - Jun - 2010
 //-
-#ifndef EVTMESSAGE_H
-#define EVTMESSAGE_H
+
+#pragma once
 
 #include <RtypesCore.h>
 
@@ -146,4 +146,3 @@ namespace Belle2 {
     bool m_ownsBuffer; ///< Wether to clean up m_data in destructor
   };
 }
-#endif

@@ -18,10 +18,7 @@
 using namespace Belle2;
 
 MillepedeTreeConversionAlgorithm::MillepedeTreeConversionAlgorithm() :
-  CalibrationAlgorithm("MillepedeCollector")
-{
-  m_OutputFile = "millepede_data.root";
-}
+  CalibrationAlgorithm("MillepedeCollector"), m_OutputFile("millepede_data.root") {}
 
 MillepedeTreeConversionAlgorithm::~MillepedeTreeConversionAlgorithm()
 {
@@ -44,8 +41,8 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
   std::vector<double>* derLocal, *derGlobal;
   float value, error, der[max_entries];
   int nlab, label[max_entries];
-  TTree& gblData = getObject<TTree>("GblDataTree");
-  gblData.SetBranchAddress("GblData", &dat);
+  auto gblData = getObjectPtr<TTree>("GblDataTree");
+  gblData->SetBranchAddress("GblData", &dat);
   TFile* f_out = new TFile(m_OutputFile.c_str(), "recreate");
   TTree* t_out = new TTree("mille", "");
   t_out->Branch("value", &value, "value/F");
@@ -53,9 +50,9 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
   t_out->Branch("nlab", &nlab, "nlab/I");
   t_out->Branch("label", label, "label[nlab]/I");
   t_out->Branch("der", der, "der[nlab]/F");
-  n = gblData.GetEntries();
+  n = gblData->GetEntries();
   for (i = 0; i < n; i++) {
-    gblData.GetEntry(i);
+    gblData->GetEntry(i);
     for (it = dat->begin(); it != dat->end(); ++it) {
       it->getAllData(aValue, aErr, indLocal, derLocal, labGlobal, derGlobal);
       if (labGlobal->size() == 0)

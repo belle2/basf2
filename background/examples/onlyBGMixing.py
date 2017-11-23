@@ -17,13 +17,13 @@ import glob
 set_log_level(LogLevel.ERROR)
 
 if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    print('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG samples')
+    B2ERROR('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG mixing samples')
     sys.exit()
 
 # background (collision) files
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 if len(bg) == 0:
-    print('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
+    B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
     sys.exit()
 
 # Create path
@@ -35,7 +35,7 @@ eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Simulation
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=bg, bkgOverlay=False)
 
 # Reconstruction
 add_reconstruction(main)

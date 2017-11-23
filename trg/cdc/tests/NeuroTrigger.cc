@@ -33,12 +33,13 @@ namespace TrgTest {
       StoreObjPtr<EventMetaData> evtPtr;
       DataStore::Instance().setInitializeActive(true);
       evtPtr.registerInDataStore();
-      StoreArray<CDCTriggerSegmentHit>::registerPersistent("CDCTriggerSegmentHits");
-      StoreArray<CDCTriggerTrack>::registerPersistent("CDCTriggerTracks");
-      StoreObjPtr<EventT0>::registerPersistent("EventT0");
-      StoreArray<CDCTriggerSegmentHit> hits;
+      StoreArray<CDCTriggerSegmentHit> segmentHits;
+      segmentHits.registerInDataStore();
       StoreArray<CDCTriggerTrack> tracks;
-      tracks.registerRelationTo(hits);
+      tracks.registerInDataStore();
+      StoreObjPtr<EventT0> eventT0;
+      eventT0.registerInDataStore();
+      tracks.registerRelationTo(segmentHits);
       DataStore::Instance().setInitializeActive(false);
       evtPtr.construct(0, 0, 1);
 

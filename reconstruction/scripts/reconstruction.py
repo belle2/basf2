@@ -25,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
@@ -289,6 +289,8 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
+        ClusterMatch = register_module('ClusterMatcher')
+        path.add_module(ClusterMatch)
 
 
 def add_pid_module(path, components=None):

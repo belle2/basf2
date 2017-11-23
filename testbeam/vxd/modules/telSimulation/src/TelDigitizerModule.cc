@@ -9,7 +9,6 @@
 
 #include <testbeam/vxd/modules/telSimulation/TelDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -73,9 +72,9 @@ void TelDigitizerModule::initialize()
 
   storeDigits.registerInDataStore();
   /* This always makes problems.
-  storeMCParticles.required();
-  storeSimHits.required();
-  storeTrueHits.required();
+  storeMCParticles.isRequired();
+  storeSimHits.isRequired();
+  storeTrueHits.isRequired();
   */
 
   RelationArray relDigitsToMCParticles(storeDigits, storeMCParticles);

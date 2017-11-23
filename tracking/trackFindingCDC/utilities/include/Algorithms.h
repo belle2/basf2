@@ -251,7 +251,7 @@ namespace Belle2 {
     };
 
     /**
-     * Convenency function to obtain pointers from a range of objects
+     * Convenience function to obtain pointers from a range of objects
      */
     template <class T, class Ts>
     std::vector<T*> as_pointers(Ts& ts)
@@ -260,7 +260,7 @@ namespace Belle2 {
       using std::end;
       std::size_t size = end(ts) - begin(ts);
       std::vector<T*> result(size, nullptr);
-      std::transform(begin(ts), end(ts), result.begin(), std::addressof<T>);
+      std::transform(begin(ts), end(ts), result.begin(), [](T & t) { return std::addressof<T>(t);});
       return result;
     }
   }

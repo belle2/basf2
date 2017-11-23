@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_DBOBJECTS_BEAMPARAMETERS_H
-#define FRAMEWORK_DBOBJECTS_BEAMPARAMETERS_H
 
 #include <framework/dataobjects/MCInitialParticles.h>
 #include <TMatrixDSym.h>
@@ -182,4 +180,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // FRAMEWORK_DBOBJECTS_BEAMPARAMETERS_H

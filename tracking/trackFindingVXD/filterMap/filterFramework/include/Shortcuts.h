@@ -34,7 +34,8 @@ namespace Belle2 {
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
   // otherwise SFINAE ( Substitution Failure Is Not An Error )
   typename
-  std::enable_if < std::is_base_of< SelectionVariable< typename Var::argumentType, typename Var::variableType >, Var >::value&&
+  std::enable_if <
+  std::is_base_of< SelectionVariable< typename Var::argumentType, Var::c_Nargs, typename Var::variableType >, Var >::value&&
   std::is_arithmetic< Arithmetic >::value,
       Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver> >::type
       operator < (const Var&, Arithmetic  upperBound)
@@ -47,7 +48,8 @@ namespace Belle2 {
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
   // otherwise SFINAE ( Substitution Failure Is Not An Error )
   typename
-  std::enable_if < std::is_base_of< SelectionVariable< typename Var::argumentType, typename Var::variableType >, Var >::value&&
+  std::enable_if <
+  std::is_base_of< SelectionVariable< typename Var::argumentType, Var::c_Nargs, typename Var::variableType >, Var >::value&&
   std::is_arithmetic< Arithmetic >::value,
       Filter< Var, ClosedUpperBoundedSet<Arithmetic>, VoidObserver> >::type
       operator <= (const Var&, Arithmetic  upperBound)
@@ -58,7 +60,8 @@ namespace Belle2 {
   template < class Var, class Arithmetic  >
   // the following typename expands to Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver>
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver> >::type
   operator > (const Var&, Arithmetic  lowerBound)
@@ -69,7 +72,8 @@ namespace Belle2 {
   template < class Var, class Arithmetic  >
   // the following typename expands to Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver>
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, ClosedLowerBoundedSet<Arithmetic>, VoidObserver> >::type
   operator >= (const Var&, Arithmetic  lowerBound)
@@ -80,7 +84,8 @@ namespace Belle2 {
   template < class Var, class Arithmetic  >
   // the following typename expands to Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver>
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver> >::type
   operator > (Arithmetic  upperBound, const Var&)
@@ -91,7 +96,8 @@ namespace Belle2 {
   template < class Var, class Arithmetic  >
   // the following typename expands to Filter< Var, UpperBoundedSet<Arithmetic>, VoidObserver>
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs,  typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, ClosedUpperBoundedSet<Arithmetic>, VoidObserver> >::type
   operator >= (Arithmetic  upperBound, const Var&)
@@ -103,7 +109,8 @@ namespace Belle2 {
   template < class Var, class Arithmetic  >
   // the following typename expands to Filter< Var, LowerBoundedSet<Arithmetic>, Observer>
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, LowerBoundedSet<Arithmetic>, VoidObserver> >::type
   operator < (Arithmetic  lowerBound, const Var&)
@@ -114,7 +121,8 @@ namespace Belle2 {
   template < class Var, class Arithmetic  >
   // the following typename expands to Filter< Var, LowerBoundedSet<Arithmetic>, Observer>
   // if Var derives from SelectionVariable and Arithmetic is an integer or a floating point type
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic< Arithmetic >::value,
   Filter< Var, ClosedLowerBoundedSet<Arithmetic>, VoidObserver> >::type
   operator <= (Arithmetic  lowerBound, const Var&)
@@ -125,9 +133,10 @@ namespace Belle2 {
   template < class Var, class Val  >
   // the following typename expands to Filter< Var, SingleElementSet<Val>, VoidObserver>
   // if Var derives from SelectionVariable
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value,
-           Filter< Var, SingleElementSet<Val>, VoidObserver> >::type
-           operator == (const Var&,  Val v)
+  typename std::enable_if
+  < std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs,  typename Var::variableType>, Var>::value,
+  Filter< Var, SingleElementSet<Val>, VoidObserver> >::type
+  operator == (const Var&,  Val v)
   {
     return Filter< Var, SingleElementSet<Val>, VoidObserver >(SingleElementSet<Val> (v));
   }
@@ -136,9 +145,10 @@ namespace Belle2 {
   template < class Var, class Val  >
   // the following typename expands to Filter< Var, SingleElementSet<Val>, VoidObserver>
   // if Var derives from SelectionVariable
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value,
-           Filter< Var, SingleElementSet<Val>, VoidObserver> >::type
-           operator == (Val val, const Var& var)
+  typename std::enable_if
+  < std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value,
+  Filter< Var, SingleElementSet<Val>, VoidObserver> >::type
+  operator == (Val val, const Var& var)
   {
     return var == val;
   }
@@ -149,7 +159,8 @@ namespace Belle2 {
   template < class Var, class ArithmeticLower, class ArithmeticUpper, class Observer  >
   // the following typename expands to Filter< Var, Range< ArithmeticLower, ArithmeticUpper >, Observer>
   // if Var derives from SelectionVariable and Arithmetics are integer or floating point types
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs,  typename Var::variableType>, Var>::value
   && std::is_arithmetic< ArithmeticLower >::value
   && std::is_arithmetic< ArithmeticUpper >::value ,
   Filter< Var, Range< ArithmeticLower, ArithmeticUpper >, Observer> >::type
@@ -163,7 +174,8 @@ namespace Belle2 {
   template < class Var, class ArithmeticLower, class ArithmeticUpper, class Observer  >
   // the following typename expands to Filter< Var, Range< ArithmeticLower, ArithmeticUpper >, Observer>
   // if Var derives from SelectionVariable and Arithmetics are integer or floating point types
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs,  typename Var::variableType>, Var>::value
   && std::is_arithmetic< ArithmeticLower >::value
   && std::is_arithmetic< ArithmeticUpper >::value ,
   Filter< Var, Range< ArithmeticLower, ArithmeticUpper >, Observer> >::type
@@ -176,7 +188,8 @@ namespace Belle2 {
   template < class Var, class ArithmeticLower, class ArithmeticUpper, class Observer  >
   // the following typename expands to Filter< Var, ClosedRange< ArithmeticLower, ArithmeticUpper >, Observer>
   // if Var derives from SelectionVariable and Arithmetics are integer or floating point types
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs,  typename Var::variableType>, Var>::value
   && std::is_arithmetic< ArithmeticLower >::value
   && std::is_arithmetic< ArithmeticUpper >::value ,
   Filter< Var, ClosedRange< ArithmeticLower, ArithmeticUpper >, Observer> >::type
@@ -190,7 +203,8 @@ namespace Belle2 {
   template < class Var, class ArithmeticLower, class ArithmeticUpper, class Observer  >
   // the following typename expands to Filter< Var, ClosedRange< ArithmeticLower, ArithmeticUpper >, Observer>
   // if Var derives from SelectionVariable and Arithmetics are integer or floating point types
-  typename std::enable_if < std::is_base_of< SelectionVariable<typename Var::argumentType, typename Var::variableType>, Var>::value
+  typename std::enable_if <
+  std::is_base_of< SelectionVariable<typename Var::argumentType, Var::c_Nargs,  typename Var::variableType>, Var>::value
   && std::is_arithmetic< ArithmeticLower >::value
   && std::is_arithmetic< ArithmeticUpper >::value ,
   Filter< Var, ClosedRange< ArithmeticLower, ArithmeticUpper >, Observer> >::type

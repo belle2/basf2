@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef STOREARRAY_H
-#define STOREARRAY_H
+#pragma once
 
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/datastore/DataStore.h>
@@ -125,6 +124,7 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
+    [[deprecated("Please use registerInDataStore() on an instance and consider making the StoreArray a member of your class")]]
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                    bool errorIfExisting = false)
     {
@@ -142,6 +142,7 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of array in question.
      *  @return            True if the array exists.
      */
+    [[deprecated("Please use isRequired() on an instance and consider making the StoreArray a member of your class")]]
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
     {
       std::string arrayName = DataStore::arrayName<T>(name);
@@ -158,6 +159,7 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of array in question.
      *  @return            True if the array exists.
      */
+    [[deprecated("Please use isOptional() on an instance and consider making the StoreArray a member of your class")]]
     static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
     {
       std::string arrayName = DataStore::arrayName<T>(name);
@@ -387,4 +389,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-#endif

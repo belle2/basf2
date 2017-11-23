@@ -31,6 +31,7 @@ namespace Belle2 {
     /** Destructor. */
     virtual ~AlignableSVDRecoHit() {}
 
+    /** Creating a deep copy of this hit. */
     genfit::AbsMeasurement* clone() const
     {
       return new AlignableSVDRecoHit(*this);

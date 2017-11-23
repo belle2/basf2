@@ -24,9 +24,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// DataStore classes
-#include <mdst/dataobjects/MCParticle.h>
-
 // ROOT
 #include <TRandom.h>
 #include <TVector3.h>
@@ -92,7 +89,7 @@ namespace Belle2 {
   void OpticalGunModule::initialize()
   {
     // data store objects registration
-    StoreArray<MCParticle>::registerPersistent();
+    m_MCParticles.registerInDataStore();
 
     // parameters check
     if (m_wavelength < 150 or m_wavelength > 1000)
@@ -134,9 +131,6 @@ namespace Belle2 {
 
   void OpticalGunModule::event()
   {
-
-    // if not already existed, create MCParticles data store
-    StoreArray<MCParticle> MCParticles;
 
     // generate number of photons
     int numPhotons = 1;
@@ -189,7 +183,7 @@ namespace Belle2 {
       }
 
       // store generated photon
-      MCParticle* part = MCParticles.appendNew();
+      auto* part = m_MCParticles.appendNew();
       part->setPDG(0); // optical photon
       part->setMass(0);
       part->setStatus(MCParticle::c_PrimaryParticle);

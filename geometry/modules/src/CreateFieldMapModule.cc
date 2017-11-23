@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <geometry/modules/CreateFieldMapModule.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 #include <boost/algorithm/string.hpp>
 #include <framework/utilities/Utils.h>
 #include <framework/gearbox/Unit.h>
@@ -163,7 +163,7 @@ void CreateFieldMapModule::beginRun()
           B2Vector3D pos(v, 0, u);
           pos.RotateZ(2 * M_PI * iPhi / m_nPhi);
           //Obtain magnetic field
-          B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
+          B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
           //And fill histograms
           if (save) {
             h_br->Fill(u, v, bfield.Perp());
@@ -213,7 +213,7 @@ void CreateFieldMapModule::beginRun()
         }
         pos.RotateZ(m_phi);
         //Obtain magnetic field
-        B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
+        B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
         //And fill histograms
         if (save) {
           h_bx->Fill(u, v, bfield.X());

@@ -8,7 +8,6 @@ namespace Belle2 {
 }
 
 #include <fstream>
-#include <stdint.h>
 
 namespace PrepBoardstackFE {
 

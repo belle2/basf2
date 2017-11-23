@@ -20,10 +20,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <math.h>
 #include <arpa/inet.h>
 
 namespace Belle2 {
@@ -66,8 +62,6 @@ namespace Belle2 {
       std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
-      //std::string m_RemapLUTifob;  /**< Name of the LUT which remaps DHP data for inner forward and outer backward modules */
-      //std::string m_RemapLUTibof;  /**< Name of the LUT which remaps DHP data for inner backward and outer forward modules */
       bool m_ignore_headernrframes;
 
       /**  Swap the endianess of the ONSEN header yes/no */
@@ -100,7 +94,7 @@ namespace Belle2 {
       StoreArray<RawPXD> m_storeRawPXD;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
-      /** Output array for Raw Hits. */
+      /** Output array for Raw ROIs. */
       StoreArray<PXDRawROIs> m_storeROIs;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
@@ -109,10 +103,8 @@ namespace Belle2 {
       /** Output array for Clusters. */
       StoreArray<PXDRawCluster> m_storeRawCluster;
 
-
-      /** Unpack one event (several frames) stored in RawPXD object./ Unpack one cluster stored in Cluster object.
+      /** Unpack one event (several frames) stored in RawPXD object.
        * @param px RawPXD data object
-       * @param cl Cluster data object
        */
       void unpack_event(RawPXD& px);
 

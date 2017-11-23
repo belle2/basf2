@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RELATIONENTRY_H
-#define RELATIONENTRY_H
+#pragma once
 
 class TObject;
 
@@ -32,5 +31,3 @@ namespace Belle2 {
     float   weight;  /**< Weight of the relation. */
   };
 }
-
-#endif /* RELATIONENTRY_H */

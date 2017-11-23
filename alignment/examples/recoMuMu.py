@@ -10,13 +10,14 @@ import modularAnalysis as ana
 main = basf2.create_path()
 
 main.add_module("RootInput")
+main.add_module("HistoManager", histoFileName="CollectorOutput.root")
 main.add_module("Gearbox")
 main.add_module("Geometry")
 
 reco.add_reconstruction(main, pruneTracks=False)
 
 # Pre-fit with beam+vertex constraint decays for alignment
-ana.fillParticleList('mu+:qed', 'muid > 0.1 and useCMSFrame(p) > 2.', writeOut=True, path=main)
+ana.fillParticleList('mu+:qed', 'muonID > 0.1 and useCMSFrame(p) > 2.', writeOut=True, path=main)
 ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', '', writeOut=True, path=main)
 ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main, constraint='ipprofile')
 
@@ -24,7 +25,7 @@ ana.matchMCTruth('mu+:qed', main)
 ana.matchMCTruth('Z0:mumu', main)
 
 ana.printVariableValues('Z0:mumu', ['E', 'deltaE', 'M', 'mcPDG', 'p'], path=main)
-ana.printVariableValues('mu+:qed', ['E', 'deltaE', 'M', 'mcPDG', 'p', 'muid'], path=main)
+ana.printVariableValues('mu+:qed', ['E', 'deltaE', 'M', 'mcPDG', 'p', 'muonID'], path=main)
 
 # main.add_module('MillepedeCollector', components=['BeamParameters'], tracks=[], primaryVertices=['Z0:mumu'], calibrateVertex=True)
 

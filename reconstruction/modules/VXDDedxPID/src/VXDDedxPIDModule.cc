@@ -55,7 +55,7 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", false);
+           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
 
@@ -69,7 +69,7 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
            false);
 
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_7b7a9f_500k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -214,11 +214,9 @@ void VXDDedxPIDModule::event()
     dedxTrack->m_eventID = m_eventID;
     dedxTrack->m_trackID = m_trackID;
 
-    // get pion fit hypothesis for now
-    //  Should be ok in most cases, for MC fitting this will return the fit with the
-    //  true PDG value. At some point, it might be worthwhile to look into using a
-    //  different fit if the differences are large
-    const TrackFitResult* fitResult = track.getTrackFitResult(Const::pion);
+    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // the tracking will not always successfully fit with a pion hypothesis
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for track ...");
       continue;

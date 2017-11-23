@@ -20,9 +20,11 @@ namespace Belle2 {
   namespace TOP {
 
     TimeDigitizer::TimeDigitizer(int moduleID, int pixelID, unsigned window,
+                                 unsigned storageDepth,
                                  const TOP::PulseHeightGenerator& generator,
                                  const TOPSampleTimes& sampleTimes):
       m_moduleID(moduleID), m_pixelID(pixelID), m_window(window),
+      m_storageDepth(storageDepth),
       m_pulseHeightGenerator(generator)
     {
       const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
@@ -215,7 +217,6 @@ namespace Belle2 {
                                  int hysteresis,
                                  int thresholdCount)
     {
-      if (m_times.empty()) return;
 
       // get parameters of the model
 
@@ -228,7 +229,7 @@ namespace Belle2 {
       std::vector<unsigned short> windowNumbers;
       windowNumbers.push_back(m_window);
       for (unsigned i = 1; i < tdc.getNumWindows(); i++) {
-        windowNumbers.push_back((windowNumbers.back() + 1) % 512); // TODO: rpl hardcoded
+        windowNumbers.push_back((windowNumbers.back() + 1) % m_storageDepth);
       }
       std::vector<double> baselines(windowNumbers.size(), 0);
       double rmsNoise = m_pulseHeightGenerator.getPedestalRMS();

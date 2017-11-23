@@ -7,17 +7,13 @@
 # Example steering file - 2014 Belle II Collaboration
 ############################################################
 
-import os
 from basf2 import *
 
-
+main = create_path()
 # EventInfoSetter - generate event meta data
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({
-    'evtNumList': [1]
-})
+main.add_module('EventInfoSetter', evtNumList=[1])
 
-gearbox = register_module("Gearbox")
+gearbox = main.add_module("Gearbox")
 gearbox.param({
     # Set the length of the simulation volume to 9m and the width to 3m and the
     # Material to Vacuum instead of Air (no unit for the Material though)
@@ -63,12 +59,6 @@ gearbox.param({
 #        ("SensitiveThreshold", "0", "eV"),
 #    ],
 # })
-
-main = create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
 
 # Process all events
 process(main)

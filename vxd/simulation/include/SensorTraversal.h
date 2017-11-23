@@ -27,8 +27,9 @@ namespace Belle2 {
      * @param electrons number of created electrons
      * @param time global time the step occured
      */
-    StepInformation(const G4ThreeVector& pos, const G4ThreeVector& mom, double electrons, double time, double length):
-      position(pos), momentum(mom), electrons(electrons), time(time), length(length) {}
+    StepInformation(const G4ThreeVector& stepPosition, const G4ThreeVector& stepMomentum, double stepElectrons, double stepTime,
+                    double stepLength):
+      position(stepPosition), momentum(stepMomentum), electrons(stepElectrons), time(stepTime), length(stepLength) {}
     /** Step position */
     G4ThreeVector position;
     /** Step momentum */

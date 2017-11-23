@@ -78,34 +78,8 @@ def Bplus2XdModes():
     return list
 
 
-def B2XgammaList():
-    cutAndCopyList('pi0:ewp', 'pi0:loose', 'p > 0.1', True)
-    btoxgammacuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
-
-    B02dgammaList = []
-    for chID, channel in enumerate(B02XdModes()):
-        reconstructDecay('B0:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        B02dgammaList.append('B0:EWP_b2dgamma' + str(chID))
-
-    B02sgammaList = []
-    for chID, channel in enumerate(B02XsModes()):
-        reconstructDecay('B0:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        B02sgammaList.append('B0:EWP_b2sgamma' + str(chID))
-
-    Bplus2dgammaList = []
-    for chID, channel in enumerate(Bplus2XdModes()):
-        reconstructDecay('B+:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        Bplus2dgammaList.append('B+:EWP_b2dgamma' + str(chID))
-
-    Bplus2sgammaList = []
-    for chID, channel in enumerate(Bplus2XsModes()):
-        reconstructDecay('B+:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        Bplus2sgammaList.append('B+:EWP_b2sgamma' + str(chID))
-
-    return B02dgammaList + B02sgammaList + Bplus2dgammaList + Bplus2sgammaList
-
-
 def B2XllList():
+    applyEventCuts('nTracks>4')
     cutAndCopyList('pi0:ewp', 'pi0:loose', 'p > 0.1', True)
     cutAndCopyList('e+:ewp', 'e+:loose', 'pt > 0.4', True)
     cutAndCopyList('mu+:ewp', 'mu+:loose', 'pt > 0.5', True)

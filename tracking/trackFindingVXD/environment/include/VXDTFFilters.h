@@ -11,17 +11,20 @@
 #ifndef VXDTFFILTERS_HH
 #define VXDTFFILTERS_HH
 
-#include "tracking/dataobjects/FullSecID.h"
+#include <tracking/dataobjects/FullSecID.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/DistanceInTimeUside.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/DistanceInTimeVside.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DistanceInTime.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
@@ -34,14 +37,16 @@
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
-#include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
+#include <tracking/trackFindingVXD/filterTools/ObserverPrintResults.h>
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h> // empty observer
 
 #include <tracking/dataobjects/SectorMapConfig.h>
 
-#include "vxd/dataobjects/VxdID.h"
+#include <framework/logging/Logger.h>
+
+#include <vxd/dataobjects/VxdID.h>
 #include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
-#include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
+#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 
 #include <TString.h>
 //#include <unordered_map>
@@ -53,7 +58,7 @@ namespace Belle2 {
 
 
   template<class point_t>
-  class VXDTFFilters {
+  class VXDTFFilters final {
   public:
 
 
@@ -64,11 +69,13 @@ namespace Belle2 {
     /// big working 2-hits-example used for redesign of VXDTF.
     typedef decltype(
       (
-        0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.&&
-        0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.
+        0. <= DistanceInTimeUside<point_t>() <= 0. &&
+        0. <= DistanceInTimeVside<point_t>() <= 0. &&
+        0. <= Distance3DSquared<point_t>() <= 0.&&
+        0. <= Distance2DXYSquared<point_t>() <= 0.&&
+        0. <= Distance1DZ<point_t>() <= 0.&&
+        0. <= SlopeRZ<point_t>() <= 0.&&
+        0. <= Distance3DNormed<point_t>() <= 0.
       )
     ) twoHitFilter_t;
 
@@ -88,6 +95,7 @@ namespace Belle2 {
     /// big working example for 3-hits:
     typedef decltype(
       (
+        0. <= DistanceInTime<point_t>() <= 0. &&
         0. <= Angle3DSimple<point_t>()   <= 0.&&
         0. <= CosAngleXY<point_t>()   <= 0.&&
         0. <= AngleRZSimple<point_t>()   <= 0.&&
@@ -115,6 +123,13 @@ namespace Belle2 {
       m_staticSectors[0] = nullptr;
       // initialize the first slot of the Static sector vector
       m_staticSectors[1] = nullptr;
+    }
+
+    /** Destructor **/
+    ~VXDTFFilters()
+    {
+      // delete the static sectors
+      for (staticSector_t* aSector : m_staticSectors) if (aSector != nullptr) delete aSector;
     }
 
     /** To add an array of sectors on a sensor.
@@ -216,7 +231,7 @@ namespace Belle2 {
       if (staticSector == nullptr)
         return just_in_case;
       const auto* filterPtr = staticSector->getFilter2sp(inner);
-      if (filterPtr == NULL)
+      if (filterPtr == nullptr)
         return just_in_case;
       return *filterPtr;
     }
@@ -360,19 +375,19 @@ namespace Belle2 {
       treeName.Append(c_CompactSecIDstreeName);
       TTree* tree = (TTree*) gFile->Get(treeName);
       UInt_t layer, ladder, sensor;
-      tree->SetBranchAddress("layer" , & layer);
-      tree->SetBranchAddress("ladder", & ladder);
-      tree->SetBranchAddress("sensor", & sensor);
+      if (tree->SetBranchAddress("layer" , & layer) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (tree->SetBranchAddress("ladder", & ladder) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (tree->SetBranchAddress("sensor", & sensor) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       std::vector< double >* normalizedUsup = new std::vector< double> ();
-      tree->SetBranchAddress("normalizedUsup", & normalizedUsup);
+      if (tree->SetBranchAddress("normalizedUsup", & normalizedUsup) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
-      tree->SetBranchAddress("normalizedVsup", & normalizedVsup);
+      if (tree->SetBranchAddress("normalizedVsup", & normalizedVsup) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       std::vector< std::vector< unsigned int > >* fullSecIDs =
         new std::vector< std::vector< unsigned int > > ();
-      tree->SetBranchAddress("fullSecID", & fullSecIDs);
+      if (tree->SetBranchAddress("fullSecID", & fullSecIDs) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
 
       for (Long64_t i = 0; i < tree->GetEntries() ; i++) {
@@ -455,8 +470,8 @@ namespace Belle2 {
       twoHitFilter.setBranchAddress(sp2tree, "filter");
 
       unsigned int outerFullSecID2sp, innerFullSecID2sp;
-      sp2tree->SetBranchAddress("outerFullSecID", & outerFullSecID2sp);
-      sp2tree->SetBranchAddress("innerFullSecID", & innerFullSecID2sp);
+      if (sp2tree->SetBranchAddress("outerFullSecID", & outerFullSecID2sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (sp2tree->SetBranchAddress("innerFullSecID", & innerFullSecID2sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       for (Long64_t i = 0 ; i < sp2tree->GetEntries() ; i++) {
         sp2tree->GetEntry(i);
@@ -476,9 +491,9 @@ namespace Belle2 {
 
       unsigned int outerFullSecID3sp, centerFullSecID3sp,
                innerFullSecID3sp;
-      sp3tree->SetBranchAddress("outerFullSecID", & outerFullSecID3sp);
-      sp3tree->SetBranchAddress("centerFullSecID", & centerFullSecID3sp);
-      sp3tree->SetBranchAddress("innerFullSecID", & innerFullSecID3sp);
+      if (sp3tree->SetBranchAddress("outerFullSecID", & outerFullSecID3sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (sp3tree->SetBranchAddress("centerFullSecID", & centerFullSecID3sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (sp3tree->SetBranchAddress("innerFullSecID", & innerFullSecID3sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       for (Long64_t i = 0 ; i < sp3tree->GetEntries() ; i++) {
         sp3tree->GetEntry(i);

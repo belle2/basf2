@@ -1,11 +1,11 @@
-#ifndef DATASTORESTREAMER_H
-#define DATASTORESTREAMER_H
 //+
 // File : DataStoreStreamer.h
 // Description : Stream/Destream DataStore objects in EvtMessage
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 5 - Sep - 2012
+
+#pragma once
 
 #include <framework/pcore/EvtMessage.h>
 
@@ -169,5 +169,3 @@ namespace Belle2 {
 
 
 } // namespace Belle2
-
-#endif

@@ -7,11 +7,9 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef RELATIONCONTAINER_H
-#define RELATIONCONTAINER_H
+#pragma once
 
 #include <TClonesArray.h>
-
 #include <string>
 
 namespace Belle2 {
@@ -107,6 +105,3 @@ namespace Belle2 {
     ClassDef(RelationContainer, 1); /**< Class to store relations between StoreArrays in the DataStore. */
   };
 }
-
-#endif
-

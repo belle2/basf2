@@ -87,7 +87,7 @@ class TreeWriterModule(Module):
                     continue
                 costheta = momentumVec.CosTheta()
                 phi = momentumVec.Phi()
-                fitresult = track.getTrackFitResult(Belle2.Const.pion)
+                fitresult = track.getTrackFitResultWithClosestMass(Belle2.Const.pion)
                 if fitresult:
                     trackmomentum = fitresult.getMomentum().Mag()
                 else:

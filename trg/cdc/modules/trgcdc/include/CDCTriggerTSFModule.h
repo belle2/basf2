@@ -7,6 +7,10 @@
 #include "CLHEP/Geometry/Point3D.h"
 #include "trg/trg/Clock.h"
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <cdc/dataobjects/CDCHit.h>
+
 namespace Belle2 {
 
   typedef HepGeom::Point3D<double> Point3D;
@@ -72,6 +76,11 @@ namespace Belle2 {
     /** list of (# true right, # true left, # true background)
      *  for the outer super layers */
     std::vector<std::vector<unsigned>> outerTrueLRTable = {};
+
+    /** list of input CDC hits */
+    StoreArray<CDCHit> m_cdcHits;
+    /** list of output track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
   };
 
 } // namespace Belle2

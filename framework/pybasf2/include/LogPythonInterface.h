@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGPYTHONINTERFACE_H_
-#define LOGPYTHONINTERFACE_H_
+#pragma once
 
 #include <boost/python/dict.hpp>
 
@@ -205,5 +204,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* LOGPYTHON_H_ */

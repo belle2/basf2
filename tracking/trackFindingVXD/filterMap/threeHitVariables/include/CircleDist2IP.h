@@ -25,7 +25,7 @@ namespace Belle2 {
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class CIRCLEDIST2IP_NAME : public SelectionVariable< PointType , double > {
+  class CIRCLEDIST2IP_NAME : public SelectionVariable< PointType , 3, double > {
   public:
 
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */

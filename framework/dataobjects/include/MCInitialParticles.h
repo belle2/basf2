@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_DATAOBJECTS_MCINITIALPARTICLES_H
-#define FRAMEWORK_DATAOBJECTS_MCINITIALPARTICLES_H
 
 #include <TLorentzVector.h>
 #include <TLorentzRotation.h>
@@ -104,12 +102,16 @@ namespace Belle2 {
     {
       m_vertex = vertex;
     }
+    /** Set collison time */
+    void setTime(double time) {m_time = time;}
     /** Get 4vector of the high energy beam */
     const TLorentzVector& getHER() const { return m_her; }
     /** Get 4vector of the low energy beam */
     const TLorentzVector& getLER() const { return m_ler; }
     /** Get the position of the collision */
     const TVector3& getVertex() const { return m_vertex; }
+    /** get collison time */
+    double getTime() const {return m_time;}
     /** Get the the actual collision energy (in lab system)*/
     double getEnergy() const { return (m_her + m_ler).E(); }
     /** Get the invariant mass of the collision (= energy in CMS) */
@@ -145,6 +147,8 @@ namespace Belle2 {
     TLorentzVector m_ler;
     /** collision position */
     TVector3 m_vertex;
+    /** collision time */
+    double m_time = 0;
     /** Boost from Lab into CMS. (calculated on first use, not saved to file) */
     mutable TLorentzRotation* m_labToCMS{nullptr}; //!transient
     /** Boost from CMS into lab. (calculated on first use, not saved to file) */
@@ -154,7 +158,7 @@ namespace Belle2 {
     /** Flags to be used when generating events */
     int m_generationFlags{0};
     /** ROOT Dictionary */
-    ClassDef(MCInitialParticles, 1);
+    ClassDef(MCInitialParticles, 2);
   };
 
   inline void MCInitialParticles::calculateBoost() const
@@ -198,4 +202,3 @@ namespace Belle2 {
   }
 
 } //Belle2 namespace
-#endif // FRAMEWORK_DATAOBJECTS_MCINITIALPARTICLES_H

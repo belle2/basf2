@@ -128,7 +128,7 @@ void SVDClusterizerModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeDigits.required();
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -565,7 +565,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
                               sensorID, side == 0, clusterPosition, clusterPositionError, clusterTime, clusterTimeStd,
-                              clusterSeed.getCharge(), clusterCharge, clusterSize, clusterSNR
+                              clusterCharge, clusterSeed.getCharge(), clusterSize, clusterSNR
                             ));
 
     //Create Relations to this Digit

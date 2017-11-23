@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-CDCFEE::CDCFEE() : FEE("cdc")
+CDCFEE::CDCFEE()
 {
 }
 
@@ -42,6 +42,21 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& /*obj*/)
 
 void CDCFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
 {
+  const std::string firmware = obj.getText("firm");
+  /*
+  if (File::exist(firmware)) {
+    LogFile::info("Loading CDC FEE firmware: %s", firmware.c_str());
+    std::string cmd = "ssh ropc01 \"cd ~b2daq/run/cdc/; sh impact-batch.sh " +
+                      firmware + "\"";
+    system(cmd.c_str());
+  } else {
+    LogFile::debug("CDC FEE firmware not exists : %s", firmware.c_str());
+  }
+  */
+  int err = 0;
+  if ((err = hslb.test()) > 0) {
+    LogFile::error("Test HSLB failed");
+  }
 }
 
 void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)

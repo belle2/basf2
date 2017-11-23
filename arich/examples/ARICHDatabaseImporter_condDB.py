@@ -14,7 +14,7 @@ from fnmatch import fnmatch
 parser = OptionParser()
 parser.add_option('-c', '--class', dest='whatclass', default='none', help='')
 parser.add_option('-x', '--i-e', dest='importexport', default='export', help='')
-parser.add_option('-h', '--hvtest', dest='hvtest', default='no', help='')
+parser.add_option('-t', '--hvtest', dest='hvtest', default='no', help='')
 (options, args) = parser.parse_args()
 ie = options.importexport
 ieClass = options.whatclass
@@ -44,7 +44,7 @@ main.add_module(eventinfo)
 
 if(ie == "import"):
     paramloader = register_module('Gearbox')
-    pathname = 'file://%s/AllData/' % (os.getcwd())
+    pathname = 'file://%s/data/AllData/' % (os.getcwd())
     paramloader.param('backends', [pathname])
     paramloader.param('fileName', 'ArichData.xml')
     paramloader.initialize()
@@ -99,6 +99,10 @@ if(ie == 'import'):
     dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsics, rootFilesHapdQE, rootFilesFebTest)
     if(ieClass == 'aerogelInfo'):
         dbImporter.importAerogelInfo()
+    if(ieClass == 'aerogelMap'):
+        dbImporter.importAerogelMap()
+    if(ieClass == 'aerogelTilesInfo'):
+        dbImporter.importAeroTilesInfo()
     if(ieClass == 'hapdQA'):
         dbImporter.importHapdQA()
     if(ieClass == 'hapdQE'):
@@ -130,6 +134,10 @@ if(ie == 'export'):
     dbImporter = ARICHDatabaseImporter()
     if(ieClass == 'aerogelInfo'):
         dbImporter.exportAerogelInfo()
+    if(ieClass == 'aerogelMap'):
+        dbImporter.exportAerogelMap()
+    if(ieClass == 'aerogelTilesInfo'):
+        dbImporter.printAeroTileInfo()
     if(ieClass == 'hapdQA'):
         dbImporter.exportHapdQA()
     if(ieClass == 'hapdQE'):
@@ -154,6 +162,7 @@ if(ie == 'export'):
         dbImporter.exportSensorModuleMap()
     if(ieClass == 'all'):
         dbImporter.exportAll()
+
 
 # print parameters used in simulation/reconstruction software
 # dbImporter.printSimulationPar()

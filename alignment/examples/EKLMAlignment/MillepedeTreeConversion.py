@@ -9,10 +9,7 @@ import numpy as np
 
 main = create_path()
 
-input = register_module('RootInput')
-input.param('inputFileName', sys.argv[1])
-input.initialize()
-
 algo = Belle2.MillepedeTreeConversionAlgorithm()
+algo.setInputFileNames([sys.argv[1]])
 algo.setOutputFile('millepede_data.root')
 algo.execute()

@@ -231,7 +231,7 @@ namespace Belle2 {
         }
       }
       double time = sampleTimes->getTime(window, rawTime); // time in [ns]
-      if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
+      if (m_useChannelT0Calibration) time += (*m_channelT0)->getT0(moduleID, channel); // + sign for the LocalT0 cal convention
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
       if (m_subtractOffset) time -= geo->getNominalTDC().getOffset();

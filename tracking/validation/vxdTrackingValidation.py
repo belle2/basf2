@@ -23,6 +23,11 @@ from tracking.validation.run import TrackingValidationRun
 import tracking
 
 
+def setupFinderModule(path):
+    tracking.add_hit_preparation_modules(path, components=["PXD", "SVD"])
+    tracking.add_vxd_track_finding_vxdtf2(path, components=["PXD", "SVD"])
+
+
 class VXD(TrackingValidationRun):
     """
     Class for the validation of the VXD track finders
@@ -38,7 +43,7 @@ class VXD(TrackingValidationRun):
     components = None
 
     #: lambda method which is used by the validation to add the vxd finder modules
-    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["PXD", "SVD"]))
+    finder_module = staticmethod(setupFinderModule)
 
     #: fit the tracks after the track finder
     fit_tracks = True

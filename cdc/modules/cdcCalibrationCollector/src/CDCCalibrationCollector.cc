@@ -135,7 +135,7 @@ void CDCCalibrationCollectorModule::collect()
     }
     if (!m_BField) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, Npars = 4;
     else {ndf = fs->getNdf();}
-
+    if (ndf < 15) continue;
     double Chi2 = fs->getChi2();
     Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     //store track parameters
@@ -146,8 +146,8 @@ void CDCCalibrationCollectorModule::collect()
       omega = fitresult->getOmega();
       phi0 = fitresult->getPhi0() * 180 / M_PI;
     }
-    getObject<TH1D>("hPval").Fill(Pval);
-    getObject<TH1D>("hNDF").Fill(ndf);
+    getObjectPtr<TH1D>("hPval")->Fill(Pval);
+    getObjectPtr<TH1D>("hNDF")->Fill(ndf);
     B2DEBUG(99, "ndf = " << ndf);
     B2DEBUG(99, "Pval = " << Pval);
     //cut at Pt
@@ -169,7 +169,7 @@ void CDCCalibrationCollectorModule::collect()
   }
 }
 
-void CDCCalibrationCollectorModule::terminate()
+void CDCCalibrationCollectorModule::finish()
 {
 }
 
@@ -236,7 +236,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         // substract event t0;
         t -= evtT0;
 
-        getObject<TTree>("tree").Fill();
+        getObjectPtr<TTree>("tree")->Fill();
       } //NDF
       // }//end of if isU
     }//end of for

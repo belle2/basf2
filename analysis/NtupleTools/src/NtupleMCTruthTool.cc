@@ -25,8 +25,15 @@ void NtupleMCTruthTool::setupTree()
   m_iTruthIDMatch = new int[nDecayProducts];
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_mcPDG").c_str(), &m_iTruthID[iProduct], (strNames[iProduct] + "_mcPDG/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_mcErrors").c_str(), &m_iTruthIDMatch[iProduct], (strNames[iProduct] + "_mcErrors/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_mcErrors").c_str(), &m_iTruthIDMatch[iProduct],
+                   (strNames[iProduct] + "_mcErrors/I").c_str());
   }
+}
+
+void NtupleMCTruthTool::deallocateMemory()
+{
+  delete [] m_iTruthID;
+  delete [] m_iTruthIDMatch;
 }
 
 void NtupleMCTruthTool::eval(const Particle* particle)

@@ -13,24 +13,11 @@ from modularAnalysis import *
 from stdFSParticles import *
 
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = [
-        '/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_001724_prod00000962_task00001729.root']
-    bkgType = 'notSpecified'
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_001724_prod00000962_task00001729.root']
 
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
+inputMdstList('default', fileList)
 
 
 stdPi()
@@ -41,13 +28,13 @@ reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, an
 vertexKFit('K_S0:all', 0.0)
 applyCuts('K_S0:all', '0.477614 < M < 0.517614')
 
-fillParticleList('e+:std', 'eid > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
-fillParticleList('mu+:std', 'muid > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
+fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
+fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
 
 # CSL Skim
 from CharmSemileptonic_List import *
 CSLList = CharmSemileptonicList()
-skimOutputUdst('outputFiles/CharmSemileptonic_' + bkgType, CSLList)
+skimOutputUdst('CharmSemileptonic', CSLList)
 summaryOfLists(CSLList)
 
 process(analysis_main)

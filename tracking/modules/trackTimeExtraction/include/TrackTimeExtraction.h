@@ -31,11 +31,11 @@ namespace Belle2 {
    * * If the extraction fails, because e.g. the fit fails, randomize the next time step to try out different
    *   starting parameters.
    */
-  class TrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack const*> {
+  class TrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack*> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::Findlet<RecoTrack const*>;
+    using Super = TrackFindingCDC::Findlet<RecoTrack*>;
 
   public:
     /// Create a new instance of the module.
@@ -51,7 +51,7 @@ namespace Belle2 {
     void initialize() override final;
 
     /// timing extraction for this findlet
-    void apply(std::vector<RecoTrack const*>&) override final;
+    void apply(std::vector<RecoTrack*>&) override final;
 
   private:
     /// StoreArray name from which to read the reco tracks.
@@ -78,8 +78,8 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0;
 
     /// Helper function doing one step of the time extraction.
-    double extractTrackTime(StoreArray<RecoTrack>& recoTracks, const double& randomizeLimits) const;
+    double extractTrackTime(std::vector<RecoTrack*>& recoTracks, const double& randomizeLimits) const;
     /// Helper function doing all iteration steps of the time extraction.
-    double extractTrackTimeLoop(StoreArray<RecoTrack>& recoTracks) const;
+    double extractTrackTimeLoop(std::vector<RecoTrack*>&  recoTracks) const;
   };
 }

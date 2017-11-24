@@ -59,6 +59,8 @@ namespace Belle2 {
     /// Create a new instance of this module.
     CombinedTrackTimeExtraction();
 
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+
     /// Register the store arrays and store obj pointers.
     void initialize() final override;
 
@@ -72,9 +74,11 @@ namespace Belle2 {
   private:
 
     StoreObjPtr<EventT0> m_eventT0;
-    std::vector< RecoTrack const*> m_recoTracks;
-    TrackFindingCDC::StoreArrayLoader< const RecoTrack > m_recoTrackLoader;
+    std::vector< RecoTrack*> m_recoTracks;
+    TrackFindingCDC::StoreArrayLoader< RecoTrack > m_recoTrackLoader;
     FullGridTrackTimeExtraction m_fullGridExtraction;
     TrackTimeExtraction m_trackTimeExtraction;
+
+    bool m_param_useFullGridExtraction;
   };
 }

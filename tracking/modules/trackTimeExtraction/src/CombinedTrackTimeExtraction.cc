@@ -15,8 +15,10 @@
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 #include <numeric>
+#include <cmath>
 
 using namespace Belle2;
+using namespace TrackFindingCDC;
 
 
 CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
@@ -24,12 +26,32 @@ CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
   addProcessingSignalListener(&m_recoTrackLoader);
   addProcessingSignalListener(&m_fullGridExtraction);
   addProcessingSignalListener(&m_trackTimeExtraction);
+
+
+  ModuleParamList moduleParamList;
+  const std::string prefix = "";
+  this->exposeParameters(&moduleParamList, prefix);
+  moduleParamList.getParameter<unsigned int>("maximalIterations").setDefaultValue(1);
+  moduleParamList.getParameter<unsigned int >("minimalIterations").setDefaultValue(1);
 }
 
 void CombinedTrackTimeExtraction::initialize()
 {
   Super::initialize();
 }
+
+void CombinedTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  m_fullGridExtraction.exposeParameters(moduleParamList, prefix);
+  m_trackTimeExtraction.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter(prefixed(prefix, "useFullGridExtraction"), m_param_useFullGridExtraction,
+                                "use full grid t0 extraction in case the fast methods don't work",
+                                m_param_useFullGridExtraction);
+
+}
+
+
 
 void CombinedTrackTimeExtraction::apply()
 {
@@ -43,11 +65,28 @@ void CombinedTrackTimeExtraction::apply()
   // is there already an output from the Fast CDC hit finder ?
   bool doFullGridExtraction = true;
   if (m_eventT0->hasEventT0(Belle2::Const::CDC)) {
+
+    const double fastExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
+    const double fastExtractT0Uncertainty = m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC);
+
     // use fast hit-based as starting point for the TrackTimeExtraction
     m_trackTimeExtraction.apply(m_recoTracks);
 
-    // sufficiently precise ?
+    // check if t0 extraction was successfull, if not the CDC number will be NAN
+    double timeExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
 
+    if (std::isnan(timeExtractT0)) {
+      // set the old (best) t0 value and run full grid extraction
+      m_eventT0->addEventT0(fastExtractT0, fastExtractT0Uncertainty, Belle2::Const::CDC);
+    } else {
+
+      doFullGridExtraction = false;
+    }
+  }
+
+  // sufficiently precise ?
+  if (doFullGridExtraction) {
+    m_fullGridExtraction.apply(m_recoTracks);
   }
 
 }

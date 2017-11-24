@@ -19,44 +19,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-//REG_MODULE(TrackTimeExtraction);
-
-/*
-TrackTimeExtractionModule::TrackTimeExtractionModule() : Module()
-{
-//  setDescription("Build the full covariance matrix for RecoTracks.");
-  setPropertyFlags(c_ParallelProcessingCertified);
-
-  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray containing the RecoTracks to process",
-           m_param_recoTracksStoreArrayName);
-
-  addParam("maximalIterations", m_param_maximalIterations, "Maximal number of iterations to perform.",
-           m_param_maximalIterations);
-  addParam("minimalIterations", m_param_minimalIterations, "Minimal number of iterations to perform.",
-           m_param_minimalIterations);
-
-  addParam("minimalTimeDeviation", m_param_minimalTimeDeviation,
-           "Minimal deviation between two extractions, to call the extraction as converged.",
-           m_param_minimalTimeDeviation);
-
-  addParam("randomizeOnError", m_param_randomizeOnError, "Whether to randomize the extracted time, when the fit fails.",
-           m_param_randomizeOnError);
-  addParam("randomizeLimits", m_param_randomizeLimits,
-           "The maximal and minimal limit [-l, l] in which to randomize the extracted time on errors.",
-           m_param_randomizeLimits);
-
-  addParam("overwriteExistingEstimation", m_param_overwriteExistingEstimation,
-           "Whether to replace an existing time estimation or not.",
-           m_param_overwriteExistingEstimation);
-
-  addParam("maximalExtractedT0", m_param_maximalExtractedT0,
-           "Hard cut on this value of extracted times in the positive as well as the negative direction.",
-           m_param_maximalExtractedT0);
-
-  addParam("t0Uncertainty", m_param_t0Uncertainty, "Use this as sigma t0.",
-           m_param_t0Uncertainty);
-}
-*/
 
 /// Short description of the findlet
 std::string TrackTimeExtraction::getDescription()
@@ -110,24 +72,22 @@ void TrackTimeExtraction::initialize()
   m_eventT0.registerInDataStore();
 }
 
-void TrackTimeExtraction::apply(std::vector<RecoTrack const*>& recoTracks)
+void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
 {
-  /*  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
+  if (not m_eventT0.isValid()) {
+    m_eventT0.create();
+  } else if (not m_param_overwriteExistingEstimation) {
+    B2INFO("T0 estimation already present and overwriteExistingEstimation set to false. Skipping.");
+    return;
+  }
 
-    if (not m_eventT0.isValid()) {
-      m_eventT0.create();
-    } else if (not m_param_overwriteExistingEstimation) {
-      B2INFO("T0 estimation already present and overwriteExistingEstimation set to false. Skipping.");
-      return;
-    }
+  const double extractedTime = extractTrackTimeLoop(recoTracks);
 
-    const double extractedTime = extractTrackTimeLoop(recoTracks);
-
-    // The uncertainty was calculated using a test MC sample
-    m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);*/
+  // The uncertainty was calculated using a test MC sample
+  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
 }
 
-double TrackTimeExtraction::extractTrackTimeLoop(StoreArray<RecoTrack>& recoTracks) const
+double TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks) const
 {
   TrackFitter trackFitter;
 
@@ -137,8 +97,8 @@ double TrackTimeExtraction::extractTrackTimeLoop(StoreArray<RecoTrack>& recoTrac
   unsigned int loopCounter = 0;
 
   for (; loopCounter < m_param_maximalIterations; loopCounter++) {
-    for (RecoTrack& recoTrack : recoTracks) {
-      trackFitter.fit(recoTrack);
+    for (RecoTrack* recoTrack : recoTracks) {
+      trackFitter.fit(*recoTrack);
     }
 
     double randomizeValue = lastExtractedTime;
@@ -171,12 +131,12 @@ double TrackTimeExtraction::extractTrackTimeLoop(StoreArray<RecoTrack>& recoTrac
 
 
 
-double TrackTimeExtraction::extractTrackTime(StoreArray<RecoTrack>& recoTracks, const double& randomizeLimits) const
+double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks, const double& randomizeLimits) const
 {
   double sumFirstDerivatives = 0;
   double sumSecondDerivatives = 0;
-  for (RecoTrack& recoTrack : recoTracks) {
-    const auto& chi2Derivatives = TimeExtractionUtils::getChi2Derivatives(recoTrack);
+  for (RecoTrack* recoTrack : recoTracks) {
+    const auto& chi2Derivatives = TimeExtractionUtils::getChi2Derivatives(*recoTrack);
     const double& dchi2da = chi2Derivatives.first;
     const double& d2chi2da2 = chi2Derivatives.second;
 
@@ -206,9 +166,9 @@ double TrackTimeExtraction::extractTrackTime(StoreArray<RecoTrack>& recoTracks, 
   }
 
   if (extractedT0 != 0) {
-    for (RecoTrack& recoTrack : recoTracks) {
-      recoTrack.setTimeSeed(recoTrack.getTimeSeed() + extractedT0);
-      recoTrack.deleteFittedInformation();
+    for (RecoTrack* recoTrack : recoTracks) {
+      recoTrack->setTimeSeed(recoTrack->getTimeSeed() + extractedT0);
+      recoTrack->deleteFittedInformation();
     }
   }
 

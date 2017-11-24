@@ -139,7 +139,14 @@ void Raw2DsModule::registerRawCOPPERs()
   sndhdr.SetBuffer(evtbuf);
   int npackedevts = sndhdr.GetNumEventsinPacket();
   if (npackedevts != 1) {
+    printf("[FATAL] strange SendHeader : ");
+    for (int i = 0; i < sndhdr.SENDHDR_NWORDS; i++) {
+      printf("0x%.8x ");
+    }
+    printf("\n"); fflush(stdout);
+
     B2FATAL("Raw2DsModule::number of events in packet is not 1");
+
   }
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;

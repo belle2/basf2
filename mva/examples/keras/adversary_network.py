@@ -14,7 +14,7 @@ import basf2_mva
 from basf2_mva_python_interface.contrib_keras import State
 import h5py
 import tensorflow as tf
-# import tensorflow.contrib.keras as keras
+import tensorflow.contrib.keras as keras
 import keras
 
 from keras.layers import Input, Dense, Concatenate, Lambda

@@ -43,6 +43,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
         )
 
     path.add_module("ToPXDCKF",
+                    hitFilter="sensor",
+                    seedFilter="sensor",
                     inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
                     **module_parameters)

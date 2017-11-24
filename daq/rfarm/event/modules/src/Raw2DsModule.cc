@@ -141,7 +141,7 @@ void Raw2DsModule::registerRawCOPPERs()
   if (npackedevts != 1) {
     printf("[FATAL] strange SendHeader : ");
     for (int i = 0; i < sndhdr.SENDHDR_NWORDS; i++) {
-      printf("0x%.8x ");
+      printf("0x%.8x ", *(sendhdr.GetBuffer() + i));
     }
     printf("\n"); fflush(stdout);
 

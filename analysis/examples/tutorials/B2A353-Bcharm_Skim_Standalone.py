@@ -27,13 +27,11 @@ inputMdstList('default', fileList)
 loadStdPi0()
 loadStdKS()
 loadStdCharged()  # Loading Charged particle lists: kaons, pions, leptons
+# load D mesons from stdCharm.py
 loadStdD0()
 loadStdDplus()
 loadStdDstar0()
 loadStdDstarPlus()
-loadStdPi0()
-loadStdKS()
-loadStdPi0()
 
 from Bcharm_List import *
 BList = Bcharm()

@@ -290,8 +290,10 @@ void EclFrame::handleMenu(int id)
       fi.fFileTypes = 0;
       fi.fIniDir    = StrDup(dir);
       new TGFileDialog(gClient->GetRoot(), this, kFDOpen, &fi);
-      m_ecl_data->loadRootFile(fi.fFilename);
-      loadNewData();
+      if (fi.fFileNamesList) {
+        m_ecl_data->loadRootFile(fi.fFilename);
+        loadNewData();
+      }
       // doDraw();
       break;
     case M_FILE_SAVE:

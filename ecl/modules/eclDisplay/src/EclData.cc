@@ -140,13 +140,13 @@ int EclData::getCrystalCount()
   return 8736;
 }
 
-double EclData::ampToEnergy(int amp)
+double EclData::ampToEnergy(int _amp)
 {
   // This is the default conversion constant that should be changed to
   // database value.
   const double adc_to_mev = 0.05;
 
-  return amp * adc_to_mev;
+  return _amp * adc_to_mev;
 }
 
 TTree* EclData::getTree()

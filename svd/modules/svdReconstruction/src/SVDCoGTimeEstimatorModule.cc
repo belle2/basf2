@@ -9,19 +9,6 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-
-#include <string>
-#include "TMath.h"
-#include <algorithm>
-#include <functional>
-
 
 using namespace Belle2;
 using namespace std;
@@ -37,14 +24,15 @@ REG_MODULE(SVDCoGTimeEstimator)
 
 SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
 {
-  setDescription("From SVDShaperDigit to SVDRecoDigit. Strip charge is evaluated as the max of the 6 samples; hit time is evaluated as a shifted Centre of Gravity (CoG) time.");
+  setDescription("From SVDShaperDigit to SVDRecoDigit. Strip charge is evaluated as the max of the 6 samples; hit time is evaluated as a corrected Centre of Gravity (CoG) time.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
            "RecoDigits collection name", string(""));
-  addParam("FinalShiftWidth", m_FinalShiftWidth, "Width of the 3rd (final) time shift", float(6.0));
+  addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
+           float(6.0));
 
 }
 
@@ -56,25 +44,21 @@ SVDCoGTimeEstimatorModule::~SVDCoGTimeEstimatorModule()
 
 void SVDCoGTimeEstimatorModule::initialize()
 {
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  storeTrueHits.isOptional();
-  storeMCParticles.isOptional();
+  m_storeTrueHits.isOptional();
+  m_storeMCParticles.isOptional();
 
-//Inizialization of useful store array
-  StoreArray<SVDShaperDigit> storeShaper(m_storeShaperDigitsName);
-  storeShaper.isRequired();
+  //Inizialization of needed store array
+  m_storeShaper.isRequired(m_storeShaperDigitsName);
 
   //Initialize the new RecoDigit
-  StoreArray<SVDRecoDigit> storeReco(m_storeRecoDigitsName);
-  storeReco.registerInDataStore();
+  m_storeReco.registerInDataStore(m_storeRecoDigitsName);
 
-  RelationArray relRecoDigitShaperDigits(storeReco, storeShaper);
+  RelationArray relRecoDigitShaperDigits(m_storeReco, m_storeShaper);
   relRecoDigitShaperDigits.registerInDataStore();
-  RelationArray relRecoDigitTrueHits(storeReco, storeTrueHits);
-  RelationArray relRecoDigitMCParticles(storeReco, storeMCParticles);
-  RelationArray relShaperDigitTrueHits(storeShaper, storeTrueHits);
-  RelationArray relShaperDigitMCParticles(storeShaper, storeMCParticles);
+  RelationArray relRecoDigitTrueHits(m_storeReco, m_storeTrueHits);
+  RelationArray relRecoDigitMCParticles(m_storeReco, m_storeMCParticles);
+  RelationArray relShaperDigitTrueHits(m_storeShaper, m_storeTrueHits);
+  RelationArray relShaperDigitMCParticles(m_storeShaper, m_storeMCParticles);
 
   //Relations to simulation objects only if the ancestor relations exist
   if (relShaperDigitTrueHits.isOptional())
@@ -83,10 +67,8 @@ void SVDCoGTimeEstimatorModule::initialize()
     relRecoDigitMCParticles.registerInDataStore();
 
   //Store names to speed up creation later
-  m_storeRecoDigitsName = storeReco.getName();
-  m_storeShaperDigitsName = storeShaper.getName();
-  m_storeTrueHitsName = storeTrueHits.getName();
-  m_storeMCParticlesName = storeMCParticles.getName();
+  m_storeTrueHitsName = m_storeTrueHits.getName();
+  m_storeMCParticlesName = m_storeMCParticles.getName();
 
   m_relRecoDigitShaperDigitName = relRecoDigitShaperDigits.getName();
   m_relRecoDigitTrueHitName = relRecoDigitTrueHits.getName();
@@ -117,30 +99,25 @@ void SVDCoGTimeEstimatorModule::event()
   /** Probabilities, to be defined here */
   std::vector<float> probabilities = {0.5};
 
-  StoreArray<SVDShaperDigit> storeShapers;
-  StoreArray<SVDRecoDigit> storeRecos;
-
   // If no digits, nothing to do
-  if (!storeShapers || !storeShapers.getEntries()) return;
+  if (!m_storeShaper || !m_storeShaper.getEntries()) return;
 
-  size_t nDigits = storeShapers.getEntries();
+  size_t nDigits = m_storeShaper.getEntries();
 
-  RelationArray relRecoDigitShaperDigit(storeRecos, storeShapers,
+  RelationArray relRecoDigitShaperDigit(m_storeReco, m_storeShaper,
                                         m_relRecoDigitShaperDigitName);
   if (relRecoDigitShaperDigit) relRecoDigitShaperDigit.clear();
 
-  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
 
-  RelationArray relShaperDigitMCParticle(storeShapers, storeMCParticles, m_relShaperDigitMCParticleName);
-  RelationArray relShaperDigitTrueHit(storeShapers, storeTrueHits, m_relShaperDigitTrueHitName);
+  RelationArray relShaperDigitMCParticle(m_storeShaper, m_storeMCParticles, m_relShaperDigitMCParticleName);
+  RelationArray relShaperDigitTrueHit(m_storeShaper, m_storeTrueHits, m_relShaperDigitTrueHitName);
 
-  RelationArray relRecoDigitMCParticle(storeRecos, storeMCParticles,
+  RelationArray relRecoDigitMCParticle(m_storeReco, m_storeMCParticles,
                                        m_relRecoDigitMCParticleName);
   if (relRecoDigitMCParticle) relRecoDigitMCParticle.clear();
 
 
-  RelationArray relRecoDigitTrueHit(storeRecos, storeTrueHits,
+  RelationArray relRecoDigitTrueHit(m_storeReco, m_storeTrueHits,
                                     m_relRecoDigitTrueHitName);
   if (relRecoDigitTrueHit) relRecoDigitTrueHit.clear();
 
@@ -151,7 +128,7 @@ void SVDCoGTimeEstimatorModule::event()
   //start loop on SVDSHaperDigits
   Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
-  for (const SVDShaperDigit& shaper : storeShapers) {
+  for (const SVDShaperDigit& shaper : m_storeShaper) {
     samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit
@@ -191,11 +168,11 @@ void SVDCoGTimeEstimatorModule::event()
     }
 
     //recording of the RecoDigit
-    storeRecos.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                      m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
+    m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
+                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
-    int recoDigitIndex = storeRecos.getEntries() - 1;
+    int recoDigitIndex = m_storeReco.getEntries() - 1;
     vector<pair<unsigned int, float> > digit_weights;
     digit_weights.reserve(1);
     digit_weights.emplace_back(shaper.getArrayIndex(), 1.0);
@@ -262,7 +239,7 @@ float SVDCoGTimeEstimatorModule::CalculateAmplitude(Belle2::SVDShaperDigit::APVF
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError()
 {
-  return m_FinalShiftWidth;
+  return m_FixedTimeError;
 }
 
 float SVDCoGTimeEstimatorModule::CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID)

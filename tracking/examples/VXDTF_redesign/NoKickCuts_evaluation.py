@@ -47,7 +47,8 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
 rootinput = register_module('RootInput')
-rootinput.param("inputFileNames", "/group/belle2/users/lueck/data/new/train/simulatedEvents_rndSeed_*.root")
+# rootinput.param("inputFileNames", "/group/belle2/users/lueck/data/new/train/simulatedEvents_rndSeed_*.root")
+rootinput.param("inputFileNames", "/home/belle2/vberta/storage/release1_validation/training_sample/simulated*.root")
 
 progressbar = register_module('ProgressBar')
 

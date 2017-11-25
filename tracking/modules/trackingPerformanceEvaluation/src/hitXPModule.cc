@@ -13,7 +13,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
+//#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <TFile.h>
@@ -51,25 +51,25 @@ void hitXPModule::initialize()
 {
 
   /** iniziialize of useful store array and relations */
-  StoreArray<SVDDigit> storeDigits("");
+  //StoreArray<SVDDigit> storeDigits("");
   StoreArray<SVDCluster> storeClusters("");
   StoreArray<SVDTrueHit> storeTrueHits("");
   StoreArray<MCParticle> storeMCParticles("");
   StoreArray<RecoTrack> recoTracks("");
 
 
-  storeDigits.isRequired();
+  //storeDigits.isRequired();
   storeClusters.isRequired();
   storeTrueHits.isRequired();
   storeMCParticles.isRequired();
   recoTracks.isRequired();
 
 
-  RelationArray relClusterDigits(storeClusters, storeDigits);
+  //RelationArray relClusterDigits(storeClusters, storeDigits);
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
   RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
-  RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
-  RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
+  //  RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
+  //RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
   RelationArray recoTracksToMCParticles(recoTracks , storeMCParticles);
 
 
@@ -166,7 +166,7 @@ void hitXPModule::beginRun() {}
 
 void hitXPModule::event()
 {
-  StoreArray<SVDDigit> SVDDigits;
+  // StoreArray<SVDDigit> SVDDigits;
   StoreArray<SVDCluster> SVDClusters;
   StoreArray<SVDTrueHit> SVDTrueHits;
   StoreArray<MCParticle> MCParticles;

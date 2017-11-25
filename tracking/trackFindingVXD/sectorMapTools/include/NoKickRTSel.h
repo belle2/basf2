@@ -56,7 +56,7 @@ namespace Belle2 {
     std::set<hitXP, hitXP::timeCompare> m_setHitXP; /**< set of hit to order the hit in time */
     std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
-    double m_pmax = 2.; /**< range analyzed with cuts */
+    double m_pmax = 10.; /**< range analyzed with cuts */
     int m_numberOfCuts; /**< number of catastrophic interaction for each track */
     bool m_outputFlag; /**< true=produce validation output */
 

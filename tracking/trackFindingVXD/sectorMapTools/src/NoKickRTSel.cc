@@ -117,8 +117,8 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
     if (XP.getSensorLayer() == 4) lay4 = 1;
     if (XP.getSensorLayer() == 5) lay5 = 1;
     if (XP.getSensorLayer() == 6) lay6 = 1;
-    if (fabs(XP.getD0Entry()) > 1.) flagd0 = 0;
-    if (fabs(XP.getZ0Entry()) > 1.) flagz0 = 0;
+    //    if (fabs(XP.getD0Entry()) > 1.) flagd0 = 0;
+    //    if (fabs(XP.getZ0Entry()) > 1.) flagz0 = 0;
   }
   int N_lay = lay3 + lay4 + lay5 + lay6;
   if (N_lay >= 3) N_lay = 1;

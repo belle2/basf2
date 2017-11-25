@@ -101,11 +101,11 @@ namespace Belle2 {
   private:
 
     const double c_pmin = 0.025; /**< minimum momentum evaluated */
-    const double c_pmax = 2.; /**< maximum momentum evaluated */
+    const double c_pmax = 10.; /**< maximum momentum evaluated */
     const double c_tmin = 17.*M_PI / 180.; /**< 17 degrees. minimum theta evaluated */
     const double c_tmax = 5. / 6.*M_PI; /**< 150 degrees. maximum theta evaluated */
     const int c_nbin = 5000; /**< number of bins of histogram of DeltaX */
-    const int c_nbinp = 40; /**< number of momentum bins */
+    const int c_nbinp = 200; /**< number of momentum bins */
     const int c_nbinpar = 5; /**< number of track parameters */
     const int c_nbinlay = 7;/**< present IP too. number of layers */
     const int c_nbint = 3; /**< number of theta parameters */

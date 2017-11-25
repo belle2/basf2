@@ -18,7 +18,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
+//#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>

@@ -196,24 +196,38 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
 {
   initNoKickRTSel();
   hit8TrackBuilder(track);
+
+  if (m_outputFlag) {
+    m_pdgID = m_8hitTrack.getPDGID();
+    m_pMag = track.getMomentumSeed().Mag();
+    m_pt = track.sqrt(getMomentumSeed().X() * track.getMomentumSeed().X() + track.getMomentumSeed().Y() * track.getMomentumSeed().Y());
+       
+  }
+
   bool good = true;
   good = globalCut(m_8hitTrack);
   if (good == false) {
     if (m_outputFlag) {
       m_numberOfCuts = 25;
+      m_Ncuts = m_numberOfCuts;
+      m_isCutted = true;
       m_nCutHit->Fill(m_numberOfCuts);
       m_momCut->Fill(track.getMomentumSeed().Mag());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     }
+    m_noKickTree->Fill();
     return good;
   }
 
   if (track.getMomentumSeed().Mag() > m_pmax) {
     if (m_outputFlag) {
+      m_Ncuts = m_numberOfCuts;
+      m_isCutted = false;
       m_nCutHit->Fill(m_numberOfCuts);
       m_momSel->Fill(track.getMomentumSeed().Mag());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     }
+    m_noKickTree->Fill();
     return good;
   }
   for (int i = 0; i < (int)(m_8hitTrack.size() - 2); i++) {
@@ -249,15 +263,19 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
     }
   }
   if (m_outputFlag) {
+    m_Ncuts = m_numberOfCuts;
     m_nCutHit->Fill(m_numberOfCuts);
     if (good) {
+      m_isCutted = false;
       m_momSel->Fill(track.getMomentumSeed().Mag());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     } else {
+      m_isCutted = true;
       m_momCut->Fill(track.getMomentumSeed().Mag());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     }
   }
+  m_noKickTree->Fill();
   return good;
 }
 
@@ -283,6 +301,8 @@ void NoKickRTSel::produceHistoNoKick()
     m_PDGIDEff->Write();
 
     m_nCutHit->Write();
+
+    m_noKickTree->Write();
 
     delete m_noKickOutputTFile;
   }

@@ -68,6 +68,11 @@ namespace Belle2 {
     TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
     TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
     TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
+    bool m_isCutted;
+    double m_pMag;
+    double m_pt;
+    double m_pdgID;
+    int m_Ncuts;
 
     /** Constructor with input file for use specific cuts file and allows validation */
     NoKickRTSel(std::string fileName, bool outputHisto) :
@@ -142,16 +147,12 @@ namespace Belle2 {
 
         m_nCutHit = new TH1F("m_nCutHit", "m_nCutHit", 30, 0, 30);
 
-        bool m_isCutted;
-        double m_pMag;
-        double m_pt;
-        double m_pdgID;
-        int m_Ncuts;
+
         TTree* m_noKickTree = new TTree("noKickTree", "noKickTree");
-        m_noKickTree->Branch("is_rejected", &m_isCutted)
+        m_noKickTree->Branch("is_rejected", &m_isCutted);
         m_noKickTree->Branch("p_mag", &m_pMag);
         m_noKickTree->Branch("pt", &m_pt);
-        m_noKickTree->Branch("pdgID," &m_pdgID)
+        m_noKickTree->Branch("pdgID," &m_pdgID);
         m_noKickTree->Branch("number_of_rejected_SP", &m_Ncuts);
 
         m_outputFlag = true;

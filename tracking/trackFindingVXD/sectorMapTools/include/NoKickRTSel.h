@@ -148,11 +148,11 @@ namespace Belle2 {
         double m_pdgID;
         int m_Ncuts;
         TTree* m_noKickTree = new TTree("noKickTree", "noKickTree");
-        m_tree->Branch("is_rejected", &m_isCutted)
-        m_tree->Branch("p_mag", &m_pMag);
-        m_tree->Branch("pt", &m_pt);
-        m_tree->Branch("pdgID," &m_pdgID)
-        m_tree->Branch("number_of_rejected_SP", &m_Ncuts);
+        m_noKickTree->Branch("is_rejected", &m_isCutted)
+        m_noKickTree->Branch("p_mag", &m_pMag);
+        m_noKickTree->Branch("pt", &m_pt);
+        m_noKickTree->Branch("pdgID," &m_pdgID)
+        m_noKickTree->Branch("number_of_rejected_SP", &m_Ncuts);
 
         m_outputFlag = true;
       }

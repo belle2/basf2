@@ -60,7 +60,7 @@ TSF::CDCTriggerTSFFirmwareModule() :
            string("CDCTriggerFirmwareSegmentHits"));
   addParam("outputBitstreamNameTo2D", m_outputBitstreamNameTo2D,
            "Name of the StoreArray holding the raw bit content to 2D trackers",
-           string("BitstreamTSF-2D"));
+           string("BitstreamTSFto2D"));
   addParam("mergerOnly", m_mergerOnly,
            "Flag to only simulate merger and not TSF",
            false);

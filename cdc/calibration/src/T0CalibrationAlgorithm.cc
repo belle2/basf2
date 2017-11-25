@@ -28,9 +28,9 @@ using namespace CDC;
 T0CalibrationAlgorithm::T0CalibrationAlgorithm(): CalibrationAlgorithm("CDCCalibrationCollector")
 {
 
-  //   setDescription(
-  //    " -------------------------- T0 Calibration Algoritm -------------------------\n"
-  //    );
+  setDescription(
+    " -------------------------- T0 Calibration Algorithm -------------------------\n"
+  );
 }
 
 void T0CalibrationAlgorithm::createHisto()

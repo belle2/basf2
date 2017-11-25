@@ -32,7 +32,7 @@ typedef std::array<float, 3> array3; /**< angle bin info. */
 XTCalibrationAlgorithm::XTCalibrationAlgorithm() :  CalibrationAlgorithm("CDCCalibrationCollector")
 {
   setDescription(
-    " -------------------------- XT Calibration Algoritm -------------------------\n"
+    " -------------------------- XT Calibration Algorithm -------------------------\n"
   );
 }
 

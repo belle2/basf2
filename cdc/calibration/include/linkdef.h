@@ -13,4 +13,5 @@
 #pragma link C++ class Belle2::CDC::T0CalibrationAlgorithm-;
 #pragma link C++ class Belle2::CDC::XTCalibrationAlgorithm-;
 #pragma link C++ class Belle2::CDC::SpaceResolutionCalibrationAlgorithm-;
+#pragma link C++ class Belle2::CDC::TimeWalkCalibrationAlgorithm-;
 #endif

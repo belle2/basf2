@@ -97,7 +97,7 @@ namespace Belle2 {
     static constexpr size_t timeWidth = 4;
 
     /** how many clocks to simulate per event */
-    static constexpr int m_nClockPerEvent = 36;
+    static constexpr int m_nClockPerEvent = 44;
 
   protected:
     /** Name of the StoreArray containing the input CDC hits. */

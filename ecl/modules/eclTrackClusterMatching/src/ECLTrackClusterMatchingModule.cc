@@ -83,58 +83,58 @@ void ECLTrackClusterMatchingModule::initialize()
 
   if (m_writeToRoot == true) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
+    // initialize tree
+    m_tree     = new TTree("m_tree", "ECL Track Cluster Matching Analysis tree");
+
+    m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
+    m_tree->Branch("runNo", &m_iRun, "runNo/I");
+    m_tree->Branch("evtNo", &m_iEvent, "evtNo/I");
+
+    m_tree->Branch("trackNo", &m_trackNo, "trackNo/I");
+    m_tree->Branch("trackMomentum", &m_trackMomentum, "trackMomentum/D");
+    m_tree->Branch("deltaPhi", &m_deltaPhi, "deltaPhi/D");
+    m_tree->Branch("phiCluster", &m_phiCluster, "phiCluster/D");
+    m_tree->Branch("phiHit", &m_phiHit, "phiHit/D");
+    m_tree->Branch("errorPhi", &m_errorPhi, "errorPhi/D");
+    m_tree->Branch("deltaTheta", &m_deltaTheta, "deltaTheta/D");
+    m_tree->Branch("thetaCluster", &m_thetaCluster, "thetaCluster/D");
+    m_tree->Branch("thetaHit", &m_thetaHit, "thetaHit/D");
+    m_tree->Branch("errorTheta", &m_errorTheta, "errorTheta/D");
+    m_tree->Branch("phi_consistency", &m_phi_consistency, "phi_consistency/D");
+    m_tree->Branch("phi_consistency_best", &m_phi_consistency_best, "phi_consistency_best/D");
+    m_tree->Branch("theta_consistency", &m_theta_consistency, "theta_consistency/D");
+    m_tree->Branch("theta_consistency_best", &m_theta_consistency_best, "theta_consistency_best/D");
+    m_tree->Branch("quality", &m_quality, "quality/D");
+    m_tree->Branch("quality_best", &m_quality_best, "quality_best/D");
+    m_tree->Branch("hitStatus", &m_hitstatus, "hitStatus/I");
+    m_tree->Branch("hitStatus_best", &m_hitstatus_best, "hitStatus_best/I");
+    m_tree->Branch("trueClusterPDG", &m_true_cluster_pdg, "trueClusterPDG/I");
+    m_tree->Branch("trueTrackPDG", &m_true_track_pdg, "trueTrackPDG/I");
+    /*
+    m_tree->Branch("trackNo", "std::vector<int>", &m_trackNo);
+    m_tree->Branch("trackMomentum", "std::vector<double>", &m_trackMomentum);
+    m_tree->Branch("deltaPhi", "std::vector<double>",  &m_deltaPhi);
+    m_tree->Branch("phiCluster", "std::vector<double>",  &m_phiCluster);
+    m_tree->Branch("phiHit", "std::vector<double>",  &m_phiHit);
+    m_tree->Branch("errorPhi", "std::vector<double>",  &m_errorPhi);
+    m_tree->Branch("deltaTheta", "std::vector<double>",  &m_deltaTheta);
+    m_tree->Branch("thetaCluster", "std::vector<double>",  &m_thetaCluster);
+    m_tree->Branch("thetaHit", "std::vector<double>",  &m_thetaHit);
+    m_tree->Branch("errorTheta", "std::vector<double>",  &m_errorTheta);
+    m_tree->Branch("phi_consistency", "std::vector<double>",  &m_phi_consistency);
+    m_tree->Branch("phi_consistency_best", "std::vector<double>",  &m_phi_consistency_best);
+    m_tree->Branch("theta_consistency", "std::vector<double>",  &m_theta_consistency);
+    m_tree->Branch("theta_consistency_best", "std::vector<double>",  &m_theta_consistency_best);
+    m_tree->Branch("quality", "std::vector<double>",  &m_quality);
+    m_tree->Branch("quality_best", "std::vector<double>",  &m_quality_best);
+    m_tree->Branch("hitStatus", "std::vector<int>",  &m_hitstatus);
+    m_tree->Branch("hitStatus_best", "std::vector<int>",  &m_hitstatus_best);
+    m_tree->Branch("trueClusterPDG", "std::vector<int>",  &m_true_cluster_pdg);
+    m_tree->Branch("trueTrackPDG", "std::vector<int>",  &m_true_track_pdg);
+    */
   } else
     m_rootFilePtr = NULL;
 
-  // initialize tree
-  m_tree     = new TTree("m_tree", "ECL Track Cluster Matching Analysis tree");
-
-  m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
-  m_tree->Branch("runNo", &m_iRun, "runNo/I");
-  m_tree->Branch("evtNo", &m_iEvent, "evtNo/I");
-
-  m_tree->Branch("trackNo", &m_trackNo, "trackNo/I");
-  m_tree->Branch("trackMomentum", &m_trackMomentum, "trackMomentum/D");
-  m_tree->Branch("deltaPhi", &m_deltaPhi, "deltaPhi/D");
-  m_tree->Branch("phiCluster", &m_phiCluster, "phiCluster/D");
-  m_tree->Branch("phiHit", &m_phiHit, "phiHit/D");
-  m_tree->Branch("errorPhi", &m_errorPhi, "errorPhi/D");
-  m_tree->Branch("deltaTheta", &m_deltaTheta, "deltaTheta/D");
-  m_tree->Branch("thetaCluster", &m_thetaCluster, "thetaCluster/D");
-  m_tree->Branch("thetaHit", &m_thetaHit, "thetaHit/D");
-  m_tree->Branch("errorTheta", &m_errorTheta, "errorTheta/D");
-  m_tree->Branch("phi_consistency", &m_phi_consistency, "phi_consistency/D");
-  m_tree->Branch("phi_consistency_best", &m_phi_consistency_best, "phi_consistency_best/D");
-  m_tree->Branch("theta_consistency", &m_theta_consistency, "theta_consistency/D");
-  m_tree->Branch("theta_consistency_best", &m_theta_consistency_best, "theta_consistency_best/D");
-  m_tree->Branch("quality", &m_quality, "quality/D");
-  m_tree->Branch("quality_best", &m_quality_best, "quality_best/D");
-  m_tree->Branch("hitStatus", &m_hitstatus, "hitStatus/I");
-  m_tree->Branch("hitStatus_best", &m_hitstatus_best, "hitStatus_best/I");
-  m_tree->Branch("trueClusterPDG", &m_true_cluster_pdg, "trueClusterPDG/I");
-  m_tree->Branch("trueTrackPDG", &m_true_track_pdg, "trueTrackPDG/I");
-  /*
-  m_tree->Branch("trackNo", "std::vector<int>", &m_trackNo);
-  m_tree->Branch("trackMomentum", "std::vector<double>", &m_trackMomentum);
-  m_tree->Branch("deltaPhi", "std::vector<double>",  &m_deltaPhi);
-  m_tree->Branch("phiCluster", "std::vector<double>",  &m_phiCluster);
-  m_tree->Branch("phiHit", "std::vector<double>",  &m_phiHit);
-  m_tree->Branch("errorPhi", "std::vector<double>",  &m_errorPhi);
-  m_tree->Branch("deltaTheta", "std::vector<double>",  &m_deltaTheta);
-  m_tree->Branch("thetaCluster", "std::vector<double>",  &m_thetaCluster);
-  m_tree->Branch("thetaHit", "std::vector<double>",  &m_thetaHit);
-  m_tree->Branch("errorTheta", "std::vector<double>",  &m_errorTheta);
-  m_tree->Branch("phi_consistency", "std::vector<double>",  &m_phi_consistency);
-  m_tree->Branch("phi_consistency_best", "std::vector<double>",  &m_phi_consistency_best);
-  m_tree->Branch("theta_consistency", "std::vector<double>",  &m_theta_consistency);
-  m_tree->Branch("theta_consistency_best", "std::vector<double>",  &m_theta_consistency_best);
-  m_tree->Branch("quality", "std::vector<double>",  &m_quality);
-  m_tree->Branch("quality_best", "std::vector<double>",  &m_quality_best);
-  m_tree->Branch("hitStatus", "std::vector<int>",  &m_hitstatus);
-  m_tree->Branch("hitStatus_best", "std::vector<int>",  &m_hitstatus_best);
-  m_tree->Branch("trueClusterPDG", "std::vector<int>",  &m_true_cluster_pdg);
-  m_tree->Branch("trueTrackPDG", "std::vector<int>",  &m_true_track_pdg);
-  */
   B2INFO("[ECLTrackClusterMatchingModule]: Initialization of ECLTrackClusterMatching Module completed.");
 }
 
@@ -258,7 +258,7 @@ void ECLTrackClusterMatchingModule::event()
           cluster_best = eclCluster;
           hitStatus_best = hitStatus;
         }
-        m_tree->Fill();
+        if (m_writeToRoot) m_tree->Fill();
       }
     } // end loop on ExtHits related to Track
     m_phi_consistency_best = phi_consistency_best;

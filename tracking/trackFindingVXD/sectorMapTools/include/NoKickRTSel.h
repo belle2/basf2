@@ -73,7 +73,7 @@ namespace Belle2 {
     double m_pt;
     double m_pdgID;
     int m_Ncuts;
-    TTree* m_noKickTree
+    TTree* m_noKickTree;
 
     /** Constructor with input file for use specific cuts file and allows validation */
     NoKickRTSel(std::string fileName, bool outputHisto) :
@@ -153,7 +153,7 @@ namespace Belle2 {
         m_noKickTree->Branch("is_rejected", &m_isCutted);
         m_noKickTree->Branch("p_mag", &m_pMag);
         m_noKickTree->Branch("pt", &m_pt);
-        m_noKickTree->Branch("pdgID," &m_pdgID);
+        m_noKickTree->Branch("pdgID", &m_pdgID);
         m_noKickTree->Branch("number_of_rejected_SP", &m_Ncuts);
 
         m_outputFlag = true;

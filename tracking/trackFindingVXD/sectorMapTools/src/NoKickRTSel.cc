@@ -201,7 +201,6 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
     m_pdgID = m_8hitTrack[0].getPDGID();
     m_pMag = track.getMomentumSeed().Mag();
     m_pt = sqrt(track.getMomentumSeed().X() * track.getMomentumSeed().X() + track.getMomentumSeed().Y() * track.getMomentumSeed().Y());
-       
   }
 
   bool good = true;

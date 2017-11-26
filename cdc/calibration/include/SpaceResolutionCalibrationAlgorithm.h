@@ -76,11 +76,9 @@ namespace Belle2 {
       double m_minPval = 0.; /**<  Minimum Prob(chi2) of track*/
       double m_binWidth = 0.05; /**<width of each bin, unit cm*/
       bool m_debug = false;   /**< Debug or not */
-      bool m_draw = false;    /**< print out histogram in pdf file or not*/
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_bField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
       double sigma_new[56][2][18][7][8]; /**<new sigma prameters.*/
-      TF1* ffit[56][2][18][7];           /**< fitting function*/
       TGraphErrors* gfit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* gr[56][2][18][7];    /**< sigma graph.*/
       TH2F* hist_b[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of biased residual */

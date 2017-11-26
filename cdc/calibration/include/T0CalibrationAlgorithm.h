@@ -26,8 +26,6 @@ namespace Belle2 {
       virtual ~T0CalibrationAlgorithm() {}
       /// turn on/off debug.
       virtual void setDebug(bool debug = false) {m_debug = debug; }
-      /// use DB or text mode.
-      virtual void setUseDB(bool useDB = true) {m_useDB = useDB; }
       /// store Hisotgram or not.
       virtual void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
@@ -66,7 +64,6 @@ namespace Belle2 {
 
       bool m_debug;   /**< debug. */
       bool m_storeHisto; /**< store histo or not*/
-      bool m_useDB; /**< use DB or text mode*/
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
     };
   }// name space CDC

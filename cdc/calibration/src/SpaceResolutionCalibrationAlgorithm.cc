@@ -46,28 +46,6 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
 {
   readProfile();
   const int np = floor(1 / m_binWidth);
-  auto tree = getObjectPtr<TTree>("tree");
-
-  int lay;
-  double w;
-  double x_u;
-  double x_b;
-  double x_mea;
-  double Pval;
-  double alpha;
-  double theta;
-  double ndf;
-  double absRes_u;
-  double absRes_b;
-  tree->SetBranchAddress("lay", &lay);
-  tree->SetBranchAddress("ndf", &ndf);
-  tree->SetBranchAddress("Pval", &Pval);
-  tree->SetBranchAddress("x_u", &x_u);
-  tree->SetBranchAddress("x_b", &x_b);
-  tree->SetBranchAddress("x_mea", &x_mea);
-  tree->SetBranchAddress("weight", &w);
-  tree->SetBranchAddress("alpha", &alpha);
-  tree->SetBranchAddress("theta", &theta);
 
   vector<double> yu;
   vector <double> yb;
@@ -100,6 +78,29 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
     }
   }
 
+
+  auto tree = getObjectPtr<TTree>("tree");
+
+  int lay;
+  double w;
+  double x_u;
+  double x_b;
+  double x_mea;
+  double Pval;
+  double alpha;
+  double theta;
+  double ndf;
+  double absRes_u;
+  double absRes_b;
+  tree->SetBranchAddress("lay", &lay);
+  tree->SetBranchAddress("ndf", &ndf);
+  tree->SetBranchAddress("Pval", &Pval);
+  tree->SetBranchAddress("x_u", &x_u);
+  tree->SetBranchAddress("x_b", &x_b);
+  tree->SetBranchAddress("x_mea", &x_mea);
+  tree->SetBranchAddress("weight", &w);
+  tree->SetBranchAddress("alpha", &alpha);
+  tree->SetBranchAddress("theta", &theta);
 
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);

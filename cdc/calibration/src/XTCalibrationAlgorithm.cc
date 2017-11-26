@@ -38,12 +38,34 @@ XTCalibrationAlgorithm::XTCalibrationAlgorithm() :  CalibrationAlgorithm("CDCCal
 
 void XTCalibrationAlgorithm::createHisto()
 {
-  B2INFO("creating and filling histo");
-  readXTProfile();
+  B2INFO("create and fillhisto");
+
+
+  /*Create histogram*/
+  for (int i = 0; i < 56; ++i) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
+          m_hProf[i][lr][al][th] = new TProfile(Form("m_hProf%d_%d_%d_%d", i, lr, al, th),
+                                                Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
+                                                     i, lr, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 0, 1.2, "i");
+          m_hist2d[i][lr][al][th] = new TH2D(Form("h%d_%d_%d_%d", i, lr, al, th),
+                                             Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
+                                                  i, lr, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 110, 0, 1.2);
+          if (lr == 1)
+            m_hist2dDraw[i][al][th] = new TH2D(Form("h_draw%d_%d_%d", i, al, th),
+                                               Form("(L=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
+                                                    i, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 2200, -1.2, 1.2);
+        }
+      }
+    }
+  }
+
+  /* Read data and make histo*/
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  int lay, trighit;
+  int lay;
   double dt;
   double dx;
   double Pval, alpha, theta;
@@ -55,38 +77,14 @@ void XTCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("alpha", &alpha);
   tree->SetBranchAddress("theta", &theta);
   tree->SetBranchAddress("Pval", &Pval);
-  tree->SetBranchAddress("trighit", &trighit);
   tree->SetBranchAddress("ndf", &ndf);
 
-  /*Create histogram*/
-  for (int i = 0; i < 56; ++i) {
-    for (int lr = 0; lr < 2; ++lr) {
-      for (int al = 0; al < m_nAlphaBins; ++al) {
-        for (int th = 0; th < m_nThetaBins; ++th) {
-          hprof[i][lr][al][th] = new TProfile(Form("hprof%d_%d_%d_%d", i, lr, al, th),
-                                              Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
-                                                   i, lr, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 0, 1.2, "i");
-          hist2d[i][lr][al][th] = new TH2D(Form("h%d_%d_%d_%d", i, lr, al, th),
-                                           Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
-                                                i, lr, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 110, 0, 1.2);
-          if (lr == 1)
-            hist2d_draw[i][al][th] = new TH2D(Form("h_draw%d_%d_%d", i, al, th),
-                                              Form("(L=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
-                                                   i, m_iAlpha[al], m_iTheta[th]), 210, -20, 600, 2200, -1.2, 1.2);
-        }
-      }
-    }
-  }
-
-  /* Read data and make histo*/
   int al = 0;
   int th = 0;
-  Long64_t nbytes = 0;
   const int nEntries = tree->GetEntries();
-  B2INFO("Number of events: " << nEntries);
-
+  B2INFO("Number of entries " << nEntries);
   for (int i = 0; i < nEntries; ++i) {
-    nbytes += tree->GetEntry(i);
+    tree->GetEntry(i);
     /* protect in case |alpha|>90 */
     if (fabs(alpha > 90)) {
       if (alpha < 0) alpha += 180;
@@ -109,15 +107,15 @@ void XTCalibrationAlgorithm::createHisto()
     }
     int lr = dx > 0 ? c_Right : c_Left;
     if (m_LRseparate) {
-      hprof[lay][lr][al][th]->Fill(dt, abs(dx));
-      hist2d[lay][lr][al][th]->Fill(dt, abs(dx));
+      m_hProf[lay][lr][al][th]->Fill(dt, abs(dx));
+      m_hist2d[lay][lr][al][th]->Fill(dt, abs(dx));
     } else {
-      hprof[lay][0][al][th]->Fill(dt, abs(dx));
-      hist2d[lay][0][al][th]->Fill(dt, abs(dx));
-      hprof[lay][1][al][th]->Fill(dt, abs(dx));
-      hist2d[lay][1][al][th]->Fill(dt, abs(dx));
+      m_hProf[lay][0][al][th]->Fill(dt, abs(dx));
+      m_hist2d[lay][0][al][th]->Fill(dt, abs(dx));
+      m_hProf[lay][1][al][th]->Fill(dt, abs(dx));
+      m_hist2d[lay][1][al][th]->Fill(dt, abs(dx));
     }
-    hist2d_draw[lay][al][th]->Fill(dt, dx);
+    m_hist2dDraw[lay][al][th]->Fill(dt, dx);
   }
 }
 
@@ -125,6 +123,7 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
 {
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
+  prepare();
   createHisto();
   B2INFO("Start calibration");
 
@@ -133,31 +132,31 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          if (hist2d[l][lr][al][th]->GetEntries() < m_minEntriesRequired) {
-            m_fitStatus[l][lr][al][th] = -1;
+          if (m_hist2d[l][lr][al][th]->GetEntries() < m_minEntriesRequired) {
+            m_fitStatus[l][lr][al][th] = FitStatus::c_lowStat;
             continue;
           }
           double p0, p1, tmin;
           TF1* fpol1;
           if (m_useSliceFit) {
-            hist2d[l][lr][al][th]->FitSlicesY(0, 0, -1, 5);
-            hist2d_1[l][lr][al][th] = (TH1D*)gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th));
-            if (!hist2d_1[l][lr][al][th]) {
-              m_fitStatus[l][lr][al][th] = -1;
+            m_hist2d[l][lr][al][th]->FitSlicesY(0, 0, -1, 5);
+            m_hist2d_1[l][lr][al][th] = (TH1D*)gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th));
+            if (!m_hist2d_1[l][lr][al][th]) {
+              m_fitStatus[l][lr][al][th] = FitStatus::c_lowStat;
               B2WARNING("Error, not found results of slices fit");
               continue;
             }
-            hist2d_1[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            fpol1 = (TF1*)hprof[l][lr][al][th]->GetFunction("pol1");
+            m_hist2d_1[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
+            fpol1 = (TF1*)m_hProf[l][lr][al][th]->GetFunction("pol1");
           } else {
             /*Set Error for low statistic bin*/
-            for (int n = 0; n < hprof[l][lr][al][th]->GetNbinsX(); ++n) {
-              if (hprof[l][lr][al][th]->GetBinEntries(n) < 5 && hprof[l][lr][al][th]->GetBinEntries(n) > 1) {
-                hprof[l][lr][al][th]->SetBinError(n, 0.3 / hprof[l][lr][al][th]->GetBinEntries(n));
+            for (int n = 0; n < m_hProf[l][lr][al][th]->GetNbinsX(); ++n) {
+              if (m_hProf[l][lr][al][th]->GetBinEntries(n) < 5 && m_hProf[l][lr][al][th]->GetBinEntries(n) > 1) {
+                m_hProf[l][lr][al][th]->SetBinError(n, 0.3 / m_hProf[l][lr][al][th]->GetBinEntries(n));
               }
             }
-            hprof[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            fpol1 = (TF1*)hprof[l][lr][al][th]->GetFunction("pol1");
+            m_hProf[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
+            fpol1 = (TF1*)m_hProf[l][lr][al][th]->GetFunction("pol1");
           }
 
           if (fpol1) {
@@ -174,9 +173,9 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
 
           XTFunction* xt;
           if (m_useSliceFit) { // if slice fit results exist.
-            xt = new XTFunction(hist2d_1[l][lr][al][th], m_xtMode);
+            xt = new XTFunction(m_hist2d_1[l][lr][al][th], m_xtMode);
           } else { // from TProfile.
-            xt = new XTFunction(hprof[l][lr][al][th], m_xtMode);
+            xt = new XTFunction(m_hProf[l][lr][al][th], m_xtMode);
           }
 
           if (m_bField) {
@@ -194,12 +193,18 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
                 break;
               }
             }
-            double p6 = m_xtOld[l][lr][ial_old][ith_old][6];
+
+            double p6 = m_xtPost[l][lr][ial_old][ith_old][6];
             if (p6 > 400) {
               p6 = 400;
             }
-            xt->setXTParams(m_xtOld[l][lr][ial_old][ith_old]);
-            xt->setP6(p6);
+
+            if (m_xtMode == m_xtModePost) {
+              xt->setXTParams(m_xtPost[l][lr][ial_old][ith_old]);
+              xt->setP6(p6);
+            } else {
+              xt->setXTParams(p0, p1, 0., 0., 0., 0., p6, m_xtPost[l][lr][ial_old][ith_old][7]);
+            }
             xt->setFitRange(tmin, p6 + 100);
           } else {
             xt->setXTParams(p0, p1, 0., 0., 0., 0., m_par6[l], 0.0001);
@@ -208,20 +213,85 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
           xt->setDebug(m_debug);
           xt->setBField(m_bField);
           xt->fitXT();
+
           m_fitStatus[l][lr][al][th] = xt->getFitStatus();
           m_xtFunc[l][lr][al][th] = (TF1*)xt->getXTFunction();
+
           if (m_useSliceFit) {
-            hist2d_1[l][lr][al][th] = (TH1D*)xt->getFittedHisto();
+            m_hist2d_1[l][lr][al][th] = (TH1D*)xt->getFittedHisto();
           } else {
-            hprof[l][lr][al][th] = (TProfile*)xt->getFittedHisto();
+            m_hProf[l][lr][al][th] = (TProfile*)xt->getFittedHisto();
           }
         }
       }
     }
   }
+
   write();
   storeHisto();
+  for (int l = 0; l < 56; ++l) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
+          if (m_fitStatus[l][lr][al][th] != FitStatus::c_OK) {
+            return c_Iterate;
+          }
+        }
+      }
+    }
+  }
+
   return c_OK;
+}
+
+void XTCalibrationAlgorithm::prepare()
+{
+  B2INFO("Prepare calibration of XT");
+  const double rad2deg = 180 / M_PI;
+
+  DBObjPtr<CDCXtRelations> dbXT;
+  DBStore::Instance().update();
+
+
+  m_nAlphaBins = dbXT->getNoOfAlphaBins();
+  m_nThetaBins = dbXT->getNoOfThetaBins();
+  for (unsigned short i = 0; i < m_nAlphaBins; ++i) {
+    array3 alpha = dbXT->getAlphaBin(i);
+    m_lowerAlpha[i] = alpha[0] * rad2deg;
+    m_upperAlpha[i] = alpha[1] * rad2deg;
+    m_iAlpha[i] = alpha[2] * rad2deg;
+  }
+
+  for (unsigned short i = 0; i < m_nThetaBins; ++i) {
+    array3 theta = dbXT->getThetaBin(i);
+    m_lowerTheta[i] = theta[0] * rad2deg;
+    m_upperTheta[i] = theta[1] * rad2deg;
+    m_iTheta[i] = theta[2] * rad2deg;
+  }
+  m_xtModePost = dbXT->getXtParamMode();
+  if (!(m_xtModePost == c_Chebyshev || m_xtModePost == c_Polynomial)) {
+    B2FATAL("Function type before calibration is wrong " << m_xtModePost);
+  }
+
+  B2INFO("Number of alpha bins " << m_nAlphaBins);
+  B2INFO("Number of theta bins " << m_nThetaBins);
+  B2INFO("Function type " << m_xtMode);
+
+  for (unsigned short iCL = 0; iCL < 56; ++iCL) {
+    for (unsigned short iLR = 0; iLR < 2; ++iLR) {
+      for (unsigned short iA = 0; iA < m_nAlphaBins; ++iA) {
+        for (unsigned short iT = 0; iT < m_nThetaBins; ++iT) {
+          const std::vector<float> params = dbXT->getXtParams(iCL, iLR, iA, iT);
+          unsigned short np = params.size();
+          for (unsigned short i = 0; i < np; ++i) {
+            m_xtPost[iCL][iLR][iA][iT][i] = params[i];
+          }
+        }
+      }
+    }
+  }
+
+
 }
 void XTCalibrationAlgorithm::write()
 {
@@ -254,7 +324,7 @@ void XTCalibrationAlgorithm::write()
             nfailure += 1;
             printf("fit failure status = %d \n", m_fitStatus[l][lr][al][th]);
             printf("layer %d, r %d, alpha %3.1f, theta %3.1f \n", l, lr, m_iAlpha[al], m_iTheta[th]);
-            printf("number of event: %3.2f \n", hprof[l][lr][al][th]->GetEntries());
+            printf("number of event: %3.2f \n", m_hProf[l][lr][al][th]->GetEntries());
             if (m_fitStatus[l][lr][al][th] != -1) {
               printf("Probability of fit: %3.4f \n", m_xtFunc[l][lr][al][th]->GetProb());
             }
@@ -343,17 +413,17 @@ void XTCalibrationAlgorithm::storeHisto()
     Direct[l]->cd();
     for (int th = 0; th < m_nThetaBins; ++th) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
-        hist2d_draw[l][al][th]->Write();
+        m_hist2dDraw[l][al][th]->Write();
         for (int lr = 0; lr < 2; ++lr) {
-          hist2d[l][lr][al][th]->Write();
+          m_hist2d[l][lr][al][th]->Write();
           if (m_fitStatus[l][lr][al][th] != 1) continue;
           if (m_useSliceFit) {
-            if (hist2d_1[l][lr][al][th]) {
-              hist2d_1[l][lr][al][th]->Write();
+            if (m_hist2d_1[l][lr][al][th]) {
+              m_hist2d_1[l][lr][al][th]->Write();
               nhisto += 1;
             }
           } else {
-            hprof[l][lr][al][th]->Write();
+            m_hProf[l][lr][al][th]->Write();
             nhisto += 1;
           }
         }
@@ -362,35 +432,5 @@ void XTCalibrationAlgorithm::storeHisto()
   }
   fout->Close();
   B2RESULT("  " << nhisto << " histograms was stored.");
-}
-
-void XTCalibrationAlgorithm::readXTProfile()
-{
-  B2INFO("readXTProfile");
-  const double rad2deg = 180 / M_PI;
-
-  DBObjPtr<CDCXtRelations> dbXT;
-  DBStore::Instance().update();
-
-
-  m_nAlphaBins = dbXT->getNoOfAlphaBins();
-  m_nThetaBins = dbXT->getNoOfThetaBins();
-  for (unsigned short i = 0; i < m_nAlphaBins; ++i) {
-    array3 alpha = dbXT->getAlphaBin(i);
-    m_lowerAlpha[i] = alpha[0] * rad2deg;
-    m_upperAlpha[i] = alpha[1] * rad2deg;
-    m_iAlpha[i] = alpha[2] * rad2deg;
-  }
-
-  for (unsigned short i = 0; i < m_nThetaBins; ++i) {
-    array3 theta = dbXT->getThetaBin(i);
-    m_lowerTheta[i] = theta[0] * rad2deg;
-    m_upperTheta[i] = theta[1] * rad2deg;
-    m_iTheta[i] = theta[2] * rad2deg;
-  }
-  m_xtMode = dbXT->getXtParamMode();
-
-  B2INFO("Number of alpha bins " << m_nAlphaBins);
-  B2INFO("Number of theta bins " << m_nThetaBins);
 }
 

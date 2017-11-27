@@ -522,10 +522,8 @@ void EclData::fillTimeHistogram(TH1F* hist, int time_min, int time_max, EclData:
   for (int i = start; i < end; i++) {
     m_tree->GetEntry(i);
 
-    double energy = m_branch_energy;
-
     if (m_en_range_max >= 0)
-      if (energy < m_en_range_min || energy > m_en_range_max)
+      if (m_branch_energy < m_en_range_min || m_branch_energy > m_en_range_max)
         continue;
 
     if (isCrystalInSubsystem(m_branch_ch, subsys)) {

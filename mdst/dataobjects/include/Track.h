@@ -30,8 +30,9 @@ namespace Belle2 {
     */
     typedef std::pair< Const::ChargedStable, const TrackFitResult*> ChargedStableTrackFitResultPair;
 
-    /** Constructor without arguments; needed for I/O.
+    /** Constructor of Track without any attached TrackFitResults.
      *
+     *  Corresponding TrackFitResults should be added using the corresponding setter function.
      *  The array with the indices for the TrackFitResults is initialized with -1,
      *  which is an invalid index.
      *  @param qualityIndicator   Initialises m_qualityIndicator with 0, a value associated typically with fake tracks.

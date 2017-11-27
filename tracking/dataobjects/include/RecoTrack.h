@@ -718,6 +718,7 @@ namespace Belle2 {
      */
     void deleteFittedInformation();
 
+    /// Get useful information on EventDisplay
     virtual std::string getInfoHTML() const;
 
   private:

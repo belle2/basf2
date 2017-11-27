@@ -47,7 +47,7 @@ int EclPainterCommon::getMinX()
 {
   switch (m_type) {
     case AMP:
-      return 50;
+      return 0;
     case AMP_SUM:
       return 0;
     case TIME:
@@ -61,9 +61,9 @@ int EclPainterCommon::getMaxX()
 {
   switch (m_type) {
     case AMP:
-      return 3000;
+      return 150;
     case AMP_SUM:
-      return 45000;
+      return 2500;
     case TIME:
       return 2048;
   }
@@ -94,10 +94,10 @@ void EclPainterCommon::Draw()
 
   switch (getType()) {
     case AMP:
-      data->fillAmpHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
+      data->fillEnergyHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
       break;
     case AMP_SUM:
-      data->fillAmpSumHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
+      data->fillEnergySumHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
       break;
     case TIME:
       data->fillTimeHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());

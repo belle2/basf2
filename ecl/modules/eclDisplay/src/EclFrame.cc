@@ -272,6 +272,7 @@ void EclFrame::initData()
   m_events_max->SetLimits(TGNumberFormat::kNELLimitMinMax,
                           0, m_ecl_data->getLastEventId());
 
+  B2DEBUG(500, "Last event id: " << m_ecl_data->getLastEventId());
   m_ev_slider->SetRange(0, m_ecl_data->getLastEventId());
   m_ev_slider->SetPosition(0, 0);
   m_ev_slider->Connect("TGDoubleHSlider", "PositionChanged()",
@@ -290,9 +291,12 @@ void EclFrame::handleMenu(int id)
       fi.fFileTypes = 0;
       fi.fIniDir    = StrDup(dir);
       new TGFileDialog(gClient->GetRoot(), this, kFDOpen, &fi);
-      if (fi.fFileNamesList) {
-        m_ecl_data->loadRootFile(fi.fFilename);
-        loadNewData();
+      if (fi.fFilename) {
+        if (gSystem->AccessPathName(fi.fFilename, kFileExists) == 0) {
+          B2DEBUG(50, "ECLFrame:: Opening file " << fi.fFilename);
+          m_ecl_data->loadRootFile(fi.fFilename);
+          loadNewData();
+        }
       }
       // doDraw();
       break;
@@ -368,14 +372,9 @@ void EclFrame::loadNewData()
       m_settings->MapSubwindows();
       MapSubwindows();
 
-//      Layout();
-//      MapSubwindows();
-//      Layout();
-
       m_ev_slider->SetPosition(0, 0);
     }
     updateEventRange();
-//    gSystem->ProcessEvents();
   }
 }
 
@@ -398,10 +397,8 @@ void EclFrame::updateEventRange()
   m_events_min->SetNumber(ev_min);
   m_events_max->SetNumber(ev_max);
 
-//  m_settings->MapSubwindows();
-//  m_ev_slider->Layout();
   m_ev_slider->MapWindow();
-  m_ev_slider->MapSubwindows(); // Doesn't work without MapWindow
+  m_ev_slider->MapSubwindows();
 }
 
 void EclFrame::showPrevEvents()
@@ -514,7 +511,6 @@ void EclFrame::changeRange(TGListTreeItem* entry, int)
       changeType(PAINTER_SHAPER, false);
       long crate = (long)entry->GetUserData();
       m_ecl_painter->setXRange(crate * 12, crate * 12 + 11);
-      //((EclPainter1D*)m_ecl_painter)->setCrate(crate + 1);
       doDraw();
     } else {
       // Shaper entry had been selected.
@@ -522,7 +518,6 @@ void EclFrame::changeRange(TGListTreeItem* entry, int)
       long shaper = (long)entry->GetUserData();
       long crate  = (long)parent->GetUserData();
       shaper = 12 * crate + shaper;
-      //m_ecl_painter->setXRange(shaper * 16, shaper * 16 + 15);
       ((EclPainter1D*)m_ecl_painter)->setShaper(crate + 1, shaper + 1);
       doDraw();
     }

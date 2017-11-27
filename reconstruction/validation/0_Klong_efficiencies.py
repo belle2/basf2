@@ -39,6 +39,7 @@ add_reconstruction(main)
 # run a module to generate histograms to test pid performance
 validation = register_module('KlongValidation')
 validation.param('outPath', 'nightlyKlongValidationPhiThetaMom.root')
+validation.param("KlId_cut", 0.1)
 main.add_module(validation)
 
 main.add_module(register_module('ProgressBar'))

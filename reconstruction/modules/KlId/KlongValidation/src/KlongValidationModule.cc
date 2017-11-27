@@ -19,6 +19,7 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <reconstruction/dataobjects/KlId.h>
 //#include <mdst/dataobjects/ECLCluster.h>
 
 // here's where the functions are hidden
@@ -26,7 +27,7 @@
 
 #include <TTree.h>
 #include <TFile.h>
-#include <TEfficiency.h>
+#include <TH1F.h>
 #include <cstring>
 
 using namespace Belle2;
@@ -41,6 +42,9 @@ KlongValidationModule::KlongValidationModule(): Module()
   addParam("outPath", m_outPath,
            "name your root file. has to end with .root",
            m_outPath);
+  addParam("KlId_cut", m_KlIDCut,
+           "if cut < 0 then only the !trackFlag condition will be used (only neutral clusters). Otherwise the cut determines which Clusters will be used.",
+           m_KlIDCut);
 }
 
 
@@ -65,16 +69,28 @@ void KlongValidationModule::initialize()
   // initialize root tree to write stuff into
   m_f =     new TFile(m_outPath.c_str(), "recreate");
 
-  //use TEfficiency histogramms to calculate efficiency
+  //use TH1F histogramms to calculate efficiency
   // name, title;xtitle;ytitle,
-  m_effPhi    = new TEfficiency("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 5, -3.2, 3.2);
-  m_effTheta  = new TEfficiency("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 5, 0, 3.2);
-  m_effMom    = new TEfficiency("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 5, 0, 5);
-  m_fakePhi   = new TEfficiency("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 5, -3.2, 3.2);
-  m_fakeTheta = new TEfficiency("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 5, 0, 3.2);
-  m_fakeMom   = new TEfficiency("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 5, 0, 5);
+  m_effPhi_Pass      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 50, -3.2, 3.2);
+  m_Phi_all  = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 50, -3.2, 3.2);
+  m_effPhi      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 50, -3.2, 3.2);
 
+  m_effTheta_Pass    = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 50, 0, 3.2);
+  m_Theta_all  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 50, 0, 3.2);
+  m_effTheta  = new TH1F("Theta Efficiency", "Efficiency #Theta;#Theta;Efficiency", 50, 0, 3.2);
 
+  m_effMom_Pass      = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 50, 0, 5);
+  m_Mom_all    = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 50, 0, 5);
+  m_effMom    = new TH1F("Momentum Efficiency", "Efficiency Momentum;Momentum;Efficiency", 50, 0, 5);
+
+  m_fakePhi_Pass     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 50, -3.2, 3.2);
+  m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi;Fake Rate", 50, -3.2, 3.2);
+
+  m_fakeTheta_Pass = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 50, 0, 3.2);
+  m_fakeTheta = new TH1F("Theta Fake Rate", "Fake Rate #Theta;#Theta;Fake Rate", 50, 0, 3.2);
+
+  m_fakeMom_Pass   = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 50, 0, 5);
+  m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 50, 0, 5);
 }//init
 
 
@@ -90,22 +106,40 @@ void KlongValidationModule::event()
 {
   StoreArray<KLMCluster> klmClusters;
 
-  // the performance of the classifier depends on the cut on the classifier
-  // output. This is generally arbitrary as it depends on what the user wants.
-  // Finding K_L or rejecting?
-  // Therefore an arbitrary cut is chosen so that something happens and we can judge
-  // if the behavior changes.
-  float abitraryCut = 0.1;
   for (const KLMCluster& cluster : klmClusters) {
 
-    if (!cluster.getRelatedTo<KlId>()) {
-      B2WARNING("could not find a associated K_L Id obj. Did you run the KLM classifier?");
-    }
+    MCParticle* mcpart = NULL;
 
-    if (cluster.getRelatedTo<KlId>()->getKlId() > abitraryCut)
-      m_reconstructedAsKl = true;
-    else {
-      m_reconstructedAsKl = false;
+    if (m_KlIDCut >= 0) {
+      auto klidObj = cluster.getRelatedTo<KlId>();
+      if (klidObj) {
+        if (klidObj->getKlId() > m_KlIDCut) {
+          m_reconstructedAsKl = true;
+        } else {
+          m_reconstructedAsKl = false;
+        }
+      }
+    } else {
+      if (!cluster.getAssociatedTrackFlag()) {
+        m_reconstructedAsKl = true;
+      }
+    }
+    mcpart = cluster.getRelatedTo<MCParticle>();
+    // find mc truth
+    // go thru all mcparts mothers up to highest particle and check if its a Klong
+    m_isKl = 0;
+    if (mcpart == nullptr) {
+      m_isKl = 0; // this is the case for beambkg
+      m_isBeamBKG = 1;
+    } else {
+      m_isBeamBKG = 0;
+      while (!(mcpart -> getMother() == nullptr)) {
+        if (mcpart -> getPDG() == 130) {
+          m_isKl = 1;
+          break;
+        }
+        mcpart = mcpart -> getMother();
+      }// while
     }
     // second param is cut on
     m_isKl = isKLMClusterSignal(cluster);
@@ -122,21 +156,23 @@ void KlongValidationModule::event()
     m_theta    = cluster.getMomentum().Theta();
     m_momentum = std::abs(cluster.getMomentum().Mag());//Mag2(); ??
 
-    // TEff fills 2 histogramms based on "passed" and calculates
-    // the efficiency from that...
 
-    // for the efficiency only fill something if its klong
-    // so that efficiency wil be normalized to 1.
-    if (m_isKl) {
-      m_effPhi    -> Fill(m_passed,  m_phi);
-      m_effTheta  -> Fill(m_passed,  m_theta);
-      m_effMom    -> Fill(m_passed,  m_momentum);
+    if (m_passed) {
+      m_effPhi_Pass    -> Fill(m_phi);
+      m_effTheta_Pass  -> Fill(m_theta);
+      m_effMom_Pass    -> Fill(m_momentum);
     }
 
-    // for the fakerate no normalisation is needed
-    m_fakePhi   -> Fill(m_faked,   m_phi);
-    m_fakeTheta -> Fill(m_faked,   m_theta);
-    m_fakeMom   -> Fill(m_faked,   m_momentum);
+    if (m_faked) {
+      m_fakePhi_Pass   -> Fill(m_phi);
+      m_fakeTheta_Pass -> Fill(m_theta);
+      m_fakeMom_Pass   -> Fill(m_momentum);
+    }
+
+    //fil all to normalise later
+    m_Phi_all -> Fill(m_phi);
+    m_Theta_all -> Fill(m_theta);
+    m_Mom_all -> Fill(m_momentum);
 
   }// for klm clusters
 
@@ -147,6 +183,15 @@ void KlongValidationModule::terminate()
 {
   // write TEff to root file ,
   m_f         -> cd();
+
+  // TH1F is not compatible with the validation server
+  m_effPhi->Divide(m_effPhi_Pass, m_Phi_all);
+  m_effTheta->Divide(m_effTheta_Pass, m_Theta_all);
+  m_effMom->Divide(m_effTheta_Pass, m_Mom_all);
+
+  m_fakePhi->Divide(m_fakePhi_Pass, m_Phi_all);
+  m_fakeTheta->Divide(m_fakeTheta_Pass, m_Theta_all);
+  m_fakeMom->Divide(m_fakeMom_Pass, m_Mom_all);
 
   // efficiencies
   m_effPhi   -> SetTitle("Klong efficiency in Phi");
@@ -182,7 +227,6 @@ void KlongValidationModule::terminate()
                                                         "Fake Rate = 1-purity of the KLM classifier in momentum bins."));
   m_fakeMom   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
   m_fakeMom   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
-
 
   m_effPhi    -> Write();
   m_effTheta  -> Write();

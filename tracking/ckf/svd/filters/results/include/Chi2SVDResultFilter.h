@@ -24,12 +24,10 @@ namespace Belle2 {
     TrackFindingCDC::Weight operator()(const CKFToSVDResult& result)
     {
       const double chi2 = result.getChi2();
-
-      const RecoTrack* seedTrack = result.getSeed();
       const std::vector<const SpacePoint*> spacePoints = result.getHits();
 
       // TODO: this is bad, as we actually have already performed this!
-      genfit::MeasuredStateOnPlane mSoP = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
+      genfit::MeasuredStateOnPlane mSoP = result.getSeedMSoP();
 
       for (const SpacePoint* spacePoint : spacePoints) {
         if (std::isnan(m_advancer.extrapolateToPlane(mSoP, *spacePoint))) {
@@ -38,7 +36,7 @@ namespace Belle2 {
         m_kalmanStepper.kalmanStep(mSoP, *spacePoint);
       }
 
-      const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
+      const genfit::MeasuredStateOnPlane& firstCDCHit = result.getSeedMSoP();
       m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());
 
       const double distance = (mSoP.getPos() - firstCDCHit.getPos()).Mag();

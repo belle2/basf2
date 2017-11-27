@@ -42,9 +42,9 @@ namespace Belle2 {
     int* m_event_counts;
     /**  Max value in event_counts array. */
     int m_event_count_max;
-    /**  Sum of amplitudes of every event captured by crystal. */
+    /**  Sum of energies of every event captured by crystal (MeV). */
     float* m_energy_sums;
-    /**  Max value in amp_sums array. */
+    /**  Max value in m_energy_sums array. */
     float m_energy_sums_max;
     /**  Total energy for last displayed range of events. */
     float m_energy_total;

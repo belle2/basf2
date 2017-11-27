@@ -96,8 +96,8 @@ void EclPainter1D::setTitles()
     },
 
     {
-      "Time per channel (DAQ units)", "Time per shaper (DAQ units)", "Time per collector (DAQ units)",
-      "Time per phi_id (DAQ units)", "Time per theta_id (DAQ units)"
+      "Time per channel (ns)", "Time per shaper (ns)", "Time per collector (ns)",
+      "Time per phi_id (ns)", "Time per theta_id (ns)"
     }
   };
   const char* xname[3] = {

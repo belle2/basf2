@@ -135,6 +135,6 @@ namespace Belle2 {
      */
     float const m_qualityIndicator;
 
-    ClassDef(Track, 3); /**< Class that bundles various TrackFitResults. */
+    ClassDef(Track, 4); /**< Class that bundles various TrackFitResults. */
   };
 }

@@ -113,7 +113,7 @@ namespace Belle2 {
      *  The meaning of the value may strongly depend on the presence of VXD or CDC measurements,
      *  but this information is available at mdst level as well.
      */
-    float getQualityIndictor() const
+    float getQualityIndicator() const
     {
       return m_qualityIndicator;
     }

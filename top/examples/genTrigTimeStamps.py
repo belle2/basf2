@@ -33,14 +33,14 @@ main.add_module(evtgeninput)
 
 # Beam background mixer
 bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if 'BELLE2_BACKGROUND_MIXING_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
 if bg is not None:
     bkgmixer = register_module('BeamBkgMixer')
     bkgmixer.param('backgroundFiles', bg)
     main.add_module(bkgmixer)
     B2RESULT('Simulaton w/ beam background, samples taken from folder ' +
-             os.environ['BELLE2_BACKGROUND_DIR'])
+             os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 else:
     B2RESULT('Simulaton w/o beam background')
 

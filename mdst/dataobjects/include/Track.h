@@ -34,8 +34,9 @@ namespace Belle2 {
      *
      *  The array with the indices for the TrackFitResults is initialized with -1,
      *  which is an invalid index.
+     *  @param qualityIndicator   Initialises m_qualityIndicator with 0, a value associated typically with fake tracks.
      */
-    Track()
+    Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
     {
       std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }
@@ -95,6 +96,27 @@ namespace Belle2 {
     /** Returns the number of fitted hypothesis which are stored in this track. */
     unsigned int getNumberOfFittedHypotheses() const;
 
+    /** Getter for quality indicator for classification of fake vs. MC-matched Tracks.
+     *
+     *  During reconstruction, the probability (given a certain sample composition) of a track
+     *  to originate from a charged particle rather than e.g. a random combination of hits from
+     *  different charged particles and background contributions is estimated. This estimate
+     *  includes information, that isn't used for the calculation of the p-value of the fit, e.g.
+     *  energy-deposition, timing, and cluster-shape information.
+     *  We consider it unlikely, that we will make such an estimate for each hypothesis. Therfore,
+     *  the Track rather than the TrackFitResult is the place to store this information.
+     *  We don't want to provide a default cut, because charged-particle-vetos and
+     *  recombination of different kind of resonances potentially can profit from different
+     *  working points on the efficiency-purity curve, and we expect some MC-data discrepancy due
+     *  to imperfect calibration of the local reconstruction inputs.
+     *  The meaning of the value may strongly depend on the presence of VXD or CDC measurements,
+     *  but this information is available at mdst level as well.
+     */
+    float getQualityIndictor() const
+    {
+      return m_qualityIndicator;
+    }
+
   private:
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
@@ -104,6 +126,13 @@ namespace Belle2 {
      * which have been set (meaning are not -1)
      */
     std::vector < short int > getValidIndices() const;
+
+    /** Quality indicator for classification of fake vs. MC-matched Tracks.
+     *
+     *  Given likely data-MC discrepancies etc orders of magnitude larger than float precision,
+     *  single precision is enough.
+     */
+    float const m_qualityIndicator;
 
     ClassDef(Track, 3); /**< Class that bundles various TrackFitResults. */
   };

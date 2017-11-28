@@ -22,7 +22,7 @@
       <z_plume unit="cm">4.22</z_plume>
       <r_plume unit="cm">6.1</r_plume>
       <ThetaZ unit="deg">178.0</ThetaZ>
-      <Phi unit="deg">135.0</Phi>      
+      <Phi unit="deg">225.0</Phi>      
       
       <elecBandX unit="mm">0.300</elecBandX>
       <integrationTime unit="us">100.0</integrationTime>
@@ -52,7 +52,7 @@
       <z_plume unit="cm">-2.18</z_plume>
       <r_plume unit="cm">8.4</r_plume>
       <ThetaZ unit="deg">20.0</ThetaZ>
-      <Phi unit="deg">225.0</Phi>      
+      <Phi unit="deg">135.0</Phi>      
       
       <elecBandX unit="mm">0.300</elecBandX>
       <integrationTime unit="us">100.0</integrationTime>

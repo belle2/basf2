@@ -16,7 +16,6 @@ import tracking
 from modularAnalysis import *
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
-from Overlaps import Overlaps
 
 inname = "generation.root"
 outname = "reconstruction.root"

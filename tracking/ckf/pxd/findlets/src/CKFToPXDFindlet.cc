@@ -72,8 +72,10 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
 
   moduleParamList->getParameter<bool>("useAssignedHits").setDefaultValue(false);
 
-  moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("distance");
-  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("distance");
+  moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+
+  moduleParamList->getParameter<std::string>("filter").setDefaultValue("mva");
 }
 
 void CKFToPXDFindlet::beginEvent()

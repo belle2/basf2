@@ -101,11 +101,16 @@ namespace Belle2 {
     m_tree->Branch("extHit",  &m_top.extHit,  "moduleID/I:PDG:x/F:y:z:p:theta:phi:time");
     m_tree->Branch("barHit",  &m_top.barHit,  "moduleID/I:PDG:x/F:y:z:p:theta:phi:time");
 
-    StoreArray<Track>::required();
-    StoreArray<ExtHit>::required();
-    StoreArray<TOPLikelihood>::required();
-    StoreArray<MCParticle>::optional();
-    StoreArray<TOPBarHit>::optional();
+    StoreArray<Track> tracks;
+    tracks.isRequired();
+    StoreArray<ExtHit> extHits;
+    extHits.isRequired();
+    StoreArray<TOPLikelihood> likelihoods;
+    likelihoods.isRequired();
+    StoreArray<MCParticle> mcParticles;
+    mcParticles.isOptional();
+    StoreArray<TOPBarHit> barHits;
+    barHits.isOptional();
 
   }
 

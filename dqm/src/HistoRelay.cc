@@ -24,11 +24,11 @@ HistoRelay::HistoRelay(string& file, string& dest, int port) : m_filename(file),
   m_msg = NULL;
 }
 
-HistoRelay::HistoRelay(const HistoRelay& hr) : HistoRelay(hr.m_filename, hr.m_dest, hr.m_port)
+HistoRelay::HistoRelay(const HistoRelay& hr) : m_filename(hr.m_filename), m_dest(hr.m_dest), m_port(hr.m_port)
 {
-  //m_memfile = new DqmMemFile(hr.m_filename);
-  //m_sock = new EvtSocketSend(hr.m_dest, hr.m_port);
-  //m_msg = NULL;
+  m_memfile = new DqmMemFile(hr.m_filename);
+  m_sock = new EvtSocketSend(hr.m_dest, hr.m_port);
+  m_msg = NULL;
 }
 
 HistoRelay::~HistoRelay()
@@ -38,14 +38,19 @@ HistoRelay::~HistoRelay()
   delete m_msg;
 }
 
-HistoRelay& HistoRelay::operator=(const HistoRelay& hr)
+HistoRelay& HistoRelay::operator=(const HistoRelay& other)
 {
-  if (m_memfile != NULL) delete m_memfile;
-  if (m_sock != NULL) delete m_sock;
-  if (m_msg != NULL) delete m_msg;
-  m_memfile = new DqmMemFile(hr.m_filename);
-  m_sock = new EvtSocketSend(hr.m_dest, hr.m_port);
-  m_msg = NULL;
+  if (this != &other) {
+    if (m_memfile != NULL) delete m_memfile;
+    if (m_sock != NULL) delete m_sock;
+    if (m_msg != NULL) delete m_msg;
+    m_filename = other.m_filename;
+    m_dest = other.m_dest;
+    m_port = other.m_port;
+    m_memfile = new DqmMemFile(m_filename);
+    m_sock = new EvtSocketSend(m_dest, m_port);
+    m_msg = NULL;
+  }
   return *this;
 }
 

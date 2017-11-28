@@ -41,14 +41,6 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  const std::vector<CDCHit*>& cdcHits = seedTrack->getSortedCDCHitList();
-  const std::vector<SVDCluster*>& svdHits = seedTrack->getSortedSVDHitList();
-
-  var<named("seed_cdc_hits")>() = cdcHits.size();
-  var<named("seed_svd_hits")>() = svdHits.size();
-  var<named("seed_lowest_cdc_layer")>() = cdcHits.empty() ? 0 : cdcHits.front()->getICLayer();
-  var<named("seed_lowest_svd_layer")>() = svdHits.empty() ? 0 : svdHits.front()->getSensorID().getLayerNumber();
-
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());
 

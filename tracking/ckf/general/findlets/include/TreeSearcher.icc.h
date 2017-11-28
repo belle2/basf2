@@ -10,12 +10,14 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
 #include <framework/logging/Logger.h>
+
 #include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/ca/CellHolder.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.icc.h>
 
 namespace Belle2 {
   template <class AState, class AStateRejecter, class AResult>

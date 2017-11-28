@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 
 #include <vector>
@@ -21,6 +23,13 @@ namespace Belle2 {
   class ModuleParamList;
 
   /**
+   * Findlet for constructing result paths out of a list of states, which are connected
+   * with weighted relations. At each step, the states are again tested using a state rejector,
+   * which also knows the current path of states.
+   *
+   * This rejector is allowed to alter the states, so using a cellular automaton it is assured,
+   * that the states are traversed in the correct order without overriding each other.
+   * It is however crucial, that the relations do not create cycles in the graph!
    */
   template <class AState, class AStateRejecter, class AResult>
   class TreeSearcher : public

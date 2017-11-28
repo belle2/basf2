@@ -11,15 +11,11 @@
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 //#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/utilities/ClosestApproach.h>
 
 #include <TRandom.h>
@@ -120,20 +116,16 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
 void CDCDigitizerModule::initialize()
 {
-  StoreArray<CDCSimHit> cdcSimHits(m_inputCDCSimHitsName);
-  cdcSimHits.isRequired();
+  m_simHits.isRequired(m_inputCDCSimHitsName);
 
   // Register the arrays in the DataStore, that are to be added in this module.
-  StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
-  cdcHits.registerPersistent();
-  cdcSimHits.registerRelationTo(cdcHits);
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.registerRelationTo(cdcHits);
+  m_cdcHits.registerInDataStore(m_outputCDCHitsName);
+  m_simHits.registerRelationTo(m_cdcHits);
+  m_mcParticles.registerRelationTo(m_cdcHits);
   // Arrays for trigger.
-  StoreArray<CDCHit> cdcHits4Trg(m_outputCDCHitsName4Trg);
-  cdcHits4Trg.registerPersistent(m_outputCDCHitsName4Trg);
-  cdcSimHits.registerRelationTo(cdcHits4Trg);
-  mcParticles.registerRelationTo(cdcHits4Trg);
+  m_cdcHits4Trg.registerInDataStore(m_outputCDCHitsName4Trg);
+  m_simHits.registerRelationTo(m_cdcHits4Trg);
+  m_mcParticles.registerRelationTo(m_cdcHits4Trg);
 
   m_cdcgp = &(CDCGeometryPar::Instance());
   CDCGeometryPar& cdcgp = *m_cdcgp;
@@ -174,10 +166,7 @@ void CDCDigitizerModule::initialize()
 void CDCDigitizerModule::event()
 {
   // Get SimHit array, MCParticle array, and relation between the two.
-  StoreArray<CDCSimHit> simHits(m_inputCDCSimHitsName);
-
-  StoreArray<MCParticle> mcParticles;                //needed to use the relations with MCParticles
-  RelationArray mcParticlesToCDCSimHits(mcParticles, simHits);  //RelationArray created by CDC SensitiveDetector
+  RelationArray mcParticlesToCDCSimHits(m_mcParticles, m_simHits);  //RelationArray created by CDC SensitiveDetector
 
 
   //--- Start Digitization --------------------------------------------------------------------------------------------
@@ -195,11 +184,11 @@ void CDCDigitizerModule::event()
   double trigTiming = m_trigTimeJitter == 0. ? 0. : m_trigTimeJitter * (gRandom->Uniform() - 0.5);
   //  std::cout << "trigTiming= " << trigTiming << std::endl;
   // Loop over all hits
-  int nHits = simHits.getEntries();
+  int nHits = m_simHits.getEntries();
   B2DEBUG(250, "Number of CDCSimHits in the current event: " << nHits);
   for (int iHits = 0; iHits < nHits; ++iHits) {
     // Get a hit
-    m_aCDCSimHit = simHits[iHits];
+    m_aCDCSimHit = m_simHits[iHits];
 
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
@@ -378,11 +367,8 @@ void CDCDigitizerModule::event()
   // create corresponding relations between SimHits and CDCHits.
 
   unsigned int iCDCHits = 0;
-
-  StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
-
-  RelationArray cdcSimHitsToCDCHits(simHits, cdcHits); //SimHit<->CDCHit
-  RelationArray mcParticlesToCDCHits(mcParticles, cdcHits); //MCParticle<->CDCHit
+  RelationArray cdcSimHitsToCDCHits(m_simHits, m_cdcHits); //SimHit<->CDCHit
+  RelationArray mcParticlesToCDCHits(m_mcParticles, m_cdcHits); //MCParticle<->CDCHit
 
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
@@ -401,13 +387,13 @@ void CDCDigitizerModule::event()
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
     unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
-    CDCHit* firstHit = cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
+    CDCHit* firstHit = m_cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
     //    std::cout <<"firsthit?= " << firstHit->is2ndHit() << std::endl;
     //set a relation: CDCSimHit -> CDCHit
     cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
 
     //set a relation: MCParticle -> CDCHit
-    RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+    RelationVector<MCParticle> rels = m_simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
     if (rels.size() != 0) {
       //assumption: only one MCParticle
       const MCParticle* mcparticle = rels[0];
@@ -420,7 +406,7 @@ void CDCDigitizerModule::event()
       unsigned short tdcCount2 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
                                                              m_tdcBinWidthInv + 0.5);
       if (tdcCount2 != tdcCount) {
-        CDCHit* secondHit = cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first);
+        CDCHit* secondHit = m_cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first);
         secondHit->set2ndHitFlag();
         secondHit->setOtherHitIndices(firstHit);
         //  std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
@@ -437,7 +423,7 @@ void CDCDigitizerModule::event()
         //        std::cout << "settdc2 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
         //set a relation: MCParticle -> CDCHit
-        rels = simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        rels = m_simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
         if (rels.size() != 0) {
           //assumption: only one MCParticle
           const MCParticle* mcparticle = rels[0];
@@ -451,7 +437,7 @@ void CDCDigitizerModule::event()
                                                                  m_tdcBinWidthInv + 0.5);
           //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
           if (tdcCount3 != tdcCount) {
-            CDCHit* secondHit = cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first);
+            CDCHit* secondHit = m_cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first);
             secondHit->set2ndHitFlag();
             secondHit->setOtherHitIndices(firstHit);
             //      secondHit->setOtherHitIndex(firstHit->getArrayIndex());
@@ -464,7 +450,7 @@ void CDCDigitizerModule::event()
             //            std::cout << "settdc3 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
             //set a relation: MCParticle -> CDCHit
-            rels = simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+            rels = m_simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
             if (rels.size() != 0) {
               //assumption: only one MCParticle
               const MCParticle* mcparticle = rels[0];
@@ -486,18 +472,16 @@ void CDCDigitizerModule::event()
 
   // Store the results with trigger time window in a separate array
   // with corresponding relations.
-  StoreArray<CDCHit> cdcHits4Trg(m_outputCDCHitsName4Trg);
-
   for (iterSignalMapTrg = signalMapTrg.begin(); iterSignalMapTrg != signalMapTrg.end(); ++iterSignalMapTrg) {
     unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
     unsigned short tdcCount =
       static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMapTrg->first.first) -
                                    iterSignalMapTrg->second.m_driftTime) * m_tdcBinWidthInv + 0.5);
-    const CDCHit* cdcHit = cdcHits4Trg.appendNew(tdcCount, adcCount, iterSignalMapTrg->first.first);
+    const CDCHit* cdcHit = m_cdcHits4Trg.appendNew(tdcCount, adcCount, iterSignalMapTrg->first.first);
 
     // relations
-    simHits[iterSignalMapTrg->second.m_simHitIndex]->addRelationTo(cdcHit);
-    RelationVector<MCParticle> rels = simHits[iterSignalMapTrg->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+    m_simHits[iterSignalMapTrg->second.m_simHitIndex]->addRelationTo(cdcHit);
+    RelationVector<MCParticle> rels = m_simHits[iterSignalMapTrg->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
     if (rels.size() != 0) {
       //assumption: only one MCParticle
       const MCParticle* mcparticle = rels[0];

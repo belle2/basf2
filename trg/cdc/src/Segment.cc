@@ -464,20 +464,11 @@ namespace Belle2 {
   float
   TCSegment::priorityTime() const
   {
-    if (center().signal().active()) {
-      return center().signal()[0]->time();
-    } else if (LUT()->getValue(lutPattern())) {
-      const TRGCDCWire* priorityL;
-      const TRGCDCWire* priorityR;
-      if (_wires.size() == 15) {
-        priorityL = _wires[2];
-        priorityR = _wires[1];
-      } else {
-        priorityL = _wires[7];
-        priorityR = _wires[6];
-      }
-      return fasterWire(priorityL, priorityR).signal()[0]->time();
-    } else return -1;
+    const TRGSignal& prioritySignal = priority().signal();
+    if (prioritySignal.active()) {
+      return prioritySignal[0]->time();
+    }
+    return -1;
   }
 
   int
@@ -485,7 +476,7 @@ namespace Belle2 {
   {
     if (center().signal().active()) {
       return 3;
-    } else if (signal().active()) {
+    } else {
       const TRGCDCWire* priorityL;
       const TRGCDCWire* priorityR;
       if (_wires.size() == 15) {
@@ -497,13 +488,13 @@ namespace Belle2 {
       }
       if (priorityL->signal().active()) {
         if (priorityR->signal().active()) {
-          if ((priorityL->signal()[0]->time()) > (priorityR->signal()[0]->time())) return 1;
+          if ((priorityL->signal()[0]->time()) >= (priorityR->signal()[0]->time())) return 1;
           else return 2;
         } else return 2;
       } else if (priorityR->signal().active()) {
         return 1;
-      } else return -1;
-    } else return 0;
+      } else return 0;
+    }
   }
 
   int
@@ -523,7 +514,7 @@ namespace Belle2 {
       }
       if (priorityL->signal().active(clk0, clk1)) {
         if (priorityR->signal().active(clk0, clk1)) {
-          if ((priorityL->signal()[0]->time()) > (priorityR->signal()[0]->time())) return 1;
+          if ((priorityL->signal()[0]->time()) >= (priorityR->signal()[0]->time())) return 1;
           else return 2;
         } else return 2;
       } else if (priorityR->signal().active(clk0, clk1)) {
@@ -535,30 +526,11 @@ namespace Belle2 {
   const TRGCDCWire&
   TCSegment::priority() const
   {
-    if (center().signal().active()) {
-      if (_wires.size() == 15) {
-        return *_wires[0];
-      } else return *_wires[5];
-    } else if (LUT()->getValue(lutPattern())) {
-      if (_wires.size() == 15) {
-        return fasterWire(_wires[1], _wires[2]);
-      } else return fasterWire(_wires[6], _wires[7]);
-    } else {
-      if (_wires.size() == 15) {
-        return *_wires[0];
-      } else return *_wires[5];
-    }
-  }
-
-  const TRGCDCWire&
-  TCSegment::fasterWire(const TRGCDCWire* w1, const TRGCDCWire* w2)const
-  {
-    if (w1->signal().active()) {
-      if (w2->signal().active()) {
-        if (w1->signal()[0]->time() > w2->signal()[0]->time()) return *w2;
-        else return *w1;
-      } else return *w1;
-    } else return *w2;
+    int priority = priorityPosition();
+    int offset = (_wires.size() == 15) ? 0 : 5;
+    if (priority == 1 || priority == 2)
+      return *_wires[offset + priority];
+    return *_wires[offset];
   }
 
   unsigned

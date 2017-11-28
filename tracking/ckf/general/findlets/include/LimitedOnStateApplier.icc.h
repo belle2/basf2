@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+
 #include <algorithm>
 
 namespace Belle2 {

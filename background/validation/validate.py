@@ -111,13 +111,17 @@ main.add_module(geometry)
 
 # mix beam background
 bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if 'BELLE2_BACKGROUND_MIXING_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
+    if bg is None:
+        B2FATAL('No beam background samples found in folder ' +
+                os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+    B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     bkgmixer = register_module('BeamBkgMixer')
     bkgmixer.param('backgroundFiles', bg)
     main.add_module(bkgmixer)
 else:
-    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
+    B2FATAL('variable BELLE2_BACKGROUND_MIXING_DIR is not set')
 
 # fill validation histograms
 main.add_module(BGHistogrammer())
@@ -131,8 +135,3 @@ process(main)
 
 # Print call statistics
 print(statistics)
-
-# Print warning again
-if bg is None:
-    print('Warning: variable BELLE2_BACKGROUND_DIR is not set -> BG mixer not in path!')
-    print()

@@ -32,8 +32,12 @@ EvtSocketSend::~EvtSocketSend()
 
 EvtSocketSend& EvtSocketSend::operator=(EvtSocketSend& other)
 {
-  if (m_sock != NULL) delete m_sock;
-  m_sock = new SocketSend((other.m_sock)->node(), (u_short)(other.m_sock)->port());
+  if (this != &other) {
+    if (m_sock != NULL) delete m_sock;
+    if (m_recbuf != NULL) delete m_recbuf;
+    m_sock = new SocketSend((other.m_sock)->node(), (u_short)(other.m_sock)->port());
+    m_recbuf = new char[MAXEVTSIZE];
+  }
   return *this;
 }
 

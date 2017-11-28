@@ -36,6 +36,10 @@ namespace Belle2 {
       c_uniformPtDistribution,
       /** Uniform distribution of the cosine of the values, parameters are min and max value */
       c_uniformCosDistribution,
+      /** Uniform distribution of the logarithm of the values, parameters are min and max value */
+      c_uniformLogDistribution,
+      /** Uniform distribution of the logarithm of the Pt, parameters are min and max value */
+      c_uniformLogPtDistribution,
       /** Normal distribution, parameters are mean and sigma */
       c_normalDistribution,
       /** Normal distribution of Pt, parameters are mean and sigma */

@@ -39,11 +39,6 @@ CDCCosmicTrackMergerModule::CDCCosmicTrackMergerModule() : Module()
 
 void CDCCosmicTrackMergerModule::initialize()
 {
-  //cdcp = &(Belle2::CDC::CDCGeometryPar::Instance());
-  //Belle2::CDC::CDCGeometryPar::Instance();
-  //CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();
-  //const CDC::CDCGeometryPar& cdcgeoPar = CDC::CDCGeometryPar::Instance();
-
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
 
@@ -57,12 +52,12 @@ void CDCCosmicTrackMergerModule::event()
 {
   StoreArray<RecoTrack> recoTrackStoreArray(m_param_recoTracksStoreArrayName);
   StoreArray<RecoTrack> MergedRecoTracks(m_param_MergedRecoTracksStoreArrayName);
-  //static CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  // static CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
 
   if (recoTrackStoreArray.getEntries() == 2) {
     if (recoTrackStoreArray[0]->getNumberOfCDCHits() > m_MinimumNumHitCut
         && recoTrackStoreArray[1]->getNumberOfCDCHits() > m_MinimumNumHitCut) {
-      //  if(recoTrackStoreArray[0].getPositionSeed().Y() * recoTrackStoreArray[1].getPositionSeed().Y() >0) continue;
+      // if(recoTrackStoreArray[0].getPositionSeed().Y() * recoTrackStoreArray[1].getPositionSeed().Y() >0) continue;
 
       std::vector<RecoTrack*> recoTracks;
       recoTracks.reserve(static_cast<unsigned int>(recoTrackStoreArray.getEntries()));
@@ -108,6 +103,7 @@ void CDCCosmicTrackMergerModule::event()
                                                               upperTrack->getChargeSeed());
       // retain the seed time of the original track. Important for t0 extraction.
       MergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
+
       //MergedRecoTrack->addHitsFromRecoTrack(upperTrack);
 
       //int upperTotalHits = upperTrack->getNumberOfTotalHits();
@@ -122,13 +118,12 @@ void CDCCosmicTrackMergerModule::event()
         }
       }
 
-      else if (upperTrack->hasEKLMHits()) {
+      if (upperTrack->hasEKLMHits()) {
         int EKLMHits = upperTrack->getNumberOfEKLMHits();
         for (int i = EKLMHits - 1; i >= 0; i--) {
           MergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
         }
       }
-
 
       if (upperTrack->hasCDCHits()) {
         int CDCHits = upperTrack->getNumberOfCDCHits();
@@ -144,13 +139,13 @@ void CDCCosmicTrackMergerModule::event()
           MergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
           sortingNumber++;
         }
+      }
 
-        if (upperTrack->hasPXDHits()) {
-          int PXDHits = upperTrack->getNumberOfSVDHits();
-          for (int i = PXDHits - 1; i >= 0; i--) {
-            MergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
-            sortingNumber++;
-          }
+      if (upperTrack->hasPXDHits()) {
+        int PXDHits = upperTrack->getNumberOfPXDHits();
+        for (int i = PXDHits - 1; i >= 0; i--) {
+          MergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+          sortingNumber++;
         }
       }
 
@@ -162,6 +157,87 @@ void CDCCosmicTrackMergerModule::event()
         }
       }
 
+
+      //MergedRecoTrack->addHitsFromRecoTrack(lowerTrack, upperTrack->getNumberOfTotalHits()); //getNumberOfTrackingHits());
+
+      if (lowerTrack->hasPXDHits()) {
+        int PXDHits = lowerTrack->getNumberOfPXDHits();
+        for (int i = 0; i < PXDHits; i++) {
+          MergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (lowerTrack->hasSVDHits()) {
+        int SVDHits = lowerTrack->getNumberOfSVDHits();
+        for (int i = 0; i < SVDHits; i++) {
+          MergedRecoTrack->addSVDHit(lowerTrack->getSortedSVDHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (lowerTrack->hasCDCHits()) {
+        int CDCHits = lowerTrack->getNumberOfCDCHits();
+        for (int i = 0; i < CDCHits; i++) {
+          MergedRecoTrack->addCDCHit(lowerTrack->getSortedCDCHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (lowerTrack->hasBKLMHits()) {
+        int BKLMHits = lowerTrack->getNumberOfBKLMHits();
+        for (int i = 0; i < BKLMHits; i++) {
+          MergedRecoTrack->addBKLMHit(lowerTrack->getSortedBKLMHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (lowerTrack->hasEKLMHits()) {
+        int EKLMHits = lowerTrack->getNumberOfEKLMHits();
+        for (int i = 0; i < EKLMHits; i++) {
+          MergedRecoTrack->addEKLMHit(lowerTrack->getSortedEKLMHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (upperTrack->hasBKLMHits()) {
+        int BKLMHits = upperTrack->getNumberOfBKLMHits();
+        for (int i = BKLMHits - 1; i >= 0; i--) {
+          MergedRecoTrack->addBKLMHit(upperTrack->getSortedBKLMHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (upperTrack->hasEKLMHits()) {
+        int EKLMHits = upperTrack->getNumberOfEKLMHits();
+        for (int i = EKLMHits - 1; i >= 0; i--) {
+          MergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
+        }
+      }
+
+      if (upperTrack->hasCDCHits()) {
+        int CDCHits = upperTrack->getNumberOfCDCHits();
+        for (int i = CDCHits - 1; i >= 0; i--) {
+          MergedRecoTrack->addCDCHit(upperTrack->getSortedCDCHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (upperTrack->hasSVDHits()) {
+        int SVDHits = upperTrack->getNumberOfSVDHits();
+        for (int i = SVDHits - 1; i >= 0; i--) {
+          MergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
+
+      if (upperTrack->hasPXDHits()) {
+        int PXDHits = upperTrack->getNumberOfPXDHits();
+        for (int i = PXDHits - 1; i >= 0; i--) {
+          MergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+          sortingNumber++;
+        }
+      }
 
       //MergedRecoTrack->addHitsFromRecoTrack(lowerTrack, upperTrack->getNumberOfTotalHits()); //getNumberOfTrackingHits());
 

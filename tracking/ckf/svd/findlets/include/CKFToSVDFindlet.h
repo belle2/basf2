@@ -72,8 +72,7 @@ namespace Belle2 {
   private:
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
-    unsigned int m_param_minimalHitRequirement = 2;
-
+    unsigned int m_param_minimalHitRequirement = 1;
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out

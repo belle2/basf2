@@ -87,7 +87,7 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
 
 
 def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
-                filter_cut=0.0, overlap_cut=0.1, use_best_results=5, use_best_seeds=5):
+                filter_cut=0.1, overlap_cut=0.2, use_best_results=5, use_best_seeds=10):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
@@ -106,13 +106,7 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
     if use_mc_truth:
         module_parameters = dict(
             firstHighFilter="truth",
-
-            advanceHighFilter="advance",
-
             secondHighFilter="all",
-
-            updateHighFilter="fit",
-
             thirdHighFilter="all",
 
             filter="truth",
@@ -120,38 +114,21 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
         )
     else:
         module_parameters = dict(
-            firstHighFilter="mva",
             firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_1.xml", "cut": filter_cut},
             firstHighUseNStates=use_best_seeds,
 
-            advanceHighFilter="advance",
-
-            secondHighFilter="mva",
             secondHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_2.xml", "cut": filter_cut},
             secondHighUseNStates=use_best_seeds,
 
-            updateHighFilter="fit",
-
-            thirdHighFilter="mva",
             thirdHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_3.xml", "cut": filter_cut},
             thirdHighUseNStates=use_best_seeds,
 
-            filter="mva",
             filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_CDCToSVDResult.xml"},
             useBestNInSeed=use_best_results,
         )
 
     path.add_module("CDCToSVDSpacePointCKF",
-                    minimalPtRequirement=0,
-                    minimalHitRequirement=1,
-
-                    useAssignedHits=False,
-
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
-                    hitFilter="sensor",
-                    seedFilter="sensor",
-
-                    enableOverlapResolving=True,
 
                     **module_parameters)

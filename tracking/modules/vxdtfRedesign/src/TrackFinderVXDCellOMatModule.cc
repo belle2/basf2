@@ -116,7 +116,10 @@ void TrackFinderVXDCellOMatModule::event()
 
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
-  if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
+  if (nSeeds == 0) {
+    B2DEBUG(1, "TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!");
+    return;
+  }
 
   /// mark families
   if (m_PARAMsetFamilies) {

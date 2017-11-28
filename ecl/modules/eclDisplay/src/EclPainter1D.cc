@@ -42,12 +42,14 @@ int EclPainter1D::channelToSegId(int channel)
     case CHANNEL:
       return channel;
     case SHAPER:
-      //return 12 * GetCrateId(channel) + GetShaperId(channel);
       return 12 * getMapper()->getCrateID(channel) +
              getMapper()->getShaperPosition(channel) - 12;
     case CRATE:
-      //return GetCrateId(channel);
       return getMapper()->getCrateID(channel);
+    case PHI:
+      return getData()->getPhiId(channel);
+    case THETA:
+      return getData()->getThetaId(channel);
   }
 
   return 0;
@@ -62,6 +64,10 @@ int EclPainter1D::getMaxX()
       return 52 * 12;
     case CRATE:
       return 52;
+    case PHI:
+      return 144;
+    case THETA:
+      return 69;
   }
 
   return 1;
@@ -78,10 +84,21 @@ void EclPainter1D::initHisto()
 void EclPainter1D::setTitles()
 {
   // TODO: These extra labels might not be necessary.
-  const char* name[3][3] = {
-    {"Events per channel", "Events per shaper", "Events per collector"},
-    {"Energy per channel (MeV)", "Energy per shaper (MeV)", "Energy per collector (MeV)"},
-    {"Time per channel (DAQ units)", "Time per shaper (DAQ units)", "Time per collector (DAQ units)"}
+  const char* name[3][5] = {
+    {
+      "Events per channel", "Events per shaper", "Events per collector",
+      "Events per phi_id", "Events per theta_id"
+    },
+
+    {
+      "Energy per channel (MeV)", "Energy per shaper (MeV)", "Energy per collector (MeV)"
+      "Energy per phi_id (MeV)", "Energy per theta_id (MeV)"
+    },
+
+    {
+      "Time per channel (ns)", "Time per shaper (ns)", "Time per collector (ns)",
+      "Time per phi_id (ns)", "Time per theta_id (ns)"
+    }
   };
   const char* xname[3] = {
     "Channel id", "Shaper id", "Collector id"
@@ -127,6 +144,14 @@ void EclPainter1D::getInformation(int px, int py, MultilineWidget* panel)
   }
   if (m_type == CRATE) {
     sprintf(info, "crate_id = %d", binx);
+    panel->setLine(1, info);
+  }
+  if (m_type == PHI) {
+    sprintf(info, "phi_id = %d", binx);
+    panel->setLine(1, info);
+  }
+  if (m_type == THETA) {
+    sprintf(info, "theta_id = %d", binx);
     panel->setLine(1, info);
   }
 }

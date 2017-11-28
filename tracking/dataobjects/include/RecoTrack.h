@@ -708,15 +708,15 @@ namespace Belle2 {
     }
 
     /// Get the quality index attached to this RecoTrack given by one of the reconstruction algorithms. 0 means likely fake.
-    float getQualityIndex() const
+    float getQualityIndicator() const
     {
-      return m_qualityIndex;
+      return m_qualityIndicator;
     }
 
     /// Set the quality index attached to this RecoTrack. 0 means likely fake.
-    void setQualityIndex(float qualityIndex)
+    void setQualityIndicator(float qualityIndicator)
     {
-      m_qualityIndex = qualityIndex;
+      m_qualityIndicator = qualityIndicator;
     }
 
     /**
@@ -756,7 +756,7 @@ namespace Belle2 {
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
-    float m_qualityIndex;
+    float m_qualityIndicator;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

@@ -112,6 +112,13 @@ namespace Belle2 {
    */
   class TrackFitter {
   public:
+    /// Default deltaPValue for the default DAF fitter
+    static constexpr double s_defaultDeltaPValue = 1.0;
+    /// Default probCut for the default DAF fitter
+    static constexpr double s_defaultProbCut = 0.001;
+    /// Default maxFailedHits for the default DAF fitter
+    static constexpr unsigned int s_defaultMaxFailedHits = 5;
+
     /// Create a new fitter instance.
     TrackFitter(const std::string& storeArrayNameOfPXDHits = "",
                 const std::string& storeArrayNameOfSVDHits = "",
@@ -294,11 +301,6 @@ namespace Belle2 {
     std::shared_ptr<genfit::AbsFitter> m_fitter;
     /// Flag to skip the dirty flag check which is needed when using non-default fitters.
     bool m_skipDirtyCheck = false;
-
-    /// This is the difference on pvalue between two fit iterations of the DAF procedure which
-    /// is used as a early termination criteria of the DAF procedure. This is large on purpose
-    /// See https://agira.desy.de/browse/BII-1725 for details
-    const double m_dafDeltaPval = 1.0f;
 
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;

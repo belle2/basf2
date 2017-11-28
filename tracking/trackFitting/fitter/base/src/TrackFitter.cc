@@ -22,6 +22,10 @@
 
 using namespace Belle2;
 
+constexpr double TrackFitter::s_defaultDeltaPValue;
+constexpr double TrackFitter::s_defaultProbCut;
+constexpr unsigned int TrackFitter::s_defaultMaxFailedHits;
+
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
@@ -100,9 +104,9 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
 void TrackFitter::resetFitterToDefaultSettings()
 {
-  genfit::DAF* dafFitter = new genfit::DAF(true, m_dafDeltaPval);
-  dafFitter->setProbCut(0.001);
-  dafFitter->setMaxFailedHits(5);
+  genfit::DAF* dafFitter = new genfit::DAF(true, s_defaultDeltaPValue);
+  dafFitter->setProbCut(s_defaultProbCut);
+  dafFitter->setMaxFailedHits(s_defaultMaxFailedHits);
 
   m_fitter.reset(dafFitter);
 

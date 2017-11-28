@@ -44,29 +44,6 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 {
   B2INFO("Creating and filling histograms");
 
-
-  auto tree = getObjectPtr<TTree>("tree");
-
-  double x;
-  double t_mea;
-  double w;
-  double t_fit;
-  double ndf;
-  double Pval;
-  unsigned short adc;
-  int IWire;
-  int lay;
-
-
-  tree->SetBranchAddress("lay", &lay);
-  tree->SetBranchAddress("IWire", &IWire);
-  tree->SetBranchAddress("x_u", &x);
-  tree->SetBranchAddress("t", &t_mea);
-  tree->SetBranchAddress("t_fit", &t_fit);
-  tree->SetBranchAddress("weight", &w);
-  tree->SetBranchAddress("ndf", &ndf);
-  tree->SetBranchAddress("Pval", &Pval);
-  tree->SetBranchAddress("adc", &adc);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {
@@ -81,6 +58,29 @@ void TimeWalkCalibrationAlgorithm::createHisto()
   }
 
   // Read data
+
+  auto tree = getObjectPtr<TTree>("tree");
+
+  double x;
+  double t_mea;
+  double w;
+  double t_fit;
+  double ndf;
+  double Pval;
+  unsigned short adc;
+  int IWire;
+  int lay;
+
+  tree->SetBranchAddress("lay", &lay);
+  tree->SetBranchAddress("IWire", &IWire);
+  tree->SetBranchAddress("x_u", &x);
+  tree->SetBranchAddress("t", &t_mea);
+  tree->SetBranchAddress("t_fit", &t_fit);
+  tree->SetBranchAddress("weight", &w);
+  tree->SetBranchAddress("ndf", &ndf);
+  tree->SetBranchAddress("Pval", &Pval);
+  tree->SetBranchAddress("adc", &adc);
+
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
   for (int i = 0; i < nEntries; ++i) {
@@ -165,7 +165,7 @@ void TimeWalkCalibrationAlgorithm::write()
   B2INFO("Save to the local DB");
   CDCTimeWalks* dbTw = new CDCTimeWalks();
   for (int ib = 0; ib < 300; ++ib) {
-    dbTw->setTimeWalkParam(ib, m_twPrev[ib] + m_tw[ib]);
+    dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
   }
   saveCalibration(dbTw, "CDCTimeWalks");
 }
@@ -178,7 +178,7 @@ void TimeWalkCalibrationAlgorithm::prepare()
   DBStore::Instance().update();
   const int nEntries = dbTw->getEntries();
   for (int ib = 0; ib < nEntries; ++ib) {
-    m_twPrev[ib] = dbTw->getTimeWalkParam(ib);
+    m_twPost[ib] = dbTw->getTimeWalkParam(ib);
   }
 }
 void TimeWalkCalibrationAlgorithm::doSliceFitY(int boardId, int minHitCut = 0)

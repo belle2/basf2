@@ -62,7 +62,7 @@ namespace Belle2 {
       double m_minNdf = 5;  /**< minimum number of degree of freedom required for track. */
       double m_minPval = 0.; /**< minimum number of Prob(chi2) of fitted track. */
       double m_tw[300] = {0.}; /**< Time Walk params, result after fitting*/
-      double m_twPrev[300] = {0.}; /**< Time Walk params before calibration */
+      double m_twPost[300] = {0.}; /**< Time Walk params before calibration */
       bool m_debug = false; /**< run debug or not.*/
       bool m_storeHisto = true;/**< Store all Histogram or not*/
       std::string m_OutputTWFileName = "tw_new.dat";  /**< Output tw file name for time walk. */

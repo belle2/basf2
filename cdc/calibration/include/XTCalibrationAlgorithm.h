@@ -29,6 +29,19 @@ namespace Belle2 {
     enum {c_Polynomial = 0, c_Chebyshev = 1};
 
     /**
+     * Fit Status.
+     * =-1: low statitic
+     * =1: good
+     * =0: Fit failure
+     * =2: Error Outer
+     * =3: Error Inner part;
+     */
+
+    enum FitStatus {c_lowStat = -1, c_fitFailure = 0, c_OK = 1,
+                    c_errorOuter = 2, c_errorInner = 3
+                   };
+
+    /**
      * Class to perform xt calibration for drift chamber.
      */
     class XTCalibrationAlgorithm :  public CalibrationAlgorithm {
@@ -52,7 +65,7 @@ namespace Belle2 {
       virtual void setMinimumPval(double pval) {m_minPval = pval;}
 
       /// set xt mode, 0 is polynimial, 1 is Chebshev polynomial
-      ///virtual void setMode(unsigned short mode = 1) {m_xtmode = mode;}
+      virtual void setXtMode(unsigned short mode = c_Chebyshev) {m_xtMode = mode;}
 
       /// set to store histogram or not.
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
@@ -71,9 +84,8 @@ namespace Belle2 {
       /// Store histogram to file
       virtual void storeHisto();
 
-      /// read the profile of xt paramter.
-      virtual void readXTProfile();
-
+      /// Prepare the calibration of XT.
+      virtual void prepare();
 
     private:
       double m_minNdf = 5;    /**< minimum ndf required */
@@ -83,27 +95,22 @@ namespace Belle2 {
       bool m_LRseparate = true; /**< Separate LR in calibration or mix*/
       bool m_bField = true;  /**< with b field or none*/
 
-      TProfile* hprof[56][2][20][10];      /**< Profile xt histo*/
-      TH2D* hist2d[56][2][20][10];         /**< 2D histo of xt*/
-      TH2D* hist2d_draw[56][20][10];       /**< 2d histo for draw*/
-      TH1D* hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit*/
-      double m_xtOld[56][2][18][7][8];     /**< Old paremeters (before calibration) of XT */
-      TF1* m_xtFunc[56][2][20][10];           /**< XTFunction */
+      TProfile* m_hProf[56][2][20][10];      /**< Profile xt histo*/
+      TH2D* m_hist2d[56][2][20][10];         /**< 2D histo of xt*/
+      TH2D* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
+      TH1D* m_hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit */
 
-      /*********************************
-      Fit Flag
-      =-1: low statitic
-       =1: good
-      =0: Fit failure
-      =2: Error Outer
-      =3: Error Inner part;
-      **********************************/
+      TF1* m_xtFunc[56][2][20][10];         /**< XTFunction */
+
+      double m_xtPost[56][2][18][7][8];     /**< paremeters of XT before calibration */
+
       int m_fitStatus[56][2][20][10];         /**< Fit flag */
       bool m_useSliceFit = false; /**< Use slice fit or profile */
       int m_minEntriesRequired = 1000; /**< minimum number of hit per hitosgram. */
       int m_nAlphaBins; /**<number of alpha bins*/
       int m_nThetaBins; /**<number of  theta bins*/
       int m_xtMode = c_Chebyshev;  /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/
+      int m_xtModePost;  /**< Mode of xt before calibration; 0 is polynomial;1 is Chebyshev.*/
       float m_lowerAlpha[18];/**< Lower boundays of alpha bins. */
       float m_upperAlpha[18];/**< Upper boundays of alpha bins. */
       float m_iAlpha[18]; /**< Represented alpha in alpha bins. */

@@ -26,7 +26,7 @@ namespace Belle2 {
      * Default constructor.
      * @param data Data to display.
      */
-    explicit EclPainter(EclData* data);
+    EclPainter(EclData* data);
     virtual ~EclPainter();
 
     /**

@@ -26,18 +26,18 @@ else:
     sys.exit()
 
 
-if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    B2ERROR('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG samples')
+if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG samples')
     sys.exit()
 
-bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
 if len(bg) == 0:
-    B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_DIR'])
+    B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression))
-B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_DIR'])
+B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 
 set_log_level(LogLevel.ERROR)
 

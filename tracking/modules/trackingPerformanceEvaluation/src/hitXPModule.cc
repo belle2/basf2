@@ -70,7 +70,11 @@ void hitXPModule::initialize()
 
   /** inizialize output TFile (ttree, with own-class (hitXP) branch)
   * nb: is not possibile to completely access to entries of this tree using
-  * external (out of basf2) scripts. Only the "external tree is completely accessible"
+  * external (out of basf2) scripts beacuse are used, as branches of the tree,
+  * some basf2 internal classes (more specifically, some memeber of the hitXP
+  * branch, see tracking/dataobjects/hitXP for more details)
+  * Only the "external tree" is completely accessible, but the information is
+  * reduced.
   */
   m_outputFile = new TFile("TFile_hitXP.root", "RECREATE");
   m_tree = new TTree("TTree_hitXP", "TTree_hitXP");

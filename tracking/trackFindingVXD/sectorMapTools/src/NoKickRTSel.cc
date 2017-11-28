@@ -207,14 +207,14 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
   good = globalCut(m_8hitTrack);
   if (good == false) {
     if (m_outputFlag) {
-      m_numberOfCuts = 25;
+      m_numberOfCuts = -1; //it means "no specific cuts applied, but rejected for global cuts"
       m_Ncuts = m_numberOfCuts;
       m_isCutted = true;
       m_nCutHit->Fill(m_numberOfCuts);
       m_momCut->Fill(track.getMomentumSeed().Mag());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+      m_noKickTree->Fill();
     }
-    m_noKickTree->Fill();
     return good;
   }
 
@@ -225,8 +225,8 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
       m_nCutHit->Fill(m_numberOfCuts);
       m_momSel->Fill(track.getMomentumSeed().Mag());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+      m_noKickTree->Fill();
     }
-    m_noKickTree->Fill();
     return good;
   }
   for (int i = 0; i < (int)(m_8hitTrack.size() - 2); i++) {
@@ -273,8 +273,8 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
       m_momCut->Fill(track.getMomentumSeed().Mag());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     }
+    m_noKickTree->Fill();
   }
-  m_noKickTree->Fill();
   return good;
 }
 

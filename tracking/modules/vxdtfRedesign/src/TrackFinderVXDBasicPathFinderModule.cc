@@ -72,6 +72,11 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Number of best track candidates to be created per family.",
            m_PARAMxBestPerFamily);
 
+  addParam("maxFamilies",
+           m_PARAMmaxFamilies,
+           "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxFamilies);
+
 }
 
 
@@ -132,7 +137,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
-    if (nFamilies > 10000)  {
+    if (nFamilies > m_PARAMmaxFamilies)  {
       B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
       return;
     }

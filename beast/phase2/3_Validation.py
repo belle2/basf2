@@ -45,10 +45,6 @@ components = [
     'ECL'
 ]
 
-# reconstruction
-# add_reconstruction(main, components, pruneTracks = False)
-# add_reconstruction(main, pruneTracks = False)
-
 VXDHits = VXDHits()
 main.add_module(VXDHits)
 

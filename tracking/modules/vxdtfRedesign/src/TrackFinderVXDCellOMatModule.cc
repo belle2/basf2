@@ -122,6 +122,10 @@ void TrackFinderVXDCellOMatModule::event()
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
+    if (nFamilies > 10000)  {
+      B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      return;
+    }
     m_sptcSelector->prepareSelector(nFamilies);
   }
 

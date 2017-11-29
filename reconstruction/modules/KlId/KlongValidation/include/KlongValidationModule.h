@@ -135,6 +135,10 @@ namespace Belle2 {
     TH1F*  m_klidAll  ;
     /** roc */
     TGraph*  m_ROC;
+    /** roc */
+    TGraph*  m_backRej;
+
+
     /** number of bins used for roc curve */
     unsigned int m_ROCBins;
 

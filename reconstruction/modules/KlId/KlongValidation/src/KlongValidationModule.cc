@@ -247,8 +247,9 @@ void KlongValidationModule::terminate()
   m_fakeTheta->Divide(m_fakeTheta_Pass, m_Theta_all);
   m_fakeMom->Divide(m_fakeMom_Pass, m_Mom_all);
 
-  double efficiency[m_ROCBins], purity[m_ROCBins];
+  double efficiency[m_ROCBins], purity[m_ROCBins], backrej[m_ROCBins];
   double NallKlong = m_klidTrue->GetEntries();
+  double NallFakes = m_klidFake->GetEntries();
   for (unsigned int i = 0; i < m_ROCBins - 1; ++i) {
     double NtruePositive = m_klidTrue->Integral(i, m_ROCBins - 1);
     double NfalsePositive = m_klidFake->Integral(i, m_ROCBins - 1);
@@ -257,22 +258,36 @@ void KlongValidationModule::terminate()
     } else {
       purity[i] = NtruePositive / (NtruePositive + NfalsePositive);
     }
+    if (NallFakes) {
+      backrej[i] = 1 - NfalsePositive / NallFakes;
+    } else {
+      backrej[i] = 0;
+    }
     if (NallKlong <= 0) {
       B2WARNING("No Klongs found in ROC calculation.");
     } else {
       efficiency[i] = NtruePositive / NallKlong;
     }
   }
+
   m_ROC = new TGraph(m_ROCBins, efficiency, purity);
+  m_backRej = new TGraph(m_ROCBins, efficiency, backrej);
   m_ROC->SetMarkerStyle(3);
+  m_backRej->SetMarkerStyle(3);
   m_ROC->SetLineColorAlpha(kBlue, 0.0);
+  m_backRej->SetLineColorAlpha(kBlue, 0.0);
   m_ROC->GetXaxis()->SetTitle("Efficiency");
+  m_backRej->GetXaxis()->SetTitle("Efficiency");
   m_ROC->GetYaxis()->SetTitle("Purity");
+  m_backRej->GetYaxis()->SetTitle("Background rejection");
   m_ROC-> SetTitle("Klong Purity vs Efficiency");
+  m_backRej-> SetTitle("Klong background rejection vs Efficiency");
   m_ROC-> GetListOfFunctions() -> Add(new TNamed("Description",
                                                  "Purity vs Efficiency each point represents a cut on the klong ID."));
   m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
+  m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
   m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
+  m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
 
   std::vector<std::string> titles = {"K_L ID", "All Momenta generated", "Klong efficiency in Phi", "Klong efficiency in Theta", "Klong efficiency in Momentum", "Klong fake rate in Phi", "Klong fake rate in Theta", "Klong fake rate in Momentum", "KLM time", "KLM distance to next track", "KLM energy", "KLM nLayer", "Beam BKG in Phi", "Beam BKG in Theta", "Beam BKG in Momentum", "Innermost layer", "Track flag", "ECL Flag" };
 
@@ -283,7 +298,7 @@ void KlongValidationModule::terminate()
                                   };
   unsigned int counter = 0;
   for (auto hist  : histograms) {
-    hist -> SetTitle(titles[counter]);
+    hist -> SetTitle(titles[counter].c_str());
     hist -> GetListOfFunctions() -> Add(new TNamed("Description", titles[counter]));
     hist -> GetListOfFunctions() -> Add(new TNamed("Check", "Should not change"));
     hist -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
@@ -291,7 +306,8 @@ void KlongValidationModule::terminate()
     ++counter;
   }
   //this guy is a tgraph
-  m_ROC            -> Write();
+  m_ROC       -> Write();
+  m_backRej   -> Write();
   m_f         -> Close();
 }
 

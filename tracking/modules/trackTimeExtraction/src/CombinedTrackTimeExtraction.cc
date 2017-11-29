@@ -30,7 +30,7 @@ CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   this->exposeParameters(&moduleParamList, prefix);
-  moduleParamList.getParameter<unsigned int>("maximalIterations").setDefaultValue(2);
+  moduleParamList.getParameter<unsigned int>("maximalIterations").setDefaultValue(10);
   moduleParamList.getParameter<unsigned int >("minimalIterations").setDefaultValue(1);
 }
 

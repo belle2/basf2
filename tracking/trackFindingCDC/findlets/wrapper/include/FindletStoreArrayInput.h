@@ -44,7 +44,7 @@ namespace Belle2 {
       using DataStoreInputTypeRefType = typename std::remove_pointer<DataStoreInputTypePtrType>::type;
 
       /// Create a new instance of the module.
-      FindletStoreArrayInput()
+      FindletStoreArrayInput() : Super()
       {
         addProcessingSignalListener(&m_storeArrayLoader);
         addProcessingSignalListener(&m_wrappedFindlet);

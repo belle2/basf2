@@ -53,10 +53,10 @@ namespace Belle2 {
 
   public:
     /// Create a new instance of this module.
-    FullGridTrackTimeExtraction() = default;
+    FullGridTrackTimeExtraction();
 
     /// Register the store arrays and store obj pointers.
-    void initialize() override;
+    //void initialize() override;
 
     /// Do the iterative grid-search time extraction described above.
     //void event() override;
@@ -65,7 +65,7 @@ namespace Belle2 {
 
   private:
     /// StoreArray name from which to read the reco tracks.
-    std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
+    //std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
 
     /// Module Parameter: Minimal shift which is allowed.
     double m_param_minimalT0Shift = -30;

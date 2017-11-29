@@ -26,13 +26,26 @@ std::string TrackTimeExtraction::getDescription()
   return "Build the full covariance matrix for RecoTracks.";
 }
 
+TrackTimeExtraction::TrackTimeExtraction() : Super()
+{
+  ModuleParamList moduleParamList;
+  const std::string prefix = "";
+  this->exposeParameters(&moduleParamList, prefix);
+
+  /*  for ( auto s : moduleParamList.getParameterNames()) {
+      std::cout << "param " << s << std::endl;
+    }*/
+  // todo: this should not be set here, but in the module
+  //moduleParamList.getParameter<std::string>("recoTracksStoreArrayName").setDefaultValue("__SelectedRecoTracks");
+}
+
 void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
 
-  moduleParamList->addParameter(prefixed(prefix, "recoTracksStoreArrayName"), m_param_recoTracksStoreArrayName,
-                                "StoreArray containing the RecoTracks to process",
-                                m_param_recoTracksStoreArrayName);
-
+  /*  moduleParamList->addParameter(prefixed(prefix, "recoTracksStoreArrayName"), m_param_recoTracksStoreArrayName,
+                                  "StoreArray containing the RecoTracks to process",
+                                  m_param_recoTracksStoreArrayName);
+  */
   moduleParamList->addParameter(prefixed(prefix, "maximalIterations"), m_param_maximalIterations,
                                 "Maximal number of iterations to perform.",
                                 m_param_maximalIterations);
@@ -63,12 +76,13 @@ void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, con
                                 m_param_t0Uncertainty);
 }
 
-
 void TrackTimeExtraction::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.isRequired();
+  Super::initialize();
 
+  /*  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
+    recoTracks.isRequired();
+  */
   m_eventT0.registerInDataStore();
 }
 
@@ -107,7 +121,7 @@ double TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTr
     }
 
     const double extractedTime = extractTrackTime(recoTracks, randomizeValue);
-    B2INFO(extractedTime);
+    B2INFO("Extracted Time in iteration " << loopCounter << " is " << extractedTime << " ns");
     if (std::isnan(extractedTime)) {
       B2ERROR("Extracted Time is NaN! Aborting.");
       break;
@@ -128,8 +142,6 @@ double TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTr
 
   return sumExtractedTime;
 }
-
-
 
 double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks, const double& randomizeLimits) const
 {

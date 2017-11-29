@@ -193,7 +193,7 @@ namespace {
     }
   }
 }
-
+/*
 void FullGridTrackTimeExtraction::initialize()
 {
   Super::initialize();
@@ -202,6 +202,15 @@ void FullGridTrackTimeExtraction::initialize()
   recoTracks.isRequired();
 
   m_eventT0.registerInDataStore();
+}
+*/
+
+FullGridTrackTimeExtraction::FullGridTrackTimeExtraction() : Super()
+{
+  ModuleParamList moduleParamList;
+  const std::string prefix = "";
+  this->exposeParameters(&moduleParamList, prefix);
+  //moduleParamList.getParameter<std::string>("recoTracksStoreArrayName").setDefaultValue("__SelectedRecoTracks");
 }
 
 void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& recoTracks)

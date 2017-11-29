@@ -12,3 +12,7 @@
 using namespace Belle2;
 
 REG_MODULE(TrackTimeExtraction);
+/*
+TrackTimeExtractionModule::TrackTimeExtractionModule() : Super() {
+}
+*/

@@ -39,7 +39,7 @@ namespace Belle2 {
 
   public:
     /// Create a new instance of the module.
-    TrackTimeExtraction() = default;
+    TrackTimeExtraction();
 
     /// Expose the parameters to a module
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
@@ -55,7 +55,7 @@ namespace Belle2 {
 
   private:
     /// StoreArray name from which to read the reco tracks.
-    std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
+    //std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
 
     /// Module parameter: Maximal number of iterations to perform.
     unsigned int m_param_maximalIterations = 10;

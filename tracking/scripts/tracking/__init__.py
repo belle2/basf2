@@ -68,6 +68,15 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                             trackFitHypotheses=additionalTrackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
+    add_time_extraction(path, components=components)
+
+
+def add_time_extraction(path, components=None):
+
+    # todo: select specific tracks for extraction
+
+    path.add_module("CombinedTrackTimeExtraction")
+
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,

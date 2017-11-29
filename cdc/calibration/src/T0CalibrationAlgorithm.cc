@@ -158,7 +158,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   if (m_storeHisto) {
     B2INFO("Store histo");
-    TFile* fout = new TFile("Correct_T0.root", "RECREATE");
+    TFile* fout = new TFile("histT0.root", "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;

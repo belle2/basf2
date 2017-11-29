@@ -416,7 +416,7 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
 {
   B2INFO("store histo");
 
-  TFile*  ff = new TFile("sigma_histo.root", "RECREATE");
+  TFile*  ff = new TFile("histSigma.root", "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
 
@@ -497,21 +497,23 @@ void SpaceResolutionCalibrationAlgorithm::write()
   B2RESULT("Histos fit failure: " << nfailure);
 
   CDCSpaceResols* dbSigma = new CDCSpaceResols();
-  const double deg2rad = M_PI / 180.0;
-  std::array<float, 3> alpha3;
+
+  const float deg2rad = M_PI / 180.0;
+
   for (unsigned short i = 0; i < m_nAlphaBins; ++i) {
-    for (unsigned short j = 0; j < 3; ++j) {
-      alpha3[j] *= deg2rad;
-    }
+    std::array<float, 3> alpha3 = {m_lowerAlpha[i]* deg2rad,
+                                   m_upperAlpha[i]* deg2rad,
+                                   m_iAlpha[i]*   deg2rad
+                                  };
     dbSigma->setAlphaBin(alpha3);
   }
 
-  std::array<float, 3> theta3;
 
   for (unsigned short i = 0; i < m_nThetaBins; ++i) {
-    for (unsigned short j = 0; j < 3; ++j) {
-      theta3[j] *= deg2rad;
-    }
+    std::array<float, 3> theta3 = {m_lowerTheta[i]* deg2rad,
+                                   m_upperTheta[i]* deg2rad,
+                                   m_iTheta[i]* deg2rad
+                                  };
     dbSigma->setThetaBin(theta3);
   }
 

@@ -91,13 +91,13 @@ namespace Belle2 {
 
       int m_nAlphaBins; /**<number of alpha bins*/
       int m_nThetaBins;/**<number of  theta bins*/
-      double m_lowerAlpha[18];/**< Lower boundays of alpha bins. */
-      double m_upperAlpha[18];/**< Upper boundays of alpha bins. */
-      double m_iAlpha[18]; /**< represented alphas of alpha bins. */
-      double m_lowerTheta[7]; /**< Lower boundays of theta bins. */
-      double m_upperTheta[7];/**< Upper boundays of theta bins. */
-      double m_iTheta[7]; /**< represented alphas of theta bins. */
-      unsigned short m_sigmaParamMode = 1; /**< sigma mode for this calibration.*/
+      float m_lowerAlpha[18];/**< Lower boundays of alpha bins. */
+      float m_upperAlpha[18];/**< Upper boundays of alpha bins. */
+      float m_iAlpha[18]; /**< represented alphas of alpha bins. */
+      float m_lowerTheta[7]; /**< Lower boundays of theta bins. */
+      float m_upperTheta[7];/**< Upper boundays of theta bins. */
+      float m_iTheta[7]; /**< represented alphas of theta bins. */
+      unsigned short m_sigmaParamMode = 0; /**< sigma mode for this calibration.*/
 
       double m_sigmaPost[56][2][18][7][8]; /**< sigma prameters before calibration */
       unsigned short m_sigmaParamModePost; /**< sigma mode before this calibration.*/

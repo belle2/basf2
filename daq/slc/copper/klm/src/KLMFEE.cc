@@ -22,6 +22,10 @@ void KLMFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 
 void KLMFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
+}
+
+void KLMFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
+{
   // write access to register "reg0"
   LogFile::info("0x38>>0x%x", hslb.readfee32(0x38));
   hslb.writefee32(0x38, 10);
@@ -58,10 +62,6 @@ void KLMFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     hslb.writefee32(0x32, o_window.getInt("val2"));
     hslb.writefee32(0x33, o_window.getInt("val3"));
   }
-}
-
-void KLMFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
 }
 
 extern "C" {

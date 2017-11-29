@@ -411,7 +411,7 @@ void XTCalibrationAlgorithm::write()
 void XTCalibrationAlgorithm::storeHisto()
 {
   B2INFO("saving histograms");
-  TFile* fout = new TFile("XTFIT.root", "RECREATE");
+  TFile* fout = new TFile("histXT.root", "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
   int nhisto = 0;

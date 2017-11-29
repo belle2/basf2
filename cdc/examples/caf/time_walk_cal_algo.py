@@ -22,8 +22,6 @@ main.add_module('Geometry', components=['CDC'])
 process(main, 1)
 
 algo = Belle2.CDC.TimeWalkCalibrationAlgorithm()
-# algo.setInputFileNames(['rootfile/output_cdc.*.root'])
-# algo.setInputFileNames(['rootfile_org/output_cdc.*.root'])
 algo.setInputFileNames(['rootfile/*/CollectorOutput.root'])
 # algo.setInputFileNames(['5/output_cdc.*.root'])
 # print("Result of calibration =", algo.execute())

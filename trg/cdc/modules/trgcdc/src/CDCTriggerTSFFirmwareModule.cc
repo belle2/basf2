@@ -13,6 +13,7 @@
 #include <trg/cdc/Cosim.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -371,6 +372,7 @@ void TSF::simulateMerger(unsigned iClock)
     const timeVec hitTime = timeStamp(iHit, m_iFirstHit);
     auto& mergerData = dataInClock[iSL][iMerger];
     auto& registeredCell = registered[iSL][iMerger];
+    // register the priority hit in the corresponding merger
     auto& priorityHit = m_priorityHit[iClock][iSL][iMerger];
     B2DEBUG(50, "iHit: " << iHit << ", Merger" << iSL << "-" << iMerger <<
             ", iCell: " << iCell);
@@ -407,9 +409,15 @@ void TSF::simulateMerger(unsigned iClock)
       case Priority::second: {
         // update the 2 priority times and the sc bits
         for (unsigned i = 0; i < 2; ++i) {
-          unsigned priTS = iCell % 16 + i;
-          if (priTS > 15) {
-            continue;
+          unsigned priTS = iCell % nSegmentsInMerger + i;
+          if (priTS == nSegmentsInMerger) {
+            // crossing the left edge
+            // set the 2nd priority left of the first TS in the next merger
+            priTS = 0;
+            const unsigned short iMergerPlus1 = (iMerger == nMergers[iSL] - 1) ? 0 : iMerger + 1;
+            mergerData = dataInClock[iSL][iMergerPlus1];
+            registeredCell = registered[iSL][iMergerPlus1];
+            priorityHit = m_priorityHit[iClock][iSL][iMergerPlus1];
           }
           timeVec& priorityTime = (get<MergerOut::priorityTime>(mergerData))[priTS];
           // when there is not already a (1st or 2nd priority) hit
@@ -498,6 +506,8 @@ void TSF::saveFirmwareOutput()
   m_bitsTo2D.appendNew(outputToTracker);
 }
 
+constexpr std::array<int, 9> TSF::nMergers;
+
 void TSF::saveFastOutput(short iclock)
 {
   const int ccWidth = 9;
@@ -546,12 +556,14 @@ void TSF::saveFastOutput(short iclock)
         B2DEBUG(10, "iAx:" << iAx << ", iTS:" << iTS << ", iTracker: " << iTracker);
         // scan through all CDC hits to get the priority hit
         for (int iclkPri = firstClock; iclkPri < lastClock; ++iclkPri) {
-          auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / 16];
+          // get the map storing the hit index in the corresponding merger
+          auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / nSegmentsInMerger];
+          unsigned itsInMerger = iTS % nSegmentsInMerger;
           // Pick up the first CDCHit which agrees to the priority position
           // of firmware sim output
-          if (priMap.find(iTS % 16) != priMap.end() &&
-              toPriority(decoded[3]) == priority(priMap[iTS % 16])) {
-            iHit = priMap[iTS % 16];
+          if (priMap.find(itsInMerger) != priMap.end() &&
+              toPriority(decoded[3]) == priority(priMap[itsInMerger])) {
+            iHit = priMap[itsInMerger];
             B2DEBUG(10, "iHit:" << iHit);
             B2DEBUG(10, "TDC: " << m_cdcHits[iHit]->getTDCCount() << ", TSF: " << decoded[1]);
             break;
@@ -571,6 +583,7 @@ void TSF::saveFastOutput(short iclock)
         if (iHit < 0) {
           B2WARNING("No corresponding priority CDC hit can be found.");
           B2WARNING("Maybe the latency and number of widened clocks are wrong.");
+          B2WARNING("In event " << StoreObjPtr<EventMetaData>()->getEvent());
           B2DEBUG(20, "priority " << decoded[3]);
           for (int iclkPri = 0; iclkPri < m_nClockPerEvent; ++iclkPri) {
             auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / 16];

@@ -11,8 +11,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <TError.h>
-
 #include <genfit/AbsTrackRep.h>
 #include <genfit/FitStatus.h>
 #include <genfit/AbsFitter.h>
@@ -25,6 +23,44 @@ using namespace Belle2;
 constexpr double TrackFitter::s_defaultDeltaPValue;
 constexpr double TrackFitter::s_defaultProbCut;
 constexpr unsigned int TrackFitter::s_defaultMaxFailedHits;
+
+int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack)
+{
+  int currentPdgCode = particleType.getPDGCode();
+
+  const auto& pdgParticleCharge = particleType.getParticlePDG()->Charge();
+  const auto& recoTrackCharge = recoTrack.getChargeSeed();
+
+  // Copy from GenfitterModule
+  B2ASSERT("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).",
+           fabs(pdgParticleCharge) == fabs(recoTrackCharge * 3.0));
+
+  /*
+  * Because the charged stable particles do describe a positive as well as a negative particle,
+  * we have to correct the charge if needed.
+  */
+  if (std::signbit(pdgParticleCharge) != std::signbit(recoTrackCharge))
+    currentPdgCode *= -1;
+
+  return currentPdgCode;
+}
+
+genfit::AbsTrackRep* TrackFitter::getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack)
+{
+  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
+
+  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
+    // Check if the track representation is a RKTrackRep.
+    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
+    if (rkTrackRepresenation != nullptr) {
+      if (rkTrackRepresenation->getPDG() == pdgCode) {
+        return trackRepresentation;
+      }
+    }
+  }
+
+  return nullptr;
+}
 
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
@@ -111,4 +147,10 @@ void TrackFitter::resetFitterToDefaultSettings()
   m_fitter.reset(dafFitter);
 
   m_skipDirtyCheck = false;
+}
+
+void TrackFitter::resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter)
+{
+  m_fitter = fitter;
+  m_skipDirtyCheck = true;
 }

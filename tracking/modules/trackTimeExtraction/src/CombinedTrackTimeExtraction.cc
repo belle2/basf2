@@ -30,7 +30,7 @@ CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   this->exposeParameters(&moduleParamList, prefix);
-  moduleParamList.getParameter<unsigned int>("maximalIterations").setDefaultValue(1);
+  moduleParamList.getParameter<unsigned int>("maximalIterations").setDefaultValue(2);
   moduleParamList.getParameter<unsigned int >("minimalIterations").setDefaultValue(1);
 }
 
@@ -49,8 +49,6 @@ void CombinedTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamL
                                 m_param_useFullGridExtraction);
 
 }
-
-
 
 void CombinedTrackTimeExtraction::apply()
 {
@@ -81,13 +79,13 @@ void CombinedTrackTimeExtraction::apply()
       // set the old (best) t0 value and run full grid extraction
       m_eventT0->addEventT0(fastExtractT0, fastExtractT0Uncertainty, Belle2::Const::CDC);
     } else {
-      B2DEBUG(50, "CDC t0 fit successfull, will not do full extraction");
+      B2DEBUG(50, "CDC t0 fit successful, will not do full extraction");
       doFullGridExtraction = false;
     }
   }
 
   // sufficiently precise ?
-  if (doFullGridExtraction) {
+  if (doFullGridExtraction && m_param_useFullGridExtraction) {
     B2DEBUG(50, "Running full grid search for CDC t0 fit extraction");
     m_fullGridExtraction.apply(m_recoTracks);
   }

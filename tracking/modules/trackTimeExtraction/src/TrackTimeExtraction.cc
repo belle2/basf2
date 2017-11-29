@@ -41,11 +41,6 @@ TrackTimeExtraction::TrackTimeExtraction() : Super()
 
 void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-
-  /*  moduleParamList->addParameter(prefixed(prefix, "recoTracksStoreArrayName"), m_param_recoTracksStoreArrayName,
-                                  "StoreArray containing the RecoTracks to process",
-                                  m_param_recoTracksStoreArrayName);
-  */
   moduleParamList->addParameter(prefixed(prefix, "maximalIterations"), m_param_maximalIterations,
                                 "Maximal number of iterations to perform.",
                                 m_param_maximalIterations);
@@ -95,19 +90,17 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
     return;
   }
 
-  const double extractedTime = extractTrackTimeLoop(recoTracks);
+  extractTrackTimeLoop(recoTracks);
 
   // The uncertainty was calculated using a test MC sample
-  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+//  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
 }
 
-double TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks) const
+void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks) const
 {
   TrackFitter trackFitter;
 
-  double sumExtractedTime = 0;
-  double lastExtractedTime = std::nan("");
-
+  // by default, we expect the time difference to the current t0 to be very small
   unsigned int loopCounter = 0;
 
   for (; loopCounter < m_param_maximalIterations; loopCounter++) {
@@ -115,21 +108,23 @@ double TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTr
       trackFitter.fit(*recoTrack);
     }
 
-    double randomizeValue = lastExtractedTime;
-    if (std::isnan(randomizeValue)) {
-      randomizeValue = m_param_randomizeLimits * (1 - 0.5 * loopCounter / m_param_maximalIterations);
-    }
-
-    const double extractedTime = extractTrackTime(recoTracks, randomizeValue);
-    B2INFO("Extracted Time in iteration " << loopCounter << " is " << extractedTime << " ns");
-    if (std::isnan(extractedTime)) {
-      B2ERROR("Extracted Time is NaN! Aborting.");
+    const double extractedTimeDelta = extractTrackTime(recoTracks);
+    B2DEBUG(50, "Extracted Time delta in iteration " << loopCounter << " is " << extractedTimeDelta << " ns");
+    if (std::isnan(extractedTimeDelta)) {
+      B2ERROR("Extracted Time delta is NaN! Aborting.");
       break;
     } else {
-      sumExtractedTime += extractedTime;
-      lastExtractedTime = extractedTime;
-      if (fabs(extractedTime) < m_param_minimalTimeDeviation and loopCounter >= m_param_minimalIterations) {
-        B2RESULT("Final delta T0 " << extractedTime << " with " << sumExtractedTime
+      const float fullT0 = m_eventT0->getEventT0(Const::EDetector::CDC);
+      const float fullT0Updated = fullT0 + extractedTimeDelta;
+
+      B2DEBUG(50, "Updating full event t0 to " << fullT0 << " (from previous EventT0) + " << extractedTimeDelta
+              << " (from this iteration), total = " << fullT0Updated << " +- " << m_param_t0Uncertainty);
+
+      m_eventT0->addEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
+
+      // check for early exit criteria
+      if (std::abs(extractedTimeDelta) < m_param_minimalTimeDeviation and loopCounter >= m_param_minimalIterations) {
+        B2RESULT("Final delta T0 " << extractedTimeDelta
                  << ". Needed " << loopCounter << " iterations.");
         break;
       }
@@ -139,11 +134,9 @@ double TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTr
   if (loopCounter == m_param_maximalIterations) {
     B2WARNING("Could not determine the track time in the maximum number of iterations to the needed precision.");
   }
-
-  return sumExtractedTime;
 }
 
-double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks, const double& randomizeLimits) const
+double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks) const
 {
   double sumFirstDerivatives = 0;
   double sumSecondDerivatives = 0;
@@ -162,27 +155,29 @@ double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks
     }
   }
 
-  double extractedT0 = 0;
+  double extractedDeltaT0 = 0;
 
   if (sumSecondDerivatives != 0 or sumFirstDerivatives != 0) {
-    extractedT0 = sumSecondDerivatives / sumFirstDerivatives;
+    extractedDeltaT0 = sumSecondDerivatives / sumFirstDerivatives;
   } else {
     if (m_param_randomizeOnError) {
-      extractedT0 = gRandom->Uniform(-randomizeLimits, randomizeLimits);
-      B2WARNING("Strange results, setting randomly to " << extractedT0);
+      extractedDeltaT0 = gRandom->Uniform(-m_param_minimalTimeDeviation,
+                                          m_param_minimalTimeDeviation);
+      B2WARNING("Strange results, setting randomly to " << extractedDeltaT0);
     }
   }
 
-  if (fabs(extractedT0) > m_param_maximalExtractedT0) {
-    extractedT0 = std::copysign(m_param_maximalExtractedT0, extractedT0);
+  if (std::abs(extractedDeltaT0) > m_param_maximalExtractedT0) {
+    extractedDeltaT0 = std::copysign(m_param_maximalExtractedT0, extractedDeltaT0);
   }
 
-  if (extractedT0 != 0) {
+  // is this really needed ?
+  if (extractedDeltaT0 != 0) {
     for (RecoTrack* recoTrack : recoTracks) {
-      recoTrack->setTimeSeed(recoTrack->getTimeSeed() + extractedT0);
+      ///recoTrack->setTimeSeed(recoTrack->getTimeSeed() + extractedT0);
       recoTrack->deleteFittedInformation();
     }
   }
 
-  return extractedT0;
+  return extractedDeltaT0;
 }

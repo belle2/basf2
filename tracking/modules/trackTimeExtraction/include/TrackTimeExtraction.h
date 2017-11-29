@@ -62,7 +62,7 @@ namespace Belle2 {
     /// Module parameter: Minimal number of iterations to perform.
     unsigned int m_param_minimalIterations = 1;
     /// Module parameter: Minimal deviation between two extractions, to call the extraction as converged.
-    double m_param_minimalTimeDeviation = 2;
+    double m_param_minimalTimeDeviation = 0.2;
     /// Module parameter: Whether to randomize the extracted time, when the fit fails.
     bool m_param_randomizeOnError = true;
     /// Module parameter: The maximal and minimal limit [-l, l] in which to randomize the extracted time on errors.
@@ -78,8 +78,9 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0;
 
     /// Helper function doing one step of the time extraction.
-    double extractTrackTime(std::vector<RecoTrack*>& recoTracks, const double& randomizeLimits) const;
-    /// Helper function doing all iteration steps of the time extraction.
-    double extractTrackTimeLoop(std::vector<RecoTrack*>&  recoTracks) const;
+    double extractTrackTime(std::vector<RecoTrack*>& recoTracks) const;
+    /// Helper function doing all iteration steps of the time extraction, this function will
+    /// iteratively update the EventT0 object
+    void extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks) const;
   };
 }

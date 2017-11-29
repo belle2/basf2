@@ -503,7 +503,8 @@ namespace Belle2 {
     /// Set the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
     void setChargeSeed(const short int chargeSeed) { m_charge = chargeSeed; }
 
-    /// Set the time seed. ATTENTION: This is not the fitted time.
+    /// Set the time seed. ATTENTION: This is not the fitted time but
+    /// This is the time difference between the time of the first hit of the track and the t0 of the event
     void setTimeSeed(const double timeSeed) { m_genfitTrack.setTimeSeed(timeSeed); }
 
     /// Return the covariance matrix of the seed. ATTENTION: This is not the fitted covariance.

@@ -3,10 +3,10 @@
 
 # *****************************************************************************
 
-# title           : 3_Reconstruction.py
-# description     : Reconstruction De^+ e^- -> Y(4S)
+# title           : 3_ValidationCRY.py
+# description     : Validation of cosmic tracks in phase II
 # author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 20. 6. 2017
+# date            : 29. 11. 2017
 
 # *****************************************************************************
 

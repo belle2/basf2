@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -26,9 +26,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(hitXP)
+REG_MODULE(HitXP)
 
-hitXPModule::hitXPModule() : Module()
+HitXPModule::HitXPModule() : Module()
 {
   setDescription("This module builds a ttree with true hit informations (momentum, position, PDGID, and track parameters hit per hit) running over simulated and reconstructed events.");
 
@@ -40,13 +40,13 @@ hitXPModule::hitXPModule() : Module()
 }
 
 
-hitXPModule::~hitXPModule()
+HitXPModule::~HitXPModule()
 {
 }
 
 
 
-void hitXPModule::initialize()
+void HitXPModule::initialize()
 {
 
   /** iniziialize store array and relations */
@@ -160,9 +160,9 @@ void hitXPModule::initialize()
 
 }
 
-void hitXPModule::beginRun() {}
+void HitXPModule::beginRun() {}
 
-void hitXPModule::event()
+void HitXPModule::event()
 {
   StoreArray<SVDCluster> SVDClusters;
   StoreArray<SVDTrueHit> SVDTrueHits;
@@ -373,7 +373,7 @@ void hitXPModule::event()
 
 
 
-void hitXPModule::endRun()
+void HitXPModule::endRun()
 {
   m_outputFile->cd();
   m_tree->Write();
@@ -405,4 +405,4 @@ void hitXPModule::endRun()
   m_outputFileExt->Close();
 }
 
-void hitXPModule::terminate() {}
+void HitXPModule::terminate() {}

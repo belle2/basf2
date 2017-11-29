@@ -12,7 +12,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <TFile.h>
-#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <tracking/modules/vxdtfRedesign/NoKickCutsEvalModule.h>
 
 

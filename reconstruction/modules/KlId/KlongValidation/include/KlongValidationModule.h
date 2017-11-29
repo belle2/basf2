@@ -19,7 +19,7 @@
 #include <TFile.h>
 #include <string>
 #include <TH1F.h>
-
+#include <TGraph.h>
 
 
 namespace Belle2 {
@@ -71,6 +71,8 @@ namespace Belle2 {
     /** of > 0 use Klid else use trackflag as reconstruction criterion  */
     float m_KlIDCut;
 
+    /** is beam bkg */
+    bool m_isBeamBKG;
     // use TH1F histogramms to calculate efficiency
     /** efficiency in x-y plane   */
     TH1F* m_effPhi;
@@ -97,12 +99,47 @@ namespace Belle2 {
     TH1F* m_Theta_all;
     /** momentum efficiency   */
     TH1F* m_Mom_all;
+    /** momentum efficiency   */
+    TH1F* m_Mom_all_plot;
     /** fake phi, angle in x-y   */
     TH1F* m_fakePhi_Pass;
     /**  fake theta, angle to z   */
     TH1F* m_fakeTheta_Pass;
     /**  fake momentum plot   */
     TH1F* m_fakeMom_Pass;
+    /**  fake momentum plot   */
+    TH1F* m_time;
+    /**  fake momentum plot   */
+    TH1F* m_trackSep;
+    /**  fake momentum plot   */
+    TH1F* m_energy;
+    /**  fake momentum plot   */
+    TH1F* m_nLayer;
+    /**  innermostlayer  */
+    TH1F*  m_innermostLayer;
+    /**  track flag  */
+    TH1F*  m_trackFlag     ;
+    /**  ECL flag*/
+    TH1F*  m_ECLFlag       ;    /** beambkg */
+    /**mbkg  */
+    TH1F*  m_bkgPhi  ;
+    /** beambkg */
+    TH1F*  m_bkgTheta;
+    /** beambkg */
+    TH1F*  m_bkgMom  ;
+    /** used for roc */
+    TH1F*  m_klidFake  ;
+    /** used for roc */
+    TH1F*  m_klidTrue  ;
+    /** used for roc */
+    TH1F*  m_klidAll  ;
+    /** roc */
+    TGraph*  m_ROC;
+    /** number of bins used for roc curve */
+    unsigned int m_ROCBins;
+
+
+
 
 
     /** output path   */

@@ -74,8 +74,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 def add_time_extraction(path, components=None):
 
     # todo: select specific tracks for extraction
-
-    path.add_module("CombinedTrackTimeExtraction")
+    path.add_module("CombinedTrackTimeExtraction", useFullGridExtraction=False)
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,

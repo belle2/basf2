@@ -238,7 +238,7 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       const double fitted_t0 = -fitresFull->Parameter(3);
       const double fitted_t0_error = fitresFull->Error(3);
 
-      if (fitresFull->Chi2() > m_param_rejectIfChiSquareLargerThan) {
+      if ((fitresFull->Chi2() / double(fitresFull->Ndf())) > m_param_rejectIfChiSquareLargerThan) {
         B2DEBUG(50,
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());
       } else {

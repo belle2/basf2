@@ -44,9 +44,14 @@ millepede = MillepedeCalibration(['CDCTimeZeros'],
                                  vertices=[],
                                  primary_vertices=['Z0:mumu'],
                                  path=path)
+# Use inversion as digonalization is about 10 times slower
+# and takes really long for all 14k wires
+millepede.set_command('method inversion 3 0.1')
 # For simulated data:
 millepede.algo.invertSign()
-
+# This is needed to get payloads even if for some wire not enough data
+# for calibration is available
+millepede.ignoreUndeterminedParams()
 # Fix layer 0, wire 0 to T0=0
 millepede.fixCDCTimeZero(Belle2.WireID(0, 0).getEWire())
 
@@ -63,7 +68,7 @@ caf = CAF()
 
 # For testing misalignment, set it up in a local DB and uncomment following (with path to your local DB)
 #
-millepede.use_local_database(os.path.abspath('localdb/database.txt'), directory="")
+# millepede.use_local_database(os.path.abspath('localdb/database.txt'), directory="")
 
 
 # Uncomment following to run on batch system (KEKCC)
@@ -73,10 +78,10 @@ millepede.use_local_database(os.path.abspath('localdb/database.txt'), directory=
 # caf.backend = backends.LSF()
 
 
-# Or to run with local backend with e.g. 10 processes, do:
+# Or to run with local backend with e.g. 2 processes, do:
 #
 # millepede.max_files_per_collector_job = 1
-# caf.backend = backends.Local(10)
+# caf.backend = backends.Local(2)
 
 caf.add_calibration(millepede)
 

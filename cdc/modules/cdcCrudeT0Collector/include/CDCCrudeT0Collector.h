@@ -35,12 +35,14 @@ namespace Belle2 {
       virtual void finish();
 
     private:
-      unsigned short m_lay; /**< Layer ID */
+      unsigned short m_lay;  /**< Layer ID */
       unsigned short m_wire; /**< Wire ID */
-      unsigned short m_tdc; /**< TDC count */
+      unsigned short m_tdc;  /**< TDC count */
       StoreArray<CDCHit> m_cdcHits; /**< CDCHit array */
       unsigned short m_adcMin = 0;    /**< ADC cut to reject noise. */
-      virtual void inDefineHisto();
+      /**
+       * Describe the process.
+       */
       void describeProcess(std::string functionName);
 
     };

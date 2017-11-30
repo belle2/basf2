@@ -16,13 +16,17 @@
 namespace Belle2 {
   namespace CDC {
     /**
-     * Class for T0 Correction .
+     * Algorithm class for crude T0 calibration.
      */
     class CrudeT0CalibrationAlgorithm: public CalibrationAlgorithm {
     public:
-      /// Constructor.
+      /**
+       * Constructor.
+       */
       CrudeT0CalibrationAlgorithm();
-      /// Destructor
+      /**
+       * Destructor.
+       */
       virtual ~CrudeT0CalibrationAlgorithm() {}
 
     protected:
@@ -41,10 +45,10 @@ namespace Belle2 {
       TH1D* m_hTDC[56][400];    /**< TDC distribution histo. */
       TH1D* m_hTDCBoard[300];   /**< T0 distribution of each board. */
       TH1D* m_hT0All;           /**< T0 distribution of all channel. */
-      unsigned short m_tdcMin = 4500;
-      unsigned short m_tdcMax = 5000;
-      float m_initT0 = 4887.;
-      unsigned short m_minEntries = 100; /**< min entries per histo. */
+      unsigned short m_tdcMin = 4500; /**< minimum of TDC hist for fitting */
+      unsigned short m_tdcMax = 5000; /**< maximum of TDC hist for fitting */
+      float m_initT0 = 4887.;   /**< Common initial T0 for fitting */
+      unsigned short m_minEntries = 100; /**< minimum entries required by histo. */
       double m_zOffset = 0.0;        /**< z offset for calculate prop time, it is position of trigger counter, */
       bool m_cosmic = true;    /**< for cosmic case, tof of upper sector will be negative*/
 

@@ -29,11 +29,6 @@ void CDCCrudeT0CollectorModule::prepare()
   registerObject<TTree>(objectName, tree);
 }
 
-void CDCCrudeT0CollectorModule::inDefineHisto()
-{
-  describeProcess("CDCCrudeT0Collector::inDefineHisto()");
-}
-
 void CDCCrudeT0CollectorModule::startRun()
 {
   describeProcess("CDCCrudeT0Collector::startRun()");

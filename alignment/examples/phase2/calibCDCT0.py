@@ -48,7 +48,7 @@ millepede = MillepedeCalibration(['CDCTimeZeros'],
 millepede.algo.invertSign()
 
 # Fix layer 0, wire 0 to T0=0
-millepede.fixCDCTimeZero(Belle2.WireID(0, 0))
+millepede.fixCDCTimeZero(Belle2.WireID(0, 0).getEWire())
 
 # Note that here we replace the helper class by real Calibration class of CAF
 millepede = millepede.create('cdc_t0', inputFiles)

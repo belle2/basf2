@@ -45,7 +45,7 @@ namespace Belle2 {
     void setComponents(const std::vector<std::string>& components) {m_components = components;}
 
     /// Report failure(false) or success (true) even if some parameters could not be determined
-    void ignoreUndeterminedParams(bool ignore) {m_ignoreUndeterminedParams = ignore;}
+    void ignoreUndeterminedParams(bool ignore = true) {m_ignoreUndeterminedParams = ignore;}
 
   protected:
 

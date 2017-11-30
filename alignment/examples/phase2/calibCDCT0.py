@@ -47,11 +47,15 @@ millepede = MillepedeCalibration(['CDCTimeZeros'],
 # Use inversion as digonalization is about 10 times slower
 # and takes really long for all 14k wires
 millepede.set_command('method inversion 3 0.1')
+# Set num threads for millepede reading and local fits
+# millepede.set_command('threads 4 4')
+
 # For simulated data:
 millepede.algo.invertSign()
 # This is needed to get payloads even if for some wire not enough data
 # for calibration is available
-millepede.ignoreUndeterminedParams()
+millepede.algo.ignoreUndeterminedParams(True)
+
 # Fix layer 0, wire 0 to T0=0
 millepede.fixCDCTimeZero(Belle2.WireID(0, 0).getEWire())
 

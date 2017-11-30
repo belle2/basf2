@@ -491,12 +491,6 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EP
   int layer1 = hit1.m_sensorLayer;
   int layer2 = hit2.m_sensorLayer;
   double layerdiff = layer2 - layer1;
-  // bool zeroFlag = true;
-  // if(is0){
-  //   if(layer1>2){
-  //     zeroFlag = false;
-  //   }
-  // }
   if (layerdiff >= 0 && layerdiff < 3) {
     switch (par) {
       case NoKickCuts::c_Omega:

@@ -137,7 +137,12 @@ namespace Belle2 {
     /// Helper function to return an already created track representation of the given reco track for the PDG
     static genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack);
 
-    /// Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
+    /**
+     * Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
+     *
+     * Whenever you call this function, all tracks will be automatically refitted, although
+     * they might be already fitted (because you use non-default parameters, so we assume you want other fit results).
+     */
     void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter);
 
     /**

@@ -49,6 +49,8 @@ std::shared_ptr<genfit::AbsFitter> DAFRecoFitterModule::createFitter() const
 
     return fitter;
   } else {
+    // The user has not changed any parameters, so this is basically the default fitter. We return nullptr,
+    // to not reset the fitter and make refitting unnecessary.
     return std::shared_ptr<genfit::DAF>(nullptr);
   }
 }

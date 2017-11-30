@@ -53,6 +53,8 @@ namespace Belle2 {
     /// timing extraction for this findlet
     void apply(std::vector<RecoTrack*>&) override final;
 
+    bool wasSucessful() const;
+
   private:
     /// StoreArray name from which to read the reco tracks.
     //std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
@@ -73,6 +75,10 @@ namespace Belle2 {
     double m_param_maximalExtractedT0 = 20;
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
+
+    unsigned int m_param_minimalNumberCDCHits = 20;
+
+    mutable bool m_lastRunSucessful = false;
 
     /// Pointer to the storage of the eventwise T0 estimation in the data store.
     StoreObjPtr<EventT0> m_eventT0;

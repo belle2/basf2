@@ -54,6 +54,14 @@ void CombinedTrackTimeExtraction::apply()
 {
   m_recoTrackLoader.apply(m_recoTracks);
 
+  B2DEBUG(50, "Got " << m_recoTracks.size() << " RecoTracks");
+
+  // check if there are any reco tracks at all available
+  if (m_recoTracks.size() == 0) {
+    B2DEBUG(50, "No tracks for time extraction available, skipping for this event ");
+    return;
+  }
+
   // make sure the EventT0 object is available and created (even if we don't fill it later)
   if (!m_eventT0.isValid()) {
     m_eventT0.create();
@@ -61,7 +69,10 @@ void CombinedTrackTimeExtraction::apply()
 
   // is there already an output from the Fast CDC hit finder ?
   bool doFullGridExtraction = true;
-  if (m_eventT0->hasEventT0(Belle2::Const::CDC)) {
+  bool extractionSuccesful = false;
+
+  B2DEBUG(50, "m_eventT0->hasDEventT0(Belle2::Const::CDC) = :" << m_eventT0->hasDoubleEventT0(Belle2::Const::CDC));
+  if (m_eventT0->hasDoubleEventT0(Belle2::Const::CDC)) {
 
     const double fastExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
     const double fastExtractT0Uncertainty = m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC);
@@ -72,15 +83,17 @@ void CombinedTrackTimeExtraction::apply()
     m_trackTimeExtraction.apply(m_recoTracks);
 
     // check if t0 extraction was successful, if not the CDC number will be NAN
-    double timeExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
+    //double timeExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
 
-    if (std::isnan(timeExtractT0)) {
+    // todo: this is not nan any more in case the fit failed
+    if (!m_trackTimeExtraction.wasSucessful()) {
       B2DEBUG(50, "CDC t0 fit failed");
       // set the old (best) t0 value and run full grid extraction
       m_eventT0->addEventT0(fastExtractT0, fastExtractT0Uncertainty, Belle2::Const::CDC);
     } else {
       B2DEBUG(50, "CDC t0 fit successful, will not do full extraction");
       doFullGridExtraction = false;
+      extractionSuccesful = true;
     }
   }
 
@@ -90,6 +103,11 @@ void CombinedTrackTimeExtraction::apply()
     m_fullGridExtraction.apply(m_recoTracks);
   }
 
-  B2DEBUG(50, "CDC t0 result with combined method: " << m_eventT0->getEventT0(Belle2::Const::CDC) <<
-          " +- " << m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC));
+  if (extractionSuccesful) {
+    B2DEBUG(50, "CDC t0 result with combined method: " << m_eventT0->getEventT0(Belle2::Const::CDC) <<
+            " +- " << m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC));
+  } else {
+    B2DEBUG(50, "CDC t0 extraction not sucessful");
+
+  }
 }

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <TDecompChol.h>
 #include <TDecompSVD.h>
@@ -44,6 +45,15 @@ namespace Belle2 {
    */
   class TimeExtractionUtils {
   public:
+
+    static std::vector<RecoTrack*> selectTracksForTimeExtraction(std::vector<RecoTrack*> const& tracks,
+        unsigned int minNumberCDCHits = 20)
+    {
+      return TrackFindingCDC::filter(tracks, [minNumberCDCHits](RecoTrack * rt) {
+        return (rt->getNumberOfCDCHits() >= minNumberCDCHits);
+      });
+    }
+
     /**
      * Main function of this class: do one time extraction step by calculating the
      * derivatives of chi^2 to the global event time for minimizing chi^2.

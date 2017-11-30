@@ -87,6 +87,11 @@ void CDCHitBasedT0Extraction::exposeParameters(ModuleParamList* moduleParamList,
                                 m_param_storeAllFits,
                                 "store images for all fits",
                                 m_param_storeAllFits);
+
+  moduleParamList->addParameter(prefixed(prefix, "minHitCount"),
+                                m_param_minHitCount,
+                                "Minimum amount of hits which is required to try the extraction",
+                                m_param_minHitCount);
 }
 
 void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
@@ -112,6 +117,8 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
     return;
   }
 
+  unsigned int usedHitCount = 0;
+
   for (auto const& wireHit : inputWireHits) {
 
     if (m_param_rejectByBackgroundFlag
@@ -131,6 +138,11 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       continue;
 
     timingHistgram.Fill(wireHit.getDriftTime());
+    usedHitCount ++;
+  }
+
+  if (usedHitCount < m_param_minHitCount) {
+    return;
   }
 
   // add an overall offset of 1 to not have to care about empty bins in
@@ -238,11 +250,19 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       const double fitted_t0 = -fitresFull->Parameter(3);
       const double fitted_t0_error = fitresFull->Error(3);
 
-      if ((fitresFull->Chi2() / double(fitresFull->Ndf())) > m_param_rejectIfChiSquareLargerThan) {
+      const double norm_chi2 = fitresFull->Chi2() / double(fitresFull->Ndf());
+
+      B2DEBUG(50, "T0 fit with t0 " << fitted_t0 << " +- " << fitted_t0_error << " and normalized chi2 " << norm_chi2 << " and " <<
+              usedHitCount << " hits");
+
+
+      if (norm_chi2 > m_param_rejectIfChiSquareLargerThan) {
         B2DEBUG(50,
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());
+      } else if (std::abs(fitted_t0_error) > 8.0f) {
+        B2DEBUG(50,
+                "T0 fit has too large error " << fitted_t0_error);
       } else {
-
         m_eventT0->addEventT0(fitted_t0, fitted_t0_error, Const::CDC);
         B2DEBUG(50,
                 "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);

@@ -48,6 +48,10 @@ void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, con
                                 "Minimal number of iterations to perform.",
                                 m_param_minimalIterations);
 
+  moduleParamList->addParameter(prefixed(prefix, "minimalNumberCDCHits"), m_param_minimalNumberCDCHits,
+                                "Minimal number of CDC hits track must contain to be used for extraction.",
+                                m_param_minimalNumberCDCHits);
+
   moduleParamList->addParameter(prefixed(prefix, "minimalTimeDeviation"), m_param_minimalTimeDeviation,
                                 "Minimal deviation between two extractions, to call the extraction as converged.",
                                 m_param_minimalTimeDeviation);
@@ -83,6 +87,8 @@ void TrackTimeExtraction::initialize()
 
 void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
 {
+  m_lastRunSucessful = false;
+
   if (not m_eventT0.isValid()) {
     m_eventT0.create();
   } else if (not m_param_overwriteExistingEstimation) {
@@ -90,7 +96,15 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
     return;
   }
 
-  extractTrackTimeLoop(recoTracks);
+  auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(recoTracks, m_param_minimalNumberCDCHits);
+
+  // check if there are any reco tracks at all available
+  if (selectedRecoTracks.size() == 0) {
+    B2DEBUG(50, "No tracks for time extraction satisfy the requirements, skipping this event ");
+    return;
+  }
+
+  extractTrackTimeLoop(selectedRecoTracks);
 
   // The uncertainty was calculated using a test MC sample
 //  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
@@ -104,7 +118,10 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
   unsigned int loopCounter = 0;
 
   for (; loopCounter < m_param_maximalIterations; loopCounter++) {
+
+    B2DEBUG(50, "Using " << recoTracks.size() << " tracks for t0 fitting");
     for (RecoTrack* recoTrack : recoTracks) {
+      recoTrack->deleteFittedInformation();
       trackFitter.fit(*recoTrack);
     }
 
@@ -126,15 +143,25 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
       if (std::abs(extractedTimeDelta) < m_param_minimalTimeDeviation and loopCounter >= m_param_minimalIterations) {
         B2RESULT("Final delta T0 " << extractedTimeDelta
                  << ". Needed " << loopCounter << " iterations.");
+        m_lastRunSucessful = true;
         break;
       }
     }
   }
 
+  // todo: reset to the previous EventT0 ??
+
   if (loopCounter == m_param_maximalIterations) {
     B2WARNING("Could not determine the track time in the maximum number of iterations to the needed precision.");
   }
 }
+
+bool TrackTimeExtraction::wasSucessful() const
+{
+  return m_lastRunSucessful;
+}
+
+
 
 double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks) const
 {
@@ -147,7 +174,7 @@ double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks
 
     if (not std::isnan(dchi2da) and not std::isnan(d2chi2da2)) {
       if (d2chi2da2 > 20) {
-        B2DEBUG(200, "Track with bad second derivative");
+        B2DEBUG(50, "Track with bad second derivative");
         continue;
       }
       sumFirstDerivatives += d2chi2da2;

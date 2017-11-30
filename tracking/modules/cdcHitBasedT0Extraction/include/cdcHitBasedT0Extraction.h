@@ -50,6 +50,8 @@ namespace Belle2 {
 
   private:
 
+    unsigned int m_param_minHitCount = 20;
+
     float m_param_searchWindow = 70.0f; /** the window (+-m_param_searchWindow) in ns where to search for the best t0 */
 
     float m_param_fitWindow = 100.0f; /** the space (+-m_param_fitWindow) in ns used to fit the t0 */

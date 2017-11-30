@@ -233,6 +233,20 @@ namespace Belle2 {
     }
 
     /**
+
+    */
+    template <class Ts, class TCopyIfPredicate>
+    Ts filter(Ts const& inputContainer, TCopyIfPredicate pred)
+    {
+      Ts outputContainer;
+
+      // copy only positive numbers:
+      std::copy_if(inputContainer.begin(), inputContainer.end(), std::back_inserter(outputContainer), pred);
+      return outputContainer;
+    }
+
+
+    /**
      * Shortcut for applying the std::any_of function.
      */
     template <class Ts, class AUnaryPredicate>

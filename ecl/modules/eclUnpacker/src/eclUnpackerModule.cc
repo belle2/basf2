@@ -304,11 +304,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG(50, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
-        else if (triggerTag != triggerTag0) {
-          B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
-                    " != " << triggerTag0);
-          triggerTag0 |= (1 << 16);
-        }
+        else if (triggerTag != triggerTag0) B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
+                                                        " != " << triggerTag0);
 
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
@@ -418,7 +415,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       if (eclTrig) {
         eclTrig->setTrigId(iCrate);
         eclTrig->setTimeTrig(triggerPhase0);
-        eclTrig->setTrigTag(triggerTag0);
+        eclTrig->setTrigTag(triggerTag);
       }
 
 

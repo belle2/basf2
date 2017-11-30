@@ -16,8 +16,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <tracking/dataobjects/hitXP.h>
-#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
-#include <tracking/modules/vxdtfRedesign/NoKickCutsEvalModule.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <TFile.h>
@@ -112,7 +110,7 @@ namespace Belle2 {
     double c_pwidth = (c_pmax - c_pmin) / (double)c_nbinp; /**< width of momentum bin */
     double c_twidth = (c_tmax - c_tmin) / (double)c_nbint; /**< width of theta bin */
     const double c_multLimit = 1; /**< multiplier of the range limit of the histograms of DeltaX */
-    const int c_over = 9999999; /**< escape flag of some methods */
+    const double c_over = 9999999.; /**< escape flag of some methods */
     int m_pCounter = 0; /**< conter of hit out of range in momentum */
     int m_tCounter = 0; /**< counter of hit out of range in theta */
     int m_globCounter = 0; /**< counter of tracks cutted from global cuts */

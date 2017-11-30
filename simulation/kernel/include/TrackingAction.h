@@ -84,7 +84,7 @@ namespace Belle2 {
       void setIgnoreBremsstrahlungPhotons(bool ignore = true) {m_ignoreBremsstrahlungPhotons = ignore;}
 
       /**
-       * Set energy cut for bremstrahlung photons
+       * Set energy cut for bremsstrahlung photons
        * @param cut_MeV energy in MeV
        */
       void setBremsstrahlungPhotonsEnergyCut(double cut_MeV) {m_bremsstrahlungPhotonsEnergyCut = cut_MeV;}
@@ -101,8 +101,8 @@ namespace Belle2 {
       bool m_ignoreOpticalPhotons;              /**< do not store optical photons in MCParticles */
       bool m_ignoreSecondaries;                 /**< do not store secondaries in MCParticles */
       double m_secondariesEnergyCut;            /**< kinetic energy cut for stored secondaries [MeV] */
-      bool m_ignoreBremsstrahlungPhotons;       /**< do not store bremstrahlung photons in MCParticles */
-      double m_bremsstrahlungPhotonsEnergyCut;  /**< kinetic energy cut for stored bremstrahlung photons [MeV] */
+      bool m_ignoreBremsstrahlungPhotons;       /**< do not store bremsstrahlung photons in MCParticles */
+      double m_bremsstrahlungPhotonsEnergyCut;  /**< kinetic energy cut for stored bremsstrahlung photons [MeV] */
 
 
       int m_storeTrajectories;    /**< Store trajectories for 0=none, 1=primary or 2=all particles */

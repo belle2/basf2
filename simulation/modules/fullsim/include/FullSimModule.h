@@ -111,9 +111,9 @@ namespace Belle2 {
     bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
 
     bool m_storeOpticalPhotons;            /**< controls storing of optical photons in MCParticles */
-    bool m_storeSecondaries;               /**< contorls storing of Geant secondaries in MCParticles */
+    bool m_storeSecondaries;               /**< controls storing of Geant secondaries in MCParticles */
     double m_secondariesEnergyCut;         /**< kinetic energy cut for the stored Geant secondaries */
-    bool m_storeBremsstrahlungPhotons;     /**< contorls storing of bremsstrahlung photons in MCParticles */
+    bool m_storeBremsstrahlungPhotons;     /**< controls storing of bremsstrahlung photons in MCParticles */
     double m_bremsstrahlungPhotonsEnergyCut;/**< kinetic energy cut for the stored bremsstrahlung photons */
 
     std::string m_magneticFieldName;       /**< magnetic field stepper to use */

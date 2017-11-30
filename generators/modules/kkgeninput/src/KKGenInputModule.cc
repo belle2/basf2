@@ -60,7 +60,8 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
 void KKGenInputModule::initialize()
 {
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Initialize initial particle for beam parameters.
   m_initial.initialize();

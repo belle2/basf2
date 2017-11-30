@@ -35,6 +35,26 @@ namespace Belle2 {
       return m_nCDCHitsNotAssigned;
     }
 
+    /** Getter for number of CDC measurements, that are not assigned to any Track nor very likely beam-background.
+     *
+     *  CDC hits, that are close to each other are combined in clusters during the reconstruction,
+     *  which are evaluated with respect to the likelihood to stem from beam-background and the like
+     *  rather than from an interesting physics object.
+     *  Before any real attempt to actually combine CDC hits into a track, a cut on the output of such a classifier
+     *  is performed. Here we want to get only the number of those CDC hits, that survive that cut,
+     *  but are then not used for an actual Track.
+     */
+    unsigned short getNCDCHitsNotAssignedPostCleaning() const
+    {
+      return m_nCDCHitsNotAssignedPostCleaning;
+    }
+
+    /** Setter for number of CDC measurements, that are not assigned to any Track nor very likely beam-background. */
+    void setNCDCHitsNotAssignedPostCleaning(unsigned short nCDCHitsNotAssignedPostCleaning)
+    {
+      m_nCDCHitsNotAssignedPostCleaning = nCDCHitsNotAssignedPostCleaning;
+    }
+
   private:
     /** Number of hits in the CDC, that were not assigned to any Track.
      *
@@ -43,6 +63,13 @@ namespace Belle2 {
      *  we save this as a separate number.
      */
     unsigned short m_nCDCHitsNotAssigned {0};
+
+    /** Number of unassigned hits in the CDC, that survived the background filter.
+     *
+     *  During the pattern recognition, a cleaning of hits, that are very likely due to background
+     *  is performed. Here we save only the number of unassinged hits, that survive that cut.
+     */
+    unsigned short m_nCDCHitsNotAssignedPostCleaning {0};
 
     /** Efficient way of storing, which layers in the CDC have at least a single hit.
       *
@@ -54,13 +81,6 @@ namespace Belle2 {
       *  @sa HitPatternCDC
       */
     uint64_t m_hitPatternCDCInitializer {0};
-
-    /** Number of unassigned hits in the CDC, that survived the background filter.
-     *
-     *  During the pattern recognition, a cleaning of hits, that are very likely due to background
-     *  is performed. Here we save only the number of unassinged hits, that survive that cut.
-     */
-    unsigned short m_nCDCHitsNotAssignedPostCleaning {0};
 
     ClassDef(EventLevelTrackingInfo, 1); /**< ROOTification. */
   };

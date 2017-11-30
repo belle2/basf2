@@ -14,9 +14,13 @@ namespace Belle2 {
     // Test proper initialization for an empty afterimage.
     EventLevelTrackingInfo eventLevelTrackingInfo;
     EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssigned(), 0);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssignedPostCleaning(), 0);
 
     //Let's set the total number CDC hits in the afterimage
     eventLevelTrackingInfo.setNCDCHitsNotAssigned(324);
+    eventLevelTrackingInfo.setNCDCHitsNotAssignedPostCleaning(257);
+
     EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssigned(), 324);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssignedPostCleaning(), 257);
   }
 } // namespace Belle2

@@ -54,6 +54,8 @@ namespace Belle2 {
 
     /*! Get Trig Time
      * @return Trig Time
+     * Trigger Tag word width is 16 bit.
+     * Bit 16 is error bit which is 1 if trigger tags from different shapers are not equal.
      */
     double getTimeTrig() const { return m_TimeTrig; }
 

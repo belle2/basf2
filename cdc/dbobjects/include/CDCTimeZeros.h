@@ -125,7 +125,7 @@ namespace Belle2 {
     void setGlobalParam(double value, unsigned short element, unsigned short)
     {
       WireID wire(element);
-      setT0(wire.getICLayer(), wire.getEWire(), value);
+      setT0(wire.getICLayer(), wire.getIWire(), value);
     }
     /// list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()

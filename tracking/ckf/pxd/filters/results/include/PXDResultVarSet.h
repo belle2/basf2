@@ -67,8 +67,6 @@ namespace Belle2 {
   class PXDResultVarSet : public TrackFindingCDC::VarSet<PXDResultVarNames> {
 
   public:
-    PXDResultVarSet();
-
     void initialize() override;
 
     /// Generate and assign the variables from the object.

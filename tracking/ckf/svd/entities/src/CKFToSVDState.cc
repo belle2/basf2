@@ -17,9 +17,13 @@
 
 using namespace Belle2;
 
-CKFToSVDState::CKFToSVDState(const RecoTrack* seed) : CKFState(seed)
+CKFToSVDState::CKFToSVDState(const RecoTrack* seed, bool reversed) : CKFState(seed)
 {
-  setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+  if (reversed) {
+    setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromLastHit());
+  } else {
+    setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+  }
 }
 
 unsigned int CKFToSVDState::getGeometricalLayer() const

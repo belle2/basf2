@@ -16,9 +16,14 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+#include <reconstruction/dbobjects/DedxPDFs.h>
+
 #include <string>
 #include <vector>
 #include <TVector3.h>
+#include <TH2F.h>
 
 class TH2F;
 
@@ -87,14 +92,23 @@ namespace Belle2 {
     /** save energy loss and hit information from SVD/PXDHits to track */
     template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const std::vector<HitClass*>& hits) const;
 
-    /** for all particles, save log-likelihood values into 'logl'.
+    /** for all particles in the PXD, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified
      * @param p     track momentum
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
+    void savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
+
+    /** for all particles in the SVD, save log-likelihood values into 'logl'.
+     *
+     * @param logl  array of log-likelihood to be modified
+     * @param p     track momentum
+     * @param dedx  dE/dx value
+     * @param pdf   pointer to array of 2d PDFs to use (not modified)
+     * */
+    void saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
 
     /** should info from this detector be included in likelihood? */
     bool detectorEnabled(Dedx::Detector d) const
@@ -103,7 +117,8 @@ namespace Belle2 {
     }
 
     /** dedx:momentum PDFs. */
-    TH2F* m_pdfs[Dedx::c_num_detectors][Const::ChargedStable::c_SetSize]; //m_pdfs[detector_type][particle_type]
+    DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
+    TH2F m_pdfs[2][6]; //m_pdfs[detector_type][particle_type]
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

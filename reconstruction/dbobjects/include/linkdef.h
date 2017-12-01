@@ -14,6 +14,7 @@
 #pragma link C++ class Belle2::CDCDedxHadronCor+;
 #pragma link C++ class Belle2::CDCDedxCurvePars+;
 #pragma link C++ class Belle2::CDCDedxSigmaPars+;
+#pragma link C++ class Belle2::DedxPDFs;
 #pragma link C++ class Belle2::CDCDedxDatabaseImporter;
 
 #endif

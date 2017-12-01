@@ -28,6 +28,7 @@
 #include <reconstruction/dbobjects/CDCDedxCurvePars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dbobjects/DedxPDFs.h>
 
 #include <string>
 #include <vector>
@@ -126,13 +127,15 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
+    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx) const;
 
     // parameters to determine the predicted means and resolutions
     std::vector<double> m_curvepars; /**< dE/dx curve parameters */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
-    TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
+    // pdfs for PID
+    DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
+    TH2F m_pdfs[6]; /**< dedx:momentum PDFs. */
 
     bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */

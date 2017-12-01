@@ -9,12 +9,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
+#include <tracking/ckf/pxd/filters/states/AllPXDStateFilter.h>
+#include <string>
 
 namespace Belle2 {
-  /// A very simple filter for all space points.
-  class AllPXDStateFilter : public BasePXDStateFilter {
+  class ModuleParamList;
+
+  class NonIPCrossingPXDStateFilter : public AllPXDStateFilter {
   public:
-    TrackFindingCDC::Weight operator()(const BasePXDStateFilter::Object& pair) override;
+    TrackFindingCDC::Weight operator()(const AllPXDStateFilter::Object& pair) final;
+
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+  private:
+    double m_param_direction = 1;
   };
 }

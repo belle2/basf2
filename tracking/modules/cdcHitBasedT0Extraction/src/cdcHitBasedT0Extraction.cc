@@ -80,8 +80,13 @@ void CDCHitBasedT0Extraction::exposeParameters(ModuleParamList* moduleParamList,
 
   moduleParamList->addParameter(prefixed(prefix, "rejectIfChiSquareLargerThan"),
                                 m_param_rejectIfChiSquareLargerThan,
-                                "consider all t0 fit failed which have larger chi2 than this number",
+                                "consider the t0 fit failed which have larger chi2 than this number",
                                 m_param_rejectIfChiSquareLargerThan);
+
+  moduleParamList->addParameter(prefixed(prefix, "rejectIfUncertaintyLargerThan"),
+                                m_param_rejectIfUncertaintyLargerThan,
+                                "consider the t0 fit if the uncertainty on t0 is larger than this value",
+                                m_param_rejectIfUncertaintyLargerThan);
 
   moduleParamList->addParameter(prefixed(prefix, "storeAllFits"),
                                 m_param_storeAllFits,
@@ -259,7 +264,7 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       if (norm_chi2 > m_param_rejectIfChiSquareLargerThan) {
         B2DEBUG(50,
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());
-      } else if (std::abs(fitted_t0_error) > 8.0f) {
+      } else if (std::abs(fitted_t0_error) > m_param_rejectIfUncertaintyLargerThan) {
         B2DEBUG(50,
                 "T0 fit has too large error " << fitted_t0_error);
       } else {

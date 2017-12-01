@@ -67,6 +67,8 @@ namespace Belle2 {
     // don't use fit results which have a chi2 largen than configured here
     float m_param_rejectIfChiSquareLargerThan = std::numeric_limits<float>::max();
 
+    float m_param_rejectIfUncertaintyLargerThan = 8.0f;
+
     float m_param_refitWindow = 50.0f; /** the with of the window in ns (+- m_param_refitWindow) used to refit the final t0 value*/
 
     StoreObjPtr<EventT0> m_eventT0; /** acccess to the EventT0 object in the datastore */

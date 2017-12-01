@@ -22,6 +22,7 @@ namespace Belle2 {
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter = ASeedRelationFilter>
   class CKFRelationCreator : public TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>> {
   public:
+    /// The parent class
     using Super = TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>>;
 
     /// Construct this findlet and add the subfindlet as listener

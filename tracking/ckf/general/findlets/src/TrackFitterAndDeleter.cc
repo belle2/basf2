@@ -28,5 +28,5 @@ void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
 
 void TrackFitterAndDeleter::beginRun()
 {
-  m_trackFitter.reset(new TrackFitter());
+  m_trackFitter = std::make_unique<Belle2::TrackFitter>();
 }

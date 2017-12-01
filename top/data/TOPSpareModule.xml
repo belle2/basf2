@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Name>TOPSpareModule</Name>
+  <Description>TOP spare module #1</Description>
+  <Global>
+    <material>Air</material>
+    <width  unit="m">4.0</width>
+    <length unit="m">4.0</length>
+    <height unit="m">4.0</height>
+  </Global>
+
+  <!-- Define materials -->
+  <xi:include href="../geometry/BasicMaterials.xml"/>
+  <xi:include href="TOP-Materials.xml"/>
+
+  <DetectorComponent name="TOP" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="top">TOPCreator</Creator>
+    <Content>
+      <xi:include href="TOPSpareModule-Bars.xml"/>
+      <xi:include href="TOP-Mirror.xml"/>
+      <xi:include href="TOP-PMT.xml"/>
+      <xi:include href="TOP-TDC.xml"/>
+      <xi:include href="TOP-QENaKSbCs.xml"/>
+      <xi:include href="TOP-Materials.xml"/>
+      <xi:include href="QBB.xml"/>
+      <xi:include href="FrontEndGeo.xml"/>
+      <xi:include href="FrontEndMapping-spareModule.xml"/>
+      <xi:include href="ChannelMappingIRS3B.xml"/>
+      <xi:include href="ChannelMappingIRSX.xml"/>
+      <xi:include href="BrokenGlues.xml"/>
+      <xi:include href="PeelOffCookies.xml"/>
+      <xi:include href="SignalShape.xml"/>
+      <xi:include href="DisplacedGeometry.xml"/>
+      <xi:include href="DisplacedPMTArrays.xml"/>
+      
+      <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
+
+    </Content>
+  </DetectorComponent>
+
+</Detector>

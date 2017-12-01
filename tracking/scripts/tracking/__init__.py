@@ -929,11 +929,12 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         path.add_module(pxdSVDCut)
 
     # Quality
-    qualityEstimator = register_module('QualityEstimatorMVA')
+    qualityEstimator = register_module('QualityEstimatorVXD')  # QualityEstimatorMVA
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
-    qualityEstimator.param('WeightFileIdentifier', '/local/scratch/ssd/sracs/VXDTF2-MVA-Tests/FastBDT-SMrev5-noTime.weights.xml')
-    qualityEstimator.param('ClusterInformation', 'Average')
+    # qualityEstimator.param('WeightFileIdentifier',
+    #   '/local/scratch/ssd/sracs/VXDTF2-MVA-Tests/FastBDT-SMrev5-noTime-fixed.weights.xml')
+    # qualityEstimator.param('ClusterInformation', 'Average')
     path.add_module(qualityEstimator)
 
     if use_quality_index_cutter:

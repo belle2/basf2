@@ -235,16 +235,16 @@ CDCTrigger2DFinderModule::event()
     for (auto hit : hitMap) {
       seqHitMap.push_back(hit);
     }
-    sort(seqHitMap.begin(), seqHitMap.end(), [tsHits](cdcHitPair i, cdcHitPair j) {
-      return tsHits[i.first]->foundTime() < tsHits[j.first]->foundTime();
+    sort(seqHitMap.begin(), seqHitMap.end(), [this](cdcHitPair i, cdcHitPair j) {
+      return m_segmentHits[i.first]->foundTime() < m_segmentHits[j.first]->foundTime();
     });
     auto seqHitItr = seqHitMap.begin();
     /* layer filter */
     vector<bool> layerHit(CDC_SUPER_LAYERS, false);
     // data clock cycle in unit of 2ns
     short period = 16;
-    short firstTick = tsHits[(*seqHitMap.begin()).first]->foundTime() / period + 1;
-    short lastTick = tsHits[(*(seqHitMap.end() - 1)).first]->foundTime() / period + 1;
+    short firstTick = m_segmentHits[(*seqHitMap.begin()).first]->foundTime() / period + 1;
+    short lastTick = m_segmentHits[(*(seqHitMap.end() - 1)).first]->foundTime() / period + 1;
     // add TS hits in every clock cycle until a track candidate is found
     for (auto tick = firstTick * period; tick < lastTick * period; tick += period) {
       int nHitInCycle = 0;
@@ -252,11 +252,11 @@ CDCTrigger2DFinderModule::event()
         cdcHitPair currentHit = *itr;
         // start from the first hit over SL threshold
         if (count(layerHit.begin(), layerHit.end(), true) >= m_minHits &&
-            tsHits[currentHit.first]->foundTime() > tick) {
+            m_segmentHits[currentHit.first]->foundTime() > tick) {
           break;
         }
         nHitInCycle++;
-        layerHit[tsHits[currentHit.first]->getISuperLayer()] = true;
+        layerHit[m_segmentHits[currentHit.first]->getISuperLayer()] = true;
       }
       copy_n(seqHitItr, nHitInCycle, inserter(fastHitMap, fastHitMap.end()));
       fastInterceptFinder(fastHitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);

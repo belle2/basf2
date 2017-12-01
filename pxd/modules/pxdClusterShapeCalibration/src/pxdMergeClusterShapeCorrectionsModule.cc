@@ -14,6 +14,8 @@
 // #include <framework/database/DBImportArray.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBObjPtr.h>
+#include <TH1F.h>
+#include <TH1I.h>
 
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -355,8 +357,8 @@ void pxdMergeClusterShapeCorrectionsModule::initialize()
   for (int iSh = 0; iSh < m_shapes; iSh++) {
     hClSBVal[iSh] = NULL;
     hClSEEVal[iSh] = NULL;
-    TString HistoName = Form("ClSBVal_Sh%02i", iSh + 1);
-    TString HistoTitle = Form("Cluster Shape Correction, bias values, shape %02i", iSh + 1);
+    HistoName = Form("ClSBVal_Sh%02i", iSh + 1);
+    HistoTitle = Form("Cluster Shape Correction, bias values, shape %02i", iSh + 1);
     hClSBVal[iSh] = new TH1F(HistoName.Data(), HistoTitle.Data(),
                              100, -50.0, 50.0);
     hClSBVal[iSh]->GetXaxis()->SetTitle("Correction [#mum]");
@@ -411,7 +413,7 @@ void pxdMergeClusterShapeCorrectionsModule::initialize()
             i_vector += i_angleV;
             int i_vectorSpecial[4];  // Vectors to special file with correction only in one i_pk case
             for (int i = 0; i < 4; i++) {
-              int i_pkSp;
+              int i_pkSp = 0;
               if (i == 0) i_pkSp = 2;
               else if (i == 1) i_pkSp = 3;
               else if (i == 2) i_pkSp = 6;
@@ -588,10 +590,10 @@ void pxdMergeClusterShapeCorrectionsModule::initialize()
     CorrectionErrorEstimationCovariance.import(iov);
 
     Name = Form("PXDClSh_InPixelPosition");
-    DBImportObjPtr<TVectorD> InPixelPosition(Name.Data());
-    InPixelPosition.construct(m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV);
-    InPixelPosition->SetElements(ValueCorsInPixPos);
-    InPixelPosition.import(iov);
+    DBImportObjPtr<TVectorD> InPixelPositionDB(Name.Data());
+    InPixelPositionDB.construct(m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV);
+    InPixelPositionDB->SetElements(ValueCorsInPixPos);
+    InPixelPositionDB.import(iov);
 
     B2INFO("Output local database... done. ");
   } else {

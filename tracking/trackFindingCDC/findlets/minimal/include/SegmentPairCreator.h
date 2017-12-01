@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
+
 #include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
@@ -54,11 +56,19 @@ namespace Belle2 {
                   std::vector<CDCSegmentPair>& segmentPairs);
 
     private:
-      /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const CDCSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      /// Parameter : Switch to enable the search for axial to axial pairs to enable more stable reconstruction of the middle stereo.
+      bool m_param_axialBridging = false;
+
+    private:
+      /// Findlet responsible for the creation of axial axial segment pairs
+      AxialSegmentPairCreator m_axialSegmentPairCreator;
 
       /// The filter to be used for the segment pair generation.
       ChooseableSegmentPairFilter m_segmentPairFilter;
+
+      // Object pools
+      /// Structure for the segments grouped by super layer id.
+      std::array<std::vector<const CDCSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
     };
   }
 }

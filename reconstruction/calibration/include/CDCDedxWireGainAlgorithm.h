@@ -51,6 +51,5 @@ namespace Belle2 {
      */
     double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
 
-    ClassDef(CDCDedxWireGainAlgorithm, 0); /**< Class for CDC dE/dx calibration algorithm **/
   };
 } // namespace Belle2

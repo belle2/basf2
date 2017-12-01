@@ -13,11 +13,11 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -27,24 +27,63 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
+  int iEndcap, iLayer, iSector, iPlane, iStrip, strip, maxStrip;
+  EKLMChannelData* channelData;
+  m_ChannelActive = NULL;
+  m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
-  StoreArray<EKLMSimHit> simHits;
+  DBObjPtr<EKLMChannels> channels;
+  if (!channels.isValid())
+    B2FATAL("EKLM channel data are not available.");
+  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
+  m_ChannelActive = new bool[maxStrip];
+  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+          for (iStrip = 1; iStrip <= m_GeoDat->getNStrips(); iStrip++) {
+            strip = m_GeoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
+                                          iStrip);
+            channelData = channels->getChannelData(strip);
+            if (channelData == NULL)
+              B2FATAL("Incomplete EKLM channel data.");
+            m_ChannelActive[strip - 1] = channelData->getActive();
+          }
+        }
+      }
+    }
+  }
   StoreArray<MCParticle> particles;
-  simHits.registerInDataStore();
-  particles.registerRelationTo(simHits);
-  RelationArray particleToSimHits(particles, simHits);
+  m_SimHits.registerInDataStore();
+  particles.registerRelationTo(m_SimHits);
+  RelationArray particleToSimHits(particles, m_SimHits);
   registerMCParticleRelation(particleToSimHits);
+}
+
+EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
+{
+  if (m_ChannelActive != NULL)
+    delete[] m_ChannelActive;
 }
 
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   const int stripLevel = 1;
+  int endcap, layer, sector, plane, strip, stripGlobal;
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
+  endcap = hist->GetVolume(stripLevel + 6)->GetCopyNo();
+  layer = hist->GetVolume(stripLevel + 5)->GetCopyNo();
+  sector = hist->GetVolume(stripLevel + 4)->GetCopyNo();
+  plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
+  strip = hist->GetVolume(stripLevel)->GetCopyNo();
+  stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
+  if (!m_ChannelActive[stripGlobal - 1])
+    return false;
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   /* Do not record hits without deposited energy. */
   if (eDep <= 0)
@@ -62,8 +101,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                 aStep->GetPreStepPoint()->GetPosition());
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
-  StoreArray<EKLMSimHit> simHits;
-  EKLMSimHit* hit = simHits.appendNew();
+  EKLMSimHit* hit = m_SimHits.appendNew();
   CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
   hit->setMomentum(TLorentzVector(trackMomentum.x(), trackMomentum.y(),
                                   trackMomentum.z(), track.GetTotalEnergy()));
@@ -78,19 +116,16 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
-  /* Get information on mother volumes and store them to the hit. */
-  hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());
-  hit->setPlane(hist->GetVolume(stripLevel + 3)->GetCopyNo());
-  hit->setSector(hist->GetVolume(stripLevel + 4)->GetCopyNo());
-  hit->setLayer(hist->GetVolume(stripLevel + 5)->GetCopyNo());
-  hit->setEndcap(hist->GetVolume(stripLevel + 6)->GetCopyNo());
-  hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
-                                         hit->getSector(), hit->getPlane(),
-                                         hit->getStrip()));
+  hit->setStrip(strip);
+  hit->setPlane(plane);
+  hit->setSector(sector);
+  hit->setLayer(layer);
+  hit->setEndcap(endcap);
+  hit->setVolumeID(stripGlobal);
   /* Relation. */
   StoreArray<MCParticle> particles;
-  RelationArray particleToSimHits(particles, simHits);
-  particleToSimHits.add(track.GetTrackID(), simHits.getEntries() - 1);
+  RelationArray particleToSimHits(particles, m_SimHits);
+  particleToSimHits.add(track.GetTrackID(), m_SimHits.getEntries() - 1);
   return true;
 }
 

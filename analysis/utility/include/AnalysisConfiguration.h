@@ -48,29 +48,24 @@ namespace Belle2 {
    *
    */
   {
-    std::string m_tupleStyle;
+    std::string m_tupleStyle; /**< branch naming style */
     bool m_legacyMCMatching; /**< specifies the version of MC matching algorithm to be used */
+    static AnalysisConfiguration* s_instance; /**< Singleton instance */
 
-    static AnalysisConfiguration* s_instance;
-
-    /*Constructor*/
-    AnalysisConfiguration()
-    {
-      //Setting default value
-      m_tupleStyle = "Default";
-      m_legacyMCMatching = false;
-    }
+    /** Constructor */
+    AnalysisConfiguration(): m_tupleStyle("Default"), m_legacyMCMatching(false)
+    { }
   public:
 
-    /*Configurable-specific function to obtain value*/
+    /** Configurable-specific function to obtain value */
     const std::string getTupleStyle()
     {
       //B2INFO("Returning style '"<<m_tupleStyle<<"'");
       return m_tupleStyle;
     }
 
-    /*Configurable-specific function to set value*/
-    void setTupleStyle(std::string v)
+    /** Configurable-specific function to set value*/
+    void setTupleStyle(const std::string& v)
     {
       //B2INFO("Setting style '"<<v<<"'");
       m_tupleStyle = v;
@@ -92,6 +87,9 @@ namespace Belle2 {
       return m_legacyMCMatching;
     }
 
+    /**
+     * Returns a pointer to the singleton instance
+     */
     static AnalysisConfiguration* instance()
     {
       if (!s_instance)

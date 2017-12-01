@@ -9,23 +9,36 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackFindingCDC/topology/ILayer.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
-#include <cdc/dataobjects/ADCCountTranslatorBase.h>
-#include <cdc/dataobjects/CDCHit.h>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
+#include <cdc/dataobjects/WireID.h>
+
+#include <utility>
+#include <iosfwd>
 #include <cassert>
 
 namespace Belle2 {
+  class CDCHit;
+  namespace CDC {
+    class TDCCountTranslatorBase;
+    class ADCCountTranslatorBase;
+  }
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
+    class CDCWireSuperLayer;
+    class CDCWire; // IWYU pragma: keep
+    class Circle2D;
+    class Vector3D;
+    class Vector2D;
 
     /**
      *  Class representing a hit wire in the central drift chamber.
@@ -49,7 +62,7 @@ namespace Belle2 {
       static constexpr const double c_simpleDriftLengthVariance = 0.000169;
 
       /// Default constructor for ROOT compatibility.
-      CDCWireHit();
+      CDCWireHit() = default;
 
       /**
        *  Constructor associating the CDCHit with estimates of the drift length and charge deposit.
@@ -60,11 +73,13 @@ namespace Belle2 {
        *  @param driftLength          Initial estimate of the drift length at the reference position.
        *  @param driftLengthVariance  Initial estimate of the variance of the dirft length at the reference position.
        *  @param chargeDeposit        Initial estimate of the deposited charge in the drift cell.
+       *  @param driftTime            Measured drift time
        */
       CDCWireHit(const CDCHit* ptrHit,
                  double driftLength,
                  double driftLengthVariance = c_simpleDriftLengthVariance,
-                 double chargeDeposit = 0);
+                 double chargeDeposit = 0,
+                 double driftTime = 0);
 
       /**
        *  Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
@@ -86,8 +101,9 @@ namespace Belle2 {
 
       /// Equality comparison based on the wire and the hit id.
       bool operator==(const CDCWireHit& rhs) const
-      { return getWireID() == rhs.getWireID() and getRefDriftLength() == rhs.getRefDriftLength(); }
-
+      {
+        return getWireID() == rhs.getWireID() and getRefDriftLength() == rhs.getRefDriftLength();
+      }
 
       /// Total ordering relation based on the wire and the hit id.
       bool operator<(const CDCWireHit& rhs) const
@@ -100,14 +116,14 @@ namespace Belle2 {
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWireHit& wireHit, const CDCWire& wire)
       {
-        return wireHit.getWire() < wire;
+        return &wireHit.getWire() < &wire;
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but the other way round.
       friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit)
       {
-        return wire < wireHit.getWire();
+        return &wire < &wireHit.getWire();
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
@@ -115,7 +131,7 @@ namespace Belle2 {
       friend bool operator<(const CDCWireHit* wireHit, const CDCWire& wire)
       {
         assert(wireHit);
-        return wireHit->getWire() < wire;
+        return *wireHit < wire;
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
@@ -123,40 +139,17 @@ namespace Belle2 {
       friend bool operator<(const CDCWire& wire, const CDCWireHit* wireHit)
       {
         assert(wireHit);
-        return wire < wireHit->getWire();
+        return wire < *wireHit;
       }
 
       /// Defines CDCWireHits and raw CDCHit to be coaligned.
-      bool operator<(const CDCHit& hit)
-      {
-        return this->getWireID().getEWire() < hit.getID();
-      }
+      bool operator<(const CDCHit& hit);
 
-      /// Defines CDCWireHits and raw CDCHit to be coaligned.
-      friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
-      {
-        return wireHit.getWireID().getEWire() < hit.getID();
-      }
+      friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit);
 
       /// Defines wire hits and raw CDCHit to be coaligned.
       // Same as above but the other way round.
-      friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
-      {
-        return hit.getID() < wireHit.getWireID().getEWire();
-      }
-
-      /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
-      friend bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
-      {
-        return wireHit.getISuperLayer() < wireSuperLayer.getISuperLayer();
-      }
-
-      /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
-      // Same as above but the other way round.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
-      {
-        return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer();
-      }
+      friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit);
 
       /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const
@@ -165,10 +158,7 @@ namespace Belle2 {
       }
 
       /// Getter for the index of the hit in the StoreArray holding this hit.
-      Index getStoreIHit() const
-      {
-        return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
-      }
+      Index getStoreIHit() const;
 
       /// Getter for the CDCWire the hit is located on.
       const CDCWire& getWire() const
@@ -211,23 +201,20 @@ namespace Belle2 {
         return getWireID().getISuperLayer();
       }
 
-      /// The two dimensional reference position (z=0) of the underlying wire.
-      const Vector2D& getRefPos2D() const
+      /// Getter for the layer id.
+      ILayer getILayer() const
       {
-        return getWire().getRefPos2D();
+        return getWireID().getILayer();
       }
+
+      /// The two dimensional reference position (z=0) of the underlying wire.
+      const Vector2D& getRefPos2D() const;
 
       /// The three dimensional reference position of the underlying wire.
-      const Vector3D& getRefPos3D() const
-      {
-        return getWire().getRefPos3D();
-      }
+      const Vector3D& getRefPos3D() const;
 
       /// The distance from the beam line at reference position of the underlying wire.
-      double getRefCylindricalR() const
-      {
-        return getWire().getRefCylindricalR();
-      }
+      double getRefCylindricalR() const;
 
       /// Getter for the drift length at the reference position of the wire.
       double getRefDriftLength() const
@@ -250,7 +237,7 @@ namespace Belle2 {
       /// Checks if the wire hit is based on the given wire.
       bool isOnWire(const CDCWire& wire) const
       {
-        return getWireID() == wire.getWireID();
+        return &getWire() == &wire;
       }
 
       /**
@@ -277,7 +264,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo) const;
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo, double z = 0) const;
 
       /**
        *  Applys the conformal transformation to the drift circle this hit represents.
@@ -290,13 +277,6 @@ namespace Belle2 {
        *  - \f$R = r / (x^2 + y^2 - r^2)\f$
        */
       Circle2D conformalTransformed(const Vector2D& relativeTo) const;
-
-      /// String output operator for wire hit objects to help debugging.
-      friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)
-      {
-        return output << "CDCWireHit(" << wirehit.getWireID()
-               << ", drift length=" << wirehit.getRefDriftLength() << ")";
-      }
 
       /// Mutable getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const
@@ -322,6 +302,12 @@ namespace Belle2 {
         m_iSuperCluster = iSuperCluster;
       }
 
+      /// Return the drift time measured by the CDC for this hit
+      double getDriftTime() const
+      {
+        return m_refDriftTime;
+      }
+
     private:
       /// Memory for the WireID.
       WireID m_wireID;
@@ -343,6 +329,9 @@ namespace Belle2 {
 
       /// Memory for the super cluster id
       int m_iSuperCluster = -1;
+
+      /// Measured drift time of the CDC hit
+      double m_refDriftTime = 0.0f;
 
       /// Memory for the CDCHit pointer.
       const CDCHit* m_hit = nullptr;
@@ -366,5 +355,21 @@ namespace Belle2 {
         return wireHit;
       }
     };
+
+    /// String output operator for wire hit objects to help debugging.
+    std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit);
+
+    /// Defines CDCWireHits and raw CDCHit to be coaligned.
+    bool operator<(const CDCWireHit& wireHit, const CDCHit& hit);
+
+    /// Defines CDCWireHits and raw CDCHit to be coaligned.
+    bool operator<(const CDCHit& hit, const CDCWireHit& wireHit);;
+
+    /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
+    bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer);
+
+    /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
+    // Same as above but the other way round.
+    bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit);
   }
 }

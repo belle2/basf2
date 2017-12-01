@@ -24,6 +24,22 @@ namespace TreeFitter {
                      bool forceFitAll) ;
     virtual ~InternalParticle() ;
 
+    /** init covariance */
+    virtual ErrCode initCovariance(FitParams*) const;
+    /** project kinematical constraint */
+    ErrCode projectKineConstraintCopy(const FitParams&, Projection&) const;
+    /** project lifetime constraint */
+    ErrCode projectLifeTimeConstraintCopy(const FitParams&, Projection&) const;
+    /** enforece conservation of momentum sum*/
+    virtual void forceP4SumCopy(FitParams&) const;
+    /** init particle in case it has a mother */
+    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    /** init particle in case it has no mother */
+    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+
+    /** find out which constraint it is and project */
+    ErrCode projectConstraintCopy(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
+
     virtual int dim() const { return mother() ? 8 : 7 ; }
     //    virtual void updateIndex(int& offset) ;
 
@@ -50,21 +66,7 @@ namespace TreeFitter {
                                       const FitParams& fitparams, Projection& p) const ;
     virtual void forceP4Sum(FitParams&) const ;
 
-    // some of that other stuff
-    //    virtual double chiSquare(const FitParams*) const ;
-
-    //    virtual ParticleBase* addDaughter(Particle*, bool forceFitAll=false) ;
-    //    virtual void removeDaughter(const ParticleBase* pb) ;
-    //    daucontainer& daughters() { return m_daughters ; }
-    //    const daucontainer& daughters() const { return m_daughters ; }
-    //    virtual const_iterator begin() const  { return m_daughters.begin() ; }
-    //    virtual const_iterator end()   const  { return m_daughters.end() ; }
-
-    //moved to ParticleBase
-    //    virtual int nFinalChargedCandidates() const ;
-    //    virtual void retrieveIndexMap(indexmap& anindexmap) const ;
-
-    virtual void addToConstraintList(constraintlist& alist, int depth) const ;
+    virtual void addToConstraintList(constraintlist& list, int depth) const ;
 
     //    bool swapMotherDaughter(FitParams* fitparams, const ParticleBase* newmother) ;
     void setMassConstraint(bool b) { m_massconstraint = b ; }
@@ -76,6 +78,8 @@ namespace TreeFitter {
                      double&, double&, TVector3&, bool);
   protected:
     ErrCode initMom(FitParams* fitparams) const ;
+    /** init momentum of *this and daughters */
+    ErrCode initMomentum(FitParams* fitparams) const ;
     //    virtual void addToDaughterList(daucontainer& list) ; //moved to ParticleBase
   private:
     //    daucontainer m_daughters ;

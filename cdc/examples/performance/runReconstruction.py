@@ -7,7 +7,8 @@ Usage :
 basf2 runReconstruction.py <input> <output>
 input: Input root file (after CDC unpacker).
        These data are usually stored in
-       /ghi/fs01/belle2/bdata/group/detector/CDC/unpacked/
+       GCR2017 (RAW) /hsm/belle2/bdata/Data/Raw/e0001/
+       GCR2017 (dst) /hsm/belle2/bdata/Data/release-00-09-01/DB00000266/ etc...
 output : Output root file, which contains helix parameters.
          N.B. this is not the basf2 root file!
          To see the helix parameters.
@@ -29,13 +30,13 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 # use_local_database("cdc_crt/database.txt", "cdc_crt")
 # use_local_database("localDB/database.txt", "localDB")
 # For GCR, July 2017.
-use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
-# For GCR, August 2017.
-# use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
+# use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
+# For GCR, July and August 2017.
+use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
 def rec(input, output, topInCounter=False, magneticField=True,
-        unpacking=False, fieldMapper=True):
+        unpacking=False, fieldMapper=False):
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -45,6 +46,9 @@ def rec(input, output, topInCounter=False, magneticField=True,
     # Set the peiod of data taking.
     data_period = getDataPeriod(exp=exp_number,
                                 run=run_number)
+
+    mapperAngle = getMapperAngle(exp=exp_number,
+                                 run=run_number)
 
     # print(data_period)
     if os.path.exists('output') is False:
@@ -60,22 +64,28 @@ def rec(input, output, topInCounter=False, magneticField=True,
     #                         override=[
     #                             ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(globalPhiRotation), "deg")
     #                         ])
-    main_path.add_module('Gearbox')
-    #
+    if data_period == 'gcr2017':
+        gearbox = register_module('Gearbox',
+                                  fileName="/geometry/GCR_Summer2017.xml",
+                                  override=[("/Global/length", "8.", "m"),
+                                            ("/Global/width", "8.", "m"),
+                                            ("/Global/height", "8.", "m"),
+                                            ])
+        main_path.add_module(gearbox)
+    else:
+        main_path.add_module('Gearbox')
 
     if fieldMapper is True:
         main_path.add_module('CDCJobCntlParModifier',
                              MapperGeometry=True,
-                             MapperPhiAngle=43.3)
+                             MapperPhiAngle=mapperAngle)
 
-    if magneticField is False:
+    if magneticField is True:
         main_path.add_module('Geometry',
-                             components=['CDC'])
+                             excludedComponents=['BKLM', 'EKLM'])
     else:
-        #        main_path.add_module('Geometry')
-        main_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
-        #        main_path.add_module('Geometry',
-        #                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
+        main_path.add_module('Geometry',
+                             components=['CDC', 'ECL'])
 
     main_path.add_module('Progress')
 
@@ -88,7 +98,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
     #                               data_taking_period=data_period,
     #                               merge_tracks=False)
 
-    # Simple analysi module.
+    # Simple analysis module.
     output = "/".join(['output', output])
     main_path.add_module('CDCCosmicAnalysis',
                          noBFit=not magneticField,

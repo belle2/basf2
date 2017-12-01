@@ -9,13 +9,9 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcCosmicSelectorAfterFullSim/CDCCosmicSelectorAfterFullSimModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
-#include <cdc/dataobjects/CDCSimHit.h>
 
 #include <utility>
 #include <iostream>
@@ -28,7 +24,7 @@ REG_MODULE(CDCCosmicSelectorAfterFullSim)
 CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Module()
 {
   // Set description
-  setDescription("Modify CDCSimHits and MCParticles for cosmics so that the global time is (approximately) zero at y=0 using FullSim output (=CDCSimHits). And select cosmics passing through a user-specified region at y=0. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after FullSim and before CDCDigitizer.");
+  setDescription("Modify CDCSimHits and MCParticles for cosmics so that the global time is (approximately) zero at y=0 using FullSim output (=CDCSimHits). And select cosmics passing through a user-specified region at y=0. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after FullSim and before CDCDigitizer. This module is not needed for normal MC; only needed when you want to evaluate performance of T0 extraction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("xOfRegion", m_xOfRegion, "x of center position of region at y=0 (cm)", 0.);
@@ -39,26 +35,22 @@ CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Mod
 
 void CDCCosmicSelectorAfterFullSimModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.required();
-  StoreArray<CDCSimHit> simHits;
-  simHits.required();
+  m_mcParticles.isRequired();
+  m_simHits.isRequired();
 }
 
 
 void CDCCosmicSelectorAfterFullSimModule::event()
 {
-  // Get SimHit array, MCParticle array
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<CDCSimHit>  simHits;
-  RelationArray mcParticlesToCDCSimHits(mcParticles, simHits);
+  // Get relation array
+  RelationArray mcParticlesToCDCSimHits(m_mcParticles, m_simHits);
 
   bool returnVal = false;
 
   //  const double c = 29.9792458; //light speed (cm/ns)
   //  double mass = 0.1056583715;
 
-  int nHits = simHits.getEntries();
+  int nHits = m_simHits.getEntries();
   if (nHits <= 1) {
     B2DEBUG(250, "No .of CDCSimHits <= 1 in the current event.");
     //    B2WARNING("No .of CDCSimHits=0 in the current event= " << nHits);
@@ -66,7 +58,7 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     return;
   }
 
-  int nMCPs = mcParticles.getEntries();
+  int nMCPs = m_mcParticles.getEntries();
   if (nMCPs == 0) {
     B2ERROR("No. of MCParticles=0 in the current event.");
     setReturnValue(returnVal);
@@ -76,7 +68,7 @@ void CDCCosmicSelectorAfterFullSimModule::event()
   // Loop over prim. charged MC particle
   unsigned nPrimChgds = 0;
   for (int iMCP = 0; iMCP < nMCPs; ++iMCP) {
-    MCParticle* m_P = mcParticles[iMCP];
+    MCParticle* m_P = m_mcParticles[iMCP];
 
     //    B2INFO("isPrimaryParticle= " << m_P->isPrimaryParticle());
     if (!m_P->isPrimaryParticle()) continue;
@@ -135,7 +127,7 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     double tof_dn =  9999.;
     double ihit_up = -1;
     double ihit_dn = -1;
-    RelationIndex<MCParticle, CDCSimHit> mcp_to_hit(mcParticles, simHits);
+    RelationIndex<MCParticle, CDCSimHit> mcp_to_hit(m_mcParticles, m_simHits);
     if (!mcp_to_hit) B2FATAL("No MCParticle->CDCSimHit relation found!");
     typedef RelationIndex<MCParticle, CDCSimHit>::Element RelationElement;
     //    std::cout <<" "<< std::endl;
@@ -148,13 +140,13 @@ void CDCCosmicSelectorAfterFullSimModule::event()
 
     for (int iHit = 0; iHit < nHits; ++iHit) {
       if (crossfind) break;
-      for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
+      for (const RelationElement& rel : mcp_to_hit.getElementsTo(m_simHits[iHit])) {
         //  std::cout <<"iHit,iMCP,rfromindex= " << iHit <<" "<< iMCP <<" "<< rel.from->getIndex()-1 << std::endl;
         if ((rel.from->getIndex() - 1) != iMCP) continue;
         //  std::cout << "weight,pdginsimhit= " << rel.weight <<" "<< simHits[iHit]->getPDGCode() << std::endl;
         if (rel.weight < 0.) continue;  //reject 2ndary particle
-        const double y   = simHits[iHit]->getPosTrack().Y();
-        const double tof = simHits[iHit]->getFlightTime();
+        const double y   = m_simHits[iHit]->getPosTrack().Y();
+        const double tof = m_simHits[iHit]->getFlightTime();
         //        const double py  = simHits[iHit]->getMomentum().Y();
 
         ++ntry;
@@ -194,10 +186,10 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     //calculate flight time from y_up to y=0 plane (linear approx.)
     //    std::cout <<"ihit_up,dn= " << ihit_up <<" "<< ihit_dn << std::endl;
     if (ihit_up < 0 || ihit_dn < 0) continue;
-    const TVector3 pos_up = simHits[ihit_up]->getPosTrack();
-    const TVector3 pos_dn = simHits[ihit_dn]->getPosTrack();
-    const TVector3 mom_up = simHits[ihit_up]->getMomentum();
-    const TVector3 mom_dn = simHits[ihit_dn]->getMomentum();
+    const TVector3 pos_up = m_simHits[ihit_up]->getPosTrack();
+    const TVector3 pos_dn = m_simHits[ihit_dn]->getPosTrack();
+    const TVector3 mom_up = m_simHits[ihit_up]->getMomentum();
+    const TVector3 mom_dn = m_simHits[ihit_dn]->getMomentum();
     if (tof_up > tof_dn) B2WARNING("tof_up > tof_dn " << tof_up << " " << tof_dn);
     //    std::cout <<"tof_up,dn= " << tof_up <<" "<< tof_dn << std::endl;
 
@@ -258,9 +250,9 @@ void CDCCosmicSelectorAfterFullSimModule::event()
       for (int iHit = 0; iHit < nHits; ++iHit) {
         //  for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
         //        if ((rel.from->getIndex() - 1) != iMCP) continue;
-        const double oldgtime = simHits[iHit]->getGlobalTime();
-        simHits[iHit]->setFlightTime(oldgtime - dT);
-        simHits[iHit]->setGlobalTime(oldgtime - dT);
+        const double oldgtime = m_simHits[iHit]->getGlobalTime();
+        m_simHits[iHit]->setFlightTime(oldgtime - dT);
+        m_simHits[iHit]->setGlobalTime(oldgtime - dT);
         //        }
       }
     } //end of hitRegion

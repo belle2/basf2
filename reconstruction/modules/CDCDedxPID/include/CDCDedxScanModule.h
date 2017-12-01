@@ -53,11 +53,6 @@ namespace Belle2 {
 
   private:
 
-    /** counter for events */
-    int m_eventID;
-    /** counter for tracks */
-    int m_trackID;
-
   };
 } // Belle2 namespace
 #endif

@@ -26,6 +26,7 @@ BKLMDigit::BKLMDigit() :
   m_EDep(0.0),
   m_SimNPixel(0),
   m_NPixel(0.0),
+  m_Charge(0.0),
   m_FitStatus(0)
 {
 }
@@ -40,6 +41,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_EDep(m_SimEDep),
   m_SimNPixel(0),
   m_NPixel(0.0),
+  m_Charge(0.0),
   m_FitStatus(0)
 {
   m_ModuleID = simHit->getModuleID() & ~(BKLM_STRIP_MASK | BKLM_MAXSTRIP_MASK);
@@ -47,19 +49,21 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
-BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge) :
+BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
   DigitBase(),
   m_SimTime(0.0),
   m_SimEDep(0.0),
   m_EDep(0.0),
   m_SimNPixel(0),
+  m_NPixel(0.0),
   m_FitStatus(0)
 {
   //this assaumes that the strip is already zero based...
   m_ModuleID = moduleID;
   m_CTime = ctime;
   m_Time = tdc;
-  m_NPixel = charge;
+  //m_NPixel = charge;
+  m_Charge = charge;
 
 }
 
@@ -74,6 +78,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   m_EDep(m_SimEDep),
   m_SimNPixel(0),
   m_NPixel(0.0),
+  m_Charge(0.0),
   m_FitStatus(0)
 {
 }
@@ -89,6 +94,7 @@ BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
   m_EDep(digit.m_EDep),
   m_SimNPixel(digit.m_SimNPixel),
   m_NPixel(digit.m_NPixel),
+  m_Charge(digit.m_Charge),
   m_FitStatus(digit.m_FitStatus)
 {
 }
@@ -104,6 +110,7 @@ BKLMDigit& BKLMDigit::operator=(const BKLMDigit& digit)
   m_EDep = digit.m_EDep;
   m_SimNPixel = digit.m_SimNPixel;
   m_NPixel = digit.m_NPixel;
+  m_Charge = digit.m_Charge;
   m_FitStatus = digit.m_FitStatus;
   return *this;
 }

@@ -20,6 +20,7 @@ from basf2 import *
 from setup_modules import setup_RTCtoSPTCConverters
 from setup_modules import setup_Geometry
 import argparse
+import os
 
 # ---------------------------------------------------------------------------------------
 # Argument parser to enable training sample selection via comandline option.
@@ -70,12 +71,12 @@ path.add_module(eventCounter)
 
 # put PXD and SVD SpacePoints into the same StoreArray
 if usePXD:
-    spCreatorPXD = register_module('SpacePointCreatorPXD')
+    spCreatorPXD = register_module('PXDSpacePointCreator')
     spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
     spCreatorPXD.param('SpacePoints', 'SpacePoints')
     path.add_module(spCreatorPXD)
 
-spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
 spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
 spCreatorSVD.param('SpacePoints', 'SpacePoints')
@@ -105,7 +106,17 @@ path.add_module(secMapBootStrap)
 
 
 # Module for generation of train sample for SecMap Training
+nameTag = 'Belle2'
+if os.environ.get('USE_BEAST2_GEOMETRY'):
+    nameTag = 'Beast2'
+
+if usePXD:
+    nameTag += '_VXD'
+else:
+    nameTag += '_SVDOnly'
+
 SecMapTrainerBase = register_module('VXDTFTrainingDataCollector')
+SecMapTrainerBase.param('NameTag', nameTag)
 SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')
 path.add_module(SecMapTrainerBase)
 

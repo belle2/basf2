@@ -10,7 +10,6 @@
 #pragma link C++ class Belle2::TrackFindingCDC::ExtendedRiemannsMethod-;
 #pragma link C++ class Belle2::TrackFindingCDC::KarimakisMethod-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCFitter2D<Belle2::TrackFindingCDC::RiemannsMethod>-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCFitter2D<Belle2::TrackFindingCDC::ExtendedRiemannsMethod>-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCFitter2D<Belle2::TrackFindingCDC::KarimakisMethod>-;
 

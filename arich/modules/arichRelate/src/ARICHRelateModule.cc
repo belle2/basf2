@@ -81,7 +81,7 @@ namespace Belle2 {
     // Input: reconstructed tracks
     StoreArray<MCParticle> MCParticles("");
     StoreArray<Track> mdstTracks("");
-    StoreArray<ExtHit> extHits("");
+    //    StoreArray<ExtHit> extHits("");
     StoreArray<ARICHAeroHit> aeroHits("");
 
     int nHits = aeroHits.getEntries();
@@ -101,7 +101,7 @@ namespace Belle2 {
       const Track* track = DataStore::getRelated<Track>(particle);
       if (!track) continue;
 
-      const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
       if (!fitResult) continue;
 
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);

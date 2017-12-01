@@ -16,6 +16,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeometryData.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
@@ -40,7 +41,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      ~EKLMSensitiveDetector() {};
+      ~EKLMSensitiveDetector();
 
       /**
        * Process each step and calculate variables for EKLMSimHit
@@ -52,6 +53,12 @@ namespace Belle2 {
 
       /** Geometry data. */
       const EKLM::GeometryData* m_GeoDat;
+
+      /** Simulation hits. */
+      StoreArray<EKLMSimHit> m_SimHits;
+
+      /** Active channels. */
+      bool* m_ChannelActive;
 
       /**
        * All hits with time large  than m_ThresholdHitTime

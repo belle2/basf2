@@ -81,6 +81,24 @@ namespace Belle2 {
     //! Export BKLM displaced-geometry parameters from the database
     void exportBklmDisplacement();
 
+    //! Import BKLM scintillator digitization parameters in database
+    void importBklmDigitizationParams();
+
+    //! Export BKLM scintillator digitization parameters from database
+    void exportBklmDigitizationParams();
+
+    //! Import BKLM scintillator ADC parameters in database
+    void importBklmADCThreshold();
+
+    //! Export BKLM scintillator ADC parameters from database
+    void exportBklmADCThreshold();
+
+    //! Import BKLM time window cut
+    void importBklmTimeWindow();
+
+    //! Export BKLM time window cut
+    void exportBklmTimeWindow();
+
   private:
 
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */

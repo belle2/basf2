@@ -20,6 +20,8 @@
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
+#include <bitset>
+
 namespace Belle2 {
   /**
    * Module for converting RecoTracks to SpacePointTrackCands
@@ -103,12 +105,6 @@ namespace Belle2 {
 
     int m_ncut = 0; /**< counter of the cuttet tracks */
     int m_npass = 0; /**< counter of the selected tracks */
-
-    /** validation NoKickCuts members */
-    TFile* m_momentumTFile; /**< validartion output TFile */
-    TH1F* m_momSel; /**< histogram of selected tracks */
-    TH1F* m_momCut; /**< histrogram of cutted tracks */
-    TH1F* m_momEff; /**< histogram for efficiency */
 
 
     // state variables

@@ -2,8 +2,8 @@ void getResult(){
   ifstream ifs("runlist");
   string id;
   int n=0;
-  double pval;
-  double ndf;
+  double pval = 0;
+  double ndf = 0;
   TString filename;
   while(getline(ifs,id)){
     n +=1;

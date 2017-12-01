@@ -19,8 +19,8 @@ from glob import glob
 inputMdstList('default', '../1213030101.dst.root')
 
 # create and fill pi/K ParticleLists
-fillParticleList('pi+:all', 'piid > 0.5 and d0 < 0.5 and abs(z0) < 1')
-fillParticleList('K+:all', 'Kid > 0.5 and d0 < 0.5 and abs(z0) < 1')
+fillParticleList('pi+:all', 'pionID > 0.5 and abs(d0) < 0.5 and abs(z0) < 1')
+fillParticleList('K+:all', 'kaonID > 0.5 and abs(d0) < 0.5 and abs(z0) < 1')
 
 # create Ks -> pi+ pi- list from V0
 stdKshorts()
@@ -38,24 +38,11 @@ reconstructDecay('B-:dk -> D0:kspipi K-:all', 'Mbc > 5.25 and abs(deltaE) < 0.15
 vertexKFit('B-:dk', 0.0)
 matchMCTruth('B-:dk')
 
-# get the rest of the event:
-# buildRestOfEvent('B-:dk')
-
-# get tag vertex ('breco' is the type of MC association)
-# TagV('B-:dk', 'breco')
-# buildContinuumSuppression('B-:dk')
-
 
 toolsBDk = ['EventMetaData', 'B-']
 toolsBDk += ['InvMass', '^B- -> [^D0:kspipi -> ^K_S0:all pi+:all pi-:all] ^K-:all']
 toolsBDk += ['DeltaEMbc', '^B-']
 # toolsBDk += ['CustomFloats[isSignal]', '^B-']
-# toolsBDk += ['CustomFloats[isNotContinuumEvent]', '^B-']
-toolsBDk += ['CMSKinematics', '^B- -> [^D0:ch00 -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
-toolsBDk += ['PID', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
-toolsBDk += ['Track', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
-toolsBDk += ['Dalitz', 'B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] K-:all']
-toolsBDk += ['MCTruth', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
 
 outputFile = "../1213030101.ntup.root"
 ntupleFile(outputFile)

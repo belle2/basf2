@@ -63,15 +63,15 @@ void DumpClustersModule::initialize()
   // PXD Digit arrays
   //StoreArray<PXDDigit>::optional(m_pxddigits);
   StoreArray<PXDDigit> storePXDDigits(m_pxddigits);
-  storePXDDigits.required();
+  storePXDDigits.isRequired();
 
   // SVD Digit arrays
   StoreArray<SVDDigit> storeSVDDigits(m_svddigits);
-  storeSVDDigits.required();
+  storeSVDDigits.isRequired();
 
   // Tel Digit arrays
   StoreArray<TelDigit> storeTelDigits(m_svddigits);
-  storeTelDigits.required();
+  storeTelDigits.isRequired();
 }
 
 void DumpClustersModule::beginRun()

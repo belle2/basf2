@@ -3,15 +3,12 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 //Creates a particle. Base class for all other particle classes.
-
-//#include <iomanip>
-//#include <analysis/dataobjects/Particle.h>
 
 #include <TDatabasePDG.h>
 #include <TMath.h>
@@ -21,6 +18,7 @@
 #include <analysis/modules/TreeFitter/RecoComposite.h>
 #include <analysis/modules/TreeFitter/RecoResonance.h>
 #include <analysis/modules/TreeFitter/RecoTrack.h>
+
 #include <analysis/modules/TreeFitter/RecoPhoton.h>
 #include <analysis/modules/TreeFitter/Resonance.h>
 #include <analysis/modules/TreeFitter/InteractionPoint.h>
@@ -33,13 +31,13 @@ namespace TreeFitter {
   int vtxverbose = 0;
   std::vector<int> massConstraintList;//FT: this is not the best place to place this, but that's where the other extern goes.
 
-  // Default constructor
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother)
     : m_particle(particle), m_mother(mother), m_index(0), m_pdgMass(0), m_pdgWidth(0), m_pdgLifeTime(0), m_charge(0), m_name("Unknown")
   {
     if (particle) {
       const int pdgcode = particle->getPDGCode();
       if (pdgcode) { // PDG code != 0
+
         m_pdgMass      = particle->getPDGMass();//getMass() might also work
         //      m_pdgMass      =TDatabasePDG::Instance()->GetParticle(pdgcode)->Mass();
         m_pdgWidth     = TDatabasePDG::Instance()->GetParticle(pdgcode)->Width();
@@ -48,181 +46,158 @@ namespace TreeFitter {
         double fltcharge = particle->getCharge();//FT: could also come from PDG
         //FT: getCharge() divides by 3.0 and gives a float, make sure it doesn't create problems
         //  round to nearest integer
-        m_charge = fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5) ;
+        m_charge = fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5);
         m_name = particle->getName();
       } else {// PDG code = 0
-        m_charge = particle->getCharge() > 0 ? 1 : (particle->getCharge() < 0 ? -1 : 0) ;
+        m_charge = particle->getCharge() > 0 ? 1 : (particle->getCharge() < 0 ? -1 : 0);
       }
     }
   }
 
+
+  ParticleBase::ParticleBase(const std::string& name)
+    : m_particle(NULL), m_mother(NULL), m_index(0), m_pdgMass(0), m_pdgWidth(0), m_pdgLifeTime(0), m_charge(0), m_name(name) {}
+
+
   ParticleBase::~ParticleBase()
   {
-    for (daucontainer::iterator it = m_daughters.begin() ;
-         it != m_daughters.end() ; ++it)
-      delete *it ;
-    m_daughters.clear() ;
-  } ;
+    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      delete(*it);
+    }
+    m_daughters.clear();
+  }
 
   ParticleBase* ParticleBase::addDaughter(Belle2::Particle* cand, bool forceFitAll)
   {
-    m_daughters.push_back(ParticleBase::createParticle(cand, this, forceFitAll)) ;
-    return m_daughters.back() ;
+
+    auto newDaughter = ParticleBase::createParticle(cand, this, forceFitAll);
+    m_daughters.push_back(newDaughter);
+
+    return m_daughters.back();
   }
+
 
   void ParticleBase::removeDaughter(const ParticleBase* pb)
   {
-    daucontainer::iterator it = std::find(m_daughters.begin(), m_daughters.end(), pb) ;
+    ParticleBase::iter it = std::find(m_daughters.begin(), m_daughters.end(), pb);
     if (it != m_daughters.end()) {
-      delete *it ;
-      m_daughters.erase(it) ;
+      delete *it;
+      m_daughters.erase(it);
     } else {
-      std::cout << "ERROR: cannot remove particle, because not found ..." << std::endl ;
+      B2ERROR("Cannot remove particle, because not found ...");
     }
   }
 
   void ParticleBase::updateIndex(int& offset)
   {
     // first the daughters
-    for (const_iterator it = begin();
-         it != end(); ++it)(*it)->updateIndex(offset) ;
+    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      (*it)->updateIndex(offset);
+    }
     // now the real work
-    m_index = offset ;
-    offset += dim() ;
+    m_index = offset;
+    //JFK: this is an extremely stupid construct... 2017-09-28
+    offset += dim();
   }
+
+  ParticleBase* ParticleBase::createInteractionPoint(Belle2::Particle* daughter, bool forceFitAll, int dimension)
+  {
+    return new InteractionPoint(daughter, forceFitAll, dimension);
+  }
+
 
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
-    // This routine interpretes a Particle dataobject as a 'Particle' used by the fitter.
-    if (vtxverbose >= 2)
-      std::cout << "ParticleBase::createParticle: " << forceFitAll << std::endl ;
-    ParticleBase* rc = 0 ;
+    ParticleBase* rc = 0;
     int pdgcode = particle->getPDGCode();
-    //    bool isupsilon = pdgcode % 1000 == 553; //FT: Y(any) ends with 553. But we don't use this anyway.
-
-    //FT: Beamspot constraint still needs some development
-    /*
-    bool bsconstraint = bc->constraint(BtaConstraint::Beam) !=0 ;
-    bool beconstraint = bc->constraint(BtaConstraint::BeamEnergy) != 0;
-    */
 
     // We refit invalid fits, kinematic fits and composites with beamspot
     // constraint if not at head of tree.
-    TVector3 zero; //initializes to (0,0,0)
-    bool validfit  = !forceFitAll && mother
-                     && !(particle->getVertex() == zero); // && //FT: stopgap since we don't have decay vertex flagging
-    //      (particle->decayVtx()->status() == BtaAbsVertex::Success ) &&
-    //      (particle->decayVtx()->type() == BtaAbsVertex::Geometric ) &&
-    //      !(bsconstraint||beconstraint) ;
-    //
-    //    if(validfit && (bc->fitParams().cov7()(7,1)==0 &&
-    //        bc->fitParams().cov7()(6,1)!=0) ) {
-    // this is an awfull hack to detect whether the covariance
-    // matrix contains a x-E row. if not, then the matrix is
-    // unusable. GeoKin does not fill the xE row.
-    //
-    //      static int printit=10 ;
-    //      if(--printit>0)
-    //  ErrMsg(warning) << "ParticleBase: this btacandidate (" << bc->pdtEntry()->name()
-    //      << ") has a bad cov matrix. I'll refit it. " << endmsg ;
-    //      validfit = false ;
-    //    }
+    //FT: for now we refit everything since doing otherwise sometimes causes loss of mother-daughter relations
+    //    this is due to the way we build the tree...
+    bool validfit  = false;
 
     // FT:leave this one for now
     if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
-      static int printit = 10 ;
-      if (--printit >= 0)
-        B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.") ;
-      validfit = false ;
+      B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.");
     }
 
     if (!mother) { // 'head of tree' particles
-      //      if( beconstraint )
-      //  rc = isupsilon ? new Upsilon(bc,forceFitAll) : new Upsilon(bc,forceFitAll,true) ;
-      //      else if ( bsconstraint )
-      //  rc = isupsilon ? new InteractionPoint(bc,forceFitAll) : new InteractionPoint(bc,forceFitAll,true) ;
-      //      else if( bc->isComposite() )
 
       //FT: we don't have a way to properly flag particles as composites, and we don't have a stored value for decay time. Some hacking is required.
-      //if( particle->isComposite() )
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
         B2DEBUG(90, "We attempt to create the mother, named " << particle->getName());
-        rc = new InternalParticle(particle, 0, forceFitAll) ; // still need proper head-of-tree class
+        rc = new InternalParticle(particle, 0, forceFitAll);
         B2DEBUG(80, "We create the mother, named " << particle->getName());
+
       } else {
         B2ERROR("ParticleBase::createParticle: You are fitting a decay tree that exists of a single, non-composite particle and which does not have a beamconstraint.");
         B2ERROR("I do not understand what you want me to do with this.");
-        rc = new InternalParticle(particle, 0, forceFitAll) ; // still need proper head-of-tree class
+        rc = new InternalParticle(particle, 0, forceFitAll); // still need proper head-of-tree class
         B2DEBUG(80, "We create... something, named " << particle->getName());
       }
-      //    } else if( !(particle->isComposite()) ) { // external particles
+
     } else if (particle->getMdstArrayIndex() || particle->getTrack() || particle->getECLCluster()) { // external particles
       //FT: added request for tracks/ECL, very inefficient way because I do it twice, double check if getMdstArrayIndex is doing what I want it to
-      //I'll go back and optimize this later on
       if (particle->getTrack()) {
         B2DEBUG(90, "We attempt to create a track, named " << particle->getName());
-        rc = new RecoTrack(particle, mother) ; // reconstructed track
+        rc = new RecoTrack(particle, mother); // reconstructed track
         B2DEBUG(80, "We create a track, named " << particle->getName());
+
       } else if (particle->getECLCluster()) {
         B2DEBUG(90, "We attempt to create a photon, named " << particle->getName());
-        rc = new RecoPhoton(particle, mother) ; // reconstructed photon
+        rc = new RecoPhoton(particle, mother); // reconstructed photon
         B2DEBUG(80, "We create a photon, named " << particle->getName());
-        //      else if(!validfit || particle->constraint(BtaConstraint::MissingMass) ) //FT disabled for now
-        //  rc = new MissingParticle(particle,mother) ; // missing particle
+
       } else if (isAResonance(particle)) {
         B2DEBUG(90, "We attempt to create an external resonance, named " << particle->getName());
-        rc = new RecoResonance(particle, mother) ;
+        rc = new RecoResonance(particle, mother);
         B2DEBUG(80, "We create an external resonance, named " << particle->getName());
+
       }  else {
         B2DEBUG(90, "We attempt to create an external composite, named " << particle->getName());
-        rc = new RecoComposite(particle, mother) ;
+        rc = new RecoComposite(particle, mother);
         B2DEBUG(80, "We create an external composite, named " << particle->getName());
       }
+
     } else { // 'internal' particles
-      if (validfit /*|| isconversion*/) {   // fitted composites
+      if (validfit) {   // fitted composites
         if (isAResonance(particle)) {
           B2DEBUG(90, "We attempt to create an internal resonance, named " << particle->getName());
-          rc = new RecoResonance(particle, mother) ;
+          rc = new RecoResonance(particle, mother);
           B2DEBUG(80, "We create an internal resonance, named " << particle->getName());
+
         } else {
           B2DEBUG(90, "We attempt to create an internal composite, named " << particle->getName());
-          rc = new RecoComposite(particle, mother) ;
+          rc = new RecoComposite(particle, mother);
           B2DEBUG(80, "We create an internal composite, named " << particle->getName());
         }
+
       } else {         // unfitted composites
         if (isAResonance(particle)) {
           B2DEBUG(90, "We attempt to create an internal unfitted resonance, named " << particle->getName());
-          rc = new Resonance(particle, mother, forceFitAll) ;
+          rc = new Resonance(particle, mother, forceFitAll);
           B2DEBUG(80, "We create an internal unfitted resonance, named " << particle->getName());
+
         } else {
           B2DEBUG(90, "We attempt to create a nonresonant, unfitted internal particle, named " << particle->getName());
-          rc = new InternalParticle(particle, mother, forceFitAll) ;
+          rc = new InternalParticle(particle, mother, forceFitAll);
           B2DEBUG(80, "We create a nonresonant, unfitted internal particle, named " << particle->getName());
         }
       }
     }
-
-    if (vtxverbose >= 2)
-      std::cout << "ParticleBase::createParticle returns " << rc->type()
-                << " " << rc->index() << std::endl ;
-    return rc ;
+    return rc;
   }
 
-  //moved to constructor
-  /*
-  const std::string ParticleBase::name() const
-  {
-    return (particle() && particle()->getName()) ? particle()->getName() : "Unknown" ;
-  }
-  */
 
   double ParticleBase::pdgLifeTime(Belle2::Particle* particle) //FT: This is actually the decay length in cm (in the CMS)
   {
     int pdgcode = particle->getPDGCode();
     double lifetime = 0;
     double decaylen = 0;
-    if (pdgcode)
+    if (pdgcode) {
       lifetime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime();
+    }
     decaylen = Belle2::Const::speedOfLight * lifetime * Belle2::Unit::s;
     return decaylen ;
   }
@@ -257,70 +232,126 @@ namespace TreeFitter {
   }
 
   //FT: this was moved from InternalParticle::addToDaughterList
-  void ParticleBase::collectVertexDaughters(daucontainer& particles, int posindex)
+  void ParticleBase::collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex)
   {
     // collect all particles emitted from vertex with position posindex
-    if (mother() && mother()->posIndex() == posindex)
+    if (mother() && mother()->posIndex() == posindex) {
       //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
       particles.push_back(this);
-    for (daucontainer::const_iterator idau = daughters().begin() ;
-         idau != daughters().end() ; ++idau)
-      (*idau)->collectVertexDaughters(particles, posindex) ;
+    }
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      (*it)->collectVertexDaughters(particles, posindex);
+    }
   }
 
   ErrCode ParticleBase::initCov(FitParams* fitparams) const
   {
-    ErrCode status ;
-
+    ErrCode status;
     // position
-    int posindex = posIndex() ;
+    int posindex = posIndex();
     if (posindex >= 0) {
       //double decaylength = pdtLifeTime() ;
-      const double sigpos = 20 ; // cm
+      const double sigpos = 20; // cm
       // that's how good the initalization should be
-      for (int row = posindex + 1; row <= posindex + 3 ; ++row)
-        fitparams->cov().fast(row, row) = sigpos * sigpos ;
+      for (int row = posindex + 1; row <= posindex + 3 ; ++row) {
+        fitparams->cov().fast(row, row) = sigpos * sigpos;
+      }
+    }
+    // momentum
+    int momindex = momIndex();
+    if (momindex >= 0) {
+      const double sigmom = 1; // GeV
+      int maxrow = hasEnergy() ? 4 : 3;
+      for (int row = momindex + 1; row <= momindex + maxrow; ++row) {
+        fitparams->cov().fast(row, row) = sigmom * sigmom;
+      }
+    }
+    // JFK: tau is a length in our version of the code Thu 24 Aug 2017 04:30:17 AM CEST
+    int tauindex = tauIndex();
+    if (tauindex >= 0) {
+      double tau = pdgTau();
+      double sigtau = tau > 0 ? 20 * tau : 999;
+      const double maxdecaylength = 20; // [cm] (okay for Ks->pi0pi0)
+      double bcP = particle()->getP();
+      if (bcP > 0.0) {
+        sigtau = std::min(maxdecaylength / bcP, sigtau);
+      }
+      if (tau > 0) {
+        sigtau = 20 * tau;
+      } else {
+        sigtau = 100;
+      }
+      fitparams->cov().fast(tauindex + 1, tauindex + 1) = sigtau * sigtau;
+    }
+    return status;
+  }
+  ErrCode ParticleBase::initCovariance(FitParams* fitparams) const
+  {
+    ErrCode status;
+    // position
+    int posindex = posIndex();
+    if (posindex >= 0) {
+//      fitparams->getCovariance().block<3, 3>(posindex, posindex).triangularView<Eigen::Lower>()
+      //      = EigenTypes::MatrixXd::Constant(3, 3, 400);
+      //JFK: the fits diverge if we init the off elements dont ask me ... 2017-09-30
+      for (int i = 0; i < 3; ++i) {
+        fitparams->getCovariance()(posindex + i, posindex + i) = 400;
+      }
     }
 
     // momentum
-    int momindex = momIndex() ;
+    int momindex = momIndex();
     if (momindex >= 0) {
-      const double sigmom = 1 ; // GeV
-      int maxrow = hasEnergy() ? 4 : 3 ;
-      for (int row = momindex + 1; row <= momindex + maxrow; ++row)
-        fitparams->cov().fast(row, row) = sigmom * sigmom ;
+      //JFK: init Value in  GeV squared 2017-09-25
+      const double initVal = 1;
+      int maxrow = hasEnergy() ? 4 : 3;
+      //JFK: same here: fit diverges if this has off elments 2017-09-30
+      for (int i = 0; i < maxrow; ++i) {
+        fitparams->getCovariance()(momindex + i, momindex + i) = initVal;
+      }
+      //if (maxrow == 4) {
+      //  fitparams->getCovariance().block<4, 4>(momindex, momindex).triangularView<Eigen::Lower>() =
+      //    EigenTypes::MatrixXd::Constant(4, 4, initVal);
+      //} else if (maxrow == 3) {
+      //  fitparams->getCovariance().block<3, 3>(momindex, momindex).triangularView<Eigen::Lower>() =
+      //    EigenTypes::MatrixXd::Constant(3, 3, initVal);
+      //}
     }
-
-    // lifetime
-    int tauindex = tauIndex() ;
+    // JFK: tau is a length in our version of the code Thu 24 Aug 2017 04:30:17 AM CEST
+    int tauindex = tauIndex();
     if (tauindex >= 0) {
-      double tau = pdgTau() ;
-      double sigtau = tau > 0 ? 20 * tau : 999 ;
+      double tau = pdgTau();
+      double sigtau = tau > 0 ? 20 * tau : 999;
       const double maxdecaylength = 20; // [cm] (okay for Ks->pi0pi0)
       double bcP = particle()->getP();
-      if (bcP > 0.0)
-        sigtau = std::min(maxdecaylength / bcP, sigtau) ;
-      fitparams->cov().fast(tauindex + 1, tauindex + 1) = sigtau * sigtau ;
+      if (bcP > 0.0) {
+        sigtau = std::min(maxdecaylength / bcP, sigtau);
+      }
+      if (tau > 0) {
+        sigtau = 20 * tau;
+      } else {
+        sigtau = 100;
+      }
+      fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
-
-    return status ;
+    return status;
   }
 
   std::string ParticleBase::parname(int thisindex) const
   {
-    std::string rc = name() ;
+    std::string rc = name();
     switch (thisindex) {
-      case 0: rc += "_x  " ; break ;
-      case 1: rc += "_y  " ; break ;
-      case 2: rc += "_z  " ; break ;
-      case 3: rc += "_tau" ; break ;
-      case 4: rc += "_px " ; break ;
-      case 5: rc += "_py " ; break ;
-      case 6: rc += "_pz " ; break ;
-      case 7: rc += "_E  " ; break ;
-      default: ;
+      case 0: rc += "_x  "; break;
+      case 1: rc += "_y  "; break;
+      case 2: rc += "_z  "; break;
+      case 3: rc += "_tau"; break;
+      case 4: rc += "_px "; break;
+      case 5: rc += "_py "; break;
+      case 6: rc += "_pz "; break;
+      case 7: rc += "_E  "; break;
+      default:;
     }
-    return rc ;
+    return rc;
   }
 
   void ParticleBase::print(const FitParams* fitpar) const
@@ -358,13 +389,12 @@ namespace TreeFitter {
     }
 
     //FT: also print daughters
-    for (daucontainer::const_iterator it = m_daughters.begin() ;
-         it != m_daughters.end() ; ++it)
-      (*it)->print(fitpar) ;
-    //
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end() ; ++it) {
+      (*it)->print(fitpar);
+    }
   }
 
-  const ParticleBase* ParticleBase::locate(Belle2::Particle* aparticle) const
+  const ParticleBase* ParticleBase::locate(Belle2::Particle* particle) const
   {
     //    const ParticleBase* rc = 0;
     //    if( particle() && ( particle()==aparticle || particle()->isCloneOf(*aparticle,true) ) ) rc = this ;
@@ -372,127 +402,195 @@ namespace TreeFitter {
     //FT: seems like isCloneOf searches down the decay tree to find the particle, which will then be cached in the ParticleMap
     //    we don't have anything like that, so we have to do it explicitly.
 
-    //    if( particle() && particle()==aparticle) rc = this ; //old fix, insufficient
-    const ParticleBase* rc = (m_particle == aparticle) ? this : 0
-                             ; //if it corresponds to the stored pointer to the head, then it's easy
+    const ParticleBase* rc = (m_particle == particle) ? this : 0; //if it corresponds to the stored pointer to the head, then it's easy
     if (!rc) { //otherwise sift through the daughters
       //FT:  LHCb iteration method, requires to define properly m_daughters in ParticleBase instead of InternalParticle, OR to do some hacks
-      for (daucontainer::const_iterator it = m_daughters.begin() ; !rc && it != m_daughters.end(); ++it) {
-        rc = (*it)->locate(aparticle) ;
+      for (ParticleBase::conIter it = m_daughters.begin(); !rc && it != m_daughters.end(); ++it) {
+        rc = (*it)->locate(particle);
+        if (rc) {break;}
       }
     }
-    return rc ;
+    return rc;
   }
 
-  void ParticleBase::retrieveIndexMap(indexmap& anindexmap) const
+  void ParticleBase::retrieveIndexMap(indexmap& indexmap) const
   {
-    anindexmap.push_back(std::pair<const ParticleBase*, int>(this, index())) ;
-    for (daucontainer::const_iterator it = m_daughters.begin() ;
-         it != m_daughters.end() ; ++it)
-      (*it)->retrieveIndexMap(anindexmap) ;
+    indexmap.push_back(std::pair<const ParticleBase*, int>(this, index()));
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      (*it)->retrieveIndexMap(indexmap);
+    }
   }
 
   double ParticleBase::chiSquare(const FitParams* fitparams) const
   {
     double rc = 0;
-    for (daucontainer::const_iterator it = m_daughters.begin() ;
-         it != m_daughters.end(); ++it)
-      rc += (*it)->chiSquare(fitparams) ;
-    return rc ;
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      double  chi2 = (*it)->chiSquare(fitparams);
+      rc += chi2;
+    }
+    return rc;
   }
 
   int ParticleBase::nFinalChargedCandidates() const
   {
     int rc = 0;
-    for (daucontainer::const_iterator it = m_daughters.begin() ;
-         it != m_daughters.end() ; ++it)
-      rc += (*it)->nFinalChargedCandidates() ;
-    return rc ;
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      rc += (*it)->nFinalChargedCandidates();
+    }
+    return rc;
   }
 
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
   {
-    int posindexmother = mother()->posIndex() ;
+    int posindexmother = mother()->posIndex();
     int posindex = posIndex();
-    int tauindex = tauIndex() ;
-    int momindex = momIndex() ;
+    int tauindex = tauIndex();
+    int momindex = momIndex();
 
-    double tau =  fitparams.par()(tauindex + 1) ;
+    double tau =  fitparams.par()(tauindex + 1);
+
+    double px = fitparams.par()(momindex + 1);
+    double py = fitparams.par()(momindex + 2);
+    double pz = fitparams.par()(momindex + 3);
+    double p2 = px * px + py * py + pz * pz;
+    double mom = std::sqrt(p2);
+
+    double posxmother = 0, posx = 0, momx = 0;
 
     // linear approximation is fine
     for (int row = 1; row <= 3; ++row) {
-      double posxmother = fitparams.par()(posindexmother + row) ;
-      double posx       = fitparams.par()(posindex + row) ;
-      double momx       = fitparams.par()(momindex + row) ;
-      p.r(row) = posxmother - (posx - tau * momx) ;
-      p.H(row, posindexmother + row) = 1 ;
-      p.H(row, posindex + row)       = -1 ;
-      p.H(row, momindex + row)       = tau ;
-      p.H(row, tauindex + 1)         = momx ;
+      posxmother = fitparams.par()(posindexmother + row);
+      posx       = fitparams.par()(posindex + row);
+      momx       = fitparams.par()(momindex + row);
+      p.r(row) = posxmother - posx + tau * momx / mom; //JFK 1/mom is new
+      p.H(row, posindexmother + row) = 1;
+      p.H(row, posindex + row)       = -1;
+      p.H(row, momindex + row)       = tau / mom; // JFK was just tau before
+      p.H(row, tauindex + 1)         = momx;
     }
+// JFK: this is the non linear part that uses the track helix as an extrapolation
+// we have to check the math here as tau is now a length! Thu 24 Aug 2017 04:31:52 AM CEST
+//
+    /*
+            if (charge() != 0) {
+              double lambda = bFieldOverC() * charge();
+              double px0 = fitparams.par()(momindex + 1);
+              double py0 = fitparams.par()(momindex + 2);
+              double pt0 = sqrt(px0 * px0 + py0 * py0);
+              const double posprecision = 1e-4; // 1mu
+              if (fabs(pt0 * lambda * tau * tau) > posprecision) {
+                // use the helix, but as if it were a 'correction'
+                double sinlt = sin(lambda * tau);
+                double coslt = cos(lambda * tau);
+                double px = px0 * coslt - py0 * sinlt;
+                double py = py0 * coslt + px0 * sinlt;
 
-    if (charge() != 0) {
-      double lambda = bFieldOverC() * charge() ;
-      double px0 = fitparams.par()(momindex + 1) ;
-      double py0 = fitparams.par()(momindex + 2) ;
-      double pt0 = sqrt(px0 * px0 + py0 * py0) ;
-      const double posprecision = 1e-4 ; // 1mu
-      if (fabs(pt0 * lambda * tau * tau) > posprecision) {
-        // use the helix, but as if it were a 'correction'
-        double sinlt = sin(lambda * tau) ;
-        double coslt = cos(lambda * tau) ;
-        double px = px0 * coslt - py0 * sinlt ;
-        double py = py0 * coslt + px0 * sinlt ;
+                p.r(1) += -tau * px0 + (py - py0) / lambda;
+                p.r(2) += -tau * py0 - (px - px0) / lambda;
 
-        p.r(1) += -tau * px0 + (py - py0) / lambda ;
-        p.r(2) += -tau * py0 - (px - px0) / lambda ;
+                p.H(1, tauindex + 1) += -px0 + px;
+                p.H(1, momindex + 1) += -tau + sinlt / lambda;
+                p.H(1, momindex + 2) += (coslt - 1) / lambda;
+                p.H(2, tauindex + 1) += -py0 + py;
+                p.H(2, momindex + 1) +=      - (coslt - 1) / lambda;
+                p.H(2, momindex + 2) += -tau + sinlt / lambda;
 
-        p.H(1, tauindex + 1) += -px0 + px ;
-        p.H(1, momindex + 1) += -tau + sinlt / lambda ;
-        p.H(1, momindex + 2) += (coslt - 1) / lambda ;
-        p.H(2, tauindex + 1) += -py0 + py ;
-        p.H(2, momindex + 1) +=      - (coslt - 1) / lambda ;
-        p.H(2, momindex + 2) += -tau + sinlt / lambda ;
+                if (vtxverbose >= 2)
+                  std::cout << "Using helix for position of particle: " << name().c_str() << " "
+                            << lambda << " " << lambda* tau
+                            << "  delta-x,y: " << -tau* px0 + (py - py0) / lambda << "  "
+                            << -tau* py0 - (px - px0) / lambda << std::endl ;
+              }
+            }*/
+    return ErrCode::success;
+  }
+  ErrCode ParticleBase::projectGeoConstraintCopy(const FitParams& fitparams, Projection& p) const
+  {
+    int posindexmother = mother()->posIndex();
+    int posindex = posIndex();
+    int tauindex = tauIndex();
+    int momindex = momIndex();
 
-        if (vtxverbose >= 2)
-          std::cout << "Using helix for position of particle: " << name().c_str() << " "
-                    << lambda << " " << lambda* tau
-                    << "  delta-x,y: " << -tau* px0 + (py - py0) / lambda << "  "
-                    << -tau* py0 - (px - px0) / lambda << std::endl ;
-      }
+    double tau =  fitparams.getStateVector()(tauindex);
+
+    EigenTypes::ColVector momentumVec = fitparams.getStateVector().segment(momindex, 3);
+    double p2 = momentumVec.transpose() * momentumVec;
+    double mom = std::sqrt(p2);
+    double posxmother = 0, posx = 0, momx = 0;
+
+    // linear approximation is fine
+    //JFK: TODO move to block operations 2017-09-28
+    for (int row = 0; row < 3; ++row) {
+      posxmother = fitparams.getStateVector()(posindexmother + row);
+      posx       = fitparams.getStateVector()(posindex + row);
+      momx       = fitparams.getStateVector()(momindex + row);
+      p.getResiduals()(row) = posxmother - posx + tau * momx / mom;
+      p.getH()(row, posindexmother + row) =    1;
+      p.getH()(row, posindex + row) =        -1;
+      p.getH()(row, momindex + row) = tau / mom; // JFK was just tau before
+      p.getH()(row, tauindex)       =      momx;
     }
-    return ErrCode::success ;
+    return ErrCode::success;
   }
 
   ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
                                               Projection& p) const
   {
-    double mass = pdgMass() ;
-    double mass2 = mass * mass ;
-    int momindex = momIndex() ;
+    double mass = pdgMass();
+    double mass2 = mass * mass;
+    int momindex = momIndex();
 
     // initialize the value
-    double px = fitparams.par()(momindex + 1) ;
-    double py = fitparams.par()(momindex + 2) ;
-    double pz = fitparams.par()(momindex + 3) ;
-    double E  = fitparams.par()(momindex + 4) ;
-    p.r(1) = E * E - px * px - py * py - pz * pz - mass2 ;
+    double px = fitparams.par()(momindex + 1);
+    double py = fitparams.par()(momindex + 2);
+    double pz = fitparams.par()(momindex + 3);
+    double E  = fitparams.par()(momindex + 4);
+    p.r(1) = E * E - px * px - py * py - pz * pz - mass2;
 
     // calculate the projection matrix
-    p.H(1, momindex + 1) = -2.0 * px ;
-    p.H(1, momindex + 2) = -2.0 * py ;
-    p.H(1, momindex + 3) = -2.0 * pz ;
-    p.H(1, momindex + 4) =  2.0 * E ;
+    p.H(1, momindex + 1) = -2.0 * px;
+    p.H(1, momindex + 2) = -2.0 * py;
+    p.H(1, momindex + 3) = -2.0 * pz;
+    p.H(1, momindex + 4) =  2.0 * E;
 
-    return ErrCode::success ;
+    return ErrCode::success;
   }
-
-  ErrCode ParticleBase::projectConstraint(Constraint::Type atype, const FitParams&, Projection&) const
+  ErrCode ParticleBase::projectMassConstraintCopy(const FitParams& fitparams,
+                                                  Projection& p) const
   {
-    std::cout << "no method to project this constaint: "
-              << name().c_str() << " " << type() << " " << atype << std::endl;
-    return ErrCode::badsetup ;
+    double mass = pdgMass();
+    double mass2 = mass * mass;
+    int momindex = momIndex();
+    // initialize the value
+    double px = fitparams.getStateVector()(momindex);
+    double py = fitparams.getStateVector()(momindex + 1);
+    double pz = fitparams.getStateVector()(momindex + 2);
+    double E  = fitparams.getStateVector()(momindex + 3);
+    p.getResiduals()(0) =  E * E - px * px - py * py - pz * pz - mass2;
+    // calculate the projection matrix
+    p.getH()(0, momindex) = -2.0 * px;
+    p.getH()(0, momindex + 1) = -2.0 * py;
+    p.getH()(0, momindex + 2) = -2.0 * pz;
+    p.getH()(0, momindex + 3) =  2.0 * E;
+
+    return ErrCode::success;
   }
+
+
+
+
+
+  ErrCode ParticleBase::projectConstraint(Constraint::Type, const FitParams&, Projection&) const
+  {
+    B2ERROR("Trying to project constraint of ParticleBase type. This is undefined.");
+    return ErrCode::badsetup;
+  }
+  ErrCode ParticleBase::projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const
+  {
+    B2ERROR("Trying to project constraint of ParticleBase type. This is undefined.");
+    return ErrCode::badsetup;
+  }
+
 
   double ParticleBase::bFieldOverC() //FT: (to do) BField is already called in RecoTrack, unify
   {
@@ -507,31 +605,69 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::initTau(FitParams* fitparams) const
   {
-    int tauindex = tauIndex() ;
+    int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
-      const ParticleBase* amother = mother() ;
-      int momposindex = amother ? amother->posIndex() : -1 ;
-      int posindex = posIndex() ;
-      int momindex = momIndex() ;
-      assert(momposindex >= 0) ; // check code logic: no mother -> no tau
+      const ParticleBase* amother = mother();
+      int momposindex = amother ? amother->posIndex() : -1;
+      int posindex = posIndex();
+      int momindex = momIndex();
+      assert(momposindex >= 0); // check code logic: no mother -> no tau
       //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
       //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
 
-      CLHEP::HepVector dX(3), mom(3);
-      double mom2 = 0;
+      double px = 0, dx = 0, momdX = 0, mom2 = 0;
       for (int irow = 1; irow <= 3; ++irow) {
-        dX(irow)  = fitparams->par(posindex + irow) - fitparams->par(momposindex + irow) ;
-        double px = fitparams->par(momindex + irow) ;
-        mom(irow) = px ;
-        mom2 += px * px ;
+        dx  = fitparams->par(posindex + irow) - fitparams->par(momposindex + irow);//JFK added abs
+        px = fitparams->par(momindex + irow);
+        momdX += dx * px;
+        mom2 += px * px;
       }
-      double tau = dot(dX, mom) / mom2 ; //scalar product
-      // we don't like 0 and we don't like very negative values
-      if (tau == 0) tau = pdgTau() ;
-      //tau = tau==0 ? pdtTau() : std::max(tau,-pdtTau()) ;
+      // JFK: tau is a length now! Thu 24 Aug 2017 04:33:11 AM CEST
+      // if tau should be a time devide by mom2 insertad of the sqrt
+      double tau = std::abs(momdX) / std::sqrt(mom2); //scalar product
+
+      // JFK: pdgTau returns nan because we init the mass with 0... Thu 24 Aug 2017 04:40:38 AM CEST
+      //      5 cm as an init value is a stupid but okish guess
+      if (tau == 0) {
+        tau = 5 ;//pdgTau();
+      }
+      if (std::isnan(tau)) {tau = -999;}
       fitparams->par(tauindex + 1) = tau;
     }
-    return ErrCode::success ;
+    return ErrCode::success;
+  }
+  ErrCode ParticleBase::initTauCopy(FitParams* fitparams) const
+  {
+    int tauindex = tauIndex();
+    if (tauindex >= 0 && hasPosition()) {
+      const ParticleBase* amother = mother();
+      int momposindex = amother ? amother->posIndex() : -1;
+      int posindex = posIndex();
+      int momindex = momIndex();
+      assert(momposindex >= 0); // check code logic: no mother -> no tau
+      //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
+      //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
+
+      EigenTypes::ColVector dxVec = fitparams->getStateVector().segment(posindex, 3)
+                                    - fitparams->getStateVector().segment(momposindex, 3);
+      EigenTypes::ColVector pxVec = fitparams->getStateVector().segment(momindex, 3);
+      double momdX = dxVec.transpose() * pxVec;
+      double mom2 =  pxVec.transpose() * pxVec;
+
+
+      // JFK: tau is a length now! Thu 24 Aug 2017 04:33:11 AM CEST
+      // if tau should be a time devide by mom2 insertad of the sqrt
+      double tau = std::abs(momdX) / std::sqrt(mom2); //scalar product
+
+      // JFK: pdgTau returns nan because we init the mass with 0... Thu 24 Aug 2017 04:40:38 AM CEST
+      //      5 cm as an init value is a stupid but okish guess
+      if (tau == 0) {
+        tau = 5 ;//pdgTau();
+      }
+      if (std::isnan(tau)) {tau = 999;}
+      fitparams->getStateVector()(tauindex) = tau;
+    }
+    return ErrCode::success;
   }
 } //end namespace TreeFitter
 

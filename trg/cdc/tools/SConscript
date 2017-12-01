@@ -1,4 +1,5 @@
 Import('env')
+env['TOOLS_LIBS']['NeuroTriggerMLPToTextfile'] = ['trg_cdc_dataobjects']
 env['TOOLS_LIBS']['TRGCDCHoughMapping'] = ['trg_cdc','trg_trg']
 env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg_cdc','trg_trg']
 env['TOOLS_LIBS']['TRGCDCInterfaceBuilder'] = ['trg_cdc','trg_trg']

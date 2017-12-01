@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PYOBJCONVUTILS_H_
-#define PYOBJCONVUTILS_H_
+#pragma once
 
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
@@ -565,5 +564,3 @@ namespace Belle2 {
     }
   }
 }
-
-#endif /* PYOBJCONVUTILS_H_ */

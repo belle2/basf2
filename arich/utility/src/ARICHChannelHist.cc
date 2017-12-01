@@ -11,6 +11,7 @@
 #include <arich/utility/ARICHChannelHist.h>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <TVector2.h>
 
 using namespace std;

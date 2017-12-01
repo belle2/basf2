@@ -13,6 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/dataobjects/BKLMHit1d.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include "TFile.h"
 #include "TH1D.h"
@@ -124,6 +127,17 @@ namespace Belle2 {
     float m_realTime;
     //! weight for each event (inverse of the realTime)
     float m_weight;
+    //! BKLMSimHit StoreArray
+    StoreArray<BKLMSimHit> simHits;
+    //! digits StoreArray
+    StoreArray<BKLMDigit> digits;
+    //! mcParticles StoreArray
+    StoreArray<MCParticle> mcParticles;
+    //! hits2D StoreArray
+    StoreArray<BKLMHit2d> hits2D;
+    //! hits1D StoreArray
+    StoreArray<BKLMHit1d> hits1D;
+
 
   };
 

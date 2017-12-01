@@ -21,7 +21,8 @@ void NtupleClusterTool::setupTree()
   int nDecayProducts = strNames.size();
 
   m_region = new int[nDecayProducts];
-  m_e9e25  = new float[nDecayProducts];
+  m_e1e9   = new float[nDecayProducts];
+  m_e9e21  = new float[nDecayProducts];
   m_nHits  = new int[nDecayProducts];
   m_trackM = new int[nDecayProducts];
 
@@ -33,17 +34,45 @@ void NtupleClusterTool::setupTree()
   m_distance = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_clusterReg").c_str(),        &m_region[iProduct], (strNames[iProduct] + "_clusterReg/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterE9E25").c_str(),      &m_e9e25[iProduct], (strNames[iProduct] + "_clusterE9E25/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterNHits").c_str(),      &m_nHits[iProduct], (strNames[iProduct] + "_clusterNHits/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterTrackMatch").c_str(), &m_trackM[iProduct], (strNames[iProduct] + "_clusterTrackMatch/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterUncorrE").c_str(),    &m_uncorrE[iProduct], (strNames[iProduct] + "_clusterUncorrE/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterHighE").c_str(),      &m_highestE[iProduct], (strNames[iProduct] + "_clusterHighE/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterTiming").c_str(),     &m_timing[iProduct], (strNames[iProduct] + "_clusterTiming/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterTheta").c_str(),      &m_theta[iProduct], (strNames[iProduct] + "_clusterTheta/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterPhi").c_str(),        &m_phi[iProduct], (strNames[iProduct] + "_clusterPhi/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterR").c_str(),          &m_distance[iProduct], (strNames[iProduct] + "_clusterR/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterReg").c_str(),        &m_region[iProduct],
+                   (strNames[iProduct] + "_clusterReg/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterE1E9").c_str(),       &m_e1e9[iProduct],
+                   (strNames[iProduct] + "_clusterE1E9/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterE9E21").c_str(),      &m_e9e21[iProduct],
+                   (strNames[iProduct] + "_clusterE9E21/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterNHits").c_str(),      &m_nHits[iProduct],
+                   (strNames[iProduct] + "_clusterNHits/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterTrackMatch").c_str(), &m_trackM[iProduct],
+                   (strNames[iProduct] + "_clusterTrackMatch/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterUncorrE").c_str(),    &m_uncorrE[iProduct],
+                   (strNames[iProduct] + "_clusterUncorrE/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterHighE").c_str(),      &m_highestE[iProduct],
+                   (strNames[iProduct] + "_clusterHighE/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterTiming").c_str(),     &m_timing[iProduct],
+                   (strNames[iProduct] + "_clusterTiming/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterTheta").c_str(),      &m_theta[iProduct],
+                   (strNames[iProduct] + "_clusterTheta/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterPhi").c_str(),        &m_phi[iProduct],
+                   (strNames[iProduct] + "_clusterPhi/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterR").c_str(),          &m_distance[iProduct],
+                   (strNames[iProduct] + "_clusterR/F").c_str());
   }
+}
+
+void NtupleClusterTool::deallocateMemory()
+{
+  delete [] m_region;
+  delete [] m_e1e9;
+  delete [] m_e9e21;
+  delete [] m_nHits;
+  delete [] m_trackM;
+
+  delete [] m_uncorrE;
+  delete [] m_highestE;
+  delete [] m_timing;
+  delete [] m_theta;
+  delete [] m_phi;
+  delete [] m_distance;
 }
 
 void NtupleClusterTool::eval(const Particle* particle)
@@ -57,7 +86,8 @@ void NtupleClusterTool::eval(const Particle* particle)
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_region[iProduct]  = int(Variable::eclClusterDetectionRegion(selparticles[iProduct]));
-    m_e9e25[iProduct]   = Variable::eclClusterE9E25(selparticles[iProduct]);
+    m_e1e9[iProduct]    = Variable::eclClusterE1E9(selparticles[iProduct]);
+    m_e9e21[iProduct]   = Variable::eclClusterE9E21(selparticles[iProduct]);
     m_nHits[iProduct]   = int(Variable::eclClusterNHits(selparticles[iProduct]));
     m_trackM[iProduct]  = int(Variable::eclClusterTrackMatched(selparticles[iProduct]));
 

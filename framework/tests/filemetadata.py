@@ -12,21 +12,10 @@ set_random_seed("something important")
 
 testFile = tempfile.NamedTemporaryFile(prefix='b2filemetadata_')
 
-# Register modules
-eventinfosetter = register_module('EventInfoSetter', evtNumList=[9, 1], runList=[1, 15], expList=[7, 7])
-output = register_module('RootOutput')
-
-output.param('outputFileName', testFile.name)
-output.param('updateFileCatalog', False)
-
-# Create paths
+# Generate a small test file
 main = create_path()
-
-# Add modules to paths
-main.add_module(eventinfosetter)
-main.add_module(output)
-
-# Process events
+main.add_module('EventInfoSetter', evtNumList=[9, 1], runList=[1, 15], expList=[7, 7])
+main.add_module('RootOutput', outputFileName=testFile.name, updateFileCatalog=False)
 process(main)
 
 # Check the file meta data (via DataStore)

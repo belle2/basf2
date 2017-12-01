@@ -6,5 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::SVDDatabaseImporter+;
+#pragma link C++ class Belle2::SVDNoiseCalibrations+;
+#pragma link C++ class Belle2::SVDPulseShapeCalibrations+;
 
 #endif

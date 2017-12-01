@@ -1,9 +1,6 @@
 #include "trg/gdl/modules/trggdl/TRGGDLCosmicRunModule.h"
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/ecl/dataobjects/TRGECLTrg.h>
 
 using namespace std;
 using namespace Belle2;
@@ -30,26 +27,28 @@ TRGGDLCosmicRunModule::TRGGDLCosmicRunModule() : Module::Module()
   addParam("BackToBack", m_backToBack,
            "Switch to turn back-to-back requirement on or off.",
            true);
+  addParam("skipECL", m_skipECL,
+           "Switch to turn off the ECL part of the cosmic trigger.",
+           false);
 }
 
 void
 TRGGDLCosmicRunModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required(m_tsHitCollectionName);
-  StoreArray<TRGECLTrg>::required();
+  m_segmentHits.isRequired(m_tsHitCollectionName);
+  if (!m_skipECL) m_tchit.isRequired();
 }
 
 void
 TRGGDLCosmicRunModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> tshits(m_tsHitCollectionName);
   bool TSinMerger[12] = {false};
   bool TSinSL2 = false;
-  for (int its = 0; its < tshits.getEntries(); ++its) {
-    if (tshits[its]->getISuperLayer() == 2) {
+  for (int its = 0; its < m_segmentHits.getEntries(); ++its) {
+    if (m_segmentHits[its]->getISuperLayer() == 2) {
       // SegmentID in SuperLayer 2 starts at 320
       // One merger corresponds to 16 segments
-      unsigned mergerID = (tshits[its]->getSegmentID() - 320) / 16;
+      unsigned mergerID = (m_segmentHits[its]->getSegmentID() - 320) / 16;
       TSinMerger[mergerID] = true;
       TSinSL2 = true;
     }
@@ -60,15 +59,16 @@ TRGGDLCosmicRunModule::event()
   }
 
   bool TCHit = false;
-  StoreArray<TRGECLTrg> tchit;
-  for (int itchit  = 0; itchit < tchit.getEntries(); itchit++) {
-    if ((tchit[itchit] -> getNofTCHit()) > 0) {
-      TCHit = true;
+  if (!m_skipECL) {
+    for (int itchit  = 0; itchit < m_tchit.getEntries(); itchit++) {
+      if ((m_tchit[itchit] -> getNofTCHit()) > 0) {
+        TCHit = true;
+      }
     }
   }
 
   if (m_backToBack)
-    setReturnValue(BackToBack && TCHit);
+    setReturnValue(BackToBack && (TCHit || m_skipECL));
   else
-    setReturnValue(TSinSL2 && TCHit);
+    setReturnValue(TSinSL2 && (TCHit || m_skipECL));
 }

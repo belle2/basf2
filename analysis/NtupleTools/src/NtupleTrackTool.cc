@@ -35,6 +35,15 @@ void NtupleTrackTool::setupTree()
   }
 }
 
+void NtupleTrackTool::deallocateMemory()
+{
+  delete [] m_fD0;
+  delete [] m_ferrD0;
+  delete [] m_fZ0;
+  delete [] m_ferrZ0;
+  delete [] m_fTrPval;
+}
+
 void NtupleTrackTool::eval(const Particle* particle)
 {
 

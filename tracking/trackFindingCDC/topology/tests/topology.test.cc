@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>

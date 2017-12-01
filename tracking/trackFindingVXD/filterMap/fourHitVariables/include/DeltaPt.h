@@ -24,7 +24,7 @@ namespace Belle2 {
   /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c.
    * */
   template <typename PointType >
-  class DELTAPT_NAME : public SelectionVariable< PointType , double > {
+  class DELTAPT_NAME : public SelectionVariable< PointType , 4, double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(DELTAPT_NAME);

@@ -168,7 +168,7 @@ namespace Belle2 {
     virtual ~NSMVHandlerMaxTimeFT() throw() {}
     bool handleSetFloat(float usec)
     {
-      unsigned int offset = 0x500 >> 2;
+      unsigned int offset = 0x9f0 >> 2;
       int v = read_ftsw(g_ftsw, offset);
       unsigned int val = (v & 0xFF000000) | (unsigned int)(usec * 1e+3 / 7.8);
       write_ftsw(g_ftsw, offset, val);
@@ -176,7 +176,7 @@ namespace Belle2 {
     }
     bool handleGetFloat(float& val)
     {
-      unsigned int addr = 0x500;
+      unsigned int addr = 0x9f0;
       unsigned int offset = addr >> 2;
       int v = read_ftsw(g_ftsw, offset);
       val = (v & 0xFFFFFF) * 7.8e-3;
@@ -193,7 +193,7 @@ namespace Belle2 {
     virtual ~NSMVHandlerMaxTrigFT() throw() {}
     bool handleSetInt(int maxtrg)
     {
-      unsigned int offset = 0x500 >> 2;
+      unsigned int offset = 0x9f0 >> 2;
       int v = read_ftsw(g_ftsw, offset);
       unsigned int val = (v & 0xFFFFFF) | (maxtrg << 24);
       write_ftsw(g_ftsw, offset, val);
@@ -201,7 +201,7 @@ namespace Belle2 {
     }
     bool handleGetInt(int& val)
     {
-      unsigned int addr = 0x500;
+      unsigned int addr = 0x9f0;
       unsigned int offset = addr >> 2;
       int v = read_ftsw(g_ftsw, offset);
       val = v >> 24;

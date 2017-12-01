@@ -59,9 +59,6 @@ CDCDedxScanModule::CDCDedxScanModule() : Module()
 {
 
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC, SVD and PXD.");
-
-  m_eventID = -1;
-  m_trackID = 0;
 }
 
 CDCDedxScanModule::~CDCDedxScanModule() { }
@@ -135,7 +132,7 @@ void CDCDedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0);
+        dedxTrack->addHit(0, 0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0, 1.0);
       }
     }
     dedxArray.appendNew(*dedxTrack);
@@ -145,6 +142,5 @@ void CDCDedxScanModule::event()
 void CDCDedxScanModule::terminate()
 {
 
-  B2INFO("CDCDedxScanModule exiting after processing " << m_trackID <<
-         " tracks in " << m_eventID + 1 << " events.");
+  B2INFO("CDCDedxScanModule exiting");
 }

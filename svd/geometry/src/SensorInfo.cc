@@ -8,7 +8,7 @@
 #include <svd/geometry/SensorInfo.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TVector3.h>
 #include <math.h>
@@ -62,10 +62,10 @@ const TVector3& SensorInfo::getBField(const TVector3& point) const
   static double bRadius = 0.5 * Unit::cm;
   if (TVector3(point - oldPoint).Mag() > bRadius) { // renew if far point
     TVector3 pointGlobal = pointToGlobal(point);
-    TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
+    TVector3 bGlobal = BFieldManager::getField(pointGlobal);
     TVector3 bLocal = vectorToLocal(bGlobal);
     oldPoint = point;
-    oldField = bLocal * Unit::T;
+    oldField = bLocal;
   }
   return oldField;
 }

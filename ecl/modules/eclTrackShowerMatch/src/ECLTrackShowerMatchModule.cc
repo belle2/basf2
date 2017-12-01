@@ -41,6 +41,12 @@ void ECLTrackShowerMatchModule::initialize()
   StoreArray<ECLCluster> eclClusters;
   tracks.registerRelationTo(eclShowers);
   tracks.registerRelationTo(eclClusters);
+
+  tracks.isRequired();
+  eclShowers.isRequired();
+  eclClusters.isRequired();
+  StoreArray<ECLCalDigit>::required();
+  StoreArray<ExtHit>::required();
 }
 
 void ECLTrackShowerMatchModule::beginRun()
@@ -177,10 +183,13 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
   double p = 0;
   const Track* selectedTrk = nullptr;
   for (const auto& track : shower.getRelationsFrom<Track>()) {
-    const TrackFitResult* fit = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
     if (fit != 0) cp = fit->getMomentum().Mag();
-    if (cp > p) selectedTrk = & track;
+    if (cp > p) {
+      selectedTrk = & track;
+      p = cp;
+    }
   }
   lTrk = 0;
   lShower = 0;

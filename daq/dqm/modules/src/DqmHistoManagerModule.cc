@@ -201,11 +201,11 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
     if (obj->IsA()->InheritsFrom("TH1")) {
       TH1* h1 = (TH1*) obj;
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
-      //      if (h1->GetEntries() > 0) {    // Do not send empty histograms
-      m_msg->add(h1, h1->GetName());
-      nobjs++;
-      m_nobjs++;
-      //      }
+      if (h1->GetEntries() > 0) {    // Do not send empty histograms
+        m_msg->add(h1, h1->GetName());
+        nobjs++;
+        m_nobjs++;
+      }
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
       TDirectory* tdir = (TDirectory*) obj;

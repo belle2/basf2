@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <algorithm>
+#include <iostream>
+
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
 
 using namespace Belle2;
@@ -17,7 +20,7 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxWireGainCollector")
+CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -30,35 +33,41 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDC
 CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
-  // You HAVE to set these pointers to 0!
+  // HAVE to set these pointers to 0!
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
 
-  ttree.SetBranchAddress("wire", &wire);
-  ttree.SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("wire", &wire);
+  ttree->SetBranchAddress("dedxhit", &dedxhit);
 
-  std::map<int, std::vector<double> > wirededx;
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  std::vector<std::vector<double>> wirededx(14336, std::vector<double>());
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
       wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }
   }
 
-  B2INFO("dE/dx Calibration done for " << wirededx.size() << " CDC wires");
-
-  TClonesArray* gains = new TClonesArray("Belle2::CDCDedxWireGain");
-  int counter = 0;
-  for (auto const& awire : wirededx) {
-    new((*gains)[counter++]) CDCDedxWireGain(awire.first, calculateMean(awire.second, 0.05, 0.25));
+  std::vector<double> means;
+  for (unsigned int i = 0; i < 14336; ++i) {
+    if (wirededx[i].size() < 50) {
+      means.push_back(1.0); // <-- FIX ME, should return not enough data
+    } else {
+      double mean = calculateMean(wirededx[i], 0.05, 0.25);
+      means.push_back(mean);
+    }
   }
-  saveCalibration(gains, "CDCDedxWireGains");
+
+  B2INFO("dE/dx Calibration done for " << means.size() << " CDC wires");
+
+  CDCDedxWireGain* gains = new CDCDedxWireGain(means);
+  saveCalibration(gains, "CDCDedxWireGain");
 
   // Iterate
   //  B2INFO("mean: " << mean);

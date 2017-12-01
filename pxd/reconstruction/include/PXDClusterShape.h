@@ -21,6 +21,31 @@
 namespace Belle2 {
   namespace PXD {
 
+    /** Type specifies cluster shape type */
+    enum class pxdClusterShapeType {
+      no_shape_set = 0,
+
+      shape_1,
+      shape_2_u,
+      shape_2_v,
+      shape_2_uv_diag,
+      shape_2_uv_antidiag,
+      shape_N1,
+      shape_1M,
+      shape_N2,
+      shape_2M,
+      shape_4,
+      shape_3_L,
+      shape_3_L_mirr_u,
+      shape_3_L_mirr_v,
+      shape_3_L_mirr_uv,
+      shape_large
+
+    };
+
+    /** Type specifies cluster shape type description */
+    typedef std::map<pxdClusterShapeType, std::string> pxdClusterShapeDescr;
+
     /** Class to correct estimation of cluster error and position base on its shape.
      * This class will set a shape ID of cluster in clusterization time.
      * ID is describe on list "pxdClusterShapeType".
@@ -58,31 +83,6 @@ namespace Belle2 {
      * @endverbatim
      *
      */
-
-    /** Type specifies cluster shape type */
-    enum class pxdClusterShapeType {
-      no_shape_set = 0,
-
-      shape_1,
-      shape_2_u,
-      shape_2_v,
-      shape_2_uv_diag,
-      shape_2_uv_antidiag,
-      shape_N1,
-      shape_1M,
-      shape_N2,
-      shape_2M,
-      shape_4,
-      shape_3_L,
-      shape_3_L_mirr_u,
-      shape_3_L_mirr_v,
-      shape_3_L_mirr_uv,
-      shape_large
-
-    };
-
-    typedef std::map<pxdClusterShapeType, std::string> pxdClusterShapeDescr;
-
     class PXDClusterShape {
     public:
 

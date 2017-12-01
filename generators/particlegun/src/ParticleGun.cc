@@ -55,15 +55,15 @@ namespace {
       }
       const double x1 = x[segment];
       const double x2 = x[segment + 1];
-      const double x = gRandom->Uniform(x1, x2);
+      const double xx = gRandom->Uniform(x1, x2);
       //Now calculate y(x) using line between (x1,y1) and (x2,y2)
       const double y1 = y[segment];
       const double y2 = y[segment + 1];
-      const double y = (y2 == y1) ? y1 : y1 + (x - x1) / (x2 - x1) * (y2 - y1);
+      const double yy = (y2 == y1) ? y1 : y1 + (xx - x1) / (x2 - x1) * (y2 - y1);
       //Generate a random y inside the step function
       const double randY = gRandom->Uniform(0, max(y1, y2));
       //And accept the x value if randY lies below the line
-      if (randY < y) return x;
+      if (randY < yy) return xx;
       //Otherwise repeat generation of x and y
     }
   }
@@ -83,6 +83,9 @@ double ParticleGun::generateValue(EDistribution dist, const vector<double>& para
       return 1. / gRandom->Uniform(1. / params[1], 1. / params[0]);
     case c_uniformCosDistribution:
       return acos(gRandom->Uniform(cos(params[0]), cos(params[1])));
+    case c_uniformLogDistribution:
+    case c_uniformLogPtDistribution:
+      return exp(gRandom->Uniform(log(params[0]), log(params[1])));
     case c_normalDistribution:
     case c_normalPtDistribution:
       return gRandom->Gaus(params[0], params[1]);
@@ -164,7 +167,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     double pt = momentum * sin(theta);
     if (m_params.momentumDist == c_uniformPtDistribution || m_params.momentumDist == c_normalPtDistribution ||
         m_params.momentumDist == c_inversePtDistribution || m_params.momentumDist == c_polylinePtDistribution ||
-        m_params.momentumDist == c_discretePtSpectrum) {
+        m_params.momentumDist == c_uniformLogPtDistribution || m_params.momentumDist == c_discretePtSpectrum) {
       //this means we are actually generating the Pt and not the P, so exchange values
       pt = momentum;
       momentum = (sin(theta) > 0) ? (pt / sin(theta)) : numeric_limits<double>::max();
@@ -216,6 +219,8 @@ bool ParticleGun::setParameters(const Parameters& p)
     {c_uniformDistribution,     "uniform"},
     {c_uniformPtDistribution,   "uniformPt"},
     {c_uniformCosDistribution,  "uniformCos"},
+    {c_uniformLogDistribution,  "uniformLog"},
+    {c_uniformLogPtDistribution,  "uniformLogPt"},
     {c_normalDistribution,      "normal"},
     {c_normalPtDistribution,    "normalPt"},
     {c_normalCosDistribution,   "normalCos"},
@@ -263,6 +268,7 @@ bool ParticleGun::setParameters(const Parameters& p)
   }
   for (auto dist : {"xVertex", "yVertex", "zVertex", "phi", "theta"}) {
     excludeDistribution(dist, c_uniformPtDistribution);
+    excludeDistribution(dist, c_uniformLogPtDistribution);
     excludeDistribution(dist, c_normalPtDistribution);
     excludeDistribution(dist, c_inversePtDistribution);
     excludeDistribution(dist, c_polylinePtDistribution);
@@ -295,20 +301,20 @@ bool ParticleGun::setParameters(const Parameters& p)
       } else if (dist == c_discreteSpectrum || dist == c_discretePtSpectrum || hasParams >= 4) {
         //Check wellformedness of polyline pdf: ascending x coordinates and positive y coordinates with at least one nonzero value
         //Discrete spectrum only requires positive weights, no sorting needed
-        const std::vector<double>& p = getPars(par);
+        const std::vector<double>& pvec = getPars(par);
         const std::string parname = (dist == c_discreteSpectrum || dist == c_discretePtSpectrum)
                                     ? "weight" : "y coordinate";
         //Check for sorting for polylines
         if ((dist != c_discreteSpectrum) && (dist != c_discretePtSpectrum)) {
           for (size_t i = 0; i < (hasParams / 2) - 1; ++i) {
-            if (p[i] > p[i + 1]) {
+            if (pvec[i] > pvec[i + 1]) {
               B2ERROR(par << " generation: " << distributionNames[dist] << " requires x coordinates in ascending order");
               ok = false;
             }
           }
         }
         //Check that values are non-negative and at least one value is positive
-        auto minmax = std::minmax_element(p.begin() + hasParams / 2, p.end());
+        auto minmax = std::minmax_element(pvec.begin() + hasParams / 2, pvec.end());
         if (*minmax.first < 0) {
           B2ERROR(par << " generation: " << distributionNames[dist] << " requires "
                   << parname << "s to be non-negative");

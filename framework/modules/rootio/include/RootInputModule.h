@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROOTINPUTMODULE_H
-#define ROOTINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
@@ -214,7 +213,8 @@ namespace Belle2 {
 
     /** some statistics for all files read so far. */
     ReadStats m_readStats;
+
+    /** Input ROOT File Cache size in MB, <0 means default */
+    int m_cacheSize{0};
   };
 } // end namespace Belle2
-
-#endif

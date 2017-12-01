@@ -94,8 +94,6 @@ double PIDforTargetEff(double *finalEffValues, int maxIterations, double toleran
     // Calculate cut val for target efficiency
     double lowercutval = 0.0;
     double uppercutval = 1.0;
-    double uppereffval = maxefficiency;
-    double lowereffval = minefficiency;
     int counter = 0;
     double currenteffval = 0;
 

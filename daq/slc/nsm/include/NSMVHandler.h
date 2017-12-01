@@ -241,28 +241,6 @@ namespace Belle2 {
 
   };
 
-  class NSMCallback;
-
-  class NSMVHandlerRef : public NSMVHandler {
-
-  public:
-    NSMVHandlerRef(NSMCallback& callback,
-                   const std::string& name,
-                   const std::string& refname)
-      : NSMVHandler("", name, true, true),
-        m_callback(callback), m_refname(refname) {}
-    virtual ~NSMVHandlerRef() throw() {}
-
-  public:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
-
-  private:
-    NSMCallback& m_callback;
-    std::string m_refname;
-
-  };
-
 };
 
 #endif

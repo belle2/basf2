@@ -61,7 +61,7 @@ void PXDDigitSorterModule::initialize()
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  storeDigits.required();
+  storeDigits.isRequired();
   storeMCParticles.isOptional();
   storeTrueHits.isOptional();
 
@@ -97,19 +97,20 @@ void PXDDigitSorterModule::event()
   // Fill sensor information to get sorted PXDDigit indices
   const int nPixels = storeDigits.getEntries();
   for (int i = 0; i < nPixels; i++) {
-    const PXDDigit* const digit = storeDigits[i];
-    Pixel px(digit, i);
-    VxdID sensorID = digit->getSensorID();
+    const PXDDigit* const storeDigit = storeDigits[i];
+    Pixel px(storeDigit, i);
+    VxdID sensorID = storeDigit->getSensorID();
     if (m_ignoredPixelsListName == ""
-        || m_ignoredPixelsList->pixelOK(digit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(digit->getUCellID(), digit->getVCellID()))) {
+        || m_ignoredPixelsList->pixelOK(storeDigit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(storeDigit->getUCellID(),
+                                        storeDigit->getVCellID()))) {
       // Trim digits
-      if (!m_trimDigits || goodDigit(digit)) {
+      if (!m_trimDigits || goodDigit(storeDigit)) {
         sensors[sensorID].insert(px);
       } else {
         B2INFO("Encountered a malformed digit in PXDDigit sorter: " << endl
                << "VxdID: " << sensorID.getLayerNumber() << "/"
                << sensorID.getLadderNumber() << "/"
-               << sensorID.getSensorNumber() << " u = " << digit->getUCellID() << "v = " << digit->getVCellID()
+               << sensorID.getSensorNumber() << " u = " << storeDigit->getUCellID() << "v = " << storeDigit->getVCellID()
                << " DISCARDED.");
       }
     }
@@ -138,8 +139,9 @@ void PXDDigitSorterModule::event()
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
           const PXDDigit& old = *storeDigits[index - 1];
-          *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(), old.getVCellID(), old.getUCellPosition(),
-                                             old.getVCellPosition(), old.getCharge() + m_digitcopy[px.getIndex()].getCharge());
+          // FIXME: Does it really make sense to add the charge of duplicate pixels?
+          *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(), old.getVCellID(),
+                                             old.getCharge() + m_digitcopy[px.getIndex()].getCharge());
           relationIndices[px.getIndex()] = std::make_pair(index - 1, false);
         } else {
           //Otherwise delete the second pixel by omitting it here and removing relation elements on consolidation

@@ -91,6 +91,8 @@ def add_packers(path, components=None):
 
     # SVD
     if components is None or 'SVD' in components:
+        path.add_module('SVDDigitSplitter')
+        path.add_module('SVDDigitSorter')
         svdpacker = register_module('SVDPacker')
         path.add_module(svdpacker)
 
@@ -145,7 +147,7 @@ def add_unpackers(path, components=None):
         path.add_module(pxdunpacker)
 
         pxdhitsorter = register_module('PXDRawHitSorter')
-        pxdhitsorter.param('mergeFrames', False)
+        pxdhitsorter.param('mergeFrames', True)
         path.add_module(pxdhitsorter)
 
         pxd_clusterizer = register_module('PXDClusterizer')

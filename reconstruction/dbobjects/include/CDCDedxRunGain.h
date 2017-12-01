@@ -24,42 +24,31 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxRunGain(): m_run(0), m_gain(0) {};
+    CDCDedxRunGain(): m_gain(1.0) {};
 
     /**
      * Constructor
      */
-    CDCDedxRunGain(int run, float gain): m_run(run), m_gain(gain) {};
+    explicit CDCDedxRunGain(double gain): m_gain(gain) {};
 
     /**
      * Destructor
      */
     ~CDCDedxRunGain() {};
 
-    /** Return run number
-     * @return run number
-     */
-    float getRun() const {return m_run; };
-
     /** Return run gain
      * @return run gain
      */
-    float getRunGain() const {return m_gain; };
-
-    /** Set run number
-     * @param run number
-     */
-    void setRun(int run) {m_run = run; };
+    double getRunGain() const {return m_gain; };
 
     /** Set run gain
      * @param run gain
      */
-    void setRunGain(float gain) {m_gain = gain; };
+    void setRunGain(double gain) {m_gain = gain; };
 
   private:
-    int m_run;          /**< Run number */
-    float m_gain;       /**< Run gain */
+    double m_gain; /**< Run gain */
 
-    ClassDef(CDCDedxRunGain, 1); /**< ClassDef */
+    ClassDef(CDCDedxRunGain, 3); /**< ClassDef */
   };
 } // end namespace Belle2

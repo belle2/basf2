@@ -8,9 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
+
 #include <framework/gearbox/Const.h>
-#include <boost/math/special_functions/sinc.hpp>
+
+#include <algorithm>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -28,7 +34,7 @@ FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator> replacement)
 namespace {
   double getFirstPeriodAlphaFlightTime(double absAlpha)
   {
-    return 1.0 / (boost::math::sinc_pi(absAlpha) * Const::speedOfLight);
+    return 1.0 / (sinc(absAlpha) * Const::speedOfLight);
   }
 }
 
@@ -45,9 +51,9 @@ namespace {
   {
     if (absAlpha > M_PI / 2.0) {
       double reverseAlpha = AngleUtil::reversed(absAlpha);
-      return -1.0 / (boost::math::sinc_pi(reverseAlpha) * Const::speedOfLight);
+      return -1.0 / (sinc(reverseAlpha) * Const::speedOfLight);
     } else {
-      return 1.0 / (boost::math::sinc_pi(absAlpha) * Const::speedOfLight);
+      return 1.0 / (sinc(absAlpha) * Const::speedOfLight);
     }
   }
 }

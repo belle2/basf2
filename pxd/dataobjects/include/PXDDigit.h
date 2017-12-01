@@ -21,7 +21,7 @@ namespace Belle2 {
    * The PXD digit class.
    *
    * This is a development implementation which is intentionally kept
-   * somewhat bulky. The coordinates probably won't be kept in future.
+   * somewhat bulky.
    */
   class PXDDigit : public DigitBase {
   public:
@@ -30,19 +30,17 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param uCellID Cell ID in "r-phi".
      * @param vCellID Cell ID in "z".
-     * @param uCell Cell center u coordinate.
-     * @param vCell Cell center v coordinate.
      * @param charge The charge collected in the cell.
      */
-    PXDDigit(VxdID sensorID, short uCellID, short vCellID, float uCellPosition, float vCellPosition, float charge):
+    PXDDigit(VxdID sensorID, unsigned short uCellID, unsigned short vCellID,
+             unsigned short charge):
       m_sensorID(sensorID),
       m_uCellID(uCellID), m_vCellID(vCellID),
-      m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
       m_charge(charge)
     {;}
 
     /** Default constructor for the ROOT IO. */
-    PXDDigit(): PXDDigit(0, -1, -1, 0, 0, 0) {}
+    PXDDigit(): PXDDigit(0, 0, 0, 0) {}
 
     /** Get frame number of this digit.
      * @return frame number of the digit.
@@ -67,32 +65,22 @@ namespace Belle2 {
     /** Get cell ID in u.
      * @return u ID of the cell.
      */
-    short int getUCellID() const { return m_uCellID; }
+    unsigned short getUCellID() const { return m_uCellID; }
 
     /** Get cell ID in v.
      * @return v ID of the cell.
      */
-    short int getVCellID() const { return m_vCellID; }
-
-    /** Get u coordinate of cell center.
-     * @return u coordinate of cell center.
-     */
-    float getUCellPosition() const { return m_uCellPosition; }
-
-    /** Get v coordinate of cell center.
-     * @return v coordinate of cell center.
-     */
-    float getVCellPosition() const { return m_vCellPosition; }
+    unsigned short getVCellID() const { return m_vCellID; }
 
     /** Get collected charge.
      * @return charge collected in the cell.
      */
-    float getCharge() const { return m_charge; }
+    unsigned short getCharge() const { return m_charge; }
 
     /** Set digit charge.
      * @param charge The charge to be set to the digit.
      */
-    void setCharge(float charge) { m_charge = charge; }
+    void setCharge(unsigned short charge) { m_charge = charge; }
 
     /**
     * Implementation of the base class function.
@@ -123,13 +111,11 @@ namespace Belle2 {
   private:
 
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
-    short m_uCellID;           /**< Cell r-phi coordinate in pitch units. */
-    short m_vCellID;           /**< Cell z coordinate in pitch units. */
-    float m_uCellPosition;     /**< Absolute cell position in r-phi. */
-    float m_vCellPosition;     /**< Absolute cell position in z. */
-    float m_charge;            /**< Deposited charge (units depend on user selection). */
+    unsigned short m_uCellID;  /**< Cell r-phi coordinate in pitch units. */
+    unsigned short m_vCellID;  /**< Cell z coordinate in pitch units. */
+    unsigned short m_charge;   /**< Digitized charge in ADC units. */
 
-    ClassDef(PXDDigit, 4)
+    ClassDef(PXDDigit, 5)
 
   }; // class PXDDigit
 

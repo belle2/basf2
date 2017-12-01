@@ -8,19 +8,66 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/mva/Recorder.h>
+
+/** Impl Declaration **/
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/RootMergeable.h>
+
+#include <functional>
+#include <string>
+
+class TTree;
+class TFile;
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    class Recorder::Impl {
+
+    public:
+      /**
+       *  Constructor creating the TFile and TTree as well as
+       *  setting up the branches with the given function.
+       */
+      Impl(const std::function<void(TTree&)>& setBranches,
+           const std::string& rootFileName,
+           const std::string& treeName = "recorded_tree");
+
+      /// Destructor finalising the tree.
+      ~Impl();
+
+      /// Write all captured variables to disk.
+      void write();
+
+      /// Capture the registered variable values and write them out.
+      void capture();
+
+    private:
+      /// Reference to the open TFile.
+      TFile* m_tFile;
+
+      /// Reference to the TTree.
+      StoreObjPtr<RootMergeable<TTree> > m_tTree;
+    };
+  }
+}
+
+/** Impl Definition **/
+#include <framework/datastore/DataStore.h>
+#include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <framework/pcore/ProcHandler.h>
-#include <TROOT.h>
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Recorder::Recorder(const std::function<void(TTree&)>& setBranches,
-                   const std::string& rootFileName,
-                   const std::string& treeName) :
-  m_tFile(nullptr),
-  m_tTree(treeName, DataStore::c_Persistent)
+Recorder::Impl::Impl(const std::function<void(TTree&)>& setBranches,
+                     const std::string& rootFileName,
+                     const std::string& treeName)
+  : m_tFile(nullptr)
+  , m_tTree(treeName, DataStore::c_Persistent)
 {
   TDirectory* ptrSavedCurrentTDirectory = gDirectory;
 
@@ -41,24 +88,7 @@ Recorder::Recorder(const std::function<void(TTree&)>& setBranches,
   }
 }
 
-
-Recorder::Recorder(const std::vector<Named<Float_t* > >& namedVariables,
-                   const std::string& rootFileName,
-                   const std::string& treeName) :
-  Recorder([ & namedVariables](TTree & tree)
-{
-  for (const Named<Float_t*>& namedVariable : namedVariables) {
-    std::string name = namedVariable.getName();
-    Float_t* variable = namedVariable;
-    tree.Branch(name.c_str(), variable);
-  }
-},
-rootFileName,
-treeName)
-{
-}
-
-Recorder::~Recorder()
+Recorder::Impl::~Impl()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     if (m_tTree) {
@@ -70,7 +100,7 @@ Recorder::~Recorder()
   }
 }
 
-void Recorder::write()
+void Recorder::Impl::write()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     if (m_tTree) {
@@ -96,7 +126,44 @@ void Recorder::write()
   }
 }
 
-void Recorder::capture()
+void Recorder::Impl::capture()
 {
   m_tTree->get().Fill();
+}
+
+/** PImpl Interface **/
+
+Recorder::Recorder(const std::function<void(TTree&)>& setBranches,
+                   const std::string& rootFileName,
+                   const std::string& treeName)
+  : m_impl(std::make_unique<Impl>(setBranches, rootFileName, treeName))
+{
+}
+
+Recorder::Recorder(const std::vector<Named<Float_t* > >& namedVariables,
+                   const std::string& rootFileName,
+                   const std::string& treeName) :
+  Recorder([ & namedVariables](TTree & tree)
+{
+  for (const Named<Float_t*>& namedVariable : namedVariables) {
+    std::string name = namedVariable.getName();
+    Float_t* variable = namedVariable;
+    tree.Branch(name.c_str(), variable);
+  }
+},
+rootFileName,
+treeName)
+{
+}
+
+Recorder::~Recorder() = default;
+
+void Recorder::write()
+{
+  m_impl->write();
+}
+
+void Recorder::capture()
+{
+  m_impl->capture();
 }

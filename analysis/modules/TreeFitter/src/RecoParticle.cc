@@ -30,6 +30,14 @@ namespace TreeFitter {
   {
   }
 
+  ErrCode RecoParticle::initMotherlessParticle([[gnu::unused]]  FitParams* fitparams)
+  {
+    return ErrCode::success;
+  }
+
+
+
+
   std::string RecoParticle::parname(int index) const
   {
     return ParticleBase::parname(index + 4) ;
@@ -44,18 +52,34 @@ namespace TreeFitter {
         status |= projectRecoConstraint(fitparams, p) ;
         break ;
       default:
+        status |= ParticleBase::projectConstraint(type, fitparams, p);
         //      status |= ParticleBase::projectConstraint(type,fitparams,p) ;
         //FT: This printout is annoying, make it B2INFO or B2DEBUG
-        std::cout << ParticleBase::projectConstraint(type, fitparams, p) << std::endl << std::flush;
+    }
+    return status ;
+  }
+  ErrCode RecoParticle::projectConstraintCopy(Constraint::Type type, const FitParams& fitparams, Projection& p) const
+  {
+    ErrCode status ;
+    switch (type) {
+      case Constraint::track:
+//        status |= projectRecoConstraintCopyCopy(fitparams, p) ;
+      case Constraint::photon:
+        status |= projectRecoConstraintCopy(fitparams, p) ;
+        break ;
+      default:
+        //      status |= ParticleBase::projectConstraint(type,fitparams,p) ;
+        //FT: This printout is annoying, make it B2INFO or B2DEBUG
+        status |= ParticleBase::projectConstraintCopy(type, fitparams, p);
     }
     return status ;
   }
 
+
   double RecoParticle::chiSquare(const FitParams* fitparams) const
   {
-    // project
-    Projection p(fitparams->dim(), dimM()) ;
-    projectRecoConstraint(*fitparams, p) ;
-    return p.chiSquare() ;
+    Projection p(fitparams->dim(), dimM());
+    projectRecoConstraint(*fitparams, p);
+    return p.chiSquare();
   }
 }

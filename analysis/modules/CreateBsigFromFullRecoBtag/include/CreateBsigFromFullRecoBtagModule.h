@@ -35,9 +35,9 @@
 
 namespace Belle2 {
   /**
-   * Partial Update Daughters
+   * Create a B particle from a Bbar particle
    *
-   * a way of performing vertex fits and update daughters   *
+   * set the direction of the recoil B   *
    */
   class CreateBsigFromFullRecoBtagModule : public Module {
 
@@ -75,8 +75,6 @@ namespace Belle2 {
     std::string m_listOutput; /**< Bsig output list */
     std::string m_antiListOutput; /**< Bsig output list */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
-    //int m_pdgCode;                /**< PDG code of the B particle */
-    //std::unique_ptr<ParticleGenerator> m_generator; /**< Generates the Bsig */
 
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
@@ -95,4 +93,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* VERTEXFITUPDATEDAUGHTERSMODULE_H */
+#endif /* CREATEBSIGFROMFULLRECOBTAGMODULE_H */

@@ -249,7 +249,7 @@ def setup_gfTCtoSPTCConverters(
 
 
 def setup_spCreatorPXD(path=0, nameOutput='pxdOnly', logLevel=LogLevel.INFO, debugVal=1):
-    """This function adds the SpacePointCreatorPXD-module to given path.
+    """This function adds the PXDSpacePointCreator-module to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
     If a path is given, 'None' is returned but will be added to given path instead.
@@ -260,8 +260,8 @@ def setup_spCreatorPXD(path=0, nameOutput='pxdOnly', logLevel=LogLevel.INFO, deb
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
-    print("setup SpacePointCreatorPXD...")
-    spCreatorPXD = register_module('SpacePointCreatorPXD')
+    print("setup PXDSpacePointCreator...")
+    spCreatorPXD = register_module('PXDSpacePointCreator')
     spCreatorPXD.logging.log_level = logLevel
     spCreatorPXD.logging.debug_level = debugVal
     spCreatorPXD.param('NameOfInstance', nameOutput)
@@ -274,7 +274,7 @@ def setup_spCreatorPXD(path=0, nameOutput='pxdOnly', logLevel=LogLevel.INFO, deb
 
 
 def setup_spCreatorSVD(path=0, nameOutput='nosingleSP', createSingleClusterSPs=False, logLevel=LogLevel.INFO, debugVal=1):
-    """This function adds the SpacePointCreatorSVD-module to given path.
+    """This function adds the SVDSpacePointCreator-module to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
     If a path is given, 'None' is returned but will be added to given path instead.
@@ -287,8 +287,8 @@ def setup_spCreatorSVD(path=0, nameOutput='nosingleSP', createSingleClusterSPs=F
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
-    print("setup SpacePointCreatorSVD...")
-    spCreatorSVD = register_module('SpacePointCreatorSVD')
+    print("setup SVDSpacePointCreator...")
+    spCreatorSVD = register_module('SVDSpacePointCreator')
     spCreatorSVD.logging.log_level = logLevel
     spCreatorSVD.logging.debug_level = debugVal
     spCreatorSVD.param('OnlySingleClusterSpacePoints', createSingleClusterSPs)

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGCONNECTIONFILTER_H_
-#define LOGCONNECTIONFILTER_H_
+#pragma once
 
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogMessage.h>
@@ -70,5 +69,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* LOGCONNECTIONFILTER_H_ */

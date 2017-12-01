@@ -86,7 +86,7 @@ namespace Belle2 {
     for (int itrk = 0; itrk < Tracks.getEntries(); ++itrk) {
 
       const Track* track = Tracks[itrk];
-      const TrackFitResult* fitResult = track->getTrackFitResult(hypothesis);
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(hypothesis);
       if (!fitResult) {
         B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
         continue;

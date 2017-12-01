@@ -17,11 +17,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-RelationSVDResultVarSet::RelationSVDResultVarSet() : TrackFindingCDC::VarSet<RelationSVDResultVarNames>()
-{
-  addProcessingSignalListener(&m_advancer);
-}
-
 void RelationSVDResultVarSet::initialize()
 {
   TrackFindingCDC::VarSet<RelationSVDResultVarNames>::initialize();

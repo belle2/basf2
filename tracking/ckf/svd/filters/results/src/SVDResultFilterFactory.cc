@@ -41,7 +41,7 @@ namespace {
   using MVASVDResultFilter = MVAFilter<SVDResultVarSet>;
 
   /// Filter using a trained MVA method
-  using MVASVDSeededResultFilter = MVAFilter<VariadicUnionVarSet<SVDResultVarSet, RelationSVDResultVarSet>>;
+  using MVASVDSeededResultFilter = MVAFilter<VariadicUnionVarSet<RelationSVDResultVarSet>>;
 }
 
 

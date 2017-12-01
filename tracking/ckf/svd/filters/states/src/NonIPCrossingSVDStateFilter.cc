@@ -42,15 +42,16 @@ Weight NonIPCrossingSVDStateFilter::operator()(const AllSVDStateFilter::Object& 
   const SpacePoint* spacePoint = state->getHit();
   B2ASSERT("Path without hit?", spacePoint);
 
-  genfit::MeasuredStateOnPlane firstMeasurement;
-  if (state->mSoPSet()) {
-    firstMeasurement = state->getMeasuredStateOnPlane();
-  } else {
-    firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
-  }
+  const genfit::MeasuredStateOnPlane& firstMeasurement = [&state, &previousStates]() {
+    if (state->mSoPSet()) {
+      return state->getMeasuredStateOnPlane();
+    } else {
+      return previousStates.back()->getMeasuredStateOnPlane();
+    }
+  }();
 
-  Vector3D position = Vector3D(firstMeasurement.getPos());
-  Vector3D momentum = Vector3D(firstMeasurement.getMom());
+  const Vector3D& position = static_cast<Vector3D>(firstMeasurement.getPos());
+  const Vector3D& momentum = static_cast<Vector3D>(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 

@@ -39,12 +39,13 @@ namespace Belle2 {
     template <class AState>
     CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
+      m_hits.reserve(path.size());
+
       for (const TrackFindingCDC::WithWeight<const AState*> state : path) {
         const Hit* hit = state->getHit();
         if (hit) {
           m_hits.push_back(hit);
         }
-
 
         if (state->isFitted()) {
           const double stateChi2 = state->getChi2();

@@ -55,6 +55,30 @@ namespace Belle2 {
       m_nCDCHitsNotAssignedPostCleaning = nCDCHitsNotAssignedPostCleaning;
     }
 
+    /** Getter for presence of hit in specific CDC Layer.
+     *
+     *  @param  cdcLayer  Specification, which layer in the CDC shall be tested for a hit.
+     *  @return true, if a non-assigned hit exists in the specified layer.
+     */
+    bool hasCDCLayer(unsigned short cdcLayer) const
+    {
+      return HitPatternCDC(m_hitPatternCDCInitializer).hasLayer(cdcLayer);
+    }
+
+    /** Setter for presence of hit in specific CDC Layer. */
+    void setCDCLayer(unsigned short cdcLayer)
+    {
+      HitPatternCDC hitPatternCDC(m_hitPatternCDCInitializer);
+      hitPatternCDC.setLayer(cdcLayer);
+      m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
+    }
+
+    /** Getter for the presence of hit in a SuperLayer. */
+    bool hasCDCSLayer(unsigned short cdcSLayer) const
+    {
+      return HitPatternCDC(m_hitPatternCDCInitializer).hasSLayer(cdcSLayer);
+    }
+
   private:
     /** Number of hits in the CDC, that were not assigned to any Track.
      *

@@ -43,12 +43,6 @@ namespace Belle2 {
   class AdvanceFilter : public
     TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
   public:
-    /// Add the advancer as a processing signal listener
-    AdvanceFilter()
-    {
-      this->addProcessingSignalListener(&m_advancer);
-    }
-
     /// Expose the parameters of the advancer.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {

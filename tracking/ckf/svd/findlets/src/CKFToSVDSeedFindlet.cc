@@ -61,7 +61,7 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
 
-  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("non_ip_crossing");
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
   moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("all");
   moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");

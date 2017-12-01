@@ -26,7 +26,7 @@ REG_MODULE(PXDclusterFilter)
 PXDclusterFilterModule::PXDclusterFilterModule() : Module()
 {
   // Set module properties
-  setDescription("The module produce a StoreArray of PXDClusters inside the ROIs.");
+  setDescription("The module produce a StoreArray of PXDClusters inside/overlapping any of the ROIs.");
 
   // Parameter definitions
   addParam("PXDClustersName", m_PXDClustersName, "The name of the StoreArray of PXDClusters to be filtered", std::string(""));
@@ -48,13 +48,9 @@ void PXDclusterFilterModule::initialize()
 
   StoreArray<ROIid>::required(m_ROIidsName);
 
-// We have to change it once the hardware type clusters are well defined
+  // We have to change it once the hardware type clusters are well defined
   StoreArray<PXDCluster> PXDClusters(m_PXDClustersName);   /**< The PXDClusters to be filtered */
   PXDClusters.isRequired();
-//   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDClusters to be filtered */
-//   PXDDigits.isRequired();
-//
-//   RelationArray relClusterDigits(storeClusters, storeDigits);
 
   m_selectorIN.registerSubset(PXDClusters, m_PXDClustersInsideROIName);
   m_selectorIN.inheritAllRelations();
@@ -91,7 +87,7 @@ bool PXDclusterFilterModule::Overlaps(const ROIid& theROI, const PXDCluster& the
 
 void PXDclusterFilterModule::event()
 {
-// We have to change it once the hardware type clusters are well defined
+  // We have to change it once the hardware type clusters are well defined
   StoreArray<PXDCluster> PXDClusters(m_PXDClustersName);   /**< The PXDClusters to be filtered */
   StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
 
@@ -103,7 +99,7 @@ void PXDclusterFilterModule::event()
   m_selectorIN.select([ROIids, this](const PXDCluster * thePxdCluster) {
     auto ROIidsRange = ROIids.equal_range(thePxdCluster->getSensorID()) ;
     for (auto theROI = ROIidsRange.first ; theROI != ROIidsRange.second; theROI ++)
-      if (Overlaps(theROI->second, *thePxdCluster)) // or Cluster has Properties
+      if (Overlaps(theROI->second, *thePxdCluster)) // *or* Cluster has intersting Properties. TODO
         return true;
 
     return false;
@@ -113,7 +109,7 @@ void PXDclusterFilterModule::event()
     m_selectorOUT.select([ROIids, this](const PXDCluster * thePxdCluster) {
       auto ROIidsRange = ROIids.equal_range(thePxdCluster->getSensorID()) ;
       for (auto theROI = ROIidsRange.first ; theROI != ROIidsRange.second; theROI ++)
-        if (Overlaps(theROI->second, *thePxdCluster)) // and Cluster has no Properties
+        if (Overlaps(theROI->second, *thePxdCluster)) // *and* Cluster has NO intersting Properties. TODO
           return false;
 
       return true;

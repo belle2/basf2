@@ -10,7 +10,6 @@
 #include <tracking/ckf/svd/filters/states/SVDStateFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
@@ -31,6 +30,7 @@
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 #include <tracking/ckf/svd/filters/states/SimpleSVDStateFilter.h>
 #include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
+#include <tracking/ckf/svd/filters/states/NonIPCrossingSVDStateFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -84,6 +84,7 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
   return {
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
+    {"non_ip_crossing", "all combinations are fine, except for crossing IPs"},
     {"advance", "extrapolate the states"},
     {"fit", "update the mSoP using a Kalman Filter"},
     {"truth", "monte carlo truth"},
@@ -103,6 +104,8 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDStateFilter>>();
   } else if (filterName == "all") {
     return std::make_unique<AllSVDStateFilter>();
+  } else if (filterName == "non_ip_crossing") {
+    return std::make_unique<NonIPCrossingSVDStateFilter>();
   } else if (filterName == "advance") {
     return std::make_unique<AdvanceFilter<CKFToSVDState, SVDAdvancer>>();
   } else if (filterName == "fit") {

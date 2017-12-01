@@ -9,27 +9,30 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/ckf/general/findlets/StateCreator.dcl.h>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   class RecoTrack;
+  class CKFToSVDState;
   class ModuleParamList;
 
-  /// Relate the SVD and CDC tracks in the given relations also in the store array.
-  class RelationApplier : public TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> {
+  /// An adaption of the normal state creator introducing another parameter to reverse the seed.
+  class SVDStateCreatorWithReversal : public StateCreator<RecoTrack, CKFToSVDState> {
+    /// Parent class
+    using Super = StateCreator<RecoTrack, CKFToSVDState>;
+
   public:
-    /// The parent findlet
-    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>;
+    /// Create states from the space points, including a reverse flag or not
+    void apply(const std::vector<RecoTrack*>& objects, std::vector<CKFToSVDState>& states) final;
 
-    /// Copy the relations to the store array
-    void apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToSVD) final;
-
-    /// Expose parameters
+    /// Expose the parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
   private:
-    /// Write out the relations with a -1 as weight, indicating the reversal of the CDC track.
-    bool m_param_reverseStoredRelations = false;
+    /// Reverse the seed.
+    bool m_param_reverseSeed = false;
   };
 }

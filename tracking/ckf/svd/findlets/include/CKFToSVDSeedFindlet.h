@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
-#include <tracking/ckf/general/findlets/StateCreator.dcl.h>
+#include <tracking/ckf/svd/findlets/SVDStateCreatorWithReversal.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
@@ -73,7 +73,7 @@ namespace Belle2 {
     /// Findlet for loading the space points
     SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks
-    StateCreator<RecoTrack, CKFToSVDState> m_stateCreatorFromTracks;
+    SVDStateCreatorWithReversal m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
     /// Relation Creator

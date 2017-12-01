@@ -10,6 +10,8 @@
 #include <tracking/ckf/svd/findlets/RelationApplier.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+
 using namespace Belle2;
 
 void RelationApplier::apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>&
@@ -18,6 +20,17 @@ void RelationApplier::apply(const std::vector<TrackFindingCDC::WeightedRelation<
   for (const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>& relation : relationsCDCToSVD) {
     const RecoTrack* cdcTrack = relation.getFrom();
     const RecoTrack* svdTrack = relation.getTo();
-    cdcTrack->addRelationTo(svdTrack);
+    if (m_param_reverseStoredRelations) {
+      cdcTrack->addRelationTo(svdTrack, -1);
+    } else {
+      cdcTrack->addRelationTo(svdTrack);
+    }
   }
+}
+
+void RelationApplier::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter("reverseStoredRelations", m_param_reverseStoredRelations,
+                                "Write out the relations with a -1 as weight, indicating the reversal of the CDC track.",
+                                m_param_reverseStoredRelations);
 }

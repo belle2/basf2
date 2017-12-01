@@ -4,7 +4,7 @@ INCDIR=$(BELLE2_DAQ_SLC)/include/daq/slc/
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/hvmasterd
-	@ ln -s $(BELLE2_DAQ_SLC)/apps/hvmasterd/include/* $(INCDIR)/apps/hvmasterd
+	@ ln -fs $(BELLE2_DAQ_SLC)/apps/hvmasterd/include/* $(INCDIR)/apps/hvmasterd
 #	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/hvmasterd/include/* $(INCDIR)/apps/hvmasterd
 
 apps/hvmasterd: %:

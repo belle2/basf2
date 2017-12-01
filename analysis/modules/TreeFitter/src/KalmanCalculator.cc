@@ -51,7 +51,8 @@ namespace TreeFitter {
     m_Rinverse = RInvtemp.inverse();
 
     //JFK: if one of the elements is infty or nan we can stop here 2017-09-28
-    if ((!std::isfinite(m_Rinverse(0, 0))) || (!std::isfinite(m_Rinverse(1, 1))) || (!std::isfinite(m_Rinverse(2, 2)))) {
+    // min matrix size is one
+    if (!std::isfinite(m_Rinverse(0, 0))) {
       return ErrCode::inversionerror;
     }
 

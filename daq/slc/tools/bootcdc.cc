@@ -136,7 +136,7 @@ int main(int argc, char** argv)
   }
   if (cpr) {
     if (nsm) sleep(1);
-    sprintf(s, "killall runcontrold rocontrold basf2 des_ser_ROPC_main eb0");
+    sprintf(s, "killall runcontrold rocontrold basf2 des_ser_ROPC_main");
     printf("%s\n", s);
     system(s);
     for (int i = 0; i < ncpr; i++) {

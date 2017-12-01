@@ -78,7 +78,7 @@ void TelClusterizerModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeDigits.required();
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

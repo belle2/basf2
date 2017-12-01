@@ -147,8 +147,10 @@ void FullSimModule::initialize()
   //Register the collections we want to use
   StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
   mcParticles.registerInDataStore();
-  StoreArray<MCParticle>::required(m_mcParticleInputColName);
-  StoreObjPtr<EventMetaData>::required();
+
+  //Make sure these collections already exist
+  StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();

@@ -10,7 +10,6 @@ import pickle
 import sys
 import os
 import glob
-import hashlib
 
 
 def get_background_files():
@@ -44,15 +43,10 @@ def get_background_files():
     # sort for easier comparison
     bg = sorted(bg)
 
-    print("{: >65} {: >65} ".format("- Background file name -", "- sha256 -"))
-    all_hexes = ""
+    print("{: >65} {: >65} ".format("- Background file name -", "- file size -"))
     for f in bg:
-        hex_hash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
-        all_hexes = all_hexes + hex_hash
-        print("{: >65} {: >65} ".format(f, hex_hash))
-
-    print("{: >65} {: >65}".format("---", "---"))
-    print("{: >65} {: >65}".format("sha256 of all background file hashes", hashlib.sha256(all_hexes.encode()).hexdigest()))
+        fsize = os.path.getsize(f)
+        print("{: >65} {: >65} ".format(f, fsize))
 
     return bg
 

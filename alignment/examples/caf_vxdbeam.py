@@ -72,7 +72,31 @@ for layer in range(1, 7):
             millepede.fixVXDid(layer, ladder, sensor)
             pass
 
+
 caf = CAF()
+
+# Uncomment following line to use different global tag for payloads (not found in local DB below)
+# Default can be loaded from basf2.get_default_global_tags()
+#
+# millepede.use_central_database(global_tag=basf2.get_default_global_tags())
+
+
+# For testing misalignment, set it up in a local DB and uncomment following (with path to your local DB)
+#
+# millepede.use_local_database(os.path.abspath('localdb/database.txt'), directory="")
+
+
+# Uncomment following to run on batch system (KEKCC)
+#
+# millepede.max_files_per_collector_job = 1
+# millepede.backend_args = {"queue": "s"}
+# caf.backend = backends.LSF()
+
+
+# Or to run with local backend with e.g. 10 processes, do:
+#
+# millepede.max_files_per_collector_job = 1
+# caf.backend = backends.Local(10)
 
 caf.add_calibration(millepede.create('vxd_shells_beamspot', inputFiles))
 

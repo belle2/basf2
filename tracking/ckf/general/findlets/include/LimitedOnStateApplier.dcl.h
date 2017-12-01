@@ -31,7 +31,7 @@ namespace Belle2 {
     LimitedOnStateApplier();
     /**
      */
-    void apply(const std::vector<const AState*>& currentPath,
+    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
 
     /// Copy the filter operator to this method

@@ -44,11 +44,7 @@ bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
 
 bool NSMVHandlerRCState::handleGetText(std::string& val)
 {
-  if (m_rcnode.isUsed()) {
-    val = m_rcnode.getState().getLabel();
-  } else {
-    val = "OFF";
-  }
+  val = m_rcnode.getState().getLabel();
   return true;
 }
 

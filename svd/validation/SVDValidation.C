@@ -2,6 +2,7 @@
 <header>
 <input>SVDValidationTTree.root</input>
 <input>SVDValidationTTreeStrip.root</input>
+<input>SVDValidationTTreeSpacePoint.root</input>
 <input>SVDValidationTTreeSimhit.root</input>
 <description>
     This ROOT macro is used for the SVD validation. It creates several
@@ -285,6 +286,7 @@ void SVDValidation()
   // open the files with simulated and reconstructed events data
   TFile* input = TFile::Open("../SVDValidationTTree.root");
   TFile* inputStrip = TFile::Open("../SVDValidationTTreeStrip.root");
+  TFile* inputSpacePoint = TFile::Open("../SVDValidationTTreeSpacePoint.root");
   TFile* inputSimhit = TFile::Open("../SVDValidationTTreeSimhit.root");
   
   // open the output file for the validation histograms
@@ -294,10 +296,21 @@ void SVDValidation()
   // loads ttrees
   TTree* tree = (TTree*) input->Get("tree");
   TTree* treeStrip = (TTree*) inputStrip->Get("tree");
+  TTree* treeSpacePoint = (TTree*) inputSpacePoint->Get("tree");
   TTree* treeSimhit = (TTree*) inputSimhit->Get("tree");
   
   // =========================== Plotting starts here ===========================
   
+  // SpacePoint TimeU
+  plotThisNoSideLoop(Type,  "spTimeU", "SpacePoint Time U", 200, -100, 100, "SP time u (ns)",
+           treeSpacePoint, "time_u", "time of the U cluster",
+           "between 20 and 40 ns", contact_str);
+
+  // SpacePoint TimeV
+  plotThisNoSideLoop(Type,  "spTimeV", "SpacePoint Time V", 200, -100, 100, "SP time v (ns)",
+           treeSpacePoint, "time_v", "time of the V cluster",
+           "between 20 and 40 ns", contact_str);
+
   // Cls size
   plotThis(Type, Side, "cSize", "Cluster size", 9, 0.5, 9.5, "Cls size",
            tree, "cluster_size", "# of strips in clusters",
@@ -322,38 +335,35 @@ void SVDValidation()
   
   // Cluster charge     
   name = "Cluster Charge";
-  plotThis(Type, Side, "cClsCharge", name, 100, 0, 350, Form("%s (# electrons)",name),
+  plotThis(Type, Side, "cClsCharge", name, 50, 0, 120000, Form("%s (# electrons)",name),
            tree, "cluster_charge", Form("%s distributions", name),
-           "Should peak around 70-80 ADU", contact_str);
+           "Should peak around 20-40 ke", contact_str);
   
+  // Cluster SN 
+  name = "Cluster SN ratio";
+  plotThis(Type, Side, "cClusterSN", name, 121, -0.5, 120.5, Form("%s",name),
+         tree, "cluster_snr", Form("%s distributions", name),
+         "Should peak at around 20", contact_str);
+
   // Strip charge   
   name = "Strip Charge";
-  plotThis(Type, Side, "cStripCharge", name, 100, 0, 200, Form("%s (# electrons)",name),
+  plotThis(Type, Side, "cStripCharge", name, 50, 0, 120000, Form("%s (# electrons)",name),
 	   treeStrip, "strip_charge", Form("%s distributions", name),
-	   "Should peak around 20-30 ADU", contact_str);
+	   "Should peak around 15-30 ke", contact_str);
 
-  // Strip SN 
-  name = "Strip SN ratio";
-  plotThis(Type, Side, "cStripSN", name, 100, 0, 0.3, Form("%s",name),
-         treeStrip, "strip_charge/strip_noise", Form("%s distributions", name),
-         "Should peak at around 20", contact_str);
   
   // Simhits: dE/dx 
   name = "dE/dx Simhits";
   plotThisNoSideLoop(Type, "cdEdx", name, 100, 1, 10, Form("%s (MeV/cm)",name),
   		     treeSimhit, "simhit_dEdx*1000", Form("%s distributions", name),
   		     "Should peak around 2.8 MeV/cm", contact_str);
-  
-  //cls size v/s cls phi
-  //    plotThis2d(Type, Side,"cSize_phi", "Cluster size", 100, 0.5, 10, "Cls size",100,0,400,"cls phi",
-  //	     tree, "cluster_size","cluster_phi", "# of str  ips in clusters",
-  //	     " ", contact_modify);
 
   //mean of cluster size v/s phi
   name = "cluster size v/s phi";
   plotMean(Type, Side, "cSizeMean",name,  100, 0, 360, Form("%s",name),
            tree,"Mean of cluster size w.r.t to each ladder while error bar represent the RMS/#sqrt{N}, here N is number of entries in particular cluster",
            " ", contact_str);
+
   
 }
 

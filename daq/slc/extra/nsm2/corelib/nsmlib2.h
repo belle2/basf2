@@ -140,8 +140,8 @@ NSMcontext* nsmlib_init(const char* nodename, const char* host,
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
-//char* nsmlib_parsefile(const char* datname, int revision, const char* incpath,
-//                       char* fmtstr, int* revisionp);
+//char *nsmlib_parsefile(const char *datname, int revision, const char *incpath,
+//           char *fmtstr, int *revisionp);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {

@@ -19,7 +19,6 @@ EKLMDigit::EKLMDigit()
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Plane = -1;
   m_Strip = -1;
-  m_good = false;
   m_Charge = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
@@ -32,7 +31,6 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
     m_Strip(hit->getStrip())
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
-  m_good = false;
   m_Charge = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
@@ -104,12 +102,7 @@ void EKLMDigit::setGeneratedNPE(int npe)
 
 bool EKLMDigit::isGood() const
 {
-  return m_good;
-}
-
-void EKLMDigit::isGood(bool status)
-{
-  m_good = status;
+  return m_fitStatus == EKLM::c_FPGASuccessfulFit;
 }
 
 int EKLMDigit::getPlane() const

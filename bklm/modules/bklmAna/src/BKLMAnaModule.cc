@@ -11,7 +11,6 @@
 #include <bklm/modules/bklmAna/BKLMAnaModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/GearDir.h>
 
@@ -23,11 +22,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <genfit/Track.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <bklm/dataobjects/BKLMDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/MuidHit.h>
 #include <tracking/dataobjects/Muid.h>
 
@@ -59,6 +54,10 @@ BKLMAnaModule::~BKLMAnaModule()
 
 void BKLMAnaModule::initialize()
 {
+  hits2D.isRequired();
+  extHits.isRequired();
+  tracks.isRequired();
+
 
   m_file = new TFile(m_filename.c_str(), "RECREATE");
 
@@ -142,20 +141,12 @@ void BKLMAnaModule::event()
   //unsigned long eventNumber = eventMetaData->getEvent();
   unsigned long runNumber = eventMetaData->getRun();
   //unsigned long expNumber = eventMetaData->getExperiment();
-  //---------------------------------------------
-  // Get BKLM hits collection from the data store
-  //---------------------------------------------
   //StoreArray<RecoTrack> recoTracks;
   //numRecoTrk = recoTracks.getEntries();
-  StoreArray<BKLMTrack> bklmtracks;
-  StoreArray<BKLMHit2d> hits2D;
-  StoreArray<BKLMHit1d> hits1D;
-  StoreArray<BKLMDigit> digits;
-  StoreArray<ExtHit> extHits;
-  StoreArray<Track> tracks;
-  StoreArray<TrackFitResult> trackFitResults;
-  StoreArray<MuidHit> muidHits;
-  StoreArray<Muid> muids;
+  //StoreArray<BKLMTrack> bklmtracks;
+  //StoreArray<TrackFitResult> trackFitResults;
+  //StoreArray<MuidHit> muidHits;
+  //StoreArray<Muid> muids;
   //StoreArray<MCParticle> mcParticles;
 
   //set<int> m_pointUsed;

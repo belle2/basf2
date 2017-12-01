@@ -19,19 +19,22 @@ import sys
 
 set_log_level(LogLevel.ERROR)
 
-# Define a file with measured BG for overlay
-bg = 'BGforOverlay.root'
-if not os.path.exists(bg):
-    print(bg + ' not found')
-    print('You can prepare the sample by: basf2 background/examples/makeBGOverlayFile.py')
-    sys.exit(1)
+if 'BELLE2_BACKGROUND_DIR' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG overlay samples')
+    sys.exit()
+
+# background overlay files
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if len(bg) == 0:
+    B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
+    sys.exit()
 
 # Create path
 main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # generate BBbar events
@@ -39,7 +42,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # Simulation
-add_simulation(main, bkgfiles=[bg], bkgOverlay=True)
+add_simulation(main, bkgfiles=bg, bkgOverlay=True)
 
 # set debug level for overlay executor module
 for m in main.modules():

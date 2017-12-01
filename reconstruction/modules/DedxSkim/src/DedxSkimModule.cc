@@ -126,8 +126,6 @@ void DedxSkimModule::event()
     // only using the electron hypothesis
     if (m_Bhabha == true || m_RadBhabha == true || m_TwoPhoton == true) {
 
-      if (!isGoodTrack(track, Const::electron)) break;
-
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::electron);
       TVector3 trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_e * mass_e);
@@ -141,8 +139,6 @@ void DedxSkimModule::event()
 
     // only using the muon hypothesis
     if (m_DiMuon == true || m_RadDiMuon == true) {
-
-      if (!isGoodTrack(track, Const::muon)) break;
 
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::muon);
       TVector3 trackMom = fitResult->getMomentum();
@@ -167,7 +163,7 @@ bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable&
 {
 
   // check if the track fit failed
-  const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+  const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
   if (!fitResult) {
     B2WARNING("No related fit for this track, skipping");
     return false;

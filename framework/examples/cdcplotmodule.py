@@ -9,19 +9,16 @@
 ###############################################################################
 
 from basf2 import *
+from simulation import add_simulation
 
-try:
-    import matplotlib
-    # to avoid loading gtk backend in the following imports
-    # (fails if no X11 display is available)
-    matplotlib.use('agg')
+import matplotlib
+# to avoid loading gtk backend in the following imports
+# (fails if no X11 display is available)
+matplotlib.use('agg')
 
-    import matplotlib.pyplot as plt
-    from matplotlib.patches import Circle
-    import matplotlib.cm as colormap
-except:
-    B2FATAL('This example requires Matplotlib. Please install'
-            ' it using "pip3 install matplotlib" and try again.')
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+import matplotlib.cm as colormap
 
 from ROOT import Belle2
 import os
@@ -34,7 +31,6 @@ def plot(x, y, col, show=0):
     Returns a pyplot.figure that can be saved.
     """
     fig = plt.figure(figsize=(8, 8))
-    fig.subplots_adjust(bottom=0.1, left=0.1, right=0.95, top=0.95)
     ax = fig.add_subplot(111)
 
     # draw the x/y arrays. note that looping over the hits and
@@ -56,6 +52,7 @@ def plot(x, y, col, show=0):
 
     ax.set_xlim(-130, 130)
     ax.set_ylim(-130, 130)
+    fig.tight_layout()
     if show:
         plt.show()
     return fig
@@ -117,22 +114,6 @@ class CDCPlotModule(Module):
 
 # Normal steering file part begins here
 
-# Create main path
-main = create_path()
-
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [5])
-
-gearbox = register_module('Gearbox')
-geo = register_module('Geometry')
-# Outer detectors are disabled for performance reasons.
-# Note that this may produce a larger number of particles reentering
-# the detector from the outside.
-geo.param('excludedComponents', ['ARICH', 'TOP', 'ECL', 'BKLM', 'EKLM'])
-
-# particle gun to shoot particles in the detector
-pGun = register_module('ParticleGun')
-
 # choose the particles you want to simulate
 param_pGun = {
     'pdgCodes': [211, -211],
@@ -150,21 +131,12 @@ param_pGun = {
     'zVertexParams': [0.0, 0.0],
 }
 
-pGun.param(param_pGun)
-
-# simulation
-g4sim = register_module('FullSim')
-# make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
-
-plotmodule = CDCPlotModule()
-
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-main.add_module(geo)
-main.add_module(pGun)
-main.add_module(g4sim)
-main.add_module(plotmodule)
+# Create main path
+main = create_path()
+main.add_module('EventInfoSetter', evtNumList=[5])
+main.add_module('ParticleGun', **param_pGun)
+add_simulation(main)
+main.add_module(CDCPlotModule())
 
 process(main)
 print(statistics)

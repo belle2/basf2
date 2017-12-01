@@ -10,9 +10,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  using BasePXDStateFilter = TrackFindingCDC::Filter<std::pair<const std::vector<const CKFToPXDState*>, CKFToPXDState*>>;
+  using BasePXDStateFilter =
+    TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>, CKFToPXDState*>>;
 }

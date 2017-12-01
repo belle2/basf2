@@ -8,13 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROOTOUTPUTMODULE_H
-#define ROOTOUTPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
-#include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
+#include <framework/datastore/DataStore.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -187,5 +185,3 @@ namespace Belle2 {
     bool m_buildIndex{true};
   };
 } // end namespace Belle2
-
-#endif

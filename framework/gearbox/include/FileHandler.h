@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_GEARBOX_FILEHANDLER_H
-#define FRAMEWORK_GEARBOX_FILEHANDLER_H
 
 #include <framework/gearbox/InputHandler.h>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -88,5 +86,3 @@ namespace Belle2 {
     };
   } //namespace gearbox
 } //namespace Belle2
-
-#endif //FRAMEWORK_GEARBOX_FILEHANDLER_H

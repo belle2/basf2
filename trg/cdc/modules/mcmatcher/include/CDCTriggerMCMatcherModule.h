@@ -3,6 +3,11 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 namespace Belle2 {
 
   /** A module to match CDCTriggerTracks to MCParticles.
@@ -44,6 +49,15 @@ namespace Belle2 {
     bool m_onlyPrimaries;
     /** switch for creating relations for clones and merged tracks */
     bool m_relateClonesAndMerged;
+
+    /** list of hits that are used for the matching */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** list of CDCTriggerTracks to be matched */
+    StoreArray<CDCTriggerTrack> m_prTracks;
+    /** list of MCParticles to be matched */
+    StoreArray<MCParticle> m_mcParticles;
+    /** list of MCParticles considered as trackable */
+    StoreArray<MCParticle> m_mcTracks;
   };
 }
 #endif

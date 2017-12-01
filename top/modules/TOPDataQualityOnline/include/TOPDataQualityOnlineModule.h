@@ -140,6 +140,10 @@ namespace Belle2 {
     TOPDQStat m_laserHitsCounter = TOPDQStat(16); /**< counter for lawer hits */
     TOPDQStat m_calHitsCounter = TOPDQStat(16); /**< counter for calibration hits */
     TOPDQStat m_otherHitsCounter = TOPDQStat(16); /**< counter for other hits */
+
+    // dataobjects
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+
   };
 
 } //namespace Belle2

@@ -18,11 +18,11 @@ using namespace TrackFindingCDC;
 
 bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
 {
-  const std::vector<const CKFToSVDState*>& previousStates = pair->first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
-  std::vector<const CKFToSVDState*> allStates = previousStates;
-  allStates.push_back(state);
+  std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>> allStates = previousStates;
+  allStates.emplace_back(state, 0);
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();
   B2ASSERT("Path without seed?", seedTrack);

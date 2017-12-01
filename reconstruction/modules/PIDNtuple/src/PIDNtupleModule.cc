@@ -122,7 +122,7 @@ void PIDNtupleModule::event()
   // loop over tracks
   for (const auto& track : tracks) {
 
-    const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!trackFit) {
       B2WARNING("No track fit result... Skipping.");
       continue;

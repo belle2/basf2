@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 #include <map>
 
@@ -43,6 +45,10 @@ namespace Belle2 {
      */
     float getWireGain(int wire) const
     {
+      if (wire < 0 || (unsigned)wire >= m_wiregains.size()) {
+        B2WARNING("Asking for a CDC Wire that is not found!");
+        return 1.0;
+      }
       double gain = m_wiregains[wire];
       return gain;
     };

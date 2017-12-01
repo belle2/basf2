@@ -179,6 +179,7 @@ void ERecoMasterCallback::load(const DBObject& db) throw(RCHandlerException)
 {
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
+    printf("Loading : %s\n", node.getName().c_str());
     if (node.getName().find("EVP") == std::string::npos) {
       while (true) {
         bool configured = true;
@@ -194,21 +195,12 @@ void ERecoMasterCallback::load(const DBObject& db) throw(RCHandlerException)
       }
     }
     if (node.getState() != RCState::READY_S) {
-      if (node.getName() == "ROISENDER") {
-        std::string enabled = std::string("ROI=") + db("roisender").getText("enabled");
-        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD, enabled))) {
-          setState(node, RCState::LOADING_TS);
-          LogFile::debug("%s >> LOADING", node.getName().c_str());
-        } else {
-          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
-        }
+      printf("ERecoMasterCallback::load : loading %s\n", (node.getName()).c_str());
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD))) {
+        setState(node, RCState::LOADING_TS);
+        LogFile::debug("%s >> LOADING", node.getName().c_str());
       } else {
-        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD))) {
-          setState(node, RCState::LOADING_TS);
-          LogFile::debug("%s >> LOADING", node.getName().c_str());
-        } else {
-          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
-        }
+        throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
       }
     } else {
       LogFile::debug("%s is READY", node.getName().c_str());

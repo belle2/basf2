@@ -25,7 +25,7 @@ using namespace TrackFindingCDC;
 
 bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
 {
-  const std::vector<const CKFToPXDState*>& previousStates = pair->first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& previousStates = pair->first;
   CKFToPXDState* state = pair->second;
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();
@@ -40,14 +40,6 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
   } else {
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
-
-  const std::vector<CDCHit*>& cdcHits = seedTrack->getSortedCDCHitList();
-  const std::vector<SVDCluster*>& svdHits = seedTrack->getSortedSVDHitList();
-
-  var<named("seed_cdc_hits")>() = cdcHits.size();
-  var<named("seed_svd_hits")>() = svdHits.size();
-  var<named("seed_lowest_cdc_layer")>() = cdcHits.empty() ? 0 : cdcHits.front()->getICLayer();
-  var<named("seed_lowest_svd_layer")>() = svdHits.empty() ? 0 : svdHits.front()->getSensorID().getLayerNumber();
 
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());

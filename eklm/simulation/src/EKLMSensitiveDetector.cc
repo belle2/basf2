@@ -18,7 +18,6 @@
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -58,11 +57,10 @@ EKLMSensitiveDetector(G4String name)
       }
     }
   }
-  StoreArray<EKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
-  simHits.registerInDataStore();
-  particles.registerRelationTo(simHits);
-  RelationArray particleToSimHits(particles, simHits);
+  m_SimHits.registerInDataStore();
+  particles.registerRelationTo(m_SimHits);
+  RelationArray particleToSimHits(particles, m_SimHits);
   registerMCParticleRelation(particleToSimHits);
 }
 
@@ -103,8 +101,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                 aStep->GetPreStepPoint()->GetPosition());
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
-  StoreArray<EKLMSimHit> simHits;
-  EKLMSimHit* hit = simHits.appendNew();
+  EKLMSimHit* hit = m_SimHits.appendNew();
   CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
   hit->setMomentum(TLorentzVector(trackMomentum.x(), trackMomentum.y(),
                                   trackMomentum.z(), track.GetTotalEnergy()));
@@ -127,8 +124,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setVolumeID(stripGlobal);
   /* Relation. */
   StoreArray<MCParticle> particles;
-  RelationArray particleToSimHits(particles, simHits);
-  particleToSimHits.add(track.GetTrackID(), simHits.getEntries() - 1);
+  RelationArray particleToSimHits(particles, m_SimHits);
+  particleToSimHits.add(track.GetTrackID(), m_SimHits.getEntries() - 1);
   return true;
 }
 

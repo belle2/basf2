@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*
+"""
+<input>../1163300003.dst.root</input>
+<output>../1163300003.ntup.root</output>
+<contact> Racha Cheaib rcheaib@olemiss.edu, Mario Merola mario.merola@na.infn.it</contact>
+<interval>nightly</interval>
+</header>
+"""
 #######################################################
 #
 # This script demonstrates how to reconstruct Btag using
-# generically trained FEI and how to validate D(*)lv and D(*)
-#
-#
-# This script is used as well for the production of
-# of official monitoring and validation single tag samples.
-#
-# Contributors: Racha Cheaib April 2017
-#
-#  FEI training copied from Anze Zupanc directory:
-# /home/belle/zupanc/belle2/physics/FEI/Belle2_Generic_2016_1_looseMCMatching
-#
-#
-#  Release required: build-2017-03-06
+# generically trained FEI and how to validate D(*)+tau- v and D(*)
+#  Release required: build-2017-09-08 or later
 #
 ######################################################
 import sys
@@ -30,8 +25,13 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-gb2_setuprel = "build-2017-03-06"
+gb2_setuprel = "build-2017-09-08"
 
+# reset_database()
+use_local_database('/cvmfs/belle.cern.ch/conditions/GT_gen_prod_003.01_Master-20170721-132500-FEI-skim-a.txt', readonly=True)
+
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
 
 # their names in the ntuple are human readable
 from variables import variables
@@ -46,43 +46,47 @@ variables.addAlias('looseMCWrongDaughterBiB', 'extraInfo(looseMCWrongDaughterBiB
 variables.addAlias('d0_dmID', 'daughter(0,extraInfo(decayModeID))')
 variables.addAlias('d1_dmID', 'daughter(1,extraInfo(decayModeID))')
 variables.addAlias('d0_d0_dmID', 'daughter(0,daughter(0,extraInfo(decayModeID)))')
-variables.addAlias('d1_d0_dmID', 'daughter(1,daughter(0,extraInfo(decayModeID)))')
-variables.addAlias('d1d2_M', 'daughterInvariantMass(1,2)')
-variables.addAlias('d1d3_M', 'daughterInvariantMass(1,3)')
-variables.addAlias('d1d4_M', 'daughterInvariantMass(1,4)')
-variables.addAlias('d2d3_M', 'daughterInvariantMass(2,3)')
-variables.addAlias('d2d4_M', 'daughterInvariantMass(2,4)')
-variables.addAlias('d3d4_M', 'daughterInvariantMass(3,4)')
-variables.addAlias('d1d2d3_M', 'daughterInvariantMass(1,2,3)')
-variables.addAlias('d2d3d4_M', 'daughterInvariantMass(2,3,4)')
-variables.addAlias('d1d2d3d4_M', 'daughterInvariantMass(1,2,3,4)')
+
+# tau daughter PID
+variables.addAlias('d1_d0_electronID', 'daughter(1,daughter(0,electronID))')
+variables.addAlias('d1_d0_muonID', 'daughter(1,daughter(0,muonID))')
+variables.addAlias('d1_d0_pionID', 'daughter(1,daughter(0,pionID))')
+variables.addAlias('d1_d0_kaonID', 'daughter(1,daughter(0,kaonID))')
 
 
-variables.addAlias('d0_d1_dmID', 'daughter(0,daughter(1,extraInfo(decayModeID)))')
+# D* daughter pion PID
+variables.addAlias('d0_d1_electronID', 'daughter(0,daughter(1,electronID))')
+variables.addAlias('d0_d1_muonID', 'daughter(0,daughter(1,muonID))')
+variables.addAlias('d0_d1_pionID', 'daughter(0,daughter(1,pionID))')
+variables.addAlias('d0_d1_kaonID', 'daughter(0,daughter(1,kaonID))')
 
+
+# D0 daughters : K- pi + PID
+variables.addAlias('d0_d0_d0_electronID', 'daughter(0,daughter(0,daughter(0,electronID)))')
+variables.addAlias('d0_d0_d0_muonID', 'daughter(0,daughter(0,daughter(0,muonID)))')
+variables.addAlias('d0_d0_d0_pionID', 'daughter(0,daughter(0,daughter(0,pionID)))')
+variables.addAlias('d0_d0_d0_kaonID', 'daughter(0,daughter(0,daughter(0,kaonID)))')
+
+variables.addAlias('d0_d0_d1_electronID', 'daughter(0,daughter(0,daughter(1,electronID)))')
+variables.addAlias('d0_d0_d1_muonID', 'daughter(0,daughter(0,daughter(1,muonID)))')
+variables.addAlias('d0_d0_d1_pionID', 'daughter(0,daughter(0,daughter(1,pionID)))')
+variables.addAlias('d0_d0_d1_kaonID', 'daughter(0,daughter(0,daughter(1,kaonID)))')
 
 # Momenta
 variables.addAlias('d0_p', 'daughter(0,p)')
 variables.addAlias('d0_pCMS', 'daughter(0,useCMSFrame(p))')
 variables.addAlias('d1_p', 'daughter(1,p)')
-variables.addAlias('d2_p', 'daughter(2,p)')
-variables.addAlias('d3_p', 'daughter(3,p)')
+variables.addAlias('d1_pCMS', 'daughter(1,useCMSFrame(p))')
 variables.addAlias('d0_d0_p', 'daughter(0,daughter(0,p))')
+variables.addAlias('d0_d1_p', 'daughter(0,daughter(1,p))')
 variables.addAlias('d0_d0_pCMS', 'daughter(0,daughter(0,useCMSFrame(p)))')
 variables.addAlias('d0_d1_pCMS', 'daughter(0,daughter(1,useCMSFrame(p)))')
-variables.addAlias('d0_d1_p', 'daughter(0,daughter(1,p))')
-variables.addAlias('d0_d2_p', 'daughter(0,daughter(2,p))')
-variables.addAlias('d0_d3_p', 'daughter(0,daughter(3,p))')
-variables.addAlias('d0_d1_d0_p', 'daughter(0,daughter(1,daughter(0,p)))')
-variables.addAlias('d0_d1_d1_p', 'daughter(0,daughter(1,daughter(1,p)))')
-variables.addAlias('d0_d1_d0_pCMS', 'daughter(0,daughter(1,daughter(0,useCMSFrame(p))))')
-variables.addAlias('d0_d1_d1_pCMS', 'daughter(0,daughter(1,daughter(1,useCMSFrame(p))))')
-variables.addAlias('d0_d0_d2_p', 'daughter(0,daughter(0,daughter(2,p)))')
-variables.addAlias('d0_d0_d3_p', 'daughter(0,daughter(0,daughter(3,p)))')
+variables.addAlias('d1_d0_p', 'daughter(1,daughter(0,p))')
+variables.addAlias('d1_d0_pCMS', 'daughter(1,daughter(0,useCMSFrame(p)))')
 
 variables.addAlias('d0_d0_M', 'daughter(0,daughter(0,InvM))')
 variables.addAlias('d0_d1_M', 'daughter(0,daughter(1,InvM))')
-variables.addAlias('d0_d0_d1_M', 'daughter(0,daughter(0,daughter(1,InvM)))')
+variables.addAlias('d1_d0_M', 'daughter(1,daughter(0,InvM))')
 variables.addAlias('d0_M', 'daughter(0,InvM)')
 variables.addAlias('d1_M', 'daughter(1,InvM)')
 
@@ -91,14 +95,20 @@ variables.addAlias('d0_costheta', 'daughter(0,cosTheta)')
 variables.addAlias('d0_costhetaCMS', 'daughter(0,useCMSFrame(cosTheta))')
 variables.addAlias('d0_d0_costhetaCMS', 'daughter(0,daughter(0,useCMSFrame(cosTheta)))')
 variables.addAlias('d0_d1_costhetaCMS', 'daughter(0,daughter(1,useCMSFrame(cosTheta)))')
-variables.addAlias('d0_d1_d0_costhetaCMS', 'daughter(0,daughter(1,daughter(0,useCMSFrame(cosTheta))))')
-variables.addAlias('d0_d1_d1_costhetaCMS', 'daughter(0,daughter(1,daughter(1,useCMSFrame(cosTheta))))')
 variables.addAlias('d1_costheta', 'daughter(1,cosTheta)')
 
 variables.addAlias('d0_d0_E', 'daughter(0,daughter(0,E))')
 variables.addAlias('d0_d1_E', 'daughter(0,daughter(1,E))')
 variables.addAlias('d0_E', 'daughter(0,E)')
 variables.addAlias('d1_E', 'daughter(1,E)')
+variables.addAlias('d1_d0_E', 'daughter(1,daughter(0,E))')
+
+
+variables.addAlias('d0_d0_eCMS', 'daughter(0,daughter(0,useCMSFrame(E)))')
+variables.addAlias('d0_d1_eCMS', 'daughter(0,daughter(1,useCMSFrame(E)))')
+variables.addAlias('d0_eCMS', 'daughter(0,useCMSFrame(E))')
+variables.addAlias('d1_eCMS', 'daughter(1,useCMSFrame(E))')
+variables.addAlias('d1_d0_eCMS', 'daughter(1,daughter(0,useCMSFrame(E)))')
 
 variables.addAlias('d0_deltaE', 'daughter(0,deltaE)')
 variables.addAlias('d0_Mbc', 'daughter(0,Mbc)')
@@ -124,17 +134,12 @@ variables.addAlias('d0_d0_d3_PDG', 'daughter(0,daughter(0,daughter(3,PDG)))')
 variables.addAlias('d0_mcPDG', 'daughter(0,mcPDG)')
 variables.addAlias('d1_mcPDG', 'daughter(1,mcPDG)')
 variables.addAlias('d1_d0_mcPDG', 'daughter(1,daughter(0,mcPDG))')
-variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))')
-variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
+variables.addAlias('d0_d0_mcPDG', 'daughter(0,daughter(0,mcPDG))')
+variables.addAlias('d0_d1_mcPDG', 'daughter(0,daughter(1,mcPDG))')
 
 
-variables.addAlias('tau_eid', 'daughter(1,daughter(0,electronID))')
-variables.addAlias('tau_muid', 'daughter(1,daughter(0,muonID))')
-outputRootFile = 'dstarptaunuOutput.root'
+outputRootFile = '../1163300003.ntup.root'
 
-
-# TODO: specify the location of database (faster)
-use_central_database('production', LogLevel.WARNING, 'fei_database')
 
 path = create_path()
 
@@ -145,10 +150,7 @@ feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 
 
-fileList = ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
-            'mdst_001724_prod00000962_task00001729.root'
-            ]
-
+fileList = ['../1163300003.dst.root']
 inputMdstList('default', fileList)
 
 # execute path and return back to the analysis_main
@@ -193,22 +195,19 @@ cutAndCopyList('gamma:lowE', 'gamma:loose', 'useCMSFrame(E)<0.4')
 
 reconstructDecay('D0:kpi -> K-:95eff pi+:95eff', '1.8<InvM<1.9')
 
-copyLists('D0:all', ['D0:kpi'])  # , 'D0:kpipi0', 'D0:k3pi'])
+copyLists('D0:all', ['D0:kpi'])
 
 # D+:
 
 reconstructDecay('D+:kpipi -> K-:95eff pi+:95eff pi+:95eff', '1.8<InvM<1.9')
 
-copyLists('D+:all', ['D+:kpipi'])  # , 'D+:kspi', 'D+:kspipi0'])
-
+copyLists('D+:all', ['D+:kpipi'])
 
 # D*+:
 
 reconstructDecay('D*+:ch1 -> D0:all pi+:lowP', '0<Q<0.04')
-reconstructDecay('D*+:ch2 -> D+:all pi0:lowP', '0<Q<0.04')
 
-copyLists('D*+:all', ['D*+:ch1', 'D*+:ch2'])
-
+copyLists('D*+:all', ['D*+:ch1'])
 
 # tau
 reconstructDecay('tau-:ch1 -> e-:all', '')
@@ -217,20 +216,20 @@ copyLists('tau-:all', ['tau-:ch1', 'tau-:ch2'])
 
 # B0:sig
 
-reconstructDecay('B0:ch1 -> D*+:all tau-:all', 'Mbc>0')
-reconstructDecay('B0:ch2 -> D*+:all tau-:all', 'Mbc>0')
-copyLists('B0:all', ['B0:ch1', 'B0:ch2'])
+reconstructDecay('B0:all -> D*-:all tau+:all', 'Mbc>0')
 
 # Upsilon(4S)
 
 reconstructDecay('Upsilon(4S):BhadBsig0 -> B0:genericRank anti-B0:all', '')
 reconstructDecay('Upsilon(4S):BslBsig0 -> B0:semileptonicRank anti-B0:all', '')
 
+
+# Rest of EVent
 buildRestOfEvent('Upsilon(4S):BhadBsig0')
 buildRestOfEvent('Upsilon(4S):BslBsig0')
 
 ROETracks = ('ROETracks', '', '')
-ROEclusters = ('ROEclusters', '', '')
+ROEclusters = ('ROEclusters', '', 'abs(clusterTiming)<clusterErrorTiming and E>0.05')
 
 
 appendROEMasks('Upsilon(4S):BhadBsig0', [ROEclusters, ROETracks])
@@ -241,8 +240,6 @@ variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
 variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
 variables.addAlias('ROE_chargeSel', 'ROE_charge(ROEclusters)')
-variables.addAlias('ROE_ESel', 'ROE_E(ROEclusters)')
-variables.addAlias('ROE_PSel', 'ROE_P(ROEclusters)')
 variables.addAlias('nAllROETracks', 'nROETracks(ROETracks)')
 variables.addAlias('nROEECLClustersSel', 'nROEECLClusters(ROEclusters)')
 variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclusters)')
@@ -251,7 +248,10 @@ variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclust
 applyCuts('Upsilon(4S):BhadBsig0', 'nAllROETracks==0')
 applyCuts('Upsilon(4S):BslBsig0', 'nAllROETracks==0')
 
+# Continuum suppression:
 
+buildContinuumSuppression('B0:genericRank', '')
+buildContinuumSuppression('B0:semileptonicRank', '')
 # perform MC matching
 
 matchMCTruth('e+:highP')
@@ -271,9 +271,7 @@ matchMCTruth('B0:all')
 toolsB0 = ['EventMetaData', '^B0:genericRank']
 toolsB0 += ['DeltaEMbc', '^B0:genericRank']
 toolsB0 += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B0:genericRank']
-toolsB0 += ['CustomFloats[d0_dmID:d1_dmID:d0_d0_dmID:d1_d0_dmID]', '^B0:genericRank']
-toolsB0 += ['CustomFloats[d1d2_M:d1d3_M:d1d4_M:d2d3_M:d2d4_M:d3d4_M]', '^B0:genericRank']
-toolsB0 += ['CustomFloats[d1d2d3_M:d2d3d4_M:d1d2d3d4_M]', '^B0:genericRank']
+toolsB0 += ['CustomFloats[d0_dmID:d1_dmID:d0_d0_dmID]', '^B0:genericRank']
 toolsB0 += ['CustomFloats[isSignal:isExtendedSignal:looseMCMotherPDG:looseMCWrongDaughterN]', '^B0:genericRank']
 toolsB0 += ['CustomFloats[looseMCWrongDaughterBiB:looseMCWrongDaughterPDG]', '^B0:genericRank']
 toolsB0 += ['MCTruth', '^B0:genericRank']
@@ -287,48 +285,71 @@ toolsB0SL += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B0:semileptonicRa
 toolsB0SL += ['MCTruth', '^B0:semileptonicRank']
 
 
-tools4SB0Had = ['EventMetaData', '^Upsilon(4S)']
-tools4SB0Had += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
-tools4SB0Had += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S)']
-tools4SB0Had += ['CustomFloats[R2:cosTBTO:cosTBz]', 'Upsilon(4S) -> ^B0:genericRank anti-B0:all']
-tools4SB0Had += ['CustomFloats[sigProb:rank]', 'Upsilon(4S) -> ^B0:genericRank anti-B0:all']
-tools4SB0Had += ['CustomFloats[d0_d0_E:d0_d1_E]', 'Upsilon(4S) ->  B0:genericRank ^anti-B0:all']
-tools4SB0Had += ['CustomFloats[d0_M:d0_d0_M:d0_d1_M]', 'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
-tools4SB0Had += ['CustomFloats[d0_p:d0_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_pCMS:d0_d1_d0_pCMS:d0_d1_d1_pCMS]',
-                 'Upsilon(4S) ->  B0:genericRank ^anti-B0:all']
-tools4SB0Had += ['CustomFloats[d0_mcPDG:d1_mcPDG:d1_d0_mcPDG:d1_d0_d0_mcPDG:d1_d0_d1_mcPDG]',
-                 '^Upsilon(4S) ->  B0:genericRank anti-B0:all']
-tools4SB0Had += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d0_dmID]',
-                 'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
+tools4SB0Had = ['EventMetaData', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[R2EventLevel:R2:cosTBTO:cosTBz]', 'Upsilon(4S):BhadBsig0 -> ^B0:genericRank anti-B0:all']
+tools4SB0Had += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BhadBsig0 -> ^B0:genericRank anti-B0:all']
+tools4SB0Had += ['CustomFloats[d0_E:d0_eCMS:d1_E:d1_eCMS:d1_d0_E:d1_d0_eCMS:d0_d0_E:d0_d0_eCMS:d0_d1_E:d0_d1_eCMS]',
+                 'Upsilon(4S):BhadBsig0 ->  B0:genericRank ^anti-B0:all']
+
+tools4SB0Had += ['CustomFloats[missPx(ROEclusters,0):missPy(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]',
+                 '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[d0_M:d1_M:d0_d0_M:d0_d1_M:d1_d0_M]', 'Upsilon(4S):BhadBsig0 ->  B0:genericRank ^anti-B0:all']
+tools4SB0Had += ['CustomFloats[d0_p:d0_pCMS:d1_p:d1_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_p:d0_d1_pCMS:d1_d0_pCMS:d1_d0_p]',
+                 'Upsilon(4S):BhadBsig0 ->  B0:genericRank ^anti-B0:all']
+tools4SB0Had += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID]',
+                 'Upsilon(4S):BhadBsig0 ->  ^B0:genericRank ^anti-B0:all']
 tools4SB0Had += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
-                 'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
-tools4SB0Had += ['MCTruth', 'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
-tools4SB0Had += ['CustomFloats[tau_eid:tau_muid]', 'Upsilon(4S) -> B0:genericRank ^anti-B0:all']
+                 'Upsilon(4S):BhadBsig0 ->  ^B0:genericRank ^anti-B0:all']
+tools4SB0Had += ['MCTruth', 'Upsilon(4S):BhadBsig0 ->  ^B0:genericRank ^anti-B0:all']
+tools4SB0Had += ['CustomFloats[d1_d0_electronID:d1_d0_muonID:d1_d0_pionID:d1_d0_kaonID]',
+                 'Upsilon(4S):BhadBsig0 -> B0:genericRank ^anti-B0:all']
+tools4SB0Had += ['CustomFloats[d0_d1_electronID:d0_d1_muonID:d0_d1_pionID:d0_d1_kaonID]',
+                 'Upsilon(4S):BhadBsig0 -> B0:genericRank ^anti-B0:all']
 
-tools4SB0SL = ['EventMetaData', '^Upsilon(4S)']
-tools4SB0SL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
-tools4SB0SL += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S)']
-tools4SB0SL += ['CustomFloats[R2:cosTBTO:cosTBz]', 'Upsilon(4S) -> ^B0:semileptonicRank anti-B0:all']
-tools4SB0SL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S) -> ^B0:semileptonicRank anti-B0:all']
+tools4SB0Had += ['CustomFloats[d0_d0_d0_kaonID:d0_d0_d0_pionID:d0_d0_d0_muonID:d0_d0_d0_electronID]',
+                 'Upsilon(4S):BhadBsig0 -> B0:genericRank ^anti-B0:all']
+
+tools4SB0Had += ['CustomFloats[d0_d0_d1_kaonID:d0_d0_d1_pionID:d0_d0_d1_muonID:d0_d0_d1_electronID]',
+                 'Upsilon(4S) -> B0:genericRank ^anti-B0:all']
 
 
-tools4SB0SL += ['CustomFloats[d0_d0_E:d0_d1_E]', 'Upsilon(4S) ->  B0:semileptonicRank ^anti-B0:all']
-tools4SB0SL += ['CustomFloats[d0_M:d0_d0_M:d0_d1_M]', 'Upsilon(4S) ->  ^B0:semileptonicRank ^anti-B0:all']
-tools4SB0SL += ['CustomFloats[d0_p:d0_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_pCMS:d0_d1_d0_pCMS:d0_d1_d1_pCMS]',
-                'Upsilon(4S) ->  B0:semileptonicRank ^anti-B0:all']
-tools4SB0SL += ['CustomFloats[d0_mcPDG:d1_mcPDG:d1_d0_mcPDG:d1_d0_d0_mcPDG:d1_d0_d1_mcPDG]',
-                '^Upsilon(4S) ->  B0:semileptonicRank anti-B0:all']
-tools4SB0SL += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d0_dmID]',
-                'Upsilon(4S) ->  ^B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL = ['EventMetaData', '^Upsilon(4S):BslBsig0']
+tools4SB0SL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S):BslBsig0']
+tools4SB0SL += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S):BslBsig0']
+tools4SB0SL += ['CustomFloats[cosThetaBetweenParticleAndTrueB:R2EventLevel:R2:cosTBTO:cosTBz]',
+                'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
+tools4SB0SL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
+
+
+tools4SB0SL += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S):BslBsig0']
+tools4SB0SL += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]',
+                '^Upsilon(4S):BslBsig0']
+tools4SB0SL += ['CustomFloats[d0_E:d0_eCMS:d1_E:d1_eCMS:d1_d0_E:d1_d0_eCMS:d0_d0_E:d0_d0_eCMS:d0_d1_E:d0_d1_eCMS]',
+                'Upsilon(4S):BslBsig0 ->  B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[d0_M:d1_M:d0_d0_M:d0_d1_M:d1_d0_M]', 'Upsilon(4S):BslBsig0 -> B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[d0_p:d0_pCMS:d1_p:d1_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_p:d0_d1_pCMS:d1_d0_pCMS:d1_d0_p]',
+                'Upsilon(4S):BslBsig0 -> B0:semileptinicRanki ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID]', 'Upsilon(4S):BslBsig0 ->  ^B0:semileptonicRank ^anti-B0:all']
 tools4SB0SL += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
-                'Upsilon(4S) ->  ^B0:semileptonicRank ^anti-B0:all']
-tools4SB0SL += ['MCTruth', 'Upsilon(4S) ->  ^B0:semileptonicRank ^anti-B0:all']
-tools4SB0SL += ['CustomFloats[tau_eid:tau_muid]', 'Upsilon(4S) -> B0:semileptonicRank ^anti-B0:all']
+                'Upsilon(4S):BslBsig0 ->  ^B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['MCTruth', 'Upsilon(4S):BslBsig0 ->  ^B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[d1_d0_electronID:d1_d0_muonID:d1_d0_pionID:d1_d0_kaonID]',
+                'Upsilon(4S):BslBsig0 -> B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[d0_d1_electronID:d0_d1_muonID:d0_d1_pionID:d0_d1_kaonID]',
+                'Upsilon(4S):BslBsig0 -> B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[d0_d0_d0_electronID:d0_d0_d0_muonID:d0_d0_d0_pionID:d0_d0_d0_kaonID]',
+                'Upsilon(4S):BslBsig0 -> B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[d0_d0_d1_electronID:d0_d0_d1_muonID:d0_d0_d1_pionID:d0_d0_d1_kaonID]',
+                'Upsilon(4S):BslBsig0 -> B0:semileptonicRank ^anti-B0:all']
 
 
-# write out the flat ntuple
 ntupleFile(outputRootFile)
-ntupleTree('Ups:B0Had', 'Upsilon(4S):BhadBsig0', tools4SB0Had)
+ntupleTree('UpsB0Had', 'Upsilon(4S):BhadBsig0', tools4SB0Had)
+ntupleTree('UpsB0sl', 'Upsilon(4S):BslBsig0', tools4SB0SL)
 ntupleTree('B0HadTag', 'B0:genericRank', toolsB0)
 ntupleTree('B0SLTag', 'B0:semileptonicRank', toolsB0SL)
 

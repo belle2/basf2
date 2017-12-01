@@ -40,7 +40,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 
   const std::vector<const SpacePoint*> spacePoints = result->getHits();
 
-  genfit::MeasuredStateOnPlane mSoP = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
+  genfit::MeasuredStateOnPlane mSoP = result->getSeedMSoP();
 
   double chi2_vxd_full = 0;
   double chi2_vxd_max = std::nan("");
@@ -98,7 +98,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   var<named("theta")>() = mSoP.getMom().Theta();
 
 
-  const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
+  const genfit::MeasuredStateOnPlane& firstCDCHit = result->getSeedMSoP();
   m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();

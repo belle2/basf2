@@ -118,7 +118,7 @@ def add_evtgen_generator(path, finalstate=''):
     )
 
 
-def add_continuum_generator(path, finalstate='', userdecfile=''):
+def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenparticledata=0):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
@@ -181,6 +181,7 @@ def add_continuum_generator(path, finalstate='', userdecfile=''):
         UseEvtGen=1,
         DecFile=decay_file,
         UserDecFile=decay_user,
+        useEvtGenParticleData=useevtgenparticledata
     )
 
     # branch to an empty path if PYTHIA failed, this will change the number of events

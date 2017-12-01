@@ -27,7 +27,6 @@
 
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
-#include <top/dataobjects/TOPDigit.h>
 
 // database classes
 #include <framework/database/DBStore.h>
@@ -37,7 +36,6 @@
 #include <TH1F.h>
 #include <TF1.h>
 #include <TTree.h>
-#include <TClonesArray.h>
 #include <sstream>
 
 using namespace std;
@@ -72,7 +70,7 @@ namespace Belle2 {
   void TOPChannelT0MCModule::initialize()
   {
 
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
 
   }
 
@@ -83,9 +81,7 @@ namespace Belle2 {
   void TOPChannelT0MCModule::event()
   {
 
-    StoreArray<TOPDigit> digits;
-
-    for (auto& digit : digits) {
+    for (auto& digit : m_digits) {
       unsigned channel = digit.getChannel();
       if (channel < c_NumChannels) {
         auto histo = m_histo[channel];

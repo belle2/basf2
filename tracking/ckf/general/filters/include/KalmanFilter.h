@@ -9,14 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <genfit/MeasuredStateOnPlane.h>
 
 namespace Belle2 {
   template <class AState, class AKalmanStepper>
-  class KalmanFilter : public TrackFindingCDC::Filter<std::pair<const std::vector<const AState*>, AState*>> {
+  class KalmanFilter : public
+    TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
   public:
-    TrackFindingCDC::Weight operator()(const std::pair<const std::vector<const AState*>, AState*>& pair) override
+    TrackFindingCDC::Weight operator()(const std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>& pair)
+    override
     {
       AState* currentState = pair.second;
 

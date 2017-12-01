@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'top_dataobjects', 'top', 
-               'top_reconstruction', '$ROOT_LIBS', 'gfortran']
-
-Return('env')

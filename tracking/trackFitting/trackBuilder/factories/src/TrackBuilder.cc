@@ -35,7 +35,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(100, trackReps.size() << " track representations available.");
-  Track newTrack;
+  Track newTrack(recoTrack.getQualityIndicator());
 
   bool repAlreadySet = false;
   unsigned int repIDPlusOne = 0;

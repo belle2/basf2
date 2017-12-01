@@ -1,4 +1,4 @@
-def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth):
+def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, reverse=False):
     """
     Convenience function to add the SVD track finding using VXDTF2 and the merger based on the CKF to the path.
     :param path: The path to add the module to
@@ -19,14 +19,26 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth):
         result_filter_parameters = {}
     else:
         result_filter = "mva_with_relations"
-        result_filter_parameters = {"cut": 0.2}
+        if reverse:
+            result_filter_parameters = {"cut": 0.1}
+        else:
+            result_filter_parameters = {"cut": 0.2}
+
+    if reverse:
+        direction = -1.0
+    else:
+        direction = 1.0
 
     path.add_module("CDCToSVDSeedCKF",
-                    advanceHighFilterParameters={"direction": 0.0},
+                    advanceHighFilterParameters={"direction": direction},
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
                     vxdTracksStoreArrayName=svd_reco_tracks,
+
+                    firstHighFilterParameters={"direction": direction},
+                    reverseSeed=reverse,
+                    reverseStoredRelations=reverse,
 
                     filter=result_filter,
                     filterParameters=result_filter_parameters

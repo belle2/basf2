@@ -35,8 +35,7 @@ namespace Belle2 {
 
   /** Extract dE/dx from fitted tracks.
    *
-   * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
-   * for all particle hypotheses are calculated and saved in a VXDDedxLikelihood object.
+   * Likelihood values for all particle hypotheses are calculated and saved in a VXDDedxLikelihood object.
    *
    * The 'EnableDebugOutput' option adds VXDDedxTrack objects (one for each genfit::Track),
    * which includes individual dE/dx data points and their corresponding layer,
@@ -135,7 +134,6 @@ namespace Belle2 {
     bool m_useSVD; /**< use SVD hits for likelihood */
 
     //parameters: PDF configuration
-    std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
   };

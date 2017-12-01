@@ -98,8 +98,8 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
-  m_tree->Branch("hTwodcor", &h_twodcor, "hTwodcor[hNHits]/D");
-  m_tree->Branch("hOnedcor", &h_onedcor, "hOnedcor[hNHits]/D");
+  m_tree->Branch("hTwodcor", h_twodcor, "hTwodcor[hNHits]/D");
+  m_tree->Branch("hOnedcor", h_onedcor, "hOnedcor[hNHits]/D");
 
 }
 
@@ -128,6 +128,10 @@ void HitLevelInfoWriterModule::event()
   for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
     CDCDedxTrack* dedxTrack = dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
+    if (!track) {
+      B2WARNING("No related track...");
+      continue;
+    }
     const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");

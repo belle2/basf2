@@ -144,7 +144,6 @@ namespace Belle2 {
     bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
-    std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
 
     bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */

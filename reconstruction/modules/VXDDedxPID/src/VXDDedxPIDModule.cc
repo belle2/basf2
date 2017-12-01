@@ -68,8 +68,6 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
   addParam("enableDebugOutput", m_enableDebugOutput, "Option to write out debugging information to DedxTracks (DataStore objects).",
            false);
 
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_7b7a9f_500k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -80,19 +78,6 @@ VXDDedxPIDModule::~VXDDedxPIDModule() { }
 
 void VXDDedxPIDModule::initialize()
 {
-
-  // check for a pdf file - necessary for likelihood calculations
-  if (!m_pdfFile.empty()) {
-
-    std::string fullPath = FileSystem::findFile(m_pdfFile);
-    if (fullPath.empty()) {
-      B2ERROR("PDF file " << m_pdfFile << " not found!");
-    }
-    m_pdfFile = fullPath;
-  }
-  if (!m_enableDebugOutput and m_pdfFile.empty()) {
-    B2ERROR("No PDFFile given and debug output disabled. This module will produce no output!");
-  }
 
   // required inputs
   StoreArray<Track> tracks;
@@ -123,70 +108,66 @@ void VXDDedxPIDModule::initialize()
     tracks.registerRelationTo(dedxTracks);
   }
 
-  if (!m_pdfFile.empty()) {
-    StoreArray<VXDDedxLikelihood> dedxLikelihoods;
-    dedxLikelihoods.registerInDataStore();
-    tracks.registerRelationTo(dedxLikelihoods);
+  StoreArray<VXDDedxLikelihood> dedxLikelihoods;
+  dedxLikelihoods.registerInDataStore();
+  tracks.registerRelationTo(dedxLikelihoods);
 
-    //load dedx:momentum PDFs
-    int nBinsXPXD, nBinsYPXD;
-    double xMinPXD, xMaxPXD, yMinPXD, yMaxPXD;
-    nBinsXPXD = nBinsYPXD = -1;
-    xMinPXD = xMaxPXD = yMinPXD = yMaxPXD = 0.0;
+  //load dedx:momentum PDFs
+  int nBinsXPXD, nBinsYPXD;
+  double xMinPXD, xMaxPXD, yMinPXD, yMaxPXD;
+  nBinsXPXD = nBinsYPXD = -1;
+  xMinPXD = xMaxPXD = yMinPXD = yMaxPXD = 0.0;
 
-    int nBinsXSVD, nBinsYSVD;
-    double xMinSVD, xMaxSVD, yMinSVD, yMaxSVD;
-    nBinsXSVD = nBinsYSVD = -1;
-    xMinSVD = xMaxSVD = yMinSVD = yMaxSVD = 0.0;
+  int nBinsXSVD, nBinsYSVD;
+  double xMinSVD, xMaxSVD, yMinSVD, yMaxSVD;
+  nBinsXSVD = nBinsYSVD = -1;
+  xMinSVD = xMaxSVD = yMinSVD = yMaxSVD = 0.0;
 
-    for (unsigned int iPart = 0; iPart < 6; iPart++) {
-      const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-      m_pdfs[0][iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getPXDTruncatedPDF(iPart) : m_DBDedxPDFs->getPXDPDF(iPart);
-      m_pdfs[1][iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getSVDTruncatedPDF(iPart) : m_DBDedxPDFs->getSVDPDF(iPart);
+  for (unsigned int iPart = 0; iPart < 6; iPart++) {
+    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
+    m_pdfs[0][iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getPXDTruncatedPDF(iPart) : m_DBDedxPDFs->getPXDPDF(iPart);
+    m_pdfs[1][iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getSVDTruncatedPDF(iPart) : m_DBDedxPDFs->getSVDPDF(iPart);
 
-      if (m_pdfs[0][iPart].GetEntries() == 0 || m_pdfs[1][iPart].GetEntries() == 0) {
-        if (m_ignoreMissingParticles)
-          continue;
-        B2FATAL("Couldn't find PDF for PDG " << pdgCode);
-      }
-
-      //check that PXD PDFs have the same dimensions and same binning
-      const double epsFactor = 1e-5;
-      if (nBinsXPXD == -1 and nBinsYPXD == -1) {
-        nBinsXPXD = m_pdfs[0][iPart].GetNbinsX();
-        nBinsYPXD = m_pdfs[0][iPart].GetNbinsY();
-        xMinPXD = m_pdfs[0][iPart].GetXaxis()->GetXmin();
-        xMaxPXD = m_pdfs[0][iPart].GetXaxis()->GetXmax();
-        yMinPXD = m_pdfs[0][iPart].GetYaxis()->GetXmin();
-        yMaxPXD = m_pdfs[0][iPart].GetYaxis()->GetXmax();
-      } else if (nBinsXPXD != m_pdfs[0][iPart].GetNbinsX()
-                 or nBinsYPXD != m_pdfs[0][iPart].GetNbinsY()
-                 or fabs(xMinPXD - m_pdfs[0][iPart].GetXaxis()->GetXmin()) > epsFactor * xMaxPXD
-                 or fabs(xMaxPXD - m_pdfs[0][iPart].GetXaxis()->GetXmax()) > epsFactor * xMaxPXD
-                 or fabs(yMinPXD - m_pdfs[0][iPart].GetYaxis()->GetXmin()) > epsFactor * yMaxPXD
-                 or fabs(yMaxPXD - m_pdfs[0][iPart].GetYaxis()->GetXmax()) > epsFactor * yMaxPXD) {
-        B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
-      }
-
-      //check that SVD PDFs have the same dimensions and same binning
-      if (nBinsXSVD == -1 and nBinsYSVD == -1) {
-        nBinsXSVD = m_pdfs[1][iPart].GetNbinsX();
-        nBinsYSVD = m_pdfs[1][iPart].GetNbinsY();
-        xMinSVD = m_pdfs[1][iPart].GetXaxis()->GetXmin();
-        xMaxSVD = m_pdfs[1][iPart].GetXaxis()->GetXmax();
-        yMinSVD = m_pdfs[1][iPart].GetYaxis()->GetXmin();
-        yMaxSVD = m_pdfs[1][iPart].GetYaxis()->GetXmax();
-      } else if (nBinsXSVD != m_pdfs[1][iPart].GetNbinsX()
-                 or nBinsYSVD != m_pdfs[1][iPart].GetNbinsY()
-                 or fabs(xMinSVD - m_pdfs[1][iPart].GetXaxis()->GetXmin()) > epsFactor * xMaxSVD
-                 or fabs(xMaxSVD - m_pdfs[1][iPart].GetXaxis()->GetXmax()) > epsFactor * xMaxSVD
-                 or fabs(yMinSVD - m_pdfs[1][iPart].GetYaxis()->GetXmin()) > epsFactor * yMaxSVD
-                 or fabs(yMaxSVD - m_pdfs[1][iPart].GetYaxis()->GetXmax()) > epsFactor * yMaxSVD) {
-        B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
-      }
+    if (m_pdfs[0][iPart].GetEntries() == 0 || m_pdfs[1][iPart].GetEntries() == 0) {
+      if (m_ignoreMissingParticles)
+        continue;
+      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
     }
 
-    //leaking pdfFile so I can access the histograms
+    //check that PXD PDFs have the same dimensions and same binning
+    const double epsFactor = 1e-5;
+    if (nBinsXPXD == -1 and nBinsYPXD == -1) {
+      nBinsXPXD = m_pdfs[0][iPart].GetNbinsX();
+      nBinsYPXD = m_pdfs[0][iPart].GetNbinsY();
+      xMinPXD = m_pdfs[0][iPart].GetXaxis()->GetXmin();
+      xMaxPXD = m_pdfs[0][iPart].GetXaxis()->GetXmax();
+      yMinPXD = m_pdfs[0][iPart].GetYaxis()->GetXmin();
+      yMaxPXD = m_pdfs[0][iPart].GetYaxis()->GetXmax();
+    } else if (nBinsXPXD != m_pdfs[0][iPart].GetNbinsX()
+               or nBinsYPXD != m_pdfs[0][iPart].GetNbinsY()
+               or fabs(xMinPXD - m_pdfs[0][iPart].GetXaxis()->GetXmin()) > epsFactor * xMaxPXD
+               or fabs(xMaxPXD - m_pdfs[0][iPart].GetXaxis()->GetXmax()) > epsFactor * xMaxPXD
+               or fabs(yMinPXD - m_pdfs[0][iPart].GetYaxis()->GetXmin()) > epsFactor * yMaxPXD
+               or fabs(yMaxPXD - m_pdfs[0][iPart].GetYaxis()->GetXmax()) > epsFactor * yMaxPXD) {
+      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
+    }
+
+    //check that SVD PDFs have the same dimensions and same binning
+    if (nBinsXSVD == -1 and nBinsYSVD == -1) {
+      nBinsXSVD = m_pdfs[1][iPart].GetNbinsX();
+      nBinsYSVD = m_pdfs[1][iPart].GetNbinsY();
+      xMinSVD = m_pdfs[1][iPart].GetXaxis()->GetXmin();
+      xMaxSVD = m_pdfs[1][iPart].GetXaxis()->GetXmax();
+      yMinSVD = m_pdfs[1][iPart].GetYaxis()->GetXmin();
+      yMaxSVD = m_pdfs[1][iPart].GetYaxis()->GetXmax();
+    } else if (nBinsXSVD != m_pdfs[1][iPart].GetNbinsX()
+               or nBinsYSVD != m_pdfs[1][iPart].GetNbinsY()
+               or fabs(xMinSVD - m_pdfs[1][iPart].GetXaxis()->GetXmin()) > epsFactor * xMaxSVD
+               or fabs(xMaxSVD - m_pdfs[1][iPart].GetXaxis()->GetXmax()) > epsFactor * xMaxSVD
+               or fabs(yMinSVD - m_pdfs[1][iPart].GetYaxis()->GetXmin()) > epsFactor * yMaxSVD
+               or fabs(yMaxSVD - m_pdfs[1][iPart].GetYaxis()->GetXmax()) > epsFactor * yMaxSVD) {
+      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
+    }
   }
 
   // create instances here to not confuse profiling
@@ -321,10 +302,8 @@ void VXDDedxPIDModule::event()
     }
 
     // save VXDDedxLikelihood
-    if (!m_pdfFile.empty()) {
-      VXDDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_vxdLogl);
-      track.addRelationTo(likelihoodObj);
-    }
+    VXDDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_vxdLogl);
+    track.addRelationTo(likelihoodObj);
 
   } // end of loop over tracks
 }
@@ -469,7 +448,7 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
       siliconDedx.push_back(dedx);
       track->m_dedx_avg[currentDetector] += dedx;
       track->addDedx(layer, totalDistance, dedx);
-      if (!m_pdfFile.empty() and m_useIndividualHits) {
+      if (m_useIndividualHits) {
         if (currentDetector == 0) savePXDLogLikelihood(track->m_vxdLogl, track->m_p, dedx);
         else if (currentDetector == 1) saveSVDLogLikelihood(track->m_vxdLogl, track->m_p, dedx);
       }

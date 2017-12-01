@@ -419,20 +419,25 @@ namespace Belle2 {
 
     double VertexZDist(const Particle* part)
     {
+      // Z - distance of two daughter tracks at vertex point
       double z0_daughters[2] = { -99., -99. };
       const double alpha = 1.0 / (1.5 * TMath::C()) * 1E11;
       const std::vector<Particle*> daughters = part->getDaughters();
+      if (daughters.size() < 2) return -999.0;
+
+      TVector3 vertex = part->getVertex();
+      const double x = vertex.X();
+      const double y = vertex.Y();
+
+      // loop over two daughters
       for (unsigned i = 0; i <= 1; i++) {
-        TLorentzVector dt;
-        dt = daughters[i]->get4Vector();
         double charge = daughters[i]->getCharge();
 
-        double x = dt.X();
-        double y = dt.Y();
-        double z = dt.Z();
-        double px = dt.Px();
-        double py = dt.Py();
-        double pz = dt.Pz();
+        TLorentzVector momentum;
+        momentum = daughters[i]->get4Vector();
+        double px = momentum.Px();
+        double py = momentum.Py();
+        double pz = momentum.Pz();
 
         // We find the perigee parameters by inverting this system of
         // equations and solving for the six variables d0, phi, omega, z0,
@@ -451,7 +456,7 @@ namespace Belle2 {
         const double phi = atan2(helY, helX) + charge * M_PI / 2;
         const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
         const double chi = asin(sinchi);
-        z0_daughters[i] = z + charge / omega * cotTheta * chi;
+        z0_daughters[i] = charge / omega * cotTheta * chi;
       }
 
       return abs(z0_daughters[1] - z0_daughters[0]);

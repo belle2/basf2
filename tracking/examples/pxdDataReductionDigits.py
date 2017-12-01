@@ -10,7 +10,7 @@ from ROOT import Belle2
 # reset_database()
 # use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 
-numEvents = 2000
+numEvents = 100
 
 # first register the modules
 
@@ -29,7 +29,7 @@ evtgeninput.logging.log_level = LogLevel.INFO
 pxdROIFinder = register_module('PXDROIFinder')
 pxdROIFinder.logging.log_level = LogLevel.DEBUG
 # pxdROIFinder.logging.debug_level = 2
-param_pxdROIFinder = {
+param_pxdDataRed = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
@@ -50,19 +50,13 @@ param_pxdROIFinder = {
     'maxWidthU': 0.5,
     'maxWidthV': 0.5,
 }
-pxdROIFinder.param(param_pxdROIFinder)
+pxdROIFinder.param(param_pxdDataRed)
 
-pxdROIFinderAnalysis = register_module('PXDROIFinderAnalysis')
-pxdROIFinderAnalysis.logging.log_level = LogLevel.RESULT
-pxdROIFinderAnalysis.logging.debug_level = 1
-param_pxdROIFinderAnalysis = {
-    'recoTrackListName': 'RecoTracks',
-    'PXDInterceptListName': 'PXDIntercepts',
-    'ROIListName': 'ROIs',
-    'writeToRoot': True,
-    'rootFileName': 'pxdROIFinderAnalysis_SVDCDC_MCTF_test',
-}
-pxdROIFinderAnalysis.param(param_pxdROIFinderAnalysis)
+# PXD digitization module
+PXDDIGI = register_module('PXDDigitizer')
+
+pxdDigitFilter = register_module('PXDdigiFilter')
+pxdDigitFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True})
 
 # Create paths
 main = create_path()
@@ -72,11 +66,14 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
 add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC'], usePXDDataReduction=False)
-add_tracking_reconstruction(main, ['SVD', 'CDC'], use_vxdtf2=False, mcTrackFinding=True)
+add_tracking_reconstruction(main, ['SVD', 'CDC'])
 main.add_module(pxdROIFinder)
-main.add_module(pxdROIFinderAnalysis)
+main.add_module(PXDDIGI)
+main.add_module(pxdDigitFilter)
 # display = register_module("Display")
 # main.add_module(display)
+
+main.add_module('RootOutput')
 
 # Process events
 process(main)

@@ -71,9 +71,11 @@ void RelatedTracksCombinerModule::event()
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     bool hasPartner = false;
-    for (const RecoTrack& vxdRecoTrack : cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName)) {
+    const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
+    for (unsigned int index = 0; index < relatedVXDRecoTracks.size(); ++index) {
+      const RecoTrack& vxdRecoTrack = *(relatedVXDRecoTracks[index]);
+      const float weight = relatedVXDRecoTracks.weight(index);
       try {
-        hasPartner = true;
         TVector3 vxdPosition;
         std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack.extractTrackState();
 
@@ -86,14 +88,23 @@ void RelatedTracksCombinerModule::event()
         // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
         // cdc track.
         // TODO: we should handle the covariance matrix properly here!
+
         RecoTrack* newMergedTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
-        newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
-        newMergedTrack->setChargeSeed(cdcCharge);
         newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
-        newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+        if (weight < 0) {
+          newMergedTrack->setPositionAndMomentum(vxdPosition, -trackMomentum);
+          newMergedTrack->setChargeSeed(-cdcCharge);
+          newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits(), true);
+        } else {
+          newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
+          newMergedTrack->setChargeSeed(cdcCharge);
+          newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits(), false);
+        }
 
         newMergedTrack->addRelationTo(&vxdRecoTrack);
         newMergedTrack->addRelationTo(&cdcRecoTrack);
+
+        hasPartner = true;
       } catch (genfit::Exception& e) {
         B2WARNING("Could not combine tracks, because of: " << e.what());
       }

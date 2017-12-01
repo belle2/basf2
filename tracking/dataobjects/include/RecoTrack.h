@@ -217,9 +217,12 @@ namespace Belle2 {
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
      *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
      *        this reco track.
+     * @param reversed: add the hits in a reversed order - each sorting parameter is set to
+     *        maximal sorting parameter - sorting parameter + offset
      * @return The number of hits copied.
      */
-    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
+                                bool reverded = false);
 
     /**
      * Adds a cdc hit with the given information to the reco track.

@@ -14,9 +14,12 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 
@@ -53,16 +56,16 @@ Weight NonIPCrossingSVDStateFilter::operator()(const AllSVDStateFilter::Object& 
 
   const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
-  const double arcLengthOfHit = trajectory.calcArcLength2D(hitPosition);
-  const double arcLengthOfOrigin = trajectory.calcArcLength2D(Vector3D(0, 0, 0));
-
-  if (arcLengthOfHit > 0 or arcLengthOfOrigin > 0) {
-    return NAN;
-  }
-
-  if (arcLengthOfOrigin > arcLengthOfHit) {
+  const double arcLengthDifference = trajectory.getTrajectory2D().calcArcLength2DBetween(hitPosition.xy(), Vector2D(0, 0));
+  if (m_param_direction * arcLengthDifference > 0) {
     return NAN;
   }
 
   return 1.0;
+}
+
+void NonIPCrossingSVDStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "direction"), m_param_direction,
+                                "The direction where the extrapolation will happen.", m_param_direction);
 }

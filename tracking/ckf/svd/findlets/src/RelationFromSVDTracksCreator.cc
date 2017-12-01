@@ -36,6 +36,10 @@ void RelationFromSVDTracksCreator::exposeParameters(ModuleParamList* moduleParam
                                 m_param_vxdTracksStoreArrayName,
                                 "Store Array name coming from VXDTF2.",
                                 m_param_vxdTracksStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cdcTracksStoreArrayName"),
+                                m_param_cdcTracksStoreArrayName,
+                                "Store Array name coming from CDCTF.",
+                                m_param_cdcTracksStoreArrayName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "spacePointTrackCandidatesName"),
                                 m_param_spacePointTrackCandidateName,
@@ -47,6 +51,10 @@ void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates,
                                          std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>>& relations)
 {
   for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
+    if (vxdRecoTrack.getRelated<RecoTrack>(m_param_cdcTracksStoreArrayName)) {
+      continue;
+    }
+
     CKFToSVDState* currentState = nullptr;
 
     const SpacePointTrackCand* spacePointTrackCand =

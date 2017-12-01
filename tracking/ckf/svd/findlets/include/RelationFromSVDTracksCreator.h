@@ -54,6 +54,8 @@ namespace Belle2 {
     // Parameters
     /// Store Array name coming from VXDTF2
     std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
+    /// Store Array name coming from CDCTF
+    std::string m_param_cdcTracksStoreArrayName = "CDCRecoTracks";
     /// Store Array name of the space point track candidates coming from VXDTF2
     std::string m_param_spacePointTrackCandidateName = "SPTrackCands";
 

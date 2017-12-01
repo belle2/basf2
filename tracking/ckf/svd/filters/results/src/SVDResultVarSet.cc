@@ -23,7 +23,7 @@ void SVDResultVarSet::initialize()
 
   ModuleParamList moduleParamList;
   m_advancer.exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<double>("direction").setValue(1);
+  moduleParamList.getParameter<double>("direction").setValue(0);
 }
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)

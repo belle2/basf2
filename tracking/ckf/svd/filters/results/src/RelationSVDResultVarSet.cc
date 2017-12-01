@@ -28,7 +28,7 @@ void RelationSVDResultVarSet::initialize()
 
   ModuleParamList moduleParamList;
   m_advancer.exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<double>("direction").setValue(1);
+  moduleParamList.getParameter<double>("direction").setValue(0);
 }
 
 bool RelationSVDResultVarSet::extract(const CKFToSVDResult* result)

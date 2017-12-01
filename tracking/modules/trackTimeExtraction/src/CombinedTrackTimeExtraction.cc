@@ -54,11 +54,11 @@ void CombinedTrackTimeExtraction::apply()
 {
   m_recoTrackLoader.apply(m_recoTracks);
 
-  B2DEBUG(50, "Got " << m_recoTracks.size() << " RecoTracks");
+  B2DEBUG(50, "Got " << m_recoTracks.size() << " RecoTracks for time extraction (before selection of tracks used for t0 fit)");
 
   // check if there are any reco tracks at all available
   if (m_recoTracks.size() == 0) {
-    B2DEBUG(50, "No tracks for time extraction available, skipping for this event ");
+    B2DEBUG(50, "No tracks for time extraction available, skipping time extraction for this event ");
     return;
   }
 

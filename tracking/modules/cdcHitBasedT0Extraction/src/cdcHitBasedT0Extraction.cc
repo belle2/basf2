@@ -122,8 +122,6 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
     return;
   }
 
-  unsigned int usedHitCount = 0;
-
   for (auto const& wireHit : inputWireHits) {
 
     if (m_param_rejectByBackgroundFlag
@@ -143,10 +141,11 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       continue;
 
     timingHistgram.Fill(wireHit.getDriftTime());
-    usedHitCount ++;
   }
 
-  if (usedHitCount < m_param_minHitCount) {
+  if (timingHistgram.GetEntries() < m_param_minHitCount) {
+    B2DEBUG(50, "Only " << timingHistgram.GetEntries() << " hits satisfied the requirements for t0 extraction, " << m_param_minHitCount
+            << " are required.");
     return;
   }
 
@@ -258,9 +257,9 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       const double norm_chi2 = fitresFull->Chi2() / double(fitresFull->Ndf());
 
       B2DEBUG(50, "T0 fit with t0 " << fitted_t0 << " +- " << fitted_t0_error << " and normalized chi2 " << norm_chi2 << " and " <<
-              usedHitCount << " hits");
+              timingHistgram.GetEntries() << " hits");
 
-
+      // check if all the criteria required for a "good fit" have been met
       if (norm_chi2 > m_param_rejectIfChiSquareLargerThan) {
         B2DEBUG(50,
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());

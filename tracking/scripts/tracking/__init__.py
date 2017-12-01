@@ -519,12 +519,16 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
     if svd_ckf_mode == "VXDTF2_before":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
         add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                             use_mc_truth=use_mc_truth)
+                             use_mc_truth=use_mc_truth, reverse=False)
+        add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                             use_mc_truth=use_mc_truth, reverse=True)
 
     elif svd_ckf_mode == "VXDTF2_before_with_second_ckf":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
         add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                             use_mc_truth=use_mc_truth)
+                             use_mc_truth=use_mc_truth, reverse=False)
+        add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                             use_mc_truth=use_mc_truth, reverse=True)
         add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                     use_mc_truth=use_mc_truth)
 

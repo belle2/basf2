@@ -239,6 +239,11 @@ void FullGridTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamL
   moduleParamList->addParameter(prefixed(prefix, "overwriteExistingEstimation"), m_param_overwriteExistingEstimation,
                                 "Whether to replace an existing time estimation or not.",
                                 m_param_overwriteExistingEstimation);
+
+  moduleParamList->addParameter(prefixed(prefix, "maximumTracksUsed"), m_param_maximumTracksUsed,
+                                "the maximum amount of tracks used for the extraction.",
+                                m_param_maximumTracksUsed);
+
 }
 
 bool FullGridTrackTimeExtraction::wasSuccessful() const
@@ -255,7 +260,8 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& allRecoTracks)
     return;
   }
 
-  auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(allRecoTracks, m_param_minimalNumberCDCHits);
+  auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(allRecoTracks, m_param_minimalNumberCDCHits,
+                            m_param_maximumTracksUsed);
 
   // check if there are any reco tracks at all available
   if (selectedRecoTracks.size() == 0) {

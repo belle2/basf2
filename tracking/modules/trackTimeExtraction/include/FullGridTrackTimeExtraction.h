@@ -123,6 +123,8 @@ namespace Belle2 {
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
 
+    unsigned int m_param_maximumTracksUsed = 3;
+
     /// Pointer to the storage of the eventwise T0 estimatio n in the data store.
     StoreObjPtr<EventT0> m_eventT0;
 

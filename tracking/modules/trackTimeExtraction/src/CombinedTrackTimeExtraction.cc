@@ -30,8 +30,6 @@ CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   this->exposeParameters(&moduleParamList, prefix);
-  moduleParamList.getParameter<unsigned int>("maximalIterations").setDefaultValue(10);
-  moduleParamList.getParameter<unsigned int >("minimalIterations").setDefaultValue(1);
 }
 
 void CombinedTrackTimeExtraction::initialize()
@@ -41,8 +39,8 @@ void CombinedTrackTimeExtraction::initialize()
 
 void CombinedTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_fullGridExtraction.exposeParameters(moduleParamList, prefix);
-  m_trackTimeExtraction.exposeParameters(moduleParamList, prefix);
+  m_fullGridExtraction.exposeParameters(moduleParamList, prefix + "fullGridExtraction");
+  m_trackTimeExtraction.exposeParameters(moduleParamList, prefix + "trackTimeExtraction");
 
   moduleParamList->addParameter(prefixed(prefix, "useFullGridExtraction"), m_param_useFullGridExtraction,
                                 "use full grid t0 extraction in case the fast methods don't work",
@@ -101,6 +99,7 @@ void CombinedTrackTimeExtraction::apply()
   if (doFullGridExtraction && m_param_useFullGridExtraction) {
     B2DEBUG(50, "Running full grid search for CDC t0 fit extraction");
     m_fullGridExtraction.apply(m_recoTracks);
+    extractionSuccesful = m_fullGridExtraction.wasSuccessful();
   }
 
   if (extractionSuccesful) {

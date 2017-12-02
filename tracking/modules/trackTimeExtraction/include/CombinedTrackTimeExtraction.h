@@ -79,6 +79,6 @@ namespace Belle2 {
     FullGridTrackTimeExtraction m_fullGridExtraction;
     TrackTimeExtraction m_trackTimeExtraction;
 
-    bool m_param_useFullGridExtraction;
+    bool m_param_useFullGridExtraction = true;
   };
 }

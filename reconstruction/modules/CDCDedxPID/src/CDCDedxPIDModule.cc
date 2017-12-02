@@ -536,18 +536,16 @@ void CDCDedxPIDModule::event()
 
     // save CDCDedxLikelihood
     // use parameterized method if called or if pdf file for lookup tables is empty
+    double* pidvalues;
     if (m_usePrediction) {
-      double* pidvalues;
-      if (m_usePrediction) {
-        pidvalues = dedxTrack->m_cdcChi;
-        for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
-          pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
-        }
-      } else pidvalues = dedxTrack->m_cdcLogl;
+      pidvalues = dedxTrack->m_cdcChi;
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
+        pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
+      }
+    } else pidvalues = dedxTrack->m_cdcLogl;
 
-      CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(pidvalues);
-      track.addRelationTo(likelihoodObj);
-    }
+    CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(pidvalues);
+    track.addRelationTo(likelihoodObj);
 
     if (m_enableDebugOutput) {
       // book the information for this track
@@ -620,8 +618,10 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
   const Int_t binY = pdf[0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (pdf[iPart].GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+    if (pdf[iPart].GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+      B2WARNING("NO CDC PDFS...");
       continue;
+    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise

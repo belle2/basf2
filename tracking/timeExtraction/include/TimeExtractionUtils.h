@@ -47,11 +47,26 @@ namespace Belle2 {
   public:
 
     static std::vector<RecoTrack*> selectTracksForTimeExtraction(std::vector<RecoTrack*> const& tracks,
-        unsigned int minNumberCDCHits = 20)
+        unsigned int minNumberCDCHits = 20, unsigned int maximumNumberOfTracks = std::numeric_limits<unsigned int>::max())
     {
-      return TrackFindingCDC::filter(tracks, [minNumberCDCHits](RecoTrack * rt) {
+      auto filteredTracks = TrackFindingCDC::filter(tracks, [minNumberCDCHits](RecoTrack * rt) {
         return (rt->getNumberOfCDCHits() >= minNumberCDCHits);
       });
+
+      // sort by the amount of CDC hits
+      std::sort(filteredTracks.begin(), filteredTracks.end(),
+                // this lambda will sort in reverse order, meaning the tracks with the most CDC hits first
+      [](RecoTrack * a, RecoTrack * b) { return a->getNumberOfCDCHits() > b->getNumberOfCDCHits(); });
+
+      // limit to the maximum number of tracks
+      filteredTracks.resize(std::min((unsigned int)filteredTracks.size(), maximumNumberOfTracks));
+
+      B2DEBUG(50, "Limited number of selected tracks: " << filteredTracks.size());
+      for (auto tr : filteredTracks) {
+        B2DEBUG(50, "Selected track with " << tr->getNumberOfCDCHits() << " CDC Hits");
+      }
+
+      return filteredTracks;
     }
 
     /**

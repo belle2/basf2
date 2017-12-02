@@ -78,6 +78,10 @@ namespace Belle2 {
 
     unsigned int m_param_minimalNumberCDCHits = 20;
 
+    /// the maximum amount of tracks used for the extraction
+    /// Using fewer tracks speeds up the module
+    unsigned int m_param_maximumTracksUsed = 3;
+
     mutable bool m_lastRunSucessful = false;
 
     /// Pointer to the storage of the eventwise T0 estimation in the data store.

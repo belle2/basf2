@@ -73,6 +73,11 @@ void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, con
 
   moduleParamList->addParameter(prefixed(prefix, "t0Uncertainty"), m_param_t0Uncertainty, "Use this as sigma t0.",
                                 m_param_t0Uncertainty);
+
+  moduleParamList->addParameter(prefixed(prefix, "maximumTracksUsed"), m_param_maximumTracksUsed,
+                                "the maximum amount of tracks used for the extraction.",
+                                m_param_maximumTracksUsed);
+
 }
 
 void TrackTimeExtraction::initialize()
@@ -96,7 +101,8 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
     return;
   }
 
-  auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(recoTracks, m_param_minimalNumberCDCHits);
+  auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(recoTracks, m_param_minimalNumberCDCHits,
+                            m_param_maximumTracksUsed);
 
   // check if there are any reco tracks at all available
   if (selectedRecoTracks.size() == 0) {

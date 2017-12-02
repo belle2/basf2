@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/modules/trackTimeExtraction/FullGridTrackTimeExtraction.h>
 #include <tracking/timeExtraction/TimeExtractionUtils.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -16,22 +17,9 @@
 #include <numeric>
 
 using namespace Belle2;
+using namespace TrackFindingCDC;
 
 namespace {
-  /// Helper Structure holding one extracted time together with their chi^2.
-  struct T0Try {
-    double m_extractedT0;
-    double m_chi2;
-
-    T0Try(const double& extractedT0, const double& chi2) :
-      m_extractedT0(extractedT0), m_chi2(chi2) {}
-  };
-
-  /// Make a list of extracted times sortable by their chi^2.
-  bool operator<(const T0Try& lhs, const T0Try& rhs)
-  {
-    return lhs.m_chi2 < rhs.m_chi2;
-  }
 
   /// Helper function to map a function over a list and sum the results for double types
   template<class T, class AFunction>
@@ -54,145 +42,161 @@ namespace {
       return value;
     });
   }
-
-  /// Extract the first and second chi^2 derivatives from each fittable track and build the mean.
-  std::pair<double, double> extractChi2DerivativesHelper(std::vector<RecoTrack*>& recoTracks,
-                                                         std::map<RecoTrack*, bool>& fittableRecoTracks,
-                                                         const unsigned int numberOfFittableRecoTracks)
-  {
-    auto chi2Derivates = sumPaired(recoTracks, [&fittableRecoTracks](RecoTrack * recoTrack) {
-      if (fittableRecoTracks[recoTrack]) {
-        return TimeExtractionUtils::getChi2Derivatives(*recoTrack);
-      } else {
-        return std::make_pair(0.0, 0.0);
-      }
-    });
-
-    chi2Derivates.first /= numberOfFittableRecoTracks;
-    chi2Derivates.second /= numberOfFittableRecoTracks;
-
-    return chi2Derivates;
-  }
-
-  /// Extract the chi^2 from the fittable reco tracks
-  double extractChi2Helper(std::vector<RecoTrack*>& recoTracks, std::map<RecoTrack*, bool>& fittableRecoTracks,
-                           const unsigned int numberOfFittableRecoTracks)
-  {
-    return sum(recoTracks, [&fittableRecoTracks](RecoTrack * recoTrack) {
-      if (fittableRecoTracks[recoTrack]) {
-        return TimeExtractionUtils::extractReducedChi2(*recoTrack);
-      } else {
-        return 0.0;
-      }
-    }) / numberOfFittableRecoTracks;
-  }
-
-  /// Helper function to add the "value" to the reco track time seeds and fit them
-  void setTimeAndFitTracks(double value, std::vector<std::pair<RecoTrack*, double>>& recoTracksWithInitialValue,
-                           std::map<RecoTrack*, bool>& fittableRecoTracks,
-                           unsigned int& numberOfFittableRecoTracks)
-  {
-
-    TrackFitter trackFitter;
-
-    for (const auto& recoTrackWithTimeSeed : recoTracksWithInitialValue) {
-      RecoTrack* recoTrack = recoTrackWithTimeSeed.first;
-      double initialValue = recoTrackWithTimeSeed.second;
-
-      recoTrack->setTimeSeed(initialValue + value);
-      recoTrack->deleteFittedInformation();
-      trackFitter.fit(*recoTrack);
-
-      if (not recoTrack->wasFitSuccessful()) {
-        fittableRecoTracks[recoTrack] = false;
-        numberOfFittableRecoTracks--;
-      }
+}
+/// Extract the first and second chi^2 derivatives from each fittable track and build the mean.
+std::pair<double, double> FullGridTrackTimeExtraction::extractChi2DerivativesHelper(std::vector<RecoTrack*>& recoTracks,
+    std::map<RecoTrack*, bool>& fittableRecoTracks,
+    const unsigned int numberOfFittableRecoTracks)
+{
+  auto chi2Derivates = sumPaired(recoTracks, [&fittableRecoTracks](RecoTrack * recoTrack) {
+    if (fittableRecoTracks[recoTrack]) {
+      return TimeExtractionUtils::getChi2Derivatives(*recoTrack);
+    } else {
+      return std::make_pair(0.0, 0.0);
     }
-  }
+  });
 
-  /**
-   * Main function used in the module: Repeat the time extraction of the reco tracks starting from the given start
-   * value until:
-   * (a) the maximum number of steps is reached
-   * (b) the extracted time is not in the range [t0 min, t0 max]
-   * (c) the result is non-sense (e.g. NaN)
-   *
-   * Each extracted time is either added to the tries or the converged tries list, depending on if the chi^2 is small
-   * and d^2 chi^2 / (d alpha)^2 is large enough.
-   *
-   * In the end, the tracks are reset to have the initial time seed.
-   */
-  void extractTrackTimeFrom(std::vector<RecoTrack*>& recoTracks, const double& startValue, const unsigned int steps,
-                            std::vector<T0Try>& tries, std::vector<T0Try>& convergedTries,
-                            const double& minimalT0, const double& maximalT0)
-  {
-    // Store the initial reco track time values to (a) subtract them on each step and (b) reset the tracks afterwards
-    std::vector<std::pair<RecoTrack*, double>> recoTracksWithInitialValue;
+  chi2Derivates.first /= numberOfFittableRecoTracks;
+  chi2Derivates.second /= numberOfFittableRecoTracks;
 
-    for (RecoTrack* recoTrack : recoTracks) {
-      recoTracksWithInitialValue.emplace_back(recoTrack, recoTrack->getTimeSeed());
+  return chi2Derivates;
+}
+
+/// Extract the chi^2 from the fittable reco tracks
+double FullGridTrackTimeExtraction::extractChi2Helper(std::vector<RecoTrack*>& recoTracks,
+                                                      std::map<RecoTrack*, bool>& fittableRecoTracks,
+                                                      const unsigned int numberOfFittableRecoTracks)
+{
+  return sum(recoTracks, [&fittableRecoTracks](RecoTrack * recoTrack) {
+    if (fittableRecoTracks[recoTrack]) {
+      return TimeExtractionUtils::extractReducedChi2(*recoTrack);
+    } else {
+      return 0.0;
     }
+  }) / numberOfFittableRecoTracks;
+}
 
-    // Store which reco tracks we should use (and where the fit already failed)
-    std::map<RecoTrack*, bool> fittableRecoTracks;
-    unsigned int numberOfFittableRecoTracks = recoTracksWithInitialValue.size();
+/// Helper function to add the "value" to the reco track time seeds and fit them
+void FullGridTrackTimeExtraction::setTimeAndFitTracks(double ,
+                                                      std::vector<std::pair<RecoTrack*, double>>& recoTracksWithInitialValue,
+                                                      std::map<RecoTrack*, bool>& fittableRecoTracks,
+                                                      unsigned int& numberOfFittableRecoTracks)
+{
 
-    for (RecoTrack* recoTrack : recoTracks) {
-      fittableRecoTracks[recoTrack] = true;
-    }
+  TrackFitter trackFitter;
 
-    // Store the first try ( = start value) with the chi^2
-    setTimeAndFitTracks(startValue, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
-    const double firstChi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
+  for (const auto& recoTrackWithTimeSeed : recoTracksWithInitialValue) {
+    RecoTrack* recoTrack = recoTrackWithTimeSeed.first;
+    //double initialValue = recoTrackWithTimeSeed.second;
 
-    tries.emplace_back(startValue, firstChi2);
+    //recoTrack->setTimeSeed(initialValue + value);
+    recoTrack->deleteFittedInformation();
+    trackFitter.fit(*recoTrack);
 
-    double extracted_time = startValue;
+    B2DEBUG(50, "Fit of RecoTrack was successful = "  << recoTrack->wasFitSuccessful());
 
-    for (unsigned int i = 0; i < steps; i++) {
-      // Extract the time for the next time step
-      std::pair<double, double> extractedDerivativePair = extractChi2DerivativesHelper(recoTracks, fittableRecoTracks,
-                                                          numberOfFittableRecoTracks);
-      extracted_time += extractedDerivativePair.first / extractedDerivativePair.second;
-
-      if (extracted_time > maximalT0 or extracted_time < minimalT0 or std::isnan(extracted_time)) {
-        break;
-      }
-
-      // Apply this new extracted time and extract the chi^2
-      setTimeAndFitTracks(extracted_time, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
-
-      if (numberOfFittableRecoTracks == 0) {
-        break;
-      }
-
-      const double chi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
-
-      if (chi2 > 10) {
-        break;
-      }
-
-      // Decide if we are already finished or not depending on the extracted values.
-      const bool finished = extractedDerivativePair.second > 2.7122 and chi2 < 1.739;
-
-      if (finished) {
-        convergedTries.emplace_back(extracted_time, chi2);
-        break;
-      } else {
-        tries.emplace_back(extracted_time, chi2);
-      }
-    }
-
-    // Reset all RecoTracks
-    for (const auto& recoTrackWithTimeSeed : recoTracksWithInitialValue) {
-      RecoTrack* recoTrack = recoTrackWithTimeSeed.first;
-      double initialValue = recoTrackWithTimeSeed.second;
-
-      recoTrack->setTimeSeed(initialValue);
-      recoTrack->deleteFittedInformation();
+    if (not recoTrack->wasFitSuccessful()) {
+      fittableRecoTracks[recoTrack] = false;
+      numberOfFittableRecoTracks--;
     }
   }
 }
+
+/**
+ * Main function used in the module: Repeat the time extraction of the reco tracks starting from the given start
+ * value until:
+ * (a) the maximum number of steps is reached
+ * (b) the extracted time is not in the range [t0 min, t0 max]
+ * (c) the result is non-sense (e.g. NaN)
+ *
+ * Each extracted time is either added to the tries or the converged tries list, depending on if the chi^2 is small
+ * and d^2 chi^2 / (d alpha)^2 is large enough.
+ *
+ * In the end, the tracks are reset to have the initial time seed.
+ */
+void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& recoTracks, const double& startValue,
+                                                       const unsigned int steps,
+                                                       std::vector<T0Try>& tries, std::vector<T0Try>& convergedTries,
+                                                       const double& minimalT0, const double& maximalT0)
+{
+  // Store the initial reco track time values to (a) subtract them on each step and (b) reset the tracks afterwards
+  std::vector<std::pair<RecoTrack*, double>> recoTracksWithInitialValue;
+
+  for (RecoTrack* recoTrack : recoTracks) {
+    recoTracksWithInitialValue.emplace_back(recoTrack, recoTrack->getTimeSeed());
+  }
+
+  // Store which reco tracks we should use (and where the fit already failed)
+  std::map<RecoTrack*, bool> fittableRecoTracks;
+  unsigned int numberOfFittableRecoTracks = recoTracksWithInitialValue.size();
+
+  for (RecoTrack* recoTrack : recoTracks) {
+    fittableRecoTracks[recoTrack] = true;
+  }
+
+  // Store the first try ( = start value) with the chi^2
+
+  B2DEBUG(50, "Trying t0 value of " << startValue << " ns");
+  m_eventT0->addEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
+  setTimeAndFitTracks(startValue, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
+  const double firstChi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
+
+  B2DEBUG(50, "Fittable tracks in first iteration: " << numberOfFittableRecoTracks << " with firstChi2 " << firstChi2);
+
+  tries.emplace_back(startValue, firstChi2);
+
+  double extracted_time = startValue;
+
+  for (unsigned int i = 0; i < steps; i++) {
+    // Extract the time for the next time step
+    std::pair<double, double> extractedDerivativePair = extractChi2DerivativesHelper(recoTracks, fittableRecoTracks,
+                                                        numberOfFittableRecoTracks);
+    extracted_time += extractedDerivativePair.first / extractedDerivativePair.second;
+
+    if (extracted_time > maximalT0 or extracted_time < minimalT0 or std::isnan(extracted_time)) {
+      break;
+    }
+
+    B2DEBUG(50, "Upadting to t0 time to " << extracted_time);
+    // Apply this new extracted time and extract the chi^2
+    m_eventT0->addEventT0(extracted_time, m_param_t0Uncertainty, Const::EDetector::CDC);
+    setTimeAndFitTracks(extracted_time, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
+
+    if (numberOfFittableRecoTracks == 0) {
+      B2DEBUG(50, "No fittable RecoTracks, bailing out");
+      break;
+    }
+
+    const double chi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
+
+    if (chi2 > 10) {
+      B2DEBUG(50, "Chi2 larger than 10, bailing out");
+      break;
+    }
+
+    // Decide if we are already finished or not depending on the extracted values.
+    const bool finished = extractedDerivativePair.second > 2.7122 and chi2 < 1.739;
+
+    if (finished) {
+      B2DEBUG(50, "Fit with t0 " << extracted_time << "converged with chi2 " << extracted_time);
+      convergedTries.emplace_back(extracted_time, chi2);
+      break;
+    } else {
+      B2DEBUG(50, "Fit with t0 " << extracted_time << "not converged with chi2 " << extracted_time);
+      tries.emplace_back(extracted_time, chi2);
+    }
+  }
+
+  // Reset all RecoTracks
+  for (const auto& recoTrackWithTimeSeed : recoTracksWithInitialValue) {
+    RecoTrack* recoTrack = recoTrackWithTimeSeed.first;
+    //double initialValue = recoTrackWithTimeSeed.second;
+
+    //recoTrack->setTimeSeed(initialValue);
+    recoTrack->deleteFittedInformation();
+  }
+}
+
 /*
 void FullGridTrackTimeExtraction::initialize()
 {
@@ -212,19 +216,66 @@ FullGridTrackTimeExtraction::FullGridTrackTimeExtraction() : Super()
   this->exposeParameters(&moduleParamList, prefix);
   //moduleParamList.getParameter<std::string>("recoTracksStoreArrayName").setDefaultValue("__SelectedRecoTracks");
 }
-
-void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& recoTracks)
+void FullGridTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
+  moduleParamList->addParameter(prefixed(prefix, "minimalNumberCDCHits"), m_param_minimalNumberCDCHits,
+                                "Minimal number of CDC hits track must contain to be used for extraction.",
+                                m_param_minimalNumberCDCHits);
 
-  if (recoTracks.size() == 0) {
+  moduleParamList->addParameter(prefixed(prefix, "minimalT0Shift"), m_param_minimalT0Shift,
+                                "Minimal shift of the event time which is allowed.",
+                                m_param_minimalT0Shift);
+
+  moduleParamList->addParameter(prefixed(prefix, "maximalT0Shift"), m_param_maximalT0Shift,
+                                "Maximal shift of the event time which is allowed.",
+                                m_param_maximalT0Shift);
+
+  moduleParamList->addParameter(prefixed(prefix, "numberOfGrids"), m_param_numberOfGrids, "Number of shifts to try out.",
+                                m_param_numberOfGrids);
+
+  moduleParamList->addParameter(prefixed(prefix, "t0Uncertainty"), m_param_t0Uncertainty, "Use this as sigma t0.",
+                                m_param_t0Uncertainty);
+
+  moduleParamList->addParameter(prefixed(prefix, "overwriteExistingEstimation"), m_param_overwriteExistingEstimation,
+                                "Whether to replace an existing time estimation or not.",
+                                m_param_overwriteExistingEstimation);
+}
+
+bool FullGridTrackTimeExtraction::wasSuccessful() const
+{
+  return m_wasSuccesful;
+}
+
+void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& allRecoTracks)
+{
+  m_wasSuccesful = false;
+
+  if (allRecoTracks.size() == 0) {
+    B2DEBUG(50, "No RecoTracks to perform t0 grid extraction, skipping for this event");
     return;
   }
+
+  auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(allRecoTracks, m_param_minimalNumberCDCHits);
+
+  // check if there are any reco tracks at all available
+  if (selectedRecoTracks.size() == 0) {
+    B2DEBUG(50, "No tracks for time extraction satisfy the requirements, skipping this event ");
+    return;
+  }
+
+  B2DEBUG(50, "Found " << selectedRecoTracks.size() << " which can be used for time extraction.");
 
   if (not m_eventT0.isValid()) {
     m_eventT0.create();
   } else if (not m_param_overwriteExistingEstimation) {
     B2INFO("T0 estimation already present and overwriteExistingEstimation set to false. Skipping.");
     return;
+  }
+
+  // store the previous best t0 extraction for CDC, if present
+  std::tuple <bool, double, double> initialT0 = {false, 0.0f, 0.0f};
+  if (m_eventT0->hasDoubleEventT0(Const::CDC)) {
+    initialT0 = {true, m_eventT0->getEventT0(Const::CDC), m_eventT0->getEventT0Uncertainty() };
   }
 
   // Try out phase: test 3 data points between t0 min and t0 max and let them extrapolate a bit.
@@ -234,7 +285,7 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& recoTracks)
   const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
 
   for (double i = 1; i < m_param_numberOfGrids; i++) {
-    extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,
+    extractTrackTimeFrom(selectedRecoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,
                          m_param_minimalT0Shift, m_param_maximalT0Shift);
   }
 
@@ -244,19 +295,35 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& recoTracks)
 
     const double extractedTime = minimalChi2->m_extractedT0;
     // The uncertainty was calculated using a test MC sample
+    B2DEBUG(50, "Converged T0 fit with the lowest chi2 is " << extractedTime << " ns");
     m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+    m_wasSuccesful = true;
   } else {
     // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
     // use this. Else, use the next best guess.
     std::sort(tries.begin(), tries.end());
 
     for (const auto& tryOut : tries) {
-      extractTrackTimeFrom(recoTracks, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
+      extractTrackTimeFrom(selectedRecoTracks, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift,
+                           m_param_maximalT0Shift);
       if (not convergedTries.empty()) {
         const double extractedTime = convergedTries.back().m_extractedT0;
+
+        B2DEBUG(50, "T0 fit after 2 additional tries with the lowest chi2 is " << extractedTime << " ns");
         // The uncertainty was calculated using a test MC sample
         m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+        m_wasSuccesful = true;
         break;
+      } else {
+        B2DEBUG(50, "Still no converged fit after additional tries, t0 extraction failed. Setting initial T0.");
+
+        // reset to old t0, if available
+        if (std::get<0>(initialT0)) {
+          m_eventT0->addEventT0(std::get<1>(initialT0), std::get<1>(initialT0), Const::EDetector::CDC);
+        } else {
+          // remove our temporary results if none was available before
+          m_eventT0->removeEventT0(Const::EDetector::CDC);
+        }
       }
     }
   }

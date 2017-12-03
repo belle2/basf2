@@ -23,7 +23,6 @@ using namespace TrackFindingCDC;
 
 CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
 {
-  addProcessingSignalListener(&m_recoTrackLoader);
   addProcessingSignalListener(&m_fullGridExtraction);
   addProcessingSignalListener(&m_trackTimeExtraction);
 
@@ -48,14 +47,12 @@ void CombinedTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamL
 
 }
 
-void CombinedTrackTimeExtraction::apply()
+void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
 {
-  m_recoTrackLoader.apply(m_recoTracks);
-
-  B2DEBUG(50, "Got " << m_recoTracks.size() << " RecoTracks for time extraction (before selection of tracks used for t0 fit)");
+  B2DEBUG(50, "Got " << recoTracks.size() << " RecoTracks for time extraction (before selection of tracks used for t0 fit)");
 
   // check if there are any reco tracks at all available
-  if (m_recoTracks.size() == 0) {
+  if (recoTracks.size() == 0) {
     B2DEBUG(50, "No tracks for time extraction available, skipping time extraction for this event ");
     return;
   }
@@ -78,7 +75,7 @@ void CombinedTrackTimeExtraction::apply()
     B2DEBUG(50, "Will use initial estimate of CDC hit based t0 of t=" << fastExtractT0 << " += " << fastExtractT0Uncertainty);
 
     // use fast hit-based as starting point for the TrackTimeExtraction
-    m_trackTimeExtraction.apply(m_recoTracks);
+    m_trackTimeExtraction.apply(recoTracks);
 
     // check if t0 extraction was successful, if not the CDC number will be NAN
     //double timeExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
@@ -98,7 +95,7 @@ void CombinedTrackTimeExtraction::apply()
   // sufficiently precise ?
   if (doFullGridExtraction && m_param_useFullGridExtraction) {
     B2DEBUG(50, "Running full grid search for CDC t0 fit extraction");
-    m_fullGridExtraction.apply(m_recoTracks);
+    m_fullGridExtraction.apply(recoTracks);
     extractionSuccesful = m_fullGridExtraction.wasSuccessful();
   }
 

@@ -22,7 +22,7 @@ namespace Belle2 {
    * documentation of the CombinedTrackTimeExtraction class for further details.
    */
   class CombinedTrackTimeExtractionModule : public
-    TrackFindingCDC::FindletModule<CombinedTrackTimeExtraction> {
+    TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<CombinedTrackTimeExtraction>> {
   public:
     /// Make destructor of interface virtual
     virtual ~CombinedTrackTimeExtractionModule() = default;

@@ -33,11 +33,11 @@ namespace Belle2 {
    * This findlet checks for a wide range of possible t0 and is therefore slow but has some chance to determine the
    * CDC t0 if all other methods failed.
    */
-  class CombinedTrackTimeExtraction : public TrackFindingCDC::Findlet<> {
+  class CombinedTrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack*> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::Findlet<>;
+    using Super = TrackFindingCDC::Findlet<RecoTrack*>;
 
   public:
     /// Create a new instance of this module.
@@ -48,18 +48,12 @@ namespace Belle2 {
     /// Register the store arrays and store obj pointers.
     void initialize() final override;
 
-    void apply() final override;
-
-    void beginEvent() final override
-    {
-      m_recoTracks.clear();
-    }
+    /// apply the combined method of fast fitting and (if needed) full grid extraction
+    void apply(std::vector<RecoTrack*>&) final override;
 
   private:
 
     StoreObjPtr<EventT0> m_eventT0;
-    std::vector< RecoTrack*> m_recoTracks;
-    TrackFindingCDC::StoreArrayLoader< RecoTrack > m_recoTrackLoader;
     FullGridTrackTimeExtraction m_fullGridExtraction;
     TrackTimeExtraction m_trackTimeExtraction;
 

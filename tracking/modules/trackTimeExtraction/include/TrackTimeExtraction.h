@@ -53,11 +53,10 @@ namespace Belle2 {
     /// timing extraction for this findlet
     void apply(std::vector<RecoTrack*>&) override final;
 
+    /// Returns true if the last run t0 extraction was successful
     bool wasSucessful() const;
 
   private:
-    /// StoreArray name from which to read the reco tracks.
-    //std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
 
     /// Module parameter: Maximal number of iterations to perform.
     unsigned int m_param_maximalIterations = 10;
@@ -76,13 +75,16 @@ namespace Belle2 {
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
 
-    unsigned int m_param_minimalNumberCDCHits = 20;
+    /// Module parameter which sets the minimum amount of CDC hits which are required for a CDC track to be
+    /// used for time extraction
+    unsigned int m_param_minimalNumberCDCHits = 5;
 
     /// the maximum amount of tracks used for the extraction
     /// Using fewer tracks speeds up the module
     unsigned int m_param_maximumTracksUsed = 3;
 
-    mutable bool m_lastRunSucessful = false;
+    /// stores if the last run of the t0 extraction was successful
+    bool m_lastRunSucessful = false;
 
     /// Pointer to the storage of the eventwise T0 estimation in the data store.
     StoreObjPtr<EventT0> m_eventT0;
@@ -91,6 +93,6 @@ namespace Belle2 {
     double extractTrackTime(std::vector<RecoTrack*>& recoTracks) const;
     /// Helper function doing all iteration steps of the time extraction, this function will
     /// iteratively update the EventT0 object
-    void extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks) const;
+    void extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks);
   };
 }

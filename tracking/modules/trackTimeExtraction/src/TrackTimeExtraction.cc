@@ -31,12 +31,6 @@ TrackTimeExtraction::TrackTimeExtraction() : Super()
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   this->exposeParameters(&moduleParamList, prefix);
-
-  /*  for ( auto s : moduleParamList.getParameterNames()) {
-      std::cout << "param " << s << std::endl;
-    }*/
-  // todo: this should not be set here, but in the module
-  //moduleParamList.getParameter<std::string>("recoTracksStoreArrayName").setDefaultValue("__SelectedRecoTracks");
 }
 
 void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -77,16 +71,11 @@ void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, con
   moduleParamList->addParameter(prefixed(prefix, "maximumTracksUsed"), m_param_maximumTracksUsed,
                                 "the maximum amount of tracks used for the extraction.",
                                 m_param_maximumTracksUsed);
-
 }
 
 void TrackTimeExtraction::initialize()
 {
   Super::initialize();
-
-  /*  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-    recoTracks.isRequired();
-  */
   m_eventT0.registerInDataStore();
 }
 
@@ -116,7 +105,7 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
 //  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
 }
 
-void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks) const
+void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks)
 {
   TrackFitter trackFitter;
 

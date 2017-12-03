@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Nils Braun                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,21 +12,16 @@
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/findlets/wrapper/FindletStoreArrayInput.h>
-
-#include <framework/core/Module.h>
-
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 namespace Belle2 {
   /**
-   * Module implementation using the CDCHitBasedT0Extraction
+   * Module implementation using only the TrackTimeExtraction Findlet. Look a the
+   * documentation of the TrackTimeExtraction class for further details.
    */
-  class TrackTimeExtractionModule : public //Module {
+  class TrackTimeExtractionModule : public
     TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<TrackTimeExtraction>> {
   public:
-    /// Type of the base class
-    //using Super = TrackFindingCDC::FindletStoreArrayInput<TrackTimeExtraction>;
-
     /// Make destructor of interface virtual
     virtual ~TrackTimeExtractionModule() = default;
   };

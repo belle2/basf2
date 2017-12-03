@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Nils Braun                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,8 @@
 
 namespace Belle2 {
   /**
-   * Module implementation using the CDCHitBasedT0Extraction
+   * Module implementation using only the FullGridTrackTimeExtraction Findlet. Look a the
+   * documentation of the FullGridTrackTimeExtraction class for further details.
    */
   class FullGridTrackTimeExtractionModule : public
     TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<FullGridTrackTimeExtraction>> {

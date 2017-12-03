@@ -20,21 +20,21 @@ namespace Belle2 {
   class RecoTrack;
 
   /**
-   * Module to extract the global event time using the CDC drift circles information.
+   * Findlet to extract the global event time using the CDC drift circles information.
    *
    * The core functionality is written and documented in the TimeExtractionUtils class.
-   * This module just calls the extractTime function in the utilities multiply times and decides, when the
+   * This findlet just calls the extractTime function in the utilities multiply times and decides, when the
    * time extraction is good enough to finish.
    *
-   * As a result of this module, the EventT0 StoreObjPtr is set to the extracted time.
+   * As a result of this findlet, the EventT0 StoreObjPtr is set to the extracted time.
    *
-   * All the extraction is done using the RecoTracks stored in the given StoreArray.
+   * All the extraction is done using the RecoTracks provided to the findlet
    *
    * The module works in the following way:
    * * Use 4 defined event time seeds between T0 min and T0 max. Set the event time to this seed and extract the event
    *   time using the derivatives of chi^2 calculated in the TimeExtractionUtils after arXiv:0810.2241.
-   *   This shift in event time is then applied to the reco tracks and the time is extracted again.
-   *   One extracted time is called "converged" or "finished", if the second derivitive of chi^2 to the event time is
+   *   This shift in event time is then applied to the event t0 for CDC and the time is extracted again.
+   *   One extracted time is called "converged" or "finished", if the second derivative of chi^2 to the event time is
    *   large (which means that the measurement uncertainty on the event time is small) and the chi^2 is small too.
    *   If the fit which is needed in each step fails, do not use this extracted time.
    *   If the extracted time is not between min T0 and max T0, do also not use this extracted time.
@@ -43,7 +43,7 @@ namespace Belle2 {
    *   If not, start a loop where each extraction point from above is used, the extraction is done twice again and
    *   checked, if it has converged now.
    *
-   * * If no converged point is found at all, set the EventT0 to 0.
+   * * If no converged point is found at all, the EventT0 is not set or reset the previous value contained in EventT0 for CDC
    */
   class FullGridTrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack*> {
 
@@ -55,21 +55,28 @@ namespace Belle2 {
     /// Create a new instance of this module.
     FullGridTrackTimeExtraction();
 
+    /// export all the findlet parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final override;
 
+    /// apply the grid time extraction on the provided reco tracks. wasSuccesful() will return true
+    /// if the apply() method was able to successfully compute an event t0
     void apply(std::vector< RecoTrack*>&) final override;
 
+    /// requests access to the EventT0 class
+    void initialize() final override;
+
+    /// Returns true if the last run t0 extraction was successful
     bool wasSuccessful() const;
 
   private:
-    /// StoreArray name from which to read the reco tracks.
-    //std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
-
     /// Helper Structure holding one extracted time together with their chi^2.
     struct T0Try {
+      /// extracted t0 of this try
       double m_extractedT0;
+      /// chi2 of this extraction
       double m_chi2;
 
+      /// Create the class with values for extracted t0 and the chi2 of this fit
       T0Try(const double& extractedT0, const double& chi2) :
         m_extractedT0(extractedT0), m_chi2(chi2) {}
 
@@ -81,7 +88,8 @@ namespace Belle2 {
 
     };
 
-
+    /// Extract the derived chi^2 from the fittable reco tracks. Return the first and second
+    /// derivative of chi2
     std::pair<double, double> extractChi2DerivativesHelper(std::vector<RecoTrack*>& recoTracks,
                                                            std::map<RecoTrack*, bool>& fittableRecoTracks,
                                                            const unsigned int numberOfFittableRecoTracks);
@@ -90,7 +98,7 @@ namespace Belle2 {
                              const unsigned int numberOfFittableRecoTracks);
 
     /// Helper function to add the "value" to the reco track time seeds and fit them
-    void setTimeAndFitTracks(double value, std::vector<std::pair<RecoTrack*, double>>& recoTracksWithInitialValue,
+    void setTimeAndFitTracks(double value, std::vector<RecoTrack*>& recoTracks,
                              std::map<RecoTrack*, bool>& fittableRecoTracks,
                              unsigned int& numberOfFittableRecoTracks);
 
@@ -111,7 +119,9 @@ namespace Belle2 {
                               const double& minimalT0, const double& maximalT0);
 
 
-    unsigned int m_param_minimalNumberCDCHits = 20;
+    /// Module parameter which sets the minimum amount of CDC hits which are required for a CDC track to be
+    /// used for time extraction
+    unsigned int m_param_minimalNumberCDCHits = 5;
     /// Module Parameter: Minimal shift which is allowed.
     double m_param_minimalT0Shift = -70;
     /// Module Parameter: Maximal shift which is allowed.
@@ -123,11 +133,13 @@ namespace Belle2 {
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
 
+    /// Returns true if the last run t0 extraction was successful
     unsigned int m_param_maximumTracksUsed = 3;
 
     /// Pointer to the storage of the eventwise T0 estimatio n in the data store.
     StoreObjPtr<EventT0> m_eventT0;
 
+    /// stores if the lsat exexcution of apply() was successful
     bool m_wasSuccesful = false;
   };
 }

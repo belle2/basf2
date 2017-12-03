@@ -78,18 +78,13 @@ double FullGridTrackTimeExtraction::extractChi2Helper(std::vector<RecoTrack*>& r
 
 /// Helper function to add the "value" to the reco track time seeds and fit them
 void FullGridTrackTimeExtraction::setTimeAndFitTracks(double ,
-                                                      std::vector<std::pair<RecoTrack*, double>>& recoTracksWithInitialValue,
+                                                      std::vector<RecoTrack*>& recoTracks,
                                                       std::map<RecoTrack*, bool>& fittableRecoTracks,
                                                       unsigned int& numberOfFittableRecoTracks)
 {
-
   TrackFitter trackFitter;
 
-  for (const auto& recoTrackWithTimeSeed : recoTracksWithInitialValue) {
-    RecoTrack* recoTrack = recoTrackWithTimeSeed.first;
-    //double initialValue = recoTrackWithTimeSeed.second;
-
-    //recoTrack->setTimeSeed(initialValue + value);
+  for (const auto& recoTrack : recoTracks) {
     recoTrack->deleteFittedInformation();
     trackFitter.fit(*recoTrack);
 
@@ -119,16 +114,9 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
                                                        std::vector<T0Try>& tries, std::vector<T0Try>& convergedTries,
                                                        const double& minimalT0, const double& maximalT0)
 {
-  // Store the initial reco track time values to (a) subtract them on each step and (b) reset the tracks afterwards
-  std::vector<std::pair<RecoTrack*, double>> recoTracksWithInitialValue;
-
-  for (RecoTrack* recoTrack : recoTracks) {
-    recoTracksWithInitialValue.emplace_back(recoTrack, recoTrack->getTimeSeed());
-  }
-
   // Store which reco tracks we should use (and where the fit already failed)
   std::map<RecoTrack*, bool> fittableRecoTracks;
-  unsigned int numberOfFittableRecoTracks = recoTracksWithInitialValue.size();
+  unsigned int numberOfFittableRecoTracks = recoTracks.size();
 
   for (RecoTrack* recoTrack : recoTracks) {
     fittableRecoTracks[recoTrack] = true;
@@ -138,10 +126,10 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
 
   B2DEBUG(50, "Trying t0 value of " << startValue << " ns");
   m_eventT0->addEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
-  setTimeAndFitTracks(startValue, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
+  setTimeAndFitTracks(startValue, recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
   const double firstChi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
 
-  B2DEBUG(50, "Fittable tracks in first iteration: " << numberOfFittableRecoTracks << " with firstChi2 " << firstChi2);
+  B2DEBUG(50, "Fitable tracks in first iteration: " << numberOfFittableRecoTracks << " with firstChi2 " << firstChi2);
 
   tries.emplace_back(startValue, firstChi2);
 
@@ -160,7 +148,7 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
     B2DEBUG(50, "Upadting to t0 time to " << extracted_time);
     // Apply this new extracted time and extract the chi^2
     m_eventT0->addEventT0(extracted_time, m_param_t0Uncertainty, Const::EDetector::CDC);
-    setTimeAndFitTracks(extracted_time, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
+    setTimeAndFitTracks(extracted_time, recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
 
     if (numberOfFittableRecoTracks == 0) {
       B2DEBUG(50, "No fittable RecoTracks, bailing out");
@@ -188,34 +176,27 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
   }
 
   // Reset all RecoTracks
-  for (const auto& recoTrackWithTimeSeed : recoTracksWithInitialValue) {
-    RecoTrack* recoTrack = recoTrackWithTimeSeed.first;
-    //double initialValue = recoTrackWithTimeSeed.second;
-
-    //recoTrack->setTimeSeed(initialValue);
+  for (const auto& recoTrack : recoTracks) {
     recoTrack->deleteFittedInformation();
   }
 }
 
-/*
+
 void FullGridTrackTimeExtraction::initialize()
 {
   Super::initialize();
 
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.isRequired();
-
   m_eventT0.registerInDataStore();
 }
-*/
+
 
 FullGridTrackTimeExtraction::FullGridTrackTimeExtraction() : Super()
 {
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   this->exposeParameters(&moduleParamList, prefix);
-  //moduleParamList.getParameter<std::string>("recoTracksStoreArrayName").setDefaultValue("__SelectedRecoTracks");
 }
+
 void FullGridTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(prefixed(prefix, "minimalNumberCDCHits"), m_param_minimalNumberCDCHits,

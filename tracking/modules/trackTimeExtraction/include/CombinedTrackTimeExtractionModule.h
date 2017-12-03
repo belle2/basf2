@@ -18,7 +18,8 @@
 
 namespace Belle2 {
   /**
-   * Module implementation using the CDCHitBasedT0Extraction
+   * Module implementation using only the CombinedTrackTimeExtraction Findlet. Look a the
+   * documentation of the CombinedTrackTimeExtraction class for further details.
    */
   class CombinedTrackTimeExtractionModule : public
     TrackFindingCDC::FindletModule<CombinedTrackTimeExtraction> {

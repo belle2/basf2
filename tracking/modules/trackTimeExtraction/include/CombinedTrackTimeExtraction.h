@@ -3,7 +3,7 @@
  * Copyright(C) 2015-2016  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter, Thomas Hauth, Nils Braun                *
+ * Contributors: Thomas Hauth, Nils Braun                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,30 +24,14 @@ namespace Belle2 {
   class RecoTrack;
 
   /**
-   * Module to extract the global event time using the CDC drift circles information.
-   *
-   * The core functionality is written and documented in the TimeExtractionUtils class.
-   * This module just calls the extractTime function in the utilities multiply times and decides, when the
-   * time extraction is good enough to finish.
-   *
-   * As a result of this module, the EventT0 StoreObjPtr is set to the extracted time.
-   *
-   * All the extraction is done using the RecoTracks stored in the given StoreArray.
-   *
-   * The module works in the following way:
-   * * Use 4 defined event time seeds between T0 min and T0 max. Set the event time to this seed and extract the event
-   *   time using the derivatives of chi^2 calculated in the TimeExtractionUtils after arXiv:0810.2241.
-   *   This shift in event time is then applied to the reco tracks and the time is extracted again.
-   *   One extracted time is called "converged" or "finished", if the second derivitive of chi^2 to the event time is
-   *   large (which means that the measurement uncertainty on the event time is small) and the chi^2 is small too.
-   *   If the fit which is needed in each step fails, do not use this extracted time.
-   *   If the extracted time is not between min T0 and max T0, do also not use this extracted time.
-   *
-   * * If one or more of the extraction steps from above lead to a converged result, use the one with the lowest chi^2.
-   *   If not, start a loop where each extraction point from above is used, the extraction is done twice again and
-   *   checked, if it has converged now.
-   *
-   * * If no converged point is found at all, set the EventT0 to 0.
+   * Findlet to extract the global event time using the CDC drift circles information and combining
+   * the faster TrackTimeExtraction and slower FullGridTrackTimeExtraction to achieve the best possible
+   * result.
+   * If a EvnetT0 for CDC is already available (for example from the CDC hit based method), the TrackTimeExtraction
+   * is used to refine this estimate.
+   * If no EventT0 is available or the TrackTimeExtraction findlet fails, the FullGridTrackTimeExtraction is used.
+   * This findlet checks for a wide range of possible t0 and is therefore slow but has some chance to determine the
+   * CDC t0 if all other methods failed.
    */
   class CombinedTrackTimeExtraction : public TrackFindingCDC::Findlet<> {
 

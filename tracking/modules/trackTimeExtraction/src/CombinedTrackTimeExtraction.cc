@@ -3,7 +3,7 @@
  * Copyright(C) 2015-2016 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter, Thomas Hauth, Nils Braun                *
+ * Contributors: Thomas Hauth, Nils Braun                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

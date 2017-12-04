@@ -67,11 +67,11 @@ namespace Belle2 {
     /// Module parameter: Whether to randomize the extracted time, when the fit fails.
     bool m_param_randomizeOnError = true;
     /// Module parameter: The maximal and minimal limit [-l, l] in which to randomize the extracted time on errors.
-    double m_param_randomizeLimits = 20;
+    double m_param_randomizeLimits = 70;
     /// Module parameter: Whether to replace an existing time estimation or not.
     bool m_param_overwriteExistingEstimation = true;
     /// Module parameter: Hard cut on this value of extracted times in the positive as well as the negative direction.
-    double m_param_maximalExtractedT0 = 20;
+    double m_param_maximalExtractedT0 = 70;
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
 

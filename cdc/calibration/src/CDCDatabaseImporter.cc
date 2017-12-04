@@ -38,7 +38,7 @@
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
-//#include <cdc/dbobjects/CDCMisalignment.h>
+#include <cdc/dbobjects/CDCADCPedestals.h>
 
 #include <iostream>
 #include <fstream>
@@ -90,6 +90,7 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
   B2RESULT("Time zero table imported to database.");
 
 }
+
 
 void CDCDatabaseImporter::importChannelMap(std::string fileName)
 {
@@ -702,6 +703,70 @@ void CDCDatabaseImporter::printWirPosMisalign()
 {
   DBObjPtr<CDCMisalignment> mal;
   mal->dump();
+}
+
+
+void CDCDatabaseImporter::importADCPedestal(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCADCPedestals> dbPed;
+  dbPed.construct();
+
+  int iB(0);
+  float ped(0);
+  int nRead(0);
+
+  while (true) {
+    stream >> iB >> ped;
+    if (stream.eof()) break;
+    ++nRead;
+    dbPed->setPedestal(iB, ped);
+    //  std::cout << iB << " " << ped << std::endl;
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbPed.import(iov);
+
+  B2RESULT("ADC pedestal table imported to database.");
+
+}
+
+void CDCDatabaseImporter::importADCPedestal()
+{
+
+  DBImportObjPtr<CDCADCPedestals> dbPed;
+  dbPed.construct();
+
+  dbPed->setZeros();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbPed.import(iov);
+
+  B2RESULT("ADC pedestal w/ zeros  imported to database.");
+
+}
+
+void CDCDatabaseImporter::printADCPedestal()
+{
+
+  DBObjPtr<CDCADCPedestals> ped;
+
+  /*  for (const auto& tz : timeZeros) {
+    std::cout << tz.getICLayer() << " " << tz.getIWire() << " "
+              << tz.getT0() << std::endl;
+  }
+  */
+  ped->dump();
 }
 
 //Note; the following function is no longer needed

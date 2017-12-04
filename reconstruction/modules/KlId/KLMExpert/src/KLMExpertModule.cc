@@ -10,7 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <reconstruction/modules/KlId/KLMExpert/KLMExpertModule.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
@@ -236,7 +236,7 @@ void KLMExpertModule::event()
     IDMVAOut = m_expert->apply(*m_dataset)[0];
     B2DEBUG(175, "KLM Expert classification: " << IDMVAOut);
     // KlId, bkg prob, KLM, ECL
-    klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
+    klid = KlIds.appendNew(IDMVAOut, true, false);
     cluster.addRelationTo(klid);
 
 

@@ -16,7 +16,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Cluster.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 
 using namespace Belle2;

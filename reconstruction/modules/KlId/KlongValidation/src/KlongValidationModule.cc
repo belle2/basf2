@@ -12,7 +12,7 @@
 
 
 #include <reconstruction/modules/KlId/KlongValidation/KlongValidationModule.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>

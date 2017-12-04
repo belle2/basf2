@@ -416,9 +416,11 @@ def print_all_modules(moduleList, package=''):
             current_module = register_module(moduleName)
             if package == '' or current_module.package() == package:
                 modules.append((current_module.package(), moduleName, current_module.description()))
-        except:
-            B2ERROR('The module could not be loaded. This is most likely ' +
-                    'caused by a library with missing links.')
+        except ModuleNotCreatedError:
+            B2ERROR('The module {} could not be loaded.'.format(moduleName))
+            fail = True
+        except Exception as e:
+            B2ERROR('An exception occured when trying to load the module {}: {}'.format(moduleName, e))
             fail = True
 
     table = []

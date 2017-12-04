@@ -103,7 +103,6 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
     B2DEBUG(50, "CDC t0 result with combined method: " << m_eventT0->getEventT0(Belle2::Const::CDC) <<
             " +- " << m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC));
   } else {
-    B2DEBUG(50, "CDC t0 extraction not successful");
-
+    B2DEBUG(50, "CDC t0 extraction not successful, keeping the previous CDC EventT0 if has been set");
   }
 }

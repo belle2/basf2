@@ -247,7 +247,9 @@ void KlongValidationModule::terminate()
   m_fakeTheta->Divide(m_fakeTheta_Pass, m_Theta_all);
   m_fakeMom->Divide(m_fakeMom_Pass, m_Mom_all);
 
-  double efficiency[m_ROCBins], purity[m_ROCBins], backrej[m_ROCBins];
+  std::vector<double> efficiency(m_ROCBins);
+  std::vector<double> purity(m_ROCBins);
+  std::vector<double> backrej(m_ROCBins);
   double NallKlong = m_klidTrue->GetEntries();
   double NallFakes = m_klidFake->GetEntries();
   for (unsigned int i = 0; i < m_ROCBins - 1; ++i) {
@@ -270,8 +272,9 @@ void KlongValidationModule::terminate()
     }
   }
 
-  m_ROC = new TGraph(m_ROCBins, efficiency, purity);
-  m_backRej = new TGraph(m_ROCBins, efficiency, backrej);
+  m_ROC = new TGraph(m_ROCBins, efficiency.data(), purity.data());
+  m_backRej = new TGraph(m_ROCBins, efficiency.data(), backrej.data());
+
   m_ROC->SetMarkerStyle(3);
   m_backRej->SetMarkerStyle(3);
   m_ROC->SetLineColorAlpha(kBlue, 0.0);

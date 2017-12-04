@@ -18,7 +18,7 @@ ma.analysis_main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=
 # generate BBbar events
 evtgeninput = ma.register_module('EvtGenInput')
 evtgeninput.param('ParentParticle', 'Upsilon(5S)')
-evtgeninput.param('userDECFile', b2.FileSystem.findFile('../dec/1320600040.dec'))
+evtgeninput.param('userDECFile', b2.FileSystem.findFile('decfiles/dec/1320600040.dec'))
 ma.analysis_main.add_module(evtgeninput)
 
 

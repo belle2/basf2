@@ -133,6 +133,9 @@ namespace Belle2 {
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
 
+    /// will get rid of most curlers from background
+    double m_param_minimumTrackPt = 0.35f;
+
     /// Returns true if the last run t0 extraction was successful
     unsigned int m_param_maximumTracksUsed = 3;
 

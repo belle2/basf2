@@ -71,6 +71,9 @@ void TrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, con
   moduleParamList->addParameter(prefixed(prefix, "maximumTracksUsed"), m_param_maximumTracksUsed,
                                 "the maximum amount of tracks used for the extraction.",
                                 m_param_maximumTracksUsed);
+  moduleParamList->addParameter(prefixed(prefix, "minimumTrackPt"), m_param_minimumTrackPt,
+                                "Track Pt a track must at least have to be used for time fitting",
+                                m_param_minimumTrackPt);
 }
 
 void TrackTimeExtraction::initialize()
@@ -91,7 +94,7 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   }
 
   auto selectedRecoTracks = TimeExtractionUtils::selectTracksForTimeExtraction(recoTracks, m_param_minimalNumberCDCHits,
-                            m_param_maximumTracksUsed);
+                            m_param_maximumTracksUsed, m_param_minimumTrackPt);
 
   // check if there are any reco tracks at all available
   if (selectedRecoTracks.size() == 0) {

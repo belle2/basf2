@@ -75,6 +75,9 @@ namespace Belle2 {
     /// Module Parameter: Use this as sigma t0.
     double m_param_t0Uncertainty = 5.1;
 
+    /// will get rid of most curlers from background
+    double m_param_minimumTrackPt = 0.35;
+
     /// Module parameter which sets the minimum amount of CDC hits which are required for a CDC track to be
     /// used for time extraction
     unsigned int m_param_minimalNumberCDCHits = 5;

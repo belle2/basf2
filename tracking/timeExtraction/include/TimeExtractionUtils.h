@@ -47,10 +47,15 @@ namespace Belle2 {
   public:
 
     static std::vector<RecoTrack*> selectTracksForTimeExtraction(std::vector<RecoTrack*> const& tracks,
-        unsigned int minNumberCDCHits = 20, unsigned int maximumNumberOfTracks = std::numeric_limits<unsigned int>::max())
+        unsigned int minNumberCDCHits = 20, unsigned int maximumNumberOfTracks = std::numeric_limits<unsigned int>::max(),
+        double minimumTrackPt = 0.35)
     {
-      auto filteredTracks = TrackFindingCDC::filter(tracks, [minNumberCDCHits](RecoTrack * rt) {
-        return (rt->getNumberOfCDCHits() >= minNumberCDCHits);
+      for (RecoTrack* rt : tracks) {
+        B2DEBUG(50, "Got RecoTrack for selection with " << rt->getNumberOfCDCHits() << " CDC Hits");
+      }
+
+      auto filteredTracks = TrackFindingCDC::filter(tracks, [minNumberCDCHits, minimumTrackPt](RecoTrack * rt) {
+        return (rt->getNumberOfCDCHits() >= minNumberCDCHits) && (rt->getMomentumSeed().Mag() >= minimumTrackPt);
       });
 
       // sort by the amount of CDC hits

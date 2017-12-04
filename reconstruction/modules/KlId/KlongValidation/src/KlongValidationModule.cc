@@ -17,9 +17,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
-//#include <mdst/dataobjects/ECLCluster.h>
 
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
@@ -54,13 +51,8 @@ KlongValidationModule::~KlongValidationModule()
 void KlongValidationModule::initialize()
 {
   // require existence of necessary datastore obj
-  StoreArray<KLMCluster>::required();
-  StoreArray<MCParticle>::required();
-  //StoreArray<ECLCluster>::required();
-
-  //StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-
+  m_klmClusters.isRequired();
+  m_mcParticles.isRequired();
 
   // initialize root tree to write stuff into
   m_f =     new TFile(m_outPath.c_str(), "recreate");
@@ -88,7 +80,6 @@ void KlongValidationModule::endRun()
 
 void KlongValidationModule::event()
 {
-  StoreArray<KLMCluster> klmClusters;
 
   // the performance of the classifier depends on the cut on the classifier
   // output. This is generally arbitrary as it depends on what the user wants.
@@ -96,7 +87,7 @@ void KlongValidationModule::event()
   // Therefore an arbitrary cut is chosen so that something happens and we can judge
   // if the behavior changes.
   float abitraryCut = 0.1;
-  for (const KLMCluster& cluster : klmClusters) {
+  for (const KLMCluster& cluster : m_klmClusters) {
 
     if (!cluster.getRelatedTo<KlId>()) {
       B2WARNING("could not find a associated K_L Id obj. Did you run the KLM classifier?");
@@ -108,7 +99,7 @@ void KlongValidationModule::event()
       m_reconstructedAsKl = false;
     }
     // second param is cut on
-    m_isKl = isKLMClusterSignal(cluster);
+    m_isKl = isKLMClusterSignal(cluster, 0);
 
     // only fill if cluster is correctly reconstructed Kl
     if (m_reconstructedAsKl && m_isKl) {m_passed = true;}

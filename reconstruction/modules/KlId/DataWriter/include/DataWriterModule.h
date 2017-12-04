@@ -13,6 +13,11 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KlId.h>
+
 #include <TTree.h>
 #include <TFile.h>
 #include <string>
@@ -231,7 +236,14 @@ namespace Belle2 {
     /** isSignal for the classifier */
     Float_t m_isSignal;
 
-    /** root file */
+
+    /** Store array  */
+    StoreArray<MCParticle> m_mcParticles;
+    /** Store array  */
+    StoreArray<KLMCluster> m_klmClusters;
+    /** Store array  */
+    StoreArray<ECLCluster> m_eclClusters;
+
     TFile* m_f = nullptr; //
     /** tree for klm data */
     TTree* m_treeKLM = nullptr;

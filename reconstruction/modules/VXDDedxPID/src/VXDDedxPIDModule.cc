@@ -11,24 +11,12 @@
 #include <reconstruction/modules/VXDDedxPID/VXDDedxPIDModule.h>
 #include <reconstruction/modules/VXDDedxPID/HelixHelper.h>
 
-#include <reconstruction/dataobjects/VXDDedxTrack.h>
-#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <svd/dataobjects/SVDCluster.h>
-#include <pxd/dataobjects/PXDCluster.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MaterialEffects.h>
 
 #include <TFile.h>
@@ -95,38 +83,31 @@ void VXDDedxPIDModule::initialize()
   }
 
   // required inputs
-  StoreArray<Track> tracks;
-  StoreArray<RecoTrack> recoTracks;
-  StoreArray<TrackFitResult> trackfitResults;
-
-  tracks.isRequired();
-  recoTracks.isRequired();
-  trackfitResults.isRequired();
+  m_tracks.isRequired();
+  m_recoTracks.isRequired();
 
   //optional inputs
-  StoreArray<MCParticle> mcparticles;
-  mcparticles.isOptional();
-  tracks.optionalRelationTo(mcparticles);
+  m_mcparticles.isOptional();
+  m_tracks.optionalRelationTo(m_mcparticles);
+
   if (m_useSVD)
-    StoreArray<SVDCluster>::required();
+    m_svdClusters.isRequired();
   else
-    StoreArray<SVDCluster>::optional();
+    m_svdClusters.isOptional();
   if (m_usePXD)
-    StoreArray<PXDCluster>::required();
+    m_pxdClusters.isRequired();
   else
-    StoreArray<PXDCluster>::optional();
+    m_pxdClusters.isOptional();
 
   // register outputs
   if (m_enableDebugOutput) {
-    StoreArray<VXDDedxTrack> dedxTracks;
-    dedxTracks.registerInDataStore();
-    tracks.registerRelationTo(dedxTracks);
+    m_dedxTracks.registerInDataStore();
+    m_tracks.registerRelationTo(m_dedxTracks);
   }
 
   if (!m_pdfFile.empty()) {
-    StoreArray<VXDDedxLikelihood> dedxLikelihoods;
-    dedxLikelihoods.registerInDataStore();
-    tracks.registerRelationTo(dedxLikelihoods);
+    m_dedxLikelihoods.registerInDataStore();
+    m_tracks.registerRelationTo(m_dedxLikelihoods);
 
     //load pdfs
     TFile* pdfFile = new TFile(m_pdfFile.c_str(), "READ");
@@ -193,13 +174,7 @@ void VXDDedxPIDModule::event()
   m_eventID++;
 
   // inputs
-  StoreArray<Track> tracks;
-  StoreArray<MCParticle> mcparticles;
-  const int numMCParticles = mcparticles.getEntries();
-
-  // outputs
-  StoreArray<VXDDedxTrack> dedxArray;
-  StoreArray<VXDDedxLikelihood> likelihoodArray;
+  const int numMCParticles = m_mcparticles.getEntries();
 
   // **************************************************
   //
@@ -207,7 +182,7 @@ void VXDDedxPIDModule::event()
   //
   // **************************************************
 
-  for (const auto& track : tracks) {
+  for (const auto& track : m_tracks) {
     m_trackID++;
 
     std::shared_ptr<VXDDedxTrack> dedxTrack = std::make_shared<VXDDedxTrack>();
@@ -300,13 +275,13 @@ void VXDDedxPIDModule::event()
       dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
 
       // now book the information for this track
-      VXDDedxTrack* newVXDDedxTrack = dedxArray.appendNew(*dedxTrack);
+      VXDDedxTrack* newVXDDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
       track.addRelationTo(newVXDDedxTrack);
     }
 
     // save VXDDedxLikelihood
     if (!m_pdfFile.empty()) {
-      VXDDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_vxdLogl);
+      VXDDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(dedxTrack->m_vxdLogl);
       track.addRelationTo(likelihoodObj);
     }
 

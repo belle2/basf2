@@ -199,7 +199,7 @@ void KLMExpertModule::event()
       m_dataset->m_input[i] = m_feature_variables[i];
     }
 
-    klid = m_klids.appendNew(m_expert->apply(*m_dataset)[0], true, false);
+    klid = m_klids.appendNew(m_expert->apply(*m_dataset)[0], -1, true, false);
     cluster.addRelationTo(klid);
 
   }// for cluster in clusters

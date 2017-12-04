@@ -244,6 +244,7 @@ namespace Belle2 {
     /** Store array  */
     StoreArray<ECLCluster> m_eclClusters;
 
+    /** root file */
     TFile* m_f = nullptr; //
     /** tree for klm data */
     TTree* m_treeKLM = nullptr;

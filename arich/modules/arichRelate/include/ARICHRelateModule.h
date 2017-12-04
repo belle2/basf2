@@ -11,6 +11,13 @@
 #ifndef ARICHRELATEMODULE_H
 #define ARICHRELATEMODULE_H
 
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
+
+#include <framework/datastore/StoreArray.h>
+
 #include <framework/core/Module.h>
 #include <string>
 #include <TFile.h>
@@ -70,6 +77,12 @@ namespace Belle2 {
     void printModuleParams() const;
 
   private:
+
+    // required input
+    StoreArray<MCParticle> m_mcParticles; /**< Required array of input MCParticles */
+    StoreArray<Track> m_mdstTracks; /**< Required array of input Tracks */
+    StoreArray<ARICHAeroHit> m_aeroHits; /**< Required array of input ARICHAeroHits */
+    StoreArray<ExtHit> m_extHits; /**< Required array of input ExtHits */
 
   };
 

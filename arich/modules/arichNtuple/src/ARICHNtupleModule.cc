@@ -16,17 +16,13 @@
 
 // Hit classes
 #include <framework/dataobjects/EventMetaData.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHPhoton.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -111,13 +107,14 @@ namespace Belle2 {
     m_tree->Branch("nrec", &m_arich.nRec, "nRec/I");
     m_tree->Branch("photons", "std::vector<Belle2::ARICHPhoton>", &m_arich.photons);
 
-    // input
-    StoreArray<ARICHTrack>::required();
-    StoreArray<ARICHLikelihood>::required();
+    // required input
+    m_arichTracks.isRequired();
+    m_arichLikelihoods.isRequired();
 
-    StoreArray<Track>::optional();
-    StoreArray<MCParticle>::optional();
-    StoreArray<ARICHAeroHit>::optional();
+    // optional input
+    m_tracks.isOptional();
+    m_arichMCPs.isOptional();
+    m_arichAeroHits.isOptional();
 
   }
 
@@ -129,12 +126,10 @@ namespace Belle2 {
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    // Input tracks
-    StoreArray<ARICHTrack> arichTracks;
-    if (!arichTracks.isValid()) return;
 
+    if (!m_arichTracks.isValid()) return;
 
-    for (const auto& arichTrack : arichTracks) {
+    for (const auto& arichTrack : m_arichTracks) {
 
       const ARICHLikelihood* lkh = arichTrack.getRelated<ARICHLikelihood>();
       if (!lkh) continue;

@@ -16,7 +16,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KlId.h>
+#include <reconstruction/dataobjects/KlId.h>
 
 #include <TTree.h>
 #include <TFile.h>

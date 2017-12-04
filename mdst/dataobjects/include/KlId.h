@@ -49,6 +49,7 @@ namespace Belle2 {
     /**  is from an ECL cluster */
     bool  m_isECL;
 
+    /** evolution of the calss */
     ClassDef(KlId, 1)
   };
 }

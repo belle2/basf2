@@ -29,9 +29,9 @@ import cppyy
 # as literal values from TDictionary.h
 
 #: EProperty::kIsStatic value from TDictionary.h
-ROOT_kIsStatic = 0x00004000
+_ROOT_kIsStatic = 0x00004000
 #: EProperty::kIsConstMethod value from TDictionary.h
-ROOT_kIsConstMethod = 0x10000000
+_ROOT_kIsConstMethod = 0x10000000
 
 
 def _avoidPyRootHang():
@@ -675,7 +675,7 @@ def _make_tobject_const(obj):
     try:
         #: list of all non-const, public methods
         non_const = [m.GetName() for m in obj.Class().GetListOfAllPublicMethods()
-                     if not (m.Property() & (ROOT_kIsConstMethod | ROOT_kIsStatic))]
+                     if not (m.Property() & (_ROOT_kIsConstMethod | _ROOT_kIsStatic))]
     except AttributeError:
         raise ValueError("Object does not have a valid dictionary: %r" % obj)
 

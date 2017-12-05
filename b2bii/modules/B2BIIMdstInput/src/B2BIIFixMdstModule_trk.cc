@@ -3366,12 +3366,12 @@ namespace Belle2 {
     //int pozdef = 1;
     for (int j = 0; j < n; j++) {
       s = a[j][j];
-      for (int k = 0; k < j; k++) s -= u[j][k] * u[j][k];
+      for (int k2 = 0; k2 < j; k2++) s -= u[j][k2] * u[j][k2];
       if (s > 0) {
         u[j][j] = sqrt(s);
         for (int i = j + 1; i < n; i++) {
           s = a[i][j];
-          for (int k = 0; k < j; k++) s -= u[i][k] * u[j][k];
+          for (int k3 = 0; k3 < j; k3++) s -= u[i][k3] * u[j][k3];
           u[i][j] = s / u[j][j];
         }
       } else {

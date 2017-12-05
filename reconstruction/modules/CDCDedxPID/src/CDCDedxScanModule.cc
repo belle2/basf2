@@ -11,7 +11,6 @@
 #include <reconstruction/modules/CDCDedxPID/CDCDedxScanModule.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -67,7 +66,7 @@ void CDCDedxScanModule::initialize()
 {
 
   // register outputs
-  StoreArray<CDCDedxTrack>::registerPersistent();
+  m_dedxArray.registerInDataStore();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -80,9 +79,6 @@ void CDCDedxScanModule::initialize()
 
 void CDCDedxScanModule::event()
 {
-
-  // outputs
-  StoreArray<CDCDedxTrack> dedxArray;
 
   // get the geometry of the cdc
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -135,7 +131,7 @@ void CDCDedxScanModule::event()
         dedxTrack->addHit(0, 0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0, 1.0);
       }
     }
-    dedxArray.appendNew(*dedxTrack);
+    m_dedxArray.appendNew(*dedxTrack);
   }
 }
 

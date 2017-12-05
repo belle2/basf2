@@ -72,6 +72,9 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
 
   m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
+  if (m_adcPedestalFromDB != nullptr) {
+    m_pedestalSubtraction = true;
+  }
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -361,6 +364,9 @@ void CDCUnpackerModule::event()
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
+            if (m_pedestalSubtraction == true) {
+              fadcSum -= (*m_adcPedestalFromDB)->getPedestal(board, ch);
+            }
             unsigned short tdc1 = 0;                  // TDC count.
             unsigned short tdc2 = 0;                  // 2nd TDC count.
             unsigned short tdcFlag = 0;               // Multiple hit or not (1 for multi hits, 0 for single hit).

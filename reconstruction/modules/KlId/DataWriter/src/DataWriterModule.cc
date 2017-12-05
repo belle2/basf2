@@ -11,14 +11,10 @@
 
 
 #include <reconstruction/modules/KlId/DataWriter/DataWriterModule.h>
-#include <reconstruction/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -26,7 +22,6 @@
 
 #include <TTree.h>
 #include <TFile.h>
-#include <genfit/Exception.h>
 #include <cstring>
 #include <utility>
 
@@ -61,16 +56,13 @@ DataWriterModule::~DataWriterModule()
 void DataWriterModule::initialize()
 {
   // require existence of necessary datastore obj
-  StoreArray<KLMCluster>::required();
-  StoreArray<MCParticle>::required();
-  StoreArray<RecoTrack>::required();
-  StoreArray<ECLCluster>::required();
 
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<MCParticle> mcParticles;
-  klmClusters.requireRelationTo(mcParticles);
-  klmClusters.registerRelationTo(eclClusters);
+  m_eclClusters.isRequired();
+  m_klmClusters.isRequired();
+  m_mcParticles.isRequired();
+
+  m_klmClusters.requireRelationTo(m_mcParticles);
+  m_klmClusters.registerRelationTo(m_eclClusters);
 
   m_f = new TFile(m_outPath.c_str(), "recreate");
 
@@ -126,7 +118,6 @@ void DataWriterModule::initialize()
     m_treeKLM -> Branch("KLMKlId",                 & m_KLMKLid);
     m_treeKLM -> Branch("KLMAngleToMC",            & m_KLMAngleToMC);
     m_treeKLM -> Branch("KLMMCWeight",             & m_KLMMCWeight);
-    m_treeKLM -> Branch("KLMgenfitDist",           & m_KLMgenfitDist);
     m_treeKLM -> Branch("KLMtrackFlag",            & m_KLMtrackFlag);
     m_treeKLM -> Branch("KLMeclFlag",              & m_KLMeclFlag);
     m_treeKLM -> Branch("isSignal",                & m_isSignal);
@@ -219,14 +210,8 @@ void DataWriterModule::endRun()
 
 void DataWriterModule::event()
 {
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<RecoTrack> genfitTracks;
-  StoreArray<ECLCluster> eclClusters;
 
-// ------------------ KLM CLUSTERS
-
-  for (const KLMCluster& cluster : klmClusters) {
+  for (const KLMCluster& cluster : m_klmClusters) {
 
     if (!m_useKLM) {continue;}
 
@@ -236,7 +221,7 @@ void DataWriterModule::event()
     m_KLMTheta                       = clusterPos.Theta();
 
     m_KLMglobalZ                     = clusterPos.Z();
-    m_KLMnCluster                    = klmClusters.getEntries();
+    m_KLMnCluster                    = m_klmClusters.getEntries();
     m_KLMnLayer                      = cluster.getLayers();
     m_KLMnInnermostLayer             = cluster.getInnermostLayer();
     m_KLMtime                        = cluster.getTime();
@@ -354,35 +339,20 @@ void DataWriterModule::event()
       m_KLMMCTheta      = -999;
     }
 
-
-    // use genfit to find nearest track by extrapolation
-    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance
-                                                            = findClosestTrack(clusterPos, 0.26);
-    m_KLMtrackDist = get<1>(closestTrackAndDistance);
-    if (isnan(m_KLMtrackDist) || (!m_KLMtrackDist)) { m_KLMtrackDist = -999;}
-    const TVector3* poca = get<2>(closestTrackAndDistance).get();
-
-    if (poca and closestECLCluster) {
-      const TVector3& trackECLClusterDist = closestECLCluster->getClusterPosition() - *poca;
-      m_KLMtrackToECL = trackECLClusterDist.Mag2();
-    } else {
-      m_KLMtrackToECL = -999;
-    }
-
     KlId* klid = cluster.getRelatedTo<KlId>();
     if (klid) {
       m_KLMKLid = klid->getKlId();
     } else {
       m_KLMKLid = -999;
     }
-    m_isSignal = isKLMClusterSignal(cluster);
+    m_isSignal = isKLMClusterSignal(cluster, 0);
 
 
     m_treeKLM -> Fill();
   }// for klmcluster in klmclusters
 
 // ---------------   ECL CLUSTERS
-  for (const ECLCluster& cluster : eclClusters) {
+  for (const ECLCluster& cluster : m_eclClusters) {
 
     if (!m_useECL) {continue;}
 

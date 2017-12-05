@@ -16,6 +16,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+
 #include <TFile.h>
 #include <string>
 #include <TEfficiency.h>
@@ -82,6 +85,13 @@ namespace Belle2 {
     TEfficiency* m_fakeTheta;
     /**  fake momentum plot   */
     TEfficiency* m_fakeMom;
+
+    /** storearrays  */
+    StoreArray<KLMCluster> m_klmClusters;
+    /** storearrays  */
+    StoreArray<MCParticle> m_mcParticles;
+
+
 
     /** output path   */
     std::string m_outPath = "nightlyKlongValidation.root";

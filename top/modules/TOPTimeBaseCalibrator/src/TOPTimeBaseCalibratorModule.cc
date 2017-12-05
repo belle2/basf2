@@ -149,7 +149,9 @@ namespace Belle2 {
           B2ERROR("No relation to TOPRawDigit - can't determine falling edge time error");
           continue;
         }
-        rawTime = rawDigit->getCFDFallingTime();
+        // rawTime may include corrections due to window number discontinuity,
+        // therefore one must add the width and not just use getCFDFallingTime()
+        rawTime += rawDigit->getFWHM();
         errScaleFactor = rawDigit->getCFDFallingTimeError(1.0) / rawDigit->getCFDLeadingTimeError(1.0);
       }
       double t = rawTime + digit.getFirstWindow() * c_WindowSize;

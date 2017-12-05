@@ -86,12 +86,17 @@ void HepevtInputModule::initialize()
     B2INFO("HEPEVT reader acts as master module for data processing.");
     if (m_runNum == 0 && m_expNum == 0)
       B2WARNING("HEPEVT reader acts as master module, but no run and experiment number set. Using defaults.");
+
     //register EventMetaData object in data store
-    StoreObjPtr<EventMetaData>::registerPersistent("EventMetaData");
+    StoreArray<MCParticle> mcparticle;
+    mcparticle.registerInDataStore();
+
   }
 
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent("MCParticles");
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
+
 }
 
 

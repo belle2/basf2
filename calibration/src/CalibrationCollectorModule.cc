@@ -34,7 +34,7 @@ CalibrationCollectorModule::CalibrationCollectorModule() :
 
 void CalibrationCollectorModule::initialize()
 {
-  StoreObjPtr<EventMetaData>::required();
+  m_evtMetaData.isRequired();
   REG_HISTOGRAM
   prepare();
 }

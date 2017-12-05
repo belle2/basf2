@@ -10,9 +10,6 @@
 #include <iostream>
 
 #include <calibration/modules/TriggerSkim/TriggerSkimModule.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 using namespace Belle2;
 using namespace std;
@@ -41,13 +38,12 @@ TriggerSkimModule::TriggerSkimModule() : Module()
 
 void TriggerSkimModule::initialize()
 {
-  StoreObjPtr<SoftwareTriggerResult>::required();
+  m_trigResults.isRequired();
 }
 
 void TriggerSkimModule::event()
 {
-  StoreObjPtr<SoftwareTriggerResult> trig_results;
-  const map<string, int> results = trig_results->getResults();
+  const map<string, int> results = m_trigResults->getResults();
   bool overall_result = 0;
   for (const string& trigger : m_triggerLines) {
     if (results.find(trigger)->second == 1) overall_result = 1;

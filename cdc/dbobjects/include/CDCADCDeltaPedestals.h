@@ -18,34 +18,26 @@ namespace Belle2 {
   /**
    * Database object for ADC pedestals.
    */
-  class CDCADCPedestals: public TObject {
+  class CDCADCDeltaPedestals: public TObject {
   public:
 
     /**
      * Default constructor.
      */
-    CDCADCPedestals() {}
+    CDCADCDeltaPedestals() {}
 
     /**
      * Set ADC pedestals in the list.
      * @param board id
      * @param pedestal
      */
-    void setPedestal(unsigned short board, float pedestal)
+    void setPedestal(int board, int ch, float pedestal)
     {
-      m_pedestals.insert(std::pair<unsigned short, float>(board, pedestal));
+      unsigned short mask =  ch == -1 ? 0x8000 : 0;
+      unsigned short id = mask == 0x8000 ? (mask | board) : (mask | (ch << 9) | board);
+      m_pedestals.insert(std::pair<unsigned short, float>(id, pedestal));
     }
 
-    /**
-     * Set all ADC pedestals to be 0.
-     */
-    void setZeros()
-    {
-      const float pedestal = 0.0;
-      for (int ib = 0; ib < 300; ++ib) {
-        m_pedestals.insert(std::pair<unsigned short, float>(ib, pedestal));
-      }
-    }
 
     /**
      * Get the no. of entries in the list.
@@ -66,12 +58,24 @@ namespace Belle2 {
     /**
      * Get ADC pedestal for the specified board.
      * @param  board id.
-     * @return pedestal for the board
+     * @param  board channel.
+     * @return pedestal for the board (and channel).
      */
-    float getPedestal(const unsigned short& board) const
+    float getPedestal(const unsigned short& board, const unsigned short& ch) const
     {
-      std::map<unsigned short, float>::const_iterator it = m_pedestals.find(board);
-      return it->second;
+      unsigned short id0 = (0x8000 | board);
+      std::map<unsigned short, float>::const_iterator it0 = m_pedestals.find(id0);
+      if (it0 != m_pedestals.end()) { // board by board delta pedestal
+        return it0->second;
+      } else {
+        unsigned short id = (0x8000 | (ch << 9) | board);
+        std::map<unsigned short, float>::const_iterator it = m_pedestals.find(id);
+        if (it != m_pedestals.end()) { //delta pedetal with (board, ch).
+          return it->second;
+        } else {
+          return 0.0;
+        }
+      }
     }
 
     /**
@@ -82,16 +86,20 @@ namespace Belle2 {
       std::cout << " " << std::endl;
       std::cout << "ADC pedestal list" << std::endl;
       std::cout << "# of entries= " << m_pedestals.size() << std::endl;
-      std::cout << "in order of board#, pedestal" << std::endl;
+      std::cout << "in order of board#, ch#, pedestal" << std::endl;
       for (auto const& ent : m_pedestals) {
-        std::cout << ent.first << " " << ent.second << std::endl;
+        if ((ent.first & 0x8000) > 0) {
+          std::cout << (ent.first & 0x1ff) << " " << -1 << " " << ent.second << std::endl;
+        } else {
+          std::cout << (ent.first & 0x1ff) << " " << ((ent.first & 0x7e00) >> 9) << " " << ent.second << std::endl;
+        }
       }
     }
 
   private:
     std::map<unsigned short, float> m_pedestals; /**< ADC pedestal list*/
 
-    ClassDef(CDCADCPedestals, 0); /**< ClassDef */
+    ClassDef(CDCADCDeltaPedestals, 0); /**< ClassDef */
   };
 
 } // end namespace Belle2

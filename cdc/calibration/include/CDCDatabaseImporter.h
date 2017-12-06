@@ -67,20 +67,20 @@ namespace Belle2 {
     void printTimeZero();
 
     /**
-     * Import ADC pedestal table to the data base specifying the text data.
+     * Import ADC delta pedestal table to the data base specifying the text data.
      */
-    void importADCPedestal(std::string fileName);
+    void importADCDeltaPedestal(std::string fileName);
 
     /**
-     * Import ADC pedestal with all 0.
+     * Import ADC delta pedestal with all 0.
      */
-    void importADCPedestal();
+    void importADCDeltaPedestal();
 
     /**
-     * Get the ADC pedestal table from the database and
+     * Get the ADC delta pedestal table from the database and
      * print it.
      */
-    void printADCPedestal();
+    void printADCDeltaPedestal();
 
     /**
      * Import badwire table to the data base.

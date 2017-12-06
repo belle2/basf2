@@ -38,7 +38,7 @@
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
-#include <cdc/dbobjects/CDCADCPedestals.h>
+#include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 
 #include <iostream>
 #include <fstream>
@@ -706,7 +706,7 @@ void CDCDatabaseImporter::printWirPosMisalign()
 }
 
 
-void CDCDatabaseImporter::importADCPedestal(std::string fileName)
+void CDCDatabaseImporter::importADCDeltaPedestal(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -716,56 +716,50 @@ void CDCDatabaseImporter::importADCPedestal(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportObjPtr<CDCADCPedestals> dbPed;
+  DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
   dbPed.construct();
 
   int iB(0);
+  int iC(0);
   float ped(0);
   int nRead(0);
 
   while (true) {
-    stream >> iB >> ped;
+    stream >> iB >> iC >> ped;
     if (stream.eof()) break;
     ++nRead;
-    dbPed->setPedestal(iB, ped);
-    //  std::cout << iB << " " << ped << std::endl;
+    dbPed->setPedestal(iB, iC, ped);
+    //  std::cout << iB << " " << iC << " " << ped << std::endl;
   }
+
   stream.close();
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   dbPed.import(iov);
 
-  B2RESULT("ADC pedestal table imported to database.");
-
+  B2RESULT("ADC delta pedestal table imported to database.");
 }
 
-void CDCDatabaseImporter::importADCPedestal()
+void CDCDatabaseImporter::importADCDeltaPedestal()
 {
 
-  DBImportObjPtr<CDCADCPedestals> dbPed;
+  DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
   dbPed.construct();
-
-  dbPed->setZeros();
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   dbPed.import(iov);
 
-  B2RESULT("ADC pedestal w/ zeros  imported to database.");
+  B2RESULT("ADC delta pedestal w/ zeros  imported to database.");
 
 }
 
-void CDCDatabaseImporter::printADCPedestal()
+void CDCDatabaseImporter::printADCDeltaPedestal()
 {
 
-  DBObjPtr<CDCADCPedestals> ped;
+  DBObjPtr<CDCADCDeltaPedestals> ped;
 
-  /*  for (const auto& tz : timeZeros) {
-    std::cout << tz.getICLayer() << " " << tz.getIWire() << " "
-              << tz.getT0() << std::endl;
-  }
-  */
   ped->dump();
 }
 

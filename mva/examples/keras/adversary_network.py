@@ -46,13 +46,19 @@ class batch_generator():
         Init the class
         :param X: Input Features
         :param Y: Label Data
-        :param Z: Spectaters/Qunatity to be uncorrelated to
+        :param Z: Spectators/Quantity to be uncorrelated to
         """
+        #: Input Features
         self.X = X
+        #: Label data
         self.Y = Y
+        #: Spectatirs/Quantity to be uncorrelated to
         self.Z = Z
+        #: Length of the data
         self.len = len(Y)
+        #: Index array containing indices from 0 to len
         self.index_array = np.arange(self.len)
+        #: Pointer to the current start of the batch
         self.pointer = 0
 
     def next_batch(self, batch_size):

@@ -38,7 +38,7 @@ XTCalibrationAlgorithm::XTCalibrationAlgorithm() :  CalibrationAlgorithm("CDCCal
 
 void XTCalibrationAlgorithm::createHisto()
 {
-  B2INFO("create and fillhisto");
+  B2INFO("create and fill histo");
 
 
   /*Create histogram*/
@@ -377,16 +377,24 @@ void XTCalibrationAlgorithm::write()
     for (int al = 0; al < m_nAlphaBins; ++al) {
       for (int l = 0; l < 56; ++l) {
         for (int lr = 0; lr < 2; ++lr) {
-          if (m_fitStatus[l][lr][al][th] != 1) {
+          if (m_fitStatus[l][lr][al][th] != FitStatus::c_OK) {
+            nfailure += 1;
+            printf("fit failure status = %d \n", m_fitStatus[l][lr][al][th]);
+            printf("layer %d, r %d, alpha %3.1f, theta %3.1f \n", l, lr, m_iAlpha[al], m_iTheta[th]);
+            printf("number of event: %3.2f \n", m_hProf[l][lr][al][th]->GetEntries());
+            if (m_fitStatus[l][lr][al][th] != FitStatus::c_lowStat) {
+              printf("Probability of fit: %3.4f \n", m_xtFunc[l][lr][al][th]->GetProb());
+            }
             par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
           } else {
             m_xtFunc[l][lr][al][th]->GetParameters(par);
+            nfitted += 1;
           }
           std::vector<float> xtbuff;
           for (int i = 0; i < 8; ++i) {
             xtbuff.push_back(par[i]);
           }
-          xtRel->setXtParams(l, lr, al * deg2rad, th * deg2rad, xtbuff);
+          xtRel->setXtParams(l, lr, al, th, xtbuff);
         }//lr
       }//layer
     }//alpha
@@ -403,7 +411,7 @@ void XTCalibrationAlgorithm::write()
 void XTCalibrationAlgorithm::storeHisto()
 {
   B2INFO("saving histograms");
-  TFile* fout = new TFile("XTFIT.root", "RECREATE");
+  TFile* fout = new TFile("histXT.root", "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
   int nhisto = 0;

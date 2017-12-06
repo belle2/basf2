@@ -134,7 +134,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   //Write histogram to file
   if (m_storeHisto) {
     B2INFO("Storing histogram");
-    TFile* fhist = new TFile("tw_histo.root", "recreate");
+    TFile* fhist = new TFile("histTw.root", "recreate");
     TDirectory* old = gDirectory;
     TDirectory* h1D = old->mkdir("h1D");
     TDirectory* h2D = old->mkdir("h2D");

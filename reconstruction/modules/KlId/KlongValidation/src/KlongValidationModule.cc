@@ -18,10 +18,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <reconstruction/dataobjects/KlId.h>
-//#include <mdst/dataobjects/ECLCluster.h>
 
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
@@ -63,11 +60,10 @@ KlongValidationModule::~KlongValidationModule()
 void KlongValidationModule::initialize()
 {
   // require existence of necessary datastore obj
-  StoreArray<KLMCluster>::required();
-  StoreArray<MCParticle>::required();
+  m_klmClusters.isRequired();
+  m_mcParticles.isRequired();
 
-  StoreArray<KLMCluster> klmClusters;
-
+  // initialize root tree to write stuff into
   m_f =     new TFile(m_outPath.c_str(), "recreate");
   /** using TH1F because the validation server does not support TEfficiency  */
   m_effPhi_Pass      = new TH1F("Phi Efficiency", "Efficiency #Phi;#Phi;Efficiency", 5, -3.2, 3.2);
@@ -124,9 +120,14 @@ void KlongValidationModule::endRun()
 
 void KlongValidationModule::event()
 {
-  StoreArray<KLMCluster> klmClusters;
 
-  for (const KLMCluster& cluster : klmClusters) {
+  // the performance of the classifier depends on the cut on the classifier
+  // output. This is generally arbitrary as it depends on what the user wants.
+  // Finding K_L or rejecting?
+  // Therefore an arbitrary cut is chosen so that something happens and we can judge
+  // if the behavior changes.
+  float abitraryCut = 0.1;
+  for (const KLMCluster& cluster : m_klmClusters) {
 
     MCParticle* mcpart = NULL;
 

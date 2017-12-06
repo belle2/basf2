@@ -70,6 +70,6 @@ while not ready:
     B2INFO("Are we done?")
     ready = job1.ready()
     B2INFO("Not done yet, will sleep")
-    time.sleep(600)
+    time.sleep(60)
 
 B2INFO("Finished")

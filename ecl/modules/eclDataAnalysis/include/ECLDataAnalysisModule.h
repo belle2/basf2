@@ -109,27 +109,28 @@ namespace Belle2 {
     /** Store object pointer: ECLEventInformation. */
     StoreObjPtr<ECLEventInformation> m_eclEventInformation;
 
-    /** Default name ECLCalDigits */
+    /** Default name ECLCalDigits array*/
     virtual const char* eclSimHitArrayName() const
     { return "ECLSimHits" ; }
-    /** Default name ECLCalDigits */
+    /** Default name ECLCalDigits array*/
     virtual const char* eclHitArrayName() const
     { return "ECLHits" ; }
-    /** Default name ECLDigits */
+    /** Default name ECLDigits array*/
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
-    /** Default name ECLCalDigits */
+    /** Default name ECLCalDigits array*/
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
-    /** Default name ECLShower */
+    /** Default name ECLShower array*/
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
-    /** Default name ECLClusters */
+    /** Default name ECLClusters array*/
     virtual const char* eclClusterArrayName() const
     { return "ECLClusters" ; }
-    /** Default name ECLConnectedRegions */
+    /** Default name ECLConnectedRegions array*/
     virtual const char* eclConnectedRegionArrayName() const
     { return "ECLConnectedRegions" ; }
+    /** Default name ECLLocalMaxima array*/
     virtual const char* eclLocalMaximumArrayName() const
     { return "ECLLocalMaximums" ; }
 
@@ -147,21 +148,22 @@ namespace Belle2 {
     /** Store array: ECLPureLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclPureLocalMaximums;
 
-    /** Default name ECLPureDigits */
+    /** Default name ECLPureDigits array*/
     virtual const char* eclPureDigitArrayName() const
     { return "ECLDigitsPureCsI" ; }
-    /** Default name ECLPureCalDigits */
+    /** Default name ECLPureCalDigits array*/
     virtual const char* eclPureCalDigitArrayName() const
     { return "ECLCalDigitsPureCsI" ; }
-    /** Default name ECLPureShower */
+    /** Default name ECLPureShower array*/
     virtual const char* eclPureShowerArrayName() const
     { return "ECLShowersPureCsI" ; }
-    /** Default name ECLPureClusters */
+    /** Default name ECLPureClusters array*/
     virtual const char* eclPureClusterArrayName() const
     { return "ECLClustersPureCsI" ; }
-    /** Default name ECLPureConnectedRegions */
+    /** Default name ECLPureConnectedRegions array*/
     virtual const char* eclPureConnectedRegionArrayName() const
     { return "ECLConnectedRegionsPureCsI" ; }
+    /** Default name ECLPureLocalMaxima array */
     virtual const char* eclPureLocalMaximumArrayName() const
     { return "ECLLocalMaximumsPureCsI" ; }
 

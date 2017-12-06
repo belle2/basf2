@@ -75,6 +75,10 @@ namespace Belle2 {
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
+
+    // required input
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Required input array for EventMetaData */
+
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
     /** Names of particle list with single particles */

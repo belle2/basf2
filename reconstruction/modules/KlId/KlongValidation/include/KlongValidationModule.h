@@ -16,6 +16,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+
 #include <TFile.h>
 #include <string>
 #include <TH1F.h>
@@ -143,6 +146,13 @@ namespace Belle2 {
     unsigned int m_ROCBins;
 
 
+
+
+
+    /** storearrays  */
+    StoreArray<KLMCluster> m_klmClusters;
+    /** storearrays  */
+    StoreArray<MCParticle> m_mcParticles;
 
 
 

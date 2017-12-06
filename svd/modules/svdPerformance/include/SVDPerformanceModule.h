@@ -132,6 +132,10 @@ namespace Belle2 {
     TH1F* h_cl_VV;
     TH1F* h_cl_UV;
 
+    TH2F* h_cltrkTime_L4uL5u;
+    TH2F* h_cltrkTime_L4vL5v;
+    TH2F* h_cltrkTime_L5uL5v;
+
     int getSensor(int layer, int sensor, bool isTB)
     {
       int result = 0;

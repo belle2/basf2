@@ -10,34 +10,16 @@
 
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h"
 #include <mdst/dataobjects/MCParticle.h>
-#include <math.h>
 
 using namespace Belle2;
-
-void QualityEstimatorMC::fillMatrixWithMCInformation()
-{
-  // fill Matrix
-  for (RecoTrack& mcRecoTrack : m_mcRecoTracks) {
-    int mcRecoTrackIndex = mcRecoTrack.getArrayIndex();
-    for (SVDCluster* cluster : mcRecoTrack.getSVDHitList()) {
-      m_linkMatrix.insert(mcRecoTrackIndex, cluster->getArrayIndex()) = true;
-    }
-  }
-}
 
 double QualityEstimatorMC::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
   if (measurements.empty()) return 0;
-  // initialize Matrix
-  m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>("").getEntries());
-  // Best guess about required size. Average should be slightly below 8 SVD clusters (2 per layer) per Track.
-  m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
-  // create relation SVDClusterIndex to MCRecoTrackIndex
-  fillMatrixWithMCInformation();
 
   m_match = getBestMatchToMCClusters(measurements);
 
-  // assuming that each SpacePoint corresponds to two Clusters. Only valid for SVD!
+  // assuming that each SpacePoint corresponds to two Clusters. Now valid for both SVD and PXD
   return calculateQualityIndex(measurements.size() * 2, m_match);
 }
 
@@ -46,17 +28,21 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
   std::map<MCRecoTrackIndex, NMatches> matches;
 
   for (SpacePoint const* spacePoint : measurements) {
+
     for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {
-      int svdClusterIndex = cluster.getArrayIndex();
-
-      // Due to MCRecoTracks overlapping each SVDCluster might match to multiple MCRecoTracks
-      for (Eigen::SparseMatrix<bool>::InnerIterator it(m_linkMatrix, svdClusterIndex); it; ++it) {
-        MCRecoTrackIndex index = it.row();
+      for (RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
         // Increase number of matches to this RecoTrack
-        ++matches[index];
+        matches[recoTrack.getArrayIndex()]++;
       }
-
     } // end loop SVDClusters
+
+    for (PXDCluster& cluster : spacePoint->getRelationsTo<PXDCluster>(m_pxdClustersName)) {
+      for (RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
+        // Increase number of matches to this RecoTrack
+        matches[recoTrack.getArrayIndex()] += 2;
+      }
+    } // end loop PXDClusters
+
   } // end loop SpacePoints
 
   // select best match as the one with the most matched clusters.
@@ -88,5 +74,3 @@ QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::v
   }
   return m_results;
 }
-
-

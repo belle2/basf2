@@ -1,4 +1,5 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
@@ -15,42 +16,34 @@
 namespace Belle2 {
 
   /** KlId datastore object to store results from KlId calculations.
-   * acces as: double KlId = cluster->getRelatedTo<KlId>()->getKlId() */
+   * Note that the klid id is stored as the weight between the cluster and this object */
   class KlId : public RelationsObject {
 
   public:
 
-    KlId();
-
     /** constructor */
-    KlId(float klid, bool isKLM, bool isECL);
+    KlId() {};
 
-    /** constructor */
+    /** destructor */
     virtual ~KlId() {};
 
-    /** get Klong ID */
-    float getKlId() const
-    {return m_KlId;}
-
     /** is this ID originally a KLM Cluster ?*/
-    bool isKLM() const
-    {return m_isKLM;}
+    bool isKLM() const;
 
     /** is this ID originally a ECL Cluster ?*/
-    bool isECL() const
-    {return m_isECL;}
+    bool isECL() const;
+
+    /** get the klong classifier output  */
+    double getKlId() const;
 
   private:
 
-    /** K long id of corresponding cluster */
-    float m_KlId;
-    /** output of beambkg classification */
-    bool  m_isKLM;
-    /**  is from an ECL cluster */
-    bool  m_isECL;
+    /** make it easier to figure out the underlying type */
+    template<class T> bool hasRelationFromClusterType() const;
 
-    /** evolution of the calss */
-    ClassDef(KlId, 1)
+
+    ClassDef(KlId,
+             1); /** K_L0 ID object. The actuall ID is stored as the weight of a relation to this object. The klongID is a classfier ouput. This means it is a frequency relative to the Klong fraction of the sample the id is trained on and the performance of the classification. */
   };
 }
 #endif

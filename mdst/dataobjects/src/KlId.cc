@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013  Belle II Collaboration                              *
+ * Copyright(C) 2017  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Jo-Frederik Krohn                                        *
@@ -12,14 +12,35 @@
 
 /* Belle2 headers. */
 #include <mdst/dataobjects/KlId.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 using namespace Belle2;
 
-KlId::KlId() : m_KlId(0), m_isKLM(false), m_isECL(false)
+
+template<class T> bool KlId::hasRelationFromClusterType() const
 {
+  if (this->getRelatedFrom<T>()) { return true; }
+  return false;
 }
 
-KlId::KlId(float klid, bool isKLM, bool isECL) :
-  m_KlId(klid), m_isKLM(isKLM), m_isECL(isECL)
+bool KlId::isKLM() const
 {
+  return hasRelationFromClusterType<KLMCluster>();
 }
+
+bool KlId::isECL() const
+{
+  return hasRelationFromClusterType<ECLCluster>();
+}
+
+double KlId::getKlId() const
+{
+  if (isKLM()) {
+    return this->getRelatedFromWithWeight<KLMCluster>().second;
+  } else if (isECL()) {
+    return this->getRelatedFromWithWeight<ECLCluster>().second;
+  }
+  return -999;
+}
+

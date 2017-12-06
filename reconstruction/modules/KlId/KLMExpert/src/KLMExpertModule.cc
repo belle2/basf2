@@ -200,9 +200,9 @@ void KLMExpertModule::event()
       m_dataset->m_input[i] = m_feature_variables[i];
     }
 
-    IDMVAOut = m_expert->apply(*m_dataset)[0];
+    double IDMVAOut = m_expert->apply(*m_dataset)[0];
     B2DEBUG(175, "KLM Expert classification: " << IDMVAOut);
-    klid = KlIds.appendNew();
+    klid = m_klids.appendNew();
     cluster.addRelationTo(klid, IDMVAOut);
 
   }// for cluster in clusters

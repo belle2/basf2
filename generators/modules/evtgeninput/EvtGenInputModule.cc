@@ -63,7 +63,7 @@ void EvtGenInputModule::initialize()
   if (defaultDecFile.empty()) {
     B2WARNING("Cannot find default decay file");
   } else if (defaultDecFile != m_DECFileName) {
-    B2INFO("Using non-standard DECAY file \"" << m_DECFileName << "\"");
+    B2DEBUG(150, "Using non-standard DECAY file \"" << m_DECFileName << "\"");
   }
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;

@@ -18,29 +18,22 @@
 using namespace Belle2;
 
 
-template<class T> bool KlId::hasRelationFromClusterType() const
-{
-  if (this->getRelatedFrom<T>()) { return true; }
-  return false;
-}
-
 bool KlId::isKLM() const
 {
-  return hasRelationFromClusterType<KLMCluster>();
+  return getRelatedFrom<KLMCluster>();
 }
 
 bool KlId::isECL() const
 {
-  return hasRelationFromClusterType<ECLCluster>();
+  return getRelatedFrom<ECLCluster>();
 }
 
 double KlId::getKlId() const
 {
-  if (isKLM()) {
-    return this->getRelatedFromWithWeight<KLMCluster>().second;
-  } else if (isECL()) {
-    return this->getRelatedFromWithWeight<ECLCluster>().second;
-  }
+  auto klmClusterWeight = getRelatedFromWithWeight<KLMCluster>();
+  if (klmClusterWeight.first) return klmClusterWeight.second;
+  auto eclClusterWeight = getRelatedFromWithWeight<ECLCluster>();
+  if (eclClusterWeight.first) return eclClusterWeight.second;
   return -999;
 }
 

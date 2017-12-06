@@ -51,61 +51,53 @@ namespace TreeFitter {
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
   }
 
-  ErrCode Constraint::projectCopy(const FitParams& fitpar, Projection& p) const
+  ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
   {
-    return m_node->projectConstraintCopy(m_type, fitpar, p);
+    return m_node->projectConstraint(m_type, fitpar, p);
   }
 
-  ErrCode Constraint::filterCopy(FitParams* fitpar)
+  ErrCode Constraint::filter(FitParams* fitpar)
   {
-
     B2DEBUG(82, "----Constraint::filtering " << this->name());
     ErrCode status;
-    if (m_type <= Constraint::unknown || m_type >= Constraint::ntypes) {
-      std::cout << "VtkConstraint: unknown constraint: " << m_type << std::endl;
-      status |= ErrCode::badsetup;
-    } else if (m_type != merged && !m_node) {
-      std::cout << "VtkConstraint: filter constraint without a node" << std::endl;
-      status |= ErrCode::badsetup;
-    } else {
 
-      Projection p(fitpar->getDimensionOfState(), m_dim);
-      KalmanCalculator kalman;
+    Projection p(fitpar->getDimensionOfState(), m_dim);
+    KalmanCalculator kalman;
 
-      double chisq(0);
-      int iter(0);
-      bool finished(false) ;
-      while (!finished && !status.failure()) {
+    double chisq(0);
+    int iter(0);
+    bool finished(false) ;
+    while (!finished && !status.failure()) {
 
-        B2DEBUG(82, "---- Constraint::filter iteration # " << iter << " current chi2 = " << chisq);
-        p.resetProjection();
-        status |= projectCopy(*fitpar, p);
+      B2DEBUG(82, "---- Constraint::filter iteration # " << iter << " current chi2 = " << chisq);
+      p.resetProjection();
+      status |= project(*fitpar, p);
+
+      if (!status.failure()) {
+
+        status |= kalman.calculateGainMatrix(p.getResiduals(), p.getH(), fitpar, &p.getV());
 
         if (!status.failure()) {
-          status |= kalman.init(p.getResiduals(), p.getH(), fitpar, &p.getV());
 
-          if (!status.failure()) {
+          kalman.updateState(fitpar);
 
-            kalman.updateState(fitpar);
-
-            const double dchisqconverged = 0.001;
-            double newchisq = kalman.getChiSquare();
-            double dchisq = newchisq - chisq;
-            bool diverging = iter > 0 && dchisq > 0;
-            bool converged = fabs(dchisq) < dchisqconverged;
-            finished  = ++iter >= m_maxNIter || diverging || converged;
-            chisq = newchisq;
-          }
+          const double dchisqconverged = 0.001;
+          double newchisq = kalman.getChiSquare();
+          double dchisq = newchisq - chisq;
+          bool diverging = iter > 0 && dchisq > 0;
+          bool converged = fabs(dchisq) < dchisqconverged;
+          finished  = ++iter >= m_maxNIter || diverging || converged;
+          chisq = newchisq;
         }
       }
-      B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
-              " NDF" << m_dim << " for " << this->name());
-
-      fitpar->addChiSquare(kalman.getChiSquare(), kalman.getConstraintDim());
-      kalman.updateCovariance(fitpar);
-      m_chi2 = kalman.getChiSquare(); //JFK: FIXME remove 2017-10-26
     }
-    return status ;
+    B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
+            " NDF" << m_dim << " for " << this->name());
+
+    fitpar->addChiSquare(kalman.getChiSquare(), kalman.getConstraintDim());
+    kalman.updateCovariance(fitpar);
+    m_chi2 = kalman.getChiSquare(); //JFK: FIXME remove 2017-10-26
+    return status;
   }
 
   std::string Constraint::name() const

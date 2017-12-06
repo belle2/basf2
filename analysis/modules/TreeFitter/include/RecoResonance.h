@@ -18,27 +18,21 @@ namespace TreeFitter {
   /** */
   class RecoResonance : public RecoComposite {
   public:
+    /** constructor */
     RecoResonance(Belle2::Particle* bc, const ParticleBase* mother);
 
     /** init particle in case it has a mother */
     virtual ErrCode initParticleWithMother(FitParams* fitparams);
     /** init particle in case it has no mother */
     virtual ErrCode initMotherlessParticle(FitParams* fitparams);
-
-
+    /**  */
     virtual ~RecoResonance();
-
-
 
     /** */
     virtual int dim() const { return hasEnergy() ? 4 : 3; } // (px,py,pz,(E))
 
     /** */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
-    /** */
-    virtual ErrCode initPar1(FitParams*);
-    /** */
-    virtual ErrCode initPar2(FitParams*);
     /** */
     virtual int type() const { return kRecoResonance; }
 

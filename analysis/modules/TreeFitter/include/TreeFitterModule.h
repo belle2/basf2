@@ -7,15 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef TREEFITTERMODULE_H
-#define TREEFITTERMODULE_H
-
+#ifndef TREEFITTERMODUEL_H
+#define TREEFITTERMODUEL_H
 #include <framework/core/Module.h>
-//#include <string>
+
+
 
 namespace Belle2 {
-
   class Particle;
 
   /** Module to fit an entire decay tree. The newton method is used to minimize the chi2 derivative. We use a kalman filter witihin the newton method to smooth the statevector.   */
@@ -62,13 +60,12 @@ namespace Belle2 {
     int m_ipConstraintDimension;
 
     /** this fits all particle candidates contained in the m_particleList  */
-    bool doTreeFit(Particle* head);
+    bool fitTree(Particle* head);
 
     /** before the fit */
     unsigned int m_nCandidatesBeforeFit;
     /** after the fit  */
     unsigned int m_nCandidatesAfter;
-
 
   };
 }

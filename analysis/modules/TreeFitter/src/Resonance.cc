@@ -25,44 +25,23 @@ namespace TreeFitter {
   ErrCode Resonance::initMotherlessParticle(FitParams* fitparams)
   {
     ErrCode status;
-    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      status |= (*it)->initMotherlessParticle(fitparams);
+    for (auto daughter : m_daughters) {
+      status |= daughter->initMotherlessParticle(fitparams);
     }
     return status;
   }
+
   ErrCode Resonance::initParticleWithMother(FitParams* fitparams)
   {
     ErrCode status;
-    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      status |= (*it)->initParticleWithMother(fitparams);
+    for (auto daughter : m_daughters) {
+      status |= daughter->initParticleWithMother(fitparams);
     }
     initMomentum(fitparams);
     return status;
   }
 
   Resonance::~Resonance() {};
-
-
-
-
-  ErrCode Resonance::initPar1(FitParams* fitparams)
-  {
-    ErrCode status;
-    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      status |= (*it)->initPar1(fitparams);
-    }
-    return status;
-  }
-
-  ErrCode Resonance::initPar2(FitParams* fitparams)
-  {
-    ErrCode status;
-    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      status |= (*it)->initPar2(fitparams);
-    }
-    initMom(fitparams);
-    return status;
-  }
 
   std::string Resonance::parname(int index) const
   {

@@ -38,7 +38,7 @@ namespace TreeFitter {
     ErrCode initialize(FitParams* par);
 
     /** filter down the chain */
-    ErrCode filterCopy(FitParams& par, bool firstpass);
+    ErrCode filter(FitParams& par, bool firstpass);
 
     /** get dimension   */
     int dim() const { return m_dim;}
@@ -78,9 +78,10 @@ namespace TreeFitter {
 
     /**    */
     int momIndex() const ;
-
+    /**  */
     double getChi2Sum() const {return m_chi2SumConstraints; }
 
+    /**  */
     double getChainsChi2(const FitParams* par)const {return m_headOfChain->chiSquare(par);}
 
   private:

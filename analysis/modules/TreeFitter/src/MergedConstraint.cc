@@ -23,13 +23,11 @@ namespace TreeFitter {
   {
     B2DEBUG(80, "MergedConstraint:project()");
     ErrCode status ;
-    for (constraintlist::const_iterator it = m_list.begin() ;
-         it != m_list.end() ; ++it) {
-      status |= (*it)->projectCopy(fitpar, p) ;
-      p.incrementOffset((*it)->dim()) ;
+    for (auto element : m_list) {
+      status |= element->project(fitpar, p) ;
+      p.incrementOffset(element->dim()) ;
     }
     return status ;
   }
-
 }
 

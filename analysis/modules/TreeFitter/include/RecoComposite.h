@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini,Jo-Frederik Krohn                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,52 +25,60 @@ namespace TreeFitter {
 
     /** init particle in case it has a mother */
     virtual ErrCode initParticleWithMother(FitParams* fitparams);
+
     /** init particle in case it has no mother */
     virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+
     /** update chaed params */
     void updateParams();
+
     /** project this particle constraint  */
-    ErrCode projectRecoCompositeCopy(const FitParams& fitparams, Projection& p) const;
+    ErrCode projectRecoComposite(const FitParams& fitparams, Projection& p) const;
+
     /** dimension of the measurement vector */
     int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
 
 
-    // the number of parameters
+    /** get dimension of cosntraint */
     virtual int dim() const { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
 
-    // the number of 'measurements'
+    /** get dimension  of measurement*/
     int dimM() const        { return m_hasEnergy ? 7 : 6 ; }
-    ErrCode projectRecoComposite(const FitParams&, Projection&) const ;
+
+    /** project this constraint */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const ;
 
-    virtual ErrCode initPar1(FitParams*) ;
-    virtual ErrCode initPar2(FitParams*) ;
+    /** get ype */
     virtual int type() const { return kRecoComposite ; }
 
+    /** get position index in statevectof x,y,z,tau,px,py,pz */
     virtual int posIndex() const { return index()   ; }
+    /** get tau (lifetime) index in statevector */
     virtual int tauIndex() const { return index() + 3 ; }
+    /** get momentum index in statevector */
     virtual int momIndex() const { return index() + 4 ; }
 
+    /** return of this constraint/particle has an energy component */
     virtual bool hasEnergy() const { return m_hasEnergy ; }
+    /** return true FIXME */
     virtual bool hasPosition() const { return true ; }
 
-    virtual void updCache() ;
+    /** get chi2 */
     virtual double chiSquare(const FitParams* fitparams) const ;
 
+    /** add this to list */
     virtual void addToConstraintList(constraintlist& alist, int depth) const
     {
       alist.push_back(Constraint(this, Constraint::composite, depth, dimM())) ;
       alist.push_back(Constraint(this, Constraint::geometric, depth, 3)) ;
     }
 
-  protected: // I hate this, so we need to change the design ...
-    // cache
-    CLHEP::HepVector m_m ;    // 'measurement' (x,y,z,px,py,pz,E)
+  protected:
     /** column vector to store the measurement */
     EigenTypes::ColVector m_params;
     /** only lower triangle filled! */
     EigenTypes::MatrixXd  m_covariance;
-    CLHEP::HepSymMatrix m_matrixV ; // covariance in measurement
+    /** flag  */
     bool m_hasEnergy ;
   } ;
 

@@ -33,8 +33,8 @@ namespace TreeFitter {
     double getChiSquare() { return m_chisq;}
 
     /** init the kalman machenery */
-    ErrCode init(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
-                 const FitParams* fitparams, const EigenTypes::MatrixXd* V = 0, double weight = 1);
+    ErrCode calculateGainMatrix(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
+                                const FitParams* fitparams, const EigenTypes::MatrixXd* V = 0, double weight = 1);
 
     /**  get chi2 */
     double chisq() const { return m_chisq ; }

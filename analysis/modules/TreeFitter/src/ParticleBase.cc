@@ -39,7 +39,6 @@ namespace TreeFitter {
       if (pdgcode) { // PDG code != 0
 
         m_pdgMass      = particle->getPDGMass();//getMass() might also work
-        //      m_pdgMass      =TDatabasePDG::Instance()->GetParticle(pdgcode)->Mass();
         m_pdgWidth     = TDatabasePDG::Instance()->GetParticle(pdgcode)->Width();
         //  m_pdgLifeTime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime();
         m_pdgLifeTime = pdgLifeTime(particle);
@@ -61,8 +60,8 @@ namespace TreeFitter {
 
   ParticleBase::~ParticleBase()
   {
-    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      delete(*it);
+    for (auto daughter : m_daughters) {
+      delete daughter;
     }
     m_daughters.clear();
   }
@@ -91,8 +90,8 @@ namespace TreeFitter {
   void ParticleBase::updateIndex(int& offset)
   {
     // first the daughters
-    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      (*it)->updateIndex(offset);
+    for (auto daughter : m_daughters) {
+      daughter->updateIndex(offset);
     }
     // now the real work
     m_index = offset;
@@ -239,60 +238,17 @@ namespace TreeFitter {
       //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
       particles.push_back(this);
     }
-    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      (*it)->collectVertexDaughters(particles, posindex);
+    for (auto daughter : m_daughters) {
+      daughter->collectVertexDaughters(particles, posindex);
     }
   }
 
-  ErrCode ParticleBase::initCov(FitParams* fitparams) const
-  {
-    ErrCode status;
-    // position
-    int posindex = posIndex();
-    if (posindex >= 0) {
-      //double decaylength = pdtLifeTime() ;
-      const double sigpos = 20; // cm
-      // that's how good the initalization should be
-      for (int row = posindex + 1; row <= posindex + 3 ; ++row) {
-        fitparams->cov().fast(row, row) = sigpos * sigpos;
-      }
-    }
-    // momentum
-    int momindex = momIndex();
-    if (momindex >= 0) {
-      const double sigmom = 1; // GeV
-      int maxrow = hasEnergy() ? 4 : 3;
-      for (int row = momindex + 1; row <= momindex + maxrow; ++row) {
-        fitparams->cov().fast(row, row) = sigmom * sigmom;
-      }
-    }
-    // JFK: tau is a length in our version of the code Thu 24 Aug 2017 04:30:17 AM CEST
-    int tauindex = tauIndex();
-    if (tauindex >= 0) {
-      double tau = pdgTau();
-      double sigtau = tau > 0 ? 20 * tau : 999;
-      const double maxdecaylength = 20; // [cm] (okay for Ks->pi0pi0)
-      double bcP = particle()->getP();
-      if (bcP > 0.0) {
-        sigtau = std::min(maxdecaylength / bcP, sigtau);
-      }
-      if (tau > 0) {
-        sigtau = 20 * tau;
-      } else {
-        sigtau = 100;
-      }
-      fitparams->cov().fast(tauindex + 1, tauindex + 1) = sigtau * sigtau;
-    }
-    return status;
-  }
   ErrCode ParticleBase::initCovariance(FitParams* fitparams) const
   {
     ErrCode status;
     // position
     int posindex = posIndex();
     if (posindex >= 0) {
-//      fitparams->getCovariance().block<3, 3>(posindex, posindex).triangularView<Eigen::Lower>()
-      //      = EigenTypes::MatrixXd::Constant(3, 3, 400);
       //JFK: the fits diverge if we init the off elements dont ask me ... 2017-09-30
       for (int i = 0; i < 3; ++i) {
         fitparams->getCovariance()(posindex + i, posindex + i) = 400;
@@ -389,8 +345,8 @@ namespace TreeFitter {
     }
 
     //FT: also print daughters
-    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end() ; ++it) {
-      (*it)->print(fitpar);
+    for (auto daughter : m_daughters) {
+      daughter->print(fitpar);
     }
   }
 
@@ -405,8 +361,8 @@ namespace TreeFitter {
     const ParticleBase* rc = (m_particle == particle) ? this : 0; //if it corresponds to the stored pointer to the head, then it's easy
     if (!rc) { //otherwise sift through the daughters
       //FT:  LHCb iteration method, requires to define properly m_daughters in ParticleBase instead of InternalParticle, OR to do some hacks
-      for (ParticleBase::conIter it = m_daughters.begin(); !rc && it != m_daughters.end(); ++it) {
-        rc = (*it)->locate(particle);
+      for (auto daughter : m_daughters) {
+        rc = daughter->locate(particle);
         if (rc) {break;}
       }
     }
@@ -416,16 +372,16 @@ namespace TreeFitter {
   void ParticleBase::retrieveIndexMap(indexmap& indexmap) const
   {
     indexmap.push_back(std::pair<const ParticleBase*, int>(this, index()));
-    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      (*it)->retrieveIndexMap(indexmap);
+    for (auto daughter : m_daughters) {
+      daughter->retrieveIndexMap(indexmap);
     }
   }
 
   double ParticleBase::chiSquare(const FitParams* fitparams) const
   {
     double rc = 0;
-    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      double  chi2 = (*it)->chiSquare(fitparams);
+    for (auto daughter : m_daughters) {
+      double  chi2 = daughter->chiSquare(fitparams);
       rc += chi2;
     }
     return rc;
@@ -434,77 +390,13 @@ namespace TreeFitter {
   int ParticleBase::nFinalChargedCandidates() const
   {
     int rc = 0;
-    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
-      rc += (*it)->nFinalChargedCandidates();
+    for (auto daughter : m_daughters) {
+      rc += daughter->nFinalChargedCandidates();
     }
     return rc;
   }
 
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
-  {
-    int posindexmother = mother()->posIndex();
-    int posindex = posIndex();
-    int tauindex = tauIndex();
-    int momindex = momIndex();
-
-    double tau =  fitparams.par()(tauindex + 1);
-
-    double px = fitparams.par()(momindex + 1);
-    double py = fitparams.par()(momindex + 2);
-    double pz = fitparams.par()(momindex + 3);
-    double p2 = px * px + py * py + pz * pz;
-    double mom = std::sqrt(p2);
-
-    double posxmother = 0, posx = 0, momx = 0;
-
-    // linear approximation is fine
-    for (int row = 1; row <= 3; ++row) {
-      posxmother = fitparams.par()(posindexmother + row);
-      posx       = fitparams.par()(posindex + row);
-      momx       = fitparams.par()(momindex + row);
-      p.r(row) = posxmother - posx + tau * momx / mom; //JFK 1/mom is new
-      p.H(row, posindexmother + row) = 1;
-      p.H(row, posindex + row)       = -1;
-      p.H(row, momindex + row)       = tau / mom; // JFK was just tau before
-      p.H(row, tauindex + 1)         = momx;
-    }
-// JFK: this is the non linear part that uses the track helix as an extrapolation
-// we have to check the math here as tau is now a length! Thu 24 Aug 2017 04:31:52 AM CEST
-//
-    /*
-            if (charge() != 0) {
-              double lambda = bFieldOverC() * charge();
-              double px0 = fitparams.par()(momindex + 1);
-              double py0 = fitparams.par()(momindex + 2);
-              double pt0 = sqrt(px0 * px0 + py0 * py0);
-              const double posprecision = 1e-4; // 1mu
-              if (fabs(pt0 * lambda * tau * tau) > posprecision) {
-                // use the helix, but as if it were a 'correction'
-                double sinlt = sin(lambda * tau);
-                double coslt = cos(lambda * tau);
-                double px = px0 * coslt - py0 * sinlt;
-                double py = py0 * coslt + px0 * sinlt;
-
-                p.r(1) += -tau * px0 + (py - py0) / lambda;
-                p.r(2) += -tau * py0 - (px - px0) / lambda;
-
-                p.H(1, tauindex + 1) += -px0 + px;
-                p.H(1, momindex + 1) += -tau + sinlt / lambda;
-                p.H(1, momindex + 2) += (coslt - 1) / lambda;
-                p.H(2, tauindex + 1) += -py0 + py;
-                p.H(2, momindex + 1) +=      - (coslt - 1) / lambda;
-                p.H(2, momindex + 2) += -tau + sinlt / lambda;
-
-                if (vtxverbose >= 2)
-                  std::cout << "Using helix for position of particle: " << name().c_str() << " "
-                            << lambda << " " << lambda* tau
-                            << "  delta-x,y: " << -tau* px0 + (py - py0) / lambda << "  "
-                            << -tau* py0 - (px - px0) / lambda << std::endl ;
-              }
-            }*/
-    return ErrCode::success;
-  }
-  ErrCode ParticleBase::projectGeoConstraintCopy(const FitParams& fitparams, Projection& p) const
   {
     int posindexmother = mother()->posIndex();
     int posindex = posIndex();
@@ -539,28 +431,6 @@ namespace TreeFitter {
     double mass = pdgMass();
     double mass2 = mass * mass;
     int momindex = momIndex();
-
-    // initialize the value
-    double px = fitparams.par()(momindex + 1);
-    double py = fitparams.par()(momindex + 2);
-    double pz = fitparams.par()(momindex + 3);
-    double E  = fitparams.par()(momindex + 4);
-    p.r(1) = E * E - px * px - py * py - pz * pz - mass2;
-
-    // calculate the projection matrix
-    p.H(1, momindex + 1) = -2.0 * px;
-    p.H(1, momindex + 2) = -2.0 * py;
-    p.H(1, momindex + 3) = -2.0 * pz;
-    p.H(1, momindex + 4) =  2.0 * E;
-
-    return ErrCode::success;
-  }
-  ErrCode ParticleBase::projectMassConstraintCopy(const FitParams& fitparams,
-                                                  Projection& p) const
-  {
-    double mass = pdgMass();
-    double mass2 = mass * mass;
-    int momindex = momIndex();
     // initialize the value
     double px = fitparams.getStateVector()(momindex);
     double py = fitparams.getStateVector()(momindex + 1);
@@ -572,25 +442,14 @@ namespace TreeFitter {
     p.getH()(0, momindex + 1) = -2.0 * py;
     p.getH()(0, momindex + 2) = -2.0 * pz;
     p.getH()(0, momindex + 3) =  2.0 * E;
-
     return ErrCode::success;
   }
-
-
-
-
 
   ErrCode ParticleBase::projectConstraint(Constraint::Type, const FitParams&, Projection&) const
   {
     B2ERROR("Trying to project constraint of ParticleBase type. This is undefined.");
     return ErrCode::badsetup;
   }
-  ErrCode ParticleBase::projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const
-  {
-    B2ERROR("Trying to project constraint of ParticleBase type. This is undefined.");
-    return ErrCode::badsetup;
-  }
-
 
   double ParticleBase::bFieldOverC() //FT: (to do) BField is already called in RecoTrack, unify
   {
@@ -604,39 +463,6 @@ namespace TreeFitter {
   }
 
   ErrCode ParticleBase::initTau(FitParams* fitparams) const
-  {
-    int tauindex = tauIndex();
-    if (tauindex >= 0 && hasPosition()) {
-      const ParticleBase* amother = mother();
-      int momposindex = amother ? amother->posIndex() : -1;
-      int posindex = posIndex();
-      int momindex = momIndex();
-      assert(momposindex >= 0); // check code logic: no mother -> no tau
-      //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
-      //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
-
-      double px = 0, dx = 0, momdX = 0, mom2 = 0;
-      for (int irow = 1; irow <= 3; ++irow) {
-        dx  = fitparams->par(posindex + irow) - fitparams->par(momposindex + irow);//JFK added abs
-        px = fitparams->par(momindex + irow);
-        momdX += dx * px;
-        mom2 += px * px;
-      }
-      // JFK: tau is a length now! Thu 24 Aug 2017 04:33:11 AM CEST
-      // if tau should be a time devide by mom2 insertad of the sqrt
-      double tau = std::abs(momdX) / std::sqrt(mom2); //scalar product
-
-      // JFK: pdgTau returns nan because we init the mass with 0... Thu 24 Aug 2017 04:40:38 AM CEST
-      //      5 cm as an init value is a stupid but okish guess
-      if (tau == 0) {
-        tau = 5 ;//pdgTau();
-      }
-      if (std::isnan(tau)) {tau = -999;}
-      fitparams->par(tauindex + 1) = tau;
-    }
-    return ErrCode::success;
-  }
-  ErrCode ParticleBase::initTauCopy(FitParams* fitparams) const
   {
     int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {

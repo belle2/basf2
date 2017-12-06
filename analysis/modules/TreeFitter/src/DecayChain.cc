@@ -52,20 +52,6 @@ namespace TreeFitter {
 
     m_headOfChain->addToConstraintList(m_constraintlist, 0);
     std::sort(m_constraintlist.begin(), m_constraintlist.end());
-    mergedconstraint = MergedConstraint();
-    for (ParticleBase::constraintlist::iterator it = m_constraintlist.begin(); it != m_constraintlist.end(); ++it) {
-
-      B2DEBUG(30, "--DecayChain::initConstraintList name:" << (*it).name());
-      if (true) {
-        m_mergedconstraintlist.push_back(&(*it)); //FT: never filter constraints together
-      } else {
-        mergedconstraint.push_back(&(*it));
-      }
-    }
-
-    if (mergedconstraint.dim() > 0) {
-      m_mergedconstraintlist.push_back(&mergedconstraint);
-    }
   }
 
   ErrCode DecayChain::initialize(FitParams* par)
@@ -79,7 +65,7 @@ namespace TreeFitter {
     return status;
   }
 
-  ErrCode DecayChain::filterCopy(FitParams& par, bool firstpass)
+  ErrCode DecayChain::filter(FitParams& par, bool firstpass)
   {
     B2DEBUG(81, "--Filtering DecayChain ");
     ErrCode status;
@@ -89,17 +75,14 @@ namespace TreeFitter {
       status |= m_headOfChain->initCovariance(&par);
     }
 
-    //JFK: I removed the other thing since we didnt use it 2017-09-27
     m_chi2SumConstraints = 0;
     par.resetChiSquare();
-    for (std::vector<Constraint*>::iterator it = m_mergedconstraintlist.begin();
-         it != m_mergedconstraintlist.end(); ++it) {
+    for (auto constraint : m_constraintlist) {
 
-      B2DEBUG(81, "--Filtering DecayChain: Current Constraint:" << (*it)->name());
+      B2DEBUG(81, "--Filtering DecayChain: Current Constraint:" << constraint.name());
+      status |= constraint.filter(&par);
 
-      status |= (*it)->filterCopy(&par);
-
-      m_chi2SumConstraints += (*it)->getChi2();
+      m_chi2SumConstraints += constraint.getChi2();
     }
     return status;
   }
@@ -113,16 +96,20 @@ namespace TreeFitter {
   {
     const ParticleBase* rc(0);
     B2DEBUG(81, "--DecayChain::locate: Trying to locate " << particle->getName() << " in a " << m_particleMap.size() << " sized map.");
-    ParticleMap::const_iterator it = m_particleMap.find(particle) ;
+    const auto mapRow = m_particleMap.find(particle) ;
 
-    if (it == m_particleMap.end()) {
+    //auto isNullPB = [](const ParticleBase * pb) {return (pb) ? pb->name() : "NULL"; }; //JFK: lambda I use for debugging 2017-11-15
+
+    if (mapRow == m_particleMap.end()) {
+      //JFK: take head of chain and recursively find particle in it 2017-11-15
       rc = m_headOfChain->locate(particle);
 
       if (rc && rc->particle()) {
         const_cast<DecayChain*>(this)->m_particleMap[rc->particle()] = rc;
       }
     } else {
-      rc = it->second;
+      //JFK: only used for "head of tree" 2017-11-15
+      rc = mapRow->second;// (B2::Particle, Particlebase)
     }
     return rc;
   }

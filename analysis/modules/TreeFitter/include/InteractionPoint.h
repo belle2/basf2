@@ -13,16 +13,11 @@
 
 #include <analysis/modules/TreeFitter/InternalParticle.h>
 #include <analysis/modules/TreeFitter/ParticleBase.h>
-#include <CLHEP/Matrix/Vector.h>
-#include <CLHEP/Matrix/SymMatrix.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 namespace TreeFitter {
-
-  //    InteractionPoint(Particle* particle, bool forceFitAll,
-  //                     bool addupsilon) ; //FT: we don't actually have addupsilon in Belle2, this can be trimmed
 
   /** Class (abstract particle) containing the projection for the beam constraint */
   class InteractionPoint : public ParticleBase {
@@ -39,6 +34,7 @@ namespace TreeFitter {
 
     /** init particle, used if it has a mother */
     virtual  ErrCode initParticleWithMother(FitParams* fitparams);
+
     /** init particle, used if it has no mother */
     virtual  ErrCode initMotherlessParticle(FitParams* fitparams);
 
@@ -48,20 +44,8 @@ namespace TreeFitter {
     /** init the IP "particle"  */
     ErrCode initBeamSpot();
 
-    /** init the IP "particle"  */
-    ErrCode initBeamSpotCopy();
-
-    /** this is weird  */
+    /** this is weird  fixme */
     virtual int dim() const { return 3 ; } // (x,y,z)
-
-    /** init parameters  */
-    virtual ErrCode initPar1(FitParams*);
-
-    /** does nothing */
-    virtual ErrCode initPar2(FitParams*);
-
-    /** init covariance matrix of the constraint  */
-    virtual ErrCode initCov(FitParams*) const;
 
     /** init covariance matrix of the constraint  */
     virtual ErrCode initCovariance(FitParams* fitpar) const;
@@ -72,22 +56,11 @@ namespace TreeFitter {
     /**  chi2 of the statevector? */
     virtual double chiSquare(const FitParams* par) const;
 
-    /**  chi2 of the statevector? */
-    double  chiSquareCopy(const FitParams* fitparams) const;
-
     /** the actuall constraint projection  */
     ErrCode projectIPConstraint(const FitParams& fitpar, Projection&) const;
 
-
-    /** the actuall constraint projection  */
-    ErrCode projectIPConstraintCopy(const FitParams& fitparams, Projection& p) const;
-
     /** the abstract projection  */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
-
-    /** the abstract projection  */
-    virtual ErrCode projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const;
-
 
     /** adds the IP as a particle to the contraint list  */
     virtual void addToConstraintList(constraintlist& list, int depth) const;

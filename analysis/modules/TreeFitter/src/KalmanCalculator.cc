@@ -18,16 +18,15 @@ namespace TreeFitter {
 
   extern int vtxverbose;
 
-  ErrCode KalmanCalculator::init(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
-                                 const FitParams* fitparams, const EigenTypes::MatrixXd* V, double weight)
+  ErrCode KalmanCalculator::calculateGainMatrix(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
+                                                const FitParams* fitparams, const EigenTypes::MatrixXd* V, double weight)
   {
     B2DEBUG(83, "------ KalmanCalculator::init                                    ");
-
     m_constrDim = residuals.size();
     m_stateDim  = fitparams->getDimensionOfState();
     m_res = residuals;
     m_G = G;
-    m_R = EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim);
+    m_R = EigenTypes::MatrixXd::Zero(m_constrDim, m_constrDim);
 
     EigenTypes::MatrixXd C =
       EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
@@ -36,6 +35,7 @@ namespace TreeFitter {
     EigenTypes::MatrixXd Rtemp =
       EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
+
     Rtemp = G * m_CGt;
 
     if (V && (weight) && ((*V)(0, 0) != 0)) {
@@ -45,13 +45,12 @@ namespace TreeFitter {
       m_R = Rtemp.triangularView<Eigen::Lower>();
     }
 
-    //JFK: FIXME is this the fastest way? 2017-09-27
     EigenTypes::MatrixXd RInvtemp;
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
 
     //JFK: if one of the elements is infty or nan we can stop here 2017-09-28
-    // min matrix size is one
+    // but smallest matrix size is scalar (masscosntraint) so we can only check the first element
     if (!std::isfinite(m_Rinverse(0, 0))) {
       return ErrCode::inversionerror;
     }

@@ -1,13 +1,12 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- *
- * Copyright(C) 2013 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/* BASF2 (Belle Analysis Framework 2)                                     *
+*
+* Copyright(C) 2013 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 //Implementation of Decay Tree Fitter based on arXiv:physics/0503191
 //Main module implementation
@@ -21,7 +20,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// Magnetic field
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
@@ -41,6 +39,7 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("ipConstraintDimension", m_ipConstraintDimension,
            "Type::Int. Use the x-y-z-beamspot or x-y-beamtube constraint. Zero means no cosntraint which is the default. The Beamspot will be treated as the mother of the particlelist you feed.",
            0);
+
 }
 
 void TreeFitterModule::initialize()
@@ -69,7 +68,7 @@ void TreeFitterModule::event()
   m_nCandidatesBeforeFit += n;
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = plist->getParticle(i);
-    bool ok = doTreeFit(particle);
+    bool ok = fitTree(particle);
     if (!ok) {
       particle->setPValue(-1);
     }
@@ -87,16 +86,16 @@ void TreeFitterModule::terminate()
   if (m_nCandidatesAfter > 0) {
     plotFancyASCII();
   } else {
-    B2ERROR("Not a single candidate survived the fit.");
+    B2FATAL("Not a single candidate survived the fit. Maybe the confidence interval is to big?");
   }
 }
 
-bool TreeFitterModule::doTreeFit(Belle2::Particle* head)
+bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
-  std::unique_ptr<TreeFitter::Fitter> TreeFitObject(new TreeFitter::Fitter(head, m_precision, m_ipConstraintDimension));
-  TreeFitObject->setVerbose(m_verbose);
-  TreeFitObject->setMassConstraintList(m_massConstraintList);
-  bool rc = TreeFitObject->fitUseEigen();
+  std::unique_ptr<TreeFitter::Fitter> TreeFitter(new TreeFitter::Fitter(head, m_precision, m_ipConstraintDimension));
+  TreeFitter->setVerbose(m_verbose);
+  TreeFitter->setMassConstraintList(m_massConstraintList);
+  bool rc = TreeFitter->fit();
   return rc;
 }
 

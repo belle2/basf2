@@ -36,11 +36,6 @@ namespace TreeFitter {
     virtual std::string parname(int index) const;
 
     /** **/
-    virtual ErrCode initPar1(FitParams*);
-    /** **/
-    virtual ErrCode initPar2(FitParams*);
-
-    /** **/
     virtual int posIndex() const { return mother()->posIndex(); }
     /** **/
     virtual int momIndex() const { return index(); }

@@ -79,18 +79,18 @@ namespace TreeFitter {
     /** destructor */
     virtual ~Constraint() {}
 
-    /**   call the constraints projection function FIXME its weird that this is buried in particle */
-    virtual ErrCode projectCopy(const FitParams& fitpar, Projection& p) const;
+    /**   call the constraints projection function */
+    virtual ErrCode project(const FitParams& fitpar, Projection& p) const;
 
     /** filter this constraint */
-    virtual ErrCode filterCopy(FitParams* fitpar);
+    virtual ErrCode filter(FitParams* fitpar);
 
 
     /** get name of constraint  */
     std::string name() const;
 
     /**
-     * JFK dont understand, unused keep for comment above
+     * JFK dont understand, unused
      * */
     [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 

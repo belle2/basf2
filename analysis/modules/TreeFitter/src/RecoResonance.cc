@@ -24,6 +24,7 @@ namespace TreeFitter {
   {
     return ErrCode::success;
   }
+
   ErrCode RecoResonance::initMotherlessParticle(FitParams* fitparams)
   {
     int posindex = posIndex();
@@ -40,47 +41,19 @@ namespace TreeFitter {
 
     // copy the 'measurement' -> this overwrites mother position !
     for (int row = 0; row < dimM(); ++row) {
-      fitparams->getStateVector()(indexmap[row]) = m_m[row];
+      fitparams->getStateVector()(indexmap[row]) = m_params[row];
     }
     return ErrCode::success;
   }
 
   RecoResonance::~RecoResonance() {};
 
-
-  ErrCode RecoResonance::initPar1(FitParams* fitparams)
-  {
-    int posindex = posIndex();
-    int momindex = momIndex();
-
-    //quick map for parameters
-    int indexmap[7];
-    for (int i = 0; i < 3; ++i) {
-      indexmap[i]   = posindex + i;
-    }
-    for (int i = 0; i < 4; ++i) {
-      indexmap[i + 3] = momindex + i;
-    }
-
-    // copy the 'measurement' -> this overwrites mother position !
-    for (int row = 0; row < dimM(); ++row) {
-      fitparams->par()(indexmap[row] + 1) = m_m[row];
-    }
-    return ErrCode::success;
-  }
-
-  ErrCode RecoResonance::initPar2(FitParams* fitparams __attribute__((unused)))
-  {
-    // nothing to do!
-    return ErrCode::success ;
-  }
-
   ErrCode RecoResonance::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {
     ErrCode status;
     switch (type) {
       case Constraint::resonance:
-        status |= projectRecoCompositeCopy(fitparams, p);
+        status |= projectRecoComposite(fitparams, p);
         break;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);

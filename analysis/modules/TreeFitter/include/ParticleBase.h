@@ -69,23 +69,10 @@ namespace TreeFitter {
     /**  get basf2 particle  */
     Belle2::Particle* getBasf2Particle() const { return m_particle ; }
 
-    /** project geometrical constraint */
-    ErrCode projectGeoConstraintCopy(const FitParams& fitparams, Projection& p) const;
-    /** project mass constraint */
-    ErrCode projectMassConstraintCopy(const FitParams& fitparams,
-                                      Projection& p) const;
-
-
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
     /**  update indexx */
     virtual void updateIndex(int& offset);
-    /** init particle that does not need a mother vertex  */
-    virtual ErrCode initPar1(FitParams*) = 0 ;
-    /**  init eveything that needs a mother vertex */
-    virtual ErrCode initPar2(FitParams*) = 0 ;
-    /**  init covariance matrix */
-    virtual ErrCode initCov(FitParams*) const  ;
     /**  get name of parameter i */
     virtual std::string parname(int index) const ;
     /**  print */
@@ -96,6 +83,7 @@ namespace TreeFitter {
 
     /**  get basf2 particle  */
     Belle2::Particle* particle() const { return m_particle ; }
+
     /** get index  */
     int index() const { return m_index ; }
     /** getMother() / hasMother() */
@@ -109,8 +97,6 @@ namespace TreeFitter {
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
-    /** project constraint.   */
-    virtual ErrCode projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const;
     /**  force p4 sum conservation all allong the tree */
     virtual void forceP4Sum(FitParams&) const {} ;
 
@@ -174,11 +160,6 @@ namespace TreeFitter {
     typedef std::vector<ParticleBase*>::iterator iter;
     /** just an alias */
     typedef std::vector<ParticleBase*> ParticleContainer;
-    /** inti tau */
-    ErrCode initTauCopy(FitParams* fitparams) const;
-
-
-
 
     /**  */
     static double pdgLifeTime(Belle2::Particle* particle)  ;

@@ -95,7 +95,7 @@ namespace Belle2 {
       return m_pt.get<float>("signal_fraction");
     }
 
-    std::string Weightfile::getFileName(const std::string& suffix)
+    std::string Weightfile::generateFileName(const std::string& suffix)
     {
       char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXX").c_str());
       auto directory = mkdtemp(directory_template);
@@ -111,11 +111,6 @@ namespace Belle2 {
       std::ifstream in(custom_weightfile, std::ios::in | std::ios::binary);
       addStream(identifier, in);
       in.close();
-    }
-
-    void Weightfile::addFile(const std::string& identifier)
-    {
-      addFile(identifier, getFileName());
     }
 
     void Weightfile::addStream(const std::string& identifier, std::istream& in)
@@ -137,11 +132,6 @@ namespace Belle2 {
     {
       std::ofstream out(custom_weightfile, std::ios::out | std::ios::binary);
       out << getStream(identifier);
-    }
-
-    void Weightfile::getFile(const std::string& identifier)
-    {
-      getFile(identifier, getFileName());
     }
 
     std::string Weightfile::getStream(const std::string& identifier) const

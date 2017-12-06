@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2016
 
+from basf2 import *
+
 from modularAnalysis import *
 
 import tempfile

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <mva/methods/FastBDT.h>
+
 #include <framework/logging/Logger.h>
 #include <sstream>
 
@@ -261,8 +262,8 @@ namespace Belle2 {
 
 
       Weightfile weightfile;
-      std::string weightfile_name = weightfile.getFileName();
-      std::fstream file(weightfile_name, std::ios_base::out | std::ios_base::trunc);
+      std::string custom_weightfile = weightfile.generateFileName();
+      std::fstream file(custom_weightfile, std::ios_base::out | std::ios_base::trunc);
 
 #if FastBDT_VERSION_MAJOR >= 5
       file << classifier << std::endl;
@@ -278,7 +279,7 @@ namespace Belle2 {
 
       weightfile.addOptions(m_general_options);
       weightfile.addOptions(m_specific_options);
-      weightfile.addFile("FastBDT_Weightfile");
+      weightfile.addFile("FastBDT_Weightfile", custom_weightfile);
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
       std::map<std::string, float> importance;
@@ -300,9 +301,9 @@ namespace Belle2 {
     void FastBDTExpert::load(Weightfile& weightfile)
     {
 
-      std::string weightfile_name = weightfile.getFileName();
-      weightfile.getFile("FastBDT_Weightfile");
-      std::fstream file(weightfile_name, std::ios_base::in);
+      std::string custom_weightfile = weightfile.generateFileName();
+      weightfile.getFile("FastBDT_Weightfile", custom_weightfile);
+      std::fstream file(custom_weightfile, std::ios_base::in);
 
       int version = weightfile.getElement<int>("FastBDT_version", 0);
       B2DEBUG(100, "FastBDT Weightfile Version " << version);
@@ -311,7 +312,7 @@ namespace Belle2 {
         std::stringstream s;
         {
           std::string t;
-          std::fstream file2(weightfile_name, std::ios_base::in);
+          std::fstream file2(custom_weightfile, std::ios_base::in);
           getline(file2, t);
           s << t;
         }

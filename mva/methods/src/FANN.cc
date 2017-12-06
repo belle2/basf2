@@ -292,7 +292,7 @@ namespace Belle2 {
       fann_destroy(ann);
 
       Weightfile weightfile;
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
 
       fann_save(bestANN, custom_weightfile.c_str());
       fann_destroy(bestANN);
@@ -318,7 +318,7 @@ namespace Belle2 {
     void FANNExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       weightfile.getFile("FANN_Weightfile", custom_weightfile);
 
       if (m_ann) {

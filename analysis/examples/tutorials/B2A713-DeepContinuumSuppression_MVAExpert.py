@@ -7,6 +7,8 @@
 # mdst files and reconstructs B->KsPi0 decays, applies the MVAExpert module,
 # and writes out flat NTuples containing all variables used in the deep continuum
 # suppression training + the (transformed) network output distribution.
+# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # This module requires the weightfile produced in B2A712 (Deep_Feed_Forward.xml).
 #
@@ -134,20 +136,20 @@ contVars = [
 ]
 
 # Define additional low level variables
-basic_coordinates = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
-vertex_coordinates = ['distance', 'dphi', 'dcosTheta']
+basic_variables = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
+vertex_variables = ['distance', 'dphi', 'dcosTheta']
 cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg', 'isInRestOfEvent']
 track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
 
-for variablename in basic_coordinates + vertex_coordinates:
+for variablename in basic_variables + vertex_variables:
     v.variables.addAlias('thrustsig' + variablename, 'useThrustFrame(' + variablename + ',Signal)')
 
 cluster_variables = cluster_specific_variables[:]
-for variablename in basic_coordinates:
+for variablename in basic_variables:
     cluster_variables.append('thrustsig' + variablename)
 
 track_variables = track_specific_variables
-for variablename in basic_coordinates + vertex_coordinates:
+for variablename in basic_variables + vertex_variables:
     track_variables.append('thrustsig' + variablename)
 
 variables = ['isContinuumEvent', 'isNotContinuumEvent', 'isSignal', 'M', 'p', 'Mbc', 'DeltaZ',
@@ -172,7 +174,10 @@ for rank in range(5):
             variables.append('{}_{}{}'.format(variable, shortcut, rank))
 
 # MVAExpert
-roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', identifier='Deep_Feed_Forward.xml')
+# In this path there are already several trained weightfiles. Look at README for a short explanation
+path = '/gpfs/fs02/belle2/users/pablog/inputForDNNContinuumSuppression/'
+
+roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', identifier=path + 'Deep_Feed_Forward.xml')
 
 # Variables from MVAExpert.
 expertVars = ['extraInfo(Deep_CS)', 'transformedNetworkOutput(Deep_CS,0.1,1.0)']

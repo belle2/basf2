@@ -8,6 +8,8 @@
 # a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
 # pure signal and qqbar for running the expert as explained below.
 # The actual training model is described in B2A714.
+# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Usage:
 #   basf2 B2A702-ContinuumSuppression_MVATrain.py
@@ -65,21 +67,21 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
     if use_continuum_features == 2:
         return contVar
 
-    sph_momenta = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
-    sph_vertex = ['distance', 'dphi', 'dcosTheta']
+    basic_variables = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
+    vertex_variables = ['distance', 'dphi', 'dcosTheta']
 
-    cluster_specific = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg']
-    track_specific = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits']
+    cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg']
+    track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits']
 
     if use_charge_and_ROE_features:
-        cluster_specific += ['isInRestOfEvent']
-        track_specific += ['isInRestOfEvent', 'charge']
+        cluster_specific_variables += ['isInRestOfEvent']
+        track_specific_variables += ['isInRestOfEvent', 'charge']
 
-    cluster_specific += ['thrustsig' + var for var in sph_momenta]
-    track_specific += ['thrustsig' + var for var in sph_momenta]
+    cluster_specific_variables += ['thrustsig' + var for var in basic_variables]
+    track_specific_variables += ['thrustsig' + var for var in basic_variables]
 
     if use_vertex_features:
-        track_specific += ['thrustsig' + var for var in sph_vertex]
+        track_specific_variables += ['thrustsig' + var for var in vertex_variables]
 
     cluster_lists = ['Csig', 'Croe']
     track_lists = ['TPsig', 'TMsig', 'TProe', 'TMroe']
@@ -87,12 +89,12 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
     variables = []
     for plist in track_lists:
         for rank in range(5):
-            for var in track_specific:
+            for var in track_specific_variables:
                 variables.append('{}_{}{}'.format(var, plist, rank))
 
     for plist in cluster_lists:
         for rank in range(10):
-            for var in cluster_specific:
+            for var in cluster_specific_variables:
                 variables.append('{}_{}{}'.format(var, plist, rank))
 
     if use_continuum_features:
@@ -103,7 +105,8 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
 
 if __name__ == "__main__":
 
-    path = ''
+    # In this path there are already several trained weightfiles. Look at README for a short explanation
+    path = '/gpfs/fs02/belle2/users/pablog/inputForDNNContinuumSuppression/'
 
     train_data = path + 'train.root'
     test_data = path + 'test.root'
@@ -113,7 +116,7 @@ if __name__ == "__main__":
     general_options.m_treename = "tree"
     general_options.m_identifier = "Deep_Feed_Forward.xml"
     general_options.m_variables = basf2_mva.vector(*choose_input_features(True, False, 1))
-    general_options.m_spectators = basf2_mva.vector('Mbc', 'deltaE')
+    general_options.m_spectators = basf2_mva.vector('Mbc', 'DeltaZ')
     general_options.m_target_variable = "isNotContinuumEvent"
 
     specific_options = basf2_mva.PythonOptions()
@@ -129,7 +132,7 @@ if __name__ == "__main__":
         'use_relation_layers': False,
         # The following options are for using Adversaries. To disable them leave lambda to zero.
         # See mva/examples/keras/adversary_network.py for details
-        'lambda': 0,  # Use 20 to try the Adversaries out
+        'lambda': 0,  # Use 500 as starting point to try the Adversaries out
         'number_bins': 10,
         'adversary_steps': 5}
     specific_options.m_config = json.dumps(keras_dic)

@@ -7,6 +7,8 @@
 # mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
 # tutorials B2A712 AND B2A713 for training, testing, and applying the MVAExpert.
 # It's useful to have a look at B2A701-ContinuumSuppression_Input.py first.
+# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# The new variables are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Usage:
 #   basf2 B2A711-DeepContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>
@@ -37,6 +39,7 @@ val_inputfiles = glob.glob(path + '/*/*/*2.root.mdst')
 signal_inputfiles = glob.glob(path + '/*/*/*1.root.mdst')
 qqbar_inputfiles = glob.glob(path + '/*/*/*7.root.mdst')
 
+# shuffle file names
 np.random.shuffle(train_inputfiles)
 np.random.shuffle(val_inputfiles)
 np.random.shuffle(signal_inputfiles)
@@ -144,24 +147,28 @@ contVars = [
 ]
 
 # Define additional low level variables
-basic_coordinates = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
-vertex_coordinates = ['distance', 'dphi', 'dcosTheta']
+basic_variables = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
+vertex_variables = ['distance', 'dphi', 'dcosTheta']
 cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg', 'isInRestOfEvent']
 track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
 
-for variablename in basic_coordinates + vertex_coordinates:
+# Aliases from normal coordinates to thrustframe coordinates (see confluence page)
+for variablename in basic_variables + vertex_variables:
     v.variables.addAlias('thrustsig' + variablename, 'useThrustFrame(' + variablename + ',Signal)')
 
 cluster_variables = cluster_specific_variables[:]
-for variablename in basic_coordinates:
+for variablename in basic_variables:
     cluster_variables.append('thrustsig' + variablename)
 
 track_variables = track_specific_variables
-for variablename in basic_coordinates + vertex_coordinates:
+for variablename in basic_variables + vertex_variables:
     track_variables.append('thrustsig' + variablename)
 
+# General variables and training targets, which are nice to have in the Ntuple
 variables = ['isContinuumEvent', 'isNotContinuumEvent', 'isSignal', 'M', 'p', 'Mbc', 'DeltaZ',
              'deltaE', 'daughter(0, M)', 'daughter(0, p)', 'daughter(1, M)', 'daughter(1, p)']
+
+# Aliases for variable ranks created by rankByHighest function
 for rank in range(10):
     for shortcut, particlelist in [('Croe', 'gamma:roe'), ('Csig', 'gamma:signal')]:
         for variable in cluster_variables:
@@ -184,6 +191,7 @@ for rank in range(5):
 # Create output file.
 variablesToNTuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
 
+# Loop over each possible ROE (1 for every B candidate) in every event
 analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 process(analysis_main)

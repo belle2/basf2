@@ -11,6 +11,8 @@
 # Additional examples with keras can be found in the folder:
 # mva/examples/keras
 #
+# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Contributors: D. Weyland (November 2017), P. Goldenzweig (October 2016)
 #

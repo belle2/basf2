@@ -34,6 +34,6 @@ double KlId::getKlId() const
   if (klmClusterWeight.first) return klmClusterWeight.second;
   auto eclClusterWeight = getRelatedFromWithWeight<ECLCluster>();
   if (eclClusterWeight.first) return eclClusterWeight.second;
-  return -999;
+  return nan("");
 }
 

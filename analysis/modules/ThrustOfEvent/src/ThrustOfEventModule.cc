@@ -26,6 +26,7 @@
 
 #include <iostream>
 
+using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -43,7 +44,7 @@ ThrustOfEventModule::ThrustOfEventModule() : Module()
   setDescription("Module to compute Thrust of a particle list, mainly used to compute the thrust of a tau-taubar event.");
 
   // Parameter definitions
-  addParam("particleList", m_particleList, "Name of the ParticleList");
+  addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
 
 }
 
@@ -53,6 +54,12 @@ ThrustOfEventModule::~ThrustOfEventModule()
 
 void ThrustOfEventModule::initialize()
 {
+  unsigned nParticleLists = m_particleLists.size();
+  for (unsigned i = 0; i < nParticleLists; ++i) {
+
+
+  }
+  B2INFO("Number of ParticleLists to calculate Thrust " << nParticleLists << " ");
 }
 
 void ThrustOfEventModule::beginRun()
@@ -61,6 +68,8 @@ void ThrustOfEventModule::beginRun()
 
 void ThrustOfEventModule::event()
 {
+  // number of ParticleLists
+  int nParticleLists = m_particleLists.size();
 }
 
 void ThrustOfEventModule::endRun()
@@ -71,7 +80,7 @@ void ThrustOfEventModule::terminate()
 {
 }
 
-float getThrustOfEvent(std::string m_particleList){
+float getThrustOfEvent(){
     std::srand(std::time(0)); // use current time as seed for random generator
     float random_variable0 = std::rand()/1.0;
     float random_variable1 = std::rand()/1.0;

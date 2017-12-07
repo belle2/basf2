@@ -57,7 +57,10 @@ namespace Belle2 {
 
   private:
 
-    std::string m_particleList;  /**< Name of the ParticleList */
+    std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
+
+    /** Count the total number of particles */
+    int m_nParticles;
 
     /**
      * Adds all tracks from StoreArray<Track> that are used in reconstruction of given particle.

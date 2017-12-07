@@ -10,9 +10,9 @@
 
 #include <string>
 
-#include <dqm/SocketLib.h>
-#include <dqm/EvtSocket.h>
-#include <dqm/EvtSocketManager.h>
+#include <daq/dataflow/SocketLib.h>
+#include <daq/dataflow/EvtSocket.h>
+#include <daq/dataflow/EvtSocketManager.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 

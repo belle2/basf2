@@ -72,7 +72,8 @@ TeeggInputModule::~TeeggInputModule()
 void TeeggInputModule::initialize()
 {
   //Initialize MCParticle collection.
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Initialize initial particle for beam parameters.
   m_initial.initialize();

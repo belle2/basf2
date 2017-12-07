@@ -9,11 +9,11 @@
  **************************************************************************/
 
 
-#ifndef ECLHITDEBUGMODULE_H_
-#define ECLHITDEBUGMODULE_H_
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 
@@ -28,7 +28,10 @@
 
 
 namespace Belle2 {
+  class ECLDebugHit;
   namespace ECL {
+
+
 
     /** Class to represent the hit of one cell */
     class ECLHitDebugModule : public Module {
@@ -58,18 +61,6 @@ namespace Belle2 {
       /** Stopping of CPU clock.*/
       virtual void terminate();
 
-      /*
-            typedef std::vector<int>   PrimaryPDG;
-            typedef std::vector<int>   MCtracks;
-            struct aTrack {
-              int cellId;
-              double energy;
-            };
-            typedef std::vector<MCtracks>   PrimaryTracks;
-            typedef std::map< int, int>  ECLTrackMap;
-            typedef std::pair< int, int> vpair;
-      */
-
     protected:
       /** Input array name. */
       std::string m_inColName;
@@ -79,9 +70,7 @@ namespace Belle2 {
       /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
       int m_hitNum;
 
-
     private:
-
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */
@@ -89,8 +78,9 @@ namespace Belle2 {
       /** Event number */
       int    m_nEvent;
 
+      //DataStore variables
+      StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */
+
     };
   } //ECL
 } // end of Belle2 namespace
-
-#endif // ECLDIGI_H

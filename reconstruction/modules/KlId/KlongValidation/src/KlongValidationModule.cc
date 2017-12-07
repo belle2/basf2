@@ -101,9 +101,9 @@ void KlongValidationModule::initialize()
   m_trackFlag      = new TH1F("Track flag", "TrackFlag;Flag; Count", 2, 0, 1);
   m_ECLFlag       = new TH1F("ECL flag", "ECLFlag;Flag; Count", 2, 0, 1);
 
-  m_klidFake       = new TH1F("Klid Fake", "klid Fake;klid; Count", m_xbins.size(), m_xbins.data());
-  m_klidTrue       = new TH1F("Klid True", "Klid True;klid; Count", m_xbins.size(), m_xbins.data());
-  m_klidAll       = new TH1F("Klid all", "klid all clusters;klid; Count", m_xbins.size(), m_xbins.data());
+  m_klidFake       = new TH1F("Klid Fake", "klid Fake;klid; Count", m_xbins.size() - 1, m_xbins.data());
+  m_klidTrue       = new TH1F("Klid True", "Klid True;klid; Count", m_xbins.size() - 1, m_xbins.data());
+  m_klidAll       = new TH1F("Klid all", "klid all clusters;klid; Count", m_xbins.size() - 1, m_xbins.data());
 
 }//initk
 

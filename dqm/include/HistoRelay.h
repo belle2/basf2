@@ -14,7 +14,7 @@
 #include "TH1.h"
 #include "TMemFile.h"
 
-#include <dqm/EvtSocket.h>
+#include <daq/dataflow/EvtSocket.h>
 #include <dqm/DqmMemFile.h>
 
 namespace Belle2 {

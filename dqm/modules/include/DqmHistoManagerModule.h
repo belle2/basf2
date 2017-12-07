@@ -10,7 +10,7 @@
 
 
 #include <framework/core/Module.h>
-#include <dqm/EvtSocket.h>
+#include <daq/dataflow/EvtSocket.h>
 
 #include <framework/core/Environment.h>
 #include <framework/pcore/ProcHandler.h>

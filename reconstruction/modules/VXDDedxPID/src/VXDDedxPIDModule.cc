@@ -291,8 +291,8 @@ void VXDDedxPIDModule::event()
 void VXDDedxPIDModule::terminate()
 {
 
-  B2INFO("VXDDedxPIDModule exiting after processing " << m_trackID <<
-         " tracks in " << m_eventID + 1 << " events.");
+  B2DEBUG(50, "VXDDedxPIDModule exiting after processing " << m_trackID <<
+          " tracks in " << m_eventID + 1 << " events.");
 }
 
 void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,

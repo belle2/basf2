@@ -35,9 +35,11 @@ import basf2_version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.intersphinx',
     'sphinx.ext.autodoc',
     # 'sphinx.ext.autosummary',
     'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinxarg.ext',
 ]
@@ -301,6 +303,9 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+# allow to have links to python documentation
+intersphinx_mapping = {'python': ('https://docs.python.org/3.6', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):

@@ -48,7 +48,7 @@ def _avoidPyRootHang():
         try:
             from ROOT import PyConfig
             PyConfig.StartGuiThread = False
-        except:
+        except BaseException:
             print("PyRoot not set up, this will cause problems.")
 
 
@@ -257,20 +257,33 @@ def pretty_print_description_list(rows):
 
 def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLevel=None, **kwargs):
     """
-    Register the module 'name' and return it (e.g. for adding to a path)
+    Register the module 'name' and return it (e.g. for adding to a path). This
+    function is intended to instantiate existing modules. To find out which
+    modules exist you can run :program:`basf2 -m` and to get details about the
+    parameters for each module you can use :program:`basf2 -m {modulename}`
 
-    :param name_or_module: The name of the module type, may also be a module instance which parameters should be set
-    :param shared_lib_path: An optional path to a shared library from which the
-                     module should be loaded
-    :param logLevel: indicates the log level, e.g. LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
-    :param debugLevel: Number indicating the detail of debug messages, default 100
-    :param kwargs: Additional parameters of the module to be set.
+    Parameters can be passed directly to the module as keyword parameters or can
+    be set later using `Module.param`
 
-    You can also use `Path.add_module() <basf2.Path.add_module>` directly,
-    which accepts the same name, logging and module parameter arguments.
+    >>> module = basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
+    >>> module.param("evtNumList", 100)
 
-    >>> basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
-    <pybasf2.Module at 0x1e356e0>
+    :param name_or_module: The name of the module type, may also be an existing
+           `Module` instance for which parameters should be set
+    :param str shared_lib_path: An optional path to a shared library from which the
+           module should be loaded
+    :param LogLevel logLevel: indicates the minimum severity of log messages
+           to be shown from this module. See `Module.set_log_level`
+    :param int debugLevel: Number indicating the detail of debug messages, the
+           default level is 100. See `Module.set_debug_level`
+    :param kwargs: Additional parameters to be passed to the module.
+
+    .. note::
+
+        You can also use `Path.add_module()` directly,
+        which accepts the same name, logging and module parameter arguments. There
+        is no need to register the module by hand if you will add it to the path in
+        any case.
     """
 
     if isinstance(name_or_module, Module):
@@ -293,7 +306,13 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
 
 
 def set_module_parameters(path, name, recursive=False, **kwargs):
-    """Set the given set of parameters for all modules in a path which have the given 'name'
+    """Set the given set of parameters for all `modules <Module>` in a path which
+    have the given ``name`` (see `Module.set_name`)
+
+    Usage is similar to `register_module()` but this function will not create
+    new modules but just adjust parameters for modules already in a `Path`
+
+    >>> set_module_parameters(path, "Geometry", components=["PXD"], logLevel=LogLevel.WARNING)
 
     :param path: The path to search for the modules
     :param name: Then name of the module to set parameters for
@@ -554,7 +573,7 @@ def set_log_level(level):
     Sets the global log level which specifies up to which level the
     logging messages will be shown
 
-    :param level: LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
+    :param basf2.LogLevel level: minimum severity of messages to be logged
     """
 
     logging.log_level = level
@@ -565,7 +584,7 @@ def set_debug_level(level):
     Sets the global debug level which specifies up to which level the
     debug messages should be shown
 
-    :param level: The debug level. The default value is 100
+    :param int level: The debug level. The default value is 100
     """
 
     logging.debug_level = level
@@ -681,6 +700,7 @@ def _make_tobject_const(obj):
 
     def __make_const_proxy(obj, name):
         """return a proxy function which just raises an attribute error on access"""
+
         def proxy(self, *args):
             """raise attribute error when called"""
             raise AttributeError("%s is readonly and method '%s' is not const" % (obj, name))

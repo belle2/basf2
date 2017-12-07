@@ -19,65 +19,61 @@ namespace Belle2 {
   class ExtHit;
   class ECLCalDigit;
   class ECLShower;
-  namespace ECL {
 
+  /** The modules creates and saves in the DataStore a Relation between Tracks and ECLShower.
+   * It uses the existing Relation between Tracks and ExtHit, from which the ECL crystals
+   *  hit by the extrapolated tracks are found. All the ECLShowers containing the found
+   * crystals are then associated to each Track. A Relation Track --> ECLShower is filled and saved
+   * in the DataStore.
+   */
+  class ECLTrackShowerMatchModule : public Module {
+  public:
+    /** Constructor, for setting module description and parameters. */
+    ECLTrackShowerMatchModule();
 
+    /** Use to clean up anything you created in the constructor. */
+    virtual ~ECLTrackShowerMatchModule();
 
-    /** The modules creates and saves in the DataStore a Relation between Tracks and ECLShower.
-     * It uses the existing Relation between Tracks and ExtHit, from which the ECL crystals
-     *  hit by the extrapolated tracks are found. All the ECLShowers containing the found
-     * crystals are then associated to each Track. A Relation Track --> ECLShower is filled and saved
-     * in the DataStore.
+    /** Use this to initialize resources or memory your module needs.
+     *
+     *  Also register any outputs of your module (StoreArrays, RelationArrays,
+     *  StoreObjPtrs) here, see the respective class documentation for details.
      */
-    class ECLTrackShowerMatchModule : public Module {
-    public:
-      /** Constructor, for setting module description and parameters. */
-      ECLTrackShowerMatchModule();
+    virtual void initialize();
 
-      /** Use to clean up anything you created in the constructor. */
-      virtual ~ECLTrackShowerMatchModule();
+    /** Called once before a new run begins.
+     *
+     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
+     */
+    virtual void beginRun();
 
-      /** Use this to initialize resources or memory your module needs.
-       *
-       *  Also register any outputs of your module (StoreArrays, RelationArrays,
-       *  StoreObjPtrs) here, see the respective class documentation for details.
-       */
-      virtual void initialize();
+    /** Called once for each event.
+     *
+     * This is most likely where your module will actually do anything.
+     */
+    virtual void event();
 
-      /** Called once before a new run begins.
-       *
-       * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-       */
-      virtual void beginRun();
+    /** Called once when a run ends.
+     *
+     *  Use this method to save run information, which you aggregated over the last run.
+     */
+    virtual void endRun();
 
-      /** Called once for each event.
-       *
-       * This is most likely where your module will actually do anything.
-       */
-      virtual void event();
+    /** Clean up anything you created in initialize(). */
+    virtual void terminate();
 
-      /** Called once when a run ends.
-       *
-       *  Use this method to save run information, which you aggregated over the last run.
-       */
-      virtual void endRun();
+  private:
+    /** Minimal distance between track and shower. */
+    double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
 
-      /** Clean up anything you created in initialize(). */
-      virtual void terminate();
+    /** Compute depth. */
+    void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
 
-    private:
-      /** Minimal distance between track and shower. */
-      double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
-
-      /** Compute depth. */
-      void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
-
-      //DataStore variabels
-      StoreArray<Track> m_tracks; /**< Track dataStore variables*/
-      StoreArray<ECLShower> m_eclShowers; /**< ECLShower dataStore variables*/
-      StoreArray<ECLCluster> m_eclClusters; /**< ECLCluster dataStore variables*/
-      StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigit dataStore variables*/
-      StoreArray<ExtHit> m_extHits; /**< ExtHit dataStore variables*/
-    };
-  }
+    //DataStore variabels
+    StoreArray<Track> m_tracks; /**< Track dataStore variables*/
+    StoreArray<ECLShower> m_eclShowers; /**< ECLShower dataStore variables*/
+    StoreArray<ECLCluster> m_eclClusters; /**< ECLCluster dataStore variables*/
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigit dataStore variables*/
+    StoreArray<ExtHit> m_extHits; /**< ExtHit dataStore variables*/
+  };
 } //Belle2

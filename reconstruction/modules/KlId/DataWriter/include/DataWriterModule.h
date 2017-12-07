@@ -77,8 +77,6 @@ namespace Belle2 {
     Float_t m_KLMenergy;
     /**  invariant mass calculated from root vector */
     Float_t m_KLMinvM;
-    /** distance KLM Cluster <-> track extrapolated into KLM */
-    Float_t m_KLMtrackDist;
     /** target variable for KLM classification */
     Float_t m_KLMTruth;
     /** distance to next KLM cluster */

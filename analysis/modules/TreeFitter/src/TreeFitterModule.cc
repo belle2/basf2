@@ -12,7 +12,7 @@
 //Main module implementation
 
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
-#include <analysis/modules/TreeFitter/Fitter.h>
+#include <analysis/VertexFitting/TreeFitter/Fitter.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>

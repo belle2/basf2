@@ -64,6 +64,7 @@ namespace Belle2 {
 
     /** before the fit */
     unsigned int m_nCandidatesBeforeFit;
+
     /** after the fit  */
     unsigned int m_nCandidatesAfter;
 

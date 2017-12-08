@@ -56,11 +56,18 @@ class batch_generator():
         :param Y: Label Data
         :param Z: Spectaters/Qunatity to be uncorrelated to
         """
+        #: Input Features
         self.X = X
+        #: Label Data
         self.Y = Y
+        #: Spectators
         self.Z = Z
+        #: Number of events
         self.len = len(Y)
+        #: Index array, which will be shuffled
         self.index_array = np.arange(self.len)
+        np.random.shuffle(self.index_array)
+        #: Pointer for index array
         self.pointer = 0
 
     def next_batch(self, batch_size):

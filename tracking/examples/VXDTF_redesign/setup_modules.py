@@ -286,7 +286,11 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
 
-    NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+    if os.environ.get('USE_BEAST2_GEOMETRY'):
+        NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCutsPhase2.root")
+    else:
+        NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+
     if useNoKick:
         recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)  # NoKickCuts applied
         recoTrackCandConverter.param('noKickOutput', True)  # produce output TFile of NoKickCuts

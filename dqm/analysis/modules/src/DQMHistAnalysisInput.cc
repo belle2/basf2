@@ -29,6 +29,7 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
   addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
+  addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
 }
 
@@ -61,30 +62,32 @@ void DQMHistAnalysisInputModule::event()
   while ((key = (TKey*)next())) {
     TH1* h = (TH1*)key->ReadObj();
     hs.push_back(h);
-    TString a = h->GetName();
-    StringList s = StringUtil::split(a.Data(), '/');
-    a.ReplaceAll("/", "_");
-    std::string name = a.Data();
-    if (m_cs.find(name) == m_cs.end()) {
-      if (s.size() > 1) {
-        std::string dirname = s[0];
-        std::string hname = s[1];
-        TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-      } else {
-        std::string hname = a.Data();
-        TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+    if (m_autocanvas) {
+      TString a = h->GetName();
+      StringList s = StringUtil::split(a.Data(), '/');
+      a.ReplaceAll("/", "_");
+      std::string name = a.Data();
+      if (m_cs.find(name) == m_cs.end()) {
+        if (s.size() > 1) {
+          std::string dirname = s[0];
+          std::string hname = s[1];
+          TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+        } else {
+          std::string hname = a.Data();
+          TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
+          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+        }
       }
+      TCanvas* c = m_cs[name];
+      c->cd();
+      if (h->GetDimension() == 1) {
+        h->Draw("hist");
+      } else if (h->GetDimension() == 2) {
+        h->Draw("colz");
+      }
+      c->Update();
     }
-    TCanvas* c = m_cs[name];
-    c->cd();
-    if (h->GetDimension() == 1) {
-      h->Draw("hist");
-    } else if (h->GetDimension() == 2) {
-      h->Draw("colz");
-    }
-    c->Update();
   }
   resetHist();
   for (size_t i = 0; i < hs.size(); i++) {

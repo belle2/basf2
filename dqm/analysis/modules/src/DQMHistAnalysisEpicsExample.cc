@@ -103,7 +103,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
   TH1* hh1;
   hh1 = findHist(m_histoname.c_str());
 
-  hh1 = findHist(m_histoname.c_str());
+  //hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
     B2INFO("Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?

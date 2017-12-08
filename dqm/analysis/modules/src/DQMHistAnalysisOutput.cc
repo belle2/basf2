@@ -35,7 +35,7 @@ DQMHistAnalysisOutputModule::~DQMHistAnalysisOutputModule() { }
 void DQMHistAnalysisOutputModule::initialize()
 {
   ParamTypeList& parnames(getParNames());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
     B2INFO("Addding : " << pname);
   }
@@ -54,7 +54,7 @@ void DQMHistAnalysisOutputModule::event()
   IntValueList& vints(getIntValues());
   FloatValueList& vfloats(getFloatValues());
   TextList& texts(getTexts());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
     TString& vvname = TString(pname).ReplaceAll('/', '.');
     vvname.ToLower();

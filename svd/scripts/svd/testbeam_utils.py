@@ -155,7 +155,7 @@ def add_vxdtf(path, magnet=True, momentum=5., filterOverlaps='hopfield', usedGeo
 # function which returns a vxdtf module with the default settings, so that one can change parameters afterwards
 
 
-def get_vxdtf(magnet=True, svd_only=False, momentum=5., filterOverlaps='hopfield', usedGeometry='TB2017newGeo'):
+def get_vxdtf(magnet=True, svd_only=True, momentum=5., filterOverlaps='hopfield', usedGeometry='TB2017newGeo'):
     if magnet:
         if not svd_only:
             # SVD and PXD sec map
@@ -278,7 +278,7 @@ def get_vxdtf(magnet=True, svd_only=False, momentum=5., filterOverlaps='hopfield
     }
 
     if not magnet:
-        param_vxdtf['artificialMomentum'] = momentum
+        param_vxdtf['artificialMomentum'] = 5.
         param_vxdtf['activateAnglesXY'] = [True]
         param_vxdtf['activateAnglesRZHioC'] = [True]
 

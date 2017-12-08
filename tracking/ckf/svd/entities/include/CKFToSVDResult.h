@@ -11,6 +11,8 @@
 #include <tracking/ckf/general/entities/CKFResult.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
@@ -21,7 +23,7 @@ namespace Belle2 {
   public:
     using Super::Super;
 
-    CKFToSVDResult(const std::vector<const CKFToSVDState*>& path);
+    CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path);
 
     void addToRecoTrack(RecoTrack& recoTrack) const;
   };

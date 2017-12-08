@@ -116,32 +116,31 @@ void PXDDigitizerModule::initialize()
   m_segmentLength *= Unit::mm;
 
 
-  B2INFO(
-    "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
-  B2INFO(" -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
-  B2INFO(" -->  ElectronicNoise:    " << m_elNoise << " e-");
-  B2INFO(" --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
-  B2INFO(" --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
-  B2INFO(
-    " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(
-    " -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
-  B2INFO(
-    " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
-  B2INFO(
-    " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
-  B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
-  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
-  B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
-  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2INFO(" -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
-  B2INFO(" --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
-  B2INFO(" -->  SegmentLength:      " << m_segmentLength << " cm");
-  B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
-  B2INFO(" -->  ElectronStepTime:   " << m_elStepTime << " ns");
-  B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
-  B2INFO(" -->  ADU unit:           " << m_eToADU << " e-/ADU");
-  B2INFO(" -->  statisticsFilename: " << m_rootFilename);
+  B2DEBUG(20, "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
+  B2DEBUG(20, " -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
+  B2DEBUG(20, " -->  ElectronicNoise:    " << m_elNoise << " e-");
+  B2DEBUG(20, " --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
+  B2DEBUG(20, " --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
+  B2DEBUG(20,
+          " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(20,
+          " -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
+  B2DEBUG(20,
+          " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
+  B2DEBUG(20,
+          " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(20, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2DEBUG(20, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2DEBUG(20, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2DEBUG(20, " -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
+  B2DEBUG(20, " --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
+  B2DEBUG(20, " -->  SegmentLength:      " << m_segmentLength << " cm");
+  B2DEBUG(20, " -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
+  B2DEBUG(20, " -->  ElectronStepTime:   " << m_elStepTime << " ns");
+  B2DEBUG(20, " -->  ElectronMaxSteps:   " << m_elMaxSteps);
+  B2DEBUG(20, " -->  ADU unit:           " << m_eToADU << " e-/ADU");
+  B2DEBUG(20, " -->  statisticsFilename: " << m_rootFilename);
 
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");

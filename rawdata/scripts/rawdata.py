@@ -91,6 +91,8 @@ def add_packers(path, components=None):
 
     # SVD
     if components is None or 'SVD' in components:
+        path.add_module('SVDDigitSplitter')
+        path.add_module('SVDDigitSorter')
         svdpacker = register_module('SVDPacker')
         path.add_module(svdpacker)
 

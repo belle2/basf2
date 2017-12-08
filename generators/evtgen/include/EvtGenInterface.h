@@ -50,7 +50,7 @@ namespace Belle2 {
      * Constructor.
      */
     EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
-      m_logCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Warning) {}
+      m_logCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100) {}
 
     /**
      * Destructor.

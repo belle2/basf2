@@ -51,6 +51,7 @@ namespace Belle2 {
       measuredStateOnPlane.setCov(TMatrixDSym(5, C_k.data()));
 
       // We return the new chi2
+      // TODO: the chi2 calculation includes another inversion, which may be optimized - however, this is not where the time is spent...
       const double chi2 = calculateChi2(x_k, C_k, m_k, H_k, V_k);
       return chi2;
     }

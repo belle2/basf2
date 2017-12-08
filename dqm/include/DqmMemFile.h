@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include <dqm/SharedMem.h>
+#include <daq/rfarm/manager/SharedMem.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"

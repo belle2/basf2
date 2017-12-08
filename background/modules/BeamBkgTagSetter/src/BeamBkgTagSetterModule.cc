@@ -22,30 +22,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// SimHits
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <top/dataobjects/TOPSimHit.h>
-#include <arich/dataobjects/ARICHSimHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-
-// BEAST SimHits
-#include <beast/beamabort/dataobjects/BeamabortSimHit.h>
-#include <beast/claw/dataobjects/ClawSimHit.h>
-#include <beast/claws/dataobjects/CLAWSSimHit.h>
-#include <beast/fangs/dataobjects/FANGSSimHit.h>
-#include <beast/plume/dataobjects/PlumeSimHit.h>
-#include <beast/pindiode/dataobjects/PindiodeSimHit.h>
-#include <beast/he3tube/dataobjects/He3tubeSimHit.h>
-#include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
-#include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
-#include <beast/bgo/dataobjects/BgoSimHit.h>
-#include <beast/csi/dataobjects/CsiSimHit.h>
-
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
 #include <background/dataobjects/BackgroundMetaData.h>
@@ -113,6 +89,7 @@ namespace Belle2 {
       else {B2ERROR("specialFor " << m_specialFor << "not supported");}
     }
 
+    // set BackgroundMetaData
     StoreObjPtr<BackgroundMetaData> bkgMetaData("", DataStore::c_Persistent);
     bkgMetaData.registerInDataStore();
     if (!bkgMetaData.isValid())
@@ -122,28 +99,29 @@ namespace Belle2 {
     bkgMetaData->setRealTime(m_realTime);
     bkgMetaData->setFileType(m_fileType);
 
-    StoreArray<PXDSimHit>::optional();
-    StoreArray<SVDSimHit>::optional();
-    StoreArray<CDCSimHit>::optional();
-    StoreArray<TOPSimHit>::optional();
-    StoreArray<ARICHSimHit>::optional();
-    StoreArray<ECLSimHit>::optional();
-    StoreArray<ECLHit>::optional();
-    StoreArray<BKLMSimHit>::optional();
-    StoreArray<EKLMSimHit>::optional();
+    // registration of detector simHits
+    m_pxdSimHits.isOptional();
+    m_svdSimHits.isOptional();
+    m_cdcSimHits.isOptional();
+    m_topSimHits.isOptional();
+    m_arichSimHits.isOptional();
+    m_eclSimHits.isOptional();
+    m_eclHits.isOptional();
+    m_bklmSimHits.isOptional();
+    m_eklmSimHits.isOptional();
 
-    // BEAST StoreArray
-    StoreArray<BeamabortSimHit>::optional();
-    StoreArray<CLAWSSimHit>::optional();
-    StoreArray<ClawSimHit>::optional();
-    StoreArray<FANGSSimHit>::optional();
-    StoreArray<PlumeSimHit>::optional();
-    StoreArray<PindiodeSimHit>::optional();
-    StoreArray<He3tubeSimHit>::optional();
-    StoreArray<MicrotpcSimHit>::optional();
-    StoreArray<QcsmonitorSimHit>::optional();
-    StoreArray<BgoSimHit>::optional();
-    StoreArray<CsiSimHit>::optional();
+    // registration of beast simHits
+    m_diaSimHits.isOptional();
+    m_clw2SimHits.isOptional();
+    m_clw1SimHits.isOptional();
+    m_fngSimHits.isOptional();
+    m_plmSimHits.isOptional();
+    m_pinSimHits.isOptional();
+    m_he3SimHits.isOptional();
+    m_tpcSimHits.isOptional();
+    m_sciSimHits.isOptional();
+    m_bgoSimHits.isOptional();
+    m_csiSimHits.isOptional();
   }
 
   void BeamBkgTagSetterModule::beginRun()
@@ -152,62 +130,39 @@ namespace Belle2 {
 
   void BeamBkgTagSetterModule::event()
   {
-    StoreArray<PXDSimHit> pxdSimHits;
-    StoreArray<SVDSimHit> svdSimHits;
-    StoreArray<CDCSimHit> cdcSimHits;
-    StoreArray<TOPSimHit> topSimHits;
-    StoreArray<ARICHSimHit> arichSimHits;
-    StoreArray<ECLSimHit> eclSimHits;
-    StoreArray<ECLHit> eclHits;
-    StoreArray<BKLMSimHit> bklmSimHits;
-    StoreArray<EKLMSimHit> eklmSimHits;
-
-    // BEAST addition
-    StoreArray<BeamabortSimHit> diaSimHits;
-    StoreArray<CLAWSSimHit> clw2SimHits;
-    StoreArray<ClawSimHit> clw1SimHits;
-    StoreArray<FANGSSimHit> fngSimHits;
-    StoreArray<PlumeSimHit> plmSimHits;
-    StoreArray<PindiodeSimHit> pinSimHits;
-    StoreArray<He3tubeSimHit> he3SimHits;
-    StoreArray<MicrotpcSimHit> tpcSimHits;
-    StoreArray<QcsmonitorSimHit> sciSimHits;
-    StoreArray<BgoSimHit> bgoSimHits;
-    StoreArray<CsiSimHit> csiSimHits;
-
     int n = 0;
     if (m_phase == 2 || m_phase == 3) {
-      n += setBackgroundTag(pxdSimHits);
-      n += setBackgroundTag(svdSimHits);
-      n += setBackgroundTag(cdcSimHits);
-      n += setBackgroundTag(topSimHits);
-      n += setBackgroundTag(arichSimHits);
-      n += setBackgroundTag(eclSimHits);
-      n += setBackgroundTag(eclHits);
-      n += setBackgroundTag(bklmSimHits);
-      n += setBackgroundTag(eklmSimHits);
+      n += setBackgroundTag(m_pxdSimHits);
+      n += setBackgroundTag(m_svdSimHits);
+      n += setBackgroundTag(m_cdcSimHits);
+      n += setBackgroundTag(m_topSimHits);
+      n += setBackgroundTag(m_arichSimHits);
+      n += setBackgroundTag(m_eclSimHits);
+      n += setBackgroundTag(m_eclHits);
+      n += setBackgroundTag(m_bklmSimHits);
+      n += setBackgroundTag(m_eklmSimHits);
     }
     // BEAST addition
     if (m_phase == 1 || m_phase == 2) {
-      n += setBackgroundTag(diaSimHits);
+      n += setBackgroundTag(m_diaSimHits);
       if (m_phase == 1) {
-        n += setBackgroundTag(clw1SimHits);
-        n += setBackgroundTag(csiSimHits);
-        n += setBackgroundTag(bgoSimHits);
+        n += setBackgroundTag(m_clw1SimHits);
+        n += setBackgroundTag(m_csiSimHits);
+        n += setBackgroundTag(m_bgoSimHits);
       }
       if (m_phase == 2) {
-        n += setBackgroundTag(clw2SimHits);
-        n += setBackgroundTag(fngSimHits);
-        n += setBackgroundTag(plmSimHits);
+        n += setBackgroundTag(m_clw2SimHits);
+        n += setBackgroundTag(m_fngSimHits);
+        n += setBackgroundTag(m_plmSimHits);
       }
-      n += setBackgroundTag(pinSimHits);
-      n += setBackgroundTag(he3SimHits);
-      n += setBackgroundTag(tpcSimHits);
-      n += setBackgroundTag(sciSimHits);
+      n += setBackgroundTag(m_pinSimHits);
+      n += setBackgroundTag(m_he3SimHits);
+      n += setBackgroundTag(m_tpcSimHits);
+      n += setBackgroundTag(m_sciSimHits);
     }
 
-    if (m_fileType == BackgroundMetaData::c_ECL) n = eclHits.getEntries();
-    if (m_fileType == BackgroundMetaData::c_PXD) n = pxdSimHits.getEntries();
+    if (m_fileType == BackgroundMetaData::c_ECL) n = m_eclHits.getEntries();
+    if (m_fileType == BackgroundMetaData::c_PXD) n = m_pxdSimHits.getEntries();
 
     setReturnValue(n > 0);
 

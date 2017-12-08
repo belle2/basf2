@@ -53,6 +53,9 @@ namespace Belle2 {
 
   private:
 
+    // register outputs
+    StoreArray<CDCDedxTrack> m_dedxArray; /**< array of output dE/dx tracks */
+
   };
 } // Belle2 namespace
 #endif

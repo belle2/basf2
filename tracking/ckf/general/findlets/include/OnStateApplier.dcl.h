@@ -20,14 +20,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   template <class AState>
-  class OnStateApplier : public TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>> {
+  class OnStateApplier : public
+    TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>>;
+    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>>;
 
   public:
     /// The object this filter refers to
-    using Object = std::pair<const std::vector<const AState*>, AState*>;
+    using Object = std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>;
 
     /// Construct this findlet and add the subfindlet as listener
     OnStateApplier();
@@ -37,7 +38,7 @@ namespace Belle2 {
 
     /**
      */
-    void apply(const std::vector<const AState*>& currentPath,
+    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
 
     /// Copy the filter operator to this method

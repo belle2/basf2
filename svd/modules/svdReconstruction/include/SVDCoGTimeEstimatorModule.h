@@ -18,8 +18,14 @@
 #include <framework/datastore/StoreArray.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+
+#include <string>
 
 namespace Belle2 {
 
@@ -59,6 +65,13 @@ namespace Belle2 {
 
 
   private:
+
+    /** store arrays*/
+    StoreArray<SVDShaperDigit> m_storeShaper;
+    StoreArray<SVDRecoDigit> m_storeReco;
+
+    StoreArray<SVDTrueHit> m_storeTrueHits;
+    StoreArray<MCParticle> m_storeMCParticles;
 
     /** The peak time estimation */
     float m_weightedMeanTime;
@@ -130,7 +143,7 @@ namespace Belle2 {
     std::string m_relRecoDigitTrueHitName;
 
     /** Width of the distribution of the times after having substracted the TriggerBin and the CalibrationPeakTime */
-    float m_FinalShiftWidth;
+    float m_FixedTimeError;
     /** Approximate ADC error on each sample */
     float m_AmplitudeArbitraryError;
 

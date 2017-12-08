@@ -41,6 +41,7 @@ gROOT.ProcessLine('struct EventData {\
     float cluster_charge;\
     float cluster_seedCharge;\
     float cluster_size;\
+    float cluster_snr;\
     float cluster_interstripPosition;\
     float cluster_pull;\
     float cluster_residual;\
@@ -114,6 +115,7 @@ class SVDValidationTTree(Module):
                 self.data.cluster_charge = cluster.getCharge()
                 self.data.cluster_seedCharge = cluster.getSeedCharge()
                 self.data.cluster_size = cluster.getSize()
+                self.data.cluster_snr = cluster.getSNR()
                 cluster_position = cluster.getPosition()
                 if cluster.isUCluster():
                     cluster_position = cluster.getPosition(truehit.getV())

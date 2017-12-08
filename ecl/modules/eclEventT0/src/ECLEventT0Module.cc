@@ -35,9 +35,7 @@ ECLEventT0Module::ECLEventT0Module() : Module()
   addParam("ethresh", m_ethresh, "Minimum energy for a CalDigit to be used", 0.1);
   addParam("stdDevNom", m_stdDevNom, "Nominal time resolution ns for a CalDigit with E=ethresh", 20.);
   addParam("stdDevLarge", m_stdDevLarge, "Reported resolution for events with 0 or 1 selected CalDigits", 1000.);
-
-  // Parameter definitions
-
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void ECLEventT0Module::initialize()
@@ -46,6 +44,7 @@ void ECLEventT0Module::initialize()
   /** Register the data object */
   StoreObjPtr<EventT0> eventT0("EventT0");
   eventT0.registerInDataStore("EventT0");
+  m_eclCalDigitArray.isRequired();
 
   /** ECL geometry */
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -137,7 +136,7 @@ void ECLEventT0Module::event()
 
     /** Average time of all digits excluding one, and those previously excluded */
     int outDigit = -1;
-    float delta2max = 0.;
+    float delta2max = -1.;
     for (int iexcluded = 0; iexcluded < nIsolated; iexcluded++) {
       if (isNotAnOutlier[iexcluded]) {
         float sumwt = 0.;

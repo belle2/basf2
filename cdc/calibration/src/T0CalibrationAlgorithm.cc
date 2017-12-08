@@ -28,9 +28,9 @@ using namespace CDC;
 T0CalibrationAlgorithm::T0CalibrationAlgorithm(): CalibrationAlgorithm("CDCCalibrationCollector")
 {
 
-  //   setDescription(
-  //    " -------------------------- T0 Calibration Algoritm -------------------------\n"
-  //    );
+  setDescription(
+    " -------------------------- T0 Calibration Algorithm -------------------------\n"
+  );
 }
 
 void T0CalibrationAlgorithm::createHisto()
@@ -158,7 +158,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   if (m_storeHisto) {
     B2INFO("Store histo");
-    TFile* fout = new TFile("Correct_T0.root", "RECREATE");
+    TFile* fout = new TFile("histT0.root", "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
@@ -239,14 +239,9 @@ void T0CalibrationAlgorithm::write()
         T0 = cdcgeo.getT0(wireid);
       }
       ofs <<  ilay << "\t" << iwire << "\t" << T0 - dt[ilay][iwire] << std::endl;
-      if (m_useDB) {
-        tz->setT0(wireid, T0 - dt[ilay][iwire]);
-      }
+      tz->setT0(wireid, T0 - dt[ilay][iwire]);
     }
   }
   ofs.close();
-  if (m_useDB) {
-    saveCalibration(tz, "CDCTimeZeros");
-  }
-
+  saveCalibration(tz, "CDCTimeZeros");
 }

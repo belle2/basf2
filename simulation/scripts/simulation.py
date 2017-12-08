@@ -78,7 +78,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
     if doCleanup:
         datastore_cleaner = register_module('PruneDataStore')
         datastore_cleaner.param('keepMatchedEntries', False)
-        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdClusters', '__ROIsvdRecoTracks',
+        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
                                                  'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
                                                  # till here it are StoreArrays, the following are relations and Datastore objects
                                                  'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
@@ -95,8 +95,6 @@ def add_simulation(
         path,
         components=None,
         bkgfiles=None,
-        bkgcomponents=None,
-        bkgscale=1.0,
         bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
@@ -117,12 +115,8 @@ def add_simulation(
         else:
             bkgmixer = register_module('BeamBkgMixer')
             bkgmixer.param('backgroundFiles', bkgfiles)
-            if bkgcomponents:
-                bkgmixer.param('components', bkgcomponents)
-            else:
-                if components:
-                    bkgmixer.param('components', components)
-            bkgmixer.param('overallScaleFactor', bkgscale)
+            if components:
+                bkgmixer.param('components', components)
             path.add_module(bkgmixer)
 
     # geometry parameter database

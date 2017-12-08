@@ -48,6 +48,7 @@ namespace Belle2 {
                                        std::vector<typename AFilter::Object>& filteredResults)
   {
     if (not m_param_enableOverlapResolving or results.empty()) {
+      std::swap(results, filteredResults);
       return;
     }
 

@@ -16,7 +16,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-
 namespace Belle2 {
   class QualityEstimatorMC : public QualityEstimatorBase {
 
@@ -28,22 +27,20 @@ namespace Belle2 {
 
     QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
                        bool strictQualityIndex = true):
-      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex)
-    {
-      m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
-      // store to make sure SPTCs are compared to the correct SVDStoreArray
-      m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-    };
+      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
+    { };
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 
     /** additionally return momentum_truth if it is a perfect match to a single MCRecoTrack */
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;
 
+    void setClustersNames(std::string svdClustersName, std::string pxdClustersName)
+    { m_svdClustersName = svdClustersName; m_pxdClustersName = pxdClustersName; };
+
   protected:
     MatchInfo getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements);
     double calculateQualityIndex(int nClusters, MatchInfo& match);
-    void fillMatrixWithMCInformation();
 
     // parameters
 
@@ -52,17 +49,15 @@ namespace Belle2 {
      */
     bool m_strictQualityIndex;
 
+    std::string m_mcRecoTracksStoreArrayName;
     // module members
-    std::string m_svdClustersName;
+    std::string m_svdClustersName = "";
+    std::string m_pxdClustersName = "";
 
     /** stores the current match for optional return values */
     MatchInfo m_match;
 
     /** the storeArray for RecoTracks as member */
     StoreArray<RecoTrack> m_mcRecoTracks;
-
-    /** store relation SVDClusterIndex to MCRecoTrackIndex */
-    Eigen::SparseMatrix<bool> m_linkMatrix;
   };
 }
-

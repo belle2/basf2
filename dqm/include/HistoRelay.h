@@ -14,7 +14,7 @@
 #include "TH1.h"
 #include "TMemFile.h"
 
-#include <dqm/EvtSocket.h>
+#include <daq/dataflow/EvtSocket.h>
 #include <dqm/DqmMemFile.h>
 
 namespace Belle2 {
@@ -23,10 +23,13 @@ namespace Belle2 {
     HistoRelay(std::string& filename, std::string& dest, int port);
     HistoRelay(const HistoRelay& hr);
     ~HistoRelay();
+    HistoRelay& operator=(const HistoRelay& hr);
 
     int collect();
   private:
-    std::string m_filename;
+    std::string& m_filename;
+    std::string& m_dest;
+    int m_port;
     DqmMemFile* m_memfile;
     EvtSocketSend* m_sock;
     MsgHandler* m_msg;

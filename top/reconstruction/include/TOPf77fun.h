@@ -94,7 +94,7 @@ extern "C" {
   float cher_angle_(float*, float*, float*);
   void getnum_pulls_(int*);
   void get_pulls_(int*, float*, float*, float*, float*, float*, int*);
-  float get_pdf_(int*, float*, float*);
+  float get_pdf_(int*, float*, float*, float*);
 
 }
 

@@ -22,7 +22,7 @@
       INTEGER ICH               ! channel number (pixelID - 1)
       REAL TIME                 ! time [ns]
       REAL TERR                 ! time uncertainty [ns]
-      INTEGER KK                ! return status: index or 0 (failure)
+      INTEGER KK                ! return status: index or <=0 (failure)
 #include "TOP_DATA.fi"
 #include "TOP_TDC.fi"
 #include "TOP_GEO.fi"
@@ -31,15 +31,23 @@
 
       INTEGER K
 
-      KK=0
       K=N_DATA+1
       IF(K.GT.NSIZ_DATA) THEN
-         PRINT*,'TOP_DATA: no space for new digitized data'
+         KK=0
          RETURN
       ENDIF
-      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
-      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
-      IF(.NOT.CH_MASK(ICH,MDN)) RETURN
+      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) THEN
+         KK=-1
+         RETURN
+      ENDIF
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) THEN
+         KK=-2
+         RETURN
+      ENDIF
+      IF(.NOT.CH_MASK(ICH,MDN)) THEN
+         KK=-3
+         RETURN
+      ENDIF
       DATA_MOD(K)=MDN
       DATA_ICH(K)=ICH
       DATA_TIME(K)=TIME

@@ -46,15 +46,30 @@ namespace Belle2 {
       data_clear_();
     }
 
-    int TOPalign::addData(int moduleID, int pixelID, double time)
+    int TOPalign::addData(int moduleID, int pixelID, double time, double timeError)
     {
       int status = 0;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      float terr = 0; //TODO
+      float terr = (float) timeError;
       data_put_(&moduleID, &pixelID, &t, &terr, &status);
-      return status;
+      switch (status) {
+        case 0:
+          B2WARNING("addData: no space available in /TOP_DATA/");
+          return status;
+        case -1:
+          B2ERROR("addData: invalid module ID " << moduleID + 1);
+          return status;
+        case -2:
+          B2ERROR("addData: invalid pixel ID " << pixelID + 1);
+          return status;
+        case -3:
+          B2ERROR("addData: digit should already be masked-out (different masks used?)");
+          return status;
+        default:
+          return status;
+      }
     }
 
     void TOPalign::setPhotonYields(double bkgPerModule, double scaleN0)

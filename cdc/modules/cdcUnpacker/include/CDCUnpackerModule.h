@@ -151,6 +151,11 @@ namespace Belle2 {
        */
       void loadMap();
 
+      /**
+       * Set DBobject of ADC delta pedestal.
+       */
+      void setADCPedestal();
+
 
       /**
        * Getter of Wire ID.

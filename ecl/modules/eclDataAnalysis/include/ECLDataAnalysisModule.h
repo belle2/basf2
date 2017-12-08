@@ -7,17 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-*
-*/
-
-#ifndef ECLDATAANALYSISMODULE_H_
-#define ECLDATAANALYSISMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
 
 // ECL
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -40,7 +33,17 @@
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+class TFile;
+class TTree;
+
 namespace Belle2 {
+  class Track;
+  class TrackFitResult;
+  class ECLPidLikelihood;
+
+
+
+
 
   /** The ECL Data Analysis Module
    *
@@ -81,14 +84,17 @@ namespace Belle2 {
   private:
 
     /** members of ECLReconstructor Module */
-
     TFile* m_rootFilePtr; /**< root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
     bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
-    //bool m_doMC; /**< if true, MC info is stored*/
+
+    //dataStore objects
+    StoreArray<Track> m_tracks;  /**< Tracks storeArray */
+    StoreArray<TrackFitResult> m_trackFitResults;  /**< TrackFitResult storeArray */
+    StoreArray<ECLPidLikelihood> m_eclPidLikelihoods; /**< ECLPidLikelihood storeArray */
 
     /** Store array: ECLSimHit. */
     StoreArray<ECLSimHit> m_eclSimHits;
@@ -170,17 +176,11 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcParticles; /**< MCParticles StoreArray*/
 
     TTree* m_tree; /**< Root tree and file for saving the output */
-    //TFile* m_rootFile;
 
     // variables
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
-
-    /*int m_eclTriggerMultip;
-    std::vector<int>* m_eclTriggerIdx;
-    std::vector<int>* m_eclTriggerCellId;
-    std::vector<double>* m_eclTriggerTime;*/
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
@@ -496,7 +496,6 @@ namespace Belle2 {
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
-
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */
     std::vector<int>* m_mcPdg; /**< MCParticle PDG code */
@@ -539,6 +538,5 @@ namespace Belle2 {
     std::vector<double>* m_eclLogLikeMu; /**< PID track muon likelyhood */
     std::vector<double>* m_eclLogLikePi; /**< PID track pion likelyhood */
   };
-}
 
-#endif
+}

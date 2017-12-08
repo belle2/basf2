@@ -75,17 +75,17 @@ namespace Belle2 {
   private:
 
     // required input
-    StoreArray<Track> m_tracks; /** Required array of Tracks */
+    StoreArray<Track> m_tracks; /**< Required array of Tracks */
     StoreArray<RecoTrack> m_recoTracks; /**< Required array of input RecoTracks */
 
     // optional input
-    StoreArray<MCParticle> m_mcparticles; /** Optional array of MCParticles */
-    StoreArray<SVDCluster> m_svdClusters; /** Optional array of SVDClusters */
-    StoreArray<PXDCluster> m_pxdClusters; /** Optional array of PXDClusters */
+    StoreArray<MCParticle> m_mcparticles; /**< Optional array of MCParticles */
+    StoreArray<SVDCluster> m_svdClusters; /**< Optional array of SVDClusters */
+    StoreArray<PXDCluster> m_pxdClusters; /**< Optional array of PXDClusters */
 
     // output
-    StoreArray<VXDDedxTrack> m_dedxTracks; /** Output array of VXDDedxTracks */
-    StoreArray<VXDDedxLikelihood> m_dedxLikelihoods; /** Output array of VXDDedxLikelihoods */
+    StoreArray<VXDDedxTrack> m_dedxTracks; /**< Output array of VXDDedxTracks */
+    StoreArray<VXDDedxLikelihood> m_dedxLikelihoods; /**< Output array of VXDDedxLikelihoods */
 
 
     /** counter for events */

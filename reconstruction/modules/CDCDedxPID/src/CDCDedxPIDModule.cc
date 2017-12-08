@@ -563,7 +563,7 @@ void CDCDedxPIDModule::event()
 void CDCDedxPIDModule::terminate()
 {
 
-  B2INFO("CDCDedxPIDModule exiting");
+  B2DEBUG(50, "CDCDedxPIDModule exiting");
 }
 
 void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,

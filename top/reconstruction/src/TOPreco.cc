@@ -84,8 +84,8 @@ namespace Belle2 {
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      int TDC = 0; // it's not used in Fortran code
-      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
+      float terr = 0; //TODO
+      data_put_(&moduleID, &pixelID, &t, &terr, &status);
       return status;
     }
 

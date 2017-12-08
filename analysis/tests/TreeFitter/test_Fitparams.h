@@ -25,17 +25,20 @@ namespace Belle2 {
   {
     TreeFitter::FitParams fitParDim3(3);
 
-    fitParDim3.getStateVector() = Eigen::MatrixXd::Random(3, 1);
+    fitParDim3.getStateVector() << 1, 2, 3;
     fitParDim3.resetStateVector();
     EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all());
 
     fitParDim3.getCovariance() = Eigen::MatrixXd::Random(3, 3);
+
+    fitParDim3.getCovariance() << 1, 2, 3, 4, 5, 6, 7, 8, 9;
     fitParDim3.resetCovariance();
     EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all());
 
     EXPECT_FALSE(fitParDim3.testCovariance());
 
     fitParDim3.getCovariance() = Eigen::MatrixXd::Random(3, 3);
+
   }
 
 }  // namespace

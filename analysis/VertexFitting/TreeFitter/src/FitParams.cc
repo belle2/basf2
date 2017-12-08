@@ -34,9 +34,6 @@ namespace TreeFitter {
 
   FitParams::~FitParams() {}
 
-
-
-
   void FitParams::resetStateVector()
   {
     m_globalState = EigenTypes::ColVector::Zero(m_dim);
@@ -56,9 +53,6 @@ namespace TreeFitter {
   bool FitParams::testCovariance() const
   {
     bool okay = true;
-
-
-
     for (int row = 0; row < m_dim && okay; ++row) {
       okay = (m_globalCovariance(row, row) > 0);
       B2DEBUG(80, "Covariance dia element is smaller than 0!");
@@ -67,7 +61,7 @@ namespace TreeFitter {
     return okay;
   }
 
-  EigenTypes::MatrixXd FitParams::getMaskInCovariance(const std::vector<int>& indexVec) const
+  [[gnu::unused]] EigenTypes::MatrixXd FitParams::getMaskInCovariance(const std::vector<int>& indexVec) const
   {
     int blockSize = indexVec.size();
     EigenTypes::MatrixXd returnCov = EigenTypes::MatrixXd::Zero(m_dim, m_dim);
@@ -79,7 +73,7 @@ namespace TreeFitter {
     return returnCov;
   }
 
-  EigenTypes::ColVector FitParams::getMaskInStateVec(const std::vector<int>& indexVec) const
+  [[gnu::unused]] EigenTypes::ColVector FitParams::getMaskInStateVec(const std::vector<int>& indexVec) const
   {
 
     int nrow = indexVec.size();
@@ -90,7 +84,7 @@ namespace TreeFitter {
     return returnVec;
   }
 
-  void FitParams::resizeAndResetStateAndCov(int newdim)
+  [[gnu::unused]] void FitParams::resizeAndResetStateAndCov(int newdim)
   {
     if (newdim > m_dim) {
       m_dim = newdim;
@@ -104,4 +98,4 @@ namespace TreeFitter {
     }
   }
 
-}
+} //TreeFitter namespace

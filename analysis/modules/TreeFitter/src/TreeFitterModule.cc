@@ -64,7 +64,7 @@ void TreeFitterModule::event()
   }
 
   std::vector<unsigned int> toRemove;
-  unsigned int n = plist->getListSize();
+  const unsigned int n = plist->getListSize();
   m_nCandidatesBeforeFit += n;
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = plist->getParticle(i);

@@ -1952,13 +1952,13 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildThrustOfEvent(list_name, path=analysis_main):
+def buildThrustOfEvent(ParticleLists, path=analysis_main):
     """
     Calculates the Thrust of the event and stores in ? variable. (WIP)
-    :param list_name: name of the input ParticleList
+    :param ParticleLists: List of ParticleList used to calculate the Thrust
     :param path: modules are added to this path
     """
     thrustModule = register_module('ThrustOfEvent')
-    thrustModule.set_name('ThrustOfEvent_' + '-'.join(list_name))
-    thrustModule.param('particleLists', list_name)
+    thrustModule.set_name('ThrustOfEvent_')
+    thrustModule.param('particleLists', ParticleLists)
     path.add_module(thrustModule)

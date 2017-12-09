@@ -1,6 +1,7 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Jo-Frederik Krohn                                        *
@@ -15,58 +16,30 @@
 namespace Belle2 {
 
   /** KlId datastore object to store results from KlId calculations.
-   * acces as: double KlId = cluster->getRelatedTo<KlId>()->getKlId() */
+   * Note that the klid id is stored as the weight between the cluster and this object */
   class KlId : public RelationsObject {
 
   public:
 
-    KlId();
-
-
     /** constructor */
-    KlId(float klid, float bkgProb, bool isKLM, bool isECL);
+    KlId() {};
 
-    /** constructor */
+    /** destructor */
     virtual ~KlId() {};
 
-    /** get Klong ID */
-    inline float getKlId() const
-    {return m_KlId;}
-
-    /** get beam bkg probability (classifier output)*/
-    inline float getBkgProb() const
-    {return m_bkgProb;}
-
-    /** set beam bkg probability (classifier output)*/
-    inline float setBkgProb(float val)
-    {return m_bkgProb = val;}
-
-
     /** is this ID originally a KLM Cluster ?*/
-    inline bool isKLM() const
-    {return m_isKLM;}
+    bool isKLM() const;
 
     /** is this ID originally a ECL Cluster ?*/
-    inline bool isECL() const
-    {return m_isECL;}
+    bool isECL() const;
 
-
+    /** get the klong classifier output  */
+    double getKlId() const;
 
   private:
 
-    /** K long id of corresponding cluster */
-    float m_KlId;
-    /** output of beambkg classification */
-    float m_bkgProb;
-    /**  is from a  KLM cluister */
-    bool  m_isKLM;
-    /**  is from an ECL cluster */
-    bool  m_isECL;
-
-
-    /** Needed to make root object storable? */
-    ClassDef(KlId, 1)
-
+    ClassDef(KlId,
+             1); /**< K_L0 ID object. The actual ID is stored as the weight of a relation to this object. The klongID is a classfier ouput. This means it is a frequency relative to the Klong fraction of the sample the id is trained on and the performance of the classification. */
   };
 }
 #endif

@@ -18,8 +18,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
-#include <reconstruction/dataobjects/KlId.h>
-
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 #include <tracking/dataobjects/TrackClusterSeparation.h>

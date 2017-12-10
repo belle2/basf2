@@ -12,6 +12,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -54,6 +55,9 @@ ThrustOfEventModule::~ThrustOfEventModule()
 
 void ThrustOfEventModule::initialize()
 {
+  StoreObjPtr<ThrustOfEvent> thrustOfEvt;
+  thrustOfEvt.registerInDataStore();
+
   unsigned nParticleLists = m_particleLists.size();
   for (unsigned i = 0; i < nParticleLists; ++i) {
 
@@ -68,8 +72,15 @@ void ThrustOfEventModule::beginRun()
 
 void ThrustOfEventModule::event()
 {
+  StoreObjPtr<ThrustOfEvent> thrust;
   // number of ParticleLists
   int nParticleLists = m_particleLists.size();
+
+  
+  // Aquí se guarda la magnitud del thrust y la dirección del thrust axis. -- Michel
+  TVector3 thrustAxis(0.1,0.2,0.1);
+  thrust->addThrustAxis(thrustAxis);
+  thrust->addThrust(0.1);
 }
 
 void ThrustOfEventModule::endRun()

@@ -73,10 +73,11 @@ void ThrustOfEventModule::beginRun()
 void ThrustOfEventModule::event()
 {
   StoreObjPtr<ThrustOfEvent> thrust;
+  if(!thrust) thrust.create();
   // number of ParticleLists
   int nParticleLists = m_particleLists.size();
 
-  
+
   // Aquí se guarda la magnitud del thrust y la dirección del thrust axis. -- Michel
   TVector3 thrustAxis(0.1,0.2,0.1);
   thrust->addThrustAxis(thrustAxis);

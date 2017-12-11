@@ -25,6 +25,7 @@
 // Constraints
 #include <analysis/OrcaKinFit/MomentumConstraint.h>
 #include <analysis/OrcaKinFit/RecoilMassConstraint.h>
+#include <analysis/OrcaKinFit/MassConstraint.h>
 #include <analysis/OrcaKinFit/SoftGaussMomentumConstraint.h>
 
 // Fitobjects
@@ -109,6 +110,7 @@ namespace Belle2 {
     std::string m_debugBeamFilename;   /**< Filename that will hold histograms. */
     int m_nMCInitialParticles;         /**< Number of initial particle sused to produce debug plots. */
     double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
+    double m_invMass;                  /**< Inviriant mass for Mass constraint */
 
     // internal variables
     TextTracer* m_textTracer;
@@ -123,6 +125,8 @@ namespace Belle2 {
     MomentumConstraint m_hardConstraintE;   /**< hard beam constraint E */
 
     RecoilMassConstraint m_hardConstraintRecoilMass;  /**< hard recoil mass constraint */
+
+    MassConstraint m_hardConstraintMass;  /**< hard mass constraint */
 
     // soft constraints
 //     SoftGaussMomentumConstraint m_softConstraintPx;  /**< soft beam constraint px */
@@ -170,6 +174,12 @@ namespace Belle2 {
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
      */
     bool fillFitParticles(Particle* mother, std::vector<Particle*>& particleChildren);
+
+    /**
+     * Added four vectors and calcuated a covariance matrix for a combined particles
+     * @param particle pointer to particle
+    */
+    bool AddFour(Particle* mother);
 
     /**
      * Adds given particle to the OrcaKinFit.
@@ -235,6 +245,15 @@ namespace Belle2 {
      * @param mother mother particle
      */
     bool updateOrcaKinFitDaughters(BaseFitter& fitter, Particle* mother);
+
+    /**
+      * update the map of daughter and tracks, find out wich tracks belong to each daugther.
+      * @param ui store the tracks ID of each daughter
+      * @param l represent the tracks ID
+      * @param p pointer to particle
+      */
+    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
+
 
     /**
      * store fit object information as ExtraInfo

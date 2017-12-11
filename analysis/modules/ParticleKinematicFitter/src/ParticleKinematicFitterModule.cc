@@ -87,6 +87,7 @@ namespace Belle2 {
     addParam("debugBeamFilename", m_debugBeamFilename, "Debug file filename.", string("debug_beam.root"));
     addParam("nMCInitialParticles", m_nMCInitialParticles, "Number of initial MC particles used in debug plots.", 1000000);
     addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only..", 0.0);
+    addParam("invMass", m_invMass, "Inviriant mass in GeV. Mass constraint only..", 0.0);
 
   }
 
@@ -187,6 +188,7 @@ namespace Belle2 {
 
     unsigned int n = plist->getListSize();
 
+    cout << "Number of plist: " << n << "  Begain  of KinematicFit" << endl;
     for (unsigned i = 0; i < n; i++) {
 //       Particle* particle = const_cast<Particle*> (plist->getParticle(i));
       Particle* particle = plist->getParticle(i);
@@ -228,7 +230,8 @@ namespace Belle2 {
 
       // check requested constraint
       if (!(m_orcaConstraint == "HardBeam" or
-            m_orcaConstraint == "RecoilMass")) {
+            m_orcaConstraint == "RecoilMass" or
+            m_orcaConstraint == "Mass")) {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
       }
 
@@ -368,16 +371,39 @@ namespace Belle2 {
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
-      if (child->getPValue() < 0) {
+      if (child->getPValue() > 0) {
+        particleChildren.push_back(child);
+      } else if (child->getNDaughters() > 0) {
+        bool err = fillFitParticles(child, particleChildren);
+      } else {
         B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
                 child->getEnergy() << " GeV");
         return false; // error matrix not valid
       }
 
-      particleChildren.push_back(child);
     }
 
     return true;
+  }
+
+  bool ParticleKinematicFitterModule::AddFour(Particle* mother)
+  {
+    TMatrixFSym MomentumVertexErrorMatrix(7);
+    for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
+      Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
+
+      if (child->getPValue() > 0) {
+        MomentumVertexErrorMatrix += child->getMomentumVertexErrorMatrix();
+      } else if (child->getNDaughters() > 0) {
+        AddFour(child);
+        MomentumVertexErrorMatrix += child->getMomentumVertexErrorMatrix();
+      } else {
+        B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
+                child->getEnergy() << " GeV");
+        return false; // error matrix not valid
+      }
+    }
+    mother->setMomentumVertexErrorMatrix(MomentumVertexErrorMatrix);
   }
 
 
@@ -527,6 +553,14 @@ namespace Belle2 {
       m_hardConstraintRecoilMass.resetFOList();
       m_hardConstraintRecoilMass.setName("Recoil Mass [hard]");
 
+    } else if (m_orcaConstraint == "Mass") {
+      PCmsLabTransform T;
+      const TLorentzVector boost = T.getBoostVector();
+
+      m_hardConstraintMass = MassConstraint(m_invMass);
+
+      m_hardConstraintMass.resetFOList();
+      m_hardConstraintMass.setName("Mass [hard]");
     } else {
       B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
     }
@@ -550,6 +584,8 @@ namespace Belle2 {
       m_hardConstraintE.addToFOList(fitobject);
     } else if (m_orcaConstraint == "RecoilMass") {
       m_hardConstraintRecoilMass.addToFOList(fitobject);
+    } else if (m_orcaConstraint == "Mass") {
+      m_hardConstraintMass.addToFOList(fitobject);
     } else {
       B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
     }
@@ -566,6 +602,8 @@ namespace Belle2 {
       fitter.addConstraint(m_hardConstraintE);
     } else if (m_orcaConstraint == "RecoilMass") {
       fitter.addConstraint(m_hardConstraintRecoilMass);
+    } else if (m_orcaConstraint == "Mass") {
+      fitter.addConstraint(m_hardConstraintMass);
     }
 
     else {
@@ -617,21 +655,47 @@ namespace Belle2 {
     std::vector <Belle2::Particle*> bDau = mother->getDaughters();
     std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
 
-    if (bDau.size() == fitObjectContainer->size()) {
+    const unsigned nd = bDau.size();
+    unsigned l = 0;
+    std::vector<std::vector<unsigned>> u(nd);
+    for (unsigned ichild = 0; ichild < nd; ichild++) {
+      const Particle* daughter = mother->getDaughter(ichild);
+      if (daughter->getNDaughters() > 0 && daughter->getPValue() < 0) {
+        updateMapofTrackandDaughter(u[ichild], l, daughter);
+      } else {
+        u[ichild].push_back(l);
+        l++;
+      }
+    }
+
+    if (l == fitObjectContainer->size()) {
 
       if (fitter.getError() == 0) {
-        for (unsigned iChild = 0; iChild < bDau.size(); iChild++) {
-          BaseFitObject* fo = fitObjectContainer->at(iChild);
-          ParticleFitObject* fitobject = (ParticleFitObject*) fo;
-          TLorentzVector tlv = getTLorentzVector(fitobject);
+        for (unsigned iDaug = 0; iDaug < bDau.size(); iDaug++) {
+          TLorentzVector tlv ;
+          TMatrixFSym errMatrixU(7);
+          if (u[iDaug].size() > 0) {
+            for (unsigned iChild = 0; iChild < u[iDaug].size(); iChild++) {
+              BaseFitObject* fo = fitObjectContainer->at(u[iDaug][iChild]);
+              ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+              TLorentzVector tlv_sub = getTLorentzVector(fitobject);
+              TMatrixFSym errMatrixU_sub = getCovMat7(fitobject);
+              tlv = tlv + tlv_sub;
+              errMatrixU = errMatrixU + errMatrixU_sub;
+            }
+          } else {
+            BaseFitObject* fo = fitObjectContainer->at(iDaug);
+            ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+            TLorentzVector tlv = getTLorentzVector(fitobject);
 
-          TVector3 pos          = bDau[iChild]->getVertex(); // we dont update the vertex yet
-          TMatrixFSym errMatrix = bDau[iChild]->getMomentumVertexErrorMatrix();
-          TMatrixFSym errMatrixMom = bDau[iChild]->getMomentumErrorMatrix();
-
-          TMatrixFSym errMatrixU = getCovMat7(fitobject);
-
-          bDau[iChild]->updateMomentum(tlv, pos, errMatrixU, -1);
+            TMatrixFSym errMatrixU = getCovMat7(fitobject);
+          }
+          TVector3 pos          = bDau[iDaug]->getVertex(); // we dont update the vertex yet
+          TMatrixFSym errMatrix = bDau[iDaug]->getMomentumVertexErrorMatrix();
+          TMatrixFSym errMatrixMom = bDau[iDaug]->getMomentumErrorMatrix();
+          bDau[iDaug]->set4Vector(tlv);
+          bDau[iDaug]->setVertex(pos);
+          bDau[iDaug]->setMomentumVertexErrorMatrix(errMatrixU);
         }
       }
 
@@ -641,8 +705,19 @@ namespace Belle2 {
       return false;
     }
 
-
   }
+
+  void ParticleKinematicFitterModule::updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l,
+      const       Particle* daughter)
+  {
+    for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
+      const Particle* child = daughter->getDaughter(ichild);
+      if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
+      else  ui.push_back(l);
+      l++;
+    }
+  }
+
 
   bool ParticleKinematicFitterModule::updateOrcaKinFitMother(BaseFitter& fitter, std::vector<Particle*>& particleChildren,
                                                              Particle* mother)
@@ -666,6 +741,7 @@ namespace Belle2 {
 
     // update
     // TODO: use pvalue of the fit or the old one of the mother? use fit covariance matrix?
+    // Maybe here should use the pvalue and errmatrix of the fit  ----Yu Hu
     mother->updateMomentum(momnew, pos, errMatrix, pvalue);
   }
 

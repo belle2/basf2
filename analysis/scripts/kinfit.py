@@ -104,6 +104,40 @@ def fitKinematic1CRecoilMass(
     path.add_module(orca)
 
 
+def fitKinematic1CMass(
+    list_name,
+    invMass,
+    fitterEngine='NewFitterGSL',
+    constraint='Mass',
+    daughtersUpdate=True,
+    addUnmeasuredPhoton=False,
+    path=analysis_main,
+):
+    """
+    Perform recoil mass kinematic fit for particles in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param fitterEngine       NewFitterGSL or OPALFitterGSL
+    @param constraint       HardBeam or RecoilMass or Mass
+    @param invMass       Inviriant  Mass (GeV)
+    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
+    @param path         modules are added to this path
+    """
+
+    orca = register_module('ParticleKinematicFitter')
+    orca.set_name('ParticleKinematicFitter_' + list_name)
+    orca.param('debugFitter', False)
+    orca.param('orcaTracer', 'None')
+    orca.param('orcaFitterEngine', fitterEngine)
+    orca.param('orcaConstraint', constraint)
+    orca.param('invMass', invMass)
+    orca.param('listName', list_name)
+    orca.param('updateDaughters', daughtersUpdate)
+    orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
+    path.add_module(orca)
+
+
 if __name__ == '__main__':
     desc_list = []
     for function_name in sorted(list_functions(sys.modules[__name__])):

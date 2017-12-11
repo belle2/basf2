@@ -1,12 +1,12 @@
 //+
 // File : PXDTriggerFixerModule.cc
-// Description : Desy 2016 event mismatch fixer
+// Description : Desy 2016 event mismatch fixer, deprecated unless we mess it up
 //
 // Author : Bjoern Spruck, with help by Martin Ritter
 // Date : 20 - Apr - 2016, Updated 03 - Jun - 2016
 //-
 
-#include <pxd/modules/pxdUnpacking/PXDTriggerFixer.h>
+#include <testbeam/vxd/modules/unpacking/PXDTriggerFixer.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>

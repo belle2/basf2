@@ -29,7 +29,6 @@ namespace Belle2 {
     fitParDim3.resetStateVector();
     EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all());
 
-    fitParDim3.getCovariance() = Eigen::MatrixXd::Random(3, 3);
 
     fitParDim3.getCovariance() << 1, 2, 3, 4, 5, 6, 7, 8, 9;
     fitParDim3.resetCovariance();

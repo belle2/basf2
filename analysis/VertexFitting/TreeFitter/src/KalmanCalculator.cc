@@ -21,10 +21,12 @@ namespace TreeFitter {
   ErrCode KalmanCalculator::calculateGainMatrix(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
                                                 const FitParams* fitparams, const EigenTypes::MatrixXd* V, double weight)
   {
+    /* it would be better to initialise the const params with a constructor:  <11-12-17, jkrohn> */
     B2DEBUG(83, "------ KalmanCalculator::init                                    ");
-    m_constrDim = residuals.size();
+    m_constrDim = residuals.size(); //TODO move to constrcutor?
     m_stateDim  = fitparams->getDimensionOfState();
-    m_res = residuals;
+    m_res = residuals; //TODO move to constructor?
+
     m_G = G;
     m_R = EigenTypes::MatrixXd::Zero(m_constrDim, m_constrDim);
 
@@ -32,13 +34,14 @@ namespace TreeFitter {
       EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
     C  = fitparams->getCovariance().triangularView<Eigen::Lower>();
 
+
     EigenTypes::MatrixXd Rtemp =
       EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
 
     Rtemp = G * m_CGt;
 
-    if (V && (weight) && ((*V)(0, 0) != 0)) {
+    if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
       const EigenTypes::MatrixXd weightedV  = weight * (*V).selfadjointView<Eigen::Lower>();
       m_R = Rtemp + weightedV;
     } else {
@@ -49,9 +52,7 @@ namespace TreeFitter {
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
 
-    //JFK: if one of the elements is infty or nan we can stop here 2017-09-28
-    // but smallest matrix size is scalar (masscosntraint) so we can only check the first element
-    if (!std::isfinite(m_Rinverse(0, 0))) {
+    if (!m_Rinverse.allFinite()) {
       return ErrCode::inversionerror;
     }
 

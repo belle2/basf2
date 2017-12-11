@@ -34,6 +34,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, r
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
+                    cdcTracksStoreArrayName=cdc_reco_tracks,
                     vxdTracksStoreArrayName=svd_reco_tracks,
 
                     firstHighFilterParameters={"direction": direction},

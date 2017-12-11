@@ -10,7 +10,6 @@
 
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 
-#include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>

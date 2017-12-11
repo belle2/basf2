@@ -10,12 +10,12 @@
 
 #include <tracking/ckf/pxd/findlets/CKFToPXDFindlet.h>
 
-#include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
+#include <tracking/ckf/general/findlets/ResultStorer.icc.h>
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
@@ -43,6 +43,7 @@ CKFToPXDFindlet::CKFToPXDFindlet()
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_overlapResolver);
   addProcessingSignalListener(&m_spacePointTagger);
+  addProcessingSignalListener(&m_resultStorer);
 }
 
 void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -57,6 +58,7 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
   m_spacePointTagger.exposeParameters(moduleParamList, prefix);
+  m_resultStorer.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
@@ -131,6 +133,6 @@ void CKFToPXDFindlet::apply()
 
   B2DEBUG(50, "Having found " << m_filteredResults.size() << " results");
 
-  m_dataHandler.store(m_filteredResults);
+  m_resultStorer.apply(m_filteredResults);
   m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);
 }

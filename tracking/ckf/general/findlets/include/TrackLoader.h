@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
-#include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -30,14 +29,13 @@ namespace Belle2 {
    *
    * This findlet does also handle the storing of the results, as the
    */
-  template <class AResult>
-  class CKFDataHandler : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class TrackLoader : public TrackFindingCDC::Findlet<RecoTrack*> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<RecoTrack*>;
 
   public:
     /// Add the subfindlets
-    CKFDataHandler();
+    TrackLoader();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -48,19 +46,14 @@ namespace Belle2 {
     /// Load in the reco tracks and the hits
     void apply(std::vector<RecoTrack*>& seeds) override;
 
-    /// Store the reco tracks and the relations
-    void store(std::vector<AResult>& results);
-
   private:
     // Findlets
     /// Findlet for fitting the tracks
     TrackFitterAndDeleter m_trackFitter;
 
     // Parameters
-    /// Export the tracks or not
-    bool m_param_exportTracks = true;
     /// StoreArray name of the output Track Store Array
-    std::string m_param_outputRecoTrackStoreArrayName = "CKFRecoTracks";
+    std::string m_param_relationRecoTrackStoreArrayName = "";
     /// StoreArray name of the input Track Store Array
     std::string m_param_inputRecoTrackStoreArrayName = "RecoTracks";
     /// Minimal pt requirement
@@ -68,8 +61,6 @@ namespace Belle2 {
 
     // Store Arrays
     /// Output Reco Tracks Store Array
-    StoreArray<RecoTrack> m_outputRecoTracks;
-    /// Input Reco Tracks Store Array
     StoreArray<RecoTrack> m_inputRecoTracks;
   };
 }

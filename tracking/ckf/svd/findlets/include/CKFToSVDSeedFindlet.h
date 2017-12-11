@@ -14,7 +14,7 @@
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
+#include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/svd/findlets/SVDStateCreatorWithReversal.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
@@ -69,7 +69,7 @@ namespace Belle2 {
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
-    CKFDataHandler<CKFToSVDResult> m_dataHandler;
+    TrackLoader m_dataHandler;
     /// Findlet for loading the space points
     SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks

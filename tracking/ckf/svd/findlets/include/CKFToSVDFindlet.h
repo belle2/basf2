@@ -15,11 +15,12 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
-#include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
+#include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
+#include <tracking/ckf/general/findlets/ResultStorer.dcl.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
@@ -76,7 +77,7 @@ namespace Belle2 {
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
-    CKFDataHandler<CKFToSVDResult> m_dataHandler;
+    TrackLoader m_dataHandler;
     /// Findlet for loading the space points
     SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks
@@ -91,6 +92,8 @@ namespace Belle2 {
     OverlapResolver<ChooseableSVDResultFilter> m_overlapResolver;
     /// Findlet for tagging the used space points
     SpacePointTagger<CKFToSVDResult, SVDCluster> m_spacePointTagger;
+    /// Findlet for storing the results
+    ResultStorer<CKFToSVDResult> m_resultStorer;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector

@@ -33,7 +33,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, r
                     advanceHighFilterParameters={"direction": direction},
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
-                    outputRecoTrackStoreArrayName=svd_reco_tracks,
+                    relatedRecoTrackStoreArrayName=svd_reco_tracks,
                     cdcTracksStoreArrayName=cdc_reco_tracks,
                     vxdTracksStoreArrayName=svd_reco_tracks,
 
@@ -96,6 +96,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
     path.add_module("ToPXDCKF",
                     inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
+                    outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName="",
                     **module_parameters)
 
 
@@ -143,5 +145,6 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
     path.add_module("CDCToSVDSpacePointCKF",
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
-
+                    outputRelationRecoTrackStoreArrayName=cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName=svd_reco_tracks,
                     **module_parameters)

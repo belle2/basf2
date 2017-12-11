@@ -35,6 +35,7 @@ namespace Belle2 {
                                                   const std::vector<CKFToSVDState*>& states) const
   {
     std::vector<CKFToSVDState*> possibleNextStates;
+    possibleNextStates.reserve(states.size());
 
     const unsigned int currentLayer = currentState->getGeometricalLayer();
     const unsigned int nextLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);

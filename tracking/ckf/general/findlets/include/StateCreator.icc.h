@@ -17,6 +17,8 @@ namespace Belle2 {
   void StateCreator<AnObject, AState>::apply(const std::vector<AnObject*>& objects,
                                              std::vector<AState>& states)
   {
+    states.reserve(states.size() + objects.size());
+
     for (AnObject* object : objects) {
       states.emplace_back(object);
     }

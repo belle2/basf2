@@ -57,6 +57,7 @@ const std::vector<SVDRecoHit>& CKFToSVDState::getRecoHits() const
 
 CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)
 {
+  m_recoHits.reserve(2);
   for (const SVDCluster& svdCluster : hit->getRelationsTo<SVDCluster>()) {
     m_recoHits.emplace_back(&svdCluster);
   }

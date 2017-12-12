@@ -48,6 +48,7 @@ namespace Belle2 {
     std::string m_mempath;
     int m_memsize;
     int m_interval;
+    bool m_autocanvas;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;

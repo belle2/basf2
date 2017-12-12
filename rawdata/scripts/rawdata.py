@@ -156,10 +156,8 @@ def add_unpackers(path, components=None):
     # SVD
     if components is None or 'SVD' in components:
         svdunpacker = register_module('SVDUnpacker')
+        svdunpacker.param('GenerateShaperDigits', True)
         path.add_module(svdunpacker)
-
-        svd_clusterizer = register_module('SVDClusterizer')
-        path.add_module(svd_clusterizer)
 
     # CDC
     if components is None or 'CDC' in components:

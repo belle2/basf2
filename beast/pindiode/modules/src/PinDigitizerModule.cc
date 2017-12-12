@@ -10,11 +10,8 @@
 
 #include <beast/pindiode/modules/PinDigitizerModule.h>
 #include <beast/pindiode/dataobjects/PindiodeSimHit.h>
-#include <beast/pindiode/dataobjects/PindiodeHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -72,7 +69,7 @@ PinDigitizerModule::~PinDigitizerModule()
 void PinDigitizerModule::initialize()
 {
   B2INFO("PinDigitizer: Initializing");
-  StoreArray<PindiodeHit>::registerPersistent();
+  m_pindiodeHit.registerInDataStore();
 
 }
 

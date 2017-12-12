@@ -10,11 +10,8 @@
 
 #include <beast/dosi/modules/DosiDigitizerModule.h>
 #include <beast/dosi/dataobjects/DosiSimHit.h>
-#include <beast/dosi/dataobjects/DosiHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -67,7 +64,7 @@ DosiDigitizerModule::~DosiDigitizerModule()
 void DosiDigitizerModule::initialize()
 {
   B2INFO("DosiDigitizer: Initializing");
-  StoreArray<DosiHit>::registerPersistent();
+  m_dosiHit.registerInDataStore();
 
   //get xml data
   getXMLData();

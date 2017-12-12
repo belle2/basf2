@@ -11,8 +11,6 @@
 #include <beast/analysis/modules/ReprocessorModule.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -22,7 +20,6 @@
 #include <framework/core/RandomNumbers.h>
 
 #include <framework/io/RootIOUtilities.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 //c++
 #include <cmath>
@@ -72,11 +69,9 @@ void ReprocessorModule::initialize()
 {
   B2INFO("Reprocessor: Initializing");
 
-  // data store objects registration
-  StoreArray<MCParticle>::registerPersistent();
+  m_mcParticle.registerInDataStore();
 
-  StoreObjPtr<EventMetaData> evtMetaData;
-  evtMetaData.registerInDataStore();
+  m_evtMetaData.registerInDataStore();
 
   MetaHits.isRequired();
   mc_he3_parts.isOptional();

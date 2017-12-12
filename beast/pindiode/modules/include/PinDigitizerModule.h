@@ -12,6 +12,9 @@
 #define PINDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <beast/pindiode/dataobjects/PindiodeHit.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 #include <string>
 #include <vector>
 
@@ -57,6 +60,7 @@ namespace Belle2 {
 
 
     private:
+      StoreArray<PindiodeHit> m_pindiodeHit; /** Array for PindiodeHit */
 
       /** Cremat gain */
       double m_CrematGain;

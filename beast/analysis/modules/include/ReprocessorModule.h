@@ -17,6 +17,10 @@
 #include <vector>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 #include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
@@ -65,6 +69,10 @@ namespace Belle2 {
 
 
   private:
+
+
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< event meta data Object pointer */
+    StoreArray<MCParticle> m_mcParticle; /**< mc Particle Array */
 
     /** Set PDG*/
     int m_input_TPC_PDG;

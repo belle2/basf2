@@ -9,7 +9,7 @@
 #ifndef _Belle2_DQMHistAnalysisOutputNSM_h
 #define _Belle2_DQMHistAnalysisOutputNSM_h
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisOutput.h>
+#include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
 namespace Belle2 {
 

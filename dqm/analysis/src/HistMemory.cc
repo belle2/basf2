@@ -1,4 +1,4 @@
-#include "daq/dqm/analysis/HistMemory.h"
+#include "dqm/analysis/HistMemory.h"
 
 #include <daq/slc/base/StringUtil.h>
 

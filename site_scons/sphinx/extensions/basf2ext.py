@@ -152,8 +152,33 @@ class VariableListDirective(Directive):
         return all_nodes
 
 
+def html_page_context(app, pagename, templatename, context, doctree):
+    """Provide Link to Stash Repository, see https://mg.pov.lt/blog/sphinx-edit-on-github.html
+
+    this goes in conjunction with
+    site_scons/sphinx/_sphinxtemplates/sourcelink.html and adds a link to our
+    git repository instead to the local source link
+    """
+
+    if templatename != 'page.html' or not doctree:
+        return
+
+    path = os.path.relpath(doctree.get('source'), app.builder.srcdir)
+    repository = app.config.basf2_repository
+    if not repository:
+        return
+
+    commit = app.config.basf2_commitid
+    context["source_url"] = f"{repository}/browse/{path}"
+    if commit:
+        context["source_url"] += "?at=" + commit
+
+
 def setup(app):
+    app.add_config_value("basf2_repository", "", True)
+    app.add_config_value("basf2_commitid", "", True)
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)
+    app.connect('html-page-context', html_page_context)
     return {'version': 0.2}

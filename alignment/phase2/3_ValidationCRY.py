@@ -23,6 +23,8 @@ if len(sys.argv) == 3:
     inname = (sys.argv)[1]
     outname = (sys.argv)[2]
 
+use_local_database("centraldb/dbcache.txt")
+
 main = create_path()
 
 main.add_module('RootInput', inputFileName=inname)
@@ -33,7 +35,7 @@ main.add_module('Geometry')
 
 # detector reconstruction
 components = [
-    'MagneticField',
+    'MagneticFieldConstant4LimitedRCDC',
     'BeamPipe',
     'PXD',
     'SVD',

@@ -13,6 +13,7 @@
 from basf2 import *
 from simulation import add_simulation
 import tracking
+import reconstruction
 from modularAnalysis import *
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
@@ -25,6 +26,8 @@ if len(sys.argv) == 3:
     outname = (sys.argv)[2]
 
 # use_central_database("development", loglevel=LogLevel.INFO)
+
+# use_local_database("centraldb/dbcache.txt")
 
 main = create_path()
 
@@ -58,17 +61,20 @@ main.add_module('EKLMReconstructor')
 main.add_module('BKLMReconstructor')
 main.add_module('KLMK0LReconstructor')
 main.add_module('Muid')
+
 main.add_module(
     "CDCCosmicTrackMerger",
     recoTracksStoreArrayName="RecoTracks",
     MergedRecoTracksStoreArrayName="CosmicRecoTracks",
     deleteOtherRecoTracks=True)
+"""
 main.add_module(
     "TrackCreator",
     recoTrackColName="CosmicRecoTracks",
     trackColName="CosmicTracks",
     trackFitResultColName="CosmicTrackFitResult",
     useClosestHitToIP=True)
+"""
 
 # main.add_module("FittedTracksStorer",inputRecoTracksStoreArrayName="RecoTracks",outputRecoTracksStoreArrayName="CosmicRecoTracks")
 

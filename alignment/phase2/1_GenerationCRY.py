@@ -31,7 +31,7 @@ if len(sys.argv) == 2:
     print(sys.argv)[1]
     outname = (sys.argv)[1]
 
-use_central_database("development", loglevel=LogLevel.INFO)
+# use_central_database("development", loglevel=LogLevel.INFO)
 
 main = create_path()
 

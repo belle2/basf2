@@ -10,18 +10,9 @@
 #pragma once
 
 #include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
-#include <string>
+#include <tracking/ckf/general/filters/NonIPCrossingStateFilter.dcl.h>
 
 namespace Belle2 {
-  class ModuleParamList;
-
-  class NonIPCrossingSVDStateFilter : public AllSVDStateFilter {
-  public:
-    TrackFindingCDC::Weight operator()(const AllSVDStateFilter::Object& pair) final;
-
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
-
-  private:
-    double m_param_direction = 1;
-  };
+  extern template class NonIPCrossingStateFilter<AllSVDStateFilter>;
+  using NonIPCrossingSVDStateFilter = NonIPCrossingStateFilter<AllSVDStateFilter>;
 }

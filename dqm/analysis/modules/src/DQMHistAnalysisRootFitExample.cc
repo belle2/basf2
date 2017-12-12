@@ -8,7 +8,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisRootFitExample.h>
+#include <dqm/analysis/modules/DQMHistAnalysisRootFitExample.h>
 #include <RooRealVar.h>
 
 using namespace std;

@@ -8,7 +8,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisInputSrv.h>
+#include <dqm/analysis/modules/DQMHistAnalysisInputSrv.h>
 #include <TSystem.h>
 
 using namespace std;

@@ -13,7 +13,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
 //#include <THttpServer.h>
 
 #include <string>

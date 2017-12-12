@@ -11,7 +11,7 @@
 
 #include <framework/core/Module.h>
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TF1.h>
 #include <TH2F.h>

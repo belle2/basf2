@@ -7,7 +7,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisPXDFits.h>
+#include <dqm/analysis/modules/DQMHistAnalysisPXDFits.h>
 #include <TROOT.h>
 #include <TClass.h>
 

@@ -10,7 +10,7 @@
 #ifndef _Belle2_DQMHistAnalysisOutputRelayMsg_h
 #define _Belle2_DQMHistAnalysisOutputRelayMsg_h
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <TSocket.h>
 #include <string>
 

@@ -6,7 +6,7 @@
 // Date : 20 - Dec - 2015
 //-
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 using namespace std;
 using namespace Belle2;

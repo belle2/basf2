@@ -6,7 +6,7 @@
 // Date : 25 - Dec - 2015
 //-
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisOutputNSM.h>
+#include <dqm/analysis/modules/DQMHistAnalysisOutputNSM.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/nsm/NSMNodeDaemon.h>

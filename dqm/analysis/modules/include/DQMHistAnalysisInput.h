@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <daq/dqm/DqmMemFile.h>
-#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 

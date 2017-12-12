@@ -9,7 +9,7 @@
 #ifndef _Belle2_DQMHistAnalysisOutput_h
 #define _Belle2_DQMHistAnalysisOutput_h
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <string>
 

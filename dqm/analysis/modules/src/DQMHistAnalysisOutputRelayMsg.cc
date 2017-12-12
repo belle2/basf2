@@ -8,7 +8,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisOutputRelayMsg.h>
+#include <dqm/analysis/modules/DQMHistAnalysisOutputRelayMsg.h>
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TClass.h>

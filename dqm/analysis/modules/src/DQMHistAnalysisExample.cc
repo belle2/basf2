@@ -7,7 +7,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisExample.h>
+#include <dqm/analysis/modules/DQMHistAnalysisExample.h>
 
 using namespace std;
 using namespace Belle2;

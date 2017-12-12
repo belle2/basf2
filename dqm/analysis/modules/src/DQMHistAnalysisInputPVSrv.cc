@@ -8,7 +8,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisInputPVSrv.h>
+#include <dqm/analysis/modules/DQMHistAnalysisInputPVSrv.h>
 #include <TSystem.h>
 #include <TDirectory.h>
 #include <TH1F.h>

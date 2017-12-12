@@ -7,7 +7,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisEpicsExample.h>
+#include <dqm/analysis/modules/DQMHistAnalysisEpicsExample.h>
 #include <TROOT.h>
 #include <TClass.h>
 

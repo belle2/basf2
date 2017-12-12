@@ -7,7 +7,7 @@
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisOutput.h>
+#include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
 #include <daq/slc/base/StringUtil.h>
 

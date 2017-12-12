@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+from svd import add_svd_packer, add_svd_unpacker
 
 
 def add_packers(path, components=None):
@@ -91,10 +92,7 @@ def add_packers(path, components=None):
 
     # SVD
     if components is None or 'SVD' in components:
-        path.add_module('SVDDigitSplitter')
-        path.add_module('SVDDigitSorter')
-        svdpacker = register_module('SVDPacker')
-        path.add_module(svdpacker)
+        add_svd_packer(path)
 
     # CDC
     if components is None or 'CDC' in components:
@@ -155,9 +153,7 @@ def add_unpackers(path, components=None):
 
     # SVD
     if components is None or 'SVD' in components:
-        svdunpacker = register_module('SVDUnpacker')
-        svdunpacker.param('GenerateShaperDigits', True)
-        path.add_module(svdunpacker)
+        add_svd_unpacker(path)
 
     # CDC
     if components is None or 'CDC' in components:

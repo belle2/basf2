@@ -313,7 +313,7 @@ void PXDDigitizerModule::processHit()
   double trackLength2 = dx * dx + dy * dy + dz * dz;
 
   // Set magnetic field to save calls to getBField()
-  //  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
+  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
 
   if (m_currentHit->getPDGcode() == 22 || trackLength2 <= 0.01 * Unit::um * Unit::um) {
     //Photons deposit the energy at the end of their step
@@ -354,13 +354,16 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
   static const double cx[] = {0, 2.611995e-01, -1.948316e+01, 9.167064e+02};
   static const double cu[] = {4.223817e-04, -1.041434e-03, 5.139596e-02, -1.180229e+00};
   static const double cv[] = {4.085681e-04, -8.615459e-04, 5.706439e-02, -1.774319e+00};
+  static const double ct[] = {2.823743e-04, -1.138627e-06, 4.310888e-09, -1.559542e-11}; // temp range [250, 350] degrees with m_elStepTime = 1 ns
 
   double dz = 0.5 * info.getThickness() - info.getGateDepth() - r.Z(), adz = fabs(dz);
 
-  double dx = copysign(pol3(adz, cx), dz);
+  double dx = fabs(m_currentBField.y()) > Unit::T ? copysign(pol3(adz, cx),
+                                                             dz) : 0; // two configurations: with default B field (B~1.5T) and B=0T
   double sigmaDrift_u = pol3(adz, cu);
   double sigmaDrift_v = pol3(adz, cv);
-  double sigmaDiffus = 2.824034e-04; // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
+  double sigmaDiffus = pol3(info.getTemperature() - 300.0,
+                            ct); // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
 
   int nGroups = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;

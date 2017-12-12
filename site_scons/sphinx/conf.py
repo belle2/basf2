@@ -21,6 +21,8 @@ import shutil
 import subprocess
 import basf2_version
 
+sys.path.insert(0, os.path.abspath("extensions"))
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -42,6 +44,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinxarg.ext',
+    'basf2ext',
 ]
 
 # autosummary_generate = True
@@ -70,7 +73,7 @@ author = 'basf2 authors'
 # built documents.
 #
 # The short X.Y version.
-version = subprocess.check_output(["git", "log", "-1", "--format=%H"]).decode()
+version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 
 # The full version, including alpha/beta/rc tags.
 release = os.environ.get('BELLE2_RELEASE', 'development')

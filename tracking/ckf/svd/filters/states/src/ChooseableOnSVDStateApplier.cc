@@ -7,16 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
-#include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
-#include <tracking/ckf/svd/entities/CKFToSVDState.h>
-
 #include <tracking/ckf/svd/filters/states/ChooseableOnSVDStateApplier.h>
+#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
+#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
+#include <tracking/ckf/svd/entities/CKFToSVDState.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-namespace Belle2 {
-  /// Rejecter findlet for CKF SVD states
-  // TODO: this is the point where one wants to implement the cached advance filter!
-  extern template class StateRejecter<CKFToSVDState, ChooseableOnSVDStateApplier>;
-  using SVDStateRejecter = StateRejecter<CKFToSVDState, ChooseableOnSVDStateApplier>;
-}
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+template class
+Belle2::LayerToggledApplier<CKFToSVDState, LimitedOnStateApplier<CKFToSVDState, ChooseableFilter<SVDStateFilterFactory>>>;

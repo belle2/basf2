@@ -42,7 +42,7 @@ SignalSideVariablesToExtraInfoModule::SignalSideVariablesToExtraInfoModule() : M
 
 void SignalSideVariablesToExtraInfoModule::initialize()
 {
-  StoreArray<Particle>::required();
+  StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_particleListName);
 
   // function pointer

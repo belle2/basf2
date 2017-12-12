@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param T0 common T0
      * @param errT0 error on T0
      */
-    TOPCalCommonT0(double T0, double errT0): m_T0(T0), m_errT0(errT0)
+    TOPCalCommonT0(double T0, double errT0): m_T0(T0), m_errT0(errT0), m_status(true)
     {}
 
     /**
@@ -48,13 +48,19 @@ namespace Belle2 {
      */
     double getT0Error() const {return m_errT0;}
 
+    /**
+     * Returns calibration status
+     * @return true, if calibrated
+     */
+    bool isCalibrated() const {return m_status;}
 
   private:
 
     float m_T0 = 0;    /**< calibration constant */
     float m_errT0 = 0; /**< error on constant */
+    bool m_status = false; /**< calibration status */
 
-    ClassDef(TOPCalCommonT0, 1); /**< ClassDef */
+    ClassDef(TOPCalCommonT0, 2); /**< ClassDef */
 
   };
 

@@ -16,6 +16,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -78,15 +79,30 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int moduleID, int pixelID, double time)
+    int TOPreco::addData(int moduleID, int pixelID, double time, double timeError)
     {
-      int status;
+      int status = 0;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      int TDC = 0; // it's not used in Fortran code
-      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
-      return status;
+      float terr = (float) timeError;
+      data_put_(&moduleID, &pixelID, &t, &terr, &status);
+      switch (status) {
+        case 0:
+          B2WARNING("addData: no space available in /TOP_DATA/");
+          return status;
+        case -1:
+          B2ERROR("addData: invalid module ID " << moduleID + 1);
+          return status;
+        case -2:
+          B2ERROR("addData: invalid pixel ID " << pixelID + 1);
+          return status;
+        case -3:
+          B2ERROR("addData: digit should already be masked-out (different masks used?)");
+          return status;
+        default:
+          return status;
+      }
     }
 
 
@@ -248,12 +264,13 @@ namespace Belle2 {
       ich++; // convert to 1-based
     }
 
-    double TOPreco::getPDF(int pixelID, double T, double Mass)
+    double TOPreco::getPDF(int pixelID, double T, double Mass, double Terr)
     {
       pixelID--;  // 0-based ID used in fortran
       float t = (float) T;
+      float terr = (float) Terr;
       float mass = (float) Mass;
-      return get_pdf_(&pixelID, &t, &mass);
+      return get_pdf_(&pixelID, &t, &terr, &mass);
     }
 
   } // end top namespace

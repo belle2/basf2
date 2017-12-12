@@ -11,6 +11,7 @@
 
 
 #include <reconstruction/modules/KlId/DataWriter/DataWriterModule.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>

@@ -109,9 +109,10 @@ namespace Belle2 {
        * Add data
        * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param time t0-corrected time in [ns]
+       * @param time TBC and t0-corrected time in [ns]
+       * @param timeError time uncertainty in [ns]
        */
-      int addData(int moduleID, int pixelID, double time);
+      int addData(int moduleID, int pixelID, double time, double timeError);
 
       /**
        * Return size of data list
@@ -232,9 +233,10 @@ namespace Belle2 {
        * Return PDF for pixel pixelID at time t for mass hypothesis mass
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param t time
+       * @param jitter additional time jitter, like electronic jitter
        * @param mass mass
        */
-      double getPDF(int pixelID, double t, double mass);
+      double getPDF(int pixelID, double t, double mass, double jitter = 0);
 
       /**
        * Set track beta (for beta resolution studies)

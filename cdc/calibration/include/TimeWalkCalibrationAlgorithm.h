@@ -40,6 +40,13 @@ namespace Belle2 {
       /// minimum chi2 prob requirement for track
       virtual void setMinimumPval(double pval) {m_minPval = pval;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
+      /// output file name
+      void setOutputFileName(std::string outputname) {m_outputFileName.assign(outputname);}
+
+
     protected:
       /// Run algo on data.
       virtual EResult calibrate();
@@ -65,7 +72,8 @@ namespace Belle2 {
       double m_twPost[300] = {0.}; /**< Time Walk params before calibration */
       bool m_debug = false; /**< run debug or not.*/
       bool m_storeHisto = true;/**< Store all Histogram or not*/
-      std::string m_OutputTWFileName = "tw_new.dat";  /**< Output tw file name for time walk. */
+      bool  m_textOutput = false; /**< output text file if true */
+      std::string m_outputFileName = "tw_new.dat";  /**< Output tw file name for time walk. */
     };
   }
 }

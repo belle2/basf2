@@ -89,7 +89,7 @@ namespace Belle2 {
         const std::string name = boxtype.getName();
         G4VSolid* shape_box = new G4Box(name, box.getHeight(), box.getWidth(), box.getLength());
         box.setVolume(new G4LogicalVolume(shape_box, Materials::get(box.getMaterial()), name));
-        B2INFO("Created " << name << " DockBox with a mass of " << (box.getVolume()->GetMass(true) / CLHEP::kg) << "kg");
+        B2DEBUG(50, "Created " << name << " DockBox with a mass of " << (box.getVolume()->GetMass(true) / CLHEP::kg) << "kg");
         if (active) {
           int identifier = boxtype.getIdentifier();
           B2DEBUG(50, "Creating BkgSensitiveDetector for DockBox " << name << " with identifier " <<  identifier);

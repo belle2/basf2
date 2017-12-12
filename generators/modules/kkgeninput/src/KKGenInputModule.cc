@@ -21,6 +21,9 @@
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
 
+#include <framework/logging/Logger.h>
+#include <framework/utilities/IOIntercept.h>
+
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
@@ -122,7 +125,7 @@ void KKGenInputModule::initializeGenerator()
 
   if (m_KKMCOutputFileName.empty()) {
     m_KKMCOutputFileName = boost::filesystem::unique_path("KKMC-%%%%%%%%%%.txt").native();
-    B2INFO("Using KKMC output file " << m_KKMCOutputFileName);
+    B2DEBUG(150, "Using KKMC output file " << m_KKMCOutputFileName);
   }
   if (FileSystem::fileExists(m_KKMCOutputFileName)) {
     auto uniqueOutputFileName = boost::filesystem::unique_path(m_KKMCOutputFileName + "-%%%%%%%%%%").native();
@@ -142,6 +145,9 @@ void KKGenInputModule::initializeGenerator()
   B2DEBUG(150, "m_taudecaytableFileName: " << m_taudecaytableFileName);
   B2DEBUG(150, "m_KKMCOutputFileName: " << m_KKMCOutputFileName);
 
+
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Info, 100, 100);
+  initLogCapture.start();
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_KKMCOutputFileName);
 
@@ -151,6 +157,7 @@ void KKGenInputModule::initializeGenerator()
 
   //set the beam parameters, ignoring beam energy spread for the moment
   m_Ikkgen.set_beam_info(v_ler, 0.0, v_her, 0.0);
+  initLogCapture.finish();
 
   m_initialized = true;
 

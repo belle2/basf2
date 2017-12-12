@@ -381,9 +381,6 @@ void RootInputModule::readTree()
       B2FATAL("Could not read data from parent file!");
   }
 
-  const StoreObjPtr<EventMetaData> eventMetaData;
-  if (!m_recovery or fileMetaData)
-    eventMetaData->setParentLfn(fileMetaData->getLfn());
 }
 
 

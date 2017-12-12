@@ -211,7 +211,6 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 void T0CalibrationAlgorithm::write()
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  ofstream ofs(m_outputT0FileName.c_str());
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   TH1F* T0B[300];
@@ -238,10 +237,12 @@ void T0CalibrationAlgorithm::write()
       } else {
         T0 = cdcgeo.getT0(wireid);
       }
-      ofs <<  ilay << "\t" << iwire << "\t" << T0 - dt[ilay][iwire] << std::endl;
       tz->setT0(wireid, T0 - dt[ilay][iwire]);
     }
   }
-  ofs.close();
+
+  if (m_textOutput == true) {
+    tz->outputToFile(m_outputT0FileName);
+  }
   saveCalibration(tz, "CDCTimeZeros");
 }

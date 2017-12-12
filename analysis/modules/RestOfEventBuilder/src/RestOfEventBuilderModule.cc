@@ -50,7 +50,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 void RestOfEventBuilderModule::initialize()
 {
   // input
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
   StoreArray<Particle> particles;
   particles.isRequired();
 

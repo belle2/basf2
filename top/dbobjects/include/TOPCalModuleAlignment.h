@@ -40,7 +40,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than " << c_numModules);
         return ;
       }
       m_alpha[module] = alpha;
@@ -57,7 +57,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than " << c_numModules);
         return ;
       }
       m_beta[module] = beta;
@@ -74,7 +74,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than " << c_numModules);
         return ;
       }
       m_gamma[module] = gamma;
@@ -91,7 +91,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than " << c_numModules);
         return ;
       }
       m_x[module] = x;
@@ -108,7 +108,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than " << c_numModules);
         return ;
       }
       m_y[module] = y;
@@ -125,13 +125,38 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than " << c_numModules);
         return ;
       }
       m_z[module] = z;
       m_errZ[module] = errZ;
     }
 
+    /**
+     * Sets calibration status to true
+     */
+    void setCalibrationStatus(int moduleID)
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than " << c_numModules);
+        return ;
+      }
+      m_status[module] = true;
+    }
+
+    /**
+     * Sets calibration status to false
+     */
+    void unsetCalibrationStatus(int moduleID)
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than " << c_numModules);
+        return ;
+      }
+      m_status[module] = false;
+    }
 
     /**
      * Gets the angle alpha on a single module
@@ -142,7 +167,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_alpha[module];
@@ -157,7 +182,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_beta[module];
@@ -172,7 +197,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_gamma[module];
@@ -187,7 +212,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_x[module];
@@ -202,7 +227,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_y[module];
@@ -217,7 +242,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_z[module];
@@ -233,7 +258,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_errAlpha[module];
@@ -248,7 +273,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_errBeta[module];
@@ -263,7 +288,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_errGamma[module];
@@ -278,7 +303,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_errX[module];
@@ -293,7 +318,7 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_errY[module];
@@ -308,13 +333,26 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
+        B2WARNING("Module number greater than " << c_numModules << ". Returning 0.");
         return 0. ;
       }
       return m_errZ[module];
     }
 
-
+    /**
+     * Returns calibration status
+     * @param moduleID module ID (1-based)
+     * @return true, if calibrated
+     */
+    bool isCalibrated(int moduleID) const
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than " << c_numModules << ". Returning false");
+        return false ;
+      }
+      return m_status[module];
+    }
 
 
   private:
@@ -339,8 +377,9 @@ namespace Belle2 {
     float m_errY[c_numModules] = {0}; /**< error on the y displacement. 0 by default. */
     float m_errZ[c_numModules] = {0}; /**< error on the z displacement. 0 by default. */
 
+    bool m_status[c_numModules] = {false}; /**< calibration status */
 
-    ClassDef(TOPCalModuleAlignment, 1); /**< ClassDef */
+    ClassDef(TOPCalModuleAlignment, 2); /**< ClassDef */
 
   };
 

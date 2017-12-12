@@ -25,7 +25,14 @@ DBStore::~DBStore()
 {
   //release all memory in db store
   for (auto& entry : m_dbEntries) {
-    delete entry.second.object;
+    DBEntry& dbEntry = entry.second;
+    if (dbEntry.intraRunDependency) {
+      delete dbEntry.intraRunDependency;
+      dbEntry.intraRunDependency = nullptr;
+    } else {
+      delete dbEntry.object;
+    }
+    dbEntry.object = nullptr;
   }
   m_dbEntries.clear();
 }
@@ -76,11 +83,11 @@ void DBStore::updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOf
 {
   if (dbEntry.intraRunDependency) {
     delete dbEntry.intraRunDependency;
-    dbEntry.intraRunDependency = 0;
+    dbEntry.intraRunDependency = nullptr;
   } else {
     delete dbEntry.object;
   }
-  dbEntry.object = 0;
+  dbEntry.object = nullptr;
   if (objectIov.first && objectIov.first->InheritsFrom(IntraRunDependency::Class())) {
     dbEntry.intraRunDependency = static_cast<IntraRunDependency*>(objectIov.first);
     dbEntry.object = dbEntry.intraRunDependency->getObject(*m_event);
@@ -152,7 +159,7 @@ void DBStore::update()
     }
     TObject* old = dbEntry.object;
     updateEntry(dbEntry, make_pair(query.object, query.iov));
-    if ((old != 0) || (dbEntry.object != 0)) {
+    if ((old != nullptr) || (dbEntry.object != nullptr)) {
       for (auto& callback : dbEntry.callbackFunctions) {
         callbacks[callback.first] = callback.second;
       }
@@ -189,9 +196,13 @@ void DBStore::reset()
 
   for (auto& entry : m_dbEntries) {
     DBEntry& dbEntry = entry.second;
-    //delete dbEntry.object;
-    dbEntry.object = 0;
-    dbEntry.intraRunDependency = 0;
+    if (dbEntry.intraRunDependency) {
+      delete dbEntry.intraRunDependency;
+      dbEntry.intraRunDependency = nullptr;
+    } else {
+      delete dbEntry.object;
+    }
+    dbEntry.object = nullptr;
     dbEntry.iov = IntervalOfValidity();
   }
 
@@ -213,7 +224,7 @@ void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool on
   } else {
     dbEntry.objClass = obj->IsA();
   }
-  dbEntry.iov = IntervalOfValidity(0, 0, -1, -1);
+  dbEntry.iov = IntervalOfValidity::always();
   if (oneRun) {
     const int exp = m_event->getExperiment();
     const int run = m_event->getRun();

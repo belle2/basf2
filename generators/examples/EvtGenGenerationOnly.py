@@ -9,9 +9,6 @@
 
 from basf2 import *
 
-# suppress messages and warnings during processing:
-set_log_level(LogLevel.INFO)
-
 # main path
 main = create_path()
 
@@ -20,7 +17,7 @@ main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
 # EvtGen
 evtgen = register_module('EvtGenInput')
-evtgen.set_log_level(LogLevel.INFO)
+# evtgen.set_log_level(LogLevel.INFO)
 
 # run
 main.add_module("Progress")

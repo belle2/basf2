@@ -39,6 +39,10 @@ namespace Belle2 {
     EXPECT_TRUE(eventLevelTrackingInfo.hasCDCSLayer(1));
     EXPECT_FALSE(eventLevelTrackingInfo.hasCDCSLayer(5));
 
-    // ... and stereo- vs. axial-layers
+    //Let's set and get the information on unused segments:
+    eventLevelTrackingInfo.setCDCNSegments(21);
+    EXPECT_EQ(eventLevelTrackingInfo.getCDCNSegments(), 21);
+    eventLevelTrackingInfo.setCDCNSegments(300);
+    EXPECT_EQ(eventLevelTrackingInfo.getCDCNSegments(), 255);
   }
 } // namespace Belle2

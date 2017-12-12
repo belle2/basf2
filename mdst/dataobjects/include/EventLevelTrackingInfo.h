@@ -23,27 +23,27 @@ namespace Belle2 {
    */
   class EventLevelTrackingInfo : public RelationsObject {
   public:
-    /** Setter for number of CDC measurements, that are not assigned to any Track. */
-    void setNCDCHitsNotAssigned(unsigned short nCDCHitsNotAssigned)
-    {
-      m_nCDCHitsNotAssigned = nCDCHitsNotAssigned;
-    }
-
     /** Getter for number of CDC measurements, that are not assigned to any Track. */
     unsigned short getNCDCHitsNotAssigned() const
     {
       return m_nCDCHitsNotAssigned;
     }
 
+    /** Setter for number of CDC measurements, that are not assigned to any Track. */
+    void setNCDCHitsNotAssigned(unsigned short nCDCHitsNotAssigned)
+    {
+      m_nCDCHitsNotAssigned = nCDCHitsNotAssigned;
+    }
+
     /** Getter for number of CDC measurements, that are not assigned to any Track nor very likely beam-background.
-     *
-     *  CDC hits, that are close to each other are combined in clusters during the reconstruction,
-     *  which are evaluated with respect to the likelihood to stem from beam-background and the like
-     *  rather than from an interesting physics object.
-     *  Before any real attempt to actually combine CDC hits into a track, a cut on the output of such a classifier
-     *  is performed. Here we want to get only the number of those CDC hits, that survive that cut,
-     *  but are then not used for an actual Track.
-     */
+      *
+      *  CDC hits, that are close to each other are combined in clusters during the reconstruction,
+      *  which are evaluated with respect to the likelihood to stem from beam-background and the like
+      *  rather than from an interesting physics object.
+      *  Before any real attempt to actually combine CDC hits into a track, a cut on the output of such a classifier
+      *  is performed. Here we want to get only the number of those CDC hits, that survive that cut,
+      *  but are then not used for an actual Track.
+      */
     unsigned short getNCDCHitsNotAssignedPostCleaning() const
     {
       return m_nCDCHitsNotAssignedPostCleaning;
@@ -57,6 +57,7 @@ namespace Belle2 {
 
     /** Getter for presence of hit in specific CDC Layer.
      *
+     *  This information refers as well to the cleaned hits.
      *  @param  cdcLayer  Specification, which layer in the CDC shall be tested for a hit.
      *  @return true, if a non-assigned hit exists in the specified layer.
      */
@@ -77,6 +78,25 @@ namespace Belle2 {
     bool hasCDCSLayer(unsigned short cdcSLayer) const
     {
       return HitPatternCDC(m_hitPatternCDCInitializer).hasSLayer(cdcSLayer);
+    }
+
+    /** Getter for number of segments not used in Tracks.
+     *
+     *  During the CDC track finding, we search for segments of within one superlayer.
+     *  We want to store the number of segments, that we couldn't attach to any Track.
+     *  The maximum number of unstored segments is 255.
+     */
+    unsigned short getCDCNSegments() const
+    {
+      return HitPatternCDC(m_hitPatternCDCInitializer).getNHits();
+    }
+
+    /** Setter for number of Segments not used in Tracks. */
+    void setCDCNSegments(unsigned short nHits)
+    {
+      HitPatternCDC hitPatternCDC(m_hitPatternCDCInitializer);
+      hitPatternCDC.setNHits(nHits);
+      m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
     }
 
   private:

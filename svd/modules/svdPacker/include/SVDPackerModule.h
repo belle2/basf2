@@ -81,10 +81,10 @@ namespace Belle2 {
       uint32_t crc16Input[1000];
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
-      void inline addData32(uint32_t data32)
+      void inline addData32(uint32_t adata32)
       {
-        data_words.push_back(data32);
-        crc16Input[iCRC] = data32;
+        data_words.push_back(adata32);
+        crc16Input[iCRC] = adata32;
         iCRC++;
       }
 
@@ -174,7 +174,10 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
+
       int m_FADCTriggerNumberOffset;
 
     };

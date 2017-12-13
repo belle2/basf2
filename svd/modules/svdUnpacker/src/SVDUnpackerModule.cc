@@ -76,8 +76,8 @@ SVDUnpackerModule::~SVDUnpackerModule()
 void SVDUnpackerModule::initialize()
 {
   m_eventMetaDataPtr.isRequired();
-  StoreArray<RawSVD>::required(m_rawSVDListName);
-  StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
+  m_rawSVD.isRequired(m_rawSVDListName);
+  m_svdDigit.registerInDataStore(m_svdDigitListName);
   //StoreArray<SVDDAQDiagnostic>::registerPersistent(m_svdDAQDiagnosticsListName);
   StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
   storeDAQDiagnostics.registerInDataStore();

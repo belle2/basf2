@@ -605,6 +605,8 @@ VXDTFModule::~VXDTFModule()
 
 void VXDTFModule::initialize()
 {
+  B2FATAL("The VXDTF Module (VXDTF1) is deprecated! Support for this module is ceased and the module will be deleted soon! "
+          << "If you have objections, please contact felix.metzner@kit.edu.");
   B2DEBUG(1, "-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance <<
           ") - initialize:");
 

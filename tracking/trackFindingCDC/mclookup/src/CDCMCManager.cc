@@ -120,8 +120,10 @@ const CDCMCTrackLookUp& CDCMCManager::getMCTrackLookUp()
 
 void CDCMCManager::requireTruthInformation()
 {
-  StoreArray <CDCSimHit>::required();
-  StoreArray <MCParticle>::required();
+  StoreArray <CDCSimHit> cdcSimHits;
+  cdcSimHits.isRequired();
+  StoreArray <MCParticle> mcParticles;
+  mcParticles.isRequired();
 }
 
 void CDCMCManager::clear()

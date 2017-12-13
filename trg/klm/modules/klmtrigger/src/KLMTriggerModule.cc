@@ -72,7 +72,7 @@ void KLMTriggerModule::initialize()
 void KLMTriggerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
+  B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
   m_nEvents = 0;
   m_nTracks = 0;
 }

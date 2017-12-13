@@ -99,7 +99,7 @@ void DQMHistAnalysisOutputNSMModule::event()
   FloatValueList& vfloats(getFloatValues());
   TextList& texts(getTexts());
   if (!initialized) {
-    for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+    for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
       std::string pname = i->first;
       std::string vname = StringUtil::replace(pname, "/", ".");
       switch (i->second) {
@@ -116,7 +116,7 @@ void DQMHistAnalysisOutputNSMModule::event()
     }
     initialized = true;
   } else {
-    for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+    for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
       std::string pname = i->first;
       std::string vname = StringUtil::replace(pname, "/", ".");
       switch (i->second) {

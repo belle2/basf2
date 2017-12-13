@@ -1,7 +1,6 @@
 Import('env')
 env['SUBLIB'] = True
-env['LIBS'] = ['framework', 'analysis', 'analysis_utility', 'analysis_dataobjects', 'analysis_DecayDescriptor', 'mdst_dataobjects',
-	       'hlt_L1Emulator_dataobjects']
+env['LIBS'] = ['framework', 'analysis', 'analysis_utility', 'analysis_dataobjects', 'analysis_DecayDescriptor', 'mdst_dataobjects']
 
 Return('env')
 

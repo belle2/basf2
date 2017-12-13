@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: iorch                                                    *
+ * Contributors: iorch, Michel Villanueva                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -81,7 +81,7 @@ void ThrustOfEventModule::event()
   // Aquí se guarda la magnitud del thrust y la dirección del thrust axis. -- Michel
   TVector3 thrustAxis = ThrustOfEventModule::getThrustOfEvent(m_particleLists);
   thrust->addThrustAxis(thrustAxis);
-  thrust->addThrust(0.1);
+  thrust->addThrust(thrustAxis.Mag());
 }
 
 void ThrustOfEventModule::endRun()
@@ -92,12 +92,12 @@ void ThrustOfEventModule::terminate()
 {
 }
 
-TVector3 getThrustOfEvent(vector<string> m_particleLists){
-  int nParticleLists = m_particleLists.size();
+TVector3 ThrustOfEventModule::getThrustOfEvent(vector<string> particleLists){
+  int nParticleLists = particleLists.size();
   PCmsLabTransform T;
   vector<TVector3> forthrust;
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl){
-    string ParticleListName = m_particleLists[i_pl];
+    string ParticleListName = particleLists[i_pl];
     StoreObjPtr<ParticleList> plist(ParticleListName);
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
@@ -109,6 +109,7 @@ TVector3 getThrustOfEvent(vector<string> m_particleLists){
       forthrust.push_back(p_cms.Vect());
     }
   }
+
   TVector3 th = Thrust::calculateThrust(forthrust);
 
   //std::srand(std::time(0)); // use current time as seed for random generator

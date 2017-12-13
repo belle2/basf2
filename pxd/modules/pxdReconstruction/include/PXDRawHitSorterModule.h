@@ -12,6 +12,7 @@
 #define PXDRawHitSorterModule_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDFrame.h>
@@ -41,6 +42,7 @@ namespace Belle2 {
       virtual void event();
 
     private:
+      StoreArray<PXDRawHit> m_pxdRawHit; /**< Required input for  PXDRawHit */
       /** Utility function to check pixel coordinates */
       inline bool goodHit(const PXDRawHit* const rawhit) const
       {

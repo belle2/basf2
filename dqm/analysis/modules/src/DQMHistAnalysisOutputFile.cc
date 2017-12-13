@@ -86,6 +86,7 @@ void DQMHistAnalysisOutputFileModule::endRun()
         while ((obj = (TObject*)next())) {
           if (obj->InheritsFrom("TCanvas")) {
             B2INFO("Canvas name: " << obj->GetName() << " title " << obj->GetTitle());
+            obj->Write();
           } else {
             B2INFO("Others name: " << obj->GetName() << " title " << obj->GetTitle());
           }

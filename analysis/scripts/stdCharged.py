@@ -40,7 +40,6 @@ def stdK(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of electron lists:
       - 'K+:all' with no cuts on track
-      - 'K+:99eff' with 99% selection efficiency and good track
       - 'K+:95eff' with 95% selection efficiency and good track
       - 'K+:90eff' with 90% selection efficiency and good track
       - 'K+:85eff' with 85% selection efficiency and good track
@@ -65,7 +64,6 @@ def stdPr(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of electron lists:
       - 'p+:all' with no cuts on track
-      - 'p+:99eff' with 99% selection efficiency and good track
       - 'p+:95eff' with 95% selection efficiency and good track
       - 'p+:90eff' with 90% selection efficiency and good track
       - 'p+:85eff' with 85% selection efficiency and good track
@@ -92,8 +90,6 @@ def stdE(listtype='95eff', path=analysis_main):
       - 'e+:all' with no cuts on track
       - 'e+:99eff' with 99% selection efficiency and good track
       - 'e+:95eff' with 95% selection efficiency and good track
-      - 'e+:90eff' with 90% selection efficiency and good track
-      - 'e+:85eff' with 85% selection efficiency and good track
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -113,7 +109,6 @@ def stdMu(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of muon lists:
       - 'mu+:all' with no cuts on track
-      - 'mu+:99eff' with 99% selection efficiency and good track
       - 'mu+:95eff' with 95% selection efficiency and good track
       - 'mu+:90eff' with 90% selection efficiency and good track
       - 'mu+:85eff' with 85% selection efficiency and good track

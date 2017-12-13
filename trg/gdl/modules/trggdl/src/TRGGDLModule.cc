@@ -24,6 +24,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 
@@ -73,18 +74,16 @@ namespace Belle2 {
              "TRGGDL firmware simulation mode",
              _firmwareSimulationMode);
 
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... created" << endl;
+    B2DEBUG(100, "TRGGDLModule ... created");
   }
 
   TRGGDLModule::~TRGGDLModule()
   {
 
     if (_gdl)
-      TRGGDL::getTRGGDL("good-bye");
+      B2DEBUG(100, "good-bye");
 
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... destructed " << endl;
+    B2DEBUG(100,  "TRGGDLModule ... destructed ");
   }
 
   void
@@ -93,11 +92,7 @@ namespace Belle2 {
 
     TRGDebug::level(_debugLevel);
 
-    if (TRGDebug::level()) {
-      cout << "TRGGDLModule::initialize ... options" << endl;
-      cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-           << endl;
-    }
+    B2DEBUG(100, "TRGGDLModule::initialize ... options");
     StoreObjPtr<TRGGRLInfo>::required("TRGGRLObjects");
     StoreObjPtr<TRGSummary>::registerPersistent();
   }
@@ -124,10 +119,7 @@ namespace Belle2 {
                                _Phase);
     }
 
-    if (TRGDebug::level()) {
-      cout << "TRGGDLModule ... beginRun called " << endl;
-      cout << "                 configFile = " << cfn << endl;
-    }
+    B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
   }
 
   void
@@ -152,8 +144,7 @@ namespace Belle2 {
   void
   TRGGDLModule::endRun()
   {
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... endRun called " << endl;
+    B2DEBUG(200, "TRGGDLModule ... endRun called ");
   }
 
   void
@@ -162,8 +153,7 @@ namespace Belle2 {
 
     _gdl->terminate();
 
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... terminate called " << endl;
+    B2DEBUG(100, "TRGGDLModule ... terminate called ");
   }
 
 } // namespace Belle2

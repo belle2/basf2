@@ -101,7 +101,7 @@ CDCTrigger3DFitterModule::event()
       }
     }
     if (nHits < m_minHits) {
-      B2INFO("Not enough hits to do 3D fit (" << m_minHits << " needed, got " << nHits << ")");
+      B2DEBUG(100, "Not enough hits to do 3D fit (" << m_minHits << " needed, got " << nHits << ")");
       continue;
     }
 
@@ -113,7 +113,7 @@ CDCTrigger3DFitterModule::event()
 
     // check if fit results are valid
     if (isnan(z0) || isnan(cot) || isnan(chi2)) {
-      B2INFO("3D fit failed");
+      B2DEBUG(100, "3D fit failed");
       continue;
     }
 

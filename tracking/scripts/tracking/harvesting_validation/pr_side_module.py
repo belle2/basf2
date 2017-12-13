@@ -20,6 +20,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     """Module to collect matching information about the found particles and to generate
        validation plots and figures of merit on the performance of track finding."""
 
+    """ Expert level behavior:
+        expert_level <= default_expert_level: all figures and plots from this module except tree entries
+        expert_level > default_expert_level: everything including tree entries
+    """
+    default_expert_level = 10
+
     def __init__(
             self,
             name,
@@ -143,7 +149,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     # #################################### #
 
     # Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=1)
+    save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=default_expert_level)
 
     save_clone_rate = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",
@@ -312,14 +318,3 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         ],
         y_log=True,
     )
-
-
-class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
-    """Module to collect more matching information about the found particles and to
-       generate validation plots and figures of merit on the performance of track finding.
-       This module gives information on the number of hits etc."""
-
-    def __init__(self, *args, **kwds):
-        warnings.warn("ExpertPRSideTrackingValidationModule is depricated for PRSideTrackingValidationModule",
-                      DeprecationWarning)
-        super().__init__(*args, **kwds)

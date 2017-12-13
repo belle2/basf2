@@ -61,10 +61,8 @@ namespace Belle2 {
 
     /** sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method */
     std::string m_MCRecoTracksStoreArrayName;
-
     /** Only required for MCInfo method */
     bool m_MCStrictQualityEstimator;
-
 
     // member variables
 

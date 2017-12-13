@@ -34,7 +34,7 @@ configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', t
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
-analysis_main.add_module('MCMatcherParticles', listName='Bplus:semileptonic', looseMCMatching=True)
+analysis_main.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 
 # now the FEI reconstruction is done
 # and we're back in analysis_main pathB
@@ -42,12 +42,11 @@ analysis_main.add_module('MCMatcherParticles', listName='Bplus:semileptonic', lo
 # apply some very loose cuts to reduce the number
 # of Btag candidates
 
-applyCuts('Bplus:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.004 and extraInfo(decayModeID)<8')
-
+applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and extraInfo(decayModeID)<8')
 # rank Btag canidates according to their SignalProbability
 
 
-BplusSemiLeptonicList = ['Bplus:semileptonic']
+BplusSemiLeptonicList = ['B+:semileptonic']
 
 
 skimOutputUdst('feiSemiLeptonicBplus', BplusSemiLeptonicList)

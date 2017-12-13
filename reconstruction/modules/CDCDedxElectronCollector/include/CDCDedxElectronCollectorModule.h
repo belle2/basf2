@@ -11,6 +11,7 @@
 #pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
+
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -45,6 +46,12 @@ namespace Belle2 {
 
 
   private:
+
+    // required input
+    StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
+    StoreArray<Track> m_tracks; /**< Required array for Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
+
     // module params
     int m_maxNumHits; /**< maximum number of hits allowed */
 

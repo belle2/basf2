@@ -9,7 +9,7 @@ EventMetaData:
   getEvent(): 0
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194090345178389
@@ -3342,7 +3342,7 @@ EventMetaData:
   getEvent(): 1
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194093029445924
@@ -6100,7 +6100,7 @@ EventMetaData:
   getEvent(): 2
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194094248154873
@@ -10022,7 +10022,7 @@ EventMetaData:
   getEvent(): 3
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194096257224344
@@ -13969,7 +13969,7 @@ EventMetaData:
   getEvent(): 4
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194098155950942
@@ -18218,7 +18218,7 @@ EventMetaData:
   getEvent(): 5
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194099596828101

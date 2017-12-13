@@ -11,16 +11,8 @@
 #include <reconstruction/modules/CDCDedxPID/CDCDedxPIDModule.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -30,8 +22,6 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
@@ -106,31 +96,22 @@ void CDCDedxPIDModule::initialize()
   }
 
   // required inputs
-  StoreArray<Track> tracks;
-  StoreArray<RecoTrack> recoTracks;
-  StoreArray<TrackFitResult> trackfitResults;
+  m_tracks.isRequired();
+  m_recoTracks.isRequired();
 
-  tracks.isRequired();
-  recoTracks.isRequired();
-  trackfitResults.isRequired();
-
-  //optional inputs
-  StoreArray<MCParticle> mcparticles;
-  mcparticles.isOptional();
-  tracks.optionalRelationTo(mcparticles);
-  StoreArray<CDCHit>::required();
+  // optional inputs
+  m_mcparticles.isOptional();
+  m_tracks.optionalRelationTo(m_mcparticles);
 
   // register outputs
   if (m_enableDebugOutput) {
-    StoreArray<CDCDedxTrack> dedxTracks;
-    dedxTracks.registerInDataStore();
-    tracks.registerRelationTo(dedxTracks);
+    m_dedxTracks.registerInDataStore();
+    m_tracks.registerRelationTo(m_dedxTracks);
   }
 
   if (!m_pdfFile.empty()) {
-    StoreArray<CDCDedxLikelihood> dedxLikelihoods;
-    dedxLikelihoods.registerInDataStore();
-    tracks.registerRelationTo(dedxLikelihoods);
+    m_dedxLikelihoods.registerInDataStore();
+    m_tracks.registerRelationTo(m_dedxLikelihoods);
 
     //load pdfs
     TFile* pdfFile = new TFile(m_pdfFile.c_str(), "READ");
@@ -214,13 +195,7 @@ void CDCDedxPIDModule::event()
   // create one DedkLikelihood per Track (plus rel)
 
   // inputs
-  StoreArray<Track> tracks;
-  StoreArray<MCParticle> mcparticles;
-  const int numMCParticles = mcparticles.getEntries();
-
-  // outputs
-  StoreArray<CDCDedxTrack> dedxArray;
-  StoreArray<CDCDedxLikelihood> likelihoodArray;
+  const int numMCParticles = m_mcparticles.getEntries();
 
   // get the geometry of the cdc
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -231,11 +206,11 @@ void CDCDedxPIDModule::event()
   //
   // **************************************************
 
-  dedxArray.clear();
-  likelihoodArray.clear();
+  m_dedxTracks.clear();
+  m_dedxLikelihoods.clear();
 
   int mtrack = 0;
-  for (const auto& track : tracks) {
+  for (const auto& track : m_tracks) {
     std::shared_ptr<CDCDedxTrack> dedxTrack = std::make_shared<CDCDedxTrack>();
     dedxTrack->m_track = mtrack++;
 
@@ -572,13 +547,13 @@ void CDCDedxPIDModule::event()
         }
       } else pidvalues = dedxTrack->m_cdcLogl;
 
-      CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(pidvalues);
+      CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
       track.addRelationTo(likelihoodObj);
     }
 
     if (m_enableDebugOutput) {
       // book the information for this track
-      CDCDedxTrack* newCDCDedxTrack = dedxArray.appendNew(*dedxTrack);
+      CDCDedxTrack* newCDCDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
       track.addRelationTo(newCDCDedxTrack);
     }
 
@@ -588,7 +563,7 @@ void CDCDedxPIDModule::event()
 void CDCDedxPIDModule::terminate()
 {
 
-  B2INFO("CDCDedxPIDModule exiting");
+  B2DEBUG(50, "CDCDedxPIDModule exiting");
 }
 
 void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,

@@ -74,7 +74,7 @@ TRGGRLMatchModule::~TRGGRLMatchModule()
 
 void TRGGRLMatchModule::initialize()
 {
-  B2INFO("TRGGRLMatchModule processing");
+  B2DEBUG(100, "TRGGRLMatchModule processing");
   StoreArray<CDCTriggerTrack> track2Dlist(m_2d_tracklist);
   StoreArray<CDCTriggerTrack> track3Dlist(m_3d_tracklist);
   track2Dlist.isRequired();

@@ -91,9 +91,7 @@ namespace Belle2 {
 
 
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... created" << std::endl;
-    }
+    B2DEBUG(100, "TRGECLFAMModule ... created");
   }
 //
 //
@@ -101,9 +99,7 @@ namespace Belle2 {
   TRGECLFAMModule::~TRGECLFAMModule()
   {
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... destructed " << std::endl;
-    }
+    B2DEBUG(100, "TRGECLFAMModule ... destructed ");
   }
 //
 //
@@ -112,25 +108,10 @@ namespace Belle2 {
   TRGECLFAMModule::initialize()
   {
 
-    TRGDebug::level(_debugLevel);
+    B2DEBUG(100, "TRGECLFAMModule::initialize ... options");
+    B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = "
+            << _famMethod << "  ; Bin of Time Interval = " << _binTimeInterval << " ;output TC waveforml = " << _waveform);
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule::initialize ... options" << std::endl;
-      std::cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-                << std::endl;
-    }
-    //
-    std::cout << "TRGECLFAMModule::initialize> FAM Fit Method = "
-              << _famMethod
-              << std::endl;
-    std::cout << "TRGECLFAMModule::initialize> FAM Bin of Time Interval = "
-              << _binTimeInterval
-              << std::endl;
-    std::cout << "TRGECLFAMModule::initialize> FAM output TC waveforml = "
-              << _waveform
-              << std::endl;
-
-    //
     m_nRun   = 0;
     m_nEvent = 1;
 
@@ -147,9 +128,7 @@ namespace Belle2 {
   TRGECLFAMModule::beginRun()
   {
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... beginRun called " << std::endl;
-    }
+    B2DEBUG(200, "TRGECLFAMModule ... beginRun called ");
 
   }
 //
@@ -159,17 +138,14 @@ namespace Belle2 {
   TRGECLFAMModule::event()
   {
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMMoudle ... event called" << std::endl;
-    }
+    B2DEBUG(200, "TRGECLFAMMoudle ... event called");
     //
     //
-    //
-    if (m_nEvent < 1e2) {if (m_nEvent %    10 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e3) {if (m_nEvent %   100 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    if (m_nEvent < 1e2) {if (m_nEvent %    10 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e3) {if (m_nEvent %   100 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
 
 
     //
@@ -214,9 +190,7 @@ namespace Belle2 {
   void
   TRGECLFAMModule::endRun()
   {
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... endRun called " << std::endl;
-    }
+    B2DEBUG(200, "TRGECLFAMModule ... endRun called ");
   }
 //
 //
@@ -224,9 +198,7 @@ namespace Belle2 {
   void
   TRGECLFAMModule::terminate()
   {
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... terminate called " << std::endl;
-    }
+    B2DEBUG(100, "TRGECLFAMModule ... terminate called ");
   }
 //
 //

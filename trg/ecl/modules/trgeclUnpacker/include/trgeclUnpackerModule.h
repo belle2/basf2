@@ -70,6 +70,7 @@ namespace Belle2 {
     int n_basf2evt;
 
   private :
+    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore; /**< output for TRGECLUnpackerStore */
 
 
   };

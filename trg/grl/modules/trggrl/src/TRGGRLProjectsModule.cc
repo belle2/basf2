@@ -9,12 +9,10 @@
  **************************************************************************/
 
 #include <trg/grl/modules/trggrl/TRGGRLProjectsModule.h>
-#include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/ecl/dataobjects/TRGECLTrg.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/TrgEclMapping.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dataobjects/ECLDigit.h>
@@ -174,7 +172,7 @@ void TRGGRLProjectsModule::initialize()
     TC1GeV.push_back(1. / CellCOM.E());
   }
 
-  StoreObjPtr<TRGGRLInfo>::registerPersistent(m_TrgGrlInformationName);
+  m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
 }
 

@@ -40,38 +40,18 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 
   genfit::MeasuredStateOnPlane mSoP = result->getSeedMSoP();
 
-  double chi2_vxd_full = 0;
-  double chi2_vxd_max = std::nan("");
-  double chi2_vxd_min = std::nan("");
-
   std::vector<unsigned int> layerUsed;
   layerUsed.resize(7, 0);
 
   for (const SpacePoint* spacePoint : spacePoints) {
     layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
-
-    if (std::isnan(m_advancer.extrapolateToPlane(mSoP, *spacePoint))) {
-      return false;
-    }
-    const double chi2 = m_kalmanStepper.kalmanStep(mSoP, *spacePoint);
-
-    chi2_vxd_full += chi2;
-
-    if (chi2 > chi2_vxd_max or std::isnan(chi2_vxd_max)) {
-      chi2_vxd_max = chi2;
-    }
-
-    if (chi2 < chi2_vxd_min or std::isnan(chi2_vxd_min)) {
-      chi2_vxd_min = chi2;
-    }
   }
 
   var<named("chi2")>() = result->getChi2();
   var<named("prob")>() = 0;
-  var<named("chi2_vxd_full")>() = chi2_vxd_full;
-  var<named("chi2_vxd_max")>() = chi2_vxd_max;
-  var<named("chi2_vxd_min")>() = chi2_vxd_min;
-  var<named("chi2_vxd_mean")>() = chi2_vxd_full / spacePoints.size();
+  var<named("chi2_vxd_max")>() = result->getMaximalChi2();
+  var<named("chi2_vxd_min")>() = result->getMaximalChi2();
+  var<named("chi2_vxd_mean")>() = result->getChi2() / spacePoints.size();
   var<named("number_of_hits")>() = spacePoints.size();
   var<named("pt")>() = mSoP.getMom().Pt();
   var<named("chi2_seed")>() = seedTrack->getTrackFitStatus()->getChi2();
@@ -95,7 +75,6 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
   var<named("number_of_overlap_hits")>() = std::count(layerUsed.begin(), layerUsed.end(), 2);
 
   var<named("theta")>() = mSoP.getMom().Theta();
-
 
   const genfit::MeasuredStateOnPlane& firstCDCHit = result->getSeedMSoP();
   m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());

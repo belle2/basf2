@@ -15,7 +15,6 @@
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/utilities/PXDAdvancer.h>
-#include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -75,7 +74,5 @@ namespace Belle2 {
   private:
     /// Findlet for advancing
     PXDAdvancer m_advancer;
-    /// Findlet for kalman step
-    PXDKalmanStepper m_kalmanStepper;
   };
 }

@@ -28,7 +28,6 @@ double Advancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateO
   try {
     const double extrapolatedS = measuredStateOnPlane.extrapolateToPlane(plane);
 
-
     if (m_param_direction * extrapolatedS <= 0) {
       returnValue = m_param_direction * extrapolatedS;
     }

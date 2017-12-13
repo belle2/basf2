@@ -24,7 +24,6 @@
 #include <tracking/ckf/svd/filters/results/RelationSVDResultVarSet.h>
 #include <tracking/ckf/svd/filters/results/SVDResultTruthVarSet.h>
 #include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
-#include <tracking/ckf/svd/filters/results/Chi2SVDResultFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -71,7 +70,6 @@ std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAn
     {"mva", "filter based on the trained MVA method"},
     {"mva_with_relations", "filter based on the trained MVA method"},
     {"size", "ordering according to size"},
-    {"chi2", "ordering according to chi2"},
     {"truth", "monte carlo truth"},
     {"truth_svd_cdc_relation", "monte carlo truth on the related CDC and SVD tracks"},
   };
@@ -96,8 +94,6 @@ SVDResultFilterFactory::create(const std::string& filterName) const
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth_svd_cdc_relation");
   } else if (filterName == "size") {
     return std::make_unique<SizeSVDResultFilter>();
-  } else if (filterName == "chi2") {
-    return std::make_unique<TrackFindingCDC::NegativeFilter<Chi2SVDResultFilter>>();
   } else {
     return Super::create(filterName);
   }

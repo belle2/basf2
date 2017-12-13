@@ -12,13 +12,5 @@
 #include <tracking/ckf/general/utilities/Advancer.h>
 
 namespace Belle2 {
-  class SpacePoint;
-
-  class SVDAdvancer : public Advancer {
-  public:
-    double extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                              const SpacePoint& spacePoint);
-
-    using Advancer::extrapolateToPlane;
-  };
+  using SVDAdvancer = Advancer;
 }

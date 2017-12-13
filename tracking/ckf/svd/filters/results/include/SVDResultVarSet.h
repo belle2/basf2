@@ -15,13 +15,11 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/utilities/SVDAdvancer.h>
-#include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const svdResultVarNames[] = {
-    "chi2_vxd_full",
     "chi2_vxd_max",
     "chi2_vxd_min",
     "chi2_vxd_mean",
@@ -76,7 +74,5 @@ namespace Belle2 {
   private:
     /// Findlet for advancing
     SVDAdvancer m_advancer;
-    /// Findlet for kalman step
-    SVDKalmanStepper m_kalmanStepper;
   };
 }

@@ -28,13 +28,13 @@ namespace Belle2 {
   public:
     //--- CDC related Stuff -------------------------------------------------------------------------------------------
     /** Getter for number of CDC measurements, that are not assigned to any Track. */
-    unsigned short getNHitsNotAssigned() const
+    uint16_t getNHitsNotAssigned() const
     {
       return m_nCDCHitsNotAssigned;
     }
 
     /** Setter for number of CDC measurements, that are not assigned to any Track. */
-    void setNHitsNotAssigned(unsigned short nCDCHitsNotAssigned)
+    void setNHitsNotAssigned(uint16_t const nCDCHitsNotAssigned)
     {
       m_nCDCHitsNotAssigned = nCDCHitsNotAssigned;
     }
@@ -48,13 +48,13 @@ namespace Belle2 {
       *  is performed. Here we want to get only the number of those CDC hits, that survive that cut,
       *  but are then not used for an actual Track.
       */
-    unsigned short getNHitsNotAssignedPostCleaning() const
+    uint16_t getNHitsNotAssignedPostCleaning() const
     {
       return m_nCDCHitsNotAssignedPostCleaning;
     }
 
     /** Setter for number of CDC measurements, that are not assigned to any Track nor very likely beam-background. */
-    void setNHitsNotAssignedPostCleaning(unsigned short nCDCHitsNotAssignedPostCleaning)
+    void setNHitsNotAssignedPostCleaning(uint16_t const nCDCHitsNotAssignedPostCleaning)
     {
       m_nCDCHitsNotAssignedPostCleaning = nCDCHitsNotAssignedPostCleaning;
     }
@@ -65,13 +65,13 @@ namespace Belle2 {
      *  @param  cdcLayer  Specification, which layer in the CDC shall be tested for a hit.
      *  @return true, if a non-assigned hit exists in the specified layer.
      */
-    bool hasLayer(unsigned short cdcLayer) const
+    bool hasLayer(uint16_t const cdcLayer) const
     {
       return HitPatternCDC(m_hitPatternCDCInitializer).hasLayer(cdcLayer);
     }
 
     /** Setter for presence of hit in specific CDC Layer. */
-    void setLayer(unsigned short cdcLayer)
+    void setLayer(uint16_t const cdcLayer)
     {
       HitPatternCDC hitPatternCDC(m_hitPatternCDCInitializer);
       hitPatternCDC.setLayer(cdcLayer);
@@ -79,7 +79,7 @@ namespace Belle2 {
     }
 
     /** Getter for the presence of hit in a SuperLayer. */
-    bool hasSLayer(unsigned short cdcSLayer) const
+    bool hasSLayer(uint16_t const cdcSLayer) const
     {
       return HitPatternCDC(m_hitPatternCDCInitializer).hasSLayer(cdcSLayer);
     }
@@ -90,13 +90,13 @@ namespace Belle2 {
      *  We want to store the number of segments, that we couldn't attach to any Track.
      *  The maximum number of unstored segments is 255.
      */
-    unsigned short getNSegments() const
+    uint16_t getNSegments() const
     {
       return HitPatternCDC(m_hitPatternCDCInitializer).getNHits();
     }
 
     /** Setter for number of Segments not used in Tracks. */
-    void setNSegments(unsigned short nHits)
+    void setNSegments(uint16_t nHits)
     {
       HitPatternCDC hitPatternCDC(m_hitPatternCDCInitializer);
       hitPatternCDC.setNHits(nHits);
@@ -113,7 +113,7 @@ namespace Belle2 {
      *  @param layer  1 to 6 for respective VXD layer for which you want to have the remaining clusters.
      *  @param isU    only used for layers 3 to 6, set true for u direction, false for v direction.
      */
-    unsigned short getNClustersInLayer(unsigned short const layer, bool const isU)
+    uint16_t getNClustersInLayer(uint16_t const layer, bool const isU)
     {
       if (layer == 1 or layer == 2) {
         return m_nPXDClusters[layer - 1];
@@ -128,7 +128,7 @@ namespace Belle2 {
      *
      *  @param layer  1 to 6 for respective VXD layer, for which you want to have the remaining clusters.
      */
-    unsigned short getNClustersInLayer(unsigned short const layer)
+    uint16_t getNClustersInLayer(uint16_t const layer)
     {
       if (layer == 1 or layer == 2) {
         return getNClustersInLayer(layer, true);
@@ -137,7 +137,7 @@ namespace Belle2 {
     }
 
     /** Setter for number of clusters in specific VXD layer, SVD directions are separated. */
-    void setNClustersInLayer(unsigned short const layer, bool const isU, unsigned short const nClusters)
+    void setNClustersInLayer(uint16_t const layer, bool const isU, uint16_t const nClusters)
     {
       if (layer == 1 or layer == 2) {
         m_nPXDClusters[layer - 1] = nClusters;

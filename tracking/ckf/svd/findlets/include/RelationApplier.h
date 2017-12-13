@@ -22,6 +22,8 @@ namespace Belle2 {
     /// The parent findlet
     using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>;
 
+    void initialize() final;
+
     /// Copy the relations to the store array
     void apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToSVD) final;
 
@@ -29,7 +31,12 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
   private:
+    // Parameters
     /// Write out the relations with a -1 as weight, indicating the reversal of the CDC track.
     bool m_param_reverseStoredRelations = false;
+    /// Create relations from this store array.
+    std::string m_param_fromRelationsStoreArrayName = "CDCRecoTracks";
+    /// Create relations to this store array.
+    std::string m_param_toRelationsStoreArrayName = "SVDRecoTracks";
   };
 }

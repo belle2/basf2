@@ -14,6 +14,8 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
 
+#include <algorithm>
+
 namespace Belle2 {
   /** Tracking-related info on event-level, for example number of unassigned measurements.
    *
@@ -105,6 +107,9 @@ namespace Belle2 {
     /** Getter for number of clusters in a specific VXD layer, SVD separated by direction.
      *
      *  All clusters, that have been part of a RecoTrack, that was converted into a Track, are removed.
+     *  Only clusters, that in principle are considered valid, e.g. that are compatible with the event T0
+     *  are counted. The maximum number of clusters per layer and direction, that are considered in the SVD
+     *  is 255.
      *  @param layer  1 to 6 for respective VXD layer for which you want to have the remaining clusters.
      *  @param isU    only used for layers 3 to 6, set true for u direction, false for v direction.
      */
@@ -119,7 +124,7 @@ namespace Belle2 {
       B2FATAL("The VXD only has layer 1 to 6, but you asked for " << layer);
     }
 
-    /** Getter for number of clsuters in specific VXD layer, SVD directions are accumulated.
+    /** Getter for number of clusters in specific VXD layer, SVD directions are accumulated.
      *
      *  @param layer  1 to 6 for respective VXD layer, for which you want to have the remaining clusters.
      */
@@ -139,7 +144,7 @@ namespace Belle2 {
         return;
       }
       if (layer > 2 and layer < 7) {
-        m_nSVDClusters[layer - 3 + 4 * isU] = nClusters;
+        m_nSVDClusters[layer - 3 + 4 * isU] = std::min(nClusters, static_cast<unsigned short>(255U));
         return;
       }
       B2FATAL("The VXD only has layer 1 to 6, but you asked for " << layer);
@@ -182,7 +187,9 @@ namespace Belle2 {
 
     /** Storage for number of clusters in the SVD
      *
-     *
+     *  We can store up to 255 clusters per layer and direction.
+     *  Typically events are much below that, if not, the event is a noisy one.
+     *  The first 4 numbers refer to u-direction strips, the second 4 to the v-direction.
      */
     uint8_t m_nSVDClusters[8] {0, 0, 0, 0, 0, 0, 0, 0};
 

@@ -13,7 +13,7 @@ def stdPi(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of pion lists:
       - 'pi+:all' with no cuts on track
-      - 'pi+:95eff' with 95% selection efficiency and good track
+      - 'pi+:99eff' with 99% selection efficiency and good track
       - 'pi+:95eff' with 95% selection efficiency and good track
       - 'pi+:90eff' with 90% selection efficiency and good track
       - 'pi+:85eff' with 85% selection efficiency and good track
@@ -40,7 +40,7 @@ def stdK(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of electron lists:
       - 'K+:all' with no cuts on track
-      - 'K+:95eff' with 95% selection efficiency and good track
+      - 'K+:99eff' with 99% selection efficiency and good track
       - 'K+:95eff' with 95% selection efficiency and good track
       - 'K+:90eff' with 90% selection efficiency and good track
       - 'K+:85eff' with 85% selection efficiency and good track
@@ -51,6 +51,9 @@ def stdK(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path=path)
+    elif listtype == '99eff':
+        fillParticleList('K+:99eff', 'kaonID > 0.001 and chiProb > 0.001', True,
+                         path=path)  # only achieves 98% efficiency on release
     elif listtype == '95eff':
         fillParticleList('K+:95eff', 'kaonID > 0.159 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':
@@ -65,7 +68,7 @@ def stdPr(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of electron lists:
       - 'p+:all' with no cuts on track
-      - 'p+:95eff' with 95% selection efficiency and good track
+      - 'p+:99eff' with 99% selection efficiency and good track
       - 'p+:95eff' with 95% selection efficiency and good track
       - 'p+:90eff' with 90% selection efficiency and good track
       - 'p+:85eff' with 85% selection efficiency and good track
@@ -90,7 +93,7 @@ def stdE(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of electron lists:
       - 'e+:all' with no cuts on track
-      - 'e+:95eff' with 95% selection efficiency and good track
+      - 'e+:99eff' with 99% selection efficiency and good track
       - 'e+:95eff' with 95% selection efficiency and good track
       - 'e+:90eff' with 90% selection efficiency and good track
       - 'e+:85eff' with 85% selection efficiency and good track
@@ -113,7 +116,7 @@ def stdMu(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of muon lists:
       - 'mu+:all' with no cuts on track
-      - 'mu+:95eff' with 95% selection efficiency and good track
+      - 'mu+:99eff' with 99% selection efficiency and good track
       - 'mu+:95eff' with 95% selection efficiency and good track
       - 'mu+:90eff' with 90% selection efficiency and good track
       - 'mu+:85eff' with 85% selection efficiency and good track

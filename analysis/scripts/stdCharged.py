@@ -38,7 +38,7 @@ def stdPi(listtype='95eff', path=analysis_main):
 
 def stdK(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of electron lists:
+    Function to prepare one of several standartized types of kaon lists:
       - 'K+:all' with no cuts on track
       - 'K+:95eff' with 95% selection efficiency and good track
       - 'K+:90eff' with 90% selection efficiency and good track
@@ -62,7 +62,7 @@ def stdK(listtype='95eff', path=analysis_main):
 
 def stdPr(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of electron lists:
+    Function to prepare one of several standartized types of proton lists:
       - 'p+:all' with no cuts on track
       - 'p+:95eff' with 95% selection efficiency and good track
       - 'p+:90eff' with 90% selection efficiency and good track

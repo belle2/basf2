@@ -79,7 +79,7 @@ void ThrustOfEventModule::event()
 
 
   // Aquí se guarda la magnitud del thrust y la dirección del thrust axis. -- Michel
-  TVector3 thrustAxis(0.1,0.2,0.1);
+  TVector3 thrustAxis = ThrustOfEventModule::getThrustOfEvent(m_particleLists);
   thrust->addThrustAxis(thrustAxis);
   thrust->addThrust(0.1);
 }
@@ -92,11 +92,29 @@ void ThrustOfEventModule::terminate()
 {
 }
 
-float getThrustOfEvent(){
-    std::srand(std::time(0)); // use current time as seed for random generator
-    float random_variable0 = std::rand()/1.0;
-    float random_variable1 = std::rand()/1.0;
-    float random_variable = std::min(random_variable0,random_variable1)/
-                            std::max(random_variable0,random_variable1);
-    return random_variable;
+TVector3 getThrustOfEvent(vector<string> m_particleLists){
+  int nParticleLists = m_particleLists.size();
+  PCmsLabTransform T;
+  vector<TVector3> forthrust;
+  for (int i_pl = 0; i_pl != nParticleLists; ++i_pl){
+    string ParticleListName = m_particleLists[i_pl];
+    StoreObjPtr<ParticleList> plist(ParticleListName);
+    int m_part = plist->getListSize();
+    for (int i = 0; i < m_part; i++) {
+      const Particle* part = plist->getParticle(i);
+      //const MCParticle* mcparticle=part->getRelatedTo<MCParticle>();
+      TVector3 p = part->getMomentum();
+      TLorentzVector p_lab = part->get4Vector();
+      TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
+      forthrust.push_back(p_cms.Vect());
+    }
+  }
+  TVector3 th = Thrust::calculateThrust(forthrust);
+
+  //std::srand(std::time(0)); // use current time as seed for random generator
+  //float random_variable0 = std::rand()/1.0;
+  //float random_variable1 = std::rand()/1.0;
+  //float random_variable = std::min(random_variable0,random_variable1)/
+  //                          std::max(random_variable0,random_variable1);
+  return th;
 }

@@ -15,11 +15,20 @@
 #include <ctime>
 #include <algorithm>
 
+#include <TVector3.h>
+
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ThrustOfEvent.h>
+
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/GearDir.h>
+#include <generators/utilities/cm2LabBoost.h>
+
+#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/ContinuumSuppression/Thrust.h>
 
 
 namespace Belle2 {
@@ -90,7 +99,7 @@ namespace Belle2 {
      */
     void addSelectedKLMClusters(const Particle* particle, RestOfEvent* roe);
 
-    float getThrustOfEvent(std::string m_particleList);
+    TVector3 getThrustOfEvent(std::vector<std::string>  m_particleList);
 
     /**
      * for debugging purposes

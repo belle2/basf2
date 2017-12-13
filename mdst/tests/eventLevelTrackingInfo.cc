@@ -45,6 +45,7 @@ namespace Belle2 {
     eventLevelTrackingInfo.setNSegments(300);
     EXPECT_EQ(eventLevelTrackingInfo.getNSegments(), 255);
   }
+
   /** Test simple Setters and Getters for the VXD related part. */
   TEST_F(EventLevelTrackingInfoTest, settersNGettersVXD)
   {
@@ -67,4 +68,12 @@ namespace Belle2 {
     EXPECT_EQ(eventLevelTrackingInfo.getSVDFirstSampleTime(), 127);
   }
 
+  /** Test simple Setters and Getters for the VXD related part. */
+  TEST_F(EventLevelTrackingInfoTest, settersNGettersFlagBlock)
+  {
+    EventLevelTrackingInfo eventLevelTrackingInfo;
+    EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), false);
+    eventLevelTrackingInfo.setHintForTrackFindingFailure();
+    EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), true);
+  }
 } // namespace Belle2

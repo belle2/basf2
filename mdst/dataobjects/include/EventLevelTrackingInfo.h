@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
+#include <bitset>
 
 namespace Belle2 {
   /** Tracking-related info on event-level, for example number of unassigned measurements.
@@ -170,6 +171,22 @@ namespace Belle2 {
       m_sampleTime = sampleTime;
     }
 
+    /** Getter for hint of track finding failure.
+     *
+     *  If we have a reason to assume, that there was a track in the event, that we didn't find,
+     *  we set a flag, that might be useful for veto purposes.
+     */
+    bool getHintForTrackFindingFailure() const
+    {
+      return m_flagBlock[0];
+    }
+
+    /** Setter for hint of track finding failure.*/
+    void setHintForTrackFindingFailure()
+    {
+      m_flagBlock.set(0);
+    }
+
   private:
     /** Number of hits in the CDC, that were not assigned to any Track.
      *
@@ -215,6 +232,9 @@ namespace Belle2 {
 
     /** storage for time of first SVD sample.*/
     int8_t m_sampleTime {0};
+
+    /** Set of further flags useful in the context of tracking reconstruction. */
+    std::bitset<16> m_flagBlock;
 
     ClassDef(EventLevelTrackingInfo, 1); /**< ROOTification. */
   };

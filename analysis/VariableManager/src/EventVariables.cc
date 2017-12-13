@@ -20,6 +20,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -291,6 +292,18 @@ namespace Belle2 {
     }
 
 
+    double thrustOfEvent(const Particle*)
+    {
+      StoreObjPtr<ThrustOfEvent> thrust;
+      if (!thrust) {
+        B2ERROR("Cannot find thrust information.");
+        return 0.0;
+      }
+      double th = thrust->getThrust();
+      return th;
+    }
+
+
     VARIABLE_GROUP("Event");
 
     REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
@@ -333,5 +346,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
 
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
+
+    REGISTER_VARIABLE("thrustOfEvent", thrustOfEvent, "[Eventbased] Thrust of the event obtained with ThrustOfEvent module")
+
   }
 }

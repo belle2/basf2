@@ -1,9 +1,10 @@
 //+
 // File : DQMHistAnalysisPXDFits.cc
-// Description :
+// Description : DQM module, which fits many PXD histograms and writes out fit parameters in new histograms
 //
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 25 - Dec - 2015
+// Author : B. Spruck
+// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
+// Date : someday
 //-
 
 
@@ -30,7 +31,7 @@ DQMHistAnalysisPXDFitsModule::DQMHistAnalysisPXDFitsModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
+//  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   B2DEBUG(1, "DQMHistAnalysisPXDFits: Constructor done.");
 }
 
@@ -41,6 +42,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDFits: initialized.");
 
+  gROOT->cd(); // this seems to be important, or strange things happen
   for (auto i = 0; i < 64; i++) {
     TString a;
     auto num1 = (((i >> 5) & 0x1) + 1);

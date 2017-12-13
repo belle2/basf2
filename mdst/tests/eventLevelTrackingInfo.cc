@@ -57,6 +57,14 @@ namespace Belle2 {
     EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(3, true), 81);
     EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(3, false), 0);
     EXPECT_B2FATAL(eventLevelTrackingInfo.getNClustersInLayer(56));
+
+    eventLevelTrackingInfo.setNClustersInLayer(6, true, 300);
+    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(6, true), 255);
+
+    eventLevelTrackingInfo.setSVDFirstSampleTime(-128);
+    EXPECT_EQ(eventLevelTrackingInfo.getSVDFirstSampleTime(), -128);
+    eventLevelTrackingInfo.setSVDFirstSampleTime(127);
+    EXPECT_EQ(eventLevelTrackingInfo.getSVDFirstSampleTime(), 127);
   }
 
 } // namespace Belle2

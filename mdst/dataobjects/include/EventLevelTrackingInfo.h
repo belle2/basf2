@@ -150,6 +150,26 @@ namespace Belle2 {
       B2FATAL("The VXD only has layer 1 to 6, but you asked for " << layer);
     }
 
+    /** Getter for time of first SVD sample relative to event T0.
+     *
+     *  An additional hint on the quality of the SVD reconstruction can be the time,
+     *  at which the first sample point for the shape estimation was taken relative to the true
+     *  T0 of the event.
+     *  We assume, that the event type etc. that ultimately determines the total number of samples,
+     *  that were taken, can be gotten from elsewhere.
+     *  The minimum and maximum are ...
+     */
+    int8_t getSVDFirstSampleTime() const
+    {
+      return m_sampleTime;
+    }
+
+    /** Setter for time of first SVD sample relatvie to event T0. */
+    void setSVDFirstSampleTime(int8_t const sampleTime)
+    {
+      m_sampleTime = sampleTime;
+    }
+
   private:
     /** Number of hits in the CDC, that were not assigned to any Track.
      *
@@ -192,6 +212,9 @@ namespace Belle2 {
      *  The first 4 numbers refer to u-direction strips, the second 4 to the v-direction.
      */
     uint8_t m_nSVDClusters[8] {0, 0, 0, 0, 0, 0, 0, 0};
+
+    /** storage for time of first SVD sample.*/
+    int8_t m_sampleTime {0};
 
     ClassDef(EventLevelTrackingInfo, 1); /**< ROOTification. */
   };

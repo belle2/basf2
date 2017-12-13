@@ -1,0 +1,52 @@
+# EventType: 1263340000
+# Descriptor: [B+ -> D(*) tau nu ]cc [B- -> D0 pi-, D0 to K- pi] 
+# NickName: Bu_Xctaunu_Dpi
+# Documentation: b->c tau nu process, D and D* modes
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Racha Cheaib
+# Email: rcheaib@olemiss.edu
+# Cuts: None
+# Date: 20171204
+#
+#
+
+Alias mytau+ tau+
+Alias mytau- tau-
+ChargeConj mytau+ mytau-
+
+Alias  D0tag D0
+Alias  anti-D0tag anti-D0
+ChargeConj D0tag  anti-D0tag
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+
+Decay B+sig
+0.01325   anti-D*0    mytau+ nu_tau        PHOTOS        HQET3 0.920 1.205 1.21 1.404 0.854;
+0.00689   anti-D0    mytau+ nu_tau         PHOTOS       HQET3 1.0541 1.128 1.0;
+Enddecay
+CDecay B-sig
+
+Decay mytau-
+0.154002925 e-      anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
+0.1700000 mu-     anti-nu_mu nu_tau                       PHOTOS  TAULNUNU; 
+Enddecay
+CDecay mytau+
+
+
+Decay B-
+1.00 D0tag  pi-                    PHSP;
+Enddecay
+CDecay B+
+
+Decay D0tag
+1.00 K- pi+    PHSP;
+Enddecay
+CDecay anti-D0tag 
+
+#
+End

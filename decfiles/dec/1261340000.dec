@@ -1,0 +1,51 @@
+# EventType: 1261340000
+# Descriptor: [B+ -> D(*) tau nu ]cc [B- -> Jpsi K-] 
+# NickName: Bu_Xctaunu_Jpsik
+# Documentation: b->c tau nu process, D and D* modes
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Racha Cheaib
+# Email: rcheaib@olemiss.edu
+# Cuts: None
+# Date: 20171204
+#
+#
+
+Alias mytau+ tau+
+Alias mytau- tau-
+ChargeConj mytau+ mytau-
+
+Alias myJpsi J/psi
+ChargeConj myJpsi myJpsi
+
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+
+Decay B+sig
+0.01325   anti-D*0    mytau+ nu_tau        PHOTOS        HQET3 0.920 1.205 1.21 1.404 0.854;
+0.00689   anti-D0    mytau+ nu_tau         PHOTOS       HQET3 1.0541 1.128 1.0;
+Enddecay
+CDecay B-sig
+
+Decay mytau-
+0.154002925 e-      anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
+0.170000000 mu-     anti-nu_mu nu_tau                       PHOTOS  TAULNUNU; 
+Enddecay
+CDecay mytau+
+
+Decay myJpsi
+0.500 e+      e-                                      PHOTOS   VLL; 
+0.500 mu+     mu-                                     PHOTOS   VLL; 
+Enddecay
+
+Decay B-
+1.00 myJpsi  K-                    SVS;
+Enddecay
+CDecay B+
+
+#
+End

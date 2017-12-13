@@ -58,6 +58,8 @@ namespace Belle2 {
     std::string m_param_inputRecoTrackStoreArrayName = "RecoTracks";
     /// Minimal pt requirement
     double m_param_minimalPtRequirement = 0.0;
+    /// Check for direction of relation
+    double m_param_relationCheckForDirection = 0.0;
 
     // Store Arrays
     /// Output Reco Tracks Store Array

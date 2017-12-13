@@ -32,12 +32,16 @@ void TrackLoader::exposeParameters(ModuleParamList* moduleParamList, const std::
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "relatedRecoTrackStoreArrayName"),
                                 m_param_relationRecoTrackStoreArrayName,
-                                "If not null, check for relations to this store array name and only use the unrelated ones",
+                                "Check for relations to this store array name and only use the unrelated ones or relations with different direction",
                                 m_param_relationRecoTrackStoreArrayName);
 
   moduleParamList->addParameter("minimalPtRequirement", m_param_minimalPtRequirement,
                                 "Minimal Pt requirement for the input CDC tracks",
                                 m_param_minimalPtRequirement);
+
+  moduleParamList->addParameter("relationCheckForDirection", m_param_relationCheckForDirection,
+                                "Check for this direction when checking for related tracks. Use 0 for not checking for relations at all.",
+                                m_param_relationCheckForDirection);
 }
 
 void TrackLoader::initialize()
@@ -46,7 +50,7 @@ void TrackLoader::initialize()
 
   m_inputRecoTracks.isRequired(m_param_inputRecoTrackStoreArrayName);
 
-  if (not m_param_relationRecoTrackStoreArrayName.empty()) {
+  if (m_param_relationCheckForDirection != 0) {
     StoreArray<RecoTrack> relatedRecoTracks;
     relatedRecoTracks.isRequired(m_param_relationRecoTrackStoreArrayName);
   }
@@ -57,9 +61,13 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
   seeds.reserve(seeds.size() + m_inputRecoTracks.getEntries());
 
   for (auto& item : m_inputRecoTracks) {
-    if (m_param_relationRecoTrackStoreArrayName.empty() or
-        not item.template getRelated<RecoTrack>(m_param_relationRecoTrackStoreArrayName)) {
+    const auto& relatedTrackWithWeight = item.template getRelatedWithWeight<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
+    const auto* relatedTrack = relatedTrackWithWeight.first;
+    const float weight = relatedTrackWithWeight.second;
+    if (not relatedTrack or weight == 0 or weight != m_param_relationCheckForDirection) {
       seeds.push_back(&item);
+    } else {
+      B2DEBUG(100, "Do not use this track, because it has already a valid relation");
     }
   }
 

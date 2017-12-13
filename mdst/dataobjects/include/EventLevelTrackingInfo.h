@@ -171,6 +171,7 @@ namespace Belle2 {
       m_sampleTime = sampleTime;
     }
 
+    //--- Flag Block related stuff ------------------------------------------------------------------------------------
     /** Getter for hint of track finding failure.
      *
      *  If we have a reason to assume, that there was a track in the event, that we didn't find,
@@ -194,14 +195,14 @@ namespace Belle2 {
      *  we we can easily have a larger number of hits, that are not assigned. Therefore,
      *  we save this as a separate number.
      */
-    unsigned short m_nCDCHitsNotAssigned {0};
+    uint16_t m_nCDCHitsNotAssigned {0};
 
     /** Number of unassigned hits in the CDC, that survived the background filter.
      *
      *  During the pattern recognition, a cleaning of hits, that are very likely due to background
      *  is performed. Here we save only the number of unassinged hits, that survive that cut.
      */
-    unsigned short m_nCDCHitsNotAssignedPostCleaning {0};
+    uint16_t m_nCDCHitsNotAssignedPostCleaning {0};
 
     /** Efficient way of storing, which layers in the CDC have at least a single hit.
       *

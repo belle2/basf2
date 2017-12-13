@@ -51,9 +51,6 @@ def stdK(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path=path)
-    elif listtype == '99eff':
-        fillParticleList('K+:99eff', 'kaonID > 0.001 and chiProb > 0.001', True,
-                         path=path)  # only achieves 98% efficiency on release
     elif listtype == '95eff':
         fillParticleList('K+:95eff', 'kaonID > 0.159 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':

@@ -48,7 +48,7 @@ void TRGECLUnpackerModule::terminate()
 void TRGECLUnpackerModule::initialize()
 {
 
-  StoreArray<TRGECLUnpackerStore>::registerPersistent();
+  m_TRGECLUnpackerStore.registerInDataStore();
 }
 
 void TRGECLUnpackerModule::beginRun()

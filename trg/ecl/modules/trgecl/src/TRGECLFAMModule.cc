@@ -20,7 +20,6 @@
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
@@ -33,10 +32,6 @@
 #include "trg/ecl/TrgEclDigitizer.h"
 #include "trg/ecl/TrgEclFAMFit.h"
 
-#include "trg/ecl/dataobjects/TRGECLFAMAna.h"
-#include "trg/ecl/dataobjects/TRGECLDigi0.h"
-#include "trg/ecl/dataobjects/TRGECLHit.h"
-#include "trg/ecl/dataobjects/TRGECLWaveform.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -115,10 +110,10 @@ namespace Belle2 {
     m_nRun   = 0;
     m_nEvent = 1;
 
-    StoreArray<TRGECLDigi0>::registerPersistent();
-    StoreArray<TRGECLWaveform>::registerPersistent();
-    StoreArray<TRGECLHit>::registerPersistent();
-    StoreArray<TRGECLFAMAna>::registerPersistent();
+    m_TRGECLDigi0.registerInDataStore();
+    m_TRGECLWaveform.registerInDataStore();
+    m_TRGECLHit.registerInDataStore();
+    m_TRGECLFAMAna.registerInDataStore();
 
   }
 //

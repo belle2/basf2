@@ -50,11 +50,11 @@ void ECLElectronIdModule::initialize()
   if (eParams.empty()  || muParams.empty() || piParams.empty())
     B2FATAL("Electron ID pdfs parameter files not found.");
 
-  (m_pdf[Const::electron.getIndex()] = new ECLElectronPdf)->init(eParams.c_str());
-  (m_pdf[Const::muon.getIndex()] = new ECLMuonPdf)->init(muParams.c_str());
+  (m_pdf[Const::electron.getIndex()] = new Belle2::ECL::ECLElectronPdf)->init(eParams.c_str());
+  (m_pdf[Const::muon.getIndex()] = new Belle2::ECL::ECLMuonPdf)->init(muParams.c_str());
   (m_pdf[Const::proton.getIndex()] =
      m_pdf[Const::kaon.getIndex()] =
-       m_pdf[Const::pion.getIndex()] = new ECLPionPdf)->init(piParams.c_str());
+       m_pdf[Const::pion.getIndex()] = new Belle2::ECL::ECLPionPdf)->init(piParams.c_str());
 }
 
 void ECLElectronIdModule::beginRun()
@@ -103,7 +103,7 @@ void ECLElectronIdModule::event()
     double eop = energy / p;
 
     for (const auto& hypo : Const::chargedStableSet) {
-      ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
+      Belle2::ECL::ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
       if (currentpdf == 0) {
         currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }

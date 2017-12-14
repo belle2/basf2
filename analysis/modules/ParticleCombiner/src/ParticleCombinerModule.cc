@@ -107,7 +107,7 @@ namespace Belle2 {
     for (int i = 0; i < nProducts; ++i) {
       const DecayDescriptorParticle* daughter =
         m_decaydescriptor.getDaughter(i)->getMother();
-      StoreObjPtr<ParticleList>::required(daughter->getFullName());
+      StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
     }
 
     m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));

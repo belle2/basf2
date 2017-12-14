@@ -12,21 +12,29 @@
 * and will be changed and corrected in later stages of developement. So please ignore them.
 */
 
-#ifndef ECLCLUSTERANALYSISMODULE_H_
-#define ECLCLUSTERANALYSISMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
+
+class TFile;
+class TTree;
 
 namespace Belle2 {
+  class ECLCluster;
+  class MCParticle;
+  class Track;
+  class TrackFitResult;
 
   /** The ECL Data Analysis Module
    *
    * this module dump an ntuple containing ECL-related infos starting from mdst
    *
    */
+
+
+
 
   class ECLClusterAnalysisModule : public Module {
 
@@ -61,24 +69,17 @@ namespace Belle2 {
   private:
 
     /** members of ECLReconstructor Module */
-
     TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
 
     TTree* m_tree; /**< Root tree and file for saving the output */
-    //TFile* m_rootFile;
 
     // variables
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
-
-    /*int m_eclTriggerMultip;
-    std::vector<int>* m_eclTriggerIdx;
-    std::vector<int>* m_eclTriggerCellId;
-    std::vector<double>* m_eclTriggerTime;*/
 
     int m_eclClusterMultip;  /**< Number of ECLClusterss per event */
     std::vector<int>* m_eclClusterIdx;  /**< ECLCluster index */
@@ -95,8 +96,6 @@ namespace Belle2 {
     std::vector<double>*
     m_eclClusterToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCluster */
     std::vector<double>* m_eclClusterSimHitSum; /**< Energy contribution of first MCParticle related to ECLCluster */
-    //std::vector<int>* m_eclClusterToShower; /**< Index of ECLShower related to ECLCluster */
-    //std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy; /**< ECLCluster energy */
     std::vector<double>* m_eclClusterEnergyError; /**< ECLCluster energy error*/
     std::vector<double>* m_eclClusterTheta;  /**< ECLCluster polar direction */
@@ -159,7 +158,11 @@ namespace Belle2 {
     std::vector<double>* m_eclLogLikeEl; /**< PID track electron likelyhood */
     std::vector<double>* m_eclLogLikeMu; /**< PID track muon likelyhood */
     std::vector<double>* m_eclLogLikePi; /**< PID track pion likelyhood */
+
+    //dataStore objects
+    StoreArray<ECLCluster> m_eclClusters;  /**< ECLCluster storeArray */
+    StoreArray<MCParticle> m_mcParticles;  /**< MCParticle storeArray */
+    StoreArray<Track> m_tracks;  /**< Tracks storeArray */
+    StoreArray<TrackFitResult> m_trackFitResults;  /**< TrackFitResult storeArray */
   };
 }
-
-#endif

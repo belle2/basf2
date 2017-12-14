@@ -13,12 +13,10 @@
 
 
 #include <reconstruction/modules/KlId/KlongValidation/KlongValidationModule.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-
-#include <reconstruction/dataobjects/KlId.h>
 
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
@@ -101,11 +99,9 @@ void KlongValidationModule::initialize()
   m_trackFlag      = new TH1F("Track flag", "TrackFlag;Flag; Count", 2, 0, 1);
   m_ECLFlag       = new TH1F("ECL flag", "ECLFlag;Flag; Count", 2, 0, 1);
 
-  m_ROCBins = 11;
-  Float_t xbins[m_ROCBins] = {0, 0.001, 0.01, 0.1, 0.15, 0.175, 0.2, 0.3, 0.4, 0.5, 1};
-  m_klidFake       = new TH1F("Klid Fake", "klid Fake;klid; Count", m_ROCBins - 1, xbins);
-  m_klidTrue       = new TH1F("Klid True", "Klid True;klid; Count", m_ROCBins - 1, xbins);
-  m_klidAll       = new TH1F("Klid all", "klid all clusters;klid; Count", m_ROCBins - 1, xbins);
+  m_klidFake       = new TH1F("Klid Fake", "klid Fake;klid; Count", m_xbins.size() - 1, m_xbins.data());
+  m_klidTrue       = new TH1F("Klid True", "Klid True;klid; Count", m_xbins.size() - 1, m_xbins.data());
+  m_klidAll       = new TH1F("Klid all", "klid all clusters;klid; Count", m_xbins.size() - 1, m_xbins.data());
 
 }//initk
 
@@ -126,7 +122,6 @@ void KlongValidationModule::event()
   // Finding K_L or rejecting?
   // Therefore an arbitrary cut is chosen so that something happens and we can judge
   // if the behavior changes.
-  float abitraryCut = 0.1;
   for (const KLMCluster& cluster : m_klmClusters) {
 
     MCParticle* mcpart = NULL;
@@ -248,14 +243,14 @@ void KlongValidationModule::terminate()
   m_fakeTheta->Divide(m_fakeTheta_Pass, m_Theta_all);
   m_fakeMom->Divide(m_fakeMom_Pass, m_Mom_all);
 
-  std::vector<double> efficiency(m_ROCBins);
-  std::vector<double> purity(m_ROCBins);
-  std::vector<double> backrej(m_ROCBins);
+  std::vector<double> efficiency(m_xbins.size());
+  std::vector<double> purity(m_xbins.size());
+  std::vector<double> backrej(m_xbins.size());
   double NallKlong = m_klidTrue->GetEntries();
   double NallFakes = m_klidFake->GetEntries();
-  for (unsigned int i = 0; i < m_ROCBins - 1; ++i) {
-    double NtruePositive = m_klidTrue->Integral(i, m_ROCBins - 1);
-    double NfalsePositive = m_klidFake->Integral(i, m_ROCBins - 1);
+  for (unsigned int i = 0; i < m_xbins.size() - 1; ++i) {
+    double NtruePositive = m_klidTrue->Integral(i, m_xbins.size() - 1);
+    double NfalsePositive = m_klidFake->Integral(i, m_xbins.size() - 1);
     if ((NtruePositive + NfalsePositive) <= 0) {
       purity[i] = 0;
     } else {
@@ -273,8 +268,8 @@ void KlongValidationModule::terminate()
     }
   }
 
-  m_ROC = new TGraph(m_ROCBins, efficiency.data(), purity.data());
-  m_backRej = new TGraph(m_ROCBins, efficiency.data(), backrej.data());
+  m_ROC = new TGraph(m_xbins.size(), efficiency.data(), purity.data());
+  m_backRej = new TGraph(m_xbins.size(), efficiency.data(), backrej.data());
 
   m_ROC->SetMarkerStyle(3);
   m_backRej->SetMarkerStyle(3);

@@ -10,13 +10,11 @@
 
 // include
 #include <trg/grl/modules/trggrl/TRGGRLMatchModule.h>
-#include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -74,7 +72,7 @@ TRGGRLMatchModule::~TRGGRLMatchModule()
 
 void TRGGRLMatchModule::initialize()
 {
-  B2INFO("TRGGRLMatchModule processing");
+  B2DEBUG(100, "TRGGRLMatchModule processing");
   StoreArray<CDCTriggerTrack> track2Dlist(m_2d_tracklist);
   StoreArray<CDCTriggerTrack> track3Dlist(m_3d_tracklist);
   track2Dlist.isRequired();
@@ -86,10 +84,9 @@ void TRGGRLMatchModule::initialize()
 //  track2Dlist.registerRelationTo(clusterslist);
 // track3Dlist.registerRelationTo(clusterslist);
 
-  StoreArray<TRGGRLMATCH>::registerPersistent(m_2dmatch_tracklist);
-  StoreArray<TRGGRLMATCH>::registerPersistent(m_phimatch_tracklist);
-//  StoreArray<TRGGRLMATCH>::register(m_2dmatch_tracklist);
-  StoreArray<TRGGRLMATCH>::registerPersistent(m_3dmatch_tracklist);
+  m_TRGGRLMATCH.registerInDataStore(m_2dmatch_tracklist);
+  m_TRGGRLMATCH.registerInDataStore(m_phimatch_tracklist);
+  m_TRGGRLMATCH.registerInDataStore(m_3dmatch_tracklist);
 
   StoreArray<TRGGRLMATCH> track2Dmatch(m_2dmatch_tracklist);
   track2Dmatch.registerRelationTo(track2Dlist);

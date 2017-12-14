@@ -12,6 +12,7 @@
 
 using namespace Belle2;
 using namespace std;
+using namespace ECL;
 
 ECLChannelMapper::ECLChannelMapper()
 {

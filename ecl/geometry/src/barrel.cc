@@ -27,6 +27,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::geometry;
+using namespace ECL;
 
 namespace {
   Point_t p1[]  = {{0.0, 0.0}, {263.4, 0.0}, {263.4, 197.2}, {248.6, 206.6}, {212.0, 152.6}, {145.2, 199.0}, {108.5, 146.6}, {46.4, 192.1}, {7.9, 140.5}, { -50.0, 185.2}, { -90.3, 134.2}, { -143.8, 178.3}, { -170.7, 145.0}};
@@ -322,18 +323,18 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       G4Point3D rf(0, 0, copysign(dz / sin(th), cos(th)));
 
       // calculate three plane intersection point
-      auto inter = [&top](const G4Vector3D & n0, const G4Point3D & r0,
-                          const G4Vector3D & n1, const G4Point3D & r1,
-      const G4Vector3D & n2, const G4Point3D & r2) -> G4Point3D {
+      auto inter = [&top](const G4Vector3D & l_n0, const G4Point3D & l_r0,
+                          const G4Vector3D & l_n1, const G4Point3D & l_r1,
+      const G4Vector3D & l_n2, const G4Point3D & l_r2) -> G4Point3D {
         CLHEP::HepMatrix A(3, 3);
         CLHEP::HepVector B(3);
-        A[0][0] = n0.x(), A[0][1] = n0.y(), A[0][2] = n0.z();
-        A[1][0] = n1.x(), A[1][1] = n1.y(), A[1][2] = n1.z();
-        A[2][0] = n2.x(), A[2][1] = n2.y(), A[2][2] = n2.z();
+        A[0][0] = l_n0.x(), A[0][1] = l_n0.y(), A[0][2] = l_n0.z();
+        A[1][0] = l_n1.x(), A[1][1] = l_n1.y(), A[1][2] = l_n1.z();
+        A[2][0] = l_n2.x(), A[2][1] = l_n2.y(), A[2][2] = l_n2.z();
 
-        B[0] = r0 * n0;
-        B[1] = r1 * n1;
-        B[2] = r2 * n2;
+        B[0] = l_r0 * l_n0;
+        B[1] = l_r1 * l_n1;
+        B[2] = l_r2 * l_n2;
 
         CLHEP::HepVector r = A.inverse() * B;
         G4Point3D res(r[0], r[1], r[2]);

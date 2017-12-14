@@ -1,5 +1,0 @@
-Import ('env')
-
-env['LIBS'] = ['framework', 'rawdata_dataobjects', 'tracking', 'mdst_dataobjects', 'tracking_dataobjects', 'dqm' ]
-
-Return ('env')

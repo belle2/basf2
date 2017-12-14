@@ -33,7 +33,7 @@ const char* EclFrame::filetypes[] = {
   0,                            0
 };
 
-EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECLChannelMapper* mapper)
+EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECL::ECLChannelMapper* mapper)
 {
   m_open = true;
   m_subsys = EclData::ALL;

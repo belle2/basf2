@@ -15,6 +15,7 @@
 #include <map>
 using namespace Belle2;
 using namespace std;
+using namespace ECL;
 
 #define DO_QUOTE(X)        #X
 #define QUOTE(X)           DO_QUOTE(X)

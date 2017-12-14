@@ -41,11 +41,11 @@ namespace Belle2 {
     /**
      * Set ECLChannelMapper for CellID <-> (crate, shaper, chid) conversion.
      */
-    void setMapper(ECLChannelMapper* mapper);
+    void setMapper(ECL::ECLChannelMapper* mapper);
     /**
      * Return currently set ECLChannelMapper
      */
-    ECLChannelMapper* getMapper();
+    ECL::ECLChannelMapper* getMapper();
 
     /**
      * Change between the displayed ECL subsystem (barrel, forward and
@@ -100,7 +100,7 @@ namespace Belle2 {
     /**  Data to draw. */
     EclData* m_ecl_data;
     /**  mapper for CellID <-> (crate, shaper, chid) conversion. */
-    ECLChannelMapper* m_mapper;
+    ECL::ECLChannelMapper* m_mapper;
 
     /**  Identifier of displayed ECL subsystem. */
     EclData::EclSubsystem displayed_subsys;

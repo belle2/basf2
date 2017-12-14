@@ -22,10 +22,11 @@
 class G4LogicalVolume;
 
 namespace Belle2 {
-
-  struct shape_t;
   class ECLCrystalsShapeAndPosition;
   namespace ECL {
+
+    struct shape_t;
+
 
 
     //!  The GeoECLCreator class.

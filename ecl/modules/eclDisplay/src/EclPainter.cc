@@ -36,12 +36,12 @@ EclData* EclPainter::getData()
   return m_ecl_data;
 }
 
-void EclPainter::setMapper(ECLChannelMapper* mapper)
+void EclPainter::setMapper(ECL::ECLChannelMapper* mapper)
 {
   m_mapper = mapper;
 }
 
-ECLChannelMapper* EclPainter::getMapper()
+ECL::ECLChannelMapper* EclPainter::getMapper()
 {
   return m_mapper;
 }

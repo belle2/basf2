@@ -101,7 +101,7 @@ namespace Belle2 {
     /**  Displayed ECL events. */
     StoreArray<ECLCalDigit> eclarray;
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */
-    ECLChannelMapper m_mapper;
+    ECL::ECLChannelMapper m_mapper;
 
   public:
     /* SLOTS */

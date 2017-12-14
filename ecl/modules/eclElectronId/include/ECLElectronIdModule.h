@@ -15,7 +15,6 @@
 #include <framework/gearbox/Const.h>
 #include <ecl/electronId/ECLAbsPdf.h>
 
-
 namespace Belle2 {
 
   /** The modules implements a first version of Electron identification
@@ -62,7 +61,7 @@ namespace Belle2 {
     virtual void terminate();
   private:
     //    double likelihood( const Const::ChargedStable& hyp, double eop) const;
-    Belle2::ECLAbsPdf* m_pdf[ Const::ChargedStable::c_SetSize ];
+    Belle2::ECL::ECLAbsPdf* m_pdf[ Const::ChargedStable::c_SetSize ];
     // max value of Log Likelihood for a particle hypothesis.
     // used when the pdf value is not positive or subnormal.
     static constexpr double m_minLogLike = -700;

@@ -19,8 +19,8 @@ def create_digits():
     sim.add_module("EvtGenInput")
     add_simulation(sim)
     sim.add_module("RootOutput", outputFileName="digits.root", branchNames=[
-      "PXDDigits", "SVDShaperDigits", "CDCDigits", "TOPRawDigits", "ARICHDigits",
-      "BKLMDigits", "EKLMDigits", "ECLDigits", "ECLDsp",
+        "PXDDigits", "SVDShaperDigits", "CDCDigits", "TOPRawDigits", "ARICHDigits",
+        "BKLMDigits", "EKLMDigits", "ECLDigits", "ECLDsp",
     ])
     process(sim)
 
@@ -49,7 +49,7 @@ main.add_module(input)
 main.add_module('Gearbox')
 
 # geometry, needed by arich and top
-main.add_module('Geometry', components=['ARICH', 'TOP'])
+main.add_module('Geometry', components=['ARICH', 'TOP', 'SVD'])
 
 # conversion from digits to raw data
 add_packers(main)

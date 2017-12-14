@@ -276,9 +276,10 @@ namespace {
     /** register Particle array + ParticleExtraInfoMap object. */
     virtual void SetUp()
     {
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
       StoreArray<Particle> particles;
       StoreArray<MCParticle> mcparticles;
+      particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       particles.registerRelationTo(mcparticles);

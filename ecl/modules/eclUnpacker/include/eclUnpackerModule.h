@@ -7,23 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
-#ifndef ECLUNPACKERMODULE_H
-#define ECLUNPACKERMODULE_H
-
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawECL.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
 #include <framework/core/Module.h>
 #include "ecl/utility/ECLChannelMapper.h"
 
 namespace Belle2 {
+
+  class RawECL;
+  class ECLDigit;
+  class ECLTrig;
+  class ECLDsp;
+
   namespace ECL {
 
     class ECLUnpackerModule : public Module {
@@ -82,6 +78,8 @@ namespace Belle2 {
       StoreArray<ECLTrig>  m_eclTrigs;
       /** store array for waveforms**/
       StoreArray<ECLDsp>   m_eclDsps;
+      /** store array for RawECL**/
+      StoreArray<RawECL>   m_rawEcl;
 
       /** read nex word from COPPER data, check if the end of data is reached  */
       unsigned int readNextCollectorWord();
@@ -93,6 +91,3 @@ namespace Belle2 {
     };
   }//namespace ECL
 }//namespace Belle2
-
-#endif
-

@@ -142,19 +142,14 @@ namespace Belle2 {
     TGraph*  m_backRej;
 
 
-    /** number of bins used for roc curve */
-    unsigned int m_ROCBins;
-
-
-
-
-
     /** storearrays  */
     StoreArray<KLMCluster> m_klmClusters;
     /** storearrays  */
     StoreArray<MCParticle> m_mcParticles;
 
-
+    /** bins used for the ROC plots */
+    const std::vector<double> m_xbins =
+    {0, 0.001, 0.01, 0.1, 0.15, 0.175, 0.2, 0.3, 0.4, 0.5, 1};
 
     /** output path   */
     std::string m_outPath = "nightlyKlongValidation.root";

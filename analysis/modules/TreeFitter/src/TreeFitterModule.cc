@@ -45,7 +45,7 @@ TreeFitterModule::TreeFitterModule() : Module()
 
 void TreeFitterModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
   StoreArray<Belle2::Particle> particles;
   particles.isRequired();
   m_nCandidatesBeforeFit = 0;

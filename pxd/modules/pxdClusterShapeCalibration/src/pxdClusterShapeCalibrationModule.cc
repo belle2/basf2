@@ -11,7 +11,6 @@
 #include <pxd/modules/pxdClusterShapeCalibration/pxdClusterShapeCalibrationModule.h>
 
 #include <framework/pcore/ProcHandler.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDFrame.h>
@@ -107,7 +106,7 @@ pxdClusterShapeCalibrationModule::pxdClusterShapeCalibrationModule() : Calibrati
 void pxdClusterShapeCalibrationModule::prepare()
 {
   //Register collections
-  StoreObjPtr<EventMetaData>::required();
+  m_eventMetaData.isRequired();
   StoreArray<PXDCluster> storeClusters;
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   m_storeRecoTrackName = recotracks.getName();

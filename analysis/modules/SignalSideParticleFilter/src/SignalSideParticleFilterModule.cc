@@ -39,7 +39,7 @@ SignalSideParticleFilterModule::SignalSideParticleFilterModule() : Module()
 
 void SignalSideParticleFilterModule::initialize()
 {
-  StoreArray<Particle>::required();
+  StoreArray<Particle>().isRequired();
 
   for (auto& iParticleListName : m_particleLists) {
 

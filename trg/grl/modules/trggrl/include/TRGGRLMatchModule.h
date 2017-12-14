@@ -13,8 +13,10 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
+#include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <string>
 #include <memory>
 
@@ -93,5 +95,6 @@ namespace Belle2 {
     /**the matched 3d track list*/
     std::string m_3dmatch_tracklist;
 
+    StoreArray<TRGGRLMATCH> m_TRGGRLMATCH; /**< output for TRGGRLMATCH */
   };
 }

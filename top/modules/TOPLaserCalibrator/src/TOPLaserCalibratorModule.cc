@@ -181,7 +181,7 @@ namespace Belle2 {
 
     for (int i = 0; i < c_NumChannels; i++) {
       channel = i;
-      t0_const = mcT[i] - dataT[i];
+      t0_const = dataT[i] - mcT[i];
       if (i == m_refCh) t0_const = 0;
       otree->Fill();
     }

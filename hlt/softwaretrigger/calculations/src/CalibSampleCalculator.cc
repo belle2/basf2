@@ -15,10 +15,11 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     void CalibSampleCalculator::requireStoreArrays()
     {
-      for (unsigned int i = 0; i < m_particlelist.size(); i++)
-      {StoreObjPtr<ParticleList>::required(m_particlelist[i]);}
-      StoreObjPtr<ParticleList>::required("pi+:calib");
-      StoreObjPtr<ParticleList>::required("gamma:calib");
+      for (unsigned int i = 0; i < m_particlelist.size(); i++) {
+        m_particleList.isRequired(m_particlelist[i]);
+      }
+      m_particleList.isRequired("pi+:calib");
+      m_particleList.isRequired("gamma:calib");
 
     };
 

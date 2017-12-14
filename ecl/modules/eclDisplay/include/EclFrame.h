@@ -107,7 +107,7 @@ namespace Belle2 {
     /**  Current EclPainter */
     EclPainter* m_ecl_painter;
     /**  ECLChannelMapper, class for conversion from CellID to (crate, shaper, chn_id). */
-    ECLChannelMapper* m_mapper;
+    ECL::ECLChannelMapper* m_mapper;
 
     /**  This flag controls whether to display newly loaded events automatically. */
     bool m_auto_display;
@@ -138,7 +138,7 @@ namespace Belle2 {
      * @param auto_load Display new events as soon as they are loaded.
      */
     EclFrame(int painter_type, EclData* data, bool auto_display,
-             ECLChannelMapper* mapper);
+             ECL::ECLChannelMapper* mapper);
     /**
      * ECLFrame destructor. Calls parent class Cleanup() method.
      */

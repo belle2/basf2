@@ -538,8 +538,9 @@ namespace Belle2 {
 
     /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
+     * return 11 and 13 if the ECL Cluster is in gap between barrel and forward respectively backward
      */
-    double eclClusterDetectionRegion(const Particle* particle);
+    int eclClusterDetectionRegion(const Particle* particle);
 
     /**
      * return distance from eclCluster to nearest track hitting the ECLCluster

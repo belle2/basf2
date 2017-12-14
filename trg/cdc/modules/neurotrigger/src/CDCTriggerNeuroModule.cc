@@ -1,7 +1,6 @@
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
 
 #include <framework/gearbox/Const.h>
 

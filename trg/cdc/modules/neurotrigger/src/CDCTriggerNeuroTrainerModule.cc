@@ -10,7 +10,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 

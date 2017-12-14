@@ -2063,7 +2063,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward, 11/13 - gap between FW/BW and barrel]");
+                      "Returns reconstructed polar angle region in the ECL (1 - forward, 2 - barrel, 3 - backward, 11/13 - gap between FW/BW and barrel)");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
                       "Returns DeltaL for the shower shape.\n"
                       "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"

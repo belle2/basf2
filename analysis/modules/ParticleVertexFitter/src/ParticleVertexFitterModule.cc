@@ -80,7 +80,7 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
-    B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
+    B2DEBUG(1, "ParticleVertexFitterModule : magnetic field = " << m_Bfield);
 
 
     if (m_decayString != "")

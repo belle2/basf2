@@ -36,7 +36,7 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   }
   for (string b : excludeBranches) {
     if (branchesToFilter.count(b) == 0)
-      B2WARNING("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
+      B2INFO("The branch " << b << " given in " << c_SteerExcludeBranchNames[durability] << " does not exist.");
     if (!excludeBranchSet.insert(b).second)
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }

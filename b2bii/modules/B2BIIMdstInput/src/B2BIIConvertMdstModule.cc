@@ -367,7 +367,7 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
     return;
   }
   HepPoint3D ip;
-  HepSymMatrix ipErr;
+  CLHEP::HepSymMatrix ipErr;
   if (beginRun) {
     // use event independent average in begin run
     ip = Belle::IpProfile::position();
@@ -546,15 +546,15 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     int trackFitPIndex = -1;
     int trackFitMIndex = -1;
     Particle daughterP, daughterM;
-    HepLorentzVector momentumP;
-    HepSymMatrix     error7x7P(7, 0);
+    CLHEP::HepLorentzVector momentumP;
+    CLHEP::HepSymMatrix     error7x7P(7, 0);
     HepPoint3D       positionP;
     TMatrixFSym errMatrixP(7);
-    HepLorentzVector momentumM;
-    HepSymMatrix     error7x7M(7, 0);
+    CLHEP::HepLorentzVector momentumM;
+    CLHEP::HepSymMatrix     error7x7M(7, 0);
     HepPoint3D       positionM;
     TMatrixFSym errMatrixM(7);
-    HepSymMatrix error5x5(5, 0);
+    CLHEP::HepSymMatrix error5x5(5, 0);
     if (trackID[0] >= 1) {
       if (belleV0.daut()) {
         std::vector<float> helixParam(5);
@@ -573,7 +573,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixP(i, j) = error7x7P[i][j];
 
-        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP);
+        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP, pTypeP);
         daughterP.updateMomentum(TLorentzVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
                                  TVector3(positionP.x(), positionP.y(), positionP.z()),
                                  errMatrixP, 0.5);
@@ -596,7 +596,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
-        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP, pTypeP);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeP.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -628,7 +628,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixM(i, j) = error7x7M[i][j];
 
-        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM);
+        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM, pTypeM);
         daughterM.updateMomentum(TLorentzVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
                                  TVector3(positionM.x(), positionM.y(), positionM.z()),
                                  errMatrixM, 0.5);
@@ -651,7 +651,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
-        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM, pTypeM);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeM.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -1137,7 +1137,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 
       if (abs((*klong_hep_it).idhep()) == 130 && klong_hep_it->isthep() > 0) {
 
-        HepLorentzVector gp4(klong_hep_it->PX(), klong_hep_it->PY(), klong_hep_it->PZ(), klong_hep_it->E());
+        CLHEP::HepLorentzVector gp4(klong_hep_it->PX(), klong_hep_it->PY(), klong_hep_it->PZ(), klong_hep_it->E());
         double sum(0.0);
         int bestRecKlongID(0);
 
@@ -1147,7 +1147,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
           //  if((*klong_rec_it).klmc().ecl())continue; // check only klm cand.
           if ((*klong_rec_it).ecl())
             continue; // check only klm cand.
-          Hep3Vector klp3(klong_rec_it->cos_x(), klong_rec_it->cos_y(), klong_rec_it->cos_z());
+          CLHEP::Hep3Vector klp3(klong_rec_it->cos_x(), klong_rec_it->cos_y(), klong_rec_it->cos_z());
 
           if (cos(gp4.theta() - klp3.theta()) > cos(dang) && cos(gp4.phi() - klp3.phi()) > cos(dang)) {
 
@@ -1182,7 +1182,7 @@ double B2BIIConvertMdstModule::acc_pid(const Belle::Mdst_charged& chg, int idp)
 
   const double pmass[5] = { 0.00051099907, 0.105658389, 0.13956995, 0.493677, 0.93827231 };
 
-  Hep3Vector mom(chg.px(), chg.py(), chg.pz());
+  CLHEP::Hep3Vector mom(chg.px(), chg.py(), chg.pz());
   double cos_theta = mom.cosTheta();
   double pval      = mom.mag();
 
@@ -1196,7 +1196,7 @@ double B2BIIConvertMdstModule::acc_pid(const Belle::Mdst_charged& chg, int idp)
 // this is CDC_prob5
 double B2BIIConvertMdstModule::cdc_pid(const Belle::Mdst_charged& chg, int idp)
 {
-  Hep3Vector mom(chg.px(), chg.py(), chg.pz());
+  CLHEP::Hep3Vector mom(chg.px(), chg.py(), chg.pz());
   double pval = mom.mag();
 
   Belle::kid_cdc kidCdc(5);
@@ -1365,22 +1365,22 @@ int B2BIIConvertMdstModule::getHelixParameters(const Belle::Mdst_trk_fit& trk_fi
                                                const double mass,
                                                const HepPoint3D& newPivot,
                                                std::vector<float>& helixParams,
-                                               HepSymMatrix& error5x5,
-                                               HepLorentzVector& momentum,
+                                               CLHEP::HepSymMatrix& error5x5,
+                                               CLHEP::HepLorentzVector& momentum,
                                                HepPoint3D& position,
-                                               HepSymMatrix& error7x7, const double dPhi)
+                                               CLHEP::HepSymMatrix& error7x7, const double dPhi)
 {
   const HepPoint3D pivot(trk_fit.pivot_x(),
                          trk_fit.pivot_y(),
                          trk_fit.pivot_z());
 
-  HepVector  a(5);
+  CLHEP::HepVector  a(5);
   a[0] = trk_fit.helix(0);
   a[1] = trk_fit.helix(1);
   a[2] = trk_fit.helix(2);
   a[3] = trk_fit.helix(3);
   a[4] = trk_fit.helix(4);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepSymMatrix Ea(5, 0);
   Ea[0][0] = trk_fit.error(0);
   Ea[1][0] = trk_fit.error(1);
   Ea[1][1] = trk_fit.error(2);
@@ -1430,13 +1430,13 @@ void B2BIIConvertMdstModule::convertHelix(const Belle::Mdst_trk_fit& trk_fit,
                          trk_fit.pivot_y(),
                          trk_fit.pivot_z());
 
-  HepVector  a(5);
+  CLHEP::HepVector  a(5);
   a[0] = trk_fit.helix(0);
   a[1] = trk_fit.helix(1);
   a[2] = trk_fit.helix(2);
   a[3] = trk_fit.helix(3);
   a[4] = trk_fit.helix(4);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepSymMatrix Ea(5, 0);
   Ea[0][0] = trk_fit.error(0);
   Ea[1][0] = trk_fit.error(1);
   Ea[1][1] = trk_fit.error(2);
@@ -1463,7 +1463,7 @@ void B2BIIConvertMdstModule::convertHelix(const Belle::Mdst_trk_fit& trk_fit,
     }
   }
 
-  HepSymMatrix error5x5(5, 0);
+  CLHEP::HepSymMatrix error5x5(5, 0);
   convertHelix(helix, helixParams, error5x5);
 
   unsigned int size = 5;
@@ -1474,10 +1474,10 @@ void B2BIIConvertMdstModule::convertHelix(const Belle::Mdst_trk_fit& trk_fit,
 
 }
 
-void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float>& helixParams, HepSymMatrix& error5x5)
+void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float>& helixParams, CLHEP::HepSymMatrix& error5x5)
 {
-  HepVector  a(5);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepVector  a(5);
+  CLHEP::HepSymMatrix Ea(5, 0);
 
   a = helix.a();
   Ea = helix.Ea();
@@ -1529,11 +1529,11 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     // Converted helix parameters
     std::vector<float> helixParam(5);
     // Converted 5x5 error matrix
-    HepSymMatrix error5x5(5, 0);
+    CLHEP::HepSymMatrix error5x5(5, 0);
     // 4-momentum
-    HepLorentzVector momentum;
+    CLHEP::HepLorentzVector momentum;
     // 7x7 (momentum, position) error matrix
-    HepSymMatrix     error7x7(7, 0);
+    CLHEP::HepSymMatrix     error7x7(7, 0);
     // position
     HepPoint3D       position;
 
@@ -1903,11 +1903,11 @@ void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, co
 
 void B2BIIConvertMdstModule::belleVeeDaughterToCartesian(const Belle::Mdst_vee2& vee, const int charge,
                                                          const Const::ParticleType& pType,
-                                                         HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error)
+                                                         CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error)
 {
   const HepPoint3D pivot(vee.vx(), vee.vy(), vee.vz());
-  HepVector  a(5);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepVector  a(5);
+  CLHEP::HepSymMatrix Ea(5, 0);
   if (charge > 0) {
     a[0] = vee.daut().helix_p(0); a[1] = vee.daut().helix_p(1);
     a[2] = vee.daut().helix_p(2); a[3] = vee.daut().helix_p(3);
@@ -1944,8 +1944,8 @@ void B2BIIConvertMdstModule::belleVeeDaughterHelix(const Belle::Mdst_vee2& vee, 
                                                    std::vector<float>& helixError)
 {
   const HepPoint3D pivot(vee.vx(), vee.vy(), vee.vz());
-  HepVector  a(5);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepVector  a(5);
+  CLHEP::HepSymMatrix Ea(5, 0);
   if (charge > 0) {
     a[0] = vee.daut().helix_p(0); a[1] = vee.daut().helix_p(1);
     a[2] = vee.daut().helix_p(2); a[3] = vee.daut().helix_p(3);
@@ -1991,7 +1991,7 @@ void B2BIIConvertMdstModule::belleVeeDaughterHelix(const Belle::Mdst_vee2& vee, 
   // go to the new pivot
   helix.pivot(HepPoint3D(0., 0., 0.));
 
-  HepSymMatrix error5x5(5, 0);
+  CLHEP::HepSymMatrix error5x5(5, 0);
   convertHelix(helix, helixParam, error5x5);
 
   unsigned int size = 5;
@@ -2008,13 +2008,13 @@ void B2BIIConvertMdstModule::belleHelixToHelix(const Belle::Mdst_trk_fit& trk_fi
                          trk_fit.pivot_y(),
                          trk_fit.pivot_z());
 
-  HepVector  a(5);
+  CLHEP::HepVector  a(5);
   a[0] = trk_fit.helix(0);
   a[1] = trk_fit.helix(1);
   a[2] = trk_fit.helix(2);
   a[3] = trk_fit.helix(3);
   a[4] = trk_fit.helix(4);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepSymMatrix Ea(5, 0);
   Ea[0][0] = trk_fit.error(0);
   Ea[1][0] = trk_fit.error(1);
   Ea[1][1] = trk_fit.error(2);
@@ -2071,19 +2071,19 @@ void B2BIIConvertMdstModule::belleHelixToHelix(const Belle::Mdst_trk_fit& trk_fi
 
 int B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass,
                                                   const HepPoint3D& newPivot,
-                                                  HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error, double dPhi)
+                                                  CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error, double dPhi)
 {
   const HepPoint3D pivot(trk_fit.pivot_x(),
                          trk_fit.pivot_y(),
                          trk_fit.pivot_z());
 
-  HepVector  a(5);
+  CLHEP::HepVector  a(5);
   a[0] = trk_fit.helix(0);
   a[1] = trk_fit.helix(1);
   a[2] = trk_fit.helix(2);
   a[3] = trk_fit.helix(3);
   a[4] = trk_fit.helix(4);
-  HepSymMatrix Ea(5, 0);
+  CLHEP::HepSymMatrix Ea(5, 0);
   Ea[0][0] = trk_fit.error(0);
   Ea[1][0] = trk_fit.error(1);
   Ea[1][1] = trk_fit.error(2);
@@ -2122,9 +2122,9 @@ int B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& trk
   return charge;
 }
 
-TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const HepLorentzVector& momentum,
+TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLorentzVector& momentum,
                                                             const HepPoint3D&       position,
-                                                            const HepSymMatrix&     error,
+                                                            const CLHEP::HepSymMatrix&     error,
                                                             const short int charge,
                                                             const Const::ParticleType& pType,
                                                             const float pValue,

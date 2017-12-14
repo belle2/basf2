@@ -53,7 +53,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
         return m_variables.getNamedVariables(prefix);
       }
@@ -62,7 +62,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(const std::string& varName) override
       {
         return m_variables.find(varName);
       }

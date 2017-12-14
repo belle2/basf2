@@ -2,7 +2,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Matt Barrett                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -75,11 +75,13 @@ namespace Belle2 {
     /** return decay string for mcPMother, highlight mcPMatched. */
     std::string buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched);
 
+    /** Convert the extended string to a more concise format. */
+    void convertToConciseString(std::string& string);
+
+
   private:
 
     std::string m_listName; /**< Name of the particle list **/
-
-    bool m_removeRadiativePhotons; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
 
     std::string m_fileName; /**< Filename in which the hash strings are saved, if empty the strings are not saved */
     std::string m_treeName; /**< Tree name in which the hash strings are saved */
@@ -96,6 +98,9 @@ namespace Belle2 {
     float m_decayHash; /**< Decay hash -> The hash of the decay string of the mother particle */
     float m_decayHashExtended; /**< Extended decay hash -> The hash of the decay string of all daughter particles */
     std::string m_decayString; /**< The complete decay string */
+
+    bool m_useConciseString; /**< Switch to use concise format for the extended string. */
+    std::string m_identifiers; /**< Characters used to identify particles in the concise decay string format (default: alphabet)." */
 
     std::hash<std::string> m_hasher; /**< Hash function */
   };

@@ -14,12 +14,6 @@
 #include <stdio.h>
 #include <framework/logging/Logger.h>
 
-enum { OFFSET_MAGIC = 0, OFFSET_LENGTH = 1, OFFSET_HEADER = 2, OFFSET_TRIGNR = 3, OFFSET_RUNNR = 4, OFFSET_ROIS = 5};
-
-#define HEADER_SIZE_WITH_LENGTH_AND_CRC 6
-#define HEADER_SIZE_WITH_LENGTH 5
-#define HEADER_SIZE_WO_LENGTH 3
-
 #define MAGIC_WORD (0xBE12DA7A)
 
 using namespace Belle2;
@@ -113,5 +107,5 @@ void ROIpayload::setCRC()
   dhh_crc_32.process_bytes((void*)(m_rootdata + OFFSET_HEADER),
                            HEADER_SIZE_WO_LENGTH * sizeof(uint32_t) + m_index * sizeof(uint64_t));
 
-  m_data32[m_index * 2 + OFFSET_ROIS] = htonl(dhh_crc_32.checksum()) ;
+  m_data32[OFFSET_ROIS + m_index * 2] = htonl(dhh_crc_32.checksum()) ;
 }

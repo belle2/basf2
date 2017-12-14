@@ -47,6 +47,21 @@ namespace Belle2 {
     }
 
     /**
+     * Assignment operator
+     */
+    TOPCalTimebase& operator=(const TOPCalTimebase& timeBase)
+    {
+      if (this != &timeBase) {
+        m_syncTimeBase = timeBase.getSyncTimeBase();
+        m_sampleTimes = timeBase.getSampleTimes();
+        m_map.clear();
+        if (m_sampleTime) delete m_sampleTime;
+        m_sampleTime = 0;
+      }
+      return *this;
+    }
+
+    /**
      * Destructor
      */
     ~TOPCalTimebase()
@@ -103,7 +118,7 @@ namespace Belle2 {
      */
     void createMap() const;
 
-    double m_syncTimeBase = 0; /**< sinchronization time base (width of 2 ASIC windows) */
+    double m_syncTimeBase = 0; /**< synchronization time base (width of 2 ASIC windows) */
     std::vector<TOPSampleTimes> m_sampleTimes; /**< calibration constants */
 
     /** cache for a map */

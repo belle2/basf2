@@ -51,6 +51,18 @@ BKLMRawHit::BKLMRawHit(const BKLMRawHit& h) :
 {
 }
 
+// Assignment operator
+BKLMRawHit& BKLMRawHit::operator=(const BKLMRawHit& h)
+{
+  m_Status = h.m_Status;
+  m_Crate = h.m_Crate;
+  m_Slot = h.m_Slot;
+  m_Channel = h.m_Channel;
+  m_TDC = h.m_TDC;
+  m_ADC = h.m_ADC;
+  return *this;
+}
+
 bool BKLMRawHit::match(const BKLMRawHit* s) const
 {
   if (m_Crate   != s->getCrate()) return false;

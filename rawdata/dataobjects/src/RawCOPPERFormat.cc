@@ -148,14 +148,14 @@ unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 
   if (flag == 0) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
   }
 
   if (err_flag == 1) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
             word[ 0 ], word[ 1 ], word[ 2 ], word[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
@@ -187,6 +187,18 @@ int RawCOPPERFormat::GetEventCRCError(int n)
   sprintf(err_buf,
           "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. n=%d : %s %s %d: Exiting...\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+}
+
+int RawCOPPERFormat::GetEventCRC16Value(int n, int finesse_num)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. n=%d fin=%d : %s %s %d: Exiting...\n",
+          n, finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s\n", err_buf); fflush(stdout);
   string err_str = err_buf;
   throw (err_str);

@@ -10,6 +10,8 @@
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
@@ -17,6 +19,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
@@ -121,6 +124,10 @@ namespace Belle2 {
     void addTrackCandidate(const std::string& collectionName,
                            const RecoTrack& recoTrack);
 
+    /** Add a CDCTriggerTrack. */
+    void addCDCTriggerTrack(const std::string& collectionName,
+                            const CDCTriggerTrack& track);
+
     /** Add VXDTF track candidate. */
     void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);
     /** Add VXDTF cell. */
@@ -174,6 +181,9 @@ namespace Belle2 {
     /** Add a reconstructed cluster in the KLM. */
     void addKLMCluster(const KLMCluster* cluster);
 
+    /** Add a reconstructed 2d hit in the BKLM. */
+    void addBKLMHit2d(const BKLMHit2d* bklm2dhit);
+
     /** Add recontructed hit in ARICH */
     void addARICHHit(const ARICHHit* hit);
 
@@ -201,7 +211,10 @@ namespace Belle2 {
     }
 
     /** show CDCHits directly. */
-    void addCDCHit(const CDCHit* hit);
+    void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
+
+    /** show outline of track segments. */
+    void addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit);
 
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);
@@ -331,6 +344,9 @@ namespace Belle2 {
 
     /** Track propagator for genfit::Tracks (different mainly because of drawing options) */
     TEveTrackPropagator* m_gftrackpropagator;
+
+    /** Track propagator for CDCTriggerTracks (uses constant B field)*/
+    TEveTrackPropagator* m_consttrackpropagator;
 
     /** ECL cluster data. */
     TEveCaloDataVec* m_eclData;

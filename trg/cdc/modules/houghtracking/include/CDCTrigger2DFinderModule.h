@@ -19,6 +19,12 @@
 
 #include <root/TVector2.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, TVector2> cdcPair;
@@ -95,6 +101,10 @@ namespace Belle2 {
     /** count the number of super layers with hits
      *  @param array of hit/no hit for all super layers */
     unsigned short countSL(bool*);
+    /** check the short track condition
+     *  (= hits in the inner super layers rather than any super layers)
+     *  @param array of hit/no hit for all super layers */
+    bool shortTrack(bool*);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */
@@ -191,6 +201,9 @@ namespace Belle2 {
     /** minimum number of hits from different super layers in a Hough cell
      *  to form a candidate */
     unsigned m_minHits;
+    /** short tracks require hits in the first minHitsShort super layers
+     *  to form a candidate */
+    unsigned m_minHitsShort;
     /** minimum number of cells in a cluster to form a track */
     unsigned m_minCells;
     /** switch to ignore candidates connected to cells with higher super layer count */
@@ -240,6 +253,15 @@ namespace Belle2 {
     double radius[9][2];
     /** Number of track segments up to super layer */
     unsigned TSoffset[10];
+
+    /** list of track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** list of found tracks */
+    StoreArray<CDCTriggerTrack> m_tracks;
+    /** list of clusters in the Hough map */
+    StoreArray<CDCTriggerHoughCluster> m_clusters;
+    /** matrix containing the Hough plane */
+    StoreObjPtr<TMatrix> m_houghPlane;
   };//end class declaration
 } // end namespace Belle2
 

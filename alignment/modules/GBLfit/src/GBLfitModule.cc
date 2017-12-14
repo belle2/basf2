@@ -17,9 +17,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -67,7 +64,7 @@
 #include <genfit/MeasurementFactory.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <alignment/GblMultipleScatteringController.h>
+//#include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>

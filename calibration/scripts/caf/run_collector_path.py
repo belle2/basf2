@@ -17,13 +17,22 @@ def run_collectors():
     import os
     import sys
     import pickle
+    import json
 
-    # Create the database chain to use a passed in localdb if one exists and fall back to central
-    # if not
+    # We pass in basf2 and CAF options via the config.json file
+    with open('collector_config.json', 'r') as config_file:
+        config = json.load(config_file)
+
+    # Create the database chain to use the necessary central DB global tag and local DBs if they are requested
+    # We don't check for existence of keys in the dictionary as we want it to fail if they don't exist.
     reset_database()
     use_database_chain(True)
-    use_central_database('production')
-    use_local_database('inputdb/database.txt', 'inputdb', True, LogLevel.INFO)
+    if config['global_tag']:
+        B2INFO("Using Global Tag {}".format(config['global_tag']))
+        use_central_database(config['global_tag'])
+    for filename, directory in config['local_database_chain']:
+        B2INFO("Adding Local Database {} to chain".format(filename))
+        use_local_database(filename, directory, True, LogLevel.INFO)
 
     # create a path with all modules needed before calibration path is run.
     collector_path = create_path()
@@ -62,10 +71,12 @@ def run_collectors():
         root_input_mod.param('inputFileNames', input_data)
     else:
         main.add_module('RootInput', inputFileNames=input_data)
+    if 'HistoManager' not in pe:
+        main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 
     main.add_path(collector_path)
-    main.add_module('RootOutput', branchNames=["EventMetaData"])
     process(main)
+
 
 if __name__ == '__main__':
     run_collectors()

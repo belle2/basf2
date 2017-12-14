@@ -15,6 +15,7 @@
   <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
   <output>SVDValidationTTreeStrip.root</output>
+  <output>SVDValidationTTreeSpacePoint.root</output>
   <output>SVDValidationTTreeSimhit.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
@@ -26,6 +27,7 @@ from basf2 import *
 from SVDValidationTTree import *
 from SVDValidationTTreeStrip import *
 from SVDValidationTTreeSimhit import *
+from SVDValidationTTreeSpacePoint import *
 
 set_random_seed(12345)
 
@@ -58,6 +60,8 @@ svdvalidation = SVDValidationTTree()
 main.add_module(svdvalidation)
 svdvalidationstrip = SVDValidationTTreeStrip()
 main.add_module(svdvalidationstrip)
+svdvalidationspacepoint = SVDValidationTTreeSpacePoint()
+main.add_module(svdvalidationspacepoint)
 svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
 

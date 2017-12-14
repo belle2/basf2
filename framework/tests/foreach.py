@@ -7,16 +7,8 @@ from ROOT import Belle2
 set_random_seed("something important")
 
 path = create_path()
-
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [5, 1])
-eventinfosetter.param('runList', [0, 1])
-eventinfosetter.param('expList', [0, 1])
-path.add_module(eventinfosetter)
-
-pgun = register_module('ParticleGun')
-pgun.param('nTracks', 3)
-path.add_module(pgun)
+path.add_module('EventInfoSetter', evtNumList=[5, 1], runList=[0, 1], expList=[0, 1])
+pgun = path.add_module('ParticleGun', nTracks=3)
 
 
 class TestModule(Module):
@@ -45,7 +37,7 @@ for use_pp in [False, True]:
         subeventpath.add_module(testmod)
         # read: for each  $objName   in $arrayName   run over $path
         path.for_each('MCParticle', 'MCParticles', subeventpath)
-        path.add_module('PrintCollections')
+        path.add_module('PrintCollections', printForEvent=0)
         if use_pp:
             set_nprocesses(2)
             logging.log_level = LogLevel.WARNING  # suppress output
@@ -68,7 +60,7 @@ for use_pp in [False, True]:
             assert statistics.get(testmod).calls(statistics.END_RUN) == 2
         # 6 events, a 3 particles
         assert statistics.get(pgun).calls(statistics.EVENT) == 6
-        assert statistics.get(testmod).calls(statistics.EVENT) == 3*6
+        assert statistics.get(testmod).calls(statistics.EVENT) == 3 * 6
 
         sys.exit(0)
     retbytes = os.wait()[1]

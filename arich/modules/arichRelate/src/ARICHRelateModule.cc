@@ -11,16 +11,8 @@
 // Own include
 #include <arich/modules/arichRelate/ARICHRelateModule.h>
 
-
-
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <arich/dataobjects/ARICHAeroHit.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -61,15 +53,11 @@ namespace Belle2 {
 
   {
     // Dependecies check
-    StoreArray<MCParticle>::required();
-    StoreArray<ARICHAeroHit>::required();
-    StoreArray<Track>::required();
-    StoreArray<ExtHit>::required();
-
-    // Prepare the relation matrix for write access
-    StoreArray<ARICHAeroHit> aeroHits;
-    StoreArray<ExtHit> extHits;
-    extHits.registerRelationTo(aeroHits);
+    m_mcParticles.isRequired();
+    m_mdstTracks.isRequired();
+    m_aeroHits.isRequired();
+    m_extHits.isRequired();
+    m_extHits.registerRelationTo(m_aeroHits);
   }
 
   void ARICHRelateModule::beginRun()
@@ -78,17 +66,11 @@ namespace Belle2 {
 
   void ARICHRelateModule::event()
   {
-    // Input: reconstructed tracks
-    StoreArray<MCParticle> MCParticles("");
-    StoreArray<Track> mdstTracks("");
-    StoreArray<ExtHit> extHits("");
-    StoreArray<ARICHAeroHit> aeroHits("");
-
-    int nHits = aeroHits.getEntries();
+    int nHits = m_aeroHits.getEntries();
     B2DEBUG(50, "No. of hits " << nHits);
 
     for (int iHit = 0; iHit < nHits; ++iHit) {
-      const ARICHAeroHit* aeroHit = aeroHits[iHit];
+      const ARICHAeroHit* aeroHit = m_aeroHits[iHit];
       const MCParticle* particle = DataStore::getRelated<MCParticle>(aeroHit);
       if (!particle) {
         B2DEBUG(50, "No MCParticle for AeroHit!");
@@ -101,7 +83,7 @@ namespace Belle2 {
       const Track* track = DataStore::getRelated<Track>(particle);
       if (!track) continue;
 
-      const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
       if (!fitResult) continue;
 
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);

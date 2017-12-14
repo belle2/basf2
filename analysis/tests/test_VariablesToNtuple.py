@@ -7,13 +7,13 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-filepath = 'analysis/tests/mdst5.root'
+filepath = 'analysis/tests/mdst7.root'
 inputFile = Belle2.FileSystem.findFile(filepath)
 if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst7.root'\n")
     sys.exit(-1)
 
 path = create_path()
@@ -25,7 +25,7 @@ path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
 # Write out electron id and momentum of all true electron candidates and every 10th wrong electron candidate
 path.add_module('VariablesToNtuple',
                 particleList='e+',
-                variables=['eid', 'p', 'isSignal'],
+                variables=['electronID', 'p', 'isSignal'],
                 sampling=('isSignal', {1: 0, 0: 20}),
                 fileName='particleListNtuple.root',
                 treeName='particleListTree')
@@ -48,8 +48,8 @@ with tempfile.TemporaryDirectory() as tempdir:
     f = ROOT.TFile('particleListNtuple.root')
     t = f.Get('particleListTree')
     assert bool(t), "particleListTree isn't contained in file"
-    assert t.GetListOfBranches().Contains('eid'), "eid branch is missing"
-    assert t.GetListOfBranches().Contains('p'), "eid branch is missing"
+    assert t.GetListOfBranches().Contains('electronID'), "electronID branch is missing"
+    assert t.GetListOfBranches().Contains('p'), "electronID branch is missing"
     assert t.GetListOfBranches().Contains('__weight__'), "weight branch is missing"
 
     nSignal = 0
@@ -81,4 +81,4 @@ with tempfile.TemporaryDirectory() as tempdir:
             assert event.__weight__ == 1, "Expected weight 1 in an event with unequal 12 tracks got {}".format(event.__weight__)
             if event.nTracks == 11:
                 nTracks_11 += 1
-    assert nTracks_12*5 < nTracks_11, "Expected much less events with 12 tracks than with 11, due to the large sampling rate"
+    assert nTracks_12 * 5 < nTracks_11, "Expected much less events with 12 tracks than with 11, due to the large sampling rate"

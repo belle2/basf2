@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <cmath>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -30,11 +29,5 @@ namespace Belle2 {
         return t.getWeight();
       }
     };
-
-    /// Operator to sort for lowest according to the weight of the object.
-    using LessWeight = LessOf<MayIndirectTo<GetWeight>>;
-
-    /// Operator to sort for highest according to the weight of the object.
-    using GreaterWeight = GreaterOf<MayIndirectTo<GetWeight>>;
   }
 }

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This file contains multiple utility functions which can be used by validation steering files.
+"""
+
 import subprocess
 import pickle
 import sys
@@ -31,10 +35,18 @@ def get_background_files():
         assert False
 
     if len(bg) == 0:
-        print("No background files found in folder {} Terminating this script.".format(bg_folder))
+        print("No background files found in folder {} . Terminating this script.".format(bg_folder))
         assert False
 
     print("Background files loaded from folder {}".format(bg_folder))
+
+    # sort for easier comparison
+    bg = sorted(bg)
+
+    print("{: >65} {: >65} ".format("- Background file name -", "- file size -"))
+    for f in bg:
+        fsize = os.path.getsize(f)
+        print("{: >65} {: >65} ".format(f, fsize))
 
     return bg
 

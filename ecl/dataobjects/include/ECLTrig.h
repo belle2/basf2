@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Poyuan Chen                                              *
+ *               Vasily Shebalin                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,27 +19,46 @@ namespace Belle2 {
   /*! Class to store ECLTrig, still need to be study
    * relation to ECLHit
    * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+   * and ecl/modules/eclUnpacker/ECLUnpacker.cc
    */
 
   class ECLTrig : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    ECLTrig() {
-      m_CellId = 0;    /**< Cell ID */
+    ECLTrig()
+    {
+      m_TrigId = 0;    /**< Trig ID == crate ID */
       m_TimeTrig = 0; /**< Trig Time */
+      m_TrigTag = 0;
     }
 
 
-    /*! Set  Cell ID
+    /*! Set  TrigID
      */
-    void setCellId(int CellId) { m_CellId = CellId; }
-    /*! Set Trig Time
+    void setTrigId(int TrigId) { m_TrigId = TrigId; }
+    /*! Set Trig Time (crate Id)
+     */
+    void setTrigTag(int TrigTag) { m_TrigTag = TrigTag; }
+    /*! Set Triger Tag (crate Id)
      */
     void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
-    /*! Get Cell ID
-     * @return cell ID
+    /*! Get Trig ID
+     * @return trig ID
      */
-    int getCellId() const { return m_CellId; }
+    int getTrigId() const { return m_TrigId; }
+
+    /*! Get Trigger tag
+     * Trigger tag word width is 16 bit (bits 0-15).
+     * Bit 16 is used as error flag.
+     * If it is 1 then trigger tags from different shapers are not equal
+     * @return Trigger tag
+     */
+    int getTrigTag() const { return m_TrigTag & 0xFFFF; }
+
+    /*! Get trigger tag quality flag.
+     * @return 0 if trigger tags from different shapers are equal. 1 otherwise.
+     */
+    int getTrigTagQualityFlag() const { return (m_TrigTag & 0x10000) >> 16; }
 
     /*! Get Trig Time
      * @return Trig Time
@@ -46,11 +66,14 @@ namespace Belle2 {
     double getTimeTrig() const { return m_TimeTrig; }
 
   private:
-    int m_CellId;      /**< Cell ID */
+    int m_TrigId;      /**< Trig ID */
     double m_TimeTrig; /**< Trig Time */
+    int m_TrigTag;
 
 
-    ClassDef(ECLTrig, 1);/**< ClassDef */
+//    ClassDef(ECLTrig, 1);/**< ClassDef */
+//    ClassDef(ECLTrig, 2); // CellId -> TrigId
+    ClassDef(ECLTrig, 3); // TrigTag added
 
   };
 } // end namespace Belle2

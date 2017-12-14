@@ -47,18 +47,21 @@ namespace Belle2 {
   {
     // All specified ParticleLists are required to exist
     for (auto& name : m_listNames) {
-      StoreObjPtr<ParticleList>::required(name);
+      StoreObjPtr<ParticleList> list(name);
+      list.isRequired();
     }
 
     if (m_listNames.empty()) {
-      StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+      StoreObjPtr<EventExtraInfo> extraInfo("", DataStore::c_Event);
+      extraInfo.registerInDataStore();
     } else {
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow re-registration
+      StoreObjPtr<ParticleExtraInfoMap> extraInfo("", DataStore::c_Event);
+      extraInfo.registerInDataStore();
     }
 
     if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
       m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                    DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
+                                    DBObjPtr<DatabaseRepresentationOfWeightfile>(MVA::makeSaveForDatabase(m_identifier)));
     }
     MVA::AbstractInterface::initSupportedInterfaces();
 

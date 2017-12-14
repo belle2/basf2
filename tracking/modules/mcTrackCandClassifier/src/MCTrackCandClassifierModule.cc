@@ -87,9 +87,15 @@ void MCTrackCandClassifierModule::initialize()
 {
 
   // MCParticles, MCTrackCands, MCTracks needed for this module
-  StoreArray<PXDCluster>::required();
-  StoreArray<SVDCluster>::required();
-  StoreArray<MCParticle>::required(m_mcParticlesName);
+  StoreArray<PXDCluster> pxdClusters;
+  pxdClusters.isRequired();
+
+  StoreArray<SVDCluster> svdClusters;
+  svdClusters.isRequired();
+
+  StoreArray<MCParticle> mcParticles(m_mcParticlesName);
+  mcParticles.isRequired();
+
   StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandsColName);
   mcTrackCands.isRequired();
   //  m_selector.registerSubset( mcTrackCands, "idealMCTrackCands");
@@ -97,8 +103,11 @@ void MCTrackCandClassifierModule::initialize()
   StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
   idealMCTrackCands.registerInDataStore();
 
-  StoreArray<PXDTrueHit>::required("");
-  StoreArray<SVDTrueHit>::required("");
+  StoreArray<PXDTrueHit> pxdTrueHits;
+  pxdTrueHits.isRequired();
+
+  StoreArray<SVDTrueHit> svdTrueHits;
+  svdTrueHits.isRequired();
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -220,9 +229,7 @@ void MCTrackCandClassifierModule::event()
 {
 
 
-  BFieldMap& bfieldMap = BFieldMap::Instance();
-  TVector3 magField = bfieldMap.getBField(TVector3(0, 0, 0));
-
+  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
 

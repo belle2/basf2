@@ -1,0 +1,4 @@
+./stop_ropc02
+./stop_nsmd2_ropc02
+./start_nsmd2_ropc02
+./start_ropc02

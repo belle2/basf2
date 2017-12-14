@@ -3,61 +3,22 @@ from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
 
-import rawdata
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
-    add_calibration_software_trigger
+    add_calibration_software_trigger, add_calcROIs_software_trigger
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
 
-def add_packers(path, components=DEFAULT_HLT_COMPONENTS):
-    """
-    Slightly modified version of rawdata.add_packers to not include the packer for PXD and add the Geometry/Gearbox
-     when needed.
-    :param path: The path to which the packers will be added.
-    :param components: Which components to use.
-    """
-    # Add Gearbox or geometry to path if not already there
-    if "Gearbox" not in path:
-        path.add_module("Gearbox")
-
-    if "Geometry" not in path:
-        path.add_module("Geometry")
-
-    # Exclude PXD
-    rawdata.add_packers(path, components=components)
-
-
-def add_unpackers(path, components=DEFAULT_HLT_COMPONENTS):
-    """
-    Slightly modified version of rawdata.add_unpackers to not include the unpacker for PXD and add the Geometry/Gearbox
-     when needed.
-    :param path: The path to which the unpackers will be added.
-    :param components: Which components to use.
-    """
-    # Add Gearbox or geometry to path if not already there
-    if "Gearbox" not in path:
-        path.add_module("Gearbox")
-
-    if "Geometry" not in path:
-        path.add_module("Geometry")
-
-    # Exclude PXD
-    rawdata.add_unpackers(path, components=components)
-
-    # add clusterizer
-    if not components or "SVD" in components:
-        path.add_module("SVDClusterizer")
-
-
 def add_softwaretrigger_reconstruction(
         path,
-        store_array_debug_prescale=None,
+        store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
-        additionalTrackFitHypotheses=[]):
+        additionalTrackFitHypotheses=[],
+        softwaretrigger_mode='hlt_filter',
+        calcROIs=True):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
     reconstruction stack in the HLT using the software trigger modules. Several steps are performed:
@@ -85,11 +46,17 @@ def add_softwaretrigger_reconstruction(
     Before calling this function, make sure that your database setup is suited to download software trigger cuts
     from the database (local or global) and that you unpacked raw data in your data store (e.g. call the add_unpacker
     function). After this part of the reconstruction is processes, you rather want to store the output, as you can not
-    do anything sensible eny more (all the information of the reconstruction is lost).
+    do anything sensible any more (all the information of the reconstruction is lost).
 
     :param path: The path to which the ST modules will be added.
     :param store_array_debug_prescale: Set to an finite value, to control for how many events the variables should
         be written out to the data store.
+    :param components: the detector components
+    :param softwaretrigger_mode: softwaretrigger_off: disable all software trigger activity, no reconstruction, no filter
+                                 monitoring: enable reconstruction, fast_reco filter is off, hlt filter is off
+                                 fast_reco_filter: enable reconstruction, fast_reco filter is on, hlt filter is off
+                                 hlt_filter: default mode, enable all software activities
+                                             including reconstruction, fast_reco and hlt filters.
     """
     # In the following, we will need some paths:
     # (1) A "store-metadata" path (deleting everything except the trigger tags and some metadata)
@@ -102,38 +69,53 @@ def add_softwaretrigger_reconstruction(
     # raw data, trigger tags and the meta data.
     calibration_and_store_only_rawdata_path = basf2.create_path()
 
+    # If softwaretrigger_mode is not any of the trigger mode, force the mode
+    # to the default mode 'hlt_filter', and print out a warning
+    if softwaretrigger_mode not in ['softwaretrigger_off', 'monitoring', 'fast_reco_filter', 'hlt_filter']:
+        basf2.B2WARNING("The trigger mode " + softwaretrigger_mode +
+                        " is not a standard software trigger" +
+                        "mode [softwaretrigger_off, monitoring, fast_reco_filter, hlt_filter]" +
+                        "the default mode hlt_filter is forced to be applied")
+        softwaretrigger_mode = 'hlt_filter'
+
     # Add fast reco reconstruction
-    reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True,
-                                      components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+    if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:
+        reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True,
+                                          components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+        # Add fast reco cuts
+        fast_reco_cut_module = add_fast_reco_software_trigger(fast_reco_reconstruction_path, store_array_debug_prescale)
+        if softwaretrigger_mode in ['fast_reco_filter', 'hlt_filter']:
+            # There are three possibilities for the output of this module
+            # (1) the event is dismissed -> only store the metadata
+            fast_reco_cut_module.if_value("==0", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+            # (2) the event is accepted -> go on with the hlt reconstruction
+            fast_reco_cut_module.if_value("==1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
 
-    # Add fast reco cuts
-    fast_reco_cut_module = add_fast_reco_software_trigger(fast_reco_reconstruction_path, store_array_debug_prescale)
-    # There are three possibilities for the output of this module
-    # (1) the event is dismissed -> only store the metadata
-    fast_reco_cut_module.if_value("==-1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
-    # (2) we do not know what to do or the event is accepted -> go on with the hlt reconstruction
-    fast_reco_cut_module.if_value("!=-1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
+        elif softwaretrigger_mode == 'monitoring':
+            fast_reco_reconstruction_path.add_path(hlt_reconstruction_path)
 
-    # second possibility
-    # # (2) the event is immediately accepted -> store everything
-    # fast_reco_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-    # # (3) we do not know what to do -> go on with the reconstruction
-    # fast_reco_cut_module.if_value("==0", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
+        # Add hlt reconstruction
+        reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
+                                          components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
 
-    # Add hlt reconstruction
-    reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
-                                      components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
-    hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
+        hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
-    # Fill the calibration_and_store_only_rawdata_path path
-    add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
-    calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
+        # preserve the reconstruction information which is needed for ROI calculation.
+        add_calcROIs_software_trigger(calibration_and_store_only_rawdata_path, calcROIs=calcROIs)
+        # Fill the calibration_and_store_only_rawdata_path path
+        add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
+        calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
+        if softwaretrigger_mode == 'hlt_filter':
+            # There are two possibilities for the output of this module
+            # (1) the event is rejected -> only store the metadata
+            hlt_cut_module.if_value("==0", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+            # (2) the event is accepted -> go on with the calibration
+            hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
+        elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
+            hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
-    # There are two possibilities for the output of this module
-    # (1) the event is accepted -> store everything
-    hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-    # (2) we do not know what to do or the event is rejected -> only store the metadata
-    hlt_cut_module.if_value("!=1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+    elif softwaretrigger_mode == 'softwaretrigger_off':
+        fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
 
     path.add_path(fast_reco_reconstruction_path)
 
@@ -148,7 +130,7 @@ def get_store_only_metadata_path():
     :return: The created path.
     """
     store_metadata_path = basf2.create_path()
-    store_metadata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX). \
+    store_metadata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX). \
         set_name("KeepMetaData")
 
     return store_metadata_path
@@ -165,20 +147,20 @@ def get_store_only_rawdata_path():
     :return: The created path.
     """
     store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
+    store_rawdata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
         .set_name("KeepRawData")
 
     return store_rawdata_path
 
 
 def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME,
-                                          production_global_tag_name="production"):
+                                          production_global_tag_name="development"):
     """
     Helper function to set up the database chain, needed for typical software trigger applications. This chains
     consists of:
     * access to the local database store in localdb/database.txt in the current folder.
     * global database access with the given software trigger global tag (probably the default one).
-    * global database access with the "production" tag, which is the standard global database.
+    * global database access with the "development" tag, which is the standard global database.
 
     :param software_trigger_global_tag_name: controls the name of the software trigger global tag in the database.
     :param production_global_tag_name: controls the name of the general global tag in the database.

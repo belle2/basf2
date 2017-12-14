@@ -12,9 +12,10 @@ from fnmatch import fnmatch
 set_log_level(LogLevel.INFO)
 
 # use_local_database()
-use_local_database("test_bklm.txt", "test_payloads")
+# use_local_database("test_bklm.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
 # use_central_database("test_bklm", LogLevel.WARNING);
+use_central_database("development", LogLevel.WARNING)
 
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -25,13 +26,11 @@ eventinfo.initialize()
 # download data if it is not available locally
 # make sure you change paths
 # os.path.isfile('BKLMElectronicsMapping_test.xml'):
-#    subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/...'])
 
 # create a gearbox module to read the data so it can be used
 paramloader = register_module('Gearbox')
 # pathname = 'file://%s/AllData/' % (os.getcwd())
 # paramloader.param('backends', [pathname])
-# paramloader.param('fileName', 'ArichData.xml')
 # paramloader.initialize()
 
 main = create_path()
@@ -41,4 +40,6 @@ process(main)
 
 # and run the importer
 dbImporter = BKLMDatabaseImporter()
-dbImporter.exportBklmElectronicMapping()
+# dbImporter.exportBklmElectronicMapping()
+# dbImporter.exportBklmDigitizationParams()
+# dbImporter.exportBklmADCThreshold()

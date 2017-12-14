@@ -1,27 +1,62 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Milkail Remnev, Dmitry Matvienko                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ ***************************************************************************/
+
 #include <ecl/modules/eclDisplay/EclData.h>
 
 using namespace Belle2;
 
-EclData::EclData(int in)
+const int EclData::ring_start_id[70] = {
+  // forward (0-12)
+  1,    49,   97,   161,  225,  289,  385,  481,  577,  673,
+  769,  865,  1009,
+  // barrel (13-58)
+  1153, 1297, 1441, 1585, 1729, 1873, 2017, 2161, 2305, 2449,
+  2593, 2737, 2881, 3025, 3169, 3313, 3457, 3601, 3745, 3889,
+  4033, 4177, 4321, 4465, 4609, 4753, 4897, 5041, 5185, 5329,
+  5473, 5617, 5761, 5905, 6049, 6193, 6337, 6481, 6625, 6769,
+  6913, 7057, 7201, 7345, 7489, 7633,
+  // forward (59-68)
+  7777, 7921, 8065, 8161, 8257, 8353, 8449, 8545, 8609, 8673,
+  // last_crystal+1
+  EclData::getCrystalCount() + 1
+};
+
+EclData::EclData()
 {
   m_tree = new TTree("tree", "tree");
-  m_tree->Branch("ch", &ch, "ch/I");
-  m_tree->Branch("amp", &amp, "amp/I");
-  m_tree->Branch("time", &time, "time/I");
-  m_tree->Branch("evtn", &evtn, "evtn/I");
+  m_tree->Branch("ch", &m_branch_ch, "ch/I");
+  m_tree->Branch("energy", &m_branch_energy, "energy/D");
+  m_tree->Branch("time", &m_branch_time, "time/D");
+  m_tree->Branch("evtn", &m_branch_evtn, "evtn/I");
 
-  m_expanded = false;
-  m_in = in;
-  InitVariables();
-  m_en_range_min    = 0;
-  m_energy_emission = 0;
-  m_energy_sums_max = 0;
-  m_ev_range_min    = 0;
-  m_ev_range_max    = 0;
-  m_event_count_max = 0;
-  m_time_max        = 0;
-  m_time_range_max  = 0;
-  m_time_range_min  = 0;
+  initVariables();
+  initEventRanges();
+}
+
+EclData::EclData(const EclData& data)
+{
+  initVariables();
+  initEventRanges();
+
+  cloneFrom(data);
+}
+
+EclData& EclData::operator=(const EclData& other)
+{
+  if (this != &other) { // self-assignment check
+    initVariables();
+    initEventRanges();
+
+    cloneFrom(other);
+  }
+  return *this;
 }
 
 EclData::~EclData()
@@ -31,173 +66,300 @@ EclData::~EclData()
   delete m_tree;
 }
 
-void EclData::InitVariables()
+void EclData::cloneFrom(const EclData& other)
 {
-  m_event_counts = new int[6912];
-  m_energy_sums = new float[6912];
+  m_tree = other.m_tree->CloneTree();
+
+  m_tree = new TTree("tree", "tree");
+  m_tree->Branch("ch", &m_branch_ch, "ch/I");
+  m_tree->Branch("energy", &m_branch_energy, "energy/I");
+  m_tree->Branch("time", &m_branch_time, "time/I");
+  m_tree->Branch("evtn", &m_branch_evtn, "evtn/I");
+
+  m_last_event_id = other.m_last_event_id;
+  m_time_max = other.m_time_max;
+  // m_excluded_ch is not copied.
+  m_excluded_ch.clear();
+
+  m_event_count_max = other.m_event_count_max;
+  m_energy_total = other.m_energy_total;
+
+  for (int i = 0; i < getCrystalCount() + 1; i++) {
+    m_event_counts[i] = other.m_event_counts[i];
+    m_energy_sums[i] = other.m_energy_sums[i];
+  }
+
+  // TODO: Vectors surely can be copied in more simple way.
+  for (unsigned int i = 0; i < other.m_event_entry.size(); i++) {
+    m_event_entry.push_back(other.m_event_entry[i]);
+  }
+
+  m_en_range_min = other.m_en_range_min;
+  m_en_range_max = other.m_en_range_max;
+
+  m_time_range_min = other.m_time_range_min;
+  m_time_range_max = other.m_time_range_max;
+
+  m_ev_range_min = other.m_ev_range_min;
+  m_ev_range_max = other.m_ev_range_max;
+}
+
+void EclData::initVariables()
+{
+  // Setting
+  m_branch_energy = m_branch_ch = m_branch_time = m_branch_evtn = 0;
+
+  m_event_counts = new int[getCrystalCount() + 1];
+  m_energy_sums = new float[getCrystalCount() + 1];
+
+  m_event_count_max = 0;
+  m_energy_sums_max = 0;
+  m_energy_total = 0;
 
   m_last_event_id = -1;
-  m_en_range_max = -1;
+
+  m_time_max = 0;
 
   m_excluded_ch.clear();
 }
 
-void EclData::InitEventRanges()
+void EclData::initEventRanges()
 {
-  m_event_entry.clear();
-
-  m_last_event_id = -1;
+  m_en_range_min = 0;
   m_en_range_max = -1;
 
-  int count = m_tree->GetEntries();
-
-  for (int i = 0; i < count; i++) {
-    m_tree->GetEntry(i);
-
-    if (m_time_max < time) m_time_max = time;
-
-    // This is used to avoid the cases of empty events.
-    while (evtn > m_last_event_id) {
-      m_last_event_id++;
-      m_event_entry.push_back(i);
-    }
-  }
-
-  m_time_range_min = 0;
+  m_time_range_min = -2048;
   m_time_range_max = m_time_max;
 
   m_ev_range_min = 0;
   m_ev_range_max = m_last_event_id;
 }
 
-void EclData::AddFile(const char*, bool)
+int EclData::getCrystalCount()
 {
-  //m_tree->Add(filename);
-  //InitEventRanges();
+  return 8736;
 }
 
-TTree* EclData::GetTree()
+TTree* EclData::getTree()
 {
   return m_tree;
 }
 
-int* EclData::GetEventCounts()
+int* EclData::getEventCounts()
 {
   return m_event_counts;
 }
-// Alias for GetEventCounts()
-int* EclData::GetEventCountsPerCrystal()
+// Alias for getEventCounts()
+int* EclData::getEventCountsPerCrystal()
 {
-  return GetEventCounts();
+  return getEventCounts();
 }
 
-int EclData::GetEventCountsMax()
+int EclData::getEventCountsMax()
 {
   return m_event_count_max;
 }
 
-float* EclData::GetEnergySums()
+float* EclData::getEnergySums()
 {
   return m_energy_sums;
 }
-// Alias for GetAmplitudeSums()
-float* EclData::GetEnergySumPerCrystal()
+// Alias for getEnergySums()
+float* EclData::getEnergySumPerCrystal()
 {
-  return GetEnergySums();
+  return getEnergySums();
 }
 
-float EclData::GetEnergySumsMax()
+float EclData::getEnergySumsMax()
 {
   return m_energy_sums_max;
 }
 
-float EclData::GetEnergyEmission()
+float EclData::getEnergyTotal()
 {
-  return m_energy_emission;
+  return m_energy_total;
 }
 
-// TODO: is there some fancy Root classes for this occurence?
-int EclData::GetTimeRangeMin()
+bool EclData::isCrystalInSubsystem(int crystal, EclData::EclSubsystem subsys)
+{
+  switch (subsys) {
+    case ALL:
+      return true;
+    case BARR:
+      return crystal >= 1153 && crystal <= 7776;
+    case FORW:
+      return crystal < 1153;
+    case BACKW:
+      return crystal > 7776;
+    default:
+      return false;
+  }
+}
+
+int EclData::getTimeRangeMin()
 {
   return m_time_range_min;
 }
-int EclData::GetTimeRangeMax()
+int EclData::getTimeRangeMax()
 {
   return m_time_range_max;
 }
 
-void EclData::SetTimeRange(int time_min, int time_max, bool update)
+void EclData::setTimeRange(int time_min, int time_max, bool do_update)
 {
   if (m_time_range_min == time_min && m_time_range_max == time_max)
     return;
 
   m_time_range_min = time_min;
   m_time_range_max = time_max;
-  if (update)
-    Update();
+  if (do_update)
+    update();
 }
 
-int EclData::GetEventRangeMin()
+int EclData::getEventRangeMin()
 {
   return m_ev_range_min;
 }
-int EclData::GetEventRangeMax()
+int EclData::getEventRangeMax()
 {
   return m_ev_range_max;
 }
-void EclData::SetEventRange(int ev_min, int ev_max, bool update)
+void EclData::setEventRange(int ev_min, int ev_max, bool do_update)
 {
   if (ev_min == m_ev_range_min && ev_max == m_ev_range_max)
     return;
 
   m_ev_range_min = ev_min;
   m_ev_range_max = ev_max;
-  if (update)
-    Update();
+  if (do_update)
+    update();
 }
 
-void EclData::SetEnergyThreshold(int en_min, int en_max, bool update)
+void EclData::setEnergyThreshold(int en_min, int en_max, bool do_update)
 {
   if (en_min == m_en_range_min && en_max == m_en_range_max)
     return;
 
   m_en_range_min = en_min;
   m_en_range_max = en_max;
-  if (update)
-    Update();
+  if (do_update)
+    update();
 }
 
-int EclData::GetTimeMin()
+int EclData::getTimeMin()
 {
-  return 0;
+  return m_time_range_min;
 }
-int EclData::GetTimeMax()
+int EclData::getTimeMax()
 {
   return m_time_max;
 }
 
-int EclData::GetLastEventId()
+int EclData::getLastEventId()
 {
   return m_last_event_id;
 }
 
-void EclData::ExcludeChannel(int ch, bool update)
+int EclData::getChannel(int phi_id, int theta_id)
 {
-  m_excluded_ch.insert(ch);
-  if (update)
-    Update();
+  return ring_start_id[theta_id] + phi_id;
 }
 
-void EclData::IncludeChannel(int ch, bool update)
+int EclData::getPhiId(int _ch)
 {
-  m_excluded_ch.erase(ch);
-  if (update)
-    Update();
+  for (int i = 0; i < 69; i++) {
+    if (_ch < ring_start_id[i + 1])
+      return _ch - ring_start_id[i];
+  }
+
+  return -1;
 }
 
-void EclData::Update()
+int EclData::getThetaId(int _ch)
+{
+  for (int i = 0; i < 69; i++) {
+    if (_ch < ring_start_id[i + 1])
+      return i;
+  }
+
+  return -1;
+}
+
+void EclData::excludeChannel(int _ch, bool do_update)
+{
+  m_excluded_ch.insert(_ch);
+  if (do_update)
+    update();
+}
+
+void EclData::includeChannel(int _ch, bool do_update)
+{
+  m_excluded_ch.erase(_ch);
+  if (do_update)
+    update();
+}
+
+void EclData::loadRootFile(const char* path)
+{
+  // TODO: Move this process to some new reset() method.
+  m_excluded_ch.clear();
+  m_event_entry.clear();
+  m_tree->Reset();
+  m_last_event_id = -1;
+  m_en_range_max = -1;
+  m_time_max = 0;
+
+  TFile* file = new TFile(path, "READ");
+  TTree* tree = (TTree*)file->Get("tree");
+  long nentries = tree->GetEntries();
+
+  tree->SetBranchAddress("ECLCalDigits.m_CellId", &m_branch_ch);
+  tree->SetBranchAddress("ECLCalDigits.m_Energy", &m_branch_energy);
+  tree->SetBranchAddress("ECLCalDigits.m_Time"  , &m_branch_time);
+
+  TLeaf* leafCellId;
+  TLeaf* leafEnergy;
+  TLeaf* leafTimeFit;
+  int len;
+
+  leafCellId  = tree->GetLeaf("ECLCalDigits.m_CellId");
+  leafEnergy  = tree->GetLeaf("ECLCalDigits.m_Energy");
+  leafTimeFit = tree->GetLeaf("ECLCalDigits.m_Time");
+
+  for (long i = 0; i < nentries; i++) {
+    tree->GetEntry(i);
+
+    len = leafCellId->GetLen();
+
+    if (len > 0) {
+      m_last_event_id++;
+      m_branch_evtn = m_last_event_id;
+
+      m_event_entry.push_back(m_tree->GetEntries());
+    }
+
+    for (int j = 0; j < len; j++) {
+      m_branch_ch     = leafCellId ->GetTypedValue<int>(j);
+      m_branch_energy = leafEnergy ->GetTypedValue<double>(j) * 1e3;
+      m_branch_time   = leafTimeFit->GetTypedValue<double>(j);
+
+      if (m_time_max < m_branch_time) m_time_max = m_branch_time;
+
+      B2DEBUG(10, "Added event ECLCalDigits for crystal " << m_branch_ch);
+
+      // TODO: Add energy cut.
+      m_tree->Fill();
+    }
+  }
+
+  update(true);
+}
+
+void EclData::update(bool reset_event_ranges)
 {
   int start, end;
+
+  if (reset_event_ranges) initEventRanges();
 
   if (m_ev_range_min < 0)
     return;
@@ -210,41 +372,38 @@ void EclData::Update()
   else
     end = m_tree->GetEntries();
 
-  for (int i = 0; i < 6912; i++) {
+  for (int i = 1; i <= getCrystalCount(); i++) {
     m_event_counts[i] = 0;
     m_energy_sums[i] = 0;
   }
   m_event_count_max = 0;
   m_energy_sums_max = 0;
-  m_time_max = 0;
-  m_energy_emission = 0;
+  m_energy_total = 0;
 
   for (int i = start; i < end; i++) {
     m_tree->GetEntry(i);
 
-    if (m_excluded_ch.count(ch) > 0) continue;
+    if (m_excluded_ch.count(m_branch_ch) > 0) continue;
 
-    if (ch >= 0 && ch < 6912) {
+    if (m_branch_ch >= 1 && m_branch_ch <= getCrystalCount()) {
       // Check if current time belongs to time_range, set by user.
       if (m_time_range_max >= 0)
-        if (time < m_time_range_min || time > m_time_range_max)
+        if (m_branch_time < m_time_range_min || m_branch_time > m_time_range_max)
           continue;
-
-      float energy = (float)amp / 20;
 
       if (m_en_range_max >= 0)
-        if (energy < m_en_range_min || energy > m_en_range_max)
+        if (m_branch_energy < m_en_range_min || m_branch_energy > m_en_range_max)
           continue;
 
-      m_event_counts[ch]++;
-      if (m_event_count_max < m_event_counts[ch])
-        m_event_count_max = m_event_counts[ch];
+      m_event_counts[m_branch_ch]++;
+      if (m_event_count_max < m_event_counts[m_branch_ch])
+        m_event_count_max = m_event_counts[m_branch_ch];
 
-      m_energy_sums[ch] += energy;
-      m_energy_emission += energy;
+      m_energy_sums[m_branch_ch] += m_branch_energy;
+      m_energy_total += m_branch_energy;
 
-      if (m_energy_sums_max < m_energy_sums[ch])
-        m_energy_sums_max = m_energy_sums[ch];
+      if (m_energy_sums_max < m_energy_sums[m_branch_ch])
+        m_energy_sums_max = m_energy_sums[m_branch_ch];
     }
   }
 
@@ -253,55 +412,35 @@ void EclData::Update()
   if (m_ev_range_max < 0)
     m_ev_range_max = m_last_event_id;
 
-//  std::cout << end - start << " events handled." << std::endl;
+  B2DEBUG(250, end - start << " events handled.");
 }
 
-bool EclData::HasExpanded()
+int EclData::addEvent(ECLCalDigit* event, int _evtn)
 {
-  Deserialize();
-  if (m_expanded) {
-    m_expanded = false;
-    return true;
+  if (event->getEnergy() <= 0 || event->getCellId() <= 0) {
+    return -1;
   }
-  return false;
-}
 
-void LoadValue(char* buf, int& shift, int len, int* val)
-{
-  while (shift < len && buf[shift] != ' ')
-    shift++;
-  if (++shift >= len) return;
-  sscanf(buf + shift, "%d ", val);
-}
+  m_branch_ch     = event->getCellId();
+  m_branch_energy = event->getEnergy() * 1e3; // To MeV
+  m_branch_time   = event->getTime();
+  m_branch_evtn   = _evtn;
 
-void EclData::Deserialize()
-{
-  char buf[1024];
-  int len = read(m_in, buf, 1024);
-  int shift = 0;
-
-  if (len <= 0) return;
-
-  for (shift = 0; shift < len; shift++) {
-    if (buf[shift] != '!')
-      continue;
-    else
-      shift++;
-    if (shift >= len) return;
-    sscanf(buf + shift, "%d ", &ch);
-    LoadValue(buf, shift, len, &amp);
-    if (shift >= len) return;
-    LoadValue(buf, shift, len, &time);
-    if (shift >= len) return;
-    LoadValue(buf, shift, len, &evtn);
-    m_tree->Fill();
-    m_expanded = true;
+  if (m_time_max < m_branch_time) m_time_max = m_branch_time;
+  if (m_last_event_id < _evtn) {
+    m_last_event_id = _evtn;
+    m_event_entry.push_back(m_tree->GetEntries());
   }
-  InitEventRanges();
-  Update();
+
+  B2DEBUG(200, "Added event #" << _evtn << ", ch:" << m_branch_ch
+          << ", energy:" << m_branch_energy << ", time:" << m_branch_time);
+
+  m_tree->Fill();
+
+  return 0;
 }
 
-void EclData::FillAmpHistogram(TH1F* hist, int amp_min, int amp_max)
+void EclData::fillEnergyHistogram(TH1F* hist, int energy_min, int energy_max, EclSubsystem subsys)
 {
   int start, end;
 
@@ -318,7 +457,78 @@ void EclData::FillAmpHistogram(TH1F* hist, int amp_min, int amp_max)
 
   for (int i = start; i < end; i++) {
     m_tree->GetEntry(i);
-    if (amp >= amp_min && amp <= amp_max)
-      hist->Fill(amp);
+    if (isCrystalInSubsystem(m_branch_ch, subsys)) {
+      if (m_branch_energy >= energy_min && m_branch_energy <= energy_max)
+        hist->Fill(m_branch_energy);
+    }
+  }
+}
+
+void EclData::fillEnergySumHistogram(TH1F* hist, int energy_min, int energy_max, EclData::EclSubsystem subsys)
+{
+  int start, end;
+
+  if (m_ev_range_min < 0)
+    return;
+  if (m_ev_range_min > m_last_event_id || m_ev_range_min > m_ev_range_max)
+    return;
+
+  start = m_event_entry[m_ev_range_min];
+  if (m_ev_range_max < m_last_event_id)
+    end = m_event_entry[m_ev_range_max + 1];
+  else
+    end = m_tree->GetEntries();
+
+  m_tree->GetEntry(start);
+  int cur_evtn = m_branch_evtn;
+  int energy_sum = 0;
+
+  for (int i = start; i < end; i++) {
+    m_tree->GetEntry(i);
+
+    // After reading all of the data from event cur_evtn,
+    // save the sum in histogram.
+    if (m_branch_evtn > cur_evtn) {
+      if (energy_sum > 0) hist->Fill(energy_sum);
+      energy_sum = 0;
+      cur_evtn = m_branch_evtn;
+    }
+
+    if (isCrystalInSubsystem(m_branch_ch, subsys)) {
+      if (m_branch_energy >= energy_min && m_branch_energy <= energy_max)
+        energy_sum += m_branch_energy;
+    }
+  }
+
+  // Add last selected event.
+  if (energy_sum > 0) hist->Fill(energy_sum);
+}
+
+void EclData::fillTimeHistogram(TH1F* hist, int time_min, int time_max, EclData::EclSubsystem subsys)
+{
+  int start, end;
+
+  if (m_ev_range_min < 0)
+    return;
+  if (m_ev_range_min > m_last_event_id || m_ev_range_min > m_ev_range_max)
+    return;
+
+  start = m_event_entry[m_ev_range_min];
+  if (m_ev_range_max < m_last_event_id)
+    end = m_event_entry[m_ev_range_max + 1];
+  else
+    end = m_tree->GetEntries();
+
+  for (int i = start; i < end; i++) {
+    m_tree->GetEntry(i);
+
+    if (m_en_range_max >= 0)
+      if (m_branch_energy < m_en_range_min || m_branch_energy > m_en_range_max)
+        continue;
+
+    if (isCrystalInSubsystem(m_branch_ch, subsys)) {
+      if (m_branch_time >= time_min && m_branch_time <= time_max)
+        hist->Fill(m_branch_time);
+    }
   }
 }

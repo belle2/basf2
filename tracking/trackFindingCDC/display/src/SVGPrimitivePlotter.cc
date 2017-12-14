@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <fstream>
 
 using namespace Belle2;
@@ -47,7 +45,7 @@ SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter)
 
 std::unique_ptr<PrimitivePlotter> SVGPrimitivePlotter::clone() const
 {
-  return makeUnique<SVGPrimitivePlotter>(*this);
+  return std::make_unique<SVGPrimitivePlotter>(*this);
 }
 
 void SVGPrimitivePlotter::drawLine(float startX,
@@ -459,7 +457,7 @@ void SVGPrimitivePlotter::writeAttributes(std::ostream& outputStream,
     const std::string& value = attribute.second;
 
     // Skip special attribute
-    if (boost::starts_with(key, "_")) {
+    if ('_' == key[0]) {
       continue;
     }
 

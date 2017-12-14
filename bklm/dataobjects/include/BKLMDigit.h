@@ -40,11 +40,14 @@ namespace Belle2 {
     //! @param ctime gives lower 16 bits of B2TT CTIME
     //! @param tdc the tdc value
     //! @@param charge the charge (number of photons for the scintillator strips)
-    BKLMDigit(int moduleID, short ctime, short tdc, short charge);
+    BKLMDigit(int moduleID, int ctime, short tdc, short charge);
 
 
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
+
+    //! Assignment operator
+    BKLMDigit& operator=(const BKLMDigit&);
 
     //! Destructor
     virtual ~BKLMDigit() {}
@@ -118,8 +121,11 @@ namespace Belle2 {
     //! @return the number of reconstructed MPPC pixels
     float getNPixel() const { return m_NPixel; }
 
+    //! Get the charge value
+    int getCharge() const { return m_Charge; }
+
     //! @return ctime
-    short getCTime() const { return m_CTime; }
+    int getCTime() const { return m_CTime; }
 
     //! Get the status of scint pulse-shape fit
     //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
@@ -149,6 +155,9 @@ namespace Belle2 {
     //! @param nPixel number of reconstructed MPPC pixels from the pulse-shape analysis
     void setNPixel(float nPixel) { m_NPixel = nPixel; }
 
+    //! Set the charge value
+    void setCharge(int charge) { m_Charge = charge; }
+
     //! Set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
     //! @param status completion status of the pulse-shape analysis
     void setFitStatus(int status) { m_FitStatus = status; }
@@ -156,7 +165,7 @@ namespace Belle2 {
   private:
 
     //!lowest 16 bits of the B2TT CTIME signal
-    short m_CTime;
+    int m_CTime;
 
     //! detector-module identifier
     //! @sa BKLMStatus.h
@@ -180,12 +189,15 @@ namespace Belle2 {
     //! reconstructed number of MPPC pixels (=photoelectrons in EKLM)
     float m_NPixel;
 
+    //! reconstructed charge value of MPPC
+    int m_Charge;
+
     //! pulse-fit status
     int m_FitStatus;
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc
-    ClassDef(BKLMDigit, 5)
+    ClassDef(BKLMDigit, 7)
 
   };
 

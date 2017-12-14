@@ -4,6 +4,10 @@
 #include <framework/core/Module.h>
 #include <trg/cdc/NeuroTrigger.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+
 namespace Belle2 {
 
   class CDCTriggerMLP;
@@ -58,6 +62,13 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
+
+    /** list of input 2D tracks */
+    StoreArray<CDCTriggerTrack> m_tracks2D;
+    /** list of output NN tracks */
+    StoreArray<CDCTriggerTrack> m_tracksNN;
+    /** list of track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
   };
 }
 #endif

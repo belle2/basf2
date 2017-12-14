@@ -75,3 +75,12 @@ BKLMHit1d::BKLMHit1d(const BKLMHit1d& h) :
   m_EDep(h.m_EDep)
 {
 }
+
+// Assignment operator
+BKLMHit1d& BKLMHit1d::operator=(const BKLMHit1d& h)
+{
+  m_ModuleID = h.m_ModuleID;
+  m_Time = h.m_Time;
+  m_EDep = h.m_EDep;
+  return *this;
+}

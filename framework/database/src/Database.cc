@@ -11,6 +11,11 @@
 #include <boost/python/def.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <boost/python/dict.hpp>
+#include <boost/python/extract.hpp>
+#include <boost/python/return_value_policy.hpp>
+#include <boost/python/manage_new_object.hpp>
+#include <boost/python/raw_function.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <framework/database/Database.h>
@@ -23,12 +28,15 @@
 #include <framework/database/DatabaseChain.h>
 #include <framework/database/DBStore.h>
 #include <framework/database/PayloadFile.h>
+#include <framework/database/ConditionsPayloadDownloader.h>
 
 #include <TFile.h>
 
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <cstdlib>
+
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.03_Master-20171106-202500"
 
 using namespace std;
 using namespace Belle2;
@@ -53,25 +61,56 @@ namespace {
 
 std::unique_ptr<Database> Database::s_instance{nullptr};
 
+std::string Database::getDefaultGlobalTags()
+{
+  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
+}
+
 Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    const std::string fallbackFilename = getFromEnvironment("BELLE2_CONDB_FALLBACK",
-                                                            "/cvmfs/belle.cern.ch/conditions/GT_gen_prod_003.19_release-00-09-02.txt");
-    const std::string globalTag = getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "GT_gen_prod_003.19_release-00-09-02");
-    // OK, add a fallback database unless empty location is specified
-    if (!fallbackFilename.empty()) {
-      LocalDatabase::createInstance(FileSystem::findFile(fallbackFilename), "", true, LogConfig::c_Error);
+    const std::string fallback = getFromEnvironment("BELLE2_CONDB_FALLBACK", "/cvmfs/belle.cern.ch/conditions");
+    const std::string globalTag = getDefaultGlobalTags();
+    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+    std::vector<string> tags;
+    boost::split(tags, globalTag, boost::is_any_of(" \t\n\r"));
+    // OK, add fallback databases unless empty location is specified
+    if (!fallback.empty()) {
+      auto logLevel = LogConfig::c_Error;
+      for (auto localdb : tokenizer(fallback, boost::char_separator<char> {" \t\n\r"})) {
+        if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
+          // If a file name is given use it as local DB
+          B2DEBUG(10, "Adding fallback database " << FileSystem::findFile(localdb));
+          LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, logLevel);
+        } else if (FileSystem::isDir(localdb)) {
+          // If a directory is given append the database file name
+          if (globalTag.empty()) {
+            // Default name if no tags given: look for compile time tag.txt
+            std::string fileName = FileSystem::findFile(localdb) + "/" CURRENT_DEFAULT_TAG ".txt";
+            B2DEBUG(10, "Adding fallback database " << fileName);
+            LocalDatabase::createInstance(fileName, "", true, logLevel);
+          } else {
+            // One local DB for each global tag
+            for (auto tag : tags) {
+              std::string fileName = localdb + "/" + tag + ".txt";
+              if (FileSystem::isFile(fileName)) {
+                B2DEBUG(10, "Adding fallback database " << fileName);
+                LocalDatabase::createInstance(fileName, "", true, logLevel);
+              }
+            }
+          }
+        }
+        logLevel = LogConfig::c_Debug;
+      }
     }
     // and add access to the central database unless we have an empty global tag
     // in which case we disable access to the database
     if (!globalTag.empty()) {
-      typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
       // add all global tags which are separated by whitespace as conditions database
-      for (auto token : tokenizer(globalTag, boost::char_separator<char> {" \t\n\r"})) {
-        B2DEBUG(100, "Adding central database for global tag " << token);
-        ConditionsDatabase::createDefaultInstance(token, LogConfig::c_Warning);
+      for (auto tag : tags) {
+        B2DEBUG(10, "Adding central database for global tag " << tag);
+        ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }
     }
     LocalDatabase::createInstance("localdb/database.txt", "", false, LogConfig::c_Warning, true);
@@ -196,6 +235,52 @@ namespace {
   {
     B2WARNING("set_experiment_name is deprecated: setting experiment names is no longer possible and will be ignored");
   }
+
+  /** Configure the network settings for the Conditions database downloads */
+  boost::python::dict setConditionsNetworkSettings(boost::python::tuple args, boost::python::dict kwargs)
+  {
+    using namespace boost::python;
+    if (len(args) > 0) {
+      // keyword only function: raise typerror on non-keyword arguments
+      std::string count = std::to_string(len(args)) + (len(args) > 1 ? " were" : " was");
+      PyErr_SetString(PyExc_TypeError, ("set_central_database_networkparams() takes 0 "
+                                        "positional arguments but " + count + " given").c_str());
+      throw_error_already_set();
+    }
+    std::vector<std::function<void(unsigned int)>> setters = {
+      &ConditionsPayloadDownloader::setConnectionTimeout,
+      &ConditionsPayloadDownloader::setStalledTimeout,
+      &ConditionsPayloadDownloader::setMaxRetries,
+      &ConditionsPayloadDownloader::setBackoffFactor
+    };
+    std::vector<std::function<unsigned int()>> getters = {
+      &ConditionsPayloadDownloader::getConnectionTimeout,
+      &ConditionsPayloadDownloader::getStalledTimeout,
+      &ConditionsPayloadDownloader::getMaxRetries,
+      &ConditionsPayloadDownloader::getBackoffFactor
+    };
+    std::vector<std::string> names = {"connection_timeout", "stalled_timeout", "max_retries", "backoff_factor"};
+    dict result;
+    for (size_t i = 0; i < names.size(); ++i) {
+      const std::string n = names[i];
+      if (kwargs.has_key(n)) {
+        setters[i](extract<unsigned int>(kwargs[n]));
+        boost::python::api::delitem(kwargs, n);
+      }
+      result[n] = getters[i]();
+    }
+    if (len(kwargs) > 0) {
+      std::string message = "Unrecognized keyword arguments: ";
+      auto keys = kwargs.keys();
+      for (int i = 0; i < len(keys); ++i) {
+        if (i > 0) message += ", ";
+        message += extract<std::string>(keys[i]);
+      }
+      PyErr_SetString(PyExc_TypeError, message.c_str());
+      throw_error_already_set();
+    }
+    return result;
+  }
 }
 
 std::string Database::getGlobalTag()
@@ -230,6 +315,7 @@ void Database::exposePythonAPI()
   //don't show c++ signature in python doc to keep it simple
   docstring_options options(true, true, false);
 
+  def("get_default_global_tags", &Database::getDefaultGlobalTags, "Get the default global tags for the central database");
   def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
 Set a name for the given experiment number when looking up payloads in the
 central database. Thisf function is deprecated and any calls to it are ignored.)DOCSTRING");
@@ -301,5 +387,30 @@ use a different database.
         payloads should be inverted. If False a log message with level
         `loglevel` will be emitted everytime a payload cannot be found. If true
         a message will be emitted if a payload is actually found.
+)DOCSTRING");
+  object f = raw_function(setConditionsNetworkSettings);
+  def("set_central_database_networkparams", f);
+  // for some reason we cannot directly provide the docstring on def when using
+  // raw_function so let's override the docstring afterwards
+  setattr(f, "__doc__",
+      R"DOCSTRING(set_central_database_networkparams(**kwargs)
+Set the network parameters for the central database.
+
+You can supply any combination of keyword-only arguments defined below. The
+function will return a dictionary containing the new settings.
+
+    >>> set_central_database_networkparams(connection_timeout=5, max_retries=1)
+    {'backoff_factor': 5, 'connection_timeout': 5, 'max_retries': 1, 'stalled_timeout': 60}
+
+:param int connection_timeout: timeout in seconds before connection should be
+    aborted. 0 sets the timeout to the default (300s)
+:param int stalled_timeout: timeout in seconds before a download should be
+    aborted if the speed stays below 10 KB/s, 0 disables this timeout
+:param int max_retries: maximum amount of retries if the server responded with
+    an HTTP response of 500 or more. 0 disables retrying
+:param int backoff_factor: backoff factor for retries in seconds. Retries are
+   performed using something similar to binary backoff: For retry :math:`n` and
+   a `backoff_factor` :math:`f` we wait for a random time chosen uniformely
+   from the interval :math:`[1, (2^{n} - 1) \times f]` in seconds.
 )DOCSTRING");
 }

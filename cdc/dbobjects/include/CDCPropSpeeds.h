@@ -11,6 +11,8 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -89,6 +91,24 @@ namespace Belle2 {
 
       for (unsigned short iCL = 0; iCL < m_speeds.size(); ++iCL) {
         std::cout << iCL << " " << m_speeds[iCL] << std::endl;
+      }
+    }
+
+    /**
+     * Output the contents in text file format
+     */
+    void outputToFile(std::string fileName) const
+    {
+      std::ofstream fout(fileName);
+
+      if (fout.bad()) {
+        B2ERROR("Specified output file could not be opened!");
+      } else {
+        for (unsigned short iCL = 0; iCL < m_speeds.size(); ++iCL) {
+          fout << std::setw(2) << std::right << iCL << "  " << std::setw(15) << std::scientific << std::setprecision(
+                 8) << m_speeds[iCL] << std::endl;
+        }
+        fout.close();
       }
     }
 

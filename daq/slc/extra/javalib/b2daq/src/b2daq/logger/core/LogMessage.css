@@ -1,0 +1,45 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2014/06/03, 12:13:26
+    Author     : tkonno
+*/
+
+
+.log-debug .text {
+    -fx-font-size: 13px;
+    -fx-fill: darkgray;
+}
+
+.log-info .text {
+    -fx-font-size: 13px;
+    -fx-fill: black;
+}
+
+.log-notice .text {
+    -fx-font-size: 13px;
+    -fx-fill: blue;
+}
+
+.log-warning .text {
+    -fx-font-size: 13px;
+    -fx-fill: deeppink;
+}
+
+.log-error .text {
+    -fx-font-size: 13px;
+    -fx-fill: red;
+}
+
+.log-fatal {
+    -fx-background-color: red; 
+}
+
+.log-fatal .text {
+    -fx-font-size: 13px;
+    -fx-fill: white; 
+}
+

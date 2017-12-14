@@ -44,13 +44,17 @@ MCV0MatcherModule::~MCV0MatcherModule()
 
 void MCV0MatcherModule::initialize()
 {
-  StoreArray<Track>::required(m_TrackColName);
-  StoreArray<TrackFitResult>::required(m_TFRColName);
-  StoreArray<V0>::required(m_V0ColName);
-  StoreArray<MCParticle>::required(m_MCParticleColName);
+  StoreArray<Track> tracks(m_TrackColName);
+  tracks.isRequired();
+
+  StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
+  trackFitResults.isRequired();
 
   StoreArray<V0> v0s(m_V0ColName);
+  v0s.isRequired();
+
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
+  mcParticles.isRequired();
   v0s.registerRelationTo(mcParticles);
   B2WARNING("This module is supposed to be used only for the debugging\n \
             of the V0Finder module, not as MC matching during analysis.");

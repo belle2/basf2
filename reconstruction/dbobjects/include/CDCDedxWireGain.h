@@ -10,7 +10,10 @@
 
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
+#include <map>
 
 namespace Belle2 {
 
@@ -25,42 +28,39 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxWireGain(): m_wireID(0), m_gain(0) {};
+    CDCDedxWireGain(): m_wiregains() {};
 
     /**
      * Constructor
      */
-    CDCDedxWireGain(int wireID, float gain): m_wireID(wireID), m_gain(gain) {};
+    explicit CDCDedxWireGain(std::vector<double>& wiregains): m_wiregains(wiregains) {};
 
     /**
      * Destructor
      */
     ~CDCDedxWireGain() {};
 
-    /** Return wire ID
-     * @return wire ID
-     */
-    float getWireID() const {return m_wireID; };
-
     /** Return wire gain
-     * @return wire gain
+     * @param wire number
      */
-    float getWireGain() const {return m_gain; };
-
-    /** Set wire ID
-     * @param wire ID
-     */
-    void setWireID(int wireID) {m_wireID = wireID; };
-
-    /** Set wire gain
-     * @param wire gain
-     */
-    void setWireGain(float gain) {m_gain = gain; };
+    float getWireGain(int wire) const
+    {
+      if (wire < 0 || (unsigned)wire >= m_wiregains.size()) {
+        B2WARNING("Asking for a CDC Wire that is not found!");
+        return 1.0;
+      }
+      double gain = m_wiregains[wire];
+      return gain;
+    };
 
   private:
-    int m_wireID;       /**< CDC wire ID */
-    float m_gain;       /**< CDC wire gain */
+    /** Note, we are using dense packed wire number (0-14336) defined as follows:
+    const int iwire = (superlayer == 0) ?
+    160*layer+wire : m_nLayerWires[superlayer-1]+(160+32*(superlayer-1))*layer+wire;
+        -see reconstruction/modules/CDCDedxPIDModule */
+    std::vector<double> m_wiregains; /**< dE/dx gains for each wire */
 
-    ClassDef(CDCDedxWireGain, 1); /**< ClassDef */
+
+    ClassDef(CDCDedxWireGain, 3); /**< ClassDef */
   };
 } // end namespace Belle2

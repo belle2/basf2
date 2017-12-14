@@ -11,8 +11,14 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseTrackRelationFilter>;
 
 MCTrackRelationFilter::MCTrackRelationFilter(bool allowReverse)
   : Super(allowReverse)

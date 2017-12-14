@@ -142,11 +142,11 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   result.first = 0;
 
   // find the entry for package and module in the maps
-  const auto& entry = m_database.find(name);
-  if (entry == m_database.end()) return tryDefault(name);
+  const auto& databaseEntry = m_database.find(name);
+  if (databaseEntry == m_database.end()) return tryDefault(name);
 
   // find the payload whose IoV contains the current event and load it
-  for (auto& entry : boost::adaptors::reverse(entry->second)) {
+  for (auto& entry : boost::adaptors::reverse(databaseEntry->second)) {
     if (entry.second.contains(event)) {
       int revision = entry.first;
       result.first = readPayload(payloadFileName(m_payloadDir, name, revision), name);
@@ -216,6 +216,10 @@ bool LocalDatabase::addPayload(const std::string& name, const std::string& fileN
     return false;
   }
 
+  if (!fs::exists(m_payloadDir)) {
+    fs::create_directories(m_payloadDir);
+  }
+
   // get lock for write access to database file
   FileSystem::Lock lock(m_absFileName);
   if (!lock.lock()) {
@@ -231,8 +235,10 @@ bool LocalDatabase::addPayload(const std::string& name, const std::string& fileN
   int revision = 1;
   while (FileSystem::fileExists(payloadFileName(m_payloadDir, name, revision))) revision++;
 
+  // resolve all symbolic links to make sure we point to the real file
+  boost::filesystem::path resolved = boost::filesystem::canonical(fileName);
   // copy payload file to payload directory and rename it to follow the file name convention
-  boost::filesystem::copy(fileName, payloadFileName(m_payloadDir, name, revision));
+  boost::filesystem::copy(resolved, payloadFileName(m_payloadDir, name, revision));
 
   // add to database and update database file
   m_database[name].push_back(make_pair(revision, iov));

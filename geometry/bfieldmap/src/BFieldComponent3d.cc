@@ -48,17 +48,17 @@ void BFieldComponent3d::initialize()
   if ((m_exRegionR[0] == m_exRegionR[1]) || (m_exRegionZ[0] == m_exRegionZ[1])) m_exRegion = false;
 
   // Print initial input parameters
-  B2INFO("BField3d:: initial input parameters");
-  B2INFO(Form("   map filename:          %s",                   m_mapFilename.c_str()));
-  B2INFO(Form("   map dimension:         %s",                   m_mapEnable.c_str()));
-  if (m_interpolate) { B2INFO(Form("   map interpolation:     on")); }
-  else               { B2INFO(Form("   map interpolation:     off")); }
-  B2INFO(Form("   map r pitch & range:   %.2e [%.2e, %.2e] cm", m_gridPitch[0], m_mapRegionR[0], m_mapRegionR[1]));
-  B2INFO(Form("   map phi pitch:         %.2e deg",             m_gridPitch[1] * 180 / M_PI));
-  B2INFO(Form("   map z pitch & range:   %.2e [%.2e, %.2e] cm", m_gridPitch[2], m_mapRegionZ[0], m_mapRegionZ[1]));
+  B2DEBUG(100, "BField3d:: initial input parameters");
+  B2DEBUG(100, Form("   map filename:          %s",                   m_mapFilename.c_str()));
+  B2DEBUG(100, Form("   map dimension:         %s",                   m_mapEnable.c_str()));
+  if (m_interpolate) { B2DEBUG(100, Form("   map interpolation:     on")); }
+  else               { B2DEBUG(100, Form("   map interpolation:     off")); }
+  B2DEBUG(100, Form("   map r pitch & range:   %.2e [%.2e, %.2e] cm", m_gridPitch[0], m_mapRegionR[0], m_mapRegionR[1]));
+  B2DEBUG(100, Form("   map phi pitch:         %.2e deg",             m_gridPitch[1] * 180 / M_PI));
+  B2DEBUG(100, Form("   map z pitch & range:   %.2e [%.2e, %.2e] cm", m_gridPitch[2], m_mapRegionZ[0], m_mapRegionZ[1]));
   if (m_exRegion) {
-    B2INFO(Form("   map r excluded region: [%.2e, %.2e] cm",    m_exRegionR[0], m_exRegionR[1]));
-    B2INFO(Form("   map z excluded region: [%.2e, %.2e] cm",    m_exRegionZ[0], m_exRegionZ[1]));
+    B2DEBUG(100, Form("   map r excluded region: [%.2e, %.2e] cm",    m_exRegionR[0], m_exRegionR[1]));
+    B2DEBUG(100, Form("   map z excluded region: [%.2e, %.2e] cm",    m_exRegionZ[0], m_exRegionZ[1]));
   }
 
   m_bmap.reserve(m_mapSize[0]*m_mapSize[1]*m_mapSize[2]);
@@ -105,10 +105,10 @@ void BFieldComponent3d::initialize()
   m_igridPitch[1] = 1 / m_gridPitch[1];
   m_igridPitch[2] = 1 / m_gridPitch[2];
 
-  B2INFO(Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
-              m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
-              m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
-  B2INFO("Memory consumption: " << m_bmap.size()*sizeof(B2Vector3F) / (1024 * 1024.) << " Mb");
+  B2DEBUG(100, Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
+                    m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
+                    m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
+  B2DEBUG(100, "Memory consumption: " << m_bmap.size()*sizeof(B2Vector3F) / (1024 * 1024.) << " Mb");
 }
 
 namespace {
@@ -127,7 +127,7 @@ namespace {
    * @param y Value representing the proportion of the y-coordinate.
    * @param x Value representing the proportion of the x-coordinate.
    */
-  template<int ORDER = 4> /* in c++14: constexpr */ double fast_atan2_minimax(double y, double x)
+  template<int ORDER = 4> constexpr double fast_atan2_minimax(double y, double x)
   {
     static_assert(ORDER >= 1 && ORDER <= 6, "fast_atan2_minimax: Only orders 1-6 are supported");
     constexpr double pi4 = M_PI / 4, pi2 = M_PI / 2;
@@ -261,16 +261,19 @@ B2Vector3D BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, un
   const unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
   const unsigned int strideR = m_mapSize[1];
 
-  double wz0 = 1 - wz1, wr0 = 1 - wr1, wphi0 = 1 - wphi1;
-  unsigned int j000 = iz * strideZ + ir * strideR + iphi;
-  unsigned int j001 = j000 + 1;
-  unsigned int j010 = j000 + strideR;
-  unsigned int j011 = j001 + strideR;
-  unsigned int j100 = j000 + strideZ;
-  unsigned int j101 = j001 + strideZ;
-  unsigned int j110 = j010 + strideZ;
-  unsigned int j111 = j011 + strideZ;
-  double w00 = wphi0 * wr0, w10 = wphi0 * wr1, w01 = wphi1 * wr0, w11 = wphi1 * wr1;
+  const double wz0 = 1 - wz1, wr0 = 1 - wr1, wphi0 = 1 - wphi1;
+  const unsigned int j000 = iz * strideZ + ir * strideR + iphi;
+  const unsigned int j001 = j000 + 1;
+  const unsigned int j010 = j000 + strideR;
+  const unsigned int j011 = j001 + strideR;
+  const unsigned int j100 = j000 + strideZ;
+  const unsigned int j101 = j001 + strideZ;
+  const unsigned int j110 = j010 + strideZ;
+  const unsigned int j111 = j011 + strideZ;
+  const double w00 = wphi0 * wr0;
+  const double w10 = wphi0 * wr1;
+  const double w01 = wphi1 * wr0;
+  const double w11 = wphi1 * wr1;
   const vector<B2Vector3F>& B = m_bmap;
   return
     (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +

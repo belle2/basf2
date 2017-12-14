@@ -1,12 +1,17 @@
-'''
+"""
 File summarizing all default generator settings.
 More information: BELLE2-NOTE-PH-2015-006
 Contact: Torben Ferber (ferber@physics.ubc.ca)
-'''
+"""
 
 from basf2 import *
 from ROOT import Belle2
 import os
+
+
+def get_default_decayfile():
+    """Return the default DECAY.dec for Belle2"""
+    return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
 
 
 def add_aafh_generator(path, finalstate='', preselection=False):
@@ -26,10 +31,11 @@ def add_aafh_generator(path, finalstate='', preselection=False):
         pass
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
-        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
+        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00,
+                                    6.512e+00]
         aafh_maxSubgeneratorWeight = 1.0
     else:
-        B2FATAL("add_aafh_generator final state not supported: ", finalstate)
+        B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
 
     aafh = path.add_module(
         'AafhInput',
@@ -80,7 +86,7 @@ def add_kkmc_generator(path, finalstate=''):
         kkmc_logfile = 'kkmc_mumu.txt'
         kkmc_tauconfigfile = ''
     else:
-        B2FATAL("add_kkmc_generator final state not supported: ", finalstate)
+        B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
 
     # use KKMC to generate lepton pairs
     kkgeninput = path.add_module(
@@ -103,7 +109,7 @@ def add_evtgen_generator(path, finalstate=''):
     elif finalstate == 'mixed':
         evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
     else:
-        B2FATAL("add_evtgen_generator final state not supported: ", finalstate)
+        B2FATAL("add_evtgen_generator final state not supported: {}".format(finalstate))
 
     # use EvtGen
     evtgen = path.add_module(
@@ -112,7 +118,7 @@ def add_evtgen_generator(path, finalstate=''):
     )
 
 
-def add_continuum_generator(path, finalstate=''):
+def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenparticledata=0):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
@@ -130,6 +136,11 @@ def add_continuum_generator(path, finalstate=''):
 
     #: user decay file
     decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+    if userdecfile == '':
+        pass
+    else:
+        B2INFO('Replacing default user decfile: ', userdecfile)
+        decay_user = userdecfile
 
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
@@ -150,7 +161,7 @@ def add_continuum_generator(path, finalstate=''):
         pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
         kkmc_logfile = 'kkmc_ccbar.txt'
     else:
-        B2FATAL("add_continuum_generator final state not supported: ", finalstate)
+        B2FATAL("add_continuum_generator final state not supported: {}".format(finalstate))
 
     # use KKMC to generate qqbar events (no fragmentation at this stage)
     kkgeninput = path.add_module(
@@ -170,6 +181,7 @@ def add_continuum_generator(path, finalstate=''):
         UseEvtGen=1,
         DecFile=decay_file,
         UserDecFile=decay_user,
+        useEvtGenParticleData=useevtgenparticledata
     )
 
     # branch to an empty path if PYTHIA failed, this will change the number of events
@@ -200,7 +212,7 @@ def add_babayaganlo_generator(path, finalstate=''):
         babayaganlo.param('FMax', 1.e4)
 
     else:
-        B2FATAL("add_babayaganlo_generator final state not supported: ", finalstate)
+        B2FATAL("add_babayaganlo_generator final state not supported: {}".format(finalstate))
 
 
 def add_phokhara_generator(path, finalstate=''):
@@ -230,41 +242,63 @@ def add_phokhara_generator(path, finalstate=''):
         phokhara.param('NLO', 0)  # no two loop corrections
         phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
     else:
-        B2FATAL("add_phokhara_generator final state not supported: ", finalstate)
+        B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
 
 
-def add_cosmics_generator(path, components=None, global_box_size=None, accept_box=None,
-                          keep_box=None,
+def add_cosmics_generator(path, components=None,
+                          global_box_size=None, accept_box=None, keep_box=None,
                           geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
-                          setup_file='simulation/scripts/cry.setup'):
+                          setup_file='generators/scripts/cry.setup',
+                          data_taking_period='gcr2017', top_in_counter=False):
     """
     Add the cosmics generator CRY with the default parameters to the path.
     :param path: Add the modules to this path.
+
+    :param data_taking_period: The cosmics generation will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+
     :param components: list of geometry components to add in the geometry module,
            or None for all components.
     :param global_box_size: sets global length, width and height.
     :param accept_box: sets the size of the accept box. As a default it is
-           set to 8.0 m as Belle2 detector size.
+           set to 8.0 m = the Belle2 detector size.
     :param keep_box: sets the size of the keep box (keep box >= accept box).
     :param geometry_xml_file: Name of the xml file to use for the geometry.
+
     :param cosmics_data_dir: parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
     :param setup_file: location of the cry.setup file (absolute or relative to the basf2 repo)
+
+
+    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
+           (assuming PMT is put at -z of the counter).
+
+    Please remember to also change the reconstruction accordingly, if you set "special" parameters here!
     """
+    import cdc.cr as cosmics_setup
+
     if global_box_size is None:
-        global_box_size = [20, 20, 9]
+        global_box_size = [100, 100, 100]
     if accept_box is None:
         accept_box = [8, 8, 8]
     if keep_box is None:
         keep_box = [8, 8, 8]
 
+    cosmics_setup.set_cdc_cr_parameters(data_taking_period)
+
+    if cosmics_setup.cosmics_period == "201607":
+        B2FATAL("The data taking period 201607 is very special (geometry setup, PMTs etc). This is not handled "
+                "by this script! Please ask the CDC group, if you want to simulate this.")
+
     if 'Gearbox' not in path:
-        path.add_module('Gearbox', override=[
-            ("/Global/length", str(global_box_size[0]), "m"),
-            ("/Global/width", str(global_box_size[1]), "m"),
-            ("/Global/height", str(global_box_size[2]), "m")],
-            fileName=geometry_xml_file,
-        )
+        override = [("/Global/length", str(global_box_size[0]), "m"),
+                    ("/Global/width", str(global_box_size[1]), "m"),
+                    ("/Global/height", str(global_box_size[2]), "m")]
+
+        if cosmics_setup.globalPhi:
+            override += [("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(cosmics_setup.globalPhi), "deg")]
+
+        path.add_module('Gearbox', override=override, fileName=geometry_xml_file,)
 
     # detector geometry
     if 'Geometry' not in path:
@@ -294,3 +328,24 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
 
     # minimal kinetic energy - all particles below that energy are ignored
     cry.param('kineticEnergyThreshold', 0.01)
+
+    # TODO: I still do not fully understand, when the cosmics selector is needed and when not
+    if cosmics_setup.cosmics_period not in ["normal", "gcr2017"]:
+        # Selector module.
+        cosmics_selector = register_module('CDCCosmicSelector',
+                                           lOfCounter=cosmics_setup.lengthOfCounter,
+                                           wOfCounter=cosmics_setup.widthOfCounter,
+                                           xOfCounter=cosmics_setup.triggerPos[0],
+                                           yOfCounter=cosmics_setup.triggerPos[1],
+                                           zOfCounter=cosmics_setup.triggerPos[2],
+                                           phiOfCounter=0.,
+                                           TOP=top_in_counter,
+                                           propSpeed=cosmics_setup.lightPropSpeed,
+                                           TOF=1,
+                                           cryGenerator=True
+                                           )
+
+        path.add_module(cosmics_selector)
+
+        empty_path = create_path()
+        cosmics_selector.if_false(empty_path)

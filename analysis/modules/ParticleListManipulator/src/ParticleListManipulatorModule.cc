@@ -89,7 +89,7 @@ namespace Belle2 {
       } else if (!m_decaydescriptor.init(listName)) {
         B2ERROR("Invalid input ParticleList name: " << listName);
       } else {
-        StoreObjPtr<ParticleList>::required(listName);
+        StoreObjPtr<ParticleList>().isRequired(listName);
       }
     }
 
@@ -150,8 +150,8 @@ namespace Belle2 {
       fsParticles.insert(fsParticles.end(), scParticles.begin(), scParticles.end());
       fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
 
-      for (unsigned i = 0; i < fsParticles.size(); i++) {
-        const Particle* part = particles[fsParticles[i]];
+      for (unsigned j = 0; j < fsParticles.size(); j++) {
+        const Particle* part = particles[fsParticles[j]];
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(part, idSeq);

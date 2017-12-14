@@ -1,4 +1,4 @@
-#/**************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
@@ -9,10 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
+    class CDCObservations2D;
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
     class RiemannsMethod  {

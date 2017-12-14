@@ -11,13 +11,8 @@
 #include <bklm/modules/bklmK0LReconstructor/BKLMK0LReconstructorModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
-
-#include <bklm/dataobjects/BKLMHit2d.h>
-
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <cmath>
 
@@ -53,13 +48,11 @@ BKLMK0LReconstructorModule::~BKLMK0LReconstructorModule()
 
 void BKLMK0LReconstructorModule::initialize()
 {
-  StoreArray<BKLMHit2d>::required();
+  hit2ds.isRequired();
 
   // Force creation and persistence of output datastore and relation
-  StoreArray<KLMCluster> klmCluster;
-  klmCluster.registerInDataStore();
-  StoreArray<BKLMHit2d> bklmHit2d;
-  klmCluster.registerRelationTo(bklmHit2d);
+  klmClusters.registerInDataStore();
+  klmClusters.registerRelationTo(hit2ds);
 
   m_KaonMassSq = Const::Klong.getMass() * Const::Klong.getMass();
   m_MaxHitConeAngle = m_MaxHitConeAngle * M_PI / 180.0;
@@ -77,7 +70,6 @@ void BKLMK0LReconstructorModule::event()
 
   // Construct clusters from StoreArray<BKLMHit2d>
 
-  StoreArray<BKLMHit2d> hit2ds;
   std::vector<std::vector<int> > clusterIndices;
   for (int i = 0; i < hit2ds.getEntries(); ++i) {
     if (hit2ds[i]->isOutOfTime()) continue;
@@ -96,7 +88,7 @@ AddedToExistingCluster: ;
 
   // Fill StoreArray<KLMCluster> and find matching ECLClusters
 
-  StoreArray<KLMCluster> klmClusters;
+  // klmClusters.clear();
   for (unsigned int j = 0; j < clusterIndices.size(); ++j) {
     int layers[NLAYER + 1] = { 0 };
     unsigned int nHits = clusterIndices[j].size();

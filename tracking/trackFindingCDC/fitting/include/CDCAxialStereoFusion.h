@@ -10,13 +10,16 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
+    class CDCSegment3D;
+    class CDCSegment2D;
+    class CDCTrajectory3D;
+    class CDCTrajectory2D;
 
     /**
      * Utility class implementing the Kalmanesk combination of to two dimensional
@@ -69,8 +72,8 @@ namespace Belle2 {
        *  Calculate the ambiguity of the helix parameters relative to the three circle
        *  parameters given the hit content of the segment and their stereo displacement.
        */
-      JacobianMatrix<3, 5> calcAmbiguity(const CDCSegment3D& segment3D,
-                                         const CDCTrajectory2D& trajectory2D);
+      PerigeeHelixAmbiguity calcAmbiguity(const CDCSegment3D& segment3D,
+                                          const CDCTrajectory2D& trajectory2D);
 
 
     private:

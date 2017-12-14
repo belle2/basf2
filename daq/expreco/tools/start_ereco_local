@@ -1,0 +1,18 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+
+from erecoutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+if argc<=1:
+    print "Usage : start_ereco_local config_name"
+    sys.exit()
+    
+start_ereco_local ( argvs[1] )
+
+

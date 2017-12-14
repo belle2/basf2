@@ -20,7 +20,7 @@ namespace Belle2 {
   /**
    * Class to store raw IRS waveforms.
    * IRS3B: http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format
-   * IRSX: https://belle2.cc.kek.jp/~twiki/pub/Detector/TOP/Module01Firmware/data_format_v1_5.xlsx
+   * IRSX: https://confluence.desy.de/download/attachments/34035431/data_format_v2_0.xlsx
    */
   class TOPRawWaveform : public RelationsObject {
   public:
@@ -43,7 +43,7 @@ namespace Belle2 {
       short vPeak = 0;    /**< ADC value at samplePeak */
       short vFall0 = 0;   /**< ADC value at sampleFall */
       short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
-      short integral = 0; /**< integral of a pulse (e.g. \propto charge) */
+      int integral = 0;   /**< integral of a pulse (e.g. \propto charge) */
     };
 
 
@@ -259,6 +259,15 @@ namespace Belle2 {
       }
       return true;
     }
+
+    /**
+     * Returns integral of a peak
+     * @param sampleRise sample number just before 50% CFD crossing at leading edge
+     * @param samplePeak sample number at maximum
+     * @param sampleFall sample number just before 50% CFD crossing at falling edge
+     * @return integral
+     */
+    int getIntegral(int sampleRise, int samplePeak, int sampleFall) const;
 
     /**
      * Do feature extraction

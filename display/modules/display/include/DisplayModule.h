@@ -79,6 +79,12 @@ namespace Belle2 {
     /** If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero). */
     bool m_showCDCHits;
 
+    /** If true, CDCHit objects will be assigned to trigger segments and trigger tracks will be shown. */
+    bool m_showTriggerObjects;
+
+    /** If true, BKLMHit objects will be shown in the display. */
+    bool m_showBKLM2dHits;
+
     /** If true, ARICHHit objects will be shown as squares, corresponding to channel pixels */
     bool m_showARICHHits;
 

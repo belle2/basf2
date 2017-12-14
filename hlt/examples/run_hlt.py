@@ -10,17 +10,16 @@ import basf2
 from simulation import add_simulation
 import os
 
-from rawdata import add_raw_seqoutput
+from rawdata import add_raw_seqoutput, add_unpackers
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
-    add_unpackers,
     add_softwaretrigger_reconstruction,
     DEFAULT_HLT_COMPONENTS,
 )
 
 # Create a path to generate some raw-data samples and then use the software trigger path(s) to reconstruct them.
-setup_softwaretrigger_database_access()
+# setup_softwaretrigger_database_access()
 
 # You could use your own components here or just use the default for the HLT (everything except PXD)
 # e.g. without SVD
@@ -35,7 +34,7 @@ main_path.add_module("SeqRootInput")
 add_unpackers(main_path, components=components)
 add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1, components=components)
 
-add_raw_seqoutput(main_path, additionalObjects=["SoftwareTriggerResults", "SoftwareTriggerVariables"])
+add_raw_seqoutput(main_path, additionalObjects=["SoftwareTriggerResults", "SoftwareTriggerVariables", "ROIs"])
 
 basf2.print_path(main_path)
 basf2.process(main_path)

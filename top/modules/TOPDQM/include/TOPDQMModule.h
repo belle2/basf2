@@ -25,6 +25,11 @@
 #include "TH2F.h"
 #include "TProfile.h"
 
+// dataobject classes
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <mdst/dataobjects/Track.h>
+
 namespace Belle2 {
 
   /**
@@ -101,6 +106,10 @@ namespace Belle2 {
 
     // other
     int m_numModules = 0; /**< number of TOP modules */
+
+    // dataobjects
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    StoreArray<Track> m_tracks;    /**< collection of tracks */
 
   };
 

@@ -1,0 +1,17 @@
+#
+# Login to Belle II Run control
+#
+
+hostname : 130.87.227.249
+port : 9090
+nsmhost : 172.22.32.11
+nsmport : 8122
+nsmnode : RC_GUI3
+nsmtarget : RUNCONTROL
+data00.dataname : RUNCONTROL_STATUS
+data00.format : rc_status
+data00.revision : 4
+
+#
+#
+#

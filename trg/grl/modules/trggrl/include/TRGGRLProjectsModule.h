@@ -34,7 +34,7 @@ namespace Belle2 {
 //  TRGGRLProjectsModule(const std::string & type);
 
     /// Destructor
-    virtual ~TRGGRLProjectsModule();
+    virtual ~TRGGRLProjectsModule() {};
 
     /// Initilizes TRGGRLProjectsModule.
     virtual void initialize();
@@ -55,12 +55,15 @@ namespace Belle2 {
   public:
 
     /// returns version of TRGGRLProjectsModule.
-    std::string version(void) const;
+    //std::string version(void) const;
 
   private: // Parameters
 
     /// Debug level.
     int _debugLevel;
+
+    /**choose the corresponding trigger menu of Belle2 phase*/
+    std::string m_belle2phase;
 
     /// Config. file name.
     std::string m_configFilename;

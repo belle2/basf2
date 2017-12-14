@@ -17,7 +17,7 @@ if __name__ == "__main__":
                  'daughter(0, dr)', 'daughter(1, dr)',
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
     # Train a MVA method and directly upload it to the database
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     xgboost_options.m_config = param
 
     stats = []
-    test_data = ["test.root"] * 10
+    test_data = ["validation.root"]
     for label, options in [("DataLoading", data_options), ("FastBDT", fastbdt_options), ("FANN", fann_options),
                            ("TMVA-BDT", tmva_bdt_options), ("TMVA-NN", tmva_nn_options),
                            ("SKLearn-BDT", sklearn_bdt_options), ("XGBoost", xgboost_options), ("Trivial", trivial_options)]:

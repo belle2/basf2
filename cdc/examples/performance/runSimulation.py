@@ -14,10 +14,14 @@ st: Stream ID
 from basf2 import *
 from ROOT import Belle2
 import datetime
-from tracking import add_cdc_cr_track_finding
+from generators import add_cosmics_generator
+from simulation import add_simulation
+
 import os.path
 import sys
-from cdc.cr import *
+from cdc.cr import getDataPeriod, getTriggerType, getMapperAngle
+from cdc.cr import add_cdc_cr_simulation
+from cdc.cr import add_GCR_Trigger_simulation
 
 
 # Set the global log level
@@ -27,19 +31,20 @@ set_log_level(LogLevel.INFO)
 reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_central_database("cdc_cr_test1", LogLevel.WARNING)
+# use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
+# For GCR, July and August 2017.
+use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
-def main(exp, run, evt, st):
-    '''
+def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=False):
+    """
     exp : Experimental number
     run : Run number
     evt : Number of events to be generated
     st : stream ID
-    '''
+    """
 
     main_path = create_path()
-    emptyPath = create_path()
 
     main_path.add_module('EventInfoSetter',
                          expList=[int(exp)],
@@ -48,25 +53,41 @@ def main(exp, run, evt, st):
 
     main_path.add_module('Progress')
 
-    period = getDataPeriod(int(run))
-    set_cdc_cr_parameters(period)
+    period = getDataPeriod(exp=int(exp),
+                           run=int(run))
 
-    phi = getPhiRotation()
+    mapperAngle = getMapperAngle(exp=int(exp),
+                                 run=int(run))
 
-    gearbox = register_module('Gearbox',
-                              override=[
-                                  ("/Global/length", "8.", "m"),
-                                  ("/Global/width", "8.", "m"),
-                                  ("/Global/height", "1.5", "m"),
-                                  ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(phi), "deg"),
-                              ])
-    main_path.add_module(gearbox)
+    triggerType = getTriggerType(exp=int(exp),
+                                 run=int(run))
 
-    main_path.add_module('Geometry',
-                         components=['CDC']
-                         )
+    if fieldMapper is True:
+        main_path.add_module('CDCJobCntlParModifier',
+                             MapperGeometry=True,
+                             MapperPhiAngle=mapperAngle)
 
-    add_cdc_cr_simulation(main_path, emptyPath)
+    components = ['CDC', 'ECL', 'MagneticField'] if magneticField is True else ['CDC', 'ECL']
+
+    add_cosmics_generator(path=main_path,
+                          components=components,
+                          global_box_size=[8, 8, 8],
+                          accept_box=[0.7, 0.3, 0.3],  # LWH
+                          keep_box=[0.7, 0.3, 0.3],
+                          cosmics_data_dir='data/generators/modules/cryinput/',
+                          setup_file='./cry.setup',
+                          data_taking_period=period,
+                          top_in_counter=topInCounter)
+
+    # add_simulation(main_path)
+    add_cdc_cr_simulation(main_path, components=components)
+
+    if triggerType is not None:
+        add_GCR_Trigger_simulation(main_path,
+                                   backToBack=True if triggerType == 'b2b' else False,
+                                   skipEcl=True)
+    else:
+        B2INFO('skip tsim')
 
     output = register_module('RootOutput',
                              outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
@@ -74,6 +95,7 @@ def main(exp, run, evt, st):
     print_path(main_path)
     process(main_path)
     print(statistics)
+
 
 if __name__ == "__main__":
 
@@ -85,4 +107,4 @@ if __name__ == "__main__":
     parser.add_argument('st', help='Stream ID')
 
     args = parser.parse_args()
-    main(args.exp, args.run, args.evt, args.st)
+    sim(args.exp, args.run, args.evt, args.st, topInCounter=False, magneticField=True, fieldMapper=True)

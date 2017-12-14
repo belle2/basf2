@@ -86,6 +86,11 @@ namespace Belle2 {
                        std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
+       * Set threshold.
+       */
+      void setThreshold(double threshold);
+
+      /**
        * Generate photoelectrons.
        * @param[in]     stripLen    Strip length.
        * @param[in]     distSiPM    Distance from hit to SiPM.
@@ -169,6 +174,9 @@ namespace Belle2 {
 
       /** Name of the strip. */
       std::string m_stripName;
+
+      /** Threshold. */
+      double m_Threshold;
 
       /**
        * Reallocate photoelectron buffers.

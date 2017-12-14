@@ -25,6 +25,8 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
@@ -149,6 +151,11 @@ EVEVisualization::EVEVisualization():
   m_gftrackpropagator->SetMagFieldObj(m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.5); //stop after track markers
 
+  m_consttrackpropagator = new TEveTrackPropagator();
+  m_consttrackpropagator->IncDenyDestroy();
+  m_consttrackpropagator->SetMagField(0, 0, -1.5);
+  m_consttrackpropagator->SetMaxR(EveGeometry::getMaxR());
+
   m_calo3d = new TEveCalo3D(NULL, "ECLClusters");
   m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
   m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
@@ -179,6 +186,7 @@ EVEVisualization::~EVEVisualization()
   destroyEveElement(m_tracklist);
   destroyEveElement(m_trackpropagator);
   destroyEveElement(m_gftrackpropagator);
+  destroyEveElement(m_consttrackpropagator);
   destroyEveElement(m_calo3d);
   delete m_bfield;
 }
@@ -242,9 +250,49 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
   addObject(&recoTrack, track_lines);
 }
 
+void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
+                                          const CDCTriggerTrack& trgTrack)
+{
+  const TString label = ObjectInfo::getIdentifier(&trgTrack);
+
+  TVector3 track_pos = TVector3(0, 0, trgTrack.getZ0());
+  TVector3 track_mom = (trgTrack.getChargeSign() == 0) ?
+                       trgTrack.getDirection() * 1000 :
+                       trgTrack.getMomentum(1.5);
+
+  TEveRecTrack rectrack;
+  rectrack.fP.Set(track_mom);
+  rectrack.fV.Set(track_pos);
+
+  TEveTrack* track_lines = new TEveTrack(&rectrack, m_consttrackpropagator);
+  track_lines->SetName(label); //popup label set at end of function
+  track_lines->SetPropagator(m_consttrackpropagator);
+  track_lines->SetLineColor(kOrange + 2);
+  track_lines->SetLineWidth(1);
+  track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack) +
+                        TString::Format("\ncharge: %d, phi: %.2fdeg, pt: %.2fGeV, theta: %.2fdeg, z: %.2fcm",
+                                        trgTrack.getChargeSign(),
+                                        trgTrack.getPhi0() * 180 / M_PI,
+                                        trgTrack.getTransverseMomentum(1.5),
+                                        trgTrack.getDirection().Theta() * 180 / M_PI,
+                                        trgTrack.getZ0()));
+
+
+  track_lines->SetCharge(trgTrack.getChargeSign());
+
+  // show 2D tracks with dashed lines
+  if (trgTrack.getZ0() == 0 && trgTrack.getCotTheta() == 0)
+    track_lines->SetLineStyle(2);
+
+  addToGroup(collectionName, track_lines);
+  addObject(&trgTrack, track_lines);
+}
+
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 {
-  const TrackFitResult* fitResult = belle2Track->getTrackFitResult(Const::pion);
+  // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+  // the tracking will not always successfully fit with a pion hypothesis
+  const TrackFitResult* fitResult = belle2Track->getTrackFitResultWithClosestMass(Const::pion);
   if (!fitResult) {
     B2ERROR("Track without TrackFitResult skipped.");
     return;
@@ -852,28 +900,28 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
       // get eigenvalues & -vectors
       {
         TMatrixDSymEigen eigen_values2(cov.GetSub(0, 2, 0, 2));
-        const TVectorD& ev = eigen_values2.GetEigenValues();
-        const TMatrixD& eVec = eigen_values2.GetEigenVectors();
+        const TVectorD& eVal = eigen_values2.GetEigenValues();
+        const TMatrixD& eVect = eigen_values2.GetEigenVectors();
         // limit
-        ev0 = std::min(ev(0), maxErr);
-        ev1 = std::min(ev(1), maxErr);
-        ev2 = std::min(ev(2), maxErr);
+        ev0 = std::min(eVal(0), maxErr);
+        ev1 = std::min(eVal(1), maxErr);
+        ev2 = std::min(eVal(2), maxErr);
 
         // get two largest eigenvalues/-vectors
         if (ev0 < ev1 && ev0 < ev2) {
-          eVec1.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+          eVec1.SetXYZ(eVect(0, 1), eVect(1, 1), eVect(2, 1));
           eVec1 *= sqrt(ev1);
-          eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+          eVec2.SetXYZ(eVect(0, 2), eVect(1, 2), eVect(2, 2));
           eVec2 *= sqrt(ev2);
         } else if (ev1 < ev0 && ev1 < ev2) {
-          eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+          eVec1.SetXYZ(eVect(0, 0), eVect(1, 0), eVect(2, 0));
           eVec1 *= sqrt(ev0);
-          eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+          eVec2.SetXYZ(eVect(0, 2), eVect(1, 2), eVect(2, 2));
           eVec2 *= sqrt(ev2);
         } else {
-          eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+          eVec1.SetXYZ(eVect(0, 0), eVect(1, 0), eVect(2, 0));
           eVec1 *= sqrt(ev0);
-          eVec2.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+          eVec2.SetXYZ(eVect(0, 1), eVect(1, 1), eVect(2, 1));
         } eVec2 *= sqrt(ev1);
       }
 
@@ -1008,15 +1056,15 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       //This will force the track propagation to visit all points in order but
       //provide smooth helix interpolation between the points
       const MCParticleTrajectory& trajectory = dynamic_cast<const MCParticleTrajectory&>(*rel.object);
-      for (const MCTrajectoryPoint& p : trajectory) {
+      for (const MCTrajectoryPoint& pt : trajectory) {
         m_mcparticleTracks[particle].track->AddPathMark(
           TEvePathMark(
             //Add the last trajectory point as decay point to prevent TEve to
             //propagate beyond the end of the track. So lets compare the adress
             //to the address of last point and choose the pathmark accordingly
-            (&p == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
-            TEveVector(p.x, p.y, p.z),
-            TEveVector(p.px, p.py, p.pz)
+            (&pt == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
+            TEveVector(pt.x, pt.y, pt.z),
+            TEveVector(pt.px, pt.py, pt.pz)
           ));
       }
       //"There can only be One" -> found a trajectory, stop the loop
@@ -1146,6 +1194,8 @@ void EVEVisualization::makeTracks()
       m_gftrackpropagator->RefFVAtt() = m;
     }
   }
+
+  m_consttrackpropagator->SetMagField(0, 0, -1.5);
 
   m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclData->Empty()) {
@@ -1341,6 +1391,49 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
   }
 }
 
+void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
+{
+  //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
+  bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
+  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->isForward(), bklm2dhit->getSector(), bklm2dhit->getLayer());
+
+  CLHEP::Hep3Vector global;
+  //+++ global coordinates of the hit
+  global[0] = bklm2dhit->getGlobalPosition()[0];
+  global[1] = bklm2dhit->getGlobalPosition()[1];
+  global[2] = bklm2dhit->getGlobalPosition()[2];
+
+  //+++ local coordinates of the hit
+  CLHEP::Hep3Vector local = module->globalToLocal(global);
+  //double localU = local[1]; //phi
+  //double localV = local[2]; //z
+  int Nphistrip = bklm2dhit->getPhiStripMax() - bklm2dhit->getPhiStripMin() + 1;
+  int Nztrip = bklm2dhit->getZStripMax() - bklm2dhit->getZStripMin() + 1;
+  double du = module->getPhiStripWidth() * Nphistrip;
+  double dv = module->getZStripWidth() * Nztrip;
+
+  //Let's do some simple thing
+  CLHEP::Hep3Vector localU(local[0], local[1] + 1.0, local[2]);
+  CLHEP::Hep3Vector localV(local[0], local[1], local[2] + 1.0);
+
+  CLHEP::Hep3Vector globalU = module->localToGlobal(localU);
+  CLHEP::Hep3Vector globalV = module->localToGlobal(localV);
+
+  TVector3 o(global[0], global[1], global[2]);
+  TVector3 u(globalU[0], globalU[1], globalU[2]);
+  TVector3 v(globalV[0], globalV[1], globalV[2]);
+
+  //Lest's just assign the depth is 1.0 cm (thickness of a layer), better to update
+  TEveBox* bklmbox = boxCreator(o, u - o, v - o, du, dv, 1.0);
+
+  bklmbox->SetMainColor(kGreen);
+  //bklmbox->SetName((std::to_string(hitModule)).c_str());
+  bklmbox->SetName("BKLMHit2d");
+
+  addToGroup("BKLM2dHits", bklmbox);
+  addObject(bklm2dhit, bklmbox);
+}
+
 void EVEVisualization::addROI(const ROIid* roi)
 {
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
@@ -1403,7 +1496,7 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 
 }
 
-void EVEVisualization::addCDCHit(const CDCHit* hit)
+void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
@@ -1437,10 +1530,23 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
   cov_shape->SetTransMatrix(det_trans);
 
+  // get relation to trigger track segments
+  bool isPartOfTS = false;
+  const auto segments = hit->getRelationsFrom<CDCTriggerSegmentHit>();
+  if (showTriggerHits && segments.size() > 0) {
+    isPartOfTS = true;
+  }
+
   if (hit->getISuperLayer() % 2 == 0) {
-    cov_shape->SetMainColor(kCyan);
+    if (isPartOfTS)
+      cov_shape->SetMainColor(kCyan + 3);
+    else
+      cov_shape->SetMainColor(kCyan);
   } else {
-    cov_shape->SetMainColor(kPink + 7);
+    if (isPartOfTS)
+      cov_shape->SetMainColor(kPink + 6);
+    else
+      cov_shape->SetMainColor(kPink + 7);
   }
 
   cov_shape->SetMainTransparency(50);
@@ -1450,6 +1556,103 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
 
   addToGroup("CDCHits", cov_shape);
   addObject(hit, cov_shape);
+  if (isPartOfTS) {
+    addToGroup("CDCTriggerSegmentHits", cov_shape);
+    for (auto rel : segments.relations()) {
+      addObject(rel.object, cov_shape);
+    }
+  }
+}
+
+void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
+{
+  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  TEveStraightLineSet* shape = new TEveStraightLineSet();
+
+  // get center wire
+  unsigned iL = WireID(hit->getID()).getICLayer();
+  if (hit->getPriorityPosition() < 3) iL -= 1;
+  unsigned nWires = cdcgeo.nWiresInLayer(iL);
+  unsigned iCenter = hit->getIWire();
+  if (hit->getPriorityPosition() == 1) iCenter += 1;
+
+  // a track segment consists of 11 wires (15 in SL0) in a special configuration
+  // -> get the shift with respect to the center wire (*) for all wires
+  // SL 1-8:
+  //  _ _ _
+  // |_|_|_|
+  //  |_|_|
+  //   |*|
+  //  |_|_|
+  // |_|_|_|
+  std::vector<int> layershift = { -2, -1, 0, 1, 2};
+  std::vector<std::vector<float>> cellshift = {
+    { -1, 0, 1},
+    { -0.5, 0.5},
+    { 0},
+    { -0.5, 0.5},
+    { -1, 0, 1}
+  };
+  // SL 0:
+  //  _ _ _ _ _
+  // |_|_|_|_|_|
+  //  |_|_|_|_|
+  //   |_|_|_|
+  //    |_|_|
+  //     |*|
+  if (hit->getISuperLayer() == 0) {
+    layershift = { 0, 1, 2, 3, 4};
+    cellshift = {
+      { 0},
+      { -0.5, 0.5},
+      { -1, 0, 1},
+      { -1.5, -0.5, 0.5, 1.5},
+      { -2, -1, 0, 1, 2}
+    };
+  }
+
+  // draw all cells in segment
+  for (unsigned il = 0; il < layershift.size(); ++il) {
+    for (unsigned ic = 0; ic < cellshift[il].size(); ++ic) {
+      TVector3 corners[2][2];
+      for (unsigned ir = 0; ir < 2; ++ir) {
+        double r = cdcgeo.fieldWireR(iL + layershift[il] - ir);
+        double fz = cdcgeo.fieldWireFZ(iL + layershift[il] - ir);
+        double bz = cdcgeo.fieldWireBZ(iL + layershift[il] - ir);
+        for (unsigned iphi = 0; iphi < 2; ++iphi) {
+          double phib = (iCenter + cellshift[il][ic] + iphi - 0.5) * 2 * M_PI / nWires;
+          double phif = phib + cdcgeo.nShifts(iL + layershift[il]) * M_PI / nWires;
+
+          TVector3 pos_f = TVector3(cos(phif) * r, sin(phif) * r, fz);
+          TVector3 pos_b = TVector3(cos(phib) * r, sin(phib) * r, bz);
+          TVector3 zaxis = pos_b - pos_f;
+          corners[ir][iphi] = pos_f - zaxis * (pos_f.z() / zaxis.z());
+        }
+      }
+
+      shape->AddLine(corners[0][0].x(), corners[0][0].y(), 0,
+                     corners[0][1].x(), corners[0][1].y(), 0);
+      shape->AddLine(corners[0][1].x(), corners[0][1].y(), 0,
+                     corners[1][1].x(), corners[1][1].y(), 0);
+      shape->AddLine(corners[1][1].x(), corners[1][1].y(), 0,
+                     corners[1][0].x(), corners[1][0].y(), 0);
+      shape->AddLine(corners[1][0].x(), corners[1][0].y(), 0,
+                     corners[0][0].x(), corners[0][0].y(), 0);
+    }
+  }
+
+  if (hit->getISuperLayer() % 2 == 0) {
+    shape->SetMainColor(kCyan + 3);
+  } else {
+    shape->SetMainColor(kPink + 6);
+  }
+
+  shape->SetName(ObjectInfo::getIdentifier(hit));
+  shape->SetTitle(ObjectInfo::getTitle(hit) +
+                  TString::Format("\nPriority: %d\nLeft/Right: %d",
+                                  hit->getPriorityPosition(), hit->getLeftRight()));
+  addToGroup("CDCTriggerSegmentHits", shape);
+  addObject(hit, shape);
 }
 
 void EVEVisualization::addARICHHit(const ARICHHit* hit)

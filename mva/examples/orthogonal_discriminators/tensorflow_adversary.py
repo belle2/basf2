@@ -37,37 +37,37 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             layer = unit(tf.matmul(x, weights) + biases)
         return layer
 
-    inference_hidden1 = layer(x, [number_of_features, number_of_features+1], 'inference_hidden1')
+    inference_hidden1 = layer(x, [number_of_features, number_of_features + 1], 'inference_hidden1')
     # inference_hidden2 = layer(inference_hidden1, [number_of_features+1, number_of_features+1], 'inference_hidden2')
     # inference_hidden3 = layer(inference_hidden2, [number_of_features+1, number_of_features+1], 'inference_hidden3')
     # inference_hidden4 = layer(inference_hidden3, [number_of_features+1, number_of_features+1], 'inference_hidden4')
-    inference_activation = layer(inference_hidden1, [number_of_features+1, 1], 'inference_sigmoid', unit=tf.sigmoid)
+    inference_activation = layer(inference_hidden1, [number_of_features + 1, 1], 'inference_sigmoid', unit=tf.sigmoid)
 
     epsilon = 1e-5
     inference_loss = -tf.reduce_sum(y * w * tf.log(inference_activation + epsilon) +
                                     (1.0 - y) * w * tf.log(1 - inference_activation + epsilon)) / tf.reduce_sum(w)
-    inference_loss = tf.reduce_sum((y-inference_activation)*(y-inference_activation))
+    inference_loss = tf.reduce_sum((y - inference_activation) * (y - inference_activation))
     for i in range(number_of_spectators):
         for c in ['signal', 'background']:
             z_single = tf.slice(z, [0, i], [-1, 1])
-            adversary_hidden1 = layer(inference_activation, [1, number_of_features+1],
+            adversary_hidden1 = layer(inference_activation, [1, number_of_features + 1],
                                       'adversary_hidden1_{}_{}'.format(i, c), unit=tf.tanh)
             # adversary_hidden2 = layer(adversary_hidden1, [number_of_features+1, number_of_features+1],
             #                           'adversary_hidden2_{}_{}'.format(i,c), unit=tf.nn.relu)
-            adversary_means = layer(adversary_hidden1, [number_of_features+1, 4],
+            adversary_means = layer(adversary_hidden1, [number_of_features + 1, 4],
                                     'adversary_means_{}_{}'.format(i, c), unit=tf.identity)
-            adversary_widths = layer(adversary_hidden1, [number_of_features+1, 4],
+            adversary_widths = layer(adversary_hidden1, [number_of_features + 1, 4],
                                      'adversary_width_{}_{}'.format(i, c), unit=tf.exp)
-            adversary_fractions_not_normed = layer(adversary_hidden1, [number_of_features+1, 4],
+            adversary_fractions_not_normed = layer(adversary_hidden1, [number_of_features + 1, 4],
                                                    'adversary_fractions_{}_{}'.format(i, c), unit=tf.identity)
             adversary_fractions = tf.nn.softmax(adversary_fractions_not_normed)
             adversary_activation = tf.reduce_sum(adversary_fractions *
                                                  tf.exp(-(adversary_means - z_single) * (adversary_means - z_single) /
-                                                        (2 * adversary_widths)))
+                                                        (2 * adversary_widths)) / tf.sqrt(2 * np.pi * adversary_widths), axis=1)
             if c == 'signal':
-                adversary_loss = -tf.reduce_sum(y * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum(y*w)
+                adversary_loss = -tf.reduce_sum(y * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum(y * w)
             else:
-                adversary_loss = -tf.reduce_sum((1-y) * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum((1-y)*w)
+                adversary_loss = -tf.reduce_sum((1 - y) * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum((1 - y) * w)
             tf.add_to_collection('adversary_losses', adversary_loss)
 
     if number_of_spectators > 0:
@@ -148,15 +148,30 @@ def partial_fit(state, X, S, y, w, epoch):
 
 
 if __name__ == "__main__":
-    variables = ['M', 'p', 'pt', 'pz',
-                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
-                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
-                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)',
-                 'chiProb', 'dr', 'dz',
-                 'daughter(0, dr)', 'daughter(1, dr)',
-                 'daughter(0, dz)', 'daughter(1, dz)',
+    variables = ['p', 'pt', 'pz', 'phi',
+                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
+                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',
+                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)', 'daughter(2, phi)',
+                 'chiProb', 'dr', 'dz', 'dphi',
+                 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, dz)', 'daughter(1, dz)',
+                 'daughter(0, dphi)', 'daughter(1, dphi)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)']
+                 'daughter(0, kaonID)', 'daughter(0, pionID)', 'daughter(1, kaonID)', 'daughter(1, pionID)',
+                 'daughterAngle(0, 1)', 'daughterAngle(0, 2)', 'daughterAngle(1, 2)',
+                 'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
+                 'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
+                 'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
+                 'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+                 'M']
+
+    variables2 = ['p', 'pt', 'pz', 'phi',
+                  'chiProb', 'dr', 'dz', 'dphi',
+                  'daughter(2, chiProb)',
+                  'daughter(0, kaonID)', 'daughter(0, pionID)', 'daughter(1, kaonID)', 'daughter(1, pionID)',
+                  'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
+                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
+                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
+                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))']
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
@@ -169,11 +184,17 @@ if __name__ == "__main__":
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/tensorflow_adversary.py'
-    specific_options.m_nIterations = 400
+    specific_options.m_normalize = True
+    specific_options.m_nIterations = 1000
     specific_options.m_mini_batch_size = 400
-    specific_options.m_config = '{"adversary_steps": 20, "learning_rate": 0.001, "lambda": 10}'
+    specific_options.m_config = '{"adversary_steps": 13, "learning_rate": 0.001, "lambda": 0.1}'
     basf2_mva.teacher(general_options, specific_options)
 
     general_options.m_identifier = "tensorflow_baseline"
+    specific_options.m_nIterations = 100
     specific_options.m_config = '{"adversary_steps": 1, "learning_rate": 0.001, "lambda": -1.0}'
+    basf2_mva.teacher(general_options, specific_options)
+
+    general_options.m_variables = basf2_mva.vector(*variables2)
+    general_options.m_identifier = "tensorflow_feature_drop"
     basf2_mva.teacher(general_options, specific_options)

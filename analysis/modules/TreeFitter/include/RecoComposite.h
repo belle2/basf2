@@ -23,6 +23,18 @@ namespace TreeFitter {
     RecoComposite(Belle2::Particle* bc, const ParticleBase* mother) ;
     virtual ~RecoComposite() ;
 
+    /** init particle in case it has a mother */
+    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    /** init particle in case it has no mother */
+    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    /** update chaed params */
+    void updateParams();
+    /** project this particle constraint  */
+    ErrCode projectRecoCompositeCopy(const FitParams& fitparams, Projection& p) const;
+    /** dimension of the measurement vector */
+    int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
+
+
     // the number of parameters
     virtual int dim() const { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
 
@@ -54,6 +66,10 @@ namespace TreeFitter {
   protected: // I hate this, so we need to change the design ...
     // cache
     CLHEP::HepVector m_m ;    // 'measurement' (x,y,z,px,py,pz,E)
+    /** column vector to store the measurement */
+    EigenTypes::ColVector m_params;
+    /** only lower triangle filled! */
+    EigenTypes::MatrixXd  m_covariance;
     CLHEP::HepSymMatrix m_matrixV ; // covariance in measurement
     bool m_hasEnergy ;
   } ;

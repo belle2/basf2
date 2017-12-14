@@ -9,7 +9,6 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 
@@ -38,11 +37,11 @@ namespace Belle2 {
       /// Type for a span in the Y direction that is covered by the tree
       using YSpan = std::array<AY, 2>;
 
-      /// Type to store the minimum, center and maximum of the bins in X direction
-      using XBinBounds = std::array<AX, 3>;
+      /// Type to store the minimum and maximum of the two bins in X direction
+      using XBinBounds = std::array<AX, 4>;
 
-      /// Type to store the minimum, center and maximum of the bins in Y direction
-      using YBinBounds = std::array<AY, 3>;
+      /// Type to store the minimum and maximum of the two bins in Y direction
+      using YBinBounds = std::array<AY, 4>;
 
       /// Type of the child node structure for this node.
       using Children = std::vector<This>;
@@ -55,8 +54,18 @@ namespace Belle2 {
        *  If somebody knows the suppression category please apply it here.
        */
       QuadTreeNode(XSpan xSpan, YSpan ySpan, int level, This* parent)
-        : m_xBinBounds( {xSpan[0], xSpan[0] + (xSpan[1] - xSpan[0]) / 2, xSpan[1]})
-      , m_yBinBounds({ySpan[0], ySpan[0] + (ySpan[1] - ySpan[0]) / 2, ySpan[1]})
+        : m_xBinBounds(
+      {
+        xSpan[0],
+              xSpan[0] + (xSpan[1] - xSpan[0]) / 2,
+              xSpan[1] - (xSpan[1] - xSpan[0]) / 2,
+              xSpan[1]
+      })
+      , m_yBinBounds({ySpan[0],
+                      ySpan[0] + (ySpan[1] - ySpan[0]) / 2,
+                      ySpan[1] - (ySpan[1] - ySpan[0]) / 2,
+                      ySpan[1]
+                     })
       , m_level(level)
       , m_parent(level > 0 ? parent : nullptr)
       , m_filled(false)
@@ -138,80 +147,79 @@ namespace Belle2 {
       /** Get number of bins in "Theta" direction */
       constexpr int getXNbins() const
       {
-        return m_xBinBounds.size() - 1;
+        return m_xBinBounds.size() / 2;
       }
 
       /** Get minimal "Theta" value of the node */
       AX getXMin() const
       {
-        return m_xBinBounds[0];
-      }
-
-      /** Get mean value of "Theta" */
-      AX getXMean() const
-      {
-        return m_xBinBounds[1];
+        return m_xBinBounds.front();
       }
 
       /** Get maximal "Theta" value of the node */
       AX getXMax() const
       {
-        return m_xBinBounds[2];
+        return m_xBinBounds.back();
       }
 
       /** Getter for the width of the iBin bin in "Theta" direction */
       AX getXBinWidth(int iBin)
       {
-        return std::abs(getXBinBound(iBin + 1) - getXBinBound(iBin));
+        return std::abs(getXUpperBound(iBin) - getXLowerBound(iBin));
       }
 
-      /** Get "Theta" value of given bin border */
-      AX getXBinBound(int iBin) const
+      /** Get lower "Theta" value of given bin */
+      AX getXLowerBound(int iBin) const
       {
-        return m_xBinBounds[iBin];
+        return m_xBinBounds[2 * iBin];
+      }
+
+      /** Get upper "Theta" value of given bin */
+      AX getXUpperBound(int iBin) const
+      {
+        return m_xBinBounds[2 * iBin + 1];
       }
 
       /** Get number of bins in "r" direction */
       constexpr int getYNbins() const
       {
-        return m_yBinBounds.size() - 1;
+        return m_yBinBounds.size() / 2;
       }
 
       /** Get minimal "r" value of the node */
       AY getYMin() const
       {
-        return m_yBinBounds[0];
-      }
-
-      /** Get mean value of "r" */
-      AY getYMean() const
-      {
-        return m_yBinBounds[1];
+        return m_yBinBounds.front();
       }
 
       /** Get maximal "r" value of the node */
       AY getYMax() const
       {
-        return m_yBinBounds[2];
+        return m_yBinBounds.back();
       }
 
       /** Getter for the width of the iBin bin in "r" direction */
       AY getYBinWidth(int iBin)
       {
-        return std::abs(getYBinBound(iBin + 1) - getYBinBound(iBin));
+        return std::abs(getYUpperBound(iBin) - getYLowerBound(iBin));
+      }
+      /** Get lower "r" value of given bin */
+      AY getYLowerBound(int iBin) const
+      {
+        return m_yBinBounds[2 * iBin];
       }
 
-      /** Get "r" value of given bin border */
-      AY getYBinBound(int iBin) const
+      /** Get upper "r" value of given bin */
+      AY getYUpperBound(int iBin) const
       {
-        return m_yBinBounds[iBin];
+        return m_yBinBounds[2 * iBin + 1];
       }
 
     private:
-      /// bins range on r
+      /// bins range on theta
       XBinBounds m_xBinBounds;
 
-      /// bins range on theta
+      /// bins range on r
       YBinBounds m_yBinBounds;
 
       /// Level of node in the tree

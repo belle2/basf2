@@ -112,8 +112,6 @@
 #include "CLHEP/Matrix/Vector.h"
 #include "CLHEP/Matrix/Matrix.h"
 
-using CLHEP::Hep3Vector;
-
 namespace Belle2 {
 
 
@@ -1231,7 +1229,7 @@ namespace Belle2 {
     //---------------------
     // Control sequence based on belle_event table.
     //---------------------
-    Belle_event_Manager& evtmgr = Belle_event_Manager::get_manager();
+    Belle::Belle_event_Manager& evtmgr = Belle::Belle_event_Manager::get_manager();
     if (0 == evtmgr.count()) {
       // Do nothing if not exist, because we can not know whether
       // this event is Exp. data or MC.
@@ -1261,7 +1259,7 @@ namespace Belle2 {
     // Correction curve version control.
     int i_previous(0);
     // Mdst_event_add table is there?
-    Mdst_event_add_Manager& mevtmgr = Mdst_event_add_Manager::get_manager();
+    Belle::Mdst_event_add_Manager& mevtmgr = Belle::Mdst_event_add_Manager::get_manager();
     // When Mdst_event_add exists,
     if (mevtmgr.count() > 0) {
       // Up to Exp.13, same treatment as V1.0 2001/Nov./30th
@@ -1297,7 +1295,7 @@ namespace Belle2 {
         }
       }
     } else { // Create Mdst_event_add and set flag.
-      Mdst_event_add& meadd = mevtmgr.add();
+      Belle::Mdst_event_add& meadd = mevtmgr.add();
       // Up to Exp.13, same treatment as before.
       if (Eno <= 13) {
         meadd.flag(3, 1);
@@ -1312,20 +1310,20 @@ namespace Belle2 {
     // overwrite proper panther tables.
     //--------------------------
     // Get Mdst_ecl and Mdst_gamma.
-    Mdst_ecl_Manager&   eclmgr   = Mdst_ecl_Manager::get_manager();
-    Mdst_gamma_Manager& gammamgr = Mdst_gamma_Manager::get_manager();
+    Belle::Mdst_ecl_Manager&   eclmgr   = Belle::Mdst_ecl_Manager::get_manager();
+    Belle::Mdst_gamma_Manager& gammamgr = Belle::Mdst_gamma_Manager::get_manager();
 
     // Get Mdst_ecl_aux. Added 20060413
-    Mdst_ecl_aux_Manager& eclauxmgr = Mdst_ecl_aux_Manager::get_manager();
-    std::vector<Mdst_ecl_aux>::iterator itaux = eclauxmgr.begin();
+    Belle::Mdst_ecl_aux_Manager& eclauxmgr = Belle::Mdst_ecl_aux_Manager::get_manager();
+    std::vector<Belle::Mdst_ecl_aux>::iterator itaux = eclauxmgr.begin();
 
     // Correct energy and error matrix in Mdst_ecl.
     double factor;
     double factor13;
     double shower_energy, shower_theta;
-    for (std::vector<Mdst_ecl>::iterator itecl = eclmgr.begin();
+    for (std::vector<Belle::Mdst_ecl>::iterator itecl = eclmgr.begin();
          itecl != eclmgr.end(); ++itecl) {
-      Mdst_ecl& shower = *itecl;
+      Belle::Mdst_ecl& shower = *itecl;
       shower_energy = shower.energy();
       shower_theta  = shower.theta();
 
@@ -1337,7 +1335,7 @@ namespace Belle2 {
         //if( factor45!=1.0 )
         //{
         //int idecl=shower.get_ID();
-        // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<<"Exp45 fix idecl="<<idecl<<" cellID="<<cellID
+        // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<<"Exp45 fix idecl="<<idecl<<" cellID="<<cellID
         //<<" factor45="<<factor45<<std::endl;
         //}
 
@@ -1347,10 +1345,10 @@ namespace Belle2 {
         shower.error(1, shower.error(1) / factor45); // Energy-phi.
         shower.error(3, shower.error(3) / factor45); // Energy-theta.
 
-        // Here, also take care of Mdst_gamma.
-        for (std::vector<Mdst_gamma>::iterator itgam45 = gammamgr.begin();
+        // Here, also take care of Belle::Mdst_gamma.
+        for (std::vector<Belle::Mdst_gamma>::iterator itgam45 = gammamgr.begin();
              itgam45 != gammamgr.end(); ++itgam45) {
-          Mdst_gamma& gamma45 = *itgam45;
+          Belle::Mdst_gamma& gamma45 = *itgam45;
           if (gamma45.ecl().get_ID() == shower.get_ID()) {
             gamma45.px(gamma45.px() / factor45);
             gamma45.py(gamma45.py() / factor45);
@@ -1358,7 +1356,7 @@ namespace Belle2 {
             //int idgam=gamma45.get_ID();
             //if( factor45!=1.0 )
             //{
-            // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<< "Exp45 fix idgamma="<<idgam<<std::endl;
+            // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<< "Exp45 fix idgamma="<<idgam<<std::endl;
             //}
           }
         }
@@ -1384,8 +1382,8 @@ namespace Belle2 {
                                shower_energy, cos(shower_theta));
             // Special treatment of Exp.15 processed by b20020125.
             if (Eno == 15 && i_previous == 1) {
-              // dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "Exp.15 version=1 applied case!" << std::endl;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "ecl factor=" << factor << " " ;
+              // dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "Exp.15 version=1 applied case!" << std::endl;
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "ecl factor=" << factor << " " ;
               // Original scaling is done by Exp.13 curve.
               //Original definition.
               //factor13
@@ -1396,7 +1394,7 @@ namespace Belle2 {
                 = ecl_adhoc_corr(13, 1, ecl_threshold,
                                  shower_energy, cos(shower_theta));
               factor = factor / factor13;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "factor(rel)=" << factor << " ";
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "factor(rel)=" << factor << " ";
             }
           }
           break;
@@ -1425,7 +1423,7 @@ namespace Belle2 {
                 = ecl_adhoc_corr(13, 1, ecl_threshold,
                                  shower_energy, cos(shower_theta));
               factor = factor / factor13;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "factor(rel)=" << factor << " ";
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "factor(rel)=" << factor << " ";
             }
 
             factor = factor / mpi0pdg(shower.energy());
@@ -1444,17 +1442,17 @@ namespace Belle2 {
       shower.error(1, shower.error(1) / factor); // Energy-phi.
       shower.error(3, shower.error(3) / factor); // Energy-theta.
 
-      // Incriment Mdst_ecl_aux pointer.
+      // Incriment Belle::Mdst_ecl_aux pointer.
       itaux++;
     }
 
-    // Correct energy in Mdst_gamma.
+    // Correct energy in Belle::Mdst_gamma.
     double gamma_energy, gamma_cos;
-    for (std::vector<Mdst_gamma>::iterator itgam = gammamgr.begin();
+    for (std::vector<Belle::Mdst_gamma>::iterator itgam = gammamgr.begin();
          itgam != gammamgr.end(); ++itgam) {
-      Mdst_gamma& gamma = *itgam;
+      Belle::Mdst_gamma& gamma = *itgam;
       // Create the gamma's 3vector
-      Hep3Vector gamma_3v(gamma.px(), gamma.py(), gamma.pz());
+      CLHEP::Hep3Vector gamma_3v(gamma.px(), gamma.py(), gamma.pz());
       gamma_energy = gamma_3v.mag();
       gamma_cos    = gamma_3v.cosTheta();
 
@@ -1477,8 +1475,8 @@ namespace Belle2 {
                                gamma_energy, gamma_cos);
             // Special treatment of Exp.15 processed by b20020125.
             if (Eno == 15 && i_previous == 1) {
-              // dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "Exp.15 version=1 applied case!" << std::endl;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "factor=" << factor << " " ;
+              // dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "Exp.15 version=1 applied case!" << std::endl;
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "factor=" << factor << " " ;
               // Original scaling is done by Exp.13 curve.
               //Original definition.
               //factor13
@@ -1489,7 +1487,7 @@ namespace Belle2 {
                 = ecl_adhoc_corr(13, 1, ecl_threshold,
                                  gamma_energy, gamma_cos);
               factor = factor / factor13;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "gamma factor(rel)=" << factor << " " << std::endl;
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "gamma factor(rel)=" << factor << " " << std::endl;
             }
           }
           break;
@@ -1508,8 +1506,8 @@ namespace Belle2 {
                                gamma_3v.mag(), gamma_3v.cosTheta());
             // Special treatment of Exp.15 processed by b20020125.
             if (Eno == 15 && i_previous == 1) {
-              // dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "Exp.15 version=1 applied case!" << std::endl;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "factor=" << factor << " " ;
+              // dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "Exp.15 version=1 applied case!" << std::endl;
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "factor=" << factor << " " ;
               // Original scaling is done by Exp.13 curve.
               //Original definition.
               //factor13
@@ -1520,7 +1518,7 @@ namespace Belle2 {
                 = ecl_adhoc_corr(13, 1, ecl_threshold,
                                  gamma_energy, gamma_cos);
               factor = factor / factor13;
-              //dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "gamma factor(rel)=" << factor << " " << std::endl;
+              //dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "gamma factor(rel)=" << factor << " " << std::endl;
             }
             factor = factor / mpi0pdg(gamma_3v.mag());
           }
@@ -1539,7 +1537,7 @@ namespace Belle2 {
 
 //=====================================================================
 //***** make_pi0.cc ********** created 2001/Jul./21st *****
-// Create Mdst_pi0 from Mdst_gamma and Mdst_ecl to let
+// Create Belle::Mdst_pi0 from Belle::Mdst_gamma and Belle::Mdst_ecl to let
 // people get mass-constraint fitted momentum of pi0
 // after ad_hoc correction.
 // input : option = 0; same as the existent Rececl_pi0
@@ -1557,7 +1555,7 @@ namespace Belle2 {
     //---------------------
     // Check Exp. number and Data/MC.
     //---------------------
-    Belle_event_Manager& evtmgr = Belle_event_Manager::get_manager();
+    Belle::Belle_event_Manager& evtmgr = Belle::Belle_event_Manager::get_manager();
     if (0 == evtmgr.count()) {
       // Do nothing if not exist, because we can not know whether
       // this event is Exp. data or MC.
@@ -1600,9 +1598,9 @@ namespace Belle2 {
         }
         break;
       case 2: // pi0 cand. are selected by -Xsigma < Mgg-Mpi0 < +Xsigma.
-        // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl") << "option=2 was selected." << std::endl;
-        //dbg dout(Debugout::INFO,"B2BIIFixMdst_ecl") << "mass window is " << low_limit << " & ";
-        //dbg dout(Debugout::INFO,"B2BIIFixMdst_ecl") << up_limit << std::endl;
+        // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl") << "option=2 was selected." << std::endl;
+        //dbg dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << "mass window is " << low_limit << " & ";
+        //dbg dout(Debugout::INFO,"B2BIIFixBelle::Mdst_ecl") << up_limit << std::endl;
         if (0.0 < low_limit || up_limit < 0.0) {
           B2ERROR("option=2 was selected. ");
           B2ERROR("Invalid mass window! " << low_limit);
@@ -1616,40 +1614,40 @@ namespace Belle2 {
         return;
     }
 
-    // At first, clear already existing Mdst_pi0.
-    Mdst_pi0_Manager::get_manager().remove();
+    // At first, clear already existing Belle::Mdst_pi0.
+    Belle::Mdst_pi0_Manager::get_manager().remove();
 
-    // Get Mdst_gamma for photon's momentum
-    // and get Mdst_ecl for error matrix.
-    Mdst_gamma_Manager& gammamgr = Mdst_gamma_Manager::get_manager();
+    // Get Belle::Mdst_gamma for photon's momentum
+    // and get Belle::Mdst_ecl for error matrix.
+    Belle::Mdst_gamma_Manager& gammamgr = Belle::Mdst_gamma_Manager::get_manager();
 
-    // Re-allocate Mdst_pi0 table.
-    Mdst_pi0_Manager& pi0mgr = Mdst_pi0_Manager::get_manager();
+    // Re-allocate Belle::Mdst_pi0 table.
+    Belle::Mdst_pi0_Manager& pi0mgr = Belle::Mdst_pi0_Manager::get_manager();
 
     // If Only one photon in the event, no need to do anything.
     if (gammamgr.count() < 2) {
       return;
     }
 
-    // Make combination of two Mdst_gamma.
-    for (std::vector<Mdst_gamma>::iterator itgamma = gammamgr.begin();
+    // Make combination of two Belle::Mdst_gamma.
+    for (std::vector<Belle::Mdst_gamma>::iterator itgamma = gammamgr.begin();
          itgamma != gammamgr.end(); ++itgamma) {
-      Mdst_gamma& gamma1 = *itgamma;
-      Hep3Vector gamma1_3v(gamma1.px(), gamma1.py(), gamma1.pz());
-      HepLorentzVector gamma1_lv(gamma1_3v, gamma1_3v.mag());
+      Belle::Mdst_gamma& gamma1 = *itgamma;
+      CLHEP::Hep3Vector gamma1_3v(gamma1.px(), gamma1.py(), gamma1.pz());
+      CLHEP::HepLorentzVector gamma1_lv(gamma1_3v, gamma1_3v.mag());
 
-      Mdst_ecl& ecl1 = gamma1.ecl();
+      Belle::Mdst_ecl& ecl1 = gamma1.ecl();
 
-      for (std::vector<Mdst_gamma>::iterator jtgamma = itgamma + 1;
+      for (std::vector<Belle::Mdst_gamma>::iterator jtgamma = itgamma + 1;
            jtgamma != gammamgr.end(); ++jtgamma) {
-        Mdst_gamma& gamma2 = *jtgamma;
-        Hep3Vector gamma2_3v(gamma2.px(), gamma2.py(), gamma2.pz());
-        HepLorentzVector gamma2_lv(gamma2_3v, gamma2_3v.mag());
+        Belle::Mdst_gamma& gamma2 = *jtgamma;
+        CLHEP::Hep3Vector gamma2_3v(gamma2.px(), gamma2.py(), gamma2.pz());
+        CLHEP::HepLorentzVector gamma2_lv(gamma2_3v, gamma2_3v.mag());
 
-        Mdst_ecl& ecl2 = gamma2.ecl();
+        Belle::Mdst_ecl& ecl2 = gamma2.ecl();
 
         // Invariant mass before const. fit.
-        HepLorentzVector gamgam_lv = gamma1_lv + gamma2_lv;
+        CLHEP::HepLorentzVector gamgam_lv = gamma1_lv + gamma2_lv;
         const double mass_before = gamgam_lv.mag();
 
         // In the case of option=0 or 1, criteria is controlled
@@ -1676,19 +1674,19 @@ namespace Belle2 {
         // If invariant mass is inside the window,
         // if( low_limit < mass_before && mass_before < up_limit ) // old.
         if (low_limit < mass_ctrl && mass_ctrl < up_limit) {
-          // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<<"mass="<<mass_before;
-          // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<<" p="<<gamgam_lv.vect().mag()<<" theta=";
-          // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<<gamgam_lv.theta()<<" mcdata="<<mcdata;
-          // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<<" higher="<<
+          // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<<"mass="<<mass_before;
+          // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<<" p="<<gamgam_lv.vect().mag()<<" theta=";
+          // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<<gamgam_lv.theta()<<" mcdata="<<mcdata;
+          // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<<" higher="<<
           //   pi0resol(gamgam_lv.vect().mag(),
           //    gamgam_lv.theta()*180./M_PI,
           //  "higher",mcdata, Eno, option )<<" or ";
-          // dout(Debugout::DDEBUG,"B2BIIFixMdst_ecl")<<" lower="<<
+          // dout(Debugout::DDEBUG,"B2BIIFixBelle::Mdst_ecl")<<" lower="<<
           //   pi0resol(gamgam_lv.vect().mag(),
           //    gamgam_lv.theta()*180./M_PI,
           //  "lower",mcdata, Eno, option )<<std::endl;
           // Error matrix(covariant matrix)
-          HepMatrix V(6, 6, 0);
+          CLHEP::HepMatrix V(6, 6, 0);
 
           V[0][0] = ecl1.error(0);
           V[0][1] = V[1][0] = ecl1.error(1);
@@ -1704,7 +1702,7 @@ namespace Belle2 {
           V[5][5] = ecl2.error(5);
 
           // Measurements; i.e. initial parameters.
-          HepMatrix y0(6, 1);
+          CLHEP::HepMatrix y0(6, 1);
           y0[0][0] = ecl1.energy();
           y0[1][0] = ecl1.phi();
           y0[2][0] = ecl1.theta();
@@ -1713,9 +1711,9 @@ namespace Belle2 {
           y0[5][0] = ecl2.theta();
 
           // Copy them to proper matrix which is given to fit.
-          HepMatrix y(y0);
+          CLHEP::HepMatrix y(y0);
           // Delivative.
-          HepMatrix Dy(6, 1, 0);
+          CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
           double Df, f_old = DBL_MAX;
@@ -1747,11 +1745,11 @@ namespace Belle2 {
               break;
 
             // constraint
-            HepMatrix f(1, 1);
+            CLHEP::HepMatrix f(1, 1);
             f[0][0] = mass2_gg - (mpi0_pdg * mpi0_pdg);
 
             // dG/dq_i, G = (M_gg - M_pi0) = 0 is the constraint.
-            HepMatrix B(1, 6);
+            CLHEP::HepMatrix B(1, 6);
             B[0][0] = mass2_gg / E1;
             B[0][1] = 2 * E1 * E2 * sin_theta1 * sin_theta2 * sin_Dphi;
             B[0][2] = 2 * E1 * E2 * (-cos_theta1 * sin_theta2 * cos_Dphi
@@ -1790,8 +1788,8 @@ namespace Belle2 {
           //  m_chi2 = chi2;  // protect...
           double pi0_chi2 = (chi2 > FLT_MAX) ? FLT_MAX : chi2;
 
-          // Fill Mdst_pi0 based on the fit result.
-          Mdst_pi0& pi0 = pi0mgr.add();
+          // Fill Belle::Mdst_pi0 based on the fit result.
+          Belle::Mdst_pi0& pi0 = pi0mgr.add();
           pi0.gamma(0, gamma1);
           pi0.gamma(1, gamma2);
           pi0.px(pi0_px);
@@ -1807,7 +1805,7 @@ namespace Belle2 {
 
   void B2BIIFixMdstModule::make_pi0_primary_vertex(int option, double low_limit, double up_limit,
                                                    const HepPoint3D& /*epvtx*/,
-                                                   const HepSymMatrix& epvtx_err)
+                                                   const CLHEP::HepSymMatrix& epvtx_err)
   {
 #if 0
     // pi0 mass of PDG.
@@ -1829,39 +1827,39 @@ namespace Belle2 {
       case 1:   // option=1 case, check given mass window.
         if (mpi0_pdg < low_limit || up_limit < mpi0_pdg) {
           // If mass window is not correct, do nothing.
-          dout(Debugout::ERR, "B2BIIFixMdst_ecl") << "Invalid mass window between " << low_limit;
-          dout(Debugout::ERR, "B2BIIFixMdst_ecl") << " and " << up_limit << std::endl;
+          dout(Debugout::ERR, "B2BIIFixBelle::Mdst_ecl") << "Invalid mass window between " << low_limit;
+          dout(Debugout::ERR, "B2BIIFixBelle::Mdst_ecl") << " and " << up_limit << std::endl;
           return;
         }
         break;
       default: // Otherwise, invalid option, do nothing.
-        dout(Debugout::ERR, "B2BIIFixMdst_ecl") << "Invalid option=" << option << std::endl;
+        dout(Debugout::ERR, "B2BIIFixBelle::Mdst_ecl") << "Invalid option=" << option << std::endl;
         return;
     }
 
-    // At first, clear already existing Mdst_pi0.
-    Mdst_pi0_Manager::get_manager().remove();
+    // At first, clear already existing Belle::Mdst_pi0.
+    Belle::Mdst_pi0_Manager::get_manager().remove();
 
-    // Get Mdst_gamma for photon's momentum
-    // and get Mdst_ecl for error matrix.
-    Mdst_gamma_Manager& gammamgr = Mdst_gamma_Manager::get_manager();
+    // Get Belle::Mdst_gamma for photon's momentum
+    // and get Belle::Mdst_ecl for error matrix.
+    Belle::Mdst_gamma_Manager& gammamgr = Belle::Mdst_gamma_Manager::get_manager();
 
-    // Re-allocate Mdst_pi0 table.
-    Mdst_pi0_Manager& pi0mgr = Mdst_pi0_Manager::get_manager();
+    // Re-allocate Belle::Mdst_pi0 table.
+    Belle::Mdst_pi0_Manager& pi0mgr = Belle::Mdst_pi0_Manager::get_manager();
 
     // If Only one photon in the event, no need to do anything.
     if (gammamgr.count() < 2) {
       return;
     }
 
-    // Make combination of two Mdst_gamma.
-    for (std::vector<Mdst_gamma>::iterator itgamma = gammamgr.begin();
+    // Make combination of two Belle::Mdst_gamma.
+    for (std::vector<Belle::Mdst_gamma>::iterator itgamma = gammamgr.begin();
          itgamma != gammamgr.end(); ++itgamma) {
-      Mdst_gamma& gamma1 = *itgamma;
-      Hep3Vector gamma1_3v(gamma1.px(), gamma1.py(), gamma1.pz());
-      HepLorentzVector gamma1_lv(gamma1_3v, gamma1_3v.mag());
+      Belle::Mdst_gamma& gamma1 = *itgamma;
+      CLHEP::Hep3Vector gamma1_3v(gamma1.px(), gamma1.py(), gamma1.pz());
+      CLHEP::HepLorentzVector gamma1_lv(gamma1_3v, gamma1_3v.mag());
 
-      Mdst_ecl& ecl1 = gamma1.ecl();
+      Belle::Mdst_ecl& ecl1 = gamma1.ecl();
 
       const double r_i       = ecl1.r();
       const double dzr_i     = std::sqrt(epvtx_err[2][2]) / r_i;
@@ -1869,22 +1867,22 @@ namespace Belle2 {
       const double theta_i0  = ecl1.theta();
       const double sin_th_i0 = std::sin(theta_i0);
 
-      for (std::vector<Mdst_gamma>::iterator jtgamma = itgamma + 1;
+      for (std::vector<Belle::Mdst_gamma>::iterator jtgamma = itgamma + 1;
            jtgamma != gammamgr.end(); ++jtgamma) {
-        Mdst_gamma& gamma2 = *jtgamma;
-        Hep3Vector gamma2_3v(gamma2.px(), gamma2.py(), gamma2.pz());
-        HepLorentzVector gamma2_lv(gamma2_3v, gamma2_3v.mag());
+        Belle::Mdst_gamma& gamma2 = *jtgamma;
+        CLHEP::Hep3Vector gamma2_3v(gamma2.px(), gamma2.py(), gamma2.pz());
+        CLHEP::HepLorentzVector gamma2_lv(gamma2_3v, gamma2_3v.mag());
 
-        Mdst_ecl& ecl2 = gamma2.ecl();
+        Belle::Mdst_ecl& ecl2 = gamma2.ecl();
 
         // Invariant mass before const. fit.
-        HepLorentzVector gamgam_lv = gamma1_lv + gamma2_lv;
+        CLHEP::HepLorentzVector gamgam_lv = gamma1_lv + gamma2_lv;
         const double mass_before = gamgam_lv.mag();
 
         // If invariant mass is inside the window,
         if (low_limit < mass_before && mass_before < up_limit) {
           // Error matrix(covariant matrix)
-          HepMatrix V(6, 6, 0);
+          CLHEP::HepMatrix V(6, 6, 0);
 
           V[0][0] = ecl1.error(0);
           V[0][1] = V[1][0] = ecl1.error(1);
@@ -1908,7 +1906,7 @@ namespace Belle2 {
 
           V[2][5] = V[5][2] = dzr_i * sin_th_i0 * dzr_j * sin_th_j0;
           // Measurements; i.e. initial parameters.
-          HepMatrix y0(6, 1);
+          CLHEP::HepMatrix y0(6, 1);
           y0[0][0] = ecl1.energy();
           y0[1][0] = ecl1.phi();
           y0[2][0] = ecl1.theta();
@@ -1917,9 +1915,9 @@ namespace Belle2 {
           y0[5][0] = ecl2.theta();
 
           // Copy them to proper matrix which is given to fit.
-          HepMatrix y(y0);
+          CLHEP::HepMatrix y(y0);
           // Delivative.
-          HepMatrix Dy(6, 1, 0);
+          CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
           double Df, f_old = DBL_MAX;
@@ -1951,11 +1949,11 @@ namespace Belle2 {
               break;
 
             // constraint
-            HepMatrix f(1, 1);
+            CLHEP::HepMatrix f(1, 1);
             f[0][0] = mass2_gg - (mpi0_pdg * mpi0_pdg);
 
             // dG/dq_i, G = (M_gg - M_pi0) = 0 is the constraint.
-            HepMatrix B(1, 6);
+            CLHEP::HepMatrix B(1, 6);
             B[0][0] = mass2_gg / E1;
             B[0][1] = 2 * E1 * E2 * sin_theta1 * sin_theta2 * sin_Dphi;
             B[0][2] = 2 * E1 * E2 * (-cos_theta1 * sin_theta2 * cos_Dphi
@@ -1994,8 +1992,8 @@ namespace Belle2 {
           //  m_chi2 = chi2;  // protect...
           double pi0_chi2 = (chi2 > FLT_MAX) ? FLT_MAX : chi2;
 
-          // Fill Mdst_pi0 based on the fit result.
-          Mdst_pi0& pi0 = pi0mgr.add();
+          // Fill Belle::Mdst_pi0 based on the fit result.
+          Belle::Mdst_pi0& pi0 = pi0mgr.add();
           pi0.gamma(0, gamma1);
           pi0.gamma(1, gamma2);
           pi0.px(pi0_px);
@@ -2035,23 +2033,23 @@ namespace Belle2 {
         B2ERROR("Invalid option=" << option);
         return;
     }
-    Mdst_pi0_Manager&  pi0_mgr     = Mdst_pi0_Manager::get_manager();
-    Mdst_gamma_Manager& gamma_mgr  = Mdst_gamma_Manager::get_manager();
+    Belle::Mdst_pi0_Manager&  pi0_mgr     = Belle::Mdst_pi0_Manager::get_manager();
+    Belle::Mdst_gamma_Manager& gamma_mgr  = Belle::Mdst_gamma_Manager::get_manager();
 
-    // At first, clear already existing Mdst_pi0.;
-    Mdst_pi0_Manager::get_manager().remove();
+    // At first, clear already existing Belle::Mdst_pi0.;
+    Belle::Mdst_pi0_Manager::get_manager().remove();
     // If Only one photon in the event, no need to do anything.;
     if (gamma_mgr.count() < 2) {
       return;
     }
 
-    for (std::vector<Mdst_gamma>::iterator i = gamma_mgr.begin();
+    for (std::vector<Belle::Mdst_gamma>::iterator i = gamma_mgr.begin();
          i != gamma_mgr.end(); ++i) {
-      const Mdst_gamma& gamma_i = *i;
+      const Belle::Mdst_gamma& gamma_i = *i;
       if (!gamma_i.ecl()) {
         continue;
       }
-      const Mdst_ecl& ecl_i = gamma_i.ecl();
+      const Belle::Mdst_ecl& ecl_i = gamma_i.ecl();
       const double r_i      = ecl_i.r();
       const double e_i0     = ecl_i.energy();
       const double phi_i0   = ecl_i.phi();
@@ -2060,19 +2058,19 @@ namespace Belle2 {
       const double sin_th_i0 = std::sin(theta_i0);
       const double cos_th_i0 = std::cos(theta_i0);
 
-      HepSymMatrix err_i(3, 0);
+      CLHEP::HepSymMatrix err_i(3, 0);
       err_i[0][0] = ecl_i.error(0);
       err_i[1][0] = ecl_i.error(1); err_i[1][1] = ecl_i.error(2);
       err_i[2][0] = ecl_i.error(3); err_i[2][1] = ecl_i.error(4); err_i[2][2] = ecl_i.error(5);
 
       const double dzr_i = std::sqrt(epvtx_err[2][2]) / r_i;
 
-      for (std::vector<Mdst_gamma>::iterator j = i + 1; j != gamma_mgr.end(); ++j) {
-        const Mdst_gamma& gamma_j = *j;
+      for (std::vector<Belle::Mdst_gamma>::iterator j = i + 1; j != gamma_mgr.end(); ++j) {
+        const Belle::Mdst_gamma& gamma_j = *j;
         if (!gamma_j.ecl()) {
           continue;
         }
-        const Mdst_ecl& ecl_j = gamma_j.ecl();
+        const Belle::Mdst_ecl& ecl_j = gamma_j.ecl();
         const double r_j      = ecl_j.r();
         const double e_j0     = ecl_j.energy();
         const double phi_j0   = ecl_j.phi();
@@ -2081,7 +2079,7 @@ namespace Belle2 {
         const double sin_th_j0 = std::sin(theta_j0);
         const double cos_th_j0 = std::cos(theta_j0);
 
-        HepSymMatrix err_j(3, 0);
+        CLHEP::HepSymMatrix err_j(3, 0);
         err_j[0][0] = ecl_j.error(0);
         err_j[1][0] = ecl_j.error(1); err_j[1][1] = ecl_j.error(2);
         err_j[2][0] = ecl_j.error(3); err_j[2][1] = ecl_j.error(4); err_j[2][2] = ecl_j.error(5);
@@ -2236,15 +2234,15 @@ namespace Belle2 {
         const double sin_phi_i = std::sin(phi_i);
         const double sin_phi_j = std::sin(phi_j);
 
-        const HepLorentzVector p4_i(e_i * sin_th_i * cos_phi_i,
-                                    e_i * sin_th_i * sin_phi_i, e_i * cos_th_i, e_i);
-        const HepLorentzVector p4_j(e_j * sin_th_j * cos_phi_j,
-                                    e_j * sin_th_j * sin_phi_j, e_j * cos_th_j, e_j);
+        const CLHEP::HepLorentzVector p4_i(e_i * sin_th_i * cos_phi_i,
+                                           e_i * sin_th_i * sin_phi_i, e_i * cos_th_i, e_i);
+        const CLHEP::HepLorentzVector p4_j(e_j * sin_th_j * cos_phi_j,
+                                           e_j * sin_th_j * sin_phi_j, e_j * cos_th_j, e_j);
 
-        const HepLorentzVector p4_pi0(p4_i + p4_j);
+        const CLHEP::HepLorentzVector p4_pi0(p4_i + p4_j);
 
-        // Fill Mdst_pi0 based on the fit result.;
-        Mdst_pi0& pi0 = pi0_mgr.add();
+        // Fill Belle::Mdst_pi0 based on the fit result.;
+        Belle::Mdst_pi0& pi0 = pi0_mgr.add();
         pi0.gamma(0, gamma_i);
         pi0.gamma(1, gamma_j);
         pi0.px(p4_pi0.x());
@@ -2260,12 +2258,12 @@ namespace Belle2 {
   }
 
   void B2BIIFixMdstModule::correct_ecl_primary_vertex(const HepPoint3D& epvtx,
-                                                      const HepSymMatrix& epvtx_err)
+                                                      const CLHEP::HepSymMatrix& epvtx_err)
   {
 
-    Mdst_gamma_Manager& Gamma  = Mdst_gamma_Manager::get_manager();
+    Belle::Mdst_gamma_Manager& Gamma  = Belle::Mdst_gamma_Manager::get_manager();
 
-    for (std::vector<Mdst_gamma>::iterator
+    for (std::vector<Belle::Mdst_gamma>::iterator
          it = Gamma.begin(); it != Gamma.end(); it++) {
       double r(it->ecl().r());
       double theta(it->ecl().theta());
@@ -2277,11 +2275,11 @@ namespace Belle2 {
       double sp(std::sin(phi));
       double cp(std::cos(phi));
       HepPoint3D gamma_pos(r * st * cp, r * st * sp, r * ct);
-      Hep3Vector gamma_vec(gamma_pos - epvtx);
+      CLHEP::Hep3Vector gamma_vec(gamma_pos - epvtx);
       double hsq(gamma_vec.perp2());
       double rsq(gamma_vec.mag2());
       double stheta_sq_new = it->ecl().error(5) + epvtx_err(3, 3) * (hsq / (rsq * rsq));
-      Hep3Vector gamma_dir(gamma_vec.unit());
+      CLHEP::Hep3Vector gamma_dir(gamma_vec.unit());
       double e(it->ecl().energy());
       it->px(e * gamma_dir.x());
       it->py(e * gamma_dir.y());

@@ -14,6 +14,12 @@
 # Input: external file or None (simulation)
 # Output: histograms: VXD_DQM_Histograms.root or custom...
 #
+# There are prepared 3 levels of DQM histograms:
+#    1. ExpressReco, very restricted, for on-line monitor
+#    2. Chip granulation, need higher statistics, for on-line
+#    3. Details, as much as possible details, for off-line
+# Default is to show all possible histograms
+#
 # Contributors: Peter Kodys                                              *
 #
 # Example steering file - 2017 Belle II Collaboration
@@ -23,7 +29,7 @@ from basf2 import *
 from ROOT import Belle2
 
 import argparse
-parser = argparse.ArgumentParser(description="VXD DQM correlations for Belle II")
+parser = argparse.ArgumentParser(description="PXD+SVD+VXD DQM correlations for Belle II + TB, show all possible histos")
 parser.add_argument('--local-db', dest='local_db', action='store', default=None, type=str, help='Location of local db')
 parser.add_argument(
     '--global-tag',
@@ -40,7 +46,7 @@ parser.add_argument(
     default=False,
     help='Turn off magnetic field')
 
-parser.add_argument('--add-pxd-svd', dest='AddPXDSVD', action='store_const', const=True, default=True,
+parser.add_argument('--skip-pxd-svd', dest='SkipPXDSVD', action='store_const', const=True, default=False,
                     help='Add also PXD and SVD DQM, default = True')
 parser.add_argument('--data-output', dest='DataOutput', action='store_const', const=True, default=False,
                     help='Save data to output file, default = False')
@@ -70,17 +76,49 @@ parser.add_argument('--use-real-data', dest='UseRealdata', action='store_const',
 parser.add_argument('--unpacking', dest='unpacking', action='store_const', const=True,
                     default=False, help='Add PXD and SVD unpacking modules to the path')
 parser.add_argument('--input-file', dest='input_file', action='store', default=None, type=str,
-                    help='Name of imput file')
+                    help='Name of input file')
 parser.add_argument('--filename-histos', dest='histo_file_name', action='store',
                     default='VXD_DQM_Histograms.root', type=str,
                     help='Name of output file with histograms in dqm option is used')
-parser.add_argument('--dqm', dest='dqm', action='store_const', const=True, default=True, help='Produce DQM plots')
+parser.add_argument('--SkipDQM', dest='SkipDQM', action='store_const', const=True, default=False, help='Produce DQM plots')
+parser.add_argument('--SkipDQMExpressReco', dest='SkipDQMExpressReco', action='store_const', const=True, default=False,
+                    help='Skip production of ExpressReco DQM plots')
+parser.add_argument('--SkipDQMChips', dest='SkipDQMChips', action='store_const', const=True, default=False,
+                    help='Skip production of chips DQM plots')
+parser.add_argument('--SkipDQMDetail', dest='SkipDQMDetail', action='store_const', const=True, default=False,
+                    help='Skip production of detail DQM plots')
+parser.add_argument('--CreateDB', dest='CreateDB', action='store', default=0, type=int,
+                    help='Create DataBase references for SVD DQM Express Reco, default = 0')
 
 args = parser.parse_args()
 
+print("Final setting of arguments: ")
+print("                 SkipPXDSVD: ", args.SkipPXDSVD)
+print("                 DataOutput: ", args.DataOutput)
+print("     CorrelationGranulation: ", args.CorrelationGranulation)
+print("       CutCorrelationSigPXD: ", args.CutCorrelationSigPXD)
+print("      CutCorrelationSigUSVD: ", args.CutCorrelationSigUSVD)
+print("      CutCorrelationSigVSVD: ", args.CutCorrelationSigVSVD)
+print("      CutCorrelationTimeSVD: ", args.CutCorrelationTimeSVD)
+print("                  UseDigits: ", args.UseDigits)
+print("       Reduce1DCorrelHistos: ", args.Reduce1DCorrelHistos)
+print("       Reduce2DCorrelHistos: ", args.Reduce2DCorrelHistos)
+print("         Only23LayersHistos: ", args.Only23LayersHistos)
+print("            SaveOtherHistos: ", args.SaveOtherHistos)
+print("                UseRealdata: ", args.UseRealdata)
+print("                  unpacking: ", args.unpacking)
+print("                 input_file: ", args.input_file)
+print("            histo_file_name: ", args.histo_file_name)
+print("                    SkipDQM: ", args.SkipDQM)
+print("         SkipDQMExpressReco: ", args.SkipDQMExpressReco)
+print("               SkipDQMChips: ", args.SkipDQMChips)
+print("              SkipDQMDetail: ", args.SkipDQMDetail)
+print("                   CreateDB: ", args.CreateDB)
+
 # setup_database(args.local_db, args.global_tag)
-reset_database()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
+# if (args.CreateDB == 0):
+# reset_database()
+# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 
 if (args.UseRealdata is True):
     # Limit branches use - necessary minimum (removes MC info if input is from simulation, HLT output)
@@ -111,34 +149,51 @@ SVDDigitSorter = register_module('SVDDigitSorter')
 output = register_module('RootOutput')
 # output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
 
-set_random_seed(1028307)
+# set_random_seed(1028307)
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 if (args.magnet_off is True):
     geometry.param('components', ['PXD', 'SVD'])
 else:
     geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
-if (args.AddPXDSVD is True):
-    pxddqm = register_module('PXDDQM')
-    pxddqm.param('UseDigits', args.UseDigits)
-    pxddqm.param('SaveOtherHistos', args.SaveOtherHistos)
+if (args.SkipPXDSVD is False):
+    pxddqmExpReco = register_module('PXDDQMExpressReco')
+    pxddqmExpReco.param('CreateDB', args.CreateDB)
+    pxddqmChips = register_module('PXDDQM')
+    pxddqmDetails = register_module('PXDDQM')
+    # pxddqm.param('UseDigits', args.UseDigits)
+    # pxddqm.param('SaveOtherHistos', args.SaveOtherHistos)
 
-    svddqm = register_module('SVDDQM')
-    svddqm.param('UseDigits', args.UseDigits)
-    svddqm.param('SaveOtherHistos', args.SaveOtherHistos)
+    svddqmExpReco = register_module('SVDDQMExpressReco')
+    svddqmExpReco.param('CreateDB', args.CreateDB)
+    svddqmChips = register_module('SVDDQM')
+    svddqmDetails = register_module('SVDDQM')
+    # svddqm.param('UseDigits', args.UseDigits)
+    # svddqm.param('SaveOtherHistos', args.SaveOtherHistos)
 
-vxddqm = register_module('VXDDQM')
-vxddqm.param('CorrelationGranulation', args.CorrelationGranulation)
-vxddqm.param('CutCorrelationSigPXD', args.CutCorrelationSigPXD)
-vxddqm.param('CutCorrelationSigUSVD', args.CutCorrelationSigUSVD)
-vxddqm.param('CutCorrelationSigVSVD', args.CutCorrelationSigVSVD)
-vxddqm.param('CutCorrelationTimeSVD', args.CutCorrelationTimeSVD)
-vxddqm.param('UseDigits', args.UseDigits)
-vxddqm.param('Reduce1DCorrelHistos', args.Reduce1DCorrelHistos)
-vxddqm.param('Reduce2DCorrelHistos', args.Reduce2DCorrelHistos)
-vxddqm.param('Only23LayersHistos', args.Only23LayersHistos)
-vxddqm.param('SaveOtherHistos', args.SaveOtherHistos)
-vxddqm.param('SwapPXD', 0)
+param_vxddqm1 = {'CutCorrelationSigPXD': args.CutCorrelationSigPXD,
+                 'CutCorrelationSigUSVD': args.CutCorrelationSigUSVD,
+                 'CutCorrelationSigVSVD': args.CutCorrelationSigVSVD,
+                 'CutCorrelationTimeSVD': args.CutCorrelationTimeSVD,
+                 'UseDigits': args.UseDigits
+                 }
+param_vxddqm2 = {'CorrelationGranulation': args.CorrelationGranulation,
+                 'Reduce1DCorrelHistos': args.Reduce1DCorrelHistos,
+                 'Reduce2DCorrelHistos': args.Reduce2DCorrelHistos,
+                 'Only23LayersHistos': args.Only23LayersHistos,
+                 'SaveOtherHistos': args.SaveOtherHistos,
+                 'SwapPXD': 0
+                 }
+
+vxddqmExpReco = register_module('VXDDQMExpressReco')
+vxddqmExpReco.param('CreateDB', args.CreateDB)
+vxddqmChips = register_module('VXDDQM')
+vxddqmDetails = register_module('VXDDQM')
+
+vxddqmExpReco.param(param_vxddqm1)
+vxddqmChips.param(param_vxddqm1)
+vxddqmDetails.param(param_vxddqm1)
+vxddqmDetails.param(param_vxddqm2)
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -172,12 +227,24 @@ if (args.UseDigits == 0):
     main.add_module(PXDCLUST)
     main.add_module(SVDCLUST)
 
-if (args.dqm is True):
+if (args.SkipDQM is False):
     main.add_module(histomanager)
-    if (args.AddPXDSVD is True):
-        main.add_module(pxddqm)
-        main.add_module(svddqm)
-    main.add_module(vxddqm)
+    if (args.SkipPXDSVD is False):
+        if (args.SkipDQMExpressReco is False):
+            main.add_module(pxddqmExpReco)
+            main.add_module(svddqmExpReco)
+#        if (args.SkipDQMChips is False):
+#            main.add_module(pxddqmChips)
+#            main.add_module(svddqmChips)
+#        if (args.SkipDQMDetail is False):
+#            main.add_module(pxddqmDetails)
+#            main.add_module(svddqmDetails)
+    if (args.SkipDQMExpressReco is False):
+        main.add_module(vxddqmExpReco)
+#    if (args.SkipDQMChips is False):
+#        main.add_module(vxddqmChips)
+#    if (args.SkipDQMDetail is False):
+#        main.add_module(vxddqmDetails)
 
 # main.add_module("PrintCollections")
 if (args.DataOutput is True):

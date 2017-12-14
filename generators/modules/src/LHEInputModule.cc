@@ -88,11 +88,14 @@ void LHEInputModule::initialize()
     if (m_runNum == 0 && m_expNum == 0)
       B2WARNING("LHE reader acts as master module, but no run and experiment number set. Using defaults.");
     //register EventMetaData object in data store
-    StoreObjPtr<EventMetaData>::registerPersistent("EventMetaData");
+    StoreArray<EventMetaData> eventmetadata;
+    eventmetadata.registerInDataStore();
   }
 
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent("MCParticles");
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
+
 }
 
 
@@ -101,14 +104,13 @@ void LHEInputModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   if (!eventMetaDataPtr) eventMetaDataPtr.create();
-  // B2INFO("LHE processes event NR " << eventMetaDataPtr->getEvent());
+  B2DEBUG(100, "LHE processes event nbr " << eventMetaDataPtr->getEvent());
 
   try {
     mpg.clear();
     double weight = 1;
     int id = m_lhe.getEvent(mpg, weight);
 
-    //  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
     if (m_makeMaster) {
       if (id > -1) {
         m_evtNum = id;
@@ -136,7 +138,6 @@ void LHEInputModule::event()
         B2FATAL(e.what());
       }
     } else {
-      StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
       eventMetaDataPtr->setEndOfData();
       B2DEBUG(100, "Reached end of all LHE files.");
     }

@@ -101,26 +101,6 @@ ExtManager::ExtManager() :
   m_StepExceptionHandler = new StepExceptionHandler();
 }
 
-// copy constructor (private: never used)
-ExtManager::ExtManager(ExtManager& e) :
-  m_G4State(e.m_G4State),
-  m_Propagator(e.m_Propagator),
-  m_G4RunMgr(e.m_G4RunMgr),
-  m_TrackingAction(e.m_TrackingAction),
-  m_SteppingAction(e.m_SteppingAction),
-  m_StepExceptionHandler(e.m_StepExceptionHandler),
-  m_MagneticField(e.m_MagneticField),
-  m_UncachedField(e.m_UncachedField),
-  m_MagFldEquation(e.m_MagFldEquation),
-  m_Stepper(e.m_Stepper),
-  m_ChordFinder(e.m_ChordFinder),
-  m_StdStepper(e.m_StdStepper),
-  m_ForwardEquationOfMotion(e.m_ForwardEquationOfMotion),
-  m_BackwardEquationOfMotion(e.m_BackwardEquationOfMotion),
-  m_VisManager(e.m_VisManager)
-{
-}
-
 ExtManager::~ExtManager()
 {
   delete m_StepExceptionHandler;
@@ -261,9 +241,9 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
 
       //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
       G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
-      B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
+      B2DEBUG(1, "Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
       chordFinder->SetDeltaChord(deltaChordInMagneticField * CLHEP::mm);
-      B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
+      B2DEBUG(1, "DeltaChord after reset = " << chordFinder->GetDeltaChord());
       //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
     }
 

@@ -22,8 +22,9 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <trg/gdl/dataobjects/TRGGDLResults.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 
@@ -46,7 +47,8 @@ namespace Belle2 {
       _configFilename("TRGGDLConfig.dat"),
       _simulationMode(1),
       _fastSimulationMode(0),
-      _firmwareSimulationMode(0)
+      _firmwareSimulationMode(0),
+      _Phase("Phase2")
   {
 
     string desc = "TRGGDLModule(" + version() + ")";
@@ -54,6 +56,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGGDL debug level", _debugLevel);
+    addParam("Belle2Phase", _Phase, "Phase2 or Phase3", _Phase);
     addParam("ConfigFile",
              _configFilename,
              "The filename of CDC trigger config file",
@@ -71,18 +74,16 @@ namespace Belle2 {
              "TRGGDL firmware simulation mode",
              _firmwareSimulationMode);
 
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... created" << endl;
+    B2DEBUG(100, "TRGGDLModule ... created");
   }
 
   TRGGDLModule::~TRGGDLModule()
   {
 
     if (_gdl)
-      TRGGDL::getTRGGDL("good-bye");
+      B2DEBUG(100, "good-bye");
 
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... destructed " << endl;
+    B2DEBUG(100,  "TRGGDLModule ... destructed ");
   }
 
   void
@@ -91,13 +92,9 @@ namespace Belle2 {
 
     TRGDebug::level(_debugLevel);
 
-    if (TRGDebug::level()) {
-      cout << "TRGGDLModule::initialize ... options" << endl;
-      cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-           << endl;
-    }
+    B2DEBUG(100, "TRGGDLModule::initialize ... options");
     StoreObjPtr<TRGGRLInfo>::required("TRGGRLObjects");
-    StoreObjPtr<TRGGDLResults>::registerPersistent();
+    StoreObjPtr<TRGSummary>::registerPersistent();
   }
 
   void
@@ -112,18 +109,17 @@ namespace Belle2 {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
-                               _firmwareSimulationMode);
+                               _firmwareSimulationMode,
+                               _Phase);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
-                               _firmwareSimulationMode);
+                               _firmwareSimulationMode,
+                               _Phase);
     }
 
-    if (TRGDebug::level()) {
-      cout << "TRGGDLModule ... beginRun called " << endl;
-      cout << "                 configFile = " << cfn << endl;
-    }
+    B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
   }
 
   void
@@ -135,9 +131,9 @@ namespace Belle2 {
     _gdl->simulate();
 
     int result_summary = 0;
-    StoreObjPtr<TRGGDLResults> gdlResult;
+    StoreObjPtr<TRGSummary> gdlResult;
     if (gdlResult)
-      result_summary = gdlResult->getL1TriggerResults();
+      result_summary = gdlResult->getTRGSummary(0);
 
     setReturnValue(result_summary);
 
@@ -148,8 +144,7 @@ namespace Belle2 {
   void
   TRGGDLModule::endRun()
   {
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... endRun called " << endl;
+    B2DEBUG(200, "TRGGDLModule ... endRun called ");
   }
 
   void
@@ -158,8 +153,7 @@ namespace Belle2 {
 
     _gdl->terminate();
 
-    if (TRGDebug::level())
-      cout << "TRGGDLModule ... terminate called " << endl;
+    B2DEBUG(100, "TRGGDLModule ... terminate called ");
   }
 
 } // namespace Belle2

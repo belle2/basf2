@@ -1,12 +1,13 @@
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <framework/dataobjects/Helix.h>
-
-#include <boost/range/adaptor/reversed.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -84,7 +85,6 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   for (CDCRecoHit3D& recoHit : track) {
     Vector2D recoPos2D = recoHit.getRLWireHit().reconstruct3D(trajectory2D).xy();
     double arcLength2D = trajectory2D.calcArcLength2D(recoPos2D);
-    // double arcLength2D = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
 
     if (arcLength2D < 0) {
       arcLength2D += arcLength2DPeriod;
@@ -98,7 +98,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   track.sortByArcLength2D();
 
   // Set the position to the first hit and let the hits start at arc length of 0
-  Vector3D frontPosition = track.front().getRecoPos3D();
+  Vector3D frontPosition = track.front().getRLWireHit().reconstruct3D(trajectory2D);
   double arcLengthOffset = trajectory3D.setLocalOrigin(frontPosition);
   track.setStartTrajectory3D(trajectory3D);
   for (CDCRecoHit3D& recoHit : track) {
@@ -106,7 +106,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   }
 
   // Set the back trajectory to start at the last hit position (and shift if necessary)
-  Vector3D backPosition = track.back().getRecoPos3D();
+  Vector3D backPosition = track.back().getRLWireHit().reconstruct3D(trajectory2D);
   double backArcLength2D = trajectory3D.setLocalOrigin(backPosition);
   if (backArcLength2D < 0) {
     trajectory3D.shiftPeriod(1);
@@ -277,7 +277,7 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
   double lastAngle = NAN;
   bool removeAfterThis = false;
 
-  for (const CDCRecoHit3D& recoHit : boost::adaptors::reverse(track)) {
+  for (const CDCRecoHit3D& recoHit : reversedRange(track)) {
     if (removeAfterThis) {
       recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
       continue;

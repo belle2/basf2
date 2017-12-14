@@ -19,11 +19,12 @@
 
 using namespace Belle2;
 
-EKLM::TransformData::TransformData(bool global, bool useDisplacement)
+EKLM::TransformData::TransformData(bool global, Displacement displacementType)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, sector, segment;
   int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
+  std::string payload;
   EKLMAlignmentData* sectorAlignment, *segmentAlignment;
   AlignmentChecker alignmentChecker(true);
   m_GeoDat = &(GeometryData::Instance());
@@ -100,12 +101,18 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
     }
   }
   /* Read alignment data from the database and modify transformations. */
-  if (useDisplacement) {
-    DBObjPtr<EKLMAlignment> alignment("EKLMDisplacement");
+  if (displacementType != c_None) {
+    if (displacementType == c_Displacement)
+      payload = "EKLMDisplacement";
+    else
+      payload = "EKLMAlignment";
+    DBObjPtr<EKLMAlignment> alignment(payload);
     if (!alignment.isValid())
-      B2FATAL("No EKLM displacement data.");
-    if (!alignmentChecker.checkAlignment(&(*alignment)))
-      B2FATAL("EKLM displacement data are incorrect, overlaps exist.");
+      B2FATAL("No EKLM displacement (alignment) data.");
+    if (displacementType == c_Displacement) {
+      if (!alignmentChecker.checkAlignment(&(*alignment)))
+        B2FATAL("EKLM displacement data are incorrect, overlaps exist.");
+    }
     for (iEndcap = 1; iEndcap <= nEndcaps; iEndcap++) {
       nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
@@ -113,7 +120,7 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
           sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
           sectorAlignment = alignment->getSectorAlignment(sector);
           if (sectorAlignment == NULL)
-            B2FATAL("Incomplete EKLM displacement data.");
+            B2FATAL("Incomplete EKLM displacement (alignment) data.");
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
             /* First plane is rotated. */
             if (iPlane == 1) {
@@ -136,7 +143,7 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
                                                 iPlane, iSegment);
               segmentAlignment = alignment->getSegmentAlignment(segment);
               if (segmentAlignment == NULL)
-                B2FATAL("Incomplete EKLM displacement data.");
+                B2FATAL("Incomplete EKLM displacement (alignment) data.");
               m_Segment[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
               [iSegment - 1] =
                 HepGeom::Translate3D(
@@ -308,6 +315,14 @@ EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
 {
   return &(m_StripInverse[hit->getEndcap() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
+}
+
+const HepGeom::Transform3D*
+EKLM::TransformData::getStripGlobalToLocal(int endcap, int layer, int sector,
+                                           int plane, int strip) const
+{
+  return &(m_StripInverse[endcap - 1][layer - 1][sector - 1][plane - 1]
+           [strip - 1]);
 }
 
 bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,

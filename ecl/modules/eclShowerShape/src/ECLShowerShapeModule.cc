@@ -53,7 +53,7 @@ REG_MODULE(ECLShowerShapePureCsI)
 ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
 {
   // Set description
-  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E21)");
+  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variables (e.g. E9oE21)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zernike_n1_rho0", m_zernike_n1_rho0,
@@ -112,17 +112,23 @@ void ECLShowerShapeModule::initialize()
 
 }
 
-void ECLShowerShapeModule::initilizeMVA(const std::string& identifier,
-                                        std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
+void ECLShowerShapeModule::initializeMVA(const std::string& identifier,
+                                         std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
 {
   MVA::Weightfile  weightfile;
   //Load MVA weight file
   if (weightFileRepresentation) {
+
+    //If multiple sources of conditions DB have been configured (the regular case), then the IOV of each payload will be "artificially" set to the current run only.
+    //This is so that in the next run, the payload can be taken from a different DB source.
+    //For example, payload of current run will be taken from central DB and payload of next run will be taken from local DB, if it appears there.
+    //In this case weightFileRepresentation->hasChanged() will be true at the beginning of each run, even though the IOV of the payload is greater than a single run.
+    //This is true as of 2017-06-01, functionality of hasChanged() might be changed in future.
+
     if (weightFileRepresentation->hasChanged()) {
       std::stringstream ss((*weightFileRepresentation)->m_data);
       weightfile = MVA::Weightfile::loadFromStream(ss);
-    } else //If a single conditions database source has been configured (for example only a local DB, as in when HLT is running), hasChanged() will always return false, even though the run number has changed.
-      //In that case, return without doing anything. (This is true as of 2017-06-01, functionality of hasChanged() might be changed in future)
+    } else
       return;
   } else {
     weightfile = MVA::Weightfile::loadFromFile(identifier);
@@ -148,9 +154,9 @@ void ECLShowerShapeModule::initilizeMVA(const std::string& identifier,
 
 void ECLShowerShapeModule::beginRun()
 {
-  initilizeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
-  initilizeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
-  initilizeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
+  initializeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
+  initializeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
+  initializeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
 
   //This is a hack because the callback doesn't seem to be called at the begining of the run
   if (m_secondMomentCorrectionArray.hasChanged()) {
@@ -239,7 +245,7 @@ void ECLShowerShapeModule::event()
     //Start by finding the N2 shower and calculating it's shower shape variables
     //Assumes that there is only 1 N2 Shower per CR!!!!!!
     ECLShower* N2shower = nullptr;
-    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>()) {
+    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
       if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N2) {
         N2shower = &eclShower;
         setShowerShapeVariables(N2shower, true);
@@ -253,7 +259,7 @@ void ECLShowerShapeModule::event()
 
     double prodN1zernikeMVAs = 1.0;
     //Calculate shower shape variables for the rest of the showers
-    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>()) {
+    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
       if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N2) continue; //shower shape variables already calculated for N2
 
       bool calculateZernikeMVA = true;
@@ -272,7 +278,7 @@ void ECLShowerShapeModule::event()
 std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::projectECLDigits(const ECLShower& shower) const
 {
   std::vector<ProjectedECLDigit> tmpProjectedECLDigits; //Will be returned at the end of the function
-  auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>();
+  auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 //   tmpProjectedECLDigits.resize( showerDigitRelations.size() );
   //---------------------------------------------------------------------
   // Get shower parameters.
@@ -478,7 +484,7 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
   double energy1 = 0.0; // to check: 'highest energy' data member may not always be the right one
   double energy9 = 0.0;
 
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto caldigit = relatedDigitsPairs.object(iRel);
@@ -499,7 +505,7 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
 
   }
 
-  if (energy9 >= 0.0) return energy1 / energy9;
+  if (energy9 > 1e-9) return energy1 / energy9;
   else return 0.0;
 }
 
@@ -516,7 +522,7 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
   double energy9 = 0.0;
   double energy21 = 0.0;
 
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto caldigit = relatedDigitsPairs.object(iRel);

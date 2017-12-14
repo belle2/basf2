@@ -27,18 +27,20 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                           const bool useClosestHitToIP)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
+                                           const bool useClosestHitToIP, const bool useBFieldAtHit)
 {
-
   StoreArray<Track> tracks(m_trackColName);
   StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(100, trackReps.size() << " track representations available.");
-  Track newTrack = Track();
+  Track newTrack(recoTrack.getQualityIndicator());
 
+  bool repAlreadySet = false;
+  unsigned int repIDPlusOne = 0;
   for (const auto& trackRep : trackReps) {
+    repIDPlusOne++;
 
     // Check if the fitted particle type is in our charged stable set.
     const Const::ParticleType particleType(std::abs(trackRep->getPDG()));
@@ -54,6 +56,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
       continue;
     }
 
+    if (not repAlreadySet) {
+      RecoTrackGenfitAccess::getGenfitTrack(recoTrack).setCardinalRep(repIDPlusOne - 1);
+      repAlreadySet = true;
+    }
+
     // Extrapolate the tracks to the perigee.
     genfit::MeasuredStateOnPlane msop;
     try {
@@ -67,8 +74,9 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
       continue;
     }
 
+    genfit::MeasuredStateOnPlane extrapolatedMSoP = msop;
     try {
-      msop.extrapolateToLine(m_beamSpot, m_beamAxis);
+      extrapolatedMSoP.extrapolateToLine(m_beamSpot, m_beamAxis);
     } catch (...) {
       B2WARNING("Could not extrapolate the fit result for pdg " << particleType.getPDGCode() <<
                 " to the perigee point. Why, I don't know.");
@@ -80,14 +88,20 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
     TVector3 poca(0., 0., 0.);
     TVector3 dirInPoca(0., 0., 0.);
     TMatrixDSym cov(6);
-    msop.getPosMomCov(poca, dirInPoca, cov);
+    extrapolatedMSoP.getPosMomCov(poca, dirInPoca, cov);
     B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
     B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
 
     const int charge = recoTrack.getTrackFitStatus(trackRep)->getCharge();
     const double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
+
     double Bx, By, Bz;  // In cgs units
-    genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(), Bx, By, Bz);
+    if (useBFieldAtHit) {
+      const TVector3& hitPosition = msop.getPos();
+      genfit::FieldManager::getInstance()->getFieldVal(hitPosition.X(), hitPosition.Y(), hitPosition.Z(), Bx, By, Bz);
+    } else {
+      genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(), Bx, By, Bz);
+    }
     Bz = Bz / 10.; // In SI-Units
 
     const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack);
@@ -100,17 +114,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
 
     const int newTrackFitResultArrayIndex = newTrackFitResult->getArrayIndex();
     newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
-
   }
-
-  try {
-    const auto msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(TrackFitter::getTrackRepresentationForPDG(
-                        defaultHypothesis.getPDGCode(), recoTrack));
-  } catch (genfit::Exception e) {
-    B2WARNING("The default hypothesis is not available after track creation. Discarding track.");
-    return false;
-  }
-
 
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
@@ -127,9 +131,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
     // cppcheck-suppress memleak
     return true;
   } else {
-    return false;
+    B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
   }
-
+  // false positive due to new with placement (cppcheck issue #7163)
+  // cppcheck-suppress memleak
+  return true;
 }
 
 

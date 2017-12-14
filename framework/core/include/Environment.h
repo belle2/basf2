@@ -8,16 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ENVIRONMENT_H
-#define ENVIRONMENT_H
+#pragma once
 
 #include <list>
 #include <string>
 #include <vector>
-
-namespace boost {
-  template<class T> class shared_ptr;
-}
+#include <memory>
 
 namespace Belle2 {
   class Path;
@@ -144,7 +140,7 @@ namespace Belle2 {
      *
      * @param path The path to the file where the pickled path is stored.
      */
-    void setPicklePath(std::string path) { m_picklePath = path; }
+    void setPicklePath(const std::string& path) { m_picklePath = path; }
 
     /**
      * Returns the path to the file where the pickled path is stored
@@ -180,7 +176,7 @@ namespace Belle2 {
     bool getDryRun() const { return m_dryRun; }
 
     /** Set info from path executed by the framework. */
-    void setJobInformation(const boost::shared_ptr<Path>& path);
+    void setJobInformation(const std::shared_ptr<Path>& path);
 
     /** Print information on input/output files in current steering file, used by --dry-run.
      *
@@ -202,7 +198,7 @@ namespace Belle2 {
     int getLogLevelOverride() const { return m_logLevelOverride; }
 
     /** Set list of streaming objects */
-    void setStreamingObjects(std::vector<std::string> strobjs) { m_streamingObjects = strobjs; }
+    void setStreamingObjects(const std::vector<std::string>& strobjs) { m_streamingObjects = strobjs; }
 
     /** Get list of streaming objects */
     const std::vector<std::string>& getStreamingObjects() const { return m_streamingObjects; }
@@ -256,5 +252,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* ENVIRONMENT_H */

@@ -33,46 +33,6 @@ using namespace Belle2;
 using namespace ECL;
 using namespace Eigen;
 
-
-class DoubleArray3D {
-public:
-  DoubleArray3D(size_t N1, size_t N2, size_t N3, double init)
-  {
-    m_N1 = N1;
-    m_N2 = N2;
-    m_N3 = N3;
-
-    m_arr = new double** [m_N1];
-    for (size_t i1 = 0; i1 < m_N1; i1++) {
-      m_arr[i1] = new double * [m_N2];
-      for (size_t i2 = 0; i2 < m_N2; i2++) {
-        m_arr[i1][i2] = new double [m_N3];
-        for (size_t i3 = 0; i3 < m_N3; i3++) {
-          m_arr[i1][i2][i3] = init;
-        }
-      }
-    }
-  }
-  ~DoubleArray3D()
-  {
-    for (size_t i1 = 0; i1 < m_N1; i1++) {
-      for (size_t i2 = 0; i2 < m_N2; i2++) {
-        delete [] m_arr[i1][i2];
-      }
-      delete [] m_arr[i1];
-    }
-    delete [] m_arr;
-  }
-  double** operator[](size_t idx)
-  {
-    return m_arr[idx];
-  }
-
-private:
-  double*** m_arr;
-  size_t m_N1, m_N2, m_N3;
-};
-
 void matrix_cal(int cortyp, const char* inputRootFilename,
                 const char* corrDirSuffix, const char* cutFilename)
 {
@@ -92,10 +52,6 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   fChain.SetBranchAddress("hitA", hitA, &b_hitA);
 
 
-  double delta;
-  delta = 0.;
-
-
   // not used commented to silence warning
   // double SI[16][16];
   // double IS[16][16];
@@ -106,16 +62,16 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
 
 
-  const int mapmax = 217;
+  constexpr int mapmax = 217;
 
-  /*
-  typedef boost::multi_array<double, 3> array3d;
-  array3d W(boost::extents[mapmax][16][1]);
-  array3d WW(boost::extents[mapmax][16][16]);
-  */
-  DoubleArray3D W(mapmax, 16, 1, 0.0);
+  //Can't be std::array because those are constructed on the stack and then there's a compiler warning about a stack overflow
+  std::vector <
+  std::vector <
+  std::vector<double >>> W(mapmax, std::vector<std::vector<double>>(16, std::vector<double>(1, 0.0)));
 
-  DoubleArray3D WW(mapmax, 16, 16, 0.0);
+  std::vector <
+  std::vector <
+  std::vector<double >>> WW(mapmax, std::vector<std::vector<double>>(16, std::vector<double>(16, 0.0)));
 
   WrapArray2D<double> Q(mapmax, 16);
   vector<double> Mean(8736, 0);
@@ -141,7 +97,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   // cortyp = 43;
   double Nsigcut;
   Nsigcut = 3.5;
-  delta = 0.;
+  double delta = 0.;
   int index;
   index = 0;
   int icn, id;
@@ -289,7 +245,8 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   for (icn = 0; icn < mapmax; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
 
 
-    if (0 == 0) { // conventional comment
+    {
+      // conventional comment
       if (icn % 10 == 0) {
         cout << "icn= " << icn << " imnt= " << inmt[icn] << endl;
         // printf("icn=%d inmt=%lf \n ", icn, inmt[icn]);
@@ -350,24 +307,6 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
         //  printf("icn=%d inmt=%lf cut=%lf delta= %e \n  ", icn, inmt[icn], dt[icn]);
       }
 
-      // can be improved....
-      if (0 == 1) { //convetrinal commnet
-        cout << endl;
-
-        for (ia = 0; ia < 16; ia++) {
-          cout << endl;
-          for (ib = 0; ib < 16; ib++) {
-            cout << setprecision(2) << FF[ia][ib] << endl;
-            // printf("%.2e ", FF[ia][ib]);
-          }
-        }
-
-
-      }  //conventinal comment
-
-
-
-
 
     } // largest conventional comment, but what is this for???
 
@@ -376,7 +315,8 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
     // WRITE INVERS MATRICES
 
 
-    if (0 == 0) { // conventional comment
+    {
+      // conventional comment
 
       string mcorFilename(corrDirSuffix);
       mcorFilename += to_string(cortyp) + "/mcor" + to_string(icn) + "_L.dat";

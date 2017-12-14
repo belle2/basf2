@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARBOX_H
-#define GEARBOX_H
+#pragma once
 
 #include <libxml/xpath.h>
 
@@ -253,5 +252,3 @@ namespace Belle2 {
 #define B2_GEARBOX_REGISTER_INPUTHANDLER(classname,prefix)\
   InputHandlerFactory<classname> Gearbox_InputHandlerFactory_##classname(prefix)
 }
-
-#endif

@@ -8,13 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PATH_H_
-#define PATH_H_
+#pragma once
 
 #include <framework/core/PathElement.h>
-
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <list>
 
 namespace boost {
@@ -33,7 +30,7 @@ namespace Belle2 {
   //------------------------------------------------------
 
   /** Defines a pointer to a path object as a boost shared pointer. */
-  typedef boost::shared_ptr<Path> PathPtr;
+  typedef std::shared_ptr<Path> PathPtr;
 
   /** Implements a path consisting of Module and/or Path objects. The modules are arranged in a linear order.  */
   class Path : public PathElement {
@@ -60,7 +57,7 @@ namespace Belle2 {
      *
      * @param module Module that should be added to the path.
      */
-    void addModule(boost::shared_ptr<Module> module);
+    void addModule(std::shared_ptr<Module> module);
 
     /** Returns true if this Path doesn't contain any elements. */
     bool isEmpty() const;
@@ -68,7 +65,7 @@ namespace Belle2 {
     /**
      * Returns a list of the modules in this path. (Recursively searches sub-paths)
      */
-    std::list<boost::shared_ptr<Module> > getModules() const override;
+    std::list<std::shared_ptr<Module> > getModules() const override;
 
     /**
      * Builds a list of all modules which could be executed during the data processing.
@@ -80,12 +77,12 @@ namespace Belle2 {
      * @param unique If true, the list will be unique.
      * @return A list containing all modules which could be executed during the data processing.
      */
-    std::list<boost::shared_ptr<Module> > buildModulePathList(bool unique = true) const;
+    std::list<std::shared_ptr<Module> > buildModulePathList(bool unique = true) const;
 
     /**
      * Replaces all Modules and sub-Paths with the specified Module list
      */
-    void putModules(const std::list<boost::shared_ptr<Module> >& mlist);
+    void putModules(const std::list<std::shared_ptr<Module> >& mlist);
 
     /**
      * Does this Path contain a module of the given type?
@@ -99,7 +96,7 @@ namespace Belle2 {
      * Note that parameters are shared, so changing them on a module in the cloned path will also affect
      * the module in the original path.
      */
-    boost::shared_ptr<PathElement> clone() const override;
+    std::shared_ptr<PathElement> clone() const override;
 
 
     //--------------------------------------------------
@@ -127,11 +124,9 @@ namespace Belle2 {
 
   private:
 
-    std::list<boost::shared_ptr<PathElement> > m_elements; /**< The list of path elements (Modules and sub-Paths) */
+    std::list<std::shared_ptr<PathElement> > m_elements; /**< The list of path elements (Modules and sub-Paths) */
 
     friend class PathIterator;
   };
 
 } // end namespace Belle2
-
-#endif /* PATH_H_ */

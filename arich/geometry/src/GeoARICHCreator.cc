@@ -86,14 +86,6 @@ namespace Belle2 {
     void GeoARICHCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes type)
     {
 
-      if (type == 0) {
-        B2INFO("Geometry type: Full");
-      } else if (type == 1) {
-        B2INFO("Geometry type: Tracking");
-      } else if (type == 2) {
-        B2INFO("Geometry type: Display");
-      }
-
       m_config.useGeantUnits();
       m_sensitive = new SensitiveDetector();
       m_sensitiveAero = new SensitiveAero();
@@ -224,7 +216,7 @@ namespace Belle2 {
       int nWedge = supportPar.getNWedges();
       for (int i = 0; i < nWedge; i++) {
         G4RotationMatrix Rx;
-        int type = supportPar.getWedgeType(i);
+        int wgtype = supportPar.getWedgeType(i);
         double phi = supportPar.getWedgePhi(i);
         Rx.rotateZ(phi);
         double r = supportPar.getWedgeR(i);
@@ -235,14 +227,14 @@ namespace Belle2 {
           z -= shieldZ[0];
           Tb.setZ(z);
           Tr = G4Transform3D(Rx, Tb);
-          if (type == 1) assemblyWedge1->MakeImprint(shieldLV[0], Tr);
-          else if (type == 2) assemblyWedge2->MakeImprint(shieldLV[0], Tr);
+          if (wgtype == 1) assemblyWedge1->MakeImprint(shieldLV[0], Tr);
+          else if (wgtype == 2) assemblyWedge2->MakeImprint(shieldLV[0], Tr);
           continue;
         }
 
         Tr = G4Transform3D(Rx, Tb);
-        if (type == 1) assemblyWedge1->MakeImprint(masterLV, Tr);
-        else if (type == 2) assemblyWedge2->MakeImprint(masterLV, Tr);
+        if (wgtype == 1) assemblyWedge1->MakeImprint(masterLV, Tr);
+        else if (wgtype == 2) assemblyWedge2->MakeImprint(masterLV, Tr);
         else B2ERROR("GeoARICHCreator: invalid support wedge type!");
       }
 

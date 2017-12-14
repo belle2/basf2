@@ -7,7 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+
+#ifndef BKLMGEOMETRYPAR_DB_H
+#define BKLMGEOMETRYPAR_DB_H
 
 #include <vector>
 #include <map>
@@ -920,3 +922,4 @@ namespace Belle2 {
   };
 } // end of namespace Belle2
 
+#endif

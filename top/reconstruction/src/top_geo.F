@@ -4,6 +4,7 @@
 ! M. Staric, mar-2009, feb-2010, sept-2011, jan-2012
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm 
 ! mar-2017: change in some commons
+! dec-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE SET_TOPVOL(R1,R2,Z1,Z2)
@@ -498,7 +499,8 @@ c-- internal functions --------------------------------------------------
       ENDDO
       PRINT*,'TDC range [channels]:     ', TDC_RANGE
       PRINT*,'TDC channel width [ps]:   ', TDC_DT*1000.
-      PRINT*,'TDC offset [ps]:          ', TDC_T0*1000.
+      PRINT*,'TDC offset [ns]:          ', TDC_T0
+      PRINT*,'time range [ns]:          ', -TDC_T0,TIME_RANGE-TDC_T0
       PRINT*,'CFD pile-up time [ns]:    ', CFD_DT
       PRINT*,'CFD double hit res. [ns]: ', CFD_DELT
       PRINT*,'mean photon energy [eV]:  ', E_MEAN

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+dir="~/belle2/release/daq/slc/extra/bin"
+for i in $(seq 1 6)
+do
+echo "booting cprcontrold in cpr${i}"
+ssh cpr00${i} "${dir}/boot_daemon cprcontrold cpr00${i}"
+done
+echo "booting rocontrold in ropc01"
+ssh ropc01 "${dir}/boot_daemon rocontrold ropc_roc01"
+echo "booting runcontrold in ropc01"
+ssh ropc01 "${dir}/boot_daemon runcontrold ropc01"

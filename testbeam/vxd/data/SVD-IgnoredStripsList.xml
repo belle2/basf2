@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+    <Date>22.01.2014</Date>
+    <Description short="Ignore strip list for SVD planes in 2014 VXD beam test">
+        Crude initial list of bad strips
+    </Description>
+    <Author>Peter Kvasnicka</Author>
+</Meta>
+<SVD>
+    <layer n="3">
+        <ladder n="1">
+            <sensor n="3">
+                <side side="u">
+                    <stripsFromTo fromStrip = "620" toStrip = "767"></stripsFromTo>
+                    <!-- Individual strips can be masked, too -->
+                    <strip stripNo = "621"></strip>
+                </side>
+                <side side="v">
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="4">
+        <ladder n="1">
+            <sensor n="4">
+                <side side="u">
+                    <stripsFromTo fromStrip = "000" toStrip = "8"></stripsFromTo>
+                    <stripsFromTo fromStrip = "600" toStrip = "767"></stripsFromTo>
+                </side>
+                <side side="v">
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="5">
+        <ladder n="1">
+            <sensor n="5">
+                <side side="u">
+                    <stripsFromTo fromStrip = "000" toStrip = "20"></stripsFromTo>
+                    <stripsFromTo fromStrip = "600" toStrip = "767"></stripsFromTo>
+                </side>
+                <side side="v">
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "110" toStrip = "114"></stripsFromTo>
+                    <stripsFromTo fromStrip = "300" toStrip = "309"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+    <layer n="6">
+        <ladder n="1">
+            <sensor n="6">
+                <side side="u">
+                    <stripsFromTo fromStrip = "000" toStrip = "008"></stripsFromTo>
+                    <stripsFromTo fromStrip = "115" toStrip = "129"></stripsFromTo>
+                    <stripsFromTo fromStrip = "400" toStrip = "404"></stripsFromTo>
+                    <stripsFromTo fromStrip = "600" toStrip = "767"></stripsFromTo>
+                </side>
+                <side side="v">
+                    <stripsFromTo fromStrip = "000" toStrip = "150"></stripsFromTo>
+                    <stripsFromTo fromStrip = "470" toStrip = "767"></stripsFromTo>
+                </side>
+            </sensor>
+        </ladder>
+    </layer>
+</SVD>

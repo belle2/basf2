@@ -1,0 +1,59 @@
+#
+# Login to Belle II Run control
+#
+
+hostname : localhost
+port : 9092
+nsmhost : 192.168.10.1
+nsmport : 9122
+nsmnode : RC_GUIG2
+nsmtarget : ECL01
+data00.dataname : ECL01_STATUS
+data00.format : rorc_status
+data00.revision : 1
+data01.dataname : CPR5001_STATUS
+data01.format : ronode_status
+data01.revision : 4
+data02.dataname : CPR5002_STATUS
+data02.format : ronode_status
+data02.revision : 4
+data03.dataname : CPR5003_STATUS
+data03.format : ronode_status
+data03.revision : 4
+data04.dataname : CPR5004_STATUS
+data04.format : ronode_status
+data04.revision : 4
+data05.dataname : CPR5005_STATUS
+data05.format : ronode_status
+data05.revision : 4
+data06.dataname : CPR5006_STATUS
+data06.format : ronode_status
+data06.revision : 4
+data07.dataname : CPR5007_STATUS
+data07.format : ronode_status
+data07.revision : 4
+data08.dataname : CPR5008_STATUS
+data08.format : ronode_status
+data08.revision : 4
+data09.dataname : CPR5009_STATUS
+data09.format : ronode_status
+data09.revision : 4
+data10.dataname : CPR5010_STATUS
+data10.format : ronode_status
+data10.revision : 4
+data11.dataname : CPR5011_STATUS
+data11.format : ronode_status
+data11.revision : 4
+data12.dataname : CPR5012_STATUS
+data12.format : ronode_status
+data12.revision : 4
+data13.dataname : CPR5013_STATUS
+data13.format : ronode_status
+data13.revision : 4
+data14.dataname : ROPC501_STATUS
+data14.format : ronode_status
+data14.revision : 4
+
+#
+#
+#

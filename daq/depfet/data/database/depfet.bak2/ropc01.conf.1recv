@@ -1,0 +1,42 @@
+#
+# DB object (confname = STORE01@RC:default)
+#
+
+nodename              : ROPC01
+config                : RC:default
+
+buf[0].name           : buf1
+buf[0].size           : 2000
+buf[1].name           : buf2
+buf[1].size           : 2000
+
+process[0].used       : true
+process[0].name       : generator
+process[0].exe        : generator
+process[0].arg[0].val : 1  # id 
+process[0].arg[1].val : -r # dummy runo
+process[0].arg[2].val : 11 # dummy runo
+process[0].arg[3].val : -w # data size [words]
+process[0].arg[4].val : 50 # data size [words]
+process[0].arg[5].val : -o
+process[0].arg[6].val : buf1,buf2:2000
+
+process[1].used       : true
+process[1].name       : sender_1 
+process[1].exe        : sender
+process[1].arg[0].val : -i
+process[1].arg[1].val : buf1:2000
+process[1].arg[2].val : -o
+process[1].arg[3].val : 0.0.0.0:9991
+
+process[2].used       : true
+process[2].name       : sender_2
+process[2].exe        : sender
+process[2].arg[0].val : -i
+process[2].arg[1].val : buf2:2000
+process[2].arg[2].val : -o
+process[2].arg[3].val : 0.0.0.0:9992
+
+#
+#
+#

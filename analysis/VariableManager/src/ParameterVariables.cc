@@ -238,6 +238,31 @@ namespace Belle2 {
       return sum.M();
     }
 
+    double daughterMCInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
+    {
+      if (!particle)
+        return -999;
+
+      TLorentzVector sum;
+      const auto& daughters = particle->getDaughters();
+      int nDaughters = static_cast<int>(daughters.size());
+
+      for (auto& double_daughter : daughter_indexes) {
+        long daughter = std::lround(double_daughter);
+        if (daughter >= nDaughters)
+          return -999;
+
+        const MCParticle* mcdaughter = daughters[daughter]->getRelated<MCParticle>();
+        if (!mcdaughter)
+          return -999;
+
+        sum += mcdaughter->get4Vector();
+      }
+
+      return sum.M();
+    }
+
+
     double massDifference(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
@@ -372,7 +397,7 @@ namespace Belle2 {
       const Track* track = daug->getTrack();
       if (!track) return 999.9;
 
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(daug->getPDGCode())));
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(daug->getPDGCode())));
       if (!trackFit) return 999.9;
 
       UncertainHelix helix = trackFit->getUncertainHelix();
@@ -398,7 +423,7 @@ namespace Belle2 {
       const Track* track = daug->getTrack();
       if (!track) return 999.9;
 
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(daug->getPDGCode())));
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(daug->getPDGCode())));
       if (!trackFit) return 999.9;
 
       UncertainHelix helix = trackFit->getUncertainHelix();
@@ -443,6 +468,8 @@ namespace Belle2 {
                       "     daughterInvariantMass(0, 1, 2) returns the invariant mass of the first, second and third daughter.\n"
                       "Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.\n"
                       "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+    REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
+                      "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.\n");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
                       "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
     REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters");

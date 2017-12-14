@@ -32,28 +32,28 @@ namespace Belle2 {
     /** Flag to save the Flavor Tagger Output using the FANN Output. This is the Default */
     bool m_useFBDT;
 
-    /**< qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
+    /** qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
     float* qrCombinedFBDT;
 
     /** Flag to save the Flavor Tagger Output using the FANN Output.  */
     bool m_useFANN;
 
-    /**< qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
+    /** qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
     float* qrCombinedFANN;
 
-    /**< q Flavor of the B0-Meson related to the RestOfEvent. Only saved if there is MC Info.*/
+    /** q Flavor of the B0-Meson related to the RestOfEvent. Only saved if there is MC Info.*/
     float* qrMC;
 
     /** Flag to save the individual output of each category.  */
     bool m_saveCategories;
 
-    /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
-    std::map<std::string, float*> m_qrCategories;
+    /** map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
+    std::map<std::string, float*> m_qpCategories;
 
-    /**< map containing the category name and the corresponding MC Variable isRightTarget. They could be used to evaluate independent tags.*/
+    /** map containing the category name and the corresponding MC Variable isRightTarget. They could be used to evaluate independent tags.*/
     std::map<std::string, float*> m_hasTrueTargets;
 
-    /**< map containing the category name and the corresponding MC Variable isRightCategory. They could be used to evaluate independent tags.*/
+    /** map containing the category name and the corresponding MC Variable isRightCategory. They could be used to evaluate independent tags.*/
     std::map<std::string, float*> m_isTrueCategories;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

@@ -1,7 +1,7 @@
 [INFO] Steering file: framework/tests/foreach.py
 [INFO] The random number seed is set to "something important"
 [EventInfoSetter -> ParticleGun -> for_each(MCParticle : MCParticles) -> PrintCollections]
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0
 [INFO] ------------------------------------------------------------------------

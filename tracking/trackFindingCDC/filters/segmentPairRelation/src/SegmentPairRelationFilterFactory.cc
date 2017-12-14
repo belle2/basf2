@@ -16,12 +16,15 @@
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/UnionRecordingSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MVARealisticSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseSegmentPairRelationFilter>;
 
 SegmentPairRelationFilterFactory::SegmentPairRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -55,17 +58,17 @@ std::unique_ptr<BaseSegmentPairRelationFilter>
 SegmentPairRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseSegmentPairRelationFilter>>();
+    return std::make_unique<NoneFilter<BaseSegmentPairRelationFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllSegmentPairRelationFilter>();
+    return std::make_unique<AllSegmentPairRelationFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCSegmentPairRelationFilter>();
+    return std::make_unique<MCSegmentPairRelationFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleSegmentPairRelationFilter>();
+    return std::make_unique<SimpleSegmentPairRelationFilter>();
   } else if (filterName == "unionrecording") {
-    return makeUnique<UnionRecordingSegmentPairRelationFilter>();
+    return std::make_unique<UnionRecordingSegmentPairRelationFilter>();
   } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticSegmentPairRelationFilter>();
+    return std::make_unique<MVARealisticSegmentPairRelationFilter>();
   } else {
     return Super::create(filterName);
   }

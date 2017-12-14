@@ -1,0 +1,22 @@
+# EventType: 1220600000
+# Descriptor: [B+ -> K*+ tau+ tau-]cc
+# NickName: Bu_K*+tautau_mumu
+# Documentation: SM B+ -> K*+ tau tau signal MC both the taus and the K* decaying as they like
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sam Cunliffe
+# Email: samuel.cunliffe@pnnl.gov
+# Cuts: None
+# Date: 20170630
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+1.000        K*+    tau+    tau-           BTOSLLBALL;
+Enddecay
+CDecay B-sig
+#
+End

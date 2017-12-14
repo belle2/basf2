@@ -98,7 +98,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
-  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.35);
+  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
   addParam("StoreAllSecondaries", m_storeSecondaries,
@@ -147,8 +147,10 @@ void FullSimModule::initialize()
   //Register the collections we want to use
   StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
   mcParticles.registerInDataStore();
-  StoreArray<MCParticle>::required(m_mcParticleInputColName);
-  StoreObjPtr<EventMetaData>::required();
+
+  //Make sure these collections already exist
+  StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();
@@ -184,7 +186,7 @@ void FullSimModule::initialize()
 
   //Create the magnetic field for the Geant4 simulation
   if (m_magneticFieldName != "none") {
-    m_magneticField = new MagneticField();
+    m_magneticField = new Belle2::Simulation::MagneticField();
     if (m_magneticCacheDistance > 0) {
       m_uncachedField = m_magneticField;
       m_magneticField = new G4CachedMagneticField(m_uncachedField, m_magneticCacheDistance);
@@ -215,9 +217,9 @@ void FullSimModule::initialize()
 
     //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
     G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
-    B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
+    B2DEBUG(1, "Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
     chordFinder->SetDeltaChord(m_deltaChordInMagneticField * CLHEP::mm);
-    B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
+    B2DEBUG(1, "DeltaChord after reset = " << chordFinder->GetDeltaChord());
 
     //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
   }
@@ -274,6 +276,27 @@ void FullSimModule::initialize()
     if (fabs(currParticle->GetPDGCharge()) > zeroChargeTol) {
       currParticle->GetProcessManager()->AddDiscreteProcess(m_stepLimiter);
       B2DEBUG(100, "Added StepLimiter process for " << currParticle->GetParticleName());
+    }
+  }
+
+  // Inactivate all secondary-generating processes for g4e particles. This comprises
+  // Cerenkov and Scintillation that were inserted by G4OpticalPhysics and the
+  // CaptureAtRest process for g4e anti-deuteron.
+  partIter->reset();
+  while ((*partIter)()) {
+    G4ParticleDefinition* currParticle = partIter->value();
+    if (currParticle->GetParticleName().compare(0, 4, "g4e_") == 0) {
+      G4ProcessManager* processManager = currParticle->GetProcessManager();
+      if (processManager) {
+        G4ProcessVector* processList = processManager->GetProcessList();
+        for (int i = 0; i < processList->size(); ++i) {
+          if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
+              ((*processList)[i]->GetProcessName() == "Scintillation") ||
+              ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {
+            processManager->SetProcessActivation(i, false);
+          }
+        }
+      }
     }
   }
 

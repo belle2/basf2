@@ -310,19 +310,19 @@ void PXDBackgroundModule::event()
     double currentSensorCut = 0;
     // Store fired pixels: count number of digits over threshold
     std::map<VxdID, std::vector<float> > firedPixels;
-    for (const PXDDigit& digit : storeDigits) {
+    for (const PXDDigit& storeDigit : storeDigits) {
       // Filter out digits with signals below zero-suppression threshold
       // ARE THRE SUCH DIGITS?
-      VxdID sensorID = digit.getSensorID();
+      VxdID sensorID = storeDigit.getSensorID();
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;
         auto info = getInfo(sensorID);
         currentSensorCut = info.getChargeThreshold();
       }
-      B2DEBUG(30, "Digit charge: " << digit.getCharge() << " threshold: " << currentSensorCut);
-      if (digit.getCharge() <  currentSensorCut) continue;
+      B2DEBUG(30, "Digit charge: " << storeDigit.getCharge() << " threshold: " << currentSensorCut);
+      if (storeDigit.getCharge() <  currentSensorCut) continue;
       B2DEBUG(30, "Passed.");
-      firedPixels[sensorID].push_back(digit.getCharge());
+      firedPixels[sensorID].push_back(storeDigit.getCharge());
     }
     // Process the map
     for (auto idAndSet : firedPixels) {

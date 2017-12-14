@@ -1,21 +1,12 @@
 import modularAnalysis
 import stdFSParticles
 import vertex
+import basf2
 
-SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
-
-FAST_RECO_CUTS = ["reject_ee", "accept_ee", "reject_bkg"]
-
-HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
-            "accept_mu_mu", "accept_gamma_gamma"]
-
-CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi",
-              "accept_D0_Kpi", "accept_Dstar", "accept_Xi_piLambda", "accept_test",
-              "accept_dqm_D0", "accept_dqm_Dplus", "accept_dqm_Dstar",
-              "accept_dqm_Jpsiee", "accept_dqm_Jpsimumu"]
+SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "development"
 
 
-def add_fast_reco_software_trigger(path, store_array_debug_prescale=None):
+def add_fast_reco_software_trigger(path, store_array_debug_prescale=0):
     """
     Add the SoftwareTrigger for the fast reco cuts to the given path.
 
@@ -23,20 +14,17 @@ def add_fast_reco_software_trigger(path, store_array_debug_prescale=None):
     using the module return value.
 
     :param path: The path to which the module should be added.
-    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+    :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
     :return: the software trigger module
     """
     fast_reco_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="fast_reco",
-                                           cutIdentifiers=FAST_RECO_CUTS,
-                                           acceptOverridesReject=True)
-    if store_array_debug_prescale is not None:
-        fast_reco_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+                                           preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
     return fast_reco_cut_module
 
 
-def add_hlt_software_trigger(path, store_array_debug_prescale=None):
+def add_hlt_software_trigger(path, store_array_debug_prescale=0):
     """
     Add the SoftwareTrigger for the HLT cuts to the given path.
 
@@ -44,31 +32,28 @@ def add_hlt_software_trigger(path, store_array_debug_prescale=None):
     using the module return value.
 
     :param path: The path to which the module should be added.
-    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+    :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
     :return: the software trigger module
     """
-    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2', path=path)
+    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2 and d0 < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:HLT", 'E>0.1', path=path)
 
     # Add fast reco cuts
     hlt_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="hlt",
-                                     cutIdentifiers=HLT_CUTS)
-
-    if store_array_debug_prescale is not None:
-        hlt_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+                                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
     return hlt_cut_module
 
 
-def add_calibration_software_trigger(path, store_array_debug_prescale=None):
+def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     """
     Add the SoftwareTrigger for the calibration (after HLT) to the given path.
 
     Only the calculation of the cuts is implemented here - the cut logic has to be done
 
     :param path: The path to which the module should be added.
-    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+    :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
     :return: the software trigger module
     """
@@ -115,8 +100,8 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     calib_extraInfo_list.append('Xi_chiProb')
 
     # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
-    modularAnalysis.fillParticleList("pi+:dqm", 'piid > 0.5 and chiProb > 0.001', path=path)
-    modularAnalysis.fillParticleList("K-:dqm", 'Kid > 0.5 and chiProb > 0.001', path=path)
+    modularAnalysis.fillParticleList("pi+:dqm", 'pionID > 0.5 and chiProb > 0.001', path=path)
+    modularAnalysis.fillParticleList("K-:dqm", 'kaonID > 0.5 and chiProb > 0.001', path=path)
     # D0->K- pi+
     modularAnalysis.reconstructDecay('D0:dqm -> K-:dqm pi+:dqm', '1.8 < M < 1.92', path=path)
     vertex.vertexKFit('D0:dqm', 0.0, path=path)
@@ -143,7 +128,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     calib_extraInfo_list.append('dqm_Dplus_M')
 
     # Jpsi-> ee
-    modularAnalysis.fillParticleList('e+:good', 'eid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.fillParticleList('e+:good', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
     vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
     modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
@@ -152,15 +137,46 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     calib_extraInfo_list.append('dqm_Jpsiee_M')
 
     # Jpsi-> mumu
-    modularAnalysis.fillParticleList('mu+:good', 'muid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.fillParticleList('mu+:good', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
     vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
     modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'dqm_Jpsimumu_M'}, path=path)
     calib_particle_list.append('J/psi:dqm_mumu')
     calib_extraInfo_list.append('dqm_Jpsimumu_M')
-    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS,
-                                             calibParticleListName=calib_particle_list, calibExtraInfoName=calib_extraInfo_list)
+    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib",
+                                             preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
+                                             calibParticleListName=calib_particle_list,
+                                             calibExtraInfoName=calib_extraInfo_list)
 
-    if store_array_debug_prescale is not None:
-        calibration_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+
+def add_calcROIs_software_trigger(path, calcROIs=True):
+    """
+    Add the PXDDataReduction module to preserve the tracking informaiton for ROI calculation
+    :param path: The path to which the module should be added
+    :param calcROIs: True: turn on the ROI calculation, False: turn off
+    """
+
+    pxdDataRed = basf2.register_module('PXDROIFinder')
+    pxdDataRed.param({
+        'recoTrackListName': 'RecoTracks',
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        # optimized performance
+        #    'sigmaSystU': 0.1,
+        #    'sigmaSystV': 0.1,
+        #    'numSigmaTotU': 10,
+        #    'numSigmaTotV': 10,
+        #    'maxWidthU': 2,
+        #    'maxWidthV': 6,
+        # official simulation
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5})
+    if calcROIs:
+        path.add_module(pxdDataRed)

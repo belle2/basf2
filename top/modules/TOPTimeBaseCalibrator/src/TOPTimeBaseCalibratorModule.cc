@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Hiromichi Kichimi and Xiaolong Wang        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +25,7 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dbobjects/TOPSampleTimes.h>
 
 // Root
@@ -70,10 +71,34 @@ namespace Belle2 {
     addParam("directoryName", m_directoryName,
              "name (with path) of the directory for the output root files.",
              string(""));
-    addParam("minHits", m_minHits, "minimal required hits per channel.", (unsigned) 1000);
+    addParam("minHits", m_minHits,
+             "minimal required hits per channel.", (unsigned) 1000);
+    addParam("numIterations", m_numIterations,
+             "number of iTBC iterations", (unsigned) 100);
+    addParam("numConvIter", m_conv_iter,
+             "Max number of iTBC iterations for conversion.", (unsigned) 50);
+    addParam("minChi2Change", m_dchi2_min,
+             "Minimal of chi2 change in iterations.",  0.2);
+    addParam("dtMin", m_dt_min,
+             "minimum Delta T of raw calpulse in iTBC",  20.0);
+    addParam("dtMax", m_dt_max,
+             "maximum Delta T of raw calpulse in iTBC",  24.0);
+    addParam("xStep", m_xstep,
+             "unit for an interation of delta(X_s)",  0.020);
+    addParam("devStep", m_dev_step,
+             "a step size to calculate the value of d(chisq)/dxval",  0.001);
+    addParam("chgStep", m_change_xstep,
+             "update m_xstep if m_dchi2dxv < m_change_step",  0.015);
+    addParam("newStep", m_new_xstep,
+             "a new step for delta(X_s) if m_dchi2dxv < m_change_step",  2.0 * m_xstep);
+    addParam("sigm2_exp", m_sigm2_exp,
+             "(sigma_0(dT))**2 for nomarlization of chisq = sum{dT^2/sigma^2}",  0.0424 * 0.0424);
+
     addParam("method", m_method, "method: 0 - profile histograms only, "
              "1 - matrix inversion, 2 - iterative, "
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);
+    addParam("useFallingEdge", m_useFallingEdge,
+             "if true, use cal pulse falling edge instead of rising edge", false);
 
   }
 
@@ -85,7 +110,7 @@ namespace Belle2 {
   {
 
     // input
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
 
     // checks
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -113,16 +138,28 @@ namespace Belle2 {
 
     vector<pair<double, double> > hits[c_NumChannels];
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getModuleID() != m_moduleID) continue;
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
-      double t = digit.getRawTime() + digit.getFirstWindow() * c_WindowSize;
+      double rawTime = digit.getRawTime();
+      double errScaleFactor = 1;
+      if (m_useFallingEdge) {
+        const auto* rawDigit = digit.getRelated<TOPRawDigit>();
+        if (!rawDigit) {
+          B2ERROR("No relation to TOPRawDigit - can't determine falling edge time error");
+          continue;
+        }
+        // rawTime may include corrections due to window number discontinuity,
+        // therefore one must add the width and not just use getCFDFallingTime()
+        rawTime += rawDigit->getFWHM();
+        errScaleFactor = rawDigit->getCFDFallingTimeError(1.0) / rawDigit->getCFDLeadingTimeError(1.0);
+      }
+      double t = rawTime + digit.getFirstWindow() * c_WindowSize;
       if (t < 0) {
         B2ERROR("Got negative sample number - digit ignored");
         continue;
       }
-      double et = digit.getTimeError() / sampleWidth;
+      double et = digit.getTimeError() / sampleWidth * errScaleFactor;
       if (et <= 0) {
         B2ERROR("Time error is not given - digit ignored");
         continue;
@@ -314,8 +351,8 @@ namespace Belle2 {
         return matrixInversion(ntuple, scrodID, chan, meanTimeDifference,
                                Hchi2, Hndf, HDeltaT);
       case 2:
-        B2ERROR("Iterative method not implemented yet");
-        return false;
+        return iterativeTBC(ntuple, scrodID, chan, meanTimeDifference,
+                            Hchi2, Hndf, HDeltaT);
       case 3:
         B2ERROR("Singuler value decomposition not implemented yet");
         return false;
@@ -465,11 +502,185 @@ namespace Belle2 {
   }
 
 
-  void TOPTimeBaseCalibratorModule::saveAsHistogram(const vector<double>& vec,
-                                                    const string& name,
-                                                    const string& title,
-                                                    const string& xTitle,
-                                                    const string& yTitle) const
+  bool TOPTimeBaseCalibratorModule::iterativeTBC(const std::vector<TwoTimes>& ntuple,
+                                                 unsigned scrodID, unsigned chan,
+                                                 double meanTimeDifference,
+                                                 TH1F& Hchi2, TH1F& Hndf,
+                                                 TH1F& HDeltaT)
+  {
+    std::vector<double> xval(c_TimeAxisSize + 1, 0.0);
+    double wx = 2 * m_syncTimeBase / c_TimeAxisSize;
+    for (int i = 0; i < c_TimeAxisSize + 1; i++) xval[i] = i * wx;
+
+    B2INFO("TimeBaseCalibration starts for channel#" << chan);
+
+    double pre_chi2 = 10000000.0;
+    unsigned   num_small_dev = 0;
+
+    for (unsigned j = 0; j < m_numIterations; j++) {
+
+      Iteration(ntuple, xval);
+      double this_chi2 = Chisq(ntuple, xval);
+      if (this_chi2 < 0)continue;
+      double deltaChi2 = pre_chi2 - this_chi2;
+      if (deltaChi2 < -m_dchi2_min) break;
+      if (fabs(deltaChi2) < m_deltamin) num_small_dev++;
+      if (num_small_dev > m_conv_iter) break;
+      pre_chi2 = this_chi2;
+    }
+
+    // calculate chi^2
+
+    double chi2 = Chisq(ntuple, xval);
+    Hchi2.SetBinContent(chan + 1, chi2);
+    Hndf.SetBinContent(chan + 1, m_good);
+
+    // constrain sum of x to 2*syncTimeBase and calculate sample times, not necessary here
+
+    double sum = 0;
+    for (auto xi : xval) sum += xi;
+    if (sum == 0) {
+      B2ERROR("sum == 0");
+      return false;
+    }
+
+    double DeltaT = meanTimeDifference * (2 * m_syncTimeBase / c_TimeAxisSize);
+    HDeltaT.SetBinContent(chan + 1, DeltaT);
+
+    std::vector<double> timeInterval;
+    for (int i = 0; i < c_TimeAxisSize; i++)timeInterval.push_back(xval[i + 1] - xval[i]);
+
+
+    std::vector<double> sampleTimes;
+    for (auto xi : xval) sampleTimes.push_back(xi);
+
+    // save results as histograms
+    std::string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
+    saveAsHistogram(timeInterval,  "dt_ch" + to_string(chan), "Sample time bins for " + forWhat,
+                    "sample number", "#Delta t [ns]");
+    saveAsHistogram(sampleTimes, "sampleTimes_ch" + to_string(chan),
+                    "Time base corrections for " + forWhat, "sample number", "t [ns]");
+
+    // calibrated cal pulse time difference
+    std::string name = "timeDiffcal_ch" + to_string(chan);
+    std::string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
+    TH2F Hcor(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
+              100, DeltaT - 0.5, DeltaT + 0.5);
+    Hcor.SetXTitle("sample number");
+    Hcor.SetYTitle("time difference [ns]");
+    Hcor.SetStats(kTRUE);
+
+    TOPSampleTimes timeBase;
+    timeBase.setTimeAxis(sampleTimes, sampleTimes.back() / 2);
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+      double dt = timeBase.getDeltaTime(0, twoTimes.t2, twoTimes.t1);
+      int sample = int(twoTimes.t1) % c_TimeAxisSize;
+      Hcor.Fill(sample, dt);
+    }
+    Hcor.Write();
+
+    B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2
+           << ", ndf = " << m_good << ")");
+
+    return true;
+  }
+
+  void TOPTimeBaseCalibratorModule::Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval)
+  {
+    for (int i = 0; i < c_TimeAxisSize; i++) {
+      double wdth = xval[i + 1] - xval[i];
+      if (wdth < m_min_binwidth) {
+        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * m_min_binwidth;
+        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * m_min_binwidth;
+      }
+      if (wdth > m_max_binwidth) {
+        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * m_max_binwidth;
+        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * m_max_binwidth;
+      }
+    }
+
+    if (xval[0] != 0)
+      for (int i = 0; i < c_TimeAxisSize; i++)  xval[i] = xval[i] - xval[0];
+
+    std::vector<double> xxval(c_TimeAxisSize + 1, 0.0);
+    for (int i = 0; i < c_TimeAxisSize + 1; i++)  xxval[i] = xval[i];
+
+    double chi2_0 = Chisq(ntuple, xxval);
+    if (chi2_0 < 0) B2ERROR("iTBC chisq_0<0! xval has problem.");
+
+    std::vector<double> dr_chi2(c_TimeAxisSize + 1, 0.0);
+    TH1D hdrsamp_try("hdrsamp_try", "dchi2/dx distribution", 100, -0.01, 0.01);
+
+    for (int smp = 1; smp < c_TimeAxisSize; smp++) {
+      xxval[smp] = xval[smp] + m_dev_step;
+      double chi2_ch = Chisq(ntuple, xxval);
+      if (chi2_ch < 0)continue;
+      dr_chi2[smp] = (chi2_ch - chi2_0) / m_dev_step;
+      hdrsamp_try.Fill(dr_chi2[smp]);
+      xxval[smp] = xval[smp];
+    }
+
+    for (int smp = 1; smp < c_TimeAxisSize; smp++) {
+      double vx_it_step = dr_chi2[smp] * m_xstep;
+      xval[smp] = xval[smp] - vx_it_step;
+    }
+
+    //save rms of dchi2/dxval.
+    m_dchi2dxv = hdrsamp_try.GetRMS();
+    //change m_xstep
+    if (fabs(m_dchi2dxv) < m_change_xstep) m_xstep = m_new_xstep;
+  }
+
+  double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval)
+  {
+    double sum1 = 0.0;
+    double sum2 = 0.0; //sum od dt and dt**2
+
+    m_good = 0;
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+
+      std::vector<double> m(c_TimeAxisSize, 0.0);
+
+      int i1 = int(twoTimes.t1);
+      double fr = twoTimes.t1 - i1;
+      double samp0 = i1 % 256;
+      double ctdc1 = xxval[samp0] + fr * (xxval[samp0 + 1] - xxval[samp0]);
+      int i2 = int(twoTimes.t2);
+      fr = twoTimes.t2 - i2;
+      double samp1 = i2 % 256;
+      double ctdc2 = xxval[samp1] + fr * (xxval[samp1 + 1] - xxval[samp1]);
+      double cdt = 0.0;
+      if (samp1 > samp0) cdt = ctdc2 - ctdc1;
+      else            cdt = ctdc2 - ctdc1 + m_syncTimeBase * 2;
+
+      if (cdt < m_dt_max && cdt > m_dt_min) {
+        sum1 += cdt;
+        sum2 += cdt * cdt;
+        m_good++;
+      }
+    }
+
+    double mean = 0.0;
+    double chi2 = -1.0;
+
+    if (m_good > 10) {
+      mean = sum1 / m_good;
+      chi2 = (sum2 - m_good * mean * mean) / m_good / m_sigm2_exp;
+    }
+    return chi2;
+  }
+
+
+
+  void TOPTimeBaseCalibratorModule::saveAsHistogram(const std::vector<double>& vec,
+                                                    const std::string& name,
+                                                    const std::string& title,
+                                                    const std::string& xTitle,
+                                                    const std::string& yTitle) const
   {
     if (vec.empty()) return;
 

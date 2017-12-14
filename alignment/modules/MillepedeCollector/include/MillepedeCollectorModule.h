@@ -16,6 +16,7 @@
 #include <genfit/StateOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
+#include <genfit/GblTrajectory.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -42,10 +43,10 @@ namespace Belle2 {
     virtual void collect();
 
     /** Only for closing mille binaries after each run */
-    virtual void endRun();
+    virtual void closeRun();
 
     /** Register mille binaries in file catalog */
-    virtual void terminate();
+    virtual void finish();
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
@@ -74,7 +75,11 @@ namespace Belle2 {
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
-    /** Names of arrays with single genfit::Tracks fitted by GBL */
+
+    // required input
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Required input array for EventMetaData */
+
+    /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
     /** Names of particle list with single particles */
     std::vector<std::string> m_particles;
@@ -88,12 +93,16 @@ namespace Belle2 {
     bool m_calibrateVertex;
     /** Minimum p.value for output */
     double m_minPValue;
+    /** Whether to use TTree to accumulate GBL data instead of binary files*/
+    bool m_useGblTree;
+    /** Use absolute path to locate binary files in MilleData */
+    bool m_absFilePaths;
+    /** Whether to use VXD alignment hierarchy*/
+    std::vector<std::string> m_components{};
+
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
-    /** Whether to use TTree to accumulate GBL data instead of binary files*/
-    bool m_useGblTree{true};
-    /** Whether to use VXD alignment hierarchy*/
-    bool m_useVXDHierarchy{false};
+
   };
 }
 

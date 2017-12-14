@@ -14,12 +14,14 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/SimpleSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseSegmentTripleFilter>;
 
 SegmentTripleFilterFactory::SegmentTripleFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -51,13 +53,13 @@ std::unique_ptr<Filter<CDCSegmentTriple> >
 SegmentTripleFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseSegmentTripleFilter>>();
+    return std::make_unique<NoneFilter<BaseSegmentTripleFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllSegmentTripleFilter>();
+    return std::make_unique<AllSegmentTripleFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCSegmentTripleFilter>();
+    return std::make_unique<MCSegmentTripleFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleSegmentTripleFilter>();
+    return std::make_unique<SimpleSegmentTripleFilter>();
   } else {
     return Super::create(filterName);
   }

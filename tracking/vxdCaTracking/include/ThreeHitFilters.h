@@ -364,8 +364,7 @@ namespace Belle2 {
         m_radiusCalculated = false;
         m_circleCenterCalculated = false;
         m_radius = 0.;
-        B2DEBUG(1, "sanityCheckRadius: given radius is " << radius << ", which is below threshold of " << 0.0000001 <<
-                ", throwing exception");
+        B2ERROR("sanityCheckRadius: given radius is " << radius << ", which is below threshold of " << 0.0000001 << ", throwing exception");
         throw FilterExceptions::Circle_too_small();
       }
     }

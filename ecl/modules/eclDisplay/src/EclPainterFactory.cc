@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Milkail Remnev, Dmitry Matvienko                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ ***************************************************************************/
+
 #include <ecl/modules/eclDisplay/EclPainterFactory.h>
 
 using namespace Belle2;
@@ -5,29 +15,31 @@ using namespace Belle2;
 const char* EclPainterFactory::titles[types_count] = {
   "Distribution of phi segments",
 //  "Energy per theta",
-  "Distribution of channels",
-  "Distribution of shapers",
-  "Distribution of crates",
-  "Amplitude distribution",
+  "Energy per channel distribution",
+  "Energy per shaper distribution",
+  "Energy per crate distribution",
+  "Energy per phi_id distribution",
+  "Energy per theta_id distribution",
+  "Energy distribution",
+  "Total event energy distribution",
+  "Time distribution",
   "Event display (channels)",
-  "Event display (shapers)",
-//  "Energy on ECL cylinder"
+  "Event display (shapers)"
 };
 
 EclPainterFactory::EclPainterFactory()
 {
 }
 
-EclPainter* EclPainterFactory::CreatePainter(EclPainterType type, EclData* data)
+EclPainter* EclPainterFactory::createPainter(EclPainterType type, EclData* data,
+                                             ECLChannelMapper* mapper,
+                                             EclData::EclSubsystem subsys)
 {
   EclPainter* painter = 0;
   switch (type) {
     case PAINTER_PHI:
       painter = new EclPainterPolar(data, EclPainterPolar::PHI);
       break;
-//    case PAINTER_THETA:
-//      painter = new EclPainterPolar(data, EclPainterPolar::THETA);
-//      break;
     case PAINTER_CHANNEL:
       painter = new EclPainter1D(data, EclPainter1D::CHANNEL);
       break;
@@ -37,8 +49,20 @@ EclPainter* EclPainterFactory::CreatePainter(EclPainterType type, EclData* data)
     case PAINTER_COLLECTOR:
       painter = new EclPainter1D(data, EclPainter1D::CRATE);
       break;
-    case PAINTER_AMP:
-      painter = new EclPainterAmp(data, 50, 3000);
+    case PAINTER_1D_PHI:
+      painter = new EclPainter1D(data, EclPainter1D::PHI);
+      break;
+    case PAINTER_1D_THETA:
+      painter = new EclPainter1D(data, EclPainter1D::THETA);
+      break;
+    case PAINTER_ENERGY:
+      painter = new EclPainterCommon(data, EclPainterCommon::ENERGY);
+      break;
+    case PAINTER_ENERGY_SUM:
+      painter = new EclPainterCommon(data, EclPainterCommon::ENERGY_SUM);
+      break;
+    case PAINTER_TIME:
+      painter = new EclPainterCommon(data, EclPainterCommon::TIME);
       break;
     case PAINTER_CHANNEL_2D:
       painter = new EclPainter2D(data, EclPainter2D::CHANNEL_2D);
@@ -46,19 +70,18 @@ EclPainter* EclPainterFactory::CreatePainter(EclPainterType type, EclData* data)
     case PAINTER_SHAPER_2D:
       painter = new EclPainter2D(data, EclPainter2D::SHAPER_2D);
       break;
-//    case PAINTER_3D:
-//      painter = new EclPainter3D(data, EclPainter3D::THETA_PHI);
-//      break;
   }
+  painter->setMapper(mapper);
+  painter->setDisplayedSubsystem(subsys);
   return painter;
 }
 
-const char** EclPainterFactory::GetTypeTitles()
+const char** EclPainterFactory::getTypeTitles()
 {
   return titles;
 }
 
-int EclPainterFactory::GetTypeTitlesCount()
+int EclPainterFactory::getTypeTitlesCount()
 {
   return types_count;
 }

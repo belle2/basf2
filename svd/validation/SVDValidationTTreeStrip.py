@@ -97,7 +97,7 @@ class SVDValidationTTreeStrip(Module):
             # We want only clusters with exactly one associated TrueHit
             if len(cluster_truehits) != 1:
                 continue
-            digits = cluster.getRelationsTo('SVDDigits')
+            digits = cluster.getRelationsTo('SVDRecoDigits')
 
             # get all the strip IDs of this cluster
             for digit in digits:
@@ -119,7 +119,7 @@ class SVDValidationTTreeStrip(Module):
 
                 # Sensor identification
                 sensorID = cluster.getSensorID()
-                self.data.sensor_id = sensorID
+                self.data.sensor_id = int(sensorID)
                 sensorNum = sensorID.getSensorNumber()
                 self.data.sensor = sensorNum
                 layerNum = sensorID.getLayerNumber()

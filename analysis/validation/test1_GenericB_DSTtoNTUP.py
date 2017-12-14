@@ -21,8 +21,8 @@ from stdLightMesons import *
 
 inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
-loadStdPhoton()
-loadStdPi0()
+stdPhotons('loose')  # loose list also creates 'all' list
+loadStdPi0('all')
 loadStdLoosePi0()
 loadStdKS()
 loadStdLightMesons()
@@ -160,10 +160,6 @@ eventtools = [
     'EventMetaData',
     '^B-',
     'RecoStats',
-    '^B-',
-    'DetectorStatsRec',
-    '^B-',
-    'DetectorStatsSim',
     '^B-',
 ]
 ntupleTree('eventtuple', '', eventtools)

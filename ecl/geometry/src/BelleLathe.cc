@@ -15,7 +15,6 @@
 
 #include <map>
 
-using namespace CLHEP;
 using namespace std;
 
 #define COMPARE 0
@@ -144,12 +143,12 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
     s.isconvex = false;
     if (s.dz > 0) return;
     vector<zr_t>::const_iterator it = fcontour.begin();
-    double a = s.dz * s.is, b = s.dr * s.is, c = b * s.z - a * s.r;
+    double a = s.dz * s.is, b = s.dr * s.is, cc = b * s.z - a * s.r;
     bool dp = false, dm = false;
     s.isconvex = true;
     do {
       const zr_t& p = *it;
-      double d = a * p.r - b * p.z + c; // distance to line
+      double d = a * p.r - b * p.z + cc; // distance to line
       dm = dm || (d < -eps);
       dp = dp || (d >  eps);
       if (dm && dp) {s.isconvex = false; return;}
@@ -216,8 +215,8 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
     findx.push_back(fseg.size());
     for (int j = 0, nj = fcache.size(); j < nj; j++) {
       const cachezr_t& sj = fcache[j];
-      double c = sj.zmin, d = sj.zmax;
-      if (c != d and b > c and d > a) { // overlap
+      double cc = sj.zmin, d = sj.zmax;
+      if (cc != d and b > cc and d > a) { // overlap
         fseg.push_back(j);
       }
     }
@@ -565,8 +564,8 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
     // search for the most distant points on the clipping plane
     for (unsigned int i = 0; i < lone.size(); i++) {
       for (unsigned int j = i + 1; j < lone.size(); j++) {
-        double d = (vlist[lone[i]] - vlist[lone[j]]).mag2();
-        if (d > dmax) { imax = lone[i]; jmax = lone[j];}
+        double d2 = (vlist[lone[i]] - vlist[lone[j]]).mag2();
+        if (d2 > dmax) { imax = lone[i]; jmax = lone[j];}
       }
     }
 
@@ -1031,12 +1030,12 @@ zr_t BelleLathe::normal(const zr_t& r, double& d2) const
 
   if (t < 0.0) {
     const cachezr_t& s = fcache[iseg];
-    zr_t d = {r.z - s.z, r.r - s.r};
-    double d2 = d.z * d.z + d.r * d.r;
-    if (d2 > 1e-18) {
-      double q = 1 / sqrt(d2);
+    zr_t dist = {r.z - s.z, r.r - s.r};
+    double dist2 = dist.z * dist.z + dist.r * dist.r;
+    if (dist2 > 1e-18) {
+      double q = 1 / sqrt(dist2);
       if (wn_poly(r) == 2) q = -q;
-      return {d.z * q, d.r * q};
+      return {dist.z * q, dist.r * q};
     } else {
       zr_t n = getn(iseg), np = getn(iseg - 1);
       n.z += np.z; n.r += np.r;
@@ -1055,10 +1054,10 @@ G4ThreeVector BelleLathe::SurfaceNormal(const G4ThreeVector& p) const
 {
   COUNTER(1);
 
-  auto side = [this, &p](const zr_t & r, double d, int side) {
-    double nx = (side) ? fn1x : fn0x, ny = (side) ? fn1y : fn0y;
+  auto side = [this, &p](const zr_t & r, double d, int iside) {
+    double nx = (iside) ? fn1x : fn0x, ny = (iside) ? fn1y : fn0y;
     if (wn_poly(r) == 2) return G4ThreeVector(nx, ny, 0);
-    double cphi = (side) ? fc1 : fc0, sphi = (side) ? fs1 : fc0;
+    double cphi = (iside) ? fc1 : fc0, sphi = (iside) ? fs1 : fc0;
 
     double d2; zr_t n = normal(r, d2);
     double x = cphi * n.r, y = sphi * n.r;
@@ -1740,13 +1739,13 @@ G4ThreeVector BelleLathe::GetPointOnSurface() const
 {
   auto GetPointOnTriangle = [this](const triangle_t& t)-> G4ThreeVector{
     // barycentric coordinates
-    double a1 = RandFlat::shoot(0., 1.), a2 = RandFlat::shoot(0., 1.);
+    double a1 = CLHEP::RandFlat::shoot(0., 1.), a2 = CLHEP::RandFlat::shoot(0., 1.);
     if (a1 + a2 > 1) { a1 = 1 - a1; a2 = 1 - a2;}
     double a0 = 1 - (a1 + a2);
     const zr_t& p0 = fcontour[t.i0], &p1 = fcontour[t.i1], &p2 = fcontour[t.i2];
     zr_t p = {p0.z* a0 + p1.z* a1 + p2.z * a2, p0.r* a0 + p1.r* a1 + p2.r * a2};
     double c, s;
-    if (RandFlat::shoot(0., 1.) > 0.5) // select phi side
+    if (CLHEP::RandFlat::shoot(0., 1.) > 0.5) // select phi side
     {
       c = -fn0y; s = fn0x;
     } else {
@@ -1756,7 +1755,7 @@ G4ThreeVector BelleLathe::GetPointOnSurface() const
     return r1;
   };
 
-  double rnd = RandFlat::shoot(0., farea.back());
+  double rnd = CLHEP::RandFlat::shoot(0., farea.back());
   std::vector<double>::const_iterator it = std::lower_bound(farea.begin(), farea.end(), rnd);
   unsigned int i = it - farea.begin();
 
@@ -1770,12 +1769,12 @@ G4ThreeVector BelleLathe::GetPointOnSurface() const
 
   const cachezr_t& s = fcache[i];
   double I = 2 * s.r + s.dr;
-  double Iw = RandFlat::shoot(0., I);
+  double Iw = CLHEP::RandFlat::shoot(0., I);
   double q = sqrt(Iw * s.dr + s.r * s.r);
   double t = Iw / (q + s.r);
   double z = s.z + s.dz * t;
   double r = s.r + s.dr * t;
-  double phi = RandFlat::shoot(fphi, fphi + fdphi);
+  double phi = CLHEP::RandFlat::shoot(fphi, fphi + fdphi);
   double x = r * cos(phi), y = r * sin(phi);
   return G4ThreeVector(x, y, z);
 }

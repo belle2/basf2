@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ErrorMessageDiagnosis>
+  <Error>
+    <ID></ID>
+    <Type>TTD</Type>
+    <Message>Example : TTD trouble</Message>
+    <Diagnosis>Trigger and Timing Distribution system trouble. Abort and try again. If the same error occurs, contact with DAQ(TTD) experts. </Diagnosis>
+  </Error>
+</ErrorMessageDiagnosis>

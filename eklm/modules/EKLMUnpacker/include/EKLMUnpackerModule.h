@@ -15,8 +15,13 @@
 #include <string>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <eklm/geometry/GeometryData.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
 
@@ -66,6 +71,18 @@ namespace Belle2 {
 
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
+
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
+    /** Electronics map. */
+    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+
+    /** Digits. */
+    StoreArray<EKLMDigit> m_Digits;
+
+    /** Raw data. */
+    StoreArray<RawKLM> m_RawKLMs;
 
   };
 

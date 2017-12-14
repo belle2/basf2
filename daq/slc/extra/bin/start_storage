@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+cd -
+
+echo "booting storagerd"
+./boot_daemon storagerd store01

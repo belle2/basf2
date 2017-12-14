@@ -149,12 +149,6 @@ namespace Belle2 {
       /** Segment support. */
       Polygon2D*** m_SegmentSupport;
 
-      /** Last checked sector. */
-      EKLMAlignmentData* m_LastCheckedSector;
-
-      /** Last sector check result. */
-      bool m_LastSectorCheckResult;
-
     };
 
   }

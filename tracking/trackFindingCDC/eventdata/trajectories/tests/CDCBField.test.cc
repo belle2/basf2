@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <framework/geometry/BFieldManager.h>
 #include <gtest/gtest.h>
 
 
@@ -19,10 +19,7 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, eventdata_trajectories_CDCBField_getBFieldZSign)
 {
-  BFieldMap& bFieldMap = BFieldMap::Instance();
-
-  TVector3 origin(0.0, 0.0, 0.0);
-  TVector3 bFieldAtOrigin = bFieldMap.getBField(origin);
+  TVector3 bFieldAtOrigin = BFieldManager::getField(0, 0, 0) / Unit::T;
   Double_t bZAtOrigin = bFieldAtOrigin.Z();
   ESign bZSignAtOrigin = sign(bZAtOrigin);
   EXPECT_EQ(bZSignAtOrigin, CDCBFieldUtil::getBFieldZSign());

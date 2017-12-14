@@ -7,8 +7,7 @@
 // Modified : 4 - Jun - 2010
 //-
 
-#ifndef MSGHANDLER_H
-#define MSGHANDLER_H
+#pragma once
 
 #include <framework/pcore/EvtMessage.h>
 #include <TMessage.h>
@@ -136,5 +135,3 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-
-#endif

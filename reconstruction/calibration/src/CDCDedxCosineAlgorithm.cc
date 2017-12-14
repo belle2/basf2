@@ -10,6 +10,7 @@
 
 #include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
 #include <TF1.h>
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -18,7 +19,7 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() : CalibrationAlgorithm("CDCDedxCosineCollector")
+CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx electron cos(theta) dependence");
@@ -30,54 +31,54 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() : CalibrationAlgorithm("CDCDedx
 
 CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
-
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   double dedx, costh;
-  ttree.SetBranchAddress("dedx", &dedx);
-  ttree.SetBranchAddress("costh", &costh);
+  ttree->SetBranchAddress("dedx", &dedx);
+  ttree->SetBranchAddress("costh", &costh);
 
-  const int nbins = 101;
-  TH1F* dedxcosth[nbins];
-  for (int i = 0; i < nbins; ++i) {
-    dedxcosth[i] = new TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 100, 20, 70);
+  // make histograms to store dE/dx values in bins of cos(theta)
+  // bin size can be arbitrary, for now just make uniform bins
+  const int nbins = 100;
+  TH1F dedxcosth[nbins];
+  for (unsigned int i = 0; i < nbins; ++i) {
+    dedxcosth[i] = TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 100, 0, 2);
   }
 
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  // fill histograms, bin size may be arbitrary
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     if (costh < -1.0 || costh > 1.0) continue;
-    int bin = (int)((costh + 1.0) / 2.0 * nbins);
-    dedxcosth[bin]->Fill(dedx);
+    int bin = (costh + 1.0) / (2.0 / nbins);
+    if (bin < 0 || bin >= nbins) continue;
+    dedxcosth[bin].Fill(dedx);
   }
 
-  B2INFO("dE/dx Calibration for CDC dE/dx electron saturation");
-
-  for (int i = 0; i < nbins; ++i) {
-    B2INFO("Bin " << i + 1 << ": " << dedxcosth[i]->Integral());
-  }
-
-  TH1F* means = new TH1F("cosine", "CDC dE/dx cosine correction", nbins, -1.0, 1.0);
-  for (int i = 0; i < nbins; ++i) {
-    if (dedxcosth[i]->Integral() < 100) {
-      means->SetBinContent(i + 1, 0);
-      continue;
+  // fit histograms to get gains in bins of cos(theta)
+  std::vector<double> cosine;
+  for (unsigned int i = 0; i < nbins; ++i) {
+    if (dedxcosth[i].Integral() < 50)
+      cosine.push_back(1.0); // FIXME! --> should return not enough data
+    else {
+      int status = dedxcosth[i].Fit("gaus");
+      if (status != 0) {
+        cosine.push_back(1.0); // FIXME! --> should return not enough data
+      } else {
+        float mean = dedxcosth[i].GetFunction("gaus")->GetParameter(1);
+        cosine.push_back(mean);
+      }
     }
-    dedxcosth[i]->Fit("gaus");
-    double mean = dedxcosth[i]->GetFunction("gaus")->GetParameter(1);
-    means->SetBinContent(i + 1, mean);
-    B2INFO("cos(theta) = " << means->GetBinCenter(i + 1));
   }
 
-  for (int i = 0; i < nbins; ++i) {
-    B2INFO("Bin " << i + 1 << ": " << means->GetBinContent(i + 1));
-  }
+  B2INFO("dE/dx Calibration done for CDC dE/dx electron saturation");
 
-  saveCalibration(means, getPrefix());
+  CDCDedxCosineCor* gain = new CDCDedxCosineCor(nbins, cosine);
+  saveCalibration(gain, "CDCDedxCosineCor");
 
   return c_OK;
 }

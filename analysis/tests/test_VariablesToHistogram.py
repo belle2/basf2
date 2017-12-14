@@ -7,13 +7,13 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-filepath = 'analysis/tests/mdst5.root'
+filepath = 'analysis/tests/mdst7.root'
 inputFile = Belle2.FileSystem.findFile(filepath)
 if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst7.root'\n")
     sys.exit(-1)
 
 path = create_path()
@@ -25,7 +25,7 @@ path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
 # Write out electron id and mc information of all electron candidates into histograms
 path.add_module('VariablesToHistogram',
                 particleList='e+',
-                variables=[('eid', 100, 0, 1), ('isSignal', 2, -0.5, 1.5)],
+                variables=[('electronID', 100, 0, 1), ('isSignal', 2, -0.5, 1.5)],
                 variables_2d=[('mcErrors', 513, -0.5, 512.5, 'isSignal', 2, -0.5, 1.5)],
                 fileName='particleListNtuple.root')
 
@@ -44,9 +44,10 @@ with tempfile.TemporaryDirectory() as tempdir:
     # Testing
     assert os.path.isfile('particleListNtuple.root'), "particleListNtuple.root wasn't created"
     f = ROOT.TFile('particleListNtuple.root')
-    t = f.Get('eid')
-    assert bool(t), "eid histogram isn't contained in file"
-    assert t.GetBinContent(1) > t.GetBinContent(100), "Expected fewer candidates with a highest eid compared to lowest eid"
+    t = f.Get('electronID')
+    assert bool(t), "electronID histogram isn't contained in file"
+    assert t.GetBinContent(1) > t.GetBinContent(
+        100), "Expected fewer candidates with a highest electronID compared to lowest electronID"
     t = f.Get('isSignal')
     assert bool(t), "isSignal histogram isn't contained in file"
     assert t.GetBinContent(1) > t.GetBinContent(2), "Expected more background than signal"
@@ -84,7 +85,7 @@ with tempfile.TemporaryDirectory() as tempdir:
     t = f.Get('nTracksnECLClusters')
     assert bool(t), "nTracksnECLClusters 2d histogram isn't contained in file"
     ntracks_12_2d = []
-    for i in range(52):
+    for i in range(53):
         ntracks_12_2d.append(t.GetBinContent(13, i))
     assert ntracks_12_1d == sum(ntracks_12_2d),\
         "Expected same amount of events with 12 tracks in 1D and 2D histograms got {} {}".format(ntracks_12_1d, sum(ntracks_12_2d))

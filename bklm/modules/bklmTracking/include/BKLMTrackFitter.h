@@ -46,19 +46,30 @@ namespace Belle2 {
                          double& error,
                          double& sigma);
 
+    //! Distance from track to a hit in the global system
+    double globalDistanceToHit(BKLMHit2d* hit,
+                               double& error,
+                               double& sigma);
+
     //! do fit in the y-x plane or z-x plane
     double fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
                             CLHEP::HepVector&  eta,
                             CLHEP::HepSymMatrix&  error,
                             int depDir,    int indDir);
 
-    //! Get track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
+    //! do fit in the global system
+    double fit1dTrack(std::list< BKLMHit2d* > hitList,
+                      CLHEP::HepVector&  eta,
+                      CLHEP::HepSymMatrix&  error,
+                      int depDir,    int indDir);
+
+    //! Get track parameters in the global system. y = p0 + p1 * x; y = p2 + p3 * z, if in local sector fit mode: y = p0 + p1 * x; z = p2 + p3 * x
     CLHEP::HepVector    getTrackParam() {return m_GlobalPar; }
 
     //! Get invariance matrix of track parameters in the global system.
     CLHEP::HepSymMatrix getTrackParamErr() {return m_GlobalErr; }
 
-    //! Get track parameters in the sector locan system, where the first layer of the sector is used as reference.
+    //! Get track parameters in the sector locan system, y = p0 + p1 * x, z = p2 + p3 *x, where the first layer of the sector is used as reference.
     CLHEP::HepVector    getTrackParamSector() {return m_SectorPar; }
 
     //! Get invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
@@ -79,6 +90,9 @@ namespace Belle2 {
     //! Invalidate track
     void  inValidate() { m_Valid = false; }
 
+    //!  set the fitting mode, local system or global system
+    void  setGlobalFit(bool localOrGlobal) { m_globalFit = localOrGlobal; }
+
   private:
 
     //! Is fit valid
@@ -92,6 +106,9 @@ namespace Belle2 {
 
     //! the number of hits on this track
     int m_NumHit;
+
+    //! do fit in the local system or global system false: local sys; true: global sys.
+    bool m_globalFit;
 
     //! track params in the sector local system
     CLHEP::HepVector     m_SectorPar;

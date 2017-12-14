@@ -14,6 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGGDL_SHORT_NAMES
 
+#include <TRandom.h>
 #include <fstream>
 #include <stdio.h>
 #include "trg/trg/Debug.h"
@@ -28,7 +29,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <trg/gdl/dataobjects/TRGGDLResults.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 
 #include <framework/logging/Logger.h>
@@ -64,7 +65,8 @@ namespace Belle2 {
   TRGGDL::getTRGGDL(const string& configFile,
                     unsigned simulationMode,
                     unsigned fastSimulationMode,
-                    unsigned firmwareSimulationMode)
+                    unsigned firmwareSimulationMode,
+                    const std::string& Phase)
   {
     if (_gdl) {
       //delete _gdl;
@@ -75,7 +77,8 @@ namespace Belle2 {
       _gdl = new TRGGDL(configFile,
                         simulationMode,
                         fastSimulationMode,
-                        firmwareSimulationMode);
+                        firmwareSimulationMode,
+                        Phase);
     } else {
       cout << "TRGGDL::getTRGGDL ... good-bye" << endl;
       //        delete _gdl;
@@ -96,12 +99,14 @@ namespace Belle2 {
   TRGGDL::TRGGDL(const string& configFile,
                  unsigned simulationMode,
                  unsigned fastSimulationMode,
-                 unsigned firmwareSimulationMode)
+                 unsigned firmwareSimulationMode,
+                 const std::string& Phase)
     : _debugLevel(0),
       _configFilename(configFile),
       _simulationMode(simulationMode),
       _fastSimulationMode(fastSimulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
+      _Phase(Phase),
       _clock(Belle2_GDL::GDLSystemClock),
       _offset(15.3),
       _isb(0),
@@ -125,7 +130,9 @@ namespace Belle2 {
   void
   TRGGDL::initialize(void)
   {
-    configure();
+    //if it is firmware simulation, do the cofigurnation
+    //fastsimulation doesn't use the configuration currently
+    if (_simulationMode == 2) configure();
   }
 
   void
@@ -195,9 +202,9 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGDL fastSim");
 
-    StoreObjPtr<TRGGDLResults> GDLResult;
+    StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
-      B2WARNING("TRGGDLResults exist already, check it!!!!");
+      B2WARNING("TRGSummary exist already, check it!!!!");
       return;
     } else {
       //TRGGDLResults* GDLResult = L1TrgResults.appendNew();
@@ -210,30 +217,153 @@ namespace Belle2 {
 
       //get the objects defined in GRL, the name have to be unified to the name in TriggerMenufile
       std::vector<int> obj;
-      obj.push_back(grlinfo->getN2Dfindertrk()); //0
-      obj.push_back(grlinfo->getNcluster());//1
-      obj.push_back(grlinfo->getNhighcluster1());//2
-      obj.push_back(grlinfo->getNhighcluster2());//3
-      obj.push_back(grlinfo->getNhighcluster3());//4
-      obj.push_back(grlinfo->getNhighcluster4());//5
-      obj.push_back(grlinfo->getNneucluster());//6
-      obj.push_back(grlinfo->getNbbCluster());//7
-      obj.push_back(grlinfo->getNbbTrkCluster());//8
-      obj.push_back(grlinfo->getBhabhaVeto());//9
-      obj.push_back(grlinfo->getsBhabhaVeto());//10
-      obj.push_back(grlinfo->geteclBhabhaVeto());//11
+      int nTrk3D = (grlinfo->getN3Dfittertrk()); //0
+      int nTrkZ10 = (grlinfo->getN3DfittertrkZ10()); //1
+      int nTrkZ25 = (grlinfo->getN3DfittertrkZ25()); //2
+      int nClust = (grlinfo->getNcluster()); //3
+      int n300MeV = (grlinfo->getNhig300cluster());
+      int n1GeV415 = (grlinfo->getNhigh1GeVcluster415()); //4
+      int n1GeV2316 = (grlinfo->getNhigh1GeVcluster2316()); //5
+      int n1GeV117 = (grlinfo->getNhigh1GeVcluster117()); //6
+      int n2GeV = (grlinfo->getNhigh2GeVcluster()); //7
+      int n2GeV414 = (grlinfo->getNhigh2GeVcluster414()); //8
+      int n2GeV231516 = (grlinfo->getNhigh2GeVcluster231516()); //9
+      int n2GeV117 = (grlinfo->getNhigh2GeVcluster117()); //10
+      int nTrkBhabha = (grlinfo->getBhabhaVeto()); //11
+      int nECLBhabha = (grlinfo->geteclBhabhaVeto()); //12
+      int nPhiPairHigh = (grlinfo->getPhiPairHigh()); //13
+      int nPhiPairLow = (grlinfo->getPhiPairLow()); //14
+      int n3DPair = (grlinfo->get3DPair()); //15
+      int nSameHem1Trk = (grlinfo->getNSameHem1Trk()); //16
+      int nOppHem1Trk = (grlinfo->getNOppHem1Trk()); //17
+
+
+      const int ntrg = 18;
+      bool passBeforePrescale[ntrg];
+      int sf[ntrg];
+      bool Phase2 = (_Phase == "Phase2");
+
+      int itrig = 0;
+      passBeforePrescale[itrig] = nTrk3D >= 3;
+      sf[itrig] = 1;
+
+      itrig = 1;
+      if (Phase2) {
+        passBeforePrescale[itrig] = nTrk3D == 2 && nTrkZ25 >= 1 && nTrkBhabha == 0;
+      } else {
+        passBeforePrescale[itrig] = nTrk3D == 2 && nTrkZ10 >= 1 && nTrkBhabha == 0;
+      }
+      sf[itrig] = 1;
+
+      itrig = 2;
+      passBeforePrescale[itrig] = nTrk3D == 2 && nTrkBhabha == 0;
+      sf[itrig] = 20;
+
+      itrig = 3;
+      passBeforePrescale[itrig] = nTrk3D == 2 && nTrkBhabha > 0;
+      if (Phase2) sf[itrig] = 1;
+      else sf[itrig] = 2;
+
+      itrig = 4;
+      if (Phase2) {
+        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ25 == 1 && nSameHem1Trk >= 1 && n2GeV == 0;
+      } else {
+        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ10 == 1 && nSameHem1Trk >= 1 && n2GeV == 0;
+      }
+      sf[itrig] = 1;
+
+      itrig = 5;
+      if (Phase2) {
+        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ25 == 1 && nOppHem1Trk >= 1 && n2GeV == 0;
+      } else {
+        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ10 == 1 && nOppHem1Trk >= 1 && n2GeV == 0;
+      }
+      sf[itrig] = 1;
+
+      itrig = 6;
+      if (Phase2) {
+        passBeforePrescale[itrig] = nClust >= 3 && n300MeV >= 1 && nECLBhabha == 0;
+      } else {
+        passBeforePrescale[itrig] = nClust >= 3 && n300MeV >= 2 && nECLBhabha == 0;
+      }
+      sf[itrig] = 1;
+
+      itrig = 7;
+      passBeforePrescale[itrig] = n2GeV414 >= 1 && nTrkBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 8;
+      passBeforePrescale[itrig] = n2GeV414 >= 1 && nTrkBhabha >= 1;
+      if (Phase2)sf[itrig] = 1;
+      else sf[itrig] = 2;
+
+      itrig = 9;
+      passBeforePrescale[itrig] = n2GeV231516 >= 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 10;
+      passBeforePrescale[itrig] = n2GeV231516 >= 1 && (nTrkBhabha >= 1 || nECLBhabha >= 1);
+      sf[itrig] = 1;
+
+      itrig = 11;
+      passBeforePrescale[itrig] = n2GeV117 >= 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      if (Phase2)sf[itrig] = 10;
+      else sf[itrig] = 20;
+
+      itrig = 12;
+      passBeforePrescale[itrig] = n2GeV117 >= 1 && (nTrkBhabha >= 1 || nECLBhabha >= 1);
+      if (Phase2)sf[itrig] = 10;
+      else sf[itrig] = 20;
+
+      itrig = 13;
+      passBeforePrescale[itrig] = n1GeV415 == 1 && n300MeV == 1;
+      sf[itrig] = 1;
+
+      itrig = 14;
+      passBeforePrescale[itrig] = n1GeV2316 == 1 && n300MeV == 1;
+      if (Phase2)sf[itrig] = 1;
+      else sf[itrig] = 5;
+
+      itrig = 15;
+      passBeforePrescale[itrig] = nPhiPairHigh >= 1 && n2GeV == 0;
+      sf[itrig] = 1;
+
+      itrig = 16;
+      if (Phase2) {
+        passBeforePrescale[itrig] = nPhiPairLow >= 1 && n2GeV == 0;
+        sf[itrig] = 1;
+      } else {
+        passBeforePrescale[itrig] = nPhiPairLow >= 1 && n2GeV == 0 && nTrkZ25 == nTrk3D;
+        sf[itrig] = 3;
+      }
+
+      itrig = 17;
+      passBeforePrescale[itrig] = n3DPair >= 1 && n2GeV == 0;
+      if (Phase2)sf[itrig] = 1;
+      else sf[itrig] = 5;
+
 
       int L1Summary = 0;
-      std::vector<int> trgres;
-      dotrigger(trgres, obj);
-      for (unsigned int i = 0; i < trgres.size(); i++) {
-        int bitval = trgres[i];
+      //std::vector<int> trgres;
+      //dotrigger(trgres, obj);
+      for (unsigned int i = 0; i < ntrg; i++) {
+        int bitval = 0;
+        if (passBeforePrescale[i]) bitval = doprescale(sf[i]);
         L1Summary = L1Summary | (bitval << i);
+        GDLResult->setPreScale(0, i, sf[i]);
       }
-      GDLResult->setL1TriggerRsults(L1Summary);
-
+      GDLResult->setTRGSummary(0, L1Summary);
     }
   }
+
+  int TRGGDL::doprescale(int f)
+  {
+    int Val = 0;
+    double ran = gRandom->Uniform(f);
+    if (ceil(ran) == f) Val = 1;
+    return Val;
+  }
+
 
   void
   TRGGDL::firmwareSimulation(void)

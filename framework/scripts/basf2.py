@@ -37,7 +37,7 @@ ROOT_kIsConstMethod = 0x10000000
 def _avoidPyRootHang():
     """
     workaround for possible hang with PyROOT on SL5
-    see https://belle2.cc.kek.jp/redmine/issues/1236
+    see https://agira.desy.de/browse/BII-976
     note: platform.libc_ver() is _really_ broken, so i'm checking the
     version via ldd (ships with libc)
     """
@@ -89,7 +89,7 @@ def get_terminal_width():
     return get_terminal_size(fallback=(80, 24)).columns
 
 
-def pretty_print_table(table, column_widths, first_row_is_heading=True):
+def pretty_print_table(table, column_widths, first_row_is_heading=True, transform=None, min_flexible_width=10):
     """
     Pretty print a given table, by using available terminal size and
     word wrapping fields as needed.
@@ -100,12 +100,22 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
         in 'table'. Available fields are::
 
             -n  as needed, up to n characters, word wrap if longer
+            0   as long as needed, no wrapping
             n   n characters (fixed)
-            *   use all available space, good for description fields
-                (can only be used ONCE)
+            *   use all available space, good for description fields.
+                If more than one column has a * they all get equal width
+            +   use all available space but at least the actual width. Only useful
+                to make the table span the full width of the terminal
 
     :param first_row_is_heading: header specifies if we should take the first row
                           as table header and offset it a bit
+
+    :param transform: either None or a callback function which takes three
+        arguments: first the elements of the row as a list, second the width of
+        each column (without separator) and finally the preformatted text line.
+        It should return a string representing the final line to be printed.
+
+    :param min_flexible_width: the minimum amount of characters for every column marked with *
     """
 
     import textwrap
@@ -118,19 +128,23 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
 
     # adjust act_column_widths to comply with user-specified widths
     total_used_width = 0
-    long_column = -1  # index of * column, if found
+    long_columns = []  # index of * column, if found
     for (col, opt) in enumerate(column_widths):
         if opt == '*':
-            if long_column >= 0:
-                print('column_widths option "*" can only be used once!')
-                return
-
             # handled after other fields are set
-            long_column = col
+            long_columns.append(col)
+            continue
+        elif opt == "+":
+            # handled after other fields are set. Distinguish from * by using by
+            # using negative indices
+            long_columns.append(- col - 1)
             continue
         elif isinstance(opt, int) and opt > 0:
             # fixed width
             act_column_widths[col] = opt
+        elif isinstance(opt, int) and opt == 0:
+            # as long as needed, nothing to do
+            pass
         elif isinstance(opt, int) and opt < 0:
             # width may be at most 'opt'
             act_column_widths[col] = min(act_column_widths[col], -opt)
@@ -142,11 +156,25 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
     # add separators
     total_used_width += len(act_column_widths) - 1
 
-    term_width = get_terminal_width()
-    if long_column >= 0:
-        # TODO: add option for minimum widh?
-        remaining_space = max(term_width - total_used_width, 10)
-        act_column_widths[long_column] = remaining_space
+    if long_columns:
+        remaining_space = max(get_terminal_width() - total_used_width, len(long_columns) * min_flexible_width)
+        # ok split the table into even parts but divide up the remainder
+        col_width, remainder = divmod(remaining_space, len(long_columns))
+        for i, col in enumerate(long_columns):
+            size = col_width + (1 if i < remainder else 0)
+            if col < 0:
+                # negative index: a '+' specifier: make column large but at
+                # least as wide as content. So convert column to positive and
+                # set the width
+                col = -1 - col
+                act_column_widths[col] = max(size, act_column_widths[col])
+                # if we are larger than we should be add the amount to the total
+                # table width
+                total_used_width += act_column_widths[col] - size
+            else:
+                act_column_widths[col] = size
+
+        total_used_width += remaining_space
 
     format_string = ' '.join(['%%-%ss' % length for length in
                               act_column_widths[:-1]])
@@ -155,7 +183,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
 
     # print table
     if first_row_is_heading:
-        print(term_width * '-')
+        print(total_used_width * '-')
 
     header_shown = False
     for row in table:
@@ -169,11 +197,13 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
                     row[i] = wrapped_row[i][line]
                 else:
                     row[i] = ''
-
-            print(format_string % tuple(row))
+            line = format_string % tuple(row)
+            if transform is not None:
+                line = transform(row, act_column_widths, line)
+            print(line)
 
         if not header_shown and first_row_is_heading:
-            print(term_width * '-')
+            print(total_used_width * '-')
             header_shown = True
 
 
@@ -313,6 +343,16 @@ def process(path, max_event=0):
                 0 for no limit
     """
 
+    # if we are running in an ipython session set the steering file to the
+    # current history
+    try:
+        ipython = get_ipython()
+        history = "\n".join(e[2] for e in ipython.history_manager.get_range())
+        from ROOT import Belle2
+        Belle2.Environment.Instance().setSteering(history)
+    except NameError:
+        pass
+
     # If a pickle path is set via  --dump-path or --execute-path we do something special
     pickle_path = fw.get_pickle_path()
     if pickle_path != '':
@@ -333,7 +373,7 @@ def process(path, max_event=0):
         else:
             B2FATAL("Couldn't open path-file '" + pickle_path + "' and no steering file provided.")
 
-    B2RESULT("Starting event processing, random seed is set to '" + get_random_seed() + "'")
+    B2INFO("Starting event processing, random seed is set to '" + get_random_seed() + "'")
 
     if max_event != 0:
         fw.process(path, max_event)

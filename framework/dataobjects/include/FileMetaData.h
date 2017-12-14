@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef FILEMETADATA_H
-#define FILEMETADATA_H
+
+#pragma once
 
 #include <TObject.h>
 
@@ -197,6 +197,9 @@ namespace Belle2 {
      */
     void setDataDescription(const std::string& key, const std::string& value) { m_dataDescription[key] = value; }
 
+    /** remove an existing data description */
+    void removeDataDescription(const std::string& key) { m_dataDescription.erase(key); }
+
     /**
      * Exposes methods of the FileMetaData class to Python.
      */
@@ -267,4 +270,3 @@ namespace Belle2 {
   }; //class
 
 } // namespace Belle2
-#endif // FILEMETADATA

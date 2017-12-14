@@ -38,7 +38,7 @@ def main(argv):
         Just to show that the function is correctly applied
         """
         B2INFO("Running Test Algorithm Setup For Iteration {0}".format(iteration))
-        B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.Class_Name()))
+        B2INFO("Can access the {0} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
 
     # Make a bunch of test calibrations
     calibrations = []
@@ -49,9 +49,6 @@ def main(argv):
         col_test.param('granularity', 'all')
         # Specific parameter to our test collector, proportional to the probability of algorithm requesting iteration.
         col_test.param('spread', 15)
-        # Allows us to force the test collector to wait before starting its event loop (microseconds).
-        # Nice for slowing everything down to a human pace.
-        col_test.param('wait', 1000000)
 
         alg_test = TestCalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have
@@ -66,6 +63,10 @@ def main(argv):
         cal_test.pre_algorithms = pre_alg_test
 
         cal_test.max_files_per_collector_job = 1
+        # If you have some local databases or want to override the default global tag for this calibration you can do that
+        # with these functions
+#        cal_test.use_local_database("mylocaldb/database.txt")
+#        cal_test.use_central_database("BelleII_GlobalTag_Tutorial")
         calibrations.append(cal_test)
 
     # Define dependencies. In this case the classic diamond e.g.
@@ -95,6 +96,7 @@ def main(argv):
     # Start her up!
     cal_fw.run()
     print("End of CAF processing.")
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

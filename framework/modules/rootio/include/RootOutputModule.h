@@ -8,13 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROOTOUTPUTMODULE_H
-#define ROOTOUTPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
-#include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
+#include <framework/datastore/DataStore.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -104,6 +102,11 @@ namespace Belle2 {
      */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
+    /** Array of names of branches that should be written out although they are not flagged for writeout.
+     *  And usually ignored, use to writeout RestOfEvent.
+     */
+    std::vector<std::string> m_additionalBranchNames[DataStore::c_NDurabilityTypes];
+
     /** Array for names of branches that should NOT be written out.
      *
      *  This takes precedence over m_branchNames, so if a branch is in both
@@ -180,7 +183,8 @@ namespace Belle2 {
 
     /** Whether or not we want to build an event index */
     bool m_buildIndex{true};
+
+    /** Whether to keep parents same as that of input file */
+    bool m_keepParents{false};
   };
 } // end namespace Belle2
-
-#endif

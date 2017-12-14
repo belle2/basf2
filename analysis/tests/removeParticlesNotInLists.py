@@ -9,15 +9,10 @@ from modularAnalysis import *
 
 main = create_path()
 
-rootinput = register_module('RootInput')
-rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root'))
+inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
 
-
-main.add_module(rootinput)
-
-
-kaons = ('K-', 'Kid > 0.05')
-pions = ('pi+', 'piid > 0.05')
+kaons = ('K-', 'kaonID > 0.05')
+pions = ('pi+', 'pionID > 0.05')
 photons = ('gamma', '')
 fillParticleLists([kaons, pions, photons], path=main)
 

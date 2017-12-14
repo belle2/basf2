@@ -35,13 +35,13 @@ NtupleMakerModule::NtupleMakerModule() : Module()
   m_iCand = 0;
 
   //Set module properties
-  setDescription("Make a TTree with the properties of selected decay products. See https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleMaker for an introduction.");
+  setDescription("Make a TTree with the properties of selected decay products. See https://confluence.desy.de/display/BI/Physics+NtupleMaker for an introduction.");
   //Parameter definition
   addParam("fileName", m_fileName, "Name of ROOT file for output", string(""));
   addParam("treeName", m_treeName, "Name of TTree to be filled.", string(""));
   addParam("comment", m_comment, "Comment about the content of the TTree.", string(""));
   addParam("tools", m_toolNames,
-           "List of tools and decay descriptors. Available tools are described in https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleTool",
+           "List of tools and decay descriptors. Available tools are described in https://confluence.desy.de/display/BI/Physics+NtupleTool",
            vector<string>());
   addParam("listName", m_listName, "Name of particle list with reconstructed particles.", string(""));
 }
@@ -52,17 +52,42 @@ void NtupleMakerModule::initialize()
     B2FATAL("Invalid inputs. Please set a vaild root output file name (fileName) or valid TTree name (treeName) module parameters.");
   }
 
-  // Initializing the output root file
-  if (!m_file) m_file = new TFile(m_fileName.c_str(), "RECREATE");
-  if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_fileName);
-    return;
+  // Initializing the output root file. There can only be one NtupleMaker output
+  // file so this module can:
+  //
+  // 1. open a file (filenName not empty, treeName is empty)
+  // 2. create a tree in the already opened file (filename is empty, treeName not empty)
+  // 3. both at the same time (fileName not empty, treeName not empty)
+  //
+  // in case of 2. this only works if another instance already opened the file.
+  if (!m_file) {
+    // No one tried to open a file yet so this needs to be case 1. or 3.
+    if (m_fileName.empty()) {
+      B2ERROR("Cannot create Ntuple tree: No ntuple file specified so far. Please call ntupleFile() "
+              "before calling ntupleTree() or specify a valid fileName parameter if using NtupleMaker directly");
+      return;
+    }
+    // Ok we have a filename, but can we actually create a file there?
+    m_file = new TFile(m_fileName.c_str(), "RECREATE");
+    if (!m_file->IsOpen()) {
+      B2ERROR("Could not create file \"" << m_fileName << "\". Please set a vaild ntuple output file name (fileName)");
+      return;
+    }
+    // everything setup
+  } else if (!m_fileName.empty()) {
+    // we already have tried to open a file but we have a filename? At least print a warning
+    B2WARNING("There is already an open Ntuple file (" << m_file->GetName() <<
+              "), ignoring additional request to create " << m_fileName);
   }
 
-  m_file->cd();
-
-  if (m_treeName.empty())
+  // Ok, we made sure there is at least a valid TFile* at m_file but it might
+  // not be open. In that case or if we don't have a tree name we do nothing:
+  // we already reported any kind of errors above
+  if (!m_file->IsOpen() || m_treeName.empty())
     return;
+
+  // Finally everything is setup: create the TTree ...
+  m_file->cd();
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {

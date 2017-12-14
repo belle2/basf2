@@ -11,6 +11,6 @@ path = basf2.create_path()
 path.add_module("EventInfoSetter", evtNumList=[1])
 path.add_module("EvtGenInput")
 add_simulation(path)
-path.add_module('RootOutput', outputFileName="evtgen_bbar_no_mc.root", branchNames=["ARICHDigits", "BKLMDigits", "ECLDigits", "EKLMDigits", "CDCHits", "SVDClusters", "TOPDigits"])
+path.add_module('RootOutput', outputFileName="evtgen_bbar_no_mc.root", branchNames=["ARICHDigits", "BKLMDigits", "ECLDigits", "EKLMDigits", "CDCHits", "SVDShaperDigits", "PXDDigits", "TOPDigits"])
 
 basf2.process(path)

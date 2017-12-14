@@ -1,0 +1,6 @@
+Import('env')
+
+env['CONTINUE'] = False
+
+
+Return('env')

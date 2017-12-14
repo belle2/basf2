@@ -15,6 +15,8 @@ using namespace std;
 
 using namespace Belle2;
 
+std::set<unsigned short> GlobalLabel::m_components = {};
+
 GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   gid(0), eid(0), pid(0), tid(0), tif(0)
 {
@@ -39,12 +41,6 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
     eid = eidpid / eidOffest;
     tid = gid % tifOffset / tidOffset;
   }
-}
-
-GlobalLabel::GlobalLabel(BeamID beamid, gidTYPE paramId) : gid(0), eid(0),
-  pid(0), tid(0), tif(0)
-{
-  construct((int)beamid + beamOffset, paramId);
 }
 
 GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): gid(0),
@@ -101,10 +97,10 @@ void GlobalLabel::clearTimeDependentParamaters()
 
 GlobalLabel::gidTYPE GlobalLabel::setParameterId(GlobalLabel::gidTYPE paramId)
 {
-  if (paramId > maxPID) {
+  if (!getUniqueId() or paramId > maxPID) {
     return label();
   }
-  construct(eid, paramId);
+  construct(getUniqueId(), getElementId(), paramId);
   return label();
 }
 

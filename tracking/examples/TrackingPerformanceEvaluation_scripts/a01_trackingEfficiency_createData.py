@@ -15,10 +15,10 @@
 # > mkdir /group/belle2/users/casarosa/trackingValidation/release
 # > ln -s /group/belle2/users/casarosa/trackingValidation/release .
 # > ln -s release/tracking/examples/TrackingPerformanceEvaluation_scripts/a*.py
-# > bsub -q s -o data_release.out basf2 a01_trackingEfficiency_createData.py
-# > bsub -q s -o simul_roi_bkg_release.out basf2 a02_trackingEfficiency_simulateData.py roi bkg
-# > bsub -q s -o reco_roi_bkg_vxdtf_release.out basf2 a03_trackingEfficiency_runTracking.py roi bkg vxdtf
-# > bsub -q s -o anal_roi_bkg_vxdtf_release.out basf2 a04_trackingEfficiency_createPlots.py roi bkg vxdtf
+# > bsub -q s -o data_release.out basf2 a01_trackingEfficiency_createData.py release
+# > bsub -q s -o simul_roi_bkg_release.out basf2 a02_trackingEfficiency_simulateData.py release roi bkg
+# > bsub -q s -o reco_roi_bkg_vxdtf_release.out basf2 a03_trackingEfficiency_runTracking.py release roi bkg vxdtf
+# > bsub -q s -o anal_roi_bkg_vxdtf_release.out basf2 a04_trackingEfficiency_createPlots.py release roi bkg vxdtf
 #
 #################################################################
 
@@ -29,7 +29,7 @@ from beamparameters import add_beamparameters
 
 set_random_seed(1509)
 
-release = 'merged'
+release = sys.argv[1]
 
 print(release)
 

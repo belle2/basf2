@@ -9,14 +9,13 @@
  * **************************************************************************/
 #include <reconstruction/modules/ClusterMatcher/ClusterMatcherModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
 
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Cluster.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 
 using namespace Belle2;
@@ -44,43 +43,30 @@ ClusterMatcherModule::~ClusterMatcherModule()
 void ClusterMatcherModule::initialize()
 {
   // require existence of necessary datastore obj
-  StoreArray<KLMCluster>::required();
-  StoreArray<ECLCluster>::required();
+  m_klmClusters.isRequired();
+  m_eclClusters.isRequired();
+  m_eclClusters.registerRelationTo(m_klmClusters);
 
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-  eclClusters.registerRelationTo(klmClusters);
-
-  StoreArray<Cluster>::registerPersistent();//Transient
-  StoreArray<Cluster> Clusters;
-  klmClusters.registerRelationTo(Clusters);
-  eclClusters.registerRelationTo(Clusters);
+  m_Clusters.registerInDataStore();
+  m_klmClusters.registerRelationTo(m_Clusters);
+  m_eclClusters.registerRelationTo(m_Clusters);
 
 }//init
 
 
 void ClusterMatcherModule::event()
 {
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<Cluster> Clusters;
-
   float angleDist;
 
-  for (const ECLCluster& eclCluster : eclClusters) {
+  for (const ECLCluster& eclCluster : m_eclClusters) {
 
     const TVector3& eclClusterPos = eclCluster.getClusterPosition();
 
-
-    Cluster* clusterecl = Clusters.appendNew();
-    clusterecl->setLogLikelihood(
-      Const::ECL,
-      Const::clusterKlong,
-      eclCluster.getRelatedTo<KlId>()->getKlId()
-    );
+    Cluster* clusterecl = m_Clusters.appendNew();
+    //Once available we will have to set ECL likelihoods here as is done for KLM
     eclCluster.addRelationTo(clusterecl);
 
-    for (KLMCluster& klmcluster : klmClusters) {
+    for (KLMCluster& klmcluster : m_klmClusters) {
 
       const TVector3& klmClusterPos = klmcluster.getClusterPosition();
 
@@ -91,7 +77,7 @@ void ClusterMatcherModule::event()
         eclCluster.addRelationTo(&klmcluster, angleDist);
         klmcluster.addRelationTo(clusterecl);
       } else {
-        Cluster* clusterklm = Clusters.appendNew();
+        Cluster* clusterklm = m_Clusters.appendNew();
         clusterklm->setLogLikelihood(
           Const::KLM,
           Const::clusterKlong,

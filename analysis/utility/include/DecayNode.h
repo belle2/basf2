@@ -28,12 +28,12 @@ namespace Belle2 {
   class DecayNode {
 
   public:
-    /*
+    /**
      * Create new Decay node
      * @param _pdg code of the particle
      * @param _daughters of the particle
      */
-    DecayNode(int _pdg = 0, const std::vector<DecayNode> _daughters = {}) : pdg(_pdg), daughters(_daughters) { }
+    DecayNode(int _pdg = 0, const std::vector<DecayNode>& _daughters = {}) : pdg(_pdg), daughters(_daughters) { }
 
     /**
      * Check if the decay node contains the given decay tree.

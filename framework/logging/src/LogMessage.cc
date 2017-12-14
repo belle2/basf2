@@ -21,14 +21,15 @@ using namespace Belle2;
 
 
 LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-                       const std::string& function, const std::string& file, unsigned int line) :
+                       const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
   m_logLevel(logLevel),
   m_message(message),
-  m_module("-global-"),
+  m_module(""),
   m_package(package ? package : ""),
   m_function(function),
   m_file(file),
   m_line(line),
+  m_debugLevel(debugLevel),
   m_logInfo(0)
 {
 }
@@ -48,7 +49,10 @@ bool LogMessage::operator==(const LogMessage& message) const
 
 std::ostream& LogMessage::print(std::ostream& out) const
 {
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Timestamp)) {
+  int logInfo = m_logInfo ? m_logInfo :
+                (LogConfig::c_Timestamp | LogConfig::c_Level | LogConfig::c_Message | LogConfig::c_Module | LogConfig::c_Package |
+                 LogConfig::c_Function | LogConfig::c_File | LogConfig::c_Line);
+  if (logInfo & LogConfig::c_Timestamp) {
     static const double startClock = Utils::getClock();
     const auto flags = out.flags();
     const int oldprecision = out.precision(3);
@@ -56,34 +60,42 @@ std::ostream& LogMessage::print(std::ostream& out) const
     out.precision(oldprecision);
     out.flags(flags);
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Level)) {
-    out << "[" << LogConfig::logLevelToString(m_logLevel) << "] ";
+  if (logInfo & LogConfig::c_Level) {
+    const std::string debugLevel = (m_logLevel == LogConfig::c_Debug) ? (":" + std::to_string(m_debugLevel)) : "";
+    out << "[" << LogConfig::logLevelToString(m_logLevel) << debugLevel << "] ";
   }
   if (ProcHandler::EvtProcID() != -1) {
     //which process is this?
     out << "(" << ProcHandler::EvtProcID() << ") ";
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Message)) {
+  if (logInfo & LogConfig::c_Message) {
     out << m_message;
   }
-  bool printLocation = (!m_logInfo
-                        || (m_logInfo & (LogConfig::c_Module + LogConfig::c_Package + LogConfig::c_Function + LogConfig::c_File + LogConfig::c_Line)));
+  // if there is no module or package or similar there's no need to print them
+  if (m_module.empty()) logInfo &= ~LogConfig::c_Module;
+  if (m_package.empty()) logInfo &= ~LogConfig::c_Package;
+  if (m_function.empty()) logInfo &= ~LogConfig::c_Function;
+  // line number without filename is useless as well so disable both in one go
+  if (m_file.empty()) logInfo &= ~(LogConfig::c_File | LogConfig::c_Line);
+  // is there any location string left to print?
+  bool printLocation = logInfo & (LogConfig::c_Module | LogConfig::c_Package | LogConfig::c_Function |
+                                  LogConfig::c_File | LogConfig::c_Line);
   if (printLocation) {
     out << "  {";
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Module)) {
+  if (logInfo & LogConfig::c_Module) {
     out << " module: " << m_module;
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Package)) {
+  if (logInfo & LogConfig::c_Package) {
     out << " package: " << m_package;
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Function)) {
+  if (logInfo & LogConfig::c_Function) {
     out << " function: " << m_function;
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_File)) {
+  if (logInfo & LogConfig::c_File) {
     out << " @" << m_file;
   }
-  if (!m_logInfo || (m_logInfo & LogConfig::c_Line)) {
+  if (logInfo & LogConfig::c_Line) {
     out  << ":" << m_line;
   }
   if (printLocation) {

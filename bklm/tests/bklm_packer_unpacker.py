@@ -11,8 +11,6 @@ require_database_for_test()
 
 set_random_seed(321)
 set_log_level(LogLevel.INFO)
-# use_central_database("test_bklm", LogLevel.INFO)
-use_central_database("production")
 
 
 class PackerUnpackerTest(Module):
@@ -74,6 +72,7 @@ class PackerUnpackerTest(Module):
             assert digit.inRPC() == digitUnpacked.inRPC()
             assert digit.isForward() == digitUnpacked.isForward()
             assert digit.getCTime() == digitUnpacked.getCTime()
+            assert digit.getCharge() == digitUnpacked.getCharge()
             assert digit.isAboveThreshold() == digitUnpacked.isAboveThreshold()
             # assert digit.getModuleID() == digitUnpacked.getModuleID()
             # assert digit.getTime() == digitUnpacked.getTime()

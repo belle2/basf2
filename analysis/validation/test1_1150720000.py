@@ -5,7 +5,7 @@
 <header>
 <input>../1150720000.dst.root</input>
 <output>../1150720000.ntup.root</output>
-<contact>Mario Merola; mario.merola@na.infn.it </contact>
+<contact>Matic Lubej; matic.lubej@ijs.si</contact>
 </header>
 """
 
@@ -37,9 +37,9 @@ mcFiles = ["../1150720000.dst.root"]
 inputMdstList('default', mcFiles)
 
 # fsp selection
-electrons = ('e-:rec', 'useCMSFrame(p) > 1.0 and eid > 0.8')
-muons = ('mu-:rec', 'useCMSFrame(p) > 1.0 and muid > 0.8')
-pions = ('pi-:rec', 'piid > 0.8')
+electrons = ('e-:rec', 'useCMSFrame(p) > 1.0 and electronID > 0.8')
+muons = ('mu-:rec', 'useCMSFrame(p) > 1.0 and muonID > 0.8')
+pions = ('pi-:rec', 'pionID > 0.8')
 
 fillParticleLists([electrons, muons, pions])
 

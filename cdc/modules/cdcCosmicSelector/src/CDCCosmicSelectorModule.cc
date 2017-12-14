@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcCosmicSelector/CDCCosmicSelectorModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <utility>
 #include <iostream>
@@ -25,7 +23,7 @@ REG_MODULE(CDCCosmicSelector)
 CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 {
   // Set description
-  setDescription("Select cosmics passing through the trigger counter");
+  setDescription("Modify MCParticles for cosmics so that the global time is zero at y=0 assuming a cosmic trajectory is a line. And select cosmics passing through a trigger counter. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after the event-generator and before FullSim.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("xOfCounter", m_xOfCounter, "x-position of trigger counter (cm)",  -0.6);
@@ -43,22 +41,20 @@ CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 
 void CDCCosmicSelectorModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.required();
+  m_mcParticles.isRequired();
 }
 
 
 void CDCCosmicSelectorModule::event()
 {
-  // Get SimHit array, MCParticle array
-  StoreArray<MCParticle> mcParticles;
+  bool returnVal = false;
 
-  // Loop over all particles
-  int nMCPs = mcParticles.getEntries();
-  B2DEBUG(250, "Number of mcParticles in the current event: " << nMCPs);
-  if (nMCPs != 1) B2WARNING("No. of mcparticle != 1 !");
-
-  const double mass = 0.1056583715; //muon mass (GeV)
+  int nMCPs = m_mcParticles.getEntries();
+  if (nMCPs == 0) {
+    B2ERROR("No. of MCParticles=0 in the current event.");
+    setReturnValue(returnVal);
+    return;
+  }
 
   /*
   const double    yOfCounter = -16.25 + 3.0;
@@ -67,12 +63,38 @@ void CDCCosmicSelectorModule::event()
   const double zmaxOfCounter = -1.5 + 15.5;
   */
 
+  // Loop over prim. charged MC particle
   const double c = 29.9792458; //light speed (cm/ns)
-  bool returnVal = false;
-  for (int iMCPs = 0; iMCPs < nMCPs; ++iMCPs) {
-    MCParticle* m_P = mcParticles[iMCPs];
+  double mass = 0.1056583715; //muon mass (GeV)
+  unsigned nPrimChgds = 0;
 
-    if (abs(m_P->getPDG()) != 13) B2FATAL("Not muon !");
+  for (int iMCPs = 0; iMCPs < nMCPs; ++iMCPs) {
+    MCParticle* m_P = m_mcParticles[iMCPs];
+
+    //    B2INFO("isPrimaryParticle= " << m_P->isPrimaryParticle());
+    if (!m_P->isPrimaryParticle()) continue;
+
+    unsigned pid = abs(m_P->getPDG());
+    if (pid ==   13) {
+      ++nPrimChgds;
+    } else if (pid ==   11) {
+      ++nPrimChgds;
+      mass = 0.000510998928;
+    } else if (pid ==  211) {
+      ++nPrimChgds;
+      mass = 0.13957018;
+    } else if (pid ==  321) {
+      ++nPrimChgds;
+      mass = 0.493677;
+    } else if (pid == 2212) {
+      ++nPrimChgds;
+      mass = 0.938272046;
+    } else {
+      continue;
+    }
+
+    //    B2INFO("No .of prim. charged MC particles= " << nPrimChgds);
+    if (nPrimChgds > 1) continue;
 
     const TVector3 vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();
@@ -165,8 +187,16 @@ void CDCCosmicSelectorModule::event()
       }
 
       const double tofToCounter = fl / (c * beta);
-      const double topToPMT = m_top ? (zi - (m_zOfCounter - 0.5 * m_lOfCounter)) / m_propSpeed : 0.;
-      //      std::cout << "topToPMT= " << topToPMT << std::endl;
+      const double topToPMT = m_top ? hypot(xi - xOfCounter, zi - (m_zOfCounter - 0.5 * m_lOfCounter)) / m_propSpeed : 0.;
+      /*
+      std::cout << "xi          = " << xi << std::endl;
+      std::cout << "xOfCounter  = " << xOfCounter << std::endl;
+      std::cout << "zi          = " << zi << std::endl;
+      std::cout << "m_zOfCounter= " << m_zOfCounter << std::endl;
+      std::cout << "m_lOfCounter= " << m_lOfCounter << std::endl;
+      std::cout << "m_propSpeed = " << m_propSpeed  << std::endl;
+      std::cout << "topToPMT    = " << topToPMT << std::endl;
+      */
       m_P->setProductionTime(pTime - tofToCounter - topToPMT);
       //      std::cout <<"org,mod= " << pTimeOrg << m_P->getProductionTime() << std::endl;
       //if not hit, reverse the momentum vector so that the particle will not be simulated

@@ -2,27 +2,40 @@
 # -*- coding: utf-8 -*-
 
 # Usage:
-# basf2 run_hlt.py -i inputfilename.sroot -o outputfilename.sroot
-# you can take the output file of rawdata_simulation.py as the input file
+# the script running on hlt for cosmic
 
 import basf2
-
-from simulation import add_simulation
 import os
-
 from reconstruction import add_cosmics_reconstruction
-from softwaretrigger.path_functions import add_unpackers
+from rawdata import add_unpackers
+from softwaretrigger import (
+    add_fast_reco_software_trigger,
+    add_hlt_software_trigger,
+    add_calibration_software_trigger,
+)
+from softwaretrigger.hltdqm import cosmic_hltdqm
+
 
 components = ["CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
-saverawdataObjs = ['EventMetaData', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
+saverawdataObjs = ['EventMetaData', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs', 'SoftwareTriggerResult']
 
 main_path = basf2.create_path()
 
 main_path.add_module("SeqRootInput")
 
-add_unpackers(main_path, components)
+histoman = basf2.register_module('HistoManager')
+main_path.add_module(histoman)
 
-add_cosmics_reconstruction(main_path, components)
+add_unpackers(main_path, components=components)
+
+# cosmic reconstruction
+add_cosmics_reconstruction(main_path, components=components)
+# hlt trigger modules for test
+add_fast_reco_software_trigger(main_path)
+add_hlt_software_trigger(main_path)
+add_calibration_software_trigger(main_path)
+
+cosmic_hltdqm(main_path)
 
 output = basf2.register_module('SeqRootOutput')
 output.param('saveObjs', saverawdataObjs)

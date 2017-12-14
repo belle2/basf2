@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "killing runcontrold"
+killall runcontrold

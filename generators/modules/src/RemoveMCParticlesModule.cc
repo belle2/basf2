@@ -74,7 +74,9 @@ RemoveMCParticlesModule::RemoveMCParticlesModule() : Module()
 
 void RemoveMCParticlesModule::initialize()
 {
-  StoreArray<MCParticle>::required(m_particleList);
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
+
   std::sort(m_pdgCodes.begin(), m_pdgCodes.end());
   m_minTheta *= Unit::deg;
   m_maxTheta *= Unit::deg;
@@ -126,7 +128,7 @@ void RemoveMCParticlesModule::applyCuts(const MCParticle& particle, bool cut)
   if (cut) m_mpg[particle.getArrayIndex()].setIgnore(true);
 
   //Then we look at all daughters
-  for (MCParticle * daughter : particle.getDaughters()) {
+  for (MCParticle* daughter : particle.getDaughters()) {
     applyCuts(*daughter, cut);
   }
 }

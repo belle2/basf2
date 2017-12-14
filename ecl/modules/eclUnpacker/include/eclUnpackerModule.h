@@ -7,21 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
-#ifndef ECLUNPACKERMODULE_H
-#define ECLUNPACKERMODULE_H
-
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawECL.h>
-#include <ecl/dataobjects/ECLDigit.h>
 #include <framework/core/Module.h>
-#include "ecl/utility/eclChannelMapper.h"
+#include "ecl/utility/ECLChannelMapper.h"
 
 namespace Belle2 {
+
+  class RawECL;
+  class ECLDigit;
+  class ECLTrig;
+  class ECLDsp;
+
   namespace ECL {
 
     class ECLUnpackerModule : public Module {
@@ -46,10 +44,6 @@ namespace Belle2 {
 
 
     private:
-//      /** CPU time     */
-//      double m_timeCPU;
-//      /** Run number   */
-//      int    m_nRun;
       /** Event number */
       int    m_EvtNum;
 
@@ -62,26 +56,38 @@ namespace Belle2 {
       /** bit position for bit-by-bit data read  */
       int m_bitPos;
 
-      /** name of output collection for ECLLDigits  */
+      /** flag for whether or not to store collection with trigger times */
+      bool m_storeTrigTime;
+
+      /** name of output collection for ECLDigits  */
       std::string m_eclDigitsName;
+      /** name of output collection for ECLTrig  */
+      std::string m_eclTrigsName;
+      /** name of output collection for ECLDsp  */
+      std::string m_eclDspsName;
       /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
       std::string m_eclMapperInitFileName;
 
+      /** ECL channel mapper **/
       ECLChannelMapper m_eclMapper;
 
       /** Output data  */
+      /** store array for digitized gits**/
       StoreArray<ECLDigit> m_eclDigits;
+      /** store array for eclTrigs data (trigger time and tag)**/
+      StoreArray<ECLTrig>  m_eclTrigs;
+      /** store array for waveforms**/
+      StoreArray<ECLDsp>   m_eclDsps;
+      /** store array for RawECL**/
+      StoreArray<RawECL>   m_rawEcl;
 
       /** read nex word from COPPER data, check if the end of data is reached  */
       unsigned int readNextCollectorWord();
       /** rean N bits from COPPER buffer (needed for reading the compressed ADC data) */
       unsigned int readNBits(int bitsToRead);
-      /// read raw data from COPPER and fill output m_eclDigits container
+      /** read raw data from COPPER and fill output m_eclDigits container */
       void readRawECLData(RawECL* rawCOPPERData, int n);
 
     };
   }//namespace ECL
 }//namespace Belle2
-
-#endif
-

@@ -48,8 +48,8 @@ geometry = main.add_module('Geometry')
 geometry.param('excludedComponents', ['ECL'])
 
 
-fillParticleList('K-', 'Kid > 0.1', path=main)
-fillParticleList('pi+', 'piid > 0.1', path=main)
+fillParticleList('K-', 'kaonID > 0.1', path=main)
+fillParticleList('pi+', 'pionID > 0.1', path=main)
 fillParticleList('gamma', '', path=main)
 
 reconstructDecay('pi0 -> gamma gamma', '0.110 < M < 0.150', path=main)

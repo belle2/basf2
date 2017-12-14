@@ -11,7 +11,11 @@ env['LIBS'] = [
     'svd',
     'svd_dataobjects',
     'pxd_dataobjects',
-    'vxd_dataobjects'
+    'vxd_dataobjects',
+    'tracking_trackFindingCDC',
+    'tracking_ckf',
+    'tracking_dataobjects',
+    'tracking',
     ]
 Return('env')
 

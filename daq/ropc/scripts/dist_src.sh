@@ -1,0 +1,62 @@
+#!/bin/sh
+#ssh -n -n -XY root@svd04 "http_proxy=http://b2stone.daqnet.kek.jp:8080/; https_proxy=http://b2stone.daqnet.kek.jp:8080/; ftp_proxy=http://b2stone.daqnet.kek.jp:8080/; export http_proxy https_proxy ftp_proxy; yum -y install emacs ; yum -y  install openldap-clients ; /sbin/chkconfig ntpd on;/sbin/chkconfig tftp on; /sbin/chkconfig nfs on; /sbin/service ntpd restart; /sbin/service xinetd restart;"
+
+#ssh -n -n -XY root@svd05  " passwd yamadas;"
+#ssh -n -n -XY root@svd06  " passwd yamadas;"
+#ssh -n -n -XY root@cdc04  " passwd yamadas;"
+#ssh -n -n -XY root@cdc06  " passwd yamadas;"
+#ssh -n -n -XY root@top03  " passwd yamadas;"
+#ssh -n -n -XY root@top04  " passwd yamadas;"
+#ssh -n -n -XY root@arich02  " passwd yamadas;"
+#ssh -n -n -XY root@ecl02  " passwd yamadas;"
+#ssh -n -n -XY root@ecl03  " passwd yamadas;"
+#ssh -n -n -XY root@ecl05  " passwd yamadas;"
+#ssh -n -n -XY root@ecl06  " passwd yamadas;"
+#ssh -n -n -XY root@klm03  " passwd yamadas;"
+
+
+#ssh -n -n -XY root@svd01 "mkdir /home/usr; useradd -m -d /home/usr/yamadas -u 14252 yamadas; useradd -m -d /home/usr/b2daq -u 3001 b2daq;"
+#ssh -n -n -XY root@svd03 "mkdir /home/usr; useradd -m -d /home/usr/yamadas -u 14252 yamadas; useradd -m -d /home/usr/b2daq -u 3001 b2daq;"
+#ssh -n -n -XY root@svd08 "mkdir /home/usr; useradd -m -d /home/usr/yamadas -u 14252 yamadas; useradd -m -d /home/usr/b2daq -u 3001 b2daq;"
+#ssh -n -n -XY root@arich01 "mkdir /home/usr; useradd -m -d /home/usr/yamadas -u 14252 yamadas; useradd -m -d /home/usr/b2daq -u 3001 b2daq;"
+#ssh -n -n -XY root@ecl07 "mkdir /home/usr; useradd -m -d /home/usr/yamadas -u 14252 yamadas; useradd -m -d /home/usr/b2daq -u 3001 b2daq;"
+
+ssh -n -n -XY svd02 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY svd03 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY svd04 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY svd05 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY svd06 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY svd07 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY svd08 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+
+ssh -n -n -XY cdc01 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc02 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc03 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc04 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc05 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc06 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc07 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc08 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc09 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY cdc10 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+
+ssh -n -n -XY top01 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY top02 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY top03 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY top04 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+
+ssh -n -n -XY arich01 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY arich02 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+
+
+ssh -n -n -XY ecl01 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY ecl02 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY ecl03 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY ecl04 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY ecl05 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY ecl06 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+
+ssh -n -n -XY klm01 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY klm02 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY klm03 "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"
+ssh -n -n -XY ecl07  "echo \${HOSTNAME}; cd ~/basf2/release/daq/rawdata/src; svn update; g++ -o dummy_data_src dummy_data_src.cc;"

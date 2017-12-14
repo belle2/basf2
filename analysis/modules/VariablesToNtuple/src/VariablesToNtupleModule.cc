@@ -33,7 +33,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
-  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple.");
+  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   vector<string> emptylist;
@@ -41,7 +41,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
            std::string(""));
   addParam("variables", m_variables,
-           "List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           "List of variables (or collections) to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
@@ -58,12 +58,18 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 void VariablesToNtupleModule::initialize()
 {
   if (not m_particleList.empty())
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
+
 
   // Initializing the output root file
+  if (m_fileName.empty()) {
+    B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
+  }
+
   m_file = new TFile(m_fileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_fileName);
+    B2ERROR("Could not create file \"" << m_fileName <<
+            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -71,9 +77,11 @@ void VariablesToNtupleModule::initialize()
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
-    B2WARNING("Tree with this name already exists: " << m_fileName);
+    B2WARNING("Tree with this name already exists: \"" << m_fileName << "\"");
     return;
   }
+
+  m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
 
   // root wants var1:var2:...
   string varlist = "__weight__";

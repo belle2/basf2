@@ -36,12 +36,21 @@ namespace Belle2 {
     public:
 
       /**
-       * Constructor.
-       * @param[in] global          If true, load global transformations
-       *                            (false - local).
-       * @param[in] useDisplacement Whether to use EKLMDisplacement or not.
+       * Source of displacement (alignment) data.
        */
-      TransformData(bool global, bool useDisplacement);
+      enum Displacement {
+        c_None,         /**< Displacement is not used. */
+        c_Displacement, /**< Use displacement data (for geometry). */
+        c_Alignment,    /**< Use alignment data (for everything else). */
+      };
+
+      /**
+       * Constructor.
+       * @param[in] global           If true, load global transformations
+       *                             (false - local).
+       * @param[in] displacementType Displacement type.
+       */
+      TransformData(bool global, Displacement displacementType);
 
       /**
        * Destructor.
@@ -128,6 +137,19 @@ namespace Belle2 {
       const HepGeom::Transform3D*
       getStripTransform(int endcap, int layer, int sector, int plane,
                         int strip) const;
+
+      /**
+       * Get strip global to local transformation by hit.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       * @param[in] strip  Strip number.
+       * @return Transformation.
+       */
+      const HepGeom::Transform3D*
+      getStripGlobalToLocal(int endcap, int layer, int sector, int plane,
+                            int strip) const;
 
       /**
        * Check if strips intersect, and find intersection point if yes.

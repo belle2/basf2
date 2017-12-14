@@ -8,15 +8,33 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
-#include <framework/logging/Logger.h>
-#include <boost/math/special_functions/sinc.hpp>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
+#include <tracking/trackFindingCDC/numerics/Angle.h>
+
+#include <ostream>
+#include <utility>
 #include <cmath>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class GeneralizedCircle;
+    class Line2D;
+  }
+}
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+
 
 PerigeeCircle::PerigeeCircle()
 {
@@ -97,9 +115,8 @@ Vector2D PerigeeCircle::atArcLength(double arcLength) const
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;
 
-  using boost::math::sinc_pi;
-  double atX = arcLength * sinc_pi(chi);
-  double atY = arcLength * sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  double atX = arcLength * sinc(chi);
+  double atY = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
   return Vector2D::compose(phi0Vec(), atX, atY);
 }
 
@@ -330,4 +347,12 @@ void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
   m_impact = distance(n0 / normalization); // Uses the new curvature
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const PerigeeCircle& circle)
+{
+  return output << "PerigeeCircle("
+         << "curvature=" << circle.curvature() << ","
+         << "phi0=" << circle.phi0() << ","
+         << "impact=" << circle.impact() << ")";
 }

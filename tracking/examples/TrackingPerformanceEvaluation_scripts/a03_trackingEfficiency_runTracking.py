@@ -27,9 +27,9 @@ release = sys.argv[1]
 # bkg = {noBkg, stdBKG, std2GBKG}
 # vxdtf = {vxdtf1, vxdtf2}
 
-roi = sys.argv[1]
-bkg = sys.argv[2]
-vxdtf = sys.argv[3]
+roi = sys.argv[2]
+bkg = sys.argv[3]
+vxdtf = sys.argv[4]
 
 useVXDTF2 = False
 if (vxdtf == 'vxdtf2'):

@@ -13,8 +13,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/FileSystem.h>
+#include <TRandom.h>
 #include <iostream>
 #include <set>
+#include <chrono>
+#include <thread>
 
 #include <curl/curl.h>
 #include <cstring>
@@ -41,6 +44,15 @@ namespace Belle2 {
     /** last time we printed the status (in ns) */
     double lasttime{0};
   };
+
+  /** Timeout to wait for connections in seconds */
+  unsigned int ConditionsPayloadDownloader::s_connectionTimeout{60};
+  /** Timeout to wait for stalled connections (<10KB/s) */
+  unsigned int ConditionsPayloadDownloader::s_stalledTimeout{60};
+  /** Number of retries to perform when downloading failes with HTTP response code >=500 */
+  unsigned int ConditionsPayloadDownloader::s_maxRetries{3};
+  /** Backoff factor for retries in seconds */
+  unsigned int ConditionsPayloadDownloader::s_backoffFactor{5};
 }
 
 namespace {
@@ -91,9 +103,9 @@ namespace {
     }
     status.lasttime = time;
     if (dltotal > 0) {
-      B2DEBUG(50, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
+      B2DEBUG(300, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
     } else {
-      B2DEBUG(50, "curl:= " << dlnow << " bytes transferred");
+      B2DEBUG(300, "curl:= " << dlnow << " bytes transferred");
     }
     return 0;
   }
@@ -158,9 +170,9 @@ namespace Belle2 {
     m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
     curl_easy_setopt(m_session->curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, s_connectionTimeout);
     curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_LIMIT, 10 * 1024); //10 kB/s
-    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, s_stalledTimeout);
     curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
     curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);
@@ -169,6 +181,9 @@ namespace Belle2 {
     curl_easy_setopt(m_session->curl, CURLOPT_XFERINFODATA, m_session.get());
     curl_easy_setopt(m_session->curl, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(m_session->curl, CURLOPT_ERRORBUFFER, m_session->errbuf);
+    // Set proxy if defined
+    const char* proxy = std::getenv("BELLE2_CONDB_PROXY");
+    if (proxy) curl_easy_setopt(m_session->curl, CURLOPT_PROXY, proxy);
     return true;
   }
 
@@ -233,7 +248,7 @@ namespace Belle2 {
         PayloadInfo payloadInfo;
         auto payload = iov.second.get_child("payload");
         auto payloadIov = iov.second.get_child("payloadIov");
-        B2DEBUG(100, "Parsing payload with id " << payload.get("payloadId", ""));
+        B2DEBUG(500, "Parsing payload with id " << payload.get("payloadId", ""));
         std::string name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
@@ -257,11 +272,11 @@ namespace Belle2 {
             if (payloadIter->second.revision < payloadInfo.revision) {
               payloadIter->second = payloadInfo;
             }
-            B2DEBUG(10, "Found duplicate payload key " << name << " while parsing conditions payloads. "
+            B2DEBUG(200, "Found duplicate payload key " << name << " while parsing conditions payloads. "
                     "Discarding revision " << drop << " and using revision " << keep);
             duplicates.insert(name);
           } else {
-            B2DEBUG(100, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
+            B2DEBUG(200, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
                     << payloadInfo.digest << ". iov: " << payloadInfo.iov);
             m_payloads[name] = payloadInfo;
           }
@@ -369,7 +384,7 @@ namespace Belle2 {
         B2DEBUG(200, "Checking checksum for " << localFile);
         std::ifstream localStream(localFile.c_str(), std::ios::binary);
         if (checkDigest(localStream, payload.digest)) {
-          B2DEBUG(100, "found matching payload: " << localFile);
+          B2DEBUG(200, "found matching payload: " << localFile);
           return localFile;
         }
         B2DEBUG(200, "Check failed, need to download, continue with next");
@@ -419,39 +434,63 @@ namespace Belle2 {
   {
     //make sure we have an active curl session ...
     SessionGuard session(*this);
-    B2DEBUG(50, "Download of " << url << " started ...");
-    //rewind the stream to the beginning
-    buffer.clear();
-    buffer.seekp(0, std::ios::beg);
-    if (!buffer.good()) {
-      B2ERROR("Cannot write to stream when downloading " << url);
-      return false;
-    }
-    // Set the exception flags to notify us of any problem during writing
-    auto oldExceptionMask = buffer.exceptions();
-    buffer.exceptions(std::ios::failbit | std::ios::badbit);
-    // build the request ...
-    CURLcode res{CURLE_FAILED_INIT};
-    // and set all the curl options
-    curl_easy_setopt(m_session->curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(m_session->curl, CURLOPT_WRITEDATA, &buffer);
-    // perform the request ...
-    res = curl_easy_perform(m_session->curl);
-    // flush output
-    buffer.exceptions(oldExceptionMask);
-    buffer.flush();
-    // and check for errors which occured during download ...
-    if (res != CURLE_OK) {
-      size_t len = strlen(m_session->errbuf);
-      if (len) {
-        B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
-      } else {
-        B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
+    B2DEBUG(200, "Download of " << url << " started ...");
+    // we might need to try a few times in case of HTTP>=500
+    for (unsigned int retry{1};; ++retry) {
+      //rewind the stream to the beginning
+      buffer.clear();
+      buffer.seekp(0, std::ios::beg);
+      if (!buffer.good()) {
+        B2ERROR("Cannot write to stream when downloading " << url);
+        return false;
       }
-      return false;
+      // Set the exception flags to notify us of any problem during writing
+      auto oldExceptionMask = buffer.exceptions();
+      buffer.exceptions(std::ios::failbit | std::ios::badbit);
+      // build the request ...
+      CURLcode res{CURLE_FAILED_INIT};
+      // and set all the curl options
+      curl_easy_setopt(m_session->curl, CURLOPT_URL, url.c_str());
+      curl_easy_setopt(m_session->curl, CURLOPT_WRITEDATA, &buffer);
+      // perform the request ...
+      res = curl_easy_perform(m_session->curl);
+      // flush output
+      buffer.exceptions(oldExceptionMask);
+      buffer.flush();
+      // and check for errors which occured during download ...
+      if (res != CURLE_OK) {
+        size_t len = strlen(m_session->errbuf);
+        if (len) {
+          B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
+        } else {
+          B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
+        }
+        if (s_maxRetries > 0) {
+          if (retry > s_maxRetries) {
+            B2WARNING("Failed " << retry << " times, giving up");
+          } else if (res == CURLE_HTTP_RETURNED_ERROR) {
+            // we treat everything below 500 as permanent error with the request,
+            // only retry on 500.
+            long responseCode{0};
+            curl_easy_getinfo(m_session->curl, CURLINFO_RESPONSE_CODE, &responseCode);
+            if (responseCode >= 500) {
+              // use exponential backoff but don't restrict to exact slots like
+              // Ethernet, just use a random wait time between 1s and maxDelay =
+              // 2^(retry)-1 * backoffFactor
+              double maxDelay = (std::pow(2, retry) - 1) * s_backoffFactor;
+              double seconds = gRandom->Uniform(1., maxDelay);
+              B2INFO("Waiting " << std::setprecision(2) << seconds << " seconds before retry ...");
+              std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
+              continue;
+            }
+          }
+        }
+        return false;
+      }
+      break;
     }
     // all fine
-    B2DEBUG(50, "Download of " << url << " finished succesfully.");
+    B2DEBUG(200, "Download of " << url << " finished succesfully.");
     return true;
   }
 
@@ -470,7 +509,7 @@ namespace Belle2 {
   {
     const auto openmode = std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
     std::unique_ptr<FileSystem::TemporaryFile> tmpfile(new FileSystem::TemporaryFile(openmode));
-    B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName());
+    B2DEBUG(200, "Trying to download into temporary file " << tmpfile->getName());
     if (downloadAndCheck(url, *tmpfile, digest)) {
       m_tempfiles[key] = std::move(tmpfile);
       return m_tempfiles[key]->getName();

@@ -32,7 +32,7 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 svdUnpacker = register_module('SVDUnpacker')
 svdUnpacker.param('rawSVDListName', 'inputList')
 svdUnpacker.param('svdDigitListName', 'outputList')
-svdUnpacker.param('xmlMapFileName', 'mapFileName')
+svdUnpacker.param('GenerateShaperDigits', True)
 # svdUnpacker.param('dataFileName','RUN19880101063811.dat')
 # svdUnpacker.param('dataFileName','coded')
 

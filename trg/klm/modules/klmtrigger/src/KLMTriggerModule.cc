@@ -72,7 +72,7 @@ void KLMTriggerModule::initialize()
 void KLMTriggerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
+  B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
   m_nEvents = 0;
   m_nTracks = 0;
 }
@@ -88,7 +88,7 @@ void KLMTriggerModule::event()
 
 void KLMTriggerModule::endRun()
 {
-  B2INFO("KLMTrigger: Processed " << m_nEvents << " events, found " << m_nTracks << " tracks");
+//  B2INFO("KLMTrigger: Processed " << m_nEvents << " events, found " << m_nTracks << " tracks");
 }
 
 void KLMTriggerModule::fillHits()
@@ -142,6 +142,7 @@ void KLMTriggerModule::fillHits()
       }
     }
   }
+//    B2INFO("KLM TSIM: " << klmTriggerHits.getEntries() << " hits made");
 }
 
 
@@ -149,7 +150,7 @@ void KLMTriggerModule::fillHits()
 
 void KLMTriggerModule::fillTracks()
 {
-  StoreArray<KLMTriggerHit> klmTriggerHits;
+  StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
   if (!klmTriggerHits.isValid())
     return;
 
@@ -158,6 +159,7 @@ void KLMTriggerModule::fillTracks()
   std::unordered_map<int, KLMTriggerTrack*> trackMap;
 
   int nEntries = klmTriggerHits.getEntries();
+//  B2INFO("KLM TSIM: " << nEntries << " hits found");
   for (int i = 0; i < nEntries; ++i) {
     const KLMTriggerHit* hit = klmTriggerHits[i];
 
@@ -177,16 +179,17 @@ void KLMTriggerModule::fillTracks()
 
 void KLMTriggerModule::calcChisq()
 {
-  StoreArray<KLMTriggerTrack> klmTriggerTracks;
+  StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
   if (!klmTriggerTracks.isValid())
     return;
 
   int nEntries = klmTriggerTracks.getEntries();
   for (int i = 0; i < nEntries; ++i) {
     KLMTriggerTrack* track = klmTriggerTracks[i];
-    RelationVector<KLMTriggerHit> hits = track->getRelationsWith<KLMTriggerHit>();
+    RelationVector<KLMTriggerHit> hits = track->getRelationsWith<KLMTriggerHit>(m_klmhitCollectionName);
 
     int nHits = hits.size();
+//    B2INFO("KLM TSIM: " << nHits << " hits attached to track");
     int sumX = 0, sumY = 0, sumZ = 0, sumXX = 0, sumXY = 0, sumXZ = 0, sumYY = 0, sumZZ = 0;
     int nLayers = 0;
     int firstLayer = c_TotalLayers;
@@ -194,8 +197,8 @@ void KLMTriggerModule::calcChisq()
 //    bool firedLayers[c_TotalLayers] = { };
     std::unordered_map<int, bool> layersMap;
 
-    for (int i = 0; i < nHits; ++i) {
-      const KLMTriggerHit* hit = hits[i];
+    for (int j = 0; j < nHits; ++j) {
+      const KLMTriggerHit* hit = hits[j];
 
       const int xInt = hit->getXInt();
       const int yInt = hit->getYInt();

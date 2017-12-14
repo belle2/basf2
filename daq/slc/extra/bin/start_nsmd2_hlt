@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+cd -
+
+echo "booting nsmd2"
+./boot_nsmd2_ssh hlt01 global

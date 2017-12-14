@@ -1,0 +1,4 @@
+#!/bin/bash
+
+./boot_nsmd2 `getconfig eclpc11 logfile.dir nsm.global.host nsm.global.port`
+

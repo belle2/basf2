@@ -18,15 +18,15 @@ using namespace std;
 void NtupleMCVertexTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
-  int nDecayProducts = strNames.size();
-  m_fTruthX = new float[nDecayProducts];
-  m_fTruthY = new float[nDecayProducts];
-  m_fTruthZ = new float[nDecayProducts];
-  m_fTruthRho = new float[nDecayProducts];
-  m_fTruthProdV = new float*[nDecayProducts];
+  m_nDecayProducts = strNames.size();
+  m_fTruthX = new float[m_nDecayProducts];
+  m_fTruthY = new float[m_nDecayProducts];
+  m_fTruthZ = new float[m_nDecayProducts];
+  m_fTruthRho = new float[m_nDecayProducts];
+  m_fTruthProdV = new float*[m_nDecayProducts];
 
 
-  for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_TruthX").c_str(), &m_fTruthX[iProduct], (strNames[iProduct] + "_TruthX/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthY").c_str(), &m_fTruthY[iProduct], (strNames[iProduct] + "_TruthY/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthZ").c_str(), &m_fTruthZ[iProduct], (strNames[iProduct] + "_TruthZ/F").c_str());
@@ -37,6 +37,17 @@ void NtupleMCVertexTool::setupTree()
                    (strNames[iProduct] + "_TruthVtxProd[3]/F").c_str());
   }
 
+}
+
+void NtupleMCVertexTool::deallocateMemory()
+{
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++)
+    delete [] m_fTruthProdV[iProduct];
+  delete [] m_fTruthProdV;
+  delete m_fTruthRho;
+  delete m_fTruthZ;
+  delete m_fTruthY;
+  delete m_fTruthX;
 }
 
 void NtupleMCVertexTool::eval(const Particle* particle)

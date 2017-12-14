@@ -10,10 +10,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCTrack;
 
     /// Relation filter that lets only possibilities with small phi distance pass
     class PhiTrackRelationFilter : public BaseTrackRelationFilter {
@@ -24,29 +28,13 @@ namespace Belle2 {
 
     public:
       /// Export all parameters
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-      {
-        moduleParamList->addParameter(prefixed(prefix, "maximalPhiDistance"), m_param_maximalPhiDistance,
-                                      "Maximal Phi distance below to tracks should be merged.",
-                                      m_param_maximalPhiDistance);
-      }
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Implementation of the phi calculation.
-      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final {
-        const double lhsPhi = fromTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
-        const double rhsPhi = toTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
-
-        const double phiDistance = std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi));
-
-        if (phiDistance > m_param_maximalPhiDistance)
-        {
-          return std::nan("");
-        } else {
-          return phiDistance;
-        }
-      }
+      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
 
     private:
+      /// Parameter : The maximal deviation in phi between the trajectories of the track.
       double m_param_maximalPhiDistance = 0.2;
     };
   }

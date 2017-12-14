@@ -3,7 +3,7 @@
  * Copyright(C) 2013  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler, Jacek Stypula                       *
+ * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
  **************************************************************************/
 
@@ -18,7 +18,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace Belle2::SVD;
 
 
 REG_MODULE(SVDSpacePointCreator)
@@ -43,8 +42,9 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("OnlySingleClusterSpacePoints", m_onlySingleClusterSpacePoints,
            "standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more",
            bool(false));
-  addParam("AllClusterCombinations", m_allClusterCombinations,
-           "standard is false. If activated, the module will combine all U and V clusters instead of only the matching ones", bool(false));
+
+  addParam("MinClusterTime", m_minClusterTime, "clusters with time below this value are not considered to make spacePoints.",
+           float(-20));
 }
 
 
@@ -78,7 +78,7 @@ void SVDSpacePointCreatorModule::event()
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_allClusterCombinations);
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime);
   }
 
 

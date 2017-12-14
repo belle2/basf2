@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Meta>
+    <Date>20.04.2016</Date>
+    <Description short="Ignore strip list for PXD planes in 2016 VXD beam test">
+        Crude initial list of bad pixels
+    </Description>
+    <Author>Peter Kodys</Author>
+</Meta>
+<PXD>
+  <layer n="1">
+    <ladder n="1">
+      <sensor n="2">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0059" vStart = "0484"></pixels>
+        <pixels uStart = "0059" vStart = "0508"></pixels>
+        <pixels uStart = "0059" vStart = "0516"></pixels>
+        <pixels uStart = "0059" vStart = "0520"></pixels>
+        <pixels uStart = "0059" vStart = "0528"></pixels>
+        <pixels uStart = "0059" vStart = "0532"></pixels>
+        <pixels uStart = "0059" vStart = "0760"></pixels>
+        <pixels uStart = "0062" vStart = "0511"></pixels>
+        <pixels uStart = "0063" vStart = "0224"></pixels>
+        <pixels uStart = "0063" vStart = "0420"></pixels>
+        <pixels uStart = "0063" vStart = "0496"></pixels>
+        <pixels uStart = "0063" vStart = "0544"></pixels>
+        <pixels uStart = "0063" vStart = "0552"></pixels>
+        <pixels uStart = "0063" vStart = "0556"></pixels>
+        <pixels uStart = "0063" vStart = "0604"></pixels>
+        <pixels uStart = "0063" vStart = "0763"></pixels>
+        <pixels uStart = "0065" vStart = "0504"></pixels>
+        <pixels uStart = "0065" vStart = "0512"></pixels>
+        <pixels uStart = "0065" vStart = "0515"></pixels>
+        <pixels uStart = "0065" vStart = "0520"></pixels>
+        <pixels uStart = "0065" vStart = "0524"></pixels>
+        <pixels uStart = "0065" vStart = "0760"></pixels>
+        <pixels uStart = "0065" vStart = "0763"></pixels>
+        <pixels uStart = "0066" vStart = "0494"></pixels>
+        <pixels uStart = "0066" vStart = "0520"></pixels>
+        <pixels uStart = "0066" vStart = "0524"></pixels>
+        <pixels uStart = "0067" vStart = "0420"></pixels>
+        <pixels uStart = "0067" vStart = "0480"></pixels>
+        <pixels uStart = "0067" vStart = "0492"></pixels>
+        <pixels uStart = "0067" vStart = "0520"></pixels>
+        <pixels uStart = "0067" vStart = "0536"></pixels>
+        <pixels uStart = "0067" vStart = "0568"></pixels>
+        <pixels uStart = "0068" vStart = "0760"></pixels>
+        <pixels uStart = "0069" vStart = "0492"></pixels>
+        <pixels uStart = "0069" vStart = "0508"></pixels>
+        <pixels uStart = "0069" vStart = "0516"></pixels>
+        <pixels uStart = "0069" vStart = "0528"></pixels>
+        <pixels uStart = "0069" vStart = "0531"></pixels>
+        <pixels uStart = "0069" vStart = "0763"></pixels>
+        <pixels uStart = "0070" vStart = "0363"></pixels>
+        <pixels uStart = "0070" vStart = "0528"></pixels>
+        <pixels uStart = "0070" vStart = "0760"></pixels>
+        <pixels uStart = "0071" vStart = "0480"></pixels>
+        <pixels uStart = "0071" vStart = "0520"></pixels>
+        <pixels uStart = "0071" vStart = "0528"></pixels>
+        <pixels uStart = "0071" vStart = "0547"></pixels>
+        <pixels uStart = "0071" vStart = "0763"></pixels>
+        <pixels uStart = "0073" vStart = "0492"></pixels>
+        <pixels uStart = "0073" vStart = "0504"></pixels>
+        <pixels uStart = "0073" vStart = "0516"></pixels>
+        <pixels uStart = "0073" vStart = "0520"></pixels>
+        <pixels uStart = "0073" vStart = "0544"></pixels>
+        <pixels uStart = "0074" vStart = "0760"></pixels>
+        <pixels uStart = "0077" vStart = "0504"></pixels>
+        <pixels uStart = "0077" vStart = "0512"></pixels>
+        <pixels uStart = "0077" vStart = "0763"></pixels>
+        <pixels uStart = "0079" vStart = "0512"></pixels>
+        <pixels uStart = "0079" vStart = "0763"></pixels>
+        <pixels uStart = "0081" vStart = "0512"></pixels>
+        <pixels uStart = "0081" vStart = "0516"></pixels>
+        <pixels uStart = "0081" vStart = "0520"></pixels>
+        <pixels uStart = "0083" vStart = "0504"></pixels>
+        <pixels uStart = "0083" vStart = "0512"></pixels>
+        <pixels uStart = "0083" vStart = "0760"></pixels>
+        <pixels uStart = "0117" vStart = "0512"></pixels>
+        <pixels uStart = "0121" vStart = "0513"></pixels>
+        <pixels uStart = "0121" vStart = "0525"></pixels>
+        <pixels uStart = "0121" vStart = "0527"></pixels>
+        <pixels uStart = "0121" vStart = "0547"></pixels>
+        <pixels uStart = "0122" vStart = "0512"></pixels>
+        <pixels uStart = "0122" vStart = "0516"></pixels>
+        <pixels uStart = "0122" vStart = "0528"></pixels>
+        <pixels uStart = "0124" vStart = "0273"></pixels>
+        <pixels uStart = "0125" vStart = "0512"></pixels>
+        <pixels uStart = "0125" vStart = "0520"></pixels>
+        <pixels uStart = "0187" vStart = "0403"></pixels>
+        <pixels uStart = "0187" vStart = "0414"></pixels>
+        <pixels uStart = "0187" vStart = "0430"></pixels>
+        <pixels uStart = "0187" vStart = "0475"></pixels>
+        <pixels uStart = "0187" vStart = "0490"></pixels>
+        <pixels uStart = "0187" vStart = "0506"></pixels>
+        <pixels uStart = "0187" vStart = "0518"></pixels>
+        <pixels uStart = "0187" vStart = "0527"></pixels>
+        <pixels uStart = "0187" vStart = "0534"></pixels>
+        <pixels uStart = "0187" vStart = "0550"></pixels>
+        <pixels uStart = "0187" vStart = "0582"></pixels>
+        <pixels uStart = "0187" vStart = "0698"></pixels>
+        <pixels uStart = "0187" vStart = "0702"></pixels>
+        <pixels uStart = "0188" vStart = "0380"></pixels>
+        <pixels uStart = "0188" vStart = "0496"></pixels>
+        <pixels uStart = "0188" vStart = "0532"></pixels>
+        <pixels uStart = "0190" vStart = "0416"></pixels>
+        <pixels uStart = "0190" vStart = "0668"></pixels>
+        <pixels uStart = "0191" vStart = "0256"></pixels>
+        <pixels uStart = "0191" vStart = "0412"></pixels>
+        <pixels uStart = "0191" vStart = "0419"></pixels>
+        <pixels uStart = "0191" vStart = "0448"></pixels>
+        <pixels uStart = "0191" vStart = "0450"></pixels>
+        <pixels uStart = "0191" vStart = "0470"></pixels>
+        <pixels uStart = "0191" vStart = "0488"></pixels>
+        <pixels uStart = "0191" vStart = "0491"></pixels>
+        <pixels uStart = "0191" vStart = "0496"></pixels>
+        <pixels uStart = "0191" vStart = "0513"></pixels>
+        <pixels uStart = "0191" vStart = "0542"></pixels>
+        <pixels uStart = "0191" vStart = "0687"></pixels>
+        <pixels uStart = "0191" vStart = "0759"></pixels>
+        <pixels uStart = "0194" vStart = "0490"></pixels>
+        <pixels uStart = "0194" vStart = "0500"></pixels>
+        <pixels uStart = "0195" vStart = "0056"></pixels>
+        <pixels uStart = "0195" vStart = "0252"></pixels>
+        <pixels uStart = "0195" vStart = "0287"></pixels>
+        <pixels uStart = "0195" vStart = "0292"></pixels>
+        <pixels uStart = "0195" vStart = "0296"></pixels>
+        <pixels uStart = "0195" vStart = "0300"></pixels>
+        <pixels uStart = "0195" vStart = "0468"></pixels>
+        <pixels uStart = "0195" vStart = "0471"></pixels>
+        <pixels uStart = "0195" vStart = "0472"></pixels>
+        <pixels uStart = "0195" vStart = "0496"></pixels>
+        <pixels uStart = "0195" vStart = "0536"></pixels>
+        <pixels uStart = "0195" vStart = "0551"></pixels>
+        <pixels uStart = "0195" vStart = "0579"></pixels>
+        <pixels uStart = "0195" vStart = "0672"></pixels>
+        <pixels uStart = "0195" vStart = "0683"></pixels>
+        <pixels uStart = "0195" vStart = "0756"></pixels>
+        <pixels uStart = "0196" vStart = "0508"></pixels>
+        <pixels uStart = "0198" vStart = "0500"></pixels>
+        <pixels uStart = "0203" vStart = "0468"></pixels>
+        <pixels uStart = "0203" vStart = "0520"></pixels>
+        <pixels uStart = "0213" vStart = "0334"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="2">
+    <ladder n="1">
+      <sensor n="2">
+        <!-- Masking rectangular parts of the sensor -->
+        <!--pixels uStart = "070" uEnd = "110" vStart = "0" vEnd = "500"></pixels-->
+
+        <!-- Individual pixels can be masked, too -->
+        <!--pixels uStart = "130" vStart = "500"></pixels-->
+
+        <!-- ROW is V  /  COLUMN is U -->
+
+        <!-- Individual rows and columns can be masked, too -->
+        <!--pixels vStart = "500"></pixels-->
+        <!--pixels uStart = "120"></pixels-->
+
+        <!-- Ranges of rows and columns can be masked, too -->
+        <!--pixels vStart = "100" vEnd = "120"></pixels-->
+        <!--pixels uStart = "120" uEnd = "202"></pixels-->
+
+        <pixels uStart = "0000" vStart = "0013"></pixels>
+        <pixels uStart = "0000" vStart = "0148"></pixels>
+        <pixels uStart = "0000" vStart = "0231"></pixels>
+        <pixels uStart = "0000" vStart = "0243"></pixels>
+        <pixels uStart = "0000" vStart = "0367"></pixels>
+        <pixels uStart = "0000" vStart = "0496"></pixels>
+        <pixels uStart = "0000" vStart = "0535"></pixels>
+        <pixels uStart = "0000" vStart = "0563"></pixels>
+        <pixels uStart = "0000" vStart = "0583"></pixels>
+        <pixels uStart = "0001" vStart = "0147"></pixels>
+        <pixels uStart = "0001" vStart = "0363"></pixels>
+        <pixels uStart = "0001" vStart = "0410"></pixels>
+        <pixels uStart = "0001" vStart = "0583"></pixels>
+        <pixels uStart = "0001" vStart = "0759"></pixels>
+        <pixels uStart = "0002" vStart = "0398"></pixels>
+        <pixels uStart = "0002" vStart = "0422"></pixels>
+        <pixels uStart = "0004" vStart = "0044"></pixels>
+        <pixels uStart = "0054" vStart = "0667"></pixels>
+        <pixels uStart = "0063" vStart = "0037"></pixels>
+        <pixels uStart = "0067" vStart = "0030"></pixels>
+        <pixels uStart = "0067" vStart = "0042"></pixels>
+        <pixels uStart = "0067" vStart = "0066"></pixels>
+        <pixels uStart = "0068" vStart = "0004"></pixels>
+        <pixels uStart = "0074" vStart = "0719"></pixels>
+        <pixels uStart = "0077" vStart = "0395"></pixels>
+        <pixels uStart = "0078" vStart = "0395"></pixels>
+        <pixels uStart = "0107" vStart = "0306"></pixels>
+        <pixels uStart = "0107" vStart = "0346"></pixels>
+        <pixels uStart = "0129" vStart = "0330"></pixels>
+        <pixels uStart = "0219" vStart = "0374"></pixels>
+        <pixels uStart = "0242" vStart = "0657"></pixels>
+        <pixels uStart = "0245" vStart = "0449"></pixels>
+        <pixels uStart = "0245" vStart = "0469"></pixels>
+        <pixels uStart = "0246" vStart = "0041"></pixels>
+        <pixels uStart = "0246" vStart = "0064"></pixels>
+        <pixels uStart = "0246" vStart = "0076"></pixels>
+        <pixels uStart = "0246" vStart = "0152"></pixels>
+        <pixels uStart = "0246" vStart = "0248"></pixels>
+        <pixels uStart = "0246" vStart = "0272"></pixels>
+        <pixels uStart = "0246" vStart = "0304"></pixels>
+        <pixels uStart = "0246" vStart = "0352"></pixels>
+        <pixels uStart = "0246" vStart = "0464"></pixels>
+        <pixels uStart = "0249" vStart = "0764"></pixels>
+
+      </sensor>
+    </ladder>
+  </layer>
+</PXD>

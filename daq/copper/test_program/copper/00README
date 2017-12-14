@@ -1,0 +1,75 @@
+1: driver install into running kernel
+
+	# ./mkdevs.sh
+	# ./module_loader.sh
+
+	Sometimes kernel complain about the version mismatch.
+	It is caused by the difference of version strings of
+	installed kernel source and running kernel.
+	In such case, append "-f" option to insmod in "module_loader.sh".
+
+2: test event-cycle
+ 2.0: configure /proc/copper/FINNESSE_STA
+      Now this copper driver works even if several FINESSE slots are empty.
+      You have to tell which FINNESSE slots are occupied via
+      /proc/copper/FINESSE_STA.
+
+      Bit 1 : slotA
+      Bit 2 : slotB
+      Bit 4 : slotC
+      Bit 8 : slotD
+
+      So if slotA and slotB are occupied and others are empty,
+      Do "echo 3 > /proc/copper/FINESSE_STA" as root.
+      If only slotC is occupied, "echo 4 > /proc/copper/FINESSE_STA"
+
+      The default setting is 0xF means A,B,C,D are occupied.
+
+ 2.1: test with COPPER TRIGGER BOARD and FlashADC
+	COPPER TRIGGER BOARD and FlashADC have no configuration.
+	Just try
+	# ./readcpr &
+	  readcpr issues soft reset to FINESSE in ioctl(CPRIO_INIT_RUN).
+
+ 2.2: test with TTRX
+
+    With AMT3 FINESSE
+	Now AMT3 driver doesn't require implicit start,
+	just open /dev/copper/amt3:a,b,c,d.
+	Do not close them until the end of the run.
+
+	So new test program "readamt" appears.
+	(readcpr doesn't open /dev/copper/amt3)
+
+	# ./readamt &
+	# /belle/local/bin/trigrx pulse 100 100
+
+	readamt will show first 10 events to stdout.
+	If it seems to work well, try infinite loop mode.
+	You can kill readamt manually by "fg" + "^C",
+
+	# ./readamt &
+	# /belle/local/bin/trigrx pulse 10000 -1
+
+	./readamt will show one "." per 1000 events and
+	/belle/local/bin/trigrx will show accepted rate.
+	hit ^C to stop the trigger.
+	
+    With FINESSE-jig
+	# ./jig-start
+
+	You can change the data size using FINESSE_MODE environment val.
+	env FINESSE_MODE=0 ./jig-start
+		will set 0 words data + header + footer
+			1 for 64 words data, 2 for 128....
+			1:64 2:128 3:256 4:512 5:1024 6:100 7:4or1024
+			
+	# ./readcpr &
+	# trigrx pulse 100 100
+	.....
+
+3: reset COPPER crate entirely
+	If you feel COPPER board fall in crazy state,
+	# ./copper-sysreset
+	This makes sysreset signal on the backplane.
+	All board in the same crate must reboot.

@@ -1,0 +1,64 @@
+#
+# DB object (configname = cdc:fee:cpr013:a:suppress:001)
+#
+
+config        : cdc:fee:cpr2046:a:suppress:021
+
+firm          : /home/usr/b2daq/run/cdc/b2l_cdc_ver44_03.bit
+mode          : suppress
+delay.val     : 4
+window.val    : 20
+tdcth.val     : 3700
+adcth.val     : 3700
+ped[0].val    : 1
+ped[1].val    : 1
+ped[2].val    : 1
+ped[3].val    : 1
+ped[4].val    : 1
+ped[5].val    : 1
+ped[6].val    : 1
+ped[7].val    : 1
+ped[8].val    : 1
+ped[9].val    : 1
+ped[10].val   : 1
+ped[11].val   : 1
+ped[12].val   : 1
+ped[13].val   : 1
+ped[14].val   : 1
+ped[15].val   : 1
+ped[16].val   : 1
+ped[17].val   : 1
+ped[18].val   : 1
+ped[19].val   : 1
+ped[20].val   : 1
+ped[21].val   : 1
+ped[22].val   : 1
+ped[23].val   : 1
+ped[24].val   : 1
+ped[25].val   : 1
+ped[26].val   : 1
+ped[27].val   : 1
+ped[28].val   : 1
+ped[29].val   : 1
+ped[30].val   : 1
+ped[31].val   : 1
+ped[32].val   : 1
+ped[33].val   : 1
+ped[34].val   : 1
+ped[35].val   : 1
+ped[36].val   : 1
+ped[37].val   : 1
+ped[38].val   : 1
+ped[39].val   : 1
+ped[40].val   : 1
+ped[41].val   : 1
+ped[42].val   : 1
+ped[43].val   : 1
+ped[44].val   : 1
+ped[45].val   : 1
+ped[46].val   : 1
+ped[47].val   : -1
+
+#
+#
+#

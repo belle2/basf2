@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.*?>
+<?import b2daq.dqm.graphics.*?>
+<?import b2daq.dqm.ui.*?>
+<?import b2daq.dqm.core.*?>
+<?import b2daq.graphics.*?>
+<?import b2daq.runcontrol.ui.*?>
+
+<fx:root prefHeight="231.0" prefWidth="512.0" type="javafx.scene.layout.VBox" HBox.hgrow="NEVER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <GridPane hgap="10.0" VBox.vgrow="SOMETIMES">
+            <rowConstraints>
+                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label fx:id="label_src" text="Sender" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label fx:id="label_dest" text="Receiver" GridPane.columnIndex="4">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <CanvasPanel minHeight="10.0" minWidth="20.0" prefHeight="45.0" prefWidth="61.0" GridPane.columnIndex="1">
+                    <canvas>
+                        <HistogramCanvas fx:id="c_in" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
+                            <shapes>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <GArrow headLength="0.3" headWidth="0.1" length="0.6" lineColor="red" lineWidth="2" width="0.4" x="0.05" y="0.3" />
+                                    <GLine lineColor="red" lineWidth="2" x1="0.1" x2="0.9" y1="0.1" y2="0.9" />
+                                    <GLine lineColor="red" lineWidth="2" x1="0.9" x2="0.1" y1="0.1" y2="0.9" />
+                                </FXCollections>
+                            </shapes>
+                        </HistogramCanvas>
+                    </canvas>
+                </CanvasPanel>
+                <Label fx:id="label_nodename" alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="45.0" prefWidth="117.0" text="NODENAME" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.valignment="CENTER">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Label>
+                <CanvasPanel minHeight="10.0" minWidth="10.0" prefHeight="45.0" prefWidth="267.0" GridPane.columnIndex="3">
+                    <canvas>
+                        <HistogramCanvas fx:id="c_out" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
+                            <shapes>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <GArrow headLength="0.3" headWidth="0.1" length="0.6" lineColor="red" lineWidth="2" width="0.4" x="0.05" y="0.3" />
+                                    <GLine lineColor="red" lineWidth="2" x1="0.1" x2="0.9" y1="0.1" y2="0.9" />
+                                    <GLine lineColor="red" lineWidth="2" x1="0.9" x2="0.1" y1="0.1" y2="0.9" />
+                                </FXCollections>
+                            </shapes>
+                        </HistogramCanvas>
+                    </canvas>
+                </CanvasPanel>
+            </children>
+            <columnConstraints>
+                <ColumnConstraints maxWidth="128.0" minWidth="20.0" prefWidth="90.0" />
+                <ColumnConstraints maxWidth="280.0" minWidth="24.0" prefWidth="73.0" />
+                <ColumnConstraints fillWidth="false" maxWidth="595.0" minWidth="39.0" prefWidth="138.0" />
+                <ColumnConstraints maxWidth="265.0" minWidth="49.0" prefWidth="71.0" />
+                <ColumnConstraints maxWidth="165.0" minWidth="64.0" prefWidth="104.0" />
+            </columnConstraints>
+        </GridPane>
+        <GridPane VBox.vgrow="SOMETIMES">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label alignment="CENTER_RIGHT" text="Input :" textAlignment="RIGHT">
+                    <padding>
+                        <Insets right="20.0" />
+                    </padding>
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label text="Output :" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                    <GridPane.margin>
+                        <Insets right="20.0" />
+                    </GridPane.margin>
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label text="0 [Hz]" GridPane.columnIndex="1">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Label text="0 [Hz]" GridPane.columnIndex="3">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+            </children>
+        </GridPane>
+    </children>
+    <HBox.margin>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </HBox.margin>
+</fx:root>

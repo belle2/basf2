@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGSYSTEM_H_
-#define LOGSYSTEM_H_
+#pragma once
 
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
@@ -66,6 +65,9 @@ namespace Belle2 {
      * Removes all log connections.
      */
     void resetLogConnections();
+
+    /** Reset logging system to defaults: empty all log messages and reset connections to the default */
+    void resetLogging();
 
     /**
      * Returns global log system configuration.
@@ -167,7 +169,7 @@ namespace Belle2 {
      *                        Set to NULL to use the global log configuration.
      * @param moduleName Name of the module.
      */
-    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
+    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
 
   private:
     std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. (owned by us) */
@@ -201,5 +203,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* LOGSYSTEM_H_ */

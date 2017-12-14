@@ -156,11 +156,14 @@ void ProfileModule::terminate()
                             profileInfoEndPtr->getRssMemory(),
                             profileInfoEndPtr->getTimeInSec());
   B2INFO("Virtual Memory usage at termination [MB]: " << m_terminateInfo.virtualMem / 1024);
+  B2INFO("Rss Memory usage at termination [MB]    : " << m_terminateInfo.rssMem / 1024);
 
   if (m_nEvents > k_burnIn) {
     B2INFO("Virtual Memory increase per event [kB]  : " << ((long)m_endInfo.virtualMem - (long)m_startInfo.virtualMem) /
            (m_nEvents - k_burnIn));
-    B2INFO("Execution time per event [ms]   : " << 1000 * (m_endInfo.virtualMem - m_startInfo.time) / (m_nEvents - k_burnIn));
+    B2INFO("Rss Memory increase per event [kB]      : " << ((long)m_endInfo.rssMem - (long)m_startInfo.rssMem) /
+           (m_nEvents - k_burnIn));
+    B2INFO("Execution time per event [ms]           : " << 1000 * (m_endInfo.time - m_startInfo.time) / (m_nEvents - k_burnIn));
   }
 
   // store the plots of ther memory consumption for virtual and rss memory

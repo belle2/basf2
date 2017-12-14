@@ -297,7 +297,7 @@ void VXDDQMModule::defineHisto()
           nameSP = str(format("VXD_Hitmap_%1%_L%2%") % Dirv.c_str() % iLayer2);
           titleSP = str(format("VXD Hitmap in %1%, layer %2%") % Dirv.c_str() % iLayer2);
           m_correlationsSP1DTheta[c_nVXDLayers * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(),
-                                                                   nStripsV2, vSize2s, vSize2e);
+                                                                   nStripsV2, -vSize2e, vSize2e);
           m_correlationsSP1DTheta[c_nVXDLayers * j + i]->GetXaxis()->SetTitle(AxisTitTheta.c_str());
           m_correlationsSP1DTheta[c_nVXDLayers * j + i]->GetYaxis()->SetTitle("hits");
         }
@@ -410,7 +410,7 @@ void VXDDQMModule::defineHisto()
             string nameSP = str(format("VXD_1D_Correlations_%1%_L%2%_L%3%") % Dirv.c_str() % iLayer1 % iLayer2);
             string titleSP = str(format("VXD 1D Correlations in %1%, layers %2% %3%") % Dirv.c_str() % iLayer1 % iLayer2);
             m_correlationsSP1DTheta[c_nVXDLayers * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(),
-                                                                     nStripsV1, vSize1s, vSize1e);
+                                                                     nStripsV1, -vSize1e, vSize1e);
             string axisxtitle = str(format("%1%, layer %2% - %3%") % AxisTitTheta.c_str() % iLayer1 % iLayer2);
             m_correlationsSP1DTheta[c_nVXDLayers * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
             m_correlationsSP1DTheta[c_nVXDLayers * j + i]->GetYaxis()->SetTitle("hits");
@@ -423,7 +423,7 @@ void VXDDQMModule::defineHisto()
             string nameSP = str(format("VXD_1D_Correlations_%1%_L%2%_L%3%") % Dirv.c_str() % iLayer1 % iLayer2);
             string titleSP = str(format("VXD 1D Correlations in %1%, layers %2% %3%") % Dirv.c_str() % iLayer1 % iLayer2);
             m_correlationsSP1DTheta[c_nVXDLayers * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(),
-                                                                     nStripsV1, vSize1s, vSize1e);
+                                                                     nStripsV1, -vSize1e, vSize1e);
             string axisxtitle = str(format("%1%, layer %2% - %3%") % AxisTitTheta.c_str() % iLayer1 % iLayer2);
             m_correlationsSP1DTheta[c_nVXDLayers * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
             m_correlationsSP1DTheta[c_nVXDLayers * j + i]->GetYaxis()->SetTitle("hits");
@@ -517,7 +517,7 @@ void VXDDQMModule::event()
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = digitPXD1.getSensorID();
         auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
-        TVector3 rLocal1(digitPXD1.getUCellPosition(), digitPXD1.getVCellPosition(), 0);
+        TVector3 rLocal1(info.getUCellPosition(digitPXD1.getUCellID()), info.getVCellPosition(digitPXD1.getVCellID()), 0);
         TVector3 ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
         iIsU1 = 1;
@@ -655,7 +655,7 @@ void VXDDQMModule::event()
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = digitPXD2.getSensorID();
           auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
-          TVector3 rLocal2(digitPXD2.getUCellPosition(), digitPXD2.getVCellPosition(), 0);
+          TVector3 rLocal2(info.getUCellPosition(digitPXD2.getUCellID()), info.getVCellPosition(digitPXD2.getVCellID()), 0);
           TVector3 ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
           iIsU2 = 1;

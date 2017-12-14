@@ -17,6 +17,11 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
+#include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
+
+#include <bitset>
+
 namespace Belle2 {
   /**
    * Module for converting RecoTracks to SpacePointTrackCands
@@ -38,6 +43,8 @@ namespace Belle2 {
     initialize(); /**< initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays) */
 
     virtual void event(); /**< event: convert RecoTracks to SpacePointTrackCands */
+
+    virtual void endRun();
 
     virtual void terminate(); /**< terminate: print some summary information on the processed events */
 
@@ -90,6 +97,15 @@ namespace Belle2 {
     bool m_skipProblematicCluster; /**< If true problematic clusters are ignored. If false the conversion of a RecoTrack containing such a cluster is aborted */
     bool m_useSingleClusterSP; /**< If true use single cluster SpacePoint collection as fallback */
     bool m_markRecoTracks; /**< If True RecoTracks where conversion problems occurred are marked dirty */
+
+    /** NoKickCuts members */
+    NoKickRTSel* m_trackSel; /**< member to call method of NoKickCuts selection */
+    std::string m_noKickCutsFile; /**< name of TFile of the cuts */
+    bool m_noKickOutput; /**< true=produce TFile with effects of NoKickCuts on tracks */
+
+    int m_ncut = 0; /**< counter of the cuttet tracks */
+    int m_npass = 0; /**< counter of the selected tracks */
+
 
     // state variables
 

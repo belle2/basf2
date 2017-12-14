@@ -21,6 +21,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -132,9 +133,38 @@ namespace Belle2 {
       return cluster->getLayers();
     }
 
+    float particleKLMgetPhi(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster) {return -999;}
+      return cluster->getMomentum().Phi();
+    }
+
+    float particleKLMgetTheta(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster) {return -999;}
+      return cluster->getMomentum().Theta();
+    }
+
+    float particleKLMgetMCMomentum(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster) {return -999;}
+      const auto mcParticle = cluster->getRelatedTo<MCParticle>();
+      if (!mcParticle) {return -999;}
+      return mcParticle->getMomentum().Mag();
+    }
+
+
+
 
     VARIABLE_GROUP("K_L0-ID");
     REGISTER_VARIABLE("KlId_KLM"          , particleKLMKlId              , "KlId from KLMcluster classifier.");
+    REGISTER_VARIABLE("KL_Phi"          , particleKLMgetPhi              , "Phi of underlying KLMCLuster.");
+    REGISTER_VARIABLE("KL_Theta"          , particleKLMgetTheta              , "Theta of underlying KLMCLuster.");
+    REGISTER_VARIABLE("KL_MCMomentum"          , particleKLMgetMCMomentum              ,
+                      "Momentum of MC particle of underlying KLMCLuster.");
     REGISTER_VARIABLE("KL_BelleTrackFlag" , particleKLMBelleTrackFlag    ,
                       "Does the corresponding Cluster carry a Belle style Track Flag.");
     REGISTER_VARIABLE("KL_BelleECLFlag"   , particleKLMBelleECLFlag      ,

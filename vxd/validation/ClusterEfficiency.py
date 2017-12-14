@@ -15,6 +15,8 @@ import math
 from basf2 import *
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = 1
+from svd import *
+from pxd import *
 import ROOT
 from ROOT import Belle2
 set_log_level(LogLevel.ERROR)
@@ -191,10 +193,11 @@ particlegun.param({
     "thetaParams": theta_params,
 })
 main.add_module("FullSim")
-main.add_module("PXDDigitizer")
-main.add_module("SVDDigitizer")
-main.add_module("PXDClusterizer")
-main.add_module("SVDClusterizer")
+add_pxd_simulation(main)
+add_svd_simulation(main)
+add_pxd_reconstruction(main)
+add_svd_reconstruction(main)
+
 clusterefficiency = ClusterEfficiency()
 main.add_module(clusterefficiency)
 main.add_module("Progress")

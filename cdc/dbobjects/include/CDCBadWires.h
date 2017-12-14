@@ -12,6 +12,8 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
 
@@ -87,6 +89,23 @@ namespace Belle2 {
 
       for (auto const ent : m_wires) {
         std::cout << WireID(ent).getICLayer() << " " << WireID(ent).getIWire() << " " << ent << std::endl;
+      }
+    }
+
+    /**
+     * Output the contents in text file format
+     */
+    void outputToFile(std::string fileName) const
+    {
+      std::ofstream fout(fileName);
+
+      if (fout.bad()) {
+        B2ERROR("Specified output file could not be opened!");
+      } else {
+        for (auto const ent : m_wires) {
+          fout << std::setw(2) << std::right << WireID(ent).getICLayer() << "  " << std::setw(3) << WireID(ent).getIWire() << std::endl;
+        }
+        fout.close();
       }
     }
 

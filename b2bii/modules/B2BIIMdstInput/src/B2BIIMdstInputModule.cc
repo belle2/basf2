@@ -11,15 +11,12 @@
 #include <b2bii/modules/B2BIIMdstInput/B2BIIMdstInputModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 
 // Belle tables
 #include "belle_legacy/tables/belletdf.h"
 
 // Belle II dataobjects
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/NumberSequence.h>
 
 #include <cstdlib>
@@ -149,8 +146,7 @@ void B2BIIMdstInputModule::initializeDataStore()
 {
   B2DEBUG(99, "[B2BIIMdstInputModule::initializeDataStore] initialization of DataStore started");
 
-  // event meta data Object pointer
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_evtMetaData.registerInDataStore();
 
   B2DEBUG(99, "[B2BIIMdstInputModule::initializeDataStore] initialization of DataStore ended");
 }

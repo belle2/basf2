@@ -63,7 +63,7 @@ namespace Belle2 {
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
 
-      bool m_generateShaperDigts;
+      bool m_generateShaperDigits;
       std::string m_svdShaperDigitListName;
       std::string m_svdDAQDiagnosticsListName;
 

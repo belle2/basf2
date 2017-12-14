@@ -18,6 +18,7 @@
 
 #include "trg/trg/Debug.h"
 #include "trg/grl/modules/trggrl/TRGGRLModule.h"
+#include <framework/logging/Logger.h>
 
 using namespace std;
 
@@ -65,9 +66,6 @@ namespace Belle2 {
              _firmwareSimulationMode,
              "TRGGRL firmware simulation mode",
              _firmwareSimulationMode);
-
-    if (TRGDebug::level())
-      cout << "TRGGRLModule ... created" << endl;
   }
 
   TRGGRLModule::~TRGGRLModule()
@@ -76,8 +74,6 @@ namespace Belle2 {
     if (_grl)
       TRGGRL::getTRGGRL("good-bye");
 
-    if (TRGDebug::level())
-      cout << "TRGGRLModule ... destructed " << endl;
   }
 
   void
@@ -86,11 +82,7 @@ namespace Belle2 {
 
 //  TRGDebug::level(_debugLevel);
 
-    if (TRGDebug::level()) {
-      cout << "TRGGRLModule::initialize ... options" << endl;
-      cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-           << endl;
-    }
+    B2DEBUG(100, "TRGGRLModule::initialize ... options");
   }
 
   void
@@ -113,29 +105,24 @@ namespace Belle2 {
                                _firmwareSimulationMode);
     }
 
-    if (TRGDebug::level()) {
-      cout << "TRGGDLModule ... beginRun called " << endl;
-      cout << "                 configFile = " << cfn << endl;
-    }
+    B2DEBUG(300, "TRGGDLModule ... beginRun called configFile = " << cfn);
+
   }
 
   void
   TRGGRLModule::event()
   {
-    TRGDebug::enterStage("TRGGRLModule event");
 
     //...GRL simulation...
     _grl->update(true);
     _grl->simulate();
 
-    TRGDebug::leaveStage("TRGGRLModule event");
   }
 
   void
   TRGGRLModule::endRun()
   {
-    if (TRGDebug::level())
-      cout << "TRGGRLModule ... endRun called " << endl;
+    B2DEBUG(300, "TRGGRLModule ... endRun called ");
   }
 
 
@@ -143,8 +130,7 @@ namespace Belle2 {
   TRGGRLModule::terminate()
   {
     _grl->terminate();
-    if (TRGDebug::level())
-      cout << "TRGGRLModule ... terminate called " << endl;
+    B2DEBUG(200, "TRGGRLModule ... terminate called ");
   }
 
 } // namespace Belle2

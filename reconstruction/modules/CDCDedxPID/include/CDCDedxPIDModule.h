@@ -15,6 +15,14 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
@@ -81,6 +89,17 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+
+    // outputs
+    StoreArray<CDCDedxTrack> m_dedxTracks; /**< Output array of CDCDedxTracks */
+    StoreArray<CDCDedxLikelihood> m_dedxLikelihoods; /**< Output array of CDCDedxLikelihoods */
+
+    // required inputs
+    StoreArray<Track> m_tracks; /**< Required array of input Tracks */
+    StoreArray<RecoTrack> m_recoTracks; /**< Required array of input RecoTracks */
+
+    // optional inputs
+    StoreArray<MCParticle> m_mcparticles; /**< Optional array of input MCParticles */
 
     /** parameterized beta-gamma curve for predicted means */
     double bgCurve(double* x, double* par, int version) const;

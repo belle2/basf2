@@ -18,7 +18,10 @@
 
 //basf2 framework headers
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include "trg/ecl/TrgEclMapping.h"
+#include "trg/ecl/dataobjects/TRGECLDigi0MC.h"
+#include "trg/ecl/dataobjects/TRGECLHitMC.h"
 
 //#include <ecl/geometry/ECLGeometryPar.h>
 //#include <ecl/dataobjects/ECLSimHit.h>
@@ -71,6 +74,8 @@ namespace Belle2 {
 
 
   private:
+    StoreArray<TRGECLDigi0MC> m_trgECLDigi0MC; /**< output for TRGECLDigi0MC */
+    StoreArray<TRGECLHitMC> m_trgECLHitMC;  /**< output for TRGECLHitMC */
 
 
 

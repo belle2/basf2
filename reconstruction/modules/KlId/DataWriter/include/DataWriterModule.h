@@ -13,6 +13,11 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KlId.h>
+
 #include <TTree.h>
 #include <TFile.h>
 #include <string>
@@ -72,8 +77,6 @@ namespace Belle2 {
     Float_t m_KLMenergy;
     /**  invariant mass calculated from root vector */
     Float_t m_KLMinvM;
-    /** distance KLM Cluster <-> track extrapolated into KLM */
-    Float_t m_KLMtrackDist;
     /** target variable for KLM classification */
     Float_t m_KLMTruth;
     /** distance to next KLM cluster */
@@ -149,8 +152,6 @@ namespace Belle2 {
     Float_t m_KLMECLUncertaintyTheta;
     /** mc weight */
     Float_t m_KLMMCWeight;
-    /** distance calculated by genfit */
-    Float_t m_KLMgenfitDist;
     /** track flag for belle comparision */
     Float_t m_KLMtrackFlag;
     /** ecl flag for belle comparision */
@@ -230,6 +231,14 @@ namespace Belle2 {
 
     /** isSignal for the classifier */
     Float_t m_isSignal;
+
+
+    /** Store array  */
+    StoreArray<MCParticle> m_mcParticles;
+    /** Store array  */
+    StoreArray<KLMCluster> m_klmClusters;
+    /** Store array  */
+    StoreArray<ECLCluster> m_eclClusters;
 
     /** root file */
     TFile* m_f = nullptr; //

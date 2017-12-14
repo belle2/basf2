@@ -13,6 +13,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include "mdst/dataobjects/HLTTag.h"
+#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 #include <string>
 #include <memory>
@@ -54,6 +57,8 @@ namespace Belle2 {
     bool eventSelect();
 
   private:
+    StoreArray<HLTTag> m_hltTag; /** Array for HLTTag */
+    StoreArray<PhysicsTriggerInformation> m_physicsTriggerInformation; /** Array for PhysicsTriggerInformation */
 
 
 

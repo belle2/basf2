@@ -64,7 +64,7 @@ namespace Belle2 {
 
   void RestOfEventUpdaterModule::initialize()
   {
-    StoreArray<Particle>::required();
+    StoreArray<Particle>().isRequired();
     m_inputList.isRequired(m_inputListName);
 
     m_cut = Variable::Cut::compile(m_selection);

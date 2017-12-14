@@ -9,6 +9,5 @@
 #pragma link C++ class Belle2::CDCDedxLikelihood+;
 #pragma link C++ class Belle2::VXDDedxTrack+;
 #pragma link C++ class Belle2::VXDDedxLikelihood+;
-#pragma link C++ class Belle2::KlId+;
 
 #endif

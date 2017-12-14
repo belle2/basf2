@@ -10,4 +10,3 @@
 #include "TreeFitter/test_Fitparams.h"
 #include "TreeFitter/test_KalmanCalculator.h"
 // run a single test with: test_all --gtest_filter=TreeFitterKalmanCalculatorTest.Functions
-// or just run_all

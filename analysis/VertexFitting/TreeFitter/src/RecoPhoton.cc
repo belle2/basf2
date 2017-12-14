@@ -219,16 +219,14 @@ namespace TreeFitter {
     const double Ec2 = m_params(3) * m_params(3);
 
     const Eigen::Matrix<double, 1, 3> vertexToCluster = x_vec - m_params.segment(0, 3);
-    //sqrt( (x - xc)^2 + (y - yc)^2 + (z - zc)^2 )
     const double delta = vertexToCluster.norm();
-    //Ec * delta
+
     const double EcDelta = m_params(3) * delta;
     const double theta = delta / m_params(3);
 
     Eigen::Matrix<double, 4, 1> residual4 = Eigen::Matrix<double, 4, 1>::Zero(4, 1);
     for (unsigned int row = 0 ; row < 3; row++) {
       residual4(row) = m_params(row) - x_vec(row) - theta * p_vec(row);
-      //p.getResiduals()(row) = m_params(row) - x_vec(row) - theta * p_vec(row);
     }
     residual4(3) = m_params(3) - mom;
 
@@ -242,14 +240,11 @@ namespace TreeFitter {
     P(2, 3) =     p_vec(2) * EcDelta / Ec2;
 
     p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
-    //p.getV() = m_covariance.selfadjointView<Eigen::Lower>();
     p.getResiduals().segment(0, 3) = P * residual4;
-    //p.getResiduals().segment(0, 4) = residual4;
 
     for (unsigned int row = 0; row < 3; row++) {
       p.getH()(row, posindex + row) = 1;
       p.getH()(row, momindex + row) = theta;
-      //p.getH()(3, row) = p_vec(row) / mom;
     }
     return ErrCode::success;
   }

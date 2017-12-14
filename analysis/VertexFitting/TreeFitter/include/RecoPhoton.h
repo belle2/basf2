@@ -20,27 +20,31 @@ namespace TreeFitter {
   public:
     /** constructor */
     RecoPhoton(Belle2::Particle* bc, const ParticleBase* mother) ;
+
     /** destructor */
     virtual ~RecoPhoton();
 
     /** init particle with mother */
     virtual ErrCode initParticleWithMother(FitParams* fitparams);
+
     /** init particle without mother */
     virtual ErrCode initMotherlessParticle(FitParams* fitparams);
 
     /** init covariance */
     ErrCode initCovariance(FitParams* fitparams) const;
+
     /** update or init params */
     ErrCode initParams();
+
     /** project photon consztraint */
     ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const;
+
     /** project photon consztraint */
     ErrCode projectRecoConstraintOld(const FitParams& fitparams, Projection& p) const;
 
-
-
     /** */
     virtual int dimM() const { return m_useEnergy ? 3 : 2 ; }
+
     /** */
     virtual int type()     const { return kRecoPhoton ; }
 
@@ -56,6 +60,7 @@ namespace TreeFitter {
   private:
     /** */
     bool m_init ;
+
     /** */
     bool m_useEnergy ;
 

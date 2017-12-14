@@ -21,7 +21,6 @@ namespace TreeFitter {
   ErrCode KalmanCalculator::calculateGainMatrix(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
                                                 const FitParams* fitparams, const EigenTypes::MatrixXd* V, double weight)
   {
-    /* it would be better to initialise the const params with a constructor:  <11-12-17, jkrohn> */
     B2DEBUG(83, "------ KalmanCalculator::init                                    ");
     m_constrDim = residuals.size(); //TODO move to constrcutor?
     m_stateDim  = fitparams->getDimensionOfState();

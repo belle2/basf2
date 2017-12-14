@@ -12,7 +12,11 @@
 #define ECLTRACKCLUSTERMATCHING_H
 
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
@@ -66,11 +70,23 @@ namespace Belle2 {
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
     bool isECLHit(const ExtHit& extHit) const;
 
-    double clusterQuality(double deltaPhi, double deltaTheta, double momentum) const;
-    double phiConsistency(double deltaPhi, double momentum) const;
-    double thetaConsistency(double deltaTheta, double momentum) const;
+    double clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum, double thetaCluster) const;
+    double phiConsistency(double deltaPhi, double transverseMomentum, double thetaCluster) const;
+    double thetaConsistency(double deltaTheta, double transverseMomentum, double thetaCluster) const;
 
-    /** members of ECLReconstructor Module */
+    // required input
+    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
+    StoreArray<Track> m_tracks; /** Required input array of Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /** Required input array of TrackFitResults */
+    StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
+
+    // optional input
+    StoreObjPtr<EventMetaData> m_eventMetaData; /** Optional input array of EventMetaData */
+    StoreArray<MCParticle> m_mcParticles; /** Optional input array of MCParticles */
+
+    /** members of ECLTrackClusterMatching Module */
+
+    double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for track-cluster match */
 
     TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
@@ -84,6 +100,7 @@ namespace Belle2 {
 
     int m_trackNo;
     double m_trackMomentum;
+    double m_pT;
     double m_deltaPhi;
     double m_phiCluster;
     double m_phiHit;

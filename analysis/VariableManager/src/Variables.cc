@@ -1385,9 +1385,9 @@ namespace Belle2 {
 
 // ECLCluster related variables -----------------------------------------
 
-    int eclClusterDetectionRegion(const Particle* particle)
+    double eclClusterDetectionRegion(const Particle* particle)
     {
-      int result = 0;
+      double result = 0.0;
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower)
@@ -2063,7 +2063,8 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "Returns reconstructed polar angle region in the ECL (1 - forward, 2 - barrel, 3 - backward, 11/13 - gap between FW/BW and barrel)");
+                      "Returns an integer code for the ECL region of a cluster:\n"
+                      "1 - forward, 2 - barrel, 3 - backward, 11 - between FWD and barrel, 13 - between BWD and barrel, 0 - otherwise)");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
                       "Returns DeltaL for the shower shape.\n"
                       "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"

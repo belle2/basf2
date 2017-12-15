@@ -605,8 +605,8 @@ VXDTFModule::~VXDTFModule()
 
 void VXDTFModule::initialize()
 {
-  B2FATAL("The VXDTF Module (VXDTF1) is deprecated! Support for this module is ceased and the module will be deleted soon! "
-          << "If you have objections, please contact felix.metzner@kit.edu.");
+  B2WARNING("The VXDTF Module (VXDTF1) is deprecated! Support for this module is ceased and the module will be deleted soon! "
+            << "If you have objections, please contact felix.metzner@kit.edu.");
   B2DEBUG(1, "-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance <<
           ") - initialize:");
 
@@ -626,6 +626,8 @@ void VXDTFModule::initialize()
 
 void VXDTFModule::beginRun()
 {
+  B2ERROR("The VXDTF Module (VXDTF1) is deprecated! Support for this module is ceased and the module will be deleted soon! "
+          << "If you have objections, please contact felix.metzner@kit.edu.");
   B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance <<
          ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
   B2DEBUG(50,

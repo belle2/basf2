@@ -49,7 +49,7 @@ namespace TreeFitter {
     virtual bool hasEnergy() const { return dim() > 3 ; }
 
     /**set the size of the particle in the statevector */
-    virtual int dim() const { return 3; }
+    virtual int dim() const { return 4; }
 
     /** */
     virtual int type()     const { return kRecoPhoton ; }

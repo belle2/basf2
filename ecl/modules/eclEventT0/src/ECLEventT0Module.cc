@@ -206,7 +206,7 @@ void ECLEventT0Module::event()
   if (stdDevAllBut1 > T0Unc) {T0Unc = stdDevAllBut1;}
   StoreObjPtr<EventT0> eventT0("EventT0");
   if (!eventT0) {eventT0.create();}
-  eventT0->addEventT0(T0, T0Unc, Const::ECL);
+  eventT0->setEventT0(T0, T0Unc, Const::ECL);
 }
 
 

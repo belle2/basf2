@@ -87,6 +87,7 @@ namespace Belle2 {
       float t = (float) time;
       float terr = (float) timeError;
       data_put_(&moduleID, &pixelID, &t, &terr, &status);
+      if (status > 0) return status;
       switch (status) {
         case 0:
           B2WARNING("addData: no space available in /TOP_DATA/");
@@ -101,6 +102,7 @@ namespace Belle2 {
           B2ERROR("addData: digit should already be masked-out (different masks used?)");
           return status;
         default:
+          B2ERROR("addData: unknown return status " << status);
           return status;
       }
     }

@@ -27,7 +27,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
-           "Name of EKLMDigit store array", string("Digits"));
+           "Name of EKLMDigit store array", string(""));
   m_GeoDat = NULL;
 }
 

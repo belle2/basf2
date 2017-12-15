@@ -14,53 +14,53 @@ namespace Belle2 {
   {
     // Test proper initialization for an empty afterimage.
     EventLevelTrackingInfo eventLevelTrackingInfo;
-    EXPECT_EQ(eventLevelTrackingInfo.getNHitsNotAssigned(), 0);
-    EXPECT_EQ(eventLevelTrackingInfo.getNHitsNotAssignedPostCleaning(), 0);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssigned(), 0);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssignedPostCleaning(), 0);
 
     //Let's set the total number CDC hits in the afterimage
-    eventLevelTrackingInfo.setNHitsNotAssigned(324);
-    eventLevelTrackingInfo.setNHitsNotAssignedPostCleaning(257);
+    eventLevelTrackingInfo.setNCDCHitsNotAssigned(324);
+    eventLevelTrackingInfo.setNCDCHitsNotAssignedPostCleaning(257);
 
-    EXPECT_EQ(eventLevelTrackingInfo.getNHitsNotAssigned(), 324);
-    EXPECT_EQ(eventLevelTrackingInfo.getNHitsNotAssignedPostCleaning(), 257);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssigned(), 324);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCHitsNotAssignedPostCleaning(), 257);
 
     //Let's set and get information for the various layers:
-    eventLevelTrackingInfo.setLayer(9); // SL1
-    EXPECT_TRUE(eventLevelTrackingInfo.hasLayer(9));
-    EXPECT_FALSE(eventLevelTrackingInfo.hasLayer(10));
-    eventLevelTrackingInfo.setLayer(23);
-    EXPECT_TRUE(eventLevelTrackingInfo.hasLayer(23));
-    EXPECT_FALSE(eventLevelTrackingInfo.hasLayer(55));
+    eventLevelTrackingInfo.setCDCLayer(9); // SL1
+    EXPECT_TRUE(eventLevelTrackingInfo.hasCDCLayer(9));
+    EXPECT_FALSE(eventLevelTrackingInfo.hasCDCLayer(10));
+    eventLevelTrackingInfo.setCDCLayer(23);
+    EXPECT_TRUE(eventLevelTrackingInfo.hasCDCLayer(23));
+    EXPECT_FALSE(eventLevelTrackingInfo.hasCDCLayer(55));
 
-    EXPECT_B2FATAL(eventLevelTrackingInfo.setLayer(56));
-    EXPECT_B2FATAL(eventLevelTrackingInfo.hasLayer(56));
+    EXPECT_B2FATAL(eventLevelTrackingInfo.setCDCLayer(56));
+    EXPECT_B2FATAL(eventLevelTrackingInfo.hasCDCLayer(56));
 
     //Let's have a look at the SuperLayers ...
-    EXPECT_TRUE(eventLevelTrackingInfo.hasSLayer(1));
-    EXPECT_FALSE(eventLevelTrackingInfo.hasSLayer(5));
+    EXPECT_TRUE(eventLevelTrackingInfo.hasCDCSLayer(1));
+    EXPECT_FALSE(eventLevelTrackingInfo.hasCDCSLayer(5));
 
     //Let's set and get the information on unused segments:
-    eventLevelTrackingInfo.setNSegments(21);
-    EXPECT_EQ(eventLevelTrackingInfo.getNSegments(), 21);
-    eventLevelTrackingInfo.setNSegments(300);
-    EXPECT_EQ(eventLevelTrackingInfo.getNSegments(), 255);
+    eventLevelTrackingInfo.setNCDCSegments(21);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCSegments(), 21);
+    eventLevelTrackingInfo.setNCDCSegments(300);
+    EXPECT_EQ(eventLevelTrackingInfo.getNCDCSegments(), 255);
   }
 
   /** Test simple Setters and Getters for the VXD related part. */
   TEST_F(EventLevelTrackingInfoTest, settersNGettersVXD)
   {
     EventLevelTrackingInfo eventLevelTrackingInfo;
-    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(3), 0);
-    eventLevelTrackingInfo.setNClustersInLayer(3, true, 81);
-    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(3), 81);
-    eventLevelTrackingInfo.setNClustersInLayer(2, true, 3456);
-    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(2), 3456);
-    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(3, true), 81);
-    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(3, false), 0);
-    EXPECT_B2FATAL(eventLevelTrackingInfo.getNClustersInLayer(56));
+    EXPECT_EQ(eventLevelTrackingInfo.getNVXDClustersInLayer(3), 0);
+    eventLevelTrackingInfo.setNVXDClustersInLayer(3, true, 81);
+    EXPECT_EQ(eventLevelTrackingInfo.getNVXDClustersInLayer(3), 81);
+    eventLevelTrackingInfo.setNVXDClustersInLayer(2, true, 3456);
+    EXPECT_EQ(eventLevelTrackingInfo.getNVXDClustersInLayer(2), 3456);
+    EXPECT_EQ(eventLevelTrackingInfo.getNVXDClustersInLayer(3, true), 81);
+    EXPECT_EQ(eventLevelTrackingInfo.getNVXDClustersInLayer(3, false), 0);
+    EXPECT_B2FATAL(eventLevelTrackingInfo.getNVXDClustersInLayer(56));
 
-    eventLevelTrackingInfo.setNClustersInLayer(6, true, 300);
-    EXPECT_EQ(eventLevelTrackingInfo.getNClustersInLayer(6, true), 255);
+    eventLevelTrackingInfo.setNVXDClustersInLayer(6, true, 300);
+    EXPECT_EQ(eventLevelTrackingInfo.getNVXDClustersInLayer(6, true), 255);
 
     eventLevelTrackingInfo.setSVDFirstSampleTime(-128);
     EXPECT_EQ(eventLevelTrackingInfo.getSVDFirstSampleTime(), -128);

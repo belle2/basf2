@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <pxd/modules/pxdUnpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDPackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
@@ -22,28 +23,6 @@
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 #include <TRandom.h>
-
-// DHP modes are the same as for DHE envelope
-#define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
-#define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
-
-// DHE like before, but now 4 bits
-#define DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
-#define DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
-#define DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1
-#define DHC_FRAME_HEADER_DATA_TYPE_COMMODE     0x6
-#define DHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
-#define DHC_FRAME_HEADER_DATA_TYPE_DHE_START   0x3
-#define DHC_FRAME_HEADER_DATA_TYPE_DHE_END     0x4
-// DHC envelope, new
-#define DHC_FRAME_HEADER_DATA_TYPE_DHC_START  0xB
-#define DHC_FRAME_HEADER_DATA_TYPE_DHC_END    0xC
-// Onsen processed data, new
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP     0xD
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE     0x9
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI     0xF
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG     0xE
-// Free IDs are 0x7 0x8 0xA
 
 using namespace std;
 using namespace Belle2;
@@ -85,10 +64,10 @@ PXDPackerModule::PXDPackerModule() :
 
 void PXDPackerModule::initialize()
 {
-  B2INFO("PXD Packer --> Init");
+  B2DEBUG(20, "PXD Packer --> Init");
   //Register output collections
-  m_storeRaws.registerInDataStore(m_RawPXDsName);
-  storeDigits.isRequired(m_PXDDigitsName);
+  m_storeRaws.registerInDataStore(m_RawPXDsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeDigits.isRequired(m_PXDDigitsName);
 
   m_packed_events = 0;
 
@@ -98,7 +77,7 @@ void PXDPackerModule::initialize()
   for (auto& it : m_dhe_to_dhc) {
     bool flag;
     int dhc_id;
-    B2INFO("PXD Packer --> DHC/DHE");
+    B2DEBUG(20, "PXD Packer --> DHC/DHE");
     flag = false;
     if (it.size() != 6) {
       /// means [ 1 2 3 4 5 -1 ] DHC 1 has DHE 2,3,4,5 on port 0-3 and nothing on port 4
@@ -108,7 +87,7 @@ void PXDPackerModule::initialize()
       if (flag) {
         int v;
         v = it2;
-        B2INFO("PXD Packer --> ... DHE " << it2);
+        B2DEBUG(20, "PXD Packer --> ... DHE " << it2);
         if (it2 < -1 || it2 >= 64) {
           if (it2 != -1) B2ERROR("PXD Packer --> DHC id " << it2 << " is out of range (0-64 or -1)! disable channel.");
           v = -1;
@@ -117,7 +96,7 @@ void PXDPackerModule::initialize()
         m_dhc_mapto_dhe[dhc_id].push_back(v);
       } else {
         dhc_id = it2;
-        B2INFO("PXD Packer --> DHC .. " << it2);
+        B2DEBUG(20, "PXD Packer --> DHC .. " << it2);
         if (dhc_id < 0 || dhc_id >= 16) {
           B2ERROR("PXD Packer --> DHC id " << it2 << " is out of range (0-15)! skip");
           break;
@@ -126,17 +105,17 @@ void PXDPackerModule::initialize()
       flag = true;
     }
   }
-  B2INFO("PXD Packer --> DHC/DHE done");
+  B2DEBUG(20, "PXD Packer --> DHC/DHE done");
 
 //   for (auto & it : m_dhe_mapto_dhc) {
-//     B2INFO("PXD Packer --> DHE " << it.first << " connects to DHC " << it.second);
+//     B2DEBUG(20, "PXD Packer --> DHE " << it.first << " connects to DHC " << it.second);
 //   }
 
   for (auto& it : m_dhc_mapto_dhe) {
     int port = 0;
-    B2INFO("PXD Packer --> DHC " << it.first);
+    B2DEBUG(20, "PXD Packer --> DHC " << it.first);
     for (auto& it2 : it.second) {
-      B2INFO("PXD Packer --> .. connects to DHE " << it2 << " port " << port);
+      B2DEBUG(20, "PXD Packer --> .. connects to DHE " << it2 << " port " << port);
       port++;
     }
   }
@@ -155,7 +134,7 @@ void PXDPackerModule::event()
 
 //   B2ERROR("Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
 
-  int nDigis = storeDigits.getEntries();
+  int nDigis = m_storeDigits.getEntries();
 
   B2DEBUG(20, "PXD Packer --> Nr of Digis: " << nDigis);
 
@@ -164,7 +143,7 @@ void PXDPackerModule::event()
   VxdID lastVxdId = -1; /// invalid ... force to set first itertor/index
   /// We assume the Digits are sorted by VxdID (P.K. says they are)
   /// Thie saves some iterating lateron
-  for (auto it = storeDigits.begin() ; it != storeDigits.end(); it++) {
+  for (auto it = m_storeDigits.begin() ; it != m_storeDigits.end(); it++) {
     VxdID currentVxdId;
     currentVxdId = it->getSensorID();
     currentVxdId.setSegmentNumber(0);
@@ -183,7 +162,7 @@ void PXDPackerModule::event()
                 dhe_id);
       }
 
-      startOfVxdID[currentVxdId] = std::distance(storeDigits.begin(), it);
+      startOfVxdID[currentVxdId] = std::distance(m_storeDigits.begin(), it);
       B2DEBUG(20, "Offset : " << startOfVxdID[currentVxdId]);
     }
   }
@@ -292,7 +271,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
   /// HLT frame ??? format still t.b.d. TODO
   start_frame();
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
+  append_int32((EDHCFrameHeaderDataType::c_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
   append_int32(0xCAFE8000);// HLT HEADER, accepted flag set
   append_int32(m_trigger_nr); // HLT Trigger Nr
   append_int32(m_run_nr_word1); // HLT Run NR etc
@@ -305,7 +284,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
   dhc_byte_count = 0;
   start_frame();
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
+  append_int32((EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
                (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16);
   append_int16(((m_meta_time << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
@@ -326,13 +305,13 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   /// lets copy the HLT/ROI frame
 
   //  start_frame();
-  //  append_int32((DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI<<27) | (m_trigger_nr & 0xFFFF));
+  //  append_int32((EDHCFrameHeaderDataType::c_ONSEN_ROI<<27) | (m_trigger_nr & 0xFFFF));
   //  add_frame_to_payload();
 
   /// DHC End
   unsigned int dlen = (dhc_byte_count / 4); // 32 bit words
   start_frame();
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHC_END << 27) | ((dhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
+  append_int32((EDHCFrameHeaderDataType::c_DHC_END << 27) | ((dhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
   append_int32(dlen); // 32 bit word count
   append_int32(0x00000000); // Error Flags
   add_frame_to_payload();
@@ -354,7 +333,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
   /// DHE Start
   dhe_byte_count = 0;
   start_frame();
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHE_START << 27) | ((dhe_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) |
+  append_int32((EDHCFrameHeaderDataType::c_DHE_START << 27) | ((dhe_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) |
                (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16); // Trigger Nr Hi
   append_int16(0x00000000);  // DHE Timer Lo
@@ -394,10 +373,10 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
     B2DEBUG(20, "pack_dhe: VxdId: " << currentVxdId << " " << (int)currentVxdId);
 
     {
-      auto it = storeDigits.begin();
+      auto it = m_storeDigits.begin();
       B2DEBUG(20, "Advance: " << startOfVxdID[currentVxdId]);
       advance(it, startOfVxdID[currentVxdId]);
-      for (; it != storeDigits.end(); it++) {
+      for (; it != m_storeDigits.end(); it++) {
         auto id = it->getSensorID();
         id.setSegmentNumber(0);
         if (currentVxdId != id) break; /// another sensor starts
@@ -405,7 +384,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
         {
           unsigned int row, col;
           row = it->getVCellID();// hardware starts counting at 0!
-          col = it->getUCellID();// U/V cell ID DO NOT follow Belle2 Note yet, TODO add -1 if this has been implemented!
+          col = it->getUCellID();// U/V cell ID DO NOT follow Belle2 Note, thus no -1
           if (row > ladder_max_row || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else {
@@ -435,7 +414,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
   /// DHE End
   unsigned int dlen = (dhe_byte_count / 2); // 16 bit words
   start_frame();
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHE_END << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+  append_int32((EDHCFrameHeaderDataType::c_DHE_END << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
   append_int16(dlen & 0xFFFF); // 16 bit word count
   append_int16((dlen >> 16) & 0xFFFF); // 16 bit word count
   append_int32(0x00000000);  // Error Flags
@@ -453,9 +432,9 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
   B2DEBUG(20, "PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id << " Mode " << adcpedestal);
   start_frame();
   /// DHP data Frame
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
+  append_int32((EDHCFrameHeaderDataType::c_DHP_RAW << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
                (m_trigger_nr & 0xFFFF));
-  append_int32((DHP_FRAME_HEADER_DATA_TYPE_RAW << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (0 & 0xFFFF));
+  append_int32((EDHPFrameHeaderDataType::c_RAW << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (0 & 0xFFFF));
 
   int c1, c2;
   c1 = 64 * chip_id;
@@ -510,9 +489,9 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
 
   start_frame();
   /// DHP data Frame
-  append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_reformat & 0x1) << 19) | ((
+  append_int32((EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_reformat & 0x1) << 19) | ((
                  chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
-  append_int32((DHP_FRAME_HEADER_DATA_TYPE_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
+  append_int32((EDHPFrameHeaderDataType::c_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
     bool rowstart;
     rowstart = true;
@@ -546,7 +525,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
     dhe_byte_count -= 8; // fixed size of Header
     start_frame();
     /// Ghost Frame ... start frame overwrites frame info set above
-    append_int32((DHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
+    append_int32((EDHCFrameHeaderDataType::c_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
                  (m_trigger_nr & 0xFFFF));
   } else {
     //B2DEBUG(20,"Found data for halfladder DHEID: " << dhe_id << " Chip: " << chip_id);

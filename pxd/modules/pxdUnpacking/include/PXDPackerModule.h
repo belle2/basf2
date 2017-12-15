@@ -21,10 +21,6 @@ namespace Belle2 {
 
   namespace PXD {
 
-#define PACKER_NUM_ROWS 768
-#define PACKER_NUM_COLS 250
-
-
     /** The PXDPacker module.
      *
      * This module is responsible for packing (simulated) Pixels back to
@@ -33,6 +29,8 @@ namespace Belle2 {
      * Not yet ready for MC Production, only lab use recommended.
      */
     class PXDPackerModule : public Module {
+      enum {PACKER_NUM_ROWS = 768};
+      enum {PACKER_NUM_COLS = 250};
 
     public:
       /** Constructor defining the parameters */
@@ -83,7 +81,7 @@ namespace Belle2 {
       std::vector <unsigned char> m_current_frame;
 
       /** Input array for Digits. */
-      StoreArray<PXDDigit> storeDigits;
+      StoreArray<PXDDigit> m_storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
 

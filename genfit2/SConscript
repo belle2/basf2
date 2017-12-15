@@ -14,7 +14,7 @@ dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measureme
 env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'geometry', 'Geom', 'EG']
 
 # prevent cling c++11 warnins as genfit is c++03 compatible
-env.Append(CLINGFLAGS="-Wno-inconsistent-missing-override")
+env.Append(CLINGFLAGS="-Wno-inconsistent-missing-override -noIncludePaths")
 
 # add genfit2 to include path
 env.Append(CPPPATH=os.path.join(env['INCDIR'], 'genfit'))

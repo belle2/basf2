@@ -217,13 +217,13 @@ namespace TreeFitter {
 
     const double mom = p_vec.norm();
 
-    Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
-    const double Ec2 = m_params(3) * m_params(3);
+    //Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
+    //const double Ec2 = m_params(3) * m_params(3);
 
     const Eigen::Matrix<double, 1, 3> vertexToCluster = x_vec - m_params.segment(0, 3);
     const double delta = vertexToCluster.norm();
 
-    const double EcDelta = m_params(3) * delta;
+    //const double EcDelta = m_params(3) * delta;
     const double theta = delta / m_params(3);
 
     Eigen::Matrix<double, 4, 1> residual4 = Eigen::Matrix<double, 4, 1>::Zero(4, 1);
@@ -232,24 +232,25 @@ namespace TreeFitter {
     }
     residual4(3) = m_params(3) - mom;
 
-    P(0, 0) = 1;
-    P(0, 3) =     p_vec(0) * EcDelta / Ec2;
+    //P(0, 0) = 1;
+    //P(0, 3) =     p_vec(0) * EcDelta / Ec2;
 
-    P(1, 1) = 1;
-    P(1, 3) =     p_vec(1) * EcDelta / Ec2;
+    //P(1, 1) = 1;
+    //P(1, 3) =     p_vec(1) * EcDelta / Ec2;
 
-    P(2, 2) = 1;
-    P(2, 3) =     p_vec(2) * EcDelta / Ec2;
+    //P(2, 2) = 1;
+    //P(2, 3) =     p_vec(2) * EcDelta / Ec2;
 
     //p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
     p.getV() = m_covariance.selfadjointView<Eigen::Lower>();
     //p.getResiduals().segment(0, 3) = residual4.segment(0, 3);
     p.getResiduals().segment(0, 4) = residual4.segment(0, 4);
-    //p.getResiduals().segment(0, 3) = P * residual4;
 
-    p.getH()(3, momindex)     =  p_vec(0) / mom;
-    p.getH()(3, momindex + 1) =  p_vec(1) / mom;
-    p.getH()(3, momindex + 2) =  p_vec(2) / mom;
+    if (dim() > 3) {
+      p.getH()(3, momindex)     =  p_vec(0) / mom;
+      p.getH()(3, momindex + 1) =  p_vec(1) / mom;
+      p.getH()(3, momindex + 2) =  p_vec(2) / mom;
+    }
 
     for (unsigned int row = 0; row < 3; row++) {
       p.getH()(row, posindex + row) = 1;

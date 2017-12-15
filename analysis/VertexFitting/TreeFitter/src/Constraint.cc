@@ -94,9 +94,16 @@ namespace TreeFitter {
     B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
             " NDF" << m_dim << " for " << this->name());
 
-    fitpar->addChiSquare(kalman.getChiSquare(), kalman.getConstraintDim());
+
+    /* FIXME get the math in RecoPhoton right so that the reduced constraint can be projected
+     * this is a hack that works but projection 3d instead of 4d photon would be better :  <15-12-17, jkrohn> */
+    const unsigned int NDF = (this->type() == photon)
+                             && (this->dim() == 4) ?  kalman.getConstraintDim() - 1 : kalman.getConstraintDim();
+    fitpar->addChiSquare(kalman.getChiSquare(), NDF);
+
+    //fitpar->addChiSquare(kalman.getChiSquare(), kalman.getConstraintDim());
     kalman.updateCovariance(fitpar);
-    m_chi2 = kalman.getChiSquare(); //JFK: FIXME remove 2017-10-26
+    m_chi2 = kalman.getChiSquare();
     return status;
   }
 

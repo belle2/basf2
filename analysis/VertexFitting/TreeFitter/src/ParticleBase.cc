@@ -68,10 +68,8 @@ namespace TreeFitter {
 
   ParticleBase* ParticleBase::addDaughter(Belle2::Particle* cand, bool forceFitAll)
   {
-
     auto newDaughter = ParticleBase::createParticle(cand, this, forceFitAll);
     m_daughters.push_back(newDaughter);
-
     return m_daughters.back();
   }
 
@@ -89,13 +87,10 @@ namespace TreeFitter {
 
   void ParticleBase::updateIndex(int& offset)
   {
-    // first the daughters
     for (auto daughter : m_daughters) {
       daughter->updateIndex(offset);
     }
-    // now the real work
     m_index = offset;
-    //JFK: this is an extremely stupid construct... 2017-09-28
     offset += dim();
   }
 
@@ -110,78 +105,39 @@ namespace TreeFitter {
     ParticleBase* rc = 0;
     int pdgcode = particle->getPDGCode();
 
-    // We refit invalid fits, kinematic fits and composites with beamspot
-    // constraint if not at head of tree.
-    //FT: for now we refit everything since doing otherwise sometimes causes loss of mother-daughter relations
-    //    this is due to the way we build the tree...
     bool validfit  = false;
 
-    // FT:leave this one for now
     if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
       B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.");
     }
-
     if (!mother) { // 'head of tree' particles
-
-      //FT: we don't have a way to properly flag particles as composites, and we don't have a stored value for decay time. Some hacking is required.
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
-        B2DEBUG(90, "We attempt to create the mother, named " << particle->getName());
         rc = new InternalParticle(particle, 0, forceFitAll);
-        B2DEBUG(80, "We create the mother, named " << particle->getName());
-
       } else {
-        B2ERROR("ParticleBase::createParticle: You are fitting a decay tree that exists of a single, non-composite particle and which does not have a beamconstraint.");
-        B2ERROR("I do not understand what you want me to do with this.");
-        rc = new InternalParticle(particle, 0, forceFitAll); // still need proper head-of-tree class
-        B2DEBUG(80, "We create... something, named " << particle->getName());
+        rc = new InternalParticle(particle, 0, forceFitAll);
       }
-
     } else if (particle->getMdstArrayIndex() || particle->getTrack() || particle->getECLCluster()) { // external particles
-      //FT: added request for tracks/ECL, very inefficient way because I do it twice, double check if getMdstArrayIndex is doing what I want it to
       if (particle->getTrack()) {
-        B2DEBUG(90, "We attempt to create a track, named " << particle->getName());
         rc = new RecoTrack(particle, mother); // reconstructed track
-        B2DEBUG(80, "We create a track, named " << particle->getName());
-
       } else if (particle->getECLCluster()) {
-        B2DEBUG(90, "We attempt to create a photon, named " << particle->getName());
         rc = new RecoPhoton(particle, mother); // reconstructed photon
-        B2DEBUG(80, "We create a photon, named " << particle->getName());
-
       } else if (isAResonance(particle)) {
-        B2DEBUG(90, "We attempt to create an external resonance, named " << particle->getName());
         rc = new RecoResonance(particle, mother);
-        B2DEBUG(80, "We create an external resonance, named " << particle->getName());
-
       }  else {
-        B2DEBUG(90, "We attempt to create an external composite, named " << particle->getName());
         rc = new RecoComposite(particle, mother);
-        B2DEBUG(80, "We create an external composite, named " << particle->getName());
       }
-
     } else { // 'internal' particles
       if (validfit) {   // fitted composites
         if (isAResonance(particle)) {
-          B2DEBUG(90, "We attempt to create an internal resonance, named " << particle->getName());
           rc = new RecoResonance(particle, mother);
-          B2DEBUG(80, "We create an internal resonance, named " << particle->getName());
-
         } else {
-          B2DEBUG(90, "We attempt to create an internal composite, named " << particle->getName());
           rc = new RecoComposite(particle, mother);
-          B2DEBUG(80, "We create an internal composite, named " << particle->getName());
         }
-
       } else {         // unfitted composites
         if (isAResonance(particle)) {
-          B2DEBUG(90, "We attempt to create an internal unfitted resonance, named " << particle->getName());
           rc = new Resonance(particle, mother, forceFitAll);
-          B2DEBUG(80, "We create an internal unfitted resonance, named " << particle->getName());
-
         } else {
-          B2DEBUG(90, "We attempt to create a nonresonant, unfitted internal particle, named " << particle->getName());
           rc = new InternalParticle(particle, mother, forceFitAll);
-          B2DEBUG(80, "We create a nonresonant, unfitted internal particle, named " << particle->getName());
         }
       }
     }

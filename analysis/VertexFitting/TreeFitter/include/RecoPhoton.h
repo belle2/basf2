@@ -42,8 +42,14 @@ namespace TreeFitter {
     /** project photon consztraint */
     ErrCode projectRecoConstraintOld(const FitParams& fitparams, Projection& p) const;
 
-    /** */
-    virtual int dimM() const { return m_useEnergy ? 3 : 2 ; }
+    /** sets the size of the corresponding residual projection */
+    virtual int dimM() const { return dim(); }
+
+    /** how should the energy be calculated ? from momentum or from E ?  */
+    virtual bool hasEnergy() const { return dim() > 3 ; }
+
+    /**set the size of the particle in the statevector */
+    virtual int dim() const { return 3; }
 
     /** */
     virtual int type()     const { return kRecoPhoton ; }

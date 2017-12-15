@@ -32,18 +32,22 @@ namespace TreeFitter {
 
     /** */
     virtual int dimM() const = 0; // dimension of the measurement
+
     /** */
     virtual std::string parname(int index) const ;
-    /** */
+
+    /** this here sets the size in the state vector */
     virtual int dim() const { return 3; }   //(px,py,pz)
 
     /** */
     virtual int momIndex() const { return index() ; }
+
     /** */
     virtual bool hasEnergy() const { return false ; }
 
     /** */
     virtual ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const = 0 ;
+
     /** */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const ;
 

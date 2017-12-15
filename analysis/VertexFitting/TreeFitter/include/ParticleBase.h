@@ -76,7 +76,7 @@ namespace TreeFitter {
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
 
-    /**  update indexx */
+    /**  indexing in the statevector */
     virtual void updateIndex(int& offset);
 
     /**  get name of parameter i */

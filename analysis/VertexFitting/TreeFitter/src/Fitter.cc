@@ -302,6 +302,7 @@ namespace TreeFitter {
 
     //FT: set energy not needed for FS since there's a mass hypotesis, but we need invariant mass for others
     if (pb.hasEnergy()) { //FT: should be the same as posindex <0 (double check?)
+      std::cout << "Particle " << pb.name() << " has Energy " << m_fitparams->getStateVector()(momindex + 3)  << std::endl;
       // if particle has energy, full p4 from fitparams
       p.SetE(m_fitparams->getStateVector()(momindex + 3));
       //const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(0, 3);
@@ -315,6 +316,7 @@ namespace TreeFitter {
     } else {
       double mass = cand.getMass();           //since when I feed a p4 in Particle what gets stored is actually the mass,
       p.SetE(p.Vect()*p.Vect() + mass * mass); //I risk rounding errors for no benefit
+      std::cout << "Particle " << pb.name() << " has Energy " << p.Vect()*p.Vect() + mass* mass  << std::endl;
       cand.set4Vector(p);
     }
     //std::cout << "--------------------------------------------------------------------- "  << std::endl;

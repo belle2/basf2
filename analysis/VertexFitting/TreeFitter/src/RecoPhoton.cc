@@ -52,6 +52,7 @@ namespace TreeFitter {
     for (unsigned int i = 0; i < 3; ++i) {
       vertexToCluster(i) = m_params(i) - fitparams->getStateVector()(posindexmother + i);
     }
+
     double distanceToMother = vertexToCluster.norm();
     // get the energy
     double energy = m_useEnergy ? m_params(3) : particle()->getEnergy();
@@ -59,6 +60,7 @@ namespace TreeFitter {
     for (unsigned int i = 0; i < 3; ++i) {
       fitparams->getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
     }
+
     return ErrCode::success;
   }
 
@@ -86,8 +88,6 @@ namespace TreeFitter {
     int momindex = momIndex() ;
     double varEnergy =  m_useEnergy ? m_covariance(3, 3) : 1;
     const double factor = 1000;
-//    fitparams->getCovariance().block<3, 3>(momindex, momindex) =
-//      Eigen::Matrix<double, 3, 3>::Constant(3, 3, factor * varEnergy);
 
     for (int row = 0; row < 3; ++row) {
       fitparams->getCovariance()(momindex + row, momindex + row) = factor * varEnergy;
@@ -240,12 +240,14 @@ namespace TreeFitter {
     P(2, 3) =     p_vec(2) * EcDelta / Ec2;
 
     p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
-    p.getResiduals().segment(0, 3) = P * residual4;
+    p.getResiduals().segment(0, 3) = residual4.segment(0, 3);
+    //p.getResiduals().segment(0, 3) = P * residual4;
 
     for (unsigned int row = 0; row < 3; row++) {
       p.getH()(row, posindex + row) = 1;
       p.getH()(row, momindex + row) = theta;
     }
+
     return ErrCode::success;
   }
 

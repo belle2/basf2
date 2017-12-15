@@ -113,6 +113,18 @@ namespace Belle2 {
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
     }
 
+    double particleEUncertainty(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      double errorSquared = frame.getMomentumErrorMatrix(part)(3, 3);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
     double particlePErr(const Particle* part)
     {
       TMatrixD jacobianRot(3, 3);
@@ -1426,6 +1438,7 @@ namespace Belle2 {
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");

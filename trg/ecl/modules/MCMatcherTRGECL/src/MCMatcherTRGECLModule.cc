@@ -16,7 +16,6 @@
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -25,9 +24,7 @@
 
 //ecl trg package header
 #include "trg/ecl/dataobjects/TRGECLHit.h"
-#include "trg/ecl/dataobjects/TRGECLHitMC.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
-#include "trg/ecl/dataobjects/TRGECLDigi0MC.h"
 
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -136,8 +133,8 @@ void MCMatcherTRGECLModule::initialize()
   // CPU time start
   m_timeCPU = clock() * Unit::us;
 
-  StoreArray<TRGECLDigi0MC>::registerPersistent();
-  StoreArray<TRGECLHitMC>::registerPersistent();
+  m_trgECLDigi0MC.registerInDataStore();
+  m_trgECLHitMC.registerInDataStore();
   StoreArray<MCParticle> mcParticles;
   StoreArray<ECLHit> eclHitArray;
 

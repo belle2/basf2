@@ -26,7 +26,7 @@ unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', 'newSVDDigits')
 
-unPacker.param('GenerateShaperDigts', True)
+unPacker.param('GenerateShaperDigits', True)
 unPacker.param('svdShaperDigitListName', 'newSVDShaperDigits')
 
 

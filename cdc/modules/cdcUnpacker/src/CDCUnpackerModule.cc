@@ -74,8 +74,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
 
 
   m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
-  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::setADCPedestal);
-
+  //  (*m_adcPedestalFromDB).addCallback(this, &CDCUnpackerModule::setADCPedestal);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -124,6 +123,9 @@ void CDCUnpackerModule::beginRun()
   }
 
   loadMap();
+  if (m_pedestalSubtraction == true) {
+    setADCPedestal();
+  }
 }
 
 void CDCUnpackerModule::event()

@@ -11,7 +11,6 @@
 #include <analysis/NtupleTools/NtupleLEECLTool.h>
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/PhysicsTriggerVariables.h>
-#include <hlt/L1Emulator/dataobjects/L1EmulationInformation.h>
 #include <TBranch.h>
 #include <cmath>
 using namespace Belle2;

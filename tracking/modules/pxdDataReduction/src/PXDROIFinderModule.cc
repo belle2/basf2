@@ -88,15 +88,15 @@ void PXDROIFinderModule::initialize()
 void PXDROIFinderModule::beginRun()
 {
 
-  B2INFO("||| PXDROIFinder Parameters:");
-  B2INFO("    tolerance: phi = " << m_tolerancePhi);
-  B2INFO("                z = " << m_toleranceZ);
-  B2INFO("    n sigma:    u = " << m_numSigmaTotU);
-  B2INFO("                v = " << m_numSigmaTotV);
-  B2INFO("    systematic: u = " << m_sigmaSystU);
-  B2INFO("                v = " << m_sigmaSystV);
-  B2INFO("    max width:  u = " << m_maxWidthU);
-  B2INFO("                v = " << m_maxWidthV);
+  B2DEBUG(1, "||| PXDROIFinder Parameters:");
+  B2DEBUG(1, "    tolerance: phi = " << m_tolerancePhi);
+  B2DEBUG(1, "                z = " << m_toleranceZ);
+  B2DEBUG(1, "    n sigma:    u = " << m_numSigmaTotU);
+  B2DEBUG(1, "                v = " << m_numSigmaTotV);
+  B2DEBUG(1, "    systematic: u = " << m_sigmaSystU);
+  B2DEBUG(1, "                v = " << m_sigmaSystV);
+  B2DEBUG(1, "    max width:  u = " << m_maxWidthU);
+  B2DEBUG(1, "                v = " << m_maxWidthV);
 
   m_ROIinfo.sigmaSystU = m_sigmaSystU;
   m_ROIinfo.sigmaSystV = m_sigmaSystV;

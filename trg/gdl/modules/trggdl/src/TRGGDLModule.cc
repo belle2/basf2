@@ -21,9 +21,6 @@
 //framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/TRGSummary.h>
-#include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -93,8 +90,8 @@ namespace Belle2 {
     TRGDebug::level(_debugLevel);
 
     B2DEBUG(100, "TRGGDLModule::initialize ... options");
-    StoreObjPtr<TRGGRLInfo>::required("TRGGRLObjects");
-    StoreObjPtr<TRGSummary>::registerPersistent();
+    m_TRGGRLInfo.isRequired("TRGGRLObjects");
+    m_TRGSummary.registerInDataStore();
   }
 
   void

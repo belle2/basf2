@@ -77,7 +77,7 @@ SectorMapBootstrapModule::initialize()
 
   // in case sector map is read from the DB one needs to set the DB pointer
   if (m_readSecMapFromDB) {
-    B2INFO("SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
+    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
     m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
     if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr not initialized");
     // add a callback function so that the sectormap is updated each time the DBObj changes
@@ -393,7 +393,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     rootFileName = (*m_ptrDBObjPtr)->getFileName();
   }
 
-  B2INFO("SectorMapBootstrapModule: retrieving new SectorMap. New file name: " << rootFileName);
+  B2DEBUG(1, "SectorMapBootstrapModule: retrieving new SectorMap. New file name: " << rootFileName);
   TFile rootFile(rootFileName.c_str());
 
   // some cross check that the file is open

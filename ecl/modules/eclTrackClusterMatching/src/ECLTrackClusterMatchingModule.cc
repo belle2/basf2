@@ -246,13 +246,14 @@ void ECLTrackClusterMatchingModule::event()
         // m_deltaTheta->push_back(deltaTheta);
         // m_thetaCluster->push_back(thetaCluster);
         // m_thetaHit->push_back(thetaHit);
-        double phi_consistency = phiConsistency(deltaPhi, pt, thetaCluster);
+        int eclDetectorRegion = eclCluster->getDetectorRegion();
+        double phi_consistency = phiConsistency(deltaPhi, pt, eclDetectorRegion);
         m_phi_consistency = phi_consistency;
         // m_phi_consistency->push_back(phi_consistency);
-        double theta_consistency = thetaConsistency(deltaTheta, pt, thetaCluster);
+        double theta_consistency = thetaConsistency(deltaTheta, pt, eclDetectorRegion);
         m_theta_consistency = theta_consistency;
         // m_theta_consistency->push_back(theta_consistency);
-        double quality = clusterQuality(deltaPhi, deltaTheta, pt, thetaCluster);
+        double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion);
         m_quality = quality;
         // m_quality->push_back(quality);
         ExtHitStatus hitStatus = extHit.getStatus();
@@ -309,19 +310,19 @@ bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
 }
 
 double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum,
-                                                     double thetaCluster) const
+                                                     int eclDetectorRegion) const
 {
-  double phi_consistency = phiConsistency(deltaPhi, transverseMomentum, thetaCluster);
-  double theta_consistency = thetaConsistency(deltaTheta, transverseMomentum, thetaCluster);
+  double phi_consistency = phiConsistency(deltaPhi, transverseMomentum, eclDetectorRegion);
+  double theta_consistency = thetaConsistency(deltaTheta, transverseMomentum, eclDetectorRegion);
   return phi_consistency * theta_consistency * (1 - log(phi_consistency * theta_consistency));
 }
 
-double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double transverseMomentum, double thetaCluster) const
+double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double transverseMomentum, int eclDetectorRegion) const
 {
   double phi_RMS;
-  if (thetaCluster < 0.5473) { /* RMS for FW endcap */
+  if (eclDetectorRegion == 1) { /* RMS for FWD */
     phi_RMS = exp(-4.057 - 0.346 * transverseMomentum) + exp(-1.712 - 8.05 * transverseMomentum);
-  } else if (thetaCluster < 2.2466) { /* RMS for barrel */
+  } else if (eclDetectorRegion == 2 || eclDetectorRegion == 11 || eclDetectorRegion == 13) { /* RMS for barrel and gaps */
     if (transverseMomentum < 0.24) {
       phi_RMS = 0.0356 + exp(1.1 - 33.3 * transverseMomentum);
     } else if (transverseMomentum < 0.3) {
@@ -331,21 +332,25 @@ double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double tra
     } else {
       phi_RMS = exp(-4.020 - 0.287 * transverseMomentum) + exp(1.29 - 10.41 * transverseMomentum);
     }
-  } else { /* RMS for BW endcap */
+  } else if (eclDetectorRegion == 3) { /* RMS for BWD */
     phi_RMS = exp(-4.06 - 0.19 * transverseMomentum) + exp(-2.187 - 5.83 * transverseMomentum);
+  } else { /* ECL cluster below acceptance */
+    return 0;
   }
   return erfc(abs(deltaPhi) / phi_RMS);
 }
 
-double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double transverseMomentum, double thetaCluster) const
+double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double transverseMomentum, int eclDetectorRegion) const
 {
   double theta_RMS;
-  if (thetaCluster < 0.5473) { /* RMS for FW endcap */
+  if (eclDetectorRegion == 1) { /* RMS for FWD */
     theta_RMS = 0.00761 + exp(-3.45 - 6.9 * transverseMomentum); // valid for pt > 0.15
-  } else if (thetaCluster < 2.2466) { /* RMS for barrel */
+  } else if (eclDetectorRegion == 2 || eclDetectorRegion == 11 || eclDetectorRegion == 13) { /* RMS for barrel and gaps */
     theta_RMS = 0.011062 + exp(-2.668 - 6.10 * transverseMomentum); // valid for pt > 0.3
-  } else { /* RMS for BW endcap */
+  } else if (eclDetectorRegion == 3) { /* RMS for BWD */
     theta_RMS = 0.01093 + exp(-3.36 - 4.71 * transverseMomentum); // valid for pt > 0.15
+  } else { /* ECL cluster below acceptance */
+    return 0;
   }
   return erfc(abs(deltaTheta) / theta_RMS);
 }

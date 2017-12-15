@@ -70,9 +70,9 @@ namespace Belle2 {
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
     bool isECLHit(const ExtHit& extHit) const;
 
-    double clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum, double thetaCluster) const;
-    double phiConsistency(double deltaPhi, double transverseMomentum, double thetaCluster) const;
-    double thetaConsistency(double deltaTheta, double transverseMomentum, double thetaCluster) const;
+    double clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum, int eclDetectorRegion) const;
+    double phiConsistency(double deltaPhi, double transverseMomentum, int eclDetectorRegion) const;
+    double thetaConsistency(double deltaTheta, double transverseMomentum, int eclDetectorRegion) const;
 
     // required input
     StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */

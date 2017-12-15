@@ -123,6 +123,9 @@ void CDCUnpackerModule::beginRun()
   }
 
   loadMap();
+  if (m_pedestalSubtraction == true) {
+    setADCPedestal();
+  }
 }
 
 void CDCUnpackerModule::event()

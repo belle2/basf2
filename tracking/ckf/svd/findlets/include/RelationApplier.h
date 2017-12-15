@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -32,8 +33,10 @@ namespace Belle2 {
 
   private:
     // Parameters
-    /// Write out the relations with a -1 as weight, indicating the reversal of the CDC track.
-    bool m_param_reverseStoredRelations = false;
+    /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
+    std::string m_param_writeOutDirectionAsString = "both";
+    /// Direction parameter converted from the string parameters
+    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
     /// Create relations from this store array.
     std::string m_param_fromRelationsStoreArrayName = "CDCRecoTracks";
     /// Create relations to this store array.

@@ -17,13 +17,18 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+SVDResultVarSet::SVDResultVarSet() : Super()
+{
+  addProcessingSignalListener(&m_advancer);
+}
+
 void SVDResultVarSet::initialize()
 {
-  TrackFindingCDC::VarSet<SVDResultVarNames>::initialize();
-
   ModuleParamList moduleParamList;
   m_advancer.exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<double>("direction").setValue(0);
+  moduleParamList.getParameter<std::string>("direction").setValue("both");
+
+  Super::initialize();
 }
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)

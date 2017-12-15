@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/ckf/general/utilities/SearchDirection.h>
+
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -50,13 +52,16 @@ namespace Belle2 {
     const TrackFindingCDC::Vector3D& position = static_cast<TrackFindingCDC::Vector3D>(firstMeasurement.getPos());
     const TrackFindingCDC::Vector3D& momentum = static_cast<TrackFindingCDC::Vector3D>(firstMeasurement.getMom());
 
-    const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+    const TrackFindingCDC::CDCTrajectory2D trajectory2D(position.xy(), 0, momentum.xy(), cdcTrack->getChargeSeed());
 
     const TrackFindingCDC::Vector3D& hitPosition = static_cast<TrackFindingCDC::Vector3D>(spacePoint->getPosition());
+    const TrackFindingCDC::Vector2D origin(0, 0);
 
-    const double arcLengthDifference = trajectory.getTrajectory2D().calcArcLength2DBetween(hitPosition.xy(),
-                                       TrackFindingCDC::Vector2D(0, 0));
-    if (m_param_direction * arcLengthDifference > 0) {
+    const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(hitPosition.xy(), origin);
+    const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(hitPosition.xy());
+
+    if (not arcLengthInRightDirection(deltaArcLengthTrackHit, m_param_direction) or
+        not arcLengthInRightDirection(deltaArcLengthHitOrigin, m_param_direction)) {
       return NAN;
     }
 
@@ -66,7 +71,14 @@ namespace Belle2 {
   template <class AllStateFilter>
   void NonIPCrossingStateFilter<AllStateFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "direction"), m_param_direction,
-                                  "The direction where the extrapolation will happen.", m_param_direction);
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "direction"), m_param_directionAsString,
+                                  "The direction where the extrapolation will happen.");
+  }
+
+  template <class AllStateFilter>
+  void NonIPCrossingStateFilter<AllStateFilter>::initialize()
+  {
+    Super::initialize();
+    m_param_direction = fromString(m_param_directionAsString);
   }
 }

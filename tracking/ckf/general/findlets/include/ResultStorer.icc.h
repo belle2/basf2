@@ -27,12 +27,10 @@ namespace Belle2 {
 
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRecoTrackStoreArrayName"),
                                   m_param_outputRecoTrackStoreArrayName,
-                                  "StoreArray name of the output Track Store Array.",
-                                  m_param_outputRecoTrackStoreArrayName);
+                                  "StoreArray name of the output Track Store Array.");
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRelationRecoTrackStoreArrayName"),
                                   m_param_outputRelationRecoTrackStoreArrayName,
-                                  "StoreArray name of the tracks, the output reco tracks should be related to.",
-                                  m_param_outputRelationRecoTrackStoreArrayName);
+                                  "StoreArray name of the tracks, the output reco tracks should be related to.");
   }
 
   /// Create the store arrays

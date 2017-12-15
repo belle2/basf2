@@ -19,15 +19,19 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void PXDResultVarSet::initialize()
+PXDResultVarSet::PXDResultVarSet() : Super()
 {
-  TrackFindingCDC::VarSet<PXDResultVarNames>::initialize();
-
-  ModuleParamList moduleParamList;
-  m_advancer.exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<double>("direction").setValue(1);
+  addProcessingSignalListener(&m_advancer);
 }
 
+void PXDResultVarSet::initialize()
+{
+  ModuleParamList moduleParamList;
+  m_advancer.exposeParameters(&moduleParamList, "");
+  moduleParamList.getParameter<std::string>("direction").setValue("both");
+
+  Super::initialize();
+}
 
 bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 {

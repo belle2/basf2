@@ -27,7 +27,7 @@ namespace Belle2 {
    */
   constexpr inline bool arcLengthInRightDirection(double arcLength2D, TrackFindingCDC::EForwardBackward forwardBackward)
   {
-    return forwardBackward * arcLength2D <= 0;
+    return forwardBackward * arcLength2D >= 0;
   }
 
   /// Helper function to turn a direction string into a valid forward backward information.

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
-
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -27,7 +27,9 @@ namespace Belle2 {
    * Findlet for loading the seeds from the data store.
    * Also, the tracks are fitted and only the fittable tracks are passed on.
    *
-   * This findlet does also handle the storing of the results, as the
+   * If a direction != "both" is given, the relations of the tracks to the given store array are checked.
+   * If there is a relation with the weight equal to the given direction (meaning there is already a
+   * partner for this direction), the track is not passed on.
    */
   class TrackLoader : public TrackFindingCDC::Findlet<RecoTrack*> {
     /// Parent class
@@ -53,13 +55,16 @@ namespace Belle2 {
 
     // Parameters
     /// StoreArray name of the output Track Store Array
-    std::string m_param_relationRecoTrackStoreArrayName = "";
+    std::string m_param_relationRecoTrackStoreArrayName = "RecoTracks";
     /// StoreArray name of the input Track Store Array
     std::string m_param_inputRecoTrackStoreArrayName = "RecoTracks";
     /// Minimal pt requirement
     double m_param_minimalPtRequirement = 0.0;
-    /// Check for direction of relation
-    double m_param_relationCheckForDirection = 0.0;
+    /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
+    std::string m_param_relationCheckForDirectionAsString = "both";
+    /// Direction parameter converted from the string parameters
+    TrackFindingCDC::EForwardBackward m_param_relationCheckForDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+
 
     // Store Arrays
     /// Output Reco Tracks Store Array

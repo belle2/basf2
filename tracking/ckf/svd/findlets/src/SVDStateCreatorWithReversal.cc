@@ -12,7 +12,7 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -26,7 +26,7 @@ void SVDStateCreatorWithReversal::apply(const std::vector<RecoTrack*>& objects, 
 
 void SVDStateCreatorWithReversal::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter("reverseSeed", m_param_reverseSeed,
-                                "Reverse the seed.",
-                                m_param_reverseSeed);
+  moduleParamList->addParameter("reverseSeed",
+                                m_param_reverseSeed,
+                                "Reverse the seed.");
 }

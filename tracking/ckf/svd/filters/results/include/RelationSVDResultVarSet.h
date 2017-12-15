@@ -63,8 +63,11 @@ namespace Belle2 {
    * which knows the truth information if two tracks belong together or not.
    */
   class RelationSVDResultVarSet : public TrackFindingCDC::VarSet<RelationSVDResultVarNames> {
+    using Super = TrackFindingCDC::VarSet<RelationSVDResultVarNames>;
 
   public:
+    RelationSVDResultVarSet();
+
     /// Generate and assign the variables from the object.
     bool extract(const CKFToSVDResult* object) final;
 

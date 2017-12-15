@@ -25,8 +25,8 @@ namespace Belle2 {
    * as averaging does not make sense for the binned data (additionally, the detectors
    * may have different time offsets unknown to this object).
    *
-   * It is in the responsibility of the user to calculate a "real" double-values t0 out
-   * of the integer estimations.
+   * It is in the responsibility of the user to calculate a floating point t0 in
+   * nanoseconds out of the integer estimations if desired.
    */
   class BinnedEventT0 : public TObject {
   public:

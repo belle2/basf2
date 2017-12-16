@@ -123,9 +123,7 @@ void CDCUnpackerModule::beginRun()
   }
 
   loadMap();
-  if (m_pedestalSubtraction == true) {
-    setADCPedestal();
-  }
+  setADCPedestal();
 }
 
 void CDCUnpackerModule::event()
@@ -368,7 +366,12 @@ void CDCUnpackerModule::event()
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
             if (m_pedestalSubtraction == true) {
-              fadcSum -= (*m_adcPedestalFromDB)->getPedestal(board, ch);
+              int diff = fadcSum - (*m_adcPedestalFromDB)->getPedestal(board, ch);
+              if (diff <= m_fadcThreshold) {
+                fadcSum = 0;
+              } else {
+                fadcSum =  static_cast<unsigned short>(diff);
+              }
             }
             unsigned short tdc1 = 0;                  // TDC count.
             unsigned short tdc2 = 0;                  // 2nd TDC count.
@@ -513,10 +516,11 @@ void CDCUnpackerModule::setADCPedestal()
 {
   if (m_pedestalSubtraction == true) {
     m_adcPedestalFromDB = new DBObjPtr<CDCADCDeltaPedestals>;
-    if (m_adcPedestalFromDB == nullptr) {
-      B2FATAL("Pedestal subtraction required, but no payload.");
+    if (!(*m_adcPedestalFromDB).isValid()) {
+      m_pedestalSubtraction = false;
     }
   }
+
 }
 
 void CDCUnpackerModule::printBuffer(int* buf, int nwords)

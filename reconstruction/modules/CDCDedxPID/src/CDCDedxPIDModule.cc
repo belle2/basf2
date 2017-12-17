@@ -585,27 +585,25 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
 
 void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx) const
 {
-  // make a local copy of the pdfs since interpolate is a non-const function (for some reason...)
-  TH2F pdf[6] = m_pdfs;
-
   //all pdfs have the same dimensions
-  const Int_t binX = pdf[0].GetXaxis()->FindFixBin(p);
-  const Int_t binY = pdf[0].GetYaxis()->FindFixBin(dedx);
+  const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
+  const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (pdf[iPart].GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[iPart];
+    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       B2WARNING("NO CDC PDFS...");
       continue;
     }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf[iPart].GetNbinsX()
-        or binY < 1 or binY > pdf[iPart].GetNbinsY()) {
-      probability = pdf[iPart].GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = pdf[iPart].Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)

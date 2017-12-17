@@ -446,25 +446,23 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 
 void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
-  // make a local copy of the pdfs since interpolate is a non-const function (for some reason...)
-  TH2F localpdf[6] = m_pdfs[0];
-
   //all pdfs have the same dimensions
-  const Int_t binX = localpdf[0].GetXaxis()->FindFixBin(p);
-  const Int_t binY = localpdf[0].GetYaxis()->FindFixBin(dedx);
+  const Int_t binX = m_pdfs[0][0].GetXaxis()->FindFixBin(p);
+  const Int_t binY = m_pdfs[0][0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (localpdf[iPart].GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[0][iPart];
+    if (pdf.GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > localpdf[iPart].GetNbinsX()
-        or binY < 1 or binY > localpdf[iPart].GetNbinsY()) {
-      probability = localpdf[iPart].GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = localpdf[iPart].Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -480,25 +478,23 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
 
 void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
-  // make a local copy of the pdfs since interpolate is a non-const function (for some reason...)
-  TH2F localpdf[6] = m_pdfs[1];
-
   //all pdfs have the same dimensions
-  const Int_t binX = localpdf[0].GetXaxis()->FindFixBin(p);
-  const Int_t binY = localpdf[0].GetYaxis()->FindFixBin(dedx);
+  const Int_t binX = m_pdfs[1][0].GetXaxis()->FindFixBin(p);
+  const Int_t binY = m_pdfs[1][0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (localpdf[iPart].GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[1][iPart];
+    if (pdf.GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > localpdf[iPart].GetNbinsX()
-        or binY < 1 or binY > localpdf[iPart].GetNbinsY()) {
-      probability = localpdf[iPart].GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = localpdf[iPart].Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)

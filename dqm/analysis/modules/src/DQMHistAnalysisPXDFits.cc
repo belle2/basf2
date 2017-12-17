@@ -155,7 +155,7 @@ void DQMHistAnalysisPXDFitsModule::event()
 
     for (auto j = 0; j < 6; j++) {
       for (auto k = 0; k < 4; k++) {
-        TH1* hh1 = NULL;
+        TH1* hh1;
         string s2 = str(format("_%d.%d.%d_%d_%d") % num1 % num2 % num3 % j % k);
 
         TString a;

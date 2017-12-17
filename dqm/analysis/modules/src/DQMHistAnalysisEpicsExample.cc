@@ -214,8 +214,8 @@ void DQMHistAnalysisEpicsExampleModule::event()
 
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
-      double data;
-      data = m_f1->GetParameter(i);
+      //double data;
+      //data = m_f1->GetParameter(i);
 //      SEVCHK(ca_put(DBR_DOUBLE,mychid[i],(void*)&data),"ca_set failure");
     }
 //    SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");

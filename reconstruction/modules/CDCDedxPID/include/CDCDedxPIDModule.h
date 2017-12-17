@@ -154,7 +154,7 @@ namespace Belle2 {
 
     // pdfs for PID
     DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
-    mutable TH2F m_pdfs[6]; /**< dedx:momentum PDFs. */
+    TH2F m_pdfs[6]; /**< dedx:momentum PDFs. */
 
     bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */

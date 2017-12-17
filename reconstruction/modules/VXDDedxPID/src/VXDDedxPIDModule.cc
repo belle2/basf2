@@ -451,17 +451,18 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
   const Int_t binY = m_pdfs[0][0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (m_pdfs[0][iPart].GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[0][iPart];
+    if (pdf.GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > m_pdfs[0][iPart].GetNbinsX()
-        or binY < 1 or binY > m_pdfs[0][iPart].GetNbinsY()) {
-      probability = m_pdfs[0][iPart].GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = m_pdfs[0][iPart].Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -482,17 +483,18 @@ void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::
   const Int_t binY = m_pdfs[1][0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (m_pdfs[1][iPart].GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[1][iPart];
+    if (pdf.GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > m_pdfs[1][iPart].GetNbinsX()
-        or binY < 1 or binY > m_pdfs[1][iPart].GetNbinsY()) {
-      probability = m_pdfs[1][iPart].GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = m_pdfs[1][iPart].Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)

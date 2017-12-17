@@ -141,7 +141,7 @@ namespace Belle2 {
 
     /** dedx:momentum PDFs. */
     DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
-    mutable TH2F m_pdfs[2][6]; //m_pdfs[detector_type][particle_type]
+    TH2F m_pdfs[2][6]; //m_pdfs[detector_type][particle_type]
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

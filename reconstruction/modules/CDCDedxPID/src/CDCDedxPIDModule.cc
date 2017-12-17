@@ -590,19 +590,20 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
   const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (m_pdfs[iPart].GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[iPart];
+    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       B2WARNING("NO CDC PDFS...");
       continue;
     }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > m_pdfs[iPart].GetNbinsX()
-        or binY < 1 or binY > m_pdfs[iPart].GetNbinsY()) {
-      probability = m_pdfs[iPart].GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = m_pdfs[iPart].Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)

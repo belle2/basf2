@@ -1205,28 +1205,6 @@ namespace Belle2 {
       return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
     }
 
-
-
-//=================================================================
-//Not compile the following functions since they are no longer used
-#if 0
-    //! Gets geometry parameters from gearbox.
-    void read();  // no longer used
-
-    /**
-     * Read XT-relation table in old format.
-     * @param[in] GearDir Gear Dir.
-     * @param[in] mode 0: read simulation file, 1: read reconstruction file.
-     */
-    void oldReadXT(const GearDir, int mode = 0);
-
-    /**
-     * Read spatial resolution table in old format.
-     * @param GearDir Gear Dir.
-     * @param mode 0: read simulation file, 1: read reconstruction file.
-     */
-    void oldReadSigma(const GearDir, int mode = 0);
-#endif
   } // end of namespace CDC
 } // end of namespace Belle2
 

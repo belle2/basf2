@@ -33,6 +33,7 @@
 #pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+;
 #pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+;
 #pragma link C++ class pair<short, short>+;
+#pragma link C++ class Belle2::EventLevelTrackingInfo+;
 
 #pragma link C++ class Belle2::TRGSummary+;
 #pragma link C++ class Belle2::SoftwareTriggerResult+;

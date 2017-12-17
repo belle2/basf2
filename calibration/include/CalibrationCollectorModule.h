@@ -107,6 +107,8 @@ namespace Belle2 {
     float m_preScale;
     /********************************/
 
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< Required input for EventMetaData */
+
     /// Whether or not we will run the collect() at all this run, basically skips the event() function if false
     bool m_runCollectOnRun = true;
     /** How many events processed for each ExpRun so far, stops counting up once max is hit

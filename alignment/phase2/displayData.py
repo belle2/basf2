@@ -61,7 +61,7 @@ display.param('showNeutrals', True)
 # --- Intermediate options ---
 # show track candidates?
 # You most likely don't want this unless you are a tracking developer
-display.param('showRecoTracks', False)
+display.param('showRecoTracks', True)
 
 # directly show CDCHits as drift cylinders (shortened, z position = 0)
 display.param('showCDCHits', False)

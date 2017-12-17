@@ -28,13 +28,13 @@ CDCCosmicTrackMergerModule::CDCCosmicTrackMergerModule() : Module()
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,
            "StoreArray containing the RecoTracks to read from and delete afterwards.",
            m_param_recoTracksStoreArrayName);
-  addParam("MergedRecoTracksStoreArrayName", m_param_MergedRecoTracksStoreArrayName,
+  addParam("mergedRecoTracksStoreArrayName", m_param_mergedRecoTracksStoreArrayName,
            "StoreArray to where to copy the merged RecoTrack.",
-           m_param_MergedRecoTracksStoreArrayName);
+           m_param_mergedRecoTracksStoreArrayName);
   addParam("deleteOtherRecoTracks", m_param_deleteOtherRecoTracks,
-           "Flag to delete the not Merged RecoTracks from the input StoreArray.",
+           "Flag to delete the not merged RecoTracks from the input StoreArray.",
            m_param_deleteOtherRecoTracks);
-  addParam("MinimumNumHitCut", m_MinimumNumHitCut, "Number of CDC hit per track required for cosmic track", m_MinimumNumHitCut);
+  addParam("minimumNumHitCut", m_minimumNumHitCut, "Number of CDC hit per track required for cosmic track", m_minimumNumHitCut);
 }
 
 void CDCCosmicTrackMergerModule::initialize()
@@ -45,255 +45,61 @@ void CDCCosmicTrackMergerModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
 
-  StoreArray<RecoTrack> MergedRecoTracks(m_param_MergedRecoTracksStoreArrayName);
-  MergedRecoTracks.registerInDataStore();
+  StoreArray<RecoTrack> mergedRecoTracks(m_param_mergedRecoTracksStoreArrayName);
+  mergedRecoTracks.registerInDataStore();
 
-  RecoTrack::registerRequiredRelations(MergedRecoTracks);
+  RecoTrack::registerRequiredRelations(mergedRecoTracks);
 }
 
 void CDCCosmicTrackMergerModule::event()
 {
   StoreArray<RecoTrack> recoTrackStoreArray(m_param_recoTracksStoreArrayName);
-  StoreArray<RecoTrack> MergedRecoTracks(m_param_MergedRecoTracksStoreArrayName);
+  StoreArray<RecoTrack> mergedRecoTracks(m_param_mergedRecoTracksStoreArrayName);
   StoreArray<KLMCluster> klmClustersStoreArray("KLMClusters");
 
-  if (recoTrackStoreArray.getEntries() == 2) {
-    /*if (recoTrackStoreArray[0]->getNumberOfCDCHits() > m_MinimumNumHitCut
-        && recoTrackStoreArray[1]->getNumberOfCDCHits() > m_MinimumNumHitCut) {
-    if(recoTrackStoreArray[0].getPositionSeed().Y() * recoTrackStoreArray[1].getPositionSeed().Y() >0) continue;*/
-    if (recoTrackStoreArray[0]->getNumberOfCDCHits() + recoTrackStoreArray[1]->getNumberOfCDCHits() > m_MinimumNumHitCut) {
-      std::vector<RecoTrack*> recoTracks;
-      recoTracks.reserve(static_cast<unsigned int>(recoTrackStoreArray.getEntries()));
+  // numberRecoTracks | numberKLMClusters | numberRecoTracksWithB(E)KLMHits => CosmicRecoTracks
+  //        1                   1                         1                       Create
+  //        1                   2                         1                       Create
+  //        2                   1                         1                       Create
+  //        2                   1                         1                       Create
+  //        2              More than 2                    2                       Create
+  //   More than 2              2                         2                       Create
 
-      for (RecoTrack& recoTrack : recoTrackStoreArray) {
-        recoTracks.push_back(&recoTrack);
-      }
-
-      std::function < bool (RecoTrack*, RecoTrack*)> lmdSort = [](RecoTrack * lhs, RecoTrack * rhs) {
-        float minimumTimeFirstTrack = 100000;
-        float minimumTimeSecondTrack = 100000;
-        if (lhs->hasBKLMHits()) {
-          minimumTimeFirstTrack = lhs->getSortedBKLMHitList()[lhs->getNumberOfBKLMHits() - 1]->getTime();
-        }
-        if (lhs->hasEKLMHits()) {
-          RelationVector<EKLMHit2d> eklmHit2ds = lhs->getSortedEKLMHitList()[lhs->getNumberOfEKLMHits() - 1]->getRelationsTo<EKLMHit2d>();
-          // std::cout << eklmHit2ds[0]->getTime() << "\n";
-          if (minimumTimeFirstTrack > eklmHit2ds[0]->getTime()) {
-            minimumTimeFirstTrack = eklmHit2ds[0]->getTime();
-          }
-        }
-        if (rhs->hasBKLMHits()) {
-          minimumTimeSecondTrack = rhs->getSortedBKLMHitList()[rhs->getNumberOfBKLMHits() - 1]->getTime();
-        }
-        if (rhs->hasEKLMHits()) {
-          RelationVector<EKLMHit2d> eklmHit2ds = rhs->getSortedEKLMHitList()[rhs->getNumberOfEKLMHits() - 1]->getRelationsTo<EKLMHit2d>();
-          // std::cout << eklmHit2ds[0]->getTime() << "\n";
-          if (minimumTimeSecondTrack > eklmHit2ds[0]->getTime()) {
-            minimumTimeSecondTrack = eklmHit2ds[0]->getTime();
-          }
-        }
-        // std::cout << minimumTimeFirstTrack << " " << minimumTimeSecondTrack << "\n";
-        // return (lhs->getPositionSeed().Y() > rhs->getPositionSeed().Y());
-        return (minimumTimeFirstTrack < minimumTimeSecondTrack);
-      };
-
-      std::sort(recoTracks.begin(), recoTracks.end(), lmdSort);
-      RecoTrack* upperTrack = recoTracks[0];
-      RecoTrack* lowerTrack = recoTracks[1];
-      // B2DEBUG(99, "upper track posSeed :" << upperTrack->getPositionSeed().Y());
-      // B2DEBUG(99, "Lowee track posSeed :" << lowerTrack->getPositionSeed().Y());
-      RecoTrack* MergedRecoTrack = MergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
-                                                              upperTrack->getMomentumSeed(),
-                                                              upperTrack->getChargeSeed());
-      // retain the seed time of the original track. Important for t0 extraction.
-      MergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
-
-      // MergedRecoTrack->addHitsFromRecoTrack(upperTrack);
-
-      int sortingNumber = 0;
-
-      if (upperTrack->hasBKLMHits()) {
-        int BKLMHits = upperTrack->getNumberOfBKLMHits();
-        for (int i = BKLMHits - 1; i >= 0; i--) {
-          MergedRecoTrack->addBKLMHit(upperTrack->getSortedBKLMHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (upperTrack->hasEKLMHits()) {
-        int EKLMHits = upperTrack->getNumberOfEKLMHits();
-        for (int i = EKLMHits - 1; i >= 0; i--) {
-          MergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
-        }
-      }
-
-      if (upperTrack->hasCDCHits()) {
-        int CDCHits = upperTrack->getNumberOfCDCHits();
-        for (int i = CDCHits - 1; i >= 0; i--) {
-          MergedRecoTrack->addCDCHit(upperTrack->getSortedCDCHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (upperTrack->hasSVDHits()) {
-        int SVDHits = upperTrack->getNumberOfSVDHits();
-        for (int i = SVDHits - 1; i >= 0; i--) {
-          MergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (upperTrack->hasPXDHits()) {
-        int PXDHits = upperTrack->getNumberOfPXDHits();
-        for (int i = PXDHits - 1; i >= 0; i--) {
-          MergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      //MergedRecoTrack->addHitsFromRecoTrack(lowerTrack, upperTrack->getNumberOfTotalHits()); //getNumberOfTrackingHits());
-
-      if (lowerTrack->hasPXDHits()) {
-        int PXDHits = lowerTrack->getNumberOfPXDHits();
-        for (int i = 0; i < PXDHits; i++) {
-          MergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (lowerTrack->hasSVDHits()) {
-        int SVDHits = lowerTrack->getNumberOfSVDHits();
-        for (int i = 0; i < SVDHits; i++) {
-          MergedRecoTrack->addSVDHit(lowerTrack->getSortedSVDHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (lowerTrack->hasCDCHits()) {
-        int CDCHits = lowerTrack->getNumberOfCDCHits();
-        for (int i = 0; i < CDCHits; i++) {
-          MergedRecoTrack->addCDCHit(lowerTrack->getSortedCDCHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (lowerTrack->hasBKLMHits()) {
-        int BKLMHits = lowerTrack->getNumberOfBKLMHits();
-        for (int i = 0; i < BKLMHits; i++) {
-          MergedRecoTrack->addBKLMHit(lowerTrack->getSortedBKLMHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      if (lowerTrack->hasEKLMHits()) {
-        int EKLMHits = lowerTrack->getNumberOfEKLMHits();
-        for (int i = 0; i < EKLMHits; i++) {
-          MergedRecoTrack->addEKLMHit(lowerTrack->getSortedEKLMHitList()[i], sortingNumber);
-          sortingNumber++;
-        }
-      }
-
-      /*if (m_param_deleteOtherRecoTracks) {
-        // Delete the other RecoTracks, as they were probably found under a wrong T0 assumption.
-        recoTracks.clear();
-      }*/
-    }
-  }
-
+  // One RecoTrack in an event
   if (recoTrackStoreArray.getEntries() == 1) {
-    if (klmClustersStoreArray.getEntries() == 2 || klmClustersStoreArray.getEntries() == 1) {
-      if (recoTrackStoreArray[0]->getNumberOfCDCHits() > m_MinimumNumHitCut) {
 
-        float minimumTimeInClusters = 0;
+    // No more than 2 KLMClusters
 
-        if (klmClustersStoreArray.getEntries() == 2) {
-          // KLMCluster* upperKLMClusters;
-          // KLMCluster* lowerKLMClusters;
-          if (klmClustersStoreArray[0]->getTime() < klmClustersStoreArray[1]->getTime()) {
-            minimumTimeInClusters = klmClustersStoreArray[0]->getTime();
-            // upperKLMClusters = klmClustersStoreArray[0];
-            // lowerKLMClusters = klmClustersStoreArray[1];
-          } else {
-            minimumTimeInClusters = klmClustersStoreArray[1]->getTime();
-            // upperKLMClusters = klmClustersStoreArray[1];
-            // lowerKLMClusters = klmClustersStoreArray[0];
-          }
-        } else {
-          minimumTimeInClusters = klmClustersStoreArray[0]->getTime();
-        }
+    int indexKLMClustersEnoughLayers[klmClustersStoreArray.getEntries()];
+    int numberKLMClustersEnoughLayers = 0;
 
-        RecoTrack* MergedRecoTrack = MergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
-                                                                recoTrackStoreArray[0]->getMomentumSeed(),
-                                                                recoTrackStoreArray[0]->getChargeSeed());
+    for (int i = 0; i < klmClustersStoreArray.getEntries(); i++) {
+      if (klmClustersStoreArray[i]->getLayers() > 4) {
+        indexKLMClustersEnoughLayers[numberKLMClustersEnoughLayers] = i;
+        numberKLMClustersEnoughLayers++;
+      }
+    }
 
-        // retain the seed time of the original track. Important for t0 extraction.
-        MergedRecoTrack->setTimeSeed(recoTrackStoreArray[0]->getTimeSeed());
+    if (numberKLMClustersEnoughLayers == 2 || klmClustersStoreArray.getEntries() == 2) {
 
-        float minimumTimeInRecoTrack = 100000;
-        if (recoTrackStoreArray[0]->hasEKLMHits()) {
-          RelationVector<EKLMHit2d> eklmHit2dsRecoTrack =
-            recoTrackStoreArray[0]->getSortedEKLMHitList()[recoTrackStoreArray[0]->getNumberOfEKLMHits() - 1]->getRelationsTo<EKLMHit2d>();
-          minimumTimeInRecoTrack = eklmHit2dsRecoTrack[0]->getTime();
-        }
-        if (recoTrackStoreArray[0]->hasBKLMHits()) {
-          if (minimumTimeInRecoTrack > recoTrackStoreArray[0]->getSortedBKLMHitList()[recoTrackStoreArray[0]->getNumberOfBKLMHits() -
-              1]->getTime()) {
-            minimumTimeInRecoTrack = recoTrackStoreArray[0]->getSortedBKLMHitList()[recoTrackStoreArray[0]->getNumberOfBKLMHits() -
-                                     1]->getTime();
-          }
-        }
+      // A candidate of CosmicRecoTrack has at least m_minimumNumHitCut (40) CDCHits
+      if (recoTrackStoreArray[0]->getNumberOfCDCHits() > m_minimumNumHitCut) {
 
-        if (minimumTimeInRecoTrack == minimumTimeInClusters) {
+        // A candidate of CosmicRecoTrack has B(E)KLM hits
+        if (recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits()) {
 
-          int sortingNumber = 0;
+          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
+                                                                  recoTrackStoreArray[0]->getMomentumSeed(), recoTrackStoreArray[0]->getChargeSeed());
 
-          if (recoTrackStoreArray[0]->hasBKLMHits()) {
-            int BKLMHits = recoTrackStoreArray[0]->getNumberOfBKLMHits();
-            for (int i = BKLMHits - 1; i >= 0; i--) {
-              MergedRecoTrack->addBKLMHit(recoTrackStoreArray[0]->getSortedBKLMHitList()[i], sortingNumber);
-              sortingNumber++;
-            }
-          }
-
-          if (recoTrackStoreArray[0]->hasEKLMHits()) {
-            int EKLMHits = recoTrackStoreArray[0]->getNumberOfEKLMHits();
-            for (int i = EKLMHits - 1; i >= 0; i--) {
-              MergedRecoTrack->addEKLMHit(recoTrackStoreArray[0]->getSortedEKLMHitList()[i], sortingNumber);
-            }
-          }
-
-          if (recoTrackStoreArray[0]->hasCDCHits()) {
-            int CDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
-            for (int i = CDCHits - 1; i >= 0; i--) {
-              MergedRecoTrack->addCDCHit(recoTrackStoreArray[0]->getSortedCDCHitList()[i], sortingNumber);
-              sortingNumber++;
-            }
-          }
-
-          if (recoTrackStoreArray[0]->hasSVDHits()) {
-            int SVDHits = recoTrackStoreArray[0]->getNumberOfSVDHits();
-            for (int i = SVDHits - 1; i >= 0; i--) {
-              MergedRecoTrack->addSVDHit(recoTrackStoreArray[0]->getSortedSVDHitList()[i], sortingNumber);
-              sortingNumber++;
-            }
-          }
-
-          if (recoTrackStoreArray[0]->hasPXDHits()) {
-            int PXDHits = recoTrackStoreArray[0]->getNumberOfPXDHits();
-            for (int i = PXDHits - 1; i >= 0; i--) {
-              MergedRecoTrack->addPXDHit(recoTrackStoreArray[0]->getSortedPXDHitList()[i], sortingNumber);
-              sortingNumber++;
-            }
-          }
-
-        } else {
+          // retain the seed time of the original track. Important for t0 extraction.
+          mergedRecoTrack->setTimeSeed(recoTrackStoreArray[0]->getTimeSeed());
 
           int sortingNumber = 0;
 
           if (recoTrackStoreArray[0]->hasPXDHits()) {
             int PXDHits = recoTrackStoreArray[0]->getNumberOfPXDHits();
             for (int i = 0; i < PXDHits; i++) {
-              MergedRecoTrack->addPXDHit(recoTrackStoreArray[0]->getSortedPXDHitList()[i], sortingNumber);
+              mergedRecoTrack->addPXDHit(recoTrackStoreArray[0]->getSortedPXDHitList()[i], sortingNumber);
               sortingNumber++;
             }
           }
@@ -301,7 +107,7 @@ void CDCCosmicTrackMergerModule::event()
           if (recoTrackStoreArray[0]->hasSVDHits()) {
             int SVDHits = recoTrackStoreArray[0]->getNumberOfSVDHits();
             for (int i = 0; i < SVDHits; i++) {
-              MergedRecoTrack->addSVDHit(recoTrackStoreArray[0]->getSortedSVDHitList()[i], sortingNumber);
+              mergedRecoTrack->addSVDHit(recoTrackStoreArray[0]->getSortedSVDHitList()[i], sortingNumber);
               sortingNumber++;
             }
           }
@@ -309,7 +115,7 @@ void CDCCosmicTrackMergerModule::event()
           if (recoTrackStoreArray[0]->hasCDCHits()) {
             int CDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
             for (int i = 0; i < CDCHits; i++) {
-              MergedRecoTrack->addCDCHit(recoTrackStoreArray[0]->getSortedCDCHitList()[i], sortingNumber);
+              mergedRecoTrack->addCDCHit(recoTrackStoreArray[0]->getSortedCDCHitList()[i], sortingNumber);
               sortingNumber++;
             }
           }
@@ -317,7 +123,7 @@ void CDCCosmicTrackMergerModule::event()
           if (recoTrackStoreArray[0]->hasBKLMHits()) {
             int BKLMHits = recoTrackStoreArray[0]->getNumberOfBKLMHits();
             for (int i = 0; i < BKLMHits; i++) {
-              MergedRecoTrack->addBKLMHit(recoTrackStoreArray[0]->getSortedBKLMHitList()[i], sortingNumber);
+              mergedRecoTrack->addBKLMHit(recoTrackStoreArray[0]->getSortedBKLMHitList()[i], sortingNumber);
               sortingNumber++;
             }
           }
@@ -325,17 +131,494 @@ void CDCCosmicTrackMergerModule::event()
           if (recoTrackStoreArray[0]->hasEKLMHits()) {
             int EKLMHits = recoTrackStoreArray[0]->getNumberOfEKLMHits();
             for (int i = 0; i < EKLMHits; i++) {
-              MergedRecoTrack->addEKLMHit(recoTrackStoreArray[0]->getSortedEKLMHitList()[i], sortingNumber);
+              mergedRecoTrack->addEKLMHit(recoTrackStoreArray[0]->getSortedEKLMHitList()[i], sortingNumber);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Two RecoTracks in an event
+  else if (recoTrackStoreArray.getEntries() == 2) {
+
+    // A candidate of CosmicRecoTrack has at least m_minimumNumHitCut (40) CDCHits
+    if (recoTrackStoreArray[0]->getNumberOfCDCHits() + recoTrackStoreArray[1]->getNumberOfCDCHits() > m_minimumNumHitCut) {
+
+      // One KLMCluster reconstructed in event
+      if (klmClustersStoreArray.getEntries() == 1) {
+
+        // One from RecoTracks has B(E)KLM hits
+        if (recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits() || recoTrackStoreArray[1]->hasEKLMHits()
+            || recoTrackStoreArray[1]->hasBKLMHits()) {
+
+          // Definition of upper and lower part of CosmicRecoTrack
+          RecoTrack* upperTrack;
+          RecoTrack* lowerTrack;
+
+          if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
+            upperTrack = recoTrackStoreArray[0];
+            lowerTrack = recoTrackStoreArray[1];
+          } else {
+            upperTrack = recoTrackStoreArray[1];
+            lowerTrack = recoTrackStoreArray[0];
+          }
+
+          // Creation of CosmicRecoTrack
+
+          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                                  upperTrack->getMomentumSeed(),
+                                                                  upperTrack->getChargeSeed());
+
+          mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
+
+          int sortingNumber = 0;
+
+          if (upperTrack->hasPXDHits()) {
+            int PXDHits = upperTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasPXDHits()) {
+            int PXDHits = lowerTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasSVDHits()) {
+            int SVDHits = upperTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasSVDHits()) {
+            int SVDHits = lowerTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(lowerTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+
+          if (upperTrack->hasCDCHits()) {
+            int CDCHits = upperTrack->getNumberOfCDCHits();
+            for (int i = 0; i < CDCHits; i++) {
+              mergedRecoTrack->addCDCHit(upperTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasCDCHits()) {
+            int CDCHits = lowerTrack->getNumberOfCDCHits();
+            for (int i = CDCHits - 1; i >= 0; i--) {
+              mergedRecoTrack->addCDCHit(lowerTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasBKLMHits()) {
+            int BKLMHits = upperTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(upperTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasEKLMHits()) {
+            int EKLMHits = upperTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
+            }
+          }
+
+          if (lowerTrack->hasBKLMHits()) {
+            int BKLMHits = lowerTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(lowerTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasEKLMHits()) {
+            int EKLMHits = lowerTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(lowerTrack->getSortedEKLMHitList()[i], sortingNumber);
               sortingNumber++;
             }
           }
         }
+      }
 
-        // if (m_param_deleteOtherRecoTracks) {
-        // Delete the other RecoTracks, as they were probably found under a wrong T0 assumption.
-        // recoTracks.clear();
-        // }
+      else if (klmClustersStoreArray.getEntries() == 2) {
 
+        // One from RecoTracks has B(E)KLM hits
+        if (recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits() || recoTrackStoreArray[1]->hasEKLMHits()
+            || recoTrackStoreArray[1]->hasBKLMHits()) {
+
+          // Definition of upper and lower part of CosmicRecoTrack
+          RecoTrack* upperTrack;
+          RecoTrack* lowerTrack;
+
+          if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
+            upperTrack = recoTrackStoreArray[0];
+            lowerTrack = recoTrackStoreArray[1];
+          } else {
+            upperTrack = recoTrackStoreArray[1];
+            lowerTrack = recoTrackStoreArray[0];
+          }
+
+          // Creation of CosmicRecoTrack
+
+          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                                  upperTrack->getMomentumSeed(),
+                                                                  upperTrack->getChargeSeed());
+
+          mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
+
+          int sortingNumber = 0;
+
+          if (upperTrack->hasPXDHits()) {
+            int PXDHits = upperTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasPXDHits()) {
+            int PXDHits = lowerTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasSVDHits()) {
+            int SVDHits = upperTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasSVDHits()) {
+            int SVDHits = lowerTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(lowerTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+          if (upperTrack->hasCDCHits()) {
+            int CDCHits = upperTrack->getNumberOfCDCHits();
+            for (int i = 0; i < CDCHits; i++) {
+              mergedRecoTrack->addCDCHit(upperTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasCDCHits()) {
+            int CDCHits = lowerTrack->getNumberOfCDCHits();
+            for (int i = CDCHits - 1; i >= 0; i--) {
+              mergedRecoTrack->addCDCHit(lowerTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasBKLMHits()) {
+            int BKLMHits = upperTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(upperTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasEKLMHits()) {
+            int EKLMHits = upperTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
+            }
+          }
+
+          if (lowerTrack->hasBKLMHits()) {
+            int BKLMHits = lowerTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(lowerTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasEKLMHits()) {
+            int EKLMHits = lowerTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(lowerTrack->getSortedEKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+        }
+      } else {
+
+        // Both RecoTracks have B(E)KLM hits
+        if ((recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits()) && (recoTrackStoreArray[1]->hasEKLMHits()
+            || recoTrackStoreArray[1]->hasBKLMHits())) {
+
+          // Definition of upper and lower part of CosmicRecoTrack
+          RecoTrack* upperTrack;
+          RecoTrack* lowerTrack;
+
+          if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
+            upperTrack = recoTrackStoreArray[0];
+            lowerTrack = recoTrackStoreArray[1];
+          } else {
+            upperTrack = recoTrackStoreArray[1];
+            lowerTrack = recoTrackStoreArray[0];
+          }
+
+          // Creation of CosmicRecoTrack
+
+          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                                  upperTrack->getMomentumSeed(),
+                                                                  upperTrack->getChargeSeed());
+
+          mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
+
+          int sortingNumber = 0;
+
+          if (upperTrack->hasPXDHits()) {
+            int PXDHits = upperTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasPXDHits()) {
+            int PXDHits = lowerTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasSVDHits()) {
+            int SVDHits = upperTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasSVDHits()) {
+            int SVDHits = lowerTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(lowerTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+
+          if (upperTrack->hasCDCHits()) {
+            int CDCHits = upperTrack->getNumberOfCDCHits();
+            for (int i = 0; i < CDCHits; i++) {
+              mergedRecoTrack->addCDCHit(upperTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasCDCHits()) {
+            int CDCHits = lowerTrack->getNumberOfCDCHits();
+            for (int i = CDCHits - 1; i >= 0; i--) {
+              mergedRecoTrack->addCDCHit(lowerTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasBKLMHits()) {
+            int BKLMHits = upperTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(upperTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasEKLMHits()) {
+            int EKLMHits = upperTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
+            }
+          }
+
+          if (lowerTrack->hasBKLMHits()) {
+            int BKLMHits = lowerTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(lowerTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasEKLMHits()) {
+            int EKLMHits = lowerTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(lowerTrack->getSortedEKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+        }
+      }
+    }
+  } else {
+
+    // Check how many KLMClusters have more than 4 layers and if two than continue
+
+    int indexKLMClustersEnoughLayers[klmClustersStoreArray.getEntries()];
+    int numberKLMClustersEnoughLayers = 0;
+
+    for (int i = 0; i < klmClustersStoreArray.getEntries(); i++) {
+      if (klmClustersStoreArray[i]->getLayers() > 4) {
+        indexKLMClustersEnoughLayers[numberKLMClustersEnoughLayers] = i;
+        numberKLMClustersEnoughLayers++;
+      }
+    }
+
+    if (numberKLMClustersEnoughLayers == 2 || klmClustersStoreArray.getEntries() == 2) {
+
+      // Check how many tracks has B(E)KLM hits and store their index
+
+      int indexRecoTracksWithKLMHits[recoTrackStoreArray.getEntries()];
+      int numberRecoTracksWithKLMHits = 0;
+
+      for (int i = 0; i < recoTrackStoreArray.getEntries(); i++) {
+        if (recoTrackStoreArray[i]->hasEKLMHits() || recoTrackStoreArray[i]->hasBKLMHits()) {
+          indexRecoTracksWithKLMHits[numberRecoTracksWithKLMHits] = i;
+          numberRecoTracksWithKLMHits++;
+        }
+      }
+
+      if (numberRecoTracksWithKLMHits > 2) {
+        numberRecoTracksWithKLMHits = 0;
+        for (int i = 0; i < numberRecoTracksWithKLMHits; i++) {
+          int numberKLMHitsInRecoTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[i]]->getNumberOfBKLMHits() +
+                                         recoTrackStoreArray[indexRecoTracksWithKLMHits[i]]->getNumberOfEKLMHits();
+          if (numberKLMHitsInRecoTrack > 3) {
+            indexRecoTracksWithKLMHits[numberRecoTracksWithKLMHits] = i;
+            numberRecoTracksWithKLMHits++;
+          }
+        }
+      }
+
+      if (numberRecoTracksWithKLMHits == 2) {
+        // A candidate of CosmicRecoTrack has at least m_minimumNumHitCut (40) CDCHits
+        if (recoTrackStoreArray[indexRecoTracksWithKLMHits[0]]->getNumberOfCDCHits() +
+            recoTrackStoreArray[indexRecoTracksWithKLMHits[1]]->getNumberOfCDCHits() > m_minimumNumHitCut) {
+
+          // Definition of upper and lower part of CosmicRecoTrack
+          RecoTrack* upperTrack;
+          RecoTrack* lowerTrack;
+
+          if (recoTrackStoreArray[indexRecoTracksWithKLMHits[0]]->getTimeSeed() <
+              recoTrackStoreArray[indexRecoTracksWithKLMHits[1]]->getTimeSeed()) {
+            upperTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[0]];
+            lowerTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[1]];
+          } else {
+            upperTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[1]];
+            lowerTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[0]];
+          }
+
+          // Creation of CosmicRecoTrack
+          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                                  upperTrack->getMomentumSeed(),
+                                                                  upperTrack->getChargeSeed());
+
+          mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
+
+          int sortingNumber = 0;
+
+          if (upperTrack->hasPXDHits()) {
+            int PXDHits = upperTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasPXDHits()) {
+            int PXDHits = lowerTrack->getNumberOfPXDHits();
+            for (int i = 0; i < PXDHits; i++) {
+              mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasSVDHits()) {
+            int SVDHits = upperTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(upperTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasSVDHits()) {
+            int SVDHits = lowerTrack->getNumberOfSVDHits();
+            for (int i = 0; i < SVDHits; i++) {
+              mergedRecoTrack->addSVDHit(lowerTrack->getSortedSVDHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+
+          if (upperTrack->hasCDCHits()) {
+            int CDCHits = upperTrack->getNumberOfCDCHits();
+            for (int i = 0; i < CDCHits; i++) {
+              mergedRecoTrack->addCDCHit(upperTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasCDCHits()) {
+            int CDCHits = lowerTrack->getNumberOfCDCHits();
+            for (int i = CDCHits - 1; i >= 0; i--) {
+              mergedRecoTrack->addCDCHit(lowerTrack->getSortedCDCHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasBKLMHits()) {
+            int BKLMHits = upperTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(upperTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (upperTrack->hasEKLMHits()) {
+            int EKLMHits = upperTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(upperTrack->getSortedEKLMHitList()[i], sortingNumber);
+            }
+          }
+
+          if (lowerTrack->hasBKLMHits()) {
+            int BKLMHits = lowerTrack->getNumberOfBKLMHits();
+            for (int i = 0; i < BKLMHits; i++) {
+              mergedRecoTrack->addBKLMHit(lowerTrack->getSortedBKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+
+          if (lowerTrack->hasEKLMHits()) {
+            int EKLMHits = lowerTrack->getNumberOfEKLMHits();
+            for (int i = 0; i < EKLMHits; i++) {
+              mergedRecoTrack->addEKLMHit(lowerTrack->getSortedEKLMHitList()[i], sortingNumber);
+              sortingNumber++;
+            }
+          }
+        }
       }
     }
   }

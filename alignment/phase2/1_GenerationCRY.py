@@ -31,8 +31,6 @@ if len(sys.argv) == 2:
     print(sys.argv)[1]
     outname = (sys.argv)[1]
 
-# use_central_database("development", loglevel=LogLevel.INFO)
-
 main = create_path()
 
 # Event Info
@@ -80,17 +78,18 @@ main.add_module("Gearbox", fileName='/geometry/Beast2_phase2.xml', override=[
 # Register the geometry module
 geometry = register_module('Geometry')
 components = [
-    'MagneticFieldConstant4LimitedRCDC',
     'BeamPipe',
+    'MagneticField',
     'PXD',
     'SVD',
     'CDC',
     'EKLM',
     'BKLM']
+
 """
-        'TOP',
-        'ARICH',
-        'ECL']
+'TOP',
+'ARICH',
+'ECL'
 """
 
 geometry.param('components', components)

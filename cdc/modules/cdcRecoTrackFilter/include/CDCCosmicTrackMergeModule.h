@@ -31,10 +31,10 @@ namespace Belle2 {
     /// StoreArray name from which to read the reco tracks.
     std::string m_param_recoTracksStoreArrayName = "";
     /// StoreArray name where the merged reco track is written.
-    std::string m_param_MergedRecoTracksStoreArrayName = "__MergedRecoTracks";
+    std::string m_param_mergedRecoTracksStoreArrayName = "__MergedRecoTracks";
     /// Flag to delete the not RecoTracks from the input StoreArray.
     bool m_param_deleteOtherRecoTracks = true;
     /// Minium NDF required for each track (up and down).
-    double m_MinimumNumHitCut = 40;
+    double m_minimumNumHitCut = 40;
   };
 }

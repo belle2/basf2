@@ -23,8 +23,6 @@ if len(sys.argv) == 3:
     inname = (sys.argv)[1]
     outname = (sys.argv)[2]
 
-use_local_database("centraldb/dbcache.txt")
-
 main = create_path()
 
 main.add_module('RootInput', inputFileName=inname)
@@ -51,7 +49,7 @@ VXDHits = VXDHits()
 main.add_module(VXDHits)
 
 # output
-main.add_module('RootOutput', outputFileName=outname)
+# main.add_module('RootOutput', outputFileName=outname)
 
 progress = register_module('ProgressBar')
 main.add_module(progress)

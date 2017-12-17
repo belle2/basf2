@@ -14,6 +14,7 @@
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 #include <reconstruction/dbobjects/CDCDedxCurvePars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
+#include <reconstruction/dbobjects/DedxPDFs.h>
 
 // FRAMEWORK
 #include <framework/gearbox/GearDir.h>
@@ -38,6 +39,16 @@ CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(std::string inputFileName, std:
   m_name = name;
 }
 
+void CDCDedxDatabaseImporter::importPDFs()
+{
+  TClonesArray dedxPDFs("Belle2::DedxPDFs");
+  TFile* infile = TFile::Open(m_inputFileNames[0].c_str(), "READ");
+  new(dedxPDFs[0]) DedxPDFs(infile);
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  Database::Instance().storeData(m_name, dedxPDFs[0], iov);
+}
+
 void CDCDedxDatabaseImporter::importScaleFactor(double scale)
 {
 
@@ -47,6 +58,7 @@ void CDCDedxDatabaseImporter::importScaleFactor(double scale)
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, scaleFactor[0], iov);
 }
+
 void CDCDedxDatabaseImporter::importHadronCorrection()
 {
 

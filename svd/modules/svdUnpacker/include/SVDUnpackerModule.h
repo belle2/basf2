@@ -161,7 +161,9 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
 
       int m_shutUpFTBError;
       int m_FADCTriggerNumberOffset;

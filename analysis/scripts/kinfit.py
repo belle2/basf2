@@ -70,6 +70,38 @@ def fitKinematic1CUnmeasured(
     path.add_module(orca)
 
 
+def fitKinematic3C(
+        list_name,
+        fitterEngine='NewFitterGSL',
+        constraint='HardBeam',
+        daughtersUpdate=True,
+        addUnmeasuredPhoton=False,
+        add3CPhoton=True,
+        path=analysis_main,
+):
+    """
+    Perform 1C momentum constraint kinematic fit with one unmeasured photon for particles in the given        ParticleList.
+    @param list_name    name of the input ParticleList
+    @param fitterEngine       NewFitterGSL or OPALFitterGSL
+    @param constraint       HardBeam or RecoilMass
+    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param addUnmeasuredPhoton add one unmeasured photon (costs 3C)
+    @param path         modules are added to this path
+    """
+
+    orca = register_module('ParticleKinematicFitter')
+    orca.set_name('ParticleKinematicFitter_' + list_name)
+    orca.param('debugFitter', False)
+    orca.param('orcaTracer', 'None')
+    orca.param('orcaFitterEngine', fitterEngine)
+    orca.param('orcaConstraint', constraint)  # beam parameters automatically taken from database
+    orca.param('listName', list_name)
+    orca.param('updateDaughters', daughtersUpdate)
+    orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
+    orca.param('add3CPhoton', add3CPhoton)
+    path.add_module(orca)
+
+
 def fitKinematic1CRecoilMass(
     list_name,
     recoilMass,

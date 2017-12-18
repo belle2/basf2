@@ -104,6 +104,7 @@ namespace Belle2 {
     int m_debugFitterLevel;            /**< internal debugging level (for New and Newton fitter only)*/
     double m_confidenceLevel;          /**< required fit confidence level to keep the particle*/
     bool m_addUnmeasuredPhoton;        /**< add one unmeasured photon to the fit (costs 3 constraints)*/
+    bool m_add3CPhoton;                /**< add one photon with unmeasured energy to the fit (costs 1 constraints)*/
     bool m_updateMother;               /**< update mother kinematics*/
     bool m_updateDaughters;            /**< update daughter kinematics*/
     bool m_debugBeam;                  /**< Generate debug plots(flag). */

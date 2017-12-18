@@ -18,6 +18,8 @@
 #include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
 
+#include <mdst/dataobjects/ECLCluster.h>
+
 // framework datastore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -80,6 +82,7 @@ namespace Belle2 {
     addParam("debugFitter", m_debugFitter, "Switch on/off internal debugging output if available.", false);
     addParam("debugFitterLevel", m_debugFitterLevel, "Internal debugging output level if available.", 10);
     addParam("addUnmeasuredPhoton", m_addUnmeasuredPhoton, "Add one unmeasured photon (-3C).", false);
+    addParam("add3CPhoton", m_add3CPhoton, "Add one photon with unmeasured energy (-1C).", false);
     addParam("decayString", m_decayString, "Specifies which daughter particles are included in the kinematic fit.", string(""));
     addParam("updateMother", m_updateMother, "Update the mother kinematics.", true);
     addParam("updateDaughters", m_updateDaughters, "Update the daughter kinematics.", false);
@@ -411,25 +414,58 @@ namespace Belle2 {
   {
     B2INFO("ParticleKinematicFitterModule: adding a particle to the fitter!");
 
-    // four vector
-    CLHEP::HepLorentzVector clheplorentzvector = getCLHEPLorentzVector(particle);
+    if (m_add3CPhoton && index == 0) {
+      if (particle -> getPDGCode() != 22) {
+        B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
+      }
 
-    // error matrix
-    CLHEP::HepSymMatrix clhepmomentumerrormatrix = getCLHEPMomentumErrorMatrix(particle);
-    CLHEP::HepSymMatrix clhepmomentumvertexerrormatrix = getCLHEPMomentumVertexErrorMatrix(particle);
+      double startingE = particle -> getECLCluster() -> getEnergy();
+      double startingPhi = particle -> getECLCluster() -> getPhi();
+      double startingTheta = particle -> getECLCluster() -> getTheta();
 
-    // create the fit object (ParticleFitObject is the base class)
-    ParticleFitObject* pfitobject;
-    pfitobject  = new PxPyPzMFitObject(clheplorentzvector, clhepmomentumerrormatrix);
-    std::string fitObjectName = "particle_" + SSTR(index);
-    pfitobject->setName(fitObjectName.c_str());
-    ParticleFitObject& fitobject = *pfitobject;
+      double startingeE = particle->getECLCluster() -> getUncertaintyEnergy();
+      double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
+      double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
 
-    // add this fit object (=particle) to the constraints
-    addFitObjectToConstraints(fitobject);
+      // create a fit object
+      ParticleFitObject* pfitobject;
+      pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, startingeE, startingePhi, startingeTheta, 0.);
+      pfitobject->setParam(0, startingE, false, false);
+      pfitobject->setParam(1, startingPhi, true, false);
+      pfitobject->setParam(2, startingTheta, true, false);
 
-    // add fit particle to the fitter
-    fitter.addFitObject(fitobject);
+      std::string fitObjectName = "unmeasured";
+      pfitobject->setName(fitObjectName.c_str());
+      ParticleFitObject& fitobject = *pfitobject;
+
+      // add this fit object (=particle) to the constraints
+      addFitObjectToConstraints(fitobject);
+
+      // add fit particle to the fitter
+      fitter.addFitObject(fitobject);
+
+    } else {
+      // four vector
+      CLHEP::HepLorentzVector clheplorentzvector = getCLHEPLorentzVector(particle);
+
+      // error matrix
+      CLHEP::HepSymMatrix clhepmomentumerrormatrix = getCLHEPMomentumErrorMatrix(particle);
+      CLHEP::HepSymMatrix clhepmomentumvertexerrormatrix = getCLHEPMomentumVertexErrorMatrix(particle);
+
+      // create the fit object (ParticleFitObject is the base class)
+      ParticleFitObject* pfitobject;
+      pfitobject  = new PxPyPzMFitObject(clheplorentzvector, clhepmomentumerrormatrix);
+      std::string fitObjectName = "particle_" + SSTR(index);
+      pfitobject->setName(fitObjectName.c_str());
+      ParticleFitObject& fitobject = *pfitobject;
+
+      // add this fit object (=particle) to the constraints
+      addFitObjectToConstraints(fitobject);
+
+      // add fit particle to the fitter
+      fitter.addFitObject(fitobject);
+    }
+
 
     return;
   }
@@ -668,7 +704,7 @@ namespace Belle2 {
       }
     }
 
-    if (l == fitObjectContainer->size()) {
+    if (l == fitObjectContainer->size() - m_addUnmeasuredPhoton) {
 
       if (fitter.getError() == 0) {
         for (unsigned iDaug = 0; iDaug < bDau.size(); iDaug++) {

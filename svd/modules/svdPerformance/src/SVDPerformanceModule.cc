@@ -110,9 +110,9 @@ void SVDPerformanceModule::initialize()
           nameSensor += j + 1;
 
         TString nameSide = "";
-        if (k == 0)
+        if (k == 1)
           nameSide = "U";
-        else if (k == 1)
+        else if (k == 0)
           nameSide = "V";
 
         //SHAPER DIGITS

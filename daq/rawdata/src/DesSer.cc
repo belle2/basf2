@@ -383,7 +383,7 @@ void DesSer::Accept(bool close_listen)
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
            m_port_to); fflush(stdout);
-    // Check the process occupying the port 33000.
+    // Check the process occupying the port 30000.
     FILE* fp;
     char buf[256];
     char cmdline[500];

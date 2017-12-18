@@ -91,7 +91,7 @@ def fitKinematic3C(
 
     orca = register_module('ParticleKinematicFitter')
     orca.set_name('ParticleKinematicFitter_' + list_name)
-    orca.param('debugFitter', False)
+    orca.param('debugFitter', True)
     orca.param('orcaTracer', 'None')
     orca.param('orcaFitterEngine', fitterEngine)
     orca.param('orcaConstraint', constraint)  # beam parameters automatically taken from database

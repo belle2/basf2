@@ -187,6 +187,12 @@ double NewFitterGSL::fit()
       break;
     }
 
+    if (debug > 5) {
+      cout << "Before test convergence, calcNewtonDe: Result: \n";
+      debug_print(dx, "dx");
+      debug_print(dxscal, "dxscal");
+    }
+
     // test convergence:
     if (gsl_blas_dasum(dxscal) < 1E-6 * idim) {
       converged = true;
@@ -202,7 +208,7 @@ double NewFitterGSL::fit()
     gsl_blas_dcopy(xnew, x);
 
     chi2new = calcChi2();
-    //cout << "chi2: " << chi2old << " -> " << chi2new << endl;
+    cout << "chi2: " << chi2old << " -> " << chi2new << endl;
 
 //   *-- Convergence criteria
 
@@ -228,6 +234,8 @@ double NewFitterGSL::fit()
     }
 
   } while (!(converged || ierr));
+
+  cout << "After fit:  " << nit << "  " << converged << "  " << ierr << "  " << endl;
 
 #ifndef FIT_TRACEOFF
   if (tracer) tracer->step(*this);

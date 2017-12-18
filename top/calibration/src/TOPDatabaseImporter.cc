@@ -376,9 +376,11 @@ namespace Belle2 {
     DBImportArray<TOPPmtQE> pmtQEs;
 
     static const int nChann = 16;
-    std::string serialNum;
-    std::vector<float> QE_data[nChann];
+    std::string* serialNum = 0;
+    std::vector<float>* QE_data[nChann];
     float lambdaFirst, lambdaStep, collEff;
+
+    TBranch* bQE_data[nChann];
 
     // open root file and get tree
     TFile* file = new TFile(fileName.c_str(), "r");
@@ -388,29 +390,40 @@ namespace Belle2 {
     tQeData->SetBranchAddress("lambdaFirst", &lambdaFirst);
     tQeData->SetBranchAddress("lambdaStep", &lambdaStep);
     tQeData->SetBranchAddress("collEff", &collEff);
+
     for (int ic = 0; ic < nChann; ic++) {
+      // must initialize vectors and branches
+      QE_data[ic] = new std::vector<float>;
+      bQE_data[ic] = new TBranch();
+
       TString cString = "QE_ch";
       cString += ic + 1;
-      tQeData->SetBranchAddress(cString, &QE_data[ic]);
+      tQeData->SetBranchAddress(cString, &QE_data[ic], &bQE_data[ic]);
     }
 
     // loop on input tree entries and construct the pmtQE objects
     int countPMTs = 0;
 
     for (int ient = 0; ient < tQeData->GetEntries(); ient++) {
+
       tQeData->GetEntry(ient);
-      auto* pmtQE = pmtQEs.appendNew(serialNum, lambdaFirst, lambdaStep, collEff);
+
+      auto* pmtQE = pmtQEs.appendNew(*serialNum, lambdaFirst, lambdaStep, collEff);
 
       for (int ic = 0; ic < nChann; ic++) {
-        pmtQE->setQE(ic + 1, QE_data[ic]);
-      }
+        int tEntry = tQeData->LoadTree(ient);
+        bQE_data[ic]->GetEntry(tEntry);
+
+        pmtQE->setQE(ic + 1, *QE_data[ic]);
+      }   // end loop on channels
+
       countPMTs++;
     }
 
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     pmtQEs.import(iov);
 
-    B2RESULT("QE data imported to database for" << countPMTs << " PMT's.");
+    B2RESULT("PMT QE data imported to database for " << countPMTs << " PMT's.");
 
     return;
   }
@@ -423,7 +436,7 @@ namespace Belle2 {
     DBImportArray<TOPPmtGainPar> pmtGains;
 
     static const int nChann = 16;
-    std::string serialNum;
+    std::string* serialNum = 0;
     float gain_const[nChann], gain_slope[nChann], gain_ratio[nChann];
     float hv_op;
 
@@ -443,7 +456,7 @@ namespace Belle2 {
 
     for (int ient = 0; ient < tGainData->GetEntries(); ient++) {
       tGainData->GetEntry(ient);
-      auto* pmtGain = pmtGains.appendNew(serialNum);
+      auto* pmtGain = pmtGains.appendNew(*serialNum);
 
       for (int ic = 0; ic < nChann; ic++) {
         pmtGain->setChannelData(ic + 1, gain_const[ic], gain_slope[ic], gain_ratio[ic]);
@@ -455,7 +468,7 @@ namespace Belle2 {
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     pmtGains.import(iov);
 
-    B2RESULT("PMT gain data imported to database for" << countPMTs << " PMT's.");
+    B2RESULT("PMT gain data imported to database for " << countPMTs << " PMT's.");
 
     return;
   }
@@ -467,7 +480,7 @@ namespace Belle2 {
     // declare db objects to be imported
     DBImportArray<TOPPmtInstallation> pmtInst;
 
-    std::string serialNum;
+    std::string* serialNum = 0;
     int moduleCNum, arrayNum, PMTposition;
 
     // open root file and get tree
@@ -479,19 +492,19 @@ namespace Belle2 {
     tInstData->SetBranchAddress("arrayNum", &arrayNum);
     tInstData->SetBranchAddress("PMTposition", &PMTposition);
 
-    // loop on input tree entries and construct the pmtGain objects
+    // loop on input tree entries and construct the pmtInstallation objects
     int countPMTs = 0;
 
     for (int ient = 0; ient < tInstData->GetEntries(); ient++) {
       tInstData->GetEntry(ient);
-      pmtInst.appendNew(serialNum, moduleCNum, arrayNum, PMTposition);
+      pmtInst.appendNew(*serialNum, moduleCNum, arrayNum, PMTposition);
       countPMTs++;
     }
 
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     pmtInst.import(iov);
 
-    B2RESULT("PMT installation data imported to database for" << countPMTs << " PMT's.");
+    B2RESULT("PMT installation data imported to database for " << countPMTs << " PMT's.");
 
     return;
   }
@@ -503,8 +516,8 @@ namespace Belle2 {
     // declare db objects to be imported
     DBImportArray<TOPPmtObsoleteData> pmtObsData;
 
-    std::string serialNum;
-    std::string cathode;
+    std::string* serialNum = 0;
+    std::string* cathode = 0;
     float hv_spec, dark_spec, qe380_spec;
     TOPPmtObsoleteData::EType type;
 
@@ -518,7 +531,7 @@ namespace Belle2 {
     tObsData->SetBranchAddress("dark_spec", &dark_spec);
     tObsData->SetBranchAddress("qe380_spec", &qe380_spec);
 
-    // loop on input tree entries and construct the pmtGain objects
+    // loop on input tree entries and construct the pmt obsolete data objects
     int countPMTs = 0;
 
     for (int ient = 0; ient < tObsData->GetEntries(); ient++) {
@@ -527,14 +540,19 @@ namespace Belle2 {
       // set type to unknown for now
       type = TOPPmtObsoleteData::c_Unknown;
 
-      pmtObsData.appendNew(serialNum, type, cathode, hv_spec, dark_spec, qe380_spec);
+      pmtObsData.appendNew(*serialNum, type, *cathode, hv_spec, dark_spec, qe380_spec);
       countPMTs++;
     }
 
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     pmtObsData.import(iov);
 
-    B2RESULT("PMT obsolete data imported to database for" << countPMTs << " PMT's.");
+    B2RESULT("PMT obsolete data imported to database for " << countPMTs << " PMT's.");
+
+    file->Close();
+
+    delete serialNum;
+    delete cathode;
 
     return;
   }
@@ -547,10 +565,14 @@ namespace Belle2 {
     DBImportArray<TOPPmtTTSPar> pmtTtsPars;
 
     static const int nChann = 16;
-    std::string serialNum;
-    std::vector<float> gausFrac[nChann];
-    std::vector<float> gausMean[nChann];
-    std::vector<float> gausSigma[nChann];
+    std::string* serialNum  = 0;
+    std::vector<float>* gausFrac[nChann];
+    std::vector<float>* gausMean[nChann];
+    std::vector<float>* gausSigma[nChann];
+
+    TBranch* bGFrac[nChann];
+    TBranch* bGMean[nChann];
+    TBranch* bGSigma[nChann];
 
 
     // open root file and get tree
@@ -559,41 +581,58 @@ namespace Belle2 {
 
     tTtsPar->SetBranchAddress("serialNum", &serialNum);
     for (int ic = 0; ic < nChann; ic++) {
-      TString cStringF = "gausF_ch";
-      TString cStringM = "gausM_ch";
-      TString cStringS = "gausS_ch";
+      // must initialize vectors and branches
+      gausFrac[ic] = new std::vector<float>;
+      gausMean[ic] = new std::vector<float>;
+      gausSigma[ic] = new std::vector<float>;
+
+      bGFrac[ic] = new TBranch();
+      bGMean[ic] = new TBranch();
+      bGSigma[ic] = new TBranch();
+
+
+      TString cStringF = "gausFrac_ch";
+      TString cStringM = "gausMean_ch";
+      TString cStringS = "gausSigma_ch";
 
       cStringF += ic + 1;
       cStringM += ic + 1;
       cStringS += ic + 1;
 
-      tTtsPar->SetBranchAddress(cStringF, &gausFrac[ic]);
-      tTtsPar->SetBranchAddress(cStringM, &gausMean[ic]);
-      tTtsPar->SetBranchAddress(cStringS, &gausSigma[ic]);
+      tTtsPar->SetBranchAddress(cStringF, &gausFrac[ic], &bGFrac[ic]);
+      tTtsPar->SetBranchAddress(cStringM, &gausMean[ic], &bGMean[ic]);
+      tTtsPar->SetBranchAddress(cStringS, &gausSigma[ic], &bGSigma[ic]);
     }
 
-    // loop on input tree entries and construct the pmtQE objects
+    // loop on input tree entries and construct the pmt tts par objects
     int countPMTs = 0;
 
     for (int ient = 0; ient < tTtsPar->GetEntries(); ient++) {
+
       tTtsPar->GetEntry(ient);
-      auto* pmtTtsPar = pmtTtsPars.appendNew(serialNum);
+
+      auto* pmtTtsPar = pmtTtsPars.appendNew(*serialNum);
 
       for (int ic = 0; ic < nChann; ic++) {
 
+        int tEntry = tTtsPar->LoadTree(ient);
+        bGFrac[ic]->GetEntry(tEntry);
+        bGMean[ic]->GetEntry(tEntry);
+        bGSigma[ic]->GetEntry(tEntry);
+
         // check that the vectors have the same size. Otherwise skip the channel
-        if ((gausFrac[ic].size() != gausMean[ic].size()) ||
-            (gausFrac[ic].size() != gausSigma[ic].size())) {
+        if ((gausFrac[ic]->size() != gausMean[ic]->size()) ||
+            (gausFrac[ic]->size() != gausSigma[ic]->size())) {
 
           B2ERROR("The TTSPar vectors for PMT " << serialNum << ", channel " << ic + 1 << " have different sizes! Skipping channel...");
           continue;
         }
 
-        for (uint iv = 0; iv < gausFrac[ic].size(); iv++) {
+        for (uint iv = 0; iv < gausFrac[ic]->size(); iv++) {
           pmtTtsPar->appendGaussian(ic + 1,
-                                    gausFrac[ic].at(iv),
-                                    gausMean[ic].at(iv),
-                                    gausSigma[ic].at(iv));
+                                    gausFrac[ic]->at(iv),
+                                    gausMean[ic]->at(iv),
+                                    gausSigma[ic]->at(iv));
         }
       }
       countPMTs++;
@@ -602,7 +641,7 @@ namespace Belle2 {
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     pmtTtsPars.import(iov);
 
-    B2RESULT("TTS parameters imported to database for" << countPMTs << " PMT's.");
+    B2RESULT("PMT TTS parameters imported to database for " << countPMTs << " PMT's.");
 
     return;
   }
@@ -611,59 +650,83 @@ namespace Belle2 {
   void TOPDatabaseImporter::importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto")
   {
 
-    // declare db objects to be imported
-    DBImportArray<TOPPmtTTSHisto> pmtTtsHistos;
+    // define data array
+    TClonesArray pmtTtsHistos("Belle2::TOPPmtTTSHisto");
 
     static const int nChann = 16;
-    std::string serialNum;
-    std::vector<float> hv[nChann];
-    std::vector<TH1F*> histo[nChann];
+    std::string* serialNum = 0;
+    float hv(-9.);
+    TH1F* histo[nChann] = {0};
 
     // open root file and get tree
     TFile* file = new TFile(fileName.c_str(), "r");
     TTree* tTtsHisto = (TTree*)file->Get(treeName.c_str());
 
     tTtsHisto->SetBranchAddress("serialNum", &serialNum);
+    tTtsHisto->SetBranchAddress("hv", &hv);
     for (int ic = 0; ic < nChann; ic++) {
-      TString cStringHV = "hv_ch";
-      TString cStringHist = "histo_ch";
-
-      cStringHV += ic + 1;
-      cStringHist += ic + 1;
-
-      tTtsHisto->SetBranchAddress(cStringHV, &hv[ic]);
-      tTtsHisto->SetBranchAddress(cStringHist, &histo[ic]);
+      TString hString = "hist_ch";
+      hString += ic + 1;
+      tTtsHisto->SetBranchAddress(hString, &histo[ic]);
     }
 
-    // loop on input tree entries and construct the pmtQE objects
-    int countPMTs = 0;
+
+    // loop on input tree entries and construct the pmt tts histo objects
+    int countHists = 0;
 
     for (int ient = 0; ient < tTtsHisto->GetEntries(); ient++) {
+
       tTtsHisto->GetEntry(ient);
-      auto* pmtTtsHisto = pmtTtsHistos.appendNew(serialNum);
 
+      B2INFO("Saving TTS histograms for PMT " << *serialNum << ", HV = " << hv);
+
+      new(pmtTtsHistos[ient]) TOPPmtTTSHisto();
+      auto* pmtTtsHisto = static_cast<TOPPmtTTSHisto*>(pmtTtsHistos[ient]);
+
+      pmtTtsHisto->setSerialNumber(*serialNum);
+      pmtTtsHisto->setHv(hv);
       for (int ic = 0; ic < nChann; ic++) {
-
-        // check that the vectors have the same size. Otherwise skip the channel
-        if (hv[ic].size() != histo[ic].size()) {
-          B2ERROR("Mismatch between HV values and TTS histograms for PMT " << serialNum << ", channel " << ic + 1 << ". Skipping channel...");
-          continue;
-        }
-
-        for (uint iv = 0; iv < hv[ic].size(); iv++) {
-          pmtTtsHisto->appendHistogram(ic + 1, hv[ic].at(iv), histo[ic].at(iv));
-        }
+        pmtTtsHisto->setHistogram(ic + 1, *histo[ic]);
       }
-      countPMTs++;
+      countHists++;
     }
 
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
-    pmtTtsHistos.import(iov);
+    Database::Instance().storeData("TOPPmtTTSHistos", &pmtTtsHistos, iov);
 
-    B2RESULT("TTS histograms imported to database for" << countPMTs << " PMT's.");
+    B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
 
     return;
   }
+
+
+  void TOPDatabaseImporter::exportPmtTTSHisto(string outFileName = "RetrievedHistos.root")
+  {
+
+    // this is just an example on how to retrieve TTS histograms
+    DBArray<TOPPmtTTSHisto> elements("TOPPmtTTSHistos");
+    elements.getEntries();
+
+    static const int nChann = 16;
+
+    TFile file(outFileName.c_str(), "recreate");
+
+    // prints serialNum of PMTs and hv setting used, and saves TTS histograms to root file
+    for (const auto& element : elements) {
+
+      B2INFO("serialNum = " << element.getSerialNumber() << ", HV = " << element.getHv());
+      TH1F ttsHisto[nChann];
+      for (int ic = 0; ic < nChann; ic++) {
+        ttsHisto[ic] = element.getTtsHisto(ic + 1);
+        ttsHisto[ic].Write();
+      }
+    }
+
+    file.Close();
+
+    return;
+  }
+
 
 
 

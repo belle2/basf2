@@ -80,7 +80,7 @@ namespace Belle2 {
       float lambdaLow  = m_lambdaFirst + ilLow * m_lambdaStep;
       float lambdaHigh = m_lambdaFirst + (ilLow + 1) * m_lambdaStep;
 
-      float qe = (m_QE[channel].at(ilLow) * (lambda - lambdaLow) + m_QE[channel].at(ilLow + 1) * (lambdaHigh - lambda)) / m_lambdaStep;
+      float qe = (m_QE[channel].at(ilLow) * (lambdaHigh - lambda) + m_QE[channel].at(ilLow + 1) * (lambda - lambdaLow)) / m_lambdaStep;
       return qe;
     }
 

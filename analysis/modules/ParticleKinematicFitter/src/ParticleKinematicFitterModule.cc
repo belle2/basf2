@@ -191,7 +191,6 @@ namespace Belle2 {
 
     unsigned int n = plist->getListSize();
 
-    cout << "Number of plist: " << n << "  Begain  of KinematicFit" << endl;
     for (unsigned i = 0; i < n; i++) {
 //       Particle* particle = const_cast<Particle*> (plist->getParticle(i));
       Particle* particle = plist->getParticle(i);
@@ -320,6 +319,15 @@ namespace Belle2 {
     int ndof      = fitter.getDoF();
     int errorcode = fitter.getError();
 
+//  cout<<"ParticleKinematicFitterModule: -------------------------------------------"<<endl;
+//  cout<<"ParticleKinematicFitterModule: Fit result of OrcaKinFit using " << m_orcaFitterEngine<<endl;
+//  cout<<"ParticleKinematicFitterModule:   prob              " << prob<<endl;
+//  cout<<"ParticleKinematicFitterModule:   chi2              " << chi2<<endl;
+//  cout<<"ParticleKinematicFitterModule:   iterations        " << niter<<endl;
+//  cout<<"ParticleKinematicFitterModule:   ndf               " << ndof<<endl;
+//  cout<<"ParticleKinematicFitterModule:   errorcode         " << errorcode<<endl;
+//  cout<<"ParticleKinematicFitterModule: -------------------------------------------"<<endl;
+
     B2DEBUG(175, "ParticleKinematicFitterModule: -------------------------------------------");
     B2DEBUG(175, "ParticleKinematicFitterModule: Fit result of OrcaKinFit using " << m_orcaFitterEngine);
     B2DEBUG(175, "ParticleKinematicFitterModule:   prob              " << prob);
@@ -427,6 +435,8 @@ namespace Belle2 {
       double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
       double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
 
+      cout << startingE << " " << startingPhi << " " << startingTheta << " " << startingeE << " " << startingePhi << " " << startingeTheta
+           << endl;
       // create a fit object
       ParticleFitObject* pfitobject;
       pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, startingeE, startingePhi, startingeTheta, 0.);

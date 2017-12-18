@@ -683,6 +683,7 @@ void NewFitterGSL::assembley(gsl_vector* vecy, const gsl_vector* vecx)
   for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
+//  std::cout <<"In New assembley FitObject:  "<< fo->getName()<<std::endl;
     fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
   }
 
@@ -729,6 +730,7 @@ void NewFitterGSL::assembleChi2Der(gsl_vector* vecy)
   for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
+//  std::cout <<"In New assembleChi2Der FitObject:  "<< fo->getName()<<std::endl;
     fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
   }
 

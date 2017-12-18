@@ -93,7 +93,6 @@ converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('subtractOffset', True)
-converter.param('storageDepth', 510)
 main.add_module(converter)
 
 main.add_module(DigitTest())

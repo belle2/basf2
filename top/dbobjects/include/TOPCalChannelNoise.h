@@ -17,6 +17,9 @@ namespace Belle2 {
 
   /**
    * r.m.s. of noise for all 512 channels of 16 modules.
+   *
+   * The noise for masked channels is undefined.
+   * It is the caller's responsibility to check for masked channels
    */
   class TOPCalChannelNoise: public TObject {
   public:
@@ -28,7 +31,8 @@ namespace Belle2 {
     TOPCalChannelNoise() {}
 
     /**
-     * Sets the noise r.m.s for a single channel
+     * Sets the noise r.m.s for a single channel.
+     * If data for a given channel not available set noise to 0 (or just skip the call)
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      * @param rmsNoise r.m.s. of noise [ADC counts]

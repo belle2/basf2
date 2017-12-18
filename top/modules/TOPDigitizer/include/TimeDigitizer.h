@@ -83,10 +83,10 @@ namespace Belle2 {
        * @param t time of simulated hit
        * @param pulseHeight simulated pulse height
        * @param type hit type
-       * @param simHit pointer to simulated hit or NULL
+       * @param simHit pointer to simulated hit
        */
       void addTimeOfHit(double t, double pulseHeight, EType type,
-                        const TOPSimHit* simHit = NULL)
+                        const TOPSimHit* simHit = 0)
       {
         Hit hit;
         hit.pulseHeight = pulseHeight;

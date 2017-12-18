@@ -86,7 +86,7 @@ namespace Belle2 {
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",
              true);
-    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 510);
+    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 508);
 
   }
 

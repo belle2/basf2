@@ -104,7 +104,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
 
 
 def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
-                filter_cut=0.1, overlap_cut=0.2, use_best_results=5, use_best_seeds=10):
+                filter_cut=0.1, overlap_cut=0.2, use_best_results=5, use_best_seeds=10,
+                direction="backward"):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
@@ -120,6 +121,11 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
     if "SVDSpacePointCreator" not in path:
         path.add_module("SVDSpacePointCreator")
 
+    if direction == "forward":
+        reverse_seed = True
+    else:
+        reverse_seed = False
+
     if use_mc_truth:
         module_parameters = dict(
             firstHighFilter="truth",
@@ -131,7 +137,8 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
         )
     else:
         module_parameters = dict(
-            firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_1.xml", "cut": filter_cut},
+            firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_1.xml", "cut": filter_cut,
+                                       "direction": direction},
             firstHighUseNStates=use_best_seeds,
 
             secondHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_2.xml", "cut": filter_cut},
@@ -149,4 +156,11 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
                     outputRelationRecoTrackStoreArrayName=cdc_reco_tracks,
                     relatedRecoTrackStoreArrayName=svd_reco_tracks,
+
+                    advanceHighFilterParameters={"direction": direction},
+                    reverseSeed=reverse_seed,
+
+                    writeOutDirection=direction,
+                    relationCheckForDirection=direction,
+
                     **module_parameters)

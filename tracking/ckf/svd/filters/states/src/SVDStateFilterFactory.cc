@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/SloppyFilter.icc.h>
@@ -50,6 +51,9 @@ namespace {
 
   /// MVA filter for svd states
   using MVASVDStateFilter = NegativeFilter<MVAFilter<VariadicUnionVarSet<SVDStateBasicVarSet>>>;
+
+  /// And filter for svd states
+  using AndSVDStateFilter = AndFilter<BaseSVDStateFilter>;
 
   /// Prescaled recording filter for VXD - CDC relations.
   class SloppyRecordingSVDStateFilter : public RecordingSVDStateFilter {
@@ -122,6 +126,11 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
+  } else if (filterName == "mva_with_direction_check") {
+    return std::make_unique<AndSVDStateFilter>(
+             std::make_unique<NonIPCrossingSVDStateFilter>(),
+             std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml")
+           );
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingSVDStateFilter>("SVDStateFilter.root");
   } else {

@@ -11,6 +11,7 @@
 #include <tracking/ckf/svd/findlets/CKFToSVDFindlet.h>
 
 #include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
@@ -64,7 +65,7 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
 
-  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva_with_direction_check");
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
   moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("mva");
   moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");

@@ -17,6 +17,7 @@
 #include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 #include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
@@ -59,7 +60,7 @@ namespace Belle2 {
     CKFToSVDFindlet();
 
     /// Default desctructor
-    ~CKFToSVDFindlet();
+    ~CKFToSVDFindlet() override;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -81,7 +82,7 @@ namespace Belle2 {
     /// Findlet for loading the space points
     SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks
-    StateCreator<RecoTrack, CKFToSVDState> m_stateCreatorFromTracks;
+    StateCreatorWithReversal<CKFToSVDState> m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
     /// Findlet for creating relations between states

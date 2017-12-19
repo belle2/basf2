@@ -12,6 +12,7 @@
 
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>

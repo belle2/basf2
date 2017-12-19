@@ -35,6 +35,9 @@ from basf2_mva_python_interface.contrib_keras import State
 from basf2_mva_extensions.keras_relational import Relations, EnhancedRelations
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
 
+import warnings
+warnings.filterwarnings('ignore')
+
 
 def slice(input, begin, end):
     """
@@ -88,17 +91,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Build the keras model for training.
     """
-    def adversary_loss(l, signal):
+    def adversary_loss(signal):
         """
         Loss for adversaries outputs
-        :param l: Trade off factor for training model 2. FOr model 3 choose -1
         :param signal: If signal or background distribution should be learned.
         :return: Loss function for the discriminator part of the Network.
         """
         back_constant = 0 if signal else 1
 
         def adv_loss(y, p):
-            return -l * (y[:, 0] - back_constant) * sparse_categorical_crossentropy(y[:, 1:], p)
+            return (y[:, 0] - back_constant) * sparse_categorical_crossentropy(y[:, 1:], p)
         return adv_loss
 
     param = {'use_relation_layers': False, 'lambda': 0, 'number_bins': 10, 'adversary_steps': 5}
@@ -157,20 +159,20 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     # The following is only relevant when using Adversaries
     # See mva/examples/keras/adversary_network.py  for details
     if state.use_adv:
-        adversaries, adversary_losses_model1, adversary_losses_model2 = [], [], []
+        adversaries, adversary_losses_model = [], []
         for mode in ['signal', 'background']:
             for i in range(number_of_spectators):
                 adversary1 = Dense(units=2 * param['number_bins'], activation=tanh, trainable=False)(output)
                 adversary2 = Dense(units=2 * param['number_bins'], activation=tanh, trainable=False)(adversary1)
                 adversaries.append(Dense(units=param['number_bins'], activation=softmax, trainable=False)(adversary2))
 
-                adversary_losses_model1.append(adversary_loss(param['lambda'], mode == 'signal'))
-                adversary_losses_model2.append(adversary_loss(-1, mode == 'signal'))
+                adversary_losses_model.append(adversary_loss(mode == 'signal'))
 
         # Model which trains first part of the net
         model1 = Model(input, [output] + adversaries)
         model1.compile(optimizer=adam(),
-                       loss=[binary_crossentropy] + adversary_losses_model1, metrics=['accuracy'])
+                       loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'],
+                       loss_weights=[1] + [-parameters['lambda']] * len(adversary_losses_model))
         model1.summary()
 
         # Model which train second, adversary part of the net
@@ -179,7 +181,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         for layer in model2.layers:
             layer.trainable = not layer.trainable
 
-        model2.compile(optimizer=adam(), loss=adversary_losses_model2,
+        model2.compile(optimizer=adam(), loss=adversary_losses_model,
                        metrics=['accuracy'])
         model2.summary()
 

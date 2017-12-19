@@ -84,17 +84,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
        combined with losses of the adverserial networks.
     """
 
-    def adversary_loss(l, signal):
+    def adversary_loss(signal):
         """
         Loss for adversaries outputs
-        :param l: Trade off factor for training model 2. FOr model 3 choose -1
         :param signal: If signal or background distribution should be learned.
         :return: Loss function for the discriminator part of the Network.
         """
         back_constant = 0 if signal else 1
 
         def adv_loss(y, p):
-            return -l * (y[:, 0] - back_constant) * sparse_categorical_crossentropy(y[:, 1:], p)
+            return (y[:, 0] - back_constant) * sparse_categorical_crossentropy(y[:, 1:], p)
         return adv_loss
 
     # Define inputs for input_feature and spectator
@@ -114,7 +113,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     state.number_bins = parameters['number_bins']
 
     # build second model on top of the first one which will try to predict spectators
-    adversaries, adversary_losses_model1, adversary_losses_model2 = [], [], []
+    adversaries, adversary_losses_model = [], []
     if state.use_adv:
         for mode in ['signal', 'background']:
             for i in range(number_of_spectators):
@@ -122,13 +121,13 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
                 adversary2 = Dense(units=2 * parameters['number_bins'], activation=tanh, trainable=False)(adversary1)
                 adversaries.append(Dense(units=parameters['number_bins'], activation=softmax, trainable=False)(adversary2))
 
-                adversary_losses_model1.append(adversary_loss(parameters['lambda'], mode == 'signal'))
-                adversary_losses_model2.append(adversary_loss(-1, mode == 'signal'))
+                adversary_losses_model.append(adversary_loss(mode == 'signal'))
 
         # Model which trains first part of the net
         model1 = Model(input, [output] + adversaries)
         model1.compile(optimizer=adam(lr=parameters['learning_rate']),
-                       loss=[binary_crossentropy] + adversary_losses_model1, metrics=['accuracy'])
+                       loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'],
+                       loss_weights=[1] + [-parameters['lambda']] * len(adversary_losses_model))
         model1.summary()
 
         # Model which train second, adversary part of the net
@@ -137,7 +136,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         for layer in model2.layers:
             layer.trainable = not layer.trainable
 
-        model2.compile(optimizer=adam(lr=parameters['learning_rate']), loss=adversary_losses_model2,
+        model2.compile(optimizer=adam(lr=parameters['learning_rate']), loss=adversary_losses_model,
                        metrics=['accuracy'])
         model2.summary()
 

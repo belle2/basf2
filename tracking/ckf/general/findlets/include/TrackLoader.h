@@ -27,7 +27,7 @@ namespace Belle2 {
    * Findlet for loading the seeds from the data store.
    * Also, the tracks are fitted and only the fittable tracks are passed on.
    *
-   * If a direction != "both" is given, the relations of the tracks to the given store array are checked.
+   * If a direction != "invalid" is given, the relations of the tracks to the given store array are checked.
    * If there is a relation with the weight equal to the given direction (meaning there is already a
    * partner for this direction), the track is not passed on.
    */
@@ -61,7 +61,7 @@ namespace Belle2 {
     /// Minimal pt requirement
     double m_param_minimalPtRequirement = 0.0;
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
-    std::string m_param_relationCheckForDirectionAsString = "both";
+    std::string m_param_relationCheckForDirectionAsString = "invalid";
     /// Direction parameter converted from the string parameters
     TrackFindingCDC::EForwardBackward m_param_relationCheckForDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
 

@@ -55,9 +55,11 @@ void TrackLoader::initialize()
 
   m_param_relationCheckForDirection = fromString(m_param_relationCheckForDirectionAsString);
 
-  if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Unknown) {
+  if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Invalid) {
     StoreArray<RecoTrack> relatedRecoTracks;
-    relatedRecoTracks.isRequired(m_param_relationRecoTrackStoreArrayName);
+    if (not relatedRecoTracks.isOptional(m_param_relationRecoTrackStoreArrayName)) {
+      m_param_relationCheckForDirection = TrackFindingCDC::EForwardBackward::c_Invalid;
+    }
   }
 }
 
@@ -66,14 +68,17 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
   seeds.reserve(seeds.size() + m_inputRecoTracks.getEntries());
 
   for (auto& item : m_inputRecoTracks) {
-    const auto& relatedTrackWithWeight = item.template getRelatedWithWeight<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
-    const auto* relatedTrack = relatedTrackWithWeight.first;
-    const float weight = relatedTrackWithWeight.second;
-    if (m_param_relationCheckForDirection == TrackFindingCDC::EForwardBackward::c_Unknown or
-        not relatedTrack or weight != m_param_relationCheckForDirection) {
-      seeds.push_back(&item);
+    if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Invalid) {
+      const auto& relatedTrackWithWeight = item.template getRelatedWithWeight<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
+      const auto* relatedTrack = relatedTrackWithWeight.first;
+      const float weight = relatedTrackWithWeight.second;
+      if (not relatedTrack or weight != m_param_relationCheckForDirection) {
+        seeds.push_back(&item);
+      } else {
+        B2DEBUG(100, "Do not use this track, because it has already a valid relation");
+      }
     } else {
-      B2DEBUG(100, "Do not use this track, because it has already a valid relation");
+      seeds.push_back(&item);
     }
   }
 

@@ -39,9 +39,11 @@ namespace Belle2 {
       return TrackFindingCDC::EForwardBackward::c_Backward;
     } else if (directionString == "both" or directionString == "unknown") {
       return TrackFindingCDC::EForwardBackward::c_Unknown;
+    } else if (directionString == "none" or directionString == "invalid") {
+      return TrackFindingCDC::EForwardBackward::c_Invalid;
     } else {
       B2FATAL("Do not understand direction " << directionString << ". Valid names are " <<
-              "forward/above/after, backward/below/before, both/unknown");
+              "forward/above/after, backward/below/before, both/unknown, none/invalid");
     }
   }
 }

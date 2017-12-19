@@ -14,7 +14,7 @@
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
-  /// Convert a ROOT matrix to Eigen
+  /// Convert a ROOT matrix to Eigen. Checks for the correct row and column number.
   template <unsigned int NRows, unsigned int NCols, class AMatrix>
   Eigen::Matrix<double, NRows, NCols, Eigen::RowMajor> convertToEigen(const AMatrix& matrix)
   {
@@ -23,7 +23,7 @@ namespace Belle2 {
     return Eigen::Matrix<double, NRows, NCols, Eigen::RowMajor>(matrix.GetMatrixArray());
   };
 
-  /// Convert a ROOT matrix to Eigen - TVector specialisation
+  /// Convert a ROOT matrix to Eigen - TVector specialisation.  Checks for the correct row number.
   template <unsigned int NRows>
   Eigen::Matrix<double, NRows, 1> convertToEigen(const TVectorD& matrix)
   {

@@ -19,11 +19,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-PXDResultVarSet::PXDResultVarSet() : TrackFindingCDC::VarSet<PXDResultVarNames>()
-{
-  addProcessingSignalListener(&m_advancer);
-}
-
 void PXDResultVarSet::initialize()
 {
   TrackFindingCDC::VarSet<PXDResultVarNames>::initialize();

@@ -53,6 +53,7 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 
   var<named("chi2")>() = result->getChi2();
   var<named("prob")>() = 0;
+  var<named("chi2_vxd_full")>() = result->getChi2();
   var<named("chi2_vxd_max")>() = result->getMaximalChi2();
   var<named("chi2_vxd_min")>() = result->getMaximalChi2();
   var<named("chi2_vxd_mean")>() = result->getChi2() / spacePoints.size();

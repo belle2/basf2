@@ -378,7 +378,7 @@ namespace Belle2 {
     static const int nChann = 16;
     std::string* serialNum = 0;
     std::vector<float>* QE_data[nChann];
-    float lambdaFirst, lambdaStep, collEff;
+    float lambdaFirst, lambdaStep, collEff0, collEff;
 
     TBranch* bQE_data[nChann];
 
@@ -389,6 +389,7 @@ namespace Belle2 {
     tQeData->SetBranchAddress("serialNum", &serialNum);
     tQeData->SetBranchAddress("lambdaFirst", &lambdaFirst);
     tQeData->SetBranchAddress("lambdaStep", &lambdaStep);
+    tQeData->SetBranchAddress("collEff0", &collEff0);
     tQeData->SetBranchAddress("collEff", &collEff);
 
     for (int ic = 0; ic < nChann; ic++) {
@@ -408,7 +409,7 @@ namespace Belle2 {
 
       tQeData->GetEntry(ient);
 
-      auto* pmtQE = pmtQEs.appendNew(*serialNum, lambdaFirst, lambdaStep, collEff);
+      auto* pmtQE = pmtQEs.appendNew(*serialNum, lambdaFirst, lambdaStep, collEff0, collEff);
 
       for (int ic = 0; ic < nChann; ic++) {
         int tEntry = tQeData->LoadTree(ient);
@@ -438,7 +439,7 @@ namespace Belle2 {
     static const int nChann = 16;
     std::string* serialNum = 0;
     float gain_const[nChann], gain_slope[nChann], gain_ratio[nChann];
-    float hv_op;
+    float hv_op0, hv_op;
 
     // open root file and get tree
     TFile* file = new TFile(fileName.c_str(), "r");
@@ -448,6 +449,7 @@ namespace Belle2 {
     tGainData->SetBranchAddress("gain_const", &gain_const);
     tGainData->SetBranchAddress("gain_slope", &gain_slope);
     tGainData->SetBranchAddress("gain_ratio", &gain_ratio);
+    tGainData->SetBranchAddress("hv_op0", &hv_op0);
     tGainData->SetBranchAddress("hv_op", &hv_op);
 
 
@@ -458,9 +460,14 @@ namespace Belle2 {
       tGainData->GetEntry(ient);
       auto* pmtGain = pmtGains.appendNew(*serialNum);
 
+      int out_hv0 = int(-fabs(hv_op0));
+      int out_hv = int(-fabs(hv_op));
+      if (out_hv0 > 0 || out_hv > 0) B2FATAL("HV settings must be negative integers. Quitting...");
+
       for (int ic = 0; ic < nChann; ic++) {
         pmtGain->setChannelData(ic + 1, gain_const[ic], gain_slope[ic], gain_ratio[ic]);
-        pmtGain->setNominalHV(hv_op);
+        pmtGain->setNominalHV0(out_hv0);
+        pmtGain->setNominalHV(out_hv);
       }
       countPMTs++;
     }
@@ -481,7 +488,7 @@ namespace Belle2 {
     DBImportArray<TOPPmtInstallation> pmtInst;
 
     std::string* serialNum = 0;
-    int moduleCNum, arrayNum, PMTposition;
+    int moduleCNum, slotNum, arrayNum, PMTposition;
 
     // open root file and get tree
     TFile* file = new TFile(fileName.c_str(), "r");
@@ -489,6 +496,7 @@ namespace Belle2 {
 
     tInstData->SetBranchAddress("serialNum", &serialNum);
     tInstData->SetBranchAddress("moduleCNum", &moduleCNum);
+    tInstData->SetBranchAddress("slotNum", &slotNum);
     tInstData->SetBranchAddress("arrayNum", &arrayNum);
     tInstData->SetBranchAddress("PMTposition", &PMTposition);
 
@@ -497,7 +505,7 @@ namespace Belle2 {
 
     for (int ient = 0; ient < tInstData->GetEntries(); ient++) {
       tInstData->GetEntry(ient);
-      pmtInst.appendNew(*serialNum, moduleCNum, arrayNum, PMTposition);
+      pmtInst.appendNew(*serialNum, moduleCNum, slotNum, arrayNum, PMTposition);
       countPMTs++;
     }
 
@@ -521,6 +529,9 @@ namespace Belle2 {
     float hv_spec, dark_spec, qe380_spec;
     TOPPmtObsoleteData::EType type;
 
+    // the HV value must be a negative int
+    int obs_hv(0);
+
     // open root file and get tree
     TFile* file = new TFile(fileName.c_str(), "r");
     TTree* tObsData = (TTree*)file->Get(treeName.c_str());
@@ -540,7 +551,10 @@ namespace Belle2 {
       // set type to unknown for now
       type = TOPPmtObsoleteData::c_Unknown;
 
-      pmtObsData.appendNew(*serialNum, type, *cathode, hv_spec, dark_spec, qe380_spec);
+      obs_hv = (int)hv_spec;
+      if (obs_hv > 0) B2FATAL("The obsolete HV must be negative! Quitting...");
+
+      pmtObsData.appendNew(*serialNum, type, *cathode, obs_hv, dark_spec, qe380_spec);
       countPMTs++;
     }
 
@@ -678,13 +692,16 @@ namespace Belle2 {
 
       tTtsHisto->GetEntry(ient);
 
-      B2INFO("Saving TTS histograms for PMT " << *serialNum << ", HV = " << hv);
+      int out_hv = int(-fabs(hv));
+      if (out_hv > 0) B2FATAL("HV setting must be negative. Quitting...");
+
+      B2INFO("Saving TTS histograms for PMT " << *serialNum << ", HV = " << out_hv);
 
       new(pmtTtsHistos[ient]) TOPPmtTTSHisto();
       auto* pmtTtsHisto = static_cast<TOPPmtTTSHisto*>(pmtTtsHistos[ient]);
 
       pmtTtsHisto->setSerialNumber(*serialNum);
-      pmtTtsHisto->setHv(hv);
+      pmtTtsHisto->setHv(out_hv);
       for (int ic = 0; ic < nChann; ic++) {
         pmtTtsHisto->setHistogram(ic + 1, *histo[ic]);
       }

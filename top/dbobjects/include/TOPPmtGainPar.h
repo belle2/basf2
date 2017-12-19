@@ -56,10 +56,16 @@ namespace Belle2 {
     }
 
     /**
-     * Sets the high voltage at gain of 5x10^5
+     * Sets the high voltage at gain of 2.5x10^5, without B field
      * @param HV high voltage [V]
      */
-    void setNominalHV(double HV) {m_HV = HV;}
+    void setNominalHV0(int HV) {m_HV_noB = HV;}
+
+    /**
+     * Sets the high voltage at gain of 2.5x10^5, with B field
+     * @param HV high voltage [V]
+     */
+    void setNominalHV(int HV) {m_HV_withB = HV;}
 
     /**
      * Returns PMT serial number
@@ -104,10 +110,16 @@ namespace Belle2 {
     }
 
     /**
-     * Returns nominal HV (corresponding to a gain of 5x10^5 at B = 0)
+     * Returns nominal HV (corresponding to a gain of 2.5x10^5 at B = 0)
      * @return HV in [V]
      */
-    double getNominalHV() const {return m_HV;}
+    int getNominalHV0() const {return m_HV_noB;}
+
+    /**
+     * Returns nominal HV (corresponding to a gain of 2.5x10^5 at B = 1.5T)
+     * @return HV in [V]
+     */
+    int getNominalHV() const {return m_HV_withB;}
 
     /**
      * Returns channel gain at B = 0 for a given high voltage
@@ -145,7 +157,8 @@ namespace Belle2 {
     float m_constant[c_NumChannels] = {0}; /**< constant */
     float m_slope[c_NumChannels] = {0};    /**< slope */
     float m_ratio[c_NumChannels] = {0};    /**< ratio of gains at B = 1.5 T and B = 0 */
-    float m_HV = 0;                        /**< high voltage for the gain of 5x10^5 */
+    int m_HV_noB = 0;                      /**< high voltage for the gain of 2.5x10^5, no B field */
+    int m_HV_withB = 0;                    /**< high voltage for the gain of 2.5x10^5, with B field */
 
     ClassDef(TOPPmtGainPar, 2); /**< ClassDef */
 

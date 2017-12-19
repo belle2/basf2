@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param hv HV setting
      */
     TOPPmtTTSHisto(const std::string& serialNumber,
-                   float hv):
+                   int hv):
       m_serialNumber(serialNumber), m_hv(hv), m_histo()
     {}
 
@@ -53,7 +53,7 @@ namespace Belle2 {
      * Set HV setting used for TTS measurement
      * @param hv high voltage setting
      */
-    void setHv(float hv) {m_hv = hv;}
+    void setHv(int hv) {m_hv = hv;}
 
     /**
      * Append new element to the array
@@ -75,7 +75,7 @@ namespace Belle2 {
      * Returns HV setting used for TTS measurement
      * @return hv
      */
-    float getHv() const {return m_hv;}
+    int getHv() const {return m_hv;}
 
     /**
      * Returns TTS histogram for a specified channel and HV setting
@@ -93,7 +93,7 @@ namespace Belle2 {
   private:
 
     std::string m_serialNumber;      /**< serial number, e.g. JTxxxx */
-    float m_hv;                      /**< HV setting for which the set of histograms were taken */
+    int m_hv;                        /**< HV setting for which the set of histograms were taken */
     TH1F m_histo[c_NumChannels];     /**< array of TTS histograms of measured TTS (one for each channel),
               *   for the specific HV setting
               */

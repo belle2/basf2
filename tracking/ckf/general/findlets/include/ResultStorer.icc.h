@@ -12,6 +12,7 @@
 #include <tracking/ckf/general/findlets/ResultStorer.dcl.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/ckf/general/utilities/SearchDirection.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/core/ModuleParamList.icc.h>
@@ -31,6 +32,10 @@ namespace Belle2 {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRelationRecoTrackStoreArrayName"),
                                   m_param_outputRelationRecoTrackStoreArrayName,
                                   "StoreArray name of the tracks, the output reco tracks should be related to.");
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeOutDirection"),
+                                  m_param_writeOutDirectionAsString,
+                                  "Write out the relations with the direction of the VXD part as weight");
   }
 
   /// Create the store arrays
@@ -48,6 +53,8 @@ namespace Belle2 {
 
     StoreArray<RecoTrack> relationRecoTracks(m_param_outputRelationRecoTrackStoreArrayName);
     relationRecoTracks.registerRelationTo(m_outputRecoTracks);
+
+    m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
   }
 
   /// Store the reco tracks and the relations
@@ -71,7 +78,7 @@ namespace Belle2 {
       if (not seed) {
         continue;
       }
-      seed->addRelationTo(newRecoTrack);
+      seed->addRelationTo(newRecoTrack, m_param_writeOutDirection);
     }
   }
 }

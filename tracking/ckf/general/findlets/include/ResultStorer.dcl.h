@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -38,6 +39,10 @@ namespace Belle2 {
 
   private:
     // Parameters
+    /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
+    std::string m_param_writeOutDirectionAsString = "both";
+    /// Direction parameter converted from the string parameters
+    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
     /// Export the tracks or not
     bool m_param_exportTracks = true;
     /// StoreArray name of the output Track Store Array.

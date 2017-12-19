@@ -1,5 +1,5 @@
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.015,
-                overlap_cut=0.3, use_best_seeds=10, use_best_results=2):
+def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,
+                overlap_cut=0.2, use_best_seeds=10, use_best_results=2):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
@@ -37,7 +37,6 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
             thirdHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_3.xml"},
             thirdHighUseNStates=use_best_seeds,
 
-            filter="mva",
             filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_PXDTrackCombination.xml"},
             useBestNInSeed=use_best_results,
         )

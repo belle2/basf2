@@ -209,6 +209,8 @@ class VxdCdcMergerHarvesterPRSide(HarvestingModule):
         else:
             result["matched_store_array_number"] = -1
 
+        result["number_of_matches"] = pr_track.getRelationsWith(self.others).size()
+
         return result
 
     save_tree = refiners.SaveTreeRefiner()

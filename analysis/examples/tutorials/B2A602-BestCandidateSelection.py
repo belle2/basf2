@@ -15,13 +15,10 @@
 # ntuple->Scan("D0__dM:D0__chiProb:D0__absdM_rank:D0__chiProb_rank:D0_mcErrors")
 #
 #
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers,
-# or by specifying other input files via the -i argument to basf2.
-#
 # based on B2A403-KFit-VertexFit.py
 #
 # Contributors: C. Pulvermacher
+#               I. Komarov (Demeber 2017)
 #
 ######################################################
 
@@ -31,10 +28,10 @@ from stdCharged import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/cc2dstar/mcprod1405/BGx1/mc35_cc2dstar_BGx1_s00/cc2dstar_e0001r001*_s00_BGx1.mdst.root'
+    ['/hsm/belle/bdata2/users/ikomarov/tutorial_samples/mdst-dstars.root'
      ]
 
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #

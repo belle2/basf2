@@ -22,6 +22,7 @@
 #
 # Contributors: A. Zupanc  (June 2014 - B2A301)
 #               M. Barrett (November 2017)
+#               I. Komarov (December 2017)
 #
 ######################################################
 
@@ -35,8 +36,8 @@ from modularAnalysis import ntupleTree
 from stdCharged import *
 
 
-filelistSIG = [('/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/'
-                'prod00000972/s00/e0000/4S/r00000/ccbar/sub00/mdst_001680_prod00000972_task00001682.root')]
+filelistSIG = [('/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002171\
+/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00002171_task00000001.root')]
 inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
@@ -63,7 +64,7 @@ matchMCTruth('D*+')
 # add the ParticleMCDecayString module to the analysis
 # More details on the format of the MC decay string can be found here:
 # https://confluence.desy.de/display/BI/Physics+MCDecayString
-analysis_main.add_module('ParticleMCDecayString', listName='D*+', conciseString=False)
+analysis_main.add_module('ParticleMCDecayString', listName='D*+', conciseString=False, fileName='my_hashmap.root')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsDST = ['EventMetaData', '^D*+']
@@ -73,7 +74,11 @@ toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
 # The MCDecayStrings are added to the NtupleTools via the following:
-toolsDST += ['MCDecayString', '^D*+']
+from variables import variables
+variables.addAlias('decayHash', 'extraInfo(DecayHash)')
+variables.addAlias('decayHashExtended', 'extraInfo(DecayHashExtended)')
+
+toolsDST += ['CustomFloats[decayHash:decayHashExtended]', 'D*+']
 
 # write out the flat ntuple
 ntupleFile('B2A504-Dstar2D0Pi-Reconstruction.root')

@@ -30,6 +30,7 @@
 #
 # Contributors: A. Zupanc (June 2014)
 #               S. Spataro (October 2017)
+#               I. Komarov (December 2017)
 #
 ######################################################
 
@@ -50,13 +51,13 @@ from stdFSParticles import stdPi0s
 # Signal file from A104 reconstructed with background
 inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
 
-# Background file from MC8 generic sample - charged
+# Background file from MC9 generic sample - charged
 # inputMdst('default',
-# 	'/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000964/s00/e0000/4S/r00000/charged/sub00/mdst_001706_prod00000964_task00001706.root')
+# 	'/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002167/e0000/4S/r00000/charged/sub00/mdst_000001_prod00002167_task00000001.root')
 
-# Background file from MC8 generic sample - ccbar
+# Background file from MC9 generic sample - ccbar
 # inputMdst('default',
-# 	'/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000972/s00/e0000/4S/r00000/ccbar/sub00/mdst_001678_prod00000972_task00001680.root')
+# 	'/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002171/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00002171_task00000001.root')
 
 # Apply a selection at the event level, to avoid
 # processing useless events

@@ -95,6 +95,7 @@ std::map<std::string, std::string> PXDStateFilterFactory::getValidFilterNamesAnd
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in pxd"},
     {"recording", "record variables to a TTree"},
+    {"mva_with_direction_check", "MVA filter with direction check"},
     {"mva", "MVA filter"},
     {"sloppy_recording", "record variables to a TTree"},
   };
@@ -121,10 +122,12 @@ PXDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCPXDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root");
-  } else if (filterName == "mva") {
+  } else if (filterName == "mva_with_direction_check") {
     return std::make_unique<AndPXDStateFilter>(
              std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml"),
              std::make_unique<NonIPCrossingPXDStateFilter>());
+  } else if (filterName == "mva") {
+    return std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml");
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingPXDStateFilter>("PXDStateFilter.root");
   } else {

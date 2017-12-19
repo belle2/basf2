@@ -68,7 +68,7 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
   moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");
 
-  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva_with_direction_check");
   moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("mva");
   moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("mva");
 

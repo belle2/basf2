@@ -20,7 +20,6 @@ namespace Belle2 {
   class ECLTrig;
   class ECLDsp;
 
-
   class ECLUnpackerModule : public Module {
   public:
     ECLUnpackerModule();

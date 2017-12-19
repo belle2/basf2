@@ -8,25 +8,25 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/ckf/svd/findlets/SVDStateCreatorWithReversal.h>
-
-#include <tracking/ckf/svd/entities/CKFToSVDState.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
 
 #include <framework/core/ModuleParamList.icc.h>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+namespace Belle2 {
 
-void SVDStateCreatorWithReversal::apply(const std::vector<RecoTrack*>& objects, std::vector<CKFToSVDState>& states)
-{
-  for (const RecoTrack* object : objects) {
-    states.emplace_back(object, m_param_reverseSeed);
+  template <class AState>
+  void StateCreatorWithReversal<AState>::apply(const std::vector<RecoTrack*>& objects, std::vector<AState>& states)
+  {
+    for (const RecoTrack* object : objects) {
+      states.emplace_back(object, m_param_reverseSeed);
+    }
   }
-}
 
-void SVDStateCreatorWithReversal::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter("reverseSeed",
-                                m_param_reverseSeed,
-                                "Reverse the seed.");
+  template <class AState>
+  void StateCreatorWithReversal<AState>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  {
+    moduleParamList->addParameter("reverseSeed",
+                                  m_param_reverseSeed,
+                                  "Reverse the seed.");
+  }
 }

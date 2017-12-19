@@ -16,6 +16,7 @@
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>

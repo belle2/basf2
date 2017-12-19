@@ -16,17 +16,17 @@
 
 namespace Belle2 {
   class RecoTrack;
-  class CKFToSVDState;
   class ModuleParamList;
 
+  template <class AState>
   /// An adaption of the normal state creator introducing another parameter to reverse the seed.
-  class SVDStateCreatorWithReversal : public StateCreator<RecoTrack, CKFToSVDState> {
+  class StateCreatorWithReversal : public StateCreator<RecoTrack, AState> {
     /// Parent class
-    using Super = StateCreator<RecoTrack, CKFToSVDState>;
+    using Super = StateCreator<RecoTrack, AState>;
 
   public:
     /// Create states from the space points, including a reverse flag or not
-    void apply(const std::vector<RecoTrack*>& objects, std::vector<CKFToSVDState>& states) final;
+    void apply(const std::vector<RecoTrack*>& objects, std::vector<AState>& states) final;
 
     /// Expose the parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

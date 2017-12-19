@@ -50,6 +50,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   }
 
   var<named("chi2")>() = result->getChi2();
+  var<named("chi2_vxd_full")>() = result->getChi2();
   var<named("chi2_vxd_max")>() = result->getMaximalChi2();
   var<named("chi2_vxd_min")>() = result->getMinimalChi2();
   var<named("weight_sum")>() = result->getWeightSum();

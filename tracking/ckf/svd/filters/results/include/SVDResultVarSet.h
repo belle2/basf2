@@ -23,6 +23,7 @@ namespace Belle2 {
     "chi2_vxd_max",
     "chi2_vxd_min",
     "chi2_vxd_mean",
+    "chi2_vxd_full",
     "number_of_hits",
     "pt",
     "chi2_cdc",

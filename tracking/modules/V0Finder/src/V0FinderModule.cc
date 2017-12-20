@@ -41,21 +41,21 @@ V0FinderModule::V0FinderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input tracks
-  addParam("RecoTrackColName", m_RecoTrackColName,
+  addParam("RecoTrackColName", m_arrayNameRecoTrack,
            "RecoTrack collection name (input)", std::string(""));
-  addParam("TFRColName", m_TFRColName,
+  addParam("TFRColName", m_arrayNameTFResult,
            "Belle2::TrackFitResult collection name (input).  Note that the V0s "
            "use pointers indices into these arrays, so all hell may break loose "
            "if you change this.", std::string(""));
-  addParam("TrackColName", m_TrackColName,
+  addParam("TrackColName", m_arrayNameTrack,
            "Belle2::Track collection name (input).  Note that the V0s use "
            "pointers indices into these arrays, so all hell may break loose "
            "if you change this.", std::string(""));
 
   // output: V0s
-  addParam("V0ColName", m_V0ColName, "V0 collection name (output)", std::string(""));
+  addParam("V0ColName", m_arrayNameV0, "V0 collection name (output)", std::string(""));
   addParam("Validation", m_validation, "Create output for validation.", bool(false));
-  addParam("V0ValidationVertexColName", m_V0ValidationVertexColName, "V0ValidationVertex collection name (optional output)",
+  addParam("V0ValidationVertexColName", m_arrayNameV0ValidationVertex, "V0ValidationVertex collection name (optional output)",
            std::string(""));
 
   addParam("beamPipeRadius", m_beamPipeRadius,
@@ -68,28 +68,23 @@ V0FinderModule::V0FinderModule() : Module()
 }
 
 
-V0FinderModule::~V0FinderModule()
-{
-}
-
-
 void V0FinderModule::initialize()
 {
-  StoreArray<Track> tracks(m_TrackColName);
+  StoreArray<Track> tracks(m_arrayNameTrack);
   tracks.isRequired();
 
-  StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
+  StoreArray<TrackFitResult> trackFitResults(m_arrayNameTFResult);
   trackFitResults.isRequired();
 
-  StoreArray<RecoTrack> recoTracks(m_RecoTrackColName);
+  StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
   recoTracks.isRequired();
 
-  StoreArray<V0> v0s(m_V0ColName);
+  StoreArray<V0> v0s(m_arrayNameV0);
   v0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   if (m_validation) {
     B2DEBUG(300, "Register DataStore for validation.");
-    StoreArray<V0ValidationVertex> validationV0s(m_V0ValidationVertexColName);
+    StoreArray<V0ValidationVertex> validationV0s(m_arrayNameV0ValidationVertex);
     validationV0s.registerInDataStore(DataStore::c_WriteOut);
   }
 
@@ -103,13 +98,9 @@ void V0FinderModule::initialize()
 }
 
 
-void V0FinderModule::beginRun()
-{
-}
-
 void V0FinderModule::event()
 {
-  StoreArray<Track> tracks(m_TrackColName);
+  StoreArray<Track> tracks(m_arrayNameTrack);
   const int nTracks = tracks.getEntries();
 
   if (nTracks == 0)
@@ -146,7 +137,7 @@ void V0FinderModule::event()
     return;
   }
 
-  V0Fitter v0Fitter(m_TFRColName, m_V0ColName, m_V0ValidationVertexColName, m_RecoTrackColName);
+  V0Fitter v0Fitter(m_arrayNameTFResult, m_arrayNameV0, m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack);
   v0Fitter.initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
   if (m_validation) {
     v0Fitter.enableValidation();
@@ -161,12 +152,4 @@ void V0FinderModule::event()
       v0Fitter.fitAndStore(trackPlus, trackMinus, Const::antiLambda);
     }
   }
-}
-
-void V0FinderModule::endRun()
-{
-}
-
-void V0FinderModule::terminate()
-{
 }

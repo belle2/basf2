@@ -152,14 +152,14 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, isROIsimulation=False, useNN=False, useCoG=True):
+def add_hit_preparation_modules(path, components=None):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
     """
 
     # Preparation of the SVD clusters
     if is_svd_used(components):
-        add_svd_reconstruction(path, isROIsimulation, useNN, useCoG)
+        add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
     if is_pxd_used(components):

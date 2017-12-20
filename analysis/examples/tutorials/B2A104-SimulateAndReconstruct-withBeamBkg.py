@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # ######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform detector simulation
 # and reconstruction (track finding+track fitting+ecl reconstruction+...)
 # on a previously generated events with beam background mixing.

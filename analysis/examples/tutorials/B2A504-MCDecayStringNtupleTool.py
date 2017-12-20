@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This Tutorial demonstrates how to use the
 # MCDecayString NtupleTool.
 #

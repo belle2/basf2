@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial exemplifies how a best-candidate selection
 # can be performed using rankByLowest()/rankByHighest() for
 # different variables.

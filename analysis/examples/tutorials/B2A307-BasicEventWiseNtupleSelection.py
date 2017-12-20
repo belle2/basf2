@@ -3,6 +3,8 @@
 
 #########################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial shows how to apply event based selections
 # before filling particle lists, to reject useless events
 # without further processing. In this case the cut is on

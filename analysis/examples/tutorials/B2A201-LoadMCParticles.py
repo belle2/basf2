@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to load generated final
 # state particles (MCParticle objects) as Particles and
 # create ParticleLists for each final state particle

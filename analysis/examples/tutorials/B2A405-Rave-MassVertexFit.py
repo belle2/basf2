@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform mass constraine
 # Vertex fits using Rave. The following  decay chain
 # (and c.c. decay chain):

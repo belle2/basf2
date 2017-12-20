@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform Vertex fits
 # using KFit. The following  decay chain (and c.c. decay
 # chain):

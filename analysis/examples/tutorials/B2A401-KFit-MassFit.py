@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform mass fit with
 # the KFit. In this example the following decay chain:
 #
@@ -24,6 +26,7 @@
 ######################################################
 
 from basf2 import *
+from mdst import add_mdst_output
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
@@ -80,6 +83,7 @@ toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
 ntupleFile('B2A401-KFit-MassFit.root')
 ntupleTree('b0', 'B0:all', toolsB0)
 ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
+
 
 # Process the events
 process(analysis_main)

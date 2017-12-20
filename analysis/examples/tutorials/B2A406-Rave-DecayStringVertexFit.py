@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+########################################################
+#
+# Stuck? Ask for help at questions.belle2.org
 #
 # This tutorial demonstrates how to perform Vertex fits
 # using Rave. The following  decay chain (and c.c. decay

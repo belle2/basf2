@@ -38,12 +38,12 @@ from modularAnalysis import massVertexRave
 from modularAnalysis import vertexRaveDaughtersUpdate
 from stdCharged import *
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/cc2dstar/mcprod1405/BGx1/mc35_cc2dstar_BGx1_s00/cc2dstar_e0001r001*_s00_BGx1.mdst.root'
-     ]
 
-inputMdstList('MC5', filelistSIG)
+# Add MC9 signal samples
+filelistSIG = [('/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002171\
+/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00002171_task00000001.root')]
+
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #

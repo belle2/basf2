@@ -37,7 +37,7 @@ from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdCharged import *
 
-
+# Add MC9 signal samples
 filelistSIG = [('/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002171\
 /e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00002171_task00000001.root')]
 inputMdstList('default', filelistSIG)

@@ -3,8 +3,6 @@
 
 #######################################################
 #
-# Stuck? Ask for help at questions.belle2.org
-#
 # This tutorial demonstrates how to perform mass fit with
 # the KFit. In this example the following decay chain:
 #
@@ -26,7 +24,6 @@
 ######################################################
 
 from basf2 import *
-from mdst import add_mdst_output
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
@@ -37,11 +34,10 @@ from modularAnalysis import massKFit
 from stdFSParticles import stdPi0s
 
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
-     ]
+filelistSIG = ['/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/\
+prod00002166/e0000/4S/r00000/mixed/sub00/mdst_000001_prod00002166_task00000001.root']
 
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #
@@ -83,7 +79,6 @@ toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
 ntupleFile('B2A401-KFit-MassFit.root')
 ntupleTree('b0', 'B0:all', toolsB0)
 ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
-
 
 # Process the events
 process(analysis_main)

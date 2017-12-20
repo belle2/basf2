@@ -46,7 +46,7 @@ outfile = step + '.root'
 # Perform analysis.
 main = create_path()
 
-inputMdstList('MC5', input, path=main)
+inputMdstList('default', input, path=main)
 
 fillParticleList('gamma:all', '', path=main)
 fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)

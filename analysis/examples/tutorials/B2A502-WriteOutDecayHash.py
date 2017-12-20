@@ -28,10 +28,10 @@ from decayHash import DecayHashMap
 # set the log level
 set_log_level(LogLevel.WARNING)
 
-# Bd_JpsiKL_ee Signal MC 7 file
-inputFile = "/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/" \
-            "prod00000628/s00/e0000/4S/r00000/signal/sub00/mdst_000001_prod00000628_task00000001.root"
-inputMdstList('MC7', inputFile)
+# Bd_JpsiKL_ee Signal MC file
+# Generated for release-01-00-00
+inputFile = "/hsm/belle/bdata2/users/ikomarov/tutorial_samples/1111540100.dst.root"
+inputMdstList('default', inputFile)
 
 
 # reconstruct the decay

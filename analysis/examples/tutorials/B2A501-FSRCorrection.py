@@ -34,6 +34,7 @@ from modularAnalysis import *
 set_log_level(LogLevel.WARNING)
 
 # Bd_JpsiKL_ee Signal MC file
+# Generated for release-01-00-00
 inputFile = "/hsm/belle/bdata2/users/ikomarov/tutorial_samples/1111540100.dst.root"
 
 inputMdstList('default', inputFile)

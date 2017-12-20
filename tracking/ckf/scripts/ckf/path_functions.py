@@ -1,5 +1,6 @@
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,
-                overlap_cut=0.2, use_best_seeds=10, use_best_results=2):
+def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.015,
+                overlap_cut=0.0, use_best_seeds=10, use_best_results=2):
+
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
@@ -44,6 +45,12 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
     path.add_module("ToPXDCKF",
                     inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
+                    # hitFilter="sensor",
+                    hitFilter="all",
+                    # seedFilter="distance",
+                    seedFilter="all",
+                    hitHitJumping=6,
+                    seedHitJumping=6,
                     **module_parameters)
 
 
@@ -108,7 +115,7 @@ def add_seeded_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, tem
 
 
 def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
-                filter_cut=0.1, overlap_cut=0.0, use_best_results=3, use_best_seeds=5):
+                filter_cut=0.015, overlap_cut=0.0, use_best_results=3, use_best_seeds=5):  # filter_cut = 0.1 -> 0.015
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
@@ -173,8 +180,12 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
-                    hitFilter="sensor",
-                    seedFilter="distance",
+                    # hitFilter="sensor",
+                    hitFilter="all",
+                    # seedFilter="distance",
+                    seedFilter="all",
+                    hitHitJumping=6,
+                    seedHitJumping=6,
 
                     enableOverlapResolving=True,
 

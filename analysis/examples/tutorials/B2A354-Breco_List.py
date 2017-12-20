@@ -3,6 +3,8 @@
 
 #####################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 #   Hadronic B Skim
 # This skim reconstructed B+ and B0 decays via hadronic modes and returns a list #of Bmesons which is then written to a uDST file.
 #

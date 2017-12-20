@@ -3,6 +3,8 @@
 
 ######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # Y(4S) -> BBbar event generation
 #
 # This tutorial demonstrates how to generate

@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to include the flavor
 # tagging user interphase into your analysis IN THE
 # SPECIAL CASE you use BELLE MONTE CARLO OR BELLE DATA.

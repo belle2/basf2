@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This describes the keras model for the training in B2A712.
 # To understand the code, the keras documentation is a good starting point.
 # Also have a look at the contrib keras interface in:

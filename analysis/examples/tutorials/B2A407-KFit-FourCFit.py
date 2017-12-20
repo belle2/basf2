@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ###################################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform four momentum constraint
 # fit with the KFit. In this example the following decay chain:
 #

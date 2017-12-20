@@ -36,7 +36,7 @@ from basf2_mva_extensions.keras_relational import Relations, EnhancedRelations
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
 
 import warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore', category=UserWarning)
 
 
 def slice(input, begin, end):

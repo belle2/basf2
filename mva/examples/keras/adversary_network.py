@@ -32,7 +32,7 @@ from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
 from sklearn.metrics import roc_auc_score
 
 import warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore', category=UserWarning)
 
 
 class batch_generator():

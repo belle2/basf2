@@ -31,7 +31,7 @@ def add_mdst_output(
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLClusters',
-        'ECLClustersToTracks',
+        'TracksToECLClusters',
         'KLMClusters',
         'KLMClustersToTracks',
         'KlIds',

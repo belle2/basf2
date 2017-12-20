@@ -138,7 +138,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat)
   evt_data.clear();
   tc_data.clear();
 
-  for (int j = 20; j < 144; j++) {
+  for (int j = 0; j < 144; j++) {
     tmp1 = kdat[11 * j + 10] & 0xFF;
     tmp2 = kdat[11 * j +  9] & 0xFF;
     tmp3 = kdat[11 * j +  8] & 0xFC;

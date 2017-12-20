@@ -413,7 +413,7 @@ def add_ecl_track_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)

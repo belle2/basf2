@@ -30,9 +30,9 @@ namespace Belle2 {
 
   public:
     /// Constructor for the V0Fitter.
-    V0Fitter(const std::string& trackFitResultColName = "", const std::string& v0ColName = "",
-             const std::string& v0ValidationVertexColName = "",
-             const std::string& gfTrackColName = "");
+    V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
+             const std::string& v0ValidationVerticesName = "",
+             const std::string& recoTracksName = "");
 
     /// Enable validation output.
     void enableValidation() { m_validation = true; }
@@ -86,7 +86,7 @@ namespace Belle2 {
 
   private:
     bool m_validation;  ///< Validation flag.
-    std::string m_RecoTrackColName;   ///< RecoTrackColName (input).
+    std::string m_recoTracksName;   ///< RecoTrackColName (input).
 
     StoreArray<TrackFitResult> m_trackFitResults;  ///< TrackFitResultColName (output).
     StoreArray<V0> m_v0s;  ///< V0ColName (output).

@@ -20,14 +20,11 @@
 
 using namespace Belle2;
 
-V0Fitter::V0Fitter(const std::string& trackFitResultColName, const std::string& v0ColName,
-                   const std::string& v0ValidationVertexColName, const std::string& gfTrackColName)
-  : m_validation(false), m_RecoTrackColName(gfTrackColName)
-{
-  m_trackFitResults = StoreArray<TrackFitResult>(trackFitResultColName);
-  m_v0s = StoreArray<V0>(v0ColName);
-  m_validationV0s = StoreArray<V0ValidationVertex>(v0ValidationVertexColName);
-}
+V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
+                   const std::string& v0ValidationVerticesName, const std::string& recoTracksName)
+  : m_validation(false), m_recoTracksName(recoTracksName), m_trackFitResults(trackFitResultsName), m_v0s(v0sName),
+    m_validationV0s(v0ValidationVerticesName)
+{}
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
                               double vertexChi2CutOutside)
@@ -150,7 +147,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
-  RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_RecoTrackColName);
+  RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_recoTracksName);
   if (not recoTrackPlus) {
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
@@ -165,7 +162,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
+  RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
   if (not recoTrackMinus) {
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;

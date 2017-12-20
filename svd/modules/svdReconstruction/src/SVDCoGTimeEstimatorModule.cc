@@ -128,9 +128,12 @@ void SVDCoGTimeEstimatorModule::event()
   //start loop on SVDSHaperDigits
   Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
-  for (const SVDShaperDigit& shaper : m_storeShaper) {
+  for (const SVDShaperDigit& shaper : storeShapers) {
 
-    m_NumberOfAPVSamples = fromModeToNumberOfSample((int)shaper.getModeByte().getDAQMode());
+    SVDModeByte modeByte = shaper.getModeByte();
+    m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
+    B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
+
     if (m_NumberOfAPVSamples == -1)
       continue;
 
@@ -153,7 +156,7 @@ void SVDCoGTimeEstimatorModule::event()
     m_amplitude = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, m_amplitude);
     m_amplitudeError = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, m_amplitudeError);
     m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
-    SVDModeByte::baseType triggerBin = (shaper.getModeByte()).getTriggerBin();
+    SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
     m_weightedMeanTime -= (DeltaT / 8 + ((int)triggerBin) * DeltaT / 4);
     m_weightedMeanTime -= m_PulseShapeCal.getTimeShiftCorrection(thisSensorID, thisSide, thisCellID);
     m_weightedMeanTime -= m_PulseShapeCal.getTriggerBinDependentCorrection(thisSensorID, thisSide, thisCellID, (int)triggerBin);

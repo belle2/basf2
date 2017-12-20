@@ -24,15 +24,13 @@ if not len(inputFiles):
     print(' Please specify input files for calibration via the -i option of basf2')
     sys.exit(1)
 
-# use_local_database("centraldb/dbcache.txt")
-
 # Pre-collector full standard reconstruction path
 main = create_path()
 main.add_module("RootInput")
 # path.add_module("Gearbox")
 main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
 components = [
-    'MagneticFieldConstant4LimitedRCDC',
+    'MagneticField',
     'BeamPipe',
     'PXD',
     'SVD',

@@ -33,7 +33,7 @@ main.add_module('Geometry')
 
 # detector reconstruction
 components = [
-    'MagneticFieldConstant4LimitedRCDC',
+    'MagneticField',
     'BeamPipe',
     'PXD',
     'SVD',

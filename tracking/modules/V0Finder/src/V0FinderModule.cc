@@ -1,21 +1,16 @@
 #include <tracking/modules/V0Finder/V0FinderModule.h>
 
 #include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/V0.h>
-#include <tracking/dataobjects/V0ValidationVertex.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
+
 #include <tracking/v0Finding/fitter/V0Fitter.h>
+
 #include <TMath.h>
 #include <TLorentzVector.h>
-
-// TODO: This dependency can be removed, because the initialization of genfit happens centralized.
+// Needed to perform assertion of presence of setup:
 #include "genfit/FieldManager.h"
 #include "genfit/MaterialEffects.h"
 
@@ -41,26 +36,26 @@ V0FinderModule::V0FinderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input tracks
-  addParam("RecoTrackColName", m_arrayNameRecoTrack,
-           "RecoTrack collection name (input)", std::string(""));
-  addParam("TFRColName", m_arrayNameTFResult,
-           "Belle2::TrackFitResult collection name (input).  Note that the V0s "
-           "use pointers indices into these arrays, so all hell may break loose "
+  addParam("RecoTracks", m_arrayNameRecoTrack,
+           "RecoTrack StoreArray name (input)", std::string(""));
+  addParam("TrackFitResults", m_arrayNameTFResult,
+           "Belle2::TrackFitResult StoreArray name (in- and output).\n"
+           "Note that the V0s use pointers indices into these arrays, so all hell may break loose, "
            "if you change this.", std::string(""));
-  addParam("TrackColName", m_arrayNameTrack,
-           "Belle2::Track collection name (input).  Note that the V0s use "
-           "pointers indices into these arrays, so all hell may break loose "
+  addParam("Tracks", m_arrayNameTrack,
+           "Belle2::Track StoreArray name (input).\n"
+           "Note that the V0s use pointers indices into these arrays, so all hell may break loose, "
            "if you change this.", std::string(""));
 
   // output: V0s
-  addParam("V0ColName", m_arrayNameV0, "V0 collection name (output)", std::string(""));
+  addParam("V0s", m_arrayNameV0, "V0 StoreArry name (output).", std::string(""));
   addParam("Validation", m_validation, "Create output for validation.", bool(false));
-  addParam("V0ValidationVertexColName", m_arrayNameV0ValidationVertex, "V0ValidationVertex collection name (optional output)",
+  addParam("V0ValidationVertices", m_arrayNameV0ValidationVertex, "V0ValidationVertex StoreArray name (optional output)",
            std::string(""));
 
   addParam("beamPipeRadius", m_beamPipeRadius,
-           "Radius at which we switch between the two classes of cuts.  The "
-           "default is a little inside the beam pipe to allow some tolerance.",
+           "Radius at which we switch between the two classes of cuts."
+           "The default is a little inside the beam pipe to allow some tolerance.",
            1.);
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
@@ -70,31 +65,21 @@ V0FinderModule::V0FinderModule() : Module()
 
 void V0FinderModule::initialize()
 {
-  StoreArray<Track> tracks(m_arrayNameTrack);
-  tracks.isRequired();
-
-  StoreArray<TrackFitResult> trackFitResults(m_arrayNameTFResult);
-  trackFitResults.isRequired();
-
-  StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
-  recoTracks.isRequired();
-
-  StoreArray<V0> v0s(m_arrayNameV0);
-  v0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  m_recoTracks.isRequired(m_arrayNameRecoTrack);
+  m_tfResults.isRequired(m_arrayNameTFResult);
+  m_tracks.isRequired(m_arrayNameTrack);
+  m_v0s.registerInDataStore(m_arrayNameV0, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   if (m_validation) {
     B2DEBUG(300, "Register DataStore for validation.");
-    StoreArray<V0ValidationVertex> validationV0s(m_arrayNameV0ValidationVertex);
-    validationV0s.registerInDataStore(DataStore::c_WriteOut);
+    m_v0ValidationVertices.registerInDataStore(m_arrayNameV0ValidationVertex);
   }
 
-  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
-  }
+  B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
+           "Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
 
-  if (!genfit::FieldManager::getInstance()->isInitialized()) {
-    B2FATAL("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
-  }
+  B2ASSERT(genfit::FieldManager::getInstance()->isInitialized(),
+           "Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
 }
 
 

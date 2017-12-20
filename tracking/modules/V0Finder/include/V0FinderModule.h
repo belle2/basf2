@@ -1,5 +1,15 @@
 #pragma once
+
+#include <tracking/dataobjects/V0ValidationVertex.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+#include <mdst/dataobjects/V0.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -35,15 +45,22 @@ namespace Belle2 {
     void event() override;
 
   private:
-    std::string m_arrayNameRecoTrack; ///< StoreArray name of the RecoTracks (Input).
-    std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResults matching to the created V0s (Output).
-    std::string m_arrayNameTrack;     ///< StoreArray name of the Tracks (Input).
-    std::string m_arrayNameV0;        ///< StoreArray name of the V0 (Output).
+    std::string m_arrayNameRecoTrack; ///< StoreArray name of the RecoTracks      (Input).
+    std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResults (In- and Output).
+    std::string m_arrayNameTrack;     ///< StoreArray name of the Tracks          (Input).
+    std::string m_arrayNameV0;        ///< StoreArray name of the V0              (Output).
 
     double m_beamPipeRadius;          ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;    ///< Chi2 cut for V0s outside of the beampipe. Applies to all.
 
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
+
+    StoreArray<RecoTrack>      m_recoTracks;
+    StoreArray<TrackFitResult> m_tfResults;
+    StoreArray<Track>          m_tracks;
+    StoreArray<V0>             m_v0s;
+
+    StoreArray<V0ValidationVertex> m_v0ValidationVertices;
   };
 }

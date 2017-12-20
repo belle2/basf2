@@ -129,6 +129,11 @@ void SVDCoGTimeEstimatorModule::event()
   Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
   for (const SVDShaperDigit& shaper : m_storeShaper) {
+
+    m_NumberOfAPVSamples = fromModeToNumberOfSample((int)shaper.getModeByte().getDAQMode());
+    if (m_NumberOfAPVSamples == -1)
+      continue;
+
     samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit
@@ -155,7 +160,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //check high charges and too high ADC
     if (m_amplitude > 255)
-      B2DEBUG(10, "SHIT: m_amplitude = " << m_amplitude);
+      B2DEBUG(10, "AAA: m_amplitude = " << m_amplitude);
     if (m_amplitude > 100000) {
       B2DEBUG(42, "Charge = " << m_amplitude);
       B2DEBUG(42, "corresponding ADC = " << m_PulseShapeCal.getADCFromCharge(thisSensorID, thisSide, thisCellID, m_amplitude));
@@ -210,12 +215,26 @@ void SVDCoGTimeEstimatorModule::terminate()
 
 //definition of the extra functions
 
+int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
+{
+  if (modality == 2)
+    return 6;
+  else if (modality == 1)
+    return 3;
+  else if (modality == 0)
+    return 1;
+  else {
+    return -1;
+    B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
+  }
+}
+
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
 {
   float averagetime = 0;
   float mean = 0;
   //calculate weighted average time and mean
-  for (int k = 0; k < 6; k ++) {
+  for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
     averagetime += k * samples[k];
     mean += samples[k];
   }
@@ -229,7 +248,7 @@ float SVDCoGTimeEstimatorModule::CalculateAmplitude(Belle2::SVDShaperDigit::APVF
 {
   float amplitude = 0;
   //calculate amplitude
-  for (int k = 0; k < 6; k ++) {
+  for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
     if (samples[k] > amplitude)
       amplitude = samples[k];
   }

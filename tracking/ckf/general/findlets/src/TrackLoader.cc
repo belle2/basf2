@@ -69,10 +69,18 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
 
   for (auto& item : m_inputRecoTracks) {
     if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Invalid) {
-      const auto& relatedTrackWithWeight = item.template getRelatedWithWeight<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
-      const auto* relatedTrack = relatedTrackWithWeight.first;
-      const float weight = relatedTrackWithWeight.second;
-      if (not relatedTrack or weight != m_param_relationCheckForDirection) {
+      const auto& relatedTracksWithWeight = item.template getRelationsWith<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
+      bool hasAlreadyRelation = false;
+      for (unsigned int index = 0; index < relatedTracksWithWeight.size(); ++index) {
+        const RecoTrack* relatedTrack = relatedTracksWithWeight[index];
+        const float weight = relatedTracksWithWeight.weight(index);
+        if (relatedTrack and weight == m_param_relationCheckForDirection) {
+          hasAlreadyRelation = true;
+          break;
+        }
+      }
+
+      if (not hasAlreadyRelation) {
         seeds.push_back(&item);
       } else {
         B2DEBUG(100, "Do not use this track, because it has already a valid relation");

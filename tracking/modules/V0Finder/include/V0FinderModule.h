@@ -56,11 +56,11 @@ namespace Belle2 {
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
 
-    StoreArray<RecoTrack>      m_recoTracks;
-    StoreArray<TrackFitResult> m_tfResults;
-    StoreArray<Track>          m_tracks;
-    StoreArray<V0>             m_v0s;
+    StoreArray<RecoTrack>      m_recoTracks;   ///< For requirement test; V0Finder object makes own array.
+    StoreArray<TrackFitResult> m_tfResults;    ///< For requirement test; V0Finder object makes own array.
+    StoreArray<Track>          m_tracks;       ///< Actually used array of mdst Tracks.
+    StoreArray<V0>             m_v0s;          ///< For requirement test; V0Finder object makes own array.
 
-    StoreArray<V0ValidationVertex> m_v0ValidationVertices;
+    StoreArray<V0ValidationVertex> m_v0ValidationVertices; ///< For requirement test; V0Finder object makes own array.
   };
 }

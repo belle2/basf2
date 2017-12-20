@@ -1,18 +1,12 @@
 #include <tracking/modules/V0Finder/V0FinderModule.h>
-
-#include <framework/datastore/RelationIndex.h>
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <tracking/v0Finding/dataobjects/VertexVector.h>
-
+//Object with performing the actual algorithm:
 #include <tracking/v0Finding/fitter/V0Fitter.h>
-
-#include <TMath.h>
-#include <TLorentzVector.h>
-// Needed to perform assertion of presence of setup:
+//Needed to perform assertion of presence of setup:
 #include "genfit/FieldManager.h"
 #include "genfit/MaterialEffects.h"
+
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

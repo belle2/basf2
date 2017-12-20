@@ -102,9 +102,9 @@ beast2_sensors = [
     (6, 1, 1), (6, 1, 2), (6, 1, 3), (6, 1, 4), (6, 1, 5)
 ]
 
-for sensor_id in beast2_sensors:
-    layer, ladder, sensor = sensor_id
-    millepede.fixVXDid(layer, ladder, sensor, parameters=[1, 2, 3, 4, 5, 6])
+# for sensor_id in beast2_sensors:
+#    layer, ladder, sensor = sensor_id
+#    millepede.fixVXDid(layer, ladder, sensor, parameters=[1, 2, 3, 4, 5, 6])
 
 # Note that here we replace the helper class by real Calibration class of CAF
 millepede = millepede.create('beast2_alignment', inputFiles)

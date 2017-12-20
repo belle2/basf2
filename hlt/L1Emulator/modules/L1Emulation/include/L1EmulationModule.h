@@ -12,9 +12,11 @@
 #define L1EMULATIONMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <string>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
+#include <hlt/L1Emulator/dataobjects/L1EmulationInformation.h>
 
 
 namespace Belle2 {
@@ -54,6 +56,7 @@ namespace Belle2 {
     bool makeScalefx(std::vector<int>);
 
   private:
+    StoreArray<L1EmulationInformation> m_l1EmulationInformation; /** array for L1EmulationInformation */
 
     /**the users' cut*/
     std::string m_userCut;

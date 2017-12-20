@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -26,8 +25,10 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <framework/logging/Logger.h>
+#include <framework/utilities/IOIntercept.h>
 
 #include <string>
 #include <queue>
@@ -85,7 +86,11 @@ void FragmentationModule::terminate()
 {
 
   // print internal pythia error statistics
+  IOIntercept::OutputToLogMessages statLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
+  statLogCapture.start();
   pythia->stat();
+  statLogCapture.finish();
+
 
   double ratio = 0.; //ratio of good over all events
   if (nAll) ratio = 100.0 * nGood / nAll;
@@ -99,12 +104,16 @@ void FragmentationModule::initialize()
 {
   m_mcparticles.isRequired(m_particleList);
 
-  B2INFO("Initialize PYTHIA8");
+  B2DEBUG(150, "Initialize PYTHIA8");
 
   // Generator and the shorthand PythiaEvent = pythia->event are declared in .h file
   // A simple way to collect all the changes is to store the parameter values in a separate file,
   // with one line per change. This should be done between the creation of the Pythia object
   // and the init call for it.
+
+  IOIntercept::OutputToLogMessages initLogCapture("PYTHIA", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100);
+  initLogCapture.start();
+
   pythia = new Pythia;
   PythiaEvent = &pythia->event;
   (*PythiaEvent) = 0;
@@ -148,6 +157,8 @@ void FragmentationModule::initialize()
 
   // List variable(s) that differ from their defaults
   pythia->settings.listChanged();
+
+  initLogCapture.finish();
 }
 
 //-----------------------------------------------------------------
@@ -160,7 +171,10 @@ void FragmentationModule::event()
   mcParticleGraph.loadList(m_particleList);
 
   // Reset PYTHIA event record to allow for new event
+  IOIntercept::OutputToLogMessages resetLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 100, 100);
+  resetLogCapture.start();
   PythiaEvent->reset();
+  resetLogCapture.finish();
 
   // Reset counter for added quarks and vphos
   nAdded  = 0;
@@ -209,16 +223,31 @@ void FragmentationModule::event()
   // Do the fragmentation using PYTHIA
   setReturnValue(1); //return value is 1...
   nAll = nAll + 1;
-  if (!pythia->next()) {
-    B2WARNING("pythia->next() failed, event generation aborted prematurely! Printing PythiaEvent.list():");
+
+  IOIntercept::OutputToLogMessages eventLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
+  eventLogCapture.start();
+  int success = pythia->next();
+  eventLogCapture.finish();
+
+  if (!success) {
+    B2WARNING("pythia->next() failed, event generation aborted prematurely! Set LogLevel to Debug 50 to see PYTHIA event listing.");
+    IOIntercept::OutputToLogMessages listLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
+    listLogCapture.start();
     PythiaEvent->list();
+    listLogCapture.finish();
+
     setReturnValue(-1); //return value becomes -1 if trials were not successfull
   } else {
     nGood = nGood + 1;
   }
 
   // use evtgen to perform the decay
-  if (m_useEvtGen) evtgen->decay();
+  if (m_useEvtGen) {
+    IOIntercept::OutputToLogMessages decayLogCapture("PYTHIA", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100);
+    decayLogCapture.start();
+    evtgen->decay();
+    decayLogCapture.finish();
+  }
 
   // Loop over the PYTHIA list and assign the mother-daughter relation
   // Might not work if the mother appear below the daughter in the event record

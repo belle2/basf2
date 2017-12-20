@@ -37,8 +37,11 @@ namespace Belle2 {
       /// Maximum mean of dt of all channels distribution, condition to stop iterating
       void setMaxMeanDt(double maxMeanDt) {m_maxMeanDt = maxMeanDt;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
       /// output xt T0 file name (for text mode)
-      void outputT0FileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
+      void setOutputFileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
 
     protected:
       /// Run algo on data
@@ -64,6 +67,7 @@ namespace Belle2 {
 
       bool m_debug;   /**< debug. */
       bool m_storeHisto; /**< store histo or not*/
+      bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
     };
   }// name space CDC

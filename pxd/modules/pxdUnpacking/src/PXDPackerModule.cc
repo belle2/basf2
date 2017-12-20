@@ -88,7 +88,7 @@ void PXDPackerModule::initialize()
   B2INFO("PXD Packer --> Init");
   //Register output collections
   m_storeRaws.registerInDataStore(m_RawPXDsName);
-  storeDigits.required(m_PXDDigitsName);
+  storeDigits.isRequired(m_PXDDigitsName);
 
   m_packed_events = 0;
 

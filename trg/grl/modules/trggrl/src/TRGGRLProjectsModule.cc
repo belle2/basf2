@@ -9,17 +9,16 @@
  **************************************************************************/
 
 #include <trg/grl/modules/trggrl/TRGGRLProjectsModule.h>
-#include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/ecl/dataobjects/TRGECLTrg.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/TrgEclMapping.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -173,15 +172,14 @@ void TRGGRLProjectsModule::initialize()
     TC1GeV.push_back(1. / CellCOM.E());
   }
 
-  StoreObjPtr<TRGGRLInfo>::registerPersistent(m_TrgGrlInformationName);
+  m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
 }
 
 void
 TRGGRLProjectsModule::beginRun()
 {
-  if (TRGDebug::level())
-    cout << "TRGGDLModule ... beginRun called " << endl;
+  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -334,7 +332,7 @@ void TRGGRLProjectsModule::event()
       if (dphi > 180.) {dphi = 360. - dphi;}
       float dCot = cotTrk - TCcotThetaLab[selTC[i0] - 1];
       if (dphi > 80.) {nOppHem1Trk++;}
-      if (dphi > 20. && dphi < 80. && (dCot < -0.8 || dCot > 0.6)) {nSameHem1Trk++;}
+      if (dphi < 80. && (dCot < -0.8 || dCot > 0.6)) {nSameHem1Trk++;}
     }
   }
 
@@ -346,8 +344,7 @@ void TRGGRLProjectsModule::event()
 void
 TRGGRLProjectsModule::endRun()
 {
-  if (TRGDebug::level())
-    cout << "TRGGRLProjectsModule ... endRun called " << endl;
+  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
 }
 
 

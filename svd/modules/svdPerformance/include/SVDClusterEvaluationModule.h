@@ -77,6 +77,11 @@ namespace Belle2 {
     TH1F* m_histo_StripTimeResolution[m_Nsets];
     /** Vector of histograms depicting Cluster Time Residuals */
     TH1F* m_histo_ClusterTimeResolution[m_Nsets];
+    /** Vector of histograms depicting Cluster Time Residuals, divided by TriggerBin */
+    TH1F* m_histo_ClusterTimeResolution_bin1[m_Nsets];
+    TH1F* m_histo_ClusterTimeResolution_bin2[m_Nsets];
+    TH1F* m_histo_ClusterTimeResolution_bin3[m_Nsets];
+    TH1F* m_histo_ClusterTimeResolution_bin4[m_Nsets];
     /** Vector of histograms depicting Cluster Time Pull */
     TH1F* m_histo_ClusterTimePull[m_Nsets];
     /** Vector of histograms depicting Cluster U Position Residual (Reduced length!) */
@@ -101,6 +106,8 @@ namespace Belle2 {
     TH1F* m_histo_THinClusterTM[m_Nsets];
     /** Vector of histograms depicting Number of Good TH inside a TM Cluster */
     TH1F* m_histo_GoodTHinClusterTM[m_Nsets];
+    /** Vector of histograms depicting Number of Good TH inside a Good TM Cluster */
+    TH1F* m_histo_GoodTHinClusterTMGood[m_Nsets];
 
     /** Vectors of floats containing the mean and the RMS from the corresponding histo */
     float m_mean_StripTimeResolution[m_Nsets];
@@ -119,6 +126,8 @@ namespace Belle2 {
     float m_RMS_THinClusterTM[m_Nsets];
     float m_mean_GoodTHinClusterTM[m_Nsets];
     float m_RMS_GoodTHinClusterTM[m_Nsets];
+    float m_mean_GoodTHinClusterTMGood[m_Nsets];
+    float m_RMS_GoodTHinClusterTMGood[m_Nsets];
 
     /** Vectors used to Draw the TGraphs (defined in the cc) depicting the averages and the means of the histos above for the various sets of sensor*/
     float m_OrderingVec[m_Nsets] = {1., 2., 3., 4., 5., 6.};
@@ -137,6 +146,7 @@ namespace Belle2 {
     TList* m_histoList_THinCluster;
     TList* m_histoList_THinClusterTM;
     TList* m_histoList_GoodTHinClusterTM;
+    TList* m_histoList_GoodTHinClusterTMGood;
     TList* m_graphList;
 
     /** Vectors used to compute the quantities depicted in Histos and Graphs */

@@ -77,6 +77,11 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
            m_PARAMmaxFamilies);
 
+  addParam("maxNetworkSize",
+           m_PARAMmaxNetworkSize,
+           "Maximal size of the segment network; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxNetworkSize);
+
 }
 
 
@@ -107,8 +112,13 @@ void TrackFinderVXDCellOMatModule::event()
 {
   m_eventCounter++;
 
-
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
+
+  if (segmentNetwork.size() > m_PARAMmaxNetworkSize) {
+    B2ERROR("Size of network provided by the SegmentNetworkProducer exceeds the limit of " << m_PARAMmaxNetworkSize
+            << ". Network size is " << segmentNetwork.size() << ".");
+    return;
+  }
 
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);

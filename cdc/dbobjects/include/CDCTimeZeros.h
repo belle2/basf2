@@ -11,6 +11,8 @@
 
 #include <map>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
 
@@ -110,6 +112,24 @@ namespace Belle2 {
       std::cout << "in order of clayer#, wire#, t0" << std::endl;
       for (auto const& ent : m_t0s) {
         std::cout << WireID(ent.first).getICLayer() << " " << WireID(ent.first).getIWire() << " " << ent.second << std::endl;
+      }
+    }
+
+    /**
+     * Output the contents in text file format
+     */
+    void outputToFile(std::string fileName) const
+    {
+      std::ofstream fout(fileName);
+
+      if (fout.bad()) {
+        B2ERROR("Specified output file could not be opened!");
+      } else {
+        for (auto const& ent : m_t0s) {
+          fout << std::setw(2) << std::right << WireID(ent.first).getICLayer() << "  " << std::setw(3) << WireID(
+                 ent.first).getIWire() << "  " << std::setw(15) << std::scientific << std::setprecision(8) << ent.second << std::endl;
+        }
+        fout.close();
       }
     }
 

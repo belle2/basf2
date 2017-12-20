@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <TFile.h>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -31,6 +32,11 @@ namespace Belle2 {
      * Destructor
      */
     virtual ~CDCDedxDatabaseImporter() {};
+
+    /**
+     * Import a set of dedx:momentum pdfs
+     */
+    void importPDFs();
 
     /**
      * Import a scale factor to make electron dE/dx ~ 1

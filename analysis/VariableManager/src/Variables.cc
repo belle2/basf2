@@ -1390,17 +1390,8 @@ namespace Belle2 {
       double result = 0.0;
 
       const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        /// TODO: check if ECLCluster will provide this on its own
-        float theta = shower->getTheta();
-        if (theta < 0.555) {
-          result = 1.0;
-        } else if (theta < 2.26) {
-          result = 2.0;
-        } else {
-          result = 3.0;
-        }
-      }
+      if (shower)
+        result = shower->getDetectorRegion();
 
       return result;
     }
@@ -2072,7 +2063,8 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "Returns reconstructed polar angle  region in the ECL (1 - forward, 2 - barrel, 3 - backward).");
+                      "Returns an integer code for the ECL region of a cluster:\n"
+                      "1 - forward, 2 - barrel, 3 - backward, 11 - between FWD and barrel, 13 - between BWD and barrel, 0 - otherwise)");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
                       "Returns DeltaL for the shower shape.\n"
                       "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"

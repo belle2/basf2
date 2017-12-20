@@ -136,7 +136,7 @@ void ECLEventT0Module::event()
 
     /** Average time of all digits excluding one, and those previously excluded */
     int outDigit = -1;
-    float delta2max = 0.;
+    float delta2max = -1.;
     for (int iexcluded = 0; iexcluded < nIsolated; iexcluded++) {
       if (isNotAnOutlier[iexcluded]) {
         float sumwt = 0.;

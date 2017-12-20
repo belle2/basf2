@@ -218,6 +218,7 @@ namespace Belle2 {
     unsigned m_numIterations = 100;    /**< Number of Iterations of iTBC */
     std::string m_directoryName; /**< directory name for the output root files */
     unsigned m_method = 0; /**< method to use */
+    bool m_useFallingEdge = false; /**< if true, use falling edge instead of rising */
 
     std::vector<TwoTimes> m_ntuples[c_NumChannels]; /**< channel wise data */
     double m_syncTimeBase = 0; /**< synchronization time (two ASIC windows) */

@@ -112,6 +112,10 @@ namespace Belle2 {
 
       double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 
+      double m_pureCsIEnergyCalib = 0.00005; /**< conversion factor from ADC counts to GeV. */
+      double m_pureCsITimeCalib = 10.; /**< conversion factor from eclPureCsIDigitizer to ns. */
+      double m_pureCsITimeOffset = 0.31; /**< ad-hoc offset correction for pureCsI timing/ */
+
       void initializeCalibration(); /**< reads calibration constants, performs checks, put them into a vector */
       void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
                                std::vector<float>& constantsUnc); /**< reads calibration constants */

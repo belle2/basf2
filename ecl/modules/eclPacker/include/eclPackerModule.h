@@ -7,17 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
-#ifndef ECLPACKERMODULE_H
-#define ECLPACKERMODULE_H
+#pragma once
 
 
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawECL.h>
-#include <ecl/dataobjects/ECLDigit.h>
 #include <framework/core/Module.h>
 #include <ecl/utility/ECLChannelMapper.h>
 
@@ -28,7 +24,12 @@ namespace Belle2 {
     ECL_ADC_SAMPLES_PER_CHANNEL = 31
   };
 
+  class ECLDigit;
+  class ECLDsp;
+
   namespace ECL {
+
+
 
     class ECLPackerModule : public Module {
     public:
@@ -110,6 +111,10 @@ namespace Belle2 {
       /** indexes of related waveforms*/
       int* iEclWfIndices;
 
+      //DataStore variables
+      StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
+      StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
+
       /** write N bits to the collector buffer */
       void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
       /** reset current position in the buffer */
@@ -121,6 +126,3 @@ namespace Belle2 {
   }//namespace ECL
 
 }//namespace Belle2
-
-#endif
-

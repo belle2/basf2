@@ -139,14 +139,15 @@ void Raw2DsModule::registerRawCOPPERs()
   sndhdr.SetBuffer(evtbuf);
   int npackedevts = sndhdr.GetNumEventsinPacket();
   if (npackedevts != 1) {
-    printf("[FATAL] strange SendHeader : ");
-    for (int i = 0; i < sndhdr.SENDHDR_NWORDS; i++) {
-      printf("0x%.8x ", *(sendhdr.GetBuffer() + i));
+    printf("[WARNING] strange SendHeader : ");
+    //    for (int i = 0; i < sndhdr.SENDHDR_NWORDS; i++) {
+    for (int i = 0; i < 10; i++) {
+      printf("0x%.8x ", *(sndhdr.GetBuffer() + i));
     }
     printf("\n"); fflush(stdout);
 
-    B2FATAL("Raw2DsModule::number of events in packet is not 1");
-
+    B2WARNING("Raw2DsModule::number of events in packet is not 1. This process gets stuck here. Please ABORT the system. (Please see discussion of daqcore channel in https://b2rc.kek.jp/ on 2017. Nov. 30. about why this is not FATAL message.");
+    sleep(86400);
   }
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;

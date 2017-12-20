@@ -155,7 +155,8 @@ ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string na
 void ParticleGunModule::initialize()
 {
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Convert string representations to distribution values
   m_parameters.momentumDist = convertDistribution(m_momentumDist);

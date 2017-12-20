@@ -16,6 +16,11 @@
 
 #include <string>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include "trg/ecl/dataobjects/TRGECLFAMAna.h"
+#include "trg/ecl/dataobjects/TRGECLDigi0.h"
+#include "trg/ecl/dataobjects/TRGECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLWaveform.h"
 
 namespace Belle2 {
 
@@ -95,6 +100,10 @@ namespace Belle2 {
     std::vector<std::vector<double>> TCFitT;
 
 
+    StoreArray<TRGECLDigi0> m_TRGECLDigi0; /**< output for TRGECLDigi0 */
+    StoreArray<TRGECLWaveform> m_TRGECLWaveform; /**< output for TRGECLWaveform */
+    StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
+    StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
 
 
   };

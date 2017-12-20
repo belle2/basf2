@@ -89,7 +89,8 @@ PhokharaInputModule::~PhokharaInputModule()
 //-----------------------------------------------------------------
 void PhokharaInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
   m_initial.initialize();

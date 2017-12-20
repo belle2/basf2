@@ -165,7 +165,7 @@ ECLGeometryPar::~ECLGeometryPar()
 {
   if (m_B4ECLGeometryParDB) {
     delete m_B4ECLGeometryParDB;
-    B2INFO("m_B4ECLGeometryParDB deleted ");
+    B2DEBUG(150, "m_B4ECLGeometryParDB deleted ");
   }
 }
 
@@ -292,14 +292,7 @@ void ECLGeometryPar::read()
     }
   }
 
-  // B2INFO("ECLGeometryPar::read() will print all crystal positions.");
-  // for(int i=0;i<8736;i++){
-  //   const TVector3& v = GetCrystalPos(i);
-  //   cout<<i<<" "<<v.x()<<" "<<v.y()<<" "<<v.z()<<"\n";
-  // }
-  // cout<<flush;
-  //  _exit(0);
-  B2INFO("ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
+  B2DEBUG(150, "ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
 }
 
 template <int n>

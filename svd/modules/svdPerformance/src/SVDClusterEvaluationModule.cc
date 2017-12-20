@@ -76,6 +76,7 @@ void SVDClusterEvaluationModule::initialize()
   m_histoList_THinCluster = new TList;
   m_histoList_THinClusterTM = new TList;
   m_histoList_GoodTHinClusterTM = new TList;
+  m_histoList_GoodTHinClusterTMGood = new TList;
   m_graphList = new TList;
   //Control List
   m_histoList_Control = new TList;
@@ -116,9 +117,30 @@ void SVDClusterEvaluationModule::initialize()
     m_histo_ClusterTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
                                                          m_histoList_ClusterTimeResolution);
 
+    NameOfHisto = "histo_ClusterTimeResolution_bin1_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Cluster Time Resolution TriggerBin=1(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
+                     i) + ")";
+    m_histo_ClusterTimeResolution_bin1[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
+                                                              m_histoList_ClusterTimeResolution);
+    NameOfHisto = "histo_ClusterTimeResolution_bin2_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Cluster Time Resolution TriggerBin=2(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
+                     i) + ")";
+    m_histo_ClusterTimeResolution_bin2[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
+                                                              m_histoList_ClusterTimeResolution);
+    NameOfHisto = "histo_ClusterTimeResolution_bin3_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Cluster Time Resolution TriggerBin=3(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
+                     i) + ")";
+    m_histo_ClusterTimeResolution_bin3[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
+                                                              m_histoList_ClusterTimeResolution);
+    NameOfHisto = "histo_ClusterTimeResolution_bin4_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Cluster Time Resolution TriggerBin=4(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
+                     i) + ")";
+    m_histo_ClusterTimeResolution_bin4[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
+                                                              m_histoList_ClusterTimeResolution);
+
     NameOfHisto = "histo_ClusterTimePull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Cluster Time Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_ClusterTimePull[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "(t_reco - t_true)/t_sigma",
+    m_histo_ClusterTimePull[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11, "(t_reco - t_true)/t_sigma",
                                                    m_histoList_ClusterTimePull);
 
     NameOfHisto = "histo2D_TresVsPosres_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
@@ -148,23 +170,29 @@ void SVDClusterEvaluationModule::initialize()
                                                            "number of TM recoDigits / cluster size",
                                                            m_histoList_PurityInsideNOTMCluster);
 
-    NameOfHisto = "m_histoList_THinCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    NameOfHisto = "histo_THinCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
                      i) + ")";
     m_histo_THinCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
                                                m_histoList_THinCluster);
 
-    NameOfHisto = "m_histoList_THinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    NameOfHisto = "histo_THinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_THinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
+    m_histo_THinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per TM cluster",
                                                  m_histoList_THinClusterTM);
 
-    NameOfHisto = "m_histoList_GoodTHinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    NameOfHisto = "histo_GoodTHinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of Good True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_GoodTHinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per cluster",
+    m_histo_GoodTHinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per TM cluster",
                                                      m_histoList_GoodTHinClusterTM);
+
+    NameOfHisto = "histo_GoodTHinClusterTMGood_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Number of Good True Hits inside a Good Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
+                     i) + ", side" + UVFromIndex(i) + ")";
+    m_histo_GoodTHinClusterTMGood[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per Good TM cluster",
+                                                         m_histoList_GoodTHinClusterTMGood);
   }
 
   //Control Histos
@@ -276,8 +304,27 @@ void SVDClusterEvaluationModule::event()
     for (int q = 0; q < (int)relatVectorClusToTH.size(); q ++) {
       //cluster time resolution and pull
       m_histo_ClusterTimeResolution[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-      m_histo_ClusterTimePull[indexForHistosAndGraphs]->Fill((clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()) /
-                                                             (clus.getClsTimeSigma()));
+
+      //get trigger bin
+      int triggerBin = 0;
+      RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
+      SVDModeByte modeByte = relatVectorClusToRD[0]->getModeByte();
+      triggerBin = (int)modeByte.getTriggerBin();
+
+      if (triggerBin == 0)
+        m_histo_ClusterTimeResolution_bin1[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
+      else if (triggerBin == 1)
+        m_histo_ClusterTimeResolution_bin2[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
+      else if (triggerBin == 2)
+        m_histo_ClusterTimeResolution_bin3[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
+      else if (triggerBin == 3)
+        m_histo_ClusterTimeResolution_bin4[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
+      else
+
+
+
+        m_histo_ClusterTimePull[indexForHistosAndGraphs]->Fill((clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()) /
+                                                               (clus.getClsTimeSigma()));
 
       //cluster position resolution and pull, also correlation between time res and position res
       if (clus.isUCluster()) {
@@ -300,15 +347,19 @@ void SVDClusterEvaluationModule::event()
     //enter only if the cluster is TM
     if (relatVectorClusToTH.size() > 0) {
 
-      //fill the THinCluster histo with the number of TH (and good TH) a TM cluster is composed of
+      //fill the THinCluster histo with the number of TH (and good TH) a TM cluster (and a Good TM cluster) is composed of
       m_histo_THinClusterTM[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
       int numberOfGoodTHInACluster = 0;
+      int numberOfGoodTHInAClusterGood = 0;
       for (int k = 0; k < (int)(relatVectorClusToTH.size()); k ++) {
         if (goodTrueHit(relatVectorClusToTH[k])) {
           numberOfGoodTHInACluster ++;
+          numberOfGoodTHInAClusterGood ++;
         }
       }
       m_histo_GoodTHinClusterTM[indexForHistosAndGraphs]->Fill(numberOfGoodTHInACluster);
+      if (numberOfGoodTHInAClusterGood > 0)
+        m_histo_GoodTHinClusterTMGood[indexForHistosAndGraphs]->Fill(numberOfGoodTHInAClusterGood);
 
       //count number of recodigit, composing the Truth-matched cluster, that are linked with a TH (internal purity)
       m_NumberOfTMRecoInTMCluster = 0;
@@ -364,6 +415,9 @@ void SVDClusterEvaluationModule::endRun()
 
     m_mean_GoodTHinClusterTM[k] = m_histo_GoodTHinClusterTM[k]->GetMean();
     m_RMS_GoodTHinClusterTM[k] = m_histo_GoodTHinClusterTM[k]->GetRMS() / sqrt(m_histo_GoodTHinClusterTM[k]->GetEntries());
+
+    m_mean_GoodTHinClusterTMGood[k] = m_histo_GoodTHinClusterTMGood[k]->GetMean();
+    m_RMS_GoodTHinClusterTMGood[k] = m_histo_GoodTHinClusterTMGood[k]->GetRMS() / sqrt(m_histo_GoodTHinClusterTMGood[k]->GetEntries());
   }
   for (int k = 0; k < m_NsetsRed; k ++) {
     m_mean_ClusterUPositionResolution[k] = m_histo_ClusterUPositionResolution[k]->GetMean();
@@ -412,6 +466,9 @@ void SVDClusterEvaluationModule::endRun()
                                    m_NullVec,
                                    m_mean_GoodTHinClusterTM, m_RMS_GoodTHinClusterTM, "set", "number of Good TH per TM cluster", m_graphList, m_Nsets);
 
+  createArbitraryGraphErrorChooser("goodTHinClusterTMGood_Means", "Number of Good True Hits inside a Good TM Cluster", m_OrderingVec,
+                                   m_NullVec,
+                                   m_mean_GoodTHinClusterTMGood, m_RMS_GoodTHinClusterTMGood, "set", "number of Good TH per Good TM cluster", m_graphList, m_Nsets);
   ///////////////////////////
   //WRITE HISTOS AND GRAPHS//
   ///////////////////////////
@@ -492,6 +549,12 @@ void SVDClusterEvaluationModule::endRun()
     dir_goodPuddleTM->cd();
     TIter nextH_GoodPuddleTM(m_histoList_GoodTHinClusterTM);
     while ((obj = nextH_GoodPuddleTM()))
+      obj->Write();
+
+    TDirectory* dir_goodPuddleTMGood = oldDir->mkdir("goodTrueHits_in_GoodTMcluster");
+    dir_goodPuddleTMGood->cd();
+    TIter nextH_GoodPuddleTMGood(m_histoList_GoodTHinClusterTMGood);
+    while ((obj = nextH_GoodPuddleTMGood()))
       obj->Write();
 
     TDirectory* dir_graph = oldDir->mkdir("graphs");

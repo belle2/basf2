@@ -48,7 +48,7 @@ REG_MODULE(SVDUnpacker)
 std::string Belle2::SVD::SVDUnpackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
-  m_generateShaperDigts(false),
+  m_generateShaperDigits(false),
   m_mapping(m_xmlFileName),
   m_shutUpFTBError(0),
   m_FADCTriggerNumberOffset(0)
@@ -59,7 +59,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
 
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
-  addParam("GenerateShaperDigts", m_generateShaperDigts, "Generate SVDShaperDigits", bool(false));
+  addParam("GenerateShaperDigits", m_generateShaperDigits, "Generate SVDShaperDigits", bool(false));
   addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVDShaperDigits list", string(""));
   addParam("shutUpFTBError", m_shutUpFTBError,
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
@@ -83,7 +83,7 @@ void SVDUnpackerModule::initialize()
   storeDAQDiagnostics.registerInDataStore();
   m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
 
-  if (m_generateShaperDigts) {
+  if (m_generateShaperDigits) {
     StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
     storeShaperDigits.registerInDataStore();
     storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
@@ -242,7 +242,7 @@ void SVDUnpackerModule::event()
                      );
             }
 
-            if (m_generateShaperDigts) { // create SVDModeByte object from MainHeader vars
+            if (m_generateShaperDigits) { // create SVDModeByte object from MainHeader vars
               //B2INFO("Filling SVDModeByte object");
               m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
             }
@@ -293,7 +293,7 @@ void SVDUnpackerModule::event()
               delete newDigit;
             }
 
-            if (m_generateShaperDigts) {
+            if (m_generateShaperDigits) {
               //B2INFO("Generating SVDShaperDigit object");
               SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
               diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));

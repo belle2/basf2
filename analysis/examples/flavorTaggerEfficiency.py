@@ -340,11 +340,23 @@ for method in methods:
     performance = []
     for i in range(1, r_size):
         # get the average r-value
+        entries[i] = histo_entries_per_bin.GetBinContent(i)
+        entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
+        entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
+        # fraction of events/all events
+        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
+        event_fractionB0[i] = entriesB0[i] / total_entriesB0
+        event_fractionB0bar[i] = entriesB0bar[i] / total_entriesB0bar
+
+        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
+
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
         rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
         rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
-        rvalueStdB0[i] = math.sqrt(histo_ms_rB0.GetBinContent(i) - (histo_avr_rB0.GetBinContent(i))**2)
-        rvalueStdB0bar[i] = math.sqrt(histo_ms_rB0bar.GetBinContent(i) - (histo_avr_rB0bar.GetBinContent(i))**2)
+        rvalueStdB0[i] = math.sqrt(histo_ms_rB0.GetBinContent(
+            i) - (histo_avr_rB0.GetBinContent(i))**2) / math.sqrt(entriesB0[i] - 1)
+        rvalueStdB0bar[i] = math.sqrt(histo_ms_rB0bar.GetBinContent(
+            i) - (histo_avr_rB0bar.GetBinContent(i))**2) / math.sqrt(entriesB0bar[i] - 1)
         rvalueStdB0Average[i] = math.sqrt(rvalueStdB0[i]**2 + rvalueStdB0bar[i]**2) / 2
         # math.sqrt(histo_ms_r.GetBinContent(i) - (histo_avr_r.GetBinContent(i))**2)
         # calculate the wrong tag fractin (only true if MC data good)
@@ -355,15 +367,6 @@ for method in methods:
         wvalueDiffUncertainty[i] = math.sqrt((rvalueStdB0[i] / 2)**2 + (rvalueStdB0bar[i] / 2)**2)
         wvalue[i] = (wvalueB0[i] + wvalueB0bar[i]) / 2
         wvalueUncertainty[i] = wvalueDiffUncertainty[i] / 2
-        entries[i] = histo_entries_per_bin.GetBinContent(i)
-        entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
-        entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
-        # fraction of events/all events
-        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
-        event_fractionB0[i] = entriesB0[i] / total_entriesB0
-        event_fractionB0bar[i] = entriesB0bar[i] / total_entriesB0bar
-
-        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
 
         iEffEfficiency[i] = tagging_eff * (event_fractionB0[i] * rvalueB0[i] * rvalueB0[i] +
                                            event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]) / 2
@@ -592,26 +595,26 @@ for method in methods:
     Canvas2.Clear()
 
     print('\\begin{tabular}{ l  r  r  r  r  r  r  r }\n\\hline')
-    print(r'$r$- Interval & $\varepsilon_i\ $ & $w_i \pm \delta w_i\ $ ' +
-          r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}$ ' +
+    print(r'$r$- Interval & $\varepsilon_i\ $ & $w_i \pm \delta w_i\enskip\, $ ' +
+          r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip$ ' +
           r' & & & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i} $\\ \hline\hline')
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 6.1f}'.format(event_fractionTotal[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(wvalue[i] * 100) + " \pm " + '{:2.1f}'.format(wvalueUncertainty[i] * 100) + r'\enskip $ & $' +
+              '{: 7.3f}'.format(wvalue[i] * 100) + " \pm " + '{:2.3f}'.format(wvalueUncertainty[i] * 100) + r' $ & $' +
               '{: 6.1f}'.format(wvalueDiff[i] * 100) + " \pm " +
-              '{:2.1f}'.format(wvalueDiffUncertainty[i] * 100) + r'\enskip\enskip $ & $' +
-              '{: 6.2f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
-              " \pm " + '{:2.2f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\enskip $ & & & $' +
-              '{: 6.2f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
-              " \pm " + '{:2.2f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
-              r'\ \quad $ \\ ')
+              '{:2.3f}'.format(wvalueDiffUncertainty[i] * 100) + r'\, $ & $' +
+              '{: 8.4f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
+              " \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\, $ & & & $' +
+              '{: 6.4f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
+              " \pm " + '{:2.4f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
+              r'\enskip $ \\ ')
     print('\hline\hline')
     print(r'\multicolumn{1}{r}{Total} &  & \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
           r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-          '{: 6.1f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.1f}'.format(uncertainty_eff_effAverage * 100) + r'\quad$ }')
+          '{: 6.2f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.2f}'.format(uncertainty_eff_effAverage * 100) + r'\quad\,$ }')
     print(r'& & \multicolumn{2}{r}{ $\Delta \varepsilon_\text{eff} = ' +
-          '{: 6.1f}'.format(diff_eff * 100) + " \pm " + '{: 6.1f}'.format(diff_eff_Uncertainty * 100) + r'\ \enskip\quad $ }' +
+          '{: 6.2f}'.format(diff_eff * 100) + " \pm " + '{: 6.2f}'.format(diff_eff_Uncertainty * 100) + r'\ \quad\,  $ }' +
           r' \\')
     print('\\hline\n\\end{tabular}')
 
@@ -832,11 +835,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     iDeltaEffEfficiencyUncertainty = array('f', [0] * r_size)
 
     for i in range(1, r_size):
-        rvalueB0[i] = hist_avr_rB0.GetBinContent(i)
-        rvalueB0bar[i] = hist_avr_rB0bar.GetBinContent(i)
-        rvalueStdB0[i] = math.sqrt(abs(hist_ms_rB0.GetBinContent(i) - (hist_avr_rB0.GetBinContent(i))**2))
-        rvalueStdB0bar[i] = math.sqrt(abs(hist_ms_rB0bar.GetBinContent(i) - (hist_avr_rB0bar.GetBinContent(i))**2))
-        # wvalue[i] = (1 - rvalueB0[i]) / 2
+
         entriesBoth[i] = entriesB0bar[i] + entriesB0[i]
         entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
         entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
@@ -845,6 +844,22 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
         # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalueB0[i]), 'entriesB0: ' +
         # str(event_fractionB0[i] * 100) + ' % (' + str(entriesB0[i]) + '/' +
         # str(total_entriesB0) + ')'
+
+        rvalueB0[i] = hist_avr_rB0.GetBinContent(i)
+        rvalueB0bar[i] = hist_avr_rB0bar.GetBinContent(i)
+
+        rvalueStdB0[i] = 0
+        rvalueStdB0bar[i] = 0
+
+        if entriesB0[i] > 1:
+            rvalueStdB0[i] = math.sqrt(abs(hist_ms_rB0.GetBinContent(
+                i) - (hist_avr_rB0.GetBinContent(i))**2)) / math.sqrt(entriesB0[i] - 1)
+
+        if entriesB0bar[i] > 1:
+            rvalueStdB0bar[i] = math.sqrt(abs(hist_ms_rB0bar.GetBinContent(
+                i) - (hist_avr_rB0bar.GetBinContent(i))**2)) / math.sqrt(entriesB0bar[i] - 1)
+        # wvalue[i] = (1 - rvalueB0[i]) / 2
+
         tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] \
             * rvalueB0[i]
         tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] \

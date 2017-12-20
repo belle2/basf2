@@ -10,10 +10,8 @@
 
 // own include
 #include <hlt/L1Emulator/modules/L1Emulation/L1EmulationModule.h>
-#include <hlt/L1Emulator/dataobjects/L1EmulationInformation.h>
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -71,7 +69,7 @@ L1EmulationModule::~L1EmulationModule()
 void L1EmulationModule::initialize()
 {
   B2INFO("L1EmulationModule processing");
-  StoreArray<L1EmulationInformation>::registerPersistent();
+  m_l1EmulationInformation.registerInDataStore();
   m_cut = Variable::Cut::compile(m_userCut);
   m_ntrg = 0;
   trgname.clear();

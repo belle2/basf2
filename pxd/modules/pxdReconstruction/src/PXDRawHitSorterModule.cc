@@ -11,7 +11,6 @@
 #include <pxd/modules/pxdReconstruction/PXDRawHitSorterModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
@@ -59,7 +58,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
 void PXDRawHitSorterModule::initialize()
 {
   //Register collections
-  StoreArray<PXDRawHit>::required(m_storeRawHitsName);
+  m_pxdRawHit.isRequired(m_storeRawHitsName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   storeDigits.registerInDataStore();
   StoreArray<PXDFrame> storeFrames(m_storeFramesName);

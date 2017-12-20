@@ -3,10 +3,6 @@
 
 # Dennis Weyland 2017
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
-
-from keras.layers.merge import Average
 from keras.layers.core import Reshape
 from keras.layers import activations
 from keras.activations import sigmoid, tanh

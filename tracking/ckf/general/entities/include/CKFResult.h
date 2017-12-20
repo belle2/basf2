@@ -35,7 +35,7 @@ namespace Belle2 {
     /// Copy hit definition
     using Hit = AHit;
 
-    /// Constructor
+    /// Constructor from the path of the result and the final mSoP, which defines the track position of the resulting track
     template <class AState>
     CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
@@ -52,7 +52,7 @@ namespace Belle2 {
         m_weightSum = state.getWeight();
       }
 
-      m_trackCharge = mSoP.getCharge();
+      m_trackCharge = static_cast<short>(mSoP.getCharge());
       m_trackMomentum = mSoP.getMom();
       m_trackPosition = mSoP.getPos();
 
@@ -60,6 +60,7 @@ namespace Belle2 {
       m_seedMSoP = path.front()->getMeasuredStateOnPlane();
     }
 
+    /// Constructor which sets all single properties
     CKFResult(const ASeed* seed, std::vector<const AHit*> hits, double chi2, const TVector3& trackPosition,
               const TVector3& trackMomentum, short trackCharge) :
       m_seed(seed), m_hits(hits), m_chi2(chi2), m_trackPosition(trackPosition), m_trackMomentum(trackMomentum),
@@ -108,6 +109,7 @@ namespace Belle2 {
       return m_weightSum;
     }
 
+    /// Getter for the mSoP of the seed associated wit this result
     const genfit::MeasuredStateOnPlane& getSeedMSoP() const
     {
       return m_seedMSoP;

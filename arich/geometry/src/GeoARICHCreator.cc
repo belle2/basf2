@@ -83,7 +83,7 @@ namespace Belle2 {
     }
 
 
-    void GeoARICHCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoARICHCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       m_config.useGeantUnits();

@@ -94,7 +94,6 @@ for mc, files in mc_files:
     if mc == 'Belle':
         import b2biiConversion
         b2biiConversion.setupB2BIIDatabase(True)
-        ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
         b2biiConversion.convertBelleMdstToBelleIIMdst(inputBelleMDSTFile=files, applyHadronBJSkim=True, path=path)
         copyList('gamma', 'gamma:mdst', path=path)
         copyList('K_S0', 'K_S0:mdst', path=path)

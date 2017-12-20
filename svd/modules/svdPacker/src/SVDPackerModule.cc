@@ -73,8 +73,8 @@ SVDPackerModule::~SVDPackerModule()
 void SVDPackerModule::initialize()
 {
 
-  StoreArray<RawSVD>::registerPersistent(m_rawSVDListName);
-  StoreArray<SVDDigit>::required(m_svdDigitListName);
+  m_rawSVD.registerInDataStore(m_rawSVDListName);
+  m_svdDigit.isRequired(m_svdDigitListName);
   m_eventMetaDataPtr.isRequired();
   prepFADClist();
 

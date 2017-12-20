@@ -85,40 +85,30 @@ void V0FinderModule::initialize()
 
 void V0FinderModule::event()
 {
-  StoreArray<Track> tracks(m_arrayNameTrack);
-  const int nTracks = tracks.getEntries();
-
-  if (nTracks == 0)
-    return;
-
-  B2DEBUG(200, nTracks << " tracks in event.");
+  B2DEBUG(200, m_tracks.getEntries() << " tracks in event.");
 
   // Group tracks into positive and negative tracks.
   std::vector<const Track*> tracksPlus;
-  tracksPlus.reserve(nTracks);
+  tracksPlus.reserve(m_tracks.getEntries());
 
   std::vector<const Track*> tracksMinus;
-  tracksMinus.reserve(nTracks);
+  tracksMinus.reserve(m_tracks.getEntries());
 
-  for (const auto& track : tracks) {
-    const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
+  for (const auto& track : m_tracks) {
+    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>();
+    B2ASSERT(recoTrack, "No RecoTrack available for given Track.");
 
-    if (!recoTrack) {
-      B2WARNING("No RecoTrack for this track");
-      continue;
-    }
-
-    const double charge = recoTrack->getChargeSeed();
-    if (charge == +1) {
+    if (recoTrack->getChargeSeed() > 0) {
       tracksPlus.push_back(&track);
-    } else {
+    }
+    if (recoTrack->getChargeSeed() < 0) {
       tracksMinus.push_back(&track);
     }
   }
 
   // Reject boring events.
-  if (tracksPlus.size() == 0 || tracksMinus.size() == 0) {
-    B2DEBUG(200, "No interesting tracks.");
+  if (tracksPlus.empty() || tracksMinus.empty()) {
+    B2DEBUG(200, "No interesting track pairs.");
     return;
   }
 

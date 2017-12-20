@@ -24,7 +24,7 @@ V0FinderModule::V0FinderModule() : Module()
 
                  "Outside the beam pipe only a chi^2 cut is applied "
                  "('vertexChi2CutOutside').\n"
-                 "The value used as beam pipe radius is a parameter and"
+                 "The value used as beam pipe radius is a parameter and "
                  "can be changed.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -48,7 +48,7 @@ V0FinderModule::V0FinderModule() : Module()
            std::string(""));
 
   addParam("beamPipeRadius", m_beamPipeRadius,
-           "Radius at which we switch between the two classes of cuts."
+           "Radius at which we switch between the two classes of cuts. "
            "The default is a little inside the beam pipe to allow some tolerance.",
            1.);
 

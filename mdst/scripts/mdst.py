@@ -33,7 +33,6 @@ def add_mdst_output(
         'ECLClusters',
         'TracksToECLClusters',
         'KLMClusters',
-        'KLMClustersToTracks',
         'KlIds',
         'KLMClustersToKlIds',
         'TRGSummary',

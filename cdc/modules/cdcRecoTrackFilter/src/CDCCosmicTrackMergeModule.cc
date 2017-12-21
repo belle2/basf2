@@ -61,7 +61,7 @@ void CDCCosmicTrackMergerModule::event()
   //        1                   1                         1                       Create
   //        1                   2                         1                       Create
   //        2                   1                         1                       Create
-  //        2                   1                         1                       Create
+  //        2                   2                         2                       Create
   //        2              More than 2                    2                       Create
   //   More than 2              2                         2                       Create
 

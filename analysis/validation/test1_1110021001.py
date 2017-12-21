@@ -38,11 +38,11 @@ inputMdst('default', '../1110021001.dst.root')
 # --------------------------------------------------
 
 stdK('95eff')
-stdPi('99eff')
+stdPi('95eff')
 stdPhotons('loose')
 
 # reconstruct K*0:kpi
-reconstructDecay('K*0:kpi -> K+:95eff pi-:99eff', '0.6 < M < 1.2')
+reconstructDecay('K*0:kpi -> K+:95eff pi-:95eff', '0.6 < M < 1.2')
 matchMCTruth('K*0:kpi')
 
 # reconstruct B0:sig
@@ -56,11 +56,11 @@ matchMCTruth('B0:sig')
 # information to be saved to file
 tools = ['EventMetaData', '^B0:sig']
 tools += ['RecoStats', '^B0:sig']
-tools += ['Kinematics', '^B0:sig -> [^K*0:kpi -> ^K+:99eff ^pi-:99eff] ^gamma:loose']
-tools += ['InvMass', '^B0:sig -> [^K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
-tools += ['DeltaEMbc', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
+tools += ['Kinematics', '^B0:sig -> [^K*0:kpi -> ^K+:95eff ^pi-:95eff] ^gamma:loose']
+tools += ['InvMass', '^B0:sig -> [^K*0:kpi -> K+:95eff pi-:95eff] gamma:loose']
+tools += ['DeltaEMbc', '^B0:sig -> [K*0:kpi -> K+:95eff pi-:95eff] gamma:loose']
 variables.addAlias("Egamma", "useRestFrame(daughter(1,E))")
-tools += ['CustomFloats[Egamma]', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
+tools += ['CustomFloats[Egamma]', '^B0:sig -> [K*0:kpi -> K+:95eff pi-:95eff] gamma:loose']
 
 
 # write out the flat ntuple

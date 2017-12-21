@@ -32,10 +32,8 @@ namespace Belle2 {
     /// Constructor for the V0Fitter.
     V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
              const std::string& v0ValidationVerticesName = "",
-             const std::string& recoTracksName = "");
-
-    /// Enable validation output.
-    void enableValidation() { m_validation = true; }
+             const std::string& recoTracksName = "",
+             bool enableValidation = false);
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,

@@ -1,7 +1,6 @@
 #include <tracking/v0Finding/fitter/V0Fitter.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -12,19 +11,32 @@
 #include <genfit/GFRaveVertex.h>
 #include <genfit/Track.h>
 #include <genfit/FieldManager.h>
+#include "genfit/MaterialEffects.h"
 #include <genfit/Exception.h>
 
 #include <framework/utilities/IOIntercept.h>
 
-#include <TVector3.h>
-
 using namespace Belle2;
 
 V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
-                   const std::string& v0ValidationVerticesName, const std::string& recoTracksName)
-  : m_validation(false), m_recoTracksName(recoTracksName), m_trackFitResults(trackFitResultsName), m_v0s(v0sName),
-    m_validationV0s(v0ValidationVerticesName)
-{}
+                   const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
+                   bool enableValidation)
+  : m_validation(enableValidation), m_recoTracksName(recoTracksName)
+{
+  m_trackFitResults.isRequired(trackFitResultsName);
+  m_v0s.registerInDataStore(v0sName, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  //Relation to RecoTracks from Tracks is already tested at the module level.
+
+  if (m_validation) {
+    B2DEBUG(300, "Register DataStore for validation.");
+    m_validationV0s.registerInDataStore(v0ValidationVerticesName);
+  }
+
+  B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
+           "Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
+  B2ASSERT(genfit::FieldManager::getInstance()->isInitialized(),
+           "Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
+}
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
                               double vertexChi2CutOutside)

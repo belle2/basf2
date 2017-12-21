@@ -1,12 +1,9 @@
 #include <tracking/modules/V0Finder/V0FinderModule.h>
-//Object with performing the actual algorithm:
-#include <tracking/v0Finding/fitter/V0Fitter.h>
-//Needed to perform assertion of presence of setup:
-#include "genfit/FieldManager.h"
-#include "genfit/MaterialEffects.h"
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 
@@ -59,21 +56,12 @@ V0FinderModule::V0FinderModule() : Module()
 
 void V0FinderModule::initialize()
 {
-  m_recoTracks.isRequired(m_arrayNameRecoTrack);
-  m_tfResults.isRequired(m_arrayNameTFResult);
   m_tracks.isRequired(m_arrayNameTrack);
-  m_v0s.registerInDataStore(m_arrayNameV0, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-
-  if (m_validation) {
-    B2DEBUG(300, "Register DataStore for validation.");
-    m_v0ValidationVertices.registerInDataStore(m_arrayNameV0ValidationVertex);
-  }
-
-  B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
-           "Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
-
-  B2ASSERT(genfit::FieldManager::getInstance()->isInitialized(),
-           "Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
+  StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
+  m_tracks.requireRelationTo(recoTracks);
+  //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
+  m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
+                                          m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
 }
 
 
@@ -102,23 +90,19 @@ void V0FinderModule::event()
 
   // Reject boring events.
   if (tracksPlus.empty() || tracksMinus.empty()) {
-    B2DEBUG(200, "No interesting track pairs.");
+    B2DEBUG(200, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
     return;
   }
 
-  V0Fitter v0Fitter(m_arrayNameTFResult, m_arrayNameV0, m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack);
-  v0Fitter.initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
-  if (m_validation) {
-    v0Fitter.enableValidation();
-  }
+  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
 
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Kshort);
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::photon);
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Lambda);
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
     }
   }
 }

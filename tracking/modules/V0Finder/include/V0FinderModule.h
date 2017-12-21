@@ -1,16 +1,14 @@
 #pragma once
+//Object with performing the actual algorithm:
+#include <tracking/v0Finding/fitter/V0Fitter.h>
 
-#include <tracking/dataobjects/V0ValidationVertex.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
-#include <mdst/dataobjects/V0.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
 #include <string>
+#include <memory>
 
 namespace Belle2 {
   /** A V0 finder module.
@@ -45,22 +43,18 @@ namespace Belle2 {
     void event() override;
 
   private:
-    std::string m_arrayNameRecoTrack; ///< StoreArray name of the RecoTracks      (Input).
-    std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResults (In- and Output).
     std::string m_arrayNameTrack;     ///< StoreArray name of the Tracks          (Input).
-    std::string m_arrayNameV0;        ///< StoreArray name of the V0              (Output).
+    StoreArray<Track> m_tracks;       ///< Actually array of mdst Tracks.
+
+    std::unique_ptr<V0Fitter> m_v0Fitter; ///< Object containing the actual algorithm.
+    std::string m_arrayNameRecoTrack;     ///< StoreArray name of the RecoTracks      (Input).
+    std::string m_arrayNameTFResult;      ///< StoreArray name of the TrackFitResults (In- and Output).
+    std::string m_arrayNameV0;            ///< StoreArray name of the V0              (Output).
 
     double m_beamPipeRadius;          ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;    ///< Chi2 cut for V0s outside of the beampipe. Applies to all.
 
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
-
-    StoreArray<RecoTrack>      m_recoTracks;   ///< For requirement test; V0Finder object makes own array.
-    StoreArray<TrackFitResult> m_tfResults;    ///< For requirement test; V0Finder object makes own array.
-    StoreArray<Track>          m_tracks;       ///< Actually used array of mdst Tracks.
-    StoreArray<V0>             m_v0s;          ///< For requirement test; V0Finder object makes own array.
-
-    StoreArray<V0ValidationVertex> m_v0ValidationVertices; ///< For requirement test; V0Finder object makes own array.
   };
 }

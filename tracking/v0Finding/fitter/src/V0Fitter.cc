@@ -139,14 +139,17 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
 
 std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis)
 {
-  switch (v0Hypothesis) {
-    case Const::Kshort     : return std::make_pair(Const::pion, Const::pion);
-    case Const::photon     : return std::make_pair(Const::electron, Const::electron);
-    case Const::Lambda     : return std::make_pair(Const::proton, Const::pion);
-    case Const::antiLambda : return std::make_pair(Const::pion, Const::proton);
+  if (v0Hypothesis == Const::Kshort) {
+    return std::make_pair(Const::pion, Const::pion);
+  } else if (v0Hypothesis == Const::photon) {
+    return std::make_pair(Const::electron, Const::electron);
+  } else if (v0Hypothesis == Const::Lambda) {
+    return std::make_pair(Const::proton, Const::pion);
+  } else if (v0Hypothesis == Const::antiLambda) {
+    return std::make_pair(Const::pion, Const::proton);
   }
   B2FATAL("Given V0Hypothesis not available.");
-  return std::make_pair(Const::invalidParticle, Const::invalidParticle);//return something to avoid trigger cppcheck
+  return std::make_pair(Const::invalidParticle, Const::invalidParticle); // return something to avoid triggering cppcheck
 }
 
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,

@@ -65,7 +65,7 @@ void DelayDQMModule::BinLogX(TH1* h)
     new_bins[i] = TMath::Power(10, from + i * width);
   }
   axis->Set(bins, new_bins);
-  delete new_bins;
+  delete[] new_bins;
 }
 
 
@@ -76,9 +76,9 @@ void DelayDQMModule::defineHisto()
   if (m_histogramDirectoryName != "") oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
   //----------------------------------------------------------------
 
-  m_DelayS = new TH1D("DelayS", m_title + "Delay;time /s", 600, 0, 600);
-  m_DelayMs = new TH1D("DelayMs", m_title + "Delay;time /ms", 200, 0, 2000);
-  m_DelayLog = new TH1D("DelayLog", m_title + "Delay; time /s", 200, -3, 6);
+  m_DelayS = new TH1D("DelayS", (m_title + "Delay;time /s").c_str(), 600, 0, 600);
+  m_DelayMs = new TH1D("DelayMs", (m_title + "Delay;time /ms").c_str(), 200, 0, 2000);
+  m_DelayLog = new TH1D("DelayLog", (m_title + "Delay; time /s").c_str(), 200, -3, 6);
   BinLogX(m_DelayLog); // set log binning, later Draw with SetLogX
 
   // cd back to root directory

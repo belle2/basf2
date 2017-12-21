@@ -4,7 +4,7 @@ import os
 from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, DEFAULT_HLT_COMPONENTS, \
     RAW_SAVE_STORE_ARRAYS
 
-from rawdata import add_unpackers
+from rawdata import add_unpackers, add_packers
 from simulation import add_roiFinder
 
 
@@ -28,12 +28,18 @@ def main():
 
     # TODO: until the ROI finding HLT setup is handled properly, we have to do this "manually" here
     add_roiFinder(path, reco_tracks="RecoTracks")
+    path.add_module('PXDdigiFilter', PXDDigitsInsideROIName='PXDDigitsInsideROI', ROIidsName='ROIs')
+    add_packers(path, components=["PXD"])
 
     path.add_module("RootOutput", outputFileName=output_file,
                     branchNames=["EventMetaData", "SoftwareTriggerResult", "SoftwareTriggerVariables"])
 
+    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
+    raw_save_store_arrays_without_rois.pop(raw_save_store_arrays_without_rois.index("ROIs"))
+    raw_save_store_arrays_without_rois.append("RawPXDs")
+
     path.add_module("RootOutput", outputFileName=raw_output_file,
-                    branchNames=["EventMetaData", "SoftwareTriggerResult"] + RAW_SAVE_STORE_ARRAYS)
+                    branchNames=["EventMetaData", "SoftwareTriggerResult"] + raw_save_store_arrays_without_rois)
 
     basf2.log_to_file(log_file)
     basf2.print_path(path)

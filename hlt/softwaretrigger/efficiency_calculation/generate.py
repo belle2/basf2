@@ -126,8 +126,9 @@ def main():
 
     add_packers(path, components=DEFAULT_HLT_COMPONENTS)
 
+    # We are adding the PXDDigits here on purpose, as they will be in the final data (stored on tape)
     path.add_module("RootOutput",
-                    branchNames=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS,
+                    branchNames=["EventMetaData", "PXDDigits"] + RAW_SAVE_STORE_ARRAYS,
                     outputFileName=output_file)
 
     basf2.log_to_file(log_file)

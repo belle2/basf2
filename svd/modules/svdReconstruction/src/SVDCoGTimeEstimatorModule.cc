@@ -128,7 +128,7 @@ void SVDCoGTimeEstimatorModule::event()
   //start loop on SVDSHaperDigits
   Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
-  for (const SVDShaperDigit& shaper : storeShapers) {
+  for (const SVDShaperDigit& shaper : m_storeShaper) {
 
     SVDModeByte modeByte = shaper.getModeByte();
     m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());

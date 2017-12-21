@@ -37,12 +37,12 @@ inputMdst('default', '../1110021001.dst.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-stdK('99eff')
+stdK('95eff')
 stdPi('99eff')
 stdPhotons('loose')
 
 # reconstruct K*0:kpi
-reconstructDecay('K*0:kpi -> K+:99eff pi-:99eff', '0.6 < M < 1.2')
+reconstructDecay('K*0:kpi -> K+:95eff pi-:99eff', '0.6 < M < 1.2')
 matchMCTruth('K*0:kpi')
 
 # reconstruct B0:sig

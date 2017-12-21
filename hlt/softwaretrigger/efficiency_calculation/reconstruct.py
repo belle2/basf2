@@ -1,3 +1,7 @@
+"""
+Script to be called by gridcontrol to reconstruct already simulated events.
+"""
+
 import basf2
 import os
 

@@ -1,3 +1,7 @@
+"""
+Script to be called by gridcontrol to simulate events with the given channel.
+"""
+
 from glob import glob
 
 import basf2

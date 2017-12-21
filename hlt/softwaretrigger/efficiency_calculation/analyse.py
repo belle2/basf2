@@ -1,3 +1,7 @@
+"""
+Script to be called by gridcontrol to extract STM variables and results out of a reconstructed file.
+"""
+
 import basf2
 import os
 

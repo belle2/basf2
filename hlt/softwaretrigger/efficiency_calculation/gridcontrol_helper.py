@@ -9,7 +9,7 @@ DEFAULT_GRIDCONTROL_CONTENT = """
 task = UserTask
 workdir create = True
 workdir space = 0
-backend = host
+backend = lsf
 [jobs]
 wall time = 5:00
 [constants]

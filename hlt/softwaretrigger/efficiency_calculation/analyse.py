@@ -1,23 +1,28 @@
 import basf2
 import os
 
+from softwaretrigger.variables import SummarizeTriggerResults, SummarizeTriggerVariables
+
 
 def main():
     # Get all parameters for this calculation
     input_file = os.environ.get("input_file")
-    output_file = input_file.replace("/reconstructed/", "/analysed/")
+    output_file = os.environ.get("output_file")
 
-    # Create output directory
-    output_dir = os.path.dirname(output_file)
+    output_variables_file = output_file.replace(".root", "_variables.pkl")
+    output_results_file = output_file.replace(".root", "_results.pkl")
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    log_file = output_file.replace(".root", ".log")
 
-    # Do the real calculation
-    # TODO: Fake
-    with open(output_file, "w") as output_f:
-        with open(input_file, "r") as input_f:
-            output_f.write(input_f.read())
+    path = basf2.create_path()
+
+    path.add_module("RootInput", inputFileName=input_file)
+    path.add_module(SummarizeTriggerResults(output_results_file))
+    path.add_module(SummarizeTriggerVariables(output_variables_file))
+
+    basf2.log_to_file(log_file)
+    basf2.print_path(path)
+    basf2.process(path)
 
 
 if __name__ == "__main__":

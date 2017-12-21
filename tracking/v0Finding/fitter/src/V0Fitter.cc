@@ -139,19 +139,14 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
 
 std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis)
 {
-  if (v0Hypothesis == Const::Kshort) {
-    return std::make_pair(Const::pion, Const::pion);
-  } else if (v0Hypothesis == Const::photon) {
-    return std::make_pair(Const::electron, Const::electron);
-  } else if (v0Hypothesis == Const::Lambda) {
-    return std::make_pair(Const::proton, Const::pion);
-  } else if (v0Hypothesis == Const::antiLambda) {
-    return std::make_pair(Const::pion, Const::proton);
-  } else {
-    B2FATAL("Given V0Hypothesis not available.");
-    return std::make_pair(Const::invalidParticle, Const::invalidParticle);
+  switch (v0Hypothesis) {
+    case Const::Kshort     : return std::make_pair(Const::pion, Const::pion);
+    case Const::photon     : return std::make_pair(Const::electron, Const::electron);
+    case Const::Lambda     : return std::make_pair(Const::proton, Const::pion);
+    case Const::antiLambda : return std::make_pair(Const::pion, Const::proton);
   }
-
+  B2FATAL("Given V0Hypothesis not available.");
+  return std::make_pair(Const::invalidParticle, Const::invalidParticle);//return something to avoid trigger cppcheck
 }
 
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
@@ -159,31 +154,20 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
+  //Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_recoTracksName);
-  if (not recoTrackPlus) {
-    B2ERROR("No RecoTrack for Belle2::Track");
-    return false;
-  }
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
-
   int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
-
   genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackPlus, *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
     B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
     return false;
   }
 
+  //Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
-  if (not recoTrackMinus) {
-    B2ERROR("No RecoTrack for Belle2::Track");
-    return false;
-  }
-
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
-
   int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
-
   genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackMinus, *recoTrackMinus);
   if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");

@@ -36,6 +36,8 @@ def extract_efficiencies(channels, storage_location):
     print("\n### Final Efficiencies per channel ###\n")
     print(all_efficiencies)
 
+    return all_efficiencies
+
 
 def extract_file_sizes(channels, storage_location):
     # Is this really needed?
@@ -73,3 +75,5 @@ def extract_file_sizes(channels, storage_location):
 
     print("\n### Final File Sizes per channel in bytes ###\n")
     print(all_filesizes)
+
+    return all_filesizes

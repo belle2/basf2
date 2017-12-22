@@ -5,6 +5,7 @@ Script to be called by gridcontrol to reconstruct already simulated events.
 import basf2
 import os
 
+from L1trigger import add_tsim
 from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, DEFAULT_HLT_COMPONENTS, \
     RAW_SAVE_STORE_ARRAYS
 
@@ -27,6 +28,8 @@ def main():
 
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
+    add_tsim(path, Belle2Phase="Phase3")
+
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
     add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring")
 
@@ -36,14 +39,14 @@ def main():
     add_packers(path, components=["PXD"])
 
     path.add_module("RootOutput", outputFileName=output_file,
-                    branchNames=["EventMetaData", "SoftwareTriggerResult", "SoftwareTriggerVariables"])
+                    branchNames=["EventMetaData", "SoftwareTriggerResult", "SoftwareTriggerVariables", "TRGSummary"])
 
     raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
     raw_save_store_arrays_without_rois.pop(raw_save_store_arrays_without_rois.index("ROIs"))
     raw_save_store_arrays_without_rois.append("RawPXDs")
 
     path.add_module("RootOutput", outputFileName=raw_output_file,
-                    branchNames=["EventMetaData", "SoftwareTriggerResult"] + raw_save_store_arrays_without_rois)
+                    branchNames=["EventMetaData", "SoftwareTriggerResult", "TRGSummary"] + raw_save_store_arrays_without_rois)
 
     basf2.log_to_file(log_file)
     basf2.print_path(path)

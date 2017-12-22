@@ -90,7 +90,7 @@ def add_generation(path, event_class):
     elif event_class == "pipi":
         generators.add_phokhara_generator(path, finalstate="pi+pi-")
     elif event_class == "pipipi":
-        generators.add_phokhara_generator(path, finalstate="pi+pi-p0")
+        generators.add_phokhara_generator(path, finalstate="pi+pi-pi0")
 
     # Fail for everything else
     else:

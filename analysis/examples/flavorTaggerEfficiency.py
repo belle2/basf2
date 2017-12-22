@@ -594,27 +594,28 @@ for method in methods:
     Canvas1.Clear()
     Canvas2.Clear()
 
-    print('\\begin{tabular}{ l  r  r  r  r  r  r  r }\n\\hline')
-    print(r'$r$- Interval & $\varepsilon_i\ $ & $w_i \pm \delta w_i\enskip\, $ ' +
+    print('\\begin{tabularx}{1\\textwidth}{@{}r  r  r  r  r  r  r@{}}\n\\hline')
+    print(r'$r$- Interval $\enskip$ & $\varepsilon_i\ $ &  $\Delta\varepsilon_i\ $ & $w_i \pm \delta w_i\enskip\, $ ' +
           r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip$ ' +
-          r' & & & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i} $\\ \hline\hline')
+          r' & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i}\enskip $\\ \hline\hline')
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 6.1f}'.format(event_fractionTotal[i] * 100) + '$ & $' +
+              '{: 7.3f}'.format(event_fractionDiff[i] * 100) + '$ & $' +
               '{: 7.3f}'.format(wvalue[i] * 100) + " \pm " + '{:2.3f}'.format(wvalueUncertainty[i] * 100) + r' $ & $' +
-              '{: 6.1f}'.format(wvalueDiff[i] * 100) + " \pm " +
+              '{: 7.3f}'.format(wvalueDiff[i] * 100) + " \pm " +
               '{:2.3f}'.format(wvalueDiffUncertainty[i] * 100) + r'\, $ & $' +
               '{: 8.4f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
-              " \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\, $ & & & $' +
+              " \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\, $ & $' +
               '{: 6.4f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
               " \pm " + '{:2.4f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
-              r'\enskip $ \\ ')
+              r'\enskip\enskip $ \\ ')
     print('\hline\hline')
-    print(r'\multicolumn{1}{r}{Total} &  & \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
+    print(r'\multicolumn{1}{r}{Total} &  & \multicolumn{5}{r}{ $\varepsilon_\text{eff} = ' +
           r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-          '{: 6.2f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.2f}'.format(uncertainty_eff_effAverage * 100) + r'\quad\,$ }')
-    print(r'& & \multicolumn{2}{r}{ $\Delta \varepsilon_\text{eff} = ' +
-          '{: 6.2f}'.format(diff_eff * 100) + " \pm " + '{: 6.2f}'.format(diff_eff_Uncertainty * 100) + r'\ \quad\,  $ }' +
+          '{: 6.2f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.2f}'.format(uncertainty_eff_effAverage * 100) + r'\enskip\, ')
+    print(r'\Delta \varepsilon_\text{eff} = ' +
+          '{: 6.2f}'.format(diff_eff * 100) + " \pm " + '{: 6.2f}'.format(diff_eff_Uncertainty * 100) + r'\quad\  $ }' +
           r' \\')
     print('\\hline\n\\end{tabular}')
 

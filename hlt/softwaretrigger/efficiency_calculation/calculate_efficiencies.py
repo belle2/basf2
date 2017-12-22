@@ -50,7 +50,7 @@ def generate_events(channels, n_events, n_jobs, storage_location):
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(steering_file="generate.py", parameters=parameters)
-    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=2)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
 
 def run_reconstruction(channels, storage_location):
@@ -76,7 +76,7 @@ def run_reconstruction(channels, storage_location):
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(steering_file="reconstruct.py", parameters=parameters)
-    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=2)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
 
 def calculate_efficiencies(channels, storage_location):
@@ -105,7 +105,7 @@ def calculate_efficiencies(channels, storage_location):
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(steering_file="analyse.py", parameters=parameters)
-    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=2)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
     extract_efficiencies(channels=channels, storage_location=storage_location)
     extract_file_sizes(channels=channels, storage_location=storage_location)

@@ -16,12 +16,17 @@ def extract_efficiencies(channels, storage_location):
         for filename in glob(os.path.join(analysed_path, "*_results.pkl")):
             result_list += pd.read_pickle(filename)
 
+        if len(result_list) == 0:
+            continue
+
         results = pd.DataFrame(result_list)
 
         efficiencies = (results[["final_decision", "software_trigger_cut&calib&total_result",
                                  "software_trigger_cut&fast_reco&total_result",
                                  "software_trigger_cut&hlt&total_result"]] == 1).mean()
+        # efficiencies = results[[col for col in results.columns if "fast_reco" in col]].mean()
         efficiencies.index = ["final decision", "calibration", "fast reco", "hlt"]
+        efficiencies = pd.concat([efficiencies, (results[[col for col in results.columns if "fast_reco" in col]] == 1).mean()])
         efficiencies.name = channel
         efficiency_list.append(efficiencies)
 
@@ -48,6 +53,8 @@ def extract_file_sizes(channels, storage_location):
 
             root_file = ROOT.TFile(filename)
             tree = root_file.Get('tree')
+            if not tree:
+                continue
             root_events = tree.GetEntriesFast() * 1.0
             for branch in tree.GetListOfBranches():
                 result[branch.GetName()] = branch.GetZipBytes('*') / root_events

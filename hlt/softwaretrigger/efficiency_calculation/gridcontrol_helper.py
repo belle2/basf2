@@ -11,7 +11,7 @@ workdir create = True
 workdir space = 0
 backend = lsf
 [jobs]
-wall time = 5:00
+wall time = 1:00
 [constants]
 BASF2_COMPILE_OPTION = {compile_option}
 BASF2_TOOLS_LOCATION = {tools_location}
@@ -26,6 +26,8 @@ pfs source = {parameter_file}
 executable = .basf2_wrapper.sh
 memory = 2100
 input files = {steering_file_abs_path}
+[wms]
+queue = s
 """
 
 

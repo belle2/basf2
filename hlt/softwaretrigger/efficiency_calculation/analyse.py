@@ -5,7 +5,7 @@ Script to be called by gridcontrol to extract STM variables and results out of a
 import basf2
 import os
 
-from softwaretrigger.variables import SummarizeTriggerResults, SummarizeTriggerVariables
+from softwaretrigger.variable_modules import SummarizeTriggerResults, SummarizeTriggerVariables
 
 
 def main():

@@ -6,7 +6,7 @@
 <header>
   <input>../1111540100.dst.root</input>
   <output>../1111540100.ntup.root</output>
-  <contact>A Morda; morda@pd.infn.it</contact>
+  <contact>"A Morda" <morda@pd.infn.it>, "Jan Strube" <jan.strube@gmail.com></contact>
 </header>
 """
 
@@ -113,6 +113,7 @@ tools += ['MCKinematics', "^B0 -> [^J/psi -> ^e+ ^e-] [^K_S0 -> ^pi+ ^pi-]"]
 tools += ['MCVertex', "^B0 -> [^J/psi -> e+ e-] [^K_S0 -> pi+ pi-]"]
 tools += ['MCTagVertex', '^B0']
 tools += ['MCDeltaT', '^B0']
+tools += ['PID', "B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]"]
 tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
           "B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]"]
 

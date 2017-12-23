@@ -5,7 +5,7 @@
 <header>
   <input>../2610030000.dst.root</input>
   <output>../2610030000.ntup.root</output>
-  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
+  <contact>"Jake Bennett" <jvbennett@cmu.edu>, "Jan Strube" <jan.strube@desy.de></contact>
 </header>
 """
 
@@ -92,6 +92,7 @@ toolsDST += ['MCKinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCFlightInfo', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCTruth', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
+toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
              'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 

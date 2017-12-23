@@ -5,7 +5,7 @@
 <header>
   <input>../mdst-xi-lambda.root</input>
   <output>../ana-xi-lambda.root</output>
-  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
+  <contact>"Jake Bennett" <jvbennett@cmu.edu>, "Jan Strube <jan.strube@desy.de></contact>
 </header>
 """
 
@@ -70,6 +70,7 @@ toolsnu += ['InvMass[BeforeFit]', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 toolsnu += ['Vertex', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['FlightInfo', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
+toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 toolsnu += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
             'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 

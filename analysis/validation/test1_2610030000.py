@@ -31,6 +31,13 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 from stdFSParticles import *
+from variables import variables
+
+variables.addAlias('piExpertPID_ALL', 'pidProbabilityExpert(211, ALL)')
+variables.addAlias('muExpertPID_ALL', 'pidProbabilityExpert(13, ALL)')
+variables.addAlias('eExpertPID_ALL', 'pidProbabilityExpert(11, ALL)')
+variables.addAlias('KExpertPID_ALL', 'pidProbabilityExpert(321, ALL)')
+variables.addAlias('pExpertPID_ALL', 'pidProbabilityExpert(2212, ALL)')
 
 # load input ROOT file
 inputMdst('default', '../2610030000.dst.root')
@@ -85,6 +92,8 @@ toolsDST += ['MCKinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCFlightInfo', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCTruth', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
+toolsDST += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+             'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 
 # write out the flat ntuple
 ntupleFile('../2610030000.ntup.root')

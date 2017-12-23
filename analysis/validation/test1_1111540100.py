@@ -36,6 +36,11 @@ from glob import glob
 
 set_log_level(LogLevel.ERROR)
 
+variables.addAlias('piExpertPID_ALL', 'pidProbabilityExpert(211, ALL)')
+variables.addAlias('muExpertPID_ALL', 'pidProbabilityExpert(13, ALL)')
+variables.addAlias('eExpertPID_ALL', 'pidProbabilityExpert(11, ALL)')
+variables.addAlias('KExpertPID_ALL', 'pidProbabilityExpert(321, ALL)')
+variables.addAlias('pExpertPID_ALL', 'pidProbabilityExpert(2212, ALL)')
 
 input_mdst = '../1111540100.dst.root'
 
@@ -108,6 +113,8 @@ tools += ['MCKinematics', "^B0 -> [^J/psi -> ^e+ ^e-] [^K_S0 -> ^pi+ ^pi-]"]
 tools += ['MCVertex', "^B0 -> [^J/psi -> e+ e-] [^K_S0 -> pi+ pi-]"]
 tools += ['MCTagVertex', '^B0']
 tools += ['MCDeltaT', '^B0']
+tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+          "B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]"]
 
 
 ntupleFile('../1111540100.ntup.root')

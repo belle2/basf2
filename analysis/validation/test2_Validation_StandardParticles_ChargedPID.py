@@ -1,6 +1,6 @@
 """
 <header>
-<input>../1111540100.ntup.root, ../1111440100.ntup.root, ../ana-dstars.root, ../ana-xi-lambda.root</input>
+<input>../1111540100.ntup.root,../1111440100.ntup.root,../2610030000.ntup.root,../ana-xi-lambda.root</input>
 <output>standardParticlesValidation_ChargedPID.root</output>
 <contact>"Jan Strube" <jan.strube@pnnl.gov></contact>
 </header>
@@ -15,9 +15,9 @@ import os.path as path
 basepath = '../'
 jpsi_ee = TFile.Open(path.join(basepath, '1111540100.ntup.root'))
 jpsi_mm = TFile.Open(path.join(basepath, '1111440100.ntup.root'))
-dstars = TFile.Open(path.join(basepath, 'ana-dstars.root'))
+dstars = TFile.Open(path.join(basepath, '2610030000.ntup.root'))
 xilambda = TFile.Open(path.join(basepath, 'ana-xi-lambda.root'))
-ds = dstars.Get("dsttree")
+ds = dstars.Get("dst")
 electrons = jpsi_ee.Get("B0")
 muons = jpsi_mm.Get("B0")
 xis = xilambda.Get("xitree")
@@ -61,7 +61,7 @@ def plot_pidEfficiencyInSample(pid, sample, detector=""):
     cuts = s.cuts
     total = s.tree.GetEntries(cuts)
     h = TH1D(
-        "%sfakeRate%s" % (sample, pid),
+        "%sPIDEff_in_%s" % (sample, pid),
         "{0} PID efficiency in {1} sample;{0} PID cut;efficiency in {1} sample".format(pid, sample),
         4, 0, 4)
     for bin, pidcut in enumerate(xvals):

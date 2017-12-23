@@ -30,6 +30,13 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 from stdFSParticles import *
+from variables import variables
+
+variables.addAlias('piExpertPID_ALL', 'pidProbabilityExpert(211, ALL)')
+variables.addAlias('muExpertPID_ALL', 'pidProbabilityExpert(13, ALL)')
+variables.addAlias('eExpertPID_ALL', 'pidProbabilityExpert(11, ALL)')
+variables.addAlias('KExpertPID_ALL', 'pidProbabilityExpert(321, ALL)')
+variables.addAlias('pExpertPID_ALL', 'pidProbabilityExpert(2212, ALL)')
 
 # load input ROOT file
 inputMdst('default', '../mdst-xi-lambda.root')
@@ -63,6 +70,8 @@ toolsnu += ['InvMass[BeforeFit]', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 toolsnu += ['Vertex', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['FlightInfo', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
+toolsnu += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+            'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 
 # write out the flat ntuple
 ntupleFile('../ana-xi-lambda.root')

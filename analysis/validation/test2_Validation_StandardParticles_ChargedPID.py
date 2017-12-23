@@ -69,7 +69,7 @@ def plot_pidEfficiencyInSample(pid, sample, detector=""):
             bin+1,
             s.tree.GetEntries("(" + cuts + ") && (%s_%sExpertPID%s > %.2f)" % (track, pid, detector, pidcut)) / total
         )
-        h.GetXaxis().SetBinLabel(bin+1, "{:.2%}".format(pidcut))
+        h.GetXaxis().SetBinLabel(bin+1, "{:.2f}".format(pidcut))
         h.GetListOfFunctions().Add(TNamed("Meta", "nostats"))
         h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
         h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))

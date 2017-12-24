@@ -30,7 +30,6 @@
 //utilities
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/PhysicsTriggerVariables.h>
-#include <analysis/VariableManager/L1EmulatorVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/utilities/FileSystem.h>
 

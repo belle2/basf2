@@ -76,53 +76,37 @@ samples = {
 }
 
 
-def plot_pidEfficiencyInSample_Default(pid, sample):
+def plot_pidEfficiencyInSample(pid, sample, isExpertMode=False, detector=""):
     """
-    Plots the fake rate for a given sample for a given pid
+    Plots the efficiencies for a given sample for a given pid
     """
-    # which sample is faking which particle?
+    metaOptions = "nostats"
+    if isExpertMode:
+        metaOptions += ", expert"
+    if isExpertMode:
+        pidString = "Expert_PID"
+    else:
+        pidString = "PID"
     s = samples[sample]
     track = s.varname
     cuts = s.cuts
     total = s.tree.GetEntries(cuts)
     h = TH1D(
-        "%sPIDEff_in_%s" % (sample, pid),
-        "{0} PID efficiency in a {1} sample;{0} PID cut;efficiency in {1} sample".format(pid, sample),
+        "%sPIDEff_in_%s" % (sample+pidString, pid),
+        "{0} {1} efficiency in a {2} sample;{0} PID cut;efficiency in {2} sample".format(pid, pidString, sample),
         4, 0, 4)
     for bin, pidcut in enumerate(xvals):
+        if isExpertMode:
+            selection = "(" + cuts + ") && (%s_%sExpertPID%s > %.2f)" % (track, pid, detector, pidcut)
+        else:
+            selection = "(" + cuts + ") && (%s_PID%s > %.2f)" % (track, pid.lower(), pidcut)
         h.SetBinContent(
             bin+1,
             # the default PID is unfortunately using lower case for the Kaon
-            s.tree.GetEntries("(" + cuts + ") && (%s_PID%s > %.2f)" % (track, pid.lower(), pidcut)) / total
+            s.tree.GetEntries(selection) / total
         )
         h.GetXaxis().SetBinLabel(bin+1, "{:.2f}".format(pidcut))
-        h.GetListOfFunctions().Add(TNamed("MetaOptions", "nostats"))
-        h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
-        h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
-    outputFile.WriteTObject(h)
-
-
-def plot_pidEfficiencyInSample_Expert(pid, sample, detector=""):
-    """
-    Plots the fake rate for a given sample for a given pid
-    """
-    # which sample is faking which particle?
-    s = samples[sample]
-    track = s.varname
-    cuts = s.cuts
-    total = s.tree.GetEntries(cuts)
-    h = TH1D(
-        "%sExpertPIDEff_in_%s" % (sample, pid),
-        "{0} Expert PID efficiency in a {1} sample;{0} PID cut;efficiency in {1} sample".format(pid, sample),
-        4, 0, 4)
-    for bin, pidcut in enumerate(xvals):
-        h.SetBinContent(
-            bin+1,
-            s.tree.GetEntries("(" + cuts + ") && (%s_%sExpertPID%s > %.2f)" % (track, pid, detector, pidcut)) / total
-        )
-        h.GetXaxis().SetBinLabel(bin+1, "{:.2f}".format(pidcut))
-        h.GetListOfFunctions().Add(TNamed("MetaOptions", "nostats, expert"))
+        h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
         h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
         h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
         h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
@@ -144,5 +128,5 @@ for detector in ("_ALL",):
         ('p', 'e'),
         ('p', 'pi')
     ]:
-        plot_pidEfficiencyInSample_Expert(pid, sample, detector)
-        plot_pidEfficiencyInSample_Default(pid, sample)
+        plot_pidEfficiencyInSample(pid, sample, isExpertMode=True, detector=detector)
+        plot_pidEfficiencyInSample(pid, sample)

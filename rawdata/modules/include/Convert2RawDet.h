@@ -60,7 +60,7 @@ namespace Belle2 {
     //! No. of sent events
     int m_nevt;
 
-    // Data members
+    //! Data members
   private:
     StoreArray<RawDataBlock>  m_rawDataBlock ; /** Array for RawDataBlock*/
     StoreArray<RawCOPPER>     m_rawCOPPER    ; /** Array for RawCOPPER   */

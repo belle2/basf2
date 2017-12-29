@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to use the FSRCorrection
 # module for the following decay:
 #
@@ -21,6 +23,7 @@
 # 2) It's recommended to use looseMCMatching.
 #
 # Contributors: Moritz Gelb (February 2017)
+#               I. Komarov (Demeber 2017)
 #
 ######################################################
 
@@ -30,9 +33,10 @@ from modularAnalysis import *
 # set the log level
 set_log_level(LogLevel.WARNING)
 
-# Bd_JpsiKL_ee Signal MC 7 file
-inputFile = "/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/" \
-            "prod00000628/s00/e0000/4S/r00000/signal/sub00/mdst_000001_prod00000628_task00000001.root"
+# Bd_JpsiKL_ee Signal MC file
+# Generated for release-01-00-00
+inputFile = "/hsm/belle/bdata2/users/ikomarov/tutorial_samples/1111540100.dst.root"
+
 inputMdstList('default', inputFile)
 
 
@@ -76,7 +80,7 @@ var0 = ['p',
         'x',
         'y',
         'z',
-        'daughter(0, eid)',
+        'daughter(0, electronID)',
         'PDG',
         'mcPDG',
         'E',

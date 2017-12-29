@@ -225,9 +225,9 @@ namespace {
       particles.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
       PCmsLabTransform T;
-      TLorentzVector vec0 = {0.0, 0.0, 0.0, 10.5794};
-      TLorentzVector vec1 = {0.0, +0.332174566, 0.0, 5.2897};
-      TLorentzVector vec2 = {0.0, -0.332174566, 0.0, 5.2897};
+      TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+      TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+      TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
       Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 22));
       Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 22, Particle::c_Unflavored, Particle::c_Undefined, 1));
       Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
@@ -235,7 +235,7 @@ namespace {
       p0->appendDaughter(p1->getArrayIndex());
       p0->appendDaughter(p2->getArrayIndex());
 
-      EXPECT_ALL_NEAR(missingMass(p0), 7.5625e-6, 1e-7);
+      EXPECT_ALL_NEAR(missingMass(p0), 0.0, 1e-7);
       EXPECT_ALL_NEAR(missingMomentum(p0), 0.0, 2e-7);
     }
 

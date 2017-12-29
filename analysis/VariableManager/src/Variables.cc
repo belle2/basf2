@@ -676,12 +676,17 @@ namespace Belle2 {
     double missingMomentum(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector tagVec = T.rotateLabToCms()
-                              * part->getDaughter(0)->get4Vector();
-      TLorentzVector sigVec = T.rotateLabToCms()
-                              * part->getDaughter(1)->get4Vector();
-      TLorentzVector vec = tagVec + sigVec;
-      return vec.Vect().Mag();
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Mag();
+    }
+
+    double missingMomentumTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Theta();
     }
 
 // released energy --------------------------------------------------
@@ -1935,8 +1940,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("missingMass", missingMass,
                       "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
-                      "Missing Momentum of the Signal Side in CMS Frame");
-
+                      "Missing momentum (magnitude of three-vector) of the particle with respect to the nominal beam momentum in the lab system, pmiss = pbeam - pparticle");
+    REGISTER_VARIABLE("missingMomentumTheta", missingMomentumTheta,
+                      "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");

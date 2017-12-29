@@ -58,18 +58,17 @@ namespace Belle2 {
     }
 
 
-    //ADDED NEW METHOD, MODIFIED
-    /** This method is to provide the correct Noise conversion into
-     * electron charges, taking into account that the noise is the result
-     * of an ADC output average, so it is not an integer but
-     * a float number, even when converted.
-     * Input:
-     * @param sensor ID: identitiy of the sensor for which the
-     * calibration is required
-     * @param isU: sensor side, true for p (u) side, false for n (v) side
-     * @param strip: strip number
-     *
-     * Output: float corresponding to the strip noise in electrons.
+    /** This method provides the correct noise conversion into
+    * electrons, taking into account that the noise is the result
+    * of an ADC output average, so it is not an integer, but
+    * a float number.
+    * Input:
+    * @param sensor ID: identitiy of the sensor for which the
+    * calibration is required
+    * @param isU: sensor side, true for p (u) side, false for n (v) side
+    * @param strip: strip number
+    *
+    * Output: float corresponding to the strip noise in electrons.
     */
     inline float getNoiseInElectrons(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
     {

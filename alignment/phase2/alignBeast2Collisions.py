@@ -23,18 +23,28 @@ if not len(inputFiles):
 # Pre-collector full standard reconstruction path
 path = basf2.create_path()
 path.add_module("RootInput")
+# path.add_module("Gearbox")
 path.add_module("Gearbox", fileName='/geometry/Beast2_phase2.xml')
+
+components = [
+    'MagneticField',
+    'BeamPipe',
+    'PXD',
+    'SVD',
+    'CDC',
+    'EKLM',
+    'BKLM']
 
 # We assume that we start from non-recontructed data
 # as we change reco-constants in each iteration, std
 # reco needs to be repeated after each calibration.
-reco.add_reconstruction(path, pruneTracks=False)
+reco.add_reconstruction(path, pruneTracks=False, components=components)
 
 # Now use analysis to select alignment tracks/decays
 # Select single muons for aligment...
-# ana.fillParticleList('mu+:bbmu', 'muonID > 0.1 and useLabFrame(p) > 0.5', True, path)
+ana.fillParticleList('mu+:bbmu', 'muonID > 0.1 and useLabFrame(p) < 4.5', True, path)
 # Pre-fit with beam+vertex constraint decays for muon pairs
-ana.fillParticleList('mu+:qed', 'muonID > 0.1 and useCMSFrame(p) > 2.', writeOut=True, path=path)
+ana.fillParticleList('mu+:qed', 'muonID > 0.1 and useCMSFrame(p) > 4.5', writeOut=True, path=path)
 ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', '', writeOut=True, path=path)
 ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=path, constraint='ipprofile')
 

@@ -15,6 +15,8 @@
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
 #include <framework/database/DBObjPtr.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+
 #include <string>
 
 //#include <framework/logging/Logger.h>
@@ -53,6 +55,26 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                               strip);
+    }
+
+
+    //ADDED NEW METHOD, MODIFIED
+    /** This method is to provide the correct Noise conversion into
+     * electron charges, taking into account that the noise is the result
+     * of an ADC output average, so it is not an integer but
+     * a float number, even when converted.
+     * Input:
+     * @param sensor ID: identitiy of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p (u) side, false for n (v) side
+     * @param strip: strip number
+     *
+     * Output: float corresponding to the strip noise in electrons.
+    */
+    inline float getNoiseInElectrons(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    {
+      SVDPulseShapeCalibrations m_pulseShape;
+      return getNoise(sensorID, isU, strip) * m_pulseShape.getChargeFromADC(sensorID, isU, strip, 1);
     }
 
     /*    inline void setNoise(const VxdID& sensorID, const bool& isU , const unsigned short& strip, float stripNoise)

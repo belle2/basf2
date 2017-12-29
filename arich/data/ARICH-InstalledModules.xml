@@ -1,2525 +1,2524 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<InstalledModules descr="Installed modules (dummy file)">
-  <Module hapdID="KA0245">
+<?xml version='1.0' encoding='UTF-8'?>
+<InstalledModules xmlns:xi='http://www.w3.org/2001/XInclude'>
+  <Module hapdID="KA0430">
     <Sector>1</Sector>
     <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0838">
+  <Module hapdID="ZJ6721">
     <Sector>1</Sector>
     <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5943">
-    <Sector>1</Sector>
-    <Ring>1</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0266">
-    <Sector>1</Sector>
-    <Ring>1</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6732">
-    <Sector>1</Sector>
-    <Ring>1</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0777">
-    <Sector>1</Sector>
-    <Ring>1</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0368">
-    <Sector>1</Sector>
-    <Ring>1</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0679">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0796">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0897">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0878">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6748">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0287">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0260">
-    <Sector>2</Sector>
-    <Ring>1</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1135">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1131">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0747">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1008">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7823">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0631">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5880">
-    <Sector>3</Sector>
-    <Ring>1</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7463">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0684">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0632">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0798">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1049">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0924">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1130">
-    <Sector>5</Sector>
-    <Ring>1</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1019">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0398">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1136">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7830">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7893">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0423">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7833">
-    <Sector>6</Sector>
-    <Ring>1</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0810">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0799">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0593">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5316">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1007">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0742">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0701">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0774">
-    <Sector>1</Sector>
-    <Ring>2</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0530">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5908">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1022">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0981">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0510">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0722">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7134">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0570">
-    <Sector>2</Sector>
-    <Ring>2</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0929">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0461">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1085">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5865">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0764">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1061">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0414">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0247">
-    <Sector>3</Sector>
-    <Ring>2</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0521">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0881">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1080">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0952">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0741">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6734">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0222">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0876">
-    <Sector>5</Sector>
-    <Ring>2</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6739">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0441">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1137">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0978">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0768">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0719">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7694">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0925">
-    <Sector>6</Sector>
-    <Ring>2</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0232">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1027">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1054">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1108">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1120">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0438">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0375">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1075">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0276">
-    <Sector>1</Sector>
-    <Ring>3</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0704">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5573">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0851">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6729">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0903">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1009">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7701">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0240">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7885">
-    <Sector>2</Sector>
-    <Ring>3</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0873">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5898">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7822">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0778">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0908">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0249">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0648">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0299">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5580">
-    <Sector>3</Sector>
-    <Ring>3</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7829">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0883">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0456">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0674">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0949">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1105">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5571">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0975">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0700">
-    <Sector>5</Sector>
-    <Ring>3</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1045">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5911">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0915">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0228">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0275">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7832">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0304">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0941">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0598">
-    <Sector>6</Sector>
-    <Ring>3</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1098">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0281">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0686">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0972">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0215">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0862">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0997">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0420">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1018">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0685">
-    <Sector>1</Sector>
-    <Ring>4</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5574">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0756">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1126">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0985">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7824">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0152">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1125">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0395">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0822">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0893">
-    <Sector>2</Sector>
-    <Ring>4</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0983">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1034">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0580">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5949">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0536">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0508">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0959">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0984">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5583">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5872">
-    <Sector>3</Sector>
-    <Ring>4</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0843">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1094">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5859">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0268">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7472">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0280">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0499">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0323">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1047">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0827">
-    <Sector>5</Sector>
-    <Ring>4</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0864">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0312">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0302">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0848">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0841">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5858">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1082">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0316">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0263">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0307">
-    <Sector>6</Sector>
-    <Ring>4</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7884">
-    <Sector>1</Sector>
-    <Ring>5</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1088">
-    <Sector>1</Sector>
-    <Ring>5</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0930">
-    <Sector>1</Sector>
-    <Ring>5</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
   </Module>
   <Module hapdID="KA0793">
     <Sector>1</Sector>
-    <Ring>5</Ring>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA1043">
+    <Sector>1</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0987">
+  <Module hapdID="ZJ6731">
     <Sector>1</Sector>
-    <Ring>5</Ring>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0476">
+  <Module hapdID="KA0520">
     <Sector>1</Sector>
-    <Ring>5</Ring>
-    <Azimuth>6</Azimuth>
+    <Ring>1</Ring>
     <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0504">
+    <Sector>1</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6726">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0982">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5858">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
   </Module>
   <Module hapdID="KA1121">
     <Sector>1</Sector>
-    <Ring>5</Ring>
-    <Azimuth>7</Azimuth>
+    <Ring>2</Ring>
     <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
   </Module>
-  <Module hapdID="KA0825">
+  <Module hapdID="ZJ5862">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0467">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0696">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0888">
+    <Sector>1</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0848">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7465">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA1034">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0987">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0309">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0840">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0447">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0203">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0667">
+    <Sector>1</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0976">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1025">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5859">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0984">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1068">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0930">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1096">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0785">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7888">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7464">
+    <Sector>1</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA1082">
     <Sector>1</Sector>
     <Ring>5</Ring>
-    <Azimuth>8</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
   </Module>
   <Module hapdID="KA0946">
     <Sector>1</Sector>
     <Ring>5</Ring>
-    <Azimuth>9</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
   </Module>
-  <Module hapdID="KA0467">
+  <Module hapdID="KA0874">
     <Sector>1</Sector>
     <Ring>5</Ring>
-    <Azimuth>10</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0409">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0825">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5872">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0589">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0536">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA1094">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA1024">
+    <Sector>1</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
   </Module>
   <Module hapdID="KA0466">
     <Sector>1</Sector>
     <Ring>5</Ring>
+    <isActive>1</isActive>
     <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0409">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>1</Azimuth>
+  <Module hapdID="KA0981">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
     <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5908">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
   </Module>
   <Module hapdID="KA0958">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0316">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1099">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7886">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0307">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0864">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0773">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA1047">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0841">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0843">
+    <Sector>1</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0570">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1049">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0247">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6748">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7134">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0881">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5316">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA1135">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0878">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0510">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0799">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0929">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0897">
+    <Sector>1</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>13</Azimuth>
+  </Module>
+  <Module hapdID="KA0503">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0295">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0250">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0465">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0968">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA1041">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0413">
+    <Sector>4</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0973">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7891">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0312">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0868">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0443">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0763">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0727">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0974">
+    <Sector>4</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0617">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0683">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7831">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7827">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6739">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA1037">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0646">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0615">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0320">
+    <Sector>4</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7697">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6743">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5938">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5932">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5594">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0820">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7884">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0563">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5576">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0474">
+    <Sector>4</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7820">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0571">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0808">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0573">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0935">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0259">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0335">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5605">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0535">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5600">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0284">
+    <Sector>4</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0919">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0923">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0767">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5607">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0446">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA1023">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0604">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA1081">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7889">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7482">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0166">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0330">
+    <Sector>4</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0342">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1029">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0953">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA1097">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1087">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0396">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5902">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5912">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA1066">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0317">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA1011">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0453">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0817">
+    <Sector>4</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>13</Azimuth>
+  </Module>
+  <Module hapdID="KA0883">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0598">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0476">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0924">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7694">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5911">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0704">
+    <Sector>2</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0983">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0275">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5574">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0560">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0499">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0756">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0605">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0215">
+    <Sector>2</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0304">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1027">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0778">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0915">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0908">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0985">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0299">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0813">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0978">
+    <Sector>2</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0240">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1009">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7885">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0972">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0949">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA1088">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0822">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7829">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0851">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0997">
+    <Sector>2</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA1098">
     <Sector>2</Sector>
     <Ring>5</Ring>
-    <Azimuth>2</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5580">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0375">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0438">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0395">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0685">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5947">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0747">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA1075">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7822">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0867">
+    <Sector>2</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0276">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1045">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5573">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0420">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1054">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0941">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0281">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5898">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
   </Module>
   <Module hapdID="KA0902">
     <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>3</Azimuth>
+    <Ring>6</Ring>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6721">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0589">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0874">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0672">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0646">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1096">
-    <Sector>2</Sector>
-    <Ring>5</Ring>
     <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA1024">
+  <Module hapdID="KA0893">
     <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>10</Azimuth>
+    <Ring>6</Ring>
     <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0222">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7472">
+    <Sector>2</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0674">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1018">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0975">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6729">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1126">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7824">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0686">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0456">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7893">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
   </Module>
   <Module hapdID="KA0831">
     <Sector>2</Sector>
-    <Ring>5</Ring>
-    <Azimuth>11</Azimuth>
+    <Ring>7</Ring>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5862">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1102">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1081">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0773">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1068">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7482">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5907">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7886">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0680">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6726">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
     <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ5922">
-    <Sector>3</Sector>
-    <Ring>5</Ring>
+  <Module hapdID="KA0684">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ7465">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>1</Azimuth>
+  <Module hapdID="KA1137">
+    <Sector>2</Sector>
+    <Ring>7</Ring>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1099">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0982">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0993">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7889">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5931">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0430">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0413">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0597">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0692">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0917">
-    <Sector>5</Sector>
-    <Ring>5</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5606">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0611">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0399">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0658">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0910">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0583">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0555">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0591">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0575">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0279">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0757">
-    <Sector>6</Sector>
-    <Ring>5</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0801">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0189">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5930">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1013">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0794">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5601">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0665">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1106">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1107">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0514">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0872">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0572">
-    <Sector>1</Sector>
-    <Ring>6</Ring>
     <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ5945">
+  <Module hapdID="ZJ7832">
     <Sector>2</Sector>
-    <Ring>6</Ring>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>13</Azimuth>
+  </Module>
+  <Module hapdID="KA1008">
+    <Sector>5</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0970">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
+  <Module hapdID="KA0724">
+    <Sector>5</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0894">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
+  <Module hapdID="KA0593">
+    <Sector>5</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7480">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0787">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0986">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0821">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5614">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0235">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0869">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0932">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0839">
-    <Sector>2</Sector>
-    <Ring>6</Ring>
-    <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0325">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5887">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0379">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0865">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0610">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5937">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0651">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0569">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
   </Module>
   <Module hapdID="KA0826">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>9</Azimuth>
+    <Sector>5</Sector>
+    <Ring>1</Ring>
     <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
   </Module>
-  <Module hapdID="KA0238">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>10</Azimuth>
+  <Module hapdID="ZJ5894">
+    <Sector>5</Sector>
+    <Ring>1</Ring>
     <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5937">
+    <Sector>5</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5943">
+    <Sector>5</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0514">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0423">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA1055">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0580">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0325">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
   </Module>
   <Module hapdID="KA0954">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0870">
-    <Sector>3</Sector>
-    <Ring>6</Ring>
-    <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0614">
     <Sector>5</Sector>
-    <Ring>6</Ring>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6732">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5945">
+    <Sector>5</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0368">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
     <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ6722">
+  <Module hapdID="KA0665">
     <Sector>5</Sector>
-    <Ring>6</Ring>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
     <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0501">
+  <Module hapdID="KA0235">
     <Sector>5</Sector>
-    <Ring>6</Ring>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
     <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA1010">
+  <Module hapdID="KA0839">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0876">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0777">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1061">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0869">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0986">
+    <Sector>5</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0238">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0794">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0865">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0932">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0651">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0569">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0225">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0766">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0894">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0610">
+    <Sector>5</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0379">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0679">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0572">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA1106">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7830">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5887">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0872">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0787">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5614">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA1085">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0266">
+    <Sector>5</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0287">
     <Sector>5</Sector>
     <Ring>6</Ring>
-    <Azimuth>4</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1007">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA1131">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0768">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1093">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0722">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0838">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0632">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
   </Module>
   <Module hapdID="KA0516">
     <Sector>5</Sector>
     <Ring>6</Ring>
-    <Azimuth>5</Azimuth>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0896">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5947">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1067">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0267">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
     <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0948">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7133">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0472">
-    <Sector>5</Sector>
-    <Ring>6</Ring>
-    <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0762">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0760">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7826">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7135">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1089">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0242">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0478">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5933">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0937">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0656">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1035">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1006">
-    <Sector>6</Sector>
-    <Ring>6</Ring>
-    <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0464">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0804">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0357">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0537">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0502">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0859">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0274">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5894">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0253">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0289">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0274">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0245">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0838">
-    <Sector>1</Sector>
-    <Ring>7</Ring>
-    <Azimuth>13</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5943">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0266">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6732">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0777">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0368">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0679">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0796">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0897">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0878">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ6748">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0287">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
   </Module>
   <Module hapdID="KA0260">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>12</Azimuth>
+    <Sector>5</Sector>
+    <Ring>6</Ring>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1135">
-    <Sector>2</Sector>
-    <Ring>7</Ring>
-    <Azimuth>13</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1131">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0747">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1008">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7823">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0631">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5880">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7463">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0684">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0632">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0798">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
     <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1049">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0924">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1130">
-    <Sector>3</Sector>
-    <Ring>7</Ring>
-    <Azimuth>13</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1019">
-    <Sector>5</Sector>
-    <Ring>7</Ring>
-    <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0398">
-    <Sector>5</Sector>
-    <Ring>7</Ring>
-    <Azimuth>2</Azimuth>
-    <isActive>1</isActive>
   </Module>
   <Module hapdID="KA1136">
     <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0963">
+    <Sector>5</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0530">
+    <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0521">
+    <Sector>5</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0796">
+    <Sector>5</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ7830">
+  <Module hapdID="KA0631">
     <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ7893">
+  <Module hapdID="KA1080">
     <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0423">
+  <Module hapdID="KA0798">
     <Sector>5</Sector>
     <Ring>7</Ring>
-    <Azimuth>6</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1022">
+    <Sector>5</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0414">
+    <Sector>5</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
   </Module>
   <Module hapdID="ZJ7833">
     <Sector>5</Sector>
     <Ring>7</Ring>
-    <Azimuth>7</Azimuth>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0810">
-    <Sector>5</Sector>
-    <Ring>7</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0799">
-    <Sector>5</Sector>
-    <Ring>7</Ring>
     <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0593">
+  <Module hapdID="KA1130">
     <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="ZJ5316">
+  <Module hapdID="ZJ7823">
     <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA1007">
+  <Module hapdID="ZJ7471">
     <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
     <Azimuth>12</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0742">
-    <Sector>5</Sector>
-    <Ring>7</Ring>
-    <Azimuth>13</Azimuth>
-    <isActive>1</isActive>
   </Module>
   <Module hapdID="KA0701">
-    <Sector>6</Sector>
+    <Sector>5</Sector>
     <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>13</Azimuth>
+  </Module>
+  <Module hapdID="KA0502">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
     <Azimuth>1</Azimuth>
-    <isActive>1</isActive>
   </Module>
-  <Module hapdID="KA0774">
+  <Module hapdID="KA0623">
     <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>2</Azimuth>
+    <Ring>2</Ring>
     <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0530">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>3</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ5908">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>4</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA1022">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>5</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0981">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>6</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0510">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>7</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0722">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>8</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="ZJ7134">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>9</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0570">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>10</Azimuth>
-    <isActive>1</isActive>
-  </Module>
-  <Module hapdID="KA0929">
-    <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>11</Azimuth>
-    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
   </Module>
   <Module hapdID="KA0461">
     <Sector>6</Sector>
-    <Ring>7</Ring>
-    <Azimuth>12</Azimuth>
+    <Ring>3</Ring>
     <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
   </Module>
-  <Module hapdID="KA1085">
+  <Module hapdID="KA0464">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0719">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA1105">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0762">
     <Sector>6</Sector>
     <Ring>7</Ring>
-    <Azimuth>13</Azimuth>
     <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
   </Module>
-
-  <Module hapdID="ZJ5594">
-     <Sector>4</Sector>
-     <Ring>1</Ring>
-     <Azimuth>7</Azimuth>
-     <isActive>1</isActive>
+  <Module hapdID="KA1108">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
   </Module>
-   <Module hapdID="KA0974">
-     <Sector>4</Sector>
-     <Ring>2</Ring>
-     <Azimuth>8</Azimuth>
-     <isActive>1</isActive>
-   </Module>
-   <Module hapdID="KA0320">
-     <Sector>4</Sector>
-     <Ring>3</Ring>
-     <Azimuth>9</Azimuth>
-     <isActive>1</isActive>
-   </Module>
-   <Module hapdID="KA0474">
-     <Sector>4</Sector>
-     <Ring>4</Ring>
-     <Azimuth>10</Azimuth>
-     <isActive>1</isActive>
-   </Module>
-    <Module hapdID="KA0284">
-     <Sector>4</Sector>
-     <Ring>5</Ring>
-     <Azimuth>11</Azimuth>
-     <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0330">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>12</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0817">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>13</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1041">
-      <Sector>4</Sector>
-      <Ring>1</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0727">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>7</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0968">
-      <Sector>4</Sector>
-      <Ring>1</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0763">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0615">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>8</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0441">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>7</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5576">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>9</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0563">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>8</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5600">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>10</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0166">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>11</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0453">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>12</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0535">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>9</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0775">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>10</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1011">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>11</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0465">
-      <Sector>4</Sector>
-      <Ring>1</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0443">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1037">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5919">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>7</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5605">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>8</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0250">
-      <Sector>4</Sector>
-      <Ring>1</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0836">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>9</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0317">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>10</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ6739">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0868">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0335">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>7</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0820">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ7467">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>8</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1066">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>9</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0295">
-      <Sector>4</Sector>
-      <Ring>1</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0503">
-      <Sector>4</Sector>
-      <Ring>1</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0626">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ7827">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0401">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0259">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0604">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>7</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5912">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>8</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5902">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>7</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1023">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0935">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5932">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ7831">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ7891">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0973">
-      <Sector>4</Sector>
-      <Ring>2</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0683">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5938">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0573">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0446">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0396">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>6</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0617">
-      <Sector>4</Sector>
-      <Ring>3</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ6743">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0808">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ5607">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1087">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>5</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ7697">
-      <Sector>4</Sector>
-      <Ring>4</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0571">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1097">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>4</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0767">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0953">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>3</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="ZJ7820">
-      <Sector>4</Sector>
-      <Ring>5</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0923">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0919">
-      <Sector>4</Sector>
-      <Ring>6</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA1029">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>2</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    <Module hapdID="KA0342">
-      <Sector>4</Sector>
-      <Ring>7</Ring>
-      <Azimuth>1</Azimuth>
-      <isActive>1</isActive>
-    </Module>
-    
+  <Module hapdID="KA0827">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0614">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5579">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5931">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA1120">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0249">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0959">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA1125">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5865">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0323">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0289">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0253">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0398">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0742">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6724">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA1129">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0228">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0648">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0441">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0823">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0152">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5571">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0268">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA1010">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7882">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0232">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0501">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5949">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0942">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0925">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1102">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1067">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1006">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0280">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0680">
+    <Sector>6</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0242">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7133">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0896">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0344">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0273">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0348">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0302">
+    <Sector>6</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0870">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0616">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0764">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0920">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0350">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0524">
+    <Sector>6</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0267">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0765">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA1089">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0955">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0485">
+    <Sector>6</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0952">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5922">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0478">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0736">
+    <Sector>6</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0993">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0937">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0940">
+    <Sector>6</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0263">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0274">
+    <Sector>6</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>13</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5606">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6723">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5907">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7480">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7470">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5880">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0626">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>1</Azimuth>
+  </Module>
+  <Module hapdID="KA0575">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0245">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0508">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0810">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7463">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5583">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0360">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>2</Azimuth>
+  </Module>
+  <Module hapdID="KA0672">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0597">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0455">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0583">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA1035">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0769">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="KA0804">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>3</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6750">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7468">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5601">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0282">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0859">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0531">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="KA0948">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>4</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5930">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0801">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7826">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0656">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0695">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0555">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0720">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>5</Azimuth>
+  </Module>
+  <Module hapdID="KA0357">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7702">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7701">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0279">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA1100">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0507">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5933">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>6</Azimuth>
+  </Module>
+  <Module hapdID="KA0399">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>13</Azimuth>
+  </Module>
+  <Module hapdID="KA0677">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="KA0658">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>12</Azimuth>
+  </Module>
+  <Module hapdID="ZJ5919">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0745">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0757">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>11</Azimuth>
+  </Module>
+  <Module hapdID="KA0537">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0526">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0692">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7469">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>10</Azimuth>
+  </Module>
+  <Module hapdID="KA0903">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0836">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7135">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0775">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0189">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>9</Azimuth>
+  </Module>
+  <Module hapdID="KA0591">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0472">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0760">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0821">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA1013">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="ZJ7467">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>8</Azimuth>
+  </Module>
+  <Module hapdID="KA0611">
+    <Sector>3</Sector>
+    <Ring>7</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6722">
+    <Sector>3</Sector>
+    <Ring>6</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0298">
+    <Sector>3</Sector>
+    <Ring>5</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0917">
+    <Sector>3</Sector>
+    <Ring>4</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0873">
+    <Sector>3</Sector>
+    <Ring>3</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="ZJ6741">
+    <Sector>3</Sector>
+    <Ring>2</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
+  <Module hapdID="KA0862">
+    <Sector>3</Sector>
+    <Ring>1</Ring>
+    <isActive>1</isActive>
+    <Azimuth>7</Azimuth>
+  </Module>
 </InstalledModules>
+

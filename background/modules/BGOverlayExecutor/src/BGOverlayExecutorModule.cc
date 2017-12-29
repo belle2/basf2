@@ -23,11 +23,10 @@
 
 // detector Digits, Clusters or waveforms
 #include <pxd/dataobjects/PXDDigit.h>
-#include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <background/dataobjects/BackgroundInfo.h>
@@ -56,7 +55,7 @@ namespace Belle2 {
     // Add parameters
     addParam("PXDDigitsName", m_PXDDigitsName,
              "name of PXD collection to overlay with BG", string(""));
-    addParam("SVDDigitsName", m_SVDDigitsName,
+    addParam("SVDShaperDigitsName", m_SVDShaperDigitsName,
              "name of SVD collection to overlay with BG", string(""));
     addParam("CDCHitsName", m_CDCHitsName,
              "name of CDC collection to overlay with BG", string(""));
@@ -64,8 +63,6 @@ namespace Belle2 {
              "name of TOP collection to overlay with BG", string(""));
     addParam("ARICHDigitsName", m_ARICHDigitsName,
              "name of ARICH collection to overlay with BG", string(""));
-    addParam("ECLDspsName", m_ECLDspsName,
-             "name of ECL collection to overlay with BG", string(""));
     addParam("BKLMDigitsName", m_BKLMDigitsName,
              "name of BKLM collection to overlay with BG", string(""));
     addParam("EKLMDigitsName", m_EKLMDigitsName,
@@ -93,11 +90,10 @@ namespace Belle2 {
 
     // registration in datastore (all as optional input - see template function)
     registerDigits<PXDDigit>(m_PXDDigitsName);
-    registerDigits<SVDDigit>(m_SVDDigitsName);
+    registerDigits<SVDShaperDigit>(m_SVDShaperDigitsName);
     registerDigits<CDCHit>(m_CDCHitsName);
     registerDigits<TOPDigit>(m_TOPDigitsName);
     registerDigits<ARICHDigit>(m_ARICHDigitsName);
-    registerDigits<ECLDsp>(m_ECLDspsName);
     registerDigits<BKLMDigit>(m_BKLMDigitsName);
     registerDigits<EKLMDigit>(m_EKLMDigitsName);
 
@@ -112,11 +108,11 @@ namespace Belle2 {
     /* note: dataobject must inherit from DigitBase */
 
     addBGDigits<PXDDigit>(m_PXDDigitsName);
-    addBGDigits<SVDDigit>(m_SVDDigitsName);
+    addBGDigits<SVDShaperDigit>(m_SVDShaperDigitsName);
     addBGDigits<CDCHit>(m_CDCHitsName);
     addBGDigits<TOPDigit>(m_TOPDigitsName);
     addBGDigits<ARICHDigit>(m_ARICHDigitsName);
-    //    addBGDigits<ECLDsp>(m_ECLDspsName);
+    //Compressed waveforms are loaded to the datastore by BGOverlayInputModule and unpacked and overlayed in ECLDigitizerModule
     addBGDigits<BKLMDigit>(m_BKLMDigitsName);
     addBGDigits<EKLMDigit>(m_EKLMDigitsName);
 

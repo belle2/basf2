@@ -13,7 +13,7 @@
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -53,11 +53,11 @@ namespace KlId {
   int BelleECLFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
   {
     const TVector3& pos = cluster.getClusterPosition();
-    Belle2::StoreArray<Belle2::ECLCluster> clusters;
+    Belle2::StoreArray<Belle2::ECLCluster> eclclusters;
 
-    for (const Belle2::ECLCluster& cluster : clusters) {
+    for (const Belle2::ECLCluster& eclcluster : eclclusters) {
 
-      const TVector3& clusterPos = cluster.getClusterPosition();
+      const TVector3& clusterPos = eclcluster.getClusterPosition();
 
       if (clusterPos.Angle(pos) < angle) {
         B2DEBUG(150, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
@@ -208,22 +208,27 @@ namespace KlId {
   {
 
     Belle2::ECLCluster* closestECL = nullptr ;
-    double initDistance = 9999999;
-    double closestECLAngleDist = 99999999;
+    double closestECLAngleDist = 1e10;
+    double angularDist = 1e10;
     Belle2::StoreArray<Belle2::ECLCluster> eclClusters;
 
-    for (Belle2::ECLCluster& eclcluster : eclClusters) {
-
-      const TVector3& eclclusterPos = eclcluster.getClusterPosition();
-      closestECLAngleDist = eclclusterPos.Angle(klmClusterPosition);
-
-      if (closestECLAngleDist < initDistance) {
-        //turn ref to pointer so you can check for null
-        closestECL = &eclcluster;
+    if (eclClusters.getEntries() > 0) {
+      unsigned int index = 0;
+      unsigned int indexOfClosestCluster = 0;
+      for (Belle2::ECLCluster& eclcluster : eclClusters) {
+        const TVector3& eclclusterPos = eclcluster.getClusterPosition();
+        angularDist = eclclusterPos.Angle(klmClusterPosition);
+        if (angularDist < closestECLAngleDist) {
+          closestECLAngleDist = angularDist;
+          // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
+          // so that after the loop the reference would always point to the last cluster in the list...
+          // if you know a more elegant solution than using the index pls tell me (Jo)
+          indexOfClosestCluster = index;
+        }
+        ++index;
       }
-
+      closestECL = eclClusters[indexOfClosestCluster];
     }
-
     return std::make_pair(closestECL, closestECLAngleDist);
   }
 
@@ -234,30 +239,32 @@ namespace KlId {
 
     Belle2::StoreArray<Belle2::KLMCluster> klmClusters;
     const Belle2::KLMCluster* closestKLM = nullptr;
-    double closestKLMDist = 99999999;
+    double closestKLMDist = 1e10;
     double avInterClusterDist = 0;
-    double nextClusterDist = 99999999;
+    double nextClusterDist = 1e10;
     double nKLMCluster = klmClusters.getEntries();
 
-    for (const Belle2::KLMCluster& nextCluster : klmClusters) {
+    if (nKLMCluster > 1) {
 
-      const TVector3& nextClusterPos = nextCluster.getClusterPosition();
-      const TVector3& clustDistanceVec = nextClusterPos - klmClusterPosition;
+      unsigned int index = 0;
+      unsigned int indexOfClosestCluster = 0;
+      for (const Belle2::KLMCluster& nextCluster : klmClusters) {
 
-      nextClusterDist = clustDistanceVec.Mag2();
-      avInterClusterDist = avInterClusterDist + nextClusterDist;
+        const TVector3& nextClusterPos = nextCluster.getClusterPosition();
+        const TVector3& clustDistanceVec = nextClusterPos - klmClusterPosition;
 
-      if ((nextClusterDist < closestKLMDist) and not(nextClusterDist == 0)) {
-        closestKLMDist = nextClusterDist ;
-        closestKLM = &nextCluster;
-      }
-    }// for next_cluster
+        nextClusterDist = clustDistanceVec.Mag2();
+        avInterClusterDist = avInterClusterDist + nextClusterDist;
 
-    // normalise avarage inter cluster dist
-    if (nKLMCluster) {
+        if ((nextClusterDist < closestKLMDist) and not(nextClusterDist == 0)) {
+          closestKLMDist = nextClusterDist ;
+          indexOfClosestCluster = index;
+        }
+        ++index;
+      }// for next_cluster
+
+      closestKLM = klmClusters[indexOfClosestCluster];
       avInterClusterDist = avInterClusterDist / (1. * nKLMCluster);
-    } else {
-      avInterClusterDist = 0;
     }
 
     return std::make_tuple(closestKLM, closestKLMDist, avInterClusterDist);

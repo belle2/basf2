@@ -40,7 +40,6 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
-    ClassDef(eclMuMuEAlgorithm, 0); /**< class implementing calibration algorithm */
 
   };
 } // namespace Belle2

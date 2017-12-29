@@ -131,7 +131,7 @@ namespace Belle2 {
 
       StoreArray<Track> tracks;
       for (int i = 0; i < tracks.getEntries(); ++i) {
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResult(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
         if (iTrack == nullptr) continue;
         TLorentzVector momtrack(iTrack->getMomentum(), 0);
         if (momtrack == momtrack) totalMomChargedtracks += momtrack;

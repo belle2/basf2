@@ -1,0 +1,7 @@
+Import('env')
+
+#env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
+#env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
+env['LIBS'] = ['framework', 'daq', 'dqm', "RooFit", "RooFitCore"]
+
+Return('env')

@@ -19,13 +19,13 @@
 
 namespace Belle2 {
 
-  SELECTION_VARIABLE(Difference, double,
+  SELECTION_VARIABLE(Difference, 2, double,
                      static double value(const double& t1,
                                          const double& t2)
   { return t1 - t2; };
                     );
 
-  SELECTION_VARIABLE(Sum, double,
+  SELECTION_VARIABLE(Sum, 2, double,
                      static double value(const double& t1,
                                          const double& t2)
   { return t1 + t2; };

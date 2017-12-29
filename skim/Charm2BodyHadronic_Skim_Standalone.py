@@ -15,7 +15,7 @@ from stdCharged import *
 
 
 set_log_level(LogLevel.INFO)
-
+gb2_setuprel = 'build-2017-10-16'
 import sys
 import os
 import glob
@@ -25,22 +25,7 @@ ccbar_wBG = \
      'mdst_00051*_prod00000198_task0000051*.root']
 
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = ccbar_wBG
-    bkgType = 'ccbarOld'
-
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
+inputMdstList('default', fileList)
 
 
 loadStdCharged()
@@ -49,7 +34,7 @@ from Charm2BodyHadronic_List import *
 
 
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm()
-skimOutputUdst('outputFiles/Charm2BodyHadronic_' + bkgType, DstToD0PiD0ToHpJmList)
+skimOutputUdst('Charm2BodyHadronic', DstToD0PiD0ToHpJmList)
 summaryOfLists(DstToD0PiD0ToHpJmList)
 
 

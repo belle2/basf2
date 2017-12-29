@@ -150,7 +150,9 @@ namespace Belle2 {
   private:
     //! Record background
     bool m_recordBackground;
+    //! Vector with types of dock boxes
     std::vector<VXDBoxTypesPar> m_vxdBoxTypes;
+    //! Vector with positions of dock boxes
     std::vector<VXDBoxPositionsPar> m_vxdBoxPositions;
 
     ClassDef(VXDServiceGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

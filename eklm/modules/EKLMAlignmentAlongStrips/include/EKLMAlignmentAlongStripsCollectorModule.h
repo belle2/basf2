@@ -23,6 +23,8 @@
 #include <eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
 
 namespace Belle2 {
 
@@ -57,12 +59,21 @@ namespace Belle2 {
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate();
+    void finish();
 
   private:
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
+
+    /** Transformation data. */
+    EKLM::TransformData* m_TransformData;
+
+    /** EKLM digits. */
+    StoreArray<EKLMDigit> m_EKLMDigits;
+
+    /** Tracks. */
+    StoreArray<Track> m_Tracks;
 
     /** Event. */
     struct EKLMAlignmentAlongStripsAlgorithm::Event* m_Event;

@@ -21,7 +21,7 @@
       TDC_DT=CHWID
       TDC_T0=OFFSET
       TIME_RANGE=TDC_RANGE*TDC_DT
-      T_MAX=TIME_RANGE
+      T_MAX=TIME_RANGE-TDC_T0
       TDC_INI=.TRUE.
 
       END
@@ -37,7 +37,7 @@
       IF(TMAX.GT.0) THEN
          T_MAX=TMAX
       ELSE
-         T_MAX=TIME_RANGE
+         T_MAX=TIME_RANGE-TDC_T0
       ENDIF
       
       END

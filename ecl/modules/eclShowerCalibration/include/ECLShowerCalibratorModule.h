@@ -57,7 +57,7 @@ namespace Belle2 {
       virtual const char* eclConnectedRegionArrayName() const
       { return "ECLConnectedRegions" ; }
 
-    }; // end of ECLCRFinderAndSplitterModule
+    };
 
 
     /** The very same module but for PureCsI */
@@ -72,7 +72,7 @@ namespace Belle2 {
       virtual const char* eclConnectedRegionArrayName() const override
       { return "ECLConnectedRegionsPureCsI" ; }
 
-    }; // end of ECLCRFinderAndSplitterPureCsIModule
+    };
   } // end of ECL namespace
 } // end of Belle2 namespace
 

@@ -24,6 +24,8 @@ namespace Belle2 {
   private:
     std::map<int, int> m_numberOfCarriers; /**number of carriers connected to scrods*/
     std::map<int, BoardStackStatus> m_statusMonitor;/**board stack status object for every fee module connected to copper*/
+    bool m_initialConfigurationDone; /**flag to indicate if inital configuration has been performed */
+
   };
 
 }

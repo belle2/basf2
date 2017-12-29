@@ -16,34 +16,24 @@ from stdV0s import *
 from stdCharm import *
 
 set_log_level(LogLevel.INFO)
-
+gb2_setuprel = 'build-2017-10-16'
 
 import sys
 import os
 import glob
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = \
-        ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-         'mdst_000001_prod00000001_task00000001.root'
+fileList = \
+    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
+     'mdst_000001_prod00000001_task00000001.root'
 
-         ]
-    bkgType = 'old'
+     ]
 
 
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
-loadStdAllPi0()  # for stdCharm.py
+inputMdstList('default', fileList)
+stdPi0s('loose')
+stdPhotons('loose')  # for stdCharm.py
+loadStdSkimPi0()
+loadStdSkimPhoton()
 loadStdCharged()
 loadStdKS()
 
@@ -55,7 +45,7 @@ loadStdDstarPlus()
 # Double Charm Skim
 from DoubleCharm_List import *
 DCList = DoubleCharmList()
-skimOutputUdst('outputFiles/DoubleCharm_' + bkgType, DCList)
+skimOutputUdst('DoubleCharm', DCList)
 summaryOfLists(DCList)
 
 # make sure memory consumption is limited by restricting the amount of

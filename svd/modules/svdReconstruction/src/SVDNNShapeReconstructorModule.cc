@@ -18,6 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -56,14 +57,13 @@ SVDNNShapeReconstructorModule::SVDNNShapeReconstructorModule() : Module()
            "TrueHits collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
-  addParam("StripMapFileName", m_stripMapXmlName,
-           "Name of strip map file, TB only", string(""));
-  addParam("OOMapFileName", m_ooMapXmlName,
-           "Name of O-O map xml to decode strip map, TB only", string(""));
-  addParam("TimeFitterFileName", m_timeFitterXmlName,
-           "Name of time fitter data file", string("svd/data/SVDTimeNet.xml"));
   addParam("WriteRecoDigits", m_writeRecoDigits,
            "Write RecoDigits to output?", m_writeRecoDigits);
+  // 2. Calibration and time fitter sources
+  addParam("TimeFitterName", m_timeFitterName,
+           "Name of time fitter data file", string("SVDTimeNet_6samples"));
+  addParam("CalibratePeak", m_calibratePeak, "Use calibrattion (vs. default) for peak widths and positions", bool(false));
+  // 3. Zero suppression
   addParam("ZeroSuppressionCut", m_cutAdjacent, "Zero-suppression cut on digits",
            m_cutAdjacent);
 }
@@ -81,7 +81,7 @@ void SVDNNShapeReconstructorModule::initialize()
   else
     storeRecoDigits.registerInDataStore();
 
-  storeShaperDigits.required();
+  storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -125,14 +125,13 @@ void SVDNNShapeReconstructorModule::initialize()
   B2INFO(" -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
   B2INFO(" -->  Save RecoDigits?    " << (m_writeRecoDigits ? "Y" : "N"));
   B2INFO(" 2. CALIBRATION:");
-  B2INFO(" -->  StripMap:           " << m_stripMapXmlName);
-  B2INFO(" -->  OO-Map:             " << m_ooMapXmlName);
-  B2INFO(" -->  Time NN:            " << m_timeFitterXmlName);
+  B2INFO(" -->  Time NN:            " << m_timeFitterName);
 
-  // Now that we have the required filenames (or don't), create the strip map object.
-  m_stripMap = std::unique_ptr<StripCalibrationMap>(new StripCalibrationMap(m_stripMapXmlName, m_ooMapXmlName));
   // Properly initialize the NN time fitter
-  m_fitter.setNetwrok(m_timeFitterXmlName);
+  // FIXME: Should be moved to beginRun
+  // FIXME: No support for 3/6 sample switching within a run/event
+  DBObjPtr<DatabaseRepresentationOfWeightfile> dbXml(m_timeFitterName);
+  m_fitter.setNetwrok(dbXml->m_data);
 }
 
 void SVDNNShapeReconstructorModule::createRelationLookup(const RelationArray& relation,
@@ -235,21 +234,35 @@ void SVDNNShapeReconstructorModule::event()
     for (size_t iDigit = firstDigit; iDigit < lastDigit; ++iDigit) {
 
       const SVDShaperDigit& shaperDigit = *storeShaperDigits[iDigit];
-      StripCalibrationMap::StripData stripData = m_stripMap->getStripData(sensorID, isU, shaperDigit.getCellID());
-      bool validDigit = stripData.m_goodStrip;
-      float stripGain = stripData.m_calPeak;
-      float stripNoise = stripData.m_noise;
-      float stripNoiseADU = stripNoise / stripGain;
-      float stripSignalWidth = stripData.m_calWidth;
-      float stripT0 = stripData.m_calTimeDelay;
+      unsigned short stripNo = shaperDigit.getCellID();
+      bool validDigit = true; // FIXME: We don't care about local run bad strips for now.
+      const double triggerBinSep = 4 * 1.96516; //in ns
+      double apvPhase = triggerBinSep * (0.5 + static_cast<int>(shaperDigit.getModeByte().getTriggerBin()));
+      // Get things from the database.
+      // Noise is good as it comes.
+      float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
+      // Some calibrations magic.
+      // FIXME: Only use calibration on real data. Until simulations correspond to
+      // default calibrtion, we cannot use it.
+      double stripSignalWidth = 270;
+      double stripT0 = isU ? 2.5 : -2.2;
+      if (m_calibratePeak) {
+        stripSignalWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
+        stripT0 = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
+                  - 0.25 * stripSignalWidth;
+      }
+
+      B2DEBUG(300, "Strip parameters: stripNoiseADU: " << stripNoiseADU <<
+              " Width: " << stripSignalWidth <<
+              " T0: " << stripT0);
 
       // If the strip is not masked away, normalize samples (sample/stripNoise)
-      // FIXME: This is excessive once we've fixed the digitizer
       apvSamples normedSamples;
       if (validDigit) {
         auto samples = shaperDigit.getSamples();
         transform(samples.begin(), samples.end(), normedSamples.begin(),
                   bind2nd(divides<float>(), stripNoiseADU));
+        // FIXME: This won't work in 3 sample mode, we have no control over the number of non-zero samples.
         validDigit = validDigit && pass3Samples(normedSamples, m_cutAdjacent);
       }
 
@@ -269,7 +282,7 @@ void SVDNNShapeReconstructorModule::event()
       copy(pStrip->begin(), pStrip->end(), ostream_iterator<double>(os, " "));
       os << endl;
       // Apply strip time shift to pdf
-      fitTool.shiftInTime(*pStrip, -stripT0);
+      fitTool.shiftInTime(*pStrip, -apvPhase - stripT0);
       B2DEBUG(200, os.str());
       // Calculate time and its error, amplitude and its error, and chi2
       double stripTime, stripTimeError;
@@ -279,10 +292,10 @@ void SVDNNShapeReconstructorModule::event()
       tie(stripAmplitude, stripAmplitudeError, stripChi2) =
         fitTool.getAmplitudeChi2(normedSamples, stripTime, stripSignalWidth);
       //De-normalize amplitudes and convert to electrons.
-      stripAmplitude *= stripNoise;
-      stripAmplitudeError *= stripNoise;
-      B2DEBUG(200, "RecoDigit " << iDigit << " Noise: " << stripNoise
-              << "Time: " << stripTime << " +/- " << stripTimeError
+      stripAmplitude = m_pulseShapeCal.getChargeFromADC(sensorID, isU, stripNo, stripAmplitude * stripNoiseADU);
+      stripAmplitudeError = m_pulseShapeCal.getChargeFromADC(sensorID, isU, stripNo, stripAmplitudeError * stripNoiseADU);
+      B2DEBUG(200, "RecoDigit " << iDigit << " Noise: " << m_pulseShapeCal.getChargeFromADC(sensorID, isU, stripNo, stripNoiseADU)
+              << " Time: " << stripTime << " +/- " << stripTimeError
               << " Amplitude: " << stripAmplitude << " +/- " << stripAmplitudeError
               << " Chi2: " << stripChi2
              );
@@ -307,7 +320,7 @@ void SVDNNShapeReconstructorModule::event()
                      shaperDigit.getModeByte())
       );
 
-      //Create relations to the cluster
+      //Create relations to RecoDigits
       if (!mc_relations.empty()) {
         relRecoDigitMCParticle.add(recoDigitIndex, mc_relations.begin(), mc_relations.end());
       }

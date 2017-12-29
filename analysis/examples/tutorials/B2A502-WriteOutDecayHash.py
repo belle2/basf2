@@ -33,7 +33,7 @@ inputMdstList('MC7', inputFile)
 
 
 # reconstruct the decay
-fillParticleList('e+', 'eid > 0.2 and d0 < 2 and abs(z0) < 4', False)
+fillParticleList('e+', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4', False)
 fillParticleList('gamma', '', False)
 reconstructDecay('J/psi -> e+ e-', '')
 

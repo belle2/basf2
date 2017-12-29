@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULEMANAGER_H_
-#define MODULEMANAGER_H_
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <string>
 #include <map>
@@ -122,15 +121,15 @@ namespace Belle2 {
      * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file!).
      * @return A shared pointer to the created module instance.
      */
-    boost::shared_ptr<Module> registerModule(const std::string& moduleName,
-                                             const std::string& sharedLibPath = "") noexcept(false);
+    std::shared_ptr<Module> registerModule(const std::string& moduleName,
+                                           const std::string& sharedLibPath = "") noexcept(false);
 
     /**
      * Returns a reference to the list of created modules.
      *
      * @return A reference to the list of created modules.
      */
-    const std::list< boost::shared_ptr<Module> >& getCreatedModules() const;
+    const std::list< std::shared_ptr<Module> >& getCreatedModules() const;
 
     /**
      * Returns a list of those modules which carry property flags matching the specified ones.
@@ -142,11 +141,11 @@ namespace Belle2 {
      * @param propertyFlags The flags for the module properties.
      * @return A list containing those modules which carry property flags matching the specified ones.
      */
-    static std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList,
+    static std::list< std::shared_ptr<Module> > getModulesByProperties(const std::list< std::shared_ptr<Module> >& modulePathList,
         unsigned int propertyFlags);
 
     /** Returns true if and only if all modules in list have the given flag (or list is empty). */
-    static bool allModulesHaveFlag(const std::list<boost::shared_ptr<Module>>& list, unsigned int flag);
+    static bool allModulesHaveFlag(const std::list<std::shared_ptr<Module>>& list, unsigned int flag);
 
     /** Delete all created modules. */
     void reset();
@@ -160,7 +159,7 @@ namespace Belle2 {
     std::map<std::string, std::string> m_moduleNameLibMap;
 
     std::map<std::string, ModuleProxyBase*> m_registeredProxyMap; /**< Maps the module name to a pointer of its proxy. */
-    std::list< boost::shared_ptr<Module> > m_createdModulesList;  /**< List of all created modules. */
+    std::list< std::shared_ptr<Module> > m_createdModulesList;  /**< List of all created modules. */
 
     /**
      * Adds the module names defined in the map file to the list of known module names.
@@ -196,5 +195,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* MODULEMANAGER_H_ */

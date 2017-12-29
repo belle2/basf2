@@ -32,6 +32,7 @@ using namespace ECL;
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(ECLShowerCalibrator)
+REG_MODULE(ECLShowerCalibratorPureCsI)
 
 //-----------------------------------------------------------------
 //                 Implementation

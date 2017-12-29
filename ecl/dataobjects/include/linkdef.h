@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::ECLWaveforms+;
 #pragma link C++ class Belle2::ECLLocalMaximum+;
 #pragma link C++ class Belle2::ECLConnectedRegion+;
 #pragma link C++ class Belle2::ECLEventInformation+;

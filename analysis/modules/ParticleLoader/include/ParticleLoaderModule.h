@@ -149,6 +149,8 @@ namespace Belle2 {
 
     int m_trackHypothesis; /**< pdg code for track hypothesis that should be used to create the particle */
 
+    bool m_enforceFitHypothesis =
+      false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
   };
 
 } // Belle2 namespace

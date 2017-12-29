@@ -13,7 +13,6 @@
 #include <trg/ecl/modules/trgeclDQM/TRGECLDQMModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
 
 #include <TDirectory.h>
@@ -59,7 +58,7 @@ void TRGECLDQMModule::initialize()
 {
 
   REG_HISTOGRAM
-  StoreArray<TRGECLUnpackerStore>::registerPersistent();
+  m_TRGECLUnpackerStore.registerInDataStore();
   defineHisto();
 
 }

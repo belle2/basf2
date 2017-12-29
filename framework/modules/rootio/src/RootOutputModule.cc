@@ -85,15 +85,17 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            "Names of persistent durability branches NOT to be saved. Branches also in branchNamesPersistent are not saved.", emptyvector);
   addParam("autoFlushSize", m_autoflush,
            "Value for TTree SetAutoFlush(): a positive value tells ROOT to flush all baskets to disk after n entries, a negative value to flush after -n bytes",
-           -30000000);
+           -10000000);
   addParam("autoSaveSize", m_autosave,
            "Value for TTree SetAutoSave(): a positive value tells ROOT to write the TTree metadata after n entries, a negative value to write the metadata after -n bytes",
-           -30000000);
+           -10000000);
   addParam("basketSize", m_basketsize, "Basketsize for Branches in the Tree in bytes", 32000);
   addParam("additionalDataDescription", m_additionalDataDescription, "Additional dictionary of "
            "name->value pairs to be added to the file metadata to describe the data",
            m_additionalDataDescription);
   addParam("buildIndex", m_buildIndex, "Build Event Index for faster finding of events by exp/run/event number", m_buildIndex);
+  addParam("keepParents", m_keepParents, "Keep parents files of input files, input files will not be added as output file's parents",
+           m_keepParents);
 }
 
 
@@ -201,15 +203,31 @@ void RootOutputModule::initialize()
 
 void RootOutputModule::event()
 {
+
+  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
+  if (!m_keepParents) {
+    if (fileMetaDataPtr) {
+      const StoreObjPtr<EventMetaData> eventMetaData;
+      eventMetaData->setParentLfn(fileMetaDataPtr->getLfn());
+    }
+  }
+
   //fill Event data
   fillTree(DataStore::c_Event);
 
-  //check for new parent file
-  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
   if (fileMetaDataPtr) {
-    string lfn = fileMetaDataPtr->getLfn();
-    if (!lfn.empty() && (m_parentLfns.empty() || (m_parentLfns.back() != lfn))) {
-      m_parentLfns.push_back(lfn);
+    if (m_keepParents) {
+      for (int iparent = 0; iparent < fileMetaDataPtr->getNParents(); iparent++) {
+        string lfn = fileMetaDataPtr->getParent(iparent);
+        if (!lfn.empty() && (m_parentLfns.empty() || (m_parentLfns.back() != lfn))) {
+          m_parentLfns.push_back(lfn);
+        }
+      }
+    } else {
+      string lfn = fileMetaDataPtr->getLfn();
+      if (!lfn.empty() && (m_parentLfns.empty() || (m_parentLfns.back() != lfn))) {
+        m_parentLfns.push_back(lfn);
+      }
     }
   }
 

@@ -63,8 +63,8 @@ void PXDHardwareClusterDQMModule::defineHisto()
 void PXDHardwareClusterDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_storeHardClusterArray.required();
-  m_storeRawCluster.required();
+  m_storeHardClusterArray.isRequired();
+  m_storeRawCluster.isRequired();
 
   StoreArray<PXDHardwareCluster> storeHardwareClusters(m_storeHardClusterArray);
   StoreArray<PXDRawCluster> storeRawClusters(m_storeRawCluster);

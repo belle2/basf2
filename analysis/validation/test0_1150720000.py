@@ -18,17 +18,12 @@ import glob
 
 set_random_seed(12345)
 
-# background (collision) files
-bg = glob.glob('./BG/[A-Z]*.root')
-
 # create path
 main = create_path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('evtNumList', [4000])
 main.add_module(eventinfosetter)
 
 # generate BBbar events

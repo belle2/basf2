@@ -13,8 +13,10 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
+#include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <string>
 #include <memory>
 
@@ -54,6 +56,9 @@ namespace Belle2 {
     /**calculate dr and dz between track and cluster*/
     void calculationdistance(CDCTriggerTrack* track, TRGECLCluster* cluster, double* ds, int _match3D);
 
+    /**calculate dphi_d between track and cluster*/
+    void calculationphiangle(CDCTriggerTrack* track, TRGECLCluster* cluster, int& dphi_d);
+
   private:
 
     /// Mode for TRGGRL simulation. 0th bit : fast simulation switch,
@@ -71,6 +76,8 @@ namespace Belle2 {
     double m_dr_threshold;
     /**max value of dz to be identified as match */
     double m_dz_threshold;
+    /**max value of dphi_d to be identified as match, 1 digit = 10 degrees */
+    int m_dphi_d_threshold;
     /**the 2D finder track list*/
     std::string m_2d_tracklist;
     /**the 3D NN track list*/
@@ -83,8 +90,11 @@ namespace Belle2 {
     //double m_dz;
     /**the matched 2d track list*/
     std::string m_2dmatch_tracklist;
+    /**the matched 2d track list by phi matching*/
+    std::string m_phimatch_tracklist;
     /**the matched 3d track list*/
     std::string m_3dmatch_tracklist;
 
+    StoreArray<TRGGRLMATCH> m_TRGGRLMATCH; /**< output for TRGGRLMATCH */
   };
 }

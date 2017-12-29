@@ -23,7 +23,7 @@ std::pair<double, double> EventT0::getEventT0WithUncertainty(const Const::Detect
   for (const EventT0Component& component : m_eventT0List) {
     if (detectorSet.getIndex(component.detector) != -1 and component.eventT0.isDoubleStored()) {
       found = true;
-      const double oneOverUncertaintySquared = 1 / component.eventT0.getDoubleUncertaintySquared();
+      const double oneOverUncertaintySquared = 1.0f / component.eventT0.getDoubleUncertaintySquared();
       eventT0WithUncertainty.first += component.eventT0.getDoubleValue()  * oneOverUncertaintySquared;
       preFactor += oneOverUncertaintySquared;
     }
@@ -35,7 +35,7 @@ std::pair<double, double> EventT0::getEventT0WithUncertainty(const Const::Detect
   }
 
   eventT0WithUncertainty.first /= preFactor;
-  eventT0WithUncertainty.second = std::sqrt(1 / preFactor);
+  eventT0WithUncertainty.second = std::sqrt(1.0f / preFactor);
 
   return eventT0WithUncertainty;
 }

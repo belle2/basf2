@@ -11,10 +11,20 @@
 #ifndef VXDDEDXPIDMODULE_H
 #define VXDDEDXPIDMODULE_H
 
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <reconstruction/dataobjects/VXDDedxTrack.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <pxd/dataobjects/PXDCluster.h>
 
 #include <string>
 #include <vector>
@@ -63,6 +73,20 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+
+    // required input
+    StoreArray<Track> m_tracks; /**< Required array of Tracks */
+    StoreArray<RecoTrack> m_recoTracks; /**< Required array of input RecoTracks */
+
+    // optional input
+    StoreArray<MCParticle> m_mcparticles; /**< Optional array of MCParticles */
+    StoreArray<SVDCluster> m_svdClusters; /**< Optional array of SVDClusters */
+    StoreArray<PXDCluster> m_pxdClusters; /**< Optional array of PXDClusters */
+
+    // output
+    StoreArray<VXDDedxTrack> m_dedxTracks; /**< Output array of VXDDedxTracks */
+    StoreArray<VXDDedxLikelihood> m_dedxLikelihoods; /**< Output array of VXDDedxLikelihoods */
+
 
     /** counter for events */
     int m_eventID;

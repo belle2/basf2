@@ -21,13 +21,13 @@ namespace Belle2 {
   class COPPERCallback : public RCCallback {
 
   public:
-    COPPERCallback(FEE* fee[4]);
+    COPPERCallback(FEE* fee[4], bool dummymode, bool disablefeconf);
     virtual ~COPPERCallback() throw();
 
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
-    virtual void boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual bool pause() throw(RCHandlerException);
@@ -37,8 +37,6 @@ namespace Belle2 {
     virtual void abort() throw(RCHandlerException);
     virtual void term() throw();
     virtual void monitor() throw(RCHandlerException);
-    int tesths(HSLB& hslb) throw (HSLBHandlerException);
-    std::string staths(HSLB& hslb) throw (HSLBHandlerException);
 
   public:
     HSLB& getHSLB(int i) { return m_hslb[i]; }
@@ -46,6 +44,8 @@ namespace Belle2 {
     TTRX& getTTRX() { return m_ttrx; }
     COPPER& getCopper() { return m_copper; }
     ProcessController& getProcess() { return m_con; }
+    virtual bool feeload();
+    void getfee(HSLB& hslb, int& hwtype, int& serial, int& fwtype, int& fwver)  throw(HSLBHandlerException);
     DBObject& getFEEDB(int hslb) { return m_o_fee[hslb]; }
 
   private:
@@ -55,11 +55,13 @@ namespace Belle2 {
     TTRX m_ttrx;
     COPPER m_copper;
     FlowMonitor m_flow;
+    bool m_dummymode;
+    bool m_force_boothslb;
+    std::string m_hslb_firm;
     bool m_iserr;
     SharedMemory m_memory;
+    bool m_disablefeconf;
     DBObject m_o_fee[4];
-    int m_warning;
-    int m_errcode;
 
   private:
     void bootBasf2(const DBObject& obj) throw(RCHandlerException);

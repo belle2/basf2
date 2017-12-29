@@ -16,13 +16,13 @@ from stdCharged import stdPi
 
 
 def stdKshorts(path=analysis_main):
-    fillParticleList('K_S0:all', '0.3 < M < 0.7', True, path)
+    fillParticleList('K_S0:all', '0.3 < M < 0.7', True, path=path)
     vertexKFit('K_S0:all', 0.0, '', '', path)
     applyCuts('K_S0:all', '0.450 < M < 0.550', path)
 
 
-def mergedKshorts(prioritiseV0=False, path=analysis_main):
-    fillParticleList('K_S0:V0', '0.3 < M < 0.7', True, path)
+def mergedKshorts(prioritiseV0=True, path=analysis_main):
+    fillParticleList('K_S0:V0', '0.3 < M < 0.7', True, path=path)
     stdPi('all')
     applyCuts('pi+:all', 'chiProb>0.001')
     reconstructDecay('K_S0:RD -> pi-:all pi+:all', '0.3 < M < 0.7', 1, True, path)

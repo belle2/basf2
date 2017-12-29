@@ -33,18 +33,19 @@ namespace Belle2 {
      * Default constructor
      */
 
-    BKLMElectronicMapping(): m_version(0.0), m_copperId(0), m_slotId(0), m_laneId(0), m_axisId(0),
-      m_isForward(0), m_sector(0), m_layer(0), m_plane(0) {};
+    BKLMElectronicMapping(): m_version(0.0), m_copperId(0), m_slotId(0), m_laneId(0), m_axisId(0), m_channelId(0),
+      m_isForward(0), m_sector(0), m_layer(0), m_plane(0), m_strip(0) {};
 
     /**
      * Constructor
      */
 
-    BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int isForward, int sector, int layer,
-                          int plane)
+    BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int channelId, int isForward, int sector,
+                          int layer,
+                          int plane, int stripId)
     {
-      m_version = version; m_copperId = copperId; m_slotId = slotId; m_laneId = laneId; m_axisId = axisId;
-      m_isForward = isForward; m_sector = sector; m_layer = layer; m_plane = plane;
+      m_version = version; m_copperId = copperId; m_slotId = slotId; m_laneId = laneId; m_axisId = axisId; m_channelId = channelId;
+      m_isForward = isForward; m_sector = sector; m_layer = layer; m_plane = plane; m_strip = stripId;
     };
 
     /**
@@ -72,6 +73,10 @@ namespace Belle2 {
      */
     int getLaneId() const {return m_laneId; }
 
+    /** Return electronics channelId in the map
+     */
+    int getChannelId() const {return m_channelId; }
+
     /** Return forward/backward info. in the map
      */
     int getIsForward() const {return m_isForward; }
@@ -88,6 +93,10 @@ namespace Belle2 {
      */
     int getPlane() const {return m_plane; }
 
+    /** Return physical channel in the map
+     */
+    int getStripId() const {return m_strip; }
+
   private:
 
     int m_version;                             /**< map version (measurement number) */
@@ -95,16 +104,18 @@ namespace Belle2 {
     int m_slotId;                              /**< BKLM motherboard fission id should be 1,2,3 or 4*/
     int m_laneId;                              /**< lane id*/
     int m_axisId;                              /**< Axis id, should be 0 or 1 */
+    int m_channelId;                              /**< electronic channel id */
     int m_isForward;                       /**< forward(1) or backward(0) */
     int m_sector;                              /**< which sector */
     int m_layer;                               /**< which layer*/
     int m_plane;                               /**< phi-measuring plane or z-measuring plane*/
+    int m_strip;                               /**< strip number */
     //int is_phiMeasuring;                       /**< is phi-measuring plane (1) or z-measuring plane (0)*/
     //std::vector<int> m_copperId;               /**< BKLM motherboard copper id */
     std::string m_comment;                     /**< optional comment */
 
 
-    ClassDef(BKLMElectronicMapping, 2);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMElectronicMapping, 3);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

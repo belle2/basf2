@@ -5,6 +5,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+from tracking.__init__ import *
 
 
 def setup_database(local_db=None, global_tag=None, daq_db='testbeam/daq/data/database_v1/database.txt'):
@@ -124,8 +125,6 @@ def add_pxd_unpacking(path):
     pxd_unpacker.param('IgnoreFrameCount', True)
     pxd_unpacker.param('IgnoreSorFlag', True)
     pxd_unpacker.param('RemapFlag', True)
-    pxd_unpacker.param('RemapLUT_IF_OB', Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
-    pxd_unpacker.param('RemapLUT_IB_OF', Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IB_OF.csv'))
     path.add_module(pxd_unpacker)
 
     path.add_module("PXDRawHitSorter")
@@ -168,7 +167,7 @@ def add_reconstruction(
                          use_segment_network_filters=True,
                          observerType=0,
                          quality_estimator='circleFit',
-                         overlap_filter='hopfield',  # 'hopfield' or 'greedy'
+                         overlap_filter='greedy',  # 'hopfield' or 'greedy'
                          log_level=LogLevel.ERROR,
                          debug_level=1,
                          usedGeometry=useThisGeometry
@@ -191,7 +190,7 @@ def add_reconstruction(
     path.add_module(daf)
     track_creator = register_module('TrackCreator')
     track_creator.param('beamSpot', [0., 0., 0.])
-    track_creator.param('defaultPDGCode', 11)
+    track_creator.param('pdgCodes', [11])
     track_creator.logging.log_level = LogLevel.ERROR
     path.add_module(track_creator)
 
@@ -213,7 +212,7 @@ def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, mo
     track_creator = register_module('TrackCreator')
     track_creator.logging.log_level = LogLevel.RESULT
     track_creator.param('beamSpot', [-20., 0., 0.])
-    track_creator.param('defaultPDGCode', 11)
+    track_creator.param('pdgCodes', [11])
     track_creator.param('recoTrackColName', 'offlineRecoTracks')
     track_creator.param('trackColName', 'offlineTracks')
     track_creator.param('trackFitResultColName', 'offlineTrackFitResults')
@@ -390,7 +389,7 @@ def add_vxdtf_v2(path=None,
                  debug_level=1):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
-    Reuslt is a store array containing reco tracks called 'RecoTracks'.
+    Result is a store array containing reco tracks called 'RecoTracks'.
     :param sec_map_file: training data for segment network.
     :param path: basf2.Path
     :param use_pxd: if true use pxd hits. Default False.
@@ -405,26 +404,10 @@ def add_vxdtf_v2(path=None,
     :return:
     """
 
-    # List containing all modules either to be added to the path or to be returned.
-    modules = []
-
-    #################
-    # VXDTF2 Step 0
-    # Preparation
-    #################
+    tf2_components = []
+    tf2_components += ['SVD']
     if use_pxd:
-        spCreatorPXD = register_module('PXDSpacePointCreator')
-        spCreatorPXD.logging.log_level = log_level
-        spCreatorPXD.logging.debug_level = debug_level
-        spCreatorPXD.param('SpacePoints', 'SpacePointsPXD')
-        modules.append(spCreatorPXD)
-
-    spCreatorSVD = register_module('SVDSpacePointCreator')
-    spCreatorSVD.logging.log_level = log_level
-    spCreatorSVD.logging.debug_level = debug_level
-    spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-    spCreatorSVD.param('SpacePoints', 'SpacePoints')
-    modules.append(spCreatorSVD)
+        tf2_components += ['PXD']
 
     # SecMap Bootstrap
     secmap_name = ""
@@ -462,106 +445,29 @@ def add_vxdtf_v2(path=None,
             else:
                 print('ERROR: no sectormap for that setting')
                 exit()
-    secMapBootStrap = register_module('SectorMapBootstrap')
-    secMapBootStrap.param('ReadSectorMap', True)
-    if secmap_name:
-        secMapBootStrap.param('SectorMapsInputFile', Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name))
-    secMapBootStrap.param('WriteSectorMap', False)
-    modules.append(secMapBootStrap)
 
-    ##################
-    # VXDTF2 Step 1
-    # SegmentNet
-    ##################
+    add_vxd_track_finding_vxdtf2(path=path,
+                                 svd_clusters="",
+                                 reco_tracks="RecoTracks",
+                                 components=tf2_components,
+                                 suffix="",
+                                 useTwoStepSelection=False,
+                                 sectormap_file=Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name),
+                                 PXDminSVDSPs=0)  # This module was not in the old function, so reproduce no action for now
 
-    segNetProducer = register_module('SegmentNetworkProducer')
-    segNetProducer.param('CreateNeworks', 3)
-    segNetProducer.param('NetworkOutputName', 'test2Hits')
-    segNetProducer.param('allFiltersOff', not use_segment_network_filters)
-    if use_pxd:
-        segNetProducer.param('SpacePointsArrayNames', ['SpacePoints', 'SpacePointsPXD'])
-    else:
-        segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
-    segNetProducer.param('printNetworks', False)
-    segNetProducer.param('addVirtualIP', False)
-    segNetProducer.param('virtualIPCoorindates', [-40, 0, 0])
-    segNetProducer.param('sectorMapName', 'testMap')  # lowTestRedesign')
-    segNetProducer.param('observerType', observerType)
-    segNetProducer.logging.log_level = log_level  # LogLevel.DEBUG
-    segNetProducer.logging.debug_level = debug_level
-    modules.append(segNetProducer)
-
-    #################
-    # VXDTF2 Step 2
-    # TrackFinder
-    #################
-
-    # this currently prevents from being able to use PXD as it only takes one array for space points (or merge pxd and svd SP)
-    cellOmat = register_module('TrackFinderVXDCellOMat')
-    cellOmat.param('NetworkName', 'test2Hits')
-    cellOmat.param('printNetworks', False)
-    cellOmat.param('strictSeeding', True)
-    cellOmat.logging.log_level = log_level
-    cellOmat.logging.debug_level = debug_level
-    modules.append(cellOmat)
-
-    #################
-    # VXDTF2 Step 3
-    # Analyzer
-    #################
-
-    # Quality
-    qualityEstimator = register_module('QualityEstimatorVXD')
-    qualityEstimator.param('EstimationMethod', quality_estimator)
-    qualityEstimator.logging.log_level = log_level
-    qualityEstimator.logging.debug_level = debug_level
-    modules.append(qualityEstimator)
-
-    # Properties
-    vIPRemover = register_module('SPTCvirtualIPRemover')
-    vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
-    vIPRemover.logging.log_level = log_level
-    vIPRemover.logging.debug_level = debug_level
-    modules.append(vIPRemover)
-
-    #################
-    # VXDTF2 Step 4
-    # OverlapFilter
-    #################
-
+    set_module_parameters(path, 'SectorMapBootstrap', SetupToRead='testbeamTEST')
+    set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
+    set_module_parameters(path, 'SegmentNetworkProducer', sectorMapName='testbeamTEST')
+    set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
     if filter_overlapping:
-        overlapNetworkProducer = register_module('SVDOverlapChecker')
-        overlapNetworkProducer.logging.log_level = log_level
-        overlapNetworkProducer.logging.debug_level = debug_level
-        modules.append(overlapNetworkProducer)
-
-        if overlap_filter.lower() == 'hopfield':
-            overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
-        elif overlap_filter.lower() == 'greedy':
-            overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
-        else:
-            print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
-            exit
-        overlapFilter.logging.log_level = log_level
-        overlapFilter.logging.debug_level = debug_level
-        modules.append(overlapFilter)
-
-    #################
-    # VXDTF2 Step 5
-    # Converter
-    #################
-    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
-    momSeedRetriever.logging.log_level = log_level
-    momSeedRetriever.logging.debug_level = debug_level
-    modules.append(momSeedRetriever)
-
-    converter = register_module('SPTC2RTConverter')
-    converter.logging.log_level = log_level
-    converter.logging.debug_level = debug_level
-    modules.append(converter)
-
-    if path:
-        for module in modules:
-            path.add_module(module)
+        set_module_parameters(path, 'SVDOverlapResolver', ResolveMethod=overlap_filter.lower())
     else:
-        return modules
+        # Would originally not add the module to the path
+        # Instead use crude workaround to create new path without the module
+        new_path = create_path()
+        for m in path.modules():
+            if m.name() != 'SVDOverlapResolver':
+                new_path.add_module(m)
+        # Need to use this way to propagate changes to the outside of the function
+        path.__init__()
+        path.add_path(new_path)

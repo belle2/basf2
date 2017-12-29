@@ -17,7 +17,9 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
+#include <bklm/dbobjects/BKLMDisplacement.h>
 #include <bklm/dataobjects/BKLMElementID.h>
 
 using namespace std;
@@ -80,6 +82,7 @@ namespace Belle2 {
       m_Modules.clear();
 
       m_Alignments.clear();
+      m_Displacements.clear();
     }
 
     // Get BKLM geometry parameters from Gearbox (no calculations here)
@@ -388,9 +391,11 @@ namespace Belle2 {
     // Calculate derived quantities from the database-defined values
     void GeometryPar::calculate(void)
     {
-      B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy = " << m_DoBeamBackgroundStudy);
       if (m_DoBeamBackgroundStudy) {
+        B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy is enabled");
         m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
+      } else {
+        B2DEBUG(1, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
       }
       m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
       m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
@@ -400,6 +405,8 @@ namespace Belle2 {
       m_ModuleReadoutHeight = m_ModuleFoamHeight + (m_ModuleCopperHeight + m_ModuleMylarHeight) * 2.0;
       m_ModuleHeight = (m_ModuleCoverHeight + m_ModuleReadoutHeight + m_ModuleGasHeight + m_ModuleGlassHeight * 2.0) * 2.0;
 
+      // set up displaced geometry
+      readDisplacedGeoFromDB();
       // set up ReconstructionAlignment, so that those information can pass to Modules
       readAlignmentFromDB();
 
@@ -434,6 +441,7 @@ namespace Belle2 {
                                            localReconstructionShift,
                                            rotation
                                           );
+              pModule->setDisplacedGeo(getModuleDisplacedGeo(isForward, sector, layer));
               pModule->setAlignment(getModuleAlignment(isForward, sector, layer));
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
             } else {
@@ -448,6 +456,7 @@ namespace Belle2 {
                                            rotation,
                                            isFlipped
                                           );
+              pModule->setDisplacedGeo(getModuleDisplacedGeo(isForward, sector, layer));
               pModule->setAlignment(getModuleAlignment(isForward, sector, layer));
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
               double base = -0.5 * (m_NPhiScints[layer - 1] + 1) * m_ScintWidth;
@@ -729,6 +738,15 @@ namespace Belle2 {
       return (iA == m_Alignments.end() ? HepGeom::Transform3D() : iA->second);
     }
 
+    const HepGeom::Transform3D GeometryPar::getModuleDisplacedGeo(bool isForward, int sector, int layer) const
+    {
+      int moduleID = (isForward ? BKLM_END_MASK : 0)
+                     | ((sector - 1) << BKLM_SECTOR_BIT)
+                     | ((layer - 1) << BKLM_LAYER_BIT);
+      map<int, HepGeom::Transform3D>::const_iterator iDis = m_Displacements.find(moduleID);
+      return (iDis == m_Displacements.end() ? HepGeom::Transform3D() : iDis->second);
+    }
+
     void GeometryPar::readAlignmentFromDB()
     {
       DBObjPtr<BKLMAlignment> bklmAlignments;
@@ -746,7 +764,7 @@ namespace Belle2 {
             BKLMElementID bklmid(fb - 1, sector - 1, layer - 1);
 
             HepGeom::Transform3D alignment;
-            alignment = getTransformFromAlignmentParams(bklmAlignments->get(bklmid, 1),
+            alignment = getTransformFromRigidBodyParams(bklmAlignments->get(bklmid, 1),
                                                         bklmAlignments->get(bklmid, 2),
                                                         bklmAlignments->get(bklmid, 3),
                                                         bklmAlignments->get(bklmid, 4),
@@ -766,7 +784,42 @@ namespace Belle2 {
       bklmAlignments.addCallback(this, &bklm::GeometryPar::readAlignmentFromDB);
     }
 
-    HepGeom::Transform3D GeometryPar::getTransformFromAlignmentParams(double dU, double dV, double dW, double dAlpha, double dBeta,
+    void GeometryPar::readDisplacedGeoFromDB()
+    {
+      DBObjPtr<BKLMAlignment> bklmDisplacements;
+      if (!bklmDisplacements.isValid()) {
+        B2INFO("No BKLM displaced geometry data in database!");
+        return;
+      }
+
+      DBArray<BKLMDisplacement> displacements;
+
+      for (const auto& disp : displacements) {
+        unsigned short bklmElementID = disp.getElementID();
+        BKLMElementID bklmid(bklmElementID);
+        unsigned short isForward = bklmid.getIsForward();
+        unsigned short sector = bklmid.getSectorNumber();
+        unsigned short layer = bklmid.getLayerNumber();
+
+        HepGeom::Transform3D displacement = getTransformFromRigidBodyParams(disp.getUShift(),
+                                            disp.getVShift(),
+                                            disp.getWShift(),
+                                            disp.getAlphaRotation(),
+                                            disp.getBetaRotation(),
+                                            disp.getGammaRotation()
+                                                                           );
+
+        int moduleID = (isForward ? BKLM_END_MASK : 0)
+                       | ((sector - 1) << BKLM_SECTOR_BIT)
+                       | ((layer - 1) << BKLM_LAYER_BIT);
+
+        m_Displacements.insert(std::pair<int, HepGeom::Transform3D>(moduleID, displacement));
+      }
+      // Add callback to itself.
+      bklmDisplacements.addCallback(this, &bklm::GeometryPar::readDisplacedGeoFromDB);
+    }
+
+    HepGeom::Transform3D GeometryPar::getTransformFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta,
         double dGamma)
     {
 

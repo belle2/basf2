@@ -747,8 +747,8 @@ namespace Belle2 {
         continue;
       }
       float D0, Z0;
-      D0 = originalTracks[i]->getTrackFitResult(constArray[i])->getD0();
-      Z0 = originalTracks[i]->getTrackFitResult(constArray[i])->getZ0();
+      D0 = originalTracks[i]->getTrackFitResultWithClosestMass(constArray[i])->getD0();
+      Z0 = originalTracks[i]->getTrackFitResultWithClosestMass(constArray[i])->getZ0();
       flavorTagInfo->setD0(D0); // Save them on the FlavorTaggerInfo
       flavorTagInfo->setZ0(Z0);
     }
@@ -858,10 +858,13 @@ namespace Belle2 {
     if (ROETracks.size() == 0) return false;
     std::vector<const Track*> fitTracks;
     for (unsigned i = 0; i < ROETracks.size(); i++) {
-      if (!ROETracks[i]->getTrackFitResult(Const::pion)) {
+      // TODO: this will always return something (so not nullptr) contrary to the previous method
+      // used here. This line can be removed as soon as the multi hypothesis fitting method
+      // has been properly established
+      if (!ROETracks[i]->getTrackFitResultWithClosestMass(Const::pion)) {
         continue;
       }
-      HitPatternVXD roeTrackPattern = ROETracks[i]->getTrackFitResult(Const::pion)->getHitPatternVXD();
+      HitPatternVXD roeTrackPattern = ROETracks[i]->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternVXD();
 
       if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
         fitTracks.push_back(ROETracks[i]);
@@ -887,7 +890,7 @@ namespace Belle2 {
     for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
       const Track* trak1 = m_tagTracks[i];
       const TrackFitResult* trak1Res = NULL;
-      if (trak1) trak1Res = trak1->getTrackFitResult(Const::pion);
+      if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
       if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) {
@@ -901,7 +904,7 @@ namespace Belle2 {
           const Track* trak2 = m_tagTracks[j];
           const TrackFitResult* trak2Res = NULL;
 
-          if (trak2) trak2Res = trak2->getTrackFitResult(Const::pion);
+          if (trak2) trak2Res = trak2->getTrackFitResultWithClosestMass(Const::pion);
 
           TVector3 mom2;
           if (trak2Res) mom2 = trak2Res->getMomentum();

@@ -11,7 +11,7 @@
 
 #######################################################
 #
-# Obtain Delta E and Mbc distribution from the decay:
+# Obtain validation plots from the decay:
 #
 #
 #    B0 -> K*0 + gamma
@@ -19,15 +19,14 @@
 #           +-> K+ pi-
 #
 #
-# Contributors: Saurabh Sandilya (April 2017)
-#
+# Contributors: Saurabh Sandilya
+#               Sam Cunliffe (Last update:Oct 31, 2017)
 ######################################################
 
-from basf2 import *
-from vertex import *
+from basf2 import process, statistics
 from modularAnalysis import *
-from reconstruction import *
 from stdFSParticles import *
+from variables import variables
 
 # load input ROOT file
 inputMdst('default', '../1110021001.dst.root')
@@ -38,17 +37,16 @@ inputMdst('default', '../1110021001.dst.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4 and piid > 0.1')
-fillParticleList('K+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4 and Kid > 0.1')
-
-fillParticleList('gamma:all', 'E > 0.050 and clusterE9E25 > 0.8')
+stdK('99eff')
+stdPi('99eff')
+stdPhotons('loose')
 
 # reconstruct K*0:kpi
-reconstructDecay('K*0:kpi -> K+:all pi-:all', '0.6 < M < 1.2')
+reconstructDecay('K*0:kpi -> K+:99eff pi-:99eff', '0.6 < M < 1.2')
 matchMCTruth('K*0:kpi')
 
 # reconstruct B0:sig
-reconstructDecay('B0:sig -> K*0:kpi gamma:all', '4.8 < M < 5.8')
+reconstructDecay('B0:sig -> K*0:kpi gamma:loose', '4.8 < M < 5.8')
 matchMCTruth('B0:sig')
 
 # --------------------------------------------------
@@ -58,12 +56,12 @@ matchMCTruth('B0:sig')
 # information to be saved to file
 tools = ['EventMetaData', '^B0:sig']
 tools += ['RecoStats', '^B0:sig']
-tools += ['Kinematics', '^B0:sig -> [^K*0:kpi -> ^K+:all ^pi-:all] ^gamma:all']
-tools += ['InvMass', '^B0:sig -> [^K*0:kpi -> K+:all pi-:all] gamma:all']
-tools += ['DeltaEMbc', '^B0:sig -> [K*0:kpi -> K+:all pi-:all] gamma:all']
-tools += ['MCTruth', '^B0:sig -> [^K*0:kpi -> ^K+:all ^pi-:all] ^gamma:all']
-tools += ['MCHierarchy', 'B0:sig -> [K*0:kpi -> ^K+:all ^pi-:all] ^gamma:all']
-tools += ['PID', 'B0:sig -> [K*0:kpi -> ^K+:all ^pi-:all] gamma:all']
+tools += ['Kinematics', '^B0:sig -> [^K*0:kpi -> ^K+:99eff ^pi-:99eff] ^gamma:loose']
+tools += ['InvMass', '^B0:sig -> [^K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
+tools += ['DeltaEMbc', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
+variables.addAlias("Egamma", "useRestFrame(daughter(1,E))")
+tools += ['CustomFloats[Egamma]', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
+
 
 # write out the flat ntuple
 ntupleFile('../1110021001.ntup.root')

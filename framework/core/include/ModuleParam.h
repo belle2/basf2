@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef MODULEPARAM_H_
-#define MODULEPARAM_H_
+#pragma once
 
 /*
 This header file has been split into declarations '.dcl.h' and inline implementations '.icc.h'
@@ -23,5 +22,3 @@ to include the heavy implementation of boost::python almost everywhere.
 
 #include <framework/core/ModuleParam.icc.h>
 #include <framework/core/ModuleParam.dcl.h>
-
-#endif /* MODULEPARAM_H_ */

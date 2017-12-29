@@ -13,6 +13,7 @@ namespace Belle2 {
 
     struct tx_t {
       std::string m_host;
+      std::string m_type;
       std::string m_local;
       std::string m_remote;
       double m_ntxq;

@@ -223,15 +223,15 @@ void SegmentNetworkProducerModule::endRun()
   double invEvents = 1. / m_eventCounter;
 
   B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents);
-  B2WARNING("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << ", results:\n "
-            << "matchSpacePoints-nSPsFound/nSPsLost/nRawSectorsFound: " << m_nSPsFound << "/" << m_nSPsLost << "/" << m_nRawSectorsFound << "\n"
-            << ", buildActiveSectorNetwork-nBadSector InnerNotActive/NoInnerActive/NoInnerExisting: " << m_nBadSectorInnerNotActive << "/" <<
-            m_nBadSectorNoInnerActive << "/" << m_nBadSectorNoInnerExisting << ", nGoodSectors/nSectorsLinked: " << m_nGoodSectorsFound << "/"
-            << m_nSectorsLinked << "\n"
-            << ", buildTrackNodeNetwork-nTrackNodesAccepted/nTrackNodesRejected/nTrackNodeLinksCreated: " << m_nTrackNodesAccepted << "/" <<
-            m_nTrackNodesRejected << "/" << m_nTrackNodeLinksCreated << "\n"
-            << ", buildSegmentNetwork-nSegmentsAccepted/nSegmentsRejected/nSegmentLinksCreated: " << m_nSegmentsAccepted << "/" <<
-            m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n");
+  B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << ", results:\n "
+         << "matchSpacePoints-nSPsFound/nSPsLost/nRawSectorsFound: " << m_nSPsFound << "/" << m_nSPsLost << "/" << m_nRawSectorsFound << "\n"
+         << ", buildActiveSectorNetwork-nBadSector InnerNotActive/NoInnerActive/NoInnerExisting: " << m_nBadSectorInnerNotActive << "/" <<
+         m_nBadSectorNoInnerActive << "/" << m_nBadSectorNoInnerExisting << ", nGoodSectors/nSectorsLinked: " << m_nGoodSectorsFound << "/"
+         << m_nSectorsLinked << "\n"
+         << ", buildTrackNodeNetwork-nTrackNodesAccepted/nTrackNodesRejected/nTrackNodeLinksCreated: " << m_nTrackNodesAccepted << "/" <<
+         m_nTrackNodesRejected << "/" << m_nTrackNodeLinksCreated << "\n"
+         << ", buildSegmentNetwork-nSegmentsAccepted/nSegmentsRejected/nSegmentLinksCreated: " << m_nSegmentsAccepted << "/" <<
+         m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n");
 }
 
 
@@ -518,8 +518,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         // the filter accepts spacepoint combinations
         // ->observe gives back an observed version of the filter
-        bool accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
-                                                                    innerHit->getEntry().getHit());
+        bool accepted = false;
+        // there is an uncaught exception thrown by the CircleCenterXY filter variable if the points are on a straight line
+        try {
+          accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
+                                                                 innerHit->getEntry().getHit());
+        } catch (...) {
+          // this may produce too much output, so consider to demote it to a B2DEBUG message
+          B2WARNING("SegmentNetworkProducerModule: exception caught thrown by one of the three hit filters");
+        }
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));

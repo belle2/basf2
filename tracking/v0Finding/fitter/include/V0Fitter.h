@@ -39,8 +39,6 @@ namespace Belle2 {
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
-                        double vertexChi2CutInside,
-                        double massWindowKshortInside,
                         double vertexChi2CutOutside);
 
     /// Fit V0 with given hypothesis and store if fit was successful.
@@ -95,8 +93,6 @@ namespace Belle2 {
     StoreArray<V0ValidationVertex> m_validationV0s;  ///< V0ValidationVertexColName (output, optional).
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
-    double m_vertexChi2CutInside;  ///< Chi2 cut inside beampipe.
-    double m_massWindowKshortInside;  ///< Kshort invariant mass cut inside beampipe.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
   };
 

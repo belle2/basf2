@@ -57,17 +57,13 @@ class PrintName(basf2.Module):
 main = basf2.create_path()
 
 # register necessary modules
-eventinfosetter = basf2.register_module('EventInfoSetter')
-# generate three events
-eventinfosetter.param('expList', [0, 1])
-eventinfosetter.param('runList', [1, 2])
-eventinfosetter.param('evtNumList', [2, 1])
 
 emptypath = basf2.create_path()
 emptypath.add_path(basf2.create_path())
 main.add_path(emptypath)
 
-main.add_module(eventinfosetter)
+# generate three events
+main.add_module('EventInfoSetter', expList=[0, 1], runList=[1, 2], evtNumList=[2, 1])
 
 anotherpath = basf2.create_path()
 main.add_path(anotherpath)  # added here, filled later

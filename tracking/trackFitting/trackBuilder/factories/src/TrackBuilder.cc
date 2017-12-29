@@ -27,17 +27,20 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP, const bool useBFieldAtHit)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
+                                           const bool useClosestHitToIP, const bool useBFieldAtHit)
 {
-
   StoreArray<Track> tracks(m_trackColName);
   StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(100, trackReps.size() << " track representations available.");
-  Track newTrack = Track();
+  Track newTrack(recoTrack.getQualityIndicator());
 
+  bool repAlreadySet = false;
+  unsigned int repIDPlusOne = 0;
   for (const auto& trackRep : trackReps) {
+    repIDPlusOne++;
 
     // Check if the fitted particle type is in our charged stable set.
     const Const::ParticleType particleType(std::abs(trackRep->getPDG()));
@@ -51,6 +54,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useC
       B2DEBUG(100, "The fit with the given track representation (" << std::abs(trackRep->getPDG()) <<
               ") was not successful. Skipping ...");
       continue;
+    }
+
+    if (not repAlreadySet) {
+      RecoTrackGenfitAccess::getGenfitTrack(recoTrack).setCardinalRep(repIDPlusOne - 1);
+      repAlreadySet = true;
     }
 
     // Extrapolate the tracks to the perigee.
@@ -106,9 +114,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useC
 
     const int newTrackFitResultArrayIndex = newTrackFitResult->getArrayIndex();
     newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
-
   }
-
 
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
@@ -125,9 +131,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useC
     // cppcheck-suppress memleak
     return true;
   } else {
-    return false;
+    B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
   }
-
+  // false positive due to new with placement (cppcheck issue #7163)
+  // cppcheck-suppress memleak
+  return true;
 }
 
 

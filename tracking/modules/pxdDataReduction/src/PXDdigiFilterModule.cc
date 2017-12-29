@@ -36,6 +36,7 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
   addParam("PXDDigitsOutsideROIName", m_PXDDigitsOutsideROIName, "The name of the StoreArray of Filtered PXDDigits",
            std::string("PXDDigitsOUT"));
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
+  addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD pixel outside the ROIs", false);
 
 }
 
@@ -53,9 +54,10 @@ void PXDdigiFilterModule::initialize()
   m_selectorIN.registerSubset(PXDDigits, m_PXDDigitsInsideROIName);
   m_selectorIN.inheritAllRelations();
 
-  m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
-  m_selectorOUT.inheritAllRelations();
-
+  if (m_CreateOutside) {
+    m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
+    m_selectorOUT.inheritAllRelations();
+  }
 }
 
 void PXDdigiFilterModule::beginRun()
@@ -81,15 +83,16 @@ void PXDdigiFilterModule::event()
     return false;
   });
 
-  m_selectorOUT.select([ROIids](const PXDDigit * thePxdDigit) {
-    auto ROIidsRange = ROIids.equal_range(thePxdDigit->getSensorID()) ;
-    for (auto theROI = ROIidsRange.first ; theROI != ROIidsRange.second; theROI ++)
-      if (theROI->second.Contains(*thePxdDigit))
-        return false;
+  if (m_CreateOutside) {
+    m_selectorOUT.select([ROIids](const PXDDigit * thePxdDigit) {
+      auto ROIidsRange = ROIids.equal_range(thePxdDigit->getSensorID()) ;
+      for (auto theROI = ROIidsRange.first ; theROI != ROIidsRange.second; theROI ++)
+        if (theROI->second.Contains(*thePxdDigit))
+          return false;
 
-    return true;
-  });
-
+      return true;
+    });
+  }
 
 }
 

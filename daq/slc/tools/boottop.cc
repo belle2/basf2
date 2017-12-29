@@ -75,11 +75,11 @@ int main(int argc, char** argv)
   }
   if (cpr) {
     if (nsm) sleep(1);
-    sprintf(s, "killall runcontrold rocontrold des_ser_ROPC_main eb0");
+    sprintf(s, "killall runcontrold rocontrold");
     printf("%s\n", s);
     system(s);
     for (int i = 0; i < ncpr; i++) {
-      sprintf(s, "ssh cpr%d \"killall -9 cprcontrold des_ser_COPPER_main;\" ", cprtop[i]);
+      sprintf(s, "ssh cpr%d \"killall -9 cprcontrold basf2;\" ", cprtop[i]);
       printf("%s\n", s);
       system(s);
     }

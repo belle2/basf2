@@ -50,10 +50,8 @@ namespace Belle2 {
   TEST_F(V0FitterTest, InitializeCuts)
   {
     V0Fitter v0Fitter;
-    v0Fitter.initializeCuts(1.0, 51., 0.03, 52.);
+    v0Fitter.initializeCuts(1.0, 52.);
     EXPECT_EQ(1.0, v0Fitter.m_beamPipeRadius);
-    EXPECT_EQ(51., v0Fitter.m_vertexChi2CutInside);
-    EXPECT_EQ(0.03, v0Fitter.m_massWindowKshortInside);
     EXPECT_EQ(52., v0Fitter.m_vertexChi2CutOutside);
   }
 

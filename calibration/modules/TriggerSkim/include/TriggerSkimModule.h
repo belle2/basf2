@@ -19,7 +19,9 @@ namespace Belle2 {
 
     /// Constructor: Sets the description, the properties and the parameters of the module.
     TriggerSkimModule();
+    /// Initialize
     virtual void initialize() override;
+    /// Event function
     virtual void event() override;
 
   private:

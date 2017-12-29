@@ -104,7 +104,7 @@ void ECLSplitterN2Module::event()
     aECLShower->addRelationTo(&aCR);
 
     // Loop over all local maximums (LM).
-    for (auto& aLM : aCR.getRelationsWith<ECLLocalMaximum>()) {
+    for (auto& aLM : aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
       // Add relation to the CR.
       aECLShower->addRelationTo(&aLM);
     }
@@ -120,7 +120,7 @@ void ECLSplitterN2Module::event()
     std::vector< double > weights;
 
     // Loop over all digits that are related to the CR, they can be weighted (in the future?).
-    auto relatedDigitsPairs = aCR.getRelationsTo<ECLCalDigit>();
+    auto relatedDigitsPairs = aCR.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
     for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
       const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
       const auto weight = relatedDigitsPairs.weight(iRel);

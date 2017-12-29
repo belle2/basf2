@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGMETHOD_H_
-#define LOGMETHOD_H_
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -71,5 +70,3 @@ namespace Belle2 {
 #else
 #define B2METHOD() Belle2::LogMethod logMethod(PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 #endif
-
-#endif /* LOGMETHOD_H_ */

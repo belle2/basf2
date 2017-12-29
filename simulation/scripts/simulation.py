@@ -43,7 +43,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
 
     # SVD reconstruction
     svd_cluster = '__ROIsvdClusters'
-    add_svd_reconstruction(path, svd_cluster)
+    add_svd_reconstruction(path, isROIsimulation=True)
 
     # SVD tracking
     svd_reco_tracks = '__ROIsvdRecoTracks'
@@ -78,7 +78,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
     if doCleanup:
         datastore_cleaner = register_module('PruneDataStore')
         datastore_cleaner.param('keepMatchedEntries', False)
-        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdClusters', '__ROIsvdRecoTracks',
+        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
                                                  'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
                                                  # till here it are StoreArrays, the following are relations and Datastore objects
                                                  'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
@@ -95,13 +95,12 @@ def add_simulation(
         path,
         components=None,
         bkgfiles=None,
-        bkgcomponents=None,
-        bkgscale=1.0,
-        bkgOverlay=False,
+        bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         use_vxdtf2=True,
-        generate_2nd_cdc_hits=False):
+        generate_2nd_cdc_hits=False,
+        simulateT0jitter=False):
     """
     This function adds the standard simulation modules to a path.
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
@@ -116,12 +115,8 @@ def add_simulation(
         else:
             bkgmixer = register_module('BeamBkgMixer')
             bkgmixer.param('backgroundFiles', bkgfiles)
-            if bkgcomponents:
-                bkgmixer.param('components', bkgcomponents)
-            else:
-                if components:
-                    bkgmixer.param('components', components)
-            bkgmixer.param('overallScaleFactor', bkgscale)
+            if components:
+                bkgmixer.param('components', components)
             path.add_module(bkgmixer)
 
     # geometry parameter database
@@ -131,10 +126,17 @@ def add_simulation(
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry')
-        if components:
+        geometry = register_module('Geometry', useDB=True)
+        if components is not None:
+            B2WARNING("Custom detector components specified, disabling Geometry from Database")
+            geometry.param('useDB', False)
             geometry.param('components', components)
         path.add_module(geometry)
+
+    # event T0 jitter simulation
+    if simulateT0jitter and 'EventT0Generator' not in path:
+        eventt0 = register_module('EventT0Generator')
+        path.add_module(eventt0)
 
     # detector simulation
     if 'FullSim' not in path:
@@ -162,7 +164,7 @@ def add_simulation(
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
             pxd_digits_name = 'pxd_unfiltered_digits'
-        add_pxd_simulation(path, digitsname=pxd_digits_name)
+        add_pxd_simulation(path, digitsName=pxd_digits_name)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -192,10 +194,13 @@ def add_simulation(
         path.add_module(eklm_digitizer)
 
     # background overlay executor - after all digitizers
-    if bkgOverlay:
-        bkgexecutor = register_module('BGOverlayExecutor')
-        bkgexecutor.param('PXDDigitsName', pxd_digits_name)
-        path.add_module(bkgexecutor)
+    if bkgfiles is not None and bkgOverlay:
+        path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+        if components is None or 'PXD' in components:
+            path.add_module("PXDDigitSorter", digits=pxd_digits_name)
+        # sort SVDShaperDigits before PXD data reduction
+        if components is None or 'SVD' in components:
+            path.add_module("SVDShaperDigitSorter")
 
     # PXD data reduction - after background overlay executor
     if (components is None or 'PXD' in components) and usePXDDataReduction:

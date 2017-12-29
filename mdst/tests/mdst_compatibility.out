@@ -9,7 +9,7 @@ EventMetaData:
   getEvent(): 0
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194090345178389
@@ -1425,12 +1425,18 @@ Track#0:
     -> MCParticles#4 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#0 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#0
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#0
-  getTrackFitResult(<type: e->): -> TrackFitResults#0
-  getTrackFitResult(<type: mu->): -> TrackFitResults#0
-  getTrackFitResult(<type: p+>): -> TrackFitResults#0
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#0
 Track#1:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -1440,12 +1446,18 @@ Track#1:
     -> MCParticles#5 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#1 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#1
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#1
-  getTrackFitResult(<type: e->): -> TrackFitResults#1
-  getTrackFitResult(<type: mu->): -> TrackFitResults#1
-  getTrackFitResult(<type: p+>): -> TrackFitResults#1
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#1
 Track#2:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -1455,12 +1467,18 @@ Track#2:
     -> MCParticles#11 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#2 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#2
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#2
-  getTrackFitResult(<type: e->): -> TrackFitResults#2
-  getTrackFitResult(<type: mu->): -> TrackFitResults#2
-  getTrackFitResult(<type: p+>): -> TrackFitResults#2
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#2
 Track#3:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -1470,12 +1488,18 @@ Track#3:
     -> MCParticles#14 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#3 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#3
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#3
-  getTrackFitResult(<type: e->): -> TrackFitResults#3
-  getTrackFitResult(<type: mu->): -> TrackFitResults#3
-  getTrackFitResult(<type: p+>): -> TrackFitResults#3
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#3
 Track#4:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -1484,12 +1508,18 @@ Track#4:
     -> MCParticles#15 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#4 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#4
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#4
-  getTrackFitResult(<type: e->): -> TrackFitResults#4
-  getTrackFitResult(<type: mu->): -> TrackFitResults#4
-  getTrackFitResult(<type: p+>): -> TrackFitResults#4
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#4
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -1499,12 +1529,18 @@ Track#5:
     -> MCParticles#19 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#5 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#5
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#5
-  getTrackFitResult(<type: e->): -> TrackFitResults#5
-  getTrackFitResult(<type: mu->): -> TrackFitResults#5
-  getTrackFitResult(<type: p+>): -> TrackFitResults#5
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#5
 Track#6:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -1514,12 +1550,18 @@ Track#6:
     -> MCParticles#30 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#6 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#6
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#6
-  getTrackFitResult(<type: e->): -> TrackFitResults#6
-  getTrackFitResult(<type: mu->): -> TrackFitResults#6
-  getTrackFitResult(<type: p+>): -> TrackFitResults#6
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#6
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -1529,12 +1571,18 @@ Track#7:
     -> MCParticles#31 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#7 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#7
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#7
-  getTrackFitResult(<type: e->): -> TrackFitResults#7
-  getTrackFitResult(<type: mu->): -> TrackFitResults#7
-  getTrackFitResult(<type: p+>): -> TrackFitResults#7
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#7
 Track#8:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -1543,12 +1591,18 @@ Track#8:
     -> MCParticles#34 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#8 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#8
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#8
-  getTrackFitResult(<type: e->): -> TrackFitResults#8
-  getTrackFitResult(<type: mu->): -> TrackFitResults#8
-  getTrackFitResult(<type: p+>): -> TrackFitResults#8
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#8
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -3288,7 +3342,7 @@ EventMetaData:
   getEvent(): 1
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194093029445924
@@ -4427,12 +4481,18 @@ Track#0:
     -> MCParticles#5 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#0 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#0
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#0
-  getTrackFitResult(<type: e->): -> TrackFitResults#0
-  getTrackFitResult(<type: mu->): -> TrackFitResults#0
-  getTrackFitResult(<type: p+>): -> TrackFitResults#0
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#0
 Track#1:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -4442,12 +4502,18 @@ Track#1:
     -> MCParticles#6 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#1 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#1
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#1
-  getTrackFitResult(<type: e->): -> TrackFitResults#1
-  getTrackFitResult(<type: mu->): -> TrackFitResults#1
-  getTrackFitResult(<type: p+>): -> TrackFitResults#1
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#1
 Track#2:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -4457,12 +4523,18 @@ Track#2:
     -> MCParticles#8 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#2 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#2
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#2
-  getTrackFitResult(<type: e->): -> TrackFitResults#2
-  getTrackFitResult(<type: mu->): -> TrackFitResults#2
-  getTrackFitResult(<type: p+>): -> TrackFitResults#2
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#2
 Track#3:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -4471,12 +4543,18 @@ Track#3:
     -> MCParticles#10 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#3 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#3
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#3
-  getTrackFitResult(<type: e->): -> TrackFitResults#3
-  getTrackFitResult(<type: mu->): -> TrackFitResults#3
-  getTrackFitResult(<type: p+>): -> TrackFitResults#3
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#3
 Track#4:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -4485,12 +4563,18 @@ Track#4:
     -> MCParticles#11 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#4 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#4
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#4
-  getTrackFitResult(<type: e->): -> TrackFitResults#4
-  getTrackFitResult(<type: mu->): -> TrackFitResults#4
-  getTrackFitResult(<type: p+>): -> TrackFitResults#4
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#4
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -4500,12 +4584,18 @@ Track#5:
     -> MCParticles#13 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#5 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#5
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#5
-  getTrackFitResult(<type: e->): -> TrackFitResults#5
-  getTrackFitResult(<type: mu->): -> TrackFitResults#5
-  getTrackFitResult(<type: p+>): -> TrackFitResults#5
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#5
 Track#6:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -4514,12 +4604,18 @@ Track#6:
     -> MCParticles#36 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#6 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#6
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#6
-  getTrackFitResult(<type: e->): -> TrackFitResults#6
-  getTrackFitResult(<type: mu->): -> TrackFitResults#6
-  getTrackFitResult(<type: p+>): -> TrackFitResults#6
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#6
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -4528,12 +4624,18 @@ Track#7:
     -> MCParticles#37 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#7 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#7
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#7
-  getTrackFitResult(<type: e->): -> TrackFitResults#7
-  getTrackFitResult(<type: mu->): -> TrackFitResults#7
-  getTrackFitResult(<type: p+>): -> TrackFitResults#7
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#7
 Track#8:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
@@ -4544,12 +4646,18 @@ Track#8:
     -> MCParticles#42 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#8 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#8
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#8
-  getTrackFitResult(<type: e->): -> TrackFitResults#8
-  getTrackFitResult(<type: mu->): -> TrackFitResults#8
-  getTrackFitResult(<type: p+>): -> TrackFitResults#8
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#8
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -5992,7 +6100,7 @@ EventMetaData:
   getEvent(): 2
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194094248154873
@@ -7914,12 +8022,18 @@ Track#0:
     -> MCParticles#4 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#0 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#0
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#0
-  getTrackFitResult(<type: e->): -> TrackFitResults#0
-  getTrackFitResult(<type: mu->): -> TrackFitResults#0
-  getTrackFitResult(<type: p+>): -> TrackFitResults#0
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#0
 Track#1:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -7929,12 +8043,18 @@ Track#1:
     -> MCParticles#5 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#1 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#1
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#1
-  getTrackFitResult(<type: e->): -> TrackFitResults#1
-  getTrackFitResult(<type: mu->): -> TrackFitResults#1
-  getTrackFitResult(<type: p+>): -> TrackFitResults#1
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#1
 Track#2:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -7943,12 +8063,18 @@ Track#2:
     -> MCParticles#8 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#2 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#2
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#2
-  getTrackFitResult(<type: e->): -> TrackFitResults#2
-  getTrackFitResult(<type: mu->): -> TrackFitResults#2
-  getTrackFitResult(<type: p+>): -> TrackFitResults#2
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#2
 Track#3:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -7957,12 +8083,18 @@ Track#3:
     -> MCParticles#12 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#3 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#3
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#3
-  getTrackFitResult(<type: e->): -> TrackFitResults#3
-  getTrackFitResult(<type: mu->): -> TrackFitResults#3
-  getTrackFitResult(<type: p+>): -> TrackFitResults#3
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#3
 Track#4:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -7972,12 +8104,18 @@ Track#4:
     -> MCParticles#20 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#4 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#4
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#4
-  getTrackFitResult(<type: e->): -> TrackFitResults#4
-  getTrackFitResult(<type: mu->): -> TrackFitResults#4
-  getTrackFitResult(<type: p+>): -> TrackFitResults#4
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#4
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -7986,12 +8124,18 @@ Track#5:
     -> MCParticles#21 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#5 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#5
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#5
-  getTrackFitResult(<type: e->): -> TrackFitResults#5
-  getTrackFitResult(<type: mu->): -> TrackFitResults#5
-  getTrackFitResult(<type: p+>): -> TrackFitResults#5
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#5
 Track#6:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -8000,12 +8144,18 @@ Track#6:
     -> MCParticles#24 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#6 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#6
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#6
-  getTrackFitResult(<type: e->): -> TrackFitResults#6
-  getTrackFitResult(<type: mu->): -> TrackFitResults#6
-  getTrackFitResult(<type: p+>): -> TrackFitResults#6
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#6
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -8015,12 +8165,18 @@ Track#7:
     -> MCParticles#27 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#7 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#7
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#7
-  getTrackFitResult(<type: e->): -> TrackFitResults#7
-  getTrackFitResult(<type: mu->): -> TrackFitResults#7
-  getTrackFitResult(<type: p+>): -> TrackFitResults#7
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#7
 Track#8:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -8029,12 +8185,18 @@ Track#8:
     -> MCParticles#28 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#8 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#8
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#8
-  getTrackFitResult(<type: e->): -> TrackFitResults#8
-  getTrackFitResult(<type: mu->): -> TrackFitResults#8
-  getTrackFitResult(<type: p+>): -> TrackFitResults#8
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#8
 Track#9:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -8043,12 +8205,18 @@ Track#9:
     -> MCParticles#41 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#9 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#9
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#9
-  getTrackFitResult(<type: e->): -> TrackFitResults#9
-  getTrackFitResult(<type: mu->): -> TrackFitResults#9
-  getTrackFitResult(<type: p+>): -> TrackFitResults#9
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#9
 Track#10:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -8057,12 +8225,18 @@ Track#10:
     -> MCParticles#42 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#10 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#10
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#10
-  getTrackFitResult(<type: e->): -> TrackFitResults#10
-  getTrackFitResult(<type: mu->): -> TrackFitResults#10
-  getTrackFitResult(<type: p+>): -> TrackFitResults#10
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#10
 Track#11:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -8071,12 +8245,18 @@ Track#11:
     -> MCParticles#46 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#11 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#11
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#11
-  getTrackFitResult(<type: e->): -> TrackFitResults#11
-  getTrackFitResult(<type: mu->): -> TrackFitResults#11
-  getTrackFitResult(<type: p+>): -> TrackFitResults#11
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#11
 Track#12:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -8085,12 +8265,18 @@ Track#12:
     -> MCParticles#55 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#12 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#12
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#12
-  getTrackFitResult(<type: e->): -> TrackFitResults#12
-  getTrackFitResult(<type: mu->): -> TrackFitResults#12
-  getTrackFitResult(<type: p+>): -> TrackFitResults#12
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#12
 Track#13:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -8100,12 +8286,18 @@ Track#13:
     -> MCParticles#56 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#13 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#13
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#13
-  getTrackFitResult(<type: e->): -> TrackFitResults#13
-  getTrackFitResult(<type: mu->): -> TrackFitResults#13
-  getTrackFitResult(<type: p+>): -> TrackFitResults#13
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#13
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#13
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#13
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#13
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -9830,7 +10022,7 @@ EventMetaData:
   getEvent(): 3
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194096257224344
@@ -11475,12 +11667,18 @@ Track#0:
     -> MCParticles#5 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#0 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#0
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#0
-  getTrackFitResult(<type: e->): -> TrackFitResults#0
-  getTrackFitResult(<type: mu->): -> TrackFitResults#0
-  getTrackFitResult(<type: p+>): -> TrackFitResults#0
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#0
 Track#1:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -11489,12 +11687,18 @@ Track#1:
     -> MCParticles#12 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#1 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#1
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#1
-  getTrackFitResult(<type: e->): -> TrackFitResults#1
-  getTrackFitResult(<type: mu->): -> TrackFitResults#1
-  getTrackFitResult(<type: p+>): -> TrackFitResults#1
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#1
 Track#2:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
@@ -11505,12 +11709,18 @@ Track#2:
     -> MCParticles#13 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#2 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#2
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#2
-  getTrackFitResult(<type: e->): -> TrackFitResults#2
-  getTrackFitResult(<type: mu->): -> TrackFitResults#2
-  getTrackFitResult(<type: p+>): -> TrackFitResults#2
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#2
 Track#3:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -11519,12 +11729,18 @@ Track#3:
     -> MCParticles#15 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#3 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#3
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#3
-  getTrackFitResult(<type: e->): -> TrackFitResults#3
-  getTrackFitResult(<type: mu->): -> TrackFitResults#3
-  getTrackFitResult(<type: p+>): -> TrackFitResults#3
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#3
 Track#4:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -11534,12 +11750,18 @@ Track#4:
     -> MCParticles#24 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#4 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#4
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#4
-  getTrackFitResult(<type: e->): -> TrackFitResults#4
-  getTrackFitResult(<type: mu->): -> TrackFitResults#4
-  getTrackFitResult(<type: p+>): -> TrackFitResults#4
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#4
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -11548,12 +11770,18 @@ Track#5:
     -> MCParticles#28 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#5 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#5
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#5
-  getTrackFitResult(<type: e->): -> TrackFitResults#5
-  getTrackFitResult(<type: mu->): -> TrackFitResults#5
-  getTrackFitResult(<type: p+>): -> TrackFitResults#5
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#5
 Track#6:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -11563,12 +11791,18 @@ Track#6:
     -> MCParticles#32 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#6 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#6
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#6
-  getTrackFitResult(<type: e->): -> TrackFitResults#6
-  getTrackFitResult(<type: mu->): -> TrackFitResults#6
-  getTrackFitResult(<type: p+>): -> TrackFitResults#6
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#6
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(2)
@@ -11579,12 +11813,18 @@ Track#7:
     -> MCParticles#33 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#7 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#7
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#7
-  getTrackFitResult(<type: e->): -> TrackFitResults#7
-  getTrackFitResult(<type: mu->): -> TrackFitResults#7
-  getTrackFitResult(<type: p+>): -> TrackFitResults#7
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#7
 Track#8:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -11593,12 +11833,18 @@ Track#8:
     -> MCParticles#45 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#8 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#8
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#8
-  getTrackFitResult(<type: e->): -> TrackFitResults#8
-  getTrackFitResult(<type: mu->): -> TrackFitResults#8
-  getTrackFitResult(<type: p+>): -> TrackFitResults#8
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#8
 Track#9:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -11608,12 +11854,18 @@ Track#9:
     -> MCParticles#46 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#9 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#9
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#9
-  getTrackFitResult(<type: e->): -> TrackFitResults#9
-  getTrackFitResult(<type: mu->): -> TrackFitResults#9
-  getTrackFitResult(<type: p+>): -> TrackFitResults#9
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#9
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -13717,7 +13969,7 @@ EventMetaData:
   getEvent(): 4
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194098155950942
@@ -15593,12 +15845,18 @@ Track#0:
     -> MCParticles#5 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#0 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#0
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#0
-  getTrackFitResult(<type: e->): -> TrackFitResults#0
-  getTrackFitResult(<type: mu->): -> TrackFitResults#0
-  getTrackFitResult(<type: p+>): -> TrackFitResults#0
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#0
 Track#1:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15607,12 +15865,18 @@ Track#1:
     -> MCParticles#6 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#1 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#1
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#1
-  getTrackFitResult(<type: e->): -> TrackFitResults#1
-  getTrackFitResult(<type: mu->): -> TrackFitResults#1
-  getTrackFitResult(<type: p+>): -> TrackFitResults#1
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#1
 Track#2:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15621,12 +15885,18 @@ Track#2:
     -> MCParticles#9 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#2 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#2
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#2
-  getTrackFitResult(<type: e->): -> TrackFitResults#2
-  getTrackFitResult(<type: mu->): -> TrackFitResults#2
-  getTrackFitResult(<type: p+>): -> TrackFitResults#2
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#2
 Track#3:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -15636,12 +15906,18 @@ Track#3:
     -> MCParticles#20 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#3 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#3
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#3
-  getTrackFitResult(<type: e->): -> TrackFitResults#3
-  getTrackFitResult(<type: mu->): -> TrackFitResults#3
-  getTrackFitResult(<type: p+>): -> TrackFitResults#3
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#3
 Track#4:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -15651,12 +15927,18 @@ Track#4:
     -> MCParticles#23 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#4 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#4
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#4
-  getTrackFitResult(<type: e->): -> TrackFitResults#4
-  getTrackFitResult(<type: mu->): -> TrackFitResults#4
-  getTrackFitResult(<type: p+>): -> TrackFitResults#4
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#4
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15665,12 +15947,18 @@ Track#5:
     -> MCParticles#28 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#5 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#5
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#5
-  getTrackFitResult(<type: e->): -> TrackFitResults#5
-  getTrackFitResult(<type: mu->): -> TrackFitResults#5
-  getTrackFitResult(<type: p+>): -> TrackFitResults#5
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#5
 Track#6:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15679,12 +15967,18 @@ Track#6:
     -> MCParticles#30 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#6 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#6
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#6
-  getTrackFitResult(<type: e->): -> TrackFitResults#6
-  getTrackFitResult(<type: mu->): -> TrackFitResults#6
-  getTrackFitResult(<type: p+>): -> TrackFitResults#6
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#6
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -15694,12 +15988,18 @@ Track#7:
     -> MCParticles#31 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#7 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#7
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#7
-  getTrackFitResult(<type: e->): -> TrackFitResults#7
-  getTrackFitResult(<type: mu->): -> TrackFitResults#7
-  getTrackFitResult(<type: p+>): -> TrackFitResults#7
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#7
 Track#8:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15708,12 +16008,18 @@ Track#8:
     -> MCParticles#33 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#8 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#8
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#8
-  getTrackFitResult(<type: e->): -> TrackFitResults#8
-  getTrackFitResult(<type: mu->): -> TrackFitResults#8
-  getTrackFitResult(<type: p+>): -> TrackFitResults#8
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#8
 Track#9:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -15723,12 +16029,18 @@ Track#9:
     -> MCParticles#34 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#9 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#9
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#9
-  getTrackFitResult(<type: e->): -> TrackFitResults#9
-  getTrackFitResult(<type: mu->): -> TrackFitResults#9
-  getTrackFitResult(<type: p+>): -> TrackFitResults#9
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#9
 Track#10:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -15738,12 +16050,18 @@ Track#10:
     -> MCParticles#35 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#10 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#10
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#10
-  getTrackFitResult(<type: e->): -> TrackFitResults#10
-  getTrackFitResult(<type: mu->): -> TrackFitResults#10
-  getTrackFitResult(<type: p+>): -> TrackFitResults#10
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#10
 Track#11:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15752,12 +16070,18 @@ Track#11:
     -> MCParticles#58 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#11 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#11
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#11
-  getTrackFitResult(<type: e->): -> TrackFitResults#11
-  getTrackFitResult(<type: mu->): -> TrackFitResults#11
-  getTrackFitResult(<type: p+>): -> TrackFitResults#11
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#11
 Track#12:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -15766,12 +16090,18 @@ Track#12:
     -> MCParticles#59 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#12 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#12
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#12
-  getTrackFitResult(<type: e->): -> TrackFitResults#12
-  getTrackFitResult(<type: mu->): -> TrackFitResults#12
-  getTrackFitResult(<type: p+>): -> TrackFitResults#12
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#12
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#12
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -17888,7 +18218,7 @@ EventMetaData:
   getEvent(): 5
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
+  getParentLfn(): 
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194099596828101
@@ -19533,12 +19863,18 @@ Track#0:
     -> MCParticles#13 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#0 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#0
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#0
-  getTrackFitResult(<type: e->): -> TrackFitResults#0
-  getTrackFitResult(<type: mu->): -> TrackFitResults#0
-  getTrackFitResult(<type: p+>): -> TrackFitResults#0
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#0
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#0
 Track#1:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -19548,12 +19884,18 @@ Track#1:
     -> MCParticles#21 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#1 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#1
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#1
-  getTrackFitResult(<type: e->): -> TrackFitResults#1
-  getTrackFitResult(<type: mu->): -> TrackFitResults#1
-  getTrackFitResult(<type: p+>): -> TrackFitResults#1
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#1
 Track#2:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -19563,12 +19905,18 @@ Track#2:
     -> MCParticles#22 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#2 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#2
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#2
-  getTrackFitResult(<type: e->): -> TrackFitResults#2
-  getTrackFitResult(<type: mu->): -> TrackFitResults#2
-  getTrackFitResult(<type: p+>): -> TrackFitResults#2
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#2
 Track#3:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -19577,12 +19925,18 @@ Track#3:
     -> MCParticles#31 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#3 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#3
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#3
-  getTrackFitResult(<type: e->): -> TrackFitResults#3
-  getTrackFitResult(<type: mu->): -> TrackFitResults#3
-  getTrackFitResult(<type: p+>): -> TrackFitResults#3
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#3
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#3
 Track#4:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -19592,12 +19946,18 @@ Track#4:
     -> MCParticles#36 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#4 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#4
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#4
-  getTrackFitResult(<type: e->): -> TrackFitResults#4
-  getTrackFitResult(<type: mu->): -> TrackFitResults#4
-  getTrackFitResult(<type: p+>): -> TrackFitResults#4
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#4
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -19606,12 +19966,18 @@ Track#5:
     -> MCParticles#37 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#5 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#5
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#5
-  getTrackFitResult(<type: e->): -> TrackFitResults#5
-  getTrackFitResult(<type: mu->): -> TrackFitResults#5
-  getTrackFitResult(<type: p+>): -> TrackFitResults#5
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#5
 Track#6:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -19621,12 +19987,18 @@ Track#6:
     -> MCParticles#40 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#6 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#6
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#6
-  getTrackFitResult(<type: e->): -> TrackFitResults#6
-  getTrackFitResult(<type: mu->): -> TrackFitResults#6
-  getTrackFitResult(<type: p+>): -> TrackFitResults#6
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#6
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#6
 Track#7:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -19635,12 +20007,18 @@ Track#7:
     -> MCParticles#42 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#7 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#7
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#7
-  getTrackFitResult(<type: e->): -> TrackFitResults#7
-  getTrackFitResult(<type: mu->): -> TrackFitResults#7
-  getTrackFitResult(<type: p+>): -> TrackFitResults#7
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#7
 Track#8:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(1)
@@ -19650,12 +20028,18 @@ Track#8:
     -> MCParticles#43 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#8 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#8
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#8
-  getTrackFitResult(<type: e->): -> TrackFitResults#8
-  getTrackFitResult(<type: mu->): -> TrackFitResults#8
-  getTrackFitResult(<type: p+>): -> TrackFitResults#8
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#8
 Track#9:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -19664,12 +20048,18 @@ Track#9:
     -> MCParticles#45 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#9 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#9
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#9
-  getTrackFitResult(<type: e->): -> TrackFitResults#9
-  getTrackFitResult(<type: mu->): -> TrackFitResults#9
-  getTrackFitResult(<type: p+>): -> TrackFitResults#9
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#9
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#9
 Track#10:
   getNumberOfFittedHypotheses(): 1
   getRelationsWith(ECLClusters): size(0)
@@ -19678,12 +20068,18 @@ Track#10:
     -> MCParticles#67 (weight: 1)
   getRelationsWith(PIDLikelihoods): size(1)
     -> PIDLikelihoods#10 (weight: 1)
-  getTrackFitResult(<type: K+>): -> TrackFitResults#10
-  getTrackFitResult(<type: deuteron>): -> TrackFitResults#10
-  getTrackFitResult(<type: e->): -> TrackFitResults#10
-  getTrackFitResult(<type: mu->): -> TrackFitResults#10
-  getTrackFitResult(<type: p+>): -> TrackFitResults#10
+  getTrackFitResult(<type: K+>): -> NULL
+  getTrackFitResult(<type: deuteron>): -> NULL
+  getTrackFitResult(<type: e->): -> NULL
+  getTrackFitResult(<type: mu->): -> NULL
+  getTrackFitResult(<type: p+>): -> NULL
   getTrackFitResult(<type: pi+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: e->): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: mu->): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
+  getTrackFitResultWithClosestMass(<type: pi+>): -> TrackFitResults#10
 V0#0:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#20 (weight: 1)

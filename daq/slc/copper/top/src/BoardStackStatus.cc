@@ -13,11 +13,11 @@
 using namespace Belle2;
 using namespace std;
 
-const float vRAW_low_margin = 0.00;
-const float vRAW_high_margin = 0.275;
-const float vRAW1_nominal = 1.765;
-const float vRAW2_nominal = 3.099;
-const float vRAW3_nominal = 4.424;
+const float vRAW_low_margin = 0.050;
+const float vRAW_high_margin = 0.150;
+const float vRAW1_nominal = 1.715;
+const float vRAW2_nominal = 3.049;
+const float vRAW3_nominal = 4.374;
 const float fpgaTempHigh = 85;
 const float walltempHigh = 80;
 const float asictempHigh = 80;
@@ -142,7 +142,6 @@ void BoardStackStatus::InitNSMCallbacksCarrier(Belle2::HSLB& hslb, Belle2::RCCal
   callback.add(new NSMVHandlerFloat(vname + "tempWall", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "tempASIC01", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "tempASIC23", true, false, 0));
-  callback.add(new NSMVHandlerFloat(vname + "lookbackGet", true, false, 0));
 }
 
 void BoardStackStatus::UpdateNSMCallbacksSCROD(Belle2::HSLB& hslb, Belle2::RCCallback& callback)
@@ -172,19 +171,19 @@ void BoardStackStatus::UpdateNSMCallbacksSCROD(Belle2::HSLB& hslb, Belle2::RCCal
     callback.log(LogFile::WARNING, "RAW1 voltage unnecessarily high " + str);
   }
   if (m_boardstackObservables.sVoltageRaw1 < vRAW1_nominal - vRAW_low_margin) {
-    callback.log(LogFile::WARNING, "RAW1 voltage too low! " + str);
+    callback.log(LogFile::ERROR, "RAW1 voltage too low! " + str);
   }
   if (vRAW2_nominal + vRAW_high_margin < m_boardstackObservables.sVoltageRaw2) {
     callback.log(LogFile::WARNING, "RAW2 voltage unnecessarily high " + str);
   }
   if (m_boardstackObservables.sVoltageRaw2 < vRAW2_nominal - vRAW_low_margin) {
-    callback.log(LogFile::WARNING, "RAW2 voltage too low! " + str);
+    callback.log(LogFile::ERROR, "RAW2 voltage too low! " + str);
   }
   if (vRAW3_nominal + vRAW_high_margin < m_boardstackObservables.sVoltageRaw3) {
     callback.log(LogFile::WARNING, "RAW3 voltage unnecessarily high " + str);
   }
   if (m_boardstackObservables.sVoltageRaw3 < vRAW3_nominal - vRAW_low_margin) {
-    callback.log(LogFile::WARNING, "RAW3 voltage too low!" + str);
+    callback.log(LogFile::ERROR, "RAW3 voltage too low!" + str);
   }
 }
 
@@ -201,8 +200,6 @@ void BoardStackStatus::UpdateNSMCallbacksCarrier(Belle2::HSLB& hslb, Belle2::RCC
   callback.set(vname + "tempWall", m_boardstackObservables.cWallTemperature.at(carrier));
   callback.set(vname + "tempASIC01", m_boardstackObservables.cASIC01Temperature.at(carrier));
   callback.set(vname + "tempASIC23", m_boardstackObservables.cASIC23Temperature.at(carrier));
-  //lookback window setting
-  callback.set(vname + "lookbackGet", Read_Register(hslb, CARRIER_IRSX_readoutLookback, carrier, 0));
 }
 
 void BoardStackStatus::PrintSCRODStatus()

@@ -221,9 +221,9 @@ namespace {
 
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Particle>::registerPersistent();
-      DataStore::Instance().setInitializeActive(false);
       StoreArray<Particle> particles;
+      particles.registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
       PCmsLabTransform T;
       TLorentzVector vec0 = {0.0, 0.0, 0.0, 10.5794};
       TLorentzVector vec1 = {0.0, +0.332174566, 0.0, 5.2897};
@@ -311,14 +311,13 @@ namespace {
   TEST(TrackVariablesTest, Variable)
   {
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<Particle>::registerPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
     StoreArray<TrackFitResult> myResults;
     StoreArray<Track> myTracks;
     StoreArray<Particle> myParticles;
+    myResults.registerInDataStore();
+    myTracks.registerInDataStore();
+    myParticles.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
 
     TRandom3 generator;
 
@@ -359,13 +358,6 @@ namespace {
 
     StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<ECLCluster>::registerPersistent();
-    StoreArray<KLMCluster>::registerPersistent();
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<PIDLikelihood>::registerPersistent();
-    StoreArray<Particle>::registerPersistent();
-    StoreArray<RestOfEvent>::registerPersistent();
     pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
@@ -374,6 +366,13 @@ namespace {
     StoreArray<Particle> myParticles;
     StoreArray<RestOfEvent> myROEs;
     StoreArray<PIDLikelihood> myPIDLikelihoods;
+    myECLClusters.registerInDataStore();
+    myKLMClusters.registerInDataStore();
+    myTFRs.registerInDataStore();
+    myTracks.registerInDataStore();
+    myParticles.registerInDataStore();
+    myROEs.registerInDataStore();
+    myPIDLikelihoods.registerInDataStore();
     myParticles.registerRelationTo(myROEs);
     myTracks.registerRelationTo(myPIDLikelihoods);
     DataStore::Instance().setInitializeActive(false);
@@ -619,9 +618,10 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<MCParticle>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
+
     }
 
     /** clear datastore */
@@ -728,10 +728,10 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreObjPtr<EventExtraInfo>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+      StoreObjPtr<EventExtraInfo>().registerInDataStore();
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<MCParticle>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
     }
 
@@ -972,14 +972,15 @@ namespace {
   TEST_F(MetaVariableTest, nCleanedTracks)
   {
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
+    StoreArray<TrackFitResult> track_fit_results;
+    StoreArray<Track> tracks;
+    track_fit_results.registerInDataStore();
+    tracks.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
     Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
 
-    StoreArray<TrackFitResult> track_fit_results;
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
@@ -989,7 +990,6 @@ namespace {
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
 
-    StoreArray<Track> tracks;
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 1);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 2);
@@ -1187,89 +1187,11 @@ namespace {
 
   TEST_F(MetaVariableTest, NBDeltaIfMissing)
   {
-    DataStore::Instance().setInitializeActive(true);
-    StoreArray<PIDLikelihood>::registerPersistent();
-    StoreArray<Particle>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<PIDLikelihood> likelihood;
-    StoreArray<Particle> particles;
-    StoreArray<Track> tracks;
-    StoreArray<TrackFitResult> tfrs;
-    tracks.registerRelationTo(likelihood);
-    DataStore::Instance().setInitializeActive(false);
-
-    // create tracks and trackFitResutls
-    TRandom3 generator;
-    const float pValue = 0.5;
-    const float bField = 1.5;
-    const int charge = 1;
-    TMatrixDSym cov6(6);
-    // Generate a random put orthogonal pair of vectors in the r-phi plane
-    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-    // Add a random z component
-    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
-
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
-    Track mytrack;
-    mytrack.setTrackFitResultIndex(Const::electron, 0);
-    Track* savedTrack1 = tracks.appendNew(mytrack);
-    Track* savedTrack2 = tracks.appendNew(mytrack);
-    Track* savedTrack3 = tracks.appendNew(mytrack);
-    Track* savedTrack4 = tracks.appendNew(mytrack);
-
-    auto* l1 = likelihood.appendNew();
-    l1->setLogLikelihood(Const::TOP, Const::electron, 0.5);
-    l1->setLogLikelihood(Const::ARICH, Const::electron, 0.5);
-    l1->setLogLikelihood(Const::ECL, Const::electron, 0.5);
-    l1->setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    l1->setLogLikelihood(Const::ARICH, Const::pion, 0.5);
-    l1->setLogLikelihood(Const::ECL, Const::pion, 0.5);
-    savedTrack1->addRelationTo(l1);
-
-    auto* l2 = likelihood.appendNew();
-    l2->setLogLikelihood(Const::TOP, Const::electron, 0.5);
-    l2->setLogLikelihood(Const::ECL, Const::electron, 0.5);
-    l2->setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    l2->setLogLikelihood(Const::ECL, Const::pion, 0.5);
-    savedTrack2->addRelationTo(l2);
-
-    auto* l3 = likelihood.appendNew();
-    l3->setLogLikelihood(Const::TOP, Const::electron, 0.5);
-    l3->setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    savedTrack3->addRelationTo(l3);
-
-    auto* l4 = likelihood.appendNew();
-    l4->setLogLikelihood(Const::ECL, Const::electron, 0.5);
-    l4->setLogLikelihood(Const::ECL, Const::pion, 0.5);
-    savedTrack4->addRelationTo(l4);
-
-    auto* p1 = particles.appendNew(savedTrack1, Const::electron);
-    auto* p2 = particles.appendNew(savedTrack2, Const::electron);
-    auto* p3 = particles.appendNew(savedTrack3, Const::electron);
-    auto* p4 = particles.appendNew(savedTrack4, Const::electron);
-
-    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, eid_TOP, 1)"));
-    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(ECL, eid_ECL)"));
-
-    const Manager::Var* var = Manager::Instance().getVariable("NBDeltaIfMissing(TOP, eid_TOP)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p2), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p3), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p4), -999.0);
-
-    var = Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, eid_ARICH)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p2), -999.0);
-    EXPECT_FLOAT_EQ(var->function(p3), -999.0);
-    EXPECT_FLOAT_EQ(var->function(p4), -999.0);
-
+    //Variable got removed, test for absence
+    const Manager::Var* var = Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)");
+    ASSERT_EQ(var, nullptr);
+    var = Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, 11)");
+    ASSERT_EQ(var, nullptr);
   }
 
   TEST_F(MetaVariableTest, matchedMC)
@@ -1438,15 +1360,18 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<Track>::registerPersistent();
-      StoreArray<TrackFitResult>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
-      StoreArray<PIDLikelihood>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap> peim;
+      StoreArray<TrackFitResult> tfrs;
+      StoreArray<MCParticle> mcparticles;
       StoreArray<PIDLikelihood> likelihood;
       StoreArray<Particle> particles;
       StoreArray<Track> tracks;
+      peim.registerInDataStore();
+      tfrs.registerInDataStore();
+      mcparticles.registerInDataStore();
+      likelihood.registerInDataStore();
+      particles.registerInDataStore();
+      tracks.registerInDataStore();
       particles.registerRelationTo(likelihood);
       tracks.registerRelationTo(likelihood);
       DataStore::Instance().setInitializeActive(false);
@@ -1484,105 +1409,148 @@ namespace {
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
-    Track* savedTrack = tracks.appendNew(mytrack);
+    Track* allTrack = tracks.appendNew(mytrack);
+    Track* noPIDTrack = tracks.appendNew(mytrack);
+    Track* dEdxTrack = tracks.appendNew(mytrack);
 
-    auto* l1 = likelihood.appendNew();
-    l1->setLogLikelihood(Const::TOP, Const::electron, 0.18);
-    l1->setLogLikelihood(Const::ARICH, Const::electron, 0.16);
-    l1->setLogLikelihood(Const::ECL, Const::electron, 0.14);
-    l1->setLogLikelihood(Const::CDC, Const::electron, 0.12);
-    l1->setLogLikelihood(Const::SVD, Const::electron, 0.1);
+    // Fill by hand likelihood values for all the detectors and hypothesis
+    // This is clearly not a phyisical case, since a particle cannot leave good
+    // signals in both TOP and ARICH
+    auto* lAll = likelihood.appendNew();
+    lAll->setLogLikelihood(Const::TOP, Const::electron, 0.18);
+    lAll->setLogLikelihood(Const::ARICH, Const::electron, 0.16);
+    lAll->setLogLikelihood(Const::ECL, Const::electron, 0.14);
+    lAll->setLogLikelihood(Const::CDC, Const::electron, 0.12);
+    lAll->setLogLikelihood(Const::SVD, Const::electron, 0.1);
 
-    l1->setLogLikelihood(Const::TOP, Const::pion, 0.2);
-    l1->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
-    l1->setLogLikelihood(Const::ECL, Const::pion, 0.24);
-    l1->setLogLikelihood(Const::CDC, Const::pion, 0.26);
-    l1->setLogLikelihood(Const::SVD, Const::pion, 0.28);
+    lAll->setLogLikelihood(Const::TOP, Const::pion, 0.2);
+    lAll->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
+    lAll->setLogLikelihood(Const::ECL, Const::pion, 0.24);
+    lAll->setLogLikelihood(Const::CDC, Const::pion, 0.26);
+    lAll->setLogLikelihood(Const::SVD, Const::pion, 0.28);
 
-    l1->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
-    l1->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
-    l1->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
-    l1->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
-    l1->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
+    lAll->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
+    lAll->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
+    lAll->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
+    lAll->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
+    lAll->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
 
-    l1->setLogLikelihood(Const::TOP, Const::proton, 0.4);
-    l1->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
-    l1->setLogLikelihood(Const::ECL, Const::proton, 0.44);
-    l1->setLogLikelihood(Const::CDC, Const::proton, 0.46);
-    l1->setLogLikelihood(Const::SVD, Const::proton, 0.48);
+    lAll->setLogLikelihood(Const::TOP, Const::proton, 0.4);
+    lAll->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
+    lAll->setLogLikelihood(Const::ECL, Const::proton, 0.44);
+    lAll->setLogLikelihood(Const::CDC, Const::proton, 0.46);
+    lAll->setLogLikelihood(Const::SVD, Const::proton, 0.48);
 
-    l1->setLogLikelihood(Const::TOP, Const::muon, 0.5);
-    l1->setLogLikelihood(Const::ARICH, Const::muon, 0.52);
-    l1->setLogLikelihood(Const::ECL, Const::muon, 0.54);
-    l1->setLogLikelihood(Const::CDC, Const::muon, 0.56);
-    l1->setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    lAll->setLogLikelihood(Const::TOP, Const::muon, 0.5);
+    lAll->setLogLikelihood(Const::ARICH, Const::muon, 0.52);
+    lAll->setLogLikelihood(Const::ECL, Const::muon, 0.54);
+    lAll->setLogLikelihood(Const::CDC, Const::muon, 0.56);
+    lAll->setLogLikelihood(Const::SVD, Const::muon, 0.58);
 
-    savedTrack->addRelationTo(l1);
+    lAll->setLogLikelihood(Const::TOP, Const::deuteron, 0.6);
+    lAll->setLogLikelihood(Const::ARICH, Const::deuteron, 0.62);
+    lAll->setLogLikelihood(Const::ECL, Const::deuteron, 0.64);
+    lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
+    lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
-    Particle* electron = particles.appendNew(savedTrack, Const::electron);
-    auto* pion = particles.appendNew(savedTrack, Const::pion);
-    auto* muon = particles.appendNew(savedTrack, Const::muon);
-    auto* kaon = particles.appendNew(savedTrack, Const::kaon);
-    auto* proton = particles.appendNew(savedTrack, Const::proton);
 
-    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(electron),  0.7 - 0.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLPion(electron),  0.7 - 1.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(electron),  0.7 - 1.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLProton(electron),  0.7 - 2.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(electron),  0.7 - 2.7);
+    // Likelihoods for a dEdx only case
+    auto* ldEdx = likelihood.appendNew();
+    ldEdx->setLogLikelihood(Const::CDC, Const::electron, 0.12);
+    ldEdx->setLogLikelihood(Const::SVD, Const::electron, 0.1);
 
-    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(pion),  1.2 - 0.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLPion(pion),  1.2 - 1.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(pion),  1.2 - 1.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLProton(pion),  1.2 - 2.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(pion),  1.2 - 2.7);
+    ldEdx->setLogLikelihood(Const::CDC, Const::pion, 0.26);
+    ldEdx->setLogLikelihood(Const::SVD, Const::pion, 0.28);
 
-    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(kaon),  1.7 - 0.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLPion(kaon),  1.7 - 1.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(kaon),  1.7 - 1.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLProton(kaon),  1.7 - 2.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(kaon),  1.7 - 2.7);
+    ldEdx->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
+    ldEdx->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
 
-    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(proton), 2.2 - 0.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLPion(proton), 2.2 - 1.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(proton), 2.2 - 1.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLProton(proton), 2.2 - 2.2);
-    EXPECT_ALL_NEAR(particleDeltaLogLMuon(proton),  2.2 - 2.7, 1e-6);
+    ldEdx->setLogLikelihood(Const::CDC, Const::proton, 0.46);
+    ldEdx->setLogLikelihood(Const::SVD, Const::proton, 0.48);
 
-    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(muon),  2.7 - 0.7);
-    EXPECT_FLOAT_EQ(particleDeltaLogLPion(muon),  2.7 - 1.2);
-    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(muon),  2.7 - 1.7);
-    EXPECT_ALL_NEAR(particleDeltaLogLProton(muon),  2.7 - 2.2, 1e-6);
-    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(muon),  2.7 - 2.7);
+    ldEdx->setLogLikelihood(Const::CDC, Const::muon, 0.56);
+    ldEdx->setLogLikelihood(Const::SVD, Const::muon, 0.58);
 
-    EXPECT_FLOAT_EQ(particleElectronId(electron), 1.0 / (1.0 + std::exp(1.2 - 0.7)));
-    EXPECT_FLOAT_EQ(particleMuonId(muon), 1.0 / (1.0 + std::exp(1.2 - 2.7)));
-    EXPECT_FLOAT_EQ(particlePionId(pion), 1.0 / (1.0 + std::exp(1.7 - 1.2)));
-    EXPECT_FLOAT_EQ(particleKaonId(kaon), 1.0 / (1.0 + std::exp(1.2 - 1.7)));
-    EXPECT_FLOAT_EQ(particleProtonId(proton), 1.0 / (1.0 + std::exp(1.2 - 2.2)));
-    EXPECT_FLOAT_EQ(particlePionvsElectronId(pion), 1.0 / (1.0 + std::exp(0.7 - 1.2)));
+    ldEdx->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
+    ldEdx->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
-    EXPECT_FLOAT_EQ(particleElectrondEdxId(electron), 1.0 / (1.0 + std::exp(0.54 - 0.22)));
-    EXPECT_FLOAT_EQ(particleMuondEdxId(muon), 1.0 / (1.0 + std::exp(0.54 - 1.14)));
-    EXPECT_FLOAT_EQ(particlePiondEdxId(pion), 1.0 / (1.0 + std::exp(0.74 - 0.54)));
-    EXPECT_FLOAT_EQ(particleKaondEdxId(kaon), 1.0 / (1.0 + std::exp(0.54 - 0.74)));
-    EXPECT_FLOAT_EQ(particleProtondEdxId(proton), 1.0 / (1.0 + std::exp(0.54 - 0.94)));
-    EXPECT_FLOAT_EQ(particlePionvsElectrondEdxId(pion), 1.0 / (1.0 + std::exp(0.22 - 0.54)));
 
-    EXPECT_FLOAT_EQ(particleElectronTOPId(electron), 1.0 / (1.0 + std::exp(0.2 - 0.18)));
-    EXPECT_FLOAT_EQ(particleMuonTOPId(muon), 1.0 / (1.0 + std::exp(0.2 - 0.5)));
-    EXPECT_FLOAT_EQ(particlePionTOPId(pion), 1.0 / (1.0 + std::exp(0.3 - 0.2)));
-    EXPECT_FLOAT_EQ(particleKaonTOPId(kaon), 1.0 / (1.0 + std::exp(0.2 - 0.3)));
-    EXPECT_FLOAT_EQ(particleProtonTOPId(proton), 1.0 / (1.0 + std::exp(0.2 - 0.4)));
+    allTrack->addRelationTo(lAll);
+    dEdxTrack->addRelationTo(ldEdx);
 
-    EXPECT_FLOAT_EQ(particleElectronARICHId(electron), 1.0 / (1.0 + std::exp(0.22 - 0.16)));
-    EXPECT_FLOAT_EQ(particleMuonARICHId(muon), 1.0 / (1.0 + std::exp(0.22 - 0.52)));
-    EXPECT_FLOAT_EQ(particlePionARICHId(pion), 1.0 / (1.0 + std::exp(0.32 - 0.22)));
-    EXPECT_FLOAT_EQ(particleKaonARICHId(kaon), 1.0 / (1.0 + std::exp(0.22 - 0.32)));
-    EXPECT_FLOAT_EQ(particleProtonARICHId(proton), 1.0 / (1.0 + std::exp(0.22 - 0.42)));
+    // Table with the sum(LogL) for several cases
+    //      All  dEdx
+    // e    0.7  0.22
+    // mu   2.7  1.14
+    // pi   1.2  0.54
+    // k    1.7  0.74
+    // p    2.2  0.94
+    // d    3.2  1.34
 
-    EXPECT_FLOAT_EQ(particleElectronECLId(electron), 1.0 / (1.0 + std::exp(0.24 - 0.14)));
+    auto* particleAll = particles.appendNew(allTrack, Const::pion);
+    auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
+    auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
+    // Basic PID quantities. Currently just binary comparisons with the pion hypothesis
+    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 0.7)));
+    EXPECT_FLOAT_EQ(muonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 2.7)));
+    EXPECT_FLOAT_EQ(pionID(particleAll), 1.0 / (1.0 + std::exp(1.7 - 1.2)));
+    EXPECT_FLOAT_EQ(kaonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 1.7)));
+    EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 2.2)));
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 3.2)));
+
+    // Check what hapens if no Likelihood is available
+    EXPECT_TRUE(std::isnan(electronID(particleNoID)));
+    EXPECT_TRUE(std::isnan(muonID(particleNoID)));
+    EXPECT_TRUE(std::isnan(pionID(particleNoID)));
+    EXPECT_TRUE(std::isnan(kaonID(particleNoID)));
+    EXPECT_TRUE(std::isnan(protonID(particleNoID)));
+    EXPECT_TRUE(std::isnan(deuteronID(particleNoID)));
+
+    //expert stuff: LogL values
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.70);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
+
+    // probability
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
+                    std::exp(3.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
+                    std::exp(2.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
+                    std::exp(1.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
+                    std::exp(1.7) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
+                    std::exp(2.7) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
+                    std::exp(0.7) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
+                    std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
+                    Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, SVD)")->function(particleAll));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particledEdx),
+                    Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particleAll));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC)")->function(particleAll),
+                    std::exp(0.36) / (std::exp(0.12) + std::exp(0.26) + std::exp(0.36) + std::exp(0.46) + std::exp(0.56) + std::exp(0.66)));
+
+    // binary probability
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particleAll),
+                    1.0 / (1.0 + std::exp(2.2 - 1.7)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particledEdx),
+                    1.0 / (1.0 + std::exp(0.94 - 0.74)));
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, SVD)")->function(particleAll),
+                    1.0 / (1.0 + std::exp(0.94 - 0.74)));
+
+    // No likelihood available
+    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));
+    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP, CDC, SVD)")->function(particleNoID)));
+    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particledEdx)));
+    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));
+    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH)")->function(
+                             particledEdx)));
+    EXPECT_FALSE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH, SVD)")->function(
+                              particledEdx)));
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)
@@ -1648,22 +1616,25 @@ namespace {
 
     auto* proton = particles.appendNew(savedTrack4, Const::proton);
 
+    const Manager::Var* varMissECL = Manager::Instance().getVariable("pidMissingProbabilityExpert(ECL)");
+    const Manager::Var* varMissTOP = Manager::Instance().getVariable("pidMissingProbabilityExpert(TOP)");
+    const Manager::Var* varMissARICH = Manager::Instance().getVariable("pidMissingProbabilityExpert(ARICH)");
 
-    EXPECT_FLOAT_EQ(particleMissingTOPId(electron), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingTOPId(pion), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingTOPId(kaon), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingTOPId(proton), 1.0);
 
-    EXPECT_FLOAT_EQ(particleMissingARICHId(electron), 1.0);
-    EXPECT_FLOAT_EQ(particleMissingARICHId(pion), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingARICHId(kaon), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingARICHId(proton), 0.0);
+    EXPECT_FLOAT_EQ(varMissTOP->function(electron), 0.0);
+    EXPECT_FLOAT_EQ(varMissTOP->function(pion), 0.0);
+    EXPECT_FLOAT_EQ(varMissTOP->function(kaon), 0.0);
+    EXPECT_FLOAT_EQ(varMissTOP->function(proton), 1.0);
 
-    EXPECT_FLOAT_EQ(particleMissingECLId(electron), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingECLId(pion), 0.0);
-    EXPECT_FLOAT_EQ(particleMissingECLId(kaon), 1.0);
-    EXPECT_FLOAT_EQ(particleMissingECLId(proton), 0.0);
+    EXPECT_FLOAT_EQ(varMissARICH->function(electron), 1.0);
+    EXPECT_FLOAT_EQ(varMissARICH->function(pion), 0.0);
+    EXPECT_FLOAT_EQ(varMissARICH->function(kaon), 0.0);
+    EXPECT_FLOAT_EQ(varMissARICH->function(proton), 0.0);
 
+    EXPECT_FLOAT_EQ(varMissECL->function(electron), 0.0);
+    EXPECT_FLOAT_EQ(varMissECL->function(pion), 0.0);
+    EXPECT_FLOAT_EQ(varMissECL->function(kaon), 1.0);
+    EXPECT_FLOAT_EQ(varMissECL->function(proton), 0.0);
   }
 
 }

@@ -31,20 +31,17 @@ void SockmemCallback::tx_t::update(SockmemCallback& callback, std::string state,
     m_rate = rate;
   }
   m_bytes = bytes;
-  m_nrxq = nrxq;
-  m_ntxq = ntxq;
 }
 
 StringList SockmemCallback::popen(const std::string& cmd)
 {
   char buf[10000];
   FILE* fp;
-  StringList ss;
   if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
-    LogFile::error("can not exec commad");
-    return ss;
-    //exit(EXIT_FAILURE);
+    perror("can not exec commad");
+    exit(EXIT_FAILURE);
   }
+  StringList ss;
   while (!feof(fp)) {
     memset(buf, 0, 1000);
     fgets(buf, sizeof(buf), fp);
@@ -61,17 +58,11 @@ SockmemCallback::SockmemCallback(const std::string& name, int timeout, ConfigFil
   setTimeout(timeout);
   for (int i = 0; true ; i++) {
     std::string vname = StringUtil::form("tx[%d].", i);
+    std::string host = conf.get(vname + "host");
+    if (host.size() == 0) break;
     std::string local = conf.get(vname + "local");
     std::string remote = conf.get(vname + "remote");
-    std::string host;// = conf.get(vname + "host");
-    if (local.size() > 0) {
-      host = StringUtil::split(local, ':')[0];
-    } else if (remote.size() > 0) {
-      host = StringUtil::split(remote, ':')[0];
-    } else {
-      break;
-    }
-    tx_t tx = {host, local, remote, 0, 0, 0, 0, false};
+    tx_t tx = {host, conf.get(vname + ".type"), local, remote, 0, 0, 0, 0, false};
     m_tx.insert(std::map<std::string, tx_t>::value_type((local.size() > 0 ? local : remote), tx));
   }
 }
@@ -106,8 +97,7 @@ void SockmemCallback::timeout(NSMCommunicator&) throw()
     tx.m_rate = 0;
   }
   double t = Time().get();
-  StringList lines = popen("/usr/sbin/ss -ntr4i");
-  if (lines.size() == 0) return;
+  StringList lines = popen("ss -ntr4i");
   for (size_t i = 1; i < lines.size(); i++) {
     {
       std::stringstream ss;

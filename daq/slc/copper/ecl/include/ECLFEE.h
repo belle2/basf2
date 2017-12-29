@@ -15,9 +15,6 @@ namespace Belle2 {
     virtual void init(RCCallback& callback, HSLB& hslb, const DBObject& obj);
     virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& obj);
     virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& obj);
-  private:
-    void rio_sh_wreg(RCCallback& callback, HSLB& hslb, unsigned int sh_num,
-                     unsigned int reg_num, unsigned int reg_wdata);
 
   };
 

@@ -49,8 +49,8 @@ class EffModule(Module):
         Event function to count the numbers of events passing each trigger line
         """
         self.Ntot_event += 1
-        trgresult = Belle2.PyStoreObj('TRGGDLResults')
-        summary = trgresult.getL1TriggerResults()
+        trgresult = Belle2.PyStoreObj('TRGSummary')
+        summary = trgresult.getTRGSummary(0)
         if summary >= 1:
             self.Ntrg_event += 1
         sum_bin = bin(summary)

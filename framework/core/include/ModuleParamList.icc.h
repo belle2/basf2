@@ -7,13 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef MODULEPARAMLIST_ICC_H_
-#define MODULEPARAMLIST_ICC_H_
+
+#pragma once
 
 #include <framework/core/ModuleParamList.dcl.h>
-
 #include <framework/core/ModuleParam.dcl.h>
-
 #include <framework/logging/Logger.h>
 
 #include <map>
@@ -123,5 +121,3 @@ namespace Belle2 {
   }
 
 } // end of Belle2 namespace
-
-#endif

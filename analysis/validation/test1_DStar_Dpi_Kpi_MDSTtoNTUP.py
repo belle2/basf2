@@ -59,6 +59,7 @@ toolsnu = ['EventMetaData', '^D*+:sig']
 toolsnu += ['Kinematics', '^D*+:sig -> [^D0:kpi -> ^K-:all ^pi+:all] ^pi+:all']
 toolsnu += ['InvMass[BeforeFit]', '^D*+:sig -> [^D0:kpi -> K-:all pi+:all] pi+:all']
 toolsnu += ['PID', 'D*+:sig -> [D0:kpi -> ^K-:all ^pi+:all] ^pi+:all']
+toolsnu += ['Charge', 'D*+:sig -> [D0:kpi -> ^K-:all ^pi+:all] ^pi+:all']
 
 # write out the flat ntuple
 ntupleFile('../ana-dstars.root')

@@ -25,7 +25,7 @@ namespace Belle2 {
     ~SubEventModule();
 
     /** used by forEach() to actually set parameters. */
-    void initSubEvent(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path);
+    void initSubEvent(const std::string& objectName, const std::string& loopOver, std::shared_ptr<Path> path);
 
     virtual void initialize();
     virtual void beginRun();
@@ -37,7 +37,7 @@ namespace Belle2 {
     std::string m_objectName; /**< name of our loop variable. */
     std::string m_loopOverName; /**< name for m_loopOver. */
     StoreArray<TObject> m_loopOver; /**< array looped over. */
-    boost::shared_ptr<Path> m_path; /**< Path to execute. */
+    std::shared_ptr<Path> m_path; /**< Path to execute. */
     int m_processID; /**< when using multi-processing contains the ID of the process where event() is called (in that process only). -1 otherwise. */
 
   };

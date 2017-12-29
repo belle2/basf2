@@ -40,7 +40,7 @@ class CDCCR(TrackingValidationRun):
                         )
 
         path.add_module('TrackCreator',
-                        defaultPDGCode=13,
+                        pdgCodes=[13],
                         useClosestHitToIP=True,
                         )
 

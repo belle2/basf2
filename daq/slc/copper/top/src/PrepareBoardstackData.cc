@@ -29,7 +29,7 @@ namespace PrepBoardstackData {
   void PrepareBoardStack(HSLB& hslb, RCCallback& callback)
   {
     int mode_ext = 3;//set standard to FE+ped-sub
-    callback.get(StringUtil::form("top[%d].ScrodfeMode", hslb.get_finid()), mode_ext);
+    callback.get("ScrodfeMode", mode_ext);
     if (mode_ext < 0 || mode_ext > 4) mode_ext = 3;
     SetFEMode(hslb, mode_ext);
 
@@ -59,7 +59,7 @@ namespace PrepBoardstackData {
     cout << "carrier " << carrier << " asic " << asic << endl;
 
     int lookback = 28;
-    callback.get(StringUtil::form("top[%d].Lookback", hslb.get_finid()), lookback);
+    callback.get("Lookback", lookback);
     SetLookback(hslb, carrier, asic, lookback);
 
     Write_Register(hslb, CARRIER_IRSX_wrAddrMode, wrAddrMode_Cyclic, carrier, asic);

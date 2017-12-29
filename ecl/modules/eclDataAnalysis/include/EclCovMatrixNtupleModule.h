@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo                                             *
+ * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -43,7 +43,11 @@ namespace Belle2 {
 
   protected:
     /** output root file name (given as Module parameter) */
-    std::string m_dataOutFileName, m_dspArrayName, m_digiArrayName;
+    std::string m_dataOutFileName,
+        /** eclDSPs array name */
+        m_dspArrayName,
+        /** eclDigit array name */
+        m_digiArrayName;
 
     /** Root tree name */
     TTree* m_tree;

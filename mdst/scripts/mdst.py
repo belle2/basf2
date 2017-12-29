@@ -34,6 +34,8 @@ def add_mdst_output(
         'ECLClustersToTracks',
         'KLMClusters',
         'KLMClustersToTracks',
+        'KlIds',
+        'KLMClustersToKlIds',
         'TRGSummary',
         'SoftwareTriggerResult',
     ]

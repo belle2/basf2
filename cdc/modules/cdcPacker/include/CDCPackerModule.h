@@ -279,7 +279,10 @@ namespace Belle2 {
        */
       DBArray<CDCChannelMap> m_channelMapFromDB;
 
-
+      /**
+       * Raw CDC array.
+       */
+      StoreArray<RawCDC>  m_rawCDCs;
     };//end class declaration
 
 

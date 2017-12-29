@@ -23,6 +23,7 @@
 #pragma link C++ class Belle2::ECLCluster+;
 
 #pragma link C++ class Belle2::KLMCluster+;
+#pragma link C++ class Belle2::KlId+;
 
 #pragma link C++ class Belle2::Track+;
 #pragma link C++ class Belle2::HitPatternCDC+;

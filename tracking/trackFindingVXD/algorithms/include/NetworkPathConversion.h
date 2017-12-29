@@ -9,23 +9,27 @@
  **************************************************************************/
 
 #pragma once
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vector>
+
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/trackFindingVXD/segmentNetwork/Segment.h>
+#include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 
 namespace Belle2 {
 
+  /** Create new SPTC from network path. */
   template<class NetworkPath>
   inline SpacePointTrackCand convertNetworkPath(NetworkPath networkPath)
   {
     std::vector <const SpacePoint*> spVector;
-    spVector.reserve(networkPath.size());
-    if (networkPath.empty()) {
+    spVector.reserve(networkPath->size());
+    if (networkPath->empty()) {
       return SpacePointTrackCand();
     }
 
-    auto family = networkPath.at(0).getFamily();
-    for (auto aNodeIt = networkPath.rbegin(); aNodeIt != networkPath.rend();  ++aNodeIt) {
-      insertSpacePoints(spVector, *aNodeIt);
+    auto family = networkPath->at(0)->getFamily();
+    for (auto aNodeIt = networkPath->rbegin(); aNodeIt != networkPath->rend();  ++aNodeIt) {
+      insertSpacePoints(spVector, (*aNodeIt)->getEntry());
     }
 
     auto sptc = SpacePointTrackCand(spVector);
@@ -33,19 +37,20 @@ namespace Belle2 {
     return sptc;
   }
 
+  inline void insertSpacePoint(std::vector<const SpacePoint*>& target, TrackNode source)
+  {
+    target.push_back(source.m_spacePoint);
+  }
+
+
   inline void insertSpacePoints(std::vector<const SpacePoint*>& target, Segment<TrackNode> source)
   {
     if (target.empty()) {
-      insertSpacePoints(target, *(source.getInnerHit()));
-      insertSpacePoints(target, *(source.getOuterHit()));
+      insertSpacePoint(target, *(source.getInnerHit()));
+      insertSpacePoint(target, *(source.getOuterHit()));
     } else {
-      insertSpacePoints(target, *(source.getOuterHit()));
+      insertSpacePoint(target, *(source.getOuterHit()));
     }
-  }
-
-  inline void insertSpacePoints(std::vector<const SpacePoint*>& target, TrackNode source)
-  {
-    target.push_back(source.spacePoint);
   }
 
 }

@@ -25,6 +25,9 @@ namespace Belle2 {
    * If you want to retrieve the calculated values, you can either retrieve
    * the double values as an average over a set of detector components (with uncertainty)
    * or the binned integer values of measurement in one detector (mostly used for L1 trigger).
+   *
+   * This class provides the t0 results of each sub-detector (if available) or a weighted mean
+   * if multiple sub-detector t0 estimations exist.
    * */
   class EventT0 : public TObject {
 
@@ -97,7 +100,7 @@ namespace Belle2 {
     };
 
     /// Create a new EventT0 object to store the eventwise T0 estimation.
-    EventT0() { }
+    EventT0() = default;
 
     /**
      * Return the calculated eventT0 and its uncertainty using only the detectors given
@@ -107,6 +110,11 @@ namespace Belle2 {
      * to supply a double value (you can include an int also).
      *
      * If there is no extracted eventT0 in any of these detectors, return (0, 0).
+     *
+     * If you set detectorSet = Const::allDetectors (default) a weighted mean with all available
+     * sub-detector measurements will be returned, including the combined uncertainty.
+     * If you set detectorSet to one specific detector, only the values provided by this
+     * detector will be returned.
      */
     std::pair<double, double> getEventT0WithUncertainty(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
@@ -162,7 +170,7 @@ namespace Belle2 {
     }
 
     /// Return true if there are no stored event T0 estimations
-    bool empty() const
+    bool isEmpty() const
     {
       return m_eventT0List.empty();
     }

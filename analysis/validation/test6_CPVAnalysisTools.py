@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input>B2JpsiKs_mu_BGx1_MC9.root</input>
   <output>CPVToolsOutput.root</output>
   <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
   <description>This file employs all the time dependent CPV analysis tools. It reconstructs B0sig->J/PsiKs on the signal side
@@ -20,7 +19,12 @@ from flavorTagger import *
 from variables import variables
 import sys
 
-inputMdst('default', '../B2JpsiKs_mu_BGx1_MC9.root')
+if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
+    sys.exit(0)
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst9_BGx1_b2jpsiks.root')
+inputMdst('default', inputFile)
+
+# inputMdst('default', '../mdst9_BGx1_b2jpsiks.root')
 
 # Reconstruction of signal side and MC match
 fillParticleList('pi+:all', '')
@@ -36,7 +40,7 @@ matchMCTruth('B0:jpsiks')
 buildRestOfEvent('B0:jpsiks')
 
 # Get Special GT for the flavor tagger weight files
-use_central_database("GT_gen_prod_003.13_Master-20171005-065700")
+use_central_database("development")
 
 # Flavor Tagger, Vertex of Signal Side and TagV
 flavorTagger(

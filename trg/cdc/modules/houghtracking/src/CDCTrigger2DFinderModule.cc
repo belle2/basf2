@@ -9,12 +9,7 @@
 
 #include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -114,18 +109,14 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 void
 CDCTrigger2DFinderModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
-  StoreArray<CDCTriggerHoughCluster>::registerPersistent(m_clusterCollectionName);
+  m_segmentHits.isRequired(m_hitCollectionName);
+  m_tracks.registerInDataStore(m_outputCollectionName);
+  m_clusters.registerInDataStore(m_clusterCollectionName);
 
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack> tracks(m_outputCollectionName);
-  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
+  m_tracks.registerRelationTo(m_segmentHits);
+  m_tracks.registerRelationTo(m_clusters);
 
-  tracks.registerRelationTo(segmentHits);
-  tracks.registerRelationTo(clusters);
-
-  if (m_storePlane > 0) StoreObjPtr<TMatrix>::registerPersistent("HoughPlane");
+  if (m_storePlane > 0) m_houghPlane.registerInDataStore("HoughPlane");
 
   CDCGeometryPar& cdc = CDCGeometryPar::Instance();
   int layerId = 3;
@@ -148,9 +139,6 @@ CDCTrigger2DFinderModule::initialize()
 void
 CDCTrigger2DFinderModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-
   /* Clean hits */
   hitMap.clear();
   houghCand.clear();
@@ -160,31 +148,31 @@ CDCTrigger2DFinderModule::event()
 
   if (m_testFilename != "") {
     testFile << StoreObjPtr<EventMetaData>()->getEvent() << " "
-             << tsHits.getEntries() << endl;
+             << m_segmentHits.getEntries() << endl;
   }
 
-  if (tsHits.getEntries() == 0) {
+  if (m_segmentHits.getEntries() == 0) {
     //B2WARNING("CDCTracking: tsHitsCollection is empty!");
     return;
   }
 
   /* get CDCHits coordinates in conformal space */
-  for (int iHit = 0; iHit < tsHits.getEntries(); iHit++) {
-    unsigned short iSL = tsHits[iHit]->getISuperLayer();
+  for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
+    unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
     if (m_testFilename != "") {
-      testFile << iSL << " " << tsHits[iHit]->getSegmentID() - TSoffset[iSL] << " "
-               << tsHits[iHit]->getPriorityPosition() << endl;
+      testFile << iSL << " " << m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL] << " "
+               << m_segmentHits[iHit]->getPriorityPosition() << endl;
     }
     if (iSL % 2) continue;
-    if (m_ignore2nd && tsHits[iHit]->getPriorityPosition() < 3) continue;
-    double phi = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
+    if (m_ignore2nd && m_segmentHits[iHit]->getPriorityPosition() < 3) continue;
+    double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
     if (m_usePriority) {
-      phi += 0.5 * (((tsHits[iHit]->getPriorityPosition() >> 1) & 1)
-                    - (tsHits[iHit]->getPriorityPosition() & 1));
+      phi += 0.5 * (((m_segmentHits[iHit]->getPriorityPosition() >> 1) & 1)
+                    - (m_segmentHits[iHit]->getPriorityPosition() & 1));
     }
     phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
     double r = radius[iSL][int(m_usePriority &&
-                               tsHits[iHit]->getPriorityPosition() < 3)];
+                               m_segmentHits[iHit]->getPriorityPosition() < 3)];
     TVector2 pos(cos(phi) / r, sin(phi) / r);
     hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
   }
@@ -213,9 +201,8 @@ CDCTrigger2DFinderModule::event()
 
   /* prepare matrix for storing the Hough plane */
   if (m_storePlane > 0) {
-    StoreObjPtr<TMatrix> plane("HoughPlane");
-    plane.create();
-    plane->ResizeTo(m_nCellsPhi, m_nCellsR);
+    m_houghPlane.create();
+    m_houghPlane->ResizeTo(m_nCellsPhi, m_nCellsR);
   }
 
   /* find track candidates in Hough plane */
@@ -228,14 +215,14 @@ CDCTrigger2DFinderModule::event()
     connectedRegions();
 
   if (m_testFilename != "") {
-    testFile << storeTracks.getEntries() << endl;
-    for (int i = 0; i < storeTracks.getEntries(); ++i) {
-      float ix = (storeTracks[i]->getPhi0() - M_PI_4) * m_nCellsPhi / 2. / M_PI - 0.5;
-      float iy = (storeTracks[i]->getOmega() / 2. + maxR - shiftR) * m_nCellsR / 2. / maxR - 0.5;
+    testFile << m_tracks.getEntries() << endl;
+    for (int i = 0; i < m_tracks.getEntries(); ++i) {
+      float ix = (m_tracks[i]->getPhi0() - M_PI_4) * m_nCellsPhi / 2. / M_PI - 0.5;
+      float iy = (m_tracks[i]->getOmega() / 2. + maxR - shiftR) * m_nCellsR / 2. / maxR - 0.5;
       testFile << round(2 * ix) / 2. << " " << round(2 * iy) / 2. << " "
-               << storeTracks[i]->getChargeSign() << endl;
+               << m_tracks[i]->getChargeSign() << endl;
       RelationVector<CDCTriggerSegmentHit> hits =
-        storeTracks[i]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+        m_tracks[i]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       testFile << hits.size() << endl;
       for (unsigned ihit = 0; ihit < hits.size(); ++ihit) {
         unsigned short iSL = hits[ihit]->getISuperLayer();

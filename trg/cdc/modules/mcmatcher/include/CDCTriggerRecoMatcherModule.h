@@ -3,6 +3,11 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
 namespace Belle2 {
 
   /** A module to match CDCTriggerTracks to RecoTracks.
@@ -36,6 +41,13 @@ namespace Belle2 {
     double m_minEfficiency;
     /** switch for creating relations for clones and merged tracks */
     bool m_relateClonesAndMerged;
+
+    /** list of hits that are used for the matching */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** list of CDCTriggerTracks to be matched */
+    StoreArray<CDCTriggerTrack> m_trgTracks;
+    /** list of RecoTracks to be matched */
+    StoreArray<RecoTrack> m_recoTracks;
   };
 }
 #endif

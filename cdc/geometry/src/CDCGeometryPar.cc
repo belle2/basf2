@@ -436,7 +436,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   m_XTetc4Recon = 0;
   //  B2INFO("CDCGeometryPar: Load x-t etc. params. for reconstruction (=1); not load and use the same ones for digitization (=0):" <<
-  B2INFO("CDCGeometryPar: Use the same x-t etc. for reconstruction as those used for digitization");
+  //  B2INFO("CDCGeometryPar: Use the same x-t etc. for reconstruction as those used for digitization");
   if (m_XTetc4Recon) {
     readXT(gbxParams, 1);
     readSigma(gbxParams, 1);
@@ -1738,6 +1738,85 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
 }
 
+//TODO: mearge with getDriftLength
+double CDCGeometryPar::getDriftLength0(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
+                                       const double theta) const
+{
+  double dist = 0.;
+
+  //convert incoming- to outgoing-lr
+  unsigned short lro = getOutgoingLR(lr, alpha);
+
+  //  std::cout << m_linearInterpolationOfXT << std::endl;
+  //  exit(-1);
+  if (!m_linearInterpolationOfXT) {
+    B2FATAL("linearInterpolationOfXT = false is not allowed now !");
+  } else {
+    double wal(0.);
+    unsigned short ial[2] = {0};
+    unsigned short ilr[2] = {lro, lro};
+    getClosestAlphaPoints(alpha, wal, ial, ilr);
+    double wth(0.);
+    unsigned short ith[2] = {0};
+    getClosestThetaPoints(alpha, theta, wth, ith);
+
+    unsigned short jal(0), jlr(0), jth(0);
+    double w = 0.;
+
+    //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
+    double timep = time;
+    //    std::cout << "iCLayer,alpha,theta,lro= " << iCLayer <<" "<< (180./M_PI)*alpha <<" "<< (180./M_PI)*theta <<" "<< lro << std::endl;
+
+    //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
+    for (unsigned k = 0; k < 4; ++k) {
+      if (k == 0) {
+        jal = ial[0];
+        jlr = ilr[0];
+        jth = ith[0];
+        w = (1. - wal) * (1. - wth);
+      } else if (k == 1) {
+        jal = ial[0];
+        jlr = ilr[0];
+        jth = ith[1];
+        w = (1. - wal) * wth;
+      } else if (k == 2) {
+        jal = ial[1];
+        jlr = ilr[1];
+        jth = ith[0];
+        w = wal * (1. - wth);
+      } else if (k == 3) {
+        jal = ial[1];
+        jlr = ilr[1];
+        jth = ith[1];
+        w = wal * wth;
+      }
+
+      double boundary = m_XT[iCLayer][jlr][jal][jth][6];
+
+      if (timep < boundary) {
+        if (m_xtParamMode == 1) {
+          dist += w * ROOT::Math::Chebyshev5(timep, m_XT[iCLayer][jlr][jal][jth][0], m_XT[iCLayer][jlr][jal][jth][1],
+                                             m_XT[iCLayer][jlr][jal][jth][2], m_XT[iCLayer][jlr][jal][jth][3], m_XT[iCLayer][jlr][jal][jth][4], m_XT[iCLayer][jlr][jal][jth][5]);
+        } else {
+          dist += w * (m_XT[iCLayer][jlr][jal][jth][0] + timep
+                       * (m_XT[iCLayer][jlr][jal][jth][1] + timep
+                          * (m_XT[iCLayer][jlr][jal][jth][2] + timep
+                             * (m_XT[iCLayer][jlr][jal][jth][3] + timep
+                                * (m_XT[iCLayer][jlr][jal][jth][4] + timep
+                                   * (m_XT[iCLayer][jlr][jal][jth][5]))))));
+        }
+      } else {
+        dist += w * (m_XT[iCLayer][jlr][jal][jth][7] * (timep - boundary) + m_XT[iCLayer][jlr][jal][jth][8]);
+      }
+      //      std::cout <<"k,w,dist= " << k <<" "<< w <<" "<< dist << std::endl;
+    } //end of weighted mean loop
+  }
+
+  //  dist = fabs(dist);
+  return dist;
+
+}
+
 double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                       const double theta,
                                       const bool calculateMinTime,
@@ -1840,7 +1919,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                        const double theta) const
 {
-  double minTime = 999.;
+  double minTime = 0.;
 
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
@@ -1899,34 +1978,70 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
       for (int i = 0; i < 5; ++i) a[i] = c[i];
     }
 
+    //estimate an initial value
     double det = a[1] * a[1] - 4.*a[2] * a[0];
     if (a[2] != 0. && det >= 0.) {
       //2nd-order approx. assuming minTime near zero
+      //Choose the solution which approaches to -a[0]/a[1] for a[2]->0
       minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
-      //plus higher-order corr.
-      const double& t = minTime;
-      const double num = (a[3] + t * (a[4] + t * a[5])) * t * t * t;
-      const double den = a[1] + t * (2.*a[2] + t * (3.*a[3] + t * (4.*a[4] + t * 5.*a[5])));
-      if (den != 0.) minTime -= num / den;
+    } else if (a[1] != 0.) {
+      minTime = -a[0] / a[1];  //1st-order approx.
     } else {
-      //1st-order approx. assuming minTime near zero
-      if (a[1] == 0.) B2FATAL("CDCGeometryPar::getMinDriftTime: a[1]=0 !");
-      //      B2WARNING("CDCGeometryPar::getMinDriftTime: 1st-order approx.");
-      minTime = -a[0] / a[1];
-      //plus higher-order corr.
-      const double& t = minTime;
-      const double num = (a[2] + t * (a[3] + t * (a[4] + t * a[5]))) * t * t;
-      const double den = a[1] + t * (2.*a[2] + t * (3.*a[3] + t * (4.*a[4] + t * 5.*a[5])));
-      if (den != 0.) minTime -= num / den;
+      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.");
+      return minTime;
     }
-  }
 
-  if (minTime == 999.) {
-    B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.");
-    minTime = 0.;
-  } else if (minTime > 20.) {
-    B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "iCLayer,lr,alpha,theta= " << iCLayer << " " << lr <<
-              " " << alpha << " " << theta);
+    //    std::cout << " " << std::endl;
+    //    double dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
+    //    std::cout << "minTime,dl= " << minTime <<" "<< dl << std::endl;
+
+    //higher-order corr. using Newton method; trial to minimize x^2
+    double  edm = 10.;   //(cm)
+    //      const double epsi4t = 0.01; //(ns)
+    const double epsi4x = 1.e-5; //(cm)
+    const unsigned short maxIter = 4;
+    unsigned short niter = 1;
+    //      double told = minTime + 1000.*epsi4t;
+    //      while (fabs(minTime - told) > epsi && niter <= maxIter) {
+    while (edm > epsi4x && niter <= maxIter) {
+      //  told = minTime;
+      double t = minTime;
+      double x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
+      double xp  = a[1] + t * (2 * a[2] + t * (3 * a[3] + t * (4 * a[4] + t * 5 * a[5])));
+      double xpp = 2 * a[2] + t * (6 * a[3] + t * (12 * a[4] + t * 20 * a[5]));
+      double den = xp * xp + x * xpp;
+      if (den != 0.) {
+        minTime -= x * xp / den;
+      } else {
+        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0 " << den);
+      }
+      t = minTime;
+      x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
+      xp  = a[1] + t * (2 * a[2] + t * (3 * a[3] + t * (4 * a[4] + t * 5 * a[5])));
+      xpp = 2 * a[2] + t * (6 * a[3] + t * (12 * a[4] + t * 20 * a[5]));
+      den = xp * xp + x * xpp;
+      if (den > 0.) {
+        edm = fabs(x * xp) / sqrt(den); //not in distance^2 but in distance
+      } else {
+        B2WARNING("CDCGeometryPar::getMinDriftTime: den <= 0 " << den);
+      }
+      //      dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
+      //      if (minTime < 0.) {
+      //      std::cout << "niter,edm,minTime,dl= " << niter << " " << edm << " " << minTime << " " << dl << " " << std::endl;
+      //      }
+      ++niter;
+    }
+    //      for (int i=-100; i < 100; ++i) {
+    //  double ti = 0.1*i;
+    //  dl = getDriftLength0(ti, iCLayer, lr, alpha, theta);
+    //  std::cout << ti <<" "<< dl << std::endl;
+    //      }
+    if (minTime > 20.) {
+      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
+                iCLayer << " "
+                << lr <<
+                " " << alpha << " " << theta << " " << minTime);
+    }
   }
 
   return minTime;

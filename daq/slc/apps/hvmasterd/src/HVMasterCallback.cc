@@ -86,7 +86,10 @@ void HVMasterCallback::monitor() throw(RCHandlerException)
   bool failed = false;
   for (size_t i = 0; i < m_node_v.size(); i++) {
     HVNode& node(m_node_v[i]);
-    if (!node.isUsed()) continue;
+    if (!node.isUsed()) {
+      setHVState(node, HVState::MASKED);
+      continue;
+    }
     HVState cstate(node.getState());
     HVState cstate_new;
     try {
@@ -170,6 +173,7 @@ void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
         return ;
       }
     }
+    /*
     cstate = node.getState();
     if (cstate == HVState::OFF_S) {
       NSMCommunicator::send(NSMMessage(node, HVCommand::TURNON));
@@ -181,6 +185,7 @@ void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
       setHVState(node, HVState::RAMPINGUP_TS);
     } else if (!cstate.isStable()) {
     }
+    */
   }
   const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
   if (getNode().getState() != HVState::OFF_S &&
@@ -198,8 +203,6 @@ void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
     setState(RCState::READY_S);
     m_loading = false;
   }
-  //  LogFile::debug("Load done");
-  //monitor();
 }
 
 void HVMasterCallback::start(int expno, int runno) throw(RCHandlerException)

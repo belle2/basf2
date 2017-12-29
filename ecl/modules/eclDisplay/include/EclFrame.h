@@ -118,7 +118,9 @@ namespace Belle2 {
 
     /**  Enum for menu commands. */
     enum EclFrameCommandIdentifiers {
+      M_FILE_OPEN,
       M_FILE_SAVE,
+      M_FILE_EXPORT_TREE, /**< Export EclDisplay data into simple TTree*/
       M_FILE_EXIT,
 
       M_VIEW_EVENTS, /**< Display histograms for events. */
@@ -129,23 +131,7 @@ namespace Belle2 {
       M_VIEW_DET_BARR  /**< Use data from barrel only. */
     };
     /**  Possible export filetypes for histograms. */
-    const char* filetypes[30] = {
-      "PDF",                        "*.pdf",
-      "PostScript",                 "*.ps",
-      "Encapsulated PostScript",    "*.eps",
-      "SVG",                        "*.svg",
-      "TeX",                        "*.tex",
-      "GIF",                        "*.gif",
-      "ROOT macros",                "*.C",
-      "ROOT files",                 "*.root",
-      "XML",                        "*.xml",
-      "PNG",                        "*.png",
-      "XPM",                        "*.xpm",
-      "JPEG",                       "*.jpg",
-      "TIFF",                       "*.tiff",
-      "XCF",                        "*.xcf",
-      0,                            0
-    };
+    static const char* filetypes[];
 
   public:
     /**
@@ -158,10 +144,6 @@ namespace Belle2 {
      */
     virtual ~EclFrame();
 
-    /**
-     * Getter for m_open
-     */
-    bool isOpen();
     /**
      * Update view of the data.
      */
@@ -222,10 +204,6 @@ namespace Belle2 {
      * See EclPainterFactory.h, EclPainterType.
      */
     void changeType(int type, bool redraw = true);
-    /**
-     * When window is closed, this slot sets 'm_open' field to false.
-     */
-    void setClosed();
     ClassDef(EclFrame, 0)
   };
 }

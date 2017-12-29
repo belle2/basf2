@@ -100,7 +100,9 @@ namespace Belle2 {
         B2WARNING("Too little Evts. for fitting (Evts. < 10)!");
         return 0;
       }
+      m_hist[channel]->SetAxisRange(m_xmin, m_xmax);
       m_maxpos[channel] = m_hist[channel]->GetXaxis()->GetBinCenter(m_hist[channel]->GetMaximumBin());
+      m_hist[channel]->SetAxisRange(m_maxpos[channel] - 1.5, m_maxpos[channel] + 2);
 
       if (m_fitMethod == "gauss") {
         m_func[channel] = makeGFit(channel);
@@ -202,7 +204,6 @@ namespace Belle2 {
     TF1* LaserCalibratorFit::makeGFit(unsigned channel)
     {
       TH1F* h = m_hist[channel];
-      h->SetAxisRange(m_xmin, m_xmax);
       double m = h->GetMean();
       double w = h->GetRMS();
       h->Fit("gaus", "Q", "", m - 2.*w, m + 4.*w);
@@ -220,7 +221,6 @@ namespace Belle2 {
     TF1* LaserCalibratorFit::makeCBFit(unsigned channel)
     {
       TH1F* h = m_hist[channel];
-      h->SetAxisRange(m_xmin, m_xmax);
       auto func = new TF1("fcnCB", fcnCB, m_xmin, m_xmax, 5);
 
       double parms[5];
@@ -257,7 +257,6 @@ namespace Belle2 {
     TF1* LaserCalibratorFit::makeCB2Fit(unsigned channel, bool minOut)
     {
       TH1F* h = m_hist[channel];
-      h->SetAxisRange(m_xmin, m_xmax);
       auto func = new TF1("fcnCB2", fcnCB2, m_xmin, m_xmax, 8);
 
       double vdt[8] = {0.272, 0.242, 0.208, 0.178, 0.113, 0.082, 0.0485, 0.017}; //input para. from MC study, need further studies

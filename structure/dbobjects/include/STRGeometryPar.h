@@ -67,7 +67,7 @@ namespace Belle2 {
     std::string getLayerMaterial(int shield, int layer) const { return m_LayerMaterial[shield].at(layer);}
 
     //! Set the material of a layer (as a std::string)
-    void setLayerMaterial(int shield, int layer, std::string material) { m_LayerMaterial[shield].at(layer) = material; }
+    void setLayerMaterial(int shield, int layer, const std::string& material) { m_LayerMaterial[shield].at(layer) = material; }
 
     //! Get Number of polycone planes in each layer
     int getLayerNPlanes(int shield, int layer) const
@@ -152,7 +152,7 @@ namespace Belle2 {
     }
 
     //! Set the material of a layer (as a std::string)
-    void setPoleMaterial(int pole, std::string material)
+    void setPoleMaterial(int pole, const std::string& material)
     {
       m_PoleMaterial[pole] = material;
     }

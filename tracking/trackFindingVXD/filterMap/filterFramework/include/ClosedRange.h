@@ -14,6 +14,8 @@
 #include <TBranch.h>
 #include <TTree.h>
 
+#include <framework/logging/Logger.h>
+
 #include <typeinfo>
 
 #include <string>
@@ -72,7 +74,8 @@ namespace Belle2 {
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
-      t->SetBranchAddress(branchName.c_str(), & m_min);
+      // sets branch address and checks for validity
+      if (t->SetBranchAddress(branchName.c_str(), & m_min) < 0) B2FATAL("ClosedRange: branch address not valid");
     }
 
     /** Accessor to the inf of the set (which is also the min) */

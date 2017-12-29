@@ -12,6 +12,7 @@ from ROOT import Belle2
 main = create_path()
 
 main.add_module('RootInput', inputFileName=sys.argv[1])
+main.add_module('HistoManager', histoFileName=sys.argv[2])
 main.add_module('Gearbox')
 geometry = register_module('Geometry', excludedComponents=['MagneticField'],
                            additionalComponents=["MagneticField2d"])
@@ -23,7 +24,6 @@ main.add_module('MillepedeCollector', components='EKLMAlignment',
                 useGblTree=False)
 
 main.add_module('Progress')
-main.add_module('RootOutput', outputFileName=sys.argv[2], branchNames=['EventMetaData'])
 process(main)
 
 # Print call statistics

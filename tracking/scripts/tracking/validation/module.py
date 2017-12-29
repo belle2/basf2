@@ -19,7 +19,7 @@ from .utilities import (
     is_primary,
     get_det_hit_ids,
     calc_ndf_from_det_hit_ids
-    )
+)
 
 import basf2
 
@@ -216,7 +216,7 @@ class TrackingValidationModule(basf2.Module):
             if self.fit:
                 prTrackFitResult = \
                     trackMatchLookUp.getRelatedTrackFitResult(trackCand)
-                filterProperties.wasFitted = True
+                filterProperties.wasFitted = prTrackFitResult is not None
                 filterProperties.fitResult = prTrackFitResult
             else:
                 prTrackFitResult = getSeedTrackFitResult(trackCand)

@@ -53,12 +53,8 @@ namespace Belle2 {
     static AnalysisConfiguration* s_instance; /**< Singleton instance */
 
     /** Constructor */
-    AnalysisConfiguration()
-    {
-      //Setting default value
-      m_tupleStyle = "Default";
-      m_legacyMCMatching = false;
-    }
+    AnalysisConfiguration(): m_tupleStyle("Default"), m_legacyMCMatching(false)
+    { }
   public:
 
     /** Configurable-specific function to obtain value */
@@ -69,7 +65,7 @@ namespace Belle2 {
     }
 
     /** Configurable-specific function to set value*/
-    void setTupleStyle(std::string v)
+    void setTupleStyle(const std::string& v)
     {
       //B2INFO("Setting style '"<<v<<"'");
       m_tupleStyle = v;

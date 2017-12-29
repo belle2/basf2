@@ -16,7 +16,9 @@
 
 #include <string>
 #include "framework/core/Module.h"
+#include <framework/datastore/StoreObjPtr.h>
 #include "trg/grl/TRGGRL.h"
+#include <trg/grl/dataobjects/TRGGRLInfo.h>
 //#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
 
 namespace Belle2 {
@@ -58,6 +60,7 @@ namespace Belle2 {
     //std::string version(void) const;
 
   private: // Parameters
+    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< output for TRGGRLInfo */
 
     /// Debug level.
     int _debugLevel;

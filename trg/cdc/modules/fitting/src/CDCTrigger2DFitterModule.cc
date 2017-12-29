@@ -1,12 +1,6 @@
 #include "trg/cdc/modules/fitting/CDCTrigger2DFitterModule.h"
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationVector.h>
-
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <trg/cdc/Fitter3DUtility.h>
@@ -54,17 +48,16 @@ void
 CDCTrigger2DFitterModule::initialize()
 {
   // register DataStore elements
-  StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  if (m_useDriftTime)
-    StoreObjPtr<EventT0>::required(m_EventTimeName);
-  // register relations
-  StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
-  StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  finderTracks.registerRelationTo(fitterTracks);
-  fitterTracks.registerRelationTo(segmentHits);
+  m_fitterTracks.registerInDataStore(m_outputCollectionName);
+  m_finderTracks.isRequired(m_inputCollectionName);
+  segmentHits.isRequired(m_hitCollectionName);
+  if (m_useDriftTime)
+    m_eventTime.isRequired(m_EventTimeName);
+  // register relations
+  m_finderTracks.registerRelationTo(m_fitterTracks);
+  m_finderTracks.requireRelationTo(segmentHits);
+  m_fitterTracks.registerRelationTo(segmentHits);
 
   // get geometry constants for first priority layers
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
@@ -91,11 +84,8 @@ CDCTrigger2DFitterModule::initialize()
 void
 CDCTrigger2DFitterModule::event()
 {
-  StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
-  StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
-  StoreObjPtr<EventT0> eventTime(m_EventTimeName);
-  int T0 = (eventTime->hasBinnedEventT0(Const::CDC))
-           ? eventTime->getBinnedEventT0(Const::CDC)
+  int T0 = (m_eventTime->hasBinnedEventT0(Const::CDC))
+           ? m_eventTime->getBinnedEventT0(Const::CDC)
            : 9999;
 
   vector<double> wirePhi2DError({0.00085106,
@@ -111,10 +101,10 @@ CDCTrigger2DFitterModule::event()
                                   0.0001514
                                  });
 
-  for (int itrack = 0; itrack < finderTracks.getEntries(); ++itrack) {
+  for (int itrack = 0; itrack < m_finderTracks.getEntries(); ++itrack) {
     // get selected hits (positive relation weight)
     RelationVector<CDCTriggerSegmentHit> hits =
-      finderTracks[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+      m_finderTracks[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
     unsigned nHits = 0;
     vector<double> tsId(5, -1.);
     vector<double> wirePhi(5, 0.);
@@ -179,7 +169,7 @@ CDCTrigger2DFitterModule::event()
     double phi0 = 0;
     double chi2 = 0;
     Fitter3DUtility::rPhiFitter(&rr[0], &phi2D[0], &phi2DInvError[0], rho, phi0, chi2);
-    double charge = finderTracks[itrack]->getChargeSign();
+    double charge = m_finderTracks[itrack]->getChargeSign();
     double chargeFit = 0;
     Fitter3DUtility::chargeFinder(&nWires[0], &tsId[0], &useSL[0], phi0,
                                   charge, chargeFit);
@@ -187,10 +177,10 @@ CDCTrigger2DFitterModule::event()
 
     // save track
     CDCTriggerTrack* fittedTrack =
-      fitterTracks.appendNew(remainder(phi0 + chargeFit * M_PI_2, 2. * M_PI),
-                             omega, chi2);
+      m_fitterTracks.appendNew(remainder(phi0 + chargeFit * M_PI_2, 2. * M_PI),
+                               omega, chi2);
     // make relation to finder track
-    finderTracks[itrack]->addRelationTo(fittedTrack);
+    m_finderTracks[itrack]->addRelationTo(fittedTrack);
     // make relation to hits
     for (unsigned iAx = 0; iAx < 5; ++iAx) {
       if (hitIds[iAx] >= 0)

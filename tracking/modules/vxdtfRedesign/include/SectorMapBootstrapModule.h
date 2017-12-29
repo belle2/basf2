@@ -50,8 +50,8 @@ namespace Belle2 {
     void bootstrapSectorMap(void);
     void bootstrapSectorMap(const SectorMapConfig& config);
     void persistSectorMap(void);
+    /** retrieves SectorMap from file or from the DB **/
     void retrieveSectorMap(void);
-    void retrieveSectorMapFromDB(void);
 
     const std::string c_setupKeyNameTTreeName     = "Setups";
     const std::string c_setupKeyNameBranchName      = "name";

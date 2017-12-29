@@ -122,6 +122,11 @@ namespace Belle2 {
     {
       return B2Vector3<DataType>(a * X(), a * Y(), a * Z());
     }
+    /** Scaling of 3-vectors with a real number */
+    B2Vector3<DataType> operator / (DataType a) const
+    {
+      return B2Vector3<DataType>(X() / a, Y() / a, Z() / a);
+    }
     /**  Scalar product of 3-vectors. */
     DataType operator * (const B2Vector3<DataType>& b) const { return Dot(b); }
 
@@ -592,6 +597,14 @@ namespace Belle2 {
     m_coordinates[0] = static_cast<Double_t>(tVec->X());
     m_coordinates[1] = static_cast<Double_t>(tVec->Y());
     m_coordinates[2] = static_cast<Double_t>(tVec->Z());
+  }
+
+  template< typename DataType >
+  void B2Vector3<DataType>::GetXYZ(double* carray) const
+  {
+    carray[0] = X();
+    carray[1] = Y();
+    carray[2] = Z();
   }
 
   /** directly copies coordinates to a TVector3 */

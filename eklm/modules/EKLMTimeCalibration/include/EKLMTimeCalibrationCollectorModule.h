@@ -23,6 +23,8 @@
 #include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
 
 namespace Belle2 {
 
@@ -57,7 +59,7 @@ namespace Belle2 {
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate();
+    void finish();
 
   private:
 
@@ -66,6 +68,12 @@ namespace Belle2 {
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
+
+    /** EKLM 2d hits. */
+    StoreArray<EKLMHit2d> m_EKLMHit2ds;
+
+    /** Tracks. */
+    StoreArray<Track> m_Tracks;
 
     /** Event (for tree branches). */
     struct EKLMTimeCalibrationAlgorithm::Event m_ev;

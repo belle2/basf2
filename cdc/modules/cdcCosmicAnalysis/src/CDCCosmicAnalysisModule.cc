@@ -33,10 +33,6 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-/**
- * Create QAM histograms.
- */
-void createQAMHist(TTree*);
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -52,8 +48,8 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
 {
   setDescription("Module for save two tracks in cdc-top test");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
-  addParam("Output", m_OutputFileName, "xt file name", string("xt.root"));
+  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold RecoTracks", std::string(""));
+  addParam("Output", m_OutputFileName, "output file name", string("twotrack.root"));
   addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
   addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
   addParam("treeName", m_treeName, "Output tree name", string("tree"));
@@ -238,7 +234,7 @@ void CDCCosmicAnalysisModule::event()
     }
   }
 
-  if (n == 2 && store && charge1 * charge2 > 0) {
+  if (n == 2 && store && charge1 * charge2 >= 0) {
     charge = charge1;
     tree->Fill();
   }

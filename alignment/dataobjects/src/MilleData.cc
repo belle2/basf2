@@ -1,6 +1,7 @@
 #include <alignment/dataobjects/MilleData.h>
 
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 #include <limits.h>
 #include <stdlib.h>
 
@@ -8,9 +9,9 @@ char* full_path = realpath("foo.dat", NULL);
 using namespace std;
 using namespace Belle2;
 
-void MilleData::merge(const Mergeable* other)
+void MilleData::merge(const MergeableNamed* other)
 {
-  auto* data = static_cast<const MilleData*>(other);
+  auto* data = dynamic_cast<const MilleData*>(other);
   const vector<string>& files = data->getFiles();
   m_numRecords += data->m_numRecords;
   for (auto& file : files) {
@@ -26,6 +27,15 @@ void MilleData::merge(const Mergeable* other)
   }
 }
 
+MilleData* MilleData::Clone(const char* newname) const
+{
+  MilleData* obj = new MilleData(*this);
+  if (newname && strlen(newname)) {
+    obj->SetName(newname);
+  }
+  return obj;
+}
+
 MilleData& MilleData::operator=(const MilleData& other)
 {
   close();
@@ -34,6 +44,7 @@ MilleData& MilleData::operator=(const MilleData& other)
   m_numRecords = other.m_numRecords;
   return *this;
 }
+
 void MilleData::close()
 {
   if (m_binary) {
@@ -62,6 +73,3 @@ void MilleData::open(string filename)
     m_files.push_back(filename);
 
 }
-
-
-

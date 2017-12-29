@@ -1,8 +1,16 @@
 #include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
 #include <framework/utilities/FileSystem.h>
 #include <iostream>
+#include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
+#include <rawdata/dataobjects/RawECL.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLDsp.h>
 
 using namespace std;
 using namespace Belle2;
@@ -74,7 +82,7 @@ void ECLUnpackerModule::initialize()
 {
 
   // require input data
-  StoreArray<RawECL>::required();
+  m_rawEcl.isRequired();
 
   // register output containers in data store
   m_eclDigits.registerInDataStore(m_eclDigitsName);
@@ -108,23 +116,19 @@ void ECLUnpackerModule::beginRun()
 
 void ECLUnpackerModule::event()
 {
-
-  // input data
-  StoreArray<RawECL> rawECLData;
-
   // output data
   m_eclDigits.clear();
   m_eclDsps.clear();
   m_eclTrigs.clear();
 
 
-  int nRawEclEntries = rawECLData.getEntries();
+  int nRawEclEntries = m_rawEcl.getEntries();
 
   B2DEBUG(50, "Ecl unpacker event called N_RAW = " << nRawEclEntries);
 
   for (int i = 0; i < nRawEclEntries; i++) {
-    for (int n = 0; n < rawECLData[i]->GetNumEntries(); n++) {
-      readRawECLData(rawECLData[ i ], n); // read data from RawECL and put into the m_eclDigits container
+    for (int n = 0; n < m_rawEcl[i]->GetNumEntries(); n++) {
+      readRawECLData(m_rawEcl[ i ], n); // read data from RawECL and put into the m_eclDigits container
     }
   }
 
@@ -183,8 +187,6 @@ unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
   return val;
 }
 
-
-
 void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 {
   int iCrate, iShaper, iChannel, cellID;
@@ -203,7 +205,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
   std::vector <int> eclWaveformSamples;
 
-//  unsigned int evnum = rawCOPPERData->GetEveNo(n);
   int nodeID = rawCOPPERData->GetNodeID(n);
 
 
@@ -281,7 +282,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           throw Bad_ShaperDSP_header();
         }
 
-
         value = readNextCollectorWord();
         nActiveChannelsWithADCData = (value >> 24) & 0x1F;//number of channels with ADC data
         nADCSamplesPerChannel = (value >> 16) & 0x7F;    //ADC samples per channel
@@ -303,8 +303,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG(50, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
-        else if (triggerTag != triggerTag0) B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
-                                                        " != " << triggerTag0);
+        else if (triggerTag != triggerTag0) {
+          B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
+                    " != " << triggerTag0);
+          triggerTag0 |= (1 << 16);
+        }
 
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
@@ -389,7 +392,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-            ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
+            m_eclDsps.appendNew(cellID, eclWaveformSamples);
           }
 
           nRead++;
@@ -414,7 +417,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       if (eclTrig) {
         eclTrig->setTrigId(iCrate);
         eclTrig->setTimeTrig(triggerPhase0);
-        eclTrig->setTrigTag(triggerTag);
+        eclTrig->setTrigTag(triggerTag0);
       }
 
 
@@ -431,9 +434,3 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   }// loop ove FINESSes
 
 }
-
-
-
-
-
-

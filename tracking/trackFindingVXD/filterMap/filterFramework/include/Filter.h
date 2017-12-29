@@ -136,6 +136,7 @@ namespace Belle2 {
 
     /** Handy typedef */
     typedef  typename Variable::argumentType argumentType;
+    typedef  typename Variable::functionType functionType;
 
     /** All the real computations are occuring in this method */
     template< typename ... argsType >
@@ -295,6 +296,7 @@ namespace Belle2 {
     Filter()  {};
 
     typedef  typename Variable::argumentType argumentType;
+    typedef  typename Variable::functionType functionType;
 
     /** All the real computations are occuring in this method */
     template< typename ... argsType >
@@ -392,6 +394,7 @@ namespace Belle2 {
 
     /** Handy typedef */
     typedef  typename Variable::argumentType argumentType;
+    typedef  typename Variable::functionType functionType;
 
     /** All the real computations are occuring here */
     template< typename ... argsType >
@@ -436,7 +439,7 @@ namespace Belle2 {
   public:
 
     typedef  typename someFilter::argumentType argumentType;
-
+    typedef  typename someFilter::functionType functionType;
 
     template< typename ... argsType >
     typename std::enable_if< all_same< argumentType,
@@ -519,6 +522,10 @@ namespace Belle2 {
 
     typedef  typename FilterA::argumentType argumentType;
     typedef  typename FilterB::argumentType argumentTypeB;
+    typedef  typename FilterA::functionType functionTypeA;
+    typedef  typename FilterB::functionType functionTypeB;
+    typedef typename std::enable_if< all_same< functionTypeA, functionTypeB >::value,
+            functionTypeA>::type functionType;
 
     template< typename ... argsType >
     typename std::enable_if <
@@ -647,6 +654,7 @@ namespace Belle2 {
     class FilterB,
     class templateObserverType
     >
+  // cppcheck-suppress copyCtorAndEqOperator
   class Filter < Belle2::OperatorOr, FilterA, FilterB, templateObserverType > {
     const char* c_orSuffixA = "_or_A";
     const char* c_orSuffixB = "_or_B";
@@ -655,6 +663,10 @@ namespace Belle2 {
 
     typedef  typename FilterA::argumentType argumentType;
     typedef  typename FilterB::argumentType argumentTypeB;
+    typedef  typename FilterA::functionType functionTypeA;
+    typedef  typename FilterB::functionType functionTypeB;
+    typedef  typename std::enable_if< all_same< functionTypeA, functionTypeB >::value,
+             functionTypeA>::type functionType;
 
 
 
@@ -677,7 +689,7 @@ namespace Belle2 {
     Filter() {};
 
 
-    /** will set the observer for this and both "OR" filters it contains, all subseqent Boolean Filters will not observed (VoidObserver)
+    /** will set the observer for this and both "OR" filters it contains, all subsequent Boolean Filters will not observed (VoidObserver)
     @param otherObserver : the new observer
     */
     template< class otherObserver >
@@ -694,7 +706,7 @@ namespace Belle2 {
 
 
     /** will set the observer for  both "OR" filters it contains, this filter will not be observed (VoidObserver)
-    NOTE: if this function is used on the top level Boolean filter, the whole filter will NOT be observed! See accept funtion!
+    NOTE: if this function is used on the top level Boolean filter, the whole filter will NOT be observed! See accept function!
     @param otherObserver : the new observer
     */
     template< class otherObserver >

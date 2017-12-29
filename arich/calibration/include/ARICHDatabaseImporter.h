@@ -18,6 +18,8 @@
 #include <map>
 #include <tuple>
 #include <vector>
+#include <iostream>
+
 
 namespace Belle2 {
 
@@ -37,8 +39,9 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHDatabaseImporter(std::vector<std::string> inputFilesHapdQA, std::vector<std::string> inputFilesAsicRoot,
-                          std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE, std::vector<std::string> inputFilesFebTest);
+    ARICHDatabaseImporter(const std::vector<std::string>& inputFilesHapdQA, const std::vector<std::string>& inputFilesAsicRoot,
+                          const std::vector<std::string>& inputFilesAsicTxt, const std::vector<std::string>& inputFilesHapdQE,
+                          const std::vector<std::string>& inputFilesFebTest);
 
     /**
      * Destructor
@@ -139,7 +142,79 @@ namespace Belle2 {
      */
     void importCosmicTestGeometry();
 
+    /**
+     * Import geometry configuration parameters to the database
+     */
     void importGeometryConfig();
+
+    /**
+    * Import optical information of aerogel tiles into database
+    */
+    void importAeroTilesInfo();
+
+    /**
+     * Get aerogel ring number from global indetifier
+     */
+    int getAeroTileRing(int slot);
+
+    /**
+     * Get aerogel ring number from global indetifier
+     */
+    int getAeroTileColumn(int slot);
+
+    /**
+     * Prints mapping of aerogel tiles and their optical properties
+     */
+    void printAeroTileInfo();
+
+
+    // DAQ classes
+
+    /**
+     * Imports mappings of power supply to bias cables and cables to HAPDs and nominal values of bias voltages
+     */
+    void importBiasMappings();
+
+    /**
+     * Imports mappings of power supply to high voltage cables
+     */
+    void importHvMappings();
+
+    /**
+     * Imports mappings of nominal values of bias voltages
+     */
+    void importNominalBiasVoltages();
+
+    /**
+     * Prints mappings of power supply to bias cables and cables to HAPDs and nominal values of bias voltages from the database
+     */
+    void printBiasMappings();
+
+    /**
+     * Prints mappings of nominal values of bias voltages from the database
+     */
+    void printNominalBiasVoltages();
+
+    /**
+     * Prints nominal bias voltage for channel on power supply from the database
+     * @param channel vector of values crate, slot and channel on power supply
+     */
+    void printNominalBiasVoltageForChannel(std::vector<int> channel);
+
+    /**
+     * Prints HAPD position (sector, ring, azimuth) and merger connection (merger, feb slot) from the database
+     * @param crate crate on power supply
+     * @param slot slot on power supply
+     * @param channelID channel number on power supply
+     */
+    void printHapdPositionFromCrateSlot(int crate, int slot, int channelID);
+
+    /**
+     * Returns feb daq position from feb slot
+     * @param febSlot feb slot number on merger
+     * @return feb daq number
+     */
+    int getFebDaqSlot(unsigned febSlot);
 
 
     // classes used in conditions DB
@@ -150,14 +225,14 @@ namespace Belle2 {
     void importAerogelInfo();
 
     /**
-     * Import ARICH aerogel map in the database.
-     */
-    void importAerogelMap();
-
-    /**
      * Export ARICH aerogel data from the database.
      */
     void exportAerogelInfo();
+
+    /**
+     * Import ARICH aerogel map in the database.
+     */
+    void importAerogelMap();
 
     /**
      * Export ARICH aerogel map in the database.
@@ -291,7 +366,7 @@ namespace Belle2 {
     /**
      * Get lists of problematic HAPD channels.
      */
-    std::vector<int> channelsListHapd(std::string chlist, int channelDelay);
+    std::vector<int> channelsListHapd(std::string chlist, std::string chipDelay);
 
     /**
      * Get position of channel on HAPD.
@@ -341,13 +416,13 @@ namespace Belle2 {
      * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
      * @param HAPD serial number
      */
-    void getBiasVoltagesForHapdChip(const std::string& serialNumber);
+    void printBiasVoltagesForHapdChip(const std::string& serialNumber);
 
     /**
      * Example that shows how to use data from the database
      * @param aerogel serial number
      */
-    void getMyParams(const std::string& aeroSerialNumber);
+    void printMyParams(const std::string& aeroSerialNumber);
 
     /**
      * Function that returns refractive index, thickness and transmission length of aerogel
@@ -414,7 +489,21 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesHapdQE;        /**< Input root files for HAPD quantum efficiency */
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
-    ClassDef(ARICHDatabaseImporter, 1);                 /**< ClassDef */
+
+    template <typename Container_t>
+    inline auto printContainer(const Container_t& rContainer, std::ostream& rStream = std::cout) noexcept -> void
+    {
+      if (rContainer.empty())
+        return void();
+
+      rStream << rContainer.front();
+      for (auto i = 1ul; i < rContainer.size(); ++i)
+        rStream << " - " << rContainer[i];
+      rStream << '\n';
+    }
+
+    ClassDef(ARICHDatabaseImporter, 2);                 /**< ClassDef */
+
   };
 
 } // Belle2 namespace

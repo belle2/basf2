@@ -63,6 +63,7 @@ class PackerUnpackerTest(Module):
             assert digit.getChannelID() == digitUnpacked.getChannelID()
             assert digit.getBitmap() == digitUnpacked.getBitmap()
 
+
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')

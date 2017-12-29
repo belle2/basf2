@@ -30,15 +30,13 @@ V0FinderModule::V0FinderModule() : Module()
                  "pair.  Depending on the outcome of each fit, a corresponding "
                  "Belle2::V0 is stored or not.\n\n"
 
-                 "Inside the beam pipe (cut determined by the option "
-                 "'beamPipeRadius') a loose chi2 cut is applied "
-                 "('vertexChi2CutInside') and, since all tracks coming from a "
-                 "single B decay will actually fit into a vertex, an additional "
-                 "mass cut restricting to Kshorts is applied "
-                 "('massWindowKshortInside').\n\n"
+                 "No V0s with vertex inside the beam pipe "
+                 "are saved. They are recovered in a following step.\n\n"
 
                  "Outside the beam pipe only a chi^2 cut is applied "
-                 "('vertexChi2CutOutside').");
+                 "('vertexChi2CutOutside').\n"
+                 "The value used as beam pipe radius is a parameter and"
+                 "can be changed.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -64,14 +62,7 @@ V0FinderModule::V0FinderModule() : Module()
            "Radius at which we switch between the two classes of cuts.  The "
            "default is a little inside the beam pipe to allow some tolerance.",
            1.);
-  addParam("vertexChi2CutInside", m_vertexChi2CutInside,
-           "Maximum chi² for the vertex fit (NDF = 1)", 50.);
-  // The mass window was agreed upon at the 2015-03-06 software
-  // developer meeting.  It matches the one used in Belle.
-  addParam("massWindowKshortInside", m_massWindowKshortInside,
-           "Half-width of symmetric mass window about the Kshort mass for "
-           "which Kshort candidates inside the beam pipe are stored (in MeV)",
-           30.);
+
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
 }
@@ -134,14 +125,14 @@ void V0FinderModule::event()
   tracksMinus.reserve(nTracks);
 
   for (const auto& track : tracks) {
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
 
-    if (!tfr) {
-      B2WARNING("No TrackFitResult for track");
+    if (!recoTrack) {
+      B2WARNING("No RecoTrack for this track");
       continue;
     }
 
-    const double charge = tfr->getChargeSign();
+    const double charge = recoTrack->getChargeSeed();
     if (charge == +1) {
       tracksPlus.push_back(&track);
     } else {
@@ -156,7 +147,7 @@ void V0FinderModule::event()
   }
 
   V0Fitter v0Fitter(m_TFRColName, m_V0ColName, m_V0ValidationVertexColName, m_RecoTrackColName);
-  v0Fitter.initializeCuts(m_beamPipeRadius, m_vertexChi2CutInside, m_massWindowKshortInside, m_vertexChi2CutOutside);
+  v0Fitter.initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
   if (m_validation) {
     v0Fitter.enableValidation();
   }
@@ -166,6 +157,8 @@ void V0FinderModule::event()
     for (auto& trackMinus : tracksMinus) {
       v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Kshort);
       v0Fitter.fitAndStore(trackPlus, trackMinus, Const::photon);
+      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::antiLambda);
     }
   }
 }

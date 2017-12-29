@@ -144,6 +144,10 @@ void FlavorTaggerInfoFillerModule::event()
         if (particleList -> getListSize() == 0) {
           infoMapsFBDT -> setProbEventLevel(category, 0);
           infoMapsFBDT -> setQpCategory(category, 0);
+          if (m_istrueCategories and mcFlag) {
+            infoMapsFBDT -> setHasTrueTarget(category, 0);
+            infoMapsFBDT -> setIsTrueCategory(category, 0);
+          }
           if (m_trackPointers) infoMapsFBDT -> setTargetEventLevel(category, nullptr);
         } else {
 

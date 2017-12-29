@@ -707,6 +707,18 @@ namespace Belle2 {
       m_matchingStatus = matchingStatus;
     }
 
+    /// Get the quality index attached to this RecoTrack given by one of the reconstruction algorithms. 0 means likely fake.
+    float getQualityIndicator() const
+    {
+      return m_qualityIndicator;
+    }
+
+    /// Set the quality index attached to this RecoTrack. 0 means likely fake.
+    void setQualityIndicator(float qualityIndicator)
+    {
+      m_qualityIndicator = qualityIndicator;
+    }
+
     /**
      * Delete all fitted information for all representations
      *
@@ -718,6 +730,8 @@ namespace Belle2 {
      */
     void deleteFittedInformation();
 
+    /// Get useful information on EventDisplay
+    virtual std::string getInfoHTML() const;
 
   private:
     /// Internal storage for the genfit track.
@@ -741,6 +755,8 @@ namespace Belle2 {
     bool m_dirtyFlag = true;
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
+    /// Quality index for classification of fake vs. MC-matched Tracks.
+    float m_qualityIndicator;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -857,7 +873,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 7);
+    ClassDef(RecoTrack, 8);
   };
 
   /**

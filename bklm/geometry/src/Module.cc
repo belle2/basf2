@@ -37,8 +37,16 @@ namespace Belle2 {
       m_GlobalOrigin(CLHEP::Hep3Vector()),
       m_LocalReconstructionShift(CLHEP::Hep3Vector()),
       m_Rotation(CLHEP::HepRotation()),
-      m_alignment(HepGeom::Transform3D()),
-      m_alignment_inverse(HepGeom::Transform3D())
+      m_Alignment(HepGeom::Transform3D()),
+      m_AlignmentRotation(CLHEP::HepRotation()),
+      m_AlignmentTranslation(CLHEP::Hep3Vector()),
+      m_AlignmentInverse(HepGeom::Transform3D()),
+      m_AlignmentRotationInverse(CLHEP::HepRotation()),
+      m_DisplacedGeo(HepGeom::Transform3D()),
+      m_DisplacedGeoRotation(CLHEP::HepRotation()),
+      m_DisplacedGeoTranslation(CLHEP::Hep3Vector()),
+      m_DisplacedGeoInverse(HepGeom::Transform3D()),
+      m_DisplacedGeoRotationInverse(CLHEP::HepRotation())
     {
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintPositions.clear();
@@ -73,8 +81,16 @@ namespace Belle2 {
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
       m_Rotation(rotation),
-      m_alignment(HepGeom::Transform3D()),
-      m_alignment_inverse(HepGeom::Transform3D())
+      m_Alignment(HepGeom::Transform3D()),
+      m_AlignmentRotation(CLHEP::HepRotation()),
+      m_AlignmentTranslation(CLHEP::Hep3Vector()),
+      m_AlignmentInverse(HepGeom::Transform3D()),
+      m_AlignmentRotationInverse(CLHEP::HepRotation()),
+      m_DisplacedGeo(HepGeom::Transform3D()),
+      m_DisplacedGeoRotation(CLHEP::HepRotation()),
+      m_DisplacedGeoTranslation(CLHEP::Hep3Vector()),
+      m_DisplacedGeoInverse(HepGeom::Transform3D()),
+      m_DisplacedGeoRotationInverse(CLHEP::HepRotation())
     {
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintLengths.clear();
@@ -109,8 +125,16 @@ namespace Belle2 {
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
       m_Rotation(rotation),
-      m_alignment(HepGeom::Transform3D()),
-      m_alignment_inverse(HepGeom::Transform3D())
+      m_Alignment(HepGeom::Transform3D()),
+      m_AlignmentRotation(CLHEP::HepRotation()),
+      m_AlignmentTranslation(CLHEP::Hep3Vector()),
+      m_AlignmentInverse(HepGeom::Transform3D()),
+      m_AlignmentRotationInverse(CLHEP::HepRotation()),
+      m_DisplacedGeo(HepGeom::Transform3D()),
+      m_DisplacedGeoRotation(CLHEP::HepRotation()),
+      m_DisplacedGeoTranslation(CLHEP::Hep3Vector()),
+      m_DisplacedGeoInverse(HepGeom::Transform3D()),
+      m_DisplacedGeoRotationInverse(CLHEP::HepRotation())
     {
       if (isFlipped) m_Rotation.rotateZ(M_PI);
       m_RotationInverse = m_Rotation.inverse();
@@ -139,9 +163,17 @@ namespace Belle2 {
       m_GlobalOrigin(m.m_GlobalOrigin),
       m_LocalReconstructionShift(m.m_LocalReconstructionShift),
       m_Rotation(m.m_Rotation),
-      m_alignment(m.m_alignment),
-      m_alignment_inverse(m.m_alignment_inverse),
       m_RotationInverse(m.m_RotationInverse),
+      m_Alignment(m.m_Alignment),
+      m_AlignmentRotation(m.m_AlignmentRotation),
+      m_AlignmentTranslation(m.m_AlignmentTranslation),
+      m_AlignmentInverse(m.m_AlignmentInverse),
+      m_AlignmentRotationInverse(m.m_AlignmentRotationInverse),
+      m_DisplacedGeo(m.m_DisplacedGeo),
+      m_DisplacedGeoRotation(m.m_DisplacedGeoRotation),
+      m_DisplacedGeoTranslation(m.m_DisplacedGeoTranslation),
+      m_DisplacedGeoInverse(m.m_DisplacedGeoInverse),
+      m_DisplacedGeoRotationInverse(m.m_DisplacedGeoRotationInverse),
       m_PhiScintLengths(m.m_PhiScintLengths),
       m_PhiScintPositions(m.m_PhiScintPositions),
       m_PhiScintOffsets(m.m_PhiScintOffsets),
@@ -196,22 +228,69 @@ namespace Belle2 {
 
     const CLHEP::Hep3Vector Module::localToGlobal(const CLHEP::Hep3Vector& v, bool m_reco) const
     {
+      CLHEP::Hep3Vector vlocal(v.x(), v.y(), v.z());
       if (m_reco) {
-        HepGeom::Vector3D<double> v3D(v.x(), v.y(), v.z());
-        v3D.transform(m_alignment);
-        CLHEP::Hep3Vector vlocal(v3D.x(), v3D.y(), v3D.z()); // to nomial local
-        return m_Rotation * vlocal + m_GlobalOrigin;
-      } else return m_Rotation * v + m_GlobalOrigin; //to global
+        vlocal = m_AlignmentRotation * vlocal + m_AlignmentTranslation; // to nominal + displaced local
+        vlocal = m_DisplacedGeoRotation * vlocal + m_DisplacedGeoTranslation; //to nominal local
+        return m_Rotation * vlocal + m_GlobalOrigin; //to global
+      } else {
+        vlocal = m_DisplacedGeoRotation * vlocal + m_DisplacedGeoTranslation; // to nominal local
+        return m_Rotation * vlocal + m_GlobalOrigin; //to global
+      }
+
     }
 
     const CLHEP::Hep3Vector Module::globalToLocal(const CLHEP::Hep3Vector& v, bool reco) const
     {
+      CLHEP::Hep3Vector vlocal = m_RotationInverse * (v - m_GlobalOrigin); //now in nominal local
+      vlocal = m_DisplacedGeoRotationInverse * (vlocal - m_DisplacedGeoTranslation); //now in displaced local
       if (reco) {
-        CLHEP::Hep3Vector vlocal = m_RotationInverse * (v - m_GlobalOrigin); //now in nominal local
-        HepGeom::Vector3D<double> v3D(vlocal.x(), vlocal.y(), vlocal.z());
-        v3D.transform(m_alignment_inverse); // now in real local
-        return CLHEP::Hep3Vector(v3D.x(), v3D.y(), v3D.z());
-      } else return m_RotationInverse * (v - m_GlobalOrigin);
+        vlocal = m_AlignmentRotationInverse * (vlocal - m_AlignmentTranslation); //now in real local
+      }
+      return vlocal;
+    }
+
+    void Module::setAlignment(const HepGeom::Transform3D& moduleAlignment)
+    {
+      m_Alignment = moduleAlignment;
+      m_AlignmentRotation = getRotationFromTransform3D(moduleAlignment);
+      m_AlignmentTranslation = getTranslationFromTransform3D(moduleAlignment);
+      m_AlignmentInverse = moduleAlignment.inverse();
+      m_AlignmentRotationInverse = getRotationFromTransform3D(m_AlignmentInverse);
+    }
+
+    void Module::setDisplacedGeo(const HepGeom::Transform3D& moduleDisplacedGeo)
+    {
+      m_DisplacedGeo = moduleDisplacedGeo;
+      m_DisplacedGeoRotation = getRotationFromTransform3D(moduleDisplacedGeo);
+      m_DisplacedGeoTranslation = getTranslationFromTransform3D(moduleDisplacedGeo);
+      m_DisplacedGeoInverse = moduleDisplacedGeo.inverse();
+      m_DisplacedGeoRotationInverse = getRotationFromTransform3D(m_DisplacedGeoInverse);
+    }
+
+    const CLHEP::Hep3Vector Module::getTranslationFromTransform3D(const HepGeom::Transform3D& trans) const
+    {
+      HepGeom::Scale3D scale;
+      HepGeom::Rotate3D rotation;
+      HepGeom::Translate3D translation;
+      trans.getDecomposition(scale, rotation, translation);
+      CLHEP::Hep3Vector t(translation.dx(), translation.dy(), translation.dz());
+      return t;
+    }
+
+    const CLHEP::HepRotation Module::getRotationFromTransform3D(const HepGeom::Transform3D& trans) const
+    {
+      HepGeom::Scale3D scale;
+      HepGeom::Rotate3D rotation;
+      HepGeom::Translate3D translation;
+      trans.getDecomposition(scale, rotation, translation);
+      CLHEP::HepRep3x3 rRep(rotation.xx(), rotation.xy(), rotation.xz(),
+                            rotation.yx(), rotation.yy(), rotation.yz(),
+                            rotation.zx(), rotation.zy(), rotation.zz()
+                           );
+      CLHEP::HepRotation r;
+      r.set(rRep);
+      return r;
     }
 
   } // end of namespace bklm

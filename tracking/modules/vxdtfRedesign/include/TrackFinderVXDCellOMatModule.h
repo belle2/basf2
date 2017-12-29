@@ -21,10 +21,7 @@
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
-
-#include <tracking/trackFindingVXD/algorithms/CALogger.h>
-#include <tracking/trackFindingVXD/algorithms/CAValidator.h>
-#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorXBestPerFamily.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
@@ -33,8 +30,9 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+#include <tracking/trackFindingVXD/algorithms/CALogger.h>
+#include <tracking/trackFindingVXD/algorithms/CAValidator.h>
+#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
 
 
 namespace Belle2 {
@@ -42,46 +40,21 @@ namespace Belle2 {
    *
    * It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands using a Cellular Automaton algorithm implementation.
    */
-  class TrackFinderVXDCellOMatModule : public Module {
+  class TrackFinderVXDCellOMatModule final : public Module {
 
   public:
-
 
     /** Constructor */
     TrackFinderVXDCellOMatModule();
 
-
-    /** Destructor */
-    virtual ~TrackFinderVXDCellOMatModule() {}
-
-
     /** initialize */
-    virtual void initialize();
-
+    virtual void initialize() override;
 
     /** beginRun */
-    virtual void beginRun() {}
-
+    virtual void beginRun() override;
 
     /** event */
-    virtual void event();
-
-
-    /** endRun */
-    virtual void endRun() {}
-
-
-    /** terminate */
-    virtual void terminate() {}
-
-
-
-    /** *************************************+************************************* **/
-    /** ***********************************+ + +*********************************** **/
-    /** *******************************+ functions +******************************* **/
-    /** ***********************************+ + +*********************************** **/
-    /** *************************************+************************************* **/
-
+    virtual void event() override;
 
 
   protected:
@@ -117,12 +90,21 @@ namespace Belle2 {
     /** If true create track candidate only for the best candidate of a family. */
     bool m_PARAMselectBestPerFamily;
 
+    /** Maximal number of best candidates to be created per family. */
+    unsigned short m_PARAMxBestPerFamily = 5;
+
+    /** Maximal number of families in event; if exceeded, the execution of the trackfinder will be stopped. */
+    unsigned short m_PARAMmaxFamilies = 10000;
+
+    /** Maximal size of segment network; if exceeded, the execution of the trackfinder will be stopped. */
+    unsigned short m_PARAMmaxNetworkSize = 50000;
+
     /// member variables
     /** CA algorithm */
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
     m_cellularAutomaton;
 
-    /** algorithm for finding paths of segments */
+    /** Algorithm for finding paths of segments. */
     PathCollectorRecursive <
     Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
            Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
@@ -130,7 +112,7 @@ namespace Belle2 {
            Belle2::NodeCompatibilityCheckerPathCollector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>>
            > m_pathCollector;
 
-    /** tool for creating SPTCs, fills storeArray directly */
+    /** Tool for creating SPTCs, which fills storeArray directly. */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
     /** Class to evaluate connected nodes, in this case for the directed node network, and assigns a family to each
@@ -142,24 +124,17 @@ namespace Belle2 {
            > m_familyDefiner;
 
     /// input containers
-    /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */
+    /** Access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates. */
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
     /// output containers
-    /** StoreArray for the TCs created in this module */
+    /** StoreArray for the TCs created in this module. */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
-    /** pointer to the QualityEstimator */
-    std::unique_ptr<QualityEstimatorBase> m_estimator;
+    /** Pointer to SPTC selector class which performes the x best candidate selection. */
+    std::unique_ptr<SPTCSelectorXBestPerFamily> m_sptcSelector;
 
-    /** Vector containing the currently best set of SPTCs, one for each family. */
-    std::vector<SpacePointTrackCand> m_bestPaths;
-
-    /** Map containing the relation between the indices of m_bestPath to the families. */
-    std::vector<short> m_familyIndex;
-
-    /// counters and other debug stuff:
-    /** counts event numbers */
+    /** Event number counter. */
     unsigned int m_eventCounter = 0;
 
   private:

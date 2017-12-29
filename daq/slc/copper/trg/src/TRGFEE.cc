@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-TRGFEE::TRGFEE() : FEE("trg")
+TRGFEE::TRGFEE()
 {
 }
 

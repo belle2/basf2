@@ -34,7 +34,7 @@ void NtupleFlavorTaggingTool::setupTree()
   //string method("");
 
   const char* categories[] = { "Muon",  "IntermediateMuon", "Electron", "IntermediateElectron", "KinLepton",
-                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar", "KaonPion"
+                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", "Lambda", "FSC", "MaximumPstar", "KaonPion"
                              };
 
   for (auto& category : categories) {
@@ -73,7 +73,7 @@ void NtupleFlavorTaggingTool::setupTree()
         B2FATAL("Invalid option used for Flavor Tagger ntuple tool: " << m_strOption <<
                 ". Write 'FBDT' and/or 'FANN' to save the Flavor Tagger Output related to these combiner methods or leave the option empty to use the default FBDT Method"
                 <<
-                ". Write 'qpCategories' to save the qr output of all used categories");
+                ". Write 'qpCategories' to save the qp output of all used categories");
       }
     }
   }

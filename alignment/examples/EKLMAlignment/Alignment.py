@@ -9,6 +9,8 @@ import numpy as np
 from alignment import MillepedeCalibration, calibrate
 from caf.framework import Calibration
 
+set_log_level(LogLevel.DEBUG)
+
 # Create the algorithm
 millepede = MillepedeCalibration(['EKLMAlignment'])
 
@@ -145,10 +147,6 @@ for ipar in range(0, millepede.algo.result().getNoParameters()):
     ibin = ibin + 1
     profile.SetBinContent(ibin, value[0])
     profile.SetBinError(ibin, error[0])
-
-# Example how to access collected data (but you need exp and run number)
-chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
-pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
 alignment_file.cd()
 profile.Write()

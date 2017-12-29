@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-TEMPLATEFEE::TEMPLATEFEE() : FEE("template")
+TEMPLATEFEE::TEMPLATEFEE()
 {
 }
 

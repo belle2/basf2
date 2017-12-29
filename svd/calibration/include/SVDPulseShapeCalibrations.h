@@ -14,9 +14,13 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
+#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDStripCalAmp.h>
+#include <svd/dbobjects/SVDTriggerBinDependentConstants.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 #include <string>
+
 
 #include <math.h>
 
@@ -34,11 +38,14 @@ namespace Belle2 {
     typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_payload;
     static std::string time_name;
     typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_time_payload;
+    static std::string bin_name;
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDTriggerBinDependentConstants > > t_bin_payload;
 
     /** Constructor, no input argument is required */
     SVDPulseShapeCalibrations()
       : m_aDBObjPtr(name)
       , m_time_aDBObjPtr(time_name)
+      , m_bin_aDBObjPtr(bin_name)
     {}
 
     /** Return the charge (number of electrons/holes) collected on a specific
@@ -158,7 +165,7 @@ namespace Belle2 {
 
     }
 
-    /** Return the time shift to be applied to the basic time estimator
+    /** Return the time shift to be applied to theCoG time estimator
      * (weighted average of the time)
      *
      * Input:
@@ -175,6 +182,38 @@ namespace Belle2 {
       return m_time_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
                                    m_time_aDBObjPtr->sideIndex(isU), strip);
 
+    }
+
+    /** return the trigger bin dependent correction for the CoG time estimator
+     *
+     * Input:
+     * @param sensorID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: strip number - NOT USED
+     *
+     * Output: a float number corresponding to the time correction in ns.
+     */
+    inline float getTriggerBinDependentCorrection(const VxdID& sensorID, const bool& isU,
+                                                  const unsigned short& strip, const int& bin) const
+    {
+      float correction = 0;
+      if (bin == 0)
+        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin0;
+      else if (bin == 1)
+        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin1;
+      else if (bin == 2)
+        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin2;
+      else if (bin == 3)
+        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin3;
+      else
+        B2WARNING("SVDPulseShapeCalibrations: you ar asking for a non existin trigger bin! Return 0.");
+
+      return correction;
     }
 
 
@@ -199,6 +238,7 @@ namespace Belle2 {
   private:
     DBObjPtr< t_payload > m_aDBObjPtr;
     DBObjPtr< t_time_payload > m_time_aDBObjPtr;
+    DBObjPtr< t_bin_payload > m_bin_aDBObjPtr;
 
   };
 }

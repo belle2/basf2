@@ -22,6 +22,8 @@ namespace Belle2 {
   /** Writes vertex information of B candidate to flat ntuple. */
   class NtupleVertexTool : public NtupleFlatTool {
   private:
+    /** number of decay products */
+    int m_nDecayProducts;
     /** Vertex position X*/
     float* m_fDX;
     /** Vertex position Y*/
@@ -44,10 +46,14 @@ namespace Belle2 {
     float*** m_fProdCov;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
+    /** delete all float** etc */
+    void deallocateMemory();
   public:
     /** Constructor. */
     NtupleVertexTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor), m_fDX(0), m_fDY(0),
       m_fDZ(0), m_fDRho(0), m_fPvalue(0), m_fProdV(0), m_fProdCov(0) {setupTree();}
+    /** Destructor. */
+    virtual ~NtupleVertexTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

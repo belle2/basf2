@@ -44,11 +44,17 @@ namespace Belle2 {
     double getGamma() const { return m_gamma; }
 
   private:
+    //! Shift along local u axis
     double m_dU;
+    //! Shift along local v axis
     double m_dV;
+    //! Shift along local w axis
     double m_dW;
+    //! Rotation around local u axis
     double m_alpha;
+    //! Rotation around local v axis
     double m_beta;
+    //! Rotation around local w axis
     double m_gamma;
 
     ClassDef(VXDAlignmentPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

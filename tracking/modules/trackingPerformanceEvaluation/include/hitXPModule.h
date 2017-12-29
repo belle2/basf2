@@ -75,6 +75,7 @@ namespace Belle2 {
     TFile* m_outputFile; /**< output file */
     std::vector<hitXP> m_hitXP; /**< vector of the hitXP, used to fill the output tree */
     std::set<hitXP, hitXP::timeCompare> m_hitXPSet; /**< set of the hitXP, used to order tn time he hit */
+    bool c_addTree; /**<parameter to produce additional tree */
 
     int m_trackNumber; /**< iterative number of the track in the run */
     int m_eventNumber; /**< interative number of the event in the run */

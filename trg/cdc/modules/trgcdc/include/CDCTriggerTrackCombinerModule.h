@@ -4,6 +4,10 @@
 #include "framework/core/Module.h"
 #include <string>
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+
 namespace Belle2 {
 
   /** Module to combine the information from the various track trigger stages. */
@@ -42,6 +46,12 @@ namespace Belle2 {
     std::string m_zDefinition;
 
   private:
+    /** list of 2D finder tracks (all others are obtained via relations) */
+    StoreArray<CDCTriggerTrack> m_tracks2Dfinder;
+    /** list of combined output tracks */
+    StoreArray<CDCTriggerTrack> m_tracksCombined;
+    /** list of track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
   };
 
 } // namespace Belle2

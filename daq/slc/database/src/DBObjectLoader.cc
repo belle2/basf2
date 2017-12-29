@@ -365,8 +365,8 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
       const char* prefix = grep.c_str();
       std::stringstream ss;
       ss << "select name from " << tablename << " where name = REPLACE(path, '.', '') "
-         << "and ("//name like '_%" << prefix << "_%' or "
-         //<< "name like '_%" << prefix << "' or "
+         << "and (name like '_%" << prefix << "_%' or "
+         << "name like '_%" << prefix << "' or "
          << "name like '" << prefix << "_%' or "
          << "name = '" << prefix << "') order by id desc";
       if (max > 0) ss << " limit " << max;

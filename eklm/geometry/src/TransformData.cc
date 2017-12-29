@@ -317,6 +317,14 @@ EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
 
+const HepGeom::Transform3D*
+EKLM::TransformData::getStripGlobalToLocal(int endcap, int layer, int sector,
+                                           int plane, int strip) const
+{
+  return &(m_StripInverse[endcap - 1][layer - 1][sector - 1][plane - 1]
+           [strip - 1]);
+}
+
 bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
                                        double* d1, double* d2, double* sd)

@@ -7,15 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef MODULEPARAM_ICC_H_
-#define MODULEPARAM_ICC_H_
+
+#pragma once
 
 #include <framework/core/ModuleParam.dcl.h>
-
 #include <framework/core/PyObjConvUtils.h>
-
 #include <boost/python/object.hpp>
-
 #include <string>
 
 namespace Belle2 {
@@ -95,5 +92,3 @@ namespace Belle2 {
   }
 
 } // end of Belle2 namespace
-
-#endif /* MODULEPARAM_ICC_H_ */

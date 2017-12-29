@@ -8,7 +8,7 @@
 
 using namespace Belle2;
 
-DUMMYFEE::DUMMYFEE() : FEE("dummy")
+DUMMYFEE::DUMMYFEE()
 {
 }
 

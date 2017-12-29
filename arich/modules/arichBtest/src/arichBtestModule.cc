@@ -396,10 +396,10 @@ namespace Belle2 {
 
         TAxis* axis =  mwpc_residualsz[i][1]->GetYaxis();
         for (int k = 0; k < axis->GetNbins(); k++) {
-          double l = (w->reco[2] + axis->GetBinCenter(k + 1) - r.z()) / dir.z();
-          TVector3 rext = r + dir * l;
-          mwpc_residualsz[i][0]->Fill(w->reco[0] - rext.y(), axis->GetBinCenter(k + 1));
-          mwpc_residualsz[i][1]->Fill(w->reco[1] - rext.x(), axis->GetBinCenter(k + 1));
+          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.z()) / dir.z();
+          TVector3 rextt = r + dir * ll;
+          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.y(), axis->GetBinCenter(k + 1));
+          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.x(), axis->GetBinCenter(k + 1));
 
         }
       }
@@ -584,10 +584,10 @@ namespace Belle2 {
 
   void arichBtestModule::terminate()
   {
-    int i = 1;
+    int j = 1;
     BOOST_FOREACH(const string & fname, m_runList) {
-      B2INFO(m_eveList[i] << " events processed from file " << fname);
-      i++;
+      B2INFO(m_eveList[j] << " events processed from file " << fname);
+      j++;
     }
     for (int i = 0; i < 4; i++) {
       //ARICHTracking* w = &m_mwpc[i];

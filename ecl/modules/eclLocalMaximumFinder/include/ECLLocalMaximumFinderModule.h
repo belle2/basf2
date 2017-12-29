@@ -197,8 +197,8 @@ namespace Belle2 {
     class ECLLocalMaximumFinderPureCsIModule : public ECLLocalMaximumFinderModule {
     public:
       /** Name to be used for PureCsI option: ECLHitsPureCsI.*/
-      virtual const char* eclHitArrayName() const override
-      { return "ECLHitsPureCsI" ; }
+      //virtual const char* eclHitArrayName() const override
+      //{ return "ECLHitsPureCsI" ; }
 
       /** Name to be used for PureCsI option: ECLDigitsPureCsI.*/
       virtual const char* eclDigitArrayName() const override

@@ -289,6 +289,8 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
+        ClusterMatch = register_module('ClusterMatcher')
+        path.add_module(ClusterMatch)
 
 
 def add_pid_module(path, components=None):
@@ -363,6 +365,9 @@ def add_ecl_modules(path, components=None):
         # ECL digit calibration
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
+
+        # ECL T0 extraction
+        path.add_module('ECLEventT0')
 
         # ECL connected region finder
         ecl_crfinder = register_module('ECLCRFinder')

@@ -1,6 +1,6 @@
 """
 <header>
-<input>../1111540100.ntup.root,../1111440100.ntup.root,../2610030000.ntup.root,../ana-xi-lambda.root</input>
+<input>../PIDMuons.ntup.root,../PIDElectrons.ntup.root,../PIDProtons.ntup.root,../PIDKpi.ntup.root</input>
 <output>standardParticlesValidation_ChargedPID.root</output>
 <contact>"Jan Strube" <jan.strube@pnnl.gov></contact>
 </header>
@@ -15,13 +15,13 @@ import os.path as path
 #: where to find the ntuples
 basepath = '../'
 #: J/Psi --> ee ntuple
-jpsi_ee = TFile.Open(path.join(basepath, '1111540100.ntup.root'))
+jpsi_ee = TFile.Open(path.join(basepath, 'PIDElectrons.ntup.root'))
 #: J/Psi --> mumu ntuple
-jpsi_mm = TFile.Open(path.join(basepath, '1111440100.ntup.root'))
+jpsi_mm = TFile.Open(path.join(basepath, 'PIDMuons.ntup.root'))
 #: D* --> D0 pi ntuple
-dstars = TFile.Open(path.join(basepath, '2610030000.ntup.root'))
+dstars = TFile.Open(path.join(basepath, 'PIDKpi.ntup.root'))
 #: Xi --> Lambda pi
-xilambda = TFile.Open(path.join(basepath, 'ana-xi-lambda.root'))
+xilambda = TFile.Open(path.join(basepath, 'PIDProtons.ntup.root'))
 #: D* tree
 ds = dstars.Get("dst")
 #: electron tree

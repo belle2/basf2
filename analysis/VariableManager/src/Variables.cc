@@ -1830,7 +1830,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       const TVector3 pcms = (T.rotateLabToCms() * part->get4Vector()).Vect();
-      double maxangle = 0.0;
+      double maxangle = -999.0;
 
       StoreArray<KLMCluster> klmClusters;
       for (int iKLM = 0; iKLM < klmClusters.getEntries(); iKLM++) {

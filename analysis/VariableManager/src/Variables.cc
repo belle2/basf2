@@ -1826,25 +1826,6 @@ namespace Belle2 {
         return 0.0;
     }
 
-    double maximumKLMAngleCMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      const TVector3 pcms = (T.rotateLabToCms() * part->get4Vector()).Vect();
-      double maxangle = -999.0;
-
-      StoreArray<KLMCluster> klmClusters;
-      for (int iKLM = 0; iKLM < klmClusters.getEntries(); iKLM++) {
-        const TVector3 klmmomcms = (T.rotateLabToCms() * klmClusters[iKLM]->getMomentum()).Vect();
-        double angle = pcms.Angle(klmmomcms);
-
-        if (angle > maxangle) {
-          maxangle = angle;
-        }
-      }
-
-      return maxangle;
-    }
-
     double False(const Particle*)
     {
       return 0;
@@ -2040,8 +2021,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
-    REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
-                      "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");

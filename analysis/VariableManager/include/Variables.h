@@ -732,11 +732,6 @@ namespace Belle2 {
     double eclClusterHypothesisId(const Particle* particle);
 
     /**
-     * return the maximum angle of a KLM cluster to this particle in the CMS frame
-     */
-    double maximumKLMAngleCMS(const Particle* particle);
-
-    /**
      * return always zero
      */
     double False(const Particle*);

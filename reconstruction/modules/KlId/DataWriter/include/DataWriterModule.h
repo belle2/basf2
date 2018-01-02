@@ -16,7 +16,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -152,8 +152,6 @@ namespace Belle2 {
     Float_t m_KLMECLUncertaintyTheta;
     /** mc weight */
     Float_t m_KLMMCWeight;
-    /** distance calculated by genfit */
-    Float_t m_KLMgenfitDist;
     /** track flag for belle comparision */
     Float_t m_KLMtrackFlag;
     /** ecl flag for belle comparision */

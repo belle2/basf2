@@ -339,6 +339,11 @@ namespace Belle2 {
       return m_errZ[module];
     }
 
+    /**
+     * Returns calibration status
+     * @param moduleID module ID (1-based)
+     * @return true, if calibrated
+     */
     bool isCalibrated(int moduleID) const
     {
       unsigned module = moduleID - 1;

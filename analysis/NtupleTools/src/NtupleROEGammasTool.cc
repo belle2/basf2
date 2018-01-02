@@ -28,15 +28,15 @@ void NtupleROEGammasTool::setupTree()
     m_tree->Branch((strNames[iProduct] + "_nROEGoodGammas").c_str(), &m_nROEGoodGammas[iProduct],
                    (strNames[iProduct] + "_nROEGoodGammas/I").c_str());
     if (nDecayProducts == 1) {
-      m_tree->Branch((strNames[iProduct] + "_ROEGoodGamma_P").c_str(), &m_fP[0], (strNames[iProduct] + "_P[20]/F").c_str());
-      m_tree->Branch((strNames[iProduct] + "_ROEGoodGamma_P4").c_str(), &m_fP4[0], (strNames[iProduct] + "_P4[20][4]/F").c_str());
+      m_tree->Branch((strNames[iProduct] + "_ROEGoodGamma_P").c_str(), &m_fP[0], (strNames[iProduct] + "_P[100]/F").c_str());
+      m_tree->Branch((strNames[iProduct] + "_ROEGoodGamma_P4").c_str(), &m_fP4[0], (strNames[iProduct] + "_P4[100][4]/F").c_str());
     }
   }
 }
 
 void NtupleROEGammasTool::eval(const Particle* particle)
 {
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 100; i++) {
     m_fP[i] = -100;
     for (int j = 0; j < 4; j++) {
       m_fP4[i][j] = -100;
@@ -64,7 +64,7 @@ void NtupleROEGammasTool::eval(const Particle* particle)
           m_fP4[result][3] = gamma.getEnergy();
 
           result++;
-          if (result > 19) B2ERROR("Increase the number of ROE photons");
+          if (result > 99) B2ERROR("Increase the number of ROE photons");
         }
       }
 

@@ -262,7 +262,7 @@ namespace Belle2 {
 
 
       Weightfile weightfile;
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       std::fstream file(custom_weightfile, std::ios_base::out | std::ios_base::trunc);
 
 #if FastBDT_VERSION_MAJOR >= 5
@@ -301,7 +301,7 @@ namespace Belle2 {
     void FastBDTExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       weightfile.getFile("FastBDT_Weightfile", custom_weightfile);
       std::fstream file(custom_weightfile, std::ios_base::in);
 

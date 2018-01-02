@@ -35,6 +35,8 @@ namespace Belle2 {
      */
     class PXDUnpackerModule : public Module {
 
+      // enum { ONSEN_MAX_TYPE_ERR=64};
+
     public:
       /** Constructor defining the parameters */
       PXDUnpackerModule();

@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 
 #include "hlt/hlt/modules/level3/L3TriggerManager.h"
-#include "hlt/hlt/dataobjects/L3Tag.h"
-#include "mdst/dataobjects/HLTTag.h"
 
 #include "hlt/hlt/modules/level3/L3TrackTrigger.h"
 #include "hlt/hlt/modules/level3/L3EnergyTrigger.h"
@@ -22,8 +19,8 @@ using namespace Belle2;
 
 void L3TriggerManager::initializeTriggerManager()
 {
-  StoreArray<HLTTag>::registerPersistent();
-  if (m_saveData) StoreArray<L3Tag>::registerPersistent();
+  m_hltTag.registerInDataStore();
+  if (m_saveData) m_l3Tag.registerInDataStore();
 }
 
 void L3TriggerManager::printInformation()

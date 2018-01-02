@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <pxd/modules/pxdUnpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
@@ -18,28 +19,6 @@
 #include <boost/crc.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/spirit/home/support/detail/endian.hpp>
-
-// DHP modes are the same as for DHE envelope
-#define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
-#define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
-
-// DHE like before, but now 4 bits
-#define DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
-#define DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
-#define DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1 //CLUSTER FRAME
-#define DHC_FRAME_HEADER_DATA_TYPE_COMMODE     0x6
-#define DHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
-#define DHC_FRAME_HEADER_DATA_TYPE_DHE_START   0x3
-#define DHC_FRAME_HEADER_DATA_TYPE_DHE_END     0x4
-// DHC envelope, new
-#define DHC_FRAME_HEADER_DATA_TYPE_DHC_START  0xB
-#define DHC_FRAME_HEADER_DATA_TYPE_DHC_END    0xC
-// Onsen processed data, new
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP     0xD
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE     0x9
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI     0xF
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG     0xE
-// Free IDs are 0x7 0x8 0xA
 
 using namespace std;
 using namespace Belle2;
@@ -640,39 +619,39 @@ public:
   {
     unsigned int s = 0;
     switch (getFrameType()) {
-      case DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW:
+      case EDHCFrameHeaderDataType::c_DHP_RAW:
         s = 0; /// size is not a fixed number
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP:
-      case DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD:
+      case EDHCFrameHeaderDataType::c_ONSEN_DHP:
+      case EDHCFrameHeaderDataType::c_DHP_ZSD:
         s = 0; /// size is not a fixed number
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
-      case DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW:
+      case EDHCFrameHeaderDataType::c_ONSEN_FCE:
+      case EDHCFrameHeaderDataType::c_FCE_RAW:
         s = 0; /// size is not a fixed number
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_COMMODE:
+      case EDHCFrameHeaderDataType::c_COMMODE:
         s = data_commode_frame->getFixedSize();
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_GHOST:
+      case EDHCFrameHeaderDataType::c_GHOST:
         s = data_ghost_frame->getFixedSize();
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_DHE_START:
+      case EDHCFrameHeaderDataType::c_DHE_START:
         s = data_dhe_start_frame->getFixedSize();
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_DHE_END:
+      case EDHCFrameHeaderDataType::c_DHE_END:
         s = data_dhe_end_frame->getFixedSize();
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_DHC_START:
+      case EDHCFrameHeaderDataType::c_DHC_START:
         s = data_dhc_start_frame->getFixedSize();
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_DHC_END:
+      case EDHCFrameHeaderDataType::c_DHC_END:
         s = data_dhc_end_frame->getFixedSize();
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI:
+      case EDHCFrameHeaderDataType::c_ONSEN_ROI:
         s = 0; /// size is not a fixed number
         break;
-      case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG:
+      case EDHCFrameHeaderDataType::c_ONSEN_TRG:
         s = data_onsen_trigger_frame->getFixedSize();
         break;
       default:
@@ -990,7 +969,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
     m_errorMask |= ONSEN_ERR_FLAG_DHE_DHP_RAW_PORT;
   }
 
-  if (dhp_header_type != DHP_FRAME_HEADER_DATA_TYPE_RAW) {
+  if (dhp_header_type != EDHPFrameHeaderDataType::c_RAW) {
     B2ERROR("Header type invalid for this kind of DHE frame: $" << hex << dhp_header_type);
     return;
   }
@@ -1111,7 +1090,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     m_errorMask |= ONSEN_ERR_FLAG_DHE_DHP_PORT;
   }
 
-  if (dhp_header_type != DHP_FRAME_HEADER_DATA_TYPE_ZSD) {
+  if (dhp_header_type != EDHPFrameHeaderDataType::c_ZSD) {
     B2ERROR("Header type invalid for this kind of DHE frame: $" << hex << dhp_header_type);
     return;
   }
@@ -1314,13 +1293,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     currentVxdId = 0;
 
     isFakedData_event = false;
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+    if (type == EDHCFrameHeaderDataType::c_DHC_START) {
       B2ERROR("This looks like this is the old Desy 2013/14 testbeam format. Please use the pxdUnpackerDesy1314 module.");
     }
   }
 
   if (Frame_Number == 1) {
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+    if (type == EDHCFrameHeaderDataType::c_DHC_START) {
       isFakedData_event = dhc.data_dhc_start_frame->isFakedData();
     }
   }
@@ -1335,14 +1314,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
     if (countedDHEStartFrames != countedDHEEndFrames + 1)
-      if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
+      if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI && type != EDHCFrameHeaderDataType::c_DHE_START) {
         B2ERROR("Data Frame outside a DHE START/END");
         m_errorMask |= ONSEN_ERR_FLAG_DATA_OUTSIDE;
       }
   }
 
   switch (type) {
-    case DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
+    case EDHCFrameHeaderDataType::c_DHP_RAW: {
       countedFramesInEvent++;
 
       if (verbose) dhc.data_direct_readout_frame_raw->print();
@@ -1363,8 +1342,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (len / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP:
-    case DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
+    case EDHCFrameHeaderDataType::c_ONSEN_DHP:
+    case EDHCFrameHeaderDataType::c_DHP_ZSD: {
       countedFramesInEvent++;
 
       if (verbose)dhc.data_direct_readout_frame->print();
@@ -1417,8 +1396,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (len / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
-    case DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
+    case EDHCFrameHeaderDataType::c_ONSEN_FCE:
+    case EDHCFrameHeaderDataType::c_FCE_RAW: {
 
       countedFramesInEvent++;
       if (verbose) hw->print();
@@ -1436,7 +1415,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (len / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
+    case EDHCFrameHeaderDataType::c_COMMODE: {
       countedFramesInEvent++;
 
       if (verbose) hw->print();
@@ -1449,7 +1428,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += ((dhc.data_commode_frame->getFixedSize()) / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_DHC_START: {
+    case EDHCFrameHeaderDataType::c_DHC_START: {
       eventNrOfDHCStartFrame = eventNrOfThisFrame;
       if (isFakedData_event != dhc.data_dhc_start_frame->isFakedData()) {
         B2ERROR("DHC START is but no Fake event OR Fake Event but DHE END is not.");
@@ -1511,7 +1490,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (dhc.data_dhc_start_frame->getFixedSize() / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_DHE_START: {
+    case EDHCFrameHeaderDataType::c_DHE_START: {
 //       bool ref_flag;
       countedFramesInEvent++;
       number_dhe_frames++;
@@ -1529,7 +1508,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       eventNrOfDHEStartFrame = eventNrOfThisFrame;
       if (countedDHEStartFrames != countedDHEEndFrames) {
-        B2ERROR("DHC_FRAME_HEADER_DATA_TYPE_DHE_START without DHC_FRAME_HEADER_DATA_TYPE_DHE_END");
+        B2ERROR("EDHCFrameHeaderDataType::c_DHE_START without EDHCFrameHeaderDataType::c_DHE_END");
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START_WO_END;
       }
       countedDHEStartFrames++;
@@ -1576,7 +1555,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (dhc.data_dhe_start_frame->getFixedSize() / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_GHOST: {
+    case EDHCFrameHeaderDataType::c_GHOST: {
       countedFramesInEvent++;
       if (verbose)dhc.data_ghost_frame->print();
       if (currentDHEID != dhc.data_ghost_frame->getDHEId()) {
@@ -1591,7 +1570,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (dhc.data_ghost_frame->getFixedSize() / 4);
       break;
     }
-    case DHC_FRAME_HEADER_DATA_TYPE_DHC_END: {
+    case EDHCFrameHeaderDataType::c_DHC_END: {
       if (dhc.data_dhc_end_frame->isFakedData() != isFakedData_event) {
         B2ERROR("DHC END is but no Fake event OR Fake Event but DHE END is not.");
       }
@@ -1663,7 +1642,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC = 0;
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_DHE_END: {
+    case EDHCFrameHeaderDataType::c_DHE_END: {
       countedFramesInEvent++;
       if (verbose) dhc.data_dhe_end_frame->print();
       if (currentDHEID != dhc.data_dhe_end_frame->getDHEId()) {
@@ -1681,7 +1660,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       }
       countedDHEEndFrames++;
       if (countedDHEStartFrames != countedDHEEndFrames) {
-        B2ERROR("DHC_FRAME_HEADER_DATA_TYPE_DHE_END without DHC_FRAME_HEADER_DATA_TYPE_DHE_START");
+        B2ERROR("EDHCFrameHeaderDataType::c_DHE_END without EDHCFrameHeaderDataType::c_DHE_START");
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
       }
       if (eventNrOfThisFrame != eventNrOfDHEStartFrame) {
@@ -1701,7 +1680,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       counted32bWordsInDHC += (dhc.data_dhe_end_frame->getFixedSize() / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI: {
+    case EDHCFrameHeaderDataType::c_ONSEN_ROI: {
       countedFramesInEvent++;// += 0; /// DO NOT COUNT!!!! Count when comparing countedFramesInEvent to number of frames in index frame
       if (verbose) dhc.data_onsen_roi_frame->print();
       m_errorMask |= dhc.data_onsen_roi_frame->check_error();// dummy
@@ -1710,7 +1689,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       if (!m_doNotStore) dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
       break;
     }
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG: {
+    case EDHCFrameHeaderDataType::c_ONSEN_TRG: {
       countedFramesInEvent++;//+= 0; /// DO NOT COUNT!!!! Count when comparing countedFramesInEvent to number of frames in index frame
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
 
@@ -1806,13 +1785,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
   if (Frame_Number == 0) {
     /// Check that DHC Start is first Frame
-    if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG) {
+    if (type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {
       B2ERROR("First frame is not a ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_FIRST;
     }
   } else { // (Frame_Number != 0 &&
     /// Check that there is no other DHC Start
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG) {
+    if (type == EDHCFrameHeaderDataType::c_ONSEN_TRG) {
       B2ERROR("More than one ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_FIRST;
     }
@@ -1820,13 +1799,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
   if (Frame_Number == 1) {
     /// Check that DHC Start is first Frame
-    if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+    if (type != EDHCFrameHeaderDataType::c_DHC_START) {
       B2ERROR("Second frame is not a DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_DHC_START_SECOND;
     }
   } else { // (Frame_Number != 0 &&
     /// Check that there is no other DHC Start
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
+    if (type == EDHCFrameHeaderDataType::c_DHC_START) {
       B2ERROR("More than one DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_DHC_START_SECOND;
     }
@@ -1834,7 +1813,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
   if (Frame_Number == Frames_in_event - 1) {
     /// Check that DHC End is last Frame
-    if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
+    if (type != EDHCFrameHeaderDataType::c_DHC_END) {
       B2ERROR("Last frame is not a DHC end of subevent frame in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_DHC_END;
     }
@@ -1852,14 +1831,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     }
   } else { //  (Frame_Number != Frames_in_event - 1 &&
     /// Check that there is no other DHC End
-    if (type == DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
+    if (type == EDHCFrameHeaderDataType::c_DHC_END) {
       B2ERROR("More than one DHC end of subevent frame in frame in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_DHC_END;
     }
   }
 
   /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
-  if (Frame_Number == 2 && nr_active_dhe != 0 && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
+  if (Frame_Number == 2 && nr_active_dhe != 0 && type != EDHCFrameHeaderDataType::c_DHE_START) {
     B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
     m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
   }

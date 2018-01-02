@@ -237,9 +237,14 @@ namespace Belle2 {
     double missingMass(const Particle* part);
 
     /**
-     * returns the magnitude of the difference of the Momenta of signal and tag side in the CMS Frame
+     * returns the difference of the beam momentum and the particle momentum in the lab system
      */
     double missingMomentum(const Particle* part);
+
+    /**
+     * returns the polar angle of the missing momentum vector between the beam and the particle in the lab system
+     */
+    double missingMomentumTheta(const Particle* part);
 
     /**
      * return released energy in decay
@@ -538,6 +543,8 @@ namespace Belle2 {
 
     /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
+     * return 11 and 13 if the ECL Cluster is in gap between barrel and forward respectively backward
+     * return 0 otherwise
      */
     double eclClusterDetectionRegion(const Particle* particle);
 

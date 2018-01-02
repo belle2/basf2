@@ -15,7 +15,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Weightfile.h>

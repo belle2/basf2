@@ -70,6 +70,14 @@ namespace Belle2 {
       /// set to store histogram or not.
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
+      /// output file name
+      void setOutputFileName(std::string outputname) {m_outputFileName.assign(outputname);}
+
+
+
     protected:
 
       /// Run algo on data
@@ -129,7 +137,8 @@ namespace Belle2 {
                            231, 243, 246, 256, 263, 300
                           };
 
-      std::string m_outputXTFileName = "xt_new.dat"; /**< Out put xt filename*/
+      bool  m_textOutput = false; /**< output text file if true */
+      std::string m_outputFileName = "xt_new.dat"; /**< Out put xt filename*/
     };
   }
 }

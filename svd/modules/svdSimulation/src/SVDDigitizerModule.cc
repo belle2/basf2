@@ -685,11 +685,21 @@ void SVDDigitizerModule::saveDigits()
   //               m_relShaperDigitDigitName);
 
   //Set time of the first sample
-
   const double bunchTimeSep = 2 * 1.96516; //in ns
   const int bunchXingsInAPVclock = 8; //m_samplingTime/bunchTimeSep;
   int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
   double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
+
+  //set the DAQ mode to 1, 3, or 6-samples:
+  int daqMode = 3;  //does not correspond to anything expected on data
+  if (m_nAPV25Samples == 6)
+    daqMode = 2;
+  else if (m_nAPV25Samples == 3)
+    daqMode = 1;
+  else if (m_nAPV25Samples == 1)
+    daqMode = 0;
+  else
+    B2WARNING("The number of APV samples that you are simulating is not expected! If you are using the CoG in recontruction, do not expect to get reasonable RecoDigits");
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -791,7 +801,7 @@ void SVDDigitizerModule::saveDigits()
       });
       // Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0,
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
                                                  bunchXingsSinceAPVstart >> 1)));
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -896,7 +906,7 @@ void SVDDigitizerModule::saveDigits()
       });
       // Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0,
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
                                                  bunchXingsSinceAPVstart >> 1)));
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {

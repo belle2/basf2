@@ -10,6 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <reconstruction/modules/KlId/KLMExpert/KLMExpertModule.h>
+#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
@@ -195,12 +196,14 @@ void KLMExpertModule::event()
 
 
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
-      if (isnan(m_feature_variables[i])) { m_feature_variables[i] = -999; }
+      if (std::isfinite(m_feature_variables[i])) { m_feature_variables[i] = -999; }
       m_dataset->m_input[i] = m_feature_variables[i];
     }
 
-    klid = m_klids.appendNew(m_expert->apply(*m_dataset)[0], -1, true, false);
-    cluster.addRelationTo(klid);
+    double IDMVAOut = m_expert->apply(*m_dataset)[0];
+    B2DEBUG(175, "KLM Expert classification: " << IDMVAOut);
+    klid = m_klids.appendNew();
+    cluster.addRelationTo(klid, IDMVAOut);
 
   }// for cluster in clusters
 } // event

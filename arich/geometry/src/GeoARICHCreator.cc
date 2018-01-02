@@ -83,16 +83,8 @@ namespace Belle2 {
     }
 
 
-    void GeoARICHCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoARICHCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
-
-      if (type == 0) {
-        B2INFO("Geometry type: Full");
-      } else if (type == 1) {
-        B2INFO("Geometry type: Tracking");
-      } else if (type == 2) {
-        B2INFO("Geometry type: Display");
-      }
 
       m_config.useGeantUnits();
       m_sensitive = new SensitiveDetector();

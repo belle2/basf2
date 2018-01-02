@@ -118,9 +118,9 @@ namespace Belle2 {
     }
 
     if (myExpNo == expNo) {
-      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo);
+      B2DEBUG(1, "MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo);
     } else {
-      B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")");
+      B2DEBUG(1, "MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")");
     }
   }
 

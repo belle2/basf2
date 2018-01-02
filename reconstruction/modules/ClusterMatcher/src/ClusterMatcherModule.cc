@@ -11,7 +11,11 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <reconstruction/dataobjects/KlId.h>
+
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Cluster.h>
+#include <mdst/dataobjects/KlId.h>
 
 
 using namespace Belle2;

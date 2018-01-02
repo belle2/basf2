@@ -95,7 +95,7 @@ void BKLMDigitizerModule::initialize()
 void BKLMDigitizerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, "BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 
   m_MPPCGain = m_ADCParams->getMPPCGain();
   m_ADCOffset = m_ADCParams->getADCOffset();

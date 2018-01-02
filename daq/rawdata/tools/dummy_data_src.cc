@@ -430,7 +430,7 @@ int main(int argc, char** argv)
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servaddr.sin_port = htons(33000);
+  servaddr.sin_port = htons(30000);
 
   int flags = 1;
   int ret = setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &flags, (socklen_t)sizeof(flags));

@@ -9,6 +9,9 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -25,6 +28,9 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+
+    StoreObjPtr<SoftwareTriggerResult> m_trigResults; /**< Required input for trigger results */
+
     std::vector<std::string> m_triggerLines;
   };
 }

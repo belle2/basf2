@@ -676,12 +676,17 @@ namespace Belle2 {
     double missingMomentum(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector tagVec = T.rotateLabToCms()
-                              * part->getDaughter(0)->get4Vector();
-      TLorentzVector sigVec = T.rotateLabToCms()
-                              * part->getDaughter(1)->get4Vector();
-      TLorentzVector vec = tagVec + sigVec;
-      return vec.Vect().Mag();
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Mag();
+    }
+
+    double missingMomentumTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Theta();
     }
 
 // released energy --------------------------------------------------
@@ -1390,17 +1395,8 @@ namespace Belle2 {
       double result = 0.0;
 
       const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        /// TODO: check if ECLCluster will provide this on its own
-        float theta = shower->getTheta();
-        if (theta < 0.555) {
-          result = 1.0;
-        } else if (theta < 2.26) {
-          result = 2.0;
-        } else {
-          result = 3.0;
-        }
-      }
+      if (shower)
+        result = shower->getDetectorRegion();
 
       return result;
     }
@@ -1944,8 +1940,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("missingMass", missingMass,
                       "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
-                      "Missing Momentum of the Signal Side in CMS Frame");
-
+                      "Missing momentum (magnitude of three-vector) of the particle with respect to the nominal beam momentum in the lab system, pmiss = pbeam - pparticle");
+    REGISTER_VARIABLE("missingMomentumTheta", missingMomentumTheta,
+                      "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -2072,7 +2069,8 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "Returns reconstructed polar angle  region in the ECL (1 - forward, 2 - barrel, 3 - backward).");
+                      "Returns an integer code for the ECL region of a cluster:\n"
+                      "1 - forward, 2 - barrel, 3 - backward, 11 - between FWD and barrel, 13 - between BWD and barrel, 0 - otherwise)");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
                       "Returns DeltaL for the shower shape.\n"
                       "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"

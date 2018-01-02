@@ -6,17 +6,17 @@
 
 #include <iostream>
 
+
+
 ///////////////////////
 // From daqlogget.cc //
 
-#include <daq/slc/database/DAQLogDB.h>
+
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 ///////////////////////
-
-#define ENV_SLC_PATH        "BELLE2_DAQ_SLC"
 
 
 namespace Belle2 {
@@ -40,11 +40,15 @@ namespace Belle2 {
 
 using namespace Belle2;
 
-ErrdiagCallback::ErrdiagCallback(const std::string& name, int timeout)
+ErrdiagCallback::ErrdiagCallback(const std::string& name, const std::string xmlpath, int timeout, int max, int offset)
 {
   LogFile::debug("NSM nodename = %s (timeout: %d seconds)", name.c_str(), timeout);
   setNode(NSMNode(name));
   setTimeout(timeout);
+
+  m_xmlpath = xmlpath;
+  m_max = max;
+  m_offset = offset;
 }
 
 ErrdiagCallback::~ErrdiagCallback() throw()
@@ -55,152 +59,716 @@ void ErrdiagCallback::init(NSMCommunicator&) throw()
 {
   add(new NSMVHandlerInt("ival", true, false, 10));
   add(new NSMVHandlerFloat("fval", true, true, 0.1));
-  add(new ErrdiagVHandler("tval", "example"));
+  add(new ErrdiagVHandler("tval", "No data"));
 
-  char temp_path[256];
-  const std::string slc_path = getenv(ENV_SLC_PATH);
-
-  sprintf(temp_path, "%s/data/errdiag/HLT_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_hlt);
-
-  sprintf(temp_path, "%s/data/errdiag/CPRROPC_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_cprropc);
-
-  sprintf(temp_path, "%s/data/errdiag/EB_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_eb);
-
-  sprintf(temp_path, "%s/data/errdiag/SLC_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_slc);
-
-  sprintf(temp_path, "%s/data/errdiag/TTD_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_ttd);
-
-  sprintf(temp_path, "%s/data/errdiag/FEE_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_fee);
-
-  sprintf(temp_path, "%s/data/errdiag/STORAGE_Diagnosis.xml", slc_path.c_str());
-  read_xml(temp_path, m_pt_storage);
+  //  read_xml("/home/usr/yamadas/slc/database/tools/temp2.xml", m_pt);
+  read_xml(m_xmlpath, m_pt);
 
   ConfigFile config("slowcontrol");
-  PostgreSQLInterface db(config.get("database.host"),
-                         config.get("database.dbname"),
-                         config.get("database.user"),
-                         config.get("database.password"),
-                         config.getInt("database.port"));
-
-  m_db = &db;
+  static PostgreSQLInterface db_temp(config.get("database.host"),
+                                     config.get("database.dbname"),
+                                     config.get("database.user"),
+                                     config.get("database.password"),
+                                     config.getInt("database.port"));
+  db = &db_temp;
+  //  db = &db_temp;
+  // PostgreSQLInterface db(config.get("database.host"),
+  //                        config.get("database.dbname"),
+  //                        config.get("database.user"),
+  //                        config.get("database.password"),
+  //                        config.getInt("database.port"));
 
 }
 
 void ErrdiagCallback::timeout(NSMCommunicator&) throw()
 {
+  int ival = rand() % 256;
+  set("ival", ival);
+  LogFile::debug("ivaldfsdfdsfse updated: %d", ival);
 
-  const std::string tablename = "logdaq";
-  int max = 3;
+  //  read_xml("/home/usr/yamadas/slc/database/tools/temp2.xml", m_pt);
 
+  //  const std::string tablename = argv[1];
+  const std::string tablename = "logtest";
   std::string nodename;
   std::stringstream ss_begin;
   std::stringstream ss_end;
   bool colored = true;
+  ///06/03 00:00:00f, eYYYY/MM/DD HH24:MI:SSf)
+  //(timestamp '2000-09-01 01:00:00')
+
+  ss_begin << "(timestamp '2017-12-23 17:46:41')";
+  ss_end << "(timestamp '2017-12-23 17:49:17')"; // "2017-12-23 17:49:17";
+
+  // ss_begin << "2017-12-23 17:46:41";
+  // ss_end << "2017-12-23 17:49:17"; // "2017-12-23 17:49:17";
+
+  // ConfigFile config("slowcontrol");
+  // PostgreSQLInterface db1(config.get("database.host"),
+  //                        config.get("database.dbname"),
+  //                        config.get("database.user"),
+  //                         config.get("database.password"),
+  //                        config.getInt("database.port"));
+
+  //  printf("Check 1 db %p db1=%p\n",db, &db1);fflush(stdout);
+
+  map_init();
+
+  DAQLogMessageList logs = DAQLogDB::getLogs(*db, tablename, nodename,
+                                             //               "","2017-12-10 18:00:00" , max );
+                                             m_max, m_offset);
+  //                                             ss_begin.str(), ss_end.str(), max);
+
+  int running = -1;
+  int log_size = logs.size();
+
+  std::vector< run_state > state;
+  std::vector<int> err_state;
+
+  std::vector< std::vector<int> > HLT_fatal_linenum;
+  std::vector< std::vector<int> > ROPC_fatal_linenum;
+  std::vector< std::vector<int> > CPR_fatal_linenum;
+
+  //  for (size_t i = 0; i < log_size; i++) {
+  for (int i = log_size - 1 ; i >= 0; i--) {
+    std::string str_mes = logs[i].getMessage();
+    std::string str_pri = logs[i].getPriorityText();
+    std::string str_nod = logs[i].getNodeName();
+    if (str_mes.find("STARTING") != std::string::npos) {
+      if (running != 2) {
+        std::cout << "[" << logs[i].getDate().toString() << "] STARTED : " <<  str_mes << std::endl;
+        running = 2;
+        run_state temp;
+        temp.state = running;
+        temp.line = i;
+        state.push_back(temp);
+      }
+    } else if (str_mes.find("ABORTING") != std::string::npos) {
+      if (running != 0) {
+        std::cout << "[" << logs[i].getDate().toString() << "] ABORTED : " <<  str_mes << std::endl;
+        running = 0;
+        run_state temp;
+        temp.state = running;
+        temp.line = i;
+        state.push_back(temp);
+      }
+
+    } else if (str_mes.find("LOADING") != std::string::npos) {
+      if (running != 1) {
+        std::cout << "[" << logs[i].getDate().toString() << "] LOADED : " <<  str_mes << std::endl;
+        running = 1;
+        for (int j = 0; j < err_state.size(); j++) {
+          err_state[j] = -1;
+        }
+        run_state temp;
+        temp.state = running;
+        temp.line = i;
+        state.push_back(temp);
+
+      }
+    }
+
+    // std::cout << i << " " << running << "[" << logs[i].getNodeName() << "] ["
+    //              << logs[i].getDate().toString() << "] ["
+    //              << logs[i].getPriorityText() << "] "
+    //              << logs[i].getMessage()  << std::endl;
 
 
-  DAQLogMessageList logs = DAQLogDB::getLogs(*m_db, tablename, nodename,
-                                             ss_begin.str(), ss_end.str(), max);
+    int same_node = 0;
+    for (int j = 0; j < err_state.size(); j++) {
+      if (err_state[j] < 0) continue;
+      if (str_nod == logs[ err_state[ j ] ].getNodeName()) {
+        ROPC_fatal_linenum[j].push_back(i);
+        same_node = 1;
+      }
+    }
+    if (same_node == 0) {
+      if (str_pri.find("FATAL") != std::string::npos) {
+        err_state.push_back(i);
+        std::vector<int> temp;
+        temp.push_back(i);
+        ROPC_fatal_linenum.push_back(temp);
+        // for( int i = 0;  i < ROPC_fatal_linenum.size(); i++ ){
+        //   std::cout << "Filled : " << i << " " << ROPC_fatal_linenum[i].size() << " " << temp.size() << std::endl;
+        // }
+      }
+    }
+  }
 
+  //    show( m_pt, logs[i].getMessage() );
 
-  for (size_t i = 0; i < logs.size(); i++) {
-    // if (colored) {
-    //   switch (logs[i].getPriority()) {
-    //     case LogFile::DEBUG:   std::cout << "\x1b[49m\x1b[39m"; break;
-    //     case LogFile::INFO:    std::cout << "\x1b[49m\x1b[32m"; break;
-    //     case LogFile::NOTICE:  std::cout << "\x1b[49m\x1b[34m"; break;
-    //     case LogFile::WARNING: std::cout << "\x1b[49m\x1b[35m"; break;
-    //     case LogFile::ERROR:   std::cout << "\x1b[49m\x1b[31m"; break;
-    //     case LogFile::FATAL:   std::cout << "\x1b[41m\x1b[37m"; break;
-    //     default: break;
-    //   }
-    // }
-    std::cout << "[" << logs[i].getNodeName() << "] ["
-              << logs[i].getDate().toString() << "] ["
-              << logs[i].getPriorityText() << "] "
-              << logs[i].getMessage() << std::endl;
+  // if (colored) {
+  //   std::cout << "\x1b[49m\x1b[39m";
+  // }
+  // std::cout << std::endl;
 
-    show(m_pt_fee, logs[i].getMessage());
-    show(m_pt_ttd, logs[i].getMessage());
-    show(m_pt_cprropc, logs[i].getMessage());
-    show(m_pt_hlt, logs[i].getMessage());
-    show(m_pt_eb, logs[i].getMessage());
-    show(m_pt_storage, logs[i].getMessage());
-    show(m_pt_slc, logs[i].getMessage());
-    // if (colored) {
-    //   std::cout << "\x1b[49m\x1b[39m";
-    // }
-    //    std::cout << std::endl;
+//  std::cout << "ROPC error" << std::endl;
+  int state_pos = 0;
+  for (int i = 0;  i < ROPC_fatal_linenum.size(); i++) {
+    //    std::cout << "RUN STATE :err line " << ROPC_fatal_linenum[i][0] << " statesize " << state.size() << " stateline " << state[state_pos].line << " pos " << state_pos << std::endl;
+    for (int j = state_pos;  j < state.size(); j++) {
+      if (ROPC_fatal_linenum[i][0] > state[state_pos].line) {
+        break;
+      } else {
+        std::cout << "RUN STATE " << state[state_pos].state << std::endl;
+        state_pos++;
+      }
+    }
+    analysis(m_pt, logs, ROPC_fatal_linenum[i]);
+    for (int j = 0;  j < ROPC_fatal_linenum[i].size(); j++) {
+      int k = ROPC_fatal_linenum[i][j];
+    }
   }
 }
 
 
-int ErrdiagCallback::test1() throw()
-{
-  printf("Test1 function is called\n");
-  return 0;
-}
 
 int ErrdiagCallback::test2() throw()
 {
   printf("Test2 function is called\n");
-  return 0;
+}
+
+void ErrdiagCallback::map_init() throw()
+{
+  // COPPER
+  m_map["cpr_eagain"] = &cpr_eagain;
+  m_map["cpr_read_err"] = &cpr_read_err;
+  m_map["cpr_read_less"] = &cpr_read_less;
+  m_map["cpr_read_more"] = &cpr_read_more;
+  m_map["cpr_bad_slot_arg"] = &cpr_bad_slot_arg;
+  m_map["cpr_open_err"] = &cpr_open_err;
+  m_map["cpr_eagain"] = &cpr_eagain;
+  m_map["cpr_read_err"] = &cpr_read_err;
+  m_map["rpc_no_resolve"] = &rpc_no_resolve;
+  m_map["rpc_sendhdr_err"] = &rpc_sendhdr_err;
+  m_map["rpc_sendhdr_err"] = &rpc_sendhdr_err;
+  m_map["rpc_b2l_hdrtrl_mismatch"] = &rpc_b2l_hdrtrl_mismatch;
+  m_map["rpc_redsize_err"] = &rpc_redsize_err;
+  m_map["no_cprdata"] = &no_cprdata;
+  m_map["no_resolve"] = &no_resolve;
+  m_map["failed_to_bind"] = &failed_to_bind;
+  m_map["failed_to_accept"] = &failed_to_accept;
+  m_map["failed_toset_timeout"] = &failed_toset_timeout;
+  m_map["post_nocpr_ctr"] = &post_nocpr_ctr;
+  m_map["post_nofunc"] = &post_nofunc;
+  m_map["post_nofunc"] = &post_nofunc;
+  m_map["rcpr_invalid_format_ver"] = &rcpr_invalid_format_ver;
+  m_map["rftsw_event_jump"] = &rftsw_event_jump;
+  m_map["rftsw_invalid_ftsw_length"] = &rftsw_invalid_ftsw_length;
+  m_map["rftsw_invalid_magic"] = &rftsw_invalid_magic;
+  m_map["rcpr_bad_slot_arg"] = &rcpr_bad_slot_arg;
+  m_map["rcpr_bad_slot_arg"] = &rcpr_bad_slot_arg;
+  m_map["rcpr_bad_slot_arg"] = &rcpr_bad_slot_arg;
+  m_map["rcpr_nohslb_indata"] = &rcpr_nohslb_indata;
+  m_map["rcpr_diff_evenum_hslbs"] = &rcpr_diff_evenum_hslbs;
+  m_map["rcpr_nofunc"] = &rcpr_nofunc;
+  m_map["rcpr_nofunc"] = &rcpr_nofunc;
+  m_map["rdblk_nolength"] = &rdblk_nolength;
+  m_map["rdblk_invalid_blocknum"] = &rdblk_invalid_blocknum;
+  m_map["rdblk_strange_length"] = &rdblk_strange_length;
+  m_map["rdblk_invalid_length"] = &rdblk_invalid_length;
+  m_map["pre_invalid_cpr_magic_1"] = &pre_invalid_cpr_magic_1;
+  m_map["pre_bad_slot_argument"] = &pre_bad_slot_argument;
+  m_map["pre_no_hslb_data"] = &pre_no_hslb_data;
+  m_map["pre_diff_eve_overhslb"] = &pre_diff_eve_overhslb;
+  m_map["pre_old_format"] = &pre_old_format;
+  m_map["pre_invalid_cpr_magic_2"] = &pre_invalid_cpr_magic_2;
+  m_map["pre_diff_length"] = &pre_diff_length;
+  m_map["pre_eve_jump"] = &pre_eve_jump;
+  m_map["pre_cprcounter_jump"] = &pre_cprcounter_jump;
+  m_map["pre_invalidevenum_runstart"] = &pre_invalidevenum_runstart;
+  m_map["pre_cprdrv_chksum_err"] = &pre_cprdrv_chksum_err;
+  m_map["pre_rcpr_chksum_err"] = &pre_rcpr_chksum_err;
+  m_map["pre_mismatch_hdr_over_hslbs"] = &pre_mismatch_hdr_over_hslbs;
+  m_map["pre_mismatch_b2lhdr_trl"] = &pre_mismatch_b2lhdr_trl;
+  m_map["pre_invalid_blocknum"] = &pre_invalid_blocknum;
+  m_map["pre_nohslb"] = &pre_nohslb;
+  m_map["pre_invalid_length"] = &pre_invalid_length;
+  m_map["pre_cprdrb_chksum_err"] = &pre_cprdrb_chksum_err;
+  m_map["pre_invalid_magic"] = &pre_invalid_magic;
+  m_map["pre_event_jump"] = &pre_event_jump;
+  m_map["pre_oldftsw_firmware"] = &pre_oldftsw_firmware;
+  m_map["pre_nohslb_data"] = &pre_nohslb_data;
+  m_map["pre_hslb_datasize_small"] = &pre_hslb_datasize_small;
+  m_map["pre_xor_chksum_err"] = &pre_xor_chksum_err;
+  m_map["pre_CRC16_err"] = &pre_CRC16_err;
+  m_map["pre_CRC16_err"] = &pre_CRC16_err;
+  m_map["pre_nofunc"] = &pre_nofunc;
+  m_map["pre_invalid_slot_arg"] = &pre_invalid_slot_arg;
+  m_map["post_strange_nwords"] = &post_strange_nwords;
+  m_map["post_noevenum"] = &post_noevenum;
+  m_map["post_xor_chksum_err"] = &post_xor_chksum_err;
+  m_map["post_no_magic_cprhdr"] = &post_no_magic_cprhdr;
+  m_map["post_nofunc"] = &post_nofunc;
+  m_map["post_nofunc"] = &post_nofunc;
+  m_map["post_nofunc"] = &post_nofunc;
+  m_map["post_nodata"] = &post_nodata;
+  m_map["post_CrC16_err"] = &post_CrC16_err;
+  m_map["post_CrC16_err"] = &post_CrC16_err;
+
+  //  m_func[0] = &invalid_event_num;
+
+//   // ROPC
+
+//   //
+}
+
+
+
+void ErrdiagCallback::analysis(ptree pt, DAQLogMessageList& logs, std::vector<int>& err_line) throw()
+{
+
+  BOOST_FOREACH(const ptree::value_type & child, pt.get_child("ErrorMessageDiagnosis")) {
+    //    const boost::proxperty_tree::ptree &pt_child = child.second();
+    boost::optional<std::string> mesg = child.second.get_optional<std::string>("Message");
+    // std::cout << "MES :[" << logs[err_line[0]].getMessage() << "]" << std::endl;
+    // std::cout << "XML :[" << mesg  << "]"<< std::endl;
+
+    if ((int)((logs[err_line[0]].getMessage()).find(mesg->c_str()))  >= 0) {       // string::nopos = -1
+
+      boost::optional<std::string> diag = child.second.get_optional<std::string>("Diagnosis");
+      boost::optional<std::string> funcname = child.second.get_optional<std::string>("Function");
+      //      std::string str5 = str4->c_str();
+      //      printf( "%p\n",m_map[*str4]);
+      function func = m_map[*funcname];
+      if (func != NULL) {
+        std::string temp_str;
+        func(logs, err_line, temp_str);
+        std::cout << "FUNCTION : " << funcname << " " << temp_str << std::endl;
+        temp_str = logs[err_line[0]].getNodeName() + " : " + temp_str;
+        set("tval", temp_str);
+      }
+
+
+      //      temp_func[0](logs, err_line);
+
+      //      std::cout << str << std::endl;
+      //      std::cout << str3 << std::endl;
+      // std::cout << str3 << std::endl;
+      // set( "tval", str3->c_str() );
+      // if( std::strcmp( str4->c_str(), "TEST1" ) == 0 ){
+      //  printf("Check 4.1\n"); fflush(stdout);
+      //  test1();
+      //  printf("Check 4.2\n"); fflush(stdout);
+      // }else if( std::strcmp( str4->c_str(), "TEST2" ) == 0 ){
+      //  printf("Check 4.3\n"); fflush(stdout);
+      //  test2();
+      //  printf("Check 4.4\n"); fflush(stdout);
+      // }
+    } else {
+      //      std::cout << str2 << std::endl;
+    }
+  }
+  int ival = rand() % 256;
+  set("ival", ival);
+  //  LogFile::debug("ival updated: %d", ival);
+  return;
+
 }
 
 
 void ErrdiagCallback::show(ptree pt, std::string str) throw()
 {
-  printf("mon 1 %s\n", str.c_str());
-  std::string tval = "I have no idea.";
 
   BOOST_FOREACH(const ptree::value_type & child, pt.get_child("ErrorMessageDiagnosis")) {
-    printf("mon 1.5\n");
-    //    const boost::property_tree::ptree &pt_child = child.second();
+    //    const boost::proxperty_tree::ptree &pt_child = child.second();
     boost::optional<std::string> str2 = child.second.get_optional<std::string>("Message");
-    printf("mon 2 : %s\n", str2->c_str());
     if ((int)(str.find(str2->c_str()))  >= 0) {    // string::nopos = -1
-      printf("mon 3\n");
-
       boost::optional<std::string> str3 = child.second.get_optional<std::string>("Diagnosis");
       boost::optional<std::string> str4 = child.second.get_optional<std::string>("Function");
-
       //      std::cout << str << std::endl;
       //      std::cout << str3 << std::endl;
-      //      std::cout << str4 << std::endl;
-      //      printf("mon 4 %s %s\n", tval.c_str());
-      tval = *str3;
-      printf("mon 5\n");
-
-      //      strcpy( const_cast<char*>(tval.c_str()), str3->c_str() );
-
-      //      sprintf( tval.c_str(), "%s", str4->c_str() );
-
-
-      if (str4 != boost::none) {
-        printf("mon 5.1\n");
-        if (std::strcmp(str4->c_str(), "TEST1") == 0) {
-          printf("mon 5.2\n");
-          test1();
-        } else if (std::strcmp(str4->c_str(), "TEST2") == 0) {
-          printf("mon 5.3\n");
-          test2();
-        }
-      }
-      printf("mon 6\n");
-      set("tval", tval.c_str());
-      LogFile::debug("tval updated: %s", tval.c_str());
-
+      //      std::cout << str3 << std::endl;
+      //      set( "tval", str3->c_str() );
+      // if( std::strcmp( str4->c_str(), "TEST1" ) == 0 ){
+      //  printf("Check 4.1\n"); fflush(stdout);
+      //  test1();
+      //  printf("Check 4.2\n"); fflush(stdout);
+      // }else if( std::strcmp( str4->c_str(), "TEST2" ) == 0 ){
+      //  printf("Check 4.3\n"); fflush(stdout);
+      //  test2();
+      //  printf("Check 4.4\n"); fflush(stdout);
+      // }
     } else {
       //      std::cout << str2 << std::endl;
     }
   }
-  printf("mon 7\n");
-  //  printf("Set\n");fflush(stdout);
-  printf("mon 9\n");
+  int ival = rand() % 256;
+  set("ival", ival);
+  //  LogFile::debug("ival updated: %d", ival);
   return;
+}
+
+
+
+int ErrdiagCallback::cpr_eagain(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::cpr_read_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::cpr_read_less(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::cpr_read_more(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::cpr_bad_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::cpr_open_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rpc_no_resolve(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rpc_sendhdr_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rpc_b2l_hdrtrl_mismatch(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rpc_redsize_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::no_cprdata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::no_resolve(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::failed_to_bind(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::failed_to_accept(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::failed_toset_timeout(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_nocpr_ctr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_invalid_format_ver(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rftsw_event_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rftsw_invalid_ftsw_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rftsw_invalid_magic(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_bad_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_nohslb_indata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_diff_evenum_hslbs(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_nolength(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_invalid_blocknum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_strange_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_invalid_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_cpr_magic_1(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_bad_slot_argument(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_no_hslb_data(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_diff_eve_overhslb(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_old_format(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_cpr_magic_2(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_diff_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_eve_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_cprcounter_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalidevenum_runstart(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_cprdrv_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_rcpr_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_mismatch_hdr_over_hslbs(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_mismatch_b2lhdr_trl(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_blocknum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_nohslb(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_cprdrb_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_magic(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_event_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_oldftsw_firmware(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_nohslb_data(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_hslb_datasize_small(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_CRC16_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_strange_nwords(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_noevenum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_no_magic_cprhdr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_nodata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
+}
+
+int ErrdiagCallback::post_CrC16_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Call the DAQ expert.";
+  return 0;
 }

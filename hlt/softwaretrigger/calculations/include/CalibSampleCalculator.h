@@ -40,6 +40,9 @@ namespace Belle2 {
 
 
     private:
+      StoreObjPtr<ParticleList> m_particleList; /** required input for ParticleList */
+
+
       /**the name of particle list*/
       std::vector<std::string> m_particlelist;
 

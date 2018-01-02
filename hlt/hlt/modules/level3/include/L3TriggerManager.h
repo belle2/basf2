@@ -12,6 +12,9 @@
 #define L3TRIGGERMANAGER_H
 
 #include "hlt/hlt/modules/level3/FTList.h"
+#include <framework/datastore/StoreArray.h>
+#include "hlt/hlt/dataobjects/L3Tag.h"
+#include "mdst/dataobjects/HLTTag.h"
 
 namespace Belle2 {
   class L3TriggerBase;
@@ -42,6 +45,8 @@ namespace Belle2 {
     //! data members
     int m_saveData;
   private:
+    StoreArray<HLTTag> m_hltTag; /** Array for HLT tag */
+    StoreArray<L3Tag> m_l3Tag;   /** array for L3 tag */
 
     //! data members
     FTList<L3TriggerBase*> m_triggers;

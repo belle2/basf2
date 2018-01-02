@@ -58,7 +58,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 void VariablesToNtupleModule::initialize()
 {
   if (not m_particleList.empty())
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
 
   // Initializing the output root file

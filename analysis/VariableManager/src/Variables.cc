@@ -2041,7 +2041,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
-                      "Returns the maximum angle between the Particle and all KLM clusters in the event.");
+                      "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");

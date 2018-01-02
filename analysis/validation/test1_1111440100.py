@@ -6,7 +6,7 @@
 <header>
   <input>../1111440100.dst.root</input>
   <output>../1111440100.ntup.root</output>
-  <contact>"A Morda" <morda@pd.infn.it>, "Jan Strube" <jan.strube@desy.de></contact>
+  <contact>A Morda; morda@pd.infn.it</contact>
 </header>
 """
 
@@ -33,12 +33,6 @@ from stdFSParticles import *
 from variables import variables
 from ROOT import Belle2
 from glob import glob
-
-variables.addAlias('piExpertPID_ALL', 'pidProbabilityExpert(211, ALL)')
-variables.addAlias('muExpertPID_ALL', 'pidProbabilityExpert(13, ALL)')
-variables.addAlias('eExpertPID_ALL', 'pidProbabilityExpert(11, ALL)')
-variables.addAlias('KExpertPID_ALL', 'pidProbabilityExpert(321, ALL)')
-variables.addAlias('pExpertPID_ALL', 'pidProbabilityExpert(2212, ALL)')
 
 set_log_level(LogLevel.ERROR)
 
@@ -114,9 +108,6 @@ tools += ['MCKinematics', "^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]"]
 tools += ['MCVertex', "^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]"]
 tools += ['MCTagVertex', '^B0']
 tools += ['MCDeltaT', '^B0']
-tools += ['PID', "B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]"]
-tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
-          "B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]"]
 
 ntupleFile('../1111440100.ntup.root')
 ntupleTree('B0', 'B0', tools)

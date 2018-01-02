@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDAQDHCSTATUS_H
-#define PXDDAQDHCSTATUS_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -78,9 +77,20 @@ namespace Belle2 {
     };
 
 
+    unsigned short getDHCID(void) const { return m_dhcID;};
     void setDHCID(int dhcid) {m_dhcID = dhcid;};
 
     void setCounters(uint32_t raw, uint32_t red) {m_rawCount = raw; m_redCount = red;};
+
+    //iterator-based iteration
+    std::vector<PXDDAQDHEStatus>::const_iterator dhe_begin() const
+    {
+      return m_pxdDHE.begin();
+    }
+    std::vector<PXDDAQDHEStatus>::const_iterator dhe_end() const
+    {
+      return m_pxdDHE.end();
+    }
 
   private:
 
@@ -95,11 +105,9 @@ namespace Belle2 {
 
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
-    ClassDef(PXDDAQDHCStatus, 1)
+//     ClassDef(PXDDAQDHCStatus, 1)
 
   }; // class PXDDAQDHCStatus
 
 
 } // end namespace Belle2
-
-#endif

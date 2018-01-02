@@ -102,7 +102,7 @@ namespace Belle2 {
 //       StoreArray<PXDDAQDHCStatus> m_storeDHCStats;
 //       /** Output array for DAQ Status/Packet. */
 //       StoreArray<PXDDAQPacketStatus> m_storeDAQPktStats;
-//       /** Output array for DAQ Status. */
+      /** Output array for DAQ Status. */ // TODO Why Array, can be object?
       StoreArray<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;

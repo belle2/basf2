@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDERRORFLAGS_H
-#define PXDERRORFLAGS_H
+#pragma once
 
 #include <string>
 
@@ -105,5 +104,3 @@ namespace Belle2 {
 
   } // end namespace PXD
 } // end namespace Belle2
-
-#endif

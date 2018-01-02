@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDAQPACKETSTATUS_H
-#define PXDDAQPACKETSTATUS_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -73,6 +72,18 @@ namespace Belle2 {
 
     void addDHC(PXDDAQDHCStatus& daqdhcstat) {m_pxdDHC.push_back(daqdhcstat);};
 
+    //iterator-based iteration
+    std::vector<PXDDAQDHCStatus>::const_iterator dhc_begin() const
+    {
+      return m_pxdDHC.begin();
+    }
+    std::vector<PXDDAQDHCStatus>::const_iterator dhc_end() const
+    {
+      return m_pxdDHC.end();
+    }
+
+    unsigned short getPktIndex(void) const { return m_index;};
+
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this Packet/sensor */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
@@ -82,11 +93,9 @@ namespace Belle2 {
 
     std::vector <PXDDAQDHCStatus> m_pxdDHC;
 
-    ClassDef(PXDDAQPacketStatus, 1)
+    // ClassDef(PXDDAQPacketStatus, 1)
 
   }; // class PXDDAQPacketStatus
 
 
 } // end namespace Belle2
-
-#endif

@@ -72,6 +72,8 @@ namespace Belle2 {
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
 
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
+    unsigned short getDHEID(void) const { return  m_dheID;};
+    VxdID getSensorID(void) const { return m_sensorID;};
 
     void setCounters(uint32_t raw, uint32_t red) {m_rawCount = raw; m_redCount = red;};
 
@@ -86,7 +88,7 @@ namespace Belle2 {
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
 
-    ClassDef(PXDDAQDHEStatus, 1)
+    // ClassDef(PXDDAQDHEStatus, 1)
 
   }; // class PXDDAQDHEStatus
 

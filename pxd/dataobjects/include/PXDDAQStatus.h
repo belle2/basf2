@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDAQSTATUS_H
-#define PXDDAQSTATUS_H
+#pragma once
 
 // #include <framework/datastore/RelationsObject.h>
 #include <pxd/dataobjects/PXDDAQPacketStatus.h>
@@ -89,6 +88,16 @@ namespace Belle2 {
 
     void addPacket(PXDDAQPacketStatus& daqpktstat) {m_pxdPacket.push_back(daqpktstat);};
 
+    //iterator-based iteration
+    std::vector<PXDDAQPacketStatus>::const_iterator pkt_begin() const
+    {
+      return m_pxdPacket.begin();
+    }
+    std::vector<PXDDAQPacketStatus>::const_iterator pkt_end() const
+    {
+      return m_pxdPacket.end();
+    }
+
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this DHC/sensor */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
@@ -105,5 +114,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif

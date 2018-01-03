@@ -222,7 +222,7 @@ def add_phokhara_generator(path, finalstate=''):
     :param finalstate: One of the possible final states using the PHOKHARA particle naming
     """
 
-    phokhara = path.add_module('')
+    phokhara = path.add_module('PhokharaInput')
 
     if finalstate == 'mu+mu-':
         phokhara.param('FinalState', 0)

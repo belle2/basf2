@@ -4,24 +4,18 @@
 """
 <header>
   <input>../mdst-xi-lambda.root</input>
-  <output>../ana-xi-lambda.root</output>
-  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
+  <output>../PIDProtons.ntup.root</output>
+  <contact>"Jan Strube <jan.strube@desy.de></contact>
 </header>
 """
 
 #######################################################
-#
-# Obtain p samples for PID performance validation
-# from Xi decays to Lambda
 #
 # ccbar -> Xi- anything
 #           |
 #           +-> Labmda:ppi pi-
 #                |
 #                +-> p+ pi-
-#
-#
-# Contributors: Jake Bennett (July 2016)
 #
 ######################################################
 
@@ -30,24 +24,30 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 from stdFSParticles import *
+from variables import variables
+
+variables.addAlias('piExpertPID_ALL', 'pidProbabilityExpert(211, ALL)')
+variables.addAlias('muExpertPID_ALL', 'pidProbabilityExpert(13, ALL)')
+variables.addAlias('eExpertPID_ALL', 'pidProbabilityExpert(11, ALL)')
+variables.addAlias('KExpertPID_ALL', 'pidProbabilityExpert(321, ALL)')
+variables.addAlias('pExpertPID_ALL', 'pidProbabilityExpert(2212, ALL)')
 
 # load input ROOT file
 inputMdst('default', '../mdst-xi-lambda.root')
+
+set_log_level(LogLevel.ERROR)
 
 # --------------------------------------------------
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-fillParticleList('pi+:xi', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
-fillParticleList('pi+:all', 'chiProb > 0.001')
-fillParticleList('p+:all', 'chiProb > 0.001')
-
-
+loadStdCharged()
 # reconstruct Lambda:ppi
 reconstructDecay('Lambda0:ppi -> p+:all pi-:all', '1.100 < M < 1.130')
 massVertexRave('Lambda0:ppi', 0.001)
 
 # reconstruct the Xi+ from the Lambda:ppi and pi+:all
+fillParticleList('pi+:xi', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
 reconstructDecay('Xi-:sig -> Lambda0:ppi pi-:xi', '1.300 < M < 1.340')
 vertexRave('Xi-:sig', 0.001)
 
@@ -60,12 +60,14 @@ vertexRave('Xi-:sig', 0.001)
 toolsnu = ['EventMetaData', '^Xi-']
 toolsnu += ['Kinematics', '^Xi- -> [^Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 toolsnu += ['InvMass[BeforeFit]', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
-toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 toolsnu += ['Vertex', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['FlightInfo', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
+toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
+toolsnu += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+            'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 
 # write out the flat ntuple
-ntupleFile('../ana-xi-lambda.root')
+ntupleFile('../PIDProtons.ntup.root')
 ntupleTree('xitree', 'Xi-:sig', toolsnu)
 
 

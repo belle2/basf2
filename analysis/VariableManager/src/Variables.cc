@@ -2038,7 +2038,6 @@ namespace Belle2 {
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
     REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
                       " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
-
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,

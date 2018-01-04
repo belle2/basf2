@@ -25,6 +25,18 @@
 namespace Belle2 {
   namespace Variable {
 
+    double L1Trigger(const Particle* part)
+    {
+      const unsigned int ntrgWords = 10;
+
+      StoreObjPtr<TRGSummary> trg;
+      for (unsigned int i = 0; i < ntrgWords; ++i) {
+        if (trg->getTRGSummary(i) > 0) return 1.0;
+      }
+
+      return 0.0;
+    }
+
     double L1TriggerBit(const Particle* part, const std::vector<double>& bit)
     {
       double isL1Trigger = 0.0;
@@ -72,6 +84,8 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("L1Trigger");
+    REGISTER_VARIABLE("L1Trigger", L1Trigger ,
+                      "Returns 1 if at least one L1 trigger bit is true.");
     REGISTER_VARIABLE("L1TriggerBit(i)", L1TriggerBit ,
                       "Returns the status of i-th trigger bit.");
     REGISTER_VARIABLE("L1TriggerBitPrescale(i)", L1TriggerBitPrescale,

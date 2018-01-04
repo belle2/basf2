@@ -19,6 +19,11 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * returns true if any L1 trigger bit is true
+     */
+    double L1Trigger(const Particle*);
+
+    /**
      * returns trigger status for a given bit trigger bit
      */
     double L1TriggerBit(const Particle*, const std::vector<double>& bit);

@@ -46,7 +46,7 @@ StorageSerializerModule::~StorageSerializerModule() { }
 void StorageSerializerModule::initialize()
 {
   m_msghandler = new MsgHandler(m_compressionLevel);
-  //m_streamer = new DataStoreStreamer(m_compressionLevel);
+  m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_expno = m_runno = -1;
   m_count = m_count_0 = 0;
   if (m_obuf_name.size() > 0 && m_obuf_size > 0) {
@@ -102,39 +102,8 @@ void StorageSerializerModule::event()
   unsigned int expno = evtmetadata->getExperiment();
   unsigned int runno = evtmetadata->getRun();
   unsigned int subno = 0;//evtmetadata->getRun() & 0xFF;
-  if (StorageDeserializerModule::get()) {
-    RunInfoBuffer& info(StorageDeserializerModule::getInfo());
-    if (info.isAvailable()) {
-      info.setExpNumber(expno);
-      info.setRunNumber(runno);
-      info.setSubNumber(subno);
-    }
-  }
+  m_obuf.lock();
   SharedEventBuffer::Header* header = m_obuf.getHeader();
-  m_obuf.lock();
-  if (header->runno < runno || header->expno < expno) {
-    m_count = 0;
-    B2INFO("New run detected: expno = " << expno << " runno = " << runno << " subno = " << subno);
-    header->expno = expno;
-    header->runno = runno;
-    header->subno = subno;
-    struct dataheader {
-      int nword;
-      int type;
-      unsigned int expno;
-      unsigned int runno;
-    } hd;
-    hd.nword = 4;
-    hd.type = MSG_STREAMERINFO;
-    hd.expno = expno;
-    hd.runno = runno;
-    m_obuf.write((int*)&hd, hd.nword, false, 0, true);
-    m_nbyte = writeStreamerInfos();
-  }
-  m_obuf.unlock();
-  EvtMessage* msg = StorageDeserializerModule::streamDataStore();
-  int nword = (msg->size() - 1) / 4 + 1;
-  m_obuf.lock();
   struct dataheader {
     int nword;
     int type;
@@ -146,6 +115,17 @@ void StorageSerializerModule::event()
   hd.expno = expno;
   hd.runno = runno;
   m_obuf.write((int*)&hd, hd.nword, false, 0, true);
+  if (header->runno < runno || header->expno < expno) {
+    m_count = 0;
+    B2INFO("New run detected: expno = " << expno << " runno = "
+           << runno << " subno = " << subno);
+    header->expno = expno;
+    header->runno = runno;
+    header->subno = subno;
+    m_nbyte = writeStreamerInfos();
+  }
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  int nword = (msg->size() - 1) / 4 + 1;
   m_obuf.write((int*)msg->buffer(), nword, false, 0, true);
   m_obuf.unlock();
   m_nbyte += msg->size();
@@ -154,14 +134,6 @@ void StorageSerializerModule::event()
                           (m_count > 100 && m_count < 1000 && m_count % 100 == 0) ||
                           (m_count > 1000 && m_count < 10000 && m_count % 1000 == 0))) {
     std::cout << "[DEBUG] Storage count = " << m_count << " nword = " << nword << std::endl;
-  }
-  if (m_count % 10 == 0 && StorageDeserializerModule::get()) {
-    RunInfoBuffer& info(StorageDeserializerModule::getInfo());
-    if (info.isAvailable()) {
-      info.setOutputCount(m_count);
-      info.addOutputNBytes(m_nbyte);
-    }
-    m_nbyte = 0;
   }
   m_count++;
 }

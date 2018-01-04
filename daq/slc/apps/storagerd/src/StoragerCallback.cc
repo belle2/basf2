@@ -230,7 +230,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].setExecutable("basf2");
       m_con[i].addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
                            record.getText("script").c_str());
-      m_con[i].addArgument(ibuf.getText("name"));
+      m_con[i].addArgument(ibuf.getText("name") + StringUtil::form("_%d", i - 3));
       m_con[i].addArgument("%d", ibuf.getInt("size"));
       m_con[i].addArgument(rbuf.getText("name"));
       m_con[i].addArgument("%d", rbuf.getInt("size"));

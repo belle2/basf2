@@ -34,28 +34,27 @@ REG_MODULE(StorageDeserializer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-StorageDeserializerModule* StorageDeserializerModule::g_module = NULL;
-
-EvtMessage* StorageDeserializerModule::streamDataStore()
-{
-  return g_module->m_streamer->streamDataStore(DataStore::c_Event);
-}
+//StorageDeserializerModule* StorageDeserializerModule::g_module = NULL;
+//
+//EvtMessage* StorageDeserializerModule::streamDataStore()
+//{
+//  return g_module->m_streamer->streamDataStore(DataStore::c_Event);
+//}
 
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
-  setDescription("Encode DataStore into RingBuffer");
+  setDescription("Encode DataStore into SharedEventBuffer");
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
-  addParam("EB2", m_eb2, "EB2", 1);
+  addParam("EB2", m_eb2, "Over capsuled by eb2", 1);
   addParam("InputBufferName", m_ibuf_name, "Input buffer name", std::string(""));
   addParam("InputBufferSize", m_ibuf_size, "Input buffer size", 100);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
-  //addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
 
   m_count = 0;
-  g_module = this;
+  //g_module = this;
   B2DEBUG(100, "StorageDeserializer: Constructor done.");
 }
 
@@ -82,7 +81,6 @@ void StorageDeserializerModule::initialize()
   }
   m_handler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer();
-  //m_streamer->setStreamingObjects(m_saveObjs);
   m_package = new DataStorePackage(m_streamer, m_eb2);
 
   StoreArray<RawPXD>::registerPersistent();

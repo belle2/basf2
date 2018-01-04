@@ -228,11 +228,17 @@ int main(int argc, char** argv)
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
   const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
+  const unsigned int ninput = (argc > 11) ? atoi(argv[12]) : 1;
+
   RunInfoBuffer info;
   const bool use_info = nodeid >= 0;
-  if (use_info) info.open(nodename, nodeid);
-  SharedEventBuffer ibuf;
-  ibuf.open(ibufname, ibufsize * 1000000);//, true);
+  if (use_info) {
+    info.open(nodename, nodeid);
+  }
+  SharedEventBuffer ibuf[10];
+  for (unsigned int ib; ib < ninput; ib++) {
+    ibuf[ib].open(StringUtil::form("%s_%d", ibufname, ib), ibufsize * 1000000);//, true);
+  }
   signal(SIGINT, signalHandler);
   signal(SIGKILL, signalHandler);
   ConfigFile config("slowcontrol");
@@ -264,74 +270,76 @@ int main(int argc, char** argv)
   } hd;
   while (true) {
     if (use_info) info.reportRunning();
-    ibuf.lock();
-    ibuf.read((int*)&hd, true, true);
-    ibuf.read(evtbuf, true, true);
-    ibuf.unlock();
-    int nbyte = evtbuf[0];
-    int nword = (nbyte - 1) / 4 + 1;
-    bool isnew = false;
-    if (!newrun || expno < hd.expno || runno < hd.runno) {
-      newrun = true;
-      isnew = true;
-      expno = hd.expno;
-      runno = hd.runno;
-      fileid = 0;
-      if (use_info) {
-        info.setExpNumber(expno);
-        info.setRunNumber(runno);
-        info.setSubNumber(subno);
-        info.setInputCount(0);
-        info.setInputNBytes(0);
-        info.setOutputCount(0);
-        info.setOutputNBytes(0);
-        nbyte_out = 0;
-        count_out = 0;
-      }
-      obuf.lock();
-      SharedEventBuffer::Header* oheader = obuf.getHeader();
-      oheader->expno = expno;
-      oheader->runno = runno;
-      obuf.unlock();
-      if (file) {
-        file.close();
-      }
-      memcpy(g_streamerinfo, evtbuf, nbyte);
-      g_streamersize = nbyte;
-      file.open(path, ndisks, expno, runno, fileid);
-      nbyte_out += nbyte;
-      fileid++;
-      continue;
-    }
-    if (use_info) {
-      info.addInputCount(1);
-      info.addInputNBytes(nbyte);
-    }
-    if (file) {
-      if (nbyte_out > MAX_FILE_SIZE) {
-        file.close();
-        nbyte_out = 0;
+    for (unsigned int ib = 0; ib < ninput; ib++) {
+      ibuf[ib].lock();
+      ibuf[ib].read((int*)&hd, true, true);
+      ibuf[ib].read(evtbuf, true, true);
+      ibuf[ib].unlock();
+      int nbyte = evtbuf[0];
+      int nword = (nbyte - 1) / 4 + 1;
+      bool isnew = false;
+      if (!newrun || expno < hd.expno || runno < hd.runno) {
+        newrun = true;
+        isnew = true;
+        expno = hd.expno;
+        runno = hd.runno;
+        fileid = 0;
+        if (use_info) {
+          info.setExpNumber(expno);
+          info.setRunNumber(runno);
+          info.setSubNumber(subno);
+          info.setInputCount(0);
+          info.setInputNBytes(0);
+          info.setOutputCount(0);
+          info.setOutputNBytes(0);
+          nbyte_out = 0;
+          count_out = 0;
+        }
+        obuf.lock();
+        SharedEventBuffer::Header* oheader = obuf.getHeader();
+        oheader->expno = expno;
+        oheader->runno = runno;
+        obuf.unlock();
+        if (file) {
+          file.close();
+        }
+        memcpy(g_streamerinfo, evtbuf, nbyte);
+        g_streamersize = nbyte;
         file.open(path, ndisks, expno, runno, fileid);
+        nbyte_out += nbyte;
         fileid++;
+        continue;
       }
-      file.write((char*)evtbuf, nbyte);
-      nbyte_out += nbyte;
-      if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
-        obuf.write(evtbuf, nword, true);
-      }
-      count_out++;
       if (use_info) {
-        info.addOutputCount(1);
-        info.addOutputNBytes(nbyte);
-        info.get()->reserved[0] = file.getFileId();
-        info.get()->reserved[1] = file.getDiskId();
-        info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
+        info.addInputCount(1);
+        info.addInputNBytes(nbyte);
       }
-    } else {
-      if (!ecount) {
-        B2WARNING("no run was initialzed for recording : " << hd.expno << "." << hd.runno);
+      if (file) {
+        if (nbyte_out > MAX_FILE_SIZE) {
+          file.close();
+          nbyte_out = 0;
+          file.open(path, ndisks, expno, runno, fileid);
+          fileid++;
+        }
+        file.write((char*)evtbuf, nbyte);
+        nbyte_out += nbyte;
+        if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
+          obuf.write(evtbuf, nword, true);
+        }
+        count_out++;
+        if (use_info) {
+          info.addOutputCount(1);
+          info.addOutputNBytes(nbyte);
+          info.get()->reserved[0] = file.getFileId();
+          info.get()->reserved[1] = file.getDiskId();
+          info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
+        }
+      } else {
+        if (!ecount) {
+          B2WARNING("no run was initialzed for recording : " << hd.expno << "." << hd.runno);
+        }
+        ecount = 1;
       }
-      ecount = 1;
     }
   }
   return 0;

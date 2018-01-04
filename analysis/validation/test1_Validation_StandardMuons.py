@@ -6,7 +6,7 @@
 <header>
   <input>../1111440100.dst.root</input>
   <output>../PIDMuons.ntup.root</output>
-  <contact>"Jan Strube" <jan.strube@desy.de></contact>
+  <contact>Jan Strube jan.strube@desy.de</contact>
 </header>
 """
 

@@ -6,7 +6,7 @@
 <header>
   <input>../1111540100.dst.root</input>
   <output>../PIDElectrons.ntup.root</output>
-  <contact>"Jan Strube" <jan.strube@gmail.com></contact>
+  <contact>Jan Strube jan.strube@desy.de</contact>
 </header>
 """
 

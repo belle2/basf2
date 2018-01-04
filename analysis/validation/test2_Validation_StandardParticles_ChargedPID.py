@@ -2,7 +2,7 @@
 <header>
 <input>../PIDMuons.ntup.root,../PIDElectrons.ntup.root,../PIDProtons.ntup.root,../PIDKpi.ntup.root</input>
 <output>standardParticlesValidation_ChargedPID.root</output>
-<contact>"Jan Strube" <jan.strube@pnnl.gov></contact>
+<contact>Jan Strube jan.strube@desy.de</contact>
 </header>
 """
 

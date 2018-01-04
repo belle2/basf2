@@ -5,7 +5,7 @@
 <header>
   <input>../mdst-xi-lambda.root</input>
   <output>../PIDProtons.ntup.root</output>
-  <contact>"Jan Strube <jan.strube@desy.de></contact>
+  <contact>Jan Strube jan.strube@desy.de</contact>
 </header>
 """
 

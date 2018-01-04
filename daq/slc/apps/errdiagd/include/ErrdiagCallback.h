@@ -28,7 +28,9 @@ namespace Belle2 {
     virtual int test2() throw();
     virtual void map_init() throw();
 
-
+    //
+    // member functions for COPPER/ROPC subsystem
+    //
     static int cpr_eagain(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
     static int cpr_read_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
     static int cpr_read_less(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
@@ -91,12 +93,26 @@ namespace Belle2 {
     static int post_noevenum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
     static int post_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
     static int post_no_magic_cprhdr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
-
     static int post_nodata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
     static int post_CrC16_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
 
+    static int check_crcerrlog(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw();
 
+    //
+    // member functions for EvB subsystem
+    //
 
+    //
+    // member functions for HLT subsystem
+    //
+
+    //
+    // member functions for Storage subsystem
+    //
+
+    //
+    // member variables
+    //
     PostgreSQLInterface* db;
 
     std::string m_xmlpath;
@@ -105,6 +121,7 @@ namespace Belle2 {
     int m_max;
     int m_offset;
 
+    int m_cnt;
     typedef struct entry {    // w
       int state;
       int line;

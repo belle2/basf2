@@ -49,6 +49,7 @@ ErrdiagCallback::ErrdiagCallback(const std::string& name, const std::string xmlp
   m_xmlpath = xmlpath;
   m_max = max;
   m_offset = offset;
+  m_cnt = 0;
 }
 
 ErrdiagCallback::~ErrdiagCallback() throw()
@@ -59,7 +60,8 @@ void ErrdiagCallback::init(NSMCommunicator&) throw()
 {
   add(new NSMVHandlerInt("ival", true, false, 10));
   add(new NSMVHandlerFloat("fval", true, true, 0.1));
-  add(new ErrdiagVHandler("tval", "No data"));
+  add(new ErrdiagVHandler("tval", "No information."));
+  add(new ErrdiagVHandler("request", "skip"));
 
   //  read_xml("/home/usr/yamadas/slc/database/tools/temp2.xml", m_pt);
   read_xml(m_xmlpath, m_pt);
@@ -82,9 +84,16 @@ void ErrdiagCallback::init(NSMCommunicator&) throw()
 
 void ErrdiagCallback::timeout(NSMCommunicator&) throw()
 {
+  //  if( m_cnt > 0 )return;
+  m_cnt++;
   int ival = rand() % 256;
-  set("ival", ival);
+
+  std::string request;
+  get("request", request);
+  std::cout << "State " << request << std::endl;
   LogFile::debug("ivaldfsdfdsfse updated: %d", ival);
+  if (request != "check") return;
+  std::cout << "Checking" << std::endl;
 
   //  read_xml("/home/usr/yamadas/slc/database/tools/temp2.xml", m_pt);
 
@@ -109,13 +118,12 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
   //                        config.get("database.user"),
   //                         config.get("database.password"),
   //                        config.getInt("database.port"));
-
   //  printf("Check 1 db %p db1=%p\n",db, &db1);fflush(stdout);
 
   map_init();
 
   DAQLogMessageList logs = DAQLogDB::getLogs(*db, tablename, nodename,
-                                             //               "","2017-12-10 18:00:00" , max );
+                                             //                "","2017-12-10 18:00:00" , max );
                                              m_max, m_offset);
   //                                             ss_begin.str(), ss_end.str(), max);
 
@@ -129,14 +137,21 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
   std::vector< std::vector<int> > ROPC_fatal_linenum;
   std::vector< std::vector<int> > CPR_fatal_linenum;
 
-  //  for (size_t i = 0; i < log_size; i++) {
+  //
+  // Store error messages
+  //
+
   for (int i = log_size - 1 ; i >= 0; i--) {
     std::string str_mes = logs[i].getMessage();
     std::string str_pri = logs[i].getPriorityText();
     std::string str_nod = logs[i].getNodeName();
+
+    //
+    // Store run-state transition from log messages
+    //
     if (str_mes.find("STARTING") != std::string::npos) {
       if (running != 2) {
-        std::cout << "[" << logs[i].getDate().toString() << "] STARTED : " <<  str_mes << std::endl;
+        // std::cout << "[" << logs[i].getDate().toString() << "] STARTED : " <<  str_mes << std::endl;
         running = 2;
         run_state temp;
         temp.state = running;
@@ -145,7 +160,7 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
       }
     } else if (str_mes.find("ABORTING") != std::string::npos) {
       if (running != 0) {
-        std::cout << "[" << logs[i].getDate().toString() << "] ABORTED : " <<  str_mes << std::endl;
+        // std::cout << "[" << logs[i].getDate().toString() << "] ABORTED : " <<  str_mes << std::endl;
         running = 0;
         run_state temp;
         temp.state = running;
@@ -155,7 +170,7 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
 
     } else if (str_mes.find("LOADING") != std::string::npos) {
       if (running != 1) {
-        std::cout << "[" << logs[i].getDate().toString() << "] LOADED : " <<  str_mes << std::endl;
+        // std::cout << "[" << logs[i].getDate().toString() << "] LOADED : " <<  str_mes << std::endl;
         running = 1;
         for (int j = 0; j < err_state.size(); j++) {
           err_state[j] = -1;
@@ -173,7 +188,9 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
     //              << logs[i].getPriorityText() << "] "
     //              << logs[i].getMessage()  << std::endl;
 
-
+    //
+    // Store error messages
+    //
     int same_node = 0;
     for (int j = 0; j < err_state.size(); j++) {
       if (err_state[j] < 0) continue;
@@ -202,10 +219,14 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
   // }
   // std::cout << std::endl;
 
-//  std::cout << "ROPC error" << std::endl;
+  //  std::cout << "ROPC error" << std::endl;
+
+  //
+  // Analyse error messages
+  //
   int state_pos = 0;
   for (int i = 0;  i < ROPC_fatal_linenum.size(); i++) {
-    //    std::cout << "RUN STATE :err line " << ROPC_fatal_linenum[i][0] << " statesize " << state.size() << " stateline " << state[state_pos].line << " pos " << state_pos << std::endl;
+    // std::cout << "RUN STATE :err line " << ROPC_fatal_linenum[i][0] << " statesize " << state.size() << " stateline " << state[state_pos].line << " pos " << state_pos << std::endl;
     for (int j = state_pos;  j < state.size(); j++) {
       if (ROPC_fatal_linenum[i][0] > state[state_pos].line) {
         break;
@@ -214,11 +235,29 @@ void ErrdiagCallback::timeout(NSMCommunicator&) throw()
         state_pos++;
       }
     }
-    analysis(m_pt, logs, ROPC_fatal_linenum[i]);
+
+    // int l = ROPC_fatal_linenum[i][0];
+    // std::cout << l << " " << running << "[" << logs[l].getNodeName() << "] ["
+    //        << logs[l].getDate().toString() << "] ["
+    //        << logs[l].getPriorityText() << "] "
+    //        << logs[l].getMessage()  << std::endl;
+
+    //
+    // Check log messages of the error node
+    //
     for (int j = 0;  j < ROPC_fatal_linenum[i].size(); j++) {
       int k = ROPC_fatal_linenum[i][j];
+      std::cout << "err " << i << " : " << j << " [" << logs[k].getNodeName() << "] ["
+                << logs[k].getDate().toString() << "] ["
+                << logs[k].getPriorityText() << "] "
+                << logs[k].getMessage()  << std::endl;
     }
+    analysis(m_pt, logs, ROPC_fatal_linenum[i]);
   }
+  request = "skip";
+  set("request", request);
+
+  return;
 }
 
 
@@ -308,9 +347,9 @@ void ErrdiagCallback::map_init() throw()
 
   //  m_func[0] = &invalid_event_num;
 
-//   // ROPC
+  //   // ROPC
 
-//   //
+  //   //
 }
 
 
@@ -399,376 +438,459 @@ void ErrdiagCallback::show(ptree pt, std::string str) throw()
   return;
 }
 
+// check whether CRC error occurred or not
+int ErrdiagCallback::check_crcerrlog(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  std::string err;
+  for (int i = 0 ; i < logs.size(); i++) {
+    err = logs[ i ].getMessage();
+    if (err.find("POST B2link event CRC16 error") != std::string::npos ||
+        err.find("PRE CRC16 error") != std::string::npos ||
+        err.find("ERROR_EVENT : B2LCRC16") != std::string::npos) {   // std::string::npos = -1
+      return 1; // CRC error !!
+    }
+  }
+  return 0; // No CRC error. FEE data are strange.
+}
 
+//
+// Functions : COPPER/ROPC subsystem
+//
+int ErrdiagCallback::cpr_bad_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
 
+//
+// Rare errors
+//
 int ErrdiagCallback::cpr_eagain(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::cpr_read_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::cpr_read_less(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::cpr_read_more(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::cpr_bad_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::cpr_open_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::rpc_no_resolve(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rpc_sendhdr_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rpc_b2l_hdrtrl_mismatch(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::rpc_redsize_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
+int ErrdiagCallback::rpc_sendhdr_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+
 int ErrdiagCallback::no_cprdata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::no_resolve(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::failed_to_bind(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::failed_to_accept(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::failed_toset_timeout(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::post_nocpr_ctr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::post_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
-int ErrdiagCallback::rcpr_invalid_format_ver(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
+//
+// FTSW errors
+//
 
 int ErrdiagCallback::rftsw_event_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::rftsw_invalid_ftsw_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::rftsw_invalid_magic(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
-int ErrdiagCallback::rcpr_bad_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+int ErrdiagCallback::post_nocpr_ctr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
-int ErrdiagCallback::rcpr_nohslb_indata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rcpr_diff_evenum_hslbs(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rcpr_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rdblk_nolength(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rdblk_invalid_blocknum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rdblk_strange_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::rdblk_invalid_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
 
 int ErrdiagCallback::pre_invalid_cpr_magic_1(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
-int ErrdiagCallback::pre_bad_slot_argument(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
+//
+// CRC check errors
+//
 
-int ErrdiagCallback::pre_no_hslb_data(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+//
+// event # jump
+//
+int ErrdiagCallback::rcpr_diff_evenum_hslbs(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
   return 0;
 }
 
 int ErrdiagCallback::pre_diff_eve_overhslb(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
 
-int ErrdiagCallback::pre_old_format(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_invalid_cpr_magic_2(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_diff_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::pre_eve_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
 
-int ErrdiagCallback::pre_cprcounter_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::pre_invalidevenum_runstart(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
 
-int ErrdiagCallback::pre_cprdrv_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_rcpr_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_mismatch_hdr_over_hslbs(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_mismatch_b2lhdr_trl(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_invalid_blocknum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_nohslb(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_invalid_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_cprdrb_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_invalid_magic(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::pre_event_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
+
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
-int ErrdiagCallback::pre_oldftsw_firmware(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+//
+// hdr/trl mismatch
+//
+int ErrdiagCallback::rpc_b2l_hdrtrl_mismatch(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
   return 0;
 }
 
-int ErrdiagCallback::pre_nohslb_data(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+int ErrdiagCallback::pre_mismatch_hdr_over_hslbs(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
   return 0;
 }
 
-int ErrdiagCallback::pre_hslb_datasize_small(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+int ErrdiagCallback::pre_mismatch_b2lhdr_trl(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  if (check_crcerrlog(logs, err_line, tval) == 0) {
+    tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  } else {
+    tval = "sub-detector FEE side error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the sub-detector/DAQ expert shifter.";
+  }
   return 0;
 }
 
-int ErrdiagCallback::pre_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
 
 int ErrdiagCallback::pre_CRC16_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
 
-int ErrdiagCallback::pre_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::pre_invalid_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::post_strange_nwords(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::post_noevenum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::post_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::post_no_magic_cprhdr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
-  return 0;
-}
-
-int ErrdiagCallback::post_nodata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
-{
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
 
 int ErrdiagCallback::post_CrC16_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
 {
-  tval = "DAQ error. Call the DAQ expert.";
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
   return 0;
 }
+
+//
+// non CRC errors
+//
+int ErrdiagCallback::pre_invalid_magic(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_invalid_format_ver(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_bad_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_nohslb_indata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rcpr_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_nolength(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_invalid_blocknum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_strange_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::rdblk_invalid_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_bad_slot_argument(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_no_hslb_data(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_old_format(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_cpr_magic_2(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_diff_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_cprcounter_jump(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_cprdrv_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_rcpr_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+
+int ErrdiagCallback::pre_invalid_blocknum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_nohslb(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_length(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_cprdrb_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+
+int ErrdiagCallback::pre_oldftsw_firmware(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_nohslb_data(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_hslb_datasize_small(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_nofunc(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::pre_invalid_slot_arg(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::post_strange_nwords(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::post_noevenum(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::post_xor_chksum_err(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::post_no_magic_cprhdr(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+
+int ErrdiagCallback::post_nodata(DAQLogMessageList& logs, std::vector<int>& err_line, std::string& tval) throw()
+{
+  tval = "DAQ error. Please retry data-taking for a few more times by ABORT-LOAD-START. If it does not work, call the DAQ expert shifter.";
+  return 0;
+}
+

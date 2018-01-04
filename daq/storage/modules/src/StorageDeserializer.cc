@@ -43,7 +43,7 @@ REG_MODULE(StorageDeserializer)
 
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
-  setDescription("Encode DataStore into SharedEventBuffer");
+  setDescription("Storage deserializer module");
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
   addParam("EB2", m_eb2, "Over capsuled by eb2", 1);

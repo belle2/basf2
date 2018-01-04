@@ -31,7 +31,7 @@ REG_MODULE(StorageSerializer)
 StorageSerializerModule::StorageSerializerModule() : Module()
 {
   //Set module properties
-  setDescription("SeqROOT output module");
+  setDescription("Storage serializer module");
 
   //Parameter definition
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 0);

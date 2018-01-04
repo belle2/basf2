@@ -1,5 +1,5 @@
-#ifndef _Belle2_MWReader_h
-#define _Belle2_MWReader_h
+#ifndef _Belle2_MWReaderImp_h
+#define _Belle2_MWReaderImp_h
 
 #include <daq/slc/base/IOException.h>
 

@@ -1,6 +1,6 @@
 /* Yokogawa MW100 Readout program
    S.Uehara 22-APR-2014   */
-#include "daq/slc/apps/mwreaderd/MWReader.h"
+#include "daq/slc/apps/mwreaderd/MWReaderImp.h"
 #include "daq/slc/apps/mwreaderd/mwreader.h"
 
 #include <stdio.h>

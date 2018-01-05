@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/ECLVariables.h>
 
 using namespace Belle2;

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Alon Hershenhorn (contents taken from Variables.cc file) *
+ * Contributors: Alon Hershenhorn, Torben Ferber                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -217,6 +217,17 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterE(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getEnergy();
+      }
+      return result;
+    }
+
     double eclClusterHighestE(const Particle* particle)
     {
       double result = 0.0;
@@ -408,6 +419,17 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterUniqueId(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getUniqueId();
+      }
+      return result;
+    }
+
     double eclClusterId(const Particle* particle)
     {
       double result = -1.0;
@@ -458,6 +480,7 @@ namespace Belle2 {
                       "Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
     REGISTER_VARIABLE("goodSkimGamma", goodSkimGamma,
                       "Returns 1.0 if photon candidate passes simple region dependent energy selection (30/20/40 MeV).");
+    REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
@@ -502,12 +525,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits,
                       "Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster. for non-overlapping clusters this is equal to the number of crystals in the cluster.");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
-                      "Returns 1.0 if at least one charged track is matched to this cluster.");
+                      "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
-                      "Returns the cluster id of this cluster within the connected region to which it belongs to.");
+                      "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
-                      "Returns the hypothesis ID of this cluster.");
+                      "Returns the hypothesis ID of this ECL cluster.");
+    REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
+                      "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
   }
 }

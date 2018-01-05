@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Alon Hershenhorn (contents taken from Variables.h file)  *
+ * Contributors: Alon Hershenhorn, Torben Ferber                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -99,6 +99,11 @@ namespace Belle2 {
      * return ECL cluster's Error on Energy
      */
     double eclClusterErrorE(const Particle* particle);
+
+    /**
+     * return ECL cluster's corrected energy
+     */
+    double eclClusterE(const Particle* particle);
 
     /**
      * return ECL cluster's uncorrected energy
@@ -197,7 +202,12 @@ namespace Belle2 {
     double eclClusterConnectedRegionId(const Particle* particle);
 
     /**
-     * return the Cluster ID of this cluster
+    * return the unique Cluster ID of this cluster
+    */
+    double eclClusterUniqueId(const Particle* particle);
+
+    /**
+     * return the Cluster ID within the connected region of this cluster
      */
     double eclClusterId(const Particle* particle);
 

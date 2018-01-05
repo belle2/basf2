@@ -26,9 +26,10 @@ if len(sys.argv) < 2:
 inputroot = sys.argv[1]
 file = ROOT.TFile(inputroot, "OPEN")
 vxd = file.Get("VXDAlignment")
-
-# fileName = 'errors.txt'
-
+"""
+fileName = 'values.txt'
+fileName = 'errors.txt'
+"""
 fileName = inputroot + '.txt'
 text_file = open(fileName, "w")
 text_file.write("layer ladder sensor param value\n")
@@ -44,7 +45,6 @@ for entry in vxd.getMap():
     if sensor != 0:
         text_file.write("{0} {1} {2} {3} {4}\n".format(layer, ladder, sensor, param, value))
 text_file.close()
-
 
 beast2_sensors = [
     (1, 1, 1), (1, 1, 2),
@@ -332,6 +332,10 @@ for i in range(0, 18):
                               edgecolor='black',
                               boxstyle='round,pad=0.15'))
 
+    line = ['NAN', r'$u$ = NAN', r'$v$ = NAN', r'$w$ = NAN', r'$\alpha$ = NAN', r'$\beta$ = NAN', r'$\gamma$ = NAN']
+
 ax.axis('off')
+# fig.savefig('errors.png', dpi=300)
+# fig.savefig('values.png', dpi=300)
 fig.savefig('output.png', dpi=300)
 plt.show()

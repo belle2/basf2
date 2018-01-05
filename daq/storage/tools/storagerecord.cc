@@ -216,6 +216,7 @@ int main(int argc, char** argv)
            "<filepath_dbtmp> [<obufname> <obufsize> nodename, nodeid]\n", argv[0]);
     return 1;
   }
+  //storagerecord STORE02:REC 10 HLT2 debug /rawdata/disk 11 /home/usr/stordaq/data/dbtmp.txt STORE02:OUT 10 store02_storagerecord 3
   const unsigned interval = 1;
   const char* ibufname = argv[1];
   const int ibufsize = atoi(argv[2]);

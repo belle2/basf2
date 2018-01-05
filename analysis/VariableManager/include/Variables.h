@@ -247,6 +247,11 @@ namespace Belle2 {
     double missingMomentumTheta(const Particle* part);
 
     /**
+     * returns the azimuthal angle of the missing momentum vector between the beam and the particle in the lab system
+     */
+    double missingMomentumPhi(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);

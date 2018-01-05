@@ -689,6 +689,14 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Theta();
     }
 
+    double missingMomentumPhi(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Phi();
+    }
+
 // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -1943,6 +1951,8 @@ namespace Belle2 {
                       "Missing momentum (magnitude of three-vector) of the particle with respect to the nominal beam momentum in the lab system, pmiss = pbeam - pparticle");
     REGISTER_VARIABLE("missingMomentumTheta", missingMomentumTheta,
                       "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("missingMomentumPhi", missingMomentumPhi,
+                      "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");

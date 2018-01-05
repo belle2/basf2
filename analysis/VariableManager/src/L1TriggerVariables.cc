@@ -25,7 +25,7 @@
 namespace Belle2 {
   namespace Variable {
 
-    double L1Trigger(const Particle* part)
+    double L1Trigger(const Particle*)
     {
       const unsigned int ntrgWords = 10;
 
@@ -37,7 +37,7 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double L1TriggerBit(const Particle* part, const std::vector<double>& bit)
+    double L1TriggerBit(const Particle*, const std::vector<double>& bit)
     {
       double isL1Trigger = 0.0;
 
@@ -61,7 +61,7 @@ namespace Belle2 {
     }
 
 
-    double L1TriggerBitPrescale(const Particle* part, const std::vector<double>& bit)
+    double L1TriggerBitPrescale(const Particle*, const std::vector<double>& bit)
     {
       double prescale = 0.0;
 

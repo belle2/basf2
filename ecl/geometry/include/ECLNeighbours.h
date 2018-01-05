@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Returns the list of neighbours for a given crystal ID.                 *
+ * Returns the list of neighbours for a given cell ID.                    *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace ECL {
 
     /**
-     * Class to get the neighbours for a given crystal id.
+     * Class to get the neighbours for a given cell id.
      */
     class ECLNeighbours {
 
@@ -31,7 +31,7 @@ namespace Belle2 {
       /**  Destructor. */
       ~ECLNeighbours();
 
-      /** Return the neighbours for a given crystal ID.*/
+      /** Return the neighbours for a given cell ID.*/
       const std::vector<short int>& getNeighbours(short int cid) const;
 
     private:
@@ -78,7 +78,7 @@ namespace Belle2 {
       std::vector<short int> getPhiIdsInBetweenC(const short int phiInc, const short int phiDec, const short int theta,
                                                  const int corners);
 
-      /** return the chord length between crystals */
+      /** return the chord length between cells */
       double getDistance(const double alpha, const double R);
 
     };

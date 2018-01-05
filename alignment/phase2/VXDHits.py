@@ -116,7 +116,7 @@ class VXDHits(Module):
                     self.trackData.chi2 = track.getTrackFitStatus().getChi2()
                     self.trackData.ndf = track.getTrackFitStatus().getNdf()
                     self.trackData.chiSquaredOverNdf = track.getTrackFitStatus().getChi2() / track.getTrackFitStatus().getNdf()
-                    self.trackData.energy = track.getTrackFitStatus().getEnergy()
+                    # self.trackData.energy = track.getTrackFitStatus().getEnergy()
                     # print('Chi2/NDF:', self.trackData.chiSquaredOverNdf)
                     self.rootfile.cd()
                     self.tree_track.Fill()

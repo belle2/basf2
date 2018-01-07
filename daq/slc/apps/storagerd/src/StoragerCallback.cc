@@ -197,7 +197,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[1].addArgument("%d", obuf.getInt("size"));
     m_con[1].addArgument(nodename + "_storagerecord");
     m_con[1].addArgument("3");
-    m_con[1].addArgument(m_con.size() - 3);
     if (!m_con[1].load(30)) {
       std::string emsg = "storagerecord: Failed to start";
       throw (RCHandlerException(emsg));
@@ -231,7 +230,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].setExecutable("basf2");
       m_con[i].addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
                            record.getText("script").c_str());
-      m_con[i].addArgument(ibuf.getText("name") + StringUtil::form("_%d", i - 3));
+      m_con[i].addArgument(ibuf.getText("name"));
       m_con[i].addArgument("%d", ibuf.getInt("size"));
       m_con[i].addArgument(rbuf.getText("name"));
       m_con[i].addArgument("%d", rbuf.getInt("size"));

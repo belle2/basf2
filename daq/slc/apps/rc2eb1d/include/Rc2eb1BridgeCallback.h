@@ -10,7 +10,7 @@ namespace Belle2 {
   class Rc2eb1BridgeCallback : public RCCallback {
 
   public:
-    Rc2eb1BridgeCallback(Rc2eb1Callback* callback, const std::string& name);
+    Rc2eb1BridgeCallback(Rc2eb1Callback* callback);
     virtual ~Rc2eb1BridgeCallback() throw() {}
 
   public:

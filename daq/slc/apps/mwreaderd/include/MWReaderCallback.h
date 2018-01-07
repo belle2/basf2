@@ -1,7 +1,7 @@
 #ifndef _Belle2_MWReaderCallback_h
 #define _Belle2_MWReaderCallback_h
 
-#include "daq/slc/apps/mwreaderd/MWReaderImp.h"
+#include "daq/slc/apps/mwreaderd/MWReader.h"
 
 #include "daq/slc/nsm/NSMCallback.h"
 

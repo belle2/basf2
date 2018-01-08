@@ -332,6 +332,29 @@ void TSF::registerHit(MergerOut field, unsigned iTS, TSF::registeredStructElemen
   reg[field].set(iTS);
 }
 
+void TSF::setSecondPriority(unsigned priTS,
+                            unsigned iHit,
+                            timeVec hitTime,
+                            unsigned lr,
+                            mergerStructElement<5>& mergerData,
+                            registeredStructElement& registeredCell,
+                            priorityHitInMerger& priorityHit)
+{
+  timeVec& priorityTime = (get<MergerOut::priorityTime>(mergerData))[priTS];
+  // when there is not already a (1st or 2nd priority) hit
+  if (notHit(MergerOut::priorityTime, priTS, registeredCell)) {
+    priorityTime = hitTime;
+    registerHit(MergerOut::priorityTime, priTS, registeredCell);
+    get<MergerOut::secondPriorityHit>(mergerData)[0].set(priTS, ! lr);
+    priorityHit.insert({priTS, iHit});
+    // set the 2nd pri bit to right when T_left == T_right
+  } else if (priority(priorityHit[priTS]) == Priority::second &&
+             hitTime.to_ulong() == priorityTime.to_ulong() && lr == 1) {
+    get<MergerOut::secondPriorityHit>(mergerData)[0].reset(priTS);
+    priorityHit[priTS] = iHit;
+  }
+}
+
 void TSF::simulateMerger(unsigned iClock)
 {
   // clean up TSF input signals
@@ -391,6 +414,17 @@ void TSF::simulateMerger(unsigned iClock)
         registerHit(MergerOut::fastestTime, iTS, registeredCell);
       }
     }
+    // get edge hit timing or local fastest time
+    if (m_edge[outer].find(iCell) != m_edge[outer].end()) {
+      for (auto& iEdgeTime : m_edge[outer][iCell]) {
+        timeVec& edgeTime = (get<MergerOut::edgeTime>(mergerData))[iEdgeTime];
+        if (notHit(MergerOut::edgeTime, iEdgeTime, registeredCell) ||
+            hitTime.to_ulong() < edgeTime.to_ulong()) {
+          edgeTime = hitTime;
+          registerHit(MergerOut::edgeTime, iEdgeTime, registeredCell);
+        }
+      }
+    }
     switch (priority(iHit)) {
       case Priority::first: {
         // update priority time
@@ -414,39 +448,18 @@ void TSF::simulateMerger(unsigned iClock)
             // set the 2nd priority left of the first TS in the next merger
             priTS = 0;
             const unsigned short iMergerPlus1 = (iMerger == nMergers[iSL] - 1) ? 0 : iMerger + 1;
-            mergerData = dataInClock[iSL][iMergerPlus1];
-            registeredCell = registered[iSL][iMergerPlus1];
-            priorityHit = m_priorityHit[iClock][iSL][iMergerPlus1];
-          }
-          timeVec& priorityTime = (get<MergerOut::priorityTime>(mergerData))[priTS];
-          // when there is not already a (1st or 2nd priority) hit
-          if (notHit(MergerOut::priorityTime, priTS, registeredCell)) {
-            priorityTime = hitTime;
-            registerHit(MergerOut::priorityTime, priTS, registeredCell);
-            get<MergerOut::secondPriorityHit>(mergerData)[0].set(priTS, ! i);
-            priorityHit.insert({priTS, iHit});
-            // set the 2nd pri bit to right when T_left == T_right
-          } else if (priority(priorityHit[priTS]) == Priority::second &&
-                     hitTime.to_ulong() == priorityTime.to_ulong() && i == 1) {
-            get<MergerOut::secondPriorityHit>(mergerData)[0].reset(priTS);
-            priorityHit[priTS] = iHit;
+            auto& nextMergerData = dataInClock[iSL][iMergerPlus1];
+            auto& nextRegisteredCell = registered[iSL][iMergerPlus1];
+            auto& nextPriorityHit = m_priorityHit[iClock][iSL][iMergerPlus1];
+            setSecondPriority(priTS, iHit, hitTime, i, nextMergerData, nextRegisteredCell, nextPriorityHit);
+          } else {
+            setSecondPriority(priTS, iHit, hitTime, i, mergerData, registeredCell, priorityHit);
           }
         }
         break;
       }
       default:
         break;
-    }
-    // get edge hit timing or local fastest time
-    if (m_edge[outer].find(iHit) != m_edge[outer].end()) {
-      for (auto& iEdgeTime : m_edge[outer][iHit]) {
-        timeVec& edgeTime = (get<MergerOut::edgeTime>(mergerData))[iEdgeTime];
-        if (notHit(MergerOut::edgeTime, iEdgeTime, registeredCell) ||
-            hitTime.to_ulong() < edgeTime.to_ulong()) {
-          edgeTime = hitTime;
-          registerHit(MergerOut::edgeTime, iEdgeTime, registeredCell);
-        }
-      }
     }
   }
   // pack the output from merger into input to TSF
@@ -535,7 +548,7 @@ void TSF::saveFastOutput(short iclock)
         string ts = output.substr(i, tsInfoWidth);
         tsOut decoded = decodeTSHit(ts);
         // finish if no more TS hit is present
-        if (decoded[2] == 0) {
+        if (decoded[3] == 0) {
           break;
         }
         const unsigned nCellsInSL = nAxialMergers[iAx] * nCellsInLayer;

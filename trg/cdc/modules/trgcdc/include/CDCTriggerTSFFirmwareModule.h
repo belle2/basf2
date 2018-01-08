@@ -398,5 +398,13 @@ namespace Belle2 {
     void saveFirmwareOutput();
 
     void saveFastOutput(short iclock);
+
+    void setSecondPriority(unsigned priTS,
+                           unsigned iHit,
+                           timeVec hitTime,
+                           unsigned lr,
+                           mergerStructElement<5>& mergerData,
+                           registeredStructElement& registeredCell,
+                           priorityHitInMerger& priorityHit);
   };
 }

@@ -38,7 +38,7 @@
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
-//#include <cdc/dbobjects/CDCMisalignment.h>
+#include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 
 #include <iostream>
 #include <fstream>
@@ -90,6 +90,7 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
   B2RESULT("Time zero table imported to database.");
 
 }
+
 
 void CDCDatabaseImporter::importChannelMap(std::string fileName)
 {
@@ -463,51 +464,6 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   B2RESULT("Sigma table imported to database.");
 }
 
-/*
-void CDCDatabaseImporter::importSigma(std::string fileName)
-{
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
-  if (!ifs) {
-    B2FATAL("openFile: " << fileName << " *** failed to open");
-    return;
-  }
-  B2INFO(fileName << ": open for reading");
-
-  DBImportObjPtr<CDCSigmas> sgm;
-  sgm.construct();
-
-  int iL;
-  const int np = nSigmaParams;
-  double sigma[np];
-  unsigned nRead = 0;
-
-  while (true) {
-    ifs >> iL;
-    for (int i = 0; i < np; ++i) {
-      ifs >> sigma[i];
-    }
-    if (ifs.eof()) break;
-
-    ++nRead;
-
-    for (int i = 0; i < np; ++i) {
-      sgm->setSigmaParam(iL, i, sigma[i]);
-    }
-  }
-
-  ifs.close();
-
-  if (nRead != MAX_N_SLAYERS) B2FATAL("importSigma: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" <<
-                                        MAX_N_SLAYERS << ") !");
-
-  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
-                         m_lastExperiment, m_lastRun);
-  sgm.import(iov);
-  B2RESULT("Sigma table imported to database.");
-}
-*/
-
 
 void CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
@@ -704,6 +660,73 @@ void CDCDatabaseImporter::printWirPosMisalign()
   mal->dump();
 }
 
+
+void CDCDatabaseImporter::importADCDeltaPedestal(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream.is_open()) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
+  dbPed.construct();
+
+  int iB(0);
+  int iC(0);
+  float ped(0);
+  int nRead(0);
+  int sample(0);
+
+  while (true) {
+    if (nRead == 0) {
+      stream >> sample;
+    } else {
+      stream >> iB >> iC >> ped;
+    }
+    if (stream.eof()) break;
+    if (nRead == 0) {
+      if (sample == 0) {
+        B2FATAL("sample window is zero !");
+      }
+      dbPed->setSamplingWindow(sample);
+    } else {
+      dbPed->setPedestal(iB, iC, ped);
+    }
+    ++nRead;
+
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbPed.import(iov);
+
+  B2RESULT("ADC delta pedestal table imported to database.");
+}
+
+void CDCDatabaseImporter::importADCDeltaPedestal()
+{
+
+  DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
+  dbPed.construct();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbPed.import(iov);
+
+  B2RESULT("ADC delta pedestal w/ zero  imported to database.");
+}
+
+void CDCDatabaseImporter::printADCDeltaPedestal()
+{
+
+  DBObjPtr<CDCADCDeltaPedestals> dbPed;
+  dbPed->dump();
+}
+
 //Note; the following function is no longer needed
 #if 0
 void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
@@ -760,3 +783,4 @@ void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
   B2RESULT("Wire misalignment table imported to database.");
 }
 #endif
+

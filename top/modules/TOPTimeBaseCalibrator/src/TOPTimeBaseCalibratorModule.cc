@@ -25,6 +25,7 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dbobjects/TOPSampleTimes.h>
 
 // Root
@@ -96,6 +97,8 @@ namespace Belle2 {
     addParam("method", m_method, "method: 0 - profile histograms only, "
              "1 - matrix inversion, 2 - iterative, "
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);
+    addParam("useFallingEdge", m_useFallingEdge,
+             "if true, use cal pulse falling edge instead of rising edge", false);
 
   }
 
@@ -138,12 +141,25 @@ namespace Belle2 {
     for (const auto& digit : m_digits) {
       if (digit.getModuleID() != m_moduleID) continue;
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
-      double t = digit.getRawTime() + digit.getFirstWindow() * c_WindowSize;
+      double rawTime = digit.getRawTime();
+      double errScaleFactor = 1;
+      if (m_useFallingEdge) {
+        const auto* rawDigit = digit.getRelated<TOPRawDigit>();
+        if (!rawDigit) {
+          B2ERROR("No relation to TOPRawDigit - can't determine falling edge time error");
+          continue;
+        }
+        // rawTime may include corrections due to window number discontinuity,
+        // therefore one must add the width and not just use getCFDFallingTime()
+        rawTime += rawDigit->getFWHM();
+        errScaleFactor = rawDigit->getCFDFallingTimeError(1.0) / rawDigit->getCFDLeadingTimeError(1.0);
+      }
+      double t = rawTime + digit.getFirstWindow() * c_WindowSize;
       if (t < 0) {
         B2ERROR("Got negative sample number - digit ignored");
         continue;
       }
-      double et = digit.getTimeError() / sampleWidth;
+      double et = digit.getTimeError() / sampleWidth * errScaleFactor;
       if (et <= 0) {
         B2ERROR("Time error is not given - digit ignored");
         continue;

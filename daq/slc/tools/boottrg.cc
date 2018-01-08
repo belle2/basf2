@@ -6,7 +6,7 @@
 
 #include <daq/slc/base/StringUtil.h>
 
-int cprtrg01[] = {11001, 15001};
+int cprtrg01[] = {11001, 11002, 11003, 11004, 15001};
 int cprtrg02[] = {5003, 5004};
 int cprtrg03[] = {5005, 5006, 5007};
 int cprtrg04[] = {5008, 5009, 5010};

@@ -362,7 +362,7 @@ void TTDACallback::monitor() throw(RCHandlerException)
   g_mutex.unlock();
 }
 
-void TTDACallback::boot(const DBObject& obj) throw(RCHandlerException)
+void TTDACallback::boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException)
 {
   resetft();
   abort();

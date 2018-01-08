@@ -297,56 +297,10 @@ void XTCalibrationAlgorithm::write()
 {
   B2INFO("write calibrated XT");
   double par[8];
-  ofstream xtout(m_outputXTFileName.c_str());
-  xtout << m_nAlphaBins << endl;
-  for (int i = 0; i < m_nAlphaBins; ++i) {
-    xtout << std::setprecision(3) << m_lowerAlpha[i] << "  "
-          << std::setprecision(3) << m_upperAlpha[i] << "  "
-          << std::setprecision(3) << m_iAlpha[i] << endl;
-  }
-  xtout << m_nThetaBins << endl;
-  for (int i = 0; i < m_nThetaBins; ++i) {
-    xtout << std::setprecision(3) << m_lowerTheta[i] << "  "
-          << std::setprecision(3) << m_upperTheta[i] << "  "
-          << std::setprecision(3) << m_iTheta[i]  << endl;
-  }
-  xtout << m_xtMode << "  " << 8 << endl;
+
 
   int nfitted = 0;
   int nfailure = 0;
-
-  for (int th = 0; th < m_nThetaBins; ++th) {
-    for (int al = 0; al < m_nAlphaBins; ++al) {
-      for (int l = 0; l < 56; ++l) {
-        for (int lr = 0; lr < 2; ++lr) {
-          /*Set Parameter for bad fit*/
-          if (m_fitStatus[l][lr][al][th] != 1) {
-            nfailure += 1;
-            printf("fit failure status = %d \n", m_fitStatus[l][lr][al][th]);
-            printf("layer %d, r %d, alpha %3.1f, theta %3.1f \n", l, lr, m_iAlpha[al], m_iTheta[th]);
-            printf("number of event: %3.2f \n", m_hProf[l][lr][al][th]->GetEntries());
-            if (m_fitStatus[l][lr][al][th] != -1) {
-              printf("Probability of fit: %3.4f \n", m_xtFunc[l][lr][al][th]->GetProb());
-            }
-            par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
-          } else {
-            m_xtFunc[l][lr][al][th]->GetParameters(par);
-            nfitted += 1;
-          }
-          /*Write params*/
-          xtout << l << std::setw(5) << m_iTheta[th] << std::setw(5) << m_iAlpha[al] << std::setw(5) << "0.0" << std::setw(
-                  4) << lr << std::setw(
-                  15);
-          for (int p = 0; p < 8; ++p) {
-            if (p != 7) { xtout << std::setprecision(7) << par[p] << std::setw(15);}
-            if (p == 7) { xtout << std::setprecision(7) << par[p] << std::endl;}
-          }
-        }//lr
-      }//layer
-    }//alpha
-  }//theta
-  xtout.close();
-
 
   //
   // Save to the localDB
@@ -400,6 +354,10 @@ void XTCalibrationAlgorithm::write()
     }//alpha
   }//theta
 
+  if (m_textOutput == true) {
+    xtRel->outputToFile(m_outputFileName);
+  }
+
   saveCalibration(xtRel, "CDCXtRelations");
 
   B2RESULT("Total number of xt fit: " << m_nAlphaBins * m_nThetaBins * 2 * 56);
@@ -411,7 +369,7 @@ void XTCalibrationAlgorithm::write()
 void XTCalibrationAlgorithm::storeHisto()
 {
   B2INFO("saving histograms");
-  TFile* fout = new TFile("XTFIT.root", "RECREATE");
+  TFile* fout = new TFile("histXT.root", "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
   int nhisto = 0;

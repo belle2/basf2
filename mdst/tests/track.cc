@@ -97,6 +97,11 @@ namespace Belle2 {
     EXPECT_EQ(countMuon, 1);
     EXPECT_EQ(countElectron, 0);
     EXPECT_EQ(countKaon, 1);
+
+    Track trackQITest;
+    EXPECT_EQ(trackQITest.getQualityIndicator(), 0.);
+    Track trackQITest1(0.5);
+    EXPECT_EQ(trackQITest1.getQualityIndicator(), 0.5);
   }
 
   /** Test simple Setters and Getters.

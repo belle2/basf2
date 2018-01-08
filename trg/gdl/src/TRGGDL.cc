@@ -130,7 +130,9 @@ namespace Belle2 {
   void
   TRGGDL::initialize(void)
   {
-    configure();
+    //if it is firmware simulation, do the cofigurnation
+    //fastsimulation doesn't use the configuration currently
+    if (_simulationMode == 2) configure();
   }
 
   void

@@ -6,7 +6,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
-#include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
@@ -14,6 +13,7 @@
 #include <sstream>
 #include <exception>
 #include <string>
+#include <regex>
 
 using namespace Belle2;
 
@@ -125,9 +125,9 @@ std::vector<std::string> Variable::Manager::resolveCollections(const std::vector
 
 void Variable::Manager::assertValidName(const std::string& name)
 {
-  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
+  const static std::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
 
-  if (!boost::regex_match(name, allowedNameRegex)) {
+  if (!std::regex_match(name, allowedNameRegex)) {
     B2FATAL("Variable '" << name <<
             "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
   }
@@ -141,10 +141,10 @@ void Variable::Manager::setVariableGroup(const std::string& groupName)
 
 bool Variable::Manager::createVariable(const std::string& name)
 {
-  boost::match_results<std::string::const_iterator> results;
+  std::match_results<std::string::const_iterator> results;
 
   // Check if name is a simple number
-  if (boost::regex_match(name, results, boost::regex("^([0-9]+\\.?[0-9]*)$"))) {
+  if (std::regex_match(name, results, std::regex("^([0-9]+\\.?[0-9]*)$"))) {
     float float_number = std::stof(results[1]);
     auto func = [float_number](const Particle*) -> double {
       return float_number;
@@ -154,7 +154,7 @@ bool Variable::Manager::createVariable(const std::string& name)
   }
 
   // Check if name is a function call
-  if (boost::regex_match(name, results, boost::regex("^([a-zA-Z0-9_]*)\\((.*)\\)$"))) {
+  if (std::regex_match(name, results, std::regex("^([a-zA-Z0-9_]*)\\((.*)\\)$"))) {
 
     std::string functionName = results[1];
     boost::algorithm::trim(functionName);

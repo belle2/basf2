@@ -74,7 +74,7 @@ namespace Belle2 {
         c_DHC_END_DBL = 1ull << 47
       };
 
-      static const std::string& getPXDBitErrorName(int bit)
+      const std::string& getPXDBitErrorName(int bit)
       {
         static const std::string undefined("undefined");
         static const std::string error_name[ONSEN_MAX_TYPE_ERR] = {

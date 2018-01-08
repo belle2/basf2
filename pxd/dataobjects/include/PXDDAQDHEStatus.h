@@ -36,10 +36,11 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQDHEStatus() : m_usable(true), m_errorMask(0), m_critErrorMask(0), m_rawCount(0), m_redCount(0) {}
+    PXDDAQDHEStatus() : m_usable(true), m_errorMask(0), m_critErrorMask(0), m_startRow(0), m_frameNr(0), m_rawCount(0), m_redCount(0) {}
 
-    PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, uint32_t raw, uint32_t red) : m_sensorID(id), m_dheID(dheid),
-      m_usable(true), m_errorMask(mask), m_critErrorMask(0), m_rawCount(raw), m_redCount(red) {}
+    PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, uint32_t raw, uint32_t red, unsigned short sr,
+                    unsigned short fn) : m_sensorID(id), m_dheID(dheid),
+      m_usable(true), m_errorMask(mask), m_critErrorMask(0), m_startRow(sr), m_frameNr(fn), m_rawCount(raw), m_redCount(red) {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -76,6 +77,13 @@ namespace Belle2 {
     VxdID getSensorID(void) const { return m_sensorID;};
 
     void setCounters(uint32_t raw, uint32_t red) {m_rawCount = raw; m_redCount = red;};
+    void getCounters(uint32_t& raw, uint32_t& red) { raw = m_rawCount; red = m_redCount;};
+
+    void setStartRow(unsigned int sr) { m_startRow = sr;};
+    unsigned short getStartRow(void) const { return  m_startRow;};
+
+    void setFrameNr(unsigned int fn) { m_frameNr = fn;};
+    unsigned short getFrameNr(void) const { return  m_frameNr;};
 
   private:
 
@@ -85,6 +93,8 @@ namespace Belle2 {
     PXDErrorFlags m_errorMask; /**< errors found in this DHE/sensor */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
 
+    unsigned short m_startRow; /**< Startrow from DHE header */
+    unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
 

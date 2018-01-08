@@ -1485,7 +1485,9 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       m_errorMaskDHE |= m_errorMask; // do latest updates
 
-      PXDDAQDHEStatus daqdhestat(currentVxdId, currentDHEID, m_errorMaskDHE, dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
+      PXDDAQDHEStatus daqdhestat(currentVxdId, currentDHEID, m_errorMaskDHE, dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE,
+                                 dhe_first_offset, dhe_first_readout_frame_id_lo
+                                );
       daqdhevect.push_back(daqdhestat);
 //       m_storeDHEStats.appendNew(currentVxdId, currentDHEID, m_errorMaskDHE);
       m_errorMaskDHE = 0;

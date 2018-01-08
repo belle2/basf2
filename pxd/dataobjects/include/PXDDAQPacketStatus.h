@@ -73,14 +73,8 @@ namespace Belle2 {
     void addDHC(PXDDAQDHCStatus& daqdhcstat) {m_pxdDHC.push_back(daqdhcstat);};
 
     //iterator-based iteration
-    std::vector<PXDDAQDHCStatus>::const_iterator dhc_begin() const
-    {
-      return m_pxdDHC.begin();
-    }
-    std::vector<PXDDAQDHCStatus>::const_iterator dhc_end() const
-    {
-      return m_pxdDHC.end();
-    }
+    std::vector<PXDDAQDHCStatus>::const_iterator dhc_begin() const { return m_pxdDHC.begin(); };
+    std::vector<PXDDAQDHCStatus>::const_iterator dhc_end() const { return m_pxdDHC.end(); };
 
     unsigned short getPktIndex(void) const { return m_index;};
 

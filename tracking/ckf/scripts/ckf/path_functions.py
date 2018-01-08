@@ -67,6 +67,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
 
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
+    direction = "backward"
+
     if use_mc_truth:
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
                         mcRecoTracksStoreArrayName="MCRecoTracks",
@@ -82,7 +84,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
         )
     else:
         module_parameters = dict(
-            firstHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_1.xml"},
+            firstHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_1.xml",
+                                       "direction": direction},
             firstHighUseNStates=use_best_seeds,
 
             secondHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_2.xml"},
@@ -96,10 +99,16 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
         )
 
     path.add_module("ToPXDCKF",
+                    advanceHighFilterParameters={"direction": direction},
+
+                    writeOutDirection=direction,
+
                     inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName=pxd_reco_tracks,
+                    relationCheckForDirection=direction,
+
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
                     outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
-                    relatedRecoTrackStoreArrayName="",
                     **module_parameters)
 
 

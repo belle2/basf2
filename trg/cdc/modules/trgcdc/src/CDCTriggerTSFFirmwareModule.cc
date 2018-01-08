@@ -304,7 +304,12 @@ void TSF::initializeMerger()
     B2DEBUG(20, "sorted TDC count: " << m_cdcHits[ihit]->getTDCCount() <<
             ", SL" << m_cdcHits[ihit]->getISuperLayer() << ", layer" << m_cdcHits[ihit]->getILayer() <<
             ", wire " << m_cdcHits[ihit]->getIWire() << ", ihit: " << ihit);
-    if (trgTime(ihit, iAxialHit.front()) >= clockEdge * clockPeriod) {
+    // if (m_cdcHits[ihit]->getTDCCount() >= 4999) {
+    //   B2DEBUG(20, "skipping this hit");
+    //   continue;
+    // }
+    // if (trgTime(ihit, iAxialHit.front()) >= clockEdge * clockPeriod) {
+    while (trgTime(ihit, iAxialHit.front()) >= clockEdge * clockPeriod) {
       ++clockEdge;
       ++itr;
     }

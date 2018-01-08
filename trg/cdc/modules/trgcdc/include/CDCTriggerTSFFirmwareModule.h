@@ -99,6 +99,9 @@ namespace Belle2 {
     /** how many clocks to simulate per event */
     static constexpr int m_nClockPerEvent = 44;
 
+    // data clock period (32ns) in unit of 2ns
+    static constexpr int clockPeriod = 16;
+
   protected:
     /** Name of the StoreArray containing the input CDC hits. */
     std::string m_hitCollectionName;

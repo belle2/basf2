@@ -227,20 +227,21 @@ unsigned short TSF::trgTime(int index, int iFirstHit)
 
 std::bitset<4> TSF::timeStamp(int index, int iFirstHit)
 {
-  return std::bitset<4> (trgTime(index, iFirstHit) % 16);
+  return std::bitset<4> (trgTime(index, iFirstHit) % clockPeriod);
 }
 
 unsigned short TSF::mergerCellID(int index)
 {
   const CDCHit& hit = (*m_cdcHits[index]);
   const unsigned offset = (hit.getISuperLayer() == 0) ? 3 : 0;
-  return (hit.getILayer() - offset) * 16 + hit.getIWire() % 16;
+  return (hit.getILayer() - offset) * nSegmentsInMerger +
+         hit.getIWire() % nSegmentsInMerger;
 }
 
 unsigned short TSF::mergerNumber(int index)
 {
   const CDCHit& hit = (*m_cdcHits[index]);
-  return hit.getIWire() / 16;
+  return hit.getIWire() / nSegmentsInMerger;
 }
 
 using WireSet = std::vector<unsigned short>;
@@ -272,9 +273,6 @@ TSF::WireSet TSF::segmentID(int iHit)
 
 void TSF::initializeMerger()
 {
-  // data clock period (32ns) in unit of 2ns
-  const int clockPeriod = 16;
-
   /* The CDCHits array in DataStore contains all the hits in an event,
    * regardless of when them at the trigger system. Their real timing behavior
    * is replayed/simulated by looking at the TDC count (timestamp) of each hit.
@@ -395,7 +393,7 @@ void TSF::simulateMerger(unsigned iClock)
     switch (priority(iHit)) {
       case Priority::first: {
         // update priority time
-        unsigned priTS = iCell % 16;
+        unsigned priTS = iCell % nSegmentsInMerger;
         timeVec& priorityTime = (get<MergerOut::priorityTime>(mergerData))[priTS];
         // when there is not already a (first priority) hit
         if (notHit(MergerOut::priorityTime, priTS, registeredCell)) {
@@ -464,7 +462,7 @@ void TSF::simulateMerger(unsigned iClock)
 
       if (get<MergerOut::hitmap>(output)[0].any()) {
         string priTime, fasTime, edgTime;
-        for (int i = 0; i < 16; ++i) {
+        for (int i = 0; i < nSegmentsInMerger; ++i) {
           priTime += get<MergerOut::priorityTime>(output)[i].to_string() + ",";
           fasTime += get<MergerOut::fastestTime>(output)[i].to_string() + ",";
           edgTime += get<MergerOut::edgeTime>(output)[i].to_string() + ",";

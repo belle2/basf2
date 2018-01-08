@@ -76,9 +76,9 @@ add_reconstruction(main, geometry_version=geom, magnet=not args.magnet_off, vxdt
 # add SVD performance module
 svdperf = register_module('SVDPerformance')
 if (args.magnet_off):
-    svdperf.param('outputFileName', "SVDPerformance_run111.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF1_run111.root")
 else:
-    svdperf.param('outputFileName', "SVDPerformance_run400.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF1_run400.root")
 svdperf.param('is2017TBanalysis', True)
 main.add_module(svdperf)
 

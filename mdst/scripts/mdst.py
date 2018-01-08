@@ -31,9 +31,8 @@ def add_mdst_output(
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLClusters',
-        'ECLClustersToTracks',
+        'TracksToECLClusters',
         'KLMClusters',
-        'KLMClustersToTracks',
         'KlIds',
         'KLMClustersToKlIds',
         'TRGSummary',
@@ -43,7 +42,7 @@ def add_mdst_output(
     if mc:
         branches += ['MCParticles', 'TracksToMCParticles',
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
-        persistentBranches += ['BackgroundInfos']
+        persistentBranches += ['BackgroundInfo']
     branches += additionalBranches
     output.param('branchNames', branches)
     output.param('branchNamesPersistent', persistentBranches)

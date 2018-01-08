@@ -67,9 +67,6 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
            true);
-  addParam("pdfFile", m_pdfFile,
-           "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_7b7a9f_500k_events.root"));
 
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
            "Only save data for primary particles (as determined by MC truth)", false);
@@ -82,19 +79,6 @@ CDCDedxPIDModule::~CDCDedxPIDModule() { }
 void CDCDedxPIDModule::initialize()
 {
 
-  // check for a pdf file - necessary for likelihood calculations
-  if (!m_pdfFile.empty()) {
-
-    std::string fullPath = FileSystem::findFile(m_pdfFile);
-    if (fullPath.empty()) {
-      B2ERROR("PDF file " << m_pdfFile << " not found!");
-    }
-    m_pdfFile = fullPath;
-  }
-  if (!m_enableDebugOutput and m_pdfFile.empty()) {
-    B2ERROR("No PDFFile given and debug output disabled. This module will produce no output!");
-  }
-
   // required inputs
   m_tracks.isRequired();
   m_recoTracks.isRequired();
@@ -103,59 +87,48 @@ void CDCDedxPIDModule::initialize()
   m_mcparticles.isOptional();
   m_tracks.optionalRelationTo(m_mcparticles);
 
-  // register outputs
+  // register optional outputs
   if (m_enableDebugOutput) {
     m_dedxTracks.registerInDataStore();
     m_tracks.registerRelationTo(m_dedxTracks);
   }
 
-  if (!m_pdfFile.empty()) {
-    m_dedxLikelihoods.registerInDataStore();
-    m_tracks.registerRelationTo(m_dedxLikelihoods);
+  // register outputs
+  m_dedxLikelihoods.registerInDataStore();
+  m_tracks.registerRelationTo(m_dedxLikelihoods);
 
-    //load pdfs
-    TFile* pdfFile = new TFile(m_pdfFile.c_str(), "READ");
-    if (!pdfFile->IsOpen())
-      B2FATAL("Couldn't open pdf file: " << m_pdfFile);
+  //load dedx:momentum PDFs
+  int nBinsX, nBinsY;
+  double xMin, xMax, yMin, yMax;
+  nBinsX = nBinsY = -1;
+  xMin = xMax = yMin = yMax = 0.0;
+  for (unsigned int iPart = 0; iPart < 6; iPart++) {
+    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
+    m_pdfs[iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getCDCTruncatedPDF(iPart) : m_DBDedxPDFs->getCDCPDF(iPart);
 
-    //load dedx:momentum PDFs
-    const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
-    int nBinsX, nBinsY;
-    double xMin, xMax, yMin, yMax;
-    nBinsX = nBinsY = -1;
-    xMin = xMax = yMin = yMax = 0.0;
-    for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-      const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-      m_pdfs[2][iPart] =
-        dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_d%i_%i%s", 2, pdgCode, suffix)));
-      //dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_%i%s", pdgCode, suffix)));
-
-      if (!m_pdfs[2][iPart]) {
-        if (m_ignoreMissingParticles)
-          continue;
-        B2FATAL("Couldn't find PDF for PDG " << pdgCode << suffix);
-      }
-
-      //check that PDFs have the same dimensions and same binning
-      const double epsFactor = 1e-5;
-      if (nBinsX == -1 and nBinsY == -1) {
-        nBinsX = m_pdfs[2][iPart]->GetNbinsX();
-        nBinsY = m_pdfs[2][iPart]->GetNbinsY();
-        xMin = m_pdfs[2][iPart]->GetXaxis()->GetXmin();
-        xMax = m_pdfs[2][iPart]->GetXaxis()->GetXmax();
-        yMin = m_pdfs[2][iPart]->GetYaxis()->GetXmin();
-        yMax = m_pdfs[2][iPart]->GetYaxis()->GetXmax();
-      } else if (nBinsX != m_pdfs[2][iPart]->GetNbinsX()
-                 or nBinsY != m_pdfs[2][iPart]->GetNbinsY()
-                 or fabs(xMin - m_pdfs[2][iPart]->GetXaxis()->GetXmin()) > epsFactor * xMax
-                 or fabs(xMax - m_pdfs[2][iPart]->GetXaxis()->GetXmax()) > epsFactor * xMax
-                 or fabs(yMin - m_pdfs[2][iPart]->GetYaxis()->GetXmin()) > epsFactor * yMax
-                 or fabs(yMax - m_pdfs[2][iPart]->GetYaxis()->GetXmax()) > epsFactor * yMax) {
-        B2FATAL("PDF for PDG " << pdgCode << suffix << " has binning/dimensions differing from previous PDF.");
-      }
+    if (m_pdfs[iPart].GetEntries() == 0) {
+      if (m_ignoreMissingParticles)
+        continue;
+      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
     }
 
-    //leaking pdfFile so I can access the histograms
+    //check that PDFs have the same dimensions and same binning
+    const double epsFactor = 1e-5;
+    if (nBinsX == -1 and nBinsY == -1) {
+      nBinsX = m_pdfs[iPart].GetNbinsX();
+      nBinsY = m_pdfs[iPart].GetNbinsY();
+      xMin = m_pdfs[iPart].GetXaxis()->GetXmin();
+      xMax = m_pdfs[iPart].GetXaxis()->GetXmax();
+      yMin = m_pdfs[iPart].GetYaxis()->GetXmin();
+      yMax = m_pdfs[iPart].GetYaxis()->GetXmax();
+    } else if (nBinsX != m_pdfs[iPart].GetNbinsX()
+               or nBinsY != m_pdfs[iPart].GetNbinsY()
+               or fabs(xMin - m_pdfs[iPart].GetXaxis()->GetXmin()) > epsFactor * xMax
+               or fabs(xMax - m_pdfs[iPart].GetXaxis()->GetXmax()) > epsFactor * xMax
+               or fabs(yMin - m_pdfs[iPart].GetYaxis()->GetXmin()) > epsFactor * yMax
+               or fabs(yMax - m_pdfs[iPart].GetYaxis()->GetXmax()) > epsFactor * yMax) {
+      B2FATAL("PDF for PDG " << pdgCode << " has binning/dimensions differing from previous PDF.");
+    }
   }
 
   // lookup table for number of wires per layer (indexed on superlayer)
@@ -473,9 +446,9 @@ void CDCDedxPIDModule::event()
           if (layerDedx > 0) {
             dedxTrack->addDedx(nhitscombined, wirelongesthit, currentLayer, totalDistance, layerDedx);
             // save the PID information if using individual hits
-            if (!m_pdfFile.empty() and m_useIndividualHits) {
+            if (m_useIndividualHits) {
               // use the momentum valid in the cdc
-              saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[2]);
+              saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx);
             }
           }
         }
@@ -534,22 +507,20 @@ void CDCDedxPIDModule::event()
 
     // save the PID information for both lookup tables and parameterized means and resolutions
     if (!m_useIndividualHits)
-      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
+      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated);
 
     // save CDCDedxLikelihood
     // use parameterized method if called or if pdf file for lookup tables is empty
-    if (m_usePrediction || !m_pdfFile.empty()) {
-      double* pidvalues;
-      if (m_usePrediction) {
-        pidvalues = dedxTrack->m_cdcChi;
-        for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
-          pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
-        }
-      } else pidvalues = dedxTrack->m_cdcLogl;
+    double* pidvalues;
+    if (m_usePrediction) {
+      pidvalues = dedxTrack->m_cdcChi;
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
+        pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
+      }
+    } else pidvalues = dedxTrack->m_cdcLogl;
 
-      CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
-      track.addRelationTo(likelihoodObj);
-    }
+    CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
+    track.addRelationTo(likelihoodObj);
 
     if (m_enableDebugOutput) {
       // book the information for this track
@@ -612,26 +583,27 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx,
-                                      TH2F* const* pdf) const
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx) const
 {
   //all pdfs have the same dimensions
-  const Int_t binX = pdf[0]->GetXaxis()->FindFixBin(p);
-  const Int_t binY = pdf[0]->GetYaxis()->FindFixBin(dedx);
-
+  const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
+  const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (!pdf[iPart]) //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[iPart];
+    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+      B2WARNING("NO CDC PDFS...");
       continue;
+    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf[iPart]->GetNbinsX()
-        or binY < 1 or binY > pdf[iPart]->GetNbinsY()) {
-      probability = pdf[iPart]->GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = pdf[iPart]->Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)

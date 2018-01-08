@@ -14,7 +14,6 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
-#include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/Exception.h>
 

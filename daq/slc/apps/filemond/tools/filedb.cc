@@ -52,7 +52,6 @@ unsigned long long cal_chksum(const char* filename, unsigned long long& chksum, 
   }
   LogFile::info("%s size=%d nevent=%d chksum=%08x", filename, size, nevents, chksum);
   fclose(fp);
-  nevents--;
   return size;
 }
 
@@ -191,7 +190,6 @@ int main(int argc, char** argv)
               unsigned long long size = records[i].getInt("size");
               unsigned long long nevents = records[i].getInt("nevents");
               unsigned long long chksum = records[i].getInt("chksum");
-              ///*
               struct stat st;
               stat(path.c_str(), &st);
               if (size != st.st_size) {
@@ -199,7 +197,7 @@ int main(int argc, char** argv)
                 unsigned long long chksum_new, nevents_new, size_new;
                 size_new = cal_chksum(path.c_str(), chksum_new, nevents_new);
                 if (fileno == 0) nevents--;
-                db.execute("update %s set time_close='%s', chksum=%lu, nevents=%lu, size=%lu "
+                db.execute("update %s set time_close='%s', chksum=%lu nevents=%lu, size=%lu "
                            "where name='%s' and host='%s';",
                            m_table.c_str(), d.c_str(), chksum_new, nevents_new, size_new,
                            name.c_str(), m_host.c_str());
@@ -209,7 +207,6 @@ int main(int argc, char** argv)
                 size = size_new;
                 nevents = nevents_new;
               }
-              //*/
               std::string s_chksum = StringUtil::form("%x", chksum);
               fout << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
                    << size << "," << nevents << "," << s_chksum << "" << std::endl;

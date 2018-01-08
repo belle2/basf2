@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial runs over skims of centrally produced B->KsPi0 and continuum MC
 # mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
 # tutorials B2A712 AND B2A713 for training, testing, and applying the MVAExpert.

@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following decay chain involving several decay modes:
 #
@@ -41,7 +43,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
              'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # create and fill final state ParticleLists
 kaons = ('K-', '')

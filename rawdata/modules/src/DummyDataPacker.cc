@@ -57,13 +57,13 @@ void DummyDataPackerModule::initialize()
   /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 
-  raw_cprarray.registerPersistent();
-  raw_svdarray.registerPersistent();
-  raw_cdcarray.registerPersistent();
-  raw_bpidarray.registerPersistent();
-  raw_epidarray.registerPersistent();
-  raw_eclarray.registerPersistent();
-  raw_klmarray.registerPersistent();
+  raw_cprarray.registerInDataStore();
+  raw_svdarray.registerInDataStore();
+  raw_cdcarray.registerInDataStore();
+  raw_bpidarray.registerInDataStore();
+  raw_epidarray.registerInDataStore();
+  raw_eclarray.registerInDataStore();
+  raw_klmarray.registerInDataStore();
   B2INFO("DummyDataPacker: initialize() done.");
 }
 

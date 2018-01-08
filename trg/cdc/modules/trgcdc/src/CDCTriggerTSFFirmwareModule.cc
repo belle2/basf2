@@ -196,7 +196,7 @@ void TSF::computeEdges()
     }
   }
   for (unsigned short iEdge = 0; iEdge < 3; ++iEdge) {
-    for (const auto& cell : innerInvEdge[iEdge]) {
+    for (const auto& cell : outerInvEdge[iEdge]) {
       m_edge[1][cell].push_back(iEdge);
     }
   }

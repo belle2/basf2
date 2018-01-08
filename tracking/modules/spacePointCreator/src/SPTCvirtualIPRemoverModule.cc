@@ -84,9 +84,9 @@ void SPTCvirtualIPRemoverModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("SPTCvirtualIPRemoverModule:endRun: events: " << m_eventCounter
-         << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
-         << ", nVIPsPerEvent: " << invEvents * float(m_nVIPsTotal)
-         << ", nVIPsRemovedPerEvent: " << invEvents * float(m_nVIPsRemoved)
-        );
+  B2DEBUG(1, "SPTCvirtualIPRemoverModule:endRun: events: " << m_eventCounter
+          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
+          << ", nVIPsPerEvent: " << invEvents * float(m_nVIPsTotal)
+          << ", nVIPsRemovedPerEvent: " << invEvents * float(m_nVIPsRemoved)
+         );
 }

@@ -50,7 +50,7 @@ DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetV
 
 void DuplicateVertexMarkerModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   Variable::Manager& manager = Variable::Manager::Instance();
   m_targetVar = manager.getVariable("chiProb");

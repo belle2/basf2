@@ -128,7 +128,9 @@ PXDStateFilterFactory::create(const std::string& filterName) const
              std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml")
            );
   } else if (filterName == "mva") {
-    return std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml");
+    return std::make_unique<AndPXDStateFilter>(
+             std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml"),
+             std::make_unique<NonIPCrossingPXDStateFilter>());
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingPXDStateFilter>("PXDStateFilter.root");
   } else {

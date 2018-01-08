@@ -1,8 +1,8 @@
 //+
-// File : PrintData.h
-// Description : Module to get data from DataStore and send it to another network node
+// File : CheckErrorEvent.h
+// Description : Count the number of CRC error events by checking RawCOPPER's header/trailer and EventMetaData
 //
-// Author : Satoru Yamada Itoh, IPNS, KEK
+// Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  /*! Count the number of CRC error events by checking RawCOPPER's header/trailer and EventMetaData */
 
   class CheckErrorEventModule : public PrintDataTemplateModule {
 
@@ -25,16 +25,16 @@ namespace Belle2 {
     CheckErrorEventModule();
     virtual ~CheckErrorEventModule();
 
-    //! Module functions to be called from main process
+    //! initialization
     virtual void initialize();
 
-    //! Module functions to be called from event process
+    //! event module
     virtual void event();
 
-    //! Module functions to be called from event process
+    //! termination
     virtual void terminate();
 
-    //! Check CRC error
+    //! Check if a RawCOPPER object contains CRC error flag in RawCOPPER header/trailer
     void checkCRCError(RawCOPPER* rawcpr, int i);
 
 #ifndef REDUCED_RAWCOPPER

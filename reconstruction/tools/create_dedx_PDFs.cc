@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
             break;
           case Dedx::c_SVD:
             flayer_selection = TString::Format("%s < -2", flayer_var);
-            dedx_cutoff = 2e4;
+            dedx_cutoff = 5e6;
             break;
           case Dedx::c_CDC:
             break;

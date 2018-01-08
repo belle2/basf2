@@ -26,6 +26,16 @@ namespace Belle2 {
      */
     CDCADCDeltaPedestals() {}
 
+
+    /**
+     * Set time window for sampling.
+     * @param sample
+     */
+    void setSamplingWindow(unsigned short sample)
+    {
+      m_samplingWindow = sample;
+    }
+
     /**
      * Set ADC pedestals in the list.
      * @param board id
@@ -35,6 +45,7 @@ namespace Belle2 {
     {
       unsigned short mask =  ch == -1 ? 0x8000 : 0;
       unsigned short id = mask == 0x8000 ? (mask | board) : (mask | (ch << 9) | board);
+      pedestal *= m_samplingWindow;
       m_pedestals.insert(std::pair<unsigned short, float>(id, pedestal));
     }
 
@@ -68,7 +79,7 @@ namespace Belle2 {
       if (it0 != m_pedestals.end()) { // board by board delta pedestal
         return it0->second;
       } else {
-        unsigned short id = (0x8000 | (ch << 9) | board);
+        unsigned short id = ((ch << 9) | board);
         std::map<unsigned short, float>::const_iterator it = m_pedestals.find(id);
         if (it != m_pedestals.end()) { //delta pedetal with (board, ch).
           return it->second;
@@ -85,6 +96,7 @@ namespace Belle2 {
     {
       std::cout << " " << std::endl;
       std::cout << "ADC pedestal list" << std::endl;
+      std::cout << "samle" << m_samplingWindow <<  std::endl;
       std::cout << "# of entries= " << m_pedestals.size() << std::endl;
       std::cout << "in order of board#, ch#, pedestal" << std::endl;
       for (auto const& ent : m_pedestals) {
@@ -97,9 +109,9 @@ namespace Belle2 {
     }
 
   private:
-    std::map<unsigned short, float> m_pedestals; /**< ADC pedestal list*/
-
-    ClassDef(CDCADCDeltaPedestals, 0); /**< ClassDef */
+    std::map<unsigned short, float> m_pedestals; /**< ADC pedestal list */
+    unsigned short m_samplingWindow = 10;  /**< ADC sampling window */
+    ClassDef(CDCADCDeltaPedestals, 1); /**< ClassDef */
   };
 
 } // end namespace Belle2

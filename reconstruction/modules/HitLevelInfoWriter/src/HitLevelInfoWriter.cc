@@ -98,8 +98,8 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
-  m_tree->Branch("hTwodcor", &h_twodcor, "hTwodcor[hNHits]/D");
-  m_tree->Branch("hOnedcor", &h_onedcor, "hOnedcor[hNHits]/D");
+  m_tree->Branch("hTwodcor", h_twodcor, "hTwodcor[hNHits]/D");
+  m_tree->Branch("hOnedcor", h_onedcor, "hOnedcor[hNHits]/D");
 
 }
 

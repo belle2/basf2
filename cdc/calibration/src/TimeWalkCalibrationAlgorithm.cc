@@ -167,6 +167,11 @@ void TimeWalkCalibrationAlgorithm::write()
   for (int ib = 0; ib < 300; ++ib) {
     dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
   }
+
+  if (m_textOutput == true) {
+    dbTw->outputToFile(m_outputFileName);
+  }
+
   saveCalibration(dbTw, "CDCTimeWalks");
 }
 

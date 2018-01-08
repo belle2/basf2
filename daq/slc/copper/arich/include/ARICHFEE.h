@@ -26,6 +26,7 @@ namespace Belle2 {
     unsigned int m_reg[256 * 256];
     double m_tstamp;
     DBObject m_o_feb[6];
+    unsigned m_serial;
 
   };
 

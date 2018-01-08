@@ -11,7 +11,7 @@
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ECLVariables.h>
 
 #include <TBranch.h>
 

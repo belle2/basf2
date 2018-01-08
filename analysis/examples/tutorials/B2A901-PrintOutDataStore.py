@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to print out the
 # contents of the DataStore for each event.
 # This is useful for debugging purposes, e.g. to check if

@@ -1,4 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'mdst_dataobjects', 'CLHEP', 'analysis_ClusterUtility']
-Return('env')

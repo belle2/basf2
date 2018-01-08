@@ -15,27 +15,48 @@ class EffModule(Module):
     Ntrg_event = 0
     #: The number of events passing each L1 trigger line
     Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    prescale = [1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1]
+    prescale_phase2 = [1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1]
+    prescale_phase3 = [1, 1, 20, 2, 1, 1, 1, 1, 2, 1, 1, 20, 20, 1, 5, 1, 3, 5]
 #   trglog = ['n_2d_finder>=3', 'n_2d_finder==2&&BhabhaVeto==0',
-    trglog = ['3 or more 3D tracks',
-              '2 3D tracks, ≥1 within 25 cm, not a trkBhabha',
-              '2 3D tracks, not a trkBhabha',
-              '2 3D tracks, trkBhabha',
-              '1 track, <25cm, clust same hemi, no 2 GeV clust',
-              '1 track, <25cm, clust opp hemi, no 2 GeV clust',
-              '≥3 clusters inc. ≥1 300 MeV, not an eclBhabha',
-              '2 GeV E* in [4,14], not a trkBhabha',
-              '2 GeV E* in [4,14], trkBhabha',
-              '2 GeV E* in 2,3,15 or 16, not a trkBhabha or eclBhabha',
-              '2 GeV E* in 2,3,15 or 16, trkBhabha or eclBhabha',
-              '2 GeV E* in 1 or 17, not a trkBhabha or eclBhabha',
-              '2 GeV E* in 1 or 17, trkBhabha or eclBhabha',
-              'exactly 1 E*>1 GeV and 1 E>300 MeV, in [4,15]',
-              'exactly 1 E*>1 GeV and 1 E>300 MeV, in 2,3 or 16',
-              'clusters back-to-back in phi, both >250 MeV, no 2 GeV',
-              'clusters back-to-back in phi, 1 <250 MeV, no 2 GeV',
-              'clusters back-to-back in 3D, no 2 GeV'
-              ]
+    trglog_phase2 = ['3 or more 3D tracks',
+                     '2 3D tracks, ≥1 within 25 cm, not a trkBhabha',
+                     '2 3D tracks, not a trkBhabha',
+                     '2 3D tracks, trkBhabha',
+                     '1 track, <25cm, clust same hemi, no 2 GeV clust',
+                     '1 track, <25cm, clust opp hemi, no 2 GeV clust',
+                     '≥3 clusters inc. ≥1 300 MeV, not an eclBhabha',
+                     '2 GeV E* in [4,14], not a trkBhabha',
+                     '2 GeV E* in [4,14], trkBhabha',
+                     '2 GeV E* in 2,3,15 or 16, not a trkBhabha or eclBhabha',
+                     '2 GeV E* in 2,3,15 or 16, trkBhabha or eclBhabha',
+                     '2 GeV E* in 1 or 17, not a trkBhabha or eclBhabha',
+                     '2 GeV E* in 1 or 17, trkBhabha or eclBhabha',
+                     'exactly 1 E*>1 GeV and 1 E>300 MeV, in [4,15]',
+                     'exactly 1 E*>1 GeV and 1 E>300 MeV, in 2,3 or 16',
+                     'clusters back-to-back in phi, both >250 MeV, no 2 GeV',
+                     'clusters back-to-back in phi, 1 <250 MeV, no 2 GeV',
+                     'clusters back-to-back in 3D, no 2 GeV'
+                     ]
+
+    trglog_phase3 = ['3 or more 3D tracks',
+                     '2 3D tracks, ≥1 within 10 cm, not a trkBhabha',
+                     '2 3D tracks, not a trkBhabha',
+                     '2 3D tracks, trkBhabha',
+                     '1 track, <10cm, clust same hemi, no 2 GeV clust',
+                     '1 track, <10cm, clust opp hemi, no 2 GeV clust',
+                     '≥3 clusters inc. ≥2 300 MeV, not an eclBhabha',
+                     '2 GeV E* in [4,14], not a trkBhabha',
+                     '2 GeV E* in [4,14], trkBhabha',
+                     '2 GeV E* in 2,3,15 or 16, not a trkBhabha or eclBhabha',
+                     '2 GeV E* in 2,3,15 or 16, trkBhabha or eclBhabha',
+                     '2 GeV E* in 1 or 17, not a trkBhabha or eclBhabha',
+                     '2 GeV E* in 1 or 17, trkBhabha or eclBhabha',
+                     'exactly 1 E*>1 GeV and 1 E>300 MeV, in [4,15]',
+                     'exactly 1 E*>1 GeV and 1 E>300 MeV, in 2,3 or 16',
+                     'clusters back-to-back in phi, both >250 MeV, no 2 GeV',
+                     'clusters back-to-back in phi, 1 <250 MeV, no 2 GeV, TrkZ25 is 3D track',
+                     'clusters back-to-back in 3D, no 2 GeV'
+                     ]
     # ---add new trigger line by users---
     # ---add a component with initial value 0 in Nsubtrg_event
     # Nsubtrg_event+=[0]
@@ -43,6 +64,10 @@ class EffModule(Module):
     # prescale += [1]
     # ---add the description of new trigger logics in trglog
     # trglog+=['new trg logics']
+
+    def __init__(self, Belle2Phase):
+        super(EffModule, self).__init__()
+        self.Belle2Phase = Belle2Phase
 
     def event(self):
         """
@@ -63,6 +88,15 @@ class EffModule(Module):
         """
         Calculate the efficiency of each trigger line with the statistical values in event function
         """
+        trglog = []
+        prescale = []
+        if self.Belle2Phase == "Phase2":
+            trglog = self.trglog_phase2
+            prescale = self.prescale_phase2
+        else:
+            trglog = self.trglog_phase3
+            prescale = self.prescale_phase3
+
         if self.Ntot_event == 0:
             return
         sp = ' '
@@ -74,8 +108,8 @@ class EffModule(Module):
         if self.Ntot_event != 0:
             for i in range(ntrg):
                 eff = self.Nsubtrg_event[i] / self.Ntot_event * 100.0
-                print('T%3d                %4d              %6.2f              %s ' % (i, self.prescale[i], eff, self.trglog[i]))
+                print('T%3d                %4d              %6.2f              %s ' % (i, prescale[i], eff, trglog[i]))
 
 
-def EffCalculation(path):
-    path.add_module(EffModule())
+def EffCalculation(path, Belle2Phase="Phase2"):
+    path.add_module(EffModule(Belle2Phase))

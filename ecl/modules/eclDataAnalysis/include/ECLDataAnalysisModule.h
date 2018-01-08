@@ -185,7 +185,6 @@ namespace Belle2 {
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
     std::vector<int>* m_eclDigitToMC; /**< Index of MCParticle related to that ECLDigit */
-    std::vector<int>* m_eclDigitToHit; /**< Index of ECLHit related to that ECLDigit */
     std::vector<int>* m_eclDigitCellId; /**< Number of ECLDigit CellId */
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
@@ -404,7 +403,6 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
     std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
-    std::vector<double>* m_eclPureClusterMergedPi0;  /**< Flag for merged pi0, PureCsI option */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters, PureCsI option */
     std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL, PureCsI option */
     std::vector<double>* m_eclPureClusterClosestTrackDist;  /**< Reconstructed Distance to Closest Track, PureCsI option */

@@ -79,10 +79,10 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
     if (m_parameters > 10) m_parameters = 10; // hard limit
 //    SEVCHK(ca_context_create(ca_disable_preemptive_callback),"ca_context_create");
     for (auto i = 0; i < m_parameters; i++) {
-      std::string aa;
-      aa = m_f1->GetParName(i);
-      if (aa == "") aa = "par" + std::to_string(i);
-      aa = m_pvname + ":" + aa;
+      std::string a;
+      a = m_f1->GetParName(i);
+      if (a == "") a = "par" + i;
+      a = m_pvname + ":" + a;
 //      SEVCHK(ca_create_channel(a.c_str(),NULL,NULL,10,&mychid[i]),"ca_create_channel failure");
       // Read LO and HI limits from EPICS, seems this needs additional channels?
       //SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
@@ -103,7 +103,6 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
   TH1* hh1;
   hh1 = findHist(m_histoname.c_str());
 
-  //hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
     B2INFO("Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?

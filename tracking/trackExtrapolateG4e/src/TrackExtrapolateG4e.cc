@@ -353,7 +353,7 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   int expNo = evtMetaData->getExperiment();
-  B2INFO((byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
   if (byMuid) {
     if (m_MuonPlusPar != NULL) {
       if (m_ExpNo == expNo) { return; }

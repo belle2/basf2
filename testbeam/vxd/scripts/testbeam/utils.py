@@ -142,11 +142,7 @@ def add_reconstruction(
         path,
         magnet=True,
         svd_only=False,
-        telescopes=False,
-        momentum=5.,
-        vxdtf2=False,
         mc=False,
-        useOldSecMaps=False,
         geometry_version=1
 ):
     add_clusterizer(path, svd_only)
@@ -159,29 +155,15 @@ def add_reconstruction(
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
-        if(vxdtf2):
-            add_vxdtf_v2(path,
-                         use_pxd=False,
-                         magnet_on=magnet,
-                         filter_overlapping=True,
-                         use_segment_network_filters=True,
-                         observerType=0,
-                         quality_estimator='circleFit',
-                         overlap_filter='greedy',  # 'hopfield' or 'greedy'
-                         log_level=LogLevel.ERROR,
-                         debug_level=1,
-                         usedGeometry=useThisGeometry
-                         )
-        else:
-            add_vxdtf(
-                path,
-                magnet=magnet,
-                svd_only=svd_only,
-                momentum=momentum,
-                filterOverlaps='hopfield',
-                usedGeometry=useThisGeometry
-            )
-            path.add_module('RecoTrackCreator', trackCandidatesStoreArrayName='__TrackCands')
+        add_vxdtf_v2(path,
+                     use_pxd=False,
+                     magnet_on=magnet,
+                     filter_overlapping=True,
+                     use_segment_network_filters=True,
+                     quality_estimator='circleFit',
+                     overlap_filter='greedy',  # 'hopfield' or 'greedy'
+                     usedGeometry=useThisGeometry
+                     )
 
     # path.add_module('GenFitterVXDTB')
     daf = register_module('DAFRecoFitter')
@@ -195,212 +177,25 @@ def add_reconstruction(
     path.add_module(track_creator)
 
 
-def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, momentum=5., mc=False):
-
-    path.add_module('SetupGenfitExtrapolation')
-    if mc:
-        path.add_module('TrackFinderMCTruthRecoTracks')
-    else:
-        add_offline_vxdtf(path, magnet=magnet, svd_only=svd_only, momentum=momentum, filterOverlaps='hopfield')
-        path.add_module('RecoTrackCreator',
-                        recoTracksStoreArrayName='offlineRecoTracks',
-                        trackCandidatesStoreArrayName='offlineTrackCands')
-    path.add_module('DAFRecoFitter',
-                    initializeCDCTranslators=False,
-                    recoTracksStoreArrayName='offlineRecoTracks')
-
-    track_creator = register_module('TrackCreator')
-    track_creator.logging.log_level = LogLevel.RESULT
-    track_creator.param('beamSpot', [-20., 0., 0.])
-    track_creator.param('pdgCodes', [11])
-    track_creator.param('recoTrackColName', 'offlineRecoTracks')
-    track_creator.param('trackColName', 'offlineTracks')
-    track_creator.param('trackFitResultColName', 'offlineTrackFitResults')
-    path.add_module(track_creator)
-
-
-# adds the vxdtf to the path
-def add_vxdtf(path, magnet=True, svd_only=False, momentum=5., filterOverlaps='hopfield', usedGeometry='TB2017'):
-    vxdtf_module = get_vxdtf(magnet, svd_only, momentum, filterOverlaps, usedGeometry=usedGeometry)
-    path.add_module(vxdtf_module)
-
-
-def add_offline_vxdtf(
-        path,
-        magnet=True,
-        svd_only=False,
-        momentum=5.,
-        filterOverlaps='hopfield',
-        loglevel=LogLevel.ERROR,
-        usedGeometry='TB2017newGeo'):
-
-    vxdtf_module = get_vxdtf(
-        magnet=magnet,
-        svd_only=svd_only,
-        momentum=momentum,
-        filterOverlaps=filterOverlaps,
-        usedGeometry=usedGeometry)
-    vxdtf_module.param('GFTrackCandidatesColName', 'offlineTrackCands')
-    path.add_module(vxdtf_module)
-
-
-# function which returns a vxdtf module with the default settings, so that one can change parameters afterwards
-def get_vxdtf(magnet=True, svd_only=False, momentum=5., filterOverlaps='hopfield', usedGeometry='TB2017newGeo'):
-    if magnet:
-        if not svd_only:
-            # SVD and PXD sec map
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOnPXDSVD-moreThan1000MeV_PXDSVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOnPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        else:
-            # only SVD:
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOnSVD-moreThan1000MeV_SVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOnSVD_afterMarch1st-moreThan1000MeV_SVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        qiType = 'circleFit'  # circleFit
-    else:
-        if not svd_only:
-            # To turn off magnetic field:
-            # SVD and PXD sec map:
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOffPXDSVD-moreThan1000MeV_PXDSVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOffPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        else:
-            # only SVD
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOffSVD-moreThan1000MeV_SVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOffSVD_afterMarch1st-moreThan1000MeV_SVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        qiType = 'straightLine'  # straightLine
-
-    vxdtf = register_module('VXDTF')
-    vxdtf.logging.debug_level = 2
-    # calcQIType:
-    # Supports 'kalman', 'circleFit' or 'trackLength.
-    # 'circleFit' has best performance at the moment
-
-    # filterOverlappingTCs:
-    # Supports 'hopfield', 'greedy' or 'none'.
-    # 'hopfield' has best performance at the moment
-    param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam,
-        # we can expect (anti-?)electrons...
-        # True
-        # 'artificialMomentum': 5., ## uncomment if there is no magnetic field!
-        # 7
-        # 'activateDistance3D': [False],
-        # 'activateDistanceZ': [True],
-        # 'activateAngles3D': [False],
-        # 'activateAnglesXY': [True],  #### noMagnet
-        # ### withMagnet
-        # 'activateAnglesRZHioC': [True], #### noMagnet
-        # ### withMagnet r51x
-        # True
-
-        # activateBaselineTF was 1: but this TF caused lots of problems last TB so I turned it off,
-        # it should work now but better play it safe
-        'activateBaselineTF': 0,
-        'debugMode': 0,
-        'tccMinState': [2],
-        'tccMinLayer': [3],
-        'reserveHitsThreshold': [0.],
-        'highestAllowedLayer': [6],
-        'standardPdgCode': -11,
-        'artificialMomentum': 3,
-        'sectorSetup': secSetup,
-        'calcQIType': qiType,
-        'killEventForHighOccupancyThreshold': 500,
-        'highOccupancyThreshold': 111,
-        'cleanOverlappingSet': False,
-        'filterOverlappingTCs': filterOverlaps,
-        'TESTERexpandedTestingRoutines': True,
-        'qiSmear': False,
-        'smearSigma': 0.000001,
-        'GFTrackCandidatesColName': '__TrackCands',
-        'tuneCutoffs': 0.51,
-        'activateDistanceXY': [False],
-        'activateDistance3D': [True],
-        'activateDistanceZ': [False],
-        'activateSlopeRZ': [False],
-        'activateNormedDistance3D': [False],
-        'activateAngles3D': [True],
-        'activateAnglesXY': [False],
-        'activateAnglesRZ': [False],
-        'activateDeltaSlopeRZ': [False],
-        'activateDistance2IP': [False],
-        'activatePT': [False],
-        'activateHelixParameterFit': [False],
-        'activateAngles3DHioC': [True],
-        'activateAnglesXYHioC': [True],
-        'activateAnglesRZHioC': [False],
-        'activateDeltaSlopeRZHioC': [False],
-        'activateDistance2IPHioC': [False],
-        'activatePTHioC': [False],
-        'activateHelixParameterFitHioC': [False],
-        'activateDeltaPtHioC': [False],
-        'activateDeltaDistance2IPHioC': [False],
-        'activateZigZagXY': [False],
-        'activateZigZagRZ': [False],
-        'activateDeltaPt': [False],
-        'activateCircleFit': [False],
-    }
-
-    if not magnet:
-        param_vxdtf['artificialMomentum'] = momentum
-        param_vxdtf['activateAnglesXY'] = [True]
-        param_vxdtf['activateAnglesRZHioC'] = [True]
-
-    vxdtf.param(param_vxdtf)
-    return vxdtf
-
-
 def add_vxdtf_v2(path=None,
                  use_pxd=False,
                  magnet_on=True,
                  filter_overlapping=True,
                  use_segment_network_filters=True,
-                 observerType=0,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
-                 log_level=LogLevel.ERROR,
-                 usedGeometry='TB2017newGeo',
-                 debug_level=1):
+                 usedGeometry='TB2017newGeo'):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
     Result is a store array containing reco tracks called 'RecoTracks'.
-    :param sec_map_file: training data for segment network.
     :param path: basf2.Path
+    :param magnet_on: whether magnet was turned on or not.
     :param use_pxd: if true use pxd hits. Default False.
-    :param use_svd: if true use svd hits. Default True.
     :param quality_estimator: which fit to use to determine track quality. Options 'circle', 'random'. Default 'circle'.
     :param filter_overlapping: if true overlapping tracks are reduced to a single track using the qualitiy indicator.
     :param use_segment_network_filters: if true use filters for segmentMap training. Default True.
-    :param observe_network_filters: FOR DEBUG ONLY! If true results for FilterVariables are stored to a root file. Default False.
     :param overlap_filter: which filter network to use. Options 'hopfield', 'greedy'. Default 'hopfield'.
-    :param log_level: LogLevel of all modules in the chain
-    :param debug_level: debug level of all modules in the chain.
+    :param usedGeometry: Which geometry is to be used.
     :return:
     """
 

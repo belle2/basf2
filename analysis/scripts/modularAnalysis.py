@@ -1954,7 +1954,7 @@ def writePi0EtaVeto(
 
 def buildThrustOfEvent(ParticleLists, path=analysis_main):
     """
-    Calculates the Thrust of the event and stores in ? variable. (WIP)
+    Calculates the Thrust of the particles in ParticleList and stores in the variable 'thrustOfEvent'.
     :param ParticleLists: List of ParticleList used to calculate the Thrust
     :param path: modules are added to this path
     """

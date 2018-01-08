@@ -296,8 +296,8 @@ namespace Belle2 {
     {
       StoreObjPtr<ThrustOfEvent> thrust;
       if (!thrust) {
-        B2ERROR("Cannot find thrust information.");
-        return 0.0;
+        B2WARNING("Cannot find thrust information.");
+        return -1.0;
       }
       double th = thrust->getThrust();
       return th;

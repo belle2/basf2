@@ -48,6 +48,7 @@ TSF::CDCTriggerTSFFirmwareModule() :
     for (auto& clock : m_priorityHit) {
       clock.insert({2 * iAx, priorityHitStructInSL(nAxialMergers[iAx])});
     }
+    dataAcrossClocks.insert({2 * iAx, mergerStruct<5> (nAxialMergers[iAx])});
   }
   //Set module properties
   setDescription("Firmware simulation of the Track Segment Finder for CDC trigger.");
@@ -460,12 +461,17 @@ void TSF::simulateMerger(unsigned iClock)
       pack<MergerOut::secondPriorityHit, 1> (input, nCellsInLayer, output);
       pack<MergerOut::edgeTime, timeWidth> (input, nEdges, output);
 
+      auto& outputAcrossClocks = dataAcrossClocks[2 * iAx][iMerger];
       if (get<MergerOut::hitmap>(output)[0].any()) {
         string priTime, fasTime, edgTime;
         for (int i = 0; i < nSegmentsInMerger; ++i) {
           priTime += get<MergerOut::priorityTime>(output)[i].to_string() + ",";
           fasTime += get<MergerOut::fastestTime>(output)[i].to_string() + ",";
           edgTime += get<MergerOut::edgeTime>(output)[i].to_string() + ",";
+          get<MergerOut::priorityTime>(outputAcrossClocks)[i] |=
+            get<MergerOut::priorityTime>(output)[i];
+          get<MergerOut::fastestTime>(outputAcrossClocks)[i] |=
+            get<MergerOut::fastestTime>(output)[i];
         }
         B2DEBUG(150, "merger " << iAx * 2 << "-" << iMerger <<
                 "\nhitmap:       " << get<MergerOut::hitmap>(output)[0] <<
@@ -473,6 +479,7 @@ void TSF::simulateMerger(unsigned iClock)
                 "\nprioiry Time: " << priTime <<
                 "\nfastest Time: " << fasTime <<
                 "\nedge    Time: " << edgTime);
+        get<MergerOut::hitmap>(outputAcrossClocks)[0] |= get<MergerOut::hitmap>(output)[0];
       }
       // simulate clock counter
       if (m_simulateCC) {
@@ -619,8 +626,15 @@ void TSF::event()
   int status = 0;
   initializeMerger();
   try {
+    // clear accumulative merger output
+    for (unsigned iAx = 0; iAx < m_nSubModules; ++iAx) {
+      dataAcrossClocks[2 * iAx] = mergerStruct<5> (nAxialMergers[iAx]);
+    }
     for (int iClock = 0; iClock < m_nClockPerEvent; iClock++) {
       B2INFO(string(15, '=') << " clock #" << iClock << " " << string(15, '='));
+      if (iClock == m_nClockPerEvent - 1) {
+        cout << "Accumulative hitmap:" << "\n";
+      }
       simulateMerger(iClock);
       if (m_mergerOnly) {
         cout << std::hex;
@@ -633,6 +647,21 @@ void TSF::event()
           })) {
               cout << "Merger " << iSL * 2 << "-" << iMerger / 2 << " u" << iMerger % 2 << ": ";
               display_hex(mergerOut);
+            }
+            // print accumulative hitmap
+            if (iClock == m_nClockPerEvent - 1) {
+              auto accuOut = dataAcrossClocks[2 * iSL][iMerger];
+              if (get<MergerOut::hitmap>(accuOut)[0].any()) {
+                cout << "Merger " << iSL * 2 << "-" << iMerger / 2 << " u" << iMerger % 2 << ": ";
+                cout << get<MergerOut::hitmap>(accuOut)[0] << "\n";
+                string priTime, fasTime;
+                for (int i = 0; i < 16; ++i) {
+                  priTime += get<MergerOut::priorityTime>(accuOut)[i].to_string() + ",";
+                  fasTime += get<MergerOut::fastestTime>(accuOut)[i].to_string() + ",";
+                }
+                cout << "pritime: " << priTime << "\n";
+                cout << "fastime: " << fasTime << "\n";
+              }
             }
             iMerger++;
           }

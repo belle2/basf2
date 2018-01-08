@@ -236,6 +236,8 @@ namespace Belle2 {
                                 std::array<std::bitset<nSegmentsInMerger>, 1> >;
     template<size_t nEdges>
     using mergerStruct = std::vector<mergerStructElement<nEdges> >;
+    std::map<unsigned, mergerStruct<5> > dataAcrossClocks;
+
     // record when a time slow has been registered by a hit
     // <priority time, fast time, edge timing>
     using registeredStructElement = std::array<std::bitset<nCellsInLayer>, 3>;

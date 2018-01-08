@@ -39,6 +39,35 @@ def extract_efficiencies(channels, storage_location):
     return all_efficiencies
 
 
+def extract_l1_efficiencies(channels, storage_location):
+    efficiency_list = []
+
+    for channel in channels:
+        result_list = []
+        channel_path = os.path.join(storage_location, channel)
+        analysed_path = os.path.join(channel_path, "analysed")
+
+        for filename in glob(os.path.join(analysed_path, "*_l1_results.pkl")):
+            result_list += pd.read_pickle(filename)
+
+        if len(result_list) == 0:
+            continue
+
+        results = pd.DataFrame(result_list)
+
+        efficiencies = (results == 1).mean()
+        efficiencies.name = channel
+        efficiency_list.append(efficiencies)
+
+    all_efficiencies = pd.DataFrame(efficiency_list)
+    all_efficiencies.to_pickle("all_l1_efficiencies.pkl")
+
+    print("\n### Final L1 Efficiencies per channel ###\n")
+    print(all_efficiencies)
+
+    return all_efficiencies
+
+
 def extract_file_sizes(channels, storage_location):
     # Is this really needed?
     ROOT.gErrorIgnoreLevel = ROOT.kWarning + 1

@@ -21,7 +21,7 @@ from glob import glob
 import os
 import argparse
 
-from extract import extract_efficiencies, extract_file_sizes
+from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficiencies
 from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
 
 
@@ -108,6 +108,7 @@ def calculate_efficiencies(channels, storage_location):
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
     extract_efficiencies(channels=channels, storage_location=storage_location)
+    extract_l1_efficiencies(channels=channels, storage_location=storage_location)
     extract_file_sizes(channels=channels, storage_location=storage_location)
 
 

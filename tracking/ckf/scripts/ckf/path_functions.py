@@ -109,6 +109,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
 
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
                     outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+
+                    reverseSeed=False,
                     **module_parameters)
 
 

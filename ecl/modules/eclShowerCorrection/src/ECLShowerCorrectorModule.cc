@@ -37,7 +37,6 @@
 #include <fstream>      // std::ifstream
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module

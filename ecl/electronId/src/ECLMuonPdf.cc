@@ -5,6 +5,7 @@
 #include <TMath.h>
 
 using namespace Belle2;
+using namespace ECL;
 
 void  ECLMuonPdf::init(const char* parametersFileName)
 {

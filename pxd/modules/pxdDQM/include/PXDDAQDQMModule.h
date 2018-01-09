@@ -25,7 +25,7 @@ namespace Belle2 {
   namespace PXD {
     /** The PXD DAQ DQM module.
      *
-     * Creates basic DQM for PXD DAQ errors
+     * Creates basic DQM for PXD DAQ errors and statistics
      */
     class PXDDAQDQMModule : public HistoModule {
 
@@ -54,7 +54,10 @@ namespace Belle2 {
       TH1F* hDAQErrorEvent;          /** per event errors */
       // TH1F* hDAQErrorPacket;         /** per packet (event builder input) errors  */
       TH2F* hDAQErrorDHC;          /** individual DHC errors  */
-      TH2F* hDAQErrorDHE;          /** individual DHH errors  */
+      TH2F* hDAQErrorDHE;          /** individual DHE errors  */
+      TH1F* hDAQDHETriggerRowOffset[64];/** DHE Trigger Row Offset ("start Row")  */
+      TH1F* hDAQDHEReduction[64];/** DHE data reduction  */
+      TH1F* hDAQDHCReduction[6];/** DHC data reduction  */
 
       virtual void defineHisto();
 

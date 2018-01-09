@@ -77,7 +77,9 @@ namespace Belle2 {
     VxdID getSensorID(void) const { return m_sensorID;};
 
     void setCounters(uint32_t raw, uint32_t red) {m_rawCount = raw; m_redCount = red;};
-    void getCounters(uint32_t& raw, uint32_t& red) { raw = m_rawCount; red = m_redCount;};
+    void getCounters(uint32_t& raw, uint32_t& red) const { raw = m_rawCount; red = m_redCount;};
+    uint32_t getRawCnt(void) const { return m_rawCount;};
+    uint32_t getRedCnt(void) const { return m_redCount;};
 
     void setStartRow(unsigned int sr) { m_startRow = sr;};
     unsigned short getStartRow(void) const { return  m_startRow;};

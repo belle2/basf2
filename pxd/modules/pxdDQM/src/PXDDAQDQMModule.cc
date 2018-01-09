@@ -56,12 +56,24 @@ void PXDDAQDQMModule::defineHisto()
     auto num3 = ((i & 0x1) + 1);
 
     // Check if sensor exist and Fill Label on Axis
-    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(num1, num2, num3))) {
+    if (1/*Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(num1, num2, num3))*/) {
       //cppcheck-suppress zerodiv
       string s = str(format("DHE %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
       //cppcheck-suppress zerodiv
       string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
+
+      hDAQDHETriggerRowOffset[i] = new TH1F(("PXDDAQDHETriggerRowOffset" + s2).c_str(), ("TriggerRowOffset " + s).c_str(), 768, 0, 768);
+      hDAQDHEReduction[i] = new TH1F(("PXDDAQDHEDataReduction" + s2).c_str(), ("Data Reduction" + s).c_str(), 1000, 0, 100);
+    } else {
+      hDAQDHETriggerRowOffset[i] = 0;
+      hDAQDHEReduction[i] = 0;
     }
+  }
+  for (int i = 0; i < 6; i++) {
+    //cppcheck-suppress zerodiv
+    hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction" + str(format("_%d") % i)).c_str(),
+                                   ("Data Reduction DHC " + str(format(" %d") % i)).c_str(), 0, 100, 1000);
+    //cppcheck-suppress zerodiv
   }
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");
@@ -102,6 +114,10 @@ void PXDDAQDQMModule::event()
           PXDErrorFlags mask = (1ull << i);
           if ((dhc_emask & mask) == mask) hDAQErrorDHC->Fill(dhc->getDHCID(), i);
         }
+        if (dhc->getDHCID() < 6) { // unsigned, no lower bound check necessary
+          if (hDAQDHCReduction[dhc->getDHCID()]) hDAQDHCReduction[dhc->getDHCID()]->Fill(dhc->getRedCnt() ? dhc->getRawCnt() /
+                dhc->getRedCnt() : 0);
+        }
         B2DEBUG(20, "Iterate PXD DHE in DHC " << dhc->getDHCID() << " , Err " << dhc_emask);
         for (auto && dhe = dhc->dhe_begin(); dhe < dhc->dhe_end(); dhe++) {
           PXDErrorFlags dhe_emask = dhe->getErrorMask();
@@ -109,6 +125,12 @@ void PXDDAQDQMModule::event()
           for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
             PXDErrorFlags mask = (1ull << i);
             if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe->getDHEID(), i);
+          }
+
+          if (dhe->getDHEID() < 64) { // unsigned, no lower bound check necessary
+            if (hDAQDHETriggerRowOffset[dhe->getDHEID()]) hDAQDHETriggerRowOffset[dhe->getDHEID()]->Fill(dhe->getStartRow());
+            if (hDAQDHEReduction[dhe->getDHEID()]) hDAQDHEReduction[dhe->getDHEID()]->Fill(dhe->getRedCnt() ? dhe->getRawCnt() /
+                  dhe->getRedCnt() : 0);
           }
         }
       }

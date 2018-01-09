@@ -81,7 +81,9 @@ namespace Belle2 {
     void setDHCID(int dhcid) {m_dhcID = dhcid;};
 
     void setCounters(uint32_t raw, uint32_t red) {m_rawCount = raw; m_redCount = red;};
-    void getCounters(uint32_t& raw, uint32_t& red) { raw = m_rawCount; red = m_redCount;};
+    void getCounters(uint32_t& raw, uint32_t& red) const { raw = m_rawCount; red = m_redCount;};
+    uint32_t getRawCnt(void) const { return m_rawCount;};
+    uint32_t getRedCnt(void) const { return m_redCount;};
 
     //iterator-based iteration
     std::vector<PXDDAQDHEStatus>::const_iterator dhe_begin() const { return m_pxdDHE.begin(); };

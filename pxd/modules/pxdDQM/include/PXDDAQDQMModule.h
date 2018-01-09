@@ -12,13 +12,15 @@
 
 #include <framework/core/HistoModule.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
+#include <vxd/geometry/GeoCache.h>
 
 // #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <string>
 #include <TH2.h>
 #include <TH1.h>
+#include <string>
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
@@ -48,6 +50,9 @@ namespace Belle2 {
       /** Input array for DAQ Status. */ // TODO why array, can be object
       StoreArray<PXDDAQStatus> m_storeDAQEvtStats;
 
+      //the geometry
+      VXD::GeoCache& m_vxdGeometry;
+
       /// Remark: Because of DHH load balancing and sub event building,
       /// the very same DHE and DHC can show up in different packets (for different events)!
       /// but we will fill only one histogram
@@ -55,9 +60,9 @@ namespace Belle2 {
       // TH1F* hDAQErrorPacket;         /** per packet (event builder input) errors  */
       TH2F* hDAQErrorDHC;          /** individual DHC errors  */
       TH2F* hDAQErrorDHE;          /** individual DHE errors  */
-      TH1F* hDAQDHETriggerRowOffset[64];/** DHE Trigger Row Offset ("start Row")  */
-      TH1F* hDAQDHEReduction[64];/** DHE data reduction  */
-      TH1F* hDAQDHCReduction[6];/** DHC data reduction  */
+      std::map<VxdID, TH1F*> hDAQDHETriggerRowOffset;/** DHE Trigger Row Offset ("start Row")  */
+      std::map<VxdID, TH1F*> hDAQDHEReduction;/** DHE data reduction  */
+      std::map<int, TH1F*> hDAQDHCReduction;/** DHC data reduction  */
 
       virtual void defineHisto();
 

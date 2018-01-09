@@ -17,7 +17,8 @@ namespace Belle2 {
 
   namespace PXD {
     namespace PXDError {
-      enum { ONSEN_MAX_TYPE_ERR = 64}; // 64 bit mask
+      enum { ONSEN_MAX_TYPE_ERR = 64}; /// 64 bit mask
+      enum { ONSEN_USED_TYPE_ERR = 48}; /// how many are used (range for plotting)
 
       typedef uint64_t PXDErrorFlags;
 

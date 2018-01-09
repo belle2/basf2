@@ -47,9 +47,22 @@ void PXDDAQDQMModule::defineHisto()
   oldDir->mkdir(m_histogramDirectoryName.c_str());// do not rely on return value, might be ZERO
   oldDir->cd(m_histogramDirectoryName.c_str());
 
-  hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;Error Bit;Count", 64, 0, 64);
-  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;Error Bit", 6, 0, 6, 64, 0, 64);
-  hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;Error Bit", 64, 0, 64, 64, 0, 64);
+  hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 6, 0, 6, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+
+  // histograms might get unreadable, but, if necessary, you can zoom in anyways.
+  // we could use full alphanumeric histograms, but then, the labels would change (in the worst case) depending on observed errors
+  // and ... the histogram would contain NO labels if there is NO error ... confusing.
+  // ... an we would have to use alphanumeric X axis (DHE ID, DHC ID), too)
+  for (int i = 0; i < ONSEN_USED_TYPE_ERR; i++) {
+    const char* label = getPXDBitErrorName(i).c_str();
+    hDAQErrorEvent->GetXaxis()->SetBinLabel(i + 1, label);
+    hDAQErrorDHE->GetYaxis()->SetBinLabel(i + 1, label);
+    hDAQErrorDHC->GetYaxis()->SetBinLabel(i + 1, label);
+  }
+
+  hDAQErrorEvent->LabelsOption("v"); // rotate the labels.
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
   for (VxdID& avxdid : sensors) {
@@ -101,7 +114,7 @@ void PXDDAQDQMModule::event()
     PXDErrorFlags evt_emask = evt.getErrorMask();
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       PXDErrorFlags mask = (1ull << i);
-      if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(i);
+      if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
     }
     B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
     for (auto && pkt = evt.pkt_begin(); pkt < evt.pkt_end(); pkt++) {

@@ -35,7 +35,7 @@ TagUniqueSignalModule::TagUniqueSignalModule() : Module(), m_targetVar(nullptr)
 
 void TagUniqueSignalModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   Variable::Manager& manager = Variable::Manager::Instance();
 

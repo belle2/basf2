@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+from svd import add_svd_packer, add_svd_unpacker
 
 
 def add_packers(path, components=None):
@@ -91,8 +92,7 @@ def add_packers(path, components=None):
 
     # SVD
     if components is None or 'SVD' in components:
-        svdpacker = register_module('SVDPacker')
-        path.add_module(svdpacker)
+        add_svd_packer(path)
 
     # CDC
     if components is None or 'CDC' in components:
@@ -148,16 +148,9 @@ def add_unpackers(path, components=None):
         pxdhitsorter.param('mergeFrames', True)
         path.add_module(pxdhitsorter)
 
-        pxd_clusterizer = register_module('PXDClusterizer')
-        path.add_module(pxd_clusterizer)
-
     # SVD
     if components is None or 'SVD' in components:
-        svdunpacker = register_module('SVDUnpacker')
-        path.add_module(svdunpacker)
-
-        svd_clusterizer = register_module('SVDClusterizer')
-        path.add_module(svd_clusterizer)
+        add_svd_unpacker(path)
 
     # CDC
     if components is None or 'CDC' in components:

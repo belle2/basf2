@@ -46,7 +46,7 @@ namespace Belle2 {
     TOPPmtObsoleteData(const std::string& serialNumber,
                        EType type,
                        const std::string& cathode,
-                       float obsHV,
+                       int obsHV,
                        float darkCurrent,
                        float qe380):
       m_serialNumber(serialNumber), m_type(type), m_cathode(cathode),
@@ -75,7 +75,7 @@ namespace Belle2 {
      * Returns high voltage
      * @return high voltage in V
      */
-    float getObsoleteHV() const {return m_obsoleteHV;}
+    int getObsoleteHV() const {return m_obsoleteHV;}
 
     /**
      * Returns dark current
@@ -94,7 +94,7 @@ namespace Belle2 {
     std::string m_serialNumber; /**< serial number, e.g. JTxxxx */
     EType m_type = c_Unknown;   /**< type (conventional, ALD, ...) */
     std::string m_cathode;      /**< photo-cathode type (e.g. NaKSb, bialkali etc) */
-    float m_obsoleteHV = 0;     /**< high voltage: obsolete - NOT to be used */
+    int   m_obsoleteHV = 0;     /**< high voltage: obsolete - NOT to be used */
     float m_darkCurrent = 0;    /**< dark current */
     float m_qe380 = 0;          /**< quantum efficiency at 380 nm */
 

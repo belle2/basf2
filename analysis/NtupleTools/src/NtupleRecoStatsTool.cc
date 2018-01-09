@@ -16,7 +16,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ECLVariables.h>
 
 using namespace Belle2;
 using namespace std;
@@ -64,6 +64,9 @@ void NtupleRecoStatsTool::eval(const  Particle*)
 
   for (int i = 0; i < ECLClusters.getEntries(); i++) {
     const ECLCluster* cluster      = ECLClusters[i];
+
+    // Only use one hypothesis ID for ECLClusters
+    if (cluster->getHypothesisId() != 5) continue;
 
     if (cluster->isNeutral()) {
       Particle* gamma = new Particle(cluster);

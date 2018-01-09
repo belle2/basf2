@@ -82,7 +82,6 @@ void CDCCalibrationCollectorModule::prepare()
   m_tree->Branch<int>("IWire", &IWire);
   m_tree->Branch<double>("Pval", &Pval);
   m_tree->Branch<double>("ndf", &ndf);
-  //  m_tree->Branch<int>("trighit", &trighit);
   if (m_StoreTrackParams) {
     m_tree->Branch<double>("d0", &d0);
     m_tree->Branch<double>("z0", &z0);
@@ -97,12 +96,10 @@ void CDCCalibrationCollectorModule::prepare()
 
   auto m_hNDF = new TH1D("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
   auto m_hPval = new TH1D("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
-// auto m_hTriggerHitZX =  new TH2D("TriggerHitZX", "Hit Position on trigger counter;z(cm);x(cm)", 300, -100, 100, 120, -15, 15);
 
   registerObject<TTree>("tree", m_tree);
   registerObject<TH1D>("hNDF", m_hNDF);
   registerObject<TH1D>("hPval", m_hPval);
-  //registerObject<TH2D>("histTriggerImg",m_hTriggerHitZX);
 }
 
 void CDCCalibrationCollectorModule::collect()

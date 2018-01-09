@@ -58,7 +58,7 @@ void EclPainter2D::setTitles()
   const char* name[3][3] = {
     {"Events per channel", "Events per shaper"},
     {"Energy per channel (MeV)", "Energy per shaper (MeV)"},
-    {"Time per channel (DAQ units)", "Time per shaper (DAQ units)"}
+    {"Time per channel (ns)", "Time per shaper (ns)"}
   };
   const char* zname[3] = {
     "Events", "Energy (MeV)", "Time"

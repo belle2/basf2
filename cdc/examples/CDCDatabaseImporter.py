@@ -60,6 +60,7 @@ dbImporter.importXT(xtfile)
 dbImporter.importSigma(sgfile)
 dbImporter.importDisplacement(dispfile)
 dbImporter.importWirPosAlign(alfile)
+dbImporter.importADCDeltaPedestal()
 # dbImporter.importWirPosMisalign(misalfile)
 
 # dbImporter.printChannelMap()

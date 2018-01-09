@@ -70,8 +70,11 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
   addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
+  addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
+
 
   m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
+  //  (*m_adcPedestalFromDB).addCallback(this, &CDCUnpackerModule::setADCPedestal);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -120,6 +123,7 @@ void CDCUnpackerModule::beginRun()
   }
 
   loadMap();
+  setADCPedestal();
 }
 
 void CDCUnpackerModule::event()
@@ -361,6 +365,14 @@ void CDCUnpackerModule::event()
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
+            if (m_pedestalSubtraction == true) {
+              int diff = fadcSum - (*m_adcPedestalFromDB)->getPedestal(board, ch);
+              if (diff <= m_fadcThreshold) {
+                fadcSum = 0;
+              } else {
+                fadcSum =  static_cast<unsigned short>(diff);
+              }
+            }
             unsigned short tdc1 = 0;                  // TDC count.
             unsigned short tdc2 = 0;                  // 2nd TDC count.
             unsigned short tdcFlag = 0;               // Multiple hit or not (1 for multi hits, 0 for single hit).
@@ -500,6 +512,16 @@ void CDCUnpackerModule::loadMap()
   }
 }
 
+void CDCUnpackerModule::setADCPedestal()
+{
+  if (m_pedestalSubtraction == true) {
+    m_adcPedestalFromDB = new DBObjPtr<CDCADCDeltaPedestals>;
+    if (!(*m_adcPedestalFromDB).isValid()) {
+      m_pedestalSubtraction = false;
+    }
+  }
+
+}
 
 void CDCUnpackerModule::printBuffer(int* buf, int nwords)
 {

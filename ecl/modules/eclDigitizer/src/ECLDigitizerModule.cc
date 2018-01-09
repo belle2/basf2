@@ -323,10 +323,10 @@ void ECLDigitizerModule::readDSPDB()
   string dataFileName;
   if (m_background) {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
-    B2INFO("ECLDigitizer: Reading configuration data with background from: " << dataFileName);
+    B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
   } else {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
-    B2INFO("ECLDigitizer: Reading configuration data without background from: " << dataFileName);
+    B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
   }
   assert(! dataFileName.empty());
 
@@ -353,7 +353,7 @@ void ECLDigitizerModule::readDSPDB()
     for (int i = 0; i < ncellId; ++i)
       eclWaveformDataTable[cellId[i] - 1] = j;
   }
-  B2INFO("ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matricies will be used.");
+  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matricies will be used.");
 
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   tree2->SetBranchAddress("Algopars", &algo);
@@ -370,7 +370,7 @@ void ECLDigitizerModule::readDSPDB()
       m_tbl[cellId[i] - 1].idn = j;
   }
   if (algo) delete algo;
-  B2INFO("ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
+  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
 
   ECLNoiseData* noise = new ECLNoiseData;
   tree3->SetBranchAddress("NoiseM", &noise);
@@ -393,7 +393,7 @@ void ECLDigitizerModule::readDSPDB()
     }
   }
   if (noise) delete noise;
-  B2INFO("ECLDigitizer: " << eclWFAlgoParams.size() << " noise matricies were loaded.");
+  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matricies were loaded.");
 
   // repack fitting algorithm parameters
   m_idn.resize(eclWFAlgoParams.size());
@@ -428,7 +428,7 @@ void ECLDigitizerModule::readDSPDB()
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
     getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
   }
-  B2INFO("ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
+  B2DEBUG(150, "ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
@@ -451,7 +451,7 @@ void ECLDigitizerModule::readDSPDB()
   double psd_params_forPSD[] = {0.654324, 0.110699, 0.606028, 1.2688, 0.553606, 0.304011, 1.2551, 0.771018, 0.454058, 1.25524};
   m_ss[3].InitSample(psd_params_forPSD, 27.7221);
 
-  B2INFO("ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
+  B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 
   if (eclWFData) delete eclWFData;
 

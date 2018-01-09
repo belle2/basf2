@@ -8,30 +8,40 @@ import glob
 
 numEvents = 2000
 
-globalTag = "development"
-reset_database()
-use_database_chain()
-use_central_database(globalTag)
+bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+# bkgFiles = None #if no background
+simulateJitter = False
+ROIfinding = False
+Phase2 = False
 
 main = create_path()
 
 set_random_seed(1)
 
+expList = [0]
+if Phase2:
+    expList = [1002]
+
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [0])
+eventinfosetter.param('expList', expList)
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 main.add_module(eventinfosetter)
 main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
-bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
-# bkgFiles = "/sw/belle2/bkg/twoPhoton_usual-phase3-optimized.root"
-# bkgFiles = ""
+add_simulation(
+    main,
+    components=[
+        'MagneticField',
+        'BeamPipe',
+        'PXD',
+        'SVD'],
+    bkgfiles=bkgFiles,
+    usePXDDataReduction=ROIfinding,
+    simulateT0jitter=simulateJitter)
 
-add_simulation(main, components=['MagneticField', 'SVD'], bkgfiles=bkgFiles, usePXDDataReduction=False)
-
-add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=True)
+add_svd_reconstruction(main)
 
 add_tracking_reconstruction(
     main,
@@ -42,14 +52,20 @@ add_tracking_reconstruction(
     skipHitPreparerAdding=True)
 
 
-svdperf = register_module('SVDPerformance')
-svdperf.param('outputFileName', "SVDPerformance_Y4S_wBKG_CoG_MCTF.root")
-main.add_module(svdperf)
+tag = "_Y4S_noJitter_noBKG_noROI_MCTF.root"
+clseval = register_module('SVDClusterEvaluation')
+clseval.param('outputFileName', "ClusterEvaluation" + str(tag))
+main.add_module(clseval)
 
+svdperf = register_module('SVDPerformance')
+svdperf.param('outputFileName', "SVDPerformance" + str(tag))
+main.add_module(svdperf)
 
 # main.add_module('RootOutput')
 main.add_module('Progress')
+
 print_path(main)
+
 process(main)
 
 print(statistics)

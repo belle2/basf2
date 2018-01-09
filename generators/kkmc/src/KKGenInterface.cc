@@ -42,7 +42,7 @@ KKGenInterface::KKGenInterface()
 int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName,
                           const std::string& taudecaytableFileName, const std::string& KKMCOutputFileName)
 {
-  B2INFO("Begin initialisation of KKGen Interface.");
+  B2DEBUG(150, "Begin initialisation of KKGen Interface.");
 
   // This is to avoid character corruption of TAUOLA output
   char DatX_d[132], DatX_u[132], DatX_p[132], DatX_o[132];
@@ -81,7 +81,7 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
     m_mapPythiaIDtoPDG[particle->PythiaID()] = particle->PdgCode();
   }
 
-  B2INFO("End initialisation of KKGen Interface.");
+  B2DEBUG(150, "End initialisation of KKGen Interface.");
 
   return 0;
 }
@@ -113,12 +113,8 @@ void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TL
 
     kk_putbeam_(&pxh, &pyh, &pzh, &eh, &pxl, &pyl, &pzl, &el);
 
-    B2INFO("Espread_LER=" << Espread_LER);
-    B2INFO("Espread_HER=" << Espread_HER);
-
-//     crossing_angle = P4_HER.Vect().Dot(P4_LER.Vect()) / ph / pl;
-    /*    double Espread_CM = getBeamEnergySpreadCM(el, Espread_LER,
-                                                  eh, Espread_HER, crossing_angle);*/
+    B2DEBUG(150, "Espread_LER=" << Espread_LER);
+    B2DEBUG(150, "Espread_HER=" << Espread_HER);
     double Espread_CM = 0.0;
 
     sprintf(buf,
@@ -137,7 +133,7 @@ void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TL
 
 int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
 {
-  B2INFO("Start simulation of KKGen Interface.");
+  B2DEBUG(150, "Start simulation of KKGen Interface.");
   int status = 0;
   kk_event_(&status);
 
@@ -174,7 +170,7 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
 
   }
 
-  B2INFO("End simulation of KKGen Interface.");
+  B2DEBUG(150, "End simulation of KKGen Interface.");
   return hepevt_.nhep; //returns the number of generated particles from KKMC
 }
 

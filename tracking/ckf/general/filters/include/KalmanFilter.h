@@ -9,14 +9,26 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <genfit/MeasuredStateOnPlane.h>
 
+#include <vector>
+
 namespace Belle2 {
+  /**
+   * Filter which can be used on a pair of path (vector of states) and states,
+   * which will call the kalmanStep function of the given stepper class, to update the mSoP
+   * of the new state with a klaman update. Will return the result of the steppers kalmanStep function as a filter
+   * result (which should be the chi2) and will also set the chi2 of the new state.
+   * @tparam AState: should have the basic functionality of a CKFState.
+   * @tparam AKalmanStepper: should have a kalmanStep function.
+   */
   template <class AState, class AKalmanStepper>
   class KalmanFilter : public
     TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
   public:
+    /// Call the kalmanStep and update the new state and its chi2.
     TrackFindingCDC::Weight operator()(const std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>& pair)
     override
     {
@@ -33,6 +45,7 @@ namespace Belle2 {
     }
 
   private:
+    /// The used stepper algorithm
     AKalmanStepper m_kalmanStepper;
   };
 }

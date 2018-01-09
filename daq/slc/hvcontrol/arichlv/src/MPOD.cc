@@ -1,4 +1,7 @@
-// rok@f9lab08:~/slc$ g++ -Iinclude -DMPOD_MAIN hvcontrol/arichlv/src/MPOD.cc -lsnmp -o MPOD
+// ~/slc$ g++ -Iinclude -DMPOD_MAIN hvcontrol/arichlv/src/MPOD.cc -lsnmp -o MPOD
+// ~/slc$ g++ -Iinclude -DMPOD_MAIN hvcontrol/arichlv/src/MPOD.cc -lnetsnmp -o MPOD  #Ubuntu 16.04 LTS
+// ~/public_html/mpod$ sudo -H -u www-data bash -c './MPOD 1'
+// sudo cp ~/.snmp/mibs/WIENER-CRATE-MIB.txt /usr/share/snmp/mibs
 #ifdef _WINDOWS
 #include <windows.h>
 #endif
@@ -9,6 +12,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 //#include "MPOD.h"
+#include <time.h>
 #include "daq/slc/hvcontrol/arichlv/MPOD.h"
 
 
@@ -104,6 +108,7 @@ static SnmpObject outputMeasurementTerminalVoltage[MaxChannelsPerCrate];
 static SnmpObject outputMeasurementCurrent[MaxChannelsPerCrate];
 static SnmpObject outputMeasurementTemperature[MaxChannelsPerCrate];
 static SnmpObject outputSwitch[MaxChannelsPerCrate];
+static SnmpObject outputUserConfig[MaxChannelsPerCrate];
 static SnmpObject outputVoltage[MaxChannelsPerCrate];
 static SnmpObject outputCurrent[MaxChannelsPerCrate];
 static SnmpObject outputVoltageRiseRate[MaxChannelsPerCrate];
@@ -158,13 +163,155 @@ char snmpLastErrorBuffer[1024];
 SnmpDoubleBuffer snmpDoubleBuffer;
 SnmpIntegerBuffer snmpIntegerBuffer;
 
-//************************************************************************
+// ************************************************************************
 static int getNode(const char* const node, SnmpObject* object);
 static int getIndexNode(const char* const nodeBase, int index, SnmpObject* object);
 
 
 
 #ifdef MPOD_MAIN
+float mabs(float a)
+{
+  if (a > 0) return a;
+  else return -a;
+}
+int MPOD_CableTest(int id)
+{
+  double ret;
+  int iret;
+  int min = 0;
+  int max = 3;
+  const char  pathkek[100] = "arich-mpod3.b2nsm.kek.jp";
+  const char  pathijs[100] = "f9mpod2.ijs.si";
+  MPOD_Start();
+  HSNMP crate =  MPOD_Open(pathkek);
+  if (!crate) {
+    crate =  MPOD_Open(pathijs);
+    if (!crate) {
+      printf("<h5>Error: Cannot connect to device %s</h5>\n", pathkek);
+      return 0;
+    }
+
+  }
+
+  time_t rawtime;
+  struct tm* info;
+  char buffer[80];
+
+  time(&rawtime);
+
+  info = localtime(&rawtime);
+  printf("%s<br/>", asctime(info));
+
+
+
+
+  if (id < 2)  for (int ch = 0; ch < 4; ch++) {
+      setChannelSwitch(crate, ch , id);
+      if (id) setChannelSwitch(crate, ch , 10);
+      printf("setOutputSwitch ch=%d =>%d", ch, id);
+      printf("<br/>\n");
+    }
+  else {
+
+// set output voltage
+    float vset[4];
+    for (int ch = 0; ch < 4; ch++) {
+      vset[ch] = ch + 1;
+      setOutputVoltage(crate, ch , vset[ch]);
+
+      char  name[0xFF], sch[0xFF];
+      sprintf(sch, "%d", ch + 1);
+      sprintf(name, "outputConfigMaxTerminalVoltage.%s", sch);
+      ret = MPOD_SetDouble(crate, name, ch + 1.5);
+
+      iret = getOutputUserConfig(crate, ch + 1);
+      iret &= 0x17;
+      setOutputUserConfig(crate, ch + 1 , iret);
+    }
+
+
+
+
+    printf("<table border=1 class='mytable' >");
+    printf("<tr><th>Ch.</th><th>Vset</th><th>Vstatus</th><th>Imon</th><th>Vterminal</th><th>Vsense</th>\n");
+    for (int ch = 0; ch < 4; ch++) printf("<th>Vterm%d</th><th>Sense%d</th>\n", ch + 1, ch + 1);
+    for (int ch = 0; ch < 4; ch++) {
+      printf("<tr><td>%d</td>\n", ch);
+
+      for (int slot = min; slot < max; slot++) {
+        int chid = ch + slot * 100;
+        char  name[0xFF], sch[0xFF];
+        sprintf(sch, "%d", chid + 1);
+        if (slot == min) {
+
+          ret = getOutputVoltage(crate, chid);
+          printf("<td>%2.2f</td>", ret);
+
+          iret = getChannelSwitch(crate, chid);
+          int iret0 = getOutputUserConfig(crate, chid);
+          printf("<td>%d:0x%x</td>", iret,  iret0);
+
+          ret = getCurrentMeasurement(crate, chid);
+          printf("<td>%f</td>\n", ret);
+
+
+        }
+
+        if (slot == min) {
+          sprintf(name, "outputMeasurementTerminalVoltage.%s", sch);
+          ret = MPOD_GetDouble(crate, name);
+          printf("<td>%2.2f</td>", ret);
+
+          sprintf(name, "outputMeasurementSenseVoltage.%s", sch);
+          ret = MPOD_GetDouble(crate, name);
+          if (mabs(vset[ch] - ret) > 0.1)
+            printf("<td bgcolor='red' >%2.2f</td>\n", ret);
+          else
+            printf("<td bgcolor='green'>%2.2f</td>\n", ret);
+
+        } else {
+
+          for (int k = 0; k < 2; k++) {
+            chid = ch + k * 4 + slot * 100;
+            setOutputVoltage(crate, chid  , 0);
+            setChannelSwitch(crate, chid  , 1);
+            iret = getOutputUserConfig(crate, chid);
+            iret &= 0x17;
+            if (slot < 2) setOutputUserConfig(crate, chid  , iret);
+            sprintf(sch, "%d", chid + 1);
+
+
+            sprintf(name, "outputMeasurementTerminalVoltage.%s", sch);
+            ret = MPOD_GetDouble(crate, name);
+            printf("<td>%2.2f</td>", ret);
+
+
+            sprintf(name, "outputMeasurementSenseVoltage.%s", sch);
+            ret = MPOD_GetDouble(crate, name);
+            if (mabs(vset[ch] - ret) > 0.1)
+              printf("<td bgcolor='red' >%2.2f</td>\n", ret);
+            else
+              printf("<td bgcolor='green'>%2.2f</td>\n", ret);
+
+          }
+
+
+        }
+      }
+    }
+    printf("</table>");
+  }
+
+  MPOD_Close(crate);
+  MPOD_End();
+
+  return 0;
+}
+
+
+
+
 #ifdef _WINDOWS
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                       LPSTR lpszCmdLine, int nCmdShow)
@@ -187,13 +334,13 @@ int main(int argc , char**   argv)
   if (InitCVIRTE(hInstance, 0, 0) == 0) return -1;     /* out of memory */
 #endif
 
+  if (argc > 1) {
+    MPOD_CableTest(atoi(argv[1]));
+    return 0;
+  }
+
   MPOD_Start();
 
-
-
-
-
-  printf("-----------------------------------------------------------------\n");
   /*
     for (i=0;i<8;i++) {
       setChannelSwitch(crate, i, 0);
@@ -603,6 +750,7 @@ int snmpInit(void)
 
     for (int channel = base; channel < base + MaxChannelsPerSlot; ++channel) {
       if (
+        (!getIndexNode("outputUserConfig", channel + 1, &outputUserConfig[channel])) ||
         (!getIndexNode("outputName", channel + 1, &outputName[channel])) ||
         (!getIndexNode("outputIndex", channel + 1, &outputIndex[channel])) ||
         (!getIndexNode("outputGroup", channel + 1, &outputGroup[channel])) ||
@@ -939,6 +1087,23 @@ int getOutputStatus(HSNMP session, int channel)
   return snmpGetInt(session, &outputStatus[channel]);
 }
 
+
+/**
+ * @brief Returns the channel outputUserConfig register.
+ * @since 1.1
+ * @param session The handle returned by snmpOpen()
+ * @param channel The requested channel in the range of 0...999
+ * @return The channels outputStatus register
+ */
+int getOutputUserConfig(HSNMP session, int channel)
+{
+  if (channel < 0 || channel >= MaxChannelsPerCrate)
+    return 0;
+
+  return snmpGetInt(session, &outputUserConfig[channel]);
+}
+
+
 /**
  * @brief Returns the measured output sense voltage for channel in Volt.
  * @note This is only valid for WIENER LV modules.
@@ -1024,9 +1189,43 @@ int setChannelSwitch(HSNMP session, int channel, int value)
 int setOutputSwitch(HSNMP session, int channel, int value)
 {
   if (channel < 0 || channel >= MaxChannelsPerCrate) return 0;
-  printf("setOutputSwitch ch=%d =>%d", channel, value);
   return snmpSetInt(session, &outputSwitch[channel], value);
 }
+
+/**
+ * @brief Change the outputUserConfig of the channel
+ * @param session The handle returned by snmpOpen()
+ * @param channel The channel in the range of 0...999
+ * @param value bitvalue:A bit field packed into an integer which define the behavior of the output channel.
+             Usable for WIENER LV devices only.
+             The position of the bit fields in the integer value are:
+             Bit 0:    Voltage ramping at switch off:
+                           0: Ramp down at switch off.
+                           1: No ramp at switch off (immediate off)
+             Bit 1, 2: Set different regulation modes, dependent on the
+                           cable inductance:
+                     0: fast:     short cables, up to 1 meter.
+                     1: moderate: cables from 1 to 30 meter.
+                     2: slow:     cables longer than 30 meter.
+                     3: slow (identical to 2, should not be used)
+             Bit 3:    Internal sense line connection to the output (MPOD only):
+                           0: The sense input at the sense connector is used
+                              for regulation.
+                           1: The output voltage is used for regulation.
+                              Any signals at the sense connector are ignored.
+             Bit 4:    External Inhibit input.
+                           0: The external inhibit input is ignored.
+                           1: The external inhibit input must be connected to
+                              a voltage source to allow switch on.
+ * @return
+ */
+int setOutputUserConfig(HSNMP session, int channel, int value)
+{
+  if (channel < 0 || channel >= MaxChannelsPerCrate) return 0;
+  return snmpSetInt(session, &outputUserConfig[channel], value);
+}
+
+
 
 /**
  * @brief Returns the state of the channel.

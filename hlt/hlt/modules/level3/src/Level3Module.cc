@@ -13,11 +13,6 @@
 #include "hlt/hlt/modules/level3/FCFinder.h"
 #include "hlt/hlt/modules/level3/FCCluster.h"
 
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
-#include "hlt/hlt/dataobjects/L3Tag.h"
-#include "hlt/hlt/dataobjects/L3Track.h"
-#include "hlt/hlt/dataobjects/L3Cluster.h"
 
 #include "hlt/hlt/modules/level3/L3TrackTrigger.h"
 #include "hlt/hlt/modules/level3/L3EnergyTrigger.h"
@@ -84,8 +79,8 @@ void Level3Module::initialize()
   m_tFinder.init();
   m_cFinder.init();
   if (m_saveData >= 2) {
-    StoreArray<L3Track>::registerPersistent();
-    StoreArray<L3Cluster>::registerPersistent();
+    m_l3Track.registerInDataStore();
+    m_l3Cluster.registerInDataStore();
   }
   initializeTriggerManager();
   printInformation();

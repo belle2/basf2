@@ -3,6 +3,8 @@
 
 ######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # e+e- -> ccbar -> D*+ antyhing event generation
 #
 # This tutorial demonstrates how to generate

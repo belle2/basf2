@@ -46,7 +46,7 @@ add_reconstruction(main)
 main.add_module('RootOutput', outputFileName='output.root')
 
 # mdst output
-add_mdst_output(main, additionalBranches=['KlIds', 'KLMClustersToKlIds'])
+add_mdst_output(main)
 
 # process events and print call statistics
 process(main)

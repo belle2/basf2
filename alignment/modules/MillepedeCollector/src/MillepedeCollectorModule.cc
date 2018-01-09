@@ -104,7 +104,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
 void MillepedeCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData>::required();
+  // required input
+  m_eventMetaData.isRequired();
 
   if (m_tracks.empty() && m_particles.empty() && m_vertices.empty() && m_primaryVertices.empty())
     B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");

@@ -47,10 +47,18 @@ namespace Belle2 {
      */
     int getTrigId() const { return m_TrigId; }
 
-    /*! Get Trig ID
-     * @return trig ID
+    /*! Get Trigger tag
+     * Trigger tag word width is 16 bit (bits 0-15).
+     * Bit 16 is used as error flag.
+     * If it is 1 then trigger tags from different shapers are not equal
+     * @return Trigger tag
      */
-    int getTrigTag() const { return m_TrigTag; }
+    int getTrigTag() const { return m_TrigTag & 0xFFFF; }
+
+    /*! Get trigger tag quality flag.
+     * @return 0 if trigger tags from different shapers are equal. 1 otherwise.
+     */
+    int getTrigTagQualityFlag() const { return (m_TrigTag & 0x10000) >> 16; }
 
     /*! Get Trig Time
      * @return Trig Time

@@ -16,10 +16,13 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+
 #include <TFile.h>
 #include <string>
-#include <TEfficiency.h>
-
+#include <TH1F.h>
+#include <TGraph.h>
 
 
 namespace Belle2 {
@@ -68,20 +71,85 @@ namespace Belle2 {
     bool   m_faked;
     /** cluster reconstructed as K0L?   */
     bool   m_reconstructedAsKl;
+    /** of > 0 use Klid else use trackflag as reconstruction criterion  */
+    float m_KlIDCut;
 
-    // use TEfficiency histogramms to calculate efficiency
+    /** is beam bkg */
+    bool m_isBeamBKG;
+    // use TH1F histogramms to calculate efficiency
     /** efficiency in x-y plane   */
-    TEfficiency* m_effPhi;
+    TH1F* m_effPhi;
     /** efficiency in angle to z   */
-    TEfficiency* m_effTheta;
+    TH1F* m_effTheta;
     /** momentum efficiency   */
-    TEfficiency* m_effMom;
+    TH1F* m_effMom;
     /** fake phi, angle in x-y   */
-    TEfficiency* m_fakePhi;
+    TH1F* m_fakePhi;
     /**  fake theta, angle to z   */
-    TEfficiency* m_fakeTheta;
+    TH1F* m_fakeTheta;
     /**  fake momentum plot   */
-    TEfficiency* m_fakeMom;
+    TH1F* m_fakeMom;
+    /** efficiency in x-y plane   */
+    TH1F* m_effPhi_Pass;
+    /** efficiency in angle to z   */
+    TH1F* m_effTheta_Pass;
+    /** momentum efficiency   */
+    TH1F* m_effMom_Pass;
+
+    /** efficiency in x-y plane   */
+    TH1F* m_Phi_all;
+    /** efficiency in angle to z   */
+    TH1F* m_Theta_all;
+    /** momentum efficiency   */
+    TH1F* m_Mom_all;
+    /** momentum efficiency   */
+    TH1F* m_Mom_all_plot;
+    /** fake phi, angle in x-y   */
+    TH1F* m_fakePhi_Pass;
+    /**  fake theta, angle to z   */
+    TH1F* m_fakeTheta_Pass;
+    /**  fake momentum plot   */
+    TH1F* m_fakeMom_Pass;
+    /**  fake momentum plot   */
+    TH1F* m_time;
+    /**  fake momentum plot   */
+    TH1F* m_trackSep;
+    /**  fake momentum plot   */
+    TH1F* m_energy;
+    /**  fake momentum plot   */
+    TH1F* m_nLayer;
+    /**  innermostlayer  */
+    TH1F*  m_innermostLayer;
+    /**  track flag  */
+    TH1F*  m_trackFlag     ;
+    /**  ECL flag*/
+    TH1F*  m_ECLFlag       ;    /** beambkg */
+    /**mbkg  */
+    TH1F*  m_bkgPhi  ;
+    /** beambkg */
+    TH1F*  m_bkgTheta;
+    /** beambkg */
+    TH1F*  m_bkgMom  ;
+    /** used for roc */
+    TH1F*  m_klidFake  ;
+    /** used for roc */
+    TH1F*  m_klidTrue  ;
+    /** used for roc */
+    TH1F*  m_klidAll  ;
+    /** roc */
+    TGraph*  m_ROC;
+    /** roc */
+    TGraph*  m_backRej;
+
+
+    /** storearrays  */
+    StoreArray<KLMCluster> m_klmClusters;
+    /** storearrays  */
+    StoreArray<MCParticle> m_mcParticles;
+
+    /** bins used for the ROC plots */
+    const std::vector<double> m_xbins =
+    {0, 0.001, 0.01, 0.1, 0.15, 0.175, 0.2, 0.3, 0.4, 0.5, 1};
 
     /** output path   */
     std::string m_outPath = "nightlyKlongValidation.root";

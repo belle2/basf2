@@ -1,11 +1,13 @@
 Import('env')
 
+env['CONTINUE'] = False
+
 env['LIBS'] = ['$ROOT_LIBS', 'Geom',
                '$GEANT4_LIBS', 'CLHEP',
                #'boost_serialization',
                #'boost_python', 'boost_filesystem',
                #'$PYTHON_LIBS', '$XML_LIBS',
-               'framework' 
+               'daq','framework' 
 		]
 
 Return('env')

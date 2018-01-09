@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FrontEndMapping descr="Mapping of SCROD's to spare module #1">
+
+  <TOPModule CNumber="1">
+    <moduleID descr="module ID">1</moduleID>  <!-- not installed -->
+    <Boardstack col="0">
+      <SCRODid>110</SCRODid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
+      <FinesseSlot>A</FinesseSlot>
+    </Boardstack>
+    <Boardstack col="1">
+      <SCRODid>28</SCRODid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
+      <FinesseSlot>B</FinesseSlot>
+    </Boardstack>
+    <Boardstack col="2">
+      <SCRODid>68</SCRODid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
+      <FinesseSlot>C</FinesseSlot>
+    </Boardstack>
+    <Boardstack col="3">
+      <SCRODid>112</SCRODid>
+      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
+      <FinesseSlot>D</FinesseSlot>
+    </Boardstack>
+  </TOPModule>
+
+</FrontEndMapping>

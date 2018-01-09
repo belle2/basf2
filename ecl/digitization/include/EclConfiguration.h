@@ -45,7 +45,7 @@ namespace Belle2 {
         void AddHit(const double a, const double t0, const signalsample_t& q);
         double total; /**< total deposition (sum of m_s array) */
         double c[m_nsmp]; /**< flash ADC measurements */
-        double totalHadron; /** total hadron deposition*/
+        double totalHadron; /**< total hadron deposition*/
       };
 
       struct fitparams_t {

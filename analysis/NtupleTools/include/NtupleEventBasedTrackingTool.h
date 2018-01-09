@@ -15,7 +15,7 @@
 #include <TTree.h>
 
 namespace Belle2 {
-  /* NtupleTool to write event based tracking quantities to a flat ntuple */
+  /** NtupleTool to write event based tracking quantities to a flat ntuple */
   class NtupleEventBasedTrackingTool : public NtupleFlatTool {
   private:
     int m_nExtraCDCHits;             /**< number of CDC hits in the event not assigned to any track */

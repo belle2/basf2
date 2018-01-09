@@ -111,7 +111,7 @@ void ARICHDatabaseImporter::importModulesInfo()
   ARICHChannelMapping QAChMap;
 
   // read mapping from xml file
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
   istringstream chstream;
   int x, y, asic;
   chstream.str(content.getString("QAChannelMapping"));
@@ -120,7 +120,7 @@ void ARICHDatabaseImporter::importModulesInfo()
   }
 
   // get list of installed modules from xml
-  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  content = GearDir("/DetectorComponent[@name='ARICH']/Content/InstalledModules");
   B2INFO("Installed modules\n");
 
   std::vector<std::string> installed;
@@ -206,7 +206,7 @@ void ARICHDatabaseImporter::importChannelMask()
   ARICHChannelMask chanMask;
 
   // loop over installed modules (from xml file)
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content/InstalledModules");
   B2INFO("Installed modules\n");
   for (const GearDir& module : content.getNodes("Module")) {
     std::string hapdID = module.getString("@hapdID");
@@ -265,7 +265,7 @@ void ARICHDatabaseImporter::importSimulationParams()
 
   ARICHSimulationPar simPar;
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/SimulationParameters");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content/SimulationParameters");
 
   double qeScale = content.getDouble("qeScale");
   double winAbs = content.getDouble("windowAbsorbtion");
@@ -300,7 +300,7 @@ void ARICHDatabaseImporter::importSimulationParams()
 
 void ARICHDatabaseImporter::importChannelMapping()
 {
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
   ARICHChannelMapping chMap;
 
   istringstream chstream;
@@ -324,7 +324,7 @@ void ARICHDatabaseImporter::importChannelMapping()
 void ARICHDatabaseImporter::importFEMappings()
 {
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
 
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
@@ -385,7 +385,7 @@ void ARICHDatabaseImporter::importFEMappings()
 void ARICHDatabaseImporter::importGeometryConfig()
 {
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
   ARICHGeometryConfig arichGeometryConfig(content);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
@@ -397,7 +397,7 @@ void ARICHDatabaseImporter::importGeometryConfig()
 
 void ARICHDatabaseImporter::importCosmicTestGeometry()
 {
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
   GearDir cosmic(content, "CosmicTest");
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
@@ -455,10 +455,10 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
     for (int layer = 0; layer < 2; layer++) {
       for (const auto& element : elements) {
         if (element.getAerogelLayer(layer) == 1 && element.getAerogelRingID() == ring
-            && element.getAerogelColumnID() == column) aeroID = element.getAerogelID();
+            && element.getAerogelColumnID() == column) aeroID = element.getAerogelSN();
       }
       for (const auto& elementInfo : elementsInfo) {
-        if (elementInfo.getAerogelSerial() == aeroID) {
+        if (elementInfo.getAerogelSN() == aeroID) {
           refractiveIndex = elementInfo.getAerogelRefractiveIndex();
           transmissionLength = elementInfo.getAerogelTransmissionLength();
         }
@@ -512,7 +512,7 @@ void ARICHDatabaseImporter::printAeroTileInfo()
 void ARICHDatabaseImporter::importBiasMappings()
 {
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorCables[@name='ARICH']/Content");
 
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
@@ -574,12 +574,12 @@ void ARICHDatabaseImporter::importBiasMappings()
 void ARICHDatabaseImporter::importHvMappings()
 {
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorCables[@name='ARICH']/Content");
 
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
   ARICHHvCablesMapping hvMap;
-  GearDir mapping(content, "hvCableMapping");
+  GearDir mapping(content, "hvCableToModuleMapping");
 
   for (const GearDir& module : mapping.getNodes("cableMap")) {
     unsigned cableID = (unsigned) module.getInt("cableID");
@@ -636,7 +636,7 @@ void ARICHDatabaseImporter::importHvMappings()
 void ARICHDatabaseImporter::importNominalBiasVoltages()
 {
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/DetectorCables[@name='ARICH']/Content");
 
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
@@ -669,6 +669,14 @@ void ARICHDatabaseImporter::printBiasMappings()
   DBObjPtr<ARICHBiasChannelsMapping> channelsMap;
   channelsMap->print();
   DBObjPtr<ARICHBiasCrateCableMapping> crateMap;
+  crateMap->print();
+}
+
+void ARICHDatabaseImporter::printHvMappings()
+{
+  DBObjPtr<ARICHHvCablesMapping> hvMap;
+  hvMap->print();
+  DBObjPtr<ARICHHvCrateCableMapping> crateMap;
   crateMap->print();
 }
 
@@ -713,7 +721,7 @@ void ARICHDatabaseImporter::printNominalBiasVoltageForChannel(std::vector<int> c
   B2INFO("Crate " << channel[0] << ", slot " << channel[1] << ", slot channel " << channel[2] << " belongs to hapd " << hapdID <<
          " (module ID = " << moduleID << ") in sector " << sector << ".\n       Corresponding cable is " << sector << "-" << outerCable <<
          ".\n       Cable type is " << biasType << " with applied voltage " << appliedVoltage << " V.");
-// B2WARNING("Please, note that the crate-slot mapping of bias cables is still random! Do not try to apply given voltages to the HAPDs yet!");
+//  B2INFO(channel[0] << "," << channel[1] << "," << channel[2] << "," << moduleID << "," << sector << "," << outerCable << "," << biasType << "," << appliedVoltage);
 }
 
 void ARICHDatabaseImporter::printHapdPositionFromCrateSlot(int crate, int slot, int channelID)
@@ -923,7 +931,7 @@ void ARICHDatabaseImporter::exportAerogelInfo()
     (*elements).GetEntries();
     for (int i = 0; i < elements->GetSize(); i++) {
       ARICHAerogelInfo* myelement = static_cast<ARICHAerogelInfo*>(elements->At(i));
-      B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSerial() << ", n = " << myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " << myelement->getAerogelThickness());
+      B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSN() << ", n = " << myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " << myelement->getAerogelThickness());
     }
   */
 
@@ -935,7 +943,7 @@ void ARICHDatabaseImporter::exportAerogelInfo()
 
   // Print aerogel info
   for (const auto& element : elements) {
-    B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
+    B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSN() <<
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
            element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
   }
@@ -962,7 +970,7 @@ void ARICHDatabaseImporter::importAerogelMap()
       // save data as an element of the array
       new(agelMap[agel]) ARICHAerogelMap();
       auto* agelConst = static_cast<ARICHAerogelMap*>(agelMap[agel]);
-      agelConst->setAerogelID(agelserial);
+      agelConst->setAerogelSN(agelserial);
       agelConst->setAerogelRingID(ring);
       agelConst->setAerogelColumnID(phi);
       agelConst->setAerogelLayer(layer, 1);
@@ -991,7 +999,7 @@ void ARICHDatabaseImporter::exportAerogelMap()
     string layer;
     if (element.getAerogelLayer(0) == 1) layer = "down";
     if (element.getAerogelLayer(1) == 1) layer = "up";
-    B2INFO("ID = " << element.getAerogelID() << ", ring = " << element.getAerogelRingID() <<
+    B2INFO("ID = " << element.getAerogelSN() << ", ring = " << element.getAerogelRingID() <<
            ", column = " << element.getAerogelColumnID() << ", layer: " << layer);
   }
 }
@@ -1092,7 +1100,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
   (*elements).GetEntries();
   for (int i = 0; i < elements->GetSize(); i++) {
     ARICHAerogelInfo* myelement = (ARICHAerogelInfo*)elements->At(i);
-    B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSerial() << ", n = " <<
+    B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSN() << ", n = " <<
            myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " <<
            myelement->getAerogelThickness());
   }
@@ -1106,7 +1114,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
     // Print aerogel info
 
     for (const auto& element : elements) {
-      B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
+      B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSN() <<
              ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
              element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
     }
@@ -2096,22 +2104,6 @@ std::vector<int> ARICHDatabaseImporter::channelsListHapd(std::string chlist, std
 {
   B2INFO("channel list = " << chlist << ", chip = " << chipDelay);
   string chlistDig = ARICHTools::remove_chars_if_not(chlist, "0123456789,～");
-  /*
-    auto iss = std::istringstream(chlistDig);
-    auto token = std::string();
-    auto strReplace = std::string();
-    const char delim = ',';
-
-    if(chlistDig.find("～") != string::npos)  {
-      while (std::getline(iss, token, delim))  {
-        if(token.find("～") != std::string::npos) {
-          for(int i = std::stoi(token.substr(0,token.find("～")))+1; i < std::stoi(token.substr(token.find("～")+3)); i++) strReplace.append(','+std::to_string(i));
-          chlistDig.replace(chlistDig.find("～"), 3, ",");
-          chlistDig.append(strReplace);
-          strReplace.clear();
-    }
-  }
-      }*/
 
   vector<int> CHs = ARICHTools::getDeadCutList(*chipDelay.c_str(), ARICHTools::StringToVector::parse<int>(chlistDig, ','));
 
@@ -2344,7 +2336,7 @@ std::map<std::string, float> ARICHDatabaseImporter::getAerogelParams(const std::
   DBArray<ARICHAerogelInfo> elements("ARICHAerogelInfo");
   elements.getEntries();
   for (const auto& element : elements) {
-    if ((element.getAerogelSerial()) == aeroSerialNumber) {
+    if ((element.getAerogelSN()) == aeroSerialNumber) {
       aerogelParams = {
         { "refractiveIndex", element.getAerogelRefractiveIndex() },
         { "transmissionLength", element.getAerogelTransmissionLength() },
@@ -2802,6 +2794,28 @@ void ARICHDatabaseImporter::exportSensorModuleMap()
   }
 }
 
+void ARICHDatabaseImporter::exportSensorModuleMapInfo(int number)
+{
+  DBArray<ARICHSensorModuleMap> elements("ARICHSensorModuleMap");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    ARICHSensorModuleInfo* newelement = element.getSensorModuleId();
+    if (!(newelement->getSensorModuleID() == number)) continue;
+    B2INFO("Sextant = " << element.getSensorModuleSextantID() << ", ring = " << element.getSensorModuleRingID() << ", column = " <<
+           element.getSensorModuleColumnID());
+    B2INFO("module ID = " << newelement->getSensorModuleID() << ", feb = " << newelement->getFEBserial() << ", hapd = " <<
+           newelement->getHAPDserial());
+    ARICHHapdInfo* newerelement = newelement->getHapdID();
+    B2INFO("Hapd Serial = " << newerelement->getSerialNumber() << "; HV = " << newerelement->getHighVoltage() << "; qe400 = " <<
+           newerelement->getQuantumEfficiency400());
+    for (int i = 0; i < 4; i++) {
+      ARICHHapdChipInfo* newestelement = newerelement->getHapdChipInfo(i);
+      B2INFO("Hapd Serial = " << newestelement->getHapdSerial() << "; chip = " << newestelement->getChipLabel() << "; gain = " <<
+             newestelement->getGain());
+    }
+  }
+}
 
 void ARICHDatabaseImporter::importMagnetTest()
 {

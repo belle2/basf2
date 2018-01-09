@@ -5,6 +5,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, d
     :param cdc_reco_tracks: The name of the already created CDC Reco Tracks
     :param svd_reco_tracks: The name of the already created CDC Reco Tracks
     :param use_mc_truth: Use the MC information in the CKF
+    :param direction: where to extrapolate to. Valid options are forward and backward
     """
     # The CDC tracks need to be fitted
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
@@ -127,6 +128,7 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
     :param overlap_cut: CKF parameter for MVA overlap filter
     :param use_best_results: CKF parameter for useNResults
     :param use_best_seeds: CKF parameter for useBestNInSeed
+    :param direction: where to extrapolate to. Valid options are forward and backward
     """
 
     if "SVDSpacePointCreator" not in path:

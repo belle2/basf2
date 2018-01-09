@@ -475,7 +475,7 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
+def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before_with_second_ckf",
                                 reco_tracks="RecoTracks",
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
@@ -492,6 +492,8 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
     :param svd_reco_tracks: The store array name where to output the svd tracks
     :param pxd_reco_tracks: The store array name where to output the pxd tracks
     :param components: the list of geometry components in use or None for all components.
+    :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
+           extrapolate also in the other direction.
     :param use_mc_truth: Use the truth information in the CKF modules
     """
     if not is_svd_used(components):

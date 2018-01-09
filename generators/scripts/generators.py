@@ -190,6 +190,27 @@ def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenpartic
     fragmentation.if_value('<1', generator_emptypath)
 
 
+def add_bhwide_generator(path, minangle=0.5):
+    """
+    Add the high precision QED generator BHWIDE to the path. Settings are the default L1/HLT study settings
+    with a cross section of about 124000 nb (!)
+    :param path: Add the modules to this path
+    :param minangle: minimum angle of the outgoing electron/positron in the CMS
+    """
+
+    if minangle < 0.0 or minangle > 180.0:
+        B2FATAL("add_bhwide_generator minimum angle too small (<0.0) or too large (>180): {}".format(minangle))
+
+    bhwide = path.add_module("BHWideInput")
+    bhwide.param('ScatteringAngleRangePositron', [minangle, 180.0 - minangle])
+    bhwide.param('ScatteringAngleRangeElectron', [minangle, 180.0 - minangle])
+    bhwide.param('MaxAcollinearity', 180.0)
+    bhwide.param('MinEnergy', 0.10)
+    bhwide.param('VacuumPolarization', 'burkhardt')
+    bhwide.param('WeakCorrections', True)
+    bhwide.param('WtMax', 3.0)
+
+
 def add_babayaganlo_generator(path, finalstate=''):
     """
     Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006

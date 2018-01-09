@@ -12,5 +12,6 @@
 #include <tracking/ckf/general/utilities/Advancer.h>
 
 namespace Belle2 {
+  /// The PXD advancer is just a synonym of the normal advancer (but may change in the future).
   using SVDAdvancer = Advancer;
 }

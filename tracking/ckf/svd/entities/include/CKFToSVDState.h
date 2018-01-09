@@ -37,16 +37,23 @@ namespace Belle2 {
     /// Return the plane of the first SVD cluster
     genfit::SharedPlanePtr getPlane(const genfit::MeasuredStateOnPlane& state) const;
 
+    /// Helper function for getting the already created reco hit (runtime reasons)
     const SVDRecoHit& getRecoHit() const;
 
+    /// Helper function for getting the already created reco hits (runtime reasons)
     const std::vector<SVDRecoHit>& getRecoHits() const;
 
+    /// Return the related SVD track, if we go along one of them (or a nullptr)
     const RecoTrack* getRelatedSVDTrack() const;
+
+    /// Set the related SVD track, if we go along one of them (or a nullptr)
     void setRelatedSVDTrack(const RecoTrack* relatedSVDTrack);
 
   private:
+    /// Precache the PXDRecoHits for runtime performance reasons.
     std::vector<SVDRecoHit> m_recoHits;
 
+    /// The related SVD track, if we go along one of them (or a nullptr)
     const RecoTrack* m_relatedSVDTrack = nullptr;
   };
 }

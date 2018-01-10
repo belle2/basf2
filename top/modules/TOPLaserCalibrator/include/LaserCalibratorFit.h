@@ -108,6 +108,12 @@ namespace Belle2 {
        */
       double getFitT()  {return m_fitT;}
 
+      /**
+       * returns the error mean positon after fit
+       */
+      double getFitTErr() {return m_fitTErr;}
+
+
     private:
 
       /**
@@ -135,6 +141,7 @@ namespace Belle2 {
       double m_xmin = 0; /**< fitting low-edge */
       double m_xmax = 0; /**< fitting upper-edge */
       double m_fitT = 0; /**< mean position after fit */
+      double m_fitTErr = 0.; /**< error on the mean position estimated by the fit */
       std::vector<TH1F*> m_hist; /**< time hist of 512 channels */
       std::vector<TF1*> m_func; /**< fitting function */
       std::string m_fitMethod; /**< fitting method */

@@ -47,6 +47,7 @@ namespace Belle2 {
     virtual void endRun()       ;
 
   private:
+
     void bootstrapSectorMap(void);
     void bootstrapSectorMap(const SectorMapConfig& config);
     void persistSectorMap(void);
@@ -65,6 +66,16 @@ namespace Belle2 {
     // pointer to the DBObjPtr for the payloadfile from which the sectormap is read
     DBObjPtr<PayloadFile>* m_ptrDBObjPtr = nullptr;
 
+
+    // vector of vector specifying how 2-hit filters are altered.
+    // The first entry of the inner vector contains the index of the cut value to be changed
+    // (see Filter::getNameAndReference function) and the second entry of the inner vector contains a regex for a TF1
+    std::vector< std::vector<std::string> > m_twoHitFilterAdjustFunctions = {};
+
+    // vector of vector specifying how 3-hit filters are altered.
+    // The first entry of the inner vector contains the index of the cut value to be changed
+    // (see Filter::getNameAndReference function) and the second entry of the inner vector contains a regex for a TF1
+    std::vector< std::vector<std::string> > m_threeHitFilterAdjustFunctions = {};
 
     // if true the sector map will be read from the DB. NOTE: this will override m_readSectorMap (read from file)
     bool m_readSecMapFromDB = false;

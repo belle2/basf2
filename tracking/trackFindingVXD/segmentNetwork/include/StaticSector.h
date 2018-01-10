@@ -3,13 +3,16 @@
  * Copyright(C) 2015 - Belle II Collaboration                                   *
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
- * Contributors: Eugenio Paoloni                                                *
+ * Contributors: Eugenio Paoloni, Thomas Lueck                                  *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
 #pragma once
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
+#include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
+
+#include <TF1.h>
 
 #include <unordered_map>
 #include <tuple>
@@ -21,9 +24,111 @@ namespace Belle2 {
              class Filter2sp, class Filter3sp, class Filter4sp >
   class StaticSector {
 
-/// DATA MEMBERS
+    // allows VXDTFFilters to modify private members and use private functions, which is kind of dangerous
+    // maybe better to make the one function needed to modify the filters public
+    template<class T>
+    friend class VXDTFFilters;
+
+/// PRIVATE MEMBERS
 
   private:
+
+    /** function that modifies all 2SP-filters connected to this static sector
+        @param adjustFunctions : a vector of vector of strings, the second vector is assumed to have 2 entries only.
+          The first entry is the index of variable to change (see Filter::getNameAndReference where the indizes are defined)
+          so it must be able to be converted to an int. The second is a regex to be used in a TF1 (root function).
+    */
+    void modify2SPFilters(const std::vector< std::vector< std::string > >& adjustFunctions)
+    {
+      // loop over all 2SP-filters
+      for (auto& filter : m_2spFilters) modifySingleFilter<Filter2sp>(filter.second, adjustFunctions);
+    }
+
+    /** function that modifies all 3SP-filters connected to this static sector
+        @param adjustFunctions : a vector of vector of strings, the second vector is assumed to have 2 entries only.
+          The first entry is the index of variable to change (see Filter::getNameAndReference where the indizes are defined)
+          so it must be able to be converted to an int. The second is a regex to be used in a TF1 (root function).
+    */
+    void modify3SPFilters(const std::vector< std::vector< std::string > >& adjustFunctions)
+    {
+      // loop over all 2SP-filters
+      for (auto& filter : m_3spFilters) modifySingleFilter<Filter3sp>(filter.second, adjustFunctions);
+    }
+
+    /** Function that modifies the uper and lower bounds of the Ranges contained in the filter. The actual bounds
+        which will be modified are accessed by their index they have (see Filter::getNameAndReference where the indizes are defined).
+        @param filter: a specialization of Filter
+        @param adjustFunctions : a vector of vector of strings, the second vector is assumed to have 2 entries only.
+              The first entry is the index of variable to change (see Filter::getNameAndReference where the indizes are defined)
+              so it must be able to be converted to an int. The second is a regex to be used in a TF1 (root function).
+              For the regex it is assumed that "x" is the cutvalue itself and "y" is the FullSecID of the static sector (e.g. "sin(x)")
+    */
+    template<class FilterType>
+    void modifySingleFilter(FilterType& filter, const std::vector< std::vector< std::string > >& adjustFunctions)
+    {
+      // get the "map" to the cut values, the char in the pair codes the type, and the pointer points to the value
+      std::vector< std::pair<char, void*> > accessor = {};
+      filter.getNameAndReference(&accessor);
+
+      // this will produce lots of output
+      B2DEBUG(1, std::endl << "BEFORE: " << filter.getNameAndReference() << std::endl);
+
+      // loop over all adjustfunctions
+      for (const std::vector< std::string >& entry : adjustFunctions) {
+        if (entry.size() != 2) {
+          B2FATAL("Incorrect format of input functions! Assumed format is vector<vector<string>> where the second (inside) vector"
+                  << " only should contain exactly two entries!");
+        }
+
+        // asume first string is an integer
+        int index = -1;
+        try {
+          index = std::stoi(entry[0]);
+        } catch (...) {
+          B2FATAL("Unable to perform stoi conversion! The provided string has to be able to be converted to an int (e.g. 1, 3, 42 ...). ");
+        }
+
+        if (index < 0 || index >= (int)accessor.size()) {
+          B2FATAL("Provided index is out of range! index = " << index << " number of entries = " << accessor.size());
+        }
+
+        // now do some casting magic
+        double x = 0;
+        // the secID will be treated as 0th parameter of the TF1 ([0]) if specified.
+        double y = m_secID;
+
+        char typeID = accessor[index].first;
+        void* valuePtr = accessor[index].second;
+        if (typeID == TBranchLeafType(double())) x = *((double*)valuePtr);
+        else if (typeID == TBranchLeafType(int())) x = *((int*)valuePtr);
+        else if (typeID == TBranchLeafType(float())) x = *((float*)valuePtr);
+        else if (typeID == TBranchLeafType(bool())) x = *((bool*)valuePtr);
+        else {
+          B2FATAL("Unrecognized type : " << typeID);
+        } // end else if
+
+        // create function
+        TF1 f("function", entry[1].c_str());
+        if (!f.IsValid() || f.GetNpar() > 1) {
+          B2FATAL("No valid function provided! The provided string has to be able to be converted by TF1. Also max. 1 parameter is allowed!");
+        }
+
+        double result = f.EvalPar(&x, &y);
+
+        // now cast back to original type and set the value
+        if (typeID == TBranchLeafType(double())) *((double*)valuePtr) = result;
+        else if (typeID == TBranchLeafType(int())) *((int*)valuePtr) = result;
+        else if (typeID == TBranchLeafType(float())) *((float*)valuePtr) = result;
+        else if (typeID == TBranchLeafType(bool())) *((bool*)valuePtr) = result;
+        else {
+          B2FATAL("Unrecognized type : " << typeID);
+        } // end else if
+
+      }// end loop over the functions
+
+      B2DEBUG(1, "AFTER: " << filter.getNameAndReference() << std::endl);
+    }
+
     /** stores its own secID */
     FullSecID m_secID;
 
@@ -188,6 +293,9 @@ namespace Belle2 {
     {
       return (getFullSecID() == b);
     }
+
+
+
 
   };
 

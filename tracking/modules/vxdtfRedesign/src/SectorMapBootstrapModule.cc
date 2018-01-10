@@ -69,6 +69,36 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
 
   addParam("ReadSecMapFromDB", m_readSecMapFromDB, "If set to true the sector map will be read from the Data Base. NOTE: this will "
            "override the parameter ReadSectorMap (reading sector map from file)!!!", m_readSecMapFromDB);
+
+
+  // dummy vector needed to get the current structure of the filter
+  std::vector< std::pair<char, void*> > dummyVector = {};
+
+  VXDTFFilters<SpacePoint>::twoHitFilter_t empty2HitFilter;
+  // the structure is the same for all templates
+  std::string structure2HitFilter = empty2HitFilter.getNameAndReference(&dummyVector);
+  dummyVector.clear();
+  addParam("twoHitFilterAdjustFunctions", m_twoHitFilterAdjustFunctions,
+           "Vector of vectors containing expressions used to "
+           "alter the 2-hit filters. The inner vector should contain exactly two strings. The first entry is interpreted as index (integer). "
+           "The second entry is interpreted as function used to create a TF1. The variable to be altered will be assumed to be called \"x\" "
+           "and in addition one can use \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. "
+           "No other parameter is allowed. The structure of the 2-hit filter is as follows:       " + structure2HitFilter +
+           "    Example: [[\"1\", \"12\"], [\"3\", \"sin(x)\"], [\"4\", \"x + [0]\"]]    PS: use this feature only if you know what you are doing!",
+           m_twoHitFilterAdjustFunctions);
+
+  VXDTFFilters<SpacePoint>::threeHitFilter_t empty3HitFilter;
+  // the structure is the same for all templates
+  std::string structure3HitFilter = empty3HitFilter.getNameAndReference(&dummyVector);
+  dummyVector.clear();
+  addParam("threeHitFilterAdjustFunctions", m_threeHitFilterAdjustFunctions,
+           "Vector of vectors containing expressions used to "
+           "alter the 3-hit filters. The inner vector should contain exactly two strings. The first entry is interpreted as index (integer). "
+           "The second entry is interpreted as function used to create a TF1. The variable to be altered will be assumed to be called \"x\" "
+           "and in addition \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. No other "
+           "parameter is allowd. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
+           "    Example: [[\"1\", \"12\"], [\"3\", \"sin(x)\"], [\"4\", \"x + [0]\"]]    PS: use this feature only if you know what you are doing!",
+           m_twoHitFilterAdjustFunctions);
 }
 
 void
@@ -97,6 +127,9 @@ SectorMapBootstrapModule::initialize()
       B2DEBUG(1, "Checked that output file does not exist!");
     }
   }
+
+
+
 }
 
 void
@@ -436,6 +469,29 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     string setupKeyNameStd = string(setupKeyName->Data());
     segmentFilters->retrieveFromRootFile(setupKeyName);
 
+    // if the m_twoHitFilterAdjustFunctions m_threeHitFilterAdjustFunctions are non empty filters will be altered
+    if (m_twoHitFilterAdjustFunctions.size() > 0) {
+      B2WARNING("The 2-hit filters will be altered from the default!");
+      B2INFO("The following set of indizes and functions will be used to alter the 2-hit filters:");
+      for (auto& vec : m_twoHitFilterAdjustFunctions) {
+        if (vec.size() != 2) B2FATAL("Error: inner vector has to have size=2");
+        B2INFO("index=" << vec[0] << " function=" << vec[1]);
+      }
+      segmentFilters->modify2SPFilters(m_twoHitFilterAdjustFunctions);
+    }
+    if (m_threeHitFilterAdjustFunctions.size() > 0) {
+      B2WARNING("The 3-hit filters will be altered from the default!");
+      B2INFO("The following set of indizes and functions will be used to alter the 3-hit filters:");
+      for (auto& vec : m_threeHitFilterAdjustFunctions) {
+        if (vec.size() != 2) B2FATAL("Error: inner vector has to have size=2");
+        B2INFO("index=" << vec[0] << " function=" << vec[1]);
+      }
+      segmentFilters->modify3SPFilters(m_threeHitFilterAdjustFunctions);
+    }
+
+    // locks all functions that can modify the filters
+    segmentFilters->lockFilters();
+
     B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
     filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
 
@@ -455,6 +511,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   if (setupKeyName != nullptr) {
     delete setupKeyName;
   }
+
 }
 
 

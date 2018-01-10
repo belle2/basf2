@@ -294,6 +294,11 @@ namespace Belle2 {
     /// Retrieves from the current TDirectory all the VXDTFFilters
     bool retrieveFromRootFile(const TString* dirName)
     {
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2WARNING("Trying to modify a locked filter! Did nothing!");
+        return false;
+      }
 
       if (! m_testConfig.Read("config"))
         return false;
@@ -312,6 +317,12 @@ namespace Belle2 {
     /// @param sublayer : new value for the sublayer, the new SubLayerID will be 0 if sublayer==0, and 1 else
     bool setSubLayerIDs(FullSecID sector, int sublayer)
     {
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2WARNING("Trying to modify a locked filter! Did nothing!");
+        return false;
+      }
+
       // first update the static sector
       // the static sector is retrieved from the compactid which automatically ignores the sublayer id
       auto sectorPosition = m_compactSecIDsMap[ sector ];
@@ -323,6 +334,49 @@ namespace Belle2 {
       // then update the fullsectorid in the compactsectoridmap, the sublayerid of sector will be ignored when searching for sector to update
       return m_compactSecIDsMap.setSubLayerID(sector, sublayer);
     }
+
+    // This function should be called only AFTER all adjustments to the filters have been performed.
+    // It sets m_preventModification to true and the VXDTFFilter is locked meaning that all function trying to modify it
+    // will be do nothing. After a filter is locked it can NOT be unlocked.
+    void lockFilters() { m_preventModification = true; };
+
+    // modifies the 2SP-filters according to the functions given
+    // @ param adjustFunctions: a vector of vectors that contain exactly two strings, the first string will be interpreted
+    //                          integer, the second one will be interpreted TF1 regexp.
+    void modify2SPFilters(const std::vector< std::vector< std::string > >& adjustFunctions)
+    {
+
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2WARNING("Trying to modify a locked filter! Did nothing!");
+        return;
+      }
+
+      for (auto staticSector : m_staticSectors) {
+        if (staticSector == nullptr) continue;
+        // may add the secid as additional parameter
+        staticSector->modify2SPFilters(adjustFunctions);
+      }
+    };
+
+    // modifies the 3SP-filters according to the functions given
+    // @ param adjustFunctions: a vector of vectors that contain exactly two strings, the first string will be interpreted
+    //                          integer, the second one will be interpreted TF1 regexp.
+    void modify3SPFilters(const std::vector< std::vector< std::string > >& adjustFunctions)
+    {
+
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2WARNING("Trying to modify a locked filter! Did nothing!");
+        return;
+      }
+
+      for (auto staticSector : m_staticSectors) {
+        if (staticSector == nullptr) continue;
+        // may add the secid as additional parameter
+        staticSector->modify3SPFilters(adjustFunctions);
+      }
+    };
 
   private:
 
@@ -542,6 +596,10 @@ namespace Belle2 {
 
     const char* c_CompactSecIDstreeName = "CompactSecIDs";
 
+    /** once set to true the VXDTFFilters will not allow modification of the stored filters.
+    A check of this variable should be included in every public function that modifies filters!
+    */
+    bool m_preventModification = false;
   };
 
 }

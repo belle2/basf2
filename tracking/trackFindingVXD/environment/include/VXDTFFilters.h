@@ -354,14 +354,13 @@ namespace Belle2 {
 
       for (auto staticSector : m_staticSectors) {
         if (staticSector == nullptr) continue;
-        // may add the secid as additional parameter
         staticSector->modify2SPFilters(adjustFunctions);
       }
     };
 
     // modifies the 3SP-filters according to the functions given
     // @ param adjustFunctions: a vector of vectors that contain exactly two strings, the first string will be interpreted
-    //                          integer, the second one will be interpreted TF1 regexp.
+    //                          integer, the second one will be interpreted as regexp to generate a TF1.
     void modify3SPFilters(const std::vector< std::vector< std::string > >& adjustFunctions)
     {
 
@@ -373,7 +372,6 @@ namespace Belle2 {
 
       for (auto staticSector : m_staticSectors) {
         if (staticSector == nullptr) continue;
-        // may add the secid as additional parameter
         staticSector->modify3SPFilters(adjustFunctions);
       }
     };

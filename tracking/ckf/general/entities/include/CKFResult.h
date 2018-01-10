@@ -57,6 +57,7 @@ namespace Belle2 {
           const double stateChi2 = state->getChi2();
           m_chi2 += stateChi2;
 
+          // The initial value of the maximal and minimal chi2 is NAN, so we always override this default value.
           if (stateChi2 > m_maximalChi2 or std::isnan(m_maximalChi2)) {
             m_maximalChi2 = stateChi2;
           }
@@ -88,13 +89,13 @@ namespace Belle2 {
       return m_chi2;
     }
 
-    /// Getter for the maximal chi2 of all stored hits
+    /// Getter for the maximal chi2 of all stored hits. NAN means there is no valid chi2 at all.
     double getMaximalChi2() const
     {
       return m_maximalChi2;
     }
 
-    /// Getter for the minimal chi2 of all stored hits
+    /// Getter for the minimal chi2 of all stored hits. NAN means there is no valid chi2 at all.
     double getMinimalChi2() const
     {
       return m_minimalChi2;
@@ -143,9 +144,9 @@ namespace Belle2 {
     std::vector<const AHit*> m_hits;
     /// The stored chi2
     double m_chi2 = 0;
-    /// The maximal chi2 of the single states
+    /// The maximal chi2 of the single states. NAN means there is no valid chi2 at all.
     double m_maximalChi2 = NAN;
-    /// The minimal chi2 of the single states
+    /// The minimal chi2 of the single states NAN means there is no valid chi2 at all.
     double m_minimalChi2 = NAN;
     /// The position this track should start at
     TVector3 m_trackPosition;

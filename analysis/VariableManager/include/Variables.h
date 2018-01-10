@@ -136,11 +136,6 @@ namespace Belle2 {
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
-     * return Zdistance of daughter tracks at vertex point
-     */
-    double VertexZDist(const Particle*);
-
-    /**
      * return distance relative to interaction point
      */
     double particleDistance(const Particle* part);

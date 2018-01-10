@@ -38,6 +38,7 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TF1.h>
+#include <TMath.h>
 #include <TTree.h>
 #include <TClonesArray.h>
 #include <sstream>
@@ -126,6 +127,7 @@ namespace Belle2 {
     }
 
     double dataT[c_NumChannels] = {0};
+    double dataTErr[c_NumChannels] = {0};
     double mcT[c_NumChannels] = {0};
 
     TOP::LaserCalibratorFit t0fit(m_barID);
@@ -136,6 +138,7 @@ namespace Belle2 {
       for (int i = 0; i < c_NumChannels; ++i) {
         t0fit.fitChannel(i);
         dataT[i] = t0fit.getFitT();
+        dataTErr[i] = t0fit.getFitTErr();
       }
     } else {
       t0fit.fitChannel(m_fitChannel);
@@ -174,15 +177,42 @@ namespace Belle2 {
 
     unsigned channel = 0;
     double t0_const = 0;
+    double t0ConstRaw = 0;
+    double fittedTime = 0;
+    double fittedTimeError = 0;
+    double mcTime = 0;
+    double mcCorrection = 0;
+    double t0ConstError = 0;
 
+    otree->Branch("fittedTime", &fittedTime, "fittedTime/D");
+    otree->Branch("fittedTimeError", &fittedTimeError, "fittedTimeError/D");
+    otree->Branch("mcTime", &mcTime, "mcTime/D");
+    otree->Branch("t0ConstRaw", &t0ConstRaw, "t0ConstRaw/D");
+    otree->Branch("mcCorrection", &mcCorrection, "mcCorrection/D");
     otree->Branch("t0Const", &t0_const, "t0_const/D");
+    otree->Branch("t0ConstError", &t0ConstError, "t0ConstError/D");
     otree->Branch("channel", &channel, "channel/I");
     otree->Branch("slot", &m_barID, "slot/I");
 
     for (int i = 0; i < c_NumChannels; i++) {
+      if (i == m_refCh) {
+        fittedTime = dataT[i];
+        mcTime = mcT[i];
+      } else {
+        fittedTime = dataT[i] + dataT[m_refCh];
+        mcTime = mcT[i] +  mcT[m_refCh];
+      }
+      fittedTimeError = dataTErr[i];
+      t0ConstRaw = dataT[i];
+      mcCorrection = mcT[i];
       channel = i;
       t0_const = dataT[i] - mcT[i];
-      if (i == m_refCh) t0_const = 0;
+      // assuming that the MC error is negligible
+      t0ConstError = TMath::Sqrt(dataTErr[i] * dataTErr[i] + dataTErr[m_refCh] * dataTErr[m_refCh]);
+      if (i == m_refCh) {
+        t0_const = 0;
+        t0ConstError = dataTErr[m_refCh];
+      }
       otree->Fill();
     }
     otree->Write();

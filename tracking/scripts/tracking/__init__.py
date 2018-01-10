@@ -515,6 +515,8 @@ def add_ckf_based_track_finding(path,
             # Otherwise we assume that the tracks are already in this store array
             add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
 
+            path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False, UseCDCHits=True,

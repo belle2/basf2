@@ -495,7 +495,7 @@ def add_ckf_based_track_finding(path,
     :param svd_reco_tracks: The store array name where to output the svd tracks
     :param pxd_reco_tracks: The store array name where to output the pxd tracks
     :param use_mc_truth: Use the truth information in the CKF modules
-    :param svd_ckf_mode: when to apply the CKF (VXDTF2 running before or after)
+    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without)
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
            extrapolate also in the other direction.
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
@@ -539,6 +539,13 @@ def add_ckf_based_track_finding(path,
             if add_both_directions:
                 add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                                      use_mc_truth=use_mc_truth, direction="forward")
+            add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                        use_mc_truth=use_mc_truth, direction="backward")
+            if add_both_directions:
+                add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
+
+        elif svd_ckf_mode == "only_ckf":
             add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                         use_mc_truth=use_mc_truth, direction="backward")
             if add_both_directions:

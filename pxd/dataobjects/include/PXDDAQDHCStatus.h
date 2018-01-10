@@ -12,8 +12,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-// #include <framework/datastore/RelationsObject.h>
-// #include <TObject.h>
 #include <pxd/dataobjects/PXDDAQDHEStatus.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
@@ -30,8 +28,6 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHC) is useable.
    *
    */
-//   class PXDDAQDHCStatus : public RelationsObject {
-//   class PXDDAQDHCStatus : public TObject {
   class PXDDAQDHCStatus {
   public:
 
@@ -86,8 +82,8 @@ namespace Belle2 {
     uint32_t getRedCnt(void) const { return m_redCount;};
 
     //iterator-based iteration
-    std::vector<PXDDAQDHEStatus>::const_iterator dhe_begin() const { return m_pxdDHE.begin(); };
-    std::vector<PXDDAQDHEStatus>::const_iterator dhe_end() const { return m_pxdDHE.end(); };
+    std::vector<PXDDAQDHEStatus>::const_iterator begin() const { return m_pxdDHE.begin(); };
+    std::vector<PXDDAQDHEStatus>::const_iterator end() const { return m_pxdDHE.end(); };
 
   private:
 
@@ -102,7 +98,7 @@ namespace Belle2 {
 
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
-//     ClassDef(PXDDAQDHCStatus, 1)
+    ClassDef(PXDDAQDHCStatus, 1);
 
   }; // class PXDDAQDHCStatus
 

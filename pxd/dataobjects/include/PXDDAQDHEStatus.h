@@ -13,8 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-// #include <framework/datastore/RelationsObject.h>
-// #include <TObject.h>
+#include <TObject.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 
@@ -30,8 +29,6 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
-//   class PXDDAQDHEStatus : public RelationsObject {
-//   class PXDDAQDHEStatus : public TObject {
   class PXDDAQDHEStatus {
   public:
 
@@ -100,7 +97,7 @@ namespace Belle2 {
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
 
-    // ClassDef(PXDDAQDHEStatus, 1)
+    ClassDef(PXDDAQDHEStatus, 1);
 
   }; // class PXDDAQDHEStatus
 

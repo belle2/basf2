@@ -22,7 +22,7 @@ namespace Belle2 {
 
       typedef uint64_t PXDErrorFlags;
 
-      /// If you change this list, change the NAMEs in the terminate function, too
+      /// If you change this list, change the description below, too
       enum EPXDErrMask : uint64_t {
         c_NO_ERROR = 0ull,
         c_TB_IDS = 1ull << 0,

@@ -11,7 +11,6 @@
 
 #pragma once
 
-// #include <framework/datastore/RelationsObject.h>
 #include <pxd/dataobjects/PXDDAQPacketStatus.h>
 #include <TObject.h>
 
@@ -28,7 +27,6 @@ namespace Belle2 {
    * It will record if the data of PXD is useable.
    *
    */
-//   class PXDDAQStatus : public RelationsObject {
   class PXDDAQStatus : public TObject {
   public:
 
@@ -42,7 +40,6 @@ namespace Belle2 {
     bool isUsable() const { return m_usable; }
 
     /** Set flag that data was recorded without ROI filtering
-     * @return
      */
     void setUnfiltered(bool b) { m_unfiltered = b; }
 
@@ -52,7 +49,6 @@ namespace Belle2 {
     bool isUnfiltered() const { return m_unfiltered; }
 
     /** Set flag that data was recorded without ROI filtering
-     * @return
      */
     void setGated(bool b) { m_gated = b; }
 
@@ -62,7 +58,6 @@ namespace Belle2 {
     bool isGated() const { return m_gated; }
 
     /** Set Error bit mask
-     * @return
      */
     void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
 
@@ -72,7 +67,6 @@ namespace Belle2 {
     PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
-     * @return
      */
     void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
 
@@ -82,21 +76,14 @@ namespace Belle2 {
     PXDErrorFlags getCritErrorMask(void) const { return m_critErrorMask; }
 
     /** Calculate the usability decision
-     * @return
      */
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0 && !m_gated;}
 
     void addPacket(PXDDAQPacketStatus& daqpktstat) {m_pxdPacket.push_back(daqpktstat);};
 
     //iterator-based iteration
-    std::vector<PXDDAQPacketStatus>::const_iterator pkt_begin() const
-    {
-      return m_pxdPacket.begin();
-    }
-    std::vector<PXDDAQPacketStatus>::const_iterator pkt_end() const
-    {
-      return m_pxdPacket.end();
-    }
+    std::vector<PXDDAQPacketStatus>::const_iterator begin() const { return m_pxdPacket.begin(); };
+    std::vector<PXDDAQPacketStatus>::const_iterator end() const { return m_pxdPacket.end(); };
 
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this DHC/sensor */

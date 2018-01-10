@@ -17,9 +17,9 @@
 #pragma link C++ class Belle2::PXDRawCluster+;
 #pragma link C++ class Belle2::PXDHardwareCluster+;
 
-#pragma link C++ class Belle2::PXDDAQDHCStatus+;
-#pragma link C++ class Belle2::PXDDAQDHEStatus+;
-#pragma link C++ class Belle2::PXDDAQPacketStatus+;
+#pragma link C++ class Belle2::PXDDAQDHCStatus;
+#pragma link C++ class Belle2::PXDDAQDHEStatus;
+#pragma link C++ class Belle2::PXDDAQPacketStatus;
 #pragma link C++ class Belle2::PXDDAQStatus+;
 
 #pragma link C++ class Belle2::PXDEnergyDepositionEvent+;

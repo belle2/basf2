@@ -12,8 +12,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-// #include <framework/datastore/RelationsObject.h>
-// #include <TObject.h>
 #include <pxd/dataobjects/PXDDAQDHCStatus.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
@@ -30,8 +28,6 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this Packet) is useable.
    *
    */
-//   class PXDDAQPacketStatus : public RelationsObject {
-//   class PXDDAQPacketStatus : public TObject {
   class PXDDAQPacketStatus {
   public:
 
@@ -73,8 +69,8 @@ namespace Belle2 {
     void addDHC(PXDDAQDHCStatus& daqdhcstat) {m_pxdDHC.push_back(daqdhcstat);};
 
     //iterator-based iteration
-    std::vector<PXDDAQDHCStatus>::const_iterator dhc_begin() const { return m_pxdDHC.begin(); };
-    std::vector<PXDDAQDHCStatus>::const_iterator dhc_end() const { return m_pxdDHC.end(); };
+    std::vector<PXDDAQDHCStatus>::const_iterator begin() const { return m_pxdDHC.begin(); };
+    std::vector<PXDDAQDHCStatus>::const_iterator end() const { return m_pxdDHC.end(); };
 
     unsigned short getPktIndex(void) const { return m_index;};
 
@@ -87,7 +83,7 @@ namespace Belle2 {
 
     std::vector <PXDDAQDHCStatus> m_pxdDHC;
 
-    // ClassDef(PXDDAQPacketStatus, 1)
+    ClassDef(PXDDAQPacketStatus, 1);
 
   }; // class PXDDAQPacketStatus
 

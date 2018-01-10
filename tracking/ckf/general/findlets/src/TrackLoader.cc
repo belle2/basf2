@@ -39,7 +39,7 @@ void TrackLoader::exposeParameters(ModuleParamList* moduleParamList, const std::
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalPtRequirement"),
                                 m_param_minimalPtRequirement,
-                                "Minimal Pt requirement for the input CDC tracks",
+                                "Minimal Pt requirement for the input tracks",
                                 m_param_minimalPtRequirement);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "relationCheckForDirection"),

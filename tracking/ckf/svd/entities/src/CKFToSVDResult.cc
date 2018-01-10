@@ -18,16 +18,16 @@
 
 using namespace Belle2;
 
-CKFToSVDResult::CKFToSVDResult(const std::vector<const CKFToSVDState*>& path) :
+CKFToSVDResult::CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path) :
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
+  B2ASSERT("Path should not be empty", not path.empty());
 }
 
 void CKFToSVDResult::addToRecoTrack(RecoTrack& recoTrack) const
 {
+  unsigned int sortingParameter = 0;
   for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
-    unsigned int sortingParameter = 0;
-
     RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
     for (const SVDCluster& cluster : relatedClusters) {
       recoTrack.addSVDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);

@@ -149,10 +149,11 @@ class Job:
         Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
         """
         if self.subjobs:
-            if all(map(lambda x: x.result.ready(), self.subjobs.values())):
-                return True
+            for subjob in self.subjobs.values():
+                if not subjob.result.ready():
+                    return False
             else:
-                return False
+                return True
         else:
             return self.result.ready()
 
@@ -711,16 +712,21 @@ class PBS(Batch):
             self.job = job
             #: Job ID from backend
             self.job_id = job_id
+            #: Quicker accessonce result is ready
+            self._is_ready = False
 
         def ready(self):
             """
             Function that queries qstat to check for jobs that are still running.
             """
+            if self._is_ready:
+                return True
             try:
                 d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             except subprocess.CalledProcessError as cpe:
                 first_line = cpe.output.splitlines()[0]
                 if "Unknown Job Id Error" in first_line:
+                    self._is_ready = True
                     return True
             else:
                 return False
@@ -807,15 +813,20 @@ class LSF(Batch):
             self.job = job
             #: job id given by LSF
             self.job_id = job_id
+            #: Quicker way to know if it's ready once it has been checked
+            self._is_ready = False
 
         def ready(self):
             """
             Function that queries bjobs to check for jobs that are still running.
             """
+            if self._is_ready:
+                return True
             output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             stat_line = output.split("\n")[1]
             status = stat_line.split()[2]
             if "DONE" in output or "EXIT" in output:
+                self._is_ready = True
                 return True
             else:
                 return False

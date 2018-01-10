@@ -81,7 +81,7 @@ void SVDNNShapeReconstructorModule::initialize()
   else
     storeRecoDigits.registerInDataStore();
 
-  storeShaperDigits.required();
+  storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

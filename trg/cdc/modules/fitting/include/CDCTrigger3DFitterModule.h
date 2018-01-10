@@ -4,6 +4,12 @@
 #include "framework/core/Module.h"
 #include <string>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
+
 namespace Belle2 {
 
   /** Module for the 3D Fitter of the CDC trigger. */
@@ -73,6 +79,15 @@ namespace Belle2 {
     std::vector<double> angleSt = {};
     /** geometry constants: drift length - drift time relation */
     std::vector<std::vector<double>> xtTables = {};
+
+    /** list of 2D input tracks */
+    StoreArray<CDCTriggerTrack> m_tracks2D;
+    /** list of 3D output tracks*/
+    StoreArray<CDCTriggerTrack> m_tracks3D;
+    /** list of track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_hits;
+    /** StoreObjPtr containing the event time */
+    StoreObjPtr<EventT0> m_eventTime;
   };
 
 } // namespace Belle2

@@ -62,7 +62,7 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
 void VariablesToEventBasedTreeModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Initializing the output root file
   m_file = new TFile(m_fileName.c_str(), "RECREATE");

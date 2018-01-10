@@ -95,8 +95,8 @@ const TVector3 SensorInfo::getLorentzShift(double u, double v) const
   for (int iz = 0; iz < 5; ++iz) {
     // This is OK as long as E only depends on z
     TVector3 currentEField = getEField(TVector3(0, 0, zKnots[iz]));
-    TVector3 v = getDriftVelocity(currentEField, currentBField);
-    position += weightGL[iz] / v.Z() * v;
+    TVector3 velocity = getDriftVelocity(currentEField, currentBField);
+    position += weightGL[iz] / velocity.Z() * velocity;
   } // for knots
   position.SetZ(0);
   position.SetX(position.X() - u);

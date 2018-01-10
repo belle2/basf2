@@ -88,7 +88,7 @@ void SVDClusterizerDirectModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeShaperDigits.required();
+  storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

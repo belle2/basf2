@@ -84,7 +84,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::initialize()
   {
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
   }
 
   void TOPLaserCalibratorModule::beginRun()
@@ -93,8 +93,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::event()
   {
-    StoreArray<TOPDigit> digits;
-    for (auto& digit : digits) {
+    for (auto& digit : m_digits) {
       if (m_barID != 0 && digit.getModuleID() != m_barID) continue; //if m_barID == 0, use all 16 slots(for MC test)
       unsigned channel = digit.getChannel();
       if (channel < c_NumChannels) {
@@ -182,7 +181,7 @@ namespace Belle2 {
 
     for (int i = 0; i < c_NumChannels; i++) {
       channel = i;
-      t0_const = mcT[i] - dataT[i];
+      t0_const = dataT[i] - mcT[i];
       if (i == m_refCh) t0_const = 0;
       otree->Fill();
     }

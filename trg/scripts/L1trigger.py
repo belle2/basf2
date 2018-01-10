@@ -30,7 +30,7 @@ def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2
     add_grl_trigger(path, SimulationMode)
     add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
     if PrintResult:
-        EffCalculation(path)
+        EffCalculation(path, Belle2Phase=Belle2Phase)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
 
 
@@ -53,4 +53,4 @@ def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phas
     add_grl_trigger(path, SimulationMode)
     add_gdl_trigger(path, SimulationMode, OpenFilter, Belle2Phase)
     if PrintResult:
-        EffCalculation(path)
+        EffCalculation(path, Belle2Phase=Belle2Phase)

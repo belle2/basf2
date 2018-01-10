@@ -132,10 +132,10 @@ feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 
 
-fileList = ['../test0_1263700001.dst.root']
+fileList = ['../1263700001.dst.root']
 
 inputMdstList('default', fileList)
-outputRootFile = '../test1_1263700001.ntup.root'
+outputRootFile = '../1263700001.ntup.root'
 # execute path and return back to the analysis_main
 # the skim condition is TRUE for all events
 skimALL = register_module('VariableToReturnValue')

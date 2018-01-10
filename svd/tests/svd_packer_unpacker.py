@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from svd import add_svd_simulation
 from ROOT import Belle2
 import os
 import numpy
@@ -19,8 +20,8 @@ class SvdPackerUnpackerTestModule(Module):
     """
 
     def sortDigits(self, unsortedPyStoreArray):
-        """ use a some digit information to sort the CDCDigits list
-            Returns a python-list containing the CDCDigts
+        """ use a some digit information to sort the SVDDigits list
+            Returns a python-list containing the SVDDigits
         """
 
         # first convert to a python-list to be abple to sort
@@ -36,7 +37,7 @@ class SvdPackerUnpackerTestModule(Module):
                 x.isUStrip()))
 
     def event(self):
-        """ load the CDC Digits of the simulation and the packed/unpacked ones
+        """ load the SVD Digits of the simulation and the packed/unpacked ones
         and compare them"""
 
         # load the digits and the collection which results from the packer and unpacker
@@ -99,7 +100,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for svd only
-simulation.add_simulation(main, components=['SVD'])
+add_svd_simulation(main, createDigits=True)
 
 main.add_module(progress)
 

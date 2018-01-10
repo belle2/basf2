@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    boost::shared_ptr<Path> m_path; /**< Path to execute. */
+    std::shared_ptr<Path> m_path; /**< Path to execute. */
     int m_processID =
       -1; /**< when using multi-processing contains the ID of the process where event() is called (in that process only). -1 otherwise. */
 

@@ -20,12 +20,10 @@ namespace Belle2 {
   namespace TOP {
 
     TimeDigitizer::TimeDigitizer(int moduleID, int pixelID, unsigned window,
-                                 unsigned storageDepth,
-                                 const TOP::PulseHeightGenerator& generator,
+                                 unsigned storageDepth, double rmsNoise,
                                  const TOPSampleTimes& sampleTimes):
       m_moduleID(moduleID), m_pixelID(pixelID), m_window(window),
-      m_storageDepth(storageDepth),
-      m_pulseHeightGenerator(generator)
+      m_storageDepth(storageDepth), m_rmsNoise(rmsNoise), m_sampleTimes(&sampleTimes)
     {
       const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
       if (!channelMapper.isValid()) {
@@ -55,19 +53,21 @@ namespace Belle2 {
       }
 
       m_scrodID = map->getScrodID();
-      m_sampleTimes = &sampleTimes;
       m_valid = true;
 
     }
 
+    //-------- simplified pile-up and double-hit-resolution model ------- //
+    // this function will probably be removed in the future, therefore I don't
+    // care about some hard-coded values
 
-    typedef std::multimap<double, const TOPSimHit*>::iterator Iterator;
+    typedef std::multimap<double, const TimeDigitizer::Hit>::const_iterator Iterator;
 
     void TimeDigitizer::digitize(StoreArray<TOPRawDigit>& rawDigits,
                                  StoreArray<TOPDigit>& digits,
                                  int threshold,
                                  int thresholdCount,
-                                 double timeJitter)
+                                 double timeJitter) const
     {
 
       if (m_times.empty()) return;
@@ -101,9 +101,9 @@ namespace Belle2 {
         for (Iterator it = ranges[k]; it != ranges[k + 1]; ++it) {
           if (it->first - prevTime > pileupTime) break;
           times.push_back(it->first);
-          double pulseHeight = m_pulseHeightGenerator.generateWithNoise();
+          double pulseHeight = gRandom->Gaus(it->second.pulseHeight, m_rmsNoise);
           weights.push_back(pulseHeight);
-          simHits.push_back(it->second);
+          simHits.push_back(it->second.simHit);
           prevTime = it->first;
         }
 
@@ -115,7 +115,7 @@ namespace Belle2 {
         for (auto& weight : weights) weight /= height;
 
         // generate pulse width
-        double width = gRandom->Gaus(2.3, 0.4); // TODO: get it from ...
+        double width = gRandom->Gaus(2.3, 0.4);
         if (width < 0.5) width = 0.5;
 
         // determine detection time
@@ -155,7 +155,9 @@ namespace Belle2 {
 
         // determine integral
         int numSamples = (sampleFall - sampleRise) * 4; // according to topcaf
-        double integral = m_pulseHeightGenerator.getIntegral(height, numSamples);
+        double sigmaIntegral = 0;
+        if (numSamples > 1) sigmaIntegral = m_rmsNoise * sqrt(numSamples - 1);
+        double integral = gRandom->Gaus(height * 7.0, sigmaIntegral);
 
         // append new raw digit
         auto* rawDigit = rawDigits.appendNew(m_scrodID);
@@ -177,7 +179,7 @@ namespace Belle2 {
         double cfdTime = rawTime * tdc.getSampleWidth() - tdc.getOffset();
         double cfdWidth = rawDigit->getFWHM() * tdc.getSampleWidth();
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions;
         rawDigit->setTFine(tfine);
 
         // append new digit
@@ -210,12 +212,14 @@ namespace Belle2 {
     }
 
 
+    // -------- full waveform digitization ------- //
+
     void TimeDigitizer::digitize(StoreArray<TOPRawWaveform>& waveforms,
                                  StoreArray<TOPRawDigit>& rawDigits,
                                  StoreArray<TOPDigit>& digits,
                                  int threshold,
                                  int hysteresis,
-                                 int thresholdCount)
+                                 int thresholdCount) const
     {
 
       // get parameters of the model
@@ -232,8 +236,7 @@ namespace Belle2 {
         windowNumbers.push_back((windowNumbers.back() + 1) % m_storageDepth);
       }
       std::vector<double> baselines(windowNumbers.size(), 0);
-      double rmsNoise = m_pulseHeightGenerator.getPedestalRMS();
-      std::vector<double> rmsNoises(windowNumbers.size(), rmsNoise);
+      std::vector<double> rmsNoises(windowNumbers.size(), m_rmsNoise);
       double averagePedestal = tdc.getAveragePedestal();
       std::vector<double> pedestals(windowNumbers.size(), averagePedestal);
       int adcRange = tdc.getADCRange();
@@ -260,6 +263,7 @@ namespace Belle2 {
         rawDigit->setASICNumber(m_asic);
         rawDigit->setASICChannel(m_chan);
         rawDigit->setASICWindow(m_window);
+        rawDigit->setStorageWindows(windowNumbers);
         rawDigit->setSampleRise(feature.sampleRise);
         rawDigit->setDeltaSamplePeak(feature.samplePeak - feature.sampleRise);
         rawDigit->setDeltaSampleFall(feature.sampleFall - feature.sampleRise);
@@ -270,7 +274,7 @@ namespace Belle2 {
         rawDigit->setValuePeak(feature.vPeak);
         rawDigit->setIntegral(feature.integral);
         double rawTime = rawDigit->getCFDLeadingTime(); // time in [samples]
-        double rawTimeErr = rawDigit->getCFDLeadingTimeError(rmsNoise); // in [samples]
+        double rawTimeErr = rawDigit->getCFDLeadingTimeError(m_rmsNoise); // in [samples]
         int sampleDivisions = 0x1 << tdc.getSubBits();
         unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
         rawDigit->setTFine(tfine);
@@ -296,15 +300,16 @@ namespace Belle2 {
         digit->addRelationTo(rawDigit);
 
         // set relations to simulated hits and MC particles, largest weight first
-        // TODO: include pulseHeight in calculation of weights (?)
 
         std::multimap<double, const TOPSimHit*, std::greater<double>> weights;
         for (const auto& hit : m_times) {
           double hitTime = hit.first;
-          const auto* simHit = hit.second;
+          const auto* simHit = hit.second.simHit;
           double weight = signalShape.getValue(cfdTime - hitTime);
-          if (weight > 0.01)
+          if (weight > 0.01) {
+            weight *= hit.second.pulseHeight;
             weights.insert(std::pair<double, const TOPSimHit*>(weight, simHit));
+          }
         }
         double sum = 0;
         for (const auto& w : weights) sum += w.first;
@@ -328,7 +333,7 @@ namespace Belle2 {
     vector<short> TimeDigitizer::generateWaveform(const vector<double>& baselines,
                                                   const vector<double>& rmsNoises,
                                                   const vector<double>& pedestals,
-                                                  int adcRange)
+                                                  int adcRange) const
     {
 
       if (baselines.empty() or baselines.size() != rmsNoises.size() or
@@ -387,7 +392,7 @@ namespace Belle2 {
 
       for (const auto& hit : m_times) {
         double hitTime = hit.first;
-        double pulseHeight = m_pulseHeightGenerator.generate();
+        double pulseHeight = hit.second.pulseHeight;
         for (unsigned sample = 0; sample < waveform.size(); sample++) {
           double t = m_sampleTimes->getTime(m_window, sample) - tdc.getOffset();
           waveform[sample] += pulseHeight * signalShape.getValue(t - hitTime);

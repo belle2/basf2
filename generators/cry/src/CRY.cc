@@ -17,6 +17,7 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/IOIntercept.h>
 
 #include <TDatabasePDG.h>
 #include <TLorentzVector.h>
@@ -91,6 +92,10 @@ void CRY::init()
     setupString.append(" ");
   }
 
+
+  IOIntercept::OutputToLogMessages initLogCapture("CRY", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100);
+  initLogCapture.start();
+
   // CRY setup
   m_crySetup = new CRYSetup(setupString, m_cosmicDataDir);
 
@@ -109,6 +114,7 @@ void CRY::init()
 
   // Set the starting time
   m_startTime = m_cryGenerator->timeSimulated() * Belle2::Unit::s;
+  initLogCapture.finish();
 
   // set up the acceptance box
   if (m_acceptWidth > 0. && m_acceptHeight > 0. && m_acceptLength > 0.) {
@@ -154,9 +160,9 @@ void CRY::FillTopVolumeCoordinates()
   m_zlow  = -topbox->GetZHalfLength() * Belle2::Unit::mm;
   m_zhigh =  topbox->GetZHalfLength() * Belle2::Unit::mm;
 
-  B2INFO("m_xlow=" << m_xlow << ", m_xhigh=" << m_xhigh);
-  B2INFO("m_ylow=" << m_ylow << ", m_xhigh=" << m_yhigh);
-  B2INFO("m_zlow=" << m_zlow << ", m_xhigh=" << m_zhigh);
+  B2DEBUG(100, "m_xlow=" << m_xlow << ", m_xhigh=" << m_xhigh);
+  B2DEBUG(100, "m_ylow=" << m_ylow << ", m_xhigh=" << m_yhigh);
+  B2DEBUG(100, "m_zlow=" << m_zlow << ", m_xhigh=" << m_zhigh);
 
   //check if the acceptance volume is inside top volume
   if (-m_acceptWidth * Belle2::Unit::m / 2. < m_xlow || m_acceptWidth * Belle2::Unit::m / 2. > m_xhigh ||

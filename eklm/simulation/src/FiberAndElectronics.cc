@@ -126,6 +126,11 @@ void EKLM::FiberAndElectronics::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
+void EKLM::FiberAndElectronics::setThreshold(double threshold)
+{
+  m_Threshold = threshold;
+}
+
 void EKLM::FiberAndElectronics::processEntry()
 {
   int i, threshold;
@@ -177,7 +182,8 @@ void EKLM::FiberAndElectronics::processEntry()
    * Fit. Threshold is 7 photoelectron signal, it has average simulated maximal
    * amplitude about 3 maximal amplitudes of 1 photoelectron signal.
    */
-  threshold = m_DigPar->getADCPedestal() + m_DigPar->getADCPEAmplitude() * 3.0;
+  threshold = m_DigPar->getADCPedestal() +
+              m_DigPar->getADCPEAmplitude() * m_Threshold;
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;

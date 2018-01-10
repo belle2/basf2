@@ -19,10 +19,6 @@
 #include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 #include <eklm/dbobjects/EKLMTimeCalibration.h>
 
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
-
 using namespace Belle2;
 
 static double CrystalBall(double* x, double* par)

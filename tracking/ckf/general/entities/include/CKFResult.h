@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <TVector3.h>
@@ -35,11 +35,11 @@ namespace Belle2 {
     /// Copy hit definition
     using Hit = AHit;
 
-    /// Constructor
+    /// Constructor from the path of the result and the final mSoP, which defines the track position of the resulting track
     template <class AState>
-    CKFResult(const std::vector<const AState*>& path, const genfit::MeasuredStateOnPlane& mSoP)
+    CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
-      for (const AState* state : path) {
+      for (const TrackFindingCDC::WithWeight<const AState*> state : path) {
         const Hit* hit = state->getHit();
         if (hit) {
           m_hits.push_back(hit);
@@ -48,15 +48,19 @@ namespace Belle2 {
         if (state->isFitted()) {
           m_chi2 += state->getChi2();
         }
+
+        m_weightSum = state.getWeight();
       }
 
-      m_trackCharge = mSoP.getCharge();
+      m_trackCharge = static_cast<short>(mSoP.getCharge());
       m_trackMomentum = mSoP.getMom();
       m_trackPosition = mSoP.getPos();
 
       m_seed = path.front()->getSeed();
+      m_seedMSoP = path.front()->getMeasuredStateOnPlane();
     }
 
+    /// Constructor which sets all single properties
     CKFResult(const ASeed* seed, std::vector<const AHit*> hits, double chi2, const TVector3& trackPosition,
               const TVector3& trackMomentum, short trackCharge) :
       m_seed(seed), m_hits(hits), m_chi2(chi2), m_trackPosition(trackPosition), m_trackMomentum(trackMomentum),
@@ -99,6 +103,18 @@ namespace Belle2 {
       return m_trackCharge;
     }
 
+    /// Getter for the sum of weights
+    double getWeightSum() const
+    {
+      return m_weightSum;
+    }
+
+    /// Getter for the mSoP of the seed associated wit this result
+    const genfit::MeasuredStateOnPlane& getSeedMSoP() const
+    {
+      return m_seedMSoP;
+    }
+
   private:
     /// The stored seed
     const ASeed* m_seed;
@@ -112,5 +128,9 @@ namespace Belle2 {
     TVector3 m_trackMomentum;
     /// The charge of the track
     short m_trackCharge = 0;
+    /// The stored sum of weights
+    TrackFindingCDC::Weight m_weightSum = 0;
+    /// The measured state on plane, which was used from the seed
+    genfit::MeasuredStateOnPlane m_seedMSoP;
   };
 }

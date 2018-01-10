@@ -3,7 +3,6 @@
 
 """
 <header>
-  <input>mdst9_BGx1_b2jpsiks.root</input>
   <output>CPVToolsOutput.root</output>
   <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
   <description>This file employs all the time dependent CPV analysis tools. It reconstructs B0sig->J/PsiKs on the signal side
@@ -23,7 +22,7 @@ import sys
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
 inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst9_BGx1_b2jpsiks.root')
-inputMdst('default' [inputFile])
+inputMdst('default', inputFile)
 
 # inputMdst('default', '../mdst9_BGx1_b2jpsiks.root')
 

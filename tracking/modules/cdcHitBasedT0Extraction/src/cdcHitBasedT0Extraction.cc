@@ -39,7 +39,7 @@ std::string CDCHitBasedT0Extraction::getDescription()
 void CDCHitBasedT0Extraction::initialize()
 {
   m_eventT0.registerInDataStore();
-  StoreObjPtr<EventMetaData>::required();
+  m_eventMetaData.isRequired();
 
   Super::initialize();
 }
@@ -96,10 +96,9 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
     m_eventT0.create();
   }
 
-  StoreObjPtr<EventMetaData> eventMetaData;
   const auto timeHistogramName = "CDCHitBasedT0Extraction_time_hist";
   const std::string debugImageName = "CDCHitBasedT0Extraction_debug_" + boost::lexical_cast<std::string>
-                                     (eventMetaData->getEvent()) + ".png";
+                                     (m_eventMetaData->getEvent()) + ".png";
 
   auto timingHistgram = TH1D(timeHistogramName, timeHistogramName,
                              m_param_binCountTimeHistogram, -m_param_fitWindow,

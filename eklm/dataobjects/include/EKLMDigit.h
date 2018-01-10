@@ -16,6 +16,7 @@
 #include <eklm/dataobjects/EKLMHitMCTime.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
@@ -93,17 +94,9 @@ namespace Belle2 {
 
     /**
      * Whether hit could be used late (if it passed discriminator threshold)
-     * (getter).
      * @return True if could be used.
      */
     bool isGood() const;
-
-    /**
-     * Whether hit could be used late (if it passed discriminator threshold)
-     * (setter).
-     * @param[in] status True if could be used.
-     */
-    void isGood(bool status) ;
 
     /**
      * Get plane number.
@@ -164,9 +157,6 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** If hit passes threshold. */
-    bool m_good;
-
     /** Charge (integral of ADC signal). */
     uint16_t m_Charge;
 
@@ -180,7 +170,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 6);
+    ClassDef(Belle2::EKLMDigit, 7);
 
   };
 

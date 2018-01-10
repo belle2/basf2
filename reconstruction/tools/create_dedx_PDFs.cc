@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
             break;
           case Dedx::c_SVD:
             flayer_selection = TString::Format("%s < -2", flayer_var);
-            dedx_cutoff = 2.5e4;
+            dedx_cutoff = 5e6;
             break;
           case Dedx::c_CDC:
             break;
@@ -143,8 +143,6 @@ int main(int argc, char* argv[])
       int detector = (int)Dedx::c_CDC;
       std::cout << "i " << i << ", d" << detector << "\n";
       double dedx_cutoff = 0;
-      //  const double dedx_cutoff = use_truncated_mean?((pdg_code==211)?2.5e-6:2e-5):(2e-5);
-      //  TODO: if sample doesn't contain slow particles this can be reduced
       dedx_cutoff = 3.0;
 
       const TString histname = TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix);

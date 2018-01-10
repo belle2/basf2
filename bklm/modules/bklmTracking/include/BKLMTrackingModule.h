@@ -12,6 +12,7 @@
 #define  BKLMTRACKING_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMTrack.h>
 #include <bklm/modules/bklmTracking/BKLMTrackFinder.h>
@@ -111,6 +112,17 @@ namespace Belle2 {
 
     //! total event at global position Y vs Z
     TH2F* m_totalYZ;
+    //! BKLMTrack StoreArray
+    StoreArray<BKLMTrack> m_storeTracks;
+
+    //! BKLMHit2d StoreArray
+    StoreArray<BKLMHit2d> hits2D;
+
+    //! RecoTrack StoreArray
+    StoreArray<RecoTrack> recoTracks;
+
+    //! RecoHitInformation StoreArray
+    StoreArray<RecoHitInformation> recoHitInformation;
 
     //! run the track finding and fitting
     void runTracking(int mode, int isforward, int sector, int layer);

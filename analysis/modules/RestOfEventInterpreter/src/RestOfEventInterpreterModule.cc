@@ -65,7 +65,7 @@ namespace Belle2 {
   void RestOfEventInterpreterModule::initialize()
   {
     // input
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
     StoreArray<Particle> particles;
     particles.isRequired();
 

@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleClusterTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ECLVariables.h>
 #include <TBranch.h>
 
 using namespace Belle2;
@@ -21,7 +21,8 @@ void NtupleClusterTool::setupTree()
   int nDecayProducts = strNames.size();
 
   m_region = new int[nDecayProducts];
-  m_e9e25  = new float[nDecayProducts];
+  m_e1e9   = new float[nDecayProducts];
+  m_e9e21  = new float[nDecayProducts];
   m_nHits  = new int[nDecayProducts];
   m_trackM = new int[nDecayProducts];
 
@@ -35,8 +36,10 @@ void NtupleClusterTool::setupTree()
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_clusterReg").c_str(),        &m_region[iProduct],
                    (strNames[iProduct] + "_clusterReg/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterE9E25").c_str(),      &m_e9e25[iProduct],
-                   (strNames[iProduct] + "_clusterE9E25/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterE1E9").c_str(),       &m_e1e9[iProduct],
+                   (strNames[iProduct] + "_clusterE1E9/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterE9E21").c_str(),      &m_e9e21[iProduct],
+                   (strNames[iProduct] + "_clusterE9E21/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterNHits").c_str(),      &m_nHits[iProduct],
                    (strNames[iProduct] + "_clusterNHits/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterTrackMatch").c_str(), &m_trackM[iProduct],
@@ -59,7 +62,8 @@ void NtupleClusterTool::setupTree()
 void NtupleClusterTool::deallocateMemory()
 {
   delete [] m_region;
-  delete [] m_e9e25;
+  delete [] m_e1e9;
+  delete [] m_e9e21;
   delete [] m_nHits;
   delete [] m_trackM;
 
@@ -82,7 +86,8 @@ void NtupleClusterTool::eval(const Particle* particle)
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_region[iProduct]  = int(Variable::eclClusterDetectionRegion(selparticles[iProduct]));
-    m_e9e25[iProduct]   = Variable::eclClusterE9E25(selparticles[iProduct]);
+    m_e1e9[iProduct]    = Variable::eclClusterE1E9(selparticles[iProduct]);
+    m_e9e21[iProduct]   = Variable::eclClusterE9E21(selparticles[iProduct]);
     m_nHits[iProduct]   = int(Variable::eclClusterNHits(selparticles[iProduct]));
     m_trackM[iProduct]  = int(Variable::eclClusterTrackMatched(selparticles[iProduct]));
 

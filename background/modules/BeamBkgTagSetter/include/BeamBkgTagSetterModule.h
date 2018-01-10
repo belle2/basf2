@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BEAMBKGTAGSETTERMODULE_H
-#define BEAMBKGTAGSETTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -17,6 +16,31 @@
 #include <simulation/background/BeamBGTypes.h>
 #include <background/dataobjects/BackgroundMetaData.h>
 #include <string>
+
+// SimHits
+#include <pxd/dataobjects/PXDSimHit.h>
+#include <svd/dataobjects/SVDSimHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <top/dataobjects/TOPSimHit.h>
+#include <arich/dataobjects/ARICHSimHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
+
+// BEAST SimHits
+#include <beast/beamabort/dataobjects/BeamabortSimHit.h>
+#include <beast/claw/dataobjects/ClawSimHit.h>
+#include <beast/claws/dataobjects/CLAWSSimHit.h>
+#include <beast/fangs/dataobjects/FANGSSimHit.h>
+#include <beast/plume/dataobjects/PlumeSimHit.h>
+#include <beast/pindiode/dataobjects/PindiodeSimHit.h>
+#include <beast/he3tube/dataobjects/He3tubeSimHit.h>
+#include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
+#include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
+#include <beast/bgo/dataobjects/BgoSimHit.h>
+#include <beast/csi/dataobjects/CsiSimHit.h>
+
 
 namespace Belle2 {
 
@@ -78,6 +102,28 @@ namespace Belle2 {
     SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
     BackgroundMetaData::EFileType m_fileType; /**< file type to set */
 
+    StoreArray<PXDSimHit> m_pxdSimHits; /**< PXD simulated hits */
+    StoreArray<SVDSimHit> m_svdSimHits; /**< SVD simulated hits */
+    StoreArray<CDCSimHit> m_cdcSimHits; /**< CDC simulated hits */
+    StoreArray<TOPSimHit> m_topSimHits; /**< TOP simulated hits */
+    StoreArray<ARICHSimHit> m_arichSimHits; /**< ARICH simulated hits */
+    StoreArray<ECLSimHit> m_eclSimHits; /**< ECL simulated hits */
+    StoreArray<ECLHit> m_eclHits; /**< ECL simulated hits (short version) */
+    StoreArray<BKLMSimHit> m_bklmSimHits; /**< BKLM simulated hits */
+    StoreArray<EKLMSimHit> m_eklmSimHits; /**< EKLM simulated hits */
+
+    StoreArray<BeamabortSimHit> m_diaSimHits; /**< beast simulated hits */
+    StoreArray<CLAWSSimHit> m_clw2SimHits;  /**< beast simulated hits */
+    StoreArray<ClawSimHit> m_clw1SimHits;  /**< beast simulated hits */
+    StoreArray<FANGSSimHit> m_fngSimHits; /**< beast simulated hits */
+    StoreArray<PlumeSimHit> m_plmSimHits; /**< beast simulated hits */
+    StoreArray<PindiodeSimHit> m_pinSimHits; /**< beast simulated hits */
+    StoreArray<He3tubeSimHit> m_he3SimHits; /**< beast simulated hits */
+    StoreArray<MicrotpcSimHit> m_tpcSimHits; /**< beast simulated hits */
+    StoreArray<QcsmonitorSimHit> m_sciSimHits; /**< beast simulated hits */
+    StoreArray<BgoSimHit> m_bgoSimHits; /**< beast simulated hits */
+    StoreArray<CsiSimHit> m_csiSimHits; /**< beast simulated hits */
+
     /**
      * functions that set background tag in SimHits
      * @param simHits a reference to DataStore SimHits
@@ -101,4 +147,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

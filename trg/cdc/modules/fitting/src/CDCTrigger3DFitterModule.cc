@@ -1,12 +1,6 @@
 #include "trg/cdc/modules/fitting/CDCTrigger3DFitterModule.h"
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationVector.h>
-
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <trg/cdc/Fitter3DUtility.h>
@@ -51,16 +45,14 @@ void
 CDCTrigger3DFitterModule::initialize()
 {
   // register DataStore elements
-  StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  StoreObjPtr<EventT0>::required(m_EventTimeName);
+  m_tracks3D.registerInDataStore(m_outputCollectionName);
+  m_tracks2D.isRequired(m_inputCollectionName);
+  m_hits.isRequired(m_hitCollectionName);
+  m_eventTime.isRequired(m_EventTimeName);
   // register relations
-  StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
-  StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  tracks2D.registerRelationTo(tracks3D);
-  tracks3D.registerRelationTo(segmentHits);
+  m_tracks2D.registerRelationTo(m_tracks3D);
+  m_tracks2D.requireRelationTo(m_hits);
+  m_tracks3D.registerRelationTo(m_hits);
 
   // get geometry constants for first priority layers
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
@@ -91,14 +83,10 @@ CDCTrigger3DFitterModule::initialize()
 void
 CDCTrigger3DFitterModule::event()
 {
-  StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
-  StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-
-  for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
-    int charge = tracks2D[itrack]->getChargeSign();
-    double rho = 1. / abs(tracks2D[itrack]->getOmega());
-    double phi = tracks2D[itrack]->getPhi0() - charge * M_PI_2;
+  for (int itrack = 0; itrack < m_tracks2D.getEntries(); ++itrack) {
+    int charge = m_tracks2D[itrack]->getChargeSign();
+    double rho = 1. / abs(m_tracks2D[itrack]->getOmega());
+    double phi = m_tracks2D[itrack]->getPhi0() - charge * M_PI_2;
 
     // select stereo hits
     vector<int> bestTSIndex(4, -1);
@@ -113,7 +101,7 @@ CDCTrigger3DFitterModule::event()
       }
     }
     if (nHits < m_minHits) {
-      B2INFO("Not enough hits to do 3D fit (" << m_minHits << " needed, got " << nHits << ")");
+      B2DEBUG(100, "Not enough hits to do 3D fit (" << m_minHits << " needed, got " << nHits << ")");
       continue;
     }
 
@@ -125,25 +113,25 @@ CDCTrigger3DFitterModule::event()
 
     // check if fit results are valid
     if (isnan(z0) || isnan(cot) || isnan(chi2)) {
-      B2INFO("3D fit failed");
+      B2DEBUG(100, "3D fit failed");
       continue;
     }
 
     // save track
     CDCTriggerTrack* fittedTrack =
-      tracks3D.appendNew(tracks2D[itrack]->getPhi0(), tracks2D[itrack]->getOmega(),
-                         tracks2D[itrack]->getChi2D(),
-                         z0, cot, chi2);
+      m_tracks3D.appendNew(m_tracks2D[itrack]->getPhi0(), m_tracks2D[itrack]->getOmega(),
+                           m_tracks2D[itrack]->getChi2D(),
+                           z0, cot, chi2);
     // make relation to 2D track
-    tracks2D[itrack]->addRelationTo(fittedTrack);
+    m_tracks2D[itrack]->addRelationTo(fittedTrack);
     // make relation to hits
     for (unsigned iSt = 0; iSt < 4; ++iSt) {
       if (bestTSIndex[iSt] != -1)
-        fittedTrack->addRelationTo(hits[bestTSIndex[iSt]]);
+        fittedTrack->addRelationTo(m_hits[bestTSIndex[iSt]]);
     }
     // add axial relations from 2D track
     RelationVector<CDCTriggerSegmentHit> axialHits =
-      tracks2D[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+      m_tracks2D[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
     for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
       fittedTrack->addRelationTo(axialHits[ihit]);
     }
@@ -154,8 +142,6 @@ void
 CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
                                  vector<int>& bestTSIndex, vector<double>& bestTSPhi)
 {
-  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-
   vector<double> stAxPhi(4);
   for (int iSt = 0; iSt < 4; ++iSt) {
     stAxPhi[iSt] = Fitter3DUtility::calStAxPhi(charge, angleSt[iSt], zToStraw[iSt],
@@ -165,16 +151,16 @@ CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
   vector<vector<int>> candidatesIndex(4, vector<int>());
   vector<vector<double>> candidatesPhi(4, vector<double>());
   vector<vector<double>> candidatesDiffStWires(4, vector<double>());
-  for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+  for (int ihit = 0; ihit < m_hits.getEntries(); ++ihit) {
     // Reject second priority TSs.
-    if (hits[ihit]->getPriorityPosition() != 3) continue;
+    if (m_hits[ihit]->getPriorityPosition() != 3) continue;
     // only stereo hits
-    unsigned iSL = hits[ihit]->getISuperLayer();
+    unsigned iSL = m_hits[ihit]->getISuperLayer();
     if (iSL % 2 == 0) continue;
     // skip hits with too large radius
     if (2 * rho < rr[iSL / 2]) continue;
     // Find number of wire difference
-    double wirePhi = hits[ihit]->getIWire() * 2. * M_PI / nWires[iSL / 2];
+    double wirePhi = m_hits[ihit]->getIWire() * 2. * M_PI / nWires[iSL / 2];
     double tsDiffSt = stAxPhi[iSL / 2] - wirePhi;
     if (tsDiffSt > M_PI) tsDiffSt -= 2 * M_PI;
     if (tsDiffSt < -M_PI) tsDiffSt += 2 * M_PI;
@@ -217,10 +203,8 @@ CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestT
                                  int charge, double rho, double phi,
                                  double& z0, double& cot, double& chi2)
 {
-  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-  StoreObjPtr<EventT0> eventTime(m_EventTimeName);
-  int T0 = (eventTime->hasBinnedEventT0(Const::CDC))
-           ? eventTime->getBinnedEventT0(Const::CDC)
+  int T0 = (m_eventTime->hasBinnedEventT0(Const::CDC))
+           ? m_eventTime->getBinnedEventT0(Const::CDC)
            : 9999;
 
   // Fill information for stereo layers
@@ -230,8 +214,8 @@ CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestT
   for (unsigned iSt = 0; iSt < 4; ++iSt) {
     if (bestTSIndex[iSt] != -1) {
       wirePhi[iSt] = bestTSPhi[iSt];
-      LR[iSt] = hits[bestTSIndex[iSt]]->getLeftRight();
-      driftTime[iSt] = hits[bestTSIndex[iSt]]->priorityTime();
+      LR[iSt] = m_hits[bestTSIndex[iSt]]->getLeftRight();
+      driftTime[iSt] = m_hits[bestTSIndex[iSt]]->priorityTime();
     }
   } // End superlayer loop
 

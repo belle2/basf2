@@ -21,7 +21,7 @@ namespace Belle2 {
   public:
     using Super::Super;
 
-    CKFToPXDResult(const std::vector<const CKFToPXDState*>& path);
+    CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& path);
 
     void addToRecoTrack(RecoTrack& recoTrack) const;
   };

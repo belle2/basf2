@@ -57,10 +57,10 @@ bool Path::isEmpty() const
 std::list<ModulePtr> Path::getModules() const
 {
   std::list<ModulePtr> modules;
-  for (const boost::shared_ptr<PathElement>& elem : m_elements) {
+  for (const std::shared_ptr<PathElement>& elem : m_elements) {
     if (dynamic_cast<Module*>(elem.get()) != 0) {
       //this path element is a Module, create a ModulePtr that shares ownership with 'elem'
-      modules.push_back(boost::static_pointer_cast<Module>(elem));
+      modules.push_back(std::static_pointer_cast<Module>(elem));
     } else {
       //some PathElement with submodules
       const std::list<ModulePtr>& modulesInElem = elem->getModules();
@@ -91,7 +91,7 @@ ModulePtrList Path::buildModulePathList(bool unique) const
   return modList;
 }
 
-void Path::putModules(const std::list<boost::shared_ptr<Module> >& mlist)
+void Path::putModules(const std::list<std::shared_ptr<Module> >& mlist)
 {
   m_elements.assign(mlist.begin(), mlist.end());
 }
@@ -138,14 +138,14 @@ bool Path::contains(std::string moduleType) const
   return std::find_if(modules.begin(), modules.end(), sameTypeFunc) != modules.end();
 }
 
-boost::shared_ptr<PathElement> Path::clone() const
+std::shared_ptr<PathElement> Path::clone() const
 {
   PathPtr path(new Path);
   for (const auto& elem : m_elements) {
     const Module* m = dynamic_cast<const Module*>(elem.get());
     if (m and m->getType() == "PyModule") {
       //B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
-      path->addModule(boost::static_pointer_cast<Module>(elem));
+      path->addModule(std::static_pointer_cast<Module>(elem));
     } else {
       path->m_elements.push_back(elem->clone());
     }
@@ -162,7 +162,7 @@ std::string Path::getPathString() const
 {
   std::string out("");
   bool firstElem = true;
-  for (const boost::shared_ptr<PathElement>& elem : m_elements) {
+  for (const std::shared_ptr<PathElement>& elem : m_elements) {
     if (!firstElem) {
       out += " -> ";
     } else {

@@ -1,2 +1,0 @@
-The code in this directory is intended for short term module testing of TOP packages during October and November 2015.  
-This code is not intended to be compiled during a basf2 build, and is not intended to be part of basf2 long term (any code from this directory (or any subdirectories) should be migrated to a separate location if intended for any longer term use.

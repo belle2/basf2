@@ -501,8 +501,8 @@ void TelxVXDModule::initialize()
   StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
   StoreArray<TelDigit> storeTelDigits(m_storeTelDigitsName);
 
-  //storeClusters.required();
-  //storeDigits.required();
+  //storeClusters.isRequired();
+  //storeDigits.isRequired();
 
   RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
   RelationArray relTelClusterDigits(storeTelClusters, storeTelDigits);

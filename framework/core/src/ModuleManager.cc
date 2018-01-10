@@ -14,7 +14,7 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/filesystem.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 
 #include <fstream>
 
@@ -178,14 +178,13 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
 
   //Read each line of the map file and use boost regular expression to find the module name string in brackets.
   string::const_iterator start, end;
-  boost::regex expression("\\((.+)\\)");
-  boost::match_results<std::string::const_iterator> matchResult;
-  boost::match_flag_type flags = boost::match_default;
+  std::regex expression("\\((.+)\\)");
+  std::match_results<std::string::const_iterator> matchResult;
 
   while (getline(mapFile, currentLine)) {
     start = currentLine.begin();
     end = currentLine.end();
-    boost::regex_search(start, end, matchResult, expression, flags);
+    std::regex_search(start, end, matchResult, expression, std::regex_constants::match_default);
 
     //We expect exactly two result entries: [0] the string that matched the regular expression
     //                                      [1] the string that matched sub-expressions (here: the string inside the quotes)

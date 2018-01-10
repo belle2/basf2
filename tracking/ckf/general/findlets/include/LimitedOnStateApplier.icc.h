@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 
+#include <framework/core/ModuleParamList.templateDetails.h>
+
 #include <algorithm>
 
 namespace Belle2 {
@@ -25,7 +27,7 @@ namespace Belle2 {
   };
 
   template <class AState, class AFilter>
-  void LimitedOnStateApplier<AState, AFilter>::apply(const std::vector<const AState*>& currentPath,
+  void LimitedOnStateApplier<AState, AFilter>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                                                      std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     Super::apply(currentPath, childStates);

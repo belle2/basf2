@@ -31,4 +31,4 @@ template class Belle2::ModuleParam<std::vector<float>>;
 template class Belle2::ModuleParam<std::vector<double>>;
 template class Belle2::ModuleParam<std::vector<std::string>>;
 
-template class Belle2::ModuleParam<boost::shared_ptr<Belle2::Path>>;
+template class Belle2::ModuleParam<std::shared_ptr<Belle2::Path>>;

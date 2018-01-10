@@ -1,10 +1,6 @@
 #include "trg/cdc/modules/mcmatcher/CDCTriggerRecoMatcherModule.h"
 
-#include <framework/datastore/StoreArray.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -76,34 +72,23 @@ CDCTriggerRecoMatcherModule::CDCTriggerRecoMatcherModule() : Module()
 void
 CDCTriggerRecoMatcherModule::initialize()
 {
-  StoreArray<CDCHit>::required();
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_TrgTrackCollectionName);
-  StoreArray<RecoTrack>::required(m_RecoTrackCollectionName);
+  m_segmentHits.isRequired(m_hitCollectionName);
+  m_trgTracks.isRequired(m_TrgTrackCollectionName);
+  m_recoTracks.isRequired(m_RecoTrackCollectionName);
 
-  StoreArray<CDCHit> cdcHits;
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack> trgTracks(m_TrgTrackCollectionName);
-  StoreArray<RecoTrack> recoTracks(m_RecoTrackCollectionName);
-
-  segmentHits.requireRelationTo(cdcHits);
-  trgTracks.requireRelationTo(segmentHits);
-  recoTracks.registerRelationTo(segmentHits);
-  recoTracks.registerRelationTo(trgTracks);
-  trgTracks.registerRelationTo(recoTracks);
+  m_trgTracks.requireRelationTo(m_segmentHits);
+  m_recoTracks.registerRelationTo(m_segmentHits);
+  m_recoTracks.registerRelationTo(m_trgTracks);
+  m_trgTracks.registerRelationTo(m_recoTracks);
 }
 
 
 void
 CDCTriggerRecoMatcherModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack> trgTracks(m_TrgTrackCollectionName);
-  StoreArray<RecoTrack> recoTracks(m_RecoTrackCollectionName);
-
   // create relations from RecoTracks to SegmentHits via CDCHits
-  for (int ireco = 0; ireco < recoTracks.getEntries(); ++ireco) {
-    RecoTrack* recoTrack = recoTracks[ireco];
+  for (int ireco = 0; ireco < m_recoTracks.getEntries(); ++ireco) {
+    RecoTrack* recoTrack = m_recoTracks[ireco];
     // if relations exist already, skip this step
     // (matching may be done several times with different trigger tracks)
     if (recoTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName).size() > 0)
@@ -125,8 +110,8 @@ CDCTriggerRecoMatcherModule::event()
 
   B2DEBUG(100, "########## start matching ############");
 
-  int nRecoTracks = recoTracks.getEntries();
-  int nTrgTracks = trgTracks.getEntries();
+  int nRecoTracks = m_recoTracks.getEntries();
+  int nTrgTracks = m_trgTracks.getEntries();
 
   B2DEBUG(100, "Number of trigger tracks is " << nTrgTracks);
   B2DEBUG(100, "Number of reco tracks is " << nRecoTracks);
@@ -143,7 +128,7 @@ CDCTriggerRecoMatcherModule::event()
   {
     std::multimap<HitId, TrackId>::iterator itRecoInsertHit = recoTrackId_by_hitId.end();
     TrackId recoTrackId = -1;
-    for (const RecoTrack& recoTrack : recoTracks) {
+    for (const RecoTrack& recoTrack : m_recoTracks) {
       ++recoTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
         recoTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
@@ -162,7 +147,7 @@ CDCTriggerRecoMatcherModule::event()
   {
     std::multimap<HitId, TrackId>::iterator itTrgInsertHit = trgTrackId_by_hitId.end();
     TrackId trgTrackId = -1;
-    for (const CDCTriggerTrack& trgTrack : trgTracks) {
+    for (const CDCTriggerTrack& trgTrack : m_trgTracks) {
       ++trgTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
         trgTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
@@ -188,9 +173,9 @@ CDCTriggerRecoMatcherModule::event()
   Eigen::VectorXi totalHits_by_trgTrackId = Eigen::VectorXi::Zero(nTrgTracks);
 
   // examine every hit to which recoTrack and trgTrack it belongs.
-  for (HitId hitId = 0; hitId < segmentHits.getEntries(); ++hitId) {
+  for (HitId hitId = 0; hitId < m_segmentHits.getEntries(); ++hitId) {
     // skip stereo hits
-    if (m_axialOnly && segmentHits[hitId]->getISuperLayer() % 2) continue;
+    if (m_axialOnly && m_segmentHits[hitId]->getISuperLayer() % 2) continue;
 
     // Seek all recoTracks and trgTracks
     auto range_trgTrackIds = trgTrackId_by_hitId.equal_range(hitId);
@@ -294,7 +279,7 @@ CDCTriggerRecoMatcherModule::event()
 
   // ### Classify the trg tracks ###
   for (TrackId trgTrackId = 0; trgTrackId < nTrgTracks; ++trgTrackId) {
-    CDCTriggerTrack* trgTrack = trgTracks[trgTrackId];
+    CDCTriggerTrack* trgTrack = m_trgTracks[trgTrackId];
 
     const pair<TrackId, Purity>& purestRecoTrackId = purestRecoTrackId_by_trgTrackId[trgTrackId];
     const TrackId& recoTrackId = purestRecoTrackId.first;
@@ -306,7 +291,7 @@ CDCTriggerRecoMatcherModule::event()
     } else {
       // check whether the highest purity reco track has in turn
       // the highest efficiency trg track equal to this track.
-      RecoTrack* recoTrack = recoTracks[recoTrackId];
+      RecoTrack* recoTrack = m_recoTracks[recoTrackId];
 
       const pair<TrackId, Efficiency>& mostEfficientTrgTrackId =
         mostEfficientTrgTrackId_by_recoTrackId[recoTrackId];
@@ -333,7 +318,7 @@ CDCTriggerRecoMatcherModule::event()
 
   // ### Classify the reco tracks ###
   for (TrackId recoTrackId = 0; recoTrackId < nRecoTracks; ++recoTrackId) {
-    RecoTrack* recoTrack = recoTracks[recoTrackId];
+    RecoTrack* recoTrack = m_recoTracks[recoTrackId];
 
     const pair<TrackId, Efficiency>& mostEfficiencyTrgTrackId =
       mostEfficientTrgTrackId_by_recoTrackId[recoTrackId];
@@ -346,7 +331,7 @@ CDCTriggerRecoMatcherModule::event()
     } else {
       // check whether the highest efficiency trg track has in turn
       // the highest purity reco track equal to this track.
-      CDCTriggerTrack* trgTrack = trgTracks[trgTrackId];
+      CDCTriggerTrack* trgTrack = m_trgTracks[trgTrackId];
 
       const pair<TrackId, Purity>& purestRecoTrackId =
         purestRecoTrackId_by_trgTrackId[trgTrackId];

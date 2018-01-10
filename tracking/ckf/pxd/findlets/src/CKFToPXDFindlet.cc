@@ -10,23 +10,23 @@
 
 #include <tracking/ckf/pxd/findlets/CKFToPXDFindlet.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 #include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
-#include <tracking/ckf/general/findlets/StateRejecter.icc.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
+#include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
-#include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.icc.h>
-
-#include <framework/core/ModuleParamList.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -61,6 +61,21 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
+
+  // Default values
+  moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
+  moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");
+
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("mva");
+
+  moduleParamList->getParameter<bool>("useAssignedHits").setDefaultValue(false);
+
+  moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+
+  moduleParamList->getParameter<std::string>("filter").setDefaultValue("mva");
 }
 
 void CKFToPXDFindlet::beginEvent()

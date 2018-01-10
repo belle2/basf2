@@ -8,14 +8,11 @@
 ############################################################
 
 from basf2 import *
-
 import interactive
-
 from ROOT import Belle2
 
 
 class MinModule(Module):
-
     """
     Example module to drop into ipython and create some objects to look at.
     If you just want to start IPython and create PyStoreArray etc.
@@ -41,14 +38,7 @@ class MinModule(Module):
 
 
 main = create_path()
-
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [2])
-main.add_module(eventinfosetter)
-
-pGun = register_module('ParticleGun')
-main.add_module(pGun)
-
+main.add_module('EventInfoSetter', evtNumList=[2])
+main.add_module('ParticleGun')
 main.add_module(MinModule())
-
 process(main)

@@ -19,6 +19,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -119,6 +120,12 @@ namespace Belle2 {
 
     //! ADC offset and threshold read from database
     DBObjPtr<BKLMADCThreshold> m_ADCParams;
+
+    //! rawKLM StoreArray
+    StoreArray<RawKLM> rawKLM;
+
+    //! BKLMDigit Array
+    StoreArray<BKLMDigit>bklmDigits;
 
   };
 

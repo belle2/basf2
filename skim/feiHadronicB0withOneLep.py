@@ -44,7 +44,7 @@ from variables import variables
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 # apply some very loose cuts to reduce the number
 # of Btag candidates
-applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
+applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200')
 
 # now signal side
 stdMu('all')

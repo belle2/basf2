@@ -22,7 +22,6 @@ import glob
 # user input
 withbg = 0  # add beam background yes/no
 bgfolder = ''  # folder that holds beam background
-bgfrac = 1.0  # fracion of nominal background
 seed = 10000  # seed for random numbers
 mdstfile = 'eclrefactoring.root'  # output file
 
@@ -46,7 +45,7 @@ main.add_module(evtgeninput)
 # add default full simulation and digitization
 if (withbg == 1):
     bg = glob.glob(bgfolder + '/*.root')
-    add_simulation(main, bkgfiles=bg, bkgscale=bgfrac)
+    add_simulation(main, bkgfiles=bg)
 else:
     add_simulation(main)
 

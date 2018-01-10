@@ -159,8 +159,9 @@ namespace Belle2 {
     // Register histograms (calls back defineHisto)
     REG_HISTOGRAM;
 
-    StoreArray<TOPDigit>::required();
-    StoreArray<Track>::optional();
+    // register dataobjects
+    m_digits.isRequired();
+    m_tracks.isOptional();
 
   }
 
@@ -171,21 +172,19 @@ namespace Belle2 {
   void TOPDQMModule::event()
   {
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       m_barHits->Fill(digit.getModuleID());
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
-        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i);
+        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i + 1);
         continue;
       }
       m_pixelHits[i]->Fill(digit.getPixelID());
       m_hitTimes[i]->Fill(digit.getRawTime());
     }
 
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
-      const auto* trackFit = track.getTrackFitResult(Const::pion);
+    for (const auto& track : m_tracks) {
+      const auto* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit) continue;
       if (trackFit->getMomentum().Mag() < m_momentumCut) continue;
       if (trackFit->getPValue() < m_pValueCut) continue;

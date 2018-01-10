@@ -124,7 +124,11 @@ namespace Belle2 {
                                              0.5 * landauTail * landauTail);
       }
 
+      //Lorentz shift correction
+      const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(m_vxdID));
+      m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);
 
+      m_timeError = 6; //order of magnitude
     };
 
     bool SimpleClusterCandidate::isGoodCluster()

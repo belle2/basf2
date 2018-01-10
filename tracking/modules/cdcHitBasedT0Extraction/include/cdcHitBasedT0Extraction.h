@@ -66,5 +66,7 @@ namespace Belle2 {
 
     StoreObjPtr<EventT0> m_eventT0; /** acccess to the EventT0 object in the datastore */
 
+    StoreObjPtr<EventMetaData> m_eventMetaData; /** acess to event nr for debugging purposes */
+
   };
 }

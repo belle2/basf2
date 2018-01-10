@@ -42,8 +42,8 @@ namespace Belle2 {
     //Create some TrackFitResults in the the DataStore.
     //PDGCode of the TrackFitResult will be used in the test to identify the TFR.
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<TrackFitResult> myResults;
+    myResults.registerInDataStore();
 
     const auto myPion = addDummyTrack(myResults, Const::pion);
     const auto myKaon = addDummyTrack(myResults, Const::kaon);
@@ -97,6 +97,11 @@ namespace Belle2 {
     EXPECT_EQ(countMuon, 1);
     EXPECT_EQ(countElectron, 0);
     EXPECT_EQ(countKaon, 1);
+
+    Track trackQITest;
+    EXPECT_EQ(trackQITest.getQualityIndicator(), 0.);
+    Track trackQITest1(0.5);
+    EXPECT_EQ(trackQITest1.getQualityIndicator(), 0.5);
   }
 
   /** Test simple Setters and Getters.
@@ -106,8 +111,8 @@ namespace Belle2 {
     //Create some TrackFitResults in the the DataStore.
     //PDGCode of the TrackFitResult will be used in the test to identify the TFR.
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<TrackFitResult> myResults;
+    myResults.registerInDataStore();
 
     // add two fit results
     const auto myKaon = addDummyTrack(myResults, Const::kaon);

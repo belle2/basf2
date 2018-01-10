@@ -42,6 +42,9 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("OnlySingleClusterSpacePoints", m_onlySingleClusterSpacePoints,
            "standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more",
            bool(false));
+
+  addParam("MinClusterTime", m_minClusterTime, "clusters with time below this value are not considered to make spacePoints.",
+           float(-20));
 }
 
 
@@ -75,7 +78,7 @@ void SVDSpacePointCreatorModule::event()
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(m_svdClusters, m_spacePoints);
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime);
   }
 
 

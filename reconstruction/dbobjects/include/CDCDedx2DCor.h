@@ -55,16 +55,23 @@ namespace Belle2 {
      */
     double getMean(int layer, double doca, double enta) const
     {
-      if (layer > 56) B2ERROR("No such layer!");
-      double mean;
+      if (layer > 56) {
+        B2ERROR("Asking for a CDC layer beyond 56!");
+        return 0;
+      }
 
       // assume rotational symmetry
       if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;
       if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
 
-      int binx = m_twodgains[0].GetXaxis()->FindBin(doca);
-      int biny = m_twodgains[0].GetYaxis()->FindBin(sin(enta));
-      mean = m_twodgains[0].GetBinContent(binx, biny);
+      int binx = floor((doca + 1.5) / 0.3);
+      int biny = floor((sin(enta) + 1.0) / 0.2);
+
+      double mean;
+      if (binx < 0 || biny < 0 || binx >= m_twodgains[0].GetXaxis()->GetNbins() || biny >= m_twodgains[0].GetYaxis()->GetNbins()) {
+        B2WARNING("Problem with the 2D correction for CDC dE/dx!");
+        mean = 1.0;
+      } else mean = m_twodgains[0].GetBinContent(binx, biny);
 
       return mean;
     };

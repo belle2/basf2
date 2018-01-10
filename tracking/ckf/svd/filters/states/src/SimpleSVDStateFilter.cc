@@ -47,7 +47,7 @@ void SimpleSVDStateFilter::beginRun()
 
 Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 {
-  const std::vector<const CKFToSVDState*>& previousStates = pair.first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair.first;
   CKFToSVDState* currentState = pair.second;
 
   const auto* spacePoint = currentState->getHit();

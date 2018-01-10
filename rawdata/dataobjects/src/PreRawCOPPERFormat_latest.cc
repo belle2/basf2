@@ -58,7 +58,8 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
     char err_buf[500];
     PrintData(m_buffer, m_nwords);
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
+            "[FATAL] ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format. : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
 
@@ -88,8 +89,11 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       break;
     default :
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
-              finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sprintf(err_buf,
+              "[FATAL] ERROR_EVENT : Specifined FINESSE number( = %d ) is invalid. Exiting... : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+              finesse_num,
+              65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       string err_str = err_buf;
       throw (err_str);
@@ -123,7 +127,8 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   if (flag == 0) {
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf; throw (err_str);
@@ -133,8 +138,9 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n%s %s %d\n",
+            "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
 
@@ -180,8 +186,10 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   // check Magic words
   //
   if (!CheckCOPPERMagic(n)) {
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
+    sprintf(err_buf,
+            "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
             GetMagicDriverHeader(n), GetMagicFPGAHeader(n), GetMagicFPGATrailer(n), GetMagicDriverTrailer(n),
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -193,8 +201,10 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
-            *cur_evenum_rawcprhdr, evenum_feehdr, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            "[FATAL] ERROR_EVENT : Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            *cur_evenum_rawcprhdr, evenum_feehdr,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
@@ -206,27 +216,33 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
+              "[FATAL] ERROR_EVENT : Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
+              GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER counter jump : i %d prev 0x%x cur 0x%x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
+              GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
   } else {
-    printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x\n",
-           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum);
+    printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x : eve 0x%x exp %d run %d sub %d\n",
+           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum,
+           GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n));
 
     // Check if the first event of a run is zero.
     if ((unsigned int)GetRunNo(n) != (prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT) {
       if (*cur_evenum_rawcprhdr != 0) {
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): i %d preveve 0x%x cureve 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
-                n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
+                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                prev_evenum, *cur_evenum_rawcprhdr,
+                prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
+                *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF,
+                GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         err_flag = 1;
       }
@@ -246,12 +262,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
-            n,
-            GetBlockNwords(n),
-            *cur_evenum_rawcprhdr,
-            GetDriverChkSum(n),
-            CalcDriverChkSum(n),
+            "[FATAL] ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, GetDriverChkSum(n), CalcDriverChkSum(n),
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -263,8 +276,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+            "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -1165,7 +1179,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f8000
                                                    | ((DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) & tmp_header.FORMAT_VERSION__MASK)
                                                    | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
-  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
+  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << tmp_header.EXP_SHIFT)
                                             | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
   packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
@@ -1234,7 +1248,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     unsigned int temp_ctime_type = packed_buf[ poswords_to + POS_TT_CTIME_TYPE ];
     packed_buf[ poswords_to + POS_TT_TAG ] = rawcpr_info.eve_num;
     packed_buf[ poswords_to + POS_TT_UTIME ] = rawcpr_info.tt_utime;
-    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << 22) | (rawcpr_info.run_subrun_num &
+    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << tmp_header.EXP_SHIFT) | (rawcpr_info.run_subrun_num &
                                               0x003FFFFF);   // exp. and run #
     packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
     poswords_to += SIZE_B2LFEE_HEADER;

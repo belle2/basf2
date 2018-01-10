@@ -19,7 +19,7 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/crc.hpp>
-#include <rawdata/dataobjects/RawKLM.h>
+//#include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 #include <framework/database/DBArray.h>
@@ -62,9 +62,9 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 
 void BKLMUnpackerModule::initialize()
 {
-  //StoreArray<BKLMDigit>::registerPersistent();
-  StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
-  bklmDigits.registerInDataStore();
+  rawKLM.isRequired();
+  //StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
+  bklmDigits.registerInDataStore(m_outputDigitsName);
   if (m_loadMapFromDB) loadMapFromDB();
 }
 
@@ -87,7 +87,7 @@ void BKLMUnpackerModule::loadMapFromDB()
     int layer = element.getLayer();
     int plane =  element.getPlane();
     int stripId = element.getStripId();
-    int elecId = electCooToInt(copperId - BKLM_ID, slotId, laneId, axisId, channelId);
+    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
     int moduleId = 0;
     B2DEBUG(1, "reading Data Base...");
     moduleId = (isForward ? BKLM_END_MASK : 0)
@@ -117,8 +117,7 @@ void BKLMUnpackerModule::beginRun()
 void BKLMUnpackerModule::event()
 {
 
-  StoreArray<RawKLM> rawKLM;
-  StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
+  //StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
   bklmDigits.clear();
 
   B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");
@@ -230,7 +229,7 @@ void BKLMUnpackerModule::event()
           //  cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
           //  " charge: " << charge << endl;
 
-          int electId = electCooToInt(copperId - BKLM_ID, finesse_num + 1, lane, axis, channel);
+          int electId = electCooToInt(copperId - BKLM_ID, finesse_num , lane, axis, channel);
           int moduleId = 0;
           bool outRange = false;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {

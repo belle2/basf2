@@ -372,7 +372,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return true if window discontinuity is found between sampleRise and sampleFall+1
      */
-    bool isAtWindowDiscontinuity(unsigned short storageDepth = 512) const;
+    bool isAtWindowDiscontinuity(unsigned short storageDepth = 508) const;
 
     /**
      * Checks if storage windows come in the consecutive order before the last sample
@@ -381,7 +381,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return true, if no gaps before the last sample or m_windows is empty
      */
-    bool areWindowsInOrder(unsigned short storageDepth = 512) const;
+    bool areWindowsInOrder(unsigned short storageDepth = 508) const;
 
     /**
      * Corrects time after window discontinuity by adding missing samples
@@ -389,7 +389,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return time corrected for missing samples if any, otherwise returns input value [samples]
      */
-    double correctTime(double time, unsigned short storageDepth = 512) const;
+    double correctTime(double time, unsigned short storageDepth = 508) const;
 
     /**
      * Checks if the first window number is the same as the first one in m_windows

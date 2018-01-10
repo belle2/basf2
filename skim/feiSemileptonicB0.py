@@ -42,7 +42,7 @@ analysis_main.add_module('MCMatcherParticles', listName='B0:semileptonic', loose
 # apply some very loose cuts to reduce the number
 # of Btag candidates
 
-applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.004 and extraInfo(decayModeID)<8')
+applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and extraInfo(decayModeID)<8')
 
 # rank Btag canidates according to their SignalProbability
 

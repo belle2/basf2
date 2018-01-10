@@ -28,6 +28,7 @@
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
+#include <bklm/dataobjects/BKLMDigit.h>
 #include <iostream>
 
 namespace Belle2 {
@@ -91,6 +92,9 @@ namespace Belle2 {
 
     //! RawKLM array
     StoreArray<RawKLM> rawklmarray;
+
+    //! digits array
+    StoreArray<BKLMDigit> digits;
 
     //! to map logical coordinates to hardware coordinates
     std::map<int, int> m_ModuleIdToelectId;

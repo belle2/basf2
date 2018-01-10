@@ -96,7 +96,7 @@ void BKLMDQMModule::initialize()
 {
   REG_HISTOGRAM   // required to register histograms to HistoManager
   StoreArray<BKLMDigit> digits(m_OutputDigitsName);
-  digits.required();
+  digits.isRequired();
   digits.registerInDataStore();
 }
 

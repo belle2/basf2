@@ -31,6 +31,7 @@ namespace Belle2 {
         for (unsigned c = 0; c < c_numChannels; c++) {
           m_T0[m][c] = 0;
           m_errT0[m][c] = 0;
+          m_status[m][c] = false;
         }
       }
     }
@@ -49,6 +50,7 @@ namespace Belle2 {
       if (channel >= c_numChannels) return;
       m_T0[module][channel] = T0;
       m_errT0[module][channel] = errT0;
+      m_status[module][channel] = true;
     }
 
     /**
@@ -79,6 +81,19 @@ namespace Belle2 {
       return m_errT0[module][channel];
     }
 
+    /**
+     * Returns calibration status
+     * @param moduleID module ID (1-based)
+     * @param channel hardware channel number (0-based)
+     * @return true, if calibrated
+     */
+    bool isCalibrated(int moduleID, unsigned channel) const
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) return false;
+      if (channel >= c_numChannels) return false;
+      return m_status[module][channel];
+    }
 
   private:
 
@@ -91,8 +106,9 @@ namespace Belle2 {
 
     float m_T0[c_numModules][c_numChannels];    /**< calibration constants */
     float m_errT0[c_numModules][c_numChannels]; /**< errors on constants */
+    bool m_status[c_numModules][c_numChannels]; /**< calibration status */
 
-    ClassDef(TOPCalChannelT0, 1); /**< ClassDef */
+    ClassDef(TOPCalChannelT0, 2); /**< ClassDef */
 
   };
 

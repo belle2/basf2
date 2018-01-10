@@ -87,7 +87,7 @@ namespace Belle2 {
       m_position = m_extHit->getPosition();
       m_momentum = m_extHit->getMomentum();
       setTrackLength(m_extHit->getTOF(), chargedStable);
-      const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
       if (!fitResult) {
         B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
         return;

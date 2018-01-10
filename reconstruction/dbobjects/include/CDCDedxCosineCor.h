@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 #include <cmath>
 
@@ -67,6 +69,10 @@ namespace Belle2 {
         }
       }
 
+      if (thisbin < 0 || nextbin >= m_nbins) {
+        B2WARNING("Problem with extrapolation of CDC dE/dx cosine correction");
+        return 1.0;
+      }
       return ((m_cosgains[nextbin] - m_cosgains[thisbin]) * frac + m_cosgains[thisbin]);
     };
 

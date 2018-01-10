@@ -77,18 +77,18 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 }
 
 
-void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_value(const std::string& expression, std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   m_conditions.emplace_back(expression, path, afterConditionPath);
 }
 
 
-void Module::if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   if_value("<1", path, afterConditionPath);
 }
 
-void Module::if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   if_value(">=1", path, afterConditionPath);
 }
@@ -111,7 +111,7 @@ bool Module::evalCondition() const
   return false;
 }
 
-boost::shared_ptr<Path> Module::getConditionPath() const
+std::shared_ptr<Path> Module::getConditionPath() const
 {
   PathPtr p;
   if (m_conditions.empty()) return p;
@@ -148,9 +148,9 @@ Module::EAfterConditionPath Module::getAfterConditionPath() const
 
   return EAfterConditionPath::c_End;
 }
-std::vector<boost::shared_ptr<Path>> Module::getAllConditionPaths() const
+std::vector<std::shared_ptr<Path>> Module::getAllConditionPaths() const
 {
-  std::vector<boost::shared_ptr<Path>> allConditionPaths;
+  std::vector<std::shared_ptr<Path>> allConditionPaths;
   for (const auto& condition : m_conditions) {
     allConditionPaths.push_back(condition.getPath());
   }
@@ -177,7 +177,7 @@ bool Module::hasUnsetForcedParams() const
 }
 
 
-boost::shared_ptr<PathElement> Module::clone() const
+std::shared_ptr<PathElement> Module::clone() const
 {
   ModulePtr newModule = ModuleManager::Instance().registerModule(getType());
   newModule->m_moduleParamList.setParameters(getParamList());

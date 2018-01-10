@@ -7,7 +7,8 @@
 <interval>nightly</interval>
 </header>
 """
-# der>
+#######################################################
+#
 # This script demonstrates how to reconstruct Btag using
 # generically trained FEI and how to validate D(*)+tau- v and D(*)
 #  Release required: build-2017-09-08 or later

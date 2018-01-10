@@ -10,12 +10,12 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-
 #include <tracking/ckf/pxd/filters/states/ChooseableOnPXDStateApplier.h>
 
 namespace Belle2 {
+  class CKFToPXDState;
+
   /// Rejecter findlet for CKF PXD states
-  // TODO: this is the point where one wants to implement the cached advance filter!
+  extern template class StateRejecter<CKFToPXDState, ChooseableOnPXDStateApplier>;
   using PXDStateRejecter = StateRejecter<CKFToPXDState, ChooseableOnPXDStateApplier>;
 }

@@ -23,6 +23,8 @@ namespace Belle2 {
   template <class AResult, class ACluster>
   void SpacePointTagger<AResult, ACluster>::beginEvent()
   {
+    Super::beginEvent();
+
     m_usedClusters.clear();
     m_usedSpacePoints.clear();
   }

@@ -13,6 +13,9 @@
 #define CDCHITFILTERMODULE_H
 
 #include <framework/core/Module.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <string>
 
@@ -64,6 +67,10 @@ namespace Belle2 {
       int m_filterSuperLayer = -1; /**< Only perform digitization for a specific super layer or for all, if the value is -1 */
       int m_filterLayerMax = -1; /**< Only perform digitization up to a specific layer or for all, if the value is -1 */
       int m_filterWireMax = -1; /**< Only perform digitization for a specific wire or for all, if the value is -1 */
+
+      StoreArray<CDCHit>  m_inputCDCHits; /**< Input CDCHit array */
+      StoreArray<CDCHit>  m_outputCDCHits; /**< Output (filtered) CDCHit array */
+
 
     };//end class declaration
 

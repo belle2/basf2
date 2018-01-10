@@ -11,6 +11,11 @@
 
 #include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
+
 namespace Belle2 {
   template <class AResult>
   /// Add the subfindlets

@@ -3,7 +3,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
+#include <bklm/dataobjects/BKLMDigit.h>
+#include <bklm/dataobjects/BKLMHit1d.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
 
 namespace Belle2 {
 
@@ -65,6 +69,14 @@ namespace Belle2 {
     //! time window parameters from dbobject
     DBObjPtr<BKLMTimeWindow> m_timing;
 
+    //! digits StoreArray
+    StoreArray<BKLMDigit> digits;
+
+    //! hit1ds StoreArray
+    StoreArray<BKLMHit1d> hit1ds;
+
+    //! hit2ds StoreArray
+    StoreArray<BKLMHit2d> hit2ds;
   };
 } // end namespace Belle2
 #endif

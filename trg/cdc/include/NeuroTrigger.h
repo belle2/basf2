@@ -3,6 +3,11 @@
 
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
+
 namespace Belle2 {
 
   class CDCTriggerSegmentHit;
@@ -110,12 +115,9 @@ namespace Belle2 {
     /** set fixed point precision */
     void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
 
-    /** set name of the data store elements */
-    void setCollectionNames(std::string hitCollectionName, std::string eventTimeName)
-    {
-      m_hitCollectionName = hitCollectionName;
-      m_eventTimeName = eventTimeName;
-    }
+    /** set the hit collection and event time to required
+     * and store the hit collection name */
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -204,10 +206,13 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
+
+    /** StoreArray containing the input track segment hits. */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** StoreObjPtr containing the event time. */
+    StoreObjPtr<EventT0> m_eventTime;
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
-    /** Name of the StoreObjPtr containing the event time. */
-    std::string m_eventTimeName;
   };
 }
 #endif

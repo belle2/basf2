@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -41,9 +41,9 @@ namespace Belle2 {
         m_path = "/data/";
       } else {
         //Check if we have placeholder for experiment or run information
-        boost::regex exp("\\{EXP(?::(\\d+))?\\}");
-        boost::regex run("\\{RUN(?::(\\d+))?\\}");
-        m_rundependence = boost::regex_search(m_path, exp) || boost::regex_search(m_path, run);
+        std::regex exp("\\{EXP(?::(\\d+))?\\}");
+        std::regex run("\\{RUN(?::(\\d+))?\\}");
+        m_rundependence = std::regex_search(m_path, exp) || std::regex_search(m_path, run);
         if (m_rundependence) {
           //Apparently we do have placeholders, replace them by something
           //boost::format will understand. The placeholder is something like
@@ -53,8 +53,8 @@ namespace Belle2 {
           //Same for {RUN} and {RUN:<n>} but as second argument
           StoreObjPtr<EventMetaData> eventMetaDataPtr;
           eventMetaDataPtr.isRequired();
-          std::string tmp = boost::regex_replace(m_path, exp, std::string("%1$$0$1d"));
-          tmp = boost::regex_replace(tmp, run, std::string("%2$$0$1d"));
+          std::string tmp = std::regex_replace(m_path, exp, std::string("%1$$0$1d"));
+          tmp = std::regex_replace(tmp, run, std::string("%2$$0$1d"));
           B2DEBUG(300, "Found run-dependence in file path, resulting in " << tmp);
           m_pathformat = boost::format(tmp);
           m_pathformat.exceptions(boost::io::all_error_bits ^ boost::io::too_many_args_bit);

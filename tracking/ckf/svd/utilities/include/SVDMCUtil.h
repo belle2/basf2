@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <vector>
 
 namespace Belle2 {
@@ -20,7 +21,7 @@ namespace Belle2 {
   public:
     unsigned int getNumberOfCorrectHits(const RecoTrack* mcRecoTrack, const std::vector<const SpacePoint*>& hits) const;
 
-    bool allStatesCorrect(const std::vector<const CKFToSVDState*>& states) const;
+    bool allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states) const;
 
     bool hitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spacePoint) const;
   };

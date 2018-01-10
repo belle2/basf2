@@ -120,11 +120,11 @@ void TelDataMergerTB2016Module::initialize()
 
   // EventMetaData
   StoreObjPtr<EventMetaData> storeEventMetaData;
-  storeEventMetaData.required();
+  storeEventMetaData.isRequired();
 
   // FTSW is necessary, without it just fail.
   StoreArray<RawFTSW> storeFTSW("");
-  storeFTSW.required();
+  storeFTSW.isRequired();
   m_storeRawFTSWsName = storeFTSW.getName();
 
   // Register output data collections
@@ -134,11 +134,11 @@ void TelDataMergerTB2016Module::initialize()
   StoreArray<PXDDigit> storePXDDigits(m_storeOutput_PXDDigitsName);
   storePXDDigits.registerInDataStore();
   // If we choose the digit merging strategy we require a PXDDigit collection, else fail
-  if (m_mergeswitch == 2) storePXDDigits.required();
+  if (m_mergeswitch == 2) storePXDDigits.isRequired();
 
   StoreObjPtr<TelEventInfo> storeEventInfo;
   storeEventInfo.registerInDataStore();
-  storeEventInfo.required();
+  storeEventInfo.isRequired();
 
   if (m_nEventsProcess < 0) m_nEventsProcess = std::numeric_limits<long>::max();
 

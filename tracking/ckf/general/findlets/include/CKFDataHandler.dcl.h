@@ -14,10 +14,21 @@
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
+#include <framework/datastore/StoreArray.h>
+
+#include <string>
+#include <vector>
+
 namespace Belle2 {
+  class RecoTrack;
+
+  class ModuleParamList;
+
   /**
    * Findlet for loading the seeds from the data store.
    * Also, the tracks are fitted and only the fittable tracks are passed on.
+   *
+   * This findlet does also handle the storing of the results, as the
    */
   template <class AResult>
   class CKFDataHandler : public TrackFindingCDC::Findlet<RecoTrack*> {

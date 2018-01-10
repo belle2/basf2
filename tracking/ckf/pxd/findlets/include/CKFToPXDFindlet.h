@@ -10,44 +10,45 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
+#include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 #include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
 #include <tracking/ckf/pxd/findlets/PXDStateRejecter.h>
-#include <tracking/ckf/svd/findlets/SpacePointLoader.h>
+#include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
   class PXDCluster;
+  class CKFToPXDResult;
+  class CKFToPXDState;
 
   class ModuleParamList;
 
   /**
    * Combinatorial Kalman Filter to extrapolate CDC Reco Tracks into the VXD (PXD) and collect space points.
    *
-   * The implementation is split up in four parts and factored out into three sub findlets.
-   * * Fetch the SpacePoints and the reco tracks from the data store (CDCTrackSpacePointStoreArrayHandler)
+   * The implementation is split up in four parts and factored out into five parts.
+   * * Fetch the SpacePoints and the reco tracks from the data store
+   * * Construct all possible two-state-relations between hits and seeds or hits and hits.
    * * Construct all possible candidates starting from a RecoTrack and going through the layers of the VXD collecting
-   *   space points (this is handles by the TreeSearchFindlet, which works on States. The selection
-   *   of space points is handled by the CDCToSpacePointHitSelector)
-   * * Find a non-overlapping set of results (only one candidate per space point and seed) (OverlapResolverFindlet,
+   *   space points.
+   * * Find a non-overlapping set of results (only one candidate per seed) (OverlapResolverFindlet,
    *   quality is determined by a filter)
-   * * Write the results out to the data store (again the CDCTrackSpacePointStoreArrayHandler)
+   * * Write the results out to the data store
    *
-   * If you want to reimplement this algorithm for a different purpose, you probably only have to
-   * implement a new state class and a new hit selector (and maybe the store array handling). The rest should be taken
-   * care by the framework.
    */
   class CKFToPXDFindlet : public TrackFindingCDC::Findlet<> {
     /// Parent class
@@ -63,7 +64,7 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /// Do the track/hit finding/merging.
+    /// Do the tree search.
     void apply() override;
 
     /// Clear the object pools
@@ -73,7 +74,6 @@ namespace Belle2 {
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
     unsigned int m_param_minimalHitRequirement = 1;
-
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out

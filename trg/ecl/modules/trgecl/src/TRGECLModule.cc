@@ -15,7 +15,6 @@
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
@@ -25,9 +24,6 @@
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgecl/TRGECLModule.h"
-#include "trg/ecl/dataobjects/TRGECLHit.h"
-#include "trg/ecl/dataobjects/TRGECLTrg.h"
-#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -110,12 +106,9 @@ namespace Belle2 {
     m_hitNum = 0;
     m_hitTCNum = 0;
 
-    StoreArray<TRGECLHit>::registerPersistent();
-    StoreArray<TRGECLTrg>::registerPersistent();
-    StoreArray<TRGECLCluster>::registerPersistent();
-
-
-
+    m_TRGECLHit.registerInDataStore();
+    m_TRGECLTrg.registerInDataStore();
+    m_TRGECLCluster.registerInDataStore();
 
   }
 //

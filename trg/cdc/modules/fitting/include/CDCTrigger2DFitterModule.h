@@ -5,6 +5,12 @@
 #include <string>
 #include <vector>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
+
 namespace Belle2 {
 
   /** Module for the 2D Fitter of the CDC trigger. */
@@ -47,6 +53,13 @@ namespace Belle2 {
     std::vector<double> rr = {};
     /** geometry constants: drift length - drift time relation */
     std::vector<std::vector<double>> xtTables = {};
+
+    /** list of input tracks from finder */
+    StoreArray<CDCTriggerTrack> m_finderTracks;
+    /** list of output tracks from fitter */
+    StoreArray<CDCTriggerTrack> m_fitterTracks;
+    /** StoreObjPtr contraining the event time */
+    StoreObjPtr<EventT0> m_eventTime;
   };
 
 } // namespace Belle2

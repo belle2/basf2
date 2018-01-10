@@ -55,7 +55,7 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
 void VariablesToHistogramModule::initialize()
 {
   if (not m_particleList.empty())
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Check if we can acces the given file
   m_file = new TFile(m_fileName.c_str(), "RECREATE");

@@ -35,6 +35,9 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
   addParam("WeightFileIdentifier", m_WeightFileIdentifier,
            "Identifier of weightfile in Database or local root/xml file.", std::string(""));
 
+  addParam("UseTimingInfo", m_UseTimingInfo,
+           "Whether to use timing information available in the weight file", bool(false));
+
   addParam("ClusterInformation", m_ClusterInformation, "Wether to use cluster infos or not", std::string(""));
 }
 
@@ -47,7 +50,7 @@ void QualityEstimatorMVAModule::initialize()
   m_variableSet.emplace_back("NSpacePoints", &m_nSpacePoints);
 
   if (m_ClusterInformation == "Average") {
-    m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet);
+    m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet, m_UseTimingInfo);
   }
 
   m_mvaExpert = std::make_unique<MVAExpert>(m_WeightFileIdentifier, m_variableSet);

@@ -20,15 +20,18 @@ namespace Belle2 {
   class ClusterInfoExtractor : public VariableExtractor {
   public:
 
-    ClusterInfoExtractor(std::vector<Named<float*>>& variableSet) :
-      VariableExtractor()
+    ClusterInfoExtractor(std::vector<Named<float*>>& variableSet, bool useTimingInfo) :
+      VariableExtractor(), m_UseTimingInfo(useTimingInfo)
     {
       initializeStats("charge", variableSet);
       initializeStats("seedCharge", variableSet);
       initializeStats("size", variableSet);
       initializeStats("energyLoss", variableSet);
-//      initializeStats("time", variableSet);
-//      initializeStats("timeSigma", variableSet);
+      if (m_UseTimingInfo) {
+        initializeStats("time", variableSet);
+        initializeStats("timeSigma", variableSet);
+      }
+
     }
 
     void extractVariables(std::vector<SpacePoint const*> const& spacePoints)
@@ -66,20 +69,23 @@ namespace Belle2 {
       }
       setStats("energyLoss", values);
 
+      if (m_UseTimingInfo) {
+        for (unsigned int i = 0; i < clusters.size(); ++i) {
+          values[i] = clusters[i]->getClsTime();
+        }
+        setStats("time", values);
 
-//      for (unsigned int i = 0; i < clusters.size(); ++i) {
-//        values[i] = clusters[i]->getClsTime();
-//      }
-//      setStats("time", values);
-//
-//      for (unsigned int i = 0; i < clusters.size(); ++i) {
-//        values[i] = clusters[i]->getClsTimeSigma();
-//      }
-//      setStats("timeSigma", values);
+        for (unsigned int i = 0; i < clusters.size(); ++i) {
+          values[i] = clusters[i]->getClsTimeSigma();
+        }
+        setStats("timeSigma", values);
+      }
 
     }
 
   protected:
+
+    bool m_UseTimingInfo;
 
     void initializeStats(std::string identifier, std::vector<Named<float*>>& variables)
     {

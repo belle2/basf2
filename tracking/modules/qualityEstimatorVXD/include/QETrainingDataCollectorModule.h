@@ -64,6 +64,8 @@ namespace Belle2 {
 
     std::string m_ClusterInformation;
 
+    bool m_UseTimingInfo;
+
     // member variables
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event */

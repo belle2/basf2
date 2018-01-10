@@ -40,7 +40,10 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
 
   addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.", std::string("QETrainingOutput.root"));
 
-  addParam("ClusterInformation", m_ClusterInformation, "Wether to use cluster infos or not", std::string(""));
+  addParam("ClusterInformation", m_ClusterInformation, "Whether to use cluster infos or not", std::string(""));
+
+  addParam("UseTimingInfo", m_UseTimingInfo,
+           "Whether to collect timing information", bool(false));
 }
 
 void QETrainingDataCollectorModule::initialize()
@@ -54,7 +57,7 @@ void QETrainingDataCollectorModule::initialize()
   m_variableSet.emplace_back("truth", &m_truth);
 
   if (m_ClusterInformation == "Average") {
-    m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet);
+    m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet, m_UseTimingInfo);
   }
 
   m_recorder = std::make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");

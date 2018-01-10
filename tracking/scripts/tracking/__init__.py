@@ -938,6 +938,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
     if use_quality_estimator_mva:
         qualityEstimator.param('WeightFileIdentifier', QEMVA_weight_file)
+        qualityEstimator.param('UseTimingInfo', False)
         qualityEstimator.param('ClusterInformation', 'Average')
 
     path.add_module(qualityEstimator)

@@ -58,6 +58,8 @@ namespace Belle2 {
 
     std::string m_WeightFileIdentifier;
 
+    bool m_UseTimingInfo;
+
     std::string m_ClusterInformation;
 
     // member variables

@@ -67,7 +67,7 @@ namespace Belle2 {
           }
         }
 
-        m_weightSum = state.getWeight();
+        m_weightSum += state.getWeight();
       }
     }
 

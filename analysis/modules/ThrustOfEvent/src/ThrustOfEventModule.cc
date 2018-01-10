@@ -63,7 +63,7 @@ void ThrustOfEventModule::initialize()
 
 
   }
-  B2INFO("Number of ParticleLists to calculate Thrust " << nParticleLists << " ");
+  B2INFO("Number of ParticleLists to calculate Thrust: " << nParticleLists << " ");
 }
 
 void ThrustOfEventModule::beginRun()
@@ -77,8 +77,6 @@ void ThrustOfEventModule::event()
   // number of ParticleLists
   int nParticleLists = m_particleLists.size();
 
-
-  // Aquí se guarda la magnitud del thrust y la dirección del thrust axis. -- Michel
   TVector3 thrustAxis = ThrustOfEventModule::getThrustOfEvent(m_particleLists);
   thrust->addThrustAxis(thrustAxis);
   thrust->addThrust(thrustAxis.Mag());

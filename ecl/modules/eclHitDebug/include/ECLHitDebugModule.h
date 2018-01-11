@@ -29,58 +29,54 @@
 
 namespace Belle2 {
   class ECLDebugHit;
-  namespace ECL {
 
+  /** Class to represent the hit of one cell */
+  class ECLHitDebugModule : public Module {
 
+  public:
+    /** Constructor.*/
+    ECLHitDebugModule();
 
-    /** Class to represent the hit of one cell */
-    class ECLHitDebugModule : public Module {
+    /** Destructor.*/
+    virtual ~ECLHitDebugModule();
 
-    public:
-      /** Constructor.*/
-      ECLHitDebugModule();
+    /** Initialize variables, print info, and start CPU clock. */
+    virtual void initialize();
 
-      /** Destructor.*/
-      virtual ~ECLHitDebugModule();
+    /** Nothing so far.*/
+    virtual void beginRun();
 
-      /** Initialize variables, print info, and start CPU clock. */
-      virtual void initialize();
+    /** Actual digitization of all hits in the ECL.
+     *
+     *  The digitized hits are written into the DataStore.
+     */
+    virtual void event();
 
-      /** Nothing so far.*/
-      virtual void beginRun();
+    /** Nothing so far. */
+    virtual void endRun();
 
-      /** Actual digitization of all hits in the ECL.
-       *
-       *  The digitized hits are written into the DataStore.
-       */
-      virtual void event();
+    /** Stopping of CPU clock.*/
+    virtual void terminate();
 
-      /** Nothing so far. */
-      virtual void endRun();
+  protected:
+    /** Input array name. */
+    std::string m_inColName;
+    /** Output array name. */
+    std::string m_eclHitOutColName;
 
-      /** Stopping of CPU clock.*/
-      virtual void terminate();
+    /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+    int m_hitNum;
 
-    protected:
-      /** Input array name. */
-      std::string m_inColName;
-      /** Output array name. */
-      std::string m_eclHitOutColName;
+  private:
+    /** CPU time     */
+    double m_timeCPU;
+    /** Run number   */
+    int    m_nRun;
+    /** Event number */
+    int    m_nEvent;
 
-      /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-      int m_hitNum;
+    //DataStore variables
+    StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */
 
-    private:
-      /** CPU time     */
-      double m_timeCPU;
-      /** Run number   */
-      int    m_nRun;
-      /** Event number */
-      int    m_nEvent;
-
-      //DataStore variables
-      StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */
-
-    };
-  } //ECL
+  };
 } // end of Belle2 namespace

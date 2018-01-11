@@ -21,7 +21,8 @@
 #include <iomanip>
 
 using namespace std;
-using namespace Belle2::ECL;
+using namespace Belle2;
+using namespace ECL;
 
 ECLGeometryPar* ECLGeometryPar::m_B4ECLGeometryParDB = 0;
 

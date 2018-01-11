@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to include the flavor
 # tagging user interphase into your analysis IN THE
 # SPECIAL CASE you use BELLE MONTE CARLO OR BELLE DATA.
@@ -145,7 +147,6 @@ use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
 flavorTagger(
     particleLists=['B0:jspiks'],
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
     belleOrBelle2='Belle')
 #
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.

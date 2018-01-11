@@ -66,8 +66,6 @@ namespace Belle2 {
   class SVDResultVarSet : public TrackFindingCDC::VarSet<SVDResultVarNames> {
 
   public:
-    SVDResultVarSet();
-
     /// Generate and assign the variables from the object.
     bool extract(const CKFToSVDResult* object) final;
 

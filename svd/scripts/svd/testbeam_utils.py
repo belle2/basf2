@@ -93,7 +93,6 @@ def add_simulation(path, momentum=5., positrons=False, momentum_spread=0.05):
     path.add_module(particlegun)
 
     path.add_module('FullSim', StoreAllSecondaries=True)
-    path.add_module('PXDDigitizer')
     path.add_module('SVDDigitizer')
 
 

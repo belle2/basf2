@@ -191,6 +191,11 @@ namespace Belle2 {
     void printBiasMappings();
 
     /**
+     * Prints mappings of power supply to HV cables and cables to HAPDs from the database
+     */
+    void printHvMappings();
+
+    /**
      * Prints mappings of nominal values of bias voltages from the database
      */
     void printNominalBiasVoltages();
@@ -464,6 +469,7 @@ namespace Belle2 {
      * Export module sensor map and info classes from database
      */
     void exportSensorModuleMap();
+    void exportSensorModuleMapInfo(int number);
 
     /**
      * Import results of magnet test
@@ -490,6 +496,11 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
 
+    /**
+     * @brief printContainer used for debugging purposes...
+     * @param rContainer
+     * @param rStream
+     */
     template <typename Container_t>
     inline auto printContainer(const Container_t& rContainer, std::ostream& rStream = std::cout) noexcept -> void
     {
@@ -502,7 +513,7 @@ namespace Belle2 {
       rStream << '\n';
     }
 
-    ClassDef(ARICHDatabaseImporter, 2);                 /**< ClassDef */
+    ClassDef(ARICHDatabaseImporter, 4);                 /**< ClassDef */
 
   };
 

@@ -15,6 +15,7 @@
 #include <analysis/NtupleTools/NtuplePIDTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
 #include <analysis/NtupleTools/NtupleTrackHitsTool.h>
+#include <analysis/NtupleTools/NtupleEventBasedTrackingTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
@@ -105,6 +106,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCReconstructible") return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName == "Track") return new NtupleTrackTool(tree, d);
   else if (strToolName == "TrackHits") return new NtupleTrackHitsTool(tree, d);
+  else if (strToolName == "EventBasedTracking") return new NtupleEventBasedTrackingTool(tree, d);
   else if (strToolName == "Cluster") return new NtupleClusterTool(tree, d);
   else if (strToolName == "Vertex") return new NtupleVertexTool(tree, d);
   else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);

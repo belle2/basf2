@@ -65,6 +65,10 @@ void EB0Controller::initArguments(const DBObject& obj)
 
 bool EB0Controller::loadArguments(const DBObject& obj)
 {
+  if (obj("eb0").getBool("xinetd")) {
+    setUsed(false);
+    return false;
+  }
   setUsed(true);
   int port = 0;
   m_nsenders = 0;

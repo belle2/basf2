@@ -52,6 +52,9 @@ namespace Belle2 {
      */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+    /** Nothing to be done when creating from DB, the payload should be found automatically */
+    virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) {}
+
     virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
 
     /** Create a Database configuration from Gearbox parameters */

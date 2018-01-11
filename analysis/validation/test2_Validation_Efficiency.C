@@ -2,17 +2,15 @@
 <header>
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_Efficiency_output.root</output>
-<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+<contact>Sam Cunliffe (sam.cunliffe@desy.de); Phillip Urquijo (phillip.urquijo@unimelb.edu.au)</contact>
+<description>Check the reconstruction efficiency for single particles</description>
 </header>
 */
-////////////////////////////////////////////////////////////
-// Validation_Efficiency.cc
-// Check the Reconstruction efficiency for single particles
-//
-// Phillip Urquijo, Luis Pesantez
-// July, 2013
-// Update: Oct 11, 2014
-//
+
+// Authors: Phillip Urquijo, Luis Pesantez, Jul 2013
+// Updated: Oct 2014
+//          Nov 2017
+
 #include <vector>
 #include <fstream>
 #include <iomanip>
@@ -412,6 +410,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
 
     ///////////////////// Tracks
     //Fill histograms
+    const char *contact_tracks = "sam.cunliffe@desy.de";
     test2_Validation_Efficiency_Track_Truth(filename, list_hist_tracks);
     test2_Validation_Efficiency_Track_Reco(filename, list_hist_tracks);
 
@@ -422,6 +421,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                           string("test2_Validation_Efficiency_plots.pdf"), string( "Track p_{T}" ) );
     h_Eff_Track->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. A Generic BBbar sample is used."));
     h_Eff_Track->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency. Steep rise in efficiency up to 90 percent at 0.5 GeV. p_{T}<0.5 GeV more sensitive to tracking algorithm changes."));
+    h_Eff_Track->GetListOfFunctions()->Add(new TNamed("Contact", contact_tracks));
     list_eff_tracks->Add( Eff_Track );
     list_web->Add( h_Eff_Track );
 
@@ -431,6 +431,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #theta_{lab}, p_{T}<250 MeV") );
     h_Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of theta_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}<250 MeV"));
     h_Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume."));
+    h_Eff_TrackTheta_LowPt->GetListOfFunctions()->Add(new TNamed("Contact", contact_tracks));
     list_eff_tracks->Add( Eff_TrackTheta_LowPt );
     list_web->Add( h_Eff_TrackTheta_LowPt );
 
@@ -440,6 +441,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #theta_{lab}, p_{T}>=250 MeV") );
     h_Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of theta_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}>=250 MeV"));
     h_Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume."));
+    h_Eff_TrackTheta_HighPt->GetListOfFunctions()->Add(new TNamed("Contact", contact_tracks));
     list_eff_tracks->Add( Eff_TrackTheta_HighPt );
     list_web->Add( h_Eff_TrackTheta_HighPt );
 
@@ -449,6 +451,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #phi_{lab}, p_{T}<250 MeV") );
     h_Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of phi_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}<250 MeV"));
     h_Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Periodic dip at #pi/2 modulo."));
+    h_Eff_TrackPhi_LowPt->GetListOfFunctions()->Add(new TNamed("Contact", contact_tracks));
     list_eff_tracks->Add( Eff_TrackPhi_LowPt );
     list_web->Add( h_Eff_TrackPhi_LowPt );
 
@@ -458,11 +461,13 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                           string("test2_Validation_Efficiency_plots.pdf"), string("Track #phi_{lab}, p_{T}>=250 MeV") );
     h_Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction efficiency of truth-matched pion tracks with a pi hypothesis in bins of phi_lab. A Generic BBbar sample is used, thus the sample is weighted to low momentum. Track cut p_{T}>=250 MeV"));
     h_Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Periodic dip at #pi/2 modulo."));
+    h_Eff_TrackPhi_HighPt->GetListOfFunctions()->Add(new TNamed("Contact", contact_tracks));
     list_eff_tracks->Add( Eff_TrackPhi_HighPt );
     list_web->Add( h_Eff_TrackPhi_HighPt );
 
     ///////////////////// Photons
     // Fill histograms
+    const char *contact_photons = "sam.cunliffe@desy.de; torben.ferber@desy.de";
     test2_Validation_Efficiency_Photon_Truth(filename, list_hist_photons);
     test2_Validation_Efficiency_Photon_Reco(filename, list_hist_photons);
 
@@ -486,6 +491,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon E", regions[i])) );
         h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of energy. Input: Generic BBbar. ECL: %s", regions[i])));
         h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency, particularly at low E. Steep rise to 80 percent at 1 GeV."));
+        h_Eff_Photon[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact_photons));
         list_eff_photons->Add( Eff_Photon[i] );
         if(i==0) list_web->Add( h_Eff_Photon[i] );
 
@@ -495,6 +501,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #theta_{lab}, E<500 MeV", regions[i])) );
         h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
+        h_Eff_PhotonTheta_LowE[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact_photons));
         list_eff_photons->Add( Eff_PhotonTheta_LowE[i] );
         if(i==0) list_web->Add( h_Eff_PhotonTheta_LowE[i] );
 
@@ -504,6 +511,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #theta_{lab}, E>=500 MeV", regions[i])) );
         h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of theta_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Dips at 0.6 and 2.3."));
+        h_Eff_PhotonTheta_HighE[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact_photons));
         list_eff_photons->Add( Eff_PhotonTheta_HighE[i] );
         if(i==0) list_web->Add( h_Eff_PhotonTheta_HighE[i] );
 
@@ -513,6 +521,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #phi_{lab}, E<500 MeV", regions[i])) );
         h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E<500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
+        h_Eff_PhotonPhLowE[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact_photons));
         list_eff_photons->Add( Eff_PhotonPhLowE[i] );
         if(i==0) list_web->Add( h_Eff_PhotonPhLowE[i] );
 
@@ -522,6 +531,7 @@ void test2_Validation_Efficiency(bool runOffline=false) {
                               string("test2_Validation_Efficiency_plots.pdf"), string(Form("%s: Photon #phi_{lab}, E>=500 MeV", regions[i]) ) );
         h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction efficiency of truth-matched photons in bins of phi_lab. Input: Generic BBbar, thus the sample is weighted to low energy. Photon cut E>=500 MeV. ECL: %s", regions[i])));
         h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Check", "Stable efficiency through the detector volume. Flat across the spectrum."));
+        h_Eff_PhotonPhHighE[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact_photons));
         list_eff_photons->Add( Eff_PhotonPhHighE[i] );
         if(i==0) list_web->Add( h_Eff_PhotonPhHighE[i] );
     }

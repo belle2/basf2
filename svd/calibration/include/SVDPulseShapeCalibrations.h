@@ -56,7 +56,7 @@ namespace Belle2 {
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
-     * @param pulseADC : The ADC-pulse height, i. e. an integer number between 0 and 2555 (included)
+     * @param pulseADC : The ADC-pulse height, a double between 0 and 155 (included)
      *
      * Output: float corresponding to the charge [e] converted
      * from the read ADC pulse.

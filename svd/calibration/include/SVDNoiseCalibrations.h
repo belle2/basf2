@@ -73,7 +73,7 @@ namespace Belle2 {
     inline float getNoiseInElectrons(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
     {
       SVDPulseShapeCalibrations m_pulseShape;
-      return getNoise(sensorID, isU, strip) * m_pulseShape.getChargeFromADC(sensorID, isU, strip, 1);
+      return m_pulseShape.getChargeFromADC(sensorID, isU, strip, getNoise(sensorID, isU, strip));
     }
 
     /*    inline void setNoise(const VxdID& sensorID, const bool& isU , const unsigned short& strip, float stripNoise)

@@ -256,14 +256,14 @@ namespace Belle2 {
       /// plus checksum 32bit
 
       inline unsigned short get_trig_nr0(void) const   {    return trignr0;  };
-      PXDErrorFlags check_error(unsigned int length) const
+      PXDErrorFlags check_error(int length) const
       {
         PXDErrorFlags m_errorMask = 0;
         // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
-        if (length < 4 + 4 + 4) {
+        if (length < minSize()) {
           B2ERROR("DHC ONSEN HLT/ROI Frame too small to hold any ROIs!");
           m_errorMask |= c_ROI_PACKET_INV_SIZE;
-        } else if ((length - 4 - 4 - 4) % 8 != 0) {
+        } else if ((length - minSize()) % 8 != 0) {
           B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
           m_errorMask |= c_ROI_PACKET_INV_SIZE;
         }
@@ -274,7 +274,8 @@ namespace Belle2 {
         word0.print();
         B2DEBUG(20, "DHC HLT/ROI Frame");
       };
-
+      // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
+      inline int minSize(void) const {return 4 + 4 + 4;};
       unsigned int check_inner_crc(unsigned int /*length*/) const
       {
         /// Parts of the data are now in the ONSEN Trigger frame, therefore the inner CRC cannot be checked that easily!

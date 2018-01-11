@@ -42,24 +42,24 @@ namespace Belle2 {
     VXDTFTrainingDataCollectorModule();
 
     /** VXDTFTrainingDataCollectorModule destructor. */
-    virtual ~VXDTFTrainingDataCollectorModule() {}
+    ~VXDTFTrainingDataCollectorModule() {}
 
     /** initialize. */
-    virtual void initialize();
+    void initialize() override;
 
     /** beginRun. */
-    virtual void beginRun()
+    void beginRun() override
     { }
 
     /** event. */
-    virtual void event();
+    void event() override;
 
     /** endRun. */
-    virtual void endRun()
+    void endRun() override
     { }
 
     /** terminate. */
-    virtual void terminate();
+    void terminate();
 
   protected:
 

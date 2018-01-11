@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDUnpackerBSModule_H
-#define PXDUnpackerBSModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
@@ -204,5 +203,3 @@ namespace Belle2 {
 
   } //end PXD namespace;
 } // end namespace Belle2
-
-#endif // PXDUnpackerBSModule_H

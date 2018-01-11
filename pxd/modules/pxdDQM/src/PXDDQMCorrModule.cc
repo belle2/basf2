@@ -57,7 +57,10 @@ void PXDDQMCorrModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not use return value with ->cd(), its ZERO if dir already exists
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
   //----------------------------------------------------------------
 
   int nPixelsU1 = 1;//getInfo(0).getUCells();// we need an actual sensor ID to use that

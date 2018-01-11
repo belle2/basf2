@@ -111,7 +111,7 @@ void ARICHDatabaseImporter::importModulesInfo()
   ARICHChannelMapping QAChMap;
 
   // read mapping from xml file
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
   istringstream chstream;
   int x, y, asic;
   chstream.str(content.getString("QAChannelMapping"));
@@ -120,7 +120,7 @@ void ARICHDatabaseImporter::importModulesInfo()
   }
 
   // get list of installed modules from xml
-  content = GearDir("/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
   B2INFO("Installed modules\n");
 
   std::vector<std::string> installed;
@@ -206,7 +206,7 @@ void ARICHDatabaseImporter::importChannelMask()
   ARICHChannelMask chanMask;
 
   // loop over installed modules (from xml file)
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
   B2INFO("Installed modules\n");
   for (const GearDir& module : content.getNodes("Module")) {
     std::string hapdID = module.getString("@hapdID");
@@ -265,7 +265,7 @@ void ARICHDatabaseImporter::importSimulationParams()
 
   ARICHSimulationPar simPar;
 
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content/SimulationParameters");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/SimulationParameters");
 
   double qeScale = content.getDouble("qeScale");
   double winAbs = content.getDouble("windowAbsorbtion");
@@ -300,7 +300,7 @@ void ARICHDatabaseImporter::importSimulationParams()
 
 void ARICHDatabaseImporter::importChannelMapping()
 {
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
   ARICHChannelMapping chMap;
 
   istringstream chstream;
@@ -324,7 +324,7 @@ void ARICHDatabaseImporter::importChannelMapping()
 void ARICHDatabaseImporter::importFEMappings()
 {
 
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
 
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
@@ -385,7 +385,7 @@ void ARICHDatabaseImporter::importFEMappings()
 void ARICHDatabaseImporter::importGeometryConfig()
 {
 
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
   ARICHGeometryConfig arichGeometryConfig(content);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
@@ -397,7 +397,7 @@ void ARICHDatabaseImporter::importGeometryConfig()
 
 void ARICHDatabaseImporter::importCosmicTestGeometry()
 {
-  GearDir content = GearDir("/DetectorComponent[@name='ARICH']/Content");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
   GearDir cosmic(content, "CosmicTest");
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 

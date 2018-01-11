@@ -20,7 +20,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
 #include <memory>

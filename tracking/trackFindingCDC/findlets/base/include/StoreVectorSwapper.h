@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 

@@ -11,8 +11,8 @@
 #include <tracking/modules/cdcHitBasedT0Extraction/cdcHitBasedT0Extraction.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
-#include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParam.h>
 
 #include <framework/logging/Logger.h>
 

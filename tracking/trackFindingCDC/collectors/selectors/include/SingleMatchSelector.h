@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {

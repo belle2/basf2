@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParam.h>
 
 namespace Belle2 {

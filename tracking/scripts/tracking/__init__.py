@@ -557,8 +557,6 @@ def add_ckf_based_track_finding(path,
         else:
             raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
 
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
-
         # Write out the combinations of tracks
         path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
                         CDCRecoTracksStoreArrayName=cdc_reco_tracks,

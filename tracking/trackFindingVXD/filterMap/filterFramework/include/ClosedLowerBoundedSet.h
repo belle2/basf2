@@ -28,7 +28,6 @@ namespace Belle2 {
 
   template< typename MinType >
   class ClosedLowerBoundedSet {
-    MinType m_min;
   public:
 
     /** Constructor */
@@ -63,6 +62,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** sets the branch address for m_min
+      @param t: pointer to the tree that contains the branch
+      @param branchName: reference to name of the branch
+    */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
@@ -90,7 +93,9 @@ namespace Belle2 {
       return ("(" + minVal + " <= " + varname + ")");
     }
 
-
+  private:
+    /// the minimum value for this range
+    MinType m_min;
   };
 
 

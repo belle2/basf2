@@ -30,8 +30,6 @@ namespace Belle2 {
 
   template< typename MinType, typename MaxType>
   class ClosedRange {
-    MinType m_min;
-    MaxType m_max;
   public:
 
     /** Constructor */
@@ -105,7 +103,11 @@ namespace Belle2 {
       return ("(" + minVal + " <= " + varname + " <= " + maxVal + ")");
     }
 
-
+  private:
+    /// the minimum of this range
+    MinType m_min;
+    /// the maximum of this range
+    MaxType m_max;
 
   };
 

@@ -75,7 +75,7 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
   std::vector< std::pair<char, void*> > dummyVector = {};
 
   VXDTFFilters<SpacePoint>::twoHitFilter_t empty2HitFilter;
-  // the structure is the same for all templates
+  // the structure is the same for all specializations of the template
   std::string structure2HitFilter = empty2HitFilter.getNameAndReference(&dummyVector);
   dummyVector.clear();
   addParam("twoHitFilterAdjustFunctions", m_twoHitFilterAdjustFunctions,
@@ -84,11 +84,11 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            "The second entry is interpreted as function used to create a TF1. The variable to be altered will be assumed to be called \"x\" "
            "and in addition one can use \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. "
            "No other parameter is allowed. The structure of the 2-hit filter is as follows:       " + structure2HitFilter +
-           "    Example: [[\"1\", \"12\"], [\"3\", \"sin(x)\"], [\"4\", \"x + [0]\"]]    PS: use this feature only if you know what you are doing!",
+           "    Example: [(1, \"12\"), (3, \"sin(x)\"), (4, \"x + [0]\")]    PS: use this feature only if you know what you are doing!",
            m_twoHitFilterAdjustFunctions);
 
   VXDTFFilters<SpacePoint>::threeHitFilter_t empty3HitFilter;
-  // the structure is the same for all templates
+  // the structure is the same for all specializations of the template
   std::string structure3HitFilter = empty3HitFilter.getNameAndReference(&dummyVector);
   dummyVector.clear();
   addParam("threeHitFilterAdjustFunctions", m_threeHitFilterAdjustFunctions,
@@ -97,7 +97,7 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            "The second entry is interpreted as function used to create a TF1. The variable to be altered will be assumed to be called \"x\" "
            "and in addition \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. No other "
            "parameter is allowd. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
-           "    Example: [[\"1\", \"12\"], [\"3\", \"sin(x)\"], [\"4\", \"x + [0]\"]]    PS: use this feature only if you know what you are doing!",
+           "    Example: [(1, \"12\"), (3, \"sin(x)\"), (4, \"x + [0]\")]    PS: use this feature only if you know what you are doing!",
            m_twoHitFilterAdjustFunctions);
 }
 
@@ -109,7 +109,7 @@ SectorMapBootstrapModule::initialize()
   if (m_readSecMapFromDB) {
     B2DEBUG(1, "SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
     m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
-    if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr not initialized");
+    if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr is not initialized");
     // add a callback function so that the sectormap is updated each time the DBObj changes
     m_ptrDBObjPtr->addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMap);
   }
@@ -473,18 +473,16 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     if (m_twoHitFilterAdjustFunctions.size() > 0) {
       B2WARNING("The 2-hit filters will be altered from the default!");
       B2INFO("The following set of indizes and functions will be used to alter the 2-hit filters:");
-      for (auto& vec : m_twoHitFilterAdjustFunctions) {
-        if (vec.size() != 2) B2FATAL("Error: inner vector has to have size=2");
-        B2INFO("index=" << vec[0] << " function=" << vec[1]);
+      for (auto& entry : m_twoHitFilterAdjustFunctions) {
+        B2INFO("index=" << std::get<0>(entry) << " function=" << std::get<1>(entry));
       }
       segmentFilters->modify2SPFilters(m_twoHitFilterAdjustFunctions);
     }
     if (m_threeHitFilterAdjustFunctions.size() > 0) {
       B2WARNING("The 3-hit filters will be altered from the default!");
       B2INFO("The following set of indizes and functions will be used to alter the 3-hit filters:");
-      for (auto& vec : m_threeHitFilterAdjustFunctions) {
-        if (vec.size() != 2) B2FATAL("Error: inner vector has to have size=2");
-        B2INFO("index=" << vec[0] << " function=" << vec[1]);
+      for (auto& entry : m_threeHitFilterAdjustFunctions) {
+        B2INFO("index=" << std::get<0>(entry) << " function=" << std::get<1>(entry));
       }
       segmentFilters->modify3SPFilters(m_threeHitFilterAdjustFunctions);
     }

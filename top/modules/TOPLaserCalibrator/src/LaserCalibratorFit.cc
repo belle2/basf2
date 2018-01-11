@@ -103,6 +103,7 @@ namespace Belle2 {
       m_hist[channel]->SetAxisRange(m_xmin, m_xmax);
       m_maxpos[channel] = m_hist[channel]->GetXaxis()->GetBinCenter(m_hist[channel]->GetMaximumBin());
       m_hist[channel]->SetAxisRange(m_maxpos[channel] - 1.5, m_maxpos[channel] + 2);
+      m_maxpos_error[channel] = m_hist[channel]->GetXaxis()->GetBinWidth(m_hist[channel]->GetMaximumBin()); // Error = bin width ?
 
       if (m_fitMethod == "gauss") {
         m_func[channel] = makeGFit(channel);
@@ -278,6 +279,7 @@ namespace Belle2 {
         m_fitTErr = func->GetParError(1);
       } else {
         m_fitT = m_maxpos[channel];
+        m_fitTErr = m_maxpos_error[channel];
       }
       return func;
     }

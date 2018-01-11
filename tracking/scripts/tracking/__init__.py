@@ -481,8 +481,9 @@ def add_ckf_based_track_finding(path,
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
                                 pxd_reco_tracks="PXDRecoTracks",
+                                phase2=False,
                                 use_mc_truth=False,
-                                svd_ckf_mode="VXDTF2_before_with_second_ckf",
+                                svd_ckf_mode=None,
                                 add_both_directions=True,
                                 use_second_cdc_hits=False,
                                 components=None):
@@ -495,12 +496,20 @@ def add_ckf_based_track_finding(path,
     :param svd_reco_tracks: The store array name where to output the svd tracks
     :param pxd_reco_tracks: The store array name where to output the pxd tracks
     :param use_mc_truth: Use the truth information in the CKF modules
-    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without)
+    :param phase2: Use phase 2 configuration instead of phase 3.
+    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without). Defaults to "VXDTF2_before_with_second_ckf"
+           for phase 3 and "VXDTF2_after" for phase 2.
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
            extrapolate also in the other direction.
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param components: the list of geometry components in use or None for all components.
     """
+    if not svd_ckf_mode:
+        if phase2:
+            svd_ckf_mode = "VXDTF2_after"
+        else:
+            svd_ckf_mode = "VXDTF2_before_with_second_ckf"
+
     if not is_svd_used(components):
         raise ValueError("SVD must be present in the components!")
 
@@ -540,17 +549,17 @@ def add_ckf_based_track_finding(path,
                 add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                                      use_mc_truth=use_mc_truth, direction="forward")
             add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="backward")
+                        use_mc_truth=use_mc_truth, direction="backward", phase2=phase2)
             if add_both_directions:
                 add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, phase2=phase2)
 
         elif svd_ckf_mode == "only_ckf":
             add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="backward")
+                        use_mc_truth=use_mc_truth, direction="backward", phase2=phase2)
             if add_both_directions:
                 add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, phase2=phase2)
 
         else:
             raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
@@ -565,7 +574,7 @@ def add_ckf_based_track_finding(path,
     if trigger_mode in ["all"]:
         if is_pxd_used(components):
             add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks,
-                        use_mc_truth=use_mc_truth)
+                        use_mc_truth=use_mc_truth, phase2=phase2)
 
             path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
                             VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=reco_tracks)

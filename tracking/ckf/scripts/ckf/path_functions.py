@@ -1,4 +1,4 @@
-def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, direction="backward"):
+def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
     """
     Convenience function to add the SVD track finding using VXDTF2 and the merger based on the CKF to the path.
     :param path: The path to add the module to
@@ -49,16 +49,17 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, d
                     )
 
 
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,
-                overlap_cut=0.2, use_best_seeds=10, use_best_results=2):
+def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False, filter_cut=0.03,
+                overlap_cut=None, use_best_seeds=10, use_best_results=2):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
     :param svd_cdc_reco_tracks: The name of the already created SVD+CDC reco tracks
     :param pxd_reco_tracks: The name to output the PXD reco tracks to
+    :param phase2: If true, use the setup for phase 2 (instead of phase 3)
     :param use_mc_truth: Use the MC information in the CKF
     :param filter_cut: CKF parameter for MVA state filter
-    :param overlap_cut: CKF parameter for MVA overlap filter
+    :param overlap_cut: CKF parameter for MVA overlap filter. Default is 0.2 for phase 3 and 0 for phase 2.
     :param use_best_results: CKF parameter for useBestNInSeed
     :param use_best_seeds: CKF parameter for UseNStates
     """
@@ -84,6 +85,12 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
             useBestNInSeed=1
         )
     else:
+        if overlap_cut is None:
+            if phase2:
+                overlap_cut = 0.0
+            else:
+                overlap_cut = 0.2
+
         module_parameters = dict(
             firstHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_1.xml",
                                        "direction": direction},
@@ -98,6 +105,9 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
             filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_PXDTrackCombination.xml"},
             useBestNInSeed=use_best_results,
         )
+
+    if phase2:
+        module_parameters["seedHitJumping"] = 1
 
     path.add_module("ToPXDCKF",
                     advanceHighFilterParameters={"direction": direction},
@@ -115,13 +125,14 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
                     **module_parameters)
 
 
-def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
+def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_truth=False,
                 filter_cut=0.1, overlap_cut=0.2, use_best_results=5, use_best_seeds=10,
                 direction="backward"):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
     :param cdc_reco_tracks: The name of the already created CDC reco tracks
+    :param phase2: If true, use the setup for phase 2 (instead of phase 3)
     :param svd_reco_tracks: The name to output the SVD reco tracks to
     :param use_mc_truth: Use the MC information in the CKF
     :param filter_cut: CKF parameter for MVA filter
@@ -163,6 +174,9 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
             filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_CDCToSVDResult.xml"},
             useBestNInSeed=use_best_results,
         )
+
+    if phase2:
+        module_parameters["seedHitJumping"] = 3
 
     path.add_module("CDCToSVDSpacePointCKF",
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,

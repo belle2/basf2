@@ -42,7 +42,10 @@ void PXDHardwareClusterDQMModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   hHardClusterPerHalfLadder = new TH1F("hHardClusterPerHalfLadder", "Pxd Hardware Clusters per half ladder;Number of Clusters;", 200,
                                        0, 200);

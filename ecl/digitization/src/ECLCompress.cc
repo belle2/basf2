@@ -15,8 +15,9 @@
 #include <stdio.h>
 
 using namespace Belle2;
+using namespace ECL;
 
-unsigned int Belle2::ilog2(unsigned int v)  // find the log base 2 of 32-bit v
+unsigned int Belle2::ECL::ilog2(unsigned int v)  // find the log base 2 of 32-bit v
 {
   static const unsigned char MultiplyDeBruijnBitPosition[32] = {
     0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
@@ -275,7 +276,7 @@ void ECLDCTCompress::uncompress(BitStream& in, int* adc)
   for (int k = 0; k < N; k++) adc[k] = lrint(out[k]);
 }
 
-ECLCompress* Belle2::selectAlgo(int compAlgo)
+ECLCompress* Belle2::ECL::selectAlgo(int compAlgo)
 {
   ECLCompress* comp = NULL;
   if (compAlgo == 1) {

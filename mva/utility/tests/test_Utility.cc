@@ -8,14 +8,7 @@
  **************************************************************************/
 
 #include <mva/utility/Utility.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
-
-#include <boost/filesystem/operations.hpp>
-
-#include <fstream>
-
-#include <gtest/gtest.h>
 
 using namespace Belle2;
 

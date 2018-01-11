@@ -8,15 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDHARDWARECLUSTERDQMMODULE_H
-#define PXDHARDWARECLUSTERDQMMODULE_H
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -92,4 +86,3 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDHardwareClusterDQMModule_H

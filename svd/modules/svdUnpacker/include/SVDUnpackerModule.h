@@ -63,7 +63,7 @@ namespace Belle2 {
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
 
-      bool m_generateShaperDigts;
+      bool m_generateShaperDigits;
       std::string m_svdShaperDigitListName;
       std::string m_svdDAQDiagnosticsListName;
 
@@ -161,7 +161,9 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
 
       int m_shutUpFTBError;
       int m_FADCTriggerNumberOffset;

@@ -147,7 +147,7 @@ converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('lookBackWindows', lookbackWindows)
-converter.param('storageDepth', 510)
+converter.param('storageDepth', 508)  # run dependent, check run list on confluence page
 converter.param('calibrationChannel', calCh)  # if set, cal pulses will be flagged
 converter.param('calpulseHeightMin', 450)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]

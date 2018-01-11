@@ -165,9 +165,10 @@ void SVDSimpleClusterizerModule::event()
     int thisCellID = storeDigits[i]->getCellID();
 
     //Ignore digits with insufficient signal
-    float ADCnoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-    float thisNoise = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
+    float thisNoise = m_NoiseCal.getNoiseInElectrons(thisSensorID, thisSide, thisCellID);
     float thisCharge = storeDigits[i]->getCharge();
+    B2DEBUG(10, "Noise = " << thisNoise << " e-, Charge = " << thisCharge);
+
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
       i++;
       continue;

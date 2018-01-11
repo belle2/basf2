@@ -25,8 +25,8 @@ ARICHHvCablesMapping::ARICHHvCablesMapping()
 int ARICHHvCablesMapping::getModuleID(int sectorID, int cableID, int innerID) const
 {
   if (sectorID > 6 || sectorID < 1) { B2WARNING("ARICHHvCablesMapping::getcableID: Sector number " << sectorID << " not valid!"); return 0;}
-  if (cableID > 8 || cableID < 1) { B2WARNING("ARICHHvCablesMapping::getcableID: Cable number " << cableID << " not valid!"); return 0;}
-  if (innerID > 9 || innerID < 1) { B2WARNING("ARICHHvCablesMapping::getcableID: Inner cable number " << innerID << " not valid!"); return 0;}
+  if (cableID > 4 || cableID < 1) { B2WARNING("ARICHHvCablesMapping::getcableID: Cable number " << cableID << " not valid!"); return 0;}
+  if (innerID > 20 || innerID < 2) { B2WARNING("ARICHHvCablesMapping::getcableID: Inner cable number " << innerID << " not valid!"); return 0;}
 
   int module = 0;
   std::vector<int> position{sectorID, cableID, innerID};
@@ -63,7 +63,7 @@ void ARICHHvCablesMapping::addMapping(int moduleID, int sectorID, int cableID, i
   if (moduleID > 420 || moduleID < 1) { B2WARNING("ARICHHvCablesMapping::addMapping: Module number " << moduleID << " not valid!"); }
   if (sectorID > 6 || sectorID < 1) { B2WARNING("ARICHHvCablesMapping::addMapping: Sector number " << sectorID << " not valid!"); }
   if (cableID > 8 || cableID < 1) { B2WARNING("ARICHHvCablesMapping::addMapping: Cable number " << cableID << " not valid!"); }
-  if (innerID > 9 || innerID < 1) { B2WARNING("ARICHHvCablesMapping::addMapping: Inner cable number " << innerID << " not valid!"); }
+  if (innerID > 20 || innerID < 2) { B2WARNING("ARICHHvCablesMapping::addMapping: Inner cable number " << innerID << " not valid!"); }
 
   std::vector<int> cableMap{sectorID, cableID, innerID};
   m_module2cable.insert(std::pair<int, std::vector<int>>(moduleID, cableMap));
@@ -83,9 +83,10 @@ void ARICHHvCablesMapping::print()
   int l = 0;
 
   for (int i = 1; i < 7 ; i++) {
-    for (int j = 1; j < 9 ; j++) {
-      for (int k = 1; k < 10; k++) {
-        if ((j == 2 || j == 6) && k == 9) continue;
+    for (int j = 1; j < 5 ; j++) {
+      for (int k = 2; k < 21; k++) {
+        if (k == 7) continue;
+        if ((j == 1 || j == 4) && k == 20) continue;
         std::cout << " Module: " << getModuleID(i, j, k) << ": sector " << i << ", cable " << j << ", inner " << k << std::endl;
         l++;
       }

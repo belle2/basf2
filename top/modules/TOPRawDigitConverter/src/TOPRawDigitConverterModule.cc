@@ -73,7 +73,7 @@ namespace Belle2 {
              "if positive, timeError will be estimated from FE data", 9.0);
     addParam("maxPulseWidth", m_maxPulseWidth,
              "maximal pulse width [ns] to flag digit as good", 10.0);
-    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 512);
+    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 508);
     addParam("lookBackWindows", m_lookBackWindows,
              "number of look back windows; used to set time origin correctly (only if >0)", 0);
 

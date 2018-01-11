@@ -26,9 +26,14 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+#include <reconstruction/dbobjects/DedxPDFs.h>
+
 #include <string>
 #include <vector>
 #include <TVector3.h>
+#include <TH2F.h>
 
 class TH2F;
 
@@ -40,8 +45,7 @@ namespace Belle2 {
 
   /** Extract dE/dx from fitted tracks.
    *
-   * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
-   * for all particle hypotheses are calculated and saved in a VXDDedxLikelihood object.
+   * Likelihood values for all particle hypotheses are calculated and saved in a VXDDedxLikelihood object.
    *
    * The 'EnableDebugOutput' option adds VXDDedxTrack objects (one for each genfit::Track),
    * which includes individual dE/dx data points and their corresponding layer,
@@ -111,14 +115,23 @@ namespace Belle2 {
     /** save energy loss and hit information from SVD/PXDHits to track */
     template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const std::vector<HitClass*>& hits) const;
 
-    /** for all particles, save log-likelihood values into 'logl'.
+    /** for all particles in the PXD, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified
      * @param p     track momentum
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
+    void savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
+
+    /** for all particles in the SVD, save log-likelihood values into 'logl'.
+     *
+     * @param logl  array of log-likelihood to be modified
+     * @param p     track momentum
+     * @param dedx  dE/dx value
+     * @param pdf   pointer to array of 2d PDFs to use (not modified)
+     * */
+    void saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
 
     /** should info from this detector be included in likelihood? */
     bool detectorEnabled(Dedx::Detector d) const
@@ -126,8 +139,9 @@ namespace Belle2 {
       return (d == Dedx::c_PXD and m_usePXD) or (d == Dedx::c_SVD and m_useSVD);
     }
 
-    /** dedx:momentum PDFs. */
-    TH2F* m_pdfs[Dedx::c_num_detectors][Const::ChargedStable::c_SetSize]; //m_pdfs[detector_type][particle_type]
+    // pdfs for PID
+    DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
+    TH2F m_pdfs[2][6]; /**< dedx:momentum PDFs. m_pdfs[detector_type][particle_type] */
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
@@ -144,7 +158,6 @@ namespace Belle2 {
     bool m_useSVD; /**< use SVD hits for likelihood */
 
     //parameters: PDF configuration
-    std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
   };

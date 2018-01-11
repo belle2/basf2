@@ -2,6 +2,7 @@
 #define TRCECLDQMMODULE_h
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
 #include <stdlib.h>
 #include <iostream>
@@ -48,6 +49,7 @@ namespace Belle2 {
     //! Hit TC Timing
     std::vector<double> TCTiming;
 
+    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore; /**< output for TRGECLUnpackerStore */
 
   };
 

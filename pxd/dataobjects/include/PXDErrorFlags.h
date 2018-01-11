@@ -31,7 +31,7 @@ namespace Belle2 {
         c_ONSEN_TRG_FIRST = 1ull << 3,
         c_DHC_END_MISS = 1ull << 4,
         c_DHE_START_MISS = 1ull << 5,
-        c_DHC_FRAMECOUNT = 1ull << 6,
+        c_ROI_PACKET_INV_SIZE = 1ull << 6,
         c_DATA_OUTSIDE = 1ull << 7,
         c_DHC_START_SECOND = 1ull << 8,
         c_DHE_WRONG_ID_SEQ = 1ull << 9,
@@ -82,7 +82,7 @@ namespace Belle2 {
         static const std::string undefined("undefined");
         static const std::string error_name[ONSEN_MAX_TYPE_ERR] = {
           "TestBeam: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
-          "DHC_END missing/wrong placed", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
+          "DHC_END missing/wrong placed", "DHE_START missing", "ROI packet invalid size", "DATA outside of DHE",
           "DHC_START is not second frame", "DHE IDs have wrong order in DHC", "Fixed size frame wrong size", "DHE CRC Error:",
           "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
           "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",

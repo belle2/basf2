@@ -273,10 +273,16 @@ namespace {
     /// plus checksum 32bit
 
     inline unsigned short get_trig_nr0(void) const   {    return trignr0;  };
-    PXDErrorFlags check_error(void) const
+    PXDErrorFlags check_error(unsigned int length) const
     {
       PXDErrorFlags m_errorMask = 0;
-      // there is nothing to check here...
+      if (length < 4 + 4 + 4) {
+        B2ERROR("DHC ONSEN HLT/ROI Frame too small to hold any ROIs, did not save anything!");
+        m_errorMask |= c_ROI_PACKET_INV_SIZE;
+      } else if ((length - 4 - 4 - 4) % 8 != 0) {
+        B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
+        m_errorMask |= c_ROI_PACKET_INV_SIZE;
+      }
       return m_errorMask;
     };
     void print(void) const
@@ -293,16 +299,12 @@ namespace {
     };
     void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) const
     {
-      // not clear what will remain here, as part of data (headers) will go to trigger frame.
-      // 4 byte header, 4 byte copy of inner CRC, 4 byte outer CRC
+      // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       if (length < 4 + 4 + 4) {
-        B2ERROR("DHC ONSEN HLT/ROI Frame too small to hold any ROIs, did not save anything!");
         return;
       }
       if ((length - 4 - 4 - 4) % 8 != 0) {
-        // TODO define error flag
-        B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
-        PXDUnpackerBSModule::dump_roi(data, length - 4); // minus CRC
+        // PXDUnpackerBSModule::dump_roi(data, length - 4); // minus CRC
       }
       unsigned int l;
       l = (length - 4 - 4 - 4) / 8;
@@ -586,9 +588,6 @@ void PXDUnpackerBSModule::initialize()
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
   m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName);
-//   m_storeDHEStats.registerInDataStore();
-//   m_storeDHCStats.registerInDataStore();
-//   m_storeDAQPktStats.registerInDataStore();
   m_storeDAQEvtStats.registerInDataStore();
   m_storeRawCluster.registerInDataStore(m_RawClusterName);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
@@ -767,8 +766,6 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
   }
   daqpktstat.setErrorMask(m_errorMaskPacket);
   daqevtstat.addPacket(daqpktstat);
-//   m_storeDAQPktStats.appendNew(inx, m_errorMaskPacket);
-
 }
 
 void PXDUnpackerBSModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport,
@@ -1506,8 +1503,8 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
     case EDHCFrameHeaderDataType::c_ONSEN_ROI:
       countedDHCFrames += 0; /// DO NOT COUNT!!!!
       if (verbose) dhc.data_onsen_roi_frame->print();
-      m_errorMask |= dhc.data_onsen_roi_frame->check_error();// dummy
-      m_errorMask |= dhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHC header, dummy see reason in function
+      m_errorMask |= dhc.data_onsen_roi_frame->check_error(len);
+      m_errorMask |= dhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHC header, see reason in function
       m_errorMask |= dhc.check_crc();
       if (!m_doNotStore) dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
       break;

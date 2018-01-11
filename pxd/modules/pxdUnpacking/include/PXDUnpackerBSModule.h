@@ -23,9 +23,6 @@
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
-// #include <pxd/dataobjects/PXDDAQPacketStatus.h>
-// #include <pxd/dataobjects/PXDDAQDHCStatus.h>
-// #include <pxd/dataobjects/PXDDAQDHEStatus.h>
 
 using namespace Belle2::PXD::PXDError;
 
@@ -96,12 +93,6 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw ROIs. */
       StoreArray<PXDRawROIs> m_storeROIs;
-//       /** Output array for DAQ DHE Status. */
-//       StoreArray<PXDDAQDHEStatus> m_storeDHEStats;
-//       /** Output array for DAQ DHC Status. */
-//       StoreArray<PXDDAQDHCStatus> m_storeDHCStats;
-//       /** Output array for DAQ Status/Packet. */
-//       StoreArray<PXDDAQPacketStatus> m_storeDAQPktStats;
       /** Output array for DAQ Status. */ // TODO Why Array, can be object?
       StoreArray<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
@@ -186,7 +177,7 @@ namespace Belle2 {
       PXDErrorFlags m_errorMaskPacket;
       /** Error Mask set per packet / event */
       PXDErrorFlags m_errorMaskEvent;
-      /** give verbose unpacking information -> will ba a parameter in next release */
+      /** give verbose unpacking information -> will be a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */
       bool ignore_datcon_flag = true;

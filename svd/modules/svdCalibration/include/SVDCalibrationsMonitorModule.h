@@ -72,8 +72,13 @@ namespace Belle2 {
 
 
     TList* m_histoList_noise;
+    TList* m_histoList_noiseInElectrons;
+
     //NOISES
-    TH1F* h_stripNoise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; //strip noise
+
+    TH1F* h_noise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // noise in ADC units
+    TH1F* h_noiseInElectrons[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // noise in electrons
+
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,

@@ -38,6 +38,7 @@ void SVDCalibrationsMonitorModule::initialize()
 
   //  for (int i = 0; i < m_maxLayers; i++) {
   m_histoList_noise = new TList;
+  m_histoList_noiseInElectrons = new TList;
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -85,10 +86,16 @@ void SVDCalibrationsMonitorModule::initialize()
             nameSide = "V";
 
           ///NOISES
+
           NameOfHisto = "noise_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+
           TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_stripNoise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 40, -0.5, 9.5, "strip noise(ADC)",
-                                                      m_histoList_noise);
+
+          h_noise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 40, -0.5, 9.5, "strip noise(ADC)",
+                                                                   m_histoList_noise);
+
+          h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, 199.5, 1199.5,
+                                                            "strip noise(electron charge)", m_histoList_noiseInElectrons);
         }
         //histogram created
         ++itSvdSensors;
@@ -139,8 +146,10 @@ void SVDCalibrationsMonitorModule::event()
 
 
           float ADCNoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
-          h_stripNoise[layer][ladder][sensor][1]->Fill(ADCNoise);
+          double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 1, Ustrip);
 
+          h_noise[layer][ladder][sensor][1]->Fill(ADCNoise);
+          h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
         } //histogram filled for U side
 
         for (int Vstrip = 0; Vstrip < currentSensorInfo->getVCells(); Vstrip++) {
@@ -149,8 +158,10 @@ void SVDCalibrationsMonitorModule::event()
 
 
           float ADCNoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
-          h_stripNoise[layer][ladder][sensor][0]->Fill(ADCNoise);
+          double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 0, Vstrip);
 
+          h_noise[layer][ladder][sensor][0]->Fill(ADCNoise);
+          h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
         } //histogram filled for V side
 
         ++itSvdSensors;
@@ -170,15 +181,27 @@ void SVDCalibrationsMonitorModule::terminate()
 {
   TObject* obj;
   if (m_rootFilePtr != NULL) {
-    m_rootFilePtr->cd();
+    //writing the histrogram list for the noises in ADC units
+    m_rootFilePtr->mkdir("noise_ADCunits");
+    m_rootFilePtr->cd("noise_ADCunits");
+
     TIter nextH_noise(m_histoList_noise);
     while ((obj = nextH_noise())) {
       obj->Print();
       obj->Write();
     }
-    B2INFO("before");
+
+    //writing the histrogram list for the noises in electron charge
+    m_rootFilePtr->mkdir("noise_electronsCharge");
+    m_rootFilePtr->cd("noise_electronsCharge");
+    TIter nextH_noiseInElectrons(m_histoList_noiseInElectrons);
+    while ((obj = nextH_noiseInElectrons())) {
+      obj->Print();
+      obj->Write();
+    }
+
     m_rootFilePtr->Close();
-    B2INFO("after");
+    B2INFO("The rootfile containing the list of histrograms has been filled and closed.");
   }
 }
 

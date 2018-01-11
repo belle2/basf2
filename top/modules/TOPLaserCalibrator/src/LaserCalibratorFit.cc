@@ -73,6 +73,7 @@ namespace Belle2 {
       for (unsigned i = 0; i < hist.size(); i++) {
         m_func.push_back(0);
         m_maxpos.push_back(0);
+        m_maxpos_error.push_back(0);
       }
     }
 
@@ -104,8 +105,7 @@ namespace Belle2 {
       m_maxpos[channel] = m_hist[channel]->GetXaxis()->GetBinCenter(m_hist[channel]->GetMaximumBin());
       m_hist[channel]->SetAxisRange(m_maxpos[channel] - 1.5, m_maxpos[channel] + 2);
       m_maxpos_error[channel] = m_hist[channel]->GetXaxis()->GetBinWidth(m_hist[channel]->GetMaximumBin()); // Error = bin width ?
-
-      if (m_fitMethod == "gauss") {
+      if (m_fitMethod == "gauss" || m_fitMethod == "gaus") {
         m_func[channel] = makeGFit(channel);
       } else if (m_fitMethod == "cb") {
         m_func[channel] = makeCBFit(channel);

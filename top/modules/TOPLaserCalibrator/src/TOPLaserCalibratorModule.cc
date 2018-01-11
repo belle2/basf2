@@ -71,7 +71,7 @@ namespace Belle2 {
              512);
     addParam("barID", m_barID, "ID of TOP module to calibrate");
     addParam("refCh", m_refCh, "reference channel of T0 constant");
-    addParam("fitMethod", m_fitMethod, "gaus: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball", string("gauss"));
+    addParam("fitMethod", m_fitMethod, "gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball", string("gauss"));
     addParam("fitRange", m_fitRange, "fit range[nbins, xmin, xmax]", frange);
 
     for (int i = 0; i < c_NumChannels; ++i) {
@@ -110,6 +110,7 @@ namespace Belle2 {
         }
         if (digit.getHitQuality() != TOPDigit::EHitQuality::c_Good) continue;
         if (digit.getTime() < m_fitRange[1] || digit.getTime() > m_fitRange[2]) continue;
+        if (!digit.isTimeBaseCalibrated()) continue;
         histo->Fill(digit.getTime()); //get Time from TOPDigit
       }
     }

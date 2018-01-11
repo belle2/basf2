@@ -17,6 +17,25 @@ using namespace Belle2;
 
 REG_MODULE(RelatedTracksCombiner);
 
+/*namespace {
+  /// Extract a momentum and charge from a reco track at a given position.
+  TVector3 extrapolateMomentum(const RecoTrack& relatedCDCRecoTrack, const TVector3& vxdPosition)
+  {
+    TVector3 cdcPosition;
+    TVector3 cdcMomentum;
+    int cdcCharge;
+
+    std::tie(cdcPosition, cdcMomentum, cdcCharge) = relatedCDCRecoTrack.extractTrackState();
+
+    const auto bField = BFieldManager::getFieldInTesla(cdcPosition).Z();
+
+    const Helix cdcHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
+    const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
+
+    return cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
+  }
+  }*/
+
 RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
   Module()
 {
@@ -54,8 +73,23 @@ void RelatedTracksCombinerModule::event()
     bool hasPartner = false;
     for (const RecoTrack& vxdRecoTrack : cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName)) {
       try {
+        /*hasPartner = true;
+        TVector3 vxdPosition;
+        std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack.extractTrackState();
+
+        short cdcCharge = cdcRecoTrack.getChargeSeed();
+
+        // For the combined track, we use the momentum of the CDC track
+        // helix-extrapolated to the start position of the VXD track.
+        const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
+
+        // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
+        // cdc track.
+        // TODO: we should handle the covariance matrix properly here!*/
         // We are using the basic information of the VXD track here.
         RecoTrack* newMergedTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
+        //newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
+        //newMergedTrack->setChargeSeed(cdcCharge);
         newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
         newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
 

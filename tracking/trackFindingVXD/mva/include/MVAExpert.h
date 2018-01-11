@@ -26,7 +26,9 @@ namespace Belle2 {
     class Weightfile;
   }
 
-  /// Class to interact with the MVA package
+  /** Class to interact with the MVA package,
+   * based on class with same name in CDC package
+   * */
   class MVAExpert {
   public:
     /**

@@ -17,9 +17,13 @@
 
 
 namespace Belle2 {
+  /// class to extract info from individual clusters and combine for SPTC
   class ClusterInfoExtractor : public VariableExtractor {
   public:
-
+    /** Constructor fills variableSet with variables to be extracted
+     * @param variableSet set of variable to be filled
+     * @param useTimingInfo whether to use the timing info in clusters
+     */
     ClusterInfoExtractor(std::vector<Named<float*>>& variableSet, bool useTimingInfo) :
       VariableExtractor(), m_UseTimingInfo(useTimingInfo)
     {
@@ -34,6 +38,7 @@ namespace Belle2 {
 
     }
 
+    /// extract variables from SpacePoints
     void extractVariables(std::vector<SpacePoint const*> const& spacePoints)
     {
       std::vector<SVDCluster const*> clusters;
@@ -84,9 +89,10 @@ namespace Belle2 {
     }
 
   protected:
-
+    /// whether to use timing info from cluster
     bool m_UseTimingInfo;
 
+    /// initialize statistics subsets of variables from clusters that get combined for SPTC
     void initializeStats(std::string identifier, std::vector<Named<float*>>& variables)
     {
       addVariable(identifier + "_max", variables);
@@ -95,6 +101,7 @@ namespace Belle2 {
       addVariable(identifier + "_std", variables);
     }
 
+    /// calculated statistics and saves them in variable set
     void setStats(std::string identifier, std::vector<float>& values)
     {
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jonas Wagner                                             *
+ * Contributors: Jonas Wagner, Sebastian Racs                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,7 +27,7 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]", std::string(""));
+           "Identifier which estimation method to use. Valid identifiers are: [tripletFit, circleFit, helixFit]", std::string(""));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
@@ -38,7 +38,7 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
   addParam("UseTimingInfo", m_UseTimingInfo,
            "Whether to use timing information available in the weight file", bool(false));
 
-  addParam("ClusterInformation", m_ClusterInformation, "Wether to use cluster infos or not", std::string(""));
+  addParam("ClusterInformation", m_ClusterInformation, "How to compile information from clusters ['Average']", std::string(""));
 }
 
 void QualityEstimatorMVAModule::initialize()

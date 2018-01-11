@@ -16,20 +16,20 @@
 
 
 namespace Belle2 {
+  /// class to extract individual variables
   class VariableExtractor {
   public:
 
-    VariableExtractor() {}
-
-    void extractVariables() {}
-
   protected:
-    std::unordered_map<std::string, float> m_variables;
+    /// add a variable to the variable set
     void addVariable(std::string identifier, std::vector<Named<float*>>& variables)
     {
       //todo: verify if it is faster to check explicitly or not
       auto value = m_variables.emplace(identifier, NAN).first;
       variables.emplace_back(identifier, &(value->second));
     }
+
+    /// unordered_map to associate float value with a string name
+    std::unordered_map<std::string, float> m_variables;
   };
 }

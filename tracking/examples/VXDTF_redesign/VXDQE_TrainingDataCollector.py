@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#####################################################################
+# VXDTF2 Example Scripts - Collect Data for use with VXDQE_teacher
+#
+# Uses QETrainingDataCollector module to collect data to be able to
+# train a FastBDT weightfile
+#
+# Contributors: Jonas Wagner, Sebastian Racs
+#####################################################################
+
 from basf2 import *
 from tracking import add_vxd_track_finding_vxdtf2, add_mc_matcher, add_hit_preparation_modules
 

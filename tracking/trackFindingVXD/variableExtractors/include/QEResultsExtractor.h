@@ -15,9 +15,11 @@
 
 
 namespace Belle2 {
+  /// class to extract results from qualityEstimation
   class QEResultsExtractor : public VariableExtractor {
   public:
 
+    /// Define names of variables that get extracted
     QEResultsExtractor(std::string method, std::vector<Named<float*>>& variableSet):
       VariableExtractor(), m_method(method)
     {
@@ -33,7 +35,7 @@ namespace Belle2 {
       addVariable(method + "_P_Z", variableSet);
     }
 
-    // TODO: Double into float?
+    /// extract the actual variables and write into a variable set
     void extractVariables(QualityEstimationResults const& values)
     {
       m_variables.at(m_method + "_QI") = values.qualityIndicator;
@@ -66,6 +68,7 @@ namespace Belle2 {
     }
 
   protected:
+    /// name of estimation method
     std::string m_method;
   };
 }

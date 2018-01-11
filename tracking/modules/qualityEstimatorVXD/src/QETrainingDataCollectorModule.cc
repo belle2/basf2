@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jonas Wagner                                             *
+ * Contributors: Jonas Wagner, Sebastian Racs                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,10 +40,9 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
 
   addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.", std::string("QETrainingOutput.root"));
 
-  addParam("ClusterInformation", m_ClusterInformation, "Whether to use cluster infos or not", std::string(""));
+  addParam("ClusterInformation", m_ClusterInformation, "How to compile information from clusters ['Average']", std::string(""));
 
-  addParam("UseTimingInfo", m_UseTimingInfo,
-           "Whether to collect timing information", bool(false));
+  addParam("UseTimingInfo", m_UseTimingInfo, "Whether to collect timing information", bool(false));
 }
 
 void QETrainingDataCollectorModule::initialize()

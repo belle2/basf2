@@ -21,6 +21,9 @@
 
 namespace Belle2 {
 
+  /** Class to write collected variables into a root file,
+   * Used by QETrainingDataCollectorModule
+   */
   class SimpleVariableRecorder {
 
   public:
@@ -58,6 +61,14 @@ namespace Belle2 {
       }
     }
 
+    /**
+     *  Construct the Recorder opening the given ROOT file and
+     *  create the underlying TTree and add let the given function setup branches.
+     *
+     *  @param namedVariables  Vector of collected named varibles to be turned into Branches in a TTree
+     *  @param fileName   Name of ROOT file to which should be written.
+     *  @param treeName       Name of the TTree in the ROOT file.
+     */
     SimpleVariableRecorder(std::vector<Named<float*>>& namedVariables, std::string fileName, std::string treeName) :
       SimpleVariableRecorder([ & namedVariables](TTree & tree)
     {
@@ -67,7 +78,7 @@ namespace Belle2 {
     }, fileName, treeName)
     { }
 
-
+    /// Destructor that closes used TTrees and TFiles
     ~SimpleVariableRecorder()
     {
       if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
@@ -80,8 +91,10 @@ namespace Belle2 {
       }
     }
 
+    /// Record varibles by filling the TTree
     void record() { m_tTree->get().Fill();}
 
+    /// Write out TFile to root file
     void write()
     {
       if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {

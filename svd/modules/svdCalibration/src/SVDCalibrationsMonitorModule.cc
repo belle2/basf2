@@ -10,7 +10,7 @@
 
 #include <svd/modules/svdCalibration/SVDCalibrationsMonitorModule.h>
 #include <vxd/geometry/GeoCache.h>
-
+#include <svd/geometry/SensorInfo.h>
 
 using namespace Belle2;
 
@@ -26,7 +26,7 @@ REG_MODULE(SVDCalibrationsMonitor)
 SVDCalibrationsMonitorModule::SVDCalibrationsMonitorModule() : Module()
 {
   // Set module properties
-  setDescription("Module to produce a list of histogram showing the uploaded calibration constants");
+  setDescription("Module to produce a list of histograms showing the uploaded calibration constants");
 
   // Parameter definitions
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDCalibrationMonitor_output.root"));
@@ -87,7 +87,7 @@ void SVDCalibrationsMonitorModule::initialize()
           ///NOISES
           NameOfHisto = "noise_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_stripNoise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 20, -0.5, 19.5, "strip noise(ADC)",
+          h_stripNoise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 40, -0.5, 9.5, "strip noise(ADC)",
                                                       m_histoList_noise);
         }
         //histogram created
@@ -108,8 +108,58 @@ void SVDCalibrationsMonitorModule::beginRun()
 
 void SVDCalibrationsMonitorModule::event()
 {
-  // float ADCnoise = m_NoiseCal.getNoise(theVxdID, side, cellID);
-  //  h_stripNoise[layer][ladder][sensor][side]->Fill(ADCNoise);
+
+  //call for a geometry instance
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
+  std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
+
+  while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
+
+    std::set<Belle2::VxdID> svdLadders = aGeometry.getLadders(*itSvdLayers);
+    std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();
+
+    while (itSvdLadders != svdLadders.end()) { //loop on Ladders
+
+      std::set<Belle2::VxdID> svdSensors = aGeometry.getSensors(*itSvdLadders);
+      std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
+      B2DEBUG(1, "    svd sensor info " << * (svdSensors.begin()));
+
+      while (itSvdSensors != svdSensors.end()) { //loop on sensors
+        B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
+
+        int layer = itSvdSensors->getLayerNumber();
+        int ladder =  itSvdSensors->getLadderNumber();
+        int sensor = itSvdSensors->getSensorNumber();
+        Belle2::VxdID theVxdID(layer, ladder, sensor);
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
+          //fill your histogram for U side
+
+
+
+          float ADCNoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
+          h_stripNoise[layer][ladder][sensor][1]->Fill(ADCNoise);
+
+        } //histogram filled for U side
+
+        for (int Vstrip = 0; Vstrip < currentSensorInfo->getVCells(); Vstrip++) {
+          //fill your histogram for V side
+
+
+
+          float ADCNoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
+          h_stripNoise[layer][ladder][sensor][0]->Fill(ADCNoise);
+
+        } //histogram filled for V side
+
+        ++itSvdSensors;
+      }
+      ++itSvdLadders;
+    }
+    ++itSvdLayers;
+  }
+
 }
 
 void SVDCalibrationsMonitorModule::endRun()

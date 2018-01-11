@@ -1,3 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Bjoern Spruck                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/modules/pxdUnpacking/PXDRawDataDefinitions.h>
@@ -14,10 +25,9 @@ using namespace Belle2::PXD::PXDError;
 
 using namespace boost::spirit::endian;
 
-
 /// define our CRC function
 using boost::crc_optimal;
-typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhe_crc_32_type;
+typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhc_crc_32_type;
 
 
 ///*********************************************************************************
@@ -260,10 +270,10 @@ namespace Belle2 {
       {
         PXDErrorFlags m_errorMask = 0;
         // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
-        if (length < minSize()) {
+        if (length < getMinSize()) {
           B2ERROR("DHC ONSEN HLT/ROI Frame too small to hold any ROIs!");
           m_errorMask |= c_ROI_PACKET_INV_SIZE;
-        } else if ((length - minSize()) % 8 != 0) {
+        } else if ((length - getMinSize()) % 8 != 0) {
           B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
           m_errorMask |= c_ROI_PACKET_INV_SIZE;
         }
@@ -275,7 +285,7 @@ namespace Belle2 {
         B2DEBUG(20, "DHC HLT/ROI Frame");
       };
       // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
-      inline int minSize(void) const {return 4 + 4 + 4;};
+      inline int getMinSize(void) const {return 4 + 4 + 4;};
       unsigned int check_inner_crc(unsigned int /*length*/) const
       {
         /// Parts of the data are now in the ONSEN Trigger frame, therefore the inner CRC cannot be checked that easily!
@@ -420,7 +430,7 @@ namespace Belle2 {
 
     PXDErrorFlags check_crc(void)
     {
-      dhe_crc_32_type bocrc;
+      dhc_crc_32_type bocrc;
 
       if (length > 65536 * 16) {
         B2WARNING("DHC Data Frame CRC not calculated because of too large packet (>1MB)!");

@@ -1005,12 +1005,12 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
         //dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
         // void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) const
         // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
-        if (len >= dhc.data_onsen_roi_frame->minSize()) {
-          if ((len - dhc.data_onsen_roi_frame->minSize()) % 8 != 0) {
+        if (len >= dhc.data_onsen_roi_frame->getMinSize()) {
+          if ((len - dhc.data_onsen_roi_frame->getMinSize()) % 8 != 0) {
             PXDUnpackerBSModule::dump_roi(data, len - 4); // minus CRC
           }
           unsigned int l;
-          l = (len - dhc.data_onsen_roi_frame->minSize()) / 8;
+          l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
           // Endian swapping is done in Contructor of RawRoi object
           m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
         }

@@ -24,7 +24,8 @@ Select the run by setting the EventInfoSetter param, runList
 """
 For phase 3 related studies, use instead this tag
 """
-use_central_database("development")
+# use_central_database("development")
+use_central_database("GT_gen_prod_004.05_prerelease-01-00-00b")
 
 """
 using localDB for testing

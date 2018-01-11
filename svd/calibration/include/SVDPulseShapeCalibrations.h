@@ -64,7 +64,7 @@ namespace Belle2 {
     inline double getChargeFromADC(
       const Belle2::VxdID& sensorID,
       const bool& isU, const unsigned short& strip,
-      const unsigned char& pulseADC
+      const double& pulseADC
     ) const
     {
       return  pulseADC / getGain(sensorID, isU, strip);

@@ -78,12 +78,13 @@ void PXDDAQDQMModule::defineHisto()
 //     string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
     hDAQDHETriggerRowOffset[avxdid] = new TH1F("PXDDAQDHETriggerRowOffset_" + bufful, "TriggerRowOffset DHE " + buff, 768, 0, 768);
-    hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff, 200, 0, 40);
+    hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff, 200, 0,
+                                        40);// If max changed, check overflow copy below
   }
   for (int i = 0; i < 6; i++) {
     //cppcheck-suppress zerodiv
     hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
-                                   ("Data Reduction DHC " + str(format(" %d") % i)).c_str(), 0, 100, 1000);
+                                   ("Data Reduction DHC " + str(format(" %d") % i)).c_str(), 200, 0, 40);// If max changed, check overflow copy below
     //cppcheck-suppress zerodiv
   }
 //   hDAQErrorEvent->LabelsDeflate("X");
@@ -127,7 +128,7 @@ void PXDDAQDQMModule::event()
         }
         if (hDAQDHCReduction[dhc.getDHCID()]) {
           float red = dhc.getRedCnt() ? float(dhc.getRawCnt()) / dhc.getRedCnt() : 0.;
-          if (red >= 40.) red = 49.999999999; // Bad, bad workaround. but we want to see the overflows
+          if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
           hDAQDHCReduction[dhc.getDHCID()]->Fill(red);
         }
         B2DEBUG(20, "Iterate PXD DHE in DHC " << dhc.getDHCID() << " , Err " << dhc_emask);
@@ -142,7 +143,7 @@ void PXDDAQDQMModule::event()
           if (hDAQDHETriggerRowOffset[dhe.getSensorID()]) hDAQDHETriggerRowOffset[dhe.getSensorID()]->Fill(dhe.getStartRow());
           if (hDAQDHEReduction[dhe.getSensorID()]) {
             float red = dhe.getRedCnt() ? float(dhe.getRawCnt()) / dhe.getRedCnt() : 0.;
-            if (red >= 40.) red = 49.999999999; // Bad, bad workaround. but we want to see the overflows
+            if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
             hDAQDHEReduction[dhe.getSensorID()]->Fill(red);
           }
         }

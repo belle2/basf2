@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace PXD {
     namespace PXDError {
       enum { ONSEN_MAX_TYPE_ERR = 64}; /// 64 bit mask
-      enum { ONSEN_USED_TYPE_ERR = 48}; /// how many are used (range for plotting)
+      enum { ONSEN_USED_TYPE_ERR = 50}; /// how many are used (range for plotting)
 
       typedef uint64_t PXDErrorFlags;
 
@@ -72,7 +72,9 @@ namespace Belle2 {
         c_DHE_ID_INVALID = 1ull << 44,
         c_DHC_DHCID_START_END_MM = 1ull << 45,
         c_DHE_END_WO_START = 1ull << 46,
-        c_DHC_END_DBL = 1ull << 47
+        c_DHC_END_DBL = 1ull << 47,
+        c_META_MM_DHC = 1ull << 48,
+        c_META_MM_DHE = 1ull << 49
       };
 
       const std::string& getPXDBitErrorName(int bit)
@@ -93,7 +95,7 @@ namespace Belle2 {
           "Row Overflow/out of bounds >=768", "DHP Frames not continuesly", "DHP Frame numbers of different frames differ>1", "DHP Frame differ from DHE Frame by >1",
           "DHE ID is invalid", "DHC ID Start/End Mismatch", "DHE End w/o Start", "double DHC End",
 
-          "unused", "unused", "unused", "unused",
+          "DHC TrigNr vs EvtMeta mismatch", "DHE TrigNr vs EvtMeta mismatch", "unused", "unused",
           "unused", "unused", "unused", "unused",
           "unused", "unused", "unused", "unused",
           "unused", "unused", "unused", "unused"

@@ -1144,17 +1144,13 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
   }
 
   // please check if this mask is suitable. At least here we are limited by the 16 bit trigger number in the DHH packet header.
-  // we can use more bits in the START Frame
+  // we can use more bits in the DHC and DHE START Frame
   if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
-//     if(Frame_Number==0){
-//       eventNrOfThisFrame = m_meta_event_nr&0xFFFF;/// TODO mismatch corrector check, workaround for DESY TB
-//     }else
     if (!isFakedData_event) {
       B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
               "(MetaInfo) mask");
       m_errorMask |= EPXDErrMask::c_META_MM;
     }
-//     }
   }
 
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
@@ -1301,8 +1297,11 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
         if (dhc.data_dhc_start_frame->get_subrun() != m_meta_subrun_nr) B2ERROR("DHC SUBRUN MM: " << dhc.data_dhc_start_frame->get_subrun()
               << " META " << m_meta_subrun_nr);
         if ((((unsigned int)dhc.data_dhc_start_frame->getEventNrHi() << 16) | dhc.data_dhc_start_frame->getEventNrLo()) !=
-            (m_meta_event_nr & 0xFFFFFFFF)) B2ERROR("DHC EVT32b MM: " << ((dhc.data_dhc_start_frame->getEventNrHi() << 16) |
-                                                      dhc.data_dhc_start_frame->getEventNrLo()) << " META " << (unsigned int)(m_meta_event_nr & 0xFFFFFFFF));
+            (m_meta_event_nr & 0xFFFFFFFF)) {
+          B2ERROR("DHC EVT32b MM: " << ((dhc.data_dhc_start_frame->getEventNrHi() << 16) | dhc.data_dhc_start_frame->getEventNrLo()) <<
+                  " META " << (unsigned int)(m_meta_event_nr & 0xFFFFFFFF));
+          m_errorMask |= EPXDErrMask::c_META_MM_DHC;
+        }
         uint32_t tt = (((unsigned int)dhc.data_dhc_start_frame->time_tag_mid & 0x7FFF) << 12) | ((unsigned int)
                       dhc.data_dhc_start_frame->time_tag_lo_and_type >> 4);
         uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
@@ -1353,9 +1352,18 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       ///      nr_active_dhp = nr5bits(mask_active_dhp);// unused
 
       /// ATTENTION seems to the Hi Word is not set!!!!
+//       if ((((unsigned int)dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) != (unsigned int)(
+//             m_meta_event_nr & 0x0000FFFF)) {
+//         B2ERROR("DHE EVT32b: " << ((dhc.data_dhe_start_frame->getEventNrHi() << 16) |
+//                                    dhc.data_dhe_start_frame->getEventNrLo()) << " META "              << (m_meta_event_nr & 0xFFFFFFFF));
+//           m_errorMask |= EPXDErrMask::c_META_MM_DHE;
+//       } else
       if ((((unsigned int)dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) != (unsigned int)(
-            m_meta_event_nr & 0x0000FFFF)) B2ERROR("DHE EVT32b: " << ((dhc.data_dhe_start_frame->getEventNrHi() << 16) |
-                                                     dhc.data_dhe_start_frame->getEventNrLo()) << " META "              << (m_meta_event_nr & 0xFFFFFFFF));
+            m_meta_event_nr & 0xFFFFFFFF)) {
+        B2ERROR("DHE EVT32b (HI WORD): " << ((dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) <<
+                " META " << (m_meta_event_nr & 0xFFFFFFFF));
+        m_errorMask |= EPXDErrMask::c_META_MM_DHE;
+      }
 //        B2ERROR("DHE TT: $" << hex << dhc.data_dhe_start_frame->dhe_time_tag_hi << "." << dhc.data_dhe_start_frame->dhe_time_tag_lo <<
 //                " META " << m_meta_time);
 

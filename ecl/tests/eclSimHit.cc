@@ -41,7 +41,7 @@ namespace Belle2 {
     const float edep = 4.2;
     const G4ThreeVector init_momentum(1, 2, 3);
     const G4ThreeVector init_position(4, 5, 6);
-    ECLSimHit myECLSimHit2(cellId, trackId, pdg, flightTime, edep, init_momentum, init_position);
+    ECLSimHit myECLSimHit2(cellId, trackId, pdg, flightTime, edep, init_momentum, init_position, 0);
     EXPECT_EQ(myECLSimHit2.getCellId(), cellId);
     EXPECT_EQ(myECLSimHit2.getTrackId(), trackId);
     EXPECT_EQ(myECLSimHit2.getPDGCode(), pdg);

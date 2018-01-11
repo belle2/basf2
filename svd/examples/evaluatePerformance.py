@@ -11,6 +11,7 @@ numEvents = 2000
 bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
 bkgFiles = None  # uncomment to remove  background
 simulateJitter = False
+
 ROIfinding = False
 Phase2 = False
 MCTracking = True
@@ -56,6 +57,7 @@ add_tracking_reconstruction(
     skipHitPreparerAdding=True)
 
 
+tag = "_Y4S_jitter10ns_wBKG_noROI_MCTF.root"
 clseval = register_module('SVDClusterEvaluation')
 clseval.param('outputFileName', "ClusterEvaluation" + str(tag))
 main.add_module(clseval)

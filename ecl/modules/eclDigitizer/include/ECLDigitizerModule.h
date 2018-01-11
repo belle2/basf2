@@ -141,6 +141,7 @@ namespace Belle2 {
     StoreArray<ECLHit>    m_eclDiodeHits; /**< diode hits array  */
     StoreArray<ECLSimHit> m_eclSimHits; /**< SimHits array  */
     StoreObjPtr<ECLWaveforms> m_eclWaveforms; /**< compressed waveforms  */
+    bool m_HadronPulseShape; /**< hadron pulse shape flag */
     /** Output Arrays */
     StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
     StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */

@@ -134,16 +134,22 @@ namespace Belle2 {
 
       /** Charge of the cluster */
       float m_charge;
+
       /** Error on Charge of the cluster */
       float m_chargeError;
+
       /** Seed Charge of the cluster */
       float m_seedCharge;
+
       /** Time of the cluster */
       float m_time;
+
       /** Error on Time of the cluster (not implemented yet)*/
       float m_timeError;
+
       /** Position of the cluster */
       float m_position;
+
       /** Error on Position of the cluster */
       float m_positionError;
 
@@ -157,7 +163,6 @@ namespace Belle2 {
       int m_seedIndex;
 
       /** vector containing the strips in the cluster */
-
       std::vector<stripInCluster> m_strips;
 
     };

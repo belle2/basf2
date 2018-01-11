@@ -226,10 +226,9 @@ int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
     return 3;
   else if (modality == 0)
     return 1;
-  else {
-    return -1;
-    B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
-  }
+
+  B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
+  return -1;
 }
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)

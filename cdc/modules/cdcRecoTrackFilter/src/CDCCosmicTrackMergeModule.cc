@@ -31,10 +31,12 @@ CDCCosmicTrackMergerModule::CDCCosmicTrackMergerModule() : Module()
   addParam("mergedRecoTracksStoreArrayName", m_param_mergedRecoTracksStoreArrayName,
            "StoreArray to where to copy the merged RecoTrack.",
            m_param_mergedRecoTracksStoreArrayName);
-  addParam("deleteOtherRecoTracks", m_param_deleteOtherRecoTracks,
-           "Flag to delete the not merged RecoTracks from the input StoreArray.",
-           m_param_deleteOtherRecoTracks);
+  addParam("usingMagneticField", m_usingMagneticField,
+           "Flag to using magnetic field during reconstruction.",
+           m_usingMagneticField);
   addParam("minimumNumHitCut", m_minimumNumHitCut, "Number of CDC hit per track required for cosmic track", m_minimumNumHitCut);
+  addParam("magnitudeOfMomentumWithoutMagneticField", m_magnitudeOfMomentumWithoutMagneticField,
+           "Magnitude of cosmic tracks if magnetic field is not used.", m_magnitudeOfMomentumWithoutMagneticField);
 }
 
 void CDCCosmicTrackMergerModule::initialize()
@@ -88,8 +90,21 @@ void CDCCosmicTrackMergerModule::event()
         // A candidate of CosmicRecoTrack has B(E)KLM hits
         if (recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits()) {
 
-          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
-                                                                  recoTrackStoreArray[0]->getMomentumSeed(), recoTrackStoreArray[0]->getChargeSeed());
+          RecoTrack* mergedRecoTrack;
+          if (m_usingMagneticField == true) {
+            mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
+                                                         recoTrackStoreArray[0]->getMomentumSeed(), recoTrackStoreArray[0]->getChargeSeed());
+          } else {
+            TVector3 momentum = recoTrackStoreArray[0]->getMomentumSeed();
+            float magnitudeMomentum = momentum.Mag();
+            float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+            std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
+            mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
+                                                         newMomentum, recoTrackStoreArray[0]->getChargeSeed());
+          }
 
           // retain the seed time of the original track. Important for t0 extraction.
           mergedRecoTrack->setTimeSeed(recoTrackStoreArray[0]->getTimeSeed());
@@ -156,7 +171,7 @@ void CDCCosmicTrackMergerModule::event()
           RecoTrack* upperTrack;
           RecoTrack* lowerTrack;
 
-          if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
+          if (recoTrackStoreArray[0]->getTimeSeed() > recoTrackStoreArray[1]->getTimeSeed()) {
             upperTrack = recoTrackStoreArray[0];
             lowerTrack = recoTrackStoreArray[1];
           } else {
@@ -165,10 +180,24 @@ void CDCCosmicTrackMergerModule::event()
           }
 
           // Creation of CosmicRecoTrack
+          RecoTrack* mergedRecoTrack;
+          if (m_usingMagneticField == true) {
 
-          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
-                                                                  upperTrack->getMomentumSeed(),
-                                                                  upperTrack->getChargeSeed());
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         upperTrack->getMomentumSeed(),
+                                                         upperTrack->getChargeSeed());
+          } else {
+            TVector3 momentum = upperTrack->getMomentumSeed();
+            float magnitudeMomentum = momentum.Mag();
+            float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+            std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         newMomentum,
+                                                         upperTrack->getChargeSeed());
+          }
 
           mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
 
@@ -266,7 +295,7 @@ void CDCCosmicTrackMergerModule::event()
           RecoTrack* upperTrack;
           RecoTrack* lowerTrack;
 
-          if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
+          if (recoTrackStoreArray[0]->getTimeSeed() > recoTrackStoreArray[1]->getTimeSeed()) {
             upperTrack = recoTrackStoreArray[0];
             lowerTrack = recoTrackStoreArray[1];
           } else {
@@ -275,10 +304,24 @@ void CDCCosmicTrackMergerModule::event()
           }
 
           // Creation of CosmicRecoTrack
+          RecoTrack* mergedRecoTrack;
+          if (m_usingMagneticField == true) {
 
-          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
-                                                                  upperTrack->getMomentumSeed(),
-                                                                  upperTrack->getChargeSeed());
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         upperTrack->getMomentumSeed(),
+                                                         upperTrack->getChargeSeed());
+          } else {
+            TVector3 momentum = upperTrack->getMomentumSeed();
+            float magnitudeMomentum = momentum.Mag();
+            float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+            std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         newMomentum,
+                                                         upperTrack->getChargeSeed());
+          }
 
           mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
 
@@ -315,6 +358,7 @@ void CDCCosmicTrackMergerModule::event()
               sortingNumber++;
             }
           }
+
           if (upperTrack->hasCDCHits()) {
             int CDCHits = upperTrack->getNumberOfCDCHits();
             for (int i = 0; i < CDCHits; i++) {
@@ -372,7 +416,7 @@ void CDCCosmicTrackMergerModule::event()
           RecoTrack* upperTrack;
           RecoTrack* lowerTrack;
 
-          if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
+          if (recoTrackStoreArray[0]->getTimeSeed() > recoTrackStoreArray[1]->getTimeSeed()) {
             upperTrack = recoTrackStoreArray[0];
             lowerTrack = recoTrackStoreArray[1];
           } else {
@@ -381,10 +425,24 @@ void CDCCosmicTrackMergerModule::event()
           }
 
           // Creation of CosmicRecoTrack
+          RecoTrack* mergedRecoTrack;
+          if (m_usingMagneticField == true) {
 
-          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
-                                                                  upperTrack->getMomentumSeed(),
-                                                                  upperTrack->getChargeSeed());
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         upperTrack->getMomentumSeed(),
+                                                         upperTrack->getChargeSeed());
+          } else {
+            TVector3 momentum = upperTrack->getMomentumSeed();
+            float magnitudeMomentum = momentum.Mag();
+            float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+            std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         newMomentum,
+                                                         upperTrack->getChargeSeed());
+          }
 
           mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
 
@@ -521,7 +579,7 @@ void CDCCosmicTrackMergerModule::event()
           RecoTrack* upperTrack;
           RecoTrack* lowerTrack;
 
-          if (recoTrackStoreArray[indexRecoTracksWithKLMHits[0]]->getTimeSeed() <
+          if (recoTrackStoreArray[indexRecoTracksWithKLMHits[0]]->getTimeSeed() >
               recoTrackStoreArray[indexRecoTracksWithKLMHits[1]]->getTimeSeed()) {
             upperTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[0]];
             lowerTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[1]];
@@ -531,9 +589,24 @@ void CDCCosmicTrackMergerModule::event()
           }
 
           // Creation of CosmicRecoTrack
-          RecoTrack* mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
-                                                                  upperTrack->getMomentumSeed(),
-                                                                  upperTrack->getChargeSeed());
+          RecoTrack* mergedRecoTrack;
+          if (m_usingMagneticField == true) {
+
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         upperTrack->getMomentumSeed(),
+                                                         upperTrack->getChargeSeed());
+          } else {
+            TVector3 momentum = upperTrack->getMomentumSeed();
+            float magnitudeMomentum = momentum.Mag();
+            float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+            TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+            std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
+            mergedRecoTrack = mergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                         newMomentum,
+                                                         upperTrack->getChargeSeed());
+          }
 
           mergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
 

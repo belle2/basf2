@@ -32,9 +32,11 @@ namespace Belle2 {
     std::string m_param_recoTracksStoreArrayName = "";
     /// StoreArray name where the merged reco track is written.
     std::string m_param_mergedRecoTracksStoreArrayName = "__MergedRecoTracks";
-    /// Flag to delete the not RecoTracks from the input StoreArray.
-    bool m_param_deleteOtherRecoTracks = true;
-    /// Minium NDF required for each track (up and down).
+    /// Flag to using magnetic field during reconstruction.
+    bool m_usingMagneticField = true;
+    /// Number of CDC hit per track required for cosmic track
     double m_minimumNumHitCut = 40;
+    /// Magnitude of cosmic tracks if magnetic field is not used.
+    double m_magnitudeOfMomentumWithoutMagneticField = 8; // GeV
   };
 }

@@ -81,6 +81,15 @@ void PXDDQMModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
+  // save way to create directories and cd to them, even if they exist already.
+  // if cd fails, Directory points to oldDir, but never ZERO ptr
+  oldDir->mkdir("PXD_Basic");
+  oldDir->cd("PXD_Basic");
+  TDirectory* DirPXDBasic = gDirectory;
+  if (m_SaveOtherHistos) oldDir->mkdir("PXD_Advance");
+  oldDir->cd("PXD_Advance");
+  TDirectory* DirPXDAdvance = gDirectory;
+  oldDir->cd();
 
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -102,13 +111,6 @@ void PXDDQMModule::defineHisto()
       }
       break;
     }
-  }
-
-  TDirectory* DirPXDBasic = NULL;
-  TDirectory* DirPXDAdvance = NULL;
-  DirPXDBasic = oldDir->mkdir("PXD_Basic");
-  if (m_SaveOtherHistos) {
-    DirPXDAdvance = oldDir->mkdir("PXD_Advance");
   }
 
   m_fired = new TH1F*[c_nPXDSensors];
@@ -495,12 +497,12 @@ void PXDDQMModule::endRun()
     return;
   }
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirPXDFlags = NULL;
   f_OutFlagsFile->cd();
 
-  DirPXDFlags = f_OutFlagsFile->mkdir("PXD_Flags");
-//  DirPXDFlags = oldDir->mkdir("PXD_ClusterShapeCorrections");
-  DirPXDFlags->cd();
+  f_OutFlagsFile->mkdir("PXD_Flags"); // new file, thus we should not get a ZERO ptr back ...
+  f_OutFlagsFile->cd("PXD_Flags");  // still, play it save
+  TDirectory* DirPXDFlags = gDirectory;
+
   TH2F* hf_hitMapCounts = new TH2F("PixelHitmapCounts", "PXD Pixel Hitmaps Counts",
                                    c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
   TH2F* hf_hitMapClCounts = new TH2F("ClusterHitmapCounts", "PXD Cluster Hitmaps Counts",

@@ -44,17 +44,17 @@ namespace Belle2 {
 
     V0findingPerformanceEvaluationModule();
 
-    virtual ~V0findingPerformanceEvaluationModule();
+    ~V0findingPerformanceEvaluationModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
+    void beginRun() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
-    virtual void terminate();
+    void terminate() override;
 
   private:
 

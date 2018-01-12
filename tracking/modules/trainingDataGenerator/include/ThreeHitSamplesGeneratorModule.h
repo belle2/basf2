@@ -35,11 +35,11 @@ namespace Belle2 {
   public:
     ThreeHitSamplesGeneratorModule(); /**< Constructor */
 
-    virtual void initialize(); /**< initialize */
+    void initialize() override; /**< initialize */
 
-    virtual void event(); /**< event */
+    void event() override; /**< event */
 
-    virtual void terminate(); /**< terminate */
+    void terminate() override; /**< terminate */
 
     /** helper struct to keep the root variables contained in this module
      * TODO: make this cleaner (i.e. less ugly)

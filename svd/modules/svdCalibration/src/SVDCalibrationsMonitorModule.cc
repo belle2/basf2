@@ -146,10 +146,12 @@ void SVDCalibrationsMonitorModule::event()
 
 
           float ADCNoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
+
           double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 1, Ustrip);
 
           h_noise[layer][ladder][sensor][1]->Fill(ADCNoise);
           h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
+
         } //histogram filled for U side
 
         for (int Vstrip = 0; Vstrip < currentSensorInfo->getVCells(); Vstrip++) {
@@ -158,10 +160,12 @@ void SVDCalibrationsMonitorModule::event()
 
 
           float ADCNoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
+
           double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 0, Vstrip);
 
           h_noise[layer][ladder][sensor][0]->Fill(ADCNoise);
           h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
+
         } //histogram filled for V side
 
         ++itSvdSensors;
@@ -181,6 +185,7 @@ void SVDCalibrationsMonitorModule::terminate()
 {
   TObject* obj;
   if (m_rootFilePtr != NULL) {
+
     //writing the histrogram list for the noises in ADC units
     m_rootFilePtr->mkdir("noise_ADCunits");
     m_rootFilePtr->cd("noise_ADCunits");

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
-#include <pxd/modules/pxdUnpacking/PXDRawDataDefinitions.h>
+#include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/crc.hpp>

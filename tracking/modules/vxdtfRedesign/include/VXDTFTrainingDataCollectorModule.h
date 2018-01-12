@@ -59,7 +59,7 @@ namespace Belle2 {
     { }
 
     /** terminate. */
-    void terminate();
+    void terminate() override;
 
   protected:
 

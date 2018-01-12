@@ -87,15 +87,15 @@ void SVDCalibrationsMonitorModule::initialize()
 
           ///NOISES
 
-          NameOfHisto = "noise_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-
+          NameOfHisto = "noiseADC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-
-          h_noise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 40, -0.5, 9.5, "strip noise(ADC)",
+          h_noise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 80, -0.5, 9.5, "strip noise (ADC)",
                                                                    m_histoList_noise);
 
-          h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, 199.5, 1199.5,
-                                                            "strip noise(electron charge)", m_histoList_noiseInElectrons);
+          NameOfHisto = "noiseELEC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
+          h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 199.5, 1499.5,
+                                                            "strip noise (e-)", m_histoList_noiseInElectrons);
         }
         //histogram created
         ++itSvdSensors;
@@ -191,22 +191,20 @@ void SVDCalibrationsMonitorModule::terminate()
     m_rootFilePtr->cd("noise_ADCunits");
 
     TIter nextH_noise(m_histoList_noise);
-    while ((obj = nextH_noise())) {
-      obj->Print();
+    while ((obj = nextH_noise()))
       obj->Write();
-    }
+
 
     //writing the histrogram list for the noises in electron charge
     m_rootFilePtr->mkdir("noise_electronsCharge");
     m_rootFilePtr->cd("noise_electronsCharge");
     TIter nextH_noiseInElectrons(m_histoList_noiseInElectrons);
-    while ((obj = nextH_noiseInElectrons())) {
-      obj->Print();
+    while ((obj = nextH_noiseInElectrons()))
       obj->Write();
-    }
+
 
     m_rootFilePtr->Close();
-    B2INFO("The rootfile containing the list of histrograms has been filled and closed.");
+    B2RESULT("The rootfile containing the list of histrograms has been filled and closed.");
   }
 }
 

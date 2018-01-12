@@ -44,11 +44,11 @@ if(args.TB_magnet_on or args.TB_magnet_off):
 
     if(args.TB_magnet_off):
         RunList = [111]
-        filename = "SVDCalibrationMonitor_2017TB_exp3_run111.root"
+        filename = "SVDCalibrationMonitor_2017TB_experiment3_run111.root"
         geom = 0
     else:
         RunList = [400]
-        filename = "SVDCalibrationMonitor_2017TB_exp3_run400.root"
+        filename = "SVDCalibrationMonitor_2017TB_experiment3_run400.root"
         geom = 1
 else:
     RunList = args.run

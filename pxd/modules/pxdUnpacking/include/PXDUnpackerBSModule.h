@@ -32,6 +32,7 @@ namespace Belle2 {
     /** The PXDUnpackerBS module.
      *
      * This module is responsible for unpacking the Raw PXD data to Pixels in v_cellID and u_cellID (global tracking coordinates system)
+     * Doing that, sophisticated error and consistency checking is done from the lowest data level on
      */
     class PXDUnpackerBSModule : public Module {
 
@@ -104,6 +105,7 @@ namespace Belle2 {
       /** Unpack one event (several frames) stored in RawPXD object
        * @param px RawPXD data object
        * @param inx Index of RawPXD packet
+       * @param daqevtstat Daq Status Object
        */
       void unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqevtstat);
 
@@ -112,6 +114,8 @@ namespace Belle2 {
        * @param len length of frame
        * @param Frame_Number current frame number
        * @param Frames_in_event number of frames in PxdRaw object (subevent)
+       * @param daqpktstat Daq Packet Status Object
+       * @param daqdhevect Daq DHE Status Object
        */
       void unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event, PXDDAQPacketStatus& daqpktstat,
                             std::vector <PXDDAQDHEStatus>& daqdhevect);
@@ -139,17 +143,11 @@ namespace Belle2 {
       void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id);
 
       /** Unpack DHP/FCE data within one DHE frame
+       * Not fully implemented as cluster format not 100% fixed
        * @param data pointer to dhp data
        * @param len length of dhp data
-       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
-       * @param dhe_ID raw DHE ID from DHC frame
-       * @param dhe_DHPport raw DHP port from DHC frame
-       * @param dhe_reformat flag if DHE did reformatting
-       * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
-
-
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
       /**
@@ -158,10 +156,10 @@ namespace Belle2 {
        * @param vxd_id vertex Detector ID
        */
 
-      //Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD
+      /** Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD */
       void remap_IF_OB(unsigned int& row, unsigned int& col, unsigned int dhp_id, unsigned int dhe_ID);
 
-      //Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD
+      /** Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD */
       void remap_IB_OF(unsigned int& row, unsigned int& col, unsigned int dhp_id, unsigned int dhe_ID);
 
       void test_mapping(void);
@@ -176,12 +174,12 @@ namespace Belle2 {
       PXDErrorFlags m_errorMaskPacket;
       /** Error Mask set per packet / event */
       PXDErrorFlags m_errorMaskEvent;
-      /** give verbose unpacking information -> will be a parameter in next release */
+      /** give verbose unpacking information -> TODO will be a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */
       bool ignore_datcon_flag = true;
 
-      /** counter for not accepted events... should not happen */
+      /** counter for not accepted events... should not happen TODO discussion ongoing with DAQ group */
       unsigned int m_notaccepted{0};
       /** counter for send debug rois */
       unsigned int m_sendrois{0};
@@ -193,11 +191,19 @@ namespace Belle2 {
       int last_dhp_readout_frame_lo[4];// signed because -1 means undefined
 
     public:
-      // The following helper functions do not need the class object
-      int static nr5bits(int i);/// helper function to "count" nr of set bits within lower 5 bits
+      /** helper function to "count" nr of set bits within lower 5 bits.
+        * It does not need the class object, thus static.
+        */
+      int static nr5bits(int i);
 
+      /** dump to a file, helper function for debugging.
+        */
       void static dump_dhp(void* data, unsigned int frame_len);
+
+      /** dump to a file, helper function for debugging.
+        */
       void static dump_roi(void* data, unsigned int frame_len);
+
     };//end class declaration
 
 

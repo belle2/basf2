@@ -17,12 +17,23 @@ namespace Belle2 {
 
   namespace PXD {
     namespace PXDError {
-      enum { ONSEN_MAX_TYPE_ERR = 64}; /// 64 bit mask
-      enum { ONSEN_USED_TYPE_ERR = 50}; /// how many are used (range for plotting)
+      /** Enums for maximum error bits, 64bit mask used (uint64_t)
+       */
+      enum { ONSEN_MAX_TYPE_ERR = 64};
 
+      /** Enums for used error bits (out of maximum).
+       * used for e.g. plotting ranges
+       */
+      enum { ONSEN_USED_TYPE_ERR = 50};
+
+      /** Typedef the flag variable type (uint64_t)
+       */
       typedef uint64_t PXDErrorFlags;
 
-      /// If you change this list, change the description below, too
+      /** Enum the bits we use for error flags
+       * If you change this list, change the description below accordingly
+       * For consistency with description, keep the order!
+       */
       enum EPXDErrMask : uint64_t {
         c_NO_ERROR = 0ull,
         c_TB_IDS = 1ull << 0,
@@ -77,9 +88,14 @@ namespace Belle2 {
         c_META_MM_DHE = 1ull << 49
       };
 
+      /** Get the description for the given error bit set above
+       * @param bit The bit number, NOT the bit mask!
+       * @return description as test
+       */
       const std::string& getPXDBitErrorName(int bit)
       {
         static const std::string undefined("undefined");
+        /** Description strings for bit, index = bit number, thus keep order as above */
         static const std::string error_name[ONSEN_MAX_TYPE_ERR] = {
           "TestBeam: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
           "DHC_END missing/wrong placed", "DHE_START missing", "ROI packet invalid size", "DATA outside of DHE",

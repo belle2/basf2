@@ -4,26 +4,24 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: bjoern.spruck@belle2.org                                 *
+ * Created: Dez 2017                                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDAQDHESTATUS_H
-#define PXDDAQDHESTATUS_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-
+#include <pxd/dataobjects/PXDErrorFlags.h>
+/// TObject is not used in this class, but the include is needed for the ClassDef
 #include <TObject.h>
 
-#include <pxd/dataobjects/PXDErrorFlags.h>
-
 using namespace Belle2::PXD::PXDError;
-
 
 namespace Belle2 {
 
   /**
-   * The PXD DAQ Status class
+   * The PXD DAQ DHE Status class
    *
    * This is a small class that records information about PXD DAQ DHE status
    * It will record if the data of this sensor (readout by this DHE) is useable.
@@ -35,6 +33,15 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     PXDDAQDHEStatus() : m_usable(true), m_errorMask(0), m_critErrorMask(0), m_startRow(0), m_frameNr(0), m_rawCount(0), m_redCount(0) {}
 
+    /** constructor setting the error mask, dhcid, raw and reduced data counters, ...
+     * @param id VxdID of sensor
+     * @param dheid DHEID of sensor
+     * @param mask Error mask
+     * @param raw raw data counter
+     * @param red reduced data counter
+     * @param sr Trigger Start Row (Trigger Offset)
+     * @param fn (absolute) Readout Frame Number, lower bits only
+     */
     PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, uint32_t raw, uint32_t red, unsigned short sr,
                     unsigned short fn) : m_sensorID(id), m_dheID(dheid),
       m_usable(true), m_errorMask(mask), m_critErrorMask(0), m_startRow(sr), m_frameNr(fn), m_rawCount(raw), m_redCount(red) {}
@@ -45,7 +52,7 @@ namespace Belle2 {
     bool isUsable() const { return m_usable; }
 
     /** Set Error bit mask
-     * @return
+     * @param m Bit Mask to set
      */
     void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
 
@@ -55,7 +62,7 @@ namespace Belle2 {
     PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
-     * @return
+     * @param m Bit Mask to set
      */
     void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
 
@@ -65,23 +72,34 @@ namespace Belle2 {
     PXDErrorFlags getCritErrorMask(void) const { return m_critErrorMask; }
 
     /** Calculate the usability decision
-     * @return
+     * If any of the critical bits is set in the error mask
+     * the PXD data from this DHE is not usable for analysis
+     * TODO Maybe this decision needs improvement.
      */
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
 
+    /** Set VxdID and DHC ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
+    /** Get DHE ID of sensor*/
     unsigned short getDHEID(void) const { return  m_dheID;};
+    /** Get VxdID of sensor */
     VxdID getSensorID(void) const { return m_sensorID;};
 
+    /** Set Data counters for reduction calculation */
     void setCounters(uint32_t raw, uint32_t red) {m_rawCount = raw; m_redCount = red;};
+    /** Get Data counters for reduction calculation */
     void getCounters(uint32_t& raw, uint32_t& red) const { raw = m_rawCount; red = m_redCount;};
+    /** Set Raw Data counter for reduction calculation */
     uint32_t getRawCnt(void) const { return m_rawCount;};
+    /** Set Reduced Data counter for reduction calculation */
     uint32_t getRedCnt(void) const { return m_redCount;};
-
+    /** set Trigger Start Row */
     void setStartRow(unsigned int sr) { m_startRow = sr;};
+    /** get Trigger Start Row */
     unsigned short getStartRow(void) const { return  m_startRow;};
-
+    /** set Readout Frame number */
     void setFrameNr(unsigned int fn) { m_frameNr = fn;};
+    /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
 
   private:
@@ -101,7 +119,4 @@ namespace Belle2 {
 
   }; // class PXDDAQDHEStatus
 
-
 } // end namespace Belle2
-
-#endif

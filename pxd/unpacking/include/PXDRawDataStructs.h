@@ -38,6 +38,10 @@ namespace Belle2 {
 
   namespace PXD {
 
+    /** DHC frame header word data struct.
+     * Encapsules the access for different bits within the header
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_frame_header_word0 {
       const ubig16_t data;
       /// fixed length
@@ -82,6 +86,10 @@ namespace Belle2 {
       };
     };
 
+    /** DHC start frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_start_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -132,6 +140,10 @@ namespace Belle2 {
       inline unsigned short get_experiment(void) const {return (exp_run & 0xFFC0) >> 6 ;};
     };
 
+    /** DHH start frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_dhe_start_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -163,6 +175,11 @@ namespace Belle2 {
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
     };
 
+    /** DHH common mode frame data struct.
+     * Encapsules the access for different bits within the header
+     * Not used in hardware yet, preliminary, data format might change
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_commode_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -175,6 +192,10 @@ namespace Belle2 {
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
     };
 
+    /** DHC direct readout frame data struct.
+     * Covers functions common for RAW and ZSD frames.
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_direct_readout_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -194,13 +215,24 @@ namespace Belle2 {
       inline bool getDataReformattedFlag(void) const {return (word0.getMisc() >> 3) & 0x1;};
     };
 
-
+    /** DHC RAW direct readout frame data struct.
+     * Dummy.
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_direct_readout_frame_raw : public dhc_direct_readout_frame {
     };
 
+    /** DHC Zero supressed direct readout frame data struct.
+     * Dummy.
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_direct_readout_frame_zsd : public dhc_direct_readout_frame {
     };
 
+    /** ONSEN Trigger frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_onsen_trigger_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trignr0;
@@ -258,6 +290,10 @@ namespace Belle2 {
       inline bool is_SendUnfiltered(void) const  {    return (magic1 & 0x4000) != 0;  };
     };
 
+    /** ONSEN (debug) ROI frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_onsen_roi_frame {
       const dhc_frame_header_word0 word0;/// mainly empty
       const ubig16_t trignr0;
@@ -295,6 +331,10 @@ namespace Belle2 {
 
     };
 
+    /** DHC Ghost frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_ghost_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -312,6 +352,10 @@ namespace Belle2 {
       inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
     };
 
+    /** DHC End frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_end_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -340,6 +384,10 @@ namespace Belle2 {
       inline unsigned int get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
     };
 
+    /** DHE End frame data struct.
+     * Encapsules the access for different bits and data words
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
     struct dhc_dhe_end_frame {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
@@ -368,6 +416,11 @@ namespace Belle2 {
 ///****************** DHC Frame Wrapper Code starts here **************************
 ///*********************************************************************************
 
+  /** DHC frame wrapper class.
+   * Contains functions common for all type of frames (CRC etc)
+   * Provides a union pointer to the different struct types
+   * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+   */
   class dhc_frames {
   public:
     union {
@@ -422,6 +475,7 @@ namespace Belle2 {
     {
       unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
       if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
+        /// TODO many false positives, we should remove that check after we KNOW tht it has been fixed in DHH Firmware
         B2WARNING("Suspicious Padding $" << hex << crc);
         return EPXDErrMask::c_SUSP_PADDING;
       }

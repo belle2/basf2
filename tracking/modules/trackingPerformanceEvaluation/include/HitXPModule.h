@@ -18,7 +18,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -46,12 +45,12 @@ namespace Belle2 {
   **    basf2 (TTree_hitXP_ext.root)
   */
 
-  class hitXPModule : public Module {
+  class HitXPModule : public Module {
   public:
 
-    hitXPModule();
+    HitXPModule();
 
-    ~hitXPModule();
+    ~HitXPModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.   */

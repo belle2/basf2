@@ -134,7 +134,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
         float pi_electronID;
         recoTree->SetBranchAddress("pi_electronID",   &pi_electronID);
         float pi_muonID;
-        recoTree->SetBranchAddress("pi_muonID",  &pi_PIDmu);
+        recoTree->SetBranchAddress("pi_muonID",  &pi_muonID);
         float pi_protonID;
         recoTree->SetBranchAddress("pi_protonID",   &pi_protonID);
         int pi_mcPDG;

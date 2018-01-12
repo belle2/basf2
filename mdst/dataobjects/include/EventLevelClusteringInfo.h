@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
-
 namespace Belle2 {
   /**
    *Clustering event level information, for example out of time ECLCalDigits, or ECLClusters rejected before storing to mdst.
@@ -25,9 +23,9 @@ namespace Belle2 {
     }
 
     /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), Barrel only */
-    uint16_t getNECLCalDigitsOutOfTimeBRL() const
+    uint16_t getNECLCalDigitsOutOfTimeBarrel() const
     {
-      return m_nECLCalDigitsOutOfTimeBRL;
+      return m_nECLCalDigitsOutOfTimeBarrel;
     }
 
     /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), BWD only */
@@ -36,10 +34,10 @@ namespace Belle2 {
       return m_nECLCalDigitsOutOfTimeBWD;
     }
 
-    /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), FWD+BRL+BWD */
+    /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), FWD+Barrel+BWD */
     uint16_t getNECLCalDigitsOutOfTime() const
     {
-      return m_nECLCalDigitsOutOfTimeFWD + m_nECLCalDigitsOutOfTimeBRL + m_nECLCalDigitsOutOfTimeBWD;
+      return m_nECLCalDigitsOutOfTimeFWD + m_nECLCalDigitsOutOfTimeBarrel + m_nECLCalDigitsOutOfTimeBWD;
     }
 
     /** Setter for the number of ECLCalDigits that are out of time and above some MeV, FWD only. */
@@ -48,10 +46,10 @@ namespace Belle2 {
       m_nECLCalDigitsOutOfTimeFWD = nECLCalDigitsOutOfTimeFWD;
     }
 
-    /** Setter for the number of ECLCalDigits that are out of time and above some MeV, BRL only. */
-    void setNECLCalDigitsOutOfTimeBRL(uint16_t const nECLCalDigitsOutOfTimeBRL)
+    /** Setter for the number of ECLCalDigits that are out of time and above some MeV, Barrel only. */
+    void setNECLCalDigitsOutOfTimeBarrel(uint16_t const nECLCalDigitsOutOfTimeBarrel)
     {
-      m_nECLCalDigitsOutOfTimeBRL = nECLCalDigitsOutOfTimeBRL;
+      m_nECLCalDigitsOutOfTimeBarrel = nECLCalDigitsOutOfTimeBarrel;
     }
 
     /** Setter for the number of ECLCalDigits that are out of time and above some MeV, BWD only. */
@@ -66,10 +64,10 @@ namespace Belle2 {
       return m_nECLShowersRejectedFWD;
     }
 
-    /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters, BRL. */
-    uint8_t getNECLShowersRejectedBRL() const
+    /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters, Barrel. */
+    uint8_t getNECLShowersRejectedBarrel() const
     {
-      return m_nECLShowersRejectedBRL;
+      return m_nECLShowersRejectedBarrel;
     }
 
     /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters, BWD. */
@@ -81,7 +79,7 @@ namespace Belle2 {
     /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters. */
     uint8_t getNECLShowersRejected() const
     {
-      return m_nECLShowersRejectedFWD + m_nECLShowersRejectedBRL + m_nECLShowersRejectedBWD;
+      return m_nECLShowersRejectedFWD + m_nECLShowersRejectedBarrel + m_nECLShowersRejectedBWD;
     }
 
     /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, FWD. */
@@ -90,10 +88,10 @@ namespace Belle2 {
       m_nECLShowersRejectedFWD = nECLShowersRejectedFWD;
     }
 
-    /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, BRL. */
-    void setNECLShowersRejectedBRL(uint8_t const nECLShowersRejectedBRL)
+    /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, Barrel. */
+    void setNECLShowersRejectedBarrel(uint8_t const nECLShowersRejectedBarrel)
     {
-      m_nECLShowersRejectedBRL = nECLShowersRejectedBRL;
+      m_nECLShowersRejectedBarrel = nECLShowersRejectedBarrel;
     }
 
     /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, BWD. */
@@ -106,8 +104,8 @@ namespace Belle2 {
     /** Number of out of time, energetic ECLCalDigits, FWD. */
     uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
 
-    /** Number of out of time, energetic ECLCalDigits, BRL. */
-    uint16_t m_nECLCalDigitsOutOfTimeBRL {0};
+    /** Number of out of time, energetic ECLCalDigits, Barrel. */
+    uint16_t m_nECLCalDigitsOutOfTimeBarrel {0};
 
     /** Number of out of time, energetic ECLCalDigits, BWD. */
     uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
@@ -115,8 +113,8 @@ namespace Belle2 {
     /** Number of N1 showers that are rejected before storing to mdst (max. 255), FWD. */
     uint8_t m_nECLShowersRejectedFWD {0};
 
-    /** Number of N1 showers that are rejected before storing to mdst (max. 255), BRL. */
-    uint8_t m_nECLShowersRejectedBRL {0};
+    /** Number of N1 showers that are rejected before storing to mdst (max. 255), Barrel. */
+    uint8_t m_nECLShowersRejectedBarrel {0};
 
     /** Number of N1 showers that are rejected before storing to mdst (max. 255), BWD. */
     uint8_t m_nECLShowersRejectedBWD {0};

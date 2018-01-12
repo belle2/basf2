@@ -15,7 +15,7 @@ from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
 from ROOT import Belle2
 
-set_random_seed(12345)
+set_random_seed(10000)
 
 main = create_path()
 

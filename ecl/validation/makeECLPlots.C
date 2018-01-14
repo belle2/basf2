@@ -91,13 +91,13 @@ void ECLMuon(TTree* muon_tree)
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMuonsE->Write();
 
-  TH1F* hMuonsFake = new TH1F("hMuonsFake","Percentage of fake (non-bkg) neutral clusters", 2,0,2);
-  hMuonsFake->SetMaximum(150);
-  muon_tree->Draw("(eclClusterIsTrack)>>hMuonsFake","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
-  hMuonsFake->Scale(0.1);
+  TH1F* hMuonsFake = new TH1F("hMuonsFake","Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons", 20,-2,2);
+  hMuonsFake->SetMaximum(1100);
+  muon_tree->Draw("(2*eclClusterIsTrack-1)>>hMuonsFake","eclClusterToMC1==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
+  //hMuonsFake->Scale(0.1);
   hMuonsFake->GetXaxis()->SetTitle("Percentage of fake (non-bkg) neutral clusters");
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Percentage of fake gammas")); 
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be around/below 5%"));
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons")); 
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Number of unmatched clusters should be around/below 5%"));
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFake->Write(); 
 

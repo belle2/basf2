@@ -1,5 +1,5 @@
-List of available Modules in the ``framework`` package
-------------------------------------------------------
+List of Core Modules
+--------------------
 
 This page contains a list of all modules in the framework package. Of special
 importance to the users are the following modules:

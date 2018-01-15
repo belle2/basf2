@@ -8,47 +8,52 @@ This is a short version of the detailed `Installation Manual`_ in Confluence.
 The Belle2 Software is meant to work an any recent 64 bit Linux system but it is only
 tested and provided in binary form for a few select distributions
 
-* Scientific Linux 6 or CentOS 6 (``sl6``)
-* Enterprise Linux 7 or CentOS 7 (``el7``)
-* Ubuntu 16.04 (``ubuntu1604``)
-
-.. hint:: to find which distribution you are running on you can use
-  ``lsb_release -a``
+.. include:: supported-distributions.rst-fragment
 
 If you run on one of these distributions the most convenient way to obtain the
 Belle2 Software is to use it via CVMFS_ which is readily available on KEKCC and
 many HEP specific software resources.  It can also easily be installed on your
 local machine following the `CVMFS Client Quick Start`_ guide.
 
-Once CVMFS is installed you should be able to access
-:file:`/cvmfs/belle.cern.ch` on your machine. Once this is done you only have
-to execute :file:`/cvmfs/belle.cern.ch/{${distribution}}/tools/prepare_belle2.sh` 
-once to check that all required dependencies are installed. In this path
-``${distribution}}`` is the correct label for your Linux distribution from the
-list above.
+If you want to install the Belle 2 Software without cvmfs please have a look at
+the following documents, otherwise if you have cvmfs available please continue with :ref:`cvmfs-setup`
 
-.. note:: Running ``ls /cvmfs`` or opening :file:`/cvmfs` in a graphical
-  file browser might not show ``belle.cern.ch`` as the directories in there are
-  only created on access so try to ``ls /cvmfs/belle.cern.ch``
+.. toctree:: 
+   :maxdepth: 1
 
-If you run a different distribution please refer to the instructions for the
-"Full Local Installation" in the `Installation Manual`_
+   installation-tools
+   installation-local
+   installation-full
 
+.. _cvmfs-setup:
 
-Setup
------
+Setup Of the Belle 2 Software
+-----------------------------
 
-To setup the Belle 2 software you need to setup the belle 2 tools ::
+If CVMS is available on your machine you only have to setup
+the :ref:`belle2-tools` by running ::
 
-  $ source /cvmfs/belle.cern.ch/${distribution}/tools/setup_belle2
+  $ source /cvmfs/belle.cern.ch/$distribution/tools/setup_belle2
 
+where you replace ``$distribution`` with one of the short names for supported
+distributions from the list at at the top of this page.
 
-.. note:: There is a custom setup script on KEKCC. If you work on KEKCC please
-  source ``/sw/belle2/tools/setup_belle2`` instead.
+.. hint:: There are some :ref:`extra environment variables
+   <belle2-tools-setup>` which can be set to customize the belle2 setup
 
-followed by a setup of the release you want to use ::
+.. note:: If you use the software without CVMFS please change the path to
+  where you :ref:`installed the Belle 2 Software tools <belle2-tools-installation>`
+
+.. warning:: There is a custom setup script on KEKCC. If you work on KEKCC
+  please source ``/sw/belle2/tools/setup_belle2`` instead.
+
+Now the only thing left to do is to setup which version of the Belle 2 Software
+you want to use ::
 
   $ setuprel release-01-00-00
+
+After that all the :ref:`command-line-tools` will be setup correctly and ready
+to use.
 
 .. hint:: to get a list of the available releases run ``get_release.sh``
 
@@ -56,7 +61,7 @@ followed by a setup of the release you want to use ::
 
 
 Physics Analysis Setup
-----------------------
+......................
 
 If you want to develop your analysis you can setup your own analysis project with ::
 
@@ -103,7 +108,7 @@ directory, use the command  ::
   $ git pull --rebase
 
 Development Setup
------------------
+.................
 
 If you plan on developing code you should consider checking out the development
 version locally instead of using a pre compiled release::
@@ -125,4 +130,3 @@ And you can compile the code with  ::
 .. _CVMFS: https://cernvm.cern.ch/portal/filesystem
 .. _CVMFS Client Quick Start: https://cernvm.cern.ch/portal/filesystem/quickstart
 .. _Installation Manual: https://confluence.desy.de/x/gFwHAg
-

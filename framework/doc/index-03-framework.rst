@@ -275,7 +275,7 @@ These settings can be modified by setting environment variables
       export BELLE2_CONDB_PROXY="http://192.168.178.1:8081"
 
    If it is not set the default proxy configuration is used (e.g. honor
-   :envvar:`http_proxy`). If it is set to an empty value direct connection is
+   ``$http_proxy``). If it is set to an empty value direct connection is
    used.
 
 Settings in Python

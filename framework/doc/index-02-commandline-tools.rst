@@ -1,5 +1,7 @@
 :tocdepth: 4
 
+.. _command-line-tools:
+
 Command Line Tools
 ==================
 

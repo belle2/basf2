@@ -66,7 +66,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'basf2'
 copyright = '2010-2017, Belle II Collaboration'
-author = 'basf2 authors'
+author = 'Belle2 Software Group'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -238,13 +238,13 @@ htmlhelp_basename = 'basf2doc'
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
     # The font size ('10pt', '11pt' or '12pt').
-    # 'pointsize': '10pt',
+    'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    # 'preamble': '',
+    'preamble': '\setcounter{tocdepth}{2}',
 
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
@@ -254,17 +254,19 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'basf2 Documentation',
-     'basf2 authors', 'manual'),
+    (master_doc, 'basf2.tex', 'Belle 2 Software Documentation',
+     author, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-# latex_logo = None
+latex_logo = "belle2-logo.pdf"
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-# latex_use_parts = False
+latex_use_parts = True
+latex_show_urls = 'footnote'
+latex_show_pagerefs = True
 
 # If true, show page references after internal links.
 # latex_show_pagerefs = False

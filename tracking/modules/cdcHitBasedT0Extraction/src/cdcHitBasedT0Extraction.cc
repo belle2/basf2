@@ -243,7 +243,7 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());
       } else {
 
-        m_eventT0->addEventT0(fitted_t0, fitted_t0_error, Const::CDC);
+        m_eventT0->setEventT0(fitted_t0, fitted_t0_error, Const::CDC);
         B2DEBUG(50,
                 "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);
       }

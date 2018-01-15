@@ -932,8 +932,8 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         path.add_module(pxdSVDCut)
 
     # Quality
-    qualityEstimator = register_module('QualityEstimatorMVA' if use_quality_estimator_mva
-                                       else 'QualityEstimatorVXD')
+    qualityEstimator = register_module('QualityEstimatorVXD' if not use_quality_estimator_mva
+                                       else 'QualityEstimatorMVA')
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
     if use_quality_estimator_mva:

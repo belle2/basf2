@@ -122,8 +122,9 @@ namespace Belle2 {
     }
 
   protected:
-
+    /// ROOT file to which should be written
     TFile* m_tFile;
+    /// TTree that contains recorded variables
     StoreObjPtr<RootMergeable<TTree> > m_tTree;
   };
 }

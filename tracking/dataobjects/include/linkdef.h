@@ -10,7 +10,6 @@
 #pragma link C++ class Belle2::Muid+;
 #pragma link C++ class Belle2::MuidHit+;
 #pragma link C++ class Belle2::TrackClusterSeparation+;
-#pragma link C++ class Belle2::VXDTFSecMap+;
 #pragma link C++ class Belle2::V0ValidationVertex+;
 
 #pragma link C++ class pair <bool, double>+;
@@ -30,11 +29,6 @@
 #pragma link C++ class pair <unsigned int, double >+;
 #pragma link C++ class vector < pair <unsigned int, double > >+;
 
-#pragma link C++ class Belle2::VXDTFRawSecMap+;
-#pragma link C++ class pair <string, Belle2::VXDTFRawSecMap >+;
-#pragma link C++ class vector < pair <string, Belle2::VXDTFRawSecMap > >+;
-
-#pragma link C++ class Belle2::SecMapVector+;
 #pragma link C++ class Belle2::ROIid+;
 #pragma link C++ class Belle2::ROIpayload+;
 #pragma link C++ class Belle2::PXDIntercept+;
@@ -51,9 +45,6 @@
 #pragma link C++ class std::vector<FilterInfo>+;
 #pragma link C++ class std::vector<SpacePointInfo>+;
 #pragma link C++ class Belle2::ObserverInfo+;
-
-#pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+; //implicit
-#pragma link C++ namespace Belle2::VXDTFSecMapTypedef+; //implicit
 
 // ----------------------------------------------------------------------------
 

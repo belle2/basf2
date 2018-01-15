@@ -313,14 +313,17 @@ As an example, to show only the level and text for all debug messages one could 
 
 >>> basf2.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 
-:param LogLevel log_level: log level for which to set the display info
-:param int log_info: Bitmask of `basf2.LogInfo` constants.)DOCSTRING")
+Parameters:
+  log_level (LogLevel): log level for which to set the display info
+  log_info (int): Bitmask of `basf2.LogInfo` constants.)DOCSTRING")
   .def("get_info", &LogPythonInterface::getLogInfo, args("log_level"), "Get info to print for given log level.\n\n"
-       ":param basf2.LogLevel log_level: Log level for which to get the display info")
+       "Parameters:\n  log_level (basf2.LogLevel): Log level for which to get the display info")
   .def("add_file", &LogPythonInterface::addLogFile, (bp::arg("filename"), bp::arg("append") = false),
-       "Write log output to given file. (In addition to existing outputs)\n\n"
-       ":param str filename: Filename to to write log messages into\n"
-       ":param bool append: If set to True the file will be truncated before writing new messages.")
+       R"DOCSTRING(Write log output to given file. (In addition to existing outputs)\n\n"
+
+Parameters:
+  filename (str): Filename to to write log messages into
+  append (bool): If set to True the file will be truncated before writing new messages.)DOCSTRING")
   .def("add_console", addLogConsole,
        addLogConsole_overloads(args("enable_color"), "Write log output to console. (In addition to existing outputs). "
                                "If ``enable_color`` is not specified color will be enabled if supported"))

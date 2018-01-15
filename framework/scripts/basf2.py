@@ -94,29 +94,44 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
     Pretty print a given table, by using available terminal size and
     word wrapping fields as needed.
 
-    :param table: A 2d list of table fields. Each row must have the same length.
+    Parameters:
+      table: A 2d list of table fields. Each row must have the same length.
 
-    :param column_width: list of column widths, needs to be of same length as rows
-        in 'table'. Available fields are::
+      column_width: list of column widths, needs to be of same length as rows
+        in 'table'. Available fields are
 
-            -n  as needed, up to n characters, word wrap if longer
-            0   as long as needed, no wrapping
-            n   n characters (fixed)
-            *   use all available space, good for description fields.
-                If more than one column has a * they all get equal width
-            +   use all available space but at least the actual width. Only useful
-                to make the table span the full width of the terminal
+        ``-n``
+          as needed, up to n characters, word wrap if longer
 
-    :param first_row_is_heading: header specifies if we should take the first row
-                          as table header and offset it a bit
+        ``0``
+          as long as needed, no wrapping
 
-    :param transform: either None or a callback function which takes three
-        arguments: first the elements of the row as a list, second the width of
-        each column (without separator) and finally the preformatted text line.
-        It should return a string representing the final line to be printed.
+        ``n``
+          n characters (fixed)
 
-    :param min_flexible_width: the minimum amount of characters for every column marked with *
-    """
+        ``*``
+          use all available space, good for description fields.
+          If more than one column has a * they all get equal width
+
+        ``+``
+          use all available space but at least the actual width. Only useful
+          to make the table span the full width of the terminal
+
+      first_row_is_heading: header specifies if we should take the first row
+          as table header and offset it a bit
+
+      transform: either None or a callback function which takes three
+          arguments
+
+              1. the elements of the row as a list
+              2. second the width of each column (without separator)
+              3. the preformatted text line.
+
+          It should return a string representing the final line to be
+          printed.
+
+      min_flexible_width: the minimum amount of characters for every column
+          marked with * """
 
     import textwrap
 
@@ -268,18 +283,18 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     >>> module = basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
     >>> module.param("evtNumList", 100)
 
-    :param name_or_module: The name of the module type, may also be an existing
+    Parameters:
+      name_or_module: The name of the module type, may also be an existing
            `Module` instance for which parameters should be set
-    :param str shared_lib_path: An optional path to a shared library from which the
+      shared_lib_path (str): An optional path to a shared library from which the
            module should be loaded
-    :param LogLevel logLevel: indicates the minimum severity of log messages
+      logLevel (LogLevel): indicates the minimum severity of log messages
            to be shown from this module. See `Module.set_log_level`
-    :param int debugLevel: Number indicating the detail of debug messages, the
+      debugLevel (int): Number indicating the detail of debug messages, the
            default level is 100. See `Module.set_debug_level`
-    :param kwargs: Additional parameters to be passed to the module.
+      kwargs: Additional parameters to be passed to the module.
 
-    .. note::
-
+    Note:
         You can also use `Path.add_module()` directly,
         which accepts the same name, logging and module parameter arguments. There
         is no need to register the module by hand if you will add it to the path in
@@ -314,10 +329,11 @@ def set_module_parameters(path, name, recursive=False, **kwargs):
 
     >>> set_module_parameters(path, "Geometry", components=["PXD"], logLevel=LogLevel.WARNING)
 
-    :param path: The path to search for the modules
-    :param name: Then name of the module to set parameters for
-    :param recursive: if True also look in paths connected by conditions or `Path.for_each()`
-    :param kwargs: Named parameters to be set for the module, see  `register_module()`
+    Parameters:
+      path: The path to search for the modules
+      name: Then name of the module to set parameters for
+      recursive: if True also look in paths connected by conditions or `Path.for_each()`
+      kwargs: Named parameters to be set for the module, see  `register_module()`
     """
     if not kwargs:
         raise ValueError("no parameters given")
@@ -357,8 +373,9 @@ def process(path, max_event=0):
     modules need to perform proper cleanup & reinitialisation, if Geometry is
     involved this might be difficult to achieve.)
 
-    :param path: The path with which the processing starts
-    :param max_event:  The maximal number of events which will be processed,
+    Parameters:
+      path: The path with which the processing starts
+      max_event:  The maximal number of events which will be processed,
                 0 for no limit
     """
 
@@ -406,7 +423,8 @@ def set_nprocesses(nproc):
 
     Can be overridden using the ``-p`` argument to basf2.
 
-    :param nproc: number of worker processes. 0 to disable parallel processing.
+    Parameters:
+      nproc: number of worker processes. 0 to disable parallel processing.
     """
 
     fw.set_nprocesses(nproc)
@@ -468,10 +486,11 @@ def print_params(module, print_values=True, shared_lib_path=None):
     """
     This function prints parameter information
 
-    :param module: Print the parameter information of this module
-    :param print_values: Set it to True to print the current values of the parameters
-    :param shared_lib_path: The path of the shared library from which the module was
-                     loaded
+    Parameters:
+      module: Print the parameter information of this module
+      print_values: Set it to True to print the current values of the parameters
+      shared_lib_path: The path of the shared library from which the module was
+          loaded
     """
 
     print('')
@@ -534,11 +553,13 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
     parameters.
     Parameters that are not set by the user are suppressed by default.
 
-    :param defaults: Set it to True to print also the parameters with default values
-    :param description: Set to True to print the descriptions of modules and
-        parameters
-    :param indentation: an internal parameter to indent the whole output (needed for outputting subpaths)
-    :param title: show the title string or not (defaults to True)
+    Parameters:
+      defaults: Set it to True to print also the parameters with default values
+      description: Set to True to print the descriptions of modules and
+          parameters
+      indentation: an internal parameter to indent the whole output
+          (needed for outputting sub-paths)
+      title: show the title string or not (defaults to True)
     """
 
     if title:
@@ -573,7 +594,8 @@ def set_log_level(level):
     Sets the global log level which specifies up to which level the
     logging messages will be shown
 
-    :param basf2.LogLevel level: minimum severity of messages to be logged
+    Parameters:
+      level (basf2.LogLevel): minimum severity of messages to be logged
     """
 
     logging.log_level = level
@@ -584,7 +606,8 @@ def set_debug_level(level):
     Sets the global debug level which specifies up to which level the
     debug messages should be shown
 
-    :param int level: The debug level. The default value is 100
+    Parameters:
+      level (int): The debug level. The default value is 100
     """
 
     logging.debug_level = level
@@ -604,8 +627,9 @@ def log_to_file(filename, append=False):
     """
     Adds a text file to the list of logging destinations.
 
-    :param filename: The path and filename of the text file
-    :param append: Should the logging system append the messages to the end of the
+    Parameters:
+      filename: The path and filename of the text file
+      append: Should the logging system append the messages to the end of the
          file (True) or create a new file for each event processing session (False).
          Default is False.
     """
@@ -648,9 +672,10 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
     and continue working with the unmodified DataStore contents outside of
     skim_path.
 
-    :param ds_ID: can be specified to give a defined ID to the temporary DataStore,
+    Parameters:
+      ds_ID: can be specified to give a defined ID to the temporary DataStore,
         otherwise, a random name will be generated.
-    :param merge_back_event: is a list of object/array names (of event durability)
+      merge_back_event: is a list of object/array names (of event durability)
         that will be merged back into the main path.
     """
     self._add_independent_path(skim_path, ds_ID, merge_back_event)

@@ -335,12 +335,13 @@ If there was an existing single source setup when `use_database_chain` is
 called this one source is kept as the first entry in the chain. Multiple calls
 to this function don't have any effect.
 
-:param bool resetIoVs: A flag to indicate whether IoVs from non-primary
+Parameters:
+  resetIoVs (bool): A flag to indicate whether IoVs from non-primary
         databases should be set to only the current run and rechecked for the
         next run.
-:param LogLevel loglevel: The severity of messages from the database
+  loglevel (LogLevel): The severity of messages from the database
         chain, defaults to `WARNING <LogLevel.WARNING>`
-:param bool invertLogging: A flag to indicate whether logging of obtained
+  invertLogging (bool): A flag to indicate whether logging of obtained
         payloads should be inverted. If False a log message with level
         ``loglevel`` will be emitted every time a payload cannot be found. If true
         a message will be emitted if a payload is actually found.
@@ -351,17 +352,18 @@ to this function don't have any effect.
       R"DOCSTRING(
 Use a local database backend: a single file containing the payload information in plain text.
 
-:param str filename: filename containing the payload information, defaults to
+Parameters:
+  filename (str): filename containing the payload information, defaults to
         "database.txt"
-:param str directory: directory containing the payloads, defaults to current
+  directory (str): directory containing the payloads, defaults to current
         directory
-:param bool readonly: if True the database will refuse to create new payloads
-:param LogLevel loglevel: The severity of messages from this backend when
+  readonly (bool): if True the database will refuse to create new payloads
+  loglevel (LogLevel): The severity of messages from this backend when
         payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
-:param bool invertLogging: A flag to indicate whether logging of obtained
+  invertLogging (bool): A flag to indicate whether logging of obtained
         payloads should be inverted. If False a log message with level
-        ``loglevel`` will be emitted ever time a payload cannot be found. If true
-        a message will be emitted if a payload is actually found.
+        ``loglevel`` will be emitted ever time a payload cannot be found. If
+        true a message will be emitted if a payload is actually found.
 )DOCSTRING");
   {
   //use_central_database has different signatures so the docstring confuses sphinx. Handcraft one complete docstring.
@@ -391,23 +393,22 @@ all jobs to make sure the payloads only need to be downloaded once. The default
 is to place payloads into a directory called :file:`centraldb` in the local
 working directory.
 
-.. warning::
-
+Warning:
     For debugging purposes this function also allows to set the base URL for
     the REST api and the file server but these should generally not be
     modified.
 
-
-:param str globalTag: name of the global tag to use for payload lookup
-:param str restBaseName: base URL for the REST api
-:param str fileBaseName: base URL for the payload download
-:param str payloaddir: directory where to save downloaded payloads
-:param LogLevel loglevel: The LogLevel of messages from this backend when
+Parameters:
+  globalTag (str): name of the global tag to use for payload lookup
+  restBaseName (str): base URL for the REST api
+  fileBaseName (str): base URL for the payload download
+  payloaddir (str): directory where to save downloaded payloads
+  loglevel (LogLevel): The LogLevel of messages from this backend when
         payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
-:param bool invertLogging: A flag to indicate whether logging of obtained
+  invertLogging (bool): A flag to indicate whether logging of obtained
         payloads should be inverted. If False a log message with level
-        ``loglevel`` will be emitted every time a payload cannot be found. If true
-        a message will be emitted if a payload is actually found.
+        ``loglevel`` will be emitted every time a payload cannot be found. If
+        true a message will be emitted if a payload is actually found.
 )DOCSTRING");
   }
 
@@ -425,21 +426,22 @@ function will return a dictionary containing the new settings.
     >>> set_central_database_networkparams(connection_timeout=5, max_retries=1)
     {'backoff_factor': 5, 'connection_timeout': 5, 'max_retries': 1, 'stalled_timeout': 60}
 
-.. warning::
-
+Warning:
     Modification of these parameters should not be needed, in rare
     circumstances this could be used to optimize access for many jobs at once
     but should only be set by experts.
 
-:param int connection_timeout: timeout in seconds before connection should be
-    aborted. 0 sets the timeout to the default (300s)
-:param int stalled_timeout: timeout in seconds before a download should be
-    aborted if the speed stays below 10 KB/s, 0 disables this timeout
-:param int max_retries: maximum amount of retries if the server responded with
-    an HTTP response of 500 or more. 0 disables retrying
-:param int backoff_factor: backoff factor for retries in seconds. Retries are
-   performed using something similar to binary backoff: For retry :math:`n` and
-   a ``backoff_factor`` :math:`f` we wait for a random time chosen uniformely
-   from the interval :math:`[1, (2^{n} - 1) \times f]` in seconds.
+Parameters:
+  connection_timeout (int): timeout in seconds before connection should be
+      aborted. 0 sets the timeout to the default (300s)
+  stalled_timeout (int): timeout in seconds before a download should be
+      aborted if the speed stays below 10 KB/s, 0 disables this timeout
+  max_retries (int): maximum amount of retries if the server responded with
+      an HTTP response of 500 or more. 0 disables retrying
+  backoff_factor (int): backoff factor for retries in seconds. Retries are
+      performed using something similar to binary backoff: For retry :math:`n`
+      and a ``backoff_factor`` :math:`f` we wait for a random time chosen
+      uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
+      seconds.
 )DOCSTRING");
 }

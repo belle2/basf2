@@ -419,14 +419,16 @@ Set custom name, e.g. to distinguish multiple modules of the same type.
 >>> if module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
 >>>     ...
 
-:param int properties: bitmask of `ModulePropFlags` to check for.
+Parameters:
+  properties (int): bitmask of `ModulePropFlags` to check for.
 )DOCSTRING")
   .def("set_property_flags", &Module::setPropertyFlags, args("property_mask"),
        "Set module properties in the form of an OR combination of `ModulePropFlags`.")
   .def("if_value", &Module::if_value, (bp::arg("expression"), bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       R"DOCSTRING(Sets a conditional sub path which will be executed after this module if the return value set in the module passes the given ``expression``.
+       R"DOCSTRING(Sets a conditional sub path which will be executed after this
+module if the return value set in the module passes the given ``expression``.
 
-Modules can define a return value (int or bool) using setReturnValue(),
+Modules can define a return value (int or bool) using ``setReturnValue()``,
 which can be used in the steering file to split the Path based on this value, for example
 
 >>> module_with_condition.if_value("<1", another_path)
@@ -435,17 +437,19 @@ In case the return value of the ``module_with_condition`` for a given event is
 less than 1, the execution will be diverted into ``another_path`` for this event.
 
 You could for example set a special return value if an error occurs, and divert
-the execution into a path containing RootOutput if it is found; saving only the
-data producing/ produced by the error.
+the execution into a path containing :b2:module:`RootOutput` if it is found;
+saving only the data producing/ produced by the error.
 
 After a conditional path has executed, basf2 will by default stop processing
-the path for this event. This behaviour can be changed by setting the ``after_condition_path`` argument.
+the path for this event. This behaviour can be changed by setting the
+``after_condition_path`` argument.
 
-:param str expression: Expression to determeetne if the conditional path should be executed.
-    This should be one of the comparison operators ``<``, ``>``, ``<=``,
-    ``>=``, ``==``, or `!=` followed by a numerical value for the return value
-:param Path condition_path: path to execute in case the expression is fullfilled
-:param AfterConditionPath after_condition_path: What to do once the ``condition_path`` has been executed.
+Parameters:
+  expression (str): Expression to determine if the conditional path should be executed.
+      This should be one of the comparison operators ``<``, ``>``, ``<=``,
+      ``>=``, ``==``, or ``!=`` followed by a numerical value for the return value
+  condition_path (Path): path to execute in case the expression is fulfilled
+  after_condition_path (AfterConditionPath): What to do once the ``condition_path`` has been executed.
 )DOCSTRING")
   .def("if_false", &Module::if_false, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
        "Sets a conditional sub path which will be executed after this module if "
@@ -470,18 +474,18 @@ the path for this event. This behaviour can be changed by setting the ``after_co
        "Set a return value. Can be used by custom modules to set the return value "
        "used to determine if conditional paths are executed")
   .def("set_log_level", &Module::setLogLevel, bp::arg("log_level"),
-       "Set the log level for this module. Messages below that level will be suppressed \n\n"
-       ":param LogLevel log_level: Minimum level for messages to be displayed")
+       "Set the log level for this module. Messages below that level will be suppressed\n\n"
+       "Parameters:\n  log_level (LogLevel): Minimum level for messages to be displayed")
   .def("set_debug_level", &Module::setDebugLevel, bp::arg("debug_level"),
        "Set the debug level for this module. Debug messages with a higher level will "
        "be suppressed. This function has no visible effect if the log level is "
-       "not set to `DEBUG <LogLevel.DEBUG>` \n\n"
-       ":param int debug_level: Maximum debug level for messages to be displayed.")
+       "not set to `DEBUG <LogLevel.DEBUG>`\n\n"
+       "Parameters:\n  debug_level (int): Maximum debug level for messages to be displayed.")
   .def("set_abort_level", &Module::setAbortLevel, bp::arg("abort_level"),
        "Set the log level which will cause processing to be aborted. Usually "
        "processing is only aborted for `FATAL <LogLevel.FATAL>` messages "
-       "but with this function it's possible to set this to a lower value \n\n "
-       ":param LogLevel abort_level: log level which will cause processing to be aborted.")
+       "but with this function it's possible to set this to a lower value\n\n"
+       "Parameters:\n  abort_level (LogLevel): log level which will cause processing to be aborted.")
   .def("set_log_info", &Module::setLogInfo, args("log_info"),
        "Set a `LogInfo` configuration object for this module to determine how log messages should be formatted")
   //tell python about the default implementations of virtual functions

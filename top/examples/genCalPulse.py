@@ -5,10 +5,10 @@ from basf2 import *
 import math
 
 # ----------------------------------------------------------------------------
-# Example of generating double calibration pulses with TOPDoublePulseGenerator
+# Example of generating realistic calibration pulses with TOPCalPulseGenerator
 # ----------------------------------------------------------------------------
 
-# local database with Kichimi-san TBC and T0 constants
+# local database with TBC constants
 reset_database()
 pathTo = '/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/'  # on KEKCC
 use_local_database(pathTo + "localDB/localDB.txt", pathTo + "localDB")
@@ -31,15 +31,16 @@ geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # pulse generator
-calpulse = register_module('TOPDoublePulseGenerator')
+calpulse = register_module('TOPCalPulseGenerator')
 calpulse.param('asicChannels', [0])
 calpulse.param('moduleIDs', [1])
-# intervals = [math.exp(-float(i)/99.0)+1 for i in range(128)]
-# intervals = intervals + intervals
-# calpulse.param('sampleTimeIntervals', intervals)
-calpulse.param('useDatabase', True)
-calpulse.param('outputFileName', 'usedSampleTimes.root')
+calpulse.param('amplitude', 750.0)
 main.add_module(calpulse)
+
+# digitization
+topdigi = register_module('TOPDigitizer')
+topdigi.param('useSampleTimeCalibration', True)
+main.add_module(topdigi)
 
 # output
 main.add_module('RootOutput')

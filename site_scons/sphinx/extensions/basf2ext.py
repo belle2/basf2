@@ -246,4 +246,10 @@ def setup(app):
     app.add_directive("docstring", RenderDocstring)
     app.add_role("issue", jira_issue_role)
     app.connect('html-page-context', html_page_context)
+
+    # Sadly sphinx does not seem to add labels to custom indices ... :/
+    StandardDomain.initial_data["labels"]["b2-modindex"] = ("b2-modindex", "", "Basf2 Module Index")
+    StandardDomain.initial_data["labels"]["b2-varindex"] = ("b2-varindex", "", "Basf2 Variable Index")
+    StandardDomain.initial_data["anonlabels"]["b2-modindex"] = ("b2-modindex", "")
+    StandardDomain.initial_data["anonlabels"]["b2-varindex"] = ("b2-varindex", "")
     return {'version': 0.2}

@@ -77,6 +77,7 @@ version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decod
 # Used for links to the repository
 basf2_repository = "https://stash.desy.de/projects/B2/repos/software"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+basf2_jira = "https://agira.desy.de"
 
 # The full version, including alpha/beta/rc tags.
 release = os.environ.get('BELLE2_RELEASE', 'development')

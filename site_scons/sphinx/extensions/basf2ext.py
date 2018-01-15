@@ -174,11 +174,22 @@ def html_page_context(app, pagename, templatename, context, doctree):
         context["source_url"] += "?at=" + commit
 
 
+def jira_issue_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+        jira_url = inliner.document.settings.env.app.config.basf2_jira
+        if not jira_url:
+            return [nodes.literal(rawtext, text=text, language=None)], []
+
+        url = f"{jira_url}/browse/{text}"
+        return [nodes.reference(rawtext, text=text, refuri=url)], []
+
+
 def setup(app):
     app.add_config_value("basf2_repository", "", True)
     app.add_config_value("basf2_commitid", "", True)
+    app.add_config_value("basf2_jira", "", True)
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)
+    app.add_role("issue", jira_issue_role)
     app.connect('html-page-context', html_page_context)
     return {'version': 0.2}

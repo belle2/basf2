@@ -39,8 +39,11 @@ namespace Belle2 {
       c_ONSEN_DHP = 0xD, // Onsen processed zero supressed DHP
       c_ONSEN_FCE = 0x9, // Onsen processed clustered
       c_ONSEN_ROI = 0xF, // Onsen ROIs (HLT+DATCON)
-      c_ONSEN_TRG = 0xE  // Trigger frame (the 1st frame)
-                    // Free IDs are 0x7 0x8 0xA
+      c_ONSEN_TRG = 0xE,  // Trigger frame (the 1st frame)
+      // Free IDs are 0x7 0x8 0xA
+      c_UNUSED_7 = 0x7,
+      c_UNUSED_8 = 0x8,
+      c_UNUSED_A = 0xA,
     };
   }
 }

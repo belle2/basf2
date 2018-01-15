@@ -78,7 +78,15 @@ REG_MODULE(PXDPackerErr)
  * 41 - Row overflow by 1
  * 42 - Col overflow by 1
  * 43 - Missing Start Row
- * 44 -
+ * 44 - No PXD raw packet at all
+ * 45 - No DATCON data
+ *
+ * 46 - unused frame type: common mode
+ * 47 - unused frame type: FCE
+ * 48 - unused frame type: ONS FCE
+ * 49 - unused frame type: 0x7, 0x8, 0xA
+ * 50 -
+ *
  *
  * */
 
@@ -102,7 +110,7 @@ PXDPackerErrModule::PXDPackerErrModule() :
   m_run_nr_word1 = 0;
   m_run_nr_word2 = 0;
   //Set module properties
-  setDescription("Create 'broken' PXD raw data got challenge Unpacker");
+  setDescription("Create 'broken' PXD raw data to challenge Unpacker");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
@@ -195,8 +203,10 @@ void PXDPackerErrModule::event()
   B2INFO("Pack Event : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," <<
          evtPtr->getExperiment() << "," << evtPtr->getTime() << " (MetaInfo)");
 
-  pack_event();
-  m_packed_events++;
+  if (!isErrorIn(44)) {
+    pack_event();
+    m_packed_events++;
+  }
 }
 
 void PXDPackerErrModule::endian_swap_frame(unsigned short* dataptr, int len)
@@ -326,11 +336,17 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int16(m_run_nr_word1); // HLT Run NR etc
   if (isErrorIn(24)) append_int32(0xDEAD0000);
   else append_int32(0xCAFE0000);// DATCON HEADER ...
-  if (isErrorIn(22)) append_int32(m_trigger_nr + 1);
-  else append_int32(m_trigger_nr);// DATCON Trigger Nr
-  if (!isErrorIn(6)) {
-    append_int16(m_run_nr_word2);  // DATCON Run NR etc
-    append_int16(m_run_nr_word1);  // DATCON Run NR etc
+  if (isErrorIn(45)) {
+    // No Datcon
+    append_int32(0x0); // trigger nr
+    append_int32(0x0); // 2*16 trg tag
+  } else {
+    if (isErrorIn(22)) append_int32(m_trigger_nr + 1);
+    else append_int32(m_trigger_nr);// DATCON Trigger Nr
+    if (!isErrorIn(6)) {
+      append_int16(m_run_nr_word2);  // DATCON Run NR etc
+      append_int16(m_run_nr_word1);  // DATCON Run NR etc
+    }
   }
   if (!isErrorIn(12)) add_frame_to_payload();
   if (isErrorIn(17)) {
@@ -423,6 +439,34 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
     // double frame
     m_onsen_header.push_back(m_current_frame.size());
     m_onsen_payload.push_back(m_current_frame);
+  }
+
+  // Now we add some undefined things
+  if (isErrorIn(46)) {
+    start_frame();
+    append_int32((EDHCFrameHeaderDataType::c_COMMODE << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+    add_frame_to_payload();
+  }
+  if (isErrorIn(47)) {
+    start_frame();
+    append_int32((EDHCFrameHeaderDataType::c_FCE_RAW << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+    add_frame_to_payload();
+  }
+  if (isErrorIn(48)) {
+    start_frame();
+    append_int32((EDHCFrameHeaderDataType::c_ONSEN_FCE << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+    add_frame_to_payload();
+  }
+  if (isErrorIn(49)) {
+    start_frame();
+    append_int32((EDHCFrameHeaderDataType::c_UNUSED_7 << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+    add_frame_to_payload();
+    start_frame();
+    append_int32((EDHCFrameHeaderDataType::c_UNUSED_8 << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+    add_frame_to_payload();
+    start_frame();
+    append_int32((EDHCFrameHeaderDataType::c_UNUSED_A << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+    add_frame_to_payload();
   }
 
 // now prepare the data from one halfladder

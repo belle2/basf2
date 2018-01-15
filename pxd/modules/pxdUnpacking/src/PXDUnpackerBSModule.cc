@@ -320,7 +320,9 @@ void PXDUnpackerBSModule::unpack_dhp_raw(void* data, unsigned int frame_len, uns
 
 void PXDUnpackerBSModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
 {
-  B2FATAL("FCE 9Cluster) Packet have not yet been tested with real HW clusters. Dont assume that this code is working!");
+  B2ERROR("FCE (Cluster) Packet have not yet been tested with real HW clusters. Dont assume that this code is working!");
+  return;
+
   ubig16_t* cluster = (ubig16_t*)data;
   int nr_words; //words in dhp frame
   unsigned int words_in_cluster = 0; //counts 16bit words in cluster

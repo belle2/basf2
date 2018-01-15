@@ -1,30 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-// modified from exoticphysics/monopole/*
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
@@ -34,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-//
-// -------------------------------------------------------------------
+
 // References
 // [1] Steven P. Ahlen: Energy loss of relativistic heavy ionizing particles,
 //     S.P. Ahlen, Rev. Mod. Phys 52(1980), p121
 // [2] K.A. Milton arXiv:hep-ex/0602040
 // [3] S.P. Ahlen and K. Kinoshita, Phys. Rev. D26 (1982) 2347
 
-//MODIFIED to work ONLY for low magnetic charge
+// modified from GEANT4 exoticphysics/monopole/*
+// works only for low magnetic charge, higher charge corrections are not used
 
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 
@@ -72,18 +45,14 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
     beta2lim(betalim * betalim),
     bg2lim(beta2lim * (1.0 + beta2lim))
 {
-  //nmpl = G4lrint(std::fabs(magCharge) * 2 * fine_structure_const);
-  //if(nmpl > 6)      { nmpl = 6; }
-  //else if(nmpl < 1) { nmpl = 1; }
-  nmpl = 0;
-  nmpl_in_eplus = magCharge * 2 * fine_structure_const;
   pi_hbarc2_over_mc2 = pi * hbarc * hbarc / electron_mass_c2;
-  chargeSquare = magCharge * magCharge;
-  dedxlim = 45.*nmpl_in_eplus * nmpl_in_eplus * GeV * cm2 / g;
+  chargeSquare = magCharge * magCharge * 4 * fine_structure_const *
+                 fine_structure_const; //Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
+  dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();
   G4cout << "### Monopole ionisation model with d-electron production, Gmag= "
-         << magCharge / eplus << G4endl;
+         << magCharge / eplus << G4endl;//TODO print it with B2INFO
   monopole = nullptr;
   mass = 0.0;
 }
@@ -126,7 +95,7 @@ G4mplIonisationWithDeltaModel::Initialise(const G4ParticleDefinition* p,
         theCoupleTable->GetMaterialCutsCouple(i)->GetMaterial();
       G4double eDensity = material->GetElectronDensity();
       G4double vF = electron_Compton_length * pow(3.*pi * pi * eDensity, 0.3333333333);
-      (*dedx0)[i] = pi_hbarc2_over_mc2 * eDensity * nmpl_in_eplus * nmpl_in_eplus *
+      (*dedx0)[i] = pi_hbarc2_over_mc2 * eDensity * chargeSquare *
                     (G4Log(2 * vF / fine_structure_const) - 0.5) / vF;
     }
   }
@@ -186,24 +155,14 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
   G4double dedx =
     0.5 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)) - 1.0);//"Conventional" ionisation
 //   G4double dedx =
-//     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon ionisation
-
-  // Kazama et al. cross-section correction
-  //G4double  k = 0.406;
-  G4double  k = 0.0; //No Kazama correction for low charges
-  if (nmpl > 1) { k = 0.346; }
-
-  // Bloch correction
-  const G4double B[7] = { 0.0, 0.248, 0.672, 1.022, 1.243, 1.464, 1.685};
-
-  dedx += 0.5 * k - B[nmpl];
+//     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon double ionisation
 
   // density effect correction
   G4double x = G4Log(bg2) / twoln10;
   dedx -= material->GetIonisation()->DensityCorrection(x);
 
   // now compute the total ionization loss
-  dedx *=  pi_hbarc2_over_mc2 * eDensity * nmpl_in_eplus * nmpl_in_eplus;
+  dedx *=  pi_hbarc2_over_mc2 * eDensity * chargeSquare;
 
   if (dedx < 0.0) { dedx = 0.; }
   return dedx;
@@ -222,7 +181,7 @@ G4mplIonisationWithDeltaModel::ComputeCrossSectionPerElectron(
   G4double maxEnergy = std::min(tmax, maxKinEnergy);
   G4double cutEnergy = std::max(LowEnergyLimit(), cut);
   if (cutEnergy < maxEnergy) {
-    cross = (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * nmpl_in_eplus * nmpl_in_eplus;
+    cross = (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * chargeSquare;
   }
   return cross;
 }
@@ -255,7 +214,7 @@ G4mplIonisationWithDeltaModel::SampleSecondaries(vector<G4DynamicParticle*>* vdp
 
   //G4cout << "G4mplIonisationWithDeltaModel::SampleSecondaries: E(GeV)= "
   //   << kineticEnergy/GeV << " M(GeV)= " << mass/GeV
-  //   << " tmin(MeV)= " << minKinEnergy/MeV << G4endl;
+  //   << " tmin(MeV)= " << minKinEnergy/MeV << G4endl;//TODO print with B2DEBUG or remove altogether
 
   G4double totEnergy     = kineticEnergy + mass;
   G4double etot2         = totEnergy * totEnergy;

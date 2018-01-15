@@ -1,30 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-// modified from exoticphysics/monopole/*
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
@@ -34,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+// modified from GEANT4 exoticphysics/monopole/*
 
 #include <simulation/monopoles/G4MonopoleTransportation.h>
 #include <simulation/monopoles/G4Monopole.h>
@@ -65,7 +40,6 @@ G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
     fThreshold_Warning_Energy(100 * MeV),
     fThreshold_Important_Energy(250 * MeV),
     fThresholdTrials(10),
-    // fUnimportant_Energy( 1 * MeV ),
     fNoLooperTrials(0),
     fSumEnergyKilled(0.0), fMaxEnergyKilled(0.0),
     fShortStepOptimisation(false),    // Old default: true (=fast short steps)
@@ -76,7 +50,7 @@ G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
   // set Process Sub Type
   SetProcessSubType(TRANSPORTATION);
 
-  fMagSetup = G4MonopoleFieldSetup::GetMonopoleFieldSetup();
+  fMagSetup = G4MonopoleFieldSetup::GetMonopoleFieldSetup();//TODO should take B field from basf2
 
   G4TransportationManager* transportMgr ;
 
@@ -105,7 +79,7 @@ G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
 
 G4MonopoleTransportation::~G4MonopoleTransportation()
 {
-  if ((verboseLevel > 0) && (fSumEnergyKilled > 0.0)) {
+  if ((verboseLevel > 0) && (fSumEnergyKilled > 0.0)) {//TODO print with B2DEBUG
     G4cout << " G4MonopoleTransportation: Statistics for looping particles "
            << G4endl;
     G4cout << "   Sum of energy of loopers killed: " <<  fSumEnergyKilled << G4endl;
@@ -194,7 +168,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
   }
 
   // G4cout << " G4Transport:  field exerts force= " << fieldExertsForce
-  //          << "  fieldMgr= " << fieldMgr << G4endl;
+  //          << "  fieldMgr= " << fieldMgr << G4endl;//TODO print with B2DEBUG or remove altogether
 
   // Choose the calculation of the transportation: Field or not
   //
@@ -455,7 +429,7 @@ G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
 
 #ifdef G4VERBOSE
       if ((verboseLevel > 1) ||
-          (endEnergy > fThreshold_Warning_Energy)) {
+          (endEnergy > fThreshold_Warning_Energy)) {//TODO print with B2DEBUG or remove altogether
         G4cout << " G4MonopoleTransportation is killing track that is looping or stuck "
                << G4endl
                << "   This track has " << track.GetKineticEnergy() / MeV
@@ -469,7 +443,7 @@ G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
     } else {
       fNoLooperTrials ++;
 #ifdef G4VERBOSE
-      if ((verboseLevel > 2)) {
+      if ((verboseLevel > 2)) {//TODO print with B2DEBUG or remove altogether
         G4cout << "   G4MonopoleTransportation::AlongStepDoIt(): Particle looping -  "
                << "   Number of trials = " << fNoLooperTrials
                << "   No of calls to  = " << noCalls

@@ -96,7 +96,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
-  addParam("MonopoleDefinition", m_monopoleDefinition, "Definition of the monopole. If not empty, registers its physics list",
+  addParam("MonopoleDefinition", m_monopoleDefinition, "Definition of the monopole. If not empty, registers monopole physics list",
            string(""));
   addParam("ProductionCut", m_productionCut,
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
@@ -179,6 +179,7 @@ void FullSimModule::initialize()
     physicsList->RegisterPhysics(new G4MonopolePhysics);
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
     uiManager->ApplyCommand("/monopole/setup " + m_monopoleDefinition);
+    // Monopole setup ui commands have to be passed before SetUserInitialization
   }
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes

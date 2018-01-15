@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Dmitrii Neverov                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -73,7 +73,7 @@ void PairGenModule::event()
     q.setFirstDaughter(0);
     q.setLastDaughter(0);
 
-    //lets generate the momentum vector angle uniformly in CMS:
+    //generate the phi uniformly in CMS and theta with 1 + Cos(Theta)^2 :
     double phi = gRandom->Uniform(0, 2.0 * Pi());
     double theta = 0;
     double value = 0;

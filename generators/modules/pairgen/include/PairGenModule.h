@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Dmitrii Neverov                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,8 +19,8 @@
 namespace Belle2 {
 
   /** The PairGen module.
-   * Generate pair of tracks back to back in CMS and store them
-   * into the MCParticle class.
+   * Simplistic generator of track pairs back to back in CMS.
+   * Stores them into the MCParticle class.
    */
   class PairGenModule : public Module {
   public:
@@ -40,10 +40,9 @@ namespace Belle2 {
     void event();
 
   protected:
-    /** Particles PDG code */
-    int m_PDG;
-    /** Store both particles if true, one if false */
-    bool m_saveBoth;
+    int m_PDG; /** Particles PDG code */
+    bool m_saveBoth; /** Store both particles if true, one if false */
+    //TODO other parameters to make the module more useful
 
     MCParticleGraph m_particleGraph;
   };

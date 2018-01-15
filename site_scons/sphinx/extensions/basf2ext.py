@@ -16,6 +16,12 @@ This module is a Sphinx Extension for the Belle~II Software:
         :regex-filter: Event.*
 
 * add directive to automatically document basf2 variables
+
+    .. b2-variables::
+        :group: Kinematics
+        :variables: x, y, z
+        :regex-filter: .*
+
 """
 
 
@@ -24,10 +30,55 @@ import re
 import textwrap
 from docutils import nodes
 from sphinx.util.nodes import nested_parse_with_titles
-from docutils.parsers.rst import directives, Directive
+from docutils.parsers.rst import directives, Directive, roles
 from docutils.statemachine import StringList
 from basf2domain import Basf2Domain
 from basf2 import fw, register_module
+from sphinx.domains.std import StandardDomain
+
+
+def parse_with_titles(state, content):
+    """Shortcut function to parse a reStructuredText fragment into docutils nodes"""
+    node = nodes.container()
+    # copied from autodoc:  necessary so that the child nodes get the right source/line set
+    node.document = state.document
+    if isinstance(content, str):
+        content = content.splitlines()
+    if not isinstance(content, StringList):
+        content = StringList(content)
+    nested_parse_with_titles(state, content, node)
+    return node.children
+
+
+class RenderDocstring(Directive):
+    """Directive to Render Docstring as Docutils nodes.
+    This is useful as standard reStructuredText does not parse Google
+    Docstrings but we support it in docstrings for python functions, modules
+    and variables. So to show example docstrings in the documentation we don't
+    want to write the example in Google Docstring and keep that synchronous
+    with a reStructuredText version
+    """
+    has_content = True
+    option_spec = {
+        "lines": directives.unchanged
+    }
+
+    def run(self):
+        """Just pass on the content to the autodoc-process-docstring event and
+        then parse the resulting reStructuredText."""
+        env = self.state.document.settings.env
+        content = list(self.content)
+        try:
+            start_index, end_index = [int(e) for e in self.options.get("lines", None).split(",")]
+            content = content[start_index:end_index]
+        except Exception:
+            pass
+
+        # remove common whitespace
+        content = textwrap.dedent("\n".join(content)).splitlines()
+
+        env.app.emit('autodoc-process-docstring', "docstring", None, None, None, content)
+        return parse_with_titles(self.state, content)
 
 
 class ModuleListDirective(Directive):
@@ -68,12 +119,9 @@ class ModuleListDirective(Directive):
             if os.path.exists(image):
                 description += [":IO diagram:", "    ", "    .. image:: /%s" % image]
 
-        node = nodes.container()
         content = [".. b2:module:: {module}".format(module=module.name()), "    "]
         content += ["    " + e for e in description]
-        nested_parse_with_titles(self.state, StringList(content), node)
-
-        return node.children
+        return parse_with_titles(self.state, content)
 
     def run(self):
         all_modules = fw.list_available_modules().items()
@@ -86,7 +134,7 @@ class ModuleListDirective(Directive):
         # check if we have a regex-filter, if so filter list of modules
         if "regex-filter" in self.options:
             re_filter = re.compile(self.options["regex-filter"])
-            all_modules = [e for e in all_modules if re_filter.search(e[0]) is not None]
+            all_modules = [e for e in all_modules if re_filter.match(e[0]) is not None]
 
         # aaand also filter by library (in case some one wants to document all
         # modules found in a given library)
@@ -134,20 +182,25 @@ class VariableListDirective(Directive):
                 continue
             if explicit_list and var.name not in explicit_list:
                 continue
-            if regex_filter and not regex_filter.search(var.name):
+            if regex_filter and not regex_filter.match(var.name):
                 continue
             all_variables.append(var)
 
         all_nodes = []
+        env = self.state.document.settings.env
         for var in sorted(all_variables, key=lambda x: x.name):
+            docstring = var.description.splitlines()
+            # pretend to be the autodoc extension to let other events process
+            # the doc string. Enables Google/Numpy docstrings as well as a bit
+            # of doxygen docstring conversion we have
+            env.app.emit('autodoc-process-docstring', "b2:variable", var.name, var, None, docstring)
+
             description = [f".. b2:variable:: {var.name}", ""]
-            description += ["    " + e for e in var.description.splitlines()]
+            description += ["    " + e for e in docstring]
             if "group" not in self.options:
                 description += ["", f"    :Group: {var.group}"]
 
-            node = nodes.container()
-            nested_parse_with_titles(self.state, StringList(description), node)
-            all_nodes += node.children
+            all_nodes += parse_with_titles(self.state, description)
 
         return all_nodes
 
@@ -190,6 +243,7 @@ def setup(app):
     app.add_domain(Basf2Domain)
     app.add_directive("b2-modules", ModuleListDirective)
     app.add_directive("b2-variables", VariableListDirective)
+    app.add_directive("docstring", RenderDocstring)
     app.add_role("issue", jira_issue_role)
     app.connect('html-page-context', html_page_context)
     return {'version': 0.2}

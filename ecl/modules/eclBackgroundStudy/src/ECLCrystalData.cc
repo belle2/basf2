@@ -14,6 +14,8 @@
 #define PI 3.14159265358979323846
 #define DEGTORAD 1.74532925199432955e-02
 
+using namespace Belle2;
+
 //ECL has 16-fold symmetry in phi. Multiply this by 16 to get the total number of crystals at each theta location.
 int const ECLCrystalData::Ring[69] = {
   3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9,            //forward calorimeter

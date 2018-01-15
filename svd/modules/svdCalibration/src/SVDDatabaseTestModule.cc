@@ -55,6 +55,17 @@ void SVDDatabaseTestModule::event()
   VxdID sensorID(3, 1, 1);
   B2INFO("Noise L3_1_1 side V strip 0 = " << m_obj_noise.getNoise(sensorID, false, 0));
   B2INFO("Noise L3_1_1 side U strip 0 = " << m_obj_noise.getNoise(sensorID , true, 0));
+  B2INFO("Test the retrieval of the noise in electrons:");
+  B2INFO("Noise L3_1_1 side V strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID, false, 0));
+  B2INFO("Noise L3_1_1 side U strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID , true, 0));
+
+  VxdID sensorID_L4(4, 1, 1);
+  B2INFO("Noise L4_1_1 side V strip 0 = " << m_obj_noise.getNoise(sensorID_L4, false, 0));
+  B2INFO("Noise L4_1_1 side U strip 0 = " << m_obj_noise.getNoise(sensorID_L4 , true, 0));
+  B2INFO("Test the retrieval of the noise in electrons:");
+  B2INFO("Noise L4_1_1 side V strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID_L4, false, 0));
+  B2INFO("Noise L4_1_1 side U strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID_L4 , true, 0));
+
   B2INFO("~~~~~~~~~~~~~~\n");
 
   B2INFO("Charge [e]        L3_1_1 side V strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorID, false, 0, 60));

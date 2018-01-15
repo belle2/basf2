@@ -52,11 +52,11 @@ namespace Belle2 {
           Belle2::MLRange<Belle2::FBDTClassifier<9>, 9, double>,
           VoidObserver >;
 
-    virtual void initialize(); /**< initialize module */
+    void initialize() override; /**< initialize module */
 
-    virtual void event(); /**< event */
+    void event() override; /**< event */
 
-    virtual void terminate(); /**< terminate module */
+    void terminate() override; /**< terminate module */
 
   private:
 

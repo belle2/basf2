@@ -84,6 +84,15 @@ void PXDDQMExpressRecoModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   m_oldDir = gDirectory;
+  // save way to create directories and cd to them, even if they exist already.
+  // if cd fails, Directory points to oldDir, but never ZERO ptr
+  m_oldDir->mkdir("PXDExpReco_Flags");
+  m_oldDir->cd("PXDExpReco_Flags");
+  TDirectory* DirPXDFlags = gDirectory;
+  m_oldDir->mkdir("PXDExpReco");
+  m_oldDir->cd("PXDExpReco");
+  TDirectory* DirPXDBasic = gDirectory;
+  m_oldDir->cd();
 
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -106,11 +115,6 @@ void PXDDQMExpressRecoModule::defineHisto()
       break;
     }
   }
-
-  TDirectory* DirPXDBasic = NULL;
-  TDirectory* DirPXDFlags = NULL;
-  DirPXDFlags = m_oldDir->mkdir("PXDExpReco_Flags");
-  DirPXDBasic = m_oldDir->mkdir("PXDExpReco");
 
   // Create basic histograms:
   DirPXDBasic->cd();
@@ -457,9 +461,9 @@ void PXDDQMExpressRecoModule::endRun()
   m_oldDir->cd();
   NoOfEvents->Write(nameBS.Data());
 
-  TDirectory* DirPXDRefs = NULL;
-  DirPXDRefs = m_oldDir->mkdir("PXDExpReco_Refs");
-  DirPXDRefs->cd();
+  m_oldDir->mkdir("PXDExpReco_Refs");
+  m_oldDir->cd("PXDExpReco_Refs");
+//   TDirectory* DirPXDRefs = gDirectory;
   // Load reference file of histograms:
   TVectorD* NoOfEventsRef;
   NoOfEventsRef = new TVectorD(1);

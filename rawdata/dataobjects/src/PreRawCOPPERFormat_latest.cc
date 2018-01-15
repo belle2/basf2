@@ -238,7 +238,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     if ((unsigned int)GetRunNo(n) != (prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT) {
       if (*cur_evenum_rawcprhdr != 0) {
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %d run %d sub %d ) cur(exp %d run %d sub %d ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
                 prev_evenum, *cur_evenum_rawcprhdr,
                 prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
                 *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF,

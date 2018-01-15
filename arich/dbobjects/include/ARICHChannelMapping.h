@@ -54,6 +54,9 @@ namespace Belle2 {
      */
     void mapXY2Asic(unsigned xChn, unsigned yChn, unsigned asicChn);
 
+    /**
+    * Print mapping parameters
+    */
     void print();
 
   private:

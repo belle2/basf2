@@ -36,15 +36,15 @@ namespace Belle2 {
     SectorMapBootstrapModule();
 
     //! Destructor
-    virtual ~SectorMapBootstrapModule()
+    ~SectorMapBootstrapModule()
     {
       if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
     };
 
-    virtual void initialize()   ;
-    virtual void beginRun()     ;
-    virtual void event()        ;
-    virtual void endRun()       ;
+    void initialize() override   ;
+    void beginRun() override     ;
+    void event() override        ;
+    void endRun() override       ;
 
   private:
     void bootstrapSectorMap(void);

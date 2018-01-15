@@ -384,7 +384,7 @@ namespace Belle2 {
 
   inline unsigned int PreRawCOPPERFormat_latest::GetTrailerChksum(int  n)
   {
-    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - 2;
+    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM;
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 

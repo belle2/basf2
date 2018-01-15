@@ -27,10 +27,10 @@ namespace Belle2 {
     RelatedTracksCombinerModule();
 
     /// Declare required StoreArray
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Event processing, combine store array
-    virtual void event() override;
+    void event() override;
 
   private:
     /// Name of the input CDC StoreArray

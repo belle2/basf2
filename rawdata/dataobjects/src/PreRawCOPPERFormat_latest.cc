@@ -681,7 +681,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
           CheckCRC16(datablock_id, i);
         }
       }
-      printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", datablock_id);
+      printf("[DEBUG] ========== No CRC error : block %d =========\n", datablock_id);
       throw (err_str);
       //      exit(-1);
 #endif

@@ -22,6 +22,8 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
+// needed for complicated parameter types to not get an undefined reference error
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>

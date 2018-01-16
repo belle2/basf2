@@ -141,12 +141,16 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("storage_location", help="Where to store the results of the calculations.")
+    parser.add_argument("--events_per_job", help="Event to generate per job",
+                        type=int, default=1000)
+    parser.add_argument("--jobs", help="Number of jobs per channel",
+                        type=int, default=5)
 
     args = parser.parse_args()
 
     # Produce 5*1000 events in each channel
-    generate_events(channels=channels_to_study, n_events=1000,
-                    n_jobs=5, storage_location=args.storage_location)
+    generate_events(channels=channels_to_study, n_events=args.events_per_job,
+                    n_jobs=args.jobs, storage_location=args.storage_location)
 
     # Reconstruct each channel
     run_reconstruction(channels=channels_to_study, storage_location=args.storage_location)

@@ -27,8 +27,8 @@ ECLTriggerClusterMatcherModule::ECLTriggerClusterMatcherModule() : Module()
 {
   // Set module properties
   setDescription("Match ECLTRGClusters to ECLClusters");
-  addParam("minClusterEnergy", m_minClusterEnergy, "", 0.1);
-  addParam("maxAngle", m_maxAngle, "Maximum angle between an ECLCLuster and an ECLTRGCluster [rad]", 0.1);
+  addParam("minClusterEnergy", m_minClusterEnergy, "Minimum energy of the ECLCluster to be checked [GeV].", 0.1);
+  addParam("maxAngle", m_maxAngle, "Maximum angle between an ECLCLuster and an ECLTRGCluster [rad]", 0.15);
   addParam("minFracEnergy", m_minFracEnergy, "Minimum energy fraction trg/cluster.", 0.);
   addParam("maxFracEnergy", m_maxFracEnergy, "Maximal energy fraction trg/cluster.", 2.);
   setPropertyFlags(c_ParallelProcessingCertified);

@@ -10,8 +10,7 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
-#ifndef G4MONOPOLEPHYSICSMESSENGER_H
-#define G4MONOPOLEPHYSICSMESSENGER_H
+#pragma once
 
 #include <globals.hh>
 #include <G4UImessenger.hh>
@@ -50,4 +49,3 @@ namespace Belle2 {
   } //end Monopoles namespace
 
 } //end Belle2 namespace
-#endif

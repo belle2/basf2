@@ -10,6 +10,8 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
+#pragma once
+
 #include <CLHEP/Units/SystemOfUnits.h>
 
 namespace Belle2 {

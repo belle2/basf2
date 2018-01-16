@@ -10,8 +10,7 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
-#ifndef G4MONOPOLEEQUATION_H
-#define G4MONOPOLEEQUATION_H
+#pragma once
 
 #include <G4EquationOfMotion.hh>
 #include <G4ElectroMagneticField.hh>
@@ -48,4 +47,3 @@ namespace Belle2 {
   } //end Monopoles namespace
 
 } //end Belle2 namespace
-#endif

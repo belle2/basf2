@@ -10,8 +10,7 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
-#ifndef G4MONOPOLETRANSPORTATION_H
-#define G4MONOPOLETRANSPORTATION_H
+#pragma once
 
 // inline include at the end of the file
 
@@ -180,5 +179,5 @@ namespace Belle2 {
   } //end Monopoles namespace
 
 } //end Belle2 namespace
+
 #include <simulation/monopoles/G4MonopoleTransportationInline.h>
-#endif

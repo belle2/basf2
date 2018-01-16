@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PAIRGENMODULE_H
-#define PAIRGENMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -48,6 +47,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif // PAIRGENMODULE_H
-

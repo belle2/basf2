@@ -10,8 +10,7 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
-#ifndef G4MPLIONISATION_H
-#define G4MPLIONISATION_H
+#pragma once
 
 #include <G4VEnergyLossProcess.hh>
 #include <globals.hh>
@@ -57,4 +56,3 @@ namespace Belle2 {
   } //end Monopoles namespace
 
 } //end Belle2 namespace
-#endif

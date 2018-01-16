@@ -10,8 +10,7 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
-#ifndef G4MPLIONISATIONWITHDELTAMODEL_H
-#define G4MPLIONISATIONWITHDELTAMODEL_H
+#pragma once
 
 #include <G4VEmModel.hh>
 #include <G4VEmFluctuationModel.hh>
@@ -108,4 +107,3 @@ namespace Belle2 {
   } //end Monopoles namespace
 
 } //end Belle2 namespace
-#endif

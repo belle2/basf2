@@ -10,8 +10,7 @@
 
 // modified from GEANT4 exoticphysics/monopole/*
 
-#ifndef G4MONOPOLEFIELDSETUP_H
-#define G4MONOPOLEFIELDSETUP_H
+#pragma once
 
 #include <G4MagneticField.hh>
 #include <G4UniformMagField.hh>
@@ -64,4 +63,3 @@ namespace Belle2 {
   } //end Monopoles namespace
 
 } //end Belle2 namespace
-#endif

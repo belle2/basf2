@@ -13,14 +13,11 @@
 #pragma link C++ class Belle2::CDCTriggerMLPData+;
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+;
 
-#define TSF_TO_2D_HALF_WIDTH 219
-#define TSF_TO_2D_WIDTH 429
-#define NUM_2D 4
-#define NUM_TSF 5
-
 #pragma link C++ class Belle2::Bitstream<array<bitset<MERGER_WIDTH>, NUM_MERGER> >+;
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, 429>, 4>, 5> >+;
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, TSF_TO_2D_WIDTH>, NUM_2D>, NUM_TSF> >+;
 #pragma link C++ class Belle2::Bitstream<array<array<bitset<TSF_TO_2D_WIDTH>, NUM_2D>,NUM_TSF> >+;
+
+#pragma link C++ class Belle2::Bitstream<array<array<char, T2D_TO_3D_WIDTH>, NUM_2D> >+;
 
 #endif

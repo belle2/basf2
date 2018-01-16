@@ -4,6 +4,12 @@
 
 #define MERGER_WIDTH 256
 #define NUM_MERGER 146
+#define TSF_TO_2D_HALF_WIDTH 219
+#define TSF_TO_2D_WIDTH 429
+#define NUM_2D 4
+#define NUM_TSF 5
+#define T2D_TO_3D_WIDTH 741
+
 
 namespace Belle2 {
 
@@ -34,6 +40,7 @@ namespace Belle2 {
   class Bitstream : public TObject {
     friend class CDCTriggerUnpackerModule;
     friend class Merger;
+    friend class Tracker2D;
   public:
     /** default constructor */
     Bitstream() {};

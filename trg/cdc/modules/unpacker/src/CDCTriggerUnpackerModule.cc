@@ -102,6 +102,97 @@ namespace Belle2 {
       }
     }
   };
+
+  struct Tracker2D : SubTrigger {
+    Tracker2D(StoreArray<TSFOutputBitStream>* inArrayPtr,
+              StoreArray<T2DOutputBitStream>* outArrayPtr,
+              std::string inName, unsigned inEventWidth, unsigned inOffset,
+              unsigned inHeaderSize, std::pair<int, int> inNodeID,
+              unsigned inNumTS, int inDebugLevel) :
+      SubTrigger(inName, inEventWidth, inOffset / 32, inHeaderSize, inNodeID,
+                 inDebugLevel),
+      inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
+      iTracker(std::stoul(inName.substr(inName.length() - 1))),
+      numTS(inNumTS), offsetBitWidth(inOffset) {};
+
+    StoreArray<TSFOutputBitStream>* inputArrayPtr;
+    StoreArray<T2DOutputBitStream>* outputArrayPtr;
+    unsigned iTracker;
+    unsigned numTS;
+    unsigned offsetBitWidth;
+    static constexpr unsigned TSWidth = 21;
+    /** reserve */
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
+    {
+      size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
+      size_t entries = inputArrayPtr->getEntries();
+      if (subDetectorId == iNode) {
+        if (entries == 0) {
+          for (unsigned i = 0; i < nClocks; ++i) {
+            inputArrayPtr->appendNew();
+            outputArrayPtr->appendNew();
+          }
+          B2DEBUG(20, name << ": " << nClocks << " clocks");
+        } else if (entries != nClocks) {
+          B2ERROR("Number of clocks in " << name << "conflicts with others!");
+        }
+      }
+    };
+
+    void unpack(int subDetectorId,
+                std::array<int*, 4> data32tab,
+                std::array<int, 4> nWords)
+    {
+      if (subDetectorId != iNode) {
+        return;
+      }
+      // get header information
+      std::string firmwareType = rawIntToAscii(data32tab.at(iFinesse)[0]);
+      std::string firmwareVersion = rawIntToString(data32tab.at(iFinesse)[1]);
+      B2DEBUG(90, name << ", " << firmwareType << ", version " << firmwareVersion
+              << ", node " << std::hex << iNode << ", finesse " << iFinesse);
+
+      // make bitstream
+      // loop over all clocks
+      for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
+        int iclock = (i - headerSize) / eventWidth;
+        auto inputClock = (*inputArrayPtr)[iclock];
+        auto outputClock = (*outputArrayPtr)[iclock];
+        // clear output bitstream
+        outputClock->m_signal[iTracker].fill(zero_val);
+        B2DEBUG(20, "clock " << iclock);
+        if (debugLevel >= 100) {
+          printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
+                      eventWidth);
+        }
+        // fill input
+        for (unsigned iTSF = 0; iTSF < nAxialTSF; ++iTSF) {
+          // clear input bitstream
+          inputClock->m_signal[iTSF][iTracker].fill(zero_val);
+          for (unsigned pos = 0; pos < numTS * TSWidth; ++pos) {
+            const int j = (offsetBitWidth + pos + iTSF * numTS * TSWidth) / 32;
+            const int k = (offsetBitWidth + pos + iTSF * numTS * TSWidth) % 32;
+            std::bitset<32> word(data32tab[iFinesse][i + j]);
+            inputClock->m_signal[iTSF][iTracker][9 + pos] = word[31 - k] + 2;
+          }
+          if (debugLevel >= 100) {
+            display_hex(inputClock->m_signal[iTSF][iTracker]);
+          }
+        }
+        // fill output
+        const int outputOffset = nAxialTSF * numTS * TSWidth;
+        for (unsigned pos = 0; pos < 732; ++pos) {
+          const int j = (offsetBitWidth + pos + outputOffset) / 32;
+          const int k = (offsetBitWidth + pos + outputOffset) % 32;
+          std::bitset<32> word(data32tab[iFinesse][i + j]);
+          outputClock->m_signal[iTracker][9 + pos] = word[31 - k] + 2;
+        }
+        if (debugLevel >= 100) {
+          display_hex(outputClock->m_signal[iTracker]);
+        }
+      }
+    }
+  };
 };
 
 CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("RawTRGs")
@@ -111,8 +202,11 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 
   // Parameter definitions
   addParam("unpackMerger", m_unpackMerger,
-           "flag to unpack merger data (recorded by Merger Reader / TSF)", false);
-  NodeList defaultMergerNodeID = {{0x11000001, 0},
+           "whether to unpack merger data (recorded by Merger Reader / TSF)", false);
+  addParam("unpackTracker2D", m_unpackTracker2D,
+           "whether to unpack 2D tracker data", false);
+  NodeList defaultMergerNodeID = {
+    {0x11000001, 0},
     {0x11000003, 0},
     {0x11000001, 1},
     {0x11000002, 0},
@@ -120,6 +214,14 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   };
   addParam("MergerNodeId", m_mergerNodeID,
            "list of FTSW ID of Merger reader (TSF)", defaultMergerNodeID);
+  NodeList defaultTracker2DNodeID = {
+    {0x11000001, 0},
+    {0x11000001, 1},
+    {0x11000002, 0},
+    {0x11000002, 1}
+  };
+  addParam("2DNodeId", m_tracker2DNodeID,
+           "list of FTSW ID of 2D tracker", defaultTracker2DNodeID);
   addParam("headerSize", m_headerSize,
            "number of words (number of bits / 32) of the B2L header", 3);
 
@@ -133,19 +235,34 @@ void CDCTriggerUnpackerModule::initialize()
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
   }
-  for (int iSL = 0; iSL < 9; iSL += 2) {
-    const int nInnerMergers = std::accumulate(nMergers.begin(),
-                                              nMergers.begin() + iSL, 0);
-    B2DEBUG(20, "in: " << nInnerMergers);
-    Merger* m_merger =
-      new Merger(&m_mergerBits,
-                 "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / 32,
-                 mergerWidth * (nMergers[8] - nMergers[iSL]) / 32, 3,
-                 m_mergerNodeID[iSL / 2],
-                 nInnerMergers);
-    m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_merger));
+  if (m_unpackTracker2D) {
+    m_bitsTo2D.registerInDataStore("CDCTriggerTSFTo2DBits");
+    m_bits2DToTracker.registerInDataStore("CDCTrigger2DToTrackerBits");
   }
-
+  for (int iSL = 0; iSL < 9; iSL += 2) {
+    if (m_unpackMerger) {
+      const int nInnerMergers = std::accumulate(nMergers.begin(),
+                                                nMergers.begin() + iSL, 0);
+      B2DEBUG(20, "in: " << nInnerMergers);
+      Merger* m_merger =
+        new Merger(&m_mergerBits,
+                   "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / 32,
+                   mergerWidth * (nMergers[8] - nMergers[iSL]) / 32, m_headerSize,
+                   m_mergerNodeID[iSL / 2], nInnerMergers,
+                   m_debugLevel);
+      m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_merger));
+    }
+  }
+  for (int iTracker = 0; iTracker < 4; ++iTracker) {
+    if (m_unpackTracker2D) {
+      Tracker2D* m_tracker2d =
+        new Tracker2D(&m_bitsTo2D, &m_bits2DToTracker,
+                      "Tracker2D" + std::to_string(iTracker), 64, 82, m_headerSize,
+                      m_tracker2DNodeID[iTracker], 10,
+                      m_debugLevel);
+      m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_tracker2d));
+    }
+  }
 }
 
 void CDCTriggerUnpackerModule::terminate()

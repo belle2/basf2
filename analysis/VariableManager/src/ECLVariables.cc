@@ -452,6 +452,16 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterTrigger(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->isTriggerCluster();
+      }
+      return result;
+    }
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
@@ -534,5 +544,7 @@ namespace Belle2 {
                       "Returns the hypothesis ID of this ECL cluster.");
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
+    REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
+                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)).");
   }
 }

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Automated trigger efficiency calculation using gridcontrol for the KEKCC setup.
 

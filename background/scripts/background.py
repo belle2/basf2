@@ -2,6 +2,50 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import create_path, B2ERROR
+import os
+import glob
+
+
+def get_background_files(folder=None):
+    """ Loads the location of the background files from the environmant variable
+     BELLE2_BACKGROUND_DIR which is set on the validation server and ensures that background
+     files exist and returns the list of background files which
+     can be directly used with add_simulation() :
+
+     add_simulation(main, bkgfiles=background.get_background_files())
+
+     Will fail with an assert if no background folder set or if no background file was
+     found in the set folder.
+
+     @param A specific folder to search for background files can be given as an optional parameter
+    """
+
+    env_name = 'BELLE2_BACKGROUND_DIR'
+    bg = None
+
+    if folder is None:
+        if env_name not in os.environ:
+            print("Environment variable {} for backgound files not set. Terminanting this script.".format(env_name))
+            assert False
+        folder = os.environ[env_name]
+
+    bg = glob.glob(folder + '/*.root')
+
+    if len(bg) == 0:
+        print("No background files found in folder {} . Terminating this script.".format(folder))
+        assert False
+
+    print("Background files loaded from folder {}".format(folder))
+
+    # sort for easier comparison
+    bg = sorted(bg)
+
+    print("{: >65} {: >65} ".format("- Background file name -", "- file size -"))
+    for f in bg:
+        fsize = os.path.getsize(f)
+        print("{: >65} {: >65} ".format(f, fsize))
+
+    return bg
 
 
 def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.root'):

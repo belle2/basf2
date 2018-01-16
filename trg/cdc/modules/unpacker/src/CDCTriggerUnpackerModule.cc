@@ -81,14 +81,14 @@ namespace Belle2 {
       for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
         int iclock = (i - headerSize) / eventWidth;
         auto mergerClock = (*arrayPtr)[iclock];
-        B2DEBUG(20, "clock " << iclock);
+        B2DEBUG(100, "clock " << iclock);
         // loop over all mergers
         for (unsigned j = offset; j < eventWidth; ++j) {
           int iMerger = (eventWidth - j - 1) / 8 + nInnerMergers;
           int pos = (eventWidth - j - 1) % 8;
-          std::bitset<32> evt(data32tab[iFinesse][i + j]);
+          std::bitset<32> word(data32tab[iFinesse][i + j]);
           for (int k = 0; k < 32; ++k) {
-            mergerClock->m_signal[iMerger].set(pos * 32 + k, evt[k]);
+            mergerClock->m_signal[iMerger].set(pos * 32 + k, word[k]);
           }
         }
       }

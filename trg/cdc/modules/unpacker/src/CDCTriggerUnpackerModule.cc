@@ -38,8 +38,9 @@ namespace Belle2 {
     Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
            unsigned inEventWidth, unsigned inOffset,
            unsigned inHeaderSize, std::pair<int, int> inNodeID,
-           unsigned inNInnerMergers) :
-      SubTrigger(inName, inEventWidth, inOffset, inHeaderSize, inNodeID),
+           unsigned inNInnerMergers, int inDebugLevel) :
+      SubTrigger(inName, inEventWidth, inOffset, inHeaderSize, inNodeID,
+                 inDebugLevel),
       arrayPtr(inArrayPtr),
       nInnerMergers(inNInnerMergers) {};
 
@@ -48,7 +49,7 @@ namespace Belle2 {
     /** reserve */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
     {
-      size_t nClocks = (nWords[iFinesse] - 3) * 32 / eventWidth;
+      size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = arrayPtr->getEntries();
       if (subDetectorId == iNode) {
         if (entries == 0) {
@@ -91,9 +92,11 @@ namespace Belle2 {
           }
         }
       }
-      printBuffer(data32tab[iFinesse] + 3, eventWidth);
-      B2DEBUG(20, "");
-      printBuffer(data32tab[iFinesse] + 3 + eventWidth, eventWidth);
+      if (debugLevel >= 100) {
+        printBuffer(data32tab[iFinesse] + headerSize, eventWidth);
+        B2DEBUG(20, "");
+        printBuffer(data32tab[iFinesse] + headerSize + eventWidth, eventWidth);
+      }
       for (int i = 0; i < std::accumulate(nMergers.begin(), nMergers.end(), 0); ++i) {
         B2DEBUG(99, (*arrayPtr)[0]->m_signal[i].to_string());
       }
@@ -117,14 +120,19 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   };
   addParam("MergerNodeId", m_mergerNodeID,
            "list of FTSW ID of Merger reader (TSF)", defaultMergerNodeID);
+  addParam("headerSize", m_headerSize,
+           "number of words (number of bits / 32) of the B2L header", 3);
 
 }
 
 
 void CDCTriggerUnpackerModule::initialize()
 {
+  m_debugLevel = getLogConfig().getDebugLevel();
   m_rawTriggers.isRequired();
-  m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
+  if (m_unpackMerger) {
+    m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
+  }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     const int nInnerMergers = std::accumulate(nMergers.begin(),
                                               nMergers.begin() + iSL, 0);

@@ -42,9 +42,11 @@ namespace Belle2 {
   struct SubTrigger {
     SubTrigger(std::string inName,
                unsigned inEventWidth, unsigned inOffset,
-               unsigned inHeaderSize, std::pair<int, int> inNodeID) :
+               unsigned inHeaderSize, std::pair<int, int> inNodeID,
+               int inDebugLevel = 0) :
       name(inName), eventWidth(inEventWidth), offset(inOffset),
-      headerSize(inHeaderSize), iNode(inNodeID.first), iFinesse(inNodeID.second) {};
+      headerSize(inHeaderSize), iNode(inNodeID.first), iFinesse(inNodeID.second),
+      debugLevel(inDebugLevel) {};
 
     std::string name;
     unsigned eventWidth;
@@ -52,6 +54,7 @@ namespace Belle2 {
     unsigned headerSize;
     int iNode;
     int iFinesse;
+    int debugLevel;
     virtual void reserve(int, std::array<int, nFinesse>) {};
     virtual void unpack(int, std::array<int*, nFinesse>, std::array<int, nFinesse>) {};
     virtual ~SubTrigger() {};
@@ -88,6 +91,8 @@ namespace Belle2 {
     static constexpr std::array<int, 9> nMergers = {10, 10, 12, 14, 16, 18, 20, 22, 24};
 
   private:
+    /** number of words (number of bits / 32) of the B2L header */
+    int m_headerSize;
 
     StoreArray<RawTRG> m_rawTriggers; /**< array containing the raw trigger data object */
 
@@ -95,6 +100,19 @@ namespace Belle2 {
     bool m_unpackMerger;  /**< flag to unpack merger data (recorded by Merger Reader / TSF) */
     MergerBits m_mergerBitsPerClock;
     StoreArray<MergerBits> m_mergerBits; /**< merger output bitstream */
+
+    NodeList m_tracker2DNodeID; /**< list of (COPPER ID, FTSW ID) of 2D tracker */
+    bool m_unpackTracker2D;  /**< flag to unpack 2D tracker data */
+
+    /** bitstream of TSF output to 2D tracker */
+    StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
+
+    /** bitstream of 2D output to 3D/Neuro */
+    StoreArray<CDCTriggerUnpacker::T2DOutputBitStream> m_bits2DToTracker;
+
+    /** debug level specified in the steering file */
+    int m_debugLevel;
+
     std::vector<SubTrigger*> m_subTrigger;
 
     void unpack(SubTrigger& subTrigger, int subDetectorId,

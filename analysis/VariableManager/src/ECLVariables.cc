@@ -458,7 +458,13 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->isTriggerCluster();
+        const bool matcher = shower->hasTriggerClusterMatching();
+
+        if (matcher) {
+          result = shower->isTriggerCluster();
+        } else {
+          B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
+        }
       }
       return result;
     }
@@ -545,6 +551,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
     REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
-                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)).");
+                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run.");
   }
 }

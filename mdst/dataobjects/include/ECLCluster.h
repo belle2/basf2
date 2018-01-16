@@ -32,6 +32,7 @@ namespace Belle2 {
     enum StatusBit {
       /** bit 0: ECLCluster is matched to a ECL trigger cluster */
       c_TriggerCluster   = 1 << 0,
+      c_TriggerClusterMatching = 1 << 1,
     };
 
     /**
@@ -282,6 +283,9 @@ namespace Belle2 {
     /** Check is cluster is matched to a trigger cluster */
     bool isTriggerCluster() const;
 
+    /** Check is cluster if trigger to cluster matcher has run */
+    bool hasTriggerClusterMatching() const;
+
   private:
 
     /** Is related to track (true) or not (false). */
@@ -392,6 +396,12 @@ namespace Belle2 {
   {
     return hasStatus(c_TriggerCluster);
   }
+
+  inline bool ECLCluster::hasTriggerClusterMatching() const
+  {
+    return hasStatus(c_TriggerClusterMatching);
+  }
+
 
 }// end namespace Belle2
 

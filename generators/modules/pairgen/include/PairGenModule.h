@@ -39,11 +39,15 @@ namespace Belle2 {
     void event();
 
   protected:
-    int m_PDG; /** Particles PDG code */
-    bool m_saveBoth; /** Store both particles if true, one if false */
+    int m_PDG; /**< Particles PDG code */
+    /** Store both particles.
+     * If set to false, only one of the two generated particles will be
+     * used later by the simulation.
+     */
+    bool m_saveBoth;
     //TODO other parameters to make the module more useful
 
-    MCParticleGraph m_particleGraph;
+    MCParticleGraph m_particleGraph; /**< Particle graph to generate MCParticle list */
   };
 
 } // end namespace Belle2

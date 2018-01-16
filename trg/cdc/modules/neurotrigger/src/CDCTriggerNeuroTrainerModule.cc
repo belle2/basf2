@@ -12,6 +12,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>

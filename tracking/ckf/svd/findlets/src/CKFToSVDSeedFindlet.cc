@@ -25,7 +25,7 @@
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 

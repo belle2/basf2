@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMEFFICIENCYMODULE_H
-#define PXDDQMEFFICIENCYMODULE_H
+
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
@@ -113,4 +113,3 @@ namespace Belle2 {
     std::map<VxdID, TH2D*> m_h_matched_cluster;
   };
 }
-#endif /* PXDDQMEFFICIENCYMODULE_H */

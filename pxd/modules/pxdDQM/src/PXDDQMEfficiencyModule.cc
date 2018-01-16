@@ -216,8 +216,8 @@ void PXDDQMEfficiencyModule::defineHisto()
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {
-    auto dir = oldDir->mkdir(m_histogramDirectoryName.c_str());
-    if (dir) dir->cd();
+    oldDir->mkdir(m_histogramDirectoryName.c_str());
+    oldDir->cd(m_histogramDirectoryName.c_str());
   }
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import create_path, B2ERROR
+from basf2 import create_path, pretty_print_table, B2ERROR, B2INFO
 import os
 import glob
 
 
-def get_background_files(folder=None):
+def get_background_files(folder=None, output_file_info=True):
     """ Loads the location of the background files from the environmant variable
      BELLE2_BACKGROUND_DIR which is set on the validation server and ensures that background
      files exist and returns the list of background files which
@@ -25,25 +25,26 @@ def get_background_files(folder=None):
 
     if folder is None:
         if env_name not in os.environ:
-            print("Environment variable {} for backgound files not set. Terminanting this script.".format(env_name))
-            assert False
+            raise RuntimeError("Environment variable {} for backgound files not set. Terminanting this script.".format(env_name))
         folder = os.environ[env_name]
 
     bg = glob.glob(folder + '/*.root')
 
     if len(bg) == 0:
-        print("No background files found in folder {} . Terminating this script.".format(folder))
-        assert False
+        raise RuntimeError("No background files found in folder {} . Terminating this script.".format(folder))
 
-    print("Background files loaded from folder {}".format(folder))
+    B2INFO("Background files loaded from folder {}".format(folder))
 
     # sort for easier comparison
     bg = sorted(bg)
 
-    print("{: >65} {: >65} ".format("- Background file name -", "- file size -"))
-    for f in bg:
-        fsize = os.path.getsize(f)
-        print("{: >65} {: >65} ".format(f, fsize))
+    if output_file_info:
+        bg_sizes = [os.path.getsize(f) for f in bg]
+        # reformat to work with pretty_print_table
+        table_rows = [list(entry) for entry in zip(bg, bg_sizes)]
+        table_rows.insert(0, ["- Background file name -", "- file size -"])
+
+        pretty_print_table(table_rows, [0, 0])
 
     return bg
 

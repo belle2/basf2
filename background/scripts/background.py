@@ -8,16 +8,19 @@ import glob
 
 def get_background_files(folder=None, output_file_info=True):
     """ Loads the location of the background files from the environmant variable
-     BELLE2_BACKGROUND_DIR which is set on the validation server and ensures that background
-     files exist and returns the list of background files which
-     can be directly used with add_simulation() :
+    BELLE2_BACKGROUND_DIR which is set on the validation server and ensures that background
+    files exist and returns the list of background files which
+    can be directly used with add_simulation() :
 
-     add_simulation(main, bkgfiles=background.get_background_files())
+    >>> add_simulation(main, bkgfiles=background.get_background_files())
 
-     Will fail with an assert if no background folder set or if no background file was
-     found in the set folder.
+    Will fail with an assert if no background folder set or if no background file was
+    found in the set folder.
 
-     @param A specific folder to search for background files can be given as an optional parameter
+    @param folder A specific folder to search for background files can be given as an optional parameter
+    @param output_file_info If true, a list of the found background files and there size will be printed
+                            This is useful to understand later which background campaign has been used
+                            to simulate events.
     """
 
     env_name = 'BELLE2_BACKGROUND_DIR'

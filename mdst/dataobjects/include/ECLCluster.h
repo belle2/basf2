@@ -32,6 +32,7 @@ namespace Belle2 {
     enum StatusBit {
       /** bit 0: ECLCluster is matched to a ECL trigger cluster */
       c_TriggerCluster   = 1 << 0,
+      /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
       c_TriggerClusterMatching = 1 << 1,
     };
 
@@ -280,11 +281,11 @@ namespace Belle2 {
      */
     bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
 
-    /** Check is cluster is matched to a trigger cluster */
-    bool isTriggerCluster() const;
+    /** Check if ECLCluster is matched to an ECLTRGCluster */
+    bool isTriggerCluster() const {return hasStatus(c_TriggerCluster);}
 
-    /** Check is cluster if trigger to cluster matcher has run */
-    bool hasTriggerClusterMatching() const;
+    /** Check if ECLTRGCluster to ECLCluster matcher has run */
+    bool hasTriggerClusterMatching() const {return hasStatus(c_TriggerClusterMatching);}
 
   private:
 
@@ -391,17 +392,6 @@ namespace Belle2 {
     // 4: Complete revision and new variables. Introduction of Double32_t. Some new setters and getters.
 
   };
-
-  inline bool ECLCluster::isTriggerCluster() const
-  {
-    return hasStatus(c_TriggerCluster);
-  }
-
-  inline bool ECLCluster::hasTriggerClusterMatching() const
-  {
-    return hasStatus(c_TriggerClusterMatching);
-  }
-
 
 }// end namespace Belle2
 

@@ -27,7 +27,7 @@ from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficie
 from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
 
 
-def generate_events(channels, n_events, n_jobs, storage_location):
+def generate_events(channels, n_events, n_jobs, storage_location, local_execution):
     """
     Helper function to call gridcontrol on the generate.py steering file with
     the correct arguments. Will run N jobs per channel to generate.
@@ -51,11 +51,11 @@ def generate_events(channels, n_events, n_jobs, storage_location):
 
             parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(steering_file="generate.py", parameters=parameters)
+    gridcontrol_file = write_gridcontrol_file(steering_file="generate.py", parameters=parameters, local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
 
-def run_reconstruction(channels, storage_location):
+def run_reconstruction(channels, storage_location, local_execution):
     """
     Helper function to call gridcontrol on the reconstruct.py steering file with
     the correct arguments. Will run one job per generated file.
@@ -77,11 +77,14 @@ def run_reconstruction(channels, storage_location):
 
             parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(steering_file="reconstruct.py", parameters=parameters)
+    gridcontrol_file = write_gridcontrol_file(
+        steering_file="reconstruct.py",
+        parameters=parameters,
+        local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
 
-def calculate_efficiencies(channels, storage_location):
+def calculate_efficiencies(channels, storage_location, local_execution):
     """
     Helper function to call gridcontrol on the analyse.py steering file with
     the correct arguments. Will run one job per reconstructed file.
@@ -106,7 +109,7 @@ def calculate_efficiencies(channels, storage_location):
 
             parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(steering_file="analyse.py", parameters=parameters)
+    gridcontrol_file = write_gridcontrol_file(steering_file="analyse.py", parameters=parameters, local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
     extract_efficiencies(channels=channels, storage_location=storage_location)
@@ -147,15 +150,20 @@ if __name__ == "__main__":
                         type=int, default=1000)
     parser.add_argument("--jobs", help="Number of jobs per channel",
                         type=int, default=5)
+    parser.add_argument("--local_execution", help="Execute on the local system and not via batch processing",
+                        action="store_true", default=False)
 
     args = parser.parse_args()
 
     # Produce 5*1000 events in each channel
     generate_events(channels=channels_to_study, n_events=args.events_per_job,
-                    n_jobs=args.jobs, storage_location=args.storage_location)
+                    n_jobs=args.jobs, storage_location=args.storage_location,
+                    local_execution=args.local_execution)
 
     # Reconstruct each channel
-    run_reconstruction(channels=channels_to_study, storage_location=args.storage_location)
+    run_reconstruction(channels=channels_to_study, storage_location=args.storage_location,
+                       local_execution=args.local_execution)
 
     # Calculate file size and efficiencies for each channel
-    calculate_efficiencies(channels=channels_to_study, storage_location=args.storage_location)
+    calculate_efficiencies(channels=channels_to_study, storage_location=args.storage_location,
+                           local_execution=args.local_execution)

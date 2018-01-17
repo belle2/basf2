@@ -1,6 +1,7 @@
 import subprocess
 import csv
 import os
+import multiprocessing
 from shutil import copyfile, rmtree
 
 
@@ -9,9 +10,10 @@ DEFAULT_GRIDCONTROL_CONTENT = """
 task = UserTask
 workdir create = True
 workdir space = 0
-backend = lsf
+backend = {backend}
 [jobs]
 wall time = 1:00
+in flight = {jobs_in_flight}
 [constants]
 BASF2_COMPILE_OPTION = {compile_option}
 BASF2_TOOLS_LOCATION = {tools_location}
@@ -31,7 +33,7 @@ queue = s
 """
 
 
-def write_gridcontrol_file(steering_file, parameters):
+def write_gridcontrol_file(steering_file, parameters, local_execution):
     release_location = os.getenv("BELLE2_LOCAL_DIR")
     tools_location = os.getenv("BELLE2_TOOLS")
     compile_option = os.getenv("BELLE2_OPTION")
@@ -67,6 +69,14 @@ def write_gridcontrol_file(steering_file, parameters):
 
     steering_file_abs_path = os.path.abspath(steering_file)
 
+    if local_execution:
+        # only run as much jobs as physical CPU (account for hyperthreading multiplier here)
+        jobs_in_flight = int(multiprocessing.cpu_count() / 2)
+        backend = "host"
+    else:
+        jobs_in_flight = 50000
+        backend = "lsf"
+
     with open(gridcontrol_file, "w") as f:
         f.write(DEFAULT_GRIDCONTROL_CONTENT.format(
             compile_option=compile_option,
@@ -74,7 +84,9 @@ def write_gridcontrol_file(steering_file, parameters):
             release_location=release_location,
             steering_file=steering_file,
             parameter_file=parameter_file,
-            steering_file_abs_path=steering_file_abs_path
+            steering_file_abs_path=steering_file_abs_path,
+            jobs_in_flight=jobs_in_flight,
+            backend=backend
         ))
 
     return gridcontrol_file

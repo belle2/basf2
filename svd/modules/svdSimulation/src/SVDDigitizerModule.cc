@@ -70,12 +70,12 @@ SVDDigitizerModule::SVDDigitizerModule() :
   // 1. Collections
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticle collection name", string(""));
-  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name",
            string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("GenerateDigits", m_generateDigits, "Generate SVDDigits", bool(false));
+  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
 
   // 2. Physics
@@ -86,11 +86,14 @@ SVDDigitizerModule::SVDDigitizerModule() :
 
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
-           "Apply Poisson smearing on chargelets", true);
-  addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
-           true);
+           "Apply Poisson smearing on chargelets", bool(true));
+  addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
+           bool(false));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(2.5));
+           "Zero suppression cut in sigmas of strip noise", double(5.0));
+  addParam("Use3SampleFilter", m_3sampleFilter,
+           "A digit must have at least 3 consecutive samples over threshold",
+           bool(false));
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
@@ -167,9 +170,7 @@ void SVDDigitizerModule::initialize()
                               DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   }
 
-
-
-  //Convert parameters to correct units
+  // Convert parameters to correct units
   m_segmentLength *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
   m_samplingTime *= Unit::ns;
@@ -199,6 +200,7 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
   B2INFO(" -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
   B2INFO(" -->  Zero suppression cut" << m_SNAdjacent);
+  B2INFO(" -->  3-sample filter:    " << (m_3sampleFilter ? "on" : "off"));
   B2INFO(" -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
   B2INFO(" TIMING: ");
   B2INFO(" -->  APV25 shaping time: " << m_shapingTime);
@@ -300,6 +302,7 @@ void SVDDigitizerModule::event()
   if (m_randomizeEventTimes) {
     StoreObjPtr<EventMetaData> storeEvent;
     m_currentEventTime = gRandom->Uniform(m_minTimeFrame, m_maxTimeFrame);
+    // We have negative event times, so we have to encode!
     storeEvent->setTime(static_cast<unsigned long>(1000 + m_currentEventTime));
   } else
     m_currentEventTime = 0.0;
@@ -659,9 +662,7 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
     double p = gRandom->Uniform(m_noiseFraction, 1.0);
     charge = TMath::NormQuantile(p) * noise;
   } else {
-    if (m_applyNoise) {
-      charge += gRandom->Gaus(0., noise);
-    }
+    charge += gRandom->Gaus(0., noise);
   }
   return charge;
 }
@@ -750,11 +751,13 @@ void SVDDigitizerModule::saveDigits()
         }
       }
       // Check that at least three consecutive samples are over threshold
-      auto it = search_n(
-                  samples.begin(), samples.end(), 3, charge_thresholdU,
-      [](double x, double y) { return x > y; }
-                );
-      if (it == samples.end()) continue;
+      if (m_3sampleFilter) {
+        auto it = search_n(
+                    samples.begin(), samples.end(), 3, charge_thresholdU,
+        [](double x, double y) { return x > y; }
+                  );
+        if (it == samples.end()) continue;
+      }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -855,11 +858,13 @@ void SVDDigitizerModule::saveDigits()
         }
       }
       // Check that at least three samples are over threshold
-      auto it = search_n(
-                  samples.begin(), samples.end(), 3, charge_thresholdV,
-      [](double x, double y) { return x > y; }
-                );
-      if (it == samples.end()) continue;
+      if (m_3sampleFilter) {
+        auto it = search_n(
+                    samples.begin(), samples.end(), 3, charge_thresholdV,
+        [](double x, double y) { return x > y; }
+                  );
+        if (it == samples.end()) continue;
+      }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();

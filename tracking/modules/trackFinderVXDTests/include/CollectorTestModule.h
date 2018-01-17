@@ -15,11 +15,11 @@ namespace Belle2 {
     CollectorTestModule();
 
     /** Init the module */
-    virtual void initialize();
+    void initialize() override;
     /** Show progress */
-    virtual void event();
+    void event() override;
     /** Don't break the terminal */
-    virtual void terminate();
+    void terminate() override;
 
   protected:
 

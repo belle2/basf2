@@ -71,6 +71,26 @@ namespace Belle2 {
     /** Accessor to the sup of the set */
     SupType getSup(void) const { return m_sup; } ;
 
+
+    /** generates a "name" and fills the vector with the variable references
+    @param filtername: optional name of the filter this range is attached to make the output look nicer
+    @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
+      and the actual pointers to the bounds, if equal to nullptr it will not be filled
+    **/
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "X")
+    {
+      std::string maxVal = std::to_string(m_sup);
+      // if pointer to vector is provided fill it
+      if (pointers != nullptr) {
+        // use the position in the vector as unique identifier
+        maxVal = "#" + std::to_string(pointers->size());
+        (*pointers).push_back({TBranchLeafType(m_sup), &m_sup});
+      }
+      return ("(" + varname + " < " + maxVal + ")");
+    }
+
+
+
   };
 
 }

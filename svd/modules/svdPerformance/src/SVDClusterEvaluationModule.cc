@@ -319,12 +319,9 @@ void SVDClusterEvaluationModule::event()
         m_histo_ClusterTimeResolution_bin3[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
       else if (triggerBin == 3)
         m_histo_ClusterTimeResolution_bin4[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-      else
 
-
-
-        m_histo_ClusterTimePull[indexForHistosAndGraphs]->Fill((clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()) /
-                                                               (clus.getClsTimeSigma()));
+      m_histo_ClusterTimePull[indexForHistosAndGraphs]->Fill((clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()) /
+                                                             (clus.getClsTimeSigma()));
 
       //cluster position resolution and pull, also correlation between time res and position res
       if (clus.isUCluster()) {

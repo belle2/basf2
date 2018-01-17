@@ -11,6 +11,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 //tracking:
 #include <tracking/modules/VXDTFHelperTools/TrackFinderVXDAnalizerModule.h>

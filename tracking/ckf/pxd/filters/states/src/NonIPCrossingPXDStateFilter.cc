@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/ckf/pxd/filters/states/NonIPCrossingPXDStateFilter.h>
 #include <tracking/ckf/general/filters/NonIPCrossingStateFilter.icc.h>
 

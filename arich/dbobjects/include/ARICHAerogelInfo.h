@@ -60,12 +60,12 @@ namespace Belle2 {
     /** Return Aerogel Serial number
      * @return Aerogel Serial number
      */
-    std::string getAerogelSerial() const {return m_serial; };
+    std::string getAerogelSN() const {return m_serial; };
 
     /** Set Aerogel Serial number
      * @param Aerogel Serial number
      */
-    void setAerogelSerial(const std::string& serial) {m_serial = serial; }
+    void setAerogelSN(const std::string& serial) {m_serial = serial; }
 
     /** Return Aerogel Identifier
      * @return Aerogel Identifier
@@ -124,7 +124,7 @@ namespace Belle2 {
      * Return Aerogel Transmittance
      * @return Aerogel transmittance
      */
-    int getAerogelTransmittance(unsigned int i) const { if (i < m_transmittance.size()) return m_transmittance[i]; else return -1;}
+    float getAerogelTransmittance(unsigned int i) const { if (i < m_transmittance.size()) return m_transmittance[i]; else return -1;}
 
     /**
      * Set Aerogel Transmittance
@@ -170,6 +170,6 @@ namespace Belle2 {
     std::string m_comment;                /**< optional comment */
 
 
-    ClassDef(ARICHAerogelInfo, 3);  /**< ClassDef */
+    ClassDef(ARICHAerogelInfo, 4);  /**< ClassDef */
   };
 } // end namespace Belle2

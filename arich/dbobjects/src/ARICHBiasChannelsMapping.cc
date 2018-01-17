@@ -52,22 +52,22 @@ std::tuple<int, int, std::string> ARICHBiasChannelsMapping::getInnerConnection(s
   return std::make_tuple(std::get<1>(pinProp), std::get<2>(pinProp), std::get<3>(pinProp));
 }
 
-int ARICHBiasChannelsMapping::getChannelID(int crate, int slot, int connectionID, int innerID, std::string type) const
+int ARICHBiasChannelsMapping::getChannelID(int crate, int slot, int connectionID, int innerID, const std::string& type) const
 {
   if (innerID > 9 || innerID < -2 || innerID == 0) { B2WARNING("ARICHBiasChannelsMapping::getChannelID: Inner ID " << innerID << " not valid!"); }
 
-  vector<int> channel{99, 99, 99};
+  vector<int> channel{ -2, -2, -2};
   for (auto& i : m_channel2type) {
     if ((std::get<1>(i.second) == connectionID) && (std::get<2>(i.second) == innerID) && (std::get<3>(i.second) == type)
         && ((i.first)[0] == crate) && ((i.first)[1] == slot)) channel = i.first;
   }
   return channel[2];
 }
-std::vector<int> ARICHBiasChannelsMapping::getChannelValues(int connectionID, int innerID, std::string type) const
+std::vector<int> ARICHBiasChannelsMapping::getChannelValues(int connectionID, int innerID, const std::string& type) const
 {
   if (innerID > 9 || innerID < -2 || innerID == 0) { B2WARNING("ARICHBiasChannelsMapping::getChannelID: Inner ID " << innerID << " not valid!"); }
 
-  vector<int> channel{99, 99, 99};
+  vector<int> channel{ -2, -2, -2};
   for (auto& i : m_channel2type) {
     if ((std::get<1>(i.second) == connectionID) && (std::get<2>(i.second) == innerID)
         && (std::get<3>(i.second) == type)) channel = i.first;
@@ -93,8 +93,8 @@ void ARICHBiasChannelsMapping::addMapping(int crate, int slot, int channelID, in
 void ARICHBiasChannelsMapping::print()
 {
 
-  for (int crate = 0; crate < 1 ; crate++) {
-    for (int slot = 0; slot < 8 ; slot++) {
+  for (int crate = 0; crate < 3 ; crate++) {
+    for (int slot = 0; slot < 15 ; slot++) {
       for (int channelID = 0; channelID < N_BIASCHANNELS; channelID++) {
         std::vector<int> channel{crate, slot, channelID};
         cout << " Channel " << channelID << " (crate " << crate << ", slot " << slot << "): pinID " << getPinID(

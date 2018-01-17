@@ -16,8 +16,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <tracking/dataobjects/hitXP.h>
-#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
-#include <tracking/modules/vxdtfRedesign/NoKickCutsEvalModule.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <TFile.h>
@@ -49,20 +47,20 @@ namespace Belle2 {
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.   */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** Called when entering a new run. */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.   */
-    virtual void event() override;
+    void event() override;
 
     /** This method is called if the current run ends. */
-    virtual void endRun() override;
+    void endRun() override;
 
     /** This method is called at the end of the event processing. */
-    virtual void terminate() override;
+    void terminate() override;
 
     /** enum for the track-parameters */
     // enum EParameters {
@@ -101,18 +99,18 @@ namespace Belle2 {
   private:
 
     const double c_pmin = 0.025; /**< minimum momentum evaluated */
-    const double c_pmax = 2.; /**< maximum momentum evaluated */
+    const double c_pmax = 10.; /**< maximum momentum evaluated */
     const double c_tmin = 17.*M_PI / 180.; /**< 17 degrees. minimum theta evaluated */
     const double c_tmax = 5. / 6.*M_PI; /**< 150 degrees. maximum theta evaluated */
     const int c_nbin = 5000; /**< number of bins of histogram of DeltaX */
-    const int c_nbinp = 40; /**< number of momentum bins */
+    const int c_nbinp = 200; /**< number of momentum bins */
     const int c_nbinpar = 5; /**< number of track parameters */
     const int c_nbinlay = 7;/**< present IP too. number of layers */
     const int c_nbint = 3; /**< number of theta parameters */
     double c_pwidth = (c_pmax - c_pmin) / (double)c_nbinp; /**< width of momentum bin */
     double c_twidth = (c_tmax - c_tmin) / (double)c_nbint; /**< width of theta bin */
     const double c_multLimit = 1; /**< multiplier of the range limit of the histograms of DeltaX */
-    const int c_over = 9999999; /**< escape flag of some methods */
+    const double c_over = NAN; /**< escape flag of some methods */
     int m_pCounter = 0; /**< conter of hit out of range in momentum */
     int m_tCounter = 0; /**< counter of hit out of range in theta */
     int m_globCounter = 0; /**< counter of tracks cutted from global cuts */

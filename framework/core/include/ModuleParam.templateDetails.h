@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <framework/core/ModuleParam.dcl.h>
+#include <framework/core/ModuleParam.h>
 #include <framework/core/PyObjConvUtils.h>
 #include <boost/python/object.hpp>
 #include <string>

@@ -10,7 +10,7 @@
 
 #include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
 

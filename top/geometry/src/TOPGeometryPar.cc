@@ -515,6 +515,19 @@ namespace Belle2 {
         geo->setSignalShape(signalShape);
       }
 
+      // calibration pulse shape
+
+      GearDir calpulseParams(content, "CalPulseShape");
+      if (calpulseParams) {
+        GearDir noiseBandwidth(calpulseParams, "noiseBandwidth");
+        TOPSignalShape shape(calpulseParams.getArray("sampleValues"),
+                             geo->getNominalTDC().getSampleWidth(),
+                             calpulseParams.getTime("tailTimeConstant"),
+                             noiseBandwidth.getDouble("pole1") / 1000,
+                             noiseBandwidth.getDouble("pole2") / 1000);
+        geo->setCalPulseShape(shape);
+      }
+
       return geo;
     }
 

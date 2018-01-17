@@ -73,26 +73,33 @@ void GFTC2SPTCConverterModule::initialize()
   initializeCounters();
 
   // check if all required StoreArrays are here
-  StoreArray<PXDCluster>::required(m_PXDClusterName);
-  StoreArray<SVDCluster>::required(m_SVDClusterName);
-  if (m_PARAMuseSingleClusterSP) { StoreArray<SpacePoint>::required(m_SingleClusterSVDSPName); }
-  if (m_PARAMcheckNoSingleSVDSP) { StoreArray<SpacePoint>::required(m_NoSingleClusterSVDSPName); }
-  StoreArray<SpacePoint>::required(m_PXDClusterSPName);
+  StoreArray<PXDCluster> PXDClusters(m_PXDClusterName); PXDClusters.isRequired(m_PXDClusterName);
+  StoreArray<SVDCluster> SVDClusters(m_SVDClusterName); SVDClusters.isRequired(m_SVDClusterName);
+  if (m_PARAMuseSingleClusterSP) {
+    StoreArray<SpacePoint> SCSPs(m_SingleClusterSVDSPName);
+    SCSPs.isRequired(m_SingleClusterSVDSPName);
+  }
+  if (m_PARAMcheckNoSingleSVDSP) {
+    StoreArray<SpacePoint> nSCSPs(m_NoSingleClusterSVDSPName);
+    nSCSPs.isRequired(m_NoSingleClusterSVDSPName);
+  }
+  StoreArray<SpacePoint> pxdSPs(m_PXDClusterSPName);
+  pxdSPs.isRequired(m_PXDClusterSPName);
 
   StoreArray<genfit::TrackCand> gfTrackCand(m_genfitTCName);
-  gfTrackCand.required(m_genfitTCName);;
+  gfTrackCand.isRequired(m_genfitTCName);
 
   // registering StoreArray for SpacePointTrackCand
   StoreArray<SpacePointTrackCand> spTrackCand(m_SPTCName);
-  spTrackCand.registerPersistent(m_SPTCName);
+  spTrackCand.registerInDataStore(m_SPTCName, DataStore::c_ErrorIfAlreadyRegistered);
 
   // register Relation to genfit::TrackCand
   spTrackCand.registerRelationTo(gfTrackCand);
 
   // CAUTION: if the StoreArray of the TrueHits is named, this check fails!!!
   if (m_PARAMcheckTrueHits) {
-    StoreArray<PXDTrueHit>::required();
-    StoreArray<SVDTrueHit>::required();
+    StoreArray<PXDTrueHit> PXDTrueHits; PXDTrueHits.isRequired();
+    StoreArray<SVDTrueHit> SVDTrueHits; SVDTrueHits.isRequired();
   }
 
   if (m_PARAMminNDF < 0) {

@@ -258,6 +258,52 @@ SocketRecv::~SocketRecv()
   printf("SocketRecv:: connection socket %d closed\n", m_sock);
 }
 
+int SocketRecv::reconnect(int ntry)
+{
+  // Close existing socket once.
+  shutdown(m_sock, 2);
+  ::close(m_sock);
+
+  // Setup socket parameters again;
+  bzero(&m_sa, sizeof(m_sa));
+  bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
+  m_sa.sin_family = m_hp->h_addrtype;
+  m_sa.sin_port = htons((u_short)m_port);
+
+  // Reopen the socket
+  int s;
+  m_sock = -1;
+  if ((s = socket(m_hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
+    m_errno = errno;
+    perror("RSocketRecv:socket");
+    return -3;
+  }
+  int sizeval = D2_SOCKBUF_SIZE;
+  setsockopt(s, SOL_SOCKET, SO_SNDBUF, &sizeval, 4);
+  setsockopt(s, SOL_SOCKET, SO_RCVBUF, &sizeval, 4);
+  int yes = 1;
+  setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, 4);
+
+  m_sock = s;
+
+  // Connect again
+  int maxretry = ntry;
+  //  printf ("RSocketRecv: reconnecting socket %d, try %d times with 5sec. interval.\n", m_sock, ntry );
+
+  for (;;) {
+    printf("RSocketRecv: reconnecting (trial %d) \n", ntry - maxretry + 1);
+    int istat = connect(m_sock, (struct sockaddr*)&m_sa, sizeof(m_sa));
+    if (istat >= 0) {
+      printf("RSocketRecv: reconnected\n");
+      return 0;
+    }
+    maxretry--;
+    if (maxretry == 0) return -1;
+    sleep(5);
+  }
+  printf("RSocketRecv: m_sock = %d reconnected.\n", m_sock);
+}
+
 int SocketRecv::accept()
 {
   m_errno = 0;
@@ -444,6 +490,52 @@ SocketSend::~SocketSend()
   shutdown(m_sock, 2);
   ::close(m_sock);
   printf("SocketSend: destructed, m_sock = %d\n", m_sock);
+}
+
+int SocketSend::reconnect(int ntry)
+{
+  // Close existing socket once.
+  shutdown(m_sock, 2);
+  ::close(m_sock);
+
+  // Setup socket parameters again;
+  bzero(&m_sa, sizeof(m_sa));
+  bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
+  m_sa.sin_family = m_hp->h_addrtype;
+  m_sa.sin_port = htons((u_short)m_port);
+
+  // Reopen the socket
+  int s;
+  m_sock = -1;
+  if ((s = socket(m_hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
+    m_errno = errno;
+    perror("RSocketRecv:socket");
+    return -3;
+  }
+  int sizeval = D2_SOCKBUF_SIZE;
+  setsockopt(s, SOL_SOCKET, SO_SNDBUF, &sizeval, 4);
+  setsockopt(s, SOL_SOCKET, SO_RCVBUF, &sizeval, 4);
+  int yes = 1;
+  setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, 4);
+
+  m_sock = s;
+
+  // Connect again
+  int maxretry = ntry;
+  //  printf ("RSocketRecv: reconnecting socket %d, try %d times with 5sec. interval.\n", m_sock, ntry );
+
+  for (;;) {
+    printf("SocketSend: reconnecting (trial %d) \n", ntry - maxretry + 1);
+    int istat = connect(m_sock, (struct sockaddr*)&m_sa, sizeof(m_sa));
+    if (istat >= 0) {
+      printf("SocketSend: reconnected\n");
+      return 0;
+    }
+    maxretry--;
+    if (maxretry == 0) return -1;
+    sleep(5);
+  }
+  printf("SocketSend: m_sock = %d reconnected.\n", m_sock);
 }
 
 int SocketSend::get(char* data, int len)

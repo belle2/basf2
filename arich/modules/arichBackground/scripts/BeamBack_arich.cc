@@ -32,8 +32,9 @@
 
 using namespace std;
 
-// scalings for "RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER","2-photon"
-double scaling[7] = {50, 1, 10, 10, 10, 10, 10};
+// scalings for "RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER","2-photon", "BHWideLargeAngle"
+double scaling[8] = {100., 1, 10., 10., 10., 10., 10., 0.001};
+int sourceType[8] = {0, 1, 2, 3, 4, 5, 6, 1};
 
 // returns "ring number" of HAPD module with id modID
 int mod2row(int modID)
@@ -45,6 +46,7 @@ int mod2row(int modID)
   if (modID <= 270) return 4;
   if (modID <= 342) return 5;
   if (modID <= 420) return 6;
+  return -1; // -1 if invalid input
 }
 
 TCanvas* make_plot(double data[][7], TString title, int type)
@@ -108,12 +110,15 @@ TCanvas* make_plot(double data[][7], TString title, int type)
 }
 
 
-int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2/background_files/feb2017/15th_campaign/arich_")
+int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
 {
 
   gROOT->SetBatch(kTRUE);
   TGraph2D* dteb = new TGraph2D(420);
   TGraph2D* dtnb = new TGraph2D(420);
+  Belle2::ARICHChannelHist* chHits = new Belle2::ARICHChannelHist("neutronFlux", "1MeV eq. neutron flux /cm2 / year on HAPD board",
+      1);
+
   TGraph2D* dteh = new TGraph2D(420);
   TGraph2D* dtnh = new TGraph2D(420);
   TGraph2D* dtp = new TGraph2D(420);
@@ -162,14 +167,14 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
   /*  for (int j = 0; j < 7; j++) {
       for (int i = 0; i < 1; i++) {
       stringstream filename;
-      filename << path << "*" << tip[j] << "*" << ".root";
+      filename << path.c_str() << "*" << tip[j] << "*" << ".root";
       printf("%s\n", filename.str().c_str());
       tree->Add(filename.str().c_str());
       }
       }*/
 
   stringstream filename;
-  filename << path << "*.root";
+  filename << path.c_str() << "*.root";
   tree->Add(filename.str().c_str());
 
   // this is neutron energy spectrum
@@ -219,7 +224,7 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
 
     // this is for photon flux
     if (type == 2) {
-      flux_phot[modID - 1][source] += 1.;
+      flux_phot[modID - 1][sourceType[source]] += scaling[source];
     }
 
     if (type != 2) {
@@ -227,9 +232,9 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
       //  energy deposit from a hit (two volumes are sensitive el. board and hapd bottom, commonly I show results for board.
       //  Anyhow the rates are approximately equal.)
       if (pdg != 2112) {
-        edep *= scaling[source]; // ?? this is scaling of Coulomb LER ?? check this
-        if (type == 0) edep_board[modID - 1][source] += edep;
-        if (type == 1) edep_hapd[modID - 1][source]  += edep;
+        edep *= scaling[source];
+        if (type == 0) edep_board[modID - 1][sourceType[source]] += edep;
+        if (type == 1) edep_hapd[modID - 1][sourceType[source]]  += edep;
       }
 
       else { // if neutron
@@ -244,13 +249,13 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
         if (type == 0) {
           if (modID == 10) continue;
           phnw *= scaling[source];
-          nflux_board[modID - 1][source] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
+          nflux_board[modID - 1][sourceType[source]] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
           // trlen = track length in volume, and 0.2cm is thickness of board.
           nenergy->Fill(lee);
         }
         if (type == 1) {
           phnw *= scaling[source];
-          nflux_hapd[modID - 1][source] += phnw * trlen / 0.05;
+          nflux_hapd[modID - 1][sourceType[source]] += phnw * trlen / 0.05;
         }
       }
     }
@@ -285,13 +290,13 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
     int nrow = mod2row(i + 1);
     for (int j = 0; j < 7; j++) {
 
-      edep_board[i][j] = edep_board[i][j] * 1.6E+6 / 47.25 / time;
-      edep_hapd[i][j] = edep_hapd[i][j] * 1.6E+6 / 5.7 / time;
+      edep_board[i][j] = edep_board[i][j] * 1.6E+6 / 47.25 / time; // 47.25 mass of FEB in grams
+      edep_hapd[i][j] = edep_hapd[i][j] * 1.6E+6 / 5.49 / time; // 5.49 mass of APD chip (volume 62.7x62.7x0.06)
 
       nflux_board[i][j] = nflux_board[i][j] * 1.E+13 / 56.25 / time; // board surface is 56.25 cm^2
-      nflux_hapd[i][j] = nflux_hapd[i][j] * 1.E+13 / 47.6 / time;
+      nflux_hapd[i][j] = nflux_hapd[i][j] * 1.E+13 / 39.3 / time; // apd surface
 
-      flux_phot[i][j] = flux_phot[i][j] * 1.E+6 / 40.0 / time;
+      flux_phot[i][j] = flux_phot[i][j] * 1.E+6 / 53.29 / time;  // photocathode size = 7.3x7.3cm
 
       edep_board_all[i] += edep_board[i][j];
       edep_hapd_all[i] += edep_hapd[i][j];
@@ -315,6 +320,7 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
     dteh->SetPoint(i, origins[i][0], origins[i][1], edep_hapd_all[i]);
     dtnh->SetPoint(i, origins[i][0], origins[i][1], nflux_hapd_all[i]);
     dtp->SetPoint(i, origins[i][0], origins[i][1], phot_all[i]);
+    chHits->setBinContent(i + 1, nn);
 
   } // end of HAPD loop
 
@@ -338,12 +344,13 @@ int BeamBack_arich_145(double time = 1000, char* path = "/gpfs/home/belle/luka/b
   TCanvas* c5 = make_plot(avgf, "photons", 3);
 
   // write output file
-  TFile* f = new TFile("arich_background.root", "RECREATE");
+  TFile* f = new TFile("arich_background_phase3.root", "RECREATE");
 
   c1->Write(); c2->Write(); c3->Write(); c4->Write(); c5->Write();
   dteb->Write(); dteh->Write();
   dtnb->Write(); dtnh->Write();
   dtp->Write();
+  chHits->Write();
   ndist->Write();
   edist->Write();
   nenergy->Write();

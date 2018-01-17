@@ -28,7 +28,7 @@ namespace Belle2 {
     PruneGenfitTracksModule();
 
     /// Event processing, prunes the genfit tracks contained in each event
-    virtual void event() override;
+    void event() override;
 
   private:
 

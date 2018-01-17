@@ -18,7 +18,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -46,29 +45,29 @@ namespace Belle2 {
   **    basf2 (TTree_hitXP_ext.root)
   */
 
-  class hitXPModule : public Module {
+  class HitXPModule : public Module {
   public:
 
-    hitXPModule();
+    HitXPModule();
 
-    virtual ~hitXPModule();
+    ~HitXPModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.   */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** Called when entering a new run.     */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.   */
-    virtual void event() override;
+    void event() override;
 
     /** This method is called if the current run ends. */
-    virtual void endRun() override;
+    void endRun() override;
 
     /** This method is called at the end of the event processing.   */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
     TTree* m_tree; /**< full output tree */

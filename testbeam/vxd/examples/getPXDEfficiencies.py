@@ -108,7 +108,6 @@ setupGenfit.param('useVXDAlignment', useAlignment)
 
 # Unpacker
 SVDUNPACK = register_module('SVDUnpacker')
-SVDUNPACK.param('xmlMapFileName', 'testbeam/vxd/data/2017_svd_mapping.xml')
 
 SVDDIGISORTER = register_module('SVDDigitSorter')
 
@@ -148,7 +147,7 @@ daf.logging.log_level = LogLevel.ERROR
 
 track_creator = register_module('TrackCreator')
 track_creator.param('beamSpot', [0., 0., 0.])
-track_creator.param('defaultPDGCode', 11)
+track_creator.param('pdgCodes', 11)
 track_creator.logging.log_level = LogLevel.ERROR
 
 

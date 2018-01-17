@@ -35,12 +35,12 @@ namespace Belle2 {
     QualityEstimatorVXDModule();
 
     /** Initializes the Module. */
-    virtual void initialize() override;
+    void initialize() override;
 
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** Applies the selected quality estimation method for a given set of TCs */
-    virtual void event() override;
+    void event() override;
 
 
   protected:

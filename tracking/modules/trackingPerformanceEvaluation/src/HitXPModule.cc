@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <TFile.h>
@@ -27,11 +26,11 @@
 
 using namespace Belle2;
 
-REG_MODULE(hitXP)
+REG_MODULE(HitXP)
 
-hitXPModule::hitXPModule() : Module()
+HitXPModule::HitXPModule() : Module()
 {
-  setDescription("This module builds a ttree with true hit informations (momentum, position). Track parameters hit per hit are accessible too.");
+  setDescription("This module builds a ttree with true hit informations (momentum, position, PDGID, and track parameters hit per hit) running over simulated and reconstructed events.");
 
   /** write validation plots */
   addParam("additionalTree", c_addTree,
@@ -41,42 +40,41 @@ hitXPModule::hitXPModule() : Module()
 }
 
 
-hitXPModule::~hitXPModule()
+HitXPModule::~HitXPModule()
 {
 }
 
 
 
-void hitXPModule::initialize()
+void HitXPModule::initialize()
 {
 
-  /** iniziialize of useful store array and relations */
-  StoreArray<SVDDigit> storeDigits("");
+  /** iniziialize store array and relations */
   StoreArray<SVDCluster> storeClusters("");
   StoreArray<SVDTrueHit> storeTrueHits("");
   StoreArray<MCParticle> storeMCParticles("");
   StoreArray<RecoTrack> recoTracks("");
 
 
-  storeDigits.isRequired();
   storeClusters.isRequired();
   storeTrueHits.isRequired();
   storeMCParticles.isRequired();
   recoTracks.isRequired();
 
 
-  RelationArray relClusterDigits(storeClusters, storeDigits);
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
   RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
-  RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
-  RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
   RelationArray recoTracksToMCParticles(recoTracks , storeMCParticles);
 
 
 
   /** inizialize output TFile (ttree, with own-class (hitXP) branch)
   * nb: is not possibile to completely access to entries of this tree using
-  * external (out of basf2) scripts
+  * external (out of basf2) scripts beacuse are used, as branches of the tree,
+  * some basf2 internal classes (more specifically, some memeber of the hitXP
+  * branch, see tracking/dataobjects/hitXP for more details)
+  * Only the "external tree" is completely accessible, but the information is
+  * reduced.
   */
   m_outputFile = new TFile("TFile_hitXP.root", "RECREATE");
   m_tree = new TTree("TTree_hitXP", "TTree_hitXP");
@@ -162,11 +160,10 @@ void hitXPModule::initialize()
 
 }
 
-void hitXPModule::beginRun() {}
+void HitXPModule::beginRun() {}
 
-void hitXPModule::event()
+void HitXPModule::event()
 {
-  StoreArray<SVDDigit> SVDDigits;
   StoreArray<SVDCluster> SVDClusters;
   StoreArray<SVDTrueHit> SVDTrueHits;
   StoreArray<MCParticle> MCParticles;
@@ -376,7 +373,7 @@ void hitXPModule::event()
 
 
 
-void hitXPModule::endRun()
+void HitXPModule::endRun()
 {
   m_outputFile->cd();
   m_tree->Write();
@@ -408,4 +405,4 @@ void hitXPModule::endRun()
   m_outputFileExt->Close();
 }
 
-void hitXPModule::terminate() {}
+void HitXPModule::terminate() {}

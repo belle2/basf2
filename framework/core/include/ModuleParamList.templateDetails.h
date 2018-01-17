@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <framework/core/ModuleParamList.dcl.h>
-#include <framework/core/ModuleParam.dcl.h>
+#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParam.h>
 #include <framework/logging/Logger.h>
 
 #include <map>

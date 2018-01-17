@@ -16,6 +16,7 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <framework/datastore/StoreArray.h>
 #include <top/dbobjects/TOPSampleTimes.h>
+#include <top/dbobjects/TOPSignalShape.h>
 
 #include <map>
 #include <vector>
@@ -35,7 +36,8 @@ namespace Belle2 {
       enum EType {
         c_Hit = 0,
         c_ChargeShare = 1,
-        c_CrossTalk = 2
+        c_CrossTalk = 2,
+        c_CalPulse = 3
       };
 
       /**
@@ -45,6 +47,7 @@ namespace Belle2 {
         double pulseHeight = 0; /**< generated pulse height */
         EType type = c_Hit;     /**< hit type */
         const TOPSimHit* simHit = 0;  /**< pointer to simulated hit */
+        const TOPSignalShape* shape = 0; /**< waveform shape of this hit */
       };
 
       /**
@@ -86,14 +89,7 @@ namespace Belle2 {
        * @param simHit pointer to simulated hit
        */
       void addTimeOfHit(double t, double pulseHeight, EType type,
-                        const TOPSimHit* simHit = 0)
-      {
-        Hit hit;
-        hit.pulseHeight = pulseHeight;
-        hit.type = type;
-        hit.simHit = simHit;
-        m_times.insert(std::pair<double, const Hit>(t, hit));
-      }
+                        const TOPSimHit* simHit = 0);
 
       /**
        * Return bar ID

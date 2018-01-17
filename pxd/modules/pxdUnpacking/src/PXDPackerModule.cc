@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <boost/foreach.hpp>
 #include <boost/crc.hpp>

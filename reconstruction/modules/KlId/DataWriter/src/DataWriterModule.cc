@@ -254,9 +254,6 @@ void DataWriterModule::event()
       }
     }
 
-    std::tuple < RecoTrack*, double, std::unique_ptr<const TVector3> > closestTrack = findClosestTrack(clusterPos, 3.14);
-    m_KLMgenfitDist = get<1>(closestTrack);
-
 
     if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
     if (isnan(m_KLMnCluster))             { m_KLMnCluster             = -999;}

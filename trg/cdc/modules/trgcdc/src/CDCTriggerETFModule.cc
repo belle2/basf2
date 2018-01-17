@@ -49,7 +49,7 @@ CDCTriggerETFModule::event()
   if (!m_eventTime.isValid()) m_eventTime.create();
 
   if (m_trueEventTime) {
-    m_eventTime->addEventT0(0, Const::CDC);
+    m_eventTime->addBinnedEventT0(0, Const::CDC);
     return;
   }
 
@@ -95,12 +95,6 @@ CDCTriggerETFModule::event()
   // save event time
   if (foundT0) {
     // add the event time as int for the following trigger modules
-    m_eventTime->addEventT0(T0, Const::CDC);
-    // add the event time in ns (with uncertainty)
-    // TODO: verify the algorithm, estimate the uncertainty,
-    // then uncomment the following:
-    //double deltaT0 = 1.; //TODO: replace with real uncertainty
-    //CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
-    //m_eventTime->addEventT0(double(T0) * 2. * cdc.getTdcBinWidth() , deltaT0, Const::CDC);
+    m_eventTime->addBinnedEventT0(T0, Const::CDC);
   }
 }

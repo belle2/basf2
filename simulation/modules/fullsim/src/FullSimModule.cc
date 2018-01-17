@@ -217,9 +217,9 @@ void FullSimModule::initialize()
 
     //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
     G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
-    B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
+    B2DEBUG(1, "Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
     chordFinder->SetDeltaChord(m_deltaChordInMagneticField * CLHEP::mm);
-    B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
+    B2DEBUG(1, "DeltaChord after reset = " << chordFinder->GetDeltaChord());
 
     //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
   }

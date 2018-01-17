@@ -23,19 +23,21 @@ ARICHBiasCrateCableMapping::ARICHBiasCrateCableMapping()
 
 int ARICHBiasCrateCableMapping::getSector(int connectionID) const
 {
+  if (connectionID < 1) { B2WARNING("ARICHBiasCrateCableMapping::getSector: connectionID " << connectionID << " not valid!"); return 0;}
   std::vector<int> sectorCable = m_connection2cable.find(connectionID)->second;
   return sectorCable[0];
 }
 
 int ARICHBiasCrateCableMapping::getCable(int connectionID) const
 {
+  if (connectionID < 1) { B2WARNING("ARICHBiasCrateCableMapping::getCable: connectionID " << connectionID << " not valid!"); return 0;}
   std::vector<int> sectorCable = m_connection2cable.find(connectionID)->second;
   return sectorCable[1];
 }
 
-int ARICHBiasCrateCableMapping::getConnectionID(std::vector<int> sectorCable) const
+int ARICHBiasCrateCableMapping::getConnectionID(const std::vector<int>& sectorCable) const
 {
-  int connectionID = 99;
+  int connectionID = -2;
   for (auto& i : m_connection2cable) {
     if (i.second == sectorCable) connectionID = i.first;
   }

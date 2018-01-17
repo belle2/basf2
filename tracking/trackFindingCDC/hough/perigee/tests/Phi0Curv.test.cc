@@ -18,8 +18,8 @@
 
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 
-#include <framework/core/ModuleParamList.icc.h>
-#include <framework/core/ModuleParam.dcl.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParam.h>
 
 #include <vector>
 

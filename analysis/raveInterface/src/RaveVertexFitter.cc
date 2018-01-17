@@ -350,7 +350,7 @@ void RaveVertexFitter::updateDaughters()
     fitted7CovM(3, 5) = fitted7CovPart(3, 5); fitted7CovM(5, 3) = fitted7CovM(3, 5);
     fitted7CovM(3, 6) = fitted7CovPart(3, 6); fitted7CovM(6, 3) = fitted7CovM(3, 6);
 
-    fitted7CovM(4, 4) = fittedCov.dxz();      fitted7CovM(4, 4) = fitted7CovM(4, 4);
+    fitted7CovM(4, 4) = fittedCov.dxx();      fitted7CovM(4, 4) = fitted7CovM(4, 4);
     fitted7CovM(4, 5) = fittedCov.dxy();      fitted7CovM(5, 4) = fitted7CovM(4, 5);
     fitted7CovM(4, 6) = fittedCov.dxz();      fitted7CovM(6, 4) = fitted7CovM(4, 6);
 

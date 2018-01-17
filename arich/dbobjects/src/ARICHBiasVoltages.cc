@@ -23,7 +23,12 @@ ARICHBiasVoltages::ARICHBiasVoltages()
 
 std::vector<int> ARICHBiasVoltages::getBiasVoltages(const std::string& hapdID) const
 {
-  return m_hapd2voltages.find(hapdID)->second;
+  if (hapdID != "") {
+    return m_hapd2voltages.find(hapdID)->second;
+  } else {
+    return std::vector<int>(5, 0);
+  }
+
 }
 
 void ARICHBiasVoltages::addVoltages(const std::string& hapdID, std::vector<int> biasVoltages)

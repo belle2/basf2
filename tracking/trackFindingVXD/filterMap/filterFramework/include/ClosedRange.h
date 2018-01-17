@@ -30,8 +30,6 @@ namespace Belle2 {
 
   template< typename MinType, typename MaxType>
   class ClosedRange {
-    MinType m_min;
-    MaxType m_max;
   public:
 
     /** Constructor */
@@ -83,6 +81,33 @@ namespace Belle2 {
 
     /** Accessor to the sup of the set (which is alsto the max) */
     MaxType getSup(void) const { return m_max; } ;
+
+
+    /** generates a "name" and fills the vector with the variable references
+    @param filtername: optional name of the filter this range is attached to make the output look nicer
+    @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
+      and the actual pointers to the bounds, if equal to nullptr it will not be filled
+    **/
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "X")
+    {
+      std::string minVal = std::to_string(m_min);
+      std::string maxVal = std::to_string(m_max);
+      // if pointer to vector is provided fill it
+      if (pointers != nullptr) {
+        // use the position in the vector as unique identifier
+        minVal = "#" + std::to_string(pointers->size());
+        (*pointers).push_back({TBranchLeafType(m_min), &m_min});
+        maxVal = "#" + std::to_string(pointers->size());
+        (*pointers).push_back({TBranchLeafType(m_max), &m_max});
+      }
+      return ("(" + minVal + " <= " + varname + " <= " + maxVal + ")");
+    }
+
+  private:
+    /// the minimum of this range
+    MinType m_min;
+    /// the maximum of this range
+    MaxType m_max;
 
   };
 

@@ -30,7 +30,7 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   set<string> branchSet, excludeBranchSet;
   for (string b : branches) {
     if (branchesToFilter.count(b) == 0)
-      B2INFO("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
+      B2WARNING("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
     if (!branchSet.insert(b).second)
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
@@ -106,7 +106,7 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
   const long minor = event;
 
   if (!tree->GetTreeIndex()) {
-    B2INFO("No TTreeIndex found, rebuild it...");
+    B2DEBUG(100, "No TTreeIndex found, rebuild it...");
     buildIndex(tree);
   }
   long entry = tree->GetEntryNumberWithIndex(major, minor);
@@ -189,6 +189,7 @@ void RootIOUtilities::setCreationData(FileMetaData& metadata)
   auto commitid = RootIOUtilities::getCommitID();
   metadata.setCreationData(date, site, user, commitid);
 }
+
 std::string RootIOUtilities::getCommitID()
 {
   return GIT_COMMITID;

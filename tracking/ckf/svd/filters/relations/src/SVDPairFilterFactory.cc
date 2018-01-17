@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
 #include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
-#include <tracking/ckf/svd/filters/relations/SeededSVDPairFilter.h>
 #include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
@@ -44,7 +43,6 @@ std::map<std::string, std::string> SVDPairFilterFactory::getValidFilterNamesAndD
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
     {"sensor", "use sensor/ladder information"},
-    {"seeded", "use the VXDTF information"},
     {"distance", "based on the position distance"},
   };
 }
@@ -62,10 +60,6 @@ SVDPairFilterFactory::create(const std::string& filterName) const
 
   if (filterName == "sensor") {
     return std::make_unique<SectorSVDPairFilter>();
-  }
-
-  if (filterName == "seeded") {
-    return std::make_unique<SeededSVDPairFilter>();
   }
 
   if (filterName == "distance") {

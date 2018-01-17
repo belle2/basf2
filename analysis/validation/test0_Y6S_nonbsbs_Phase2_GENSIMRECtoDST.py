@@ -3,7 +3,7 @@
 
 """
 <header>
-  <output>Y6S_nonbsbs_Phase2.dst.root</output>
+  <output>../Y6S_nonbsbs_Phase2.dst.root</output>
   <contact>Cate MacQueen, cmq.centaurus@gmail.com</contact>
 </header>
 """
@@ -15,7 +15,7 @@ from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
 from ROOT import Belle2
 
-set_random_seed(12345)
+set_random_seed(10000)
 
 main = create_path()
 

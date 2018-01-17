@@ -32,6 +32,7 @@
 #include <math.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <framework/logging/Logger.h>
 
 # define M_PI           3.14159265358979323846
 
@@ -71,8 +72,7 @@ namespace Belle2 {
                         fastSimulationMode,
                         firmwareSimulationMode);
     } else {
-      cout << "TRGGRL::getTRGGRL ... good-bye" << endl;
-      //        delete _grl;
+      B2DEBUG(100, "TRGGRL::getTRGGRL ... good-bye");
       _grl = 0;
     }
 
@@ -83,7 +83,7 @@ namespace Belle2 {
   TRGGRL::getTRGGRL(void)
   {
     if (! _grl)
-      cout << "TRGGRL::getTRGGRL !!! TRGGRL is not created yet" << endl;
+      B2WARNING("TRGGRL::getTRGGRL !!! TRGGRL is not created yet");
     return _grl;
   }
 
@@ -99,17 +99,12 @@ namespace Belle2 {
       _clock(Belle2_GDL::GDLSystemClock)
   {
 
-    if (TRGDebug::level()) {
-      cout << "TRGGRL ... TRGGRL initializing with " << _configFilename
-           << endl
-           << "           mode=0x" << hex << _simulationMode << dec << endl;
-    }
+    B2DEBUG(100, "TRGGRL ... TRGGRL initializing with " << _configFilename
+            << "           mode=0x" << hex << _simulationMode << dec);
 
     initialize();
 
-    if (TRGDebug::level()) {
-      cout << "TRGGRL ... TRGGRL created with " << _configFilename << endl;
-    }
+    B2DEBUG(100, "TRGGRL ... TRGGRL created with " << _configFilename);
   }
 
   void
@@ -140,7 +135,7 @@ namespace Belle2 {
   TRGGRL::dump(const string& msg) const
   {
 
-    if (msg != "") cout << "dump nothing..." << endl;
+    if (msg != "") B2DEBUG(100, "dump nothing...");
 
   }
 
@@ -161,11 +156,8 @@ namespace Belle2 {
     matchList.clear();
     matchList3D.clear();
 
-    TRGDebug::enterStage("TRGGRL update");
+    B2DEBUG(100, "do nothing...");
 
-    cout << TRGDebug::tab() << "do nothing..." << endl;
-
-    TRGDebug::leaveStage("TRGGRL update");
   }
 
   TRGGRL::~TRGGRL()
@@ -237,8 +229,6 @@ namespace Belle2 {
       x5 = match.getCenter_pt();
       x6 = match.getCenter_pz();
       x7 = match.getCluster_e();
-      if (TRGDebug::level() > 1) printf("%s %f %f %f %f %f %f %f %f \n", "dump! ", x0, x1, x2, x3, x4, x5, x6, x7);
-      if (TRGDebug::level() > 1 && match.getDr() > 30) match.dump();
       h1->Fill();
     }
 
@@ -253,8 +243,6 @@ namespace Belle2 {
       x5 = match.getCenter_pt();
       x6 = match.getCenter_pz();
       x7 = match.getCluster_e();
-      if (TRGDebug::level() > 1) printf("%s %f %f %f %f %f %f %f %f \n", "dump! ", x0, x1, x2, x3, x4, x5, x6, x7);
-      if (TRGDebug::level() > 1 && match.getDr() > 30) match.dump();
       h1->Fill();
     }
 
@@ -272,21 +260,11 @@ namespace Belle2 {
   void
   TRGGRL::fastSimulation(void)
   {
-    TRGDebug::enterStage("TRGGRL fastSim");
-
-    cout << TRGDebug::tab() << "do nothing..." << endl;
-
-    TRGDebug::leaveStage("TRGGRL fastSim");
   }
 
   void
   TRGGRL::firmwareSimulation(void)
   {
-    TRGDebug::enterStage("TRGGRL firmSim");
-
-    cout << TRGDebug::tab() << "do nothing..." << endl;
-
-    TRGDebug::leaveStage("TRGGRL firmSim");
   }
 
   void

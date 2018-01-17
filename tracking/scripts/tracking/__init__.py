@@ -211,7 +211,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
     # V0 finding
-    path.add_module('V0Finder', RecoTrackColName=reco_tracks)
+    path.add_module('V0Finder', RecoTracks=reco_tracks)
 
     # prune genfit tracks
     if pruneTracks:

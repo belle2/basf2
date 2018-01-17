@@ -17,6 +17,8 @@
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
+// needed for complex module parameter
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

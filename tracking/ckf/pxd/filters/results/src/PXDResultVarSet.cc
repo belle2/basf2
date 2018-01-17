@@ -13,16 +13,11 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/ckf/general/utilities/Advancer.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-PXDResultVarSet::PXDResultVarSet() : TrackFindingCDC::VarSet<PXDResultVarNames>()
-{
-  addProcessingSignalListener(&m_advancer);
-}
 
 void PXDResultVarSet::initialize()
 {

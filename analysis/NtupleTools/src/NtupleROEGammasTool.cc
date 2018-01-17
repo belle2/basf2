@@ -12,7 +12,7 @@
 #include <TBranch.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ECLVariables.h>
 
 using namespace Belle2;
 using namespace std;

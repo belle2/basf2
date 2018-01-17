@@ -48,11 +48,11 @@ namespace Belle2 {
     CurlingTrackCandSplitterModule(); /**< Constructor */
 
     /** initialize: initialize counters, register stuff in DataStore, check if all necessary StoreArrays are present, etc. */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void event(); /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
+    void event() override; /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
 
-    virtual void terminate(); /**< terminate: print some summary on the modules work */
+    void terminate() override; /**< terminate: print some summary on the modules work */
 
     /** Some constants for initialization */
     enum {

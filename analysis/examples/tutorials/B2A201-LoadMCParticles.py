@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to load generated final
 # state particles (MCParticle objects) as Particles and
 # create ParticleLists for each final state particle
@@ -30,7 +33,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
              'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # print contents of the DataStore before loading MCParticles
 printDataStore()

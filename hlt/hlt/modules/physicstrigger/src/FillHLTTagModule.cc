@@ -10,11 +10,9 @@
 
 // own include
 #include <hlt/hlt/modules/physicstrigger/FillHLTTagModule.h>
-#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -25,7 +23,6 @@
 #include <framework/gearbox/GearDir.h>
 
 // dataobjects
-#include "mdst/dataobjects/HLTTag.h"
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -66,8 +63,8 @@ FillHLTTagModule::~FillHLTTagModule()
 void FillHLTTagModule::initialize()
 {
   B2INFO("FillHLTTagModule processing");
-  StoreArray<HLTTag>::registerPersistent();
-  StoreArray<PhysicsTriggerInformation>::registerPersistent();
+  m_hltTag.registerInDataStore();
+  m_physicsTriggerInformation.registerInDataStore();
 }
 
 void FillHLTTagModule::beginRun()

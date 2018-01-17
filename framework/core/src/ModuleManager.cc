@@ -85,50 +85,47 @@ const map<string, string>& ModuleManager::getAvailableModules() const
 }
 
 
-ModulePtr ModuleManager::registerModule(const string& moduleName, const std::string& sharedLibPath) noexcept(false)
+ModulePtr ModuleManager::registerModule(const string& moduleName, std::string sharedLibPath) noexcept(false)
 {
   map<string, ModuleProxyBase*>::iterator moduleIter =  m_registeredProxyMap.find(moduleName);
 
+  // Print an error message and then raise the exception ...
+  auto error = [&moduleName](const std::string & text) -> void {
+    auto exception = ModuleNotCreatedError() << moduleName << text;
+    B2ERROR(exception.what());
+    throw exception;
+  };
+
   //If the proxy of the module was not already registered, load the corresponding shared library first
   if (moduleIter == m_registeredProxyMap.end()) {
-
-    //If a shared library path is given, load the library and search for the registered module.
-    if (!sharedLibPath.empty()) {
-      if (FileSystem::isFile(sharedLibPath)) {
-        FileSystem::loadLibrary(sharedLibPath);
-        moduleIter =  m_registeredProxyMap.find(moduleName);
-      } else B2WARNING("Could not load shared library " + sharedLibPath + ". File does not exist!");
-
-      //Check if the loaded shared library file contained the module
-      if (moduleIter == m_registeredProxyMap.end()) {
-        B2ERROR("The shared library " + sharedLibPath + " does not contain the module " + moduleName + "!");
-      }
-    } else {
-      //If no library path is given, check if the module name is known to the manager and load
-      //the appropriate shared library.
+    // no library specified, try to find it from map of known modules
+    if (sharedLibPath.empty()) {
       map<string, string>::const_iterator libIter = m_moduleNameLibMap.find(moduleName);
-
       if (libIter != m_moduleNameLibMap.end()) {
-        FileSystem::loadLibrary(libIter->second);
-        moduleIter =  m_registeredProxyMap.find(moduleName);
-
-        //Check if the loaded shared library file contained the module
-        if (moduleIter == m_registeredProxyMap.end()) {
-          B2ERROR("The shared library " + libIter->second + " does not contain the module " + moduleName + "!");
-        }
+        sharedLibPath = libIter->second;
       } else {
-        B2ERROR("The module " + moduleName + " is not known to the framework!");
+        error("The module is not known to the framework!");
       }
+    }
+    // Now we have a library name (provided or determined, try to load)
+    if (!FileSystem::isFile(sharedLibPath)) {
+      error("Could not load shared library " + sharedLibPath + ", file does not exist!");
+    }
+    if (!FileSystem::loadLibrary(sharedLibPath)) {
+      error("Could not load shared library " + sharedLibPath + ".");
+    }
+    //Check if the loaded shared library file contained the module
+    moduleIter =  m_registeredProxyMap.find(moduleName);
+    if (moduleIter == m_registeredProxyMap.end()) {
+      error("The shared library " + sharedLibPath + " does not contain the module!");
     }
   }
 
   //Create an instance of the module found or loaded in the previous steps and return it.
-  //If the iterator points to the end of the map, throw an exception
-  if (moduleIter != m_registeredProxyMap.end()) {
-    ModulePtr currModulePtr = moduleIter->second->createModule();
-    m_createdModulesList.push_back(currModulePtr);
-    return currModulePtr;
-  } else throw (ModuleNotCreatedError() << moduleName);
+  //The iterator cannot point to the end of the map, we checked in all branches.
+  ModulePtr currModulePtr = moduleIter->second->createModule();
+  m_createdModulesList.push_back(currModulePtr);
+  return currModulePtr;
 }
 
 

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/ckf/svd/findlets/UnusedVXDTracksAdder.h>
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>

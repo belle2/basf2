@@ -3,22 +3,23 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Own include
+// Own includes
 #include <analysis/VariableManager/TrackVariables.h>
-
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+// dataobjects from the MDST
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
@@ -231,6 +232,89 @@ namespace Belle2 {
       return trackFit->getPValue();
     }
 
+    /***************************************************
+     * Event level tracking quantities
+     */
+
+    // The number of CDC hits in the event not assigned to any track
+    double nExtraCDCHits(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      return elti->getNCDCHitsNotAssigned();
+    }
+
+    // The number of CDC hits in the event not assigned to any track nor very
+    // likely beam background (i.e. hits that survive a cleanup selection)
+    double nExtraCDCHitsPostCleaning(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      return elti->getNCDCHitsNotAssignedPostCleaning();
+    }
+
+    // Check for the presence of a non-assigned hit in the specified CDC layer
+    double hasExtraCDCHitsInLayer(const Particle*, const std::vector<double>& layer)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      int ilayer = int(std::lround(layer[0]));
+      return elti->hasCDCLayer(ilayer);
+    }
+
+    // Check for the presence of a non-assigned hit in the specified CDC SuperLayer
+    double hasExtraCDCHitsInSuperLayer(const Particle*, const std::vector<double>& layer)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      int ilayer = int(std::lround(layer[0]));
+      return elti->hasCDCSLayer(ilayer);
+    }
+
+    // The number of segments that couldn't be assigned to any track
+    double nExtraCDCSegments(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      return elti->getNCDCSegments();
+    }
+
+    //  The number of VXD hits not assigned to any track in the specified layer
+    double nExtraVXDHitsInLayer(const Particle*, const std::vector<double>& layer)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      int ilayer = int(std::lround(layer[0]));
+      return elti->getNVXDClustersInLayer(ilayer);
+    }
+
+    //  The number of VXD hits not assigned to any track
+    double nExtraVXDHits(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      double out = 0.0;
+      for (uint16_t ilayer = 1; ilayer < 7; ilayer++)
+        out += elti->getNVXDClustersInLayer(ilayer);
+      return out;
+    }
+
+    // time of first SVD sample relatvie to event T0
+    double svdFirstSampleTime(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      return elti->getSVDFirstSampleTime();
+    }
+
+    // A flag set by the tracking if there is reason to assume there was a track
+    // in the event missed by the tracking
+    double trackFindingFailureFlag(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return std::numeric_limits<float>::quiet_NaN();
+      return elti->getHintForTrackFindingFailure();
+    }
 
     VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
@@ -251,6 +335,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
     REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
+
+    REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track");
+    REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,
+                      "[Eventbased] The number of CDC hits in the event not assigned to any track nor very likely beam background (i.e. hits that survive a cleanup selection)");
+    REGISTER_VARIABLE("hasExtraCDCHitsInLayer(i)", hasExtraCDCHitsInLayer,
+                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC layer");
+    REGISTER_VARIABLE("hasExtraCDCHitsInSuperLayer(i)", hasExtraCDCHitsInSuperLayer,
+                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC SuperLayer");
+    REGISTER_VARIABLE("nExtraCDCSegments", nExtraCDCSegments, "[Eventbased] The number of CDC segments not assigned to any track");
+    REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
+                      "[Eventbased] The number VXD hits not assigned in the specified VXD layer");
+    REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
+    REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
+    REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag,
+                      "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking");
+
 
   }
 }

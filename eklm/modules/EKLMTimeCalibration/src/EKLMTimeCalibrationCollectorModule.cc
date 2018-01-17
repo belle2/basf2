@@ -51,6 +51,7 @@ void EKLMTimeCalibrationCollectorModule::prepare()
   m_EKLMHit2ds.requireRelationTo(eklmDigits);
   StoreArray<ExtHit> extHits;
   m_Tracks.requireRelationTo(extHits);
+  m_EventT0.isRequired("EventT0");
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
   t = new TTree("calibration_data", "");
   t->Branch("time", &m_ev.time, "time/F");
@@ -72,6 +73,11 @@ void EKLMTimeCalibrationCollectorModule::collect()
   const HepGeom::Transform3D* tr;
   TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   n = m_Tracks.getEntries();
+  if (!m_EventT0->hasEventT0()) {
+    B2ERROR("Event T0 is not determined. "
+            "Cannot collect data for EKLM time calibration.");
+    return;
+  }
   for (i = 0; i < n; i++) {
     RelationVector<ExtHit> extHits = m_Tracks[i]->getRelationsTo<ExtHit>();
     n2 = extHits.size();
@@ -90,6 +96,12 @@ void EKLMTimeCalibrationCollectorModule::collect()
       m_EKLMHit2ds[i]->getRelationsTo<EKLMDigit>();
     if (digits.size() != 2)
       B2FATAL("Wrong number of related EKLMDigits.");
+    /*
+     * This is possible if the threshold was crossed, but the pedestal level
+     * has been estimated incorrectly.
+     */
+    if (digits[0]->getNPE() == 0 || digits[1]->getNPE() == 0)
+      continue;
     for (j = 0; j < 2; j++) {
       entryHit[j] = NULL;
       exitHit[j] = NULL;
@@ -126,7 +138,8 @@ void EKLMTimeCalibrationCollectorModule::collect()
         entryHit[1] == NULL || exitHit[1] == NULL)
       continue;
     for (j = 0; j < 2; j++) {
-      hitTime = 0.5 * (entryHit[j]->getTOF() + exitHit[j]->getTOF());
+      hitTime = 0.5 * (entryHit[j]->getTOF() + exitHit[j]->getTOF()) +
+                m_EventT0->getEventT0();
       hitPosition = 0.5 * (entryHit[j]->getPosition() +
                            exitHit[j]->getPosition());
       l = m_GeoDat->getStripLength(digits[j]->getStrip()) / CLHEP::mm *

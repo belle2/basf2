@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <framework/core/ModuleParamList.icc.h>
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <framework/core/ModuleParamInfoPython.h>
 #include <framework/core/FrameworkExceptions.h>

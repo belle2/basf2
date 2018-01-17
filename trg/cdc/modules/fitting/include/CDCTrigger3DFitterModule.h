@@ -8,7 +8,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
@@ -87,7 +87,7 @@ namespace Belle2 {
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_hits;
     /** StoreObjPtr containing the event time */
-    StoreObjPtr<EventT0> m_eventTime;
+    StoreObjPtr<BinnedEventT0> m_eventTime;
   };
 
 } // namespace Belle2

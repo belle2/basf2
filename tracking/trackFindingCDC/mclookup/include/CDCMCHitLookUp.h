@@ -32,6 +32,12 @@ namespace Belle2 {
       /// Getter for the singletone instance
       static const CDCMCHitLookUp& getInstance();
 
+      /// Default constructor, needs to be public for initialization in CDCMCManager
+      CDCMCHitLookUp() = default;
+      /// Singleton: Delete copy constructor and assignment operator
+      CDCMCHitLookUp(CDCMCHitLookUp&) = delete;
+      CDCMCHitLookUp& operator=(const CDCMCHitLookUp&) = delete;
+
       /// Method for forwarding a request to fill the Monte Carlo lookup tables from Python
       void fill() const;
 

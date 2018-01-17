@@ -464,6 +464,17 @@ void PXDUnpackerBSModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
       m_errorMask |= EPXDErrMask::c_DHP_NOT_CONT;
     }
   }
+
+  if (daqpktstat.dhc_size() > 0) {
+    if (daqpktstat.dhc_back().dhe_size() > 0) {
+      PXDDAQDHPStatus daqdhp(dhp_dhp_id, dhp_row, dhp_readout_frame_lo);
+      // only is we have a DHC and DHE object... or back() is undefined
+      // Remark, if we have a broken data (DHE_START/END) structure, we might fill the
+      // previous DHE object ... but then the data is junk anyway
+      daqpktstat.dhc_back().dhe_back().addDHP(daqdhp);
+    }
+  }
+
   for (auto j = 0; j < 4; j++) {
     if (last_dhp_readout_frame_lo[j] != -1) {
       if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > 1) {
@@ -729,6 +740,7 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
                  dhe_first_offset, currentVxdId, daqpktstat);
+
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_FCE:

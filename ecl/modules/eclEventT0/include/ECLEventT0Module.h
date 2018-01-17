@@ -20,9 +20,12 @@ namespace Belle2 {
   /**
    * EventT0 from ECL
    *
-   * EventT0 found using isolated ECLCalDigits above 100 MeV. Results uploaded to
-   * framework/dataobjects/EventT0
+   * EventT0's found using ECLCalDigits above threshold. Results uploaded to
+   * framework/dataobjects/EventT0.
+   * Code sets all possible event T0 values as TemporaryEventT0's;
+   * One of them, as specified by m_primaryT0, is set as EventT0.
    * Description of the algorithm at https://agira.desy.de/browse/BII-2561
+   * and in BELLE2-NOTE-TE-2017-017
    */
   class ECLEventT0Module : public Module {
 
@@ -43,13 +46,16 @@ namespace Belle2 {
   private:
 
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< eclCalDigits  */
-    double m_isolationDr2;  /**< minimum 30 cm between digits */
-    double m_ethresh; /**< minimum 100 MeV for CalDigit to be used */
-    double m_stdDevNom; /**< nominal resolution (ns) for digit with E=m_ethresh */
-    double m_stdDevLarge; /**< report resolution (ns) if there is no information */
-    std::vector<float> m_xcrys; /**< ECL crystal location X */
-    std::vector<float> m_ycrys; /**< ECL crystal location Y */
-    std::vector<float> m_zcrys; /**< ECL crystal location Z */
+    double m_ethresh; /**< minimum energy for ECLCalDigit to be used (0.06 GeV) */
+    double m_maxDigitT; /**< maximum absolute value of ECLCalDigit time to be used (150 ns) */
+    double m_sigmaScale; /**< scale factor for time resolution (ie dt99) of ECLCalDigit (0.15) */
+    double m_maxT0; /**< maximum allowed absolute value of T0, in ns (135 ns)  */
+    double m_T0bin; /**< step size between T0 hypotheses (1 ns)*/
+    int m_primaryT0;/**< select which T0 is primary, ie first one reported. (0) */
+    /* 0 = lowest chi square among local minima
+     * 1 = absolute lowest chi square
+     * 2 = closest to 0 */
+
   };
 }
 

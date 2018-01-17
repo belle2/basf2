@@ -18,31 +18,37 @@ import ROOT
 from ROOT import Belle2
 
 # Usage: basf2 run_eclMuMuE_algorithm.py
-# Run just the collector part of the eclMuMuE calibration, which calibrates the single crystal
+
+# Run just the algorithm part of the eclMuMuE calibration, which calibrates the single crystal
 # energy response using muon pairs. Runs on the output produced by run_eclMuMuE_collector.py.
 # Standard usage: algo.performFits = True; performs a Novosibirsk fit on specified crystals to
 # extract the calibration constant.
 # algo.performFits = False just copies the input histograms into the output file for debugging.
-# Primary output is a histogram of calibration constant vs cellID0;
-# specified output file contains many additional diagnostic histograms.
-# run_eclMuMuE.py performs both stages of the calibration in a single job.
 
+# algo.storeConst = 0 fills database payloads ECLCrystalEnergyMuMu or ECLExpMuMuE (if findExpValues=True)
+#                     for all crystals with successful fits and writes to localdb
+# algo.storeConst = 1 fills writes the payloads only if every crystal in specified range is successful
+# algo.storeConst = -1 do not write to the database
+
+# Specified output file contains many diagnostic histograms.
 
 algo = Belle2.eclMuMuEAlgorithm()
-algo.setInputFiles(['output/CollectorOutput.root'])
-# barrel is [1152,7775]; barrel plus one endcap ring is [1008,7919]
-algo.cellIDLo = 1008
-algo.cellIDHi = 7919
+fileNames = ['eclMuMuECollectorOutput.root']
+algo.setInputFileNames(fileNames)
+# barrel is [1153,7776]
+algo.cellIDLo = 1
+algo.cellIDHi = 8736
 algo.minEntries = 150
 algo.maxIterations = 10
 algo.tRatioMin = 0.2
 algo.tRatioMax = 0.25
 algo.performFits = True
+algo.findExpValues = False
+algo.storeConst = 0
 
-exprun_vector = algo.getRunListFromAllData()
-for exprun in exprun_vector:
-    iov_to_execute = [(exprun.first, exprun.second)]
-    alg_result = algo.execute(iov_to_execute, 0)
-    print("result was", alg_result)
-    # Commits a successful list of dbobjects to localdb/
-    algo.commit()
+# Run algorithm after merging all input files, as opposed to one run at a time
+alg_result = algo.execute()
+print("result of eclMuMuEAlgorithm was", alg_result)
+
+# Commits a successful list of dbobjects to localdb/
+algo.commit()

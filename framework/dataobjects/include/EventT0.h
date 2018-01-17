@@ -62,6 +62,7 @@ namespace Belle2 {
     /// Check if one of the detectors in the given set has a temporary t0 estimation.
     bool hasTemporaryEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
+    /// Return the list of all temporary event t0 estimations.
     const std::vector<EventT0Component>& getTemporaryEventT0s() const;
 
     /// Get the detectors that have determined temporary event T0s.

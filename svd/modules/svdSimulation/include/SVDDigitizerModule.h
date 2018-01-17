@@ -135,9 +135,9 @@ namespace Belle2 {
       /** Whether or not to apply Gaussian noise */
       bool  m_applyNoise = false;
       /** Zero-suppression cut. */
-      double m_SNAdjacent = 5.0;
+      double m_SNAdjacent = 3.0;
       /** Use 3-sample filter? */
-      bool m_3sampleFilter = false;
+      bool m_3sampleFilter = true;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction;
 

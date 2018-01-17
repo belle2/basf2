@@ -90,10 +90,10 @@ SVDDigitizerModule::SVDDigitizerModule() :
   addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
            bool(false));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(5.0));
+           "Zero suppression cut in sigmas of strip noise", double(3.0));
   addParam("Use3SampleFilter", m_3sampleFilter,
            "A digit must have at least 3 consecutive samples over threshold",
-           bool(false));
+           bool(true));
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",

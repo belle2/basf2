@@ -80,7 +80,6 @@ REG_MODULE(PXDPackerErr)
  * 43 - Missing Start Row
  * 44 - No PXD raw packet at all
  * 45 - No DATCON data
- *
  * 46 - unused frame type: common mode
  * 47 - unused frame type: FCE
  * 48 - unused frame type: ONS FCE

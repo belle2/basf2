@@ -97,10 +97,18 @@ namespace Belle2 {
       for (auto a : daqdhevect) m_pxdDHE.push_back(a);
     };
 
+    /** Add DHE information
+     * @param daqdhe DHE Status Object
+     */
+    void addDHE(PXDDAQDHEStatus& daqdhe) { m_pxdDHE.push_back(daqdhe);};
+
     /** iterator-based iteration for DHEs */
-    std::vector<PXDDAQDHEStatus>::const_iterator begin() const { return m_pxdDHE.begin(); };
+    std::vector<PXDDAQDHEStatus>::iterator begin()  { return m_pxdDHE.begin(); };
     /** iterator-based iteration for DHEs */
-    std::vector<PXDDAQDHEStatus>::const_iterator end() const { return m_pxdDHE.end(); };
+    std::vector<PXDDAQDHEStatus>::iterator end()  { return m_pxdDHE.end(); };
+
+    PXDDAQDHEStatus& dhe_back()  { return m_pxdDHE.back(); };
+    size_t dhe_size() const { return m_pxdDHE.size(); };
 
   private:
 

@@ -82,9 +82,12 @@ namespace Belle2 {
     void addDHC(PXDDAQDHCStatus& daqdhcstat) {m_pxdDHC.push_back(daqdhcstat);};
 
     /** iterator-based iteration for DHCs */
-    std::vector<PXDDAQDHCStatus>::const_iterator begin() const { return m_pxdDHC.begin(); };
+    std::vector<PXDDAQDHCStatus>::iterator begin()  { return m_pxdDHC.begin(); };
     /** iterator-based iteration for DHCs */
-    std::vector<PXDDAQDHCStatus>::const_iterator end() const { return m_pxdDHC.end(); };
+    std::vector<PXDDAQDHCStatus>::iterator end()  { return m_pxdDHC.end(); };
+
+    PXDDAQDHCStatus& dhc_back()  { return m_pxdDHC.back(); };
+    size_t dhc_size() const { return m_pxdDHC.size(); };
 
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this packets sensors */

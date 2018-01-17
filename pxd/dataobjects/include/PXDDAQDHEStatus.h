@@ -12,9 +12,8 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
+#include <pxd/dataobjects/PXDDAQDHPStatus.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
-/// TObject is not used in this class, but the include is needed for the ClassDef
-#include <TObject.h>
 
 using namespace Belle2::PXD::PXDError;
 
@@ -27,13 +26,17 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
+
+  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
+
   class PXDDAQDHEStatus {
   public:
 
     /** Default constructor for the ROOT IO. */
     PXDDAQDHEStatus() : m_usable(true), m_errorMask(0), m_critErrorMask(0), m_startRow(0), m_frameNr(0), m_rawCount(0), m_redCount(0) {}
 
-    /** constructor setting the error mask, dhcid, raw and reduced data counters, ...
+    /** constructor setting the error mask, dheid, raw and reduced data counters, ...
      * @param id VxdID of sensor
      * @param dheid DHEID of sensor
      * @param mask Error mask
@@ -78,7 +81,7 @@ namespace Belle2 {
      */
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
 
-    /** Set VxdID and DHC ID of sensor */
+    /** Set VxdID and DHE ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
     /** Get DHE ID of sensor*/
     unsigned short getDHEID(void) const { return  m_dheID;};
@@ -102,6 +105,32 @@ namespace Belle2 {
     /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
 
+    /** Add DHP information
+     * @param daqdhp DHP Status Object
+     */
+    void addDHPs(PXDDAQDHPStatus& daqdhp) { m_pxdDHP.push_back(daqdhp);};
+
+    /** iterator-based iteration for DHEs */
+    std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
+    /** iterator-based iteration for DHEs */
+    std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
+
+    PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
+    size_t dhp_size() const { return m_pxdDHP.size(); };
+
+    /** Add Common Mode information
+     * @param daqcm DHP Common Mode object
+     */
+    void addCM(PXDDAQDHPComMode& daqcm) { m_commode.push_back(daqcm);};
+
+    /** iterator-based iteration for Common Mode */
+    std::vector<PXDDAQDHPComMode>::iterator cm_begin()  { return m_commode.begin(); };
+    /** iterator-based iteration for Common Mode */
+    std::vector<PXDDAQDHPComMode>::iterator cm_end()  { return m_commode.end(); };
+
+    PXDDAQDHPComMode& cm_back()  { return m_commode.back(); };
+    size_t cm_size() const { return m_commode.size(); };
+
   private:
 
     VxdID m_sensorID;/**< Sensor ID.*/
@@ -114,6 +143,10 @@ namespace Belle2 {
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
+
+    std::vector< PXDDAQDHPStatus> m_pxdDHP;
+
+    std::vector < PXDDAQDHPComMode> m_commode;
 
     ClassDef(PXDDAQDHEStatus, 1);
 

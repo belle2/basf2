@@ -117,8 +117,7 @@ namespace Belle2 {
        * @param daqpktstat Daq Packet Status Object
        * @param daqdhevect Daq DHE Status Object
        */
-      void unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event, PXDDAQPacketStatus& daqpktstat,
-                            std::vector <PXDDAQDHEStatus>& daqdhevect);
+      void unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event, PXDDAQPacketStatus& daqpktstat);
 
       /** Unpack DHP data within one DHE frame
        * @param data pointer to dhp data
@@ -131,7 +130,7 @@ namespace Belle2 {
        * @param vxd_id vertex Detector ID
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
-                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id);
+                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
 
       /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
        * @param data pointer to dhp data

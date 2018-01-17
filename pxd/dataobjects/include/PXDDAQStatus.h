@@ -99,9 +99,13 @@ namespace Belle2 {
     void addPacket(PXDDAQPacketStatus& daqpktstat) {m_pxdPacket.push_back(daqpktstat);};
 
     /** iterator-based iteration for packets */
-    std::vector<PXDDAQPacketStatus>::const_iterator begin() const { return m_pxdPacket.begin(); };
+    std::vector<PXDDAQPacketStatus>::iterator begin() { return m_pxdPacket.begin(); };
     /** iterator-based iteration for packets */
-    std::vector<PXDDAQPacketStatus>::const_iterator end() const { return m_pxdPacket.end(); };
+    std::vector<PXDDAQPacketStatus>::iterator end() { return m_pxdPacket.end(); };
+
+
+    PXDDAQPacketStatus& pkt_back() { return m_pxdPacket.back(); };
+    size_t pkt_size() const { return m_pxdPacket.size(); };
 
   private:
     PXDErrorFlags m_errorMask; /**< errors found in any packet/DHC/DHE */

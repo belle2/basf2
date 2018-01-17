@@ -180,8 +180,8 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
   m_errorMaskDHE = 0;
   m_errorMaskDHC = 0;
   m_errorMaskPacket = 0;
-  PXDDAQPacketStatus daqpktstat(inx, EPXDErrMask::c_NO_ERROR);
-  std::vector <PXDDAQDHEStatus> daqdhevect;
+  PXDDAQPacketStatus unused(inx, EPXDErrMask::c_NO_ERROR) ;
+  daqevtstat.addPacket(unused);
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
     B2ERROR("PXD Unpacker --> invalid packet size (32bit words) $" << hex << px.size());
@@ -250,7 +250,7 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
       B2DEBUG(20, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat, daqdhevect);
+      unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event, daqevtstat.pkt_back());
       ll += lo; /// no rounding needed
     }
     m_errorMaskDHE |= m_errorMask;
@@ -259,8 +259,7 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
     m_errorMaskEvent |= m_errorMask;
     m_errorMask = 0;
   }
-  daqpktstat.setErrorMask(m_errorMaskPacket);
-  daqevtstat.addPacket(daqpktstat);
+  daqevtstat.pkt_back().setErrorMask(m_errorMaskPacket);
 }
 
 void PXDUnpackerBSModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport,
@@ -391,7 +390,8 @@ void PXDUnpackerBSModule::dump_roi(void* data, unsigned int frame_len)
 }
 
 void PXDUnpackerBSModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
-                                     unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id)
+                                     unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id,
+                                     PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   bool printflag = false;
@@ -495,6 +495,15 @@ void PXDUnpackerBSModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
         rowflag = true;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (daqpktstat.dhc_size() > 0) {
+          if (daqpktstat.dhc_back().dhe_size() > 0) {
+            PXDDAQDHPComMode cm(dhp_dhp_id, dhp_row, dhp_cm);
+            // only is we have a DHC and DHE object... or back() is undefined
+            // Remark, if we have a broken data (DHE_START/END) structure, we might fill the
+            // previous DHE object ... but then the data is junk anyway
+            daqpktstat.dhc_back().dhe_back().addCM(cm);
+          }
+        }
         if (printflag)
           B2DEBUG(20, "SetRow: $" << hex << dhp_row << " CM $" << hex << dhp_cm);
       } else {
@@ -581,7 +590,7 @@ int PXDUnpackerBSModule::nr5bits(int i)
 }
 
 void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event,
-                                           PXDDAQPacketStatus& daqpktstat, std::vector <PXDDAQDHEStatus>& daqdhevect)
+                                           PXDDAQPacketStatus& daqpktstat)
 {
   /// The following STATIC variables are used to save some state or count some things
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
@@ -593,8 +602,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
     -0x7FFFFFFF;// Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
   static int countedDHEStartFrames = 0;
   static int countedDHEEndFrames = 0;
-  //  static int nr_of_frames_dhc = 0;/// tbd if and where this number will still show up in te DHC format TODO
-  static int countedDHCFrames = 0;/// would not be needed if nr_of_frames_dhc is not within the data structure
   static int mask_active_dhe = 0;// DHE mask (5 bit)
   static int nr_active_dhe =
     0;// just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
@@ -610,7 +617,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
 
 
   dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
-//   error_flag = false;
 
   dhc_frames dhc;
   dhc.set(data, hw->getFrameType(), len);
@@ -674,7 +680,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
   }
   switch (type) {
     case EDHCFrameHeaderDataType::c_DHP_RAW: {
-      countedDHCFrames++;
 
       if (verbose) dhc.data_direct_readout_frame_raw->print();
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
@@ -684,8 +689,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
-
-//       stat_raw++;
 
       unpack_dhp_raw(data, len - 4,
                      dhc.data_direct_readout_frame->getDHEId(),
@@ -700,7 +703,7 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       countedBytesInDHE = -0x7FFFFFFF;
       [[fallthrough]];
     case EDHCFrameHeaderDataType::c_DHP_ZSD: {
-      countedDHCFrames++;
+
       if (verbose) dhc.data_direct_readout_frame->print();
       if (isUnfiltered_event) {
         if (type == EDHCFrameHeaderDataType::c_ONSEN_DHP) m_errorMask |= EPXDErrMask::c_SENDALL_TYPE;
@@ -717,7 +720,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
-//       stat_zsd++;
       m_errorMask |= dhc.check_padding();// isUnfiltered_event
 
 
@@ -726,7 +728,7 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
                  dhc.data_direct_readout_frame->getDHEId(),
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
-                 dhe_first_offset, currentVxdId);
+                 dhe_first_offset, currentVxdId, daqpktstat);
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_FCE:
@@ -735,7 +737,9 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       countedBytesInDHE = -0x7FFFFFFF;
       [[fallthrough]];
     case EDHCFrameHeaderDataType::c_FCE_RAW: {
-      countedDHCFrames++;
+
+      m_errorMask |= EPXDErrMask::c_UNEXPECTED_FRAME_TYPE;
+      B2ERROR("Unexpected Frame Type (Clustering FCE)");
       if (verbose) hw->print();
       if (isUnfiltered_event) {
         if (type == EDHCFrameHeaderDataType::c_ONSEN_FCE) m_errorMask |= EPXDErrMask::c_SENDALL_TYPE;
@@ -757,7 +761,9 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       break;
     };
     case EDHCFrameHeaderDataType::c_COMMODE: {
-      countedDHCFrames++;
+
+      m_errorMask |= EPXDErrMask::c_UNEXPECTED_FRAME_TYPE;
+      B2ERROR("Unexpected Frame Type (COMMODE)");
 
       if (verbose) hw->print();
       if (currentDHEID != dhc.data_commode_frame->getDHEId()) {
@@ -784,10 +790,7 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       currentDHEID = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
       currentDHCID = dhc.data_dhc_start_frame->get_dhc_id();
-      //nr_of_frames_dhc = dhc.data_dhc_start_frame->get_dhc_nr_frames();
-      countedDHCFrames = 1;
       m_errorMask |= dhc.check_crc();
-//       stat_start++;
 
       if (!isFakedData_event) {
         /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
@@ -824,6 +827,11 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
+      {
+        PXDDAQDHCStatus daqdhc(currentDHCID, c_NO_ERROR, 0, 0);
+        daqpktstat.addDHC(daqdhc);
+      }
+
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_START: {
@@ -832,7 +840,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       last_dhp_readout_frame_lo[1] = -1;
       last_dhp_readout_frame_lo[2] = -1;
       last_dhp_readout_frame_lo[3] = -1;
-      countedDHCFrames++;
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
       dhe_first_offset = dhc.data_dhe_start_frame->getTriggerOffsetRow();
@@ -893,10 +900,13 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
         }
       }
 
+      if (daqpktstat.dhc_size() > 0) {
+        PXDDAQDHEStatus daqdhe(currentVxdId, currentDHEID, c_NO_ERROR, 0, 0, 0, 0);
+        daqpktstat.dhc_back().addDHE(daqdhe);
+      }
       break;
     };
     case EDHCFrameHeaderDataType::c_GHOST:
-      countedDHCFrames++;
       if (verbose)dhc.data_ghost_frame->print();
       if (currentDHEID != dhc.data_ghost_frame->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
@@ -909,31 +919,24 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesnt work
 
       m_errorMask |= dhc.check_crc();
-//       stat_ghost++;
 
       break;
     case EDHCFrameHeaderDataType::c_DHC_END: {
       if (dhc.data_dhc_end_frame->isFakedData() != isFakedData_event) {
         B2ERROR("DHC END is but no Fake event OR Fake Event but DHE END is not.");
       }
-      countedDHCFrames++;
       if (isFakedData_event) {
         B2WARNING("Faked DHC END Data -> trigger without Data!");
         m_errorMask |= EPXDErrMask::c_FAKE_NO_DATA_TRIG;
       } else {
         if (verbose)dhc.data_dhc_end_frame->print();
       }
-//       stat_end++;
 
       if (!isFakedData_event) {
         if (dhc.data_dhc_end_frame->get_dhc_id() != currentDHCID) {
           m_errorMask |= EPXDErrMask::c_DHC_DHCID_START_END_MM;
           B2ERROR("DHC ID Mismatch between Start and End $" << std::hex << currentDHCID << "!=$" << dhc.data_dhc_end_frame->get_dhc_id());
         }
-//         if (countedDHCFrames != nr_of_frames_dhc) { /// Nr Frames has been removed .. tbd
-//           if (!m_ignore_headernrframes) B2ERROR("Number of DHC Frames in Header(??? Tail?) " << nr_of_frames_dhc << " != " << countedDHCFrames << " Counted");
-//           m_errorMask |= EPXDErrMask::c_DHC_FRAMECOUNT;
-//         }
         int w;
         w = dhc.data_dhc_end_frame->get_words() * 4;
         if (countedBytesInDHC >= 0) {
@@ -949,11 +952,14 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       m_errorMask |= dhc.check_crc();
       m_errorMaskDHC |= m_errorMask; // do latest updates
-      PXDDAQDHCStatus daqdhcstat(currentDHCID, m_errorMaskDHC, dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
-      daqdhcstat.addDHEs(daqdhevect);
-      daqdhevect.clear();
-      daqpktstat.addDHC(daqdhcstat);
-//       m_storeDHCStats.appendNew(currentDHCID, m_errorMaskDHC, dhc.data_dhc_end_frame->get_words() * 4,countedBytesInDHC);
+
+      if (daqpktstat.dhc_size() > 0) {
+        // only is we have a DHC object... or back() is undefined
+        // Remark, if we have a broken data (DHC_START/END) structure, we might fill the
+        // previous DHC object ... but then the data is junk anyway
+        daqpktstat.dhc_back().setErrorMask(m_errorMaskDHC);
+        daqpktstat.dhc_back().setCounters(dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
+      }
       m_errorMaskDHC = 0;
       currentDHEID = 0xFFFFFFFF;
       currentDHCID = 0xFFFFFFFF;
@@ -961,7 +967,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_END: {
-      countedDHCFrames++;
       if (verbose) dhc.data_dhe_end_frame->print();
       if (currentDHEID != dhc.data_dhe_end_frame->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
@@ -995,18 +1000,23 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       m_errorMaskDHE |= m_errorMask; // do latest updates
 
-      PXDDAQDHEStatus daqdhestat(currentVxdId, currentDHEID, m_errorMaskDHE, dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE,
-                                 dhe_first_offset, dhe_first_readout_frame_id_lo
-                                );
-      daqdhevect.push_back(daqdhestat);
-//       m_storeDHEStats.appendNew(currentVxdId, currentDHEID, m_errorMaskDHE);
+      if (daqpktstat.dhc_size() > 0) {
+        if (daqpktstat.dhc_back().dhe_size() > 0) {
+          // only is we have a DHC and DHE object... or back() is undefined
+          // Remark, if we have a broken data (DHE_START/END) structure, we might fill the
+          // previous DHE object ... but then the data is junk anyway
+          daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
+          daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
+          daqpktstat.dhc_back().dhe_back().setStartRow(dhe_first_offset);
+          daqpktstat.dhc_back().dhe_back().setFrameNr(dhe_first_readout_frame_id_lo);
+        }
+      }
       m_errorMaskDHE = 0;
       currentDHEID |= 0xFF000000;// differenciate from 0xFFFFFFFFF as initial value
       currentVxdId = 0; /// invalid
       break;
     };
     case EDHCFrameHeaderDataType::c_ONSEN_ROI:
-      countedDHCFrames += 0; /// DO NOT COUNT!!!!
       if (verbose) dhc.data_onsen_roi_frame->print();
       m_errorMask |= dhc.data_onsen_roi_frame->check_error(len);
       m_errorMask |= dhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHC header, see reason in function
@@ -1027,7 +1037,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       break;
     case EDHCFrameHeaderDataType::c_ONSEN_TRG:
-      countedDHCFrames += 0; /// DO NOT COUNT!!!!
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
       if (dhc.data_onsen_trigger_frame->get_trig_nr1() != (unsigned int)(m_meta_event_nr & 0xFFFFFFFF))
         B2ERROR("TRG HLT MM: $" << dhc.data_onsen_trigger_frame->get_trig_nr1() << " META " <<
@@ -1079,17 +1088,13 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
     default:
       B2ERROR("UNKNOWN DHC frame type");
       m_errorMask |= EPXDErrMask::c_DHC_UNKNOWN;
-//      type_error++;
       if (verbose) hw->print();
-//       error_flag = true;
       break;
   }
 
   if (eventNrOfThisFrame != eventNrOfOnsenTrgFrame && !isFakedData_event) {
     B2ERROR("Frame TrigNr != ONSEN Trig Nr $" << hex << eventNrOfThisFrame << " != $" << eventNrOfOnsenTrgFrame);
     m_errorMask |= EPXDErrMask::c_FRAME_TNR_MM;
-//     evtnr_error++;
-//     error_flag = true;
   }
 
   if (Frame_Number == 0) {

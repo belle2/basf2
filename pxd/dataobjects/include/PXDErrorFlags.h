@@ -24,7 +24,7 @@ namespace Belle2 {
       /** Enums for used error bits (out of maximum).
        * used for e.g. plotting ranges
        */
-      enum { ONSEN_USED_TYPE_ERR = 51};
+      enum { ONSEN_USED_TYPE_ERR = 52};
 
       /** Typedef the flag variable type (uint64_t)
        */
@@ -100,6 +100,7 @@ namespace Belle2 {
         c_META_MM_DHC = 1ull << 48,
         c_META_MM_DHE = 1ull << 49,
         c_COL_OVERFLOW = 1ull << 50,
+        c_UNEXPECTED_FRAME_TYPE = 1ull << 51,
       };
 
       /** Get the description for the given error bit set above
@@ -136,7 +137,7 @@ namespace Belle2 {
           // 44-47
           "DHE ID is invalid", "DHC ID Start/End Mismatch", "DHE End w/o Start", "double DHC End",
           // 48-51
-          "DHC TrigNr vs EvtMeta mismatch", "DHE TrigNr vs EvtMeta mismatch", "DHP COL overflow (unconnected drain lines)", "unused",
+          "DHC TrigNr vs EvtMeta mismatch", "DHE TrigNr vs EvtMeta mismatch", "DHP COL overflow (unconnected drain lines)", "Unexpected (=unsupported) Frame Type",
           // 52-55
           "unused", "unused", "unused", "unused",
           // 56-59

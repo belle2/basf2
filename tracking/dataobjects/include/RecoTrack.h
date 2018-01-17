@@ -756,7 +756,7 @@ namespace Belle2 {
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
-    float m_qualityIndicator;
+    float m_qualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

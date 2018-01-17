@@ -79,6 +79,8 @@ void RelatedTracksCombinerModule::event()
 
         short cdcCharge = cdcRecoTrack.getChargeSeed();
 
+//        float vxdQI = vxdRecoTrack.getQualityIndicator();
+
         // For the combined track, we use the momentum of the CDC track
         // helix-extrapolated to the start position of the VXD track.
         const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
@@ -91,6 +93,8 @@ void RelatedTracksCombinerModule::event()
         newMergedTrack->setChargeSeed(cdcCharge);
         newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
         newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+
+//        newMergedTrack->setQualityIndicator(vxdQI);
 
         newMergedTrack->addRelationTo(&vxdRecoTrack);
         newMergedTrack->addRelationTo(&cdcRecoTrack);

@@ -61,9 +61,8 @@ void SPTC2RTConverterModule::initialize()
                                        m_param_recoHitInformationStoreArrayName);
   m_recoTracks.registerRelationTo(m_spacePointTCs);
 
-  StoreArray<PXDCluster>::optional(m_param_pxdClustersName);
-  StoreArray<SVDCluster>::optional(m_param_svdClustersName);
-
+  StoreArray<PXDCluster> PXDClusters; PXDClusters.isOptional(m_param_pxdClustersName);
+  StoreArray<SVDCluster> SVDClusters; SVDClusters.isOptional(m_param_svdClustersName);
 }
 
 void SPTC2RTConverterModule::event()
@@ -92,7 +91,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
   const TVector3& momentum = spacePointTC.getMomSeed();
   const short int charge = spacePointTC.getChargeSeed();
   const TMatrixDSym& covSeed = spacePointTC.getCovSeed();
-
+  const float qi = spacePointTC.getQualityIndex();
 
   // Create and append new RecoTrack
   RecoTrack* newRecoTrack = m_recoTracks.appendNew(position, momentum, charge,
@@ -101,6 +100,9 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 
   // Set information not required by constructor
   newRecoTrack->setSeedCovariance(covSeed);
+
+  // Transfer quality indicator from SPTC to RecoTrack
+  newRecoTrack->setQualityIndicator(qi);
 
   // Add individual Hits/Clusters
   unsigned int sortingParameter = 0; // Recreate sorting since there are two cluster per SVD hit.

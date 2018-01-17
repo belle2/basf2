@@ -93,7 +93,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
 
         # Basic peel function to get QI
-        qualityindex_crops = {'quality_index': reco_track.getRelated('SPTrackCands').getQualityIndex()}
+        qualityindicator_crops = peelers.peel_reco_track_quality_indicator(reco_track)
 
         # Get the fit results
         seed_fit_crops = peelers.peel_reco_track_seed(reco_track)
@@ -115,7 +115,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
             **subdetector_hit_purity_crops,  # Custom
-            **qualityindex_crops,
+            **qualityindicator_crops,
             **seed_fit_crops,
             **fit_crops,
             **fit_status_crops,

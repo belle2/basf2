@@ -13,7 +13,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, use_vxdtf2=True,
                                 fit_tracks=True, use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                use_quality_estimator_mva=False):
+                                use_vxdtf2_QE_MVA=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -58,7 +58,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks, use_vxdtf2=use_vxdtf2,
-                          use_second_cdc_hits=use_second_cdc_hits, use_quality_estimator_mva=use_quality_estimator_mva)
+                          use_second_cdc_hits=use_second_cdc_hits, use_vxdtf2_QE_MVA=use_vxdtf2_QE_MVA)
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
@@ -366,7 +366,7 @@ def add_track_finding(
         prune_temporary_tracks=True,
         use_vxdtf2=True,
         use_second_cdc_hits=False,
-        use_quality_estimator_mva=False):
+        use_vxdtf2_QE_MVA=False):
     """
     Adds the realistic track finding to the path.
     The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
@@ -409,7 +409,7 @@ def add_track_finding(
             if use_vxdtf2:
                 # version 2 of the track finder
                 add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks,
-                                             use_quality_estimator_mva=use_quality_estimator_mva)
+                                             use_vxdtf2_QE_MVA=use_vxdtf2_QE_MVA)
             else:
                 # version 1 of the track finder
                 add_vxd_track_finding(path, components=["SVD"], reco_tracks=svd_reco_tracks)
@@ -791,7 +791,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  useTwoStepSelection=True, PXDminSVDSPs=3,
-                                 use_quality_estimator_mva=False,
+                                 use_vxdtf2_QE_MVA=False,
                                  QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
                                  sectormap_file=None, custom_setup_name=None,
                                  filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
@@ -932,11 +932,11 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         path.add_module(pxdSVDCut)
 
     # Quality
-    qualityEstimator = register_module('QualityEstimatorVXD' if not use_quality_estimator_mva
+    qualityEstimator = register_module('QualityEstimatorVXD' if not use_vxdtf2_QE_MVA
                                        else 'QualityEstimatorMVA')
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
-    if use_quality_estimator_mva:
+    if use_vxdtf2_QE_MVA:
         qualityEstimator.param('WeightFileIdentifier', QEMVA_weight_file)
         qualityEstimator.param('UseTimingInfo', False)
         qualityEstimator.param('ClusterInformation', 'Average')

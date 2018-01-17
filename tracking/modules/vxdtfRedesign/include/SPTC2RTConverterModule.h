@@ -40,7 +40,10 @@ namespace Belle2 {
     std::string m_param_svdHitsStoreArrayName; /**< StoreArray name of SVDhits. Related to RecoTracks. */
 
     std::string m_param_pxdClustersName; /**< StoreArray name of PXDClusters. Related to SpacePoints. */
+    StoreArray<PXDCluster> m_pxdClusters; /**< the StoreArray for pxdClusters as member*/
+
     std::string m_param_svdClustersName; /**< StoreArray name of SVDClusters. Related to SpacePoints. */
+    StoreArray<PXDCluster> m_svdClusters; /**< the StoreArray for ssvdClusters as member*/
 
     // store array members
     StoreArray<RecoTrack> m_recoTracks; /**< StoreArray as class member to prevent relinking for every SPTC. */

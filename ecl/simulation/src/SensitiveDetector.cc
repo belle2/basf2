@@ -50,7 +50,6 @@ SensitiveDetector::~SensitiveDetector()
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
   if (not m_HadronEmissionFunction) {
-    B2INFO("Init");
     m_HadronEmissionFile = FileSystem::findFile("/data/ecl/HadronScintEmissionFunction.root");
     TFile* InFile = new TFile(m_HadronEmissionFile.c_str(), "READ");
     if (!InFile || InFile->IsZombie())

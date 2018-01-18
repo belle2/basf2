@@ -107,7 +107,7 @@ namespace Belle2 {
        * @param inx Index of RawPXD packet
        * @param daqevtstat Daq Status Object
        */
-      void unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqevtstat);
+      void unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus* daqevtstat);
 
       /** Unpack one frame (within an event).
        * @param data pointer to frame

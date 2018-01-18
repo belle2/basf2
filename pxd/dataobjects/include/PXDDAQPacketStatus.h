@@ -29,13 +29,12 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQPacketStatus() : m_errorMask(0), m_critErrorMask(0), m_index(0), m_usable(true) {}
+    PXDDAQPacketStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(0) {}
 
     /** constructor setting the error mask and packet index.
      * @param inx packet index
-     * @param mask Error mask
      */
-    PXDDAQPacketStatus(unsigned short inx, PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_index(inx), m_usable(true) {}
+    PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -71,6 +70,11 @@ namespace Belle2 {
      */
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
 
+    /** Set Packet index
+     * @param inx packet index
+     */
+    void setPktIndex(unsigned short inx) { m_index = inx;};
+
     /** Return Packet index
      * @return packet index
      */
@@ -80,6 +84,16 @@ namespace Belle2 {
      * @param daqdhcstat DHC Status Object
      */
     void addDHC(PXDDAQDHCStatus& daqdhcstat) {m_pxdDHC.push_back(daqdhcstat);};
+
+    /** Add new DHC information
+     * @param params constructor parameter
+     * @return ref to new DHC Status Object
+     */
+    template<class ...Args> PXDDAQDHCStatus& newDHC(Args&& ... params)
+    {
+      /*return*/ m_pxdDHC.emplace_back(std::forward<Args>(params)...);
+      return m_pxdDHC.back();
+    }
 
     /** iterator-based iteration for DHCs */
     std::vector<PXDDAQDHCStatus>::iterator begin()  { return m_pxdDHC.begin(); };
@@ -92,9 +106,9 @@ namespace Belle2 {
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this packets sensors */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
+    bool m_usable; /**< data is useable.*/
 
     unsigned short m_index;/**< Packet index as delivered by DAQ.*/
-    bool m_usable; /**< data is useable.*/
 
     /** Vector of DHC informations beloning to this event */
     std::vector <PXDDAQDHCStatus> m_pxdDHC;

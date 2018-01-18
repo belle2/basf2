@@ -143,7 +143,7 @@ void PXDUnpackerBSModule::event()
   m_meta_experiment = evtPtr->getExperiment();
   m_meta_time = evtPtr->getTime();
 
-  PXDDAQStatus daqevtstat(EPXDErrMask::c_NO_ERROR);
+  PXDDAQStatus* daqevtstat = m_storeDAQEvtStats.appendNew(EPXDErrMask::c_NO_ERROR);
 
   int inx = 0; // count index for output objects
   for (auto& it : m_storeRawPXD) {
@@ -156,8 +156,7 @@ void PXDUnpackerBSModule::event()
   if (nRaws == 0) m_errorMask |= EPXDErrMask::c_NO_PXD;
 
   m_errorMaskEvent |= m_errorMask;
-  daqevtstat.setErrorMask(m_errorMaskEvent);
-  m_storeDAQEvtStats.appendNew(daqevtstat);
+  daqevtstat->setErrorMask(m_errorMaskEvent);
 
   m_unpackedEventsCount++;
   {
@@ -171,7 +170,7 @@ void PXDUnpackerBSModule::event()
   setReturnValue(0 == (m_criticalErrorMask & m_errorMaskEvent));
 }
 
-void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqevtstat)
+void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus* daqevtstat)
 {
   int Frames_in_event;
   int fullsize;
@@ -180,8 +179,7 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
   m_errorMaskDHE = 0;
   m_errorMaskDHC = 0;
   m_errorMaskPacket = 0;
-  PXDDAQPacketStatus unused(inx, EPXDErrMask::c_NO_ERROR) ;
-  daqevtstat.addPacket(unused);
+  PXDDAQPacketStatus& daqpktstat = daqevtstat->newPacket(inx);
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
     B2ERROR("PXD Unpacker --> invalid packet size (32bit words) $" << hex << px.size());
@@ -250,7 +248,7 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
       B2DEBUG(20, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event, daqevtstat.pkt_back());
+      unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
       ll += lo; /// no rounding needed
     }
     m_errorMaskDHE |= m_errorMask;
@@ -259,7 +257,7 @@ void PXDUnpackerBSModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus& daqev
     m_errorMaskEvent |= m_errorMask;
     m_errorMask = 0;
   }
-  daqevtstat.pkt_back().setErrorMask(m_errorMaskPacket);
+  daqpktstat.setErrorMask(m_errorMaskPacket);
 }
 
 void PXDUnpackerBSModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport,
@@ -467,11 +465,10 @@ void PXDUnpackerBSModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
 
   if (daqpktstat.dhc_size() > 0) {
     if (daqpktstat.dhc_back().dhe_size() > 0) {
-      PXDDAQDHPStatus daqdhp(dhp_dhp_id, dhp_row, dhp_readout_frame_lo);
       // only is we have a DHC and DHE object... or back() is undefined
       // Remark, if we have a broken data (DHE_START/END) structure, we might fill the
       // previous DHE object ... but then the data is junk anyway
-      daqpktstat.dhc_back().dhe_back().addDHP(daqdhp);
+      daqpktstat.dhc_back().dhe_back().newDHP(dhp_dhp_id, dhp_readout_frame_lo);
     }
   }
 
@@ -839,11 +836,8 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
-      {
-        PXDDAQDHCStatus daqdhc(currentDHCID, c_NO_ERROR, 0, 0);
-        daqpktstat.addDHC(daqdhc);
-      }
 
+      daqpktstat.newDHC(currentDHCID, m_errorMask);
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_START: {
@@ -913,8 +907,8 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
       }
 
       if (daqpktstat.dhc_size() > 0) {
-        PXDDAQDHEStatus daqdhe(currentVxdId, currentDHEID, c_NO_ERROR, 0, 0, 0, 0);
-        daqpktstat.dhc_back().addDHE(daqdhe);
+        // if no DHC has been defined yet, do nothing!
+        daqpktstat.dhc_back().newDHE(currentVxdId, currentDHEID, m_errorMask, dhe_first_offset, dhe_first_readout_frame_id_lo);
       }
       break;
     };
@@ -1019,8 +1013,6 @@ void PXDUnpackerBSModule::unpack_dhc_frame(void* data, const int len, const int 
           // previous DHE object ... but then the data is junk anyway
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
-          daqpktstat.dhc_back().dhe_back().setStartRow(dhe_first_offset);
-          daqpktstat.dhc_back().dhe_back().setFrameNr(dhe_first_readout_frame_id_lo);
         }
       }
       m_errorMaskDHE = 0;

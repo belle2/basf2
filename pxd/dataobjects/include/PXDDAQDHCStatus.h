@@ -30,16 +30,14 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQDHCStatus() : m_usable(true), m_errorMask(0), m_critErrorMask(0), m_rawCount(0), m_redCount(0) {}
+    PXDDAQDHCStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_dhcID(0), m_rawCount(0), m_redCount(0) {}
 
     /** constructor setting the error mask, dhcid, raw and reduced data counters
      * @param dhcid DHC id
-     * @param mask Error mask
-     * @param raw raw data counter
-     * @param red reduced data counter
+     * @param mask error mask
      */
-    PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask, uint32_t raw, uint32_t red) : m_dhcID(dhcid), m_usable(true), m_errorMask(mask),
-      m_critErrorMask(0), m_rawCount(raw), m_redCount(red) {}
+    PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
+      m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0) {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -89,18 +87,21 @@ namespace Belle2 {
     /** Set Reduced Data counter for reduction calculation */
     uint32_t getRedCnt(void) const { return m_redCount;};
 
-    /** Add DHE information
-     * @param daqdhevect Vector of DHE Status Objects
-     */
-    void addDHEs(std::vector<PXDDAQDHEStatus>& daqdhevect)
-    {
-      for (auto a : daqdhevect) m_pxdDHE.push_back(a);
-    };
 
     /** Add DHE information
      * @param daqdhe DHE Status Object
      */
     void addDHE(PXDDAQDHEStatus& daqdhe) { m_pxdDHE.push_back(daqdhe);};
+
+    /** Add new DHE information
+     * @param params constructor parameter
+     * @return new DHE Status Object
+     */
+    template<class ...Args> PXDDAQDHEStatus&  newDHE(Args&& ... params)
+    {
+      /*return*/ m_pxdDHE.emplace_back(std::forward<Args>(params)...);
+      return m_pxdDHE.back();
+    }
 
     /** iterator-based iteration for DHEs */
     std::vector<PXDDAQDHEStatus>::iterator begin()  { return m_pxdDHE.begin(); };
@@ -111,16 +112,15 @@ namespace Belle2 {
     size_t dhe_size() const { return m_pxdDHE.size(); };
 
   private:
-
-    unsigned short m_dhcID;/**< DHC ID as delivered by DAQ.*/
-    bool m_usable; /**< data is useable.*/
-
     PXDErrorFlags m_errorMask; /**< errors found in this DHC/sensor */
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
+    bool m_usable; /**< data is useable.*/
 
+    unsigned short m_dhcID;/**< DHC ID as delivered by DAQ.*/
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
 
+    /** Vector of DHE informations belonging to this event */
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
     ClassDef(PXDDAQDHCStatus, 1);

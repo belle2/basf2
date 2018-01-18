@@ -14,6 +14,7 @@
 #include <pxd/dataobjects/PXDDAQPacketStatus.h>
 #include <TObject.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
+#include <memory>
 
 using namespace Belle2::PXD::PXDError;
 
@@ -98,11 +99,21 @@ namespace Belle2 {
      */
     void addPacket(PXDDAQPacketStatus& daqpktstat) {m_pxdPacket.push_back(daqpktstat);};
 
+    /** Add new Packet information
+     * @param params constructor parameter
+     * @return ref to new Packet Status Object
+     */
+    template<class ...Args> PXDDAQPacketStatus& newPacket(Args&& ... params)
+    {
+      /*return*/ m_pxdPacket.emplace_back(std::forward<Args>(params)...);
+      return m_pxdPacket.back();
+    }
+
+
     /** iterator-based iteration for packets */
     std::vector<PXDDAQPacketStatus>::iterator begin() { return m_pxdPacket.begin(); };
     /** iterator-based iteration for packets */
     std::vector<PXDDAQPacketStatus>::iterator end() { return m_pxdPacket.end(); };
-
 
     PXDDAQPacketStatus& pkt_back() { return m_pxdPacket.back(); };
     size_t pkt_size() const { return m_pxdPacket.size(); };

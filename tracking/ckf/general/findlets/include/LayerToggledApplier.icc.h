@@ -29,7 +29,8 @@ namespace Belle2 {
       const std::string& prefix)
   {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toggleOnLayer"),
-                                  m_param_toggleOnLayer, "", m_param_toggleOnLayer);
+                                  m_param_toggleOnLayer, "Where to toggle between low, equal and high filter",
+                                  m_param_toggleOnLayer);
 
     m_highLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "high"));
     m_equalLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "equal"));

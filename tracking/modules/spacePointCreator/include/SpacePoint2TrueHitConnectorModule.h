@@ -118,11 +118,11 @@ namespace Belle2 {
 
     SpacePoint2TrueHitConnectorModule(); /**< Constructor */
 
-    virtual void initialize(); /**< initialize: initialize counters, check StoreArrays, register StoreArrays, ... */
+    void initialize() override; /**< initialize: initialize counters, check StoreArrays, register StoreArrays, ... */
 
-    virtual void event(); /**< event: try to find the appropriate TrueHit to all SpacePoints */
+    void event() override; /**< event: try to find the appropriate TrueHit to all SpacePoints */
 
-    virtual void terminate(); /**< terminate: print some summary information */
+    void terminate() override; /**< terminate: print some summary information */
 
     BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint,
                             "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */

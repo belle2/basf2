@@ -27,7 +27,6 @@
 
 // NAMESPACE(S)
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -111,8 +110,8 @@ void ECLCRFinderModule::initialize()
 
   // Initialize neighbour maps.
   m_neighbourMaps.resize(2);
-  m_neighbourMaps[0] = new ECLNeighbours(m_mapType[0], m_mapPar[0]);
-  m_neighbourMaps[1] = new ECLNeighbours(m_mapType[1], m_mapPar[1]);
+  m_neighbourMaps[0] = new ECL::ECLNeighbours(m_mapType[0], m_mapPar[0]);
+  m_neighbourMaps[1] = new ECL::ECLNeighbours(m_mapType[1], m_mapPar[1]);
 
   // Initialize the modified energy cuts (that could depend on event-by-event backgrounds later).
   for (int i = 0; i < 3; i++) {

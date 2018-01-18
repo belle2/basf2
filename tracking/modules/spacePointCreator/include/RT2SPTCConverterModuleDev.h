@@ -39,14 +39,14 @@ namespace Belle2 {
 
     RT2SPTCConverterModule(); /**< Constructor*/
 
-    virtual void
-    initialize(); /**< initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays) */
+    void initialize()
+    override; /**< initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays) */
 
-    virtual void event(); /**< event: convert RecoTracks to SpacePointTrackCands */
+    void event() override; /**< event: convert RecoTracks to SpacePointTrackCands */
 
-    virtual void endRun();
+    void endRun() override;
 
-    virtual void terminate(); /**< terminate: print some summary information on the processed events */
+    void terminate() override; /**< terminate: print some summary information on the processed events */
 
   protected:
 

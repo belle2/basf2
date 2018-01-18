@@ -27,6 +27,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::geometry;
+using namespace ECL;
 
 namespace {
   Point_t p1[]  = {{0.0, 0.0}, {263.4, 0.0}, {263.4, 197.2}, {248.6, 206.6}, {212.0, 152.6}, {145.2, 199.0}, {108.5, 146.6}, {46.4, 192.1}, {7.9, 140.5}, { -50.0, 185.2}, { -90.3, 134.2}, { -143.8, 178.3}, { -170.7, 145.0}};

@@ -40,22 +40,22 @@ namespace Belle2 {
     MuidModule();
 
     //! destructor
-    virtual ~MuidModule();
+    ~MuidModule();
 
     //! Initialize for muon identification
-    virtual void initialize();
+    void initialize() override;
 
     //! Perform beginning-of-run actions
-    virtual void beginRun();
+    void beginRun() override;
 
     //! Performs muon identification for all tracks in one event
-    virtual void event();
+    void event() override;
 
     //! Perform end-of-run actions
-    virtual void endRun();
+    void endRun() override;
 
     //! Terminates the module
-    virtual void terminate();
+    void terminate() override;
 
   protected:
 

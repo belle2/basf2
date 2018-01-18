@@ -117,8 +117,8 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
     if (XP.getSensorLayer() == 4) lay4 = 1;
     if (XP.getSensorLayer() == 5) lay5 = 1;
     if (XP.getSensorLayer() == 6) lay6 = 1;
-    if (fabs(XP.getD0Entry()) > 1.) flagd0 = 0;
-    if (fabs(XP.getZ0Entry()) > 1.) flagz0 = 0;
+    //    if (fabs(XP.getD0Entry()) > 1.) flagd0 = 0;
+    //    if (fabs(XP.getZ0Entry()) > 1.) flagz0 = 0;
   }
   int N_lay = lay3 + lay4 + lay5 + lay6;
   if (N_lay >= 3) N_lay = 1;
@@ -196,23 +196,36 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
 {
   initNoKickRTSel();
   hit8TrackBuilder(track);
+
+  if (m_outputFlag) {
+    m_pdgID = m_8hitTrack[0].getPDGID();
+    m_pMag = track.getMomentumSeed().Mag();
+    m_pt = sqrt(track.getMomentumSeed().X() * track.getMomentumSeed().X() + track.getMomentumSeed().Y() * track.getMomentumSeed().Y());
+  }
+
   bool good = true;
   good = globalCut(m_8hitTrack);
   if (good == false) {
     if (m_outputFlag) {
-      m_numberOfCuts = 25;
+      m_numberOfCuts = -1; //it means "no specific cuts applied, but rejected for global cuts"
+      m_Ncuts = m_numberOfCuts;
+      m_isCutted = true;
       m_nCutHit->Fill(m_numberOfCuts);
       m_momCut->Fill(track.getMomentumSeed().Mag());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+      m_noKickTree->Fill();
     }
     return good;
   }
 
   if (track.getMomentumSeed().Mag() > m_pmax) {
     if (m_outputFlag) {
+      m_Ncuts = m_numberOfCuts;
+      m_isCutted = false;
       m_nCutHit->Fill(m_numberOfCuts);
       m_momSel->Fill(track.getMomentumSeed().Mag());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+      m_noKickTree->Fill();
     }
     return good;
   }
@@ -249,14 +262,18 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
     }
   }
   if (m_outputFlag) {
+    m_Ncuts = m_numberOfCuts;
     m_nCutHit->Fill(m_numberOfCuts);
     if (good) {
+      m_isCutted = false;
       m_momSel->Fill(track.getMomentumSeed().Mag());
       m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     } else {
+      m_isCutted = true;
       m_momCut->Fill(track.getMomentumSeed().Mag());
       m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
     }
+    m_noKickTree->Fill();
   }
   return good;
 }
@@ -283,6 +300,8 @@ void NoKickRTSel::produceHistoNoKick()
     m_PDGIDEff->Write();
 
     m_nCutHit->Write();
+
+    m_noKickTree->Write();
 
     delete m_noKickOutputTFile;
   }

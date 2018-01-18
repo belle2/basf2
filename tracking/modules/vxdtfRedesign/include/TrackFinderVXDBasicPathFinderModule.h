@@ -48,13 +48,13 @@ namespace Belle2 {
     TrackFinderVXDBasicPathFinderModule();
 
     /** initialize */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** beginRun */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** event */
-    virtual void event() override;
+    void event() override;
 
 
   protected:

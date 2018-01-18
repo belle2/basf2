@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRawDQMModule_H
-#define PXDRawDQMModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
@@ -93,4 +92,3 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDRawDQMModule_H

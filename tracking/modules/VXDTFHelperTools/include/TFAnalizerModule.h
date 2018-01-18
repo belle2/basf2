@@ -255,22 +255,22 @@ namespace Belle2 {
       TFAnalizerModule();
 
 
-      virtual ~TFAnalizerModule();
+      ~TFAnalizerModule();
 
 
-      virtual void initialize();
+      void initialize() override;
 
 
-      virtual void beginRun();
+      void beginRun() override;
 
 
-      virtual void event();
+      void event() override;
 
 
-      virtual void endRun();
+      void endRun() override;
 
 
-      virtual void terminate();
+      void terminate() override;
 
 
       /** compares entries of a list which stores pair of values (which one is bigger?) */

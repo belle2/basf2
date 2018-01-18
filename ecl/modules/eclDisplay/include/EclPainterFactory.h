@@ -59,7 +59,7 @@ namespace Belle2 {
      * It will show data from EclData specific to its type.
      */
     static EclPainter* createPainter(EclPainterType type, EclData* data,
-                                     ECLChannelMapper* mapper,
+                                     ECL::ECLChannelMapper* mapper,
                                      EclData::EclSubsystem subsys = EclData::ALL);
     /**
      * Returns array of titles for each EclPainter type.

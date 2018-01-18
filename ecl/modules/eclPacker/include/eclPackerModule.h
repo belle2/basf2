@@ -27,102 +27,96 @@ namespace Belle2 {
   class ECLDigit;
   class ECLDsp;
 
-  namespace ECL {
+  class ECLPackerModule : public Module {
+  public:
+    ECLPackerModule();
+    virtual ~ECLPackerModule();
+
+    virtual void initialize();
+    virtual void beginRun();
+    virtual void event();
+    virtual void endRun();
+    virtual void terminate();
+
+    /// exception for errors during packing ADC data buffer
+    BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
+                            "Error packing adc samples to buffer");
+    /// wrong indexes for ShaperDSP, channel or crate are apperared
+    BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
+                            "Something wrong with ECL Packer");
 
 
-
-    class ECLPackerModule : public Module {
-    public:
-      ECLPackerModule();
-      virtual ~ECLPackerModule();
-
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
-
-      /// exception for errors during packing ADC data buffer
-      BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
-                              "Error packing adc samples to buffer");
-      /// wrong indexes for ShaperDSP, channel or crate are apperared
-      BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
-                              "Something wrong with ECL Packer");
+  protected:
 
 
-    protected:
+  private:
+    /** Event number */
+    int    m_EvtNum;
 
+    /** position in the  data array */
+    int m_bufPos;
 
-    private:
-      /** Event number */
-      int    m_EvtNum;
+    /** length data  */
+    int m_bufLength;
 
-      /** position in the  data array */
-      int m_bufPos;
+    /** bit position for bit-by-bit data read  */
+    int m_bitPos;
 
-      /** length data  */
-      int m_bufLength;
+    /** DSP amplitude threshold */
+    int m_ampThreshold;
 
-      /** bit position for bit-by-bit data read  */
-      int m_bitPos;
+    /** eneble/disable compression of waveform data */
+    bool m_compressMode;
 
-      /** DSP amplitude threshold */
-      int m_ampThreshold;
+    /** the rate of writing of the ADC samples*/
+    int m_WaveformRareFactor;
 
-      /** eneble/disable compression of waveform data */
-      bool m_compressMode;
+    /** name of output collection for RawCOPPER */
+    std::string m_eclRawCOPPERsName;
 
-      /** the rate of writing of the ADC samples*/
-      int m_WaveformRareFactor;
+    /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
+    std::string m_eclMapperInitFileName;
 
-      /** name of output collection for RawCOPPER */
-      std::string m_eclRawCOPPERsName;
+    /** array of ADC samples */
+    int m_EclWaveformSamples[ECL_ADC_SAMPLES_PER_CHANNEL]; // == 31
 
-      /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
-      std::string m_eclMapperInitFileName;
+    /** channel mapper */
+    ECL::ECLChannelMapper* m_eclMapper;
 
-      /** array of ADC samples */
-      int m_EclWaveformSamples[ECL_ADC_SAMPLES_PER_CHANNEL]; // == 31
+    /** Output data  */
+    StoreArray<RawECL> m_eclRawCOPPERs;
 
-      /** channel mapper */
-      ECLChannelMapper* m_eclMapper;
+    /* temporary buffer to store ADC data */
+    unsigned int adcBuffer_temp[ECL::ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
 
-      /** Output data  */
-      StoreArray<RawECL> m_eclRawCOPPERs;
+    // number of hits, masks etc ...
+    /** array of triggered collectors */
+    int collectorMaskArray[ECL::ECL_CRATES];
+    /** triggered shapers */
+    int shaperMaskArray[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
+    /** shapers with ADC data */
+    int shaperADCMaskArray[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
+    /** Number of waveforms per shaper*/
+    int shaperNWaveform[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
+    /** Number of hits per shaper*/
+    int shaperNHits[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
 
-      /* temporary buffer to store ADC data */
-      unsigned int adcBuffer_temp[ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
+    /** indexes of related eclDigits*/
+    int* iEclDigIndices;
 
-      // number of hits, masks etc ...
-      /** array of triggered collectors */
-      int collectorMaskArray[ECL_CRATES];
-      /** triggered shapers */
-      int shaperMaskArray[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-      /** shapers with ADC data */
-      int shaperADCMaskArray[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-      /** Number of waveforms per shaper*/
-      int shaperNWaveform[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-      /** Number of hits per shaper*/
-      int shaperNHits[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
+    /** indexes of related waveforms*/
+    int* iEclWfIndices;
 
-      /** indexes of related eclDigits*/
-      int* iEclDigIndices;
+    //DataStore variables
+    StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
+    StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
 
-      /** indexes of related waveforms*/
-      int* iEclWfIndices;
+    /** write N bits to the collector buffer */
+    void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
+    /** reset current position in the buffer */
+    void resetBuffPosition();
+    /** set buffer length*/
+    void setBuffLength(int bufLength);
 
-      //DataStore variables
-      StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
-      StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
-
-      /** write N bits to the collector buffer */
-      void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
-      /** reset current position in the buffer */
-      void resetBuffPosition();
-      /** set buffer length*/
-      void setBuffLength(int bufLength);
-
-    };
-  }//namespace ECL
-
+  };
 }//namespace Belle2

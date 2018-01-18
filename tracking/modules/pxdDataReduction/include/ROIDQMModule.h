@@ -45,11 +45,11 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     ROIDQMModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
     std::string m_PXDDigitsName; /**< digit list name*/
 

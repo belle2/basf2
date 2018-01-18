@@ -4,7 +4,7 @@ INCDIR=$(BELLE2_DAQ_SLC)/include/daq/slc/
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/runrecordd
-	@ ln -s $(BELLE2_DAQ_SLC)/apps/runrecordd/include/* $(INCDIR)/apps/runrecordd/
+	@ ln -sf $(BELLE2_DAQ_SLC)/apps/runrecordd/include/* $(INCDIR)/apps/runrecordd/
 #	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/runrecordd/include/* $(INCDIR)/apps/runrecordd
 
 apps/runrecordd: %:

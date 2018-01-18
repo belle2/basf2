@@ -41,7 +41,10 @@ unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf; throw (err_str);
+
   return 0;
 }
 
@@ -79,7 +82,9 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       char err_buf[500];
       sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf; throw (err_str);
+      printf("[DEBUG] %s\n", err_buf);
+      exit(1);
+      //      string err_str = err_buf; throw (err_str);
   }
 
   if (nwords < 0 || nwords > 1e6) {
@@ -88,7 +93,9 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
             nwords,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str);
+    printf("[DEBUG] %s\n", err_buf);
+    exit(1);
+    //    string err_str = err_buf; throw (err_str);
   }
 
   return nwords;
@@ -106,7 +113,9 @@ unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
           n,
           GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf; throw (err_str);
   return 0;
 }
 
@@ -152,12 +161,12 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 
 
   if (err_flag == 1) {
+    printf("[DEBUG] %s\n", err_buf);
     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
     printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
-    string err_str = err_buf;
-    throw (err_str);
-
+    exit(1);
+    //    string err_str = err_buf; throw (err_str);
     //     sleep(1234567);
     //     exit(-1);
   }
@@ -174,7 +183,9 @@ bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
           n,
           GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf; throw (err_str);
   return false;
 }
 
@@ -183,8 +194,9 @@ void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf;  throw (err_str);
 }
 
 unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
@@ -196,8 +208,9 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u\n",
          m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf;  throw (err_str);
 
 }
 
@@ -208,8 +221,9 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   sprintf(err_buf, "[FATAL] This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf;  throw (err_str);
 
 }
 
@@ -228,8 +242,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+    exit(1);
+    //    string err_str = err_buf;    throw (err_str);
   }
 
   int* copper_buf = GetBuffer(n);
@@ -280,7 +294,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
 #ifndef NO_ERROR_STOP
-      string err_str = err_buf;     throw (err_str);
+      exit(1);
+      //      string err_str = err_buf;     throw (err_str);
 #endif
     }
     // Modify XOR checksum due to adding a bit flag

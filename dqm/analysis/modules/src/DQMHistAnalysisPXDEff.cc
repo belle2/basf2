@@ -122,7 +122,9 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 void DQMHistAnalysisPXDEffModule::event()
 {
 
-  for (VxdID& aPXDModule : m_PXDModules) {
+  for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
+    VxdID& aPXDModule = m_PXDModules[i - 1];
+
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
 
@@ -141,6 +143,9 @@ void DQMHistAnalysisPXDEffModule::event()
 
     m_hEffModules[aPXDModule]->Divide(Matches, Hits);
 
+    double moduleAverage = Matches->Integral() / Hits->Integral();
+    m_hEffAll->SetBinContent(i, moduleAverage);
+
     //todo this canvas always exists, don't create them to suppress output of the individual histos?
     if (m_cEffModules[aPXDModule]) {
       m_cEffModules[aPXDModule]->cd();
@@ -151,7 +156,10 @@ void DQMHistAnalysisPXDEffModule::event()
 
   }
 
-  //todo Here: fill the summary hist and the four averaged histos
+
+
+
+  //todo Here: fill the four averaged histos
 
 }
 

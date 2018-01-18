@@ -44,7 +44,7 @@ namespace Belle2 {
       void EndOfEvent(G4HCofThisEvent* eventHC);
 
     private:
-      TGraph* m_HadronEmissionFunction;  /**< Graph for hadron scintillation component emission function */
+      TGraph* m_HadronEmissionFunction = nullptr;  /**< Graph for hadron scintillation component emission function */
       double GetHadronIntensityFromDEDX(double);  /**< Evaluates hadron scintillation component emission function */
       /** Create ECLSimHit and ECLHit and relations from MCParticle and put them in datastore */
       int saveSimHit(G4int, G4int, G4int, G4double, G4double, const G4ThreeVector&, const G4ThreeVector&, double);

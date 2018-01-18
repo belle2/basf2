@@ -49,13 +49,16 @@ SensitiveDetector::~SensitiveDetector()
 
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
-  m_HadronEmissionFile = FileSystem::findFile("/data/ecl/HadronScintEmissionFunction.root");
-  TFile* InFile = new TFile(m_HadronEmissionFile.c_str(), "READ");
-  if (!InFile || InFile->IsZombie())
-    B2FATAL("Could not open file " << "HadronScintEmissionFunction.root");
-  m_HadronEmissionFunction = (TGraph*) InFile->Get("HadronEmissionFunction");
-  InFile->Close();
-  delete InFile;
+  if (not m_HadronEmissionFunction) {
+    B2INFO("Init");
+    m_HadronEmissionFile = FileSystem::findFile("/data/ecl/HadronScintEmissionFunction.root");
+    TFile* InFile = new TFile(m_HadronEmissionFile.c_str(), "READ");
+    if (!InFile || InFile->IsZombie())
+      B2FATAL("Could not open file " << "HadronScintEmissionFunction.root");
+    m_HadronEmissionFunction = (TGraph*) InFile->Get("HadronEmissionFunction");
+    InFile->Close();
+    delete InFile;
+  }
 }
 //Returns percent of scintillation emission for hadron component for given ionization dEdx value
 //See slides: https://kds.kek.jp/indico/event/24563/session/17/contribution/256/material/slides/0.pdf

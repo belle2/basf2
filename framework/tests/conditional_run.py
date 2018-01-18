@@ -10,10 +10,11 @@ class PrinterModule(basf2.Module):
         print(self._print_string)
 
 
-def simulate_run(run_number):
+def simulate_run(run_numbers):
     path = basf2.create_path()
 
-    path.add_module("EventInfoSetter", runList=[run_number], evtNumList=[1])
+    path.add_module("EventInfoSetter", runList=run_numbers, evtNumList=[1] * len(run_numbers),
+                    expList=[1] * len(run_numbers))
     path.add_module("EventInfoPrinter")
 
     # Phase 2 path
@@ -40,6 +41,5 @@ def simulate_run(run_number):
 
 if __name__ == "__main__":
     basf2.set_random_seed(1)
-    simulate_run(1)
-    simulate_run(1002)
-    simulate_run(4242)
+    simulate_run([1, 2])
+    simulate_run([1002, 1, 1003])

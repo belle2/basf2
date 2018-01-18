@@ -1,5 +1,7 @@
 Import('env')
 
+env['CONTINUE'] = False
+
 env['TOOLS_LIBS']['hserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['hrelay'] = ['daq', 'framework', '$ROOT_LIBS' ]
 #env['TOOLS_LIBS']['maptest'] = ['daq', 'framework','$ROOT_LIBS' ]

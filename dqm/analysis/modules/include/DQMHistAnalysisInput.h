@@ -6,8 +6,7 @@
 // Date : 25 - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisInput_h
-#define _Belle2_DQMHistAnalysisInput_h
+#pragma once
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -60,4 +59,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

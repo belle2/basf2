@@ -31,7 +31,7 @@ DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
   addParam("Function", m_function, "Fit function definition", std::string("gaus"));
   addParam("Parameters", m_parameters, "Fit function parameters for EPICS", 3);
   addParam("PVName", m_pvname, "PV Prefix", std::string("PXD:DQM:hist"));
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: Constructor done.");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: Constructor done.");
 }
 
 
@@ -39,7 +39,7 @@ DQMHistAnalysisEpicsExampleModule::~DQMHistAnalysisEpicsExampleModule() { }
 
 void DQMHistAnalysisEpicsExampleModule::initialize()
 {
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: initialized.");
 
   TString a;
   a = m_histoname;
@@ -97,14 +97,14 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
 void DQMHistAnalysisEpicsExampleModule::beginRun()
 {
   //m_serv->SetTimer(100, kFALSE);
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: beginRun called.");
   m_c1->Clear();
 
   TH1* hh1;
   hh1 = findHist(m_histoname.c_str());
 
   if (hh1 == NULL) {
-    B2INFO("Histo " << m_histoname << " not in memfile");
+    B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
@@ -117,7 +117,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
       if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
         auto e = d->GetDirectory(tok);
         if (e) {
-          B2INFO("Cd Dir " << tok);
+          B2DEBUG(20, "Cd Dir " << tok);
           d = e;
         }
         d->cd();
@@ -128,11 +128,11 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
     TObject* obj = d->FindObject(tok);
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
-        B2INFO("Histo " << m_histoname << " found in mem");
+        B2DEBUG(20, "Histo " << m_histoname << " found in mem");
         hh1 = (TH1*)obj;
       }
     } else {
-      B2INFO("Histo " << m_histoname << " NOT found in mem");
+      B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
     }
   }
 
@@ -143,7 +143,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
     m_line_lo->Draw();
     m_line_hi->Draw();
   } else {
-    B2INFO("Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
 }
 
@@ -154,7 +154,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
 
   hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
-    B2INFO("Histo " << m_histoname << " not in memfile");
+    B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
@@ -167,7 +167,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
       if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
         auto e = d->GetDirectory(tok);
         if (e) {
-          B2INFO("Cd Dir " << tok);
+          B2DEBUG(20, "Cd Dir " << tok);
           d = e;
         }
         d->cd();
@@ -178,12 +178,12 @@ void DQMHistAnalysisEpicsExampleModule::event()
     TObject* obj = d->FindObject(tok);
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
-        B2INFO("Histo " << m_histoname << " found in mem");
+        B2DEBUG(20, "Histo " << m_histoname << " found in mem");
         hh1 = (TH1*)obj;
         flag = true;
       }
     } else {
-      B2INFO("Histo " << m_histoname << " NOT found in mem");
+      B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
     }
   }
   if (hh1 != NULL) {
@@ -209,7 +209,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
     m_c1->Modified();
     m_c1->Update();
   } else {
-    B2INFO("Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
 
   if (m_parameters > 0) {
@@ -224,12 +224,12 @@ void DQMHistAnalysisEpicsExampleModule::event()
 
 void DQMHistAnalysisEpicsExampleModule::endRun()
 {
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample : endRun called");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample : endRun called");
 }
 
 
 void DQMHistAnalysisEpicsExampleModule::terminate()
 {
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: terminate called");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: terminate called");
 }
 

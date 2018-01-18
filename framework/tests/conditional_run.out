@@ -1,0 +1,31 @@
+[INFO] Steering file: conditional_run.py
+[INFO] The random number seed is set to "1"
+[INFO] Starting event processing, random seed is set to '1'
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        1
+Phase 3 is here
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+[INFO] Starting event processing, random seed is set to '1'
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1002
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:     1002        EVT:        1
+Phase 2 is here
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1002
+[INFO] ========================================================================
+[INFO] Starting event processing, random seed is set to '1'
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] ========================================================================
+[INFO] >>> Start new run: 4242
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:     4242        EVT:        1
+No condition met
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 4242
+[INFO] ========================================================================

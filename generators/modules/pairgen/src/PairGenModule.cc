@@ -58,22 +58,8 @@ void PairGenModule::event()
   try {
     m_particleGraph.clear();
 
-    //Make list of particles
-    MCParticleGraph::GraphParticle& p = m_particleGraph.addParticle();
-    p.setStatus(MCParticle::c_PrimaryParticle);
-    p.setPDG(m_PDG);
-    p.setMassFromPDG();
-    p.setFirstDaughter(0);
-    p.setLastDaughter(0);
-
-    MCParticleGraph::GraphParticle& q = m_particleGraph.addParticle();
-    q.setStatus(MCParticle::c_PrimaryParticle);
-    q.setPDG(-1 * m_PDG);
-    q.setMassFromPDG();
-    q.setFirstDaughter(0);
-    q.setLastDaughter(0);
-
-    //generate the phi uniformly in CMS and theta with 1 + Cos(Theta)^2 :
+    //Distribution values:
+    //generate phi uniformly in CMS and theta with 1 + Cos(Theta)^2 :
     double phi = gRandom->Uniform(0, 2.0 * Pi());
     double theta = 0;
     double value = 0;
@@ -82,47 +68,44 @@ void PairGenModule::event()
       value = gRandom->Uniform(0, 2.0);
     }
 
-    double m  = p.getMass();
-
-    double momentum = Sqrt(10.583 * 10.583 / 4 - m * m);
-
-    double pz = momentum * Cos(theta);
-    double px = momentum * Sin(theta) * Cos(phi);
-    double py = momentum * Sin(theta) * Sin(phi);
-    double e  = Sqrt(momentum * momentum + m * m);
-
-    TLorentzVector vp(px, py, pz, e);
-    vp.Boost(0, 0, 0.272727);
-    TLorentzVector vq(-px, -py, -pz, e);
-    vq.Boost(0, 0, 0.272727);
-
-    p.setMomentum(vp(0), vp(1), vp(2));
-    p.setEnergy(vp(3));
-    p.setProductionVertex(0, 0, 0);
-    p.addStatus(MCParticle::c_StableInGenerator);
-    //Particle is stable in generator. We could use MCParticleGraph options to
-    //do this automatically but setting it here makes the particle correct
-    //independent of the options
-    p.setDecayTime(numeric_limits<double>::infinity());
-
-    // set time offset to check fit bias in e.g. the ECL waveform fits
-    p.setProductionTime(0);
-
-    q.setMomentum(vq(0), vq(1), vq(2));
-    q.setEnergy(vq(3));
-    q.setProductionVertex(0, 0, 0);
+    int nParticles = 1;
     if (m_saveBoth) {
-      q.addStatus(MCParticle::c_StableInGenerator);
-    } else {
-      q.addStatus(MCParticle::c_IsVirtual);
+      nParticles = 2;
     }
-    //Particle is stable in generator. We could use MCParticleGraph options to
-    //do this automatically but setting it here makes the particle correct
-    //independent of the options
-    q.setDecayTime(numeric_limits<double>::infinity());
+    for (int n = 1; n <= nParticles; n++) {
+      //Make list of particles
+      MCParticleGraph::GraphParticle& p = m_particleGraph.addParticle();
+      int sign = (n % 2) * 2 - 1;
+      p.setStatus(MCParticle::c_PrimaryParticle);
+      p.setPDG(sign * m_PDG);
+      p.setMassFromPDG();
+      p.setFirstDaughter(0);
+      p.setLastDaughter(0);
 
-    // set time offset to check fit bias in e.g. the ECL waveform fits
-    q.setProductionTime(0);
+      double m  = p.getMass();
+
+      double momentum = Sqrt(10.583 * 10.583 / 4 - m * m);
+
+      double pz = momentum * Cos(theta);
+      double px = momentum * Sin(theta) * Cos(phi);
+      double py = momentum * Sin(theta) * Sin(phi);
+      double e  = Sqrt(momentum * momentum + m * m);
+
+      TLorentzVector vp(sign * px, sign * py, sign * pz, e);
+      vp.Boost(0, 0, 0.272727);
+
+      p.setMomentum(vp(0), vp(1), vp(2));
+      p.setEnergy(vp(3));
+      p.setProductionVertex(0, 0, 0);
+      p.addStatus(MCParticle::c_StableInGenerator);
+      //Particle is stable in generator. We could use MCParticleGraph options to
+      //do this automatically but setting it here makes the particle correct
+      //independent of the options
+      p.setDecayTime(numeric_limits<double>::infinity());
+
+      // set time offset to check fit bias in e.g. the ECL waveform fits
+      p.setProductionTime(0);
+    }
 
     m_particleGraph.generateList();
   } catch (runtime_error& e) {

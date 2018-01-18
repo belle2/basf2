@@ -10,35 +10,45 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/IntervalOfValidity.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
-  /// Module which sets its return value based on the fact, if the event is in the given run or not.
-  class RunDependentConditionModule : public Module {
+  /// Module which sets its return value based on the fact, if the event is in the given run/exp interval or not
+  class IoVDependentConditionModule : public Module {
   public:
     /// Add the module parameters and the description.
-    RunDependentConditionModule();
+    IoVDependentConditionModule();
 
-    /// Require the event meta data
+    /// Require the event meta data and turn the minimal/maximal exp/runs to an IoV.
     void initialize() override;
 
-    /// Sets the value of m_runConditionMet according to the vale in the event meta data.
+    /// Set the m_conditionIsMet according to the new run
     void beginRun() override;
 
-    /// Returns the value of m_runConditionMet.
+    /// Returns true, if the event is in the given IoV.
     void event() override;
 
   private:
-    /// Returns true if in this run - or false otherwise.
-    int m_trueOnRun;
+    /// Returns true if in this IoV
+    IntervalOfValidity m_iovToCheck;
+
+    /// Internal condition: true if run/exp is in IoV
+    bool m_conditionIsMet = false;
 
     /// Storage for the event meta data
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
-    /// Internal boolean if the condition to be in run m_trueOnRun is true or false. Will only be set in beginRun()
-    bool m_runConditionMet = false;
+    /// Parameter for minimal exp number
+    int m_minimalExpNumber = 0;
+    /// Parameter for minimal run number
+    int m_minimalRunNumber = 0;
+    /// Parameter for maximal exp number
+    int m_maximalExpNumber = -1;
+    /// Parameter for maximal run number
+    int m_maximalRunNumber = -1;
   };
 
 }

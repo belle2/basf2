@@ -1,4 +1,4 @@
-[INFO] Steering file: framework/tests/conditional_run.py
+[INFO] Steering file: framework/tests/conditional_iov.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] ========================================================================
@@ -10,36 +10,36 @@ Phase 3 is here
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] ========================================================================
-[INFO] >>> Start new run: 2
+[INFO] >>> Start new run: 67
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        1        RUN:        2        EVT:        1
-No condition met
+[INFO] EXP:     1002        RUN:       67        EVT:        1
+Phase 2 is here
 [INFO] ------------------------------------------------------------------------
-[INFO] <<< End run: 2
+[INFO] <<< End run: 67
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to '1'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
-[INFO] >>> Start new run: 1002
+[INFO] >>> Start new run: 41
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        1        RUN:     1002        EVT:        1
-Phase 2 is here
+[INFO] EXP:       42        RUN:       41        EVT:        1
+No condition met
 [INFO] ------------------------------------------------------------------------
-[INFO] <<< End run: 1002
+[INFO] <<< End run: 41
 [INFO] ========================================================================
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        1        RUN:        1        EVT:        1
-Phase 3 is here
+[INFO] EXP:       43        RUN:        1        EVT:        1
+Strange condition
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] ========================================================================
-[INFO] >>> Start new run: 1003
+[INFO] >>> Start new run: 48
 [INFO] ------------------------------------------------------------------------
-[INFO] EXP:        1        RUN:     1003        EVT:        1
+[INFO] EXP:       47        RUN:       48        EVT:        1
 No condition met
 [INFO] ------------------------------------------------------------------------
-[INFO] <<< End run: 1003
+[INFO] <<< End run: 48
 [INFO] ========================================================================

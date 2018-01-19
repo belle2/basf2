@@ -50,7 +50,6 @@ main.add_module(geometry)
 g4sim = register_module('FullSim')
 g4sim.param('RegisterMonopoles', True)
 g4sim.param('MonopoleMagCharge', mag)
-g4sim.param('UICommands', '/testex/fld/setField 1.5 T')
 g4sim.param('trajectoryStore', 1)
 main.add_module(g4sim)
 

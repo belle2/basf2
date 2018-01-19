@@ -30,9 +30,7 @@ namespace Belle2 {
     class G4MonopoleFieldSetup {
     public:
 
-      void InitialiseAll();    //  Set parameters and call method below
-      void SetMagField(G4double fieldValue);
-      void SetStepperAndChordFinder(G4int val);
+      void SwitchChordFinder(G4int val);
 
       static G4MonopoleFieldSetup* GetMonopoleFieldSetup();
 
@@ -45,18 +43,14 @@ namespace Belle2 {
       G4FieldManager*         GetGlobalFieldManager() ;   // static
 
       G4FieldManager*         fFieldManager ;
-      G4ChordFinder*          fChordFinder ;
-      G4Mag_UsualEqRhs*       fEquation ;
+      G4ChordFinder*          fMonopoleChordFinder ;
+      G4ChordFinder*          fbasf2ChordFinder ; //We should not forget the setup that was before switching to monopole physics
       G4MonopoleEquation*     fMonopoleEquation ;
       G4MagneticField*        fMagneticField ;
-
-      G4MagIntegratorStepper* fStepper ;
       G4MagIntegratorStepper* fMonopoleStepper ;
-
       G4double                fMinStep ;
 
       static G4MonopoleFieldSetup*  fMonopoleFieldSetup;
-      G4MonopoleFieldMessenger*     fMonopoleFieldMessenger;
 
     };
 

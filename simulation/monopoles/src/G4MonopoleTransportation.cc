@@ -50,7 +50,7 @@ G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
   // set Process Sub Type
   SetProcessSubType(TRANSPORTATION);
 
-  fMagSetup = G4MonopoleFieldSetup::GetMonopoleFieldSetup();//TODO should take B field from basf2
+  fMagSetup = G4MonopoleFieldSetup::GetMonopoleFieldSetup();
 
   G4TransportationManager* transportMgr ;
 
@@ -99,7 +99,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
                                       G4double& currentSafety,
                                       G4GPILSelection* selection)
 {
-  fMagSetup->SetStepperAndChordFinder(1);
+  fMagSetup->SwitchChordFinder(1);
   // change to monopole equation
 
   G4double geometryStepLength, newSafety ;
@@ -335,7 +335,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 
   fParticleChange.ProposeTrueStepLength(geometryStepLength) ;
 
-  fMagSetup->SetStepperAndChordFinder(0);
+  fMagSetup->SwitchChordFinder(0);
   // change back to usual equation
 
   return geometryStepLength ;

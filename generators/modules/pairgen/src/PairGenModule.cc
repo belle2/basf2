@@ -11,10 +11,12 @@
 #include <generators/modules/pairgen/PairGenModule.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
-#include <TMath.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 
+#include <TMath.h>
 #include <TRandom3.h>
 #include <TLorentzVector.h>
+#include <TLorentzRotation.h>
 
 using namespace TMath;
 using namespace std;
@@ -51,12 +53,14 @@ void PairGenModule::initialize()
 {
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
+  m_initialParticleGeneration.initialize();
 }
 
 void PairGenModule::event()
 {
   try {
     m_particleGraph.clear();
+    MCInitialParticles initial = m_initialParticleGeneration.generate();
 
     //Distribution values:
     //generate phi uniformly in CMS and theta with 1 + Cos(Theta)^2 :
@@ -67,6 +71,8 @@ void PairGenModule::event()
       theta = gRandom->Uniform(0, 1.0 * Pi());
       value = gRandom->Uniform(0, 2.0);
     }
+    double CMSEnergy = initial.getMass();
+    TLorentzRotation boostCMSToLab = initial.getCMSToLab();
 
     int nParticles = 1;
     if (m_saveBoth) {
@@ -83,8 +89,7 @@ void PairGenModule::event()
       p.setLastDaughter(0);
 
       double m  = p.getMass();
-
-      double momentum = Sqrt(10.583 * 10.583 / 4 - m * m);
+      double momentum = Sqrt(CMSEnergy * CMSEnergy / 4 - m * m);
 
       double pz = momentum * Cos(theta);
       double px = momentum * Sin(theta) * Cos(phi);
@@ -92,11 +97,11 @@ void PairGenModule::event()
       double e  = Sqrt(momentum * momentum + m * m);
 
       TLorentzVector vp(sign * px, sign * py, sign * pz, e);
-      vp.Boost(0, 0, 0.272727);
+      vp.Transform(boostCMSToLab);
 
       p.setMomentum(vp(0), vp(1), vp(2));
       p.setEnergy(vp(3));
-      p.setProductionVertex(0, 0, 0);
+      p.setProductionVertex(initial.getVertex());
       p.addStatus(MCParticle::c_StableInGenerator);
       //Particle is stable in generator. We could use MCParticleGraph options to
       //do this automatically but setting it here makes the particle correct
@@ -104,7 +109,7 @@ void PairGenModule::event()
       p.setDecayTime(numeric_limits<double>::infinity());
 
       // set time offset to check fit bias in e.g. the ECL waveform fits
-      p.setProductionTime(0);
+      p.setProductionTime(initial.getTime());
     }
 
     m_particleGraph.generateList();

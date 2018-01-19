@@ -11,9 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -40,6 +40,7 @@ namespace Belle2 {
 
   protected:
     int m_PDG; /**< Particles PDG code */
+
     /** Store both particles.
      * If set to false, only one of the two generated particles will be
      * used later by the simulation.
@@ -47,6 +48,7 @@ namespace Belle2 {
     bool m_saveBoth;
     //TODO other parameters to make the module more useful
 
+    InitialParticleGeneration m_initialParticleGeneration{MCInitialParticles::c_smearALL}; /**< Particle generator to generate initial beam energy, vertex and time */
     MCParticleGraph m_particleGraph; /**< Particle graph to generate MCParticle list */
   };
 

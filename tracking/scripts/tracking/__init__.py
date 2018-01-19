@@ -786,6 +786,28 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
+def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", quality_cut=0.0001):
+    name_sps = 'SpacePoints'
+
+    sp_creator_pxd = register_module('PXDSpacePointCreator')
+    sp_creator_pxd.param('SpacePoints', name_sps)
+    path.add_module(sp_creator_pxd)
+
+    sp_creator_svd = register_module('SVDSpacePointCreator')
+    sp_creator_svd.param('SpacePoints', name_sps)
+    path.add_module(sp_creator_svd)
+
+    track_finder = register_module('TrackFinderVXDCosmicsStandalone')
+    track_finder.param('SpacePointTrackCandArrayName', "")
+    track_finder.param('SpacePoints', name_sps)
+    track_finder.param('QualityCut', quality_cut)
+    path.add_module(track_finder)
+
+    converter = register_module('SPTC2RTConverter')
+    converter.param('recoTracksStoreArrayName', reco_tracks)
+    path.add_module(converter)
+
+
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  useTwoStepSelection=True, PXDminSVDSPs=3,
                                  sectormap_file=None, custom_setup_name=None,

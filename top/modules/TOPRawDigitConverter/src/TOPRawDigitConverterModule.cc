@@ -252,7 +252,8 @@ namespace Belle2 {
       double timeError = geo->getNominalTDC().getTimeJitter();
       if (m_pedestalRMS > 0) {
         double rawErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
-        int sample = int(rawTimeLeading);
+        int sample = static_cast<int>(rawTimeLeading);
+        if (rawTimeLeading < 0) sample--;
         timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
       }
 

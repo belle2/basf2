@@ -42,6 +42,9 @@ namespace Belle2 {
     const std::vector<AState*> seedStatePointers = TrackFindingCDC::as_pointers<AState>(seedStates);
     const std::vector<AState*> statePointers = TrackFindingCDC::as_pointers<AState>(states);
 
+    // Just some arbitrary number...
+    relations.reserve(5000);
+
     // relations += seed states -> states
     TrackFindingCDC::RelationFilterUtil::appendUsing(m_seedFilter, seedStatePointers, statePointers, relations);
 

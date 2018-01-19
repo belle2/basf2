@@ -7,18 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/ckf/svd/utilities/SVDAdvancer.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/dataobjects/SVDCluster.h>
+#include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
+#include <tracking/ckf/general/filters/NonIPCrossingStateFilter.dcl.h>
 
-using namespace Belle2;
-
-double SVDAdvancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                       const SpacePoint& spacePoint)
-{
-  SVDRecoHit recoHit(spacePoint.getRelated<SVDCluster>());
-  const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
-  return Advancer::extrapolateToPlane(measuredStateOnPlane, plane);
+namespace Belle2 {
+  extern template class NonIPCrossingStateFilter<AllSVDStateFilter>;
+  using NonIPCrossingSVDStateFilter = NonIPCrossingStateFilter<AllSVDStateFilter>;
 }

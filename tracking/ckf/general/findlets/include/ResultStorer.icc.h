@@ -9,53 +9,40 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
+#include <tracking/ckf/general/findlets/ResultStorer.dcl.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/ckf/general/utilities/SearchDirection.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
-  template <class AResult>
-  /// Add the subfindlets
-  CKFDataHandler<AResult>::CKFDataHandler() : Super()
-  {
-    this->addProcessingSignalListener(&m_trackFitter);
-  }
-
   /// Expose the parameters of the sub findlets.
   template <class AResult>
-  void CKFDataHandler<AResult>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  void ResultStorer<AResult>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    m_trackFitter.exposeParameters(moduleParamList, prefix);
-
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "exportTracks"), m_param_exportTracks,
                                   "Export the result tracks into a StoreArray.",
                                   m_param_exportTracks);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "inputRecoTrackStoreArrayName"),
-                                  m_param_inputRecoTrackStoreArrayName,
-                                  "StoreArray name of the input Track Store Array.",
-                                  m_param_inputRecoTrackStoreArrayName);
-
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRecoTrackStoreArrayName"),
                                   m_param_outputRecoTrackStoreArrayName,
-                                  "StoreArray name of the output Track Store Array.",
-                                  m_param_outputRecoTrackStoreArrayName);
+                                  "StoreArray name of the output Track Store Array.");
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRelationRecoTrackStoreArrayName"),
+                                  m_param_outputRelationRecoTrackStoreArrayName,
+                                  "StoreArray name of the tracks, the output reco tracks should be related to.");
 
-    moduleParamList->addParameter("minimalPtRequirement", m_param_minimalPtRequirement,
-                                  "Minimal Pt requirement for the input CDC tracks",
-                                  m_param_minimalPtRequirement);
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeOutDirection"),
+                                  m_param_writeOutDirectionAsString,
+                                  "Write out the relations with the direction of the VXD part as weight");
   }
 
   /// Create the store arrays
   template <class AResult>
-  void CKFDataHandler<AResult>::initialize()
+  void ResultStorer<AResult>::initialize()
   {
     Super::initialize();
-
-    m_inputRecoTracks.isRequired(m_param_inputRecoTrackStoreArrayName);
 
     if (not m_param_exportTracks) {
       return;
@@ -64,33 +51,15 @@ namespace Belle2 {
     m_outputRecoTracks.registerInDataStore(m_param_outputRecoTrackStoreArrayName);
     RecoTrack::registerRequiredRelations(m_outputRecoTracks);
 
-    StoreArray<RecoTrack> relationRecoTracks(m_param_inputRecoTrackStoreArrayName);
+    StoreArray<RecoTrack> relationRecoTracks(m_param_outputRelationRecoTrackStoreArrayName);
     relationRecoTracks.registerRelationTo(m_outputRecoTracks);
-  }
 
-  /// Load in the reco tracks and fit them
-  template <class AResult>
-  void CKFDataHandler<AResult>::apply(std::vector<RecoTrack*>& seeds)
-  {
-    seeds.reserve(seeds.size() + m_inputRecoTracks.getEntries());
-
-    for (auto& item : m_inputRecoTracks) {
-      if (not item.template getRelated<RecoTrack>(m_param_outputRecoTrackStoreArrayName)) {
-        seeds.push_back(&item);
-      }
-    }
-
-    const auto hasLowPt = [this](const auto & track) {
-      return track->getMomentumSeed().Pt() < m_param_minimalPtRequirement;
-    };
-    TrackFindingCDC::erase_remove_if(seeds, hasLowPt);
-
-    m_trackFitter.apply(seeds);
+    m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
   }
 
   /// Store the reco tracks and the relations
   template <class AResult>
-  void CKFDataHandler<AResult>::store(std::vector<AResult>& results)
+  void ResultStorer<AResult>::apply(std::vector<AResult>& results)
   {
     if (not m_param_exportTracks) {
       return;
@@ -109,7 +78,7 @@ namespace Belle2 {
       if (not seed) {
         continue;
       }
-      seed->addRelationTo(newRecoTrack);
+      seed->addRelationTo(newRecoTrack, m_param_writeOutDirection);
     }
   }
 }

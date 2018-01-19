@@ -22,6 +22,15 @@ CKFToSVDResult::CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<con
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
   B2ASSERT("Path should not be empty", not path.empty());
+
+  for (const TrackFindingCDC::WithWeight<const CKFToSVDState*>& state : path) {
+    const RecoTrack* relatedSVDTrack = state->getRelatedSVDTrack();
+    if (m_relatedSVDRecoTrack) {
+      B2ASSERT("There is a state with a different VXD track in it!", m_relatedSVDRecoTrack == relatedSVDTrack);
+    } else {
+      m_relatedSVDRecoTrack = relatedSVDTrack;
+    }
+  }
 }
 
 void CKFToSVDResult::addToRecoTrack(RecoTrack& recoTrack) const
@@ -34,4 +43,9 @@ void CKFToSVDResult::addToRecoTrack(RecoTrack& recoTrack) const
       sortingParameter++;
     }
   }
+}
+
+const RecoTrack* CKFToSVDResult::getRelatedSVDRecoTrack() const
+{
+  return m_relatedSVDRecoTrack;
 }

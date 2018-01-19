@@ -135,6 +135,11 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            "1 value or same as SLpattern.", m_parameters.SLpatternMask);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
+  addParam("T0fromHits", m_parameters.T0fromHits,
+           "If true, the event time is determined from all relevant hits "
+           "in a sector, if there is no valid event time from the event time finder. "
+           "If false, no drift times are used if there is no valid event time.",
+           m_parameters.T0fromHits);
   addParam("selectSectorByMC", m_selectSectorByMC,
            "If true, track parameters for sector selection are taken "
            "from MCParticle instead of CDCTriggerTrack.", false);
@@ -413,6 +418,8 @@ CDCTriggerNeuroTrainerModule::event()
         if (m_trainSets[isector].nSamples() > (nTrainMax + m_nValid + m_nTest)) {
           continue;
         }
+        // read out or determine event time
+        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack]);
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack]);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();

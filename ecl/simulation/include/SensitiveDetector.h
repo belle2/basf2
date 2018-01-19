@@ -61,7 +61,6 @@ namespace Belle2 {
       double m_WeightedTime;        /**< average track time weighted by energy deposition */
       double m_energyDeposit;       /**< total energy deposited in a volume by a track */
       double m_hadronenergyDeposit;     /**< energy deposited resulting in hadronic scint component */
-      std::string m_HadronEmissionFile; /**<Hadron scintillation component emission function file name. */
       G4ThreeVector m_WeightedPos;  /**< average track position weighted by energy deposition */
       G4ThreeVector m_momentum;     /**< initial momentum of track before energy deposition inside sensitive volume */
 

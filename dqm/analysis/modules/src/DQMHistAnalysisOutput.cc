@@ -58,13 +58,13 @@ void DQMHistAnalysisOutputModule::event()
     std::string pname = i->first;
     std::string vname = StringUtil::tolower(StringUtil::replace(pname, "/", "."));
     switch (i->second) {
-      case INT:
+      case c_ParamINT:
         B2DEBUG(20, vname << " " << vints[pname]);
         break;
-      case FLOAT:
+      case c_ParamFLOAT:
         B2DEBUG(20, vname << " " << vfloats[pname]);
         break;
-      case TEXT:
+      case c_ParamTEXT:
         B2DEBUG(20, vname << " " << texts[pname]);
         break;
     }

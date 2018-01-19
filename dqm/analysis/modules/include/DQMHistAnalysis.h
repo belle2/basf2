@@ -20,12 +20,12 @@ namespace Belle2 {
   class DQMHistAnalysisModule : public Module {
 
   public:
-    enum Type {
-      INT,
-      FLOAT,
-      TEXT
+    enum EParamType {
+      c_ParamINT,
+      c_ParamFLOAT,
+      c_ParamTEXT
     };
-    typedef std::map<std::string, Type> ParamTypeList;
+    typedef std::map<std::string, EParamType> ParamTypeList;
     typedef std::map<std::string, int> IntValueList;
     typedef std::map<std::string, float> FloatValueList;
     typedef std::map<std::string, std::string> TextList;

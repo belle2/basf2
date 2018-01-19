@@ -11,11 +11,12 @@
 // modified from GEANT4 exoticphysics/monopole/*
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
-#include <simulation/monopoles/G4MonopolePhysicsMessenger.h>
 #include <simulation/monopoles/G4mplIonisation.h>
 #include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 #include <simulation/monopoles/G4Monopole.h>
 #include <simulation/monopoles/G4MonopoleTransportation.h>
+
+#include <TDatabasePDG.h>
 
 #include <G4ParticleDefinition.hh>
 #include <G4ProcessManager.hh>
@@ -34,20 +35,21 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
 
-G4MonopolePhysics::G4MonopolePhysics(const G4String& nam)
+G4MonopolePhysics::G4MonopolePhysics(const G4String& nam, double magneticCharge)
   : G4VPhysicsConstructor(nam),
-    fMessenger(0), fMpl(0), fApl(0)
+    fMpl(0), fApl(0)
 {
-  fMagCharge = 1.0;
-  fElCharge  = 0.0;
-  fMonopoleMass = 4.5 * GeV;
-  fMessenger = new G4MonopolePhysicsMessenger(this);
+  //No way to store magnetic charge in TDatabasePDG,
+  //so part of the information (e, m, pdg, etc.) should be stored before generation
+  //and other part (g) passed to the simulation setup
+  fMagCharge = magneticCharge;//TODO check untis, should be handled as (e+)
+  fElCharge  = TDatabasePDG::Instance()->GetParticle(99666)->Charge() / 3.0;
+  fMonopoleMass = TDatabasePDG::Instance()->GetParticle(99666)->Mass() * GeV;
   SetPhysicsType(bUnknown);
 }
 
 G4MonopolePhysics::~G4MonopolePhysics()
 {
-  delete fMessenger;
 }
 
 void G4MonopolePhysics::ConstructParticle()
@@ -104,19 +106,3 @@ void G4MonopolePhysics::ConstructProcess()
   ph->RegisterProcess(new G4StepLimiter(), fMpl);
   ph->RegisterProcess(new G4StepLimiter(), fApl);
 }
-
-void G4MonopolePhysics::SetMagneticCharge(G4double val)
-{
-  fMagCharge = val;
-}
-
-void G4MonopolePhysics::SetElectricCharge(G4double val)
-{
-  fElCharge = val;
-}
-
-void G4MonopolePhysics::SetMonopoleMass(G4double mass)
-{
-  fMonopoleMass = mass;
-}
-

@@ -96,8 +96,8 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
-  addParam("MonopoleDefinition", m_monopoleDefinition, "Definition of the monopole. If not empty, registers monopole physics list",
-           string(""));
+  addParam("RegisterMonopoles", m_monopoles, "If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.", false);
+  addParam("MonopoleMagCharge", m_monopoleMagneticCharge, "The value of monopole magnetic charge in units of e+.", 1.0);
   addParam("ProductionCut", m_productionCut,
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
@@ -175,11 +175,8 @@ void FullSimModule::initialize()
   if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
   physicsList->RegisterPhysics(new ExtPhysicsConstructor);
   if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
-  if (m_monopoleDefinition.length() > 0) {
-    physicsList->RegisterPhysics(new G4MonopolePhysics);
-    G4UImanager* uiManager = G4UImanager::GetUIpointer();
-    uiManager->ApplyCommand("/monopole/setup " + m_monopoleDefinition);
-    // Monopole setup ui commands have to be passed before SetUserInitialization
+  if (m_monopoles) {
+    physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
   }
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes

@@ -19,13 +19,12 @@ namespace Belle2 {
 
   namespace Monopoles {
 
-    class G4MonopolePhysicsMessenger;
     class G4Monopole;
 
     class G4MonopolePhysics : public G4VPhysicsConstructor {
     public:
 
-      G4MonopolePhysics(const G4String& nam = "Monopole Physics");
+      G4MonopolePhysics(const G4String& nam = "Monopole Physics", double magneticCharge = 1.0);
 
       ~G4MonopolePhysics();
 
@@ -37,10 +36,6 @@ namespace Belle2 {
       // registered to the process manager of each particle type
       virtual void ConstructProcess();
 
-      void SetMagneticCharge(G4double);
-      void SetElectricCharge(G4double);
-      void SetMonopoleMass(G4double);
-
     private:
 
       // hide assignment operator
@@ -51,7 +46,6 @@ namespace Belle2 {
       G4double    fElCharge;
       G4double    fMonopoleMass;
 
-      G4MonopolePhysicsMessenger*  fMessenger;
       G4Monopole* fMpl; //Monopole
       G4Monopole* fApl; //Anti_Monopole
       //Anti-monopole and its processes has to be treated separetely

@@ -48,14 +48,8 @@ main.add_module(geometry)
 
 # detector simulation
 g4sim = register_module('FullSim')
-string = ' '
-string += str(mag)
-string += ' '
-string += str(el)
-string += ' '
-string += str(mass)
-string += ' GeV'
-g4sim.param('MonopoleDefinition', string)
+g4sim.param('RegisterMonopoles', True)
+g4sim.param('MonopoleMagCharge', mag)
 g4sim.param('UICommands', '/testex/fld/setField 1.5 T')
 g4sim.param('trajectoryStore', 1)
 main.add_module(g4sim)

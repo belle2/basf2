@@ -26,10 +26,10 @@ namespace Belle2 {
     RecoTracksCopierModule();
 
     /// Declare required StoreArray
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Event processing, copies store array
-    virtual void event() override;
+    void event() override;
 
   private:
     /// Name of the input StoreArray

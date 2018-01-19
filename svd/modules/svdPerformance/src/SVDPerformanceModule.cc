@@ -474,8 +474,7 @@ void SVDPerformanceModule::event()
       int side = svdRecos[digi]->isUStrip();
       int cellID = svdRecos[digi]->getCellID();
 
-      float ADCnoise = m_NoiseCal.getNoise(theVxdID, side, cellID);
-      float thisNoise = m_PulseShapeCal.getChargeFromADC(theVxdID, side, cellID, ADCnoise);
+      float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
 
       h_stripNoise[layer][sensor][side]->Fill(thisNoise);
       h_recoCharge[layer][sensor][side]->Fill(svdRecos[digi]->getCharge());

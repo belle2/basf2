@@ -9,10 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
-#include <tracking/trackFindingCDC/utilities/ModuleParamInstances.h>
-
-#include <framework/core/ModuleParamList.icc.h>
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <framework/logging/Logger.h>
 

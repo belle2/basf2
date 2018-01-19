@@ -73,6 +73,7 @@ namespace Belle2 {
       for (unsigned i = 0; i < hist.size(); i++) {
         m_func.push_back(0);
         m_maxpos.push_back(0);
+        m_maxpos_error.push_back(0);
       }
     }
 
@@ -103,8 +104,8 @@ namespace Belle2 {
       m_hist[channel]->SetAxisRange(m_xmin, m_xmax);
       m_maxpos[channel] = m_hist[channel]->GetXaxis()->GetBinCenter(m_hist[channel]->GetMaximumBin());
       m_hist[channel]->SetAxisRange(m_maxpos[channel] - 1.5, m_maxpos[channel] + 2);
-
-      if (m_fitMethod == "gauss") {
+      m_maxpos_error[channel] = m_hist[channel]->GetXaxis()->GetBinWidth(m_hist[channel]->GetMaximumBin()); // Error = bin width ?
+      if (m_fitMethod == "gauss" || m_fitMethod == "gaus") {
         m_func[channel] = makeGFit(channel);
       } else if (m_fitMethod == "cb") {
         m_func[channel] = makeCBFit(channel);
@@ -130,22 +131,28 @@ namespace Belle2 {
 
       if (m_fitMethod == "gauss") {
         double parms[3];
-
+        double parmErrs[3];
         otree->Branch("channel", &channel, "channel/I");
         otree->Branch("norm", &(parms[0]), "norm/D");
         otree->Branch("time", &(parms[1]), "time/D");
         otree->Branch("reso", &(parms[2]), "reso/D");
+        otree->Branch("normErr", &(parmErrs[0]), "normErr/D");
+        otree->Branch("timeErr", &(parmErrs[1]), "timeErr/D");
+        otree->Branch("resoErr", &(parmErrs[2]), "resoErr/D");
 
         for (auto& f : m_func) {
           maxpos = m_maxpos[channel];
           if (f) {
             f->GetParameters(parms);
+            for (int iPar = 0; iPar < 3; iPar++)
+              parmErrs[iPar] = f->GetParError(iPar);
             otree->Fill();
             channel++;
           }
         }
       } else if (m_fitMethod == "cb2") {
         double parms[8];
+        double parmErrs[8];
 
         double time2 = 0;
         otree->Branch("channel", &channel, "channel/I");
@@ -159,16 +166,29 @@ namespace Belle2 {
         otree->Branch("reso2", &(parms[7]), "reso2/D");
         otree->Branch("time2", &time2, "time2/D");
 
+        otree->Branch("norm1Err", &(parmErrs[0]), "norm1Err/D");
+        otree->Branch("time1Err", &(parmErrs[1]), "time1Err/D");
+        otree->Branch("reso1Err", &(parmErrs[2]), "reso1Err/D");
+        otree->Branch("alpha_CBErr", &(parmErrs[3]), "alpha_CBErr/D");
+        otree->Branch("n_CBErr", &(parmErrs[4]), "n_CBErr/D");
+        otree->Branch("norm2Err", &(parmErrs[5]), "norm2Err/D");
+        otree->Branch("dt12Err", &(parmErrs[6]), "dt12Err/D");
+        otree->Branch("reso2Err", &(parmErrs[7]), "reso2Err/D");
+
+
         for (auto& f : m_func) {
           maxpos = m_maxpos[channel];
           if (f) {
             f->GetParameters(parms);
+            for (int iPar = 0; iPar < 8; iPar++)
+              parmErrs[iPar] = f->GetParError(iPar);
             otree->Fill();
             channel++;
           }
         }
       } else if (m_fitMethod == "cb") {
         double parms[5];
+        double parmErrs[5];
 
         otree->Branch("channel", &channel, "channel/I");
         otree->Branch("norm", &(parms[0]), "norm/D");
@@ -177,10 +197,18 @@ namespace Belle2 {
         otree->Branch("alpha_CB", &(parms[3]), "alpha_CB/D");
         otree->Branch("n_CB", &(parms[4]), "n_CB/D");
 
+        otree->Branch("normErr", &(parmErrs[0]), "normErr/D");
+        otree->Branch("timeErr", &(parmErrs[1]), "timeErr/D");
+        otree->Branch("resoErr", &(parmErrs[2]), "resoErr/D");
+        otree->Branch("alpha_CBErr", &(parmErrs[3]), "alpha_CBErr/D");
+        otree->Branch("n_CBErr", &(parmErrs[4]), "n_CBErr/D");
+
         for (auto& f : m_func) {
           maxpos = m_maxpos[channel];
           if (f) {
             f->GetParameters(parms);
+            for (int iPar = 0; iPar < 5; iPar++)
+              parmErrs[iPar] = f->GetParError(iPar);
             otree->Fill();
             channel++;
           }
@@ -214,6 +242,7 @@ namespace Belle2 {
       h->Fit("gaus", "Q", "", m - w, m + w);
       func = h->GetFunction("gaus");
       m_fitT = parms[1];
+      m_fitTErr = func->GetParError(1);
       return func;
     }
 
@@ -247,8 +276,10 @@ namespace Belle2 {
       h->Fit(func, "Q", "");
       if (fabs(m_maxpos[channel] - parms[1]) < parms[2]) {
         m_fitT = parms[1];
+        m_fitTErr = func->GetParError(1);
       } else {
         m_fitT = m_maxpos[channel];
+        m_fitTErr = m_maxpos_error[channel];
       }
       return func;
     }
@@ -301,6 +332,7 @@ namespace Belle2 {
         h->Fit(func);
       }
       m_fitT = parms[1];
+      m_fitTErr = func->GetParError(1);
       return func;
     }
   } // TOP namespace

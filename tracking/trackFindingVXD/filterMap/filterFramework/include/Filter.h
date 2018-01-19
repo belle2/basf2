@@ -106,33 +106,33 @@ namespace Belle2 {
   \endcode
    * will produce the output: true
    * The Variable class will provide the static method value x( arg1, arg2)
-   * The Range object will provide the method contains to decide if x(arg1, arg2) is good
+   * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
    * The Observer will be notified of the actions via its static method notify
    */
   template <
     class Variable,
-    class Range,
+    class RangeType,
     class Observer
     >
-  class Filter < Variable, Range, Observer  > {
+  class Filter < Variable, RangeType, Observer  > {
   public:
 
     /** Constructor.
      *
-     * To construct the Filter we need a concrete Range. The variable and
+     * To construct the Filter we need a concrete RangeType. The variable and
      * the observer are passed through the template type pack.
      *
      * @param range: a class that provides a method \code
      bool contains( Variable::returnType x) \endcode
      *
      */
-    Filter(const Range& range):
+    Filter(const RangeType& range):
       m_range(range) { };
 
     Filter() { };
 
     /** Getter of the range */
-    Range getRange(void) const { return m_range; }
+    RangeType getRange(void) const { return m_range; }
 
     /** Handy typedef */
     typedef  typename Variable::argumentType argumentType;
@@ -200,34 +200,40 @@ namespace Belle2 {
      * false
      * true
      */
-    Filter< Variable, Range, BypassableFilter, Observer>
+    Filter< Variable, RangeType, BypassableFilter, Observer>
     bypass(const bool& bypassVariable = false)
     {
-      return Filter< Variable, Range, BypassableFilter, Observer>(m_range, bypassVariable);
+      return Filter< Variable, RangeType, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
-    Filter< Variable, Range, ActivableFilter, Observer>
+    Filter< Variable, RangeType, ActivableFilter, Observer>
     //    __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
     enable(const bool& enableVariable = true)
     {
-      return Filter< Variable, Range, ActivableFilter, Observer>(m_range, enableVariable);
+      return Filter< Variable, RangeType, ActivableFilter, Observer>(m_range, enableVariable);
     }
 
     template< class otherObserver >
-    Filter< Variable, Range, otherObserver>
+    Filter< Variable, RangeType, otherObserver>
     observeLeaf(const otherObserver&) const
     {
-      return Filter< Variable , Range, otherObserver>(m_range);
+      return Filter< Variable , RangeType, otherObserver>(m_range);
     }
 
     template< class otherObserver >
-    Filter(const Filter< Variable, Range, otherObserver>& filter):
+    Filter(const Filter< Variable, RangeType, otherObserver>& filter):
       m_range(filter.getRange()) {};
 
 
+    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    {
+      return m_range.getNameAndReference(pointers, Variable::name());
+    }
+
 
   protected:
-    Range  m_range;
+
+    RangeType  m_range;
 
   };
 
@@ -266,17 +272,17 @@ namespace Belle2 {
      * true
      *
      * The Variable class will provide the static method value x( arg1, arg2)
-     * The Range object will provide the method contains to decide if x(arg1, arg2) is good
+     * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
      * The Observer will be notified of the actions via its static method notify
      */
 
   template <
     class Variable,
-    class Range,
+    class RangeType,
     class Observer
     >
-  class Filter < Variable, Range, Belle2::BypassableFilter, Observer  >:
-    public Filter< Variable, Range, Observer> {
+  class Filter < Variable, RangeType, Belle2::BypassableFilter, Observer  >:
+    public Filter< Variable, RangeType, Observer> {
   public:
 
     /** Constructor.
@@ -290,8 +296,8 @@ namespace Belle2 {
      * true the method accept will return always true, if bypass is set to false the accept
      * method will return the actual result of the test.
      */
-    Filter(const Range& range , const bool& bypass):
-      Filter< Variable, Range, Observer >(range)
+    Filter(const RangeType& range , const bool& bypass):
+      Filter< Variable, RangeType, Observer >(range)
     { m_bypass = &bypass; };
     Filter()  {};
 
@@ -307,9 +313,16 @@ namespace Belle2 {
              accept(const argsType& ... args) const
     {
       typename Variable::variableType value = Variable::value(args ...);
-      Observer::notify(Variable(), value, Filter< Variable, Range, Observer >::m_range, args ...);
-      return (*m_bypass) || Filter< Variable, Range, Observer >::m_range.contains(value);
+      Observer::notify(Variable(), value, Filter< Variable, RangeType, Observer >::m_range, args ...);
+      return (*m_bypass) || Filter< Variable, RangeType, Observer >::m_range.contains(value);
     }
+
+    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    {
+      return "(" + std::to_string(*m_bypass) + " OR " +
+             Filter< Variable, RangeType, Observer >::m_range.getNameAndReference(pointers, Variable::name()) + ")";
+    }
+
 
   private:
 
@@ -318,10 +331,10 @@ namespace Belle2 {
 
   /*  template <
     class Variable,
-    class Range,
+    class RangeType,
     class Observer
     >
-    const bool * Filter < Variable, Range, BypassableFilter, Observer  >::m_bypass = NULL;
+    const bool * Filter < Variable, RangeType, BypassableFilter, Observer  >::m_bypass = NULL;
   */
 
 
@@ -359,22 +372,22 @@ namespace Belle2 {
      * false
      *
      * The Variable class will provide the static method value x( arg1, arg2)
-     * The Range object will provide the method contains to decide if x(arg1, arg2) is good
+     * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
      * The Observer will be notified of the actions via its static method notify
      */
 
   template <
     class Variable,
-    class Range,
+    class RangeType,
     class Observer
     >
-  class Filter < Variable, Range, Belle2::ActivableFilter, Observer  >:
-    public Filter< Variable, Range, Observer> {
+  class Filter < Variable, RangeType, Belle2::ActivableFilter, Observer  >:
+    public Filter< Variable, RangeType, Observer> {
   public:
 
     /** Constructor.
      *
-     * To construct the Filter we need a concrete Range and a reference to a bool value.
+     * To construct the Filter we need a concrete RangeType and a reference to a bool value.
      * The variable and the observer are passed through the template type pack.
      *
      * @param range: a class that provides a method \code
@@ -383,8 +396,8 @@ namespace Belle2 {
      * true the method accept will return always true, if bypass is set to false the accept
      * method will return the actual result of the test.
      */
-    Filter(const Range& range , const bool& enable):
-      Filter< Variable, Range, Observer >(range)
+    Filter(const RangeType& range , const bool& enable):
+      Filter< Variable, RangeType, Observer >(range)
     {
       m_enable = & enable ;
     };
@@ -403,12 +416,18 @@ namespace Belle2 {
     accept(const argsType& ... args) const
     {
       typename Variable::variableType value = Variable::value(args ...);
-      Observer::notify(Variable(), value, Filter< Variable, Range, Observer >::m_range,
+      Observer::notify(Variable(), value, Filter< Variable, RangeType, Observer >::m_range,
                        args ...);
 
 //    bool enableCopy  = *m_enable;
 //    B2INFO("mrange.contains: " << ", enable (should be true): " << std::to_string(enableCopy) );
-      return (!(*m_enable)) || Filter< Variable, Range, Observer >::m_range.contains(value);
+      return (!(*m_enable)) || Filter< Variable, RangeType, Observer >::m_range.contains(value);
+    }
+
+    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    {
+      return "(!(" + std::to_string(*m_enable) + ") OR "
+             + Filter< Variable, RangeType, Observer >::m_range.getNameAndReference(pointers, Variable::name()) + ")";
     }
 
   private:
@@ -418,10 +437,10 @@ namespace Belle2 {
 
   /*template <
     class Variable,
-    class Range,
+    class RangeType,
     class Observer
     >
-  const bool * Filter < Variable, Range, ActivableFilter, Observer  >::m_enable = NULL;
+  const bool * Filter < Variable, RangeType, ActivableFilter, Observer  >::m_enable = NULL;
   */
 
   /***
@@ -449,6 +468,10 @@ namespace Belle2 {
       return ! m_filter.accept(args ...);
     }
 
+    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    {
+      return "!" + m_filter.getNameAndReference(pointers);
+    }
 
     /** will set the observer for this filter
     @param otherObserver : the new observer
@@ -611,6 +634,11 @@ namespace Belle2 {
 
     Filter() { };
 
+    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    {
+      return "(" + m_filterA.getNameAndReference(pointers) + " AND " + m_filterB.getNameAndReference(pointers) + ")";
+    }
+
 
 
   private:
@@ -758,6 +786,12 @@ namespace Belle2 {
       m_filterB.setBranchAddress(t, nameOfFilterB);
     }
 
+    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    {
+      return "(" + m_filterA.getNameAndReference(pointers) + " OR " + m_filterB.getNameAndReference(pointers) + ")";
+    }
+
+
 
   private:
     FilterA  m_filterA;
@@ -803,10 +837,10 @@ namespace Belle2 {
     return observer::initialize(args ...) && initializeObservers(Belle2::Filter< types1...>(), args...);
   }
 
-  /** Initilize the observer of a Range Filter. */
+  /** Initilize the observer of a RangeType Filter. */
 
-  template< class Variable, class Range, class observer, typename ... argsTypes>
-  bool initializeObservers(Belle2::Filter<Variable, Range, observer> filter, argsTypes ... args)
+  template< class Variable, class RangeType, class observer, typename ... argsTypes>
+  bool initializeObservers(Belle2::Filter<Variable, RangeType, observer> filter, argsTypes ... args)
   {
     return observer::initialize(Variable(), filter.getRange(), args ...);
   }

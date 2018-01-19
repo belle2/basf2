@@ -497,17 +497,17 @@ namespace Belle2 {
 
     SecMapTrainerWithSpacePointsModule();
 
-    virtual ~SecMapTrainerWithSpacePointsModule();
+    ~SecMapTrainerWithSpacePointsModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
+    void beginRun() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
-    virtual void terminate();
+    void terminate() override;
 
     /** initialize variables to avoid nondeterministic behavior. */
     void InitializeVariables()

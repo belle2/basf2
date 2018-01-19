@@ -38,7 +38,15 @@ namespace Belle2 {
     /// Constructor from the path of the result and the final mSoP, which defines the track position of the resulting track
     template <class AState>
     CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
+      : m_seed(path.front()->getSeed()),
+        m_trackPosition(mSoP.getPos()),
+        m_trackMomentum(mSoP.getMom()),
+        m_trackCharge(static_cast<short>(mSoP.getCharge())),
+        m_seedMSoP(path.front()->getMeasuredStateOnPlane()),
+        m_mSoP(mSoP)
     {
+      m_hits.reserve(path.size());
+
       for (const TrackFindingCDC::WithWeight<const AState*> state : path) {
         const Hit* hit = state->getHit();
         if (hit) {
@@ -46,26 +54,22 @@ namespace Belle2 {
         }
 
         if (state->isFitted()) {
-          m_chi2 += state->getChi2();
+          const double stateChi2 = state->getChi2();
+          m_chi2 += stateChi2;
+
+          // The initial value of the maximal and minimal chi2 is NAN, so we always override this default value.
+          if (stateChi2 > m_maximalChi2 or std::isnan(m_maximalChi2)) {
+            m_maximalChi2 = stateChi2;
+          }
+
+          if (stateChi2 < m_minimalChi2 or std::isnan(m_minimalChi2)) {
+            m_minimalChi2 = stateChi2;
+          }
         }
 
-        m_weightSum = state.getWeight();
+        m_weightSum += state.getWeight();
       }
-
-      m_trackCharge = static_cast<short>(mSoP.getCharge());
-      m_trackMomentum = mSoP.getMom();
-      m_trackPosition = mSoP.getPos();
-
-      m_seed = path.front()->getSeed();
-      m_seedMSoP = path.front()->getMeasuredStateOnPlane();
     }
-
-    /// Constructor which sets all single properties
-    CKFResult(const ASeed* seed, std::vector<const AHit*> hits, double chi2, const TVector3& trackPosition,
-              const TVector3& trackMomentum, short trackCharge) :
-      m_seed(seed), m_hits(hits), m_chi2(chi2), m_trackPosition(trackPosition), m_trackMomentum(trackMomentum),
-      m_trackCharge(trackCharge)
-    {}
 
     /// Getter for the stored hits
     const std::vector<const AHit*>& getHits() const
@@ -83,6 +87,18 @@ namespace Belle2 {
     double getChi2() const
     {
       return m_chi2;
+    }
+
+    /// Getter for the maximal chi2 of all stored hits. NAN means there is no valid chi2 at all.
+    double getMaximalChi2() const
+    {
+      return m_maximalChi2;
+    }
+
+    /// Getter for the minimal chi2 of all stored hits. NAN means there is no valid chi2 at all.
+    double getMinimalChi2() const
+    {
+      return m_minimalChi2;
     }
 
     /// Get the position this track should start at
@@ -109,10 +125,16 @@ namespace Belle2 {
       return m_weightSum;
     }
 
-    /// Getter for the mSoP of the seed associated wit this result
+    /// Getter for the mSoP of the seed associated with this result
     const genfit::MeasuredStateOnPlane& getSeedMSoP() const
     {
       return m_seedMSoP;
+    }
+
+    /// Getter for the mSoP associated with this result
+    const genfit::MeasuredStateOnPlane& getMSoP() const
+    {
+      return m_mSoP;
     }
 
   private:
@@ -122,6 +144,10 @@ namespace Belle2 {
     std::vector<const AHit*> m_hits;
     /// The stored chi2
     double m_chi2 = 0;
+    /// The maximal chi2 of the single states. NAN means there is no valid chi2 at all.
+    double m_maximalChi2 = NAN;
+    /// The minimal chi2 of the single states NAN means there is no valid chi2 at all.
+    double m_minimalChi2 = NAN;
     /// The position this track should start at
     TVector3 m_trackPosition;
     /// The momentum this track should start at (defined at the position)
@@ -132,5 +158,7 @@ namespace Belle2 {
     TrackFindingCDC::Weight m_weightSum = 0;
     /// The measured state on plane, which was used from the seed
     genfit::MeasuredStateOnPlane m_seedMSoP;
+    /// The measured state on plane, which this result was initialized with
+    genfit::MeasuredStateOnPlane m_mSoP;
   };
 }

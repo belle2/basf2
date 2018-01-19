@@ -199,25 +199,25 @@ namespace Belle2 {
 
 
     //! Destructor
-    virtual ~VXDTFModule();
+    ~VXDTFModule();
 
 
-    virtual void initialize();
+    void initialize() override;
 
 
-    virtual void beginRun();
+    void beginRun() override;
 
 
-    virtual void the_real_event();
+    void the_real_event();
 
 
-    virtual void event();
+    void event() override;
 
 
-    virtual void endRun();
+    void endRun() override;
 
 
-    virtual void terminate();
+    void terminate() override;
 
 
     /** *************************************+************************************* **/

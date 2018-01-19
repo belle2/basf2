@@ -24,6 +24,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <iostream>
 #include <utility>
@@ -64,7 +65,7 @@ namespace Belle2 {
   void RestOfEventInterpreterModule::initialize()
   {
     // input
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
     StoreArray<Particle> particles;
     particles.isRequired();
 

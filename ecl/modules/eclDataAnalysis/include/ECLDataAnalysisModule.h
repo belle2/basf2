@@ -7,17 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-*
-*/
-
-#ifndef ECLDATAANALYSISMODULE_H_
-#define ECLDATAANALYSISMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
 
 // ECL
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -40,7 +33,17 @@
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+class TFile;
+class TTree;
+
 namespace Belle2 {
+  class Track;
+  class TrackFitResult;
+  class ECLPidLikelihood;
+
+
+
+
 
   /** The ECL Data Analysis Module
    *
@@ -81,14 +84,17 @@ namespace Belle2 {
   private:
 
     /** members of ECLReconstructor Module */
-
     TFile* m_rootFilePtr; /**< root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
     bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
-    //bool m_doMC; /**< if true, MC info is stored*/
+
+    //dataStore objects
+    StoreArray<Track> m_tracks;  /**< Tracks storeArray */
+    StoreArray<TrackFitResult> m_trackFitResults;  /**< TrackFitResult storeArray */
+    StoreArray<ECLPidLikelihood> m_eclPidLikelihoods; /**< ECLPidLikelihood storeArray */
 
     /** Store array: ECLSimHit. */
     StoreArray<ECLSimHit> m_eclSimHits;
@@ -109,27 +115,28 @@ namespace Belle2 {
     /** Store object pointer: ECLEventInformation. */
     StoreObjPtr<ECLEventInformation> m_eclEventInformation;
 
-    /** Default name ECLCalDigits */
+    /** Default name ECLCalDigits array*/
     virtual const char* eclSimHitArrayName() const
     { return "ECLSimHits" ; }
-    /** Default name ECLCalDigits */
+    /** Default name ECLCalDigits array*/
     virtual const char* eclHitArrayName() const
     { return "ECLHits" ; }
-    /** Default name ECLDigits */
+    /** Default name ECLDigits array*/
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
-    /** Default name ECLCalDigits */
+    /** Default name ECLCalDigits array*/
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
-    /** Default name ECLShower */
+    /** Default name ECLShower array*/
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
-    /** Default name ECLClusters */
+    /** Default name ECLClusters array*/
     virtual const char* eclClusterArrayName() const
     { return "ECLClusters" ; }
-    /** Default name ECLConnectedRegions */
+    /** Default name ECLConnectedRegions array*/
     virtual const char* eclConnectedRegionArrayName() const
     { return "ECLConnectedRegions" ; }
+    /** Default name ECLLocalMaxima array*/
     virtual const char* eclLocalMaximumArrayName() const
     { return "ECLLocalMaximums" ; }
 
@@ -147,43 +154,37 @@ namespace Belle2 {
     /** Store array: ECLPureLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclPureLocalMaximums;
 
-    /** Default name ECLPureDigits */
+    /** Default name ECLPureDigits array*/
     virtual const char* eclPureDigitArrayName() const
     { return "ECLDigitsPureCsI" ; }
-    /** Default name ECLPureCalDigits */
+    /** Default name ECLPureCalDigits array*/
     virtual const char* eclPureCalDigitArrayName() const
     { return "ECLCalDigitsPureCsI" ; }
-    /** Default name ECLPureShower */
+    /** Default name ECLPureShower array*/
     virtual const char* eclPureShowerArrayName() const
     { return "ECLShowersPureCsI" ; }
-    /** Default name ECLPureClusters */
+    /** Default name ECLPureClusters array*/
     virtual const char* eclPureClusterArrayName() const
     { return "ECLClustersPureCsI" ; }
-    /** Default name ECLPureConnectedRegions */
+    /** Default name ECLPureConnectedRegions array*/
     virtual const char* eclPureConnectedRegionArrayName() const
     { return "ECLConnectedRegionsPureCsI" ; }
+    /** Default name ECLPureLocalMaxima array */
     virtual const char* eclPureLocalMaximumArrayName() const
     { return "ECLLocalMaximumsPureCsI" ; }
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticles StoreArray*/
 
     TTree* m_tree; /**< Root tree and file for saving the output */
-    //TFile* m_rootFile;
 
     // variables
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
 
-    /*int m_eclTriggerMultip;
-    std::vector<int>* m_eclTriggerIdx;
-    std::vector<int>* m_eclTriggerCellId;
-    std::vector<double>* m_eclTriggerTime;*/
-
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
     std::vector<int>* m_eclDigitToMC; /**< Index of MCParticle related to that ECLDigit */
-    std::vector<int>* m_eclDigitToHit; /**< Index of ECLHit related to that ECLDigit */
     std::vector<int>* m_eclDigitCellId; /**< Number of ECLDigit CellId */
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
@@ -402,7 +403,6 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
     std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
-    std::vector<double>* m_eclPureClusterMergedPi0;  /**< Flag for merged pi0, PureCsI option */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters, PureCsI option */
     std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL, PureCsI option */
     std::vector<double>* m_eclPureClusterClosestTrackDist;  /**< Reconstructed Distance to Closest Track, PureCsI option */
@@ -494,7 +494,6 @@ namespace Belle2 {
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
-
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */
     std::vector<int>* m_mcPdg; /**< MCParticle PDG code */
@@ -537,6 +536,5 @@ namespace Belle2 {
     std::vector<double>* m_eclLogLikeMu; /**< PID track muon likelyhood */
     std::vector<double>* m_eclLogLikePi; /**< PID track pion likelyhood */
   };
-}
 
-#endif
+}

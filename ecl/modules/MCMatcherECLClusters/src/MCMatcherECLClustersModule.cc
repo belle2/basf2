@@ -11,7 +11,6 @@
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
 
 using namespace Belle2;
-using namespace ECL;
 
 
 //-----------------------------------------------------------------

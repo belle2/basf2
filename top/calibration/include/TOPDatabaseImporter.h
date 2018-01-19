@@ -113,6 +113,12 @@ namespace Belle2 {
     void importPmtTTSHisto(std::string fileName, std::string treeName);
 
     /**
+     * Example of exporting TTS histograms
+     * @param outFilefileName : name of the root file where data will be saved
+     */
+    void exportPmtTTSHisto(std::string outFileName);
+
+    /**
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);

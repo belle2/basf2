@@ -25,6 +25,9 @@ main = create_path()
 # specify number of events to be generated
 main.add_module('EventInfoSetter', evtNumList=[10])
 
+# print event numbers
+main.add_module('EventInfoPrinter')
+
 # generate BBbar events
 main.add_module('EvtGenInput')
 
@@ -43,10 +46,7 @@ add_reconstruction(main)
 main.add_module('RootOutput', outputFileName='output.root')
 
 # mdst output
-add_mdst_output(main, additionalBranches=['TRGGDLResults', 'KlIds', 'KLMClustersToKlIds'])
-
-# display a progress bar while running
-main.add_module('ProgressBar')
+add_mdst_output(main)
 
 # process events and print call statistics
 process(main)

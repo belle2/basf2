@@ -9,7 +9,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <iostream>
@@ -37,7 +37,7 @@ namespace TrgTest {
       segmentHits.registerInDataStore();
       StoreArray<CDCTriggerTrack> tracks;
       tracks.registerInDataStore();
-      StoreObjPtr<EventT0> eventT0;
+      StoreObjPtr<BinnedEventT0> eventT0;
       eventT0.registerInDataStore();
       tracks.registerRelationTo(segmentHits);
       DataStore::Instance().setInitializeActive(false);
@@ -113,9 +113,9 @@ namespace TrgTest {
     }
 
     // dummy event time
-    StoreObjPtr<EventT0> T0("EventT0");
+    StoreObjPtr<BinnedEventT0> T0;
     T0.create();
-    T0->addEventT0(0, Const::CDC);
+    T0->addBinnedEventT0(0, Const::CDC);
     neuroTrigger.getEventTime(0, *track);
 
     // define different hit numbers to test

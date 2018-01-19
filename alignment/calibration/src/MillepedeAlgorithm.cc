@@ -119,8 +119,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   }
 
   if (undeterminedParams) {
-    B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
-    return c_NotEnoughData;
+    B2WARNING("There are " << undeterminedParams << " undetermined parameters.");
+    if (!m_ignoreUndeterminedParams) {
+      B2WARNING("Not enough data for calibration.");
+      return c_NotEnoughData;
+    }
   }
 
   //commit();

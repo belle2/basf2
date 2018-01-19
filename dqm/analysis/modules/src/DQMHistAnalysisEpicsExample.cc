@@ -103,7 +103,6 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
   TH1* hh1;
   hh1 = findHist(m_histoname.c_str());
 
-  hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
     B2INFO("Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
@@ -215,8 +214,8 @@ void DQMHistAnalysisEpicsExampleModule::event()
 
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
-      double data;
-      data = m_f1->GetParameter(i);
+      //double data;
+      //data = m_f1->GetParameter(i);
 //      SEVCHK(ca_put(DBR_DOUBLE,mychid[i],(void*)&data),"ca_set failure");
     }
 //    SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");

@@ -7,5 +7,6 @@ env['TOOLS_LIBS']['ereco_master'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['ereco_eventsampler'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['eventserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['eventsampler'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['evserverd'] = ['daq', 'framework', '$ROOT_LIBS' ]
 
 Return('env')

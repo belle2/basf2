@@ -39,29 +39,29 @@ namespace Belle2 {
     NonRootDataExportModule();
 
     /** Destructor of the module. */
-    virtual ~NonRootDataExportModule();
+    ~NonRootDataExportModule();
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
     /**
      * Prints a header for each new run.
      */
-    virtual void beginRun();
+    void beginRun() override;
 
     /** Prints the full information about the event, run and experiment number. */
-    virtual void event();
+    void event() override;
 
     /**
      * Prints a footer for each run which ended.
      */
-    virtual void endRun();
+    void endRun() override;
 
     /**
      * Termination action.
      */
-    virtual void terminate();
+    void terminate() override;
 
     /** imports all sectorMaps listed in the vector */
     void loadSecMap(std::vector<std::string> secMaps);

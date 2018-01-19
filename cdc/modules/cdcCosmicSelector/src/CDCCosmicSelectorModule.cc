@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcCosmicSelector/CDCCosmicSelectorModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <utility>
 #include <iostream>
@@ -43,19 +41,15 @@ CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 
 void CDCCosmicSelectorModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
+  m_mcParticles.isRequired();
 }
 
 
 void CDCCosmicSelectorModule::event()
 {
-  // Get MCParticle array
-  StoreArray<MCParticle> mcParticles;
-
   bool returnVal = false;
 
-  int nMCPs = mcParticles.getEntries();
+  int nMCPs = m_mcParticles.getEntries();
   if (nMCPs == 0) {
     B2ERROR("No. of MCParticles=0 in the current event.");
     setReturnValue(returnVal);
@@ -75,7 +69,7 @@ void CDCCosmicSelectorModule::event()
   unsigned nPrimChgds = 0;
 
   for (int iMCPs = 0; iMCPs < nMCPs; ++iMCPs) {
-    MCParticle* m_P = mcParticles[iMCPs];
+    MCParticle* m_P = m_mcParticles[iMCPs];
 
     //    B2INFO("isPrimaryParticle= " << m_P->isPrimaryParticle());
     if (!m_P->isPrimaryParticle()) continue;

@@ -15,16 +15,15 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/utilities/SVDAdvancer.h>
-#include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const svdResultVarNames[] = {
-    "chi2_vxd_full",
     "chi2_vxd_max",
     "chi2_vxd_min",
     "chi2_vxd_mean",
+    "chi2_vxd_full",
     "number_of_hits",
     "pt",
     "chi2_cdc",
@@ -32,6 +31,7 @@ namespace Belle2 {
     "last_hit_layer",
     "first_hit_layer",
     "chi2",
+    "weight_sum",
     "has_missing_layer_1",
     "has_missing_layer_2",
     "has_missing_layer_3",
@@ -42,6 +42,7 @@ namespace Belle2 {
     "theta",
     "distance_to_cdc_track",
     "distance_to_cdc_track_xy",
+    "number_of_hits_related_svd_track",
   };
 
   /// Vehicle class to transport the variable names
@@ -64,6 +65,7 @@ namespace Belle2 {
    * which knows the truth information if two tracks belong together or not.
    */
   class SVDResultVarSet : public TrackFindingCDC::VarSet<SVDResultVarNames> {
+    using Super = TrackFindingCDC::VarSet<SVDResultVarNames>;
 
   public:
     SVDResultVarSet();
@@ -76,7 +78,5 @@ namespace Belle2 {
   private:
     /// Findlet for advancing
     SVDAdvancer m_advancer;
-    /// Findlet for kalman step
-    SVDKalmanStepper m_kalmanStepper;
   };
 }

@@ -39,9 +39,10 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
 void CDCDedxElectronCollectorModule::prepare()
 {
-  StoreArray<CDCDedxTrack>::required();
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
+  // required input
+  m_dedxTracks.isRequired();
+  m_tracks.isRequired();
+  m_trackFitResults.isRequired();
 
   // Data object creation
   auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
@@ -67,15 +68,18 @@ void CDCDedxElectronCollectorModule::prepare()
 
 void CDCDedxElectronCollectorModule::collect()
 {
-  StoreArray<CDCDedxTrack> dedxTracks;
 
   // Collector object access
   auto means = getObjectPtr<TH1F>("means");
   auto tree = getObjectPtr<TTree>("tree");
 
-  for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
-    CDCDedxTrack* dedxTrack = dedxTracks[idedx];
+  for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
+    CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
+    if (!track) {
+      B2WARNING("No related track...");
+      continue;
+    }
     const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");

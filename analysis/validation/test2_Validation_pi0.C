@@ -2,21 +2,18 @@
 <header>
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_pi0_output.root</output>
-<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+<contact>Sam Cunliffe (sam.cunliffe@desy.de), Mario Merola (mario.merola@na.infn.it)</contact>
+<description>
+Check the calibration of the ECL in the MC by determining the measured pi0 invariant mass,
+Fit parameter constraints need some tuning.
+</description>
 </header>
 */
-////////////////////////////////////////////////////////////
-// Validation_pi0.cc
-// Check the calibration of the ECL in the MC by
-// determining the measured pi0 invariant mass
-// Fit parameter constraints need some tuning.
-//
-// Note: MC matching is not currently available in the ECL
-//
-// Phillip Urquijo, Luis Pesantez
-// May 3,2013
-// Update: Oct 11, 2014
-//
+
+// Authors: Phillip Urquijo, Luis Pesantez, May 2013
+// Updated: Oct 2014
+//          Nov 2017
+
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -53,6 +50,7 @@
 using namespace RooFit ;
 
 void test2_Validation_pi0() {
+    const char *contact = "mario.merola@na.infn.it; sam.cunliffe@desy.de";
 
     /* Take the pi0tuple prepared by the NtupleMaker */
     TChain * recoTree = new TChain("pi0tuple");
@@ -64,18 +62,26 @@ void test2_Validation_pi0() {
     //Plots used in offline validation
     /* Invariant mass after Egamma>0.05 GeV criterion */
     TH1F * h_pi0_m_cut = new TH1F("pi0_m_cut",";Mass with photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
+    h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Description","pi0 invariant mass after Egamma>0.05 GeV cut. A Generic BBbar sample is used."));
+    h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
+    h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Contact",contact));
+
     /* Mass constrained fit value,as stored in Particle */
     TH1F * h_pi0_m_fit = new TH1F("pi0_m_fit",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Description","pi0 Mass constrained fit mass,with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
+    h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Contact",contact));
+
     /* Invariant mass determined from the two photon daughters */
     TH1F * h_pi0_m    = new TH1F("pi0_m",";Mass without photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
     h_pi0_m->GetListOfFunctions()->Add(new TNamed("Description","pi0 Mass,with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
     h_pi0_m->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
+    h_pi0_m->GetListOfFunctions()->Add(new TNamed("Contact",contact));
     
     TH1F * h_pi0_m_truth    = new TH1F("pi0_m",";Mass without cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
     h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Description","pi0 mass from photons,with mcErrors==0. A Generic BBbar sample is used."));
     h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Check","Check if mean is correct. Currently photon energy is wrong and gives wrong mean."));
+    h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Contact",contact));
 
     /* Access the Photons and pi0 M*/
     float pi0_gamma0_P4[4];
@@ -197,6 +203,7 @@ void test2_Validation_pi0() {
     tvalidation->Fill(meancut*1000.,meanerror*1000.,width*1000.,widtherror*1000.);
     tvalidation->SetAlias("Description","Fit to the pi0 mass in background conditions. Note this test may be replaced due to overlap with ECL specific tests.");
     tvalidation->SetAlias("Check","Consistent numerical fit results.");
+    tvalidation->SetAlias("Contact",contact);
 
     canvas->Print("test2_Validation_pi0_plots.pdf]");
 

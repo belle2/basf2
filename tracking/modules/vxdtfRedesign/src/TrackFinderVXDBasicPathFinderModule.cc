@@ -72,6 +72,16 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Number of best track candidates to be created per family.",
            m_PARAMxBestPerFamily);
 
+  addParam("maxFamilies",
+           m_PARAMmaxFamilies,
+           "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxFamilies);
+
+  addParam("maxNetworkSize",
+           m_PARAMmaxNetworkSize,
+           "Maximal size of the segment network; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxNetworkSize);
+
 }
 
 
@@ -102,8 +112,13 @@ void TrackFinderVXDBasicPathFinderModule::event()
 {
   m_eventCounter++;
 
-
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
+
+  if (segmentNetwork.size() > m_PARAMmaxNetworkSize) {
+    B2ERROR("Size of network provided by the SegmentNetworkProducer exceeds the limit of " << m_PARAMmaxNetworkSize
+            << ". Network size is " << segmentNetwork.size() << ".");
+    return;
+  }
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_PARAMsecMapName + "_BasicPF_Ev" + std::to_string(m_eventCounter);
@@ -132,6 +147,10 @@ void TrackFinderVXDBasicPathFinderModule::event()
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
+    if (nFamilies > m_PARAMmaxFamilies)  {
+      B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      return;
+    }
     m_sptcSelector->prepareSelector(nFamilies);
   }
   /// collect all Paths starting from a Seed:

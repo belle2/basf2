@@ -12,9 +12,13 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
+#include <vector>
+#include <string>
+
 namespace Belle2 {
   class ModuleParamList;
 
+  /// Simple findlet for searching the best candidate for a given seed aplying the given filter.
   template<class AFilter>
   class OverlapResolver : public TrackFindingCDC::Findlet<typename AFilter::Object, typename AFilter::Object> {
   public:
@@ -30,8 +34,7 @@ namespace Belle2 {
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-    /**
-     */
+    /// For each seed, search for the best candidate and return it.
     void apply(std::vector<Object>& results, std::vector<Object>& filteredResult) override;
 
   private:

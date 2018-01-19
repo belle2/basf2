@@ -32,18 +32,31 @@ void ARICHMerger::boot(const DBObject& obj, const DBObject o_febs[6], int used[6
     m_callback.set(vname + StringUtil::form(".feb[%d].done", i), (int)0);
   }
   int num = 0;
+  std::stringstream ss;
   for (size_t i = 0; i < 6; i++) {
+    ss << (used[i] > 0) << " ";
     num |= (used[i] > 0) << i;
+    LogFile::debug("0x13 << 0x%x", (num << 24));
     m_hslb.writefee32(0x13, (num << 24) + 0x000000);
     usleep(10000);
   }
+  LogFile::info("FEE enabled: " + ss.str());
   m_hslb.writefee32(0x12, (num << 24) + 0x050000);
   usleep(1000);
   m_hslb.writefee32(0x11, (num << 8) + 0x010000);
   usleep(1000);
-  std::string firmware = "/usr/local/share/firmware/arich/sa03b3fe2-v05cand2.bin";
+  std::string firmware; //= "/usr/local/share/firmware/arich/sa03b3fe2-v05cand2.bin";
+  m_callback.get(vname + ".feb.firmware", firmware);
+  //firmware = "/usr/local/share/firmware/arich/" + firmware;
+  firmware = "/home/usr/b2daq/arich/firmware/" + firmware;
   //std::string firmware = "/usr/local/share/firmware/arich/sa03b3fe2-v06cand1.bin";
-  m_hslb.writestream(firmware.c_str());//"sa03b3fe2_ferst.bin");
+  LogFile::info("Loging FEB firmware : " + firmware);
+  try {
+    m_hslb.writestream(firmware.c_str());//"sa03b3fe2_ferst.bin");
+  } catch (const std::exception& e) {
+    LogFile::fatal(e.what());
+    return;
+  }
   usleep(1000);
   for (size_t i = 0; i < 6; i++) {
     if (used[i] > 0) {
@@ -67,7 +80,7 @@ void ARICHMerger::boot(const DBObject& obj, const DBObject o_febs[6], int used[6
   usleep(1000);
   unsigned int v = m_hslb.readfee32(0x12);
   m_callback.set(vname + ".reg[12]", (int)v);
-  std::stringstream ss;
+  ss.str("");
   for (int i = 0; i < 6; i++) {
     int enable = (int)((v >> i) & 0x1);
     ss << enable << " ";
@@ -90,6 +103,8 @@ void ARICHMerger::boot(const DBObject& obj, const DBObject o_febs[6], int used[6
 
 void ARICHMerger::load(const DBObject& o_mgr, const DBObject o_febs[6], int used[6], const std::string& mode)
 {
+  int csr = 0;
+  m_callback.get("csr", csr);
   const std::string vname = StringUtil::form("arich[%d].", m_hslb.get_finid());
   for (size_t i = 0; i < 6; i++) {
     if (used[i] == 0) continue;
@@ -97,11 +112,26 @@ void ARICHMerger::load(const DBObject& o_mgr, const DBObject o_febs[6], int used
     LogFile::debug("HSLB:%c, FEE # = %d", ('a' + m_hslb.get_finid()), i);
     ARICHFEBSA0x sa03(m_hslb, i);
     // initialization
-    sa03.csr1(o_mgr.getInt("csr1"));
-    sa03.hdcycle(o_mgr.getInt("hdcycle"));
-    sa03.trgdelay(o_mgr.getInt("trgdelay"));
-    sa03.trigen(o_mgr.getInt("trigen"));
-    sa03.init();
+    sa03.init();//debug. it should be removed
+    sa03.csr1(csr);//o_mgr.getInt("csr1"));
+    const std::string cvname = vname + StringUtil::form("feb[%d].", i);
+    int hdcycle = -1;
+    m_callback.get(cvname + "hdcycle_set", hdcycle);
+    if (hdcycle >= 0) {
+      LogFile::info("hdcycle_set=%d", hdcycle);
+      sa03.hdcycle(hdcycle);
+    } else {
+      sa03.hdcycle(o_mgr.getInt("hdcycle"));
+    }
+    int trgdelay = -1;
+    m_callback.get(cvname + "trgdelay_set", trgdelay);
+    if (trgdelay >= 0) {
+      sa03.trgdelay(trgdelay);
+    } else {
+      sa03.trgdelay(o_mgr.getInt("trgdelay"));
+    }
+    //sa03.trigen(o_mgr.getInt("trigen"));
+    //sa03.init();
 
     // global parameter
     const DBObjectList& o_chips(o_feb.getObjects("chip"));
@@ -138,8 +168,8 @@ void ARICHMerger::load(const DBObject& o_mgr, const DBObject o_febs[6], int used
 
     // select chip-channel
     const DBObjectList& o_selects(o_mgr.getObjects("select"));
-    for (size_t i = 0; i < o_selects.size(); i++) {
-      const DBObject& o_select(o_selects[i]);
+    for (size_t is = 0; is < o_selects.size(); is++) {
+      const DBObject& o_select(o_selects[is]);
       if (o_select.hasValue("chip") && o_select.getValue("ch")) {
         sa03.select(o_select.getInt("chip"), o_select.getInt("ch"));
       }
@@ -257,7 +287,7 @@ int ARICHMerger::setThreshold(double th0, double dth/*, const DBObject& obj*/, i
 void ARICHMerger::load_global(ARICHFEBSA0x& sa03, unsigned int chip)
 {
   SA0xGlobalParam& prm(m_globalparam[chip]);
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 5; i++) {
     sa03.select(chip, -1);
     printf("param: 0x%x\n", prm.param());
     sa03.wparam(prm.param());
@@ -268,24 +298,30 @@ void ARICHMerger::load_global(ARICHFEBSA0x& sa03, unsigned int chip)
     printf("rbparam: 0x%x\n", val);
     /* compare */
     if (prm.compare(false) == 0) {
-      LogFile::debug("global param 0x%07x correctly loaded for chip %d (id=0x%x).",
-                     prm.param(), chip, prm.getrb_id());
+      LogFile::debug("HLSB:%c FEB:%d  global param 0x%07x correctly loaded for chip %d (id=0x%x).",
+                     ('a' + m_hslb.get_finid()), sa03.num(), prm.param(), chip, prm.getrb_id());
       return;
     } else {
-      LogFile::warning("Error in global param for chip %d (id=0x%x):"
-                       "(set 0x%07x readback 0x%07x).", chip,
+      if (i == 0) {
+        m_callback.log(LogFile::WARNING, "HLSB:%c FEB:%d  Error in global param for chip %d (id=0x%x):"
+                       "(set 0x%07x readback 0x%07x).", ('a' + m_hslb.get_finid()),
+                       sa03.num(), chip,
                        prm.getrb_id(), prm.param(), prm.getrb_masked());
+      }
     }
   }
-  throw (RCHandlerException("Error in global param for chip %d (id=0x%x):"
-                            "(set 0x%07x readback 0x%07x).", chip,
-                            prm.getrb_id(), prm.param(), prm.getrb_masked()));
+  /*
+  throw (RCHandlerException("HLSB:%c FEB:%d  Error in global param for chip %d (id=0x%x):"
+          "(set 0x%07x readback 0x%07x).", ('a'+m_hslb.get_finid()),
+          sa03.num(), chip,
+          prm.getrb_id(), prm.param(), prm.getrb_masked()));
+  */
 }
 
 void ARICHMerger::load_ch(ARICHFEBSA0x& sa03, unsigned int chip, unsigned int ch)
 {
   SA0xChannelParam& prm(m_channelparam[chip][ch]);
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 5; i++) {
     sa03.select(chip, ch);
     sa03.wparam(prm.param());
     sa03.prmset(); // load parameter
@@ -294,19 +330,25 @@ void ARICHMerger::load_ch(ARICHFEBSA0x& sa03, unsigned int chip, unsigned int ch
     prm.rbparam(val);
     /* compare */
     if (prm.compare(false) == 0) {
-      LogFile::debug("ch. param 0x%07x correctly loaded for chip %d ch %2d.",
-                     prm.param(), chip, ch);
+      //LogFile::debug("HLSB:%c FEB:%d  ch. param 0x%07x correctly loaded for chip %d ch %2d.",
+      //       ('a'+m_hslb.get_finid()), sa03.num(), prm.param(), chip, ch);
       usleep(500);
       return;
     } else {
-      LogFile::warning("Error in ch. param for chip %d ch %2d:"
-                       "(set 0x%07x readback 0x%07x).", chip, ch,
+      if (i == 0) {
+        m_callback.log(LogFile::WARNING, "HLSB:%c FEB:%d Error in ch. param for chip %d ch %2d:"
+                       "(set 0x%07x readback 0x%07x).",
+                       ('a' + m_hslb.get_finid()), sa03.num(), chip, ch,
                        prm.param(), prm.rbparam());
+      }
     }
-    usleep(500);
+    usleep(400);
   }
-  throw (RCHandlerException("Error in ch. param for chip %d ch %2d:"
-                            "(set 0x%07x readback 0x%07x).", chip, ch,
-                            prm.param(), prm.rbparam()));
+  /*
+  throw (RCHandlerException("HLSB:%c FEB:%d  Error in ch. param for chip %d ch %2d:"
+          "(set 0x%07x readback 0x%07x).",
+          ('a'+m_hslb.get_finid()), sa03.num(), chip, ch,
+          prm.param(), prm.rbparam()));
+  */
 }
 

@@ -6,7 +6,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
@@ -223,7 +223,7 @@ namespace Belle2 {
     /** StoreArray containing the input track segment hits. */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
     /** StoreObjPtr containing the event time. */
-    StoreObjPtr<EventT0> m_eventTime;
+    StoreObjPtr<BinnedEventT0> m_eventTime;
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
   };

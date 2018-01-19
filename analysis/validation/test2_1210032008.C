@@ -6,12 +6,12 @@
 <description>Distribuions used in angular analysis for 
 transverse-polarised B->K*(->K+pi0)rho(->pi+pi-) candidates:
   <ul>
-      <li>&Delta;E</li>
+      <li>&#x394;E</li>
       <li>Mbc</li>
-      <li>M(&rho;(770))</li>
+      <li>M(&#x2208;(770))</li>
       <li>M(K*(892))</li>
-      <li>cos(&theta;(&pi;&pi;))</li>
-      <li>cos(&theta;(K&pi;))</li>
+      <li>cos(&#x3B8;(&#x3C0;&#x3C0;))</li>
+      <li>cos(&#x3B8;(K&#x3C0;))</li>
   </ul>
 For each variables three histograms are created:
   <ul>

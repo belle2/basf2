@@ -24,9 +24,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// DataStore classes
-#include <mdst/dataobjects/MCParticle.h>
-
 // ROOT
 #include <TRandom.h>
 #include <TVector3.h>
@@ -92,7 +89,8 @@ namespace Belle2 {
   void OpticalGunModule::initialize()
   {
     // data store objects registration
-    StoreArray<MCParticle>::registerPersistent();
+    m_MCParticles.registerInDataStore();
+    m_simCalPulses.isOptional();
 
     // parameters check
     if (m_wavelength < 150 or m_wavelength > 1000)
@@ -135,12 +133,15 @@ namespace Belle2 {
   void OpticalGunModule::event()
   {
 
-    // if not already existed, create MCParticles data store
-    StoreArray<MCParticle> MCParticles;
-
     // generate number of photons
     int numPhotons = 1;
     if (m_numPhotons > 0) numPhotons = gRandom->Poisson(m_numPhotons);
+
+    // start time
+    double startTime = m_startTime;
+    if (m_simCalPulses.getEntries() > 0) { // TOPCalPulseGenerator in the path
+      startTime += m_simCalPulses[0]->getTime(); // set start time w.r.t cal pulse
+    }
 
     // generate photons and store them to MCParticles
     for (int i = 0; i < numPhotons; i++) {
@@ -175,7 +176,7 @@ namespace Belle2 {
       polarization.RotateUz(direction);
 
       // generate emission time
-      double startTime = gRandom->Gaus(m_startTime, m_pulseWidth);
+      double emissionTime = gRandom->Gaus(startTime, m_pulseWidth);
 
       // transform to Belle II frame
       momentum.Transform(m_rotate);
@@ -189,13 +190,13 @@ namespace Belle2 {
       }
 
       // store generated photon
-      MCParticle* part = MCParticles.appendNew();
+      auto* part = m_MCParticles.appendNew();
       part->setPDG(0); // optical photon
       part->setMass(0);
       part->setStatus(MCParticle::c_PrimaryParticle);
       part->addStatus(MCParticle::c_StableInGenerator);
       part->setProductionVertex(point);
-      part->setProductionTime(startTime);
+      part->setProductionTime(emissionTime);
       part->setMomentum(momentum);
       part->setEnergy(m_energy);
       part->setDecayVertex(polarization); // use this location temporary

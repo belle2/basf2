@@ -83,7 +83,7 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
 
 
@@ -91,7 +91,7 @@ namespace Belle2 {
     /**
      * Prints a header for each new run.
      */
-    virtual void beginRun()
+    void beginRun() override
     {
       InitializeCounters();
 
@@ -106,14 +106,14 @@ namespace Belle2 {
 
 
     /** builds the SegmentNetwork and the TrackNodeNetwork  */
-    virtual void event();
+    void event() override;
 
 
     /** Prints a footer for each run which ended. */
-    virtual void endRun();
+    void endRun() override;
 
     /** clean up: */
-    void terminate()
+    void terminate() override
     {
       // delete the root file if it has been created
       if (m_tfile) {

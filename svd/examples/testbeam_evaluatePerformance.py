@@ -18,11 +18,11 @@ import argparse
 # 2.  choose the reconstruction algorithm to be used in add_svd_reconstruction():
 #     a. old TB reconstruction: useNN=False, useCoG=False, and uncomment SVDDigitSorter
 #     b. Neural Networks: useNN=True, useCoG=False
-#     c. Center of gravity: useNN=False, useCoG=True
+#     c. Center of gravity: useNN=False, useCoG=True (DEFAULT)
 #
 # 3. execute the script like the following:
-# RUN111: basf2 2017TB_evaluateSVD.py -- --magnet-off
-# RUN400: basf2 2017TB_evaluateSVD.py
+# RUN111: basf2 testbeam_evaluateSVD.py -- --magnet-off
+# RUN400: basf2 testbeam_evaluateSVD.py
 #
 # a rootfile with performance histograms will be created
 # uncomment the RootOutput line if you want to perform your own analysis
@@ -62,7 +62,7 @@ if (args.magnet_off):
 add_geometry(main, magnet=not args.magnet_off, field_override=None, target=None, geometry_version=geom)
 
 # unpack data
-main.add_module('SVDUnpacker', shutUpFTBError=1)
+main.add_module('SVDUnpacker', GenerateShaperDigits=True, shutUpFTBError=1)
 
 # uncomment only if using the old TB reconstruction (SVDClusterizer)
 # path.add_module('SVDDigitSorter')
@@ -73,12 +73,12 @@ add_svd_reconstruction(main, useNN=False, useCoG=True)
 # add SVD-only tracking
 add_reconstruction(main, geometry_version=geom, magnet=not args.magnet_off, vxdtf2=False)
 
-# add SVD performacne module
+# add SVD performance module
 svdperf = register_module('SVDPerformance')
 if (args.magnet_off):
-    svdperf.param('outputFileName', "SVDPerformance_run111.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF1_run111.root")
 else:
-    svdperf.param('outputFileName', "SVDPerformance_run400.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF1_run400.root")
 svdperf.param('is2017TBanalysis', True)
 main.add_module(svdperf)
 

@@ -79,7 +79,9 @@ void BaseRecoFitterModule::event()
                      m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
-  fitter.resetFitter(genfitFitter);
+  if (genfitFitter) {
+    fitter.resetFitter(genfitFitter);
+  }
 
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;

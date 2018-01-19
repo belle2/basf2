@@ -14,27 +14,34 @@
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
-#include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
-#include <tracking/ckf/general/findlets/StateCreator.dcl.h>
-#include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
+#include <tracking/ckf/general/findlets/TrackLoader.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
-#include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
+#include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
-#include <tracking/ckf/svd/findlets/UnusedVXDTracksAdder.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
-
-#include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
-#include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
+#include <tracking/ckf/svd/findlets/RelationFromSVDTracksCreator.h>
+#include <tracking/ckf/svd/findlets/RecoTrackRelator.h>
+#include <tracking/ckf/svd/findlets/RelationApplier.h>
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
-  class SVDCluster;
 
   class ModuleParamList;
 
-
+  /**
+   * Findlet for combining CDC tracks with SVD tracks.
+   *
+   * The idea is to use every fitted CDC track, extrapolate it to every
+   * SVD track and extrapolate/Kalman fit it with every hit of the track.
+   *
+   * Then, a filter is applied to every CDC-SVD combination and the combinations
+   * are resolved using this filter information.
+   *
+   * This module does only output relations - the combination
+   * has to be done afterwards.
+   */
   class CKFToSVDSeedFindlet : public TrackFindingCDC::Findlet<> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<>;
@@ -46,35 +53,39 @@ namespace Belle2 {
     /// Default desctructor
     ~CKFToSVDSeedFindlet();
 
-    /// Expose the parameters of the sub findlets.
+    /// Expose the parameters (also of the sub findlets).
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /// Do the track/hit finding/merging.
+    /// Do the track merging.
     void apply() override;
 
     /// Clear the object pools
     void beginEvent() override;
 
   private:
+    // Parameters
+    /// Minimal hit requirement for the results (counted in number of space points)
+    unsigned int m_param_minimalHitRequirement = 2;
+
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
-    CKFDataHandler<CKFToSVDResult> m_dataHandler;
+    TrackLoader m_dataHandler;
     /// Findlet for loading the space points
     SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks
-    StateCreator<RecoTrack, CKFToSVDState> m_stateCreatorFromTracks;
+    StateCreatorWithReversal<CKFToSVDState> m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
-    /// Findlet for creating relations between states
-    CKFRelationCreator<CKFToSVDState, ChooseableSVDRelationFilter> m_relationCreator;
+    /// Relation Creator
+    RelationFromSVDTracksCreator m_relationCreator;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
-    /// Findlet for resolving overlaps
-    OverlapResolver<SizeSVDResultFilter> m_overlapResolver;
-    /// Findlet for adding unused VXDTF2 results
-    UnusedVXDTracksAdder m_unusedTracksAdder;
-    /// Findlet for tagging the used space points
-    SpacePointTagger<CKFToSVDResult, SVDCluster> m_spacePointTagger;
+    /// Findlet transforming the hit results to track relations.
+    RecoTrackRelator m_recoTrackRelator;
+    /// Greedy filter for the relations between SVD and CDC Reco Tracks
+    TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack> m_bestMatchSelector;
+    /// Copy the result relations to the store array
+    RelationApplier m_relationApplier;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
@@ -89,7 +100,7 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
-    /// Vector for storing the filtered results
-    std::vector<CKFToSVDResult> m_filteredResults;
+    /// Relations between CDC tracks and SVD tracks
+    std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> m_relationsCDCToSVD;
   };
 }

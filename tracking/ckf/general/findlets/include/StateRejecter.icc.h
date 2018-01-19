@@ -11,6 +11,7 @@
 
 #include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {
@@ -36,7 +37,7 @@ namespace Belle2 {
   };
 
   template <class AState, class AFindlet>
-  void StateRejecter<AState, AFindlet>::apply(const std::vector<const AState*>& currentPath,
+  void StateRejecter<AState, AFindlet>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                                               std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     B2DEBUG(100, "Starting with " << childStates.size() << " states.");

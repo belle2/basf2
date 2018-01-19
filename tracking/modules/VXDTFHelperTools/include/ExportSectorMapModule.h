@@ -59,16 +59,16 @@ namespace Belle2 {
     ExportSectorMapModule();
 
     /** Destructor of the module. */
-    virtual ~ExportSectorMapModule();
+    ~ExportSectorMapModule();
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
     /**
      * Termination action.
      */
-    virtual void terminate();
+    void terminate() override;
 
     /** safe way of importing cutoff values from the xml-file */
     double getXMLValue(GearDir& quantiles, std::string& valueType, std::string& filterType);

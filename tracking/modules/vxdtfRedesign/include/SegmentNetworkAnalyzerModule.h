@@ -48,13 +48,13 @@ namespace Belle2 {
     SegmentNetworkAnalyzerModule();
 
     /** set up root file and check required Store Arrays */
-    virtual void initialize();
+    void initialize() override;
 
     /** collect necessary data and put into TTree */
-    virtual void event();
+    void event() override;
 
     /** write and close root file*/
-    virtual void terminate();
+    void terminate() override;
 
   private:
 

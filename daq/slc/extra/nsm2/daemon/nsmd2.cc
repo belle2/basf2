@@ -44,8 +44,13 @@
 //  20150521  1944 new protocol version, master recoonect fix
 //  20160420  1946 suppress debug output
 //  20170613  1947 protect against bad USRCPYMEM from misconnected nodes
+//  20170927  1948 touchsys pos fix, log cleanup for send/recv
+//  20170929  1949 ackdaemon fix to avoid reconnecting to same M/D
+//  20171002  1950 ackdaemon fix to avoid connection to multiple D
+//  20171002  1951 destroyconn to non M/D allowed, avoid duplicate free M/D
+//  20171002  1952 shortbufp/longbufp/bsizbuf to be modified when ncon changes
 
-#define NSM_DAEMON_VERSION   1947
+#define NSM_DAEMON_VERSION   1952
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -130,8 +135,8 @@ SOCKAD_IN   nsmd_sockad;
 char        nsmd_host[1024];
 const char* nsmd_logdir = ".";
 FILE*       nsmd_logfp = stdout;
-#define NSMD_DBGAFTER 8
-#define NSMD_DBGBEFORE 16
+#define NSMD_DBGAFTER 4
+#define NSMD_DBGBEFORE 8
 char        nsmd_dbgbuf[NSMD_DBGBEFORE][256];
 int         nsmd_dbgcnt = 0;
 int         nsmd_shmsysid = -1;
@@ -160,6 +165,12 @@ int nsmd_tcpsocksiz = NSM_TCPMSGSIZ * 2;
 static NSMDtcpq* nsmd_tcpqfirst = 0;
 static NSMDtcpq* nsmd_tcpqlast = 0;
 
+// buffer to store partially received data
+const int MAX_CONI = NSMSYS_MAX_CON - NSMCON_OUT;
+const int NO_CONI = -1;
+static char* recv_shortbufp[MAX_CONI];
+static char* recv_longbufp[MAX_CONI];
+static int32_t recv_bsizbuf[MAX_CONI];
 
 // -- command list ------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -1624,8 +1635,11 @@ nsmd_tcpwriteq()
   while (1) { // just for EINTR and EAGAIN
     if ((ret = write(con.sock, writep, writelen)) >= 0) break;
     if (errno == EINTR || errno == EAGAIN) continue;
-    ERRO("tcpwriteq(%d,%d) write %d bytes",
-         con.sock, q->conid, writelen); // unexpected
+    // 20170927 this is not unexpected
+    WARN("tcpwriteq(%d,%d) write %d bytes failed: %s",
+         con.sock, q->conid, writelen, strerror(errno));
+    nsmd_destroyconn(con, 1, "tcpwriteq");
+    return 1;
   }
 
   {
@@ -1649,7 +1663,11 @@ nsmd_tcpwriteq()
 
   }
 
-  if (ret == 0) ASRT("tcpwriteq: write returns 0 for con=%d", q->conid);
+  if (ret == 0) {
+    WARN("tcpwriteq: write returns 0 for con=%d", q->conid);
+    nsmd_destroyconn(con, 1, "tcpwriteq");
+    return 1;
+  }
 
   // for a large datap, keep the queue to be called again
   if (ret == writelen && wtyp == WHEAD) {
@@ -1804,10 +1822,12 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
     if (qptr == nsmd_tcpqlast) nsmd_tcpqlast = q;
     qptr->nextp = q;
   }
+  /* 20170927 commented out
   DBG("tcpsend(%d,%d) f=%08x(%08x) l=%08x q=%08x %d",
       con.sock, CON_ID(con),
-      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast,
+      nsmd_tcpqfirst, nsmd_tcpqfirst?nsmd_tcpqfirst->prevp:0, nsmd_tcpqlast,
       q, beforeafter);
+  */
 
   // setup the queue entries
   q->conid = CON_ID(con);
@@ -1941,7 +1961,9 @@ nsmd_tcpconnect(SOCKAD_IN& sockad, const char* contype)
 // - TCP connection is made only to master/deputy and
 //   called from do_ackdaemon and do_newmaster
 // - conid = sys.ncon in do_newmaster to create a new connection,
-//   and sys.ncon++ for a successful connection
+//   and sys.ncon++ for a successful connection, right after this call
+//   in nsmd_do_ackdaemon or nsmd_do_newmaster
+//
 // ----------------------------------------------------------------------
 int
 nsmd_newconn(int conid, int32_t ip, const char* contype)
@@ -1966,6 +1988,11 @@ nsmd_newconn(int conid, int32_t ip, const char* contype)
   con.ready  = sys.ready <= 0 ? 0 : sys.ready;
   con.timevent = time(0);
   sys.sock_updated  = 1;
+
+  // clear recvbuf
+  int coni  = CON_ID(con) - NSMCON_OUT; // instead of conid
+  recv_bsizbuf[coni] = 0;
+
   return sock;
 }
 // -- nsmd_delconn ------------------------------------------------------
@@ -2012,6 +2039,21 @@ nsmd_delconn(NSMcon& con)
       q = q->nextp;
     }
   }
+
+  // clear and shift recvbuf
+  int coni = conid - NSMCON_OUT; // instead of conid
+  if (recv_shortbufp[coni]) nsmd_free("delconn", recv_shortbufp[coni]);
+  if (recv_longbufp[coni])  nsmd_free("delconn", recv_longbufp[coni]);
+  for (int i = conid; i < sys.ncon; i++) {
+    coni = i - NSMCON_OUT;
+    recv_shortbufp[coni] = recv_shortbufp[coni + 1];
+    recv_longbufp[coni]  = recv_longbufp[coni + 1];
+    recv_bsizbuf[coni]   = recv_bsizbuf[coni + 1];
+  }
+  coni = sys.ncon - NSMCON_OUT;
+  recv_shortbufp[coni] = recv_shortbufp[coni + 1];
+  recv_longbufp[coni]  = recv_longbufp[coni + 1];
+  recv_bsizbuf[coni] = 0;
 
   // and make it dirty to update select fdset
   sys.sock_updated = 1;
@@ -2080,7 +2122,7 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
     } else if (ConIsDeputy(con)) {
       sys.deputy = NSMCON_NON;
     } else if (!IamMaster() && !IamDeputy()) {
-      ASRT("destroyconn: disappeared con=%d is not a MASTER/DEPUTY",
+      WARN("destroyconn: disappeared con=%d is not a MASTER/DEPUTY",
            &con - sys.con);
     }
   }
@@ -2447,13 +2489,12 @@ nsmd_setup_daemon(NSMcon& con, int exception)
 // message.
 // ----------------------------------------------------------------------
 static void
-nsmd_touchsys(NSMcon& con, int pos, int siz)
+nsmd_touchsys(NSMcon& con, uint32_t pos, uint16_t siz)
 {
   NSMsys& sys = *nsmd_sysp;
 
   // parameter check
-  if (pos < 0 || pos >= sizeof(sys) ||
-      siz <= 0 || siz > sizeof(sys) || pos + siz > sizeof(sys)) {
+  if (siz == 0 || pos + siz > sizeof(sys)) {
     ASRT("touchsys pos/siz=%d/%d", pos, siz);
   }
 
@@ -2468,11 +2509,11 @@ nsmd_touchsys(NSMcon& con, int pos, int siz)
   char* begp = (char*)&sys + pos;
   char* endp = begp + siz;
   NSMDtcpq* qptr[NSMSYS_MAX_CON];
-  int16_t qpos[NSMSYS_MAX_CON];
-  int16_t qsiz[NSMSYS_MAX_CON];
+  uint32_t qpos[NSMSYS_MAX_CON];
+  uint16_t qsiz[NSMSYS_MAX_CON];
   memset(qptr, 0, sys.ncon * sizeof(NSMDtcpq*));
-  memset(qpos, 0, sys.ncon * sizeof(int16_t));
-  memset(qsiz, 0, sys.ncon * sizeof(int16_t));
+  memset(qpos, 0, sys.ncon * sizeof(uint32_t));
+  memset(qsiz, 0, sys.ncon * sizeof(uint16_t));
   int conid = CON_ID(con);
 
   NSMDtcpq* inprogress = 0;
@@ -2532,7 +2573,7 @@ nsmd_touchsys(NSMcon& con, int pos, int siz)
     }
 
     dmsg.pars[0] = qpos[i] ? qpos[i] : pos;
-    dmsg.pars[1] = qsiz[i] ? qsiz[i] : siz;
+    dmsg.pars[1] = (qsiz[i] ? qsiz[i] : siz) & 0xffff;
     dmsg.datap = SYSPTR(dmsg.pars[0]);
     dmsg.len   = dmsg.pars[1];
 
@@ -3428,7 +3469,6 @@ void
 nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
-  DBG("do_ackdaemon");
 
   if (dmsg.npar != 9) ASRT("do_ackdaemon: dmsg.npar(%d) != 9", dmsg.npar);
 
@@ -3443,10 +3483,20 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   int32_t oldm = sys.master ? AddrMaster() : -1;
   int32_t oldd = sys.deputy ? AddrDeputy() : -1;
   int32_t newgen = dmsg.pars[8];
+  int32_t fromip = ADDR_IP(con.sockad);
+
+  DBG("ACKDAEMON from %s m:%s=>%s d:%s=>%s g:%d=>%d",
+      ADDR_STR(fromip),
+      ADDR_STR(oldm),
+      ADDR_STR(newm),
+      ADDR_STR(oldd),
+      ADDR_STR(newd),
+      sys.generation,
+      newgen);
+
   if (newm && newm == oldm && newd == oldd && newgen == sys.generation) return;
 
   // check the message source
-  int32_t fromip = ADDR_IP(con.sockad);
   if (fromip != newm && fromip != newd) {
     WARN("ackdaemon from a non-master/deputy host %s", ADDR_STR(fromip));
     return;
@@ -3458,6 +3508,8 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   // connect to master
   if (newm == nsmd_myip) {
     sys.master = NSMCON_TCP;
+  } else if (newm == oldm) {
+    // do nothing
   } else if (nsmd_newconn(sys.ncon, newm, "master") < 0) {
     // if it cannot connect, it may be because the master have
     // disappeared just now
@@ -3469,7 +3521,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // connect to deputy if any
-  if (! NoMaster() && newd != -1 && newd != nsmd_myip) {
+  if (! NoMaster() && newd != -1 && newd != nsmd_myip && oldd == -1) {
     if (nsmd_newconn(sys.ncon, newd, "deputy") < 0) {
       sys.deputy = NSMCON_NON;
       WARN("Cannot connect to deputy at %s", ADDR_STR(newd));
@@ -3541,8 +3593,9 @@ nsmd_do_syscpymem(NSMcon& con, NSMdmsg& dmsg)
   const int tcpdatmax = NSM_TCPDATSIZ - 4 * sizeof(int32_t); // 64k - 16byte
   static int datid = -1;
 
-  DBG("syscpymem opt=%d pos=%d siz=%d%s", opt, pos, siz,
-      ConIsMaster(con) ? " master" : "");
+  DBG("syscpymem opt=%d pos=%d siz=%d seq=%d<=%s",
+      opt, pos, siz, dmsg.seq, ADDR_STR(con.sockad));
+  /* ConIsMaster(con) ? " master" : ""); */
 
   if (! ConIsMaster(con) && !(ConIsDeputy(con) && IamMaster())) return;
 
@@ -3872,11 +3925,13 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
         nsmd_delconn(sys.con[sys.master]);
         sys.master = NSMCON_NON;
       }
-      if (newgen != oldgen && ConIsMaster(con) && oldd != -1) {
+      if (newgen != oldgen && ConIsMaster(con) && oldd != -1 &&
+          sys.deputy != NSMCON_NON) {
         nsmd_delconn(sys.con[sys.deputy]);
         sys.deputy = NSMCON_NON;
       }
-      if (newgen != oldgen && ConIsDeputy(con) && oldm != -1) {
+      if (newgen != oldgen && ConIsDeputy(con) && oldm != -1 &&
+          sys.master != NSMCON_NON) {
         nsmd_delconn(sys.con[sys.master]);
         sys.master = NSMCON_NON;
       }
@@ -4494,9 +4549,11 @@ nsmd_command(NSMcon& con, NSMdmsg& dmsg)
     } else {
       int dispflag = 1;
       if ((cmd.req == NSMCMD_USRCPYMEM ||
+           cmd.req == NSMCMD_SYSCPYMEM ||
            cmd.req == NSMCMD_FLUSHMEM ||
            cmd.req == NSMCMD_PING ||
            cmd.req == NSMCMD_PONG) && !DBGBIT(7)) dispflag = 0;
+
       if (dispflag) {
         LOG("recv %s(%d)<=%s  len=%d npar=%d",
             cmd.name, dmsg.seq, ADDR_STR(con.sockad), dmsg.len, dmsg.npar);
@@ -4626,7 +4683,7 @@ nsmd_tcpaccept()
   // accept system call
   int sock = accept(tcp.sock, (SOCKAD*)&sockad, &sockadlen);
   if (sock < 0) {
-    WARN("tcpaccept: accept (%s), strerrno(errno)");
+    WARN("tcpaccept: accept (%s)", strerror(errno));
     return;
   }
 
@@ -4669,6 +4726,7 @@ nsmd_tcpaccept()
     if (fromaddr == ADDR_IP(tcp.sockad)) {
       extrastr = " (local)";
     }
+    recv_bsizbuf[sys.ncon - NSMCON_OUT] = 0;
     sys.ncon++;
   }
   LOG("ACCEPT connection from %s sock=%d conn=%d%s",
@@ -4714,7 +4772,7 @@ nsmd_tcpaccept()
     int size = write(sock, (char*)&myeuid, sizeof(myeuid));
 
     if (size < 0) {
-      WARN("tcpaccept: write (%s), strerrno(errno)");
+      WARN("tcpaccept: write (%s)", strerror(errno));
     } else if (size < sizeof(myeuid)) {
       WARN("tcpaccept: cannot write %d byte (%d byte only)",
            sizeof(myeuid), size);
@@ -4745,30 +4803,24 @@ void
 nsmd_tcprecv(NSMcon& con)
 {
   NSMsys& sys = *nsmd_sysp;
-  int coni  = CON_ID(con) - NSMCON_OUT; // instead of conid
-
-  const int MAX_CONI = NSMSYS_MAX_CON - NSMCON_OUT;
-  const int NO_CONI = -1;
-  static char* shortbufp[MAX_CONI];
-  static char* longbufp[MAX_CONI];
-  static int32_t bsizbuf[MAX_CONI];
   int recvlen;
   int recvsiz;
   char* recvp;
   char* datap = 0;
+  int coni  = CON_ID(con) - NSMCON_OUT; // instead of conid
 
   if (coni < 0 || coni >= MAX_CONI)
     ASRT("tcprecv conid=%d", coni + NSMCON_OUT);
 
-  if (! shortbufp[coni]) {
-    shortbufp[coni] = (char*)nsmd_malloc("tcprecv", NSM_TCPTHRESHOLD);
+  if (! recv_shortbufp[coni]) {
+    recv_shortbufp[coni] = (char*)nsmd_malloc("tcprecv", NSM_TCPTHRESHOLD);
   }
 
   // headlen is valid only after receiving the NSMtcphead part
-  NSMtcphead& head = *(NSMtcphead*)shortbufp[coni];
+  NSMtcphead& head = *(NSMtcphead*)recv_shortbufp[coni];
   int datlen = head.npar * sizeof(int32_t) + ntohs(head.len);
   int msglen = sizeof(NSMtcphead) + datlen;
-  int& bsiz = bsizbuf[coni];
+  int& bsiz = recv_bsizbuf[coni];
 
   if (con.icnt == 0) bsiz = 0;
   con.icnt++;
@@ -4785,8 +4837,8 @@ nsmd_tcprecv(NSMcon& con)
     recvp = (char*)&head + bsiz;
   } else if (msglen <= NSM_TCPTHRESHOLD) { // short buffer is fine
     recvsiz = msglen - bsiz;
-    recvp   = shortbufp[coni] + bsiz;
-    datap   = shortbufp[coni] + sizeof(NSMtcphead);
+    recvp   = recv_shortbufp[coni] + bsiz;
+    datap   = recv_shortbufp[coni] + sizeof(NSMtcphead);
   } else { // need a long buffer
     if (bsiz == sizeof(NSMtcphead)) {
       /* datap may not be freed after nsmd_command, and new message
@@ -4797,9 +4849,9 @@ nsmd_tcprecv(NSMcon& con)
       } else {
         datap = (char*)nsmd_malloc("tcprecv", datlen);
       }
-      longbufp[coni] = datap;
+      recv_longbufp[coni] = datap;
     } else {
-      datap = longbufp[coni];
+      datap = recv_longbufp[coni];
     }
     recvsiz = msglen - bsiz;
     recvp   = datap + (bsiz - sizeof(NSMtcphead));
@@ -4854,9 +4906,13 @@ nsmd_tcprecv(NSMcon& con)
     int err  = 0;
     int reqid = req - NSMREQ_FIRST;
 
-    DBG("tcprecv(%d,%d) req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
-        con.sock, CON_ID(con),
-        req, src, dest, len, npar, ntohl(p[0]), ntohl(p[1]), coni);
+    /* 20170927 commented out
+    if (req != NSMCMD_SYSCPYMEM) {
+      DBG("tcprecv(%d,%d) req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
+          con.sock, CON_ID(con),
+          req, src, dest, len, npar, ntohl(p[0]), ntohl(p[1]), coni);
+    }
+    */
 
     if (src  != 65535 && src  != 0 && src  >= NSMSYS_MAX_NOD) err |= 1;
     if (dest != 65535 && dest != 0 && dest >= NSMSYS_MAX_NOD) err |= 2;
@@ -4868,6 +4924,12 @@ nsmd_tcprecv(NSMcon& con)
       if (reqid < NSMSYS_MAX_REQ    && sys.req[reqid].name[0] == 0) err |= 64;
     }
     if (err) {
+
+      /* 20170927 moved to here */
+      LOG("tcprecv(%d,%d) req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
+          con.sock, CON_ID(con),
+          req, src, dest, len, npar, ntohl(p[0]), ntohl(p[1]), coni);
+
       for (int i = 0; i < 32; i += 8) {
         LOG("tcphead %02x %02x %02x %02x - %02x %02x %02x %02x",
             h[i + 0], h[i + i], h[i + 2], h[i + 3], h[i + 4], h[i + 5], h[i + 6], h[i + 7]);

@@ -14,8 +14,16 @@
 #ifndef ARICHNTUPLEMODULE_H
 #define ARICHNTUPLEMODULE_H
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <string>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <arich/dataobjects/ARICHLikelihood.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
+#include <arich/dataobjects/ARICHTrack.h>
+
 
 // ROOT
 #include <string>
@@ -91,6 +99,15 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+
+    // required input
+    StoreArray<ARICHTrack> m_arichTracks; /**< Required array of input ARICHTracks */
+    StoreArray<ARICHLikelihood> m_arichLikelihoods; /**< Required array of input ARICHLikelihoods */
+
+    // optional input
+    StoreArray<Track> m_tracks; /**< Optional input array of Tracks */
+    StoreArray<MCParticle> m_arichMCPs; /**< Optional input array of MCParticles */
+    StoreArray<ARICHAeroHit> m_arichAeroHits; /**< Optional input array of ARICHAeroHits */
 
     std::string m_outputFile; /**< output root file */
 

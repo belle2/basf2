@@ -46,7 +46,7 @@ namespace Belle2 {
     * @param sectorCable vector of sector and cable numbers
     * @return connectionID connection ID
     */
-    int getConnectionID(std::vector<int> sectorCable) const;
+    int getConnectionID(const std::vector<int>& sectorCable) const;
 
     /**
      * Add new entry to the mapping table
@@ -55,11 +55,14 @@ namespace Belle2 {
      */
     void addMapping(int connectionID, std::vector<int> sectorCable);
 
+    /**
+    * Print mapping parameters
+    */
     void print();
 
   private:
 
-    std::map<int, std::vector<int>> m_connection2cable; /**< map of modules to cables */
+    std::map<int, std::vector<int>> m_connection2cable; /**< map of crates to cables */
 
     ClassDef(ARICHBiasCrateCableMapping, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

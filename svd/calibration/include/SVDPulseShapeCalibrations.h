@@ -56,8 +56,7 @@ namespace Belle2 {
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
-     * @param pulseADC : The ADC-pulse height is also required
-     * as input argument.
+     * @param pulseADC : The ADC-pulse height, a double between 0 and 255 (included)
      *
      * Output: float corresponding to the charge [e] converted
      * from the read ADC pulse.
@@ -65,7 +64,7 @@ namespace Belle2 {
     inline double getChargeFromADC(
       const Belle2::VxdID& sensorID,
       const bool& isU, const unsigned short& strip,
-      const unsigned char& pulseADC
+      const double& pulseADC
     ) const
     {
       return  pulseADC / getGain(sensorID, isU, strip);
@@ -129,6 +128,7 @@ namespace Belle2 {
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
+     * @param charge: the charge in electrons
      *
      * Output: a float number corresponding to the peaking time
      */
@@ -211,7 +211,7 @@ namespace Belle2 {
         correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
                                           m_bin_aDBObjPtr->sideIndex(isU), strip).bin3;
       else
-        B2WARNING("SVDPulseShapeCalibrations: you ar asking for a non existin trigger bin! Return 0.");
+        B2WARNING("SVDPulseShapeCalibrations: you ar asking for a non existing trigger bin! Return 0.");
 
       return correction;
     }
@@ -222,7 +222,7 @@ namespace Belle2 {
     /** Return the channel gain.
      * the gain is expressed in ADC counts / # electrons injected in the channel
      * That is:
-     * gain / pulseADC = charge [e]
+     * pulseADC / gain = charge [e]
      * charge * gain = pulse height [ADC counts]
      */
 
@@ -231,7 +231,6 @@ namespace Belle2 {
     {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
                               m_aDBObjPtr->sideIndex(isU), strip).gain ;
-
 
     }
 

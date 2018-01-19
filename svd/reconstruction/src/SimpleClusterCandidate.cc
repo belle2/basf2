@@ -34,6 +34,7 @@ namespace Belle2 {
       , m_positionError(0)
       , m_SNR(0)
       , m_seedSNR(0)
+      , m_seedIndex(-1)
       , m_strips(4) {m_strips.clear();};
 
     bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)

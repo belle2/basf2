@@ -60,6 +60,9 @@ namespace Belle2 {
     //! Compression level
     int m_compressionLevel;
 
+    //! DataStoreStreamer
+    DataStoreStreamer* m_streamer;
+
     //! Messaage handler
     MsgHandler* m_msghandler;
 

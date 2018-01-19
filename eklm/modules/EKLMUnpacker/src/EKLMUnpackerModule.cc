@@ -27,7 +27,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
-           "Name of EKLMDigit store array", string("Digits"));
+           "Name of EKLMDigit store array", string(""));
   m_GeoDat = NULL;
 }
 
@@ -56,6 +56,7 @@ void EKLMUnpackerModule::event()
   int endcap, layer, sector;
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
+  EKLMDigit* eklmDigit;
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
@@ -122,15 +123,15 @@ void EKLMUnpackerModule::event()
           }
           m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
                                                  &endcap, &layer, &sector);
-          EKLMDigit* idigit = m_Digits.appendNew();
-          idigit->setTime(tdc);
-          idigit->setEndcap(endcap);
-          idigit->setLayer(layer);
-          idigit->setSector(sector);
-          idigit->setPlane(plane);
-          idigit->setStrip(strip);
-          idigit->isGood(true);
-          idigit->setCharge(charge);
+          eklmDigit = m_Digits.appendNew();
+          eklmDigit->setTime(tdc);
+          eklmDigit->setEndcap(endcap);
+          eklmDigit->setLayer(layer);
+          eklmDigit->setSector(sector);
+          eklmDigit->setPlane(plane);
+          eklmDigit->setStrip(strip);
+          eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+          eklmDigit->setCharge(charge);
         }
       } //finesse boards
     }  //copper boards

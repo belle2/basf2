@@ -51,8 +51,10 @@ TouschekTURTLEInputModule::TouschekTURTLEInputModule() : Module()
   addParam("FilenameLER",  m_filenameLER, "The filename of the LER TURTLE input file.");
   addParam("ReadHER", m_readHER, "Set to false to skip reading the HER data.", true);
   addParam("ReadLER", m_readLER, "Set to false to skip reading the LER data.", true);
-  addParam("zCoordinate", m_zPos, "Indicates the z-coordinate of the TURTLE particles in the file. (default is 50cm, 400cm is also implemented.)", 50.0);
-  addParam("MaxParticles", m_maxParticles, "The maximum number of particles per event that should be read. -1 means all of the particles are read.", -1);
+  addParam("zCoordinate", m_zPos,
+           "Indicates the z-coordinate of the TURTLE particles in the file. (default is 50cm, 400cm is also implemented.)", 50.0);
+  addParam("MaxParticles", m_maxParticles,
+           "The maximum number of particles per event that should be read. -1 means all of the particles are read.", -1);
 
   //Create and initialize member variables
   m_herPipePartMatrix = new TGeoHMatrix("TouschekPlaneHER");
@@ -77,7 +79,8 @@ void TouschekTURTLEInputModule::initialize()
   }
 
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent("MCParticles");
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Check parameters
   if ((m_readHER) && (!FileSystem::fileExists(m_filenameHER))) {

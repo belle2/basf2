@@ -10,10 +10,12 @@
 #ifndef KLMExpertModule_H
 #define KLMExpertModule_H
 
-#include <framework/utilities/FileSystem.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
+
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Weightfile.h>
@@ -52,9 +54,6 @@ namespace Belle2 {
       m_expert.reset();
       m_dataset.reset();
     }
-
-
-  protected:
 
   private:
 
@@ -123,7 +122,10 @@ namespace Belle2 {
     /** zernike moment 5,1 of closest ECL */
     float m_KLMECLZ51;
 
-
+    /** storearray */
+    StoreArray<KLMCluster> m_klmClusters;
+    /** storearray */
+    StoreArray<KlId> m_klids;
 
     /** vars to be classified */
     std::vector<float> m_feature_variables;

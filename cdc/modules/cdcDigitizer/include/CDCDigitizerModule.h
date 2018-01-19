@@ -13,9 +13,12 @@
 
 //basf2 framework headers
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 //cdc package headers
+#include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -97,6 +100,11 @@ namespace Belle2 {
 
     /** Charge to ADC Count converter. */
     unsigned short getADCCount(float charge);
+
+    StoreArray<MCParticle> m_mcParticles; /**< MCParticle array */
+    StoreArray<CDCSimHit>  m_simHits;     /**< CDCSimHit  array */
+    StoreArray<CDCHit>     m_cdcHits;     /**< CDCHit     array */
+    StoreArray<CDCHit>     m_cdcHits4Trg; /**< CDCHit4trg array */
 
     std::string m_inputCDCSimHitsName;       /**< Input array name.  */
     std::string m_outputCDCHitsName;         /**< Output array name. */

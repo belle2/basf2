@@ -266,7 +266,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
           break;
       }
     }
-    delete bufferorg;
+    delete[] bufferorg;
   }
 #endif
   do { // call at least once!

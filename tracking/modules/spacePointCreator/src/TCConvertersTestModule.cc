@@ -49,13 +49,19 @@ void TCConvertersTestModule::initialize()
   B2INFO("TCConvertersTest ---------------------------- initialize ------------------ ");
 
   // check if all StoreArrays are present
-  StoreArray<SpacePointTrackCand>::required(m_SPTCName);
-  for (string aName : m_genfitTCNames) { StoreArray<genfit::TrackCand>::required(aName); }
+  StoreArray<SpacePointTrackCand> SPTCs(m_SPTCName); SPTCs.isRequired(m_SPTCName);
+  for (string aName : m_genfitTCNames) {
+    StoreArray<genfit::TrackCand> TCs(aName);
+    TCs.isRequired(aName);
+  }
 
-  StoreArray<PXDCluster>::required(m_PXDClusterName);
-  StoreArray<SVDCluster>::required(m_SVDClusterName);
+  StoreArray<PXDCluster> PXDClusters(m_PXDClusterName); PXDClusters.isRequired(m_PXDClusterName);
+  StoreArray<SVDCluster> SVDClusters(m_SVDClusterName); SVDClusters.isRequired(m_SVDClusterName);
 
-  for (string aName : m_SpacePointArrayNames) { StoreArray<SpacePoint>::required(aName); }
+  for (string aName : m_SpacePointArrayNames) {
+    StoreArray<SpacePoint> SPs(aName);
+    SPs.isRequired(aName);
+  }
 
   initializeCounters();
 }

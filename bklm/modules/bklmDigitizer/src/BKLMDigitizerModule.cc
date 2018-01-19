@@ -11,7 +11,6 @@
 #include <bklm/modules/bklmDigitizer/BKLMDigitizerModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/GearDir.h>
 
@@ -71,13 +70,11 @@ BKLMDigitizerModule::~BKLMDigitizerModule()
 
 void BKLMDigitizerModule::initialize()
 {
-  StoreArray<BKLMSimHit> bklmSimHit;
-  bklmSimHit.isRequired();
+  simHits.isRequired();
 
   // Force creation and persistence of BKLM output datastores
-  StoreArray<BKLMDigit> bklmDigit;
-  bklmDigit.registerInDataStore();
-  bklmSimHit.registerRelationTo(bklmDigit);
+  bklmDigits.registerInDataStore();
+  simHits.registerRelationTo(bklmDigits);
 
   m_ADCRange = m_digitParams->getADCRange();
   m_ADCSamplingTime = m_digitParams->getADCSamplingTime();
@@ -98,7 +95,7 @@ void BKLMDigitizerModule::initialize()
 void BKLMDigitizerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, "BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 
   m_MPPCGain = m_ADCParams->getMPPCGain();
   m_ADCOffset = m_ADCParams->getADCOffset();
@@ -110,11 +107,9 @@ void BKLMDigitizerModule::event()
   //---------------------------------------------
   // Get BKLM hits collection from the data store
   //---------------------------------------------
-  StoreArray<BKLMSimHit> simHits;
   int nSimHit = simHits.getEntries();
   if (nSimHit == 0) return;
 
-  StoreArray<BKLMDigit> digits;
 
   unsigned int nDigit = 0;
   unsigned int d = 0;
@@ -127,15 +122,15 @@ void BKLMDigitizerModule::event()
         for (int s = simHit->getStripMin(); s <= simHit->getStripMax(); ++s) {
           int moduleID = (simHit->getModuleID() & ~BKLM_STRIP_MASK) | ((s - 1) << BKLM_STRIP_BIT);
           for (d = 0; d < nDigit; ++d) {
-            if (((digits[d]->getModuleID() ^ moduleID) & BKLM_MODULESTRIPID_MASK) == 0) break;
+            if (((bklmDigits[d]->getModuleID() ^ moduleID) & BKLM_MODULESTRIPID_MASK) == 0) break;
           }
           if (d == nDigit) {
-            digits.appendNew(simHit, s);
+            bklmDigits.appendNew(simHit, s);
             nDigit++;
           } else {
             // DIVOT need pileup of RPC hits here
           }
-          simHit->addRelationTo(digits[d]);  // 1 RPC hit to many digits
+          simHit->addRelationTo(bklmDigits[d]);  // 1 RPC hit to many digits
         }
       }
     } else {
@@ -151,7 +146,7 @@ void BKLMDigitizerModule::event()
   }
 
   // Digitize the scintillator-strip hits
-  digitize(volIDToSimHits, digits);
+  digitize(volIDToSimHits, bklmDigits);
 
 }
 
@@ -167,7 +162,6 @@ void BKLMDigitizerModule::digitize(const std::map<int, std::vector<std::pair<int
                                    StoreArray<BKLMDigit>& digits)
 {
 
-  StoreArray<BKLMSimHit> simHits;
 
   // Digitize the pulse(s) in each scintillator strip (identified by volumeID)
   for (std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::const_iterator iVolMap = volIDToSimHits.begin();

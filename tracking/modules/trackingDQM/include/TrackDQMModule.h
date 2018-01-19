@@ -39,20 +39,20 @@ namespace Belle2 {
     /** Constructor */
     TrackDQMModule();
     /* Destructor */
-    virtual ~TrackDQMModule();
+    ~TrackDQMModule();
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override;
+    void beginRun() override;
+    void event() override;
+    void endRun() override;
+    void terminate() override;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
     * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override;
 
   private:
     /** Name of the collection to use for the Reco Track */

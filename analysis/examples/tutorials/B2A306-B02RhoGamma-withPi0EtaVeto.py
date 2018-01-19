@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following  decay chain:
 #
@@ -23,7 +25,9 @@
 # Note: This example uses the signal MC sample created in
 # MC campaign 9, therefore it can be ran only on KEKCC computers.
 #
-# Contributors: A. Zupanc (June 2014) and K. Ota (Oct 2017)
+# Contributors: A. Zupanc (June 2014)
+#               K. Ota (Oct 2017)
+#               I. Komarov (December 2017)
 #
 ######################################################
 
@@ -53,7 +57,7 @@ rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'
 inputMdstList('default', filelist)
 
 fillParticleList('gamma:highE', 'E > 1.5')
-fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and DLLKaon > 0')
+fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and pionID > 0.002')
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV

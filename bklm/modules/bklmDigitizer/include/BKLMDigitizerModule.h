@@ -137,6 +137,11 @@ namespace Belle2 {
     //! MPPC gain, pedestal and threshold read from database
     DBObjPtr<BKLMADCThreshold> m_ADCParams;
 
+    //! simHits StoreArray
+    StoreArray<BKLMSimHit> simHits;
+
+    //! digits StoreArray
+    StoreArray<BKLMDigit> bklmDigits;
   };
 
 } // end of namespace Belle2

@@ -9,7 +9,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
-#include <dqm/StringUtil.h>
+#include <daq/slc/base/StringUtil.h>
 
 using namespace std;
 using namespace Belle2;
@@ -35,7 +35,7 @@ DQMHistAnalysisOutputModule::~DQMHistAnalysisOutputModule() { }
 void DQMHistAnalysisOutputModule::initialize()
 {
   ParamTypeList& parnames(getParNames());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
     B2INFO("Addding : " << pname);
   }
@@ -54,7 +54,7 @@ void DQMHistAnalysisOutputModule::event()
   IntValueList& vints(getIntValues());
   FloatValueList& vfloats(getFloatValues());
   TextList& texts(getTexts());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
     std::string vname = StringUtil::tolower(StringUtil::replace(pname, "/", "."));
     switch (i->second) {

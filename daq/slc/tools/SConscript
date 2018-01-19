@@ -13,5 +13,7 @@ env['TOOLS_LIBS']['bootcdc']  = ['daq']
 env['TOOLS_LIBS']['boottop']  = ['daq']
 env['TOOLS_LIBS']['boottrg']  = ['daq']
 env['TOOLS_LIBS']['bootklm']  = ['daq']
+env['TOOLS_LIBS']['bootcopper']  = ['daq']
+env['TOOLS_LIBS']['bootarich']  = ['daq']
 
 Return('env')

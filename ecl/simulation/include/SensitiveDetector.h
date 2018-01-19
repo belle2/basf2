@@ -18,6 +18,9 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
 
+#include "TGraph.h"
+#include "TFile.h"
+#include <string>
 
 namespace Belle2 {
   namespace ECL {
@@ -41,8 +44,10 @@ namespace Belle2 {
       void EndOfEvent(G4HCofThisEvent* eventHC);
 
     private:
+      TGraph* m_HadronEmissionFunction;  /**< Graph for hadron scintillation component emission function */
+      double GetHadronIntensityFromDEDX(double);  /**< Evaluates hadron scintillation component emission function */
       /** Create ECLSimHit and ECLHit and relations from MCParticle and put them in datastore */
-      int saveSimHit(G4int, G4int, G4int, G4double, G4double, const G4ThreeVector&, const G4ThreeVector&);
+      int saveSimHit(G4int, G4int, G4int, G4double, G4double, const G4ThreeVector&, const G4ThreeVector&, double);
       // members of SensitiveDetector
       // G4double m_thresholdEnergyDeposit;// Energy Deposit  threshold
       // G4double m_thresholdKineticEnergy;// Kinetic Energy  threshold
@@ -55,6 +60,8 @@ namespace Belle2 {
       int m_trackID;                /**< current track id */
       double m_WeightedTime;        /**< average track time weighted by energy deposition */
       double m_energyDeposit;       /**< total energy deposited in a volume by a track */
+      double m_hadronenergyDeposit;     /**< energy deposited resulting in hadronic scint component */
+      std::string m_HadronEmissionFile; /**<Hadron scintillation component emission function file name. */
       G4ThreeVector m_WeightedPos;  /**< average track position weighted by energy deposition */
       G4ThreeVector m_momentum;     /**< initial momentum of track before energy deposition inside sensitive volume */
 

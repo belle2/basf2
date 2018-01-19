@@ -39,6 +39,9 @@ ParticleGunModule::ParticleGunModule() : Module()
     "- uniformCos:  Generate uniformly in the cosine, e.g. flat in cos(theta).\n"
     "               Parameters are still the minimum and maximum angle (not\n"
     "               cos()): [min_theta, max_theta]\n"
+    "- uniformLog:  Generate uniformly in the logarithm. Parameters are still\n"
+    "               the normal values: [min, max]\n"
+    "- uniformLogPt: Like uniformLog but for the transverse momentum.\n"
     "- normal:      Normal (Gaussian) distributed: [mean, width]\n"
     "- normalPt:    Generate normal distributed transverse momentum pt: [mean_pt, width_pt]\n"
     "- normalCos:   Generate normal distributed cosine of the angle: [mean, width]\n"
@@ -51,7 +54,7 @@ ParticleGunModule::ParticleGunModule() : Module()
     "               track curvature: [min_pt, max_pt]\n"
     "- discrete:    Discrete Spectrum given as a list of weights and values:\n"
     "               [weight1, value1, weight2, value2, ...]\n"
-    "               (useful for radiactive sources)\n"
+    "               (useful for radioactive sources)\n"
     "- discretePt:  same as above but for transverse momentum\n"
   );
   setPropertyFlags(c_Input);
@@ -74,11 +77,11 @@ ParticleGunModule::ParticleGunModule() : Module()
   addParam("pdgCodes", m_parameters.pdgCodes,
            "PDG codes for generated particles", m_parameters.pdgCodes);
   addParam("varyNTracks", m_parameters.varyNumberOfTracks,
-           "If true, the number of tracks per event is varied using a Possion "
+           "If true, the number of tracks per event is varied using a Poisson "
            "distribution. Only used if 'nTracks'>0", false);
   addParam("momentumGeneration", m_momentumDist,
-           "Momentum distribution: one of fixed, uniform, normal, polyline, uniformPt, "
-           "normalPt, inversePt, polylinePt or discrete", string("uniform"));
+           "Momentum distribution: one of fixed, uniform, normal, polyline, uniformLog, uniformPt, "
+           "normalPt, inversePt, polylinePt, uniformLogPt or discrete", string("uniform"));
   addParam("phiGeneration", m_phiDist,
            "Phi distribution: one of fixed, uniform, normal, normalCos, polyline, uniformCos, "
            "polylineCos or discrete", string("uniform"));
@@ -134,6 +137,8 @@ ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string na
   if (name == "uniform")        return ParticleGun::c_uniformDistribution;
   if (name == "uniformpt")      return ParticleGun::c_uniformPtDistribution;
   if (name == "uniformcos")     return ParticleGun::c_uniformCosDistribution;
+  if (name == "uniformlog")     return ParticleGun::c_uniformLogDistribution;
+  if (name == "uniformlogpt")   return ParticleGun::c_uniformLogPtDistribution;
   if (name == "normal")         return ParticleGun::c_normalDistribution;
   if (name == "normalpt")       return ParticleGun::c_normalPtDistribution;
   if (name == "normalcos")      return ParticleGun::c_normalCosDistribution;
@@ -150,7 +155,8 @@ ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string na
 void ParticleGunModule::initialize()
 {
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Convert string representations to distribution values
   m_parameters.momentumDist = convertDistribution(m_momentumDist);

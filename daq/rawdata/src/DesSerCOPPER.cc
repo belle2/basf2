@@ -26,12 +26,12 @@ DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, string host_send, in
   for (int i = 0 ; i < m_num_connections; i++) {
     //  m_hostname_from.push_back( "localhost");
     m_hostname_from.push_back(host_recv);
-    //  m_port_from.push_back(33000);
+    //  m_port_from.push_back(30000);
     m_port_from.push_back(port_recv) ;
     m_socket_recv.push_back(-1);
   }
 
-  //  m_port_to = 34001;
+  //  m_port_to = 31001;
   m_port_to = port_send;
   //  m_hostname_local = "localhost";
   m_hostname_local = host_send;

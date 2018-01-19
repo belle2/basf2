@@ -22,7 +22,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>

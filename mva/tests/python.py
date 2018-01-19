@@ -7,9 +7,7 @@ import basf2_mva
 
 import os
 import tempfile
-import subprocess
 import sys
-import shutil
 
 variables = ['M', 'p', 'pt', 'pz',
              'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',

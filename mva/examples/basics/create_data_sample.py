@@ -28,7 +28,7 @@ spectators = ['isSignal', 'M']
 
 def reconstruction_path(inputfiles):
     path = create_path()
-    inputMdstList('MC6', inputfiles, path=path)
+    inputMdstList('MC7', inputfiles, path=path)
     fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5'),
                        ('gamma', 'goodGamma == 1 and abs(clusterTiming) < 20 and clusterE9E25 > 0.7 and minC2HDist > 35')],
                       path=path)
@@ -45,16 +45,17 @@ if __name__ == "__main__":
 
     # Create a train, test and validation sample with different MC files
     # Add your root files here
-    path = reconstruction_path([...])
+    f = 'mdst_002001_prod00000789_task00004203.root'
+    path = reconstruction_path([f])
     variablesToNTuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
-    path = reconstruction_path([...])
+    path = reconstruction_path([f])
     variablesToNTuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
-    path = reconstruction_path([...])
+    path = reconstruction_path([f])
     variablesToNTuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
     process(path)

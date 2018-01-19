@@ -72,6 +72,16 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "Number of best track candidates to be created per family.",
            m_PARAMxBestPerFamily);
 
+  addParam("maxFamilies",
+           m_PARAMmaxFamilies,
+           "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxFamilies);
+
+  addParam("maxNetworkSize",
+           m_PARAMmaxNetworkSize,
+           "Maximal size of the segment network; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxNetworkSize);
+
 }
 
 
@@ -102,8 +112,13 @@ void TrackFinderVXDCellOMatModule::event()
 {
   m_eventCounter++;
 
-
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
+
+  if (segmentNetwork.size() > m_PARAMmaxNetworkSize) {
+    B2ERROR("Size of network provided by the SegmentNetworkProducer exceeds the limit of " << m_PARAMmaxNetworkSize
+            << ". Network size is " << segmentNetwork.size() << ".");
+    return;
+  }
 
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
@@ -116,12 +131,19 @@ void TrackFinderVXDCellOMatModule::event()
 
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
-  if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
+  if (nSeeds == 0) {
+    B2DEBUG(1, "TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!");
+    return;
+  }
 
   /// mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
+    if (nFamilies > m_PARAMmaxFamilies)  {
+      B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      return;
+    }
     m_sptcSelector->prepareSelector(nFamilies);
   }
 

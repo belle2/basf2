@@ -16,13 +16,15 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
   /// Clear the used clusters
   template <class AResult, class ACluster>
   void SpacePointTagger<AResult, ACluster>::beginEvent()
   {
+    Super::beginEvent();
+
     m_usedClusters.clear();
     m_usedSpacePoints.clear();
   }

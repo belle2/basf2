@@ -20,6 +20,9 @@ import validationtools
 
 set_random_seed(12345)
 
+# set one parallel process to excercise the basf2 parallel code
+set_nprocesses(1)
+
 main = create_path()
 
 # specify number of events to be generated

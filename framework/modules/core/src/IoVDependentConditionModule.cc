@@ -15,7 +15,10 @@ REG_MODULE(IoVDependentCondition)
 
 IoVDependentConditionModule::IoVDependentConditionModule() : Module()
 {
-  setDescription("Module which sets its return value based on the fact, if the event is in the given run/exp interval or not.");
+  setDescription("Module which sets its return value based on the fact, if the event is in the given "
+                 "run/exp interval or not. If you set the maximal value of experiment and run to -1, "
+                 "there will be no upper limit for the interval. If you only set the maximal run to -1, "
+                 "there is no upper limit on the run number.");
   setPropertyFlags(Module::EModulePropFlags::c_ParallelProcessingCertified);
 
   addParam("minimalExpNumber", m_minimalExpNumber, "Minimal exp number to return true.", m_minimalExpNumber);
@@ -31,6 +34,10 @@ void IoVDependentConditionModule::initialize()
 
   // Copy the input parameters
   m_iovToCheck = IntervalOfValidity(m_minimalExpNumber, m_minimalRunNumber, m_maximalExpNumber, m_maximalRunNumber);
+
+  if (m_iovToCheck.empty()) {
+    B2ERROR("The specified interval of exp/run is empty. This is probably not what you want!");
+  }
 }
 
 void IoVDependentConditionModule::beginRun()

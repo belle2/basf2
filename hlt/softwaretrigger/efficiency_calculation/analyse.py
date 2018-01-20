@@ -29,11 +29,12 @@ class SummarizeL1TriggerResults(PickleHarvestingModule):
         # one common method for easy trigger bit access
         summary = result.getTRGSummary(0)
 
+        labels = EffModule.trglog_phase3
+        # note for future change: prescales can also be read from TRGSummary directly
+        prescales = EffModule.prescale_phase3
+
         if len(labels) > 32:
             basf2.B2FATAL("More than 32 l1 trigger bits not supported by this code.")
-
-        labels = EffModule.trglog_phase3
-        prescales = EffModule.prescale_phase3
 
         return_dict = {"final_decision": summary >= 1}
 

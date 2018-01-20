@@ -150,7 +150,7 @@ if __name__ == "__main__":
                         type=int, default=1000)
     parser.add_argument("--jobs", help="Number of jobs per channel",
                         type=int, default=5)
-    parser.add_argument("--local_execution", help="Execute on the local system and not via batch processing",
+    parser.add_argument("--local", help="Execute on the local system and not via batch processing",
                         action="store_true", default=False)
 
     args = parser.parse_args()
@@ -161,13 +161,13 @@ if __name__ == "__main__":
 
     # Produce 5*1000 events in each channel
     generate_events(channels=channels_to_study, n_events=args.events_per_job,
-                    n_jobs=args.jobs, storage_location=args.storage_location,
-                    local_execution=args.local_execution)
+                    n_jobs=args.jobs, storage_location=abs_storage_location,
+                    local_execution=args.local)
 
     # Reconstruct each channel
-    run_reconstruction(channels=channels_to_study, storage_location=args.storage_location,
-                       local_execution=args.local_execution)
+    run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,
+                       local_execution=args.local)
 
     # Calculate file size and efficiencies for each channel
-    calculate_efficiencies(channels=channels_to_study, storage_location=args.storage_location,
-                           local_execution=args.local_execution)
+    calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
+                           local_execution=args.local)

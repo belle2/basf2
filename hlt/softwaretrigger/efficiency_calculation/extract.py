@@ -1,8 +1,49 @@
 import os
+import shutil
+import subprocess
+from io import StringIO
 from glob import glob
 
 import ROOT
 import pandas as pd
+
+latex_template = """\\documentclass[a0paper,11pt,landscape]{article}
+\\usepackage[landscape,margin=1.4cm]{geometry}
+\\usepackage{siunitx}
+\\usepackage{booktabs}
+\\title{\\textbf{%%%title%%%}}
+\\author{Belle II Trigger Efficiency Calculation Tool}
+\\date{}
+\\begin{document}
+\\maketitle
+\\section{%%%section_name%%%}
+%%%efficiency_table%%%
+\\end{document}
+"""
+
+
+def render_to_latex(df, eff_name, filename):
+    tex_filename = filename + ".tex"
+    output_string = ""
+
+    output = StringIO()
+    df.to_latex(output, multicolumn=True, column_format="l" + "p{3cm}" * len(df.columns))
+    output_string = output.getvalue()
+
+    latex_string = latex_template.replace("%%%efficiency_table%%%", output_string)
+    latex_string = latex_string.replace("%%%section_name%%%", eff_name)
+    latex_string = latex_string.replace("%%%title%%%", eff_name)
+
+    # do some espacing for characters troublesome to Latex
+    latex_string = latex_string.replace("<", "$<$")
+    latex_string = latex_string.replace(">", "$>$")
+    latex_string = latex_string.replace("software\_trigger\_cut\&", "software\_trigger\_cut\& ")
+
+    with open(tex_filename, "w") as file:
+        file.write(latex_string)
+
+    if shutil.which("pdflatex"):
+        subprocess.check_call(["pdflatex", tex_filename])
 
 
 def extract_efficiencies(channels, storage_location):
@@ -36,6 +77,8 @@ def extract_efficiencies(channels, storage_location):
     print("\n### Final Efficiencies per channel ###\n")
     print(all_efficiencies)
 
+    render_to_latex(all_efficiencies, "All Efficiencies", "all_efficiencies")
+
     return all_efficiencies
 
 
@@ -65,6 +108,8 @@ def extract_l1_efficiencies(channels, storage_location):
     print("\n### Final L1 Efficiencies per channel ###\n")
     print(all_efficiencies)
 
+    render_to_latex(all_efficiencies, "L1 Efficiencies", "l1_efficiencies")
+
     return all_efficiencies
 
 
@@ -89,7 +134,9 @@ def extract_file_sizes(channels, storage_location):
             root_events = tree.GetEntriesFast() * 1.0
             for branch in tree.GetListOfBranches():
                 result[branch.GetName()] = branch.GetZipBytes('*') / root_events
+                result[branch.GetName() + " unzipped"] = branch.GetTotalSize() / root_events
             result["root_total_size"] = tree.GetZipBytes() / root_events
+            result["root_total_size_unzipped"] = tree.GetTotBytes() / root_events
             result["total_size_on_disk"] = os.path.getsize(filename) / root_events
             result_list.append(result)
 
@@ -104,5 +151,11 @@ def extract_file_sizes(channels, storage_location):
 
     print("\n### Final File Sizes per channel in bytes ###\n")
     print(all_filesizes)
+
+    # add some units
+    all_filesizes = all_filesizes.divide(1000)
+    all_filesizes.columns = [cname + " [kB]" for cname in all_filesizes.columns]
+
+    render_to_latex(all_filesizes, "File Sizes", "all_filesizes")
 
     return all_filesizes

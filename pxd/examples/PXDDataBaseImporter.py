@@ -16,9 +16,6 @@
 from basf2 import *
 from ROOT import Belle2
 
-
-payload = Belle2.VXDAlignment()
-
 offset = Belle2.PXDClusterOffsetPar()
 offset.setU(-1.0)
 

@@ -9,6 +9,7 @@ import os
 
 import generators
 from softwaretrigger.path_functions import RAW_SAVE_STORE_ARRAYS, DEFAULT_HLT_COMPONENTS
+from background import get_background_files
 
 from rawdata import add_packers
 from simulation import add_simulation
@@ -125,8 +126,7 @@ def main():
 
     # We do not want to have PXD data reduction in the simulation - as this is not performed in the real detector at
     # at this stage
-    bkgfiles = glob("/sw/belle2/bkg/*.root")
-    add_simulation(path, usePXDDataReduction=False, bkgfiles=bkgfiles)
+    add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
 
     add_packers(path, components=DEFAULT_HLT_COMPONENTS)
 

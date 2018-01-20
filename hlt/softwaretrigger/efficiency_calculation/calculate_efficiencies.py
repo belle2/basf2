@@ -27,18 +27,22 @@ from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficie
 from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
 
 
-def generate_events(channels, n_events, n_jobs, storage_location, local_execution):
+def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist):
     """
     Helper function to call gridcontrol on the generate.py steering file with
     the correct arguments. Will run N jobs per channel to generate.
     """
     parameters = []
 
+    all_output_files_exist = True
+
     for channel in channels:
         for number in range(n_jobs):
             channel_path = os.path.join(storage_location, channel)
             generated_path = os.path.join(channel_path, "generated")
             output_file = os.path.join(generated_path, f"{number}.root")
+
+            all_output_files_exist = all_output_files_exist & os.path.isfile(output_file)
 
             parameter = {"channel": channel, "random_seed": number + 1111, "output_file": output_file,
                          "n_events": n_events}
@@ -52,6 +56,9 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(steering_file="generate.py", parameters=parameters, local_execution=local_execution)
+
+    if skip_if_files_exist and all_output_files_exist:
+        return
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
 
@@ -152,6 +159,8 @@ if __name__ == "__main__":
                         type=int, default=5)
     parser.add_argument("--local", help="Execute on the local system and not via batch processing",
                         action="store_true", default=False)
+    parser.add_argument("--always-generate", help="Always generate events, even if the out files already exist",
+                        action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -162,7 +171,8 @@ if __name__ == "__main__":
     # Produce 5*1000 events in each channel
     generate_events(channels=channels_to_study, n_events=args.events_per_job,
                     n_jobs=args.jobs, storage_location=abs_storage_location,
-                    local_execution=args.local)
+                    local_execution=args.local,
+                    skip_if_files_exist=not args.always_generate)
 
     # Reconstruct each channel
     run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,

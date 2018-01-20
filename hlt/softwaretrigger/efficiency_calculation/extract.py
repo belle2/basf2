@@ -77,9 +77,9 @@ def extract_efficiencies(channels, storage_location):
         efficiencies = (results[["final_decision", "software_trigger_cut&calib&total_result",
                                  "software_trigger_cut&fast_reco&total_result",
                                  "software_trigger_cut&hlt&total_result"]] == 1).mean()
-        # efficiencies = results[[col for col in results.columns if "fast_reco" in col]].mean()
         efficiencies.index = ["final decision", "calibration", "fast reco", "hlt"]
-        efficiencies = pd.concat([efficiencies, (results[[col for col in results.columns if "fast_reco" in col]] == 1).mean()])
+        efficiencies = pd.concat(
+            [efficiencies, (results[[col for col in results.columns if "software_trigger" in col]] == 1).mean()])
         efficiencies.name = channel
         efficiency_list.append(efficiencies)
 

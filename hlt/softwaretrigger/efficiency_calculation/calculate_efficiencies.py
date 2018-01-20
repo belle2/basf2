@@ -27,7 +27,7 @@ from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficie
 from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
 
 
-def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist):
+def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase):
     """
     Helper function to call gridcontrol on the generate.py steering file with
     the correct arguments. Will run N jobs per channel to generate.
@@ -45,7 +45,7 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
             all_output_files_exist = all_output_files_exist & os.path.isfile(output_file)
 
             parameter = {"channel": channel, "random_seed": number + 1111, "output_file": output_file,
-                         "n_events": n_events}
+                         "n_events": n_events, "phase": phase}
 
             # Create output directory
             output_dir = os.path.dirname(output_file)
@@ -62,7 +62,7 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
 
 
-def run_reconstruction(channels, storage_location, local_execution):
+def run_reconstruction(channels, storage_location, local_execution, phase):
     """
     Helper function to call gridcontrol on the reconstruct.py steering file with
     the correct arguments. Will run one job per generated file.
@@ -80,7 +80,7 @@ def run_reconstruction(channels, storage_location, local_execution):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
 
-            parameter = {"input_file": input_file, "output_file": output_file}
+            parameter = {"input_file": input_file, "output_file": output_file, "phase": phase}
 
             parameters.append(parameter)
 
@@ -161,6 +161,8 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--always-generate", help="Always generate events, even if the out files already exist",
                         action="store_true", default=False)
+    parser.add_argument("--phase", help="Select the phase of the Belle II Detector. Can be 2 or 3 (default)",
+                        type=int, default=3)
 
     args = parser.parse_args()
 
@@ -172,11 +174,13 @@ if __name__ == "__main__":
     generate_events(channels=channels_to_study, n_events=args.events_per_job,
                     n_jobs=args.jobs, storage_location=abs_storage_location,
                     local_execution=args.local,
-                    skip_if_files_exist=not args.always_generate)
+                    skip_if_files_exist=not args.always_generate,
+                    phase=args.phase)
 
     # Reconstruct each channel
     run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,
-                       local_execution=args.local)
+                       local_execution=args.local,
+                       phase=args.phase)
 
     # Calculate file size and efficiencies for each channel
     calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,

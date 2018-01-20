@@ -104,12 +104,14 @@ def main():
     output_file = os.environ.get("output_file")
     random_seed = os.environ.get("random_seed")
     n_events = int(os.environ.get("n_events"))
+    phase = int(os.environ.get("phase"))
 
     print("Parameters: ")
     print("channel:", channel)
     print("output_file:", output_file)
     print("random_seed:", random_seed)
     print("n_events:", n_events)
+    print("phase:", n_events)
 
     log_file = output_file.replace(".root", ".log")
 
@@ -118,8 +120,16 @@ def main():
 
     path = basf2.create_path()
 
-    path.add_module("EventInfoSetter", evtNumList=[n_events])
-    path.add_module("Gearbox")
+    runNumber = 0
+    if phase == 2:
+        runNumber = 1002
+
+    path.add_module("EventInfoSetter", evtNumList=[n_events], runList=runNumber)
+
+    if phase == 2:
+        path.add_module('Gearbox', fileName="geometry/Beast2_phase2.xml")
+    else:
+        path.add_module("Gearbox")
     path.add_module("Geometry")
 
     add_generation(path, event_class=channel)
@@ -138,6 +148,7 @@ def main():
     basf2.log_to_file(log_file)
     basf2.print_path(path)
     basf2.process(path)
+
 
 if __name__ == "__main__":
     main()

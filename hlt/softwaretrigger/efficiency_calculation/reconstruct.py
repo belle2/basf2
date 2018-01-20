@@ -17,6 +17,11 @@ def main():
     # Get all parameters for this calculation
     input_file = os.environ.get("input_file")
     output_file = os.environ.get("output_file")
+    phase = int(os.environ.get("phase"))
+
+    print("input_file:", input_file)
+    print("output_file:", output_file)
+    print("phase:", phase)
 
     raw_output_file = output_file.replace(".root", "_raw.root")
 
@@ -26,9 +31,14 @@ def main():
     path = basf2.create_path()
     path.add_module("RootInput", inputFileName=input_file)
 
+    if phase == 2:
+        path.add_module("Gearbox", fileName="geometry/Beast2_phase2.xml")
+    else:
+        path.add_module("Gearbox")
+
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
-    add_tsim(path, Belle2Phase="Phase3")
+    add_tsim(path, Belle2Phase="Phase{}".format(phase))
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
     add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring")

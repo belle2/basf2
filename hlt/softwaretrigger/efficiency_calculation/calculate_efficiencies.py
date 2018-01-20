@@ -155,6 +155,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # better to put the storage location as absolute path, because the jobs will be executed
+    # in differen folders later
+    abs_storage_location = os.path.abspath(args.storage_location)
+
     # Produce 5*1000 events in each channel
     generate_events(channels=channels_to_study, n_events=args.events_per_job,
                     n_jobs=args.jobs, storage_location=args.storage_location,

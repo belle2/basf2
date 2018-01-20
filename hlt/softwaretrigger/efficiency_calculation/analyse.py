@@ -23,7 +23,14 @@ class SummarizeL1TriggerResults(PickleHarvestingModule):
         For each result ( = event), get the list of all trigger decisions and also add the total decision.
         Write them back into the internal storage ( = pandas.DataFrame) of all events.
         """
+
+        # note: this code only works if only the lower 32 trigger bits are used. See L1TriggerVariables.cc
+        # on how to acces the upper ones. This code and L1TriggerVariables needs to be refactored to provide
+        # one common method for easy trigger bit access
         summary = result.getTRGSummary(0)
+
+        if len(labels) > 32:
+            basf2.B2FATAL("More than 32 l1 trigger bits not supported by this code.")
 
         labels = EffModule.trglog_phase3
         prescales = EffModule.prescale_phase3

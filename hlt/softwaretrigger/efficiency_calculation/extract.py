@@ -23,6 +23,10 @@ latex_template = """\\documentclass[a0paper,11pt,landscape]{article}
 
 
 def render_to_latex(df, eff_name, filename):
+    """
+    Store a pandas data frame df to a latex file compile ot pdf if
+    pdflatex is available on the machine
+    """
     tex_filename = filename + ".tex"
     output_string = ""
 
@@ -47,6 +51,9 @@ def render_to_latex(df, eff_name, filename):
 
 
 def extract_efficiencies(channels, storage_location):
+    """
+    Compute the software trigger efficiencies from channels
+    """
     efficiency_list = []
 
     for channel in channels:
@@ -83,6 +90,9 @@ def extract_efficiencies(channels, storage_location):
 
 
 def extract_l1_efficiencies(channels, storage_location):
+    """
+    Compute the level1 efficiencies from channels
+    """
     efficiency_list = []
 
     for channel in channels:
@@ -114,6 +124,9 @@ def extract_l1_efficiencies(channels, storage_location):
 
 
 def extract_file_sizes(channels, storage_location):
+    """
+    Compute the file size for each channel
+    """
     # Is this really needed?
     ROOT.gErrorIgnoreLevel = ROOT.kWarning + 1
 

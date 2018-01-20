@@ -7,8 +7,8 @@ from glob import glob
 import ROOT
 import pandas as pd
 
-latex_template = """\\documentclass[a0paper,11pt,landscape]{article}
-\\usepackage[landscape,margin=1.4cm]{geometry}
+latex_template = """\\documentclass[a0paper,11pt]{article}
+\\usepackage[margin=1.4cm,paperwidth=%%%paperwidth%%%cm, paperheight=%%%paperheight%%%cm]{geometry}
 \\usepackage{siunitx}
 \\usepackage{booktabs}
 \\title{\\textbf{%%%title%%%}}
@@ -31,17 +31,22 @@ def render_to_latex(df, eff_name, filename):
     output_string = ""
 
     output = StringIO()
-    df.to_latex(output, multicolumn=True, column_format="l" + "p{3cm}" * len(df.columns))
+    df.to_latex(output, multicolumn=True, column_format="l" + "p{3.6cm}" * len(df.columns))
     output_string = output.getvalue()
 
     latex_string = latex_template.replace("%%%efficiency_table%%%", output_string)
     latex_string = latex_string.replace("%%%section_name%%%", eff_name)
     latex_string = latex_string.replace("%%%title%%%", eff_name)
 
+    latex_string = latex_string.replace("%%%paperwidth%%%", str(10 + len(df.columns) * 4.0))
+    latex_string = latex_string.replace("%%%paperheight%%%", str(10 + len(df) * 0.6))
+
     # do some espacing for characters troublesome to Latex
     latex_string = latex_string.replace("<", "$<$")
     latex_string = latex_string.replace(">", "$>$")
     latex_string = latex_string.replace("software\_trigger\_cut\&", "software\_trigger\_cut\& ")
+    latex_string = latex_string.replace("hlt\&", "hlt\& ")
+    latex_string = latex_string.replace("calib\&", "calib\& ")
 
     with open(tex_filename, "w") as file:
         file.write(latex_string)

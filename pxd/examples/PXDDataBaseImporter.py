@@ -17,11 +17,12 @@ from basf2 import *
 from ROOT import Belle2
 
 
-offset = Belle2.PXDClusterOffsetPar()
+payload = Belle2.VXDAlignment()
 
+offset = Belle2.PXDClusterOffsetPar()
 offset.setU(-1.0)
 
-print("offset ", offset)
+print("offset ", offset.getU())
 
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 Belle2.Database.Instance().storeData('PXDClusterOffsetPar', offset, iov)

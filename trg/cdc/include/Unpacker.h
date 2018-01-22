@@ -103,7 +103,7 @@ namespace Belle2 {
     template<size_t N>
     std::string slv_to_bin_string(std::array<char, N> signal, bool padding = false)
     {
-      int ini = padding ? signal.size() % 4 : 0;
+      int ini = padding ? 4 - signal.size() % 4 : 0;
       std::string res(ini, '0');
       for (auto const& bit : signal) {
         if (bit >= 0 && bit < 9) {

@@ -164,6 +164,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         std::string opt = msg.getLength() > 0 ? msg.getData() : "";
         boot(opt, m_obj);
       } else if (cmd == RCCommand::LOAD) {
+        m_isglobal = (m_gmaster == msg.getNodeName());
         get(m_obj);
         load(m_obj);
       } else if (cmd == RCCommand::START) {

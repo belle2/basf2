@@ -96,23 +96,29 @@ void EB1TXCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con.addArgument("%s:%d", host.c_str(), rxport);
     m_con.addArgument("-i");
     int nrx = 0;
+    ///*
     for (DBObjectList::const_iterator i = o_rxs.begin();
          i != o_rxs.end(); i++) {
       bool used = i->getBool("used");
       if (used) nrx++;
     }
+    //*/
+    /*
+    for (int i = 0; i < m_nsenders; i++) {
+      std::string node = StringUtil::tolower(i->getText("node"));
+      int used = 1;
+      try {
+    get(m_rcnode, node + ".used", used, 5);
+      } catch (const std::exception& e) {
+    log(LogFile::ERROR, "error on reading %s.used %s", nodename.c_str(), e.what());
+      }
+      if (used) nrx++;
+    }
+    */
     m_con.addArgument(nrx);
     m_con.addArgument("-l");
     m_con.addArgument(txport);
     m_nsenders = 0;
-    /*
-    std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb1rx_up";
-    std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb1rx_down";
-    m_con.addArgument("-u");
-    m_con.addArgument(upname);
-    m_con.addArgument("-d");
-    m_con.addArgument(downname);
-    */
   } catch (const std::out_of_range& e1) {
     throw (RCHandlerException(e1.what()));
   }

@@ -16,10 +16,12 @@
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
+#include <tracking/ckf/svd/filters/results/RelationSVDResultVarSet.h>
 #include <tracking/ckf/svd/filters/results/SVDResultTruthVarSet.h>
 #include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
 
@@ -31,10 +33,14 @@ namespace {
   using ChooseableTruthSVDResultFilter = ChoosableFromVarSetFilter<SVDResultTruthVarSet>;
 
   /// Basic recording filter for SVD - CDC results.
-  using RecordingSVDResultFilter = RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet>>;
+  using RecordingSVDResultFilter =
+    RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet, RelationSVDResultVarSet>>;
 
   /// Filter using a trained MVA method
   using MVASVDResultFilter = MVAFilter<SVDResultVarSet>;
+
+  /// Filter using a trained MVA method
+  using MVASVDSeededResultFilter = MVAFilter<VariadicUnionVarSet<RelationSVDResultVarSet>>;
 }
 
 
@@ -62,9 +68,10 @@ std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAn
     {"all", "all combination are valid"},
     {"recording", "record variables to a TTree"},
     {"mva", "filter based on the trained MVA method"},
-    {"size", "ordering accoring to size"},
+    {"mva_with_relations", "filter based on the trained MVA method"},
+    {"size", "ordering according to size"},
     {"truth", "monte carlo truth"},
-    {"truth_teacher", "monte carlo truth returning the result of the teacher"},
+    {"truth_svd_cdc_relation", "monte carlo truth on the related CDC and SVD tracks"},
   };
 }
 
@@ -79,10 +86,12 @@ SVDResultFilterFactory::create(const std::string& filterName) const
     return std::make_unique<RecordingSVDResultFilter>();
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDResultFilter>("tracking/data/ckf_CDCToSVDResult.xml");
+  } else if (filterName == "mva_with_relations") {
+    return std::make_unique<MVASVDSeededResultFilter>("tracking/data/ckf_SeededCDCToSVDResult.xml");
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
-  } else if (filterName == "truth_teacher") {
-    return std::make_unique<ChooseableTruthSVDResultFilter>("truth_teacher");
+  } else if (filterName == "truth_svd_cdc_relation") {
+    return std::make_unique<ChooseableTruthSVDResultFilter>("truth_svd_cdc_relation");
   } else if (filterName == "size") {
     return std::make_unique<SizeSVDResultFilter>();
   } else {

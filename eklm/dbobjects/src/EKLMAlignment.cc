@@ -65,55 +65,6 @@ EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(uint16_t segment)
   return &(it->second);
 }
 
-void EKLMAlignment::add(EKLMElementID element, int parameter,
-                        double correction, bool invertSign)
-{
-  double corr;
-  int sector, segment;
-  EKLMAlignmentData* sectorAlignment, *segmentAlignment;
-  corr = correction;
-  if (invertSign)
-    corr = -corr;
-  if (element.getType() == EKLMElementID::c_Sector) {
-    sector = element.getSectorNumber();
-    sectorAlignment = getSectorAlignment(sector);
-    if (sectorAlignment == NULL) {
-      B2FATAL("EKLM sector alignment data not found, "
-              "probable error in sector number.");
-    }
-    switch (parameter) {
-      case 1:
-        sectorAlignment->setDx(sectorAlignment->getDx() + corr);
-        break;
-      case 2:
-        sectorAlignment->setDy(sectorAlignment->getDy() + corr);
-        break;
-      case 3:
-        sectorAlignment->setDalpha(sectorAlignment->getDalpha() + corr);
-        break;
-      default:
-        B2FATAL("Incorrect EKLM alignment parameter " << parameter);
-    }
-  } else {
-    segment = element.getSegmentNumber();
-    segmentAlignment = getSegmentAlignment(segment);
-    if (segmentAlignment == NULL) {
-      B2FATAL("EKLM segment alignment data not found, "
-              "probable error in segment number.");
-    }
-    switch (parameter) {
-      case 1:
-        segmentAlignment->setDy(segmentAlignment->getDy() + corr);
-        break;
-      case 2:
-        segmentAlignment->setDalpha(segmentAlignment->getDalpha() + corr);
-        break;
-      default:
-        B2FATAL("Incorrect EKLM alignment parameter " << parameter);
-    }
-  }
-}
-
 void EKLMAlignment::set(EKLMElementID element, int parameter, double value)
 {
   int sector, segment;

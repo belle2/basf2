@@ -105,11 +105,32 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
+    nan = float('nan')
+
+    first_pxd_layer = nan
+    last_pxd_layer = nan
+    first_svd_layer = nan
+    last_svd_layer = nan
+    first_cdc_layer = nan
+    last_cdc_layer = nan
     if reco_track:
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
         ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+
+        pxd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getPXDHitList()]
+        if pxd_hits:
+            first_pxd_layer = min(pxd_hits)
+            last_pxd_layer = max(pxd_hits)
+        svd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getSVDHitList()]
+        if svd_hits:
+            first_svd_layer = min(svd_hits)
+            last_svd_layer = max(svd_hits)
+        cdc_hits = [hit.getICLayer() for hit in reco_track.getCDCHitList()]
+        if cdc_hits:
+            first_cdc_layer = min(cdc_hits)
+            last_cdc_layer = max(cdc_hits)
 
         return dict(
             n_pxd_hits=n_pxd_hits,
@@ -117,15 +138,26 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             n_cdc_hits=n_cdc_hits,
             n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
             ndf_hits=ndf,
+            first_pxd_layer=first_pxd_layer,
+            last_pxd_layer=last_pxd_layer,
+            first_svd_layer=first_svd_layer,
+            last_svd_layer=last_svd_layer,
+            first_cdc_layer=first_cdc_layer,
+            last_cdc_layer=last_cdc_layer,
         )
     else:
-        nan = float('nan')
         return dict(
             n_pxd_hits=nan,
             n_svd_hits=nan,
             n_cdc_hits=nan,
             n_hits=nan,
             ndf_hits=nan,
+            first_pxd_layer=first_pxd_layer,
+            last_pxd_layer=last_pxd_layer,
+            first_svd_layer=first_svd_layer,
+            last_svd_layer=last_svd_layer,
+            first_cdc_layer=first_cdc_layer,
+            last_cdc_layer=last_cdc_layer,
         )
 
 

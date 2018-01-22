@@ -7,6 +7,7 @@
 //-
 
 
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
 #include <TROOT.h>
 #include <TSystem.h>

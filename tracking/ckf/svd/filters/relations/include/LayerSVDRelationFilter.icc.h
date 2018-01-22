@@ -27,6 +27,19 @@ namespace Belle2 {
   }
 
   template <class AFilter>
+  void LayerSVDRelationFilter<AFilter>::beginRun()
+  {
+    Super::beginRun();
+
+    // Fill maximum number cache
+    auto& geoCache = VXD::GeoCache::getInstance();
+    const auto& layers = geoCache.getLayers(VXD::SensorInfoBase::SensorType::SVD);
+    for (const auto& layerVXDID : layers) {
+      m_maximalLadderCache[layerVXDID.getLayerNumber()] = geoCache.getLadders(layerVXDID).size();
+    }
+  }
+
+  template <class AFilter>
   LayerSVDRelationFilter<AFilter>::~LayerSVDRelationFilter() = default;
 
   template <class AFilter>
@@ -35,6 +48,7 @@ namespace Belle2 {
                                                   const std::vector<CKFToSVDState*>& states) const
   {
     std::vector<CKFToSVDState*> possibleNextStates;
+    possibleNextStates.reserve(states.size());
 
     const unsigned int currentLayer = currentState->getGeometricalLayer();
     const unsigned int nextLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
@@ -52,7 +66,7 @@ namespace Belle2 {
           // next layer is an overlap one, so lets return all hits from the same layer, that are on a
           // ladder which is below the last added hit.
           const unsigned int fromLadderNumber = fromVXDID.getLadderNumber();
-          const unsigned int maximumLadderNumber = VXD::GeoCache::getInstance().getLadders(fromVXDID).size();
+          const unsigned int maximumLadderNumber = m_maximalLadderCache.find(fromVXDID.getLayerNumber())->second;
 
           // the reason for this strange formula is the numbering scheme in the VXD.
           // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
@@ -76,8 +90,6 @@ namespace Belle2 {
           //               ----|----                    ----|----                    ----|----
           //  This is fine:         X        This not:                X   This not:          X
           //                      ----|----                    ----|----                    ----|----
-
-          // for PXD its the other way round!
           const double currentStateU = currentSpacePoint->getNormalizedLocalU();
           if (currentStateU > 0.2) {
             continue;

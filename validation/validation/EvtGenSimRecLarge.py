@@ -18,6 +18,7 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
+from background import get_background_files
 import validationtools
 
 set_random_seed(12345)
@@ -41,8 +42,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation
-bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=get_background_files())
 
 # trigger simulation
 add_tsim(main)

@@ -225,26 +225,48 @@ const genfit::TrackPoint* RecoTrack::getCreatedTrackPoint(const RecoHitInformati
   return m_genfitTrack.getPoint(createdTrackPointID);
 }
 
-size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset)
+size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset, bool reversed)
 {
   size_t hitsCopied = 0;
+
+  unsigned int maximalSortingParameter = 0;
+
+  if (reversed) {
+    const auto& recoHitInformations = getRecoHitInformations();
+    const auto sortBySP = [](const RecoHitInformation * lhs, const RecoHitInformation * rhs) {
+      return lhs->getSortingParameter() < rhs->getSortingParameter();
+    };
+    const auto& maximalElement = std::max_element(recoHitInformations.begin(), recoHitInformations.end(), sortBySP);
+    if (maximalElement != recoHitInformations.end()) {
+      maximalSortingParameter = (*maximalElement)->getSortingParameter();
+    }
+  }
+
+  const auto calculator = [maximalSortingParameter, sortingParameterOffset](unsigned int sortingParameters) {
+    if (maximalSortingParameter > 0) {
+      return maximalSortingParameter - sortingParameters + sortingParameterOffset;
+    }
+    return sortingParameters + sortingParameterOffset;
+  };
 
   for (auto* pxdHit : recoTrack->getPXDHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(pxdHit);
     assert(recoHitInfo);
-    hitsCopied += addPXDHit(pxdHit, recoHitInfo->getSortingParameter() + sortingParameterOffset, recoHitInfo->getFoundByTrackFinder());
+    hitsCopied += addPXDHit(pxdHit, calculator(recoHitInfo->getSortingParameter()),
+                            recoHitInfo->getFoundByTrackFinder());
   }
 
   for (auto* svdHit : recoTrack->getSVDHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(svdHit);
     assert(recoHitInfo);
-    hitsCopied += addSVDHit(svdHit, recoHitInfo->getSortingParameter() + sortingParameterOffset, recoHitInfo->getFoundByTrackFinder());
+    hitsCopied += addSVDHit(svdHit, calculator(recoHitInfo->getSortingParameter()),
+                            recoHitInfo->getFoundByTrackFinder());
   }
 
   for (auto* cdcHit : recoTrack->getCDCHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHit);
     assert(recoHitInfo);
-    hitsCopied += addCDCHit(cdcHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+    hitsCopied += addCDCHit(cdcHit, calculator(recoHitInfo->getSortingParameter()),
                             recoHitInfo->getRightLeftInformation(),
                             recoHitInfo->getFoundByTrackFinder());
   }
@@ -252,14 +274,14 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigne
   for (auto* bklmHit : recoTrack->getBKLMHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(bklmHit);
     assert(recoHitInfo);
-    hitsCopied += addBKLMHit(bklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+    hitsCopied += addBKLMHit(bklmHit, calculator(recoHitInfo->getSortingParameter()),
                              recoHitInfo->getFoundByTrackFinder());
   }
 
   for (auto* eklmHit : recoTrack->getEKLMHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(eklmHit);
     assert(recoHitInfo);
-    hitsCopied += addEKLMHit(eklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+    hitsCopied += addEKLMHit(eklmHit, calculator(recoHitInfo->getSortingParameter()),
                              recoHitInfo->getFoundByTrackFinder());
   }
 

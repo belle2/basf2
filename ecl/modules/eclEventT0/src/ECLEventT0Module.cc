@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: czhearty                                                 *
+ * Contributors: Christopher Hearty hearty@physics.ubc.ca                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,8 +42,8 @@ void ECLEventT0Module::initialize()
 {
 
   /** Register the data object */
-  StoreObjPtr<EventT0> eventT0("EventT0");
-  eventT0.registerInDataStore("EventT0");
+  StoreObjPtr<EventT0> eventT0;
+  eventT0.registerInDataStore();
   m_eclCalDigitArray.isRequired();
 }
 

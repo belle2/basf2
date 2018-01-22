@@ -15,20 +15,17 @@ namespace Belle2 {
     public:
       /// Getter for the singletone instance
       static CDCMCTrackCurlerCloneLookUp& getInstance();
-
       /// Singleton: Delete copy constructor and assignment operator
       CDCMCTrackCurlerCloneLookUp(CDCMCTrackCurlerCloneLookUp&) = delete;
       CDCMCTrackCurlerCloneLookUp& operator=(const CDCMCTrackCurlerCloneLookUp&) = delete;
 
-      void fillMCIDToCDCTracksMap(std::vector<CDCTrack>& cdcTracks);
-
-      /// Takes a vector of pointers to CDCTracks which are matched to the same MC particle
-      /// Returns track which is assumed to be not a clone.
-      /// Assumes clones are from curlers, so here this means first curler arm.
-      CDCTrack* findNonCurlerCloneCDCTrack(std::vector<CDCTrack*> matchedTrackPtrs);
-
+      /// fill with all cdcTracks in an event
       void fill(std::vector<CDCTrack>& cdcTracks);
 
+      /// Clear eventwise lookup tables
+      void clear();
+
+      /// getter for information from m_cdcTrackIsCurlerCloneMap
       bool isTrackCurlerClone(const CDCTrack& cdcTrack);
 
     private:
@@ -36,15 +33,14 @@ namespace Belle2 {
       /// TODO: Manage singleton by MCManager? Then, ctor needs to be public.
       CDCMCTrackCurlerCloneLookUp() = default;
 
-      /// Map of MCTrackIds to CDCTrack pointers
-      /// Use that to find all tracks matched to the same MCTrack and decide which are clones.
-      /// TODO: is purity threshold for "matched" definition okay?
-      std::map<const ITrackType, std::vector<CDCTrack*>> m_mcTrackIDToCDCTracksMap;
+      std::map<const ITrackType, std::vector<CDCTrack*>> getMapMCIDToCDCTracks(std::vector<CDCTrack>& cdcTracks);
 
+      /// Takes a vector of pointers to CDCTracks which are matched to the same MC particle
+      /// Returns track which is assumed to be not a clone.
+      CDCTrack* findNonCurlerCloneCDCTrack(std::vector<CDCTrack*> matchedTrackPtrs);
 
       /// Map of track pointers to isClone indicator from MCTruth-based assumption
       std::map<const CDCTrack*, bool> m_cdcTrackIsCurlerCloneMap;
-
     };
   }
 }

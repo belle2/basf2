@@ -18,20 +18,27 @@ CDCMCTrackCurlerCloneLookUp& CDCMCTrackCurlerCloneLookUp::getInstance()
   return cloneInfo;
 }
 
-void CDCMCTrackCurlerCloneLookUp::fillMCIDToCDCTracksMap(std::vector<CDCTrack>& cdcTracks)
+std::map<const ITrackType, std::vector<CDCTrack*>>
+                                                CDCMCTrackCurlerCloneLookUp::getMapMCIDToCDCTracks(std::vector<CDCTrack>& cdcTracks)
 {
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
+
+  /// Map of MCTrackIds to vectors of matching CDCTrack pointers
+  /// TODO: is purity threshold for "matched" definition okay?
+  std::map<const ITrackType, std::vector<CDCTrack*>> mapMCTrackIDToCDCTracks;
+
   for (CDCTrack& cdcTrack : cdcTracks) {
     CDCTrack* ptrCDCTrack = &cdcTrack;
     ITrackType mcTrackID = cdcMCTrackLookUp.getMCTrackId(ptrCDCTrack);
 
-    if (m_mcTrackIDToCDCTracksMap.find(mcTrackID) == m_mcTrackIDToCDCTracksMap.end()) {
+    if (mapMCTrackIDToCDCTracks.find(mcTrackID) == mapMCTrackIDToCDCTracks.end()) {
       // mcTrackID not yet in map, so add element
-      m_mcTrackIDToCDCTracksMap.emplace(mcTrackID, std::vector<CDCTrack*> {ptrCDCTrack});
+      mapMCTrackIDToCDCTracks.emplace(mcTrackID, std::vector<CDCTrack*> {ptrCDCTrack});
     } else { // mcTrackID already in map, so add Track to vector of tracks
-      m_mcTrackIDToCDCTracksMap[mcTrackID].push_back(ptrCDCTrack);
+      mapMCTrackIDToCDCTracks[mcTrackID].push_back(ptrCDCTrack);
     }
   }
+  return mapMCTrackIDToCDCTracks;
 }
 
 CDCTrack* CDCMCTrackCurlerCloneLookUp::findNonCurlerCloneCDCTrack(std::vector<CDCTrack*> matchedTrackPtrs)
@@ -48,19 +55,24 @@ CDCTrack* CDCMCTrackCurlerCloneLookUp::findNonCurlerCloneCDCTrack(std::vector<CD
   return ptrNonCurlerCloneTrack;
 }
 
+void CDCMCTrackCurlerCloneLookUp::clear()
+{
+  m_cdcTrackIsCurlerCloneMap.clear();
+}
+
 /// Fill LookUp Table which stores information, which tracks are clones from curlers
 void CDCMCTrackCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
 {
-  /// per default, all tracks are not clones
+  /// per default, set all tracks to "not clone"
   for (const CDCTrack& cdcTrack : cdcTracks) {
     const CDCTrack* ptrCDCTrack = &cdcTrack;
     m_cdcTrackIsCurlerCloneMap[ptrCDCTrack] = false; // not clone
   }
 
-  /// fill lookup table of MC track IDs to vectors of CDC track pointers
-  fillMCIDToCDCTracksMap(cdcTracks);
+  /// get lookup table of MC track IDs to vectors of CDC track pointers
+  std::map<const ITrackType, std::vector<CDCTrack*>> mapMCIDToCDCTracks = getMapMCIDToCDCTracks(cdcTracks);
 
-  for (auto& mcIDToCDCTracks : m_mcTrackIDToCDCTracksMap) {
+  for (auto& mcIDToCDCTracks : mapMCIDToCDCTracks) {
     /// Vector of track pointers which are mapped to this mcTrackID
     std::vector<CDCTrack*>& matchedTrackPtrs = mcIDToCDCTracks.second;
 

@@ -95,8 +95,8 @@ void ECLEventT0Module::event()
 
     //-----------------------------------------------------------------
     /** Minimum and maximum T0 to test. Range should be at least the specified value. */
-    float minrange = 50.;
-    tmin = tLike[itmin] - 3 * sigmaLike[itmin];
+    float minrange = 50.; /* performance is not sensitive to the particular value */
+    tmin = tLike[itmin] - 3 * sigmaLike[itmin]; /* 3 sigma to ensure minima is away from boundary. Specific value is not important. */
     if (tmin < -m_maxT0) {tmin = -m_maxT0;}
     tmax = tLike[itmax] + 3 * sigmaLike[itmax];
     if (tmax > m_maxT0) {tmax = m_maxT0;}

@@ -18,22 +18,22 @@ namespace Belle2 {
 
     /// Names of the variables to be generated
     constexpr
-    static char const* const trackCurlerCloneTruthVarNames[] = {
+    static char const* const curlerCloneTruthVarNames[] = {
       "weight", // 0 for fakes, 1 for MC matched tracks
       "track_is_curler_clone_truth", // track is clone
       "truth", // not clone, either best match or fake (which is then not used due to weight 0)
     };
 
     /// Vehicle class to transport the variable names
-    struct TrackCurlerCloneTruthVarNames : public VarNames<CDCTrack> {
+    struct CurlerCloneTruthVarNames : public VarNames<CDCTrack> {
 
       /// Number of variables to be generated
-      static const size_t nVars = size(trackCurlerCloneTruthVarNames);
+      static const size_t nVars = size(curlerCloneTruthVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
       {
-        return trackCurlerCloneTruthVarNames[iName];
+        return curlerCloneTruthVarNames[iName];
       }
     };
 
@@ -41,11 +41,11 @@ namespace Belle2 {
      *  Class to compute floating point variables from a track
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class TrackCurlerCloneTruthVarSet : public VarSet<TrackCurlerCloneTruthVarNames> {
+    class CurlerCloneTruthVarSet : public VarSet<CurlerCloneTruthVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<TrackCurlerCloneTruthVarNames>;
+      using Super = VarSet<CurlerCloneTruthVarNames>;
 
     public:
       /// Require the Monte Carlo truth information at initialisation

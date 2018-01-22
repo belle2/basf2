@@ -7,10 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/track/TrackCurlerCloneFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/track/CurlerCloneFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
-#include <tracking/trackFindingCDC/filters/track/TrackCurlerCloneTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/CurlerCloneTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
@@ -31,30 +31,30 @@ using namespace TrackFindingCDC;
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
-  using MCTrackFilter = TruthVarFilter<TrackCurlerCloneTruthVarSet>;
-  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TrackCurlerCloneTruthVarSet, BasicTrackVarSet>>;
+  using MCTrackFilter = TruthVarFilter<CurlerCloneTruthVarSet>;
+  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<CurlerCloneTruthVarSet, BasicTrackVarSet>>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }
 
 template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
 
-TrackCurlerCloneFilterFactory::TrackCurlerCloneFilterFactory(const std::string& defaultFilterName)
+CurlerCloneFilterFactory::CurlerCloneFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
 
-std::string TrackCurlerCloneFilterFactory::getIdentifier() const
+std::string CurlerCloneFilterFactory::getIdentifier() const
 {
   return "Track";
 }
 
-std::string TrackCurlerCloneFilterFactory::getFilterPurpose() const
+std::string CurlerCloneFilterFactory::getFilterPurpose() const
 {
   return "Track filter to reject fakes";
 }
 
 std::map<std::string, std::string>
-TrackCurlerCloneFilterFactory::getValidFilterNamesAndDescriptions() const
+CurlerCloneFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no track is valid"},
@@ -67,7 +67,7 @@ TrackCurlerCloneFilterFactory::getValidFilterNamesAndDescriptions() const
 }
 
 std::unique_ptr<BaseTrackFilter>
-TrackCurlerCloneFilterFactory::create(const std::string& filterName) const
+CurlerCloneFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneTrackFilter>();

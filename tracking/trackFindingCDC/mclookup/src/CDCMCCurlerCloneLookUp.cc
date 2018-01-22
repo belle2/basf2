@@ -1,10 +1,10 @@
-#include <tracking/trackFindingCDC/mclookup/CDCMCTrackCurlerCloneLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCCurlerCloneLookUp.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/logging/Logger.h>
 
-#include <algorithm>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 // #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
@@ -12,14 +12,14 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCMCTrackCurlerCloneLookUp& CDCMCTrackCurlerCloneLookUp::getInstance()
+CDCMCCurlerCloneLookUp& CDCMCCurlerCloneLookUp::getInstance()
 {
-  static CDCMCTrackCurlerCloneLookUp cloneInfo;
+  static CDCMCCurlerCloneLookUp cloneInfo;
   return cloneInfo;
 }
 
-std::map<const ITrackType, std::vector<CDCTrack*>>
-                                                CDCMCTrackCurlerCloneLookUp::getMapMCIDToCDCTracks(std::vector<CDCTrack>& cdcTracks)
+std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCurlerCloneLookUp::getMapMCIDToCDCTracks(
+                                                  std::vector<CDCTrack>& cdcTracks)
 {
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
 
@@ -41,7 +41,7 @@ std::map<const ITrackType, std::vector<CDCTrack*>>
   return mapMCTrackIDToCDCTracks;
 }
 
-CDCTrack* CDCMCTrackCurlerCloneLookUp::findNonCurlerCloneCDCTrack(std::vector<CDCTrack*> matchedTrackPtrs)
+CDCTrack* CDCMCCurlerCloneLookUp::findNonCurlerCloneCDCTrack(std::vector<CDCTrack*> matchedTrackPtrs)
 {
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
 
@@ -55,13 +55,13 @@ CDCTrack* CDCMCTrackCurlerCloneLookUp::findNonCurlerCloneCDCTrack(std::vector<CD
   return ptrNonCurlerCloneTrack;
 }
 
-void CDCMCTrackCurlerCloneLookUp::clear()
+void CDCMCCurlerCloneLookUp::clear()
 {
   m_cdcTrackIsCurlerCloneMap.clear();
 }
 
 /// Fill LookUp Table which stores information, which tracks are clones from curlers
-void CDCMCTrackCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
+void CDCMCCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
 {
   /// per default, set all tracks to "not clone"
   for (const CDCTrack& cdcTrack : cdcTracks) {
@@ -89,13 +89,15 @@ void CDCMCTrackCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
   }
 }
 
-bool CDCMCTrackCurlerCloneLookUp::isTrackCurlerClone(const CDCTrack& cdcTrack)
+bool CDCMCCurlerCloneLookUp::isTrackCurlerClone(const CDCTrack& cdcTrack)
 {
   const CDCTrack* ptrCDCTrack = &cdcTrack;
 
   if (m_cdcTrackIsCurlerCloneMap.find(ptrCDCTrack) == m_cdcTrackIsCurlerCloneMap.end()) {
     B2FATAL("No entry for this CDC track in m_cdcTrackIsCurlerCloneMap");
   }
-
+  if (m_cdcTrackIsCurlerCloneMap.size() == 0) {
+    B2FATAL("m_cdcTrackIsCurlerCloneMap is empty.");
+  }
   return m_cdcTrackIsCurlerCloneMap[ptrCDCTrack];
 }

@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <vector>
-#include <string>
 
 namespace Belle2 {
 
@@ -21,7 +20,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Findlet to exports CDCTracks as RecoTracks
-    class MCTrackCurlerCloneLookUpFiller : public Findlet<CDCTrack&> {
+    class MCCurlerCloneLookUpFiller : public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -31,8 +30,8 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
-      /// Signal initialisation phase to register store array for export
-      void initialize() final;
+      /// Signal the beginning of a new event
+      void beginEvent() final;
 
       /// Write give tracks into track store array
       void apply(std::vector<CDCTrack>& cdcTracks) final;

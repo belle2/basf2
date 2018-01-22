@@ -10,14 +10,14 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCMCTrackCurlerCloneLookUp {
+    class CDCMCCurlerCloneLookUp {
 
     public:
       /// Getter for the singletone instance
-      static CDCMCTrackCurlerCloneLookUp& getInstance();
+      static CDCMCCurlerCloneLookUp& getInstance();
       /// Singleton: Delete copy constructor and assignment operator
-      CDCMCTrackCurlerCloneLookUp(CDCMCTrackCurlerCloneLookUp&) = delete;
-      CDCMCTrackCurlerCloneLookUp& operator=(const CDCMCTrackCurlerCloneLookUp&) = delete;
+      CDCMCCurlerCloneLookUp(CDCMCCurlerCloneLookUp&) = delete;
+      CDCMCCurlerCloneLookUp& operator=(const CDCMCCurlerCloneLookUp&) = delete;
 
       /// fill with all cdcTracks in an event
       void fill(std::vector<CDCTrack>& cdcTracks);
@@ -31,7 +31,7 @@ namespace Belle2 {
     private:
       /// Singleton: Default ctor only available to getInstance method
       /// TODO: Manage singleton by MCManager? Then, ctor needs to be public.
-      CDCMCTrackCurlerCloneLookUp() = default;
+      CDCMCCurlerCloneLookUp() = default;
 
       std::map<const ITrackType, std::vector<CDCTrack*>> getMapMCIDToCDCTracks(std::vector<CDCTrack>& cdcTracks);
 

@@ -19,7 +19,7 @@ namespace Belle2 {
     extern template class FilterFactory<BaseTrackFilter>;
 
     /// Factory that can create appropriate track filters from associated names.
-    class TrackCurlerCloneFilterFactory : public FilterFactory<BaseTrackFilter> {
+    class CurlerCloneFilterFactory : public FilterFactory<BaseTrackFilter> {
 
     private:
       /// Type of the base class
@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      TrackCurlerCloneFilterFactory(const std::string& defaultFilterName = "mva");
+      CurlerCloneFilterFactory(const std::string& defaultFilterName = "recording");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

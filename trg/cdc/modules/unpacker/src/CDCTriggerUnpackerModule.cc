@@ -17,6 +17,7 @@
 #include <utility>
 #include <numeric>
 #include <iomanip>
+#include <algorithm>
 
 using namespace Belle2;
 using namespace CDCTriggerUnpacker;
@@ -149,6 +150,8 @@ namespace Belle2 {
       // get header information
       std::string firmwareType = rawIntToAscii(data32tab.at(iFinesse)[0]);
       std::string firmwareVersion = rawIntToString(data32tab.at(iFinesse)[1]);
+      // TODO: get B2L delay after it is added to the header
+      // m_2DFinderDelay =
       B2DEBUG(90, name << ", " << firmwareType << ", version " << firmwareVersion
               << ", node " << std::hex << iNode << ", finesse " << iFinesse);
 
@@ -205,6 +208,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "whether to unpack merger data (recorded by Merger Reader / TSF)", false);
   addParam("unpackTracker2D", m_unpackTracker2D,
            "whether to unpack 2D tracker data", false);
+  addParam("decode2DFinderTrack", m_decode2DFinderTrack,
+           "flag to decode 2D finder track", false);
   NodeList defaultMergerNodeID = {
     {0x11000001, 0},
     {0x11000003, 0},
@@ -238,6 +243,13 @@ void CDCTriggerUnpackerModule::initialize()
   if (m_unpackTracker2D) {
     m_bitsTo2D.registerInDataStore("CDCTriggerTSFTo2DBits");
     m_bits2DTo3D.registerInDataStore("CDCTrigger2DTo3DBits");
+  }
+  if (m_decodeTSHit or m_decode2DFinderTrack) {
+    m_TSHits.registerInDataStore("CDCTriggerSegmentHits");
+  }
+  if (m_decode2DFinderTrack) {
+    m_2DFinderTracks.registerInDataStore("CDCTrigger2DFinderTrack");
+    m_2DFinderTracks.registerRelationTo(m_TSHits);
   }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
@@ -308,5 +320,14 @@ void CDCTriggerUnpackerModule::event()
       }
     }
   }
+
+  // decode bitstream and make TSIM objects
+  if (m_decode2DFinderTrack) {
+    for (short iclock = 0; iclock < m_bits2DTo3D.getEntries(); ++iclock) {
+      decode2DOutput(iclock + m_2DFinderDelay, m_bits2DTo3D[iclock],
+                     &m_2DFinderTracks, &m_TSHits);
+    }
+  }
+
 }
 

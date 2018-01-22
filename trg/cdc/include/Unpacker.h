@@ -2,10 +2,18 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <bitset>
+#include <numeric>
+#include <cmath>
+
 #include <trg/cdc/dataobjects/Bitstream.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 
 namespace Belle2 {
   namespace CDCTriggerUnpacker {
+
+    constexpr double pi() { return std::atan(1) * 4; }
 
     // constants
     static constexpr std::array<int, 9> nMergers = {10, 10, 12, 14, 16, 18, 20, 22, 24};
@@ -17,6 +25,17 @@ namespace Belle2 {
     static constexpr int nTrackers = 4;
     static constexpr int nAxialTSF = 5;
     static constexpr int T2DOutputWidth = 741;
+
+    static constexpr int nMax2DTracksPerClock = 6;
+
+    /* number of mergers in axial super layers */
+    static constexpr std::array<int, nAxialTSF> nAxialMergers = {10, 12, 16, 20, 24};
+    /* number of wires in a super layer*/
+    static constexpr std::array<int, 9> nWiresInSuperLayer = {
+      160, 160, 192, 224, 256, 288, 320, 352, 384
+    };
+    /* Number of wire/cells in a single layer per merger unit */
+    static constexpr int nCellsInLayer = 16;
 
     // dataobjects
     using TSFOutputVector = std::array<char, TSFOutputWidth>;
@@ -151,6 +170,141 @@ namespace Belle2 {
       const size_t outWidth = max - min + 1;
       std::string str = set.to_string();
       return std::bitset<outWidth>(str.substr(nbits - max - 1, outWidth));
+    }
+
+
+    /**
+     *  Calculate the global TS ID from the ID in a super layer
+     *
+     *  @param localID     Segment ID in TSF output
+     *
+     *  @param iSL         Super layer ID (0-8)
+     */
+    unsigned short globalSegmentID(unsigned short localID, unsigned short iSL)
+    {
+      auto itr = nWiresInSuperLayer.begin();
+      unsigned short globalID = std::accumulate(itr, itr + iSL, 0);
+      globalID += localID;
+      return globalID;
+    }
+
+    using tsOut = std::array<unsigned, 4>;
+    using tsOutArray = std::array<tsOut, 5>;
+    struct TRG2DFinderTrack {
+      double omega;
+      double phi0;
+      tsOutArray ts;
+    };
+
+    unsigned TSIDInSL(unsigned tsIDInTracker, unsigned iAx, unsigned iTracker)
+    {
+      const unsigned nCellsInSL = nAxialMergers[iAx] * nCellsInLayer;
+      // get global TS ID
+      unsigned iTS = tsIDInTracker + nCellsInSL * iTracker / nTrackers;
+      // periodic ID overflow when phi0 > 0 for the 4th tracker
+      if (iTS >= nCellsInSL) {
+        iTS -= nCellsInSL;
+      }
+      // ID in SL8 is shifted by 16
+      if (iAx == 4) {
+        if (iTS < 16) {
+          iTS += nCellsInSL;
+        }
+        iTS -= 16;
+      }
+      return iTS;
+    }
+
+    tsOut decodeTSHit(std::string tsIn)
+    {
+      constexpr unsigned lenID = 8;
+      constexpr unsigned lenPriorityTime = 9;
+      constexpr unsigned lenLR = 2;
+      constexpr unsigned lenPriorityPosition = 2;
+      constexpr std::array<unsigned, 4> tsLens = {
+        lenID, lenPriorityTime, lenLR, lenPriorityPosition
+      };
+      std::array<unsigned, 5> tsPos = { 0 };
+      std::partial_sum(tsLens.begin(), tsLens.end(), tsPos.begin() + 1);
+      tsOut tsOutput;
+      tsOutput[0] = std::bitset<tsLens[0]>(tsIn.substr(tsPos[0], tsLens[0])).to_ulong();
+      tsOutput[1] = std::bitset<tsLens[1]>(tsIn.substr(tsPos[1], tsLens[1])).to_ulong();
+      tsOutput[2] = std::bitset<tsLens[2]>(tsIn.substr(tsPos[2], tsLens[2])).to_ulong();
+      tsOutput[3] = std::bitset<tsLens[3]>(tsIn.substr(tsPos[3], tsLens[3])).to_ulong();
+      return tsOutput;
+    }
+
+    TRG2DFinderTrack decode2DTrack(std::string trackIn)
+    {
+      constexpr unsigned lenCharge = 2;
+      constexpr unsigned lenOmega = 7;
+      constexpr unsigned lenPhi0 = 7;
+      constexpr unsigned lenTS = 21;
+      constexpr std::array<unsigned, 3> trackLens = {lenCharge, lenOmega, lenPhi0};
+      std::array<unsigned, 4> trackPos{ 0 };
+      std::partial_sum(trackLens.begin(), trackLens.end(), trackPos.begin() + 1);
+      const unsigned shift = 16 - lenOmega;
+      TRG2DFinderTrack trackOut;
+      std::bitset<trackLens[1]> omega(trackIn.substr(trackPos[1], trackLens[1]));
+      // shift omega to 16 bits, cast it to signed 16-bit int, and shift it back to 7 bits
+      // thus the signed bit is preserved (when right-shifting)
+      int omegaFirm = (int16_t (omega.to_ulong() << shift)) >> shift;
+      // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
+      trackOut.omega = 29.97 * 1.5e-4 * omegaFirm;
+      int phi0 = std::bitset<trackLens[2]>(trackIn.substr(trackPos[2], trackLens[2])).to_ulong();
+      trackOut.phi0 = pi() / 4 + pi() / 2 / 80 * (phi0 + 1);
+      for (unsigned i = 0; i < 5; ++i) {
+        trackOut.ts[i] = decodeTSHit(trackIn.substr(trackPos.back() + i * lenTS, lenTS));
+      }
+      return trackOut;
+    }
+
+    void decode2DOutput(short foundTime,
+                        T2DOutputBitStream* bits,
+                        StoreArray<CDCTriggerTrack>* storeTracks,
+                        StoreArray<CDCTriggerSegmentHit>* tsHits)
+    {
+      const unsigned lenTrack = 121;
+      std::array<int, 4> posTrack;
+      for (unsigned i = 0; i < posTrack.size(); ++i) {
+        posTrack[i] = 6 + lenTrack * i;
+      }
+      for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
+        const auto slv = bits->signal()[iTracker];
+        std::string strOutput = slv_to_bin_string(slv).substr(9, T2DOutputWidth - 9);
+        for (unsigned i = 0; i < nMax2DTracksPerClock; ++i) {
+          // The first 6 bits indicate whether a track is found or not
+          if (slv[9 + i] == one_val) {
+            TRG2DFinderTrack trk = decode2DTrack(strOutput.substr(posTrack[i], lenTrack));
+            // const CDCTriggerTrack* track =
+            B2DEBUG(10, "phi0:" << trk.phi0 << ", omega:" << trk.omega
+                    << ", at clock " << foundTime << ", tracker " << iTracker);
+            CDCTriggerTrack* track =
+              storeTracks->appendNew(trk.phi0, trk.omega, 0., foundTime);
+            // TODO: dig out the TS hits in DataStore, and
+            // add relations to them.
+            // Otherwise, create a new TS hit object and add the relation.
+            // However, the fastest time would be lost in this case.
+            // Problem: there might be multiple TS hits with the same ID,
+            // so the foundTime needs to be aligned first in order to compare.
+            for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
+              const auto& ts = trk.ts[iAx];
+              if (ts[3] > 0) {
+                unsigned iTS = TSIDInSL(ts[0], iAx, iTracker);
+                CDCTriggerSegmentHit* hit =
+                  tsHits->appendNew(CDCHit(),
+                                    globalSegmentID(iTS, 2 * iAx),
+                                    ts[3], // priority position
+                                    ts[2], // L/R
+                                    ts[1], // priority time
+                                    0, // fastest time (unknown)
+                                    0); // found time (unknown)
+                track->addRelationTo(hit);
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

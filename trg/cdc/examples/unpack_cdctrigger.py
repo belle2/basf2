@@ -20,6 +20,7 @@ unpacker.logging.debug_level = 10
 unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
 unpacker.param('unpackTracker2D', True)
 unpacker.param('headerSize', 2)
+unpacker.param('decode2DFinderTrack', True)
 
 main.add_module(unpacker)
 main.add_module('RootOutput', outputFileName='unpackedCDCTrigger.root')

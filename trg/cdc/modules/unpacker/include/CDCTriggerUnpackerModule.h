@@ -17,6 +17,8 @@
 #include <trg/cdc/dataobjects/Bitstream.h>
 
 #include <trg/cdc/Unpacker.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 
 #include <array>
 #include <bitset>
@@ -101,17 +103,28 @@ namespace Belle2 {
     MergerBits m_mergerBitsPerClock;
     StoreArray<MergerBits> m_mergerBits; /**< merger output bitstream */
 
+    bool m_decodeTSHit;  /**< flag to decode track segment  */
     NodeList m_tracker2DNodeID; /**< list of (COPPER ID, FTSW ID) of 2D tracker */
     bool m_unpackTracker2D;  /**< flag to unpack 2D tracker data */
+    bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
 
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
 
+    /** decoded track segment hit */
+    StoreArray<CDCTriggerSegmentHit> m_TSHits;
+
     /** bitstream of 2D output to 3D/Neuro */
     StoreArray<CDCTriggerUnpacker::T2DOutputBitStream> m_bits2DTo3D;
 
+    /** decoded 2D finder track */
+    StoreArray<CDCTriggerTrack> m_2DFinderTracks;
+
     /** debug level specified in the steering file */
     int m_debugLevel;
+
+    /** Belle2Link delay of the 2D finder */
+    short m_2DFinderDelay = 0;
 
     std::vector<SubTrigger*> m_subTrigger;
 

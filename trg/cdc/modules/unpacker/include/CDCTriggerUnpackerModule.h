@@ -108,7 +108,7 @@ namespace Belle2 {
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
 
     /** bitstream of 2D output to 3D/Neuro */
-    StoreArray<CDCTriggerUnpacker::T2DOutputBitStream> m_bits2DToTracker;
+    StoreArray<CDCTriggerUnpacker::T2DOutputBitStream> m_bits2DTo3D;
 
     /** debug level specified in the steering file */
     int m_debugLevel;

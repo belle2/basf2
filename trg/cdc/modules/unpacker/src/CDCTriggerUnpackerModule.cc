@@ -237,7 +237,7 @@ void CDCTriggerUnpackerModule::initialize()
   }
   if (m_unpackTracker2D) {
     m_bitsTo2D.registerInDataStore("CDCTriggerTSFTo2DBits");
-    m_bits2DToTracker.registerInDataStore("CDCTrigger2DToTrackerBits");
+    m_bits2DTo3D.registerInDataStore("CDCTrigger2DTo3DBits");
   }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
@@ -256,7 +256,7 @@ void CDCTriggerUnpackerModule::initialize()
   for (int iTracker = 0; iTracker < 4; ++iTracker) {
     if (m_unpackTracker2D) {
       Tracker2D* m_tracker2d =
-        new Tracker2D(&m_bitsTo2D, &m_bits2DToTracker,
+        new Tracker2D(&m_bitsTo2D, &m_bits2DTo3D,
                       "Tracker2D" + std::to_string(iTracker), 64, 82, m_headerSize,
                       m_tracker2DNodeID[iTracker], 10,
                       m_debugLevel);

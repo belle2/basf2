@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace ECL;
 
 /** Novosibirsk function, plus constant H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426 */
 double eclNovoConst(double* x, double* par)

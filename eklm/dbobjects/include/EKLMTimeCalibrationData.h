@@ -55,7 +55,7 @@ namespace Belle2 {
     float m_TimeShift;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMTimeCalibrationData, 1);
+    ClassDef(Belle2::EKLMTimeCalibrationData, 2);
 
   };
 

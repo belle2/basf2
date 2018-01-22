@@ -83,7 +83,7 @@ namespace Belle2 {
     float m_Dalpha;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMAlignmentData, 1);
+    ClassDef(Belle2::EKLMAlignmentData, 2);
 
   };
 

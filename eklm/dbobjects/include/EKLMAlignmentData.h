@@ -34,7 +34,7 @@ namespace Belle2 {
      * @param[in] dy     dy.
      * @param[in] dalpha dalpha.
      */
-    EKLMAlignmentData(double dx, double dy, double dalpha);
+    EKLMAlignmentData(float dx, float dy, float dalpha);
 
     /**
      * Destructor.
@@ -44,43 +44,43 @@ namespace Belle2 {
     /**
      * Set dx.
      */
-    void setDx(double dx);
+    void setDx(float dx);
 
     /**
      * Get dx.
      */
-    double getDx() const;
+    float getDx() const;
 
     /**
      * Set dy.
      */
-    void setDy(double dy);
+    void setDy(float dy);
 
     /**
      * Get dy.
      */
-    double getDy() const;
+    float getDy() const;
 
     /**
      * Set dalpha.
      */
-    void setDalpha(double dalpha);
+    void setDalpha(float dalpha);
 
     /**
      * Get dalpha.
      */
-    double getDalpha() const;
+    float getDalpha() const;
 
   private:
 
     /** Change of the segment x coordinate (along the strips). */
-    double m_Dx;
+    float m_Dx;
 
     /** Change of the segment y coordinate (perpendicular to the strips). */
-    double m_Dy;
+    float m_Dy;
 
     /** Additional rotation of the segment. */
-    double m_Dalpha;
+    float m_Dalpha;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMAlignmentData, 1);

@@ -63,15 +63,18 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Set the used output file, taking into account -o argument to basf2. */
-    void setOutputFile()
+    virtual std::vector<std::string> getFileNames(EModulePropFlags direction = Module::c_Output)
     {
-      if (m_ignoreCommandLineOverride)
-        return;
-      const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-      if (!outputFileArgument.empty())
-        m_outputFileName = outputFileArgument;
+      B2ASSERT("RootOutput is not an input module", direction == Module::c_Output);
+      if (!m_ignoreCommandLineOverride) {
+        // This will warn if already consumed which is what we want
+        std::string outputFileArgument = Environment::Instance().consumeOutputFileOverride(getName());
+        if (!outputFileArgument.empty())
+          m_outputFileName = outputFileArgument;
+        m_ignoreCommandLineOverride = true;
+      }
+      return {m_outputFileName};
     }
-
 
   private:
 

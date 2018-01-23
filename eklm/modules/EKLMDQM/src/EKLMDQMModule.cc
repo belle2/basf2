@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <TDirectory.h>
+
 /* Belle2 headers. */
 #include <eklm/modules/EKLMDQM/EKLMDQMModule.h>
 
@@ -28,6 +30,7 @@ EKLMDQMModule::~EKLMDQMModule()
 
 void EKLMDQMModule::defineHisto()
 {
+  printf("%s\n", gDirectory->GetName());
   m_Sector = new TH1F("eklm_sector", "Sector number", 112, 0.5, 112.5);
 }
 
@@ -62,5 +65,4 @@ void EKLMDQMModule::endRun()
 
 void EKLMDQMModule::terminate()
 {
-  delete m_Sector;
 }

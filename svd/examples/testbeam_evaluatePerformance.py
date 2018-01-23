@@ -71,14 +71,29 @@ main.add_module('SVDUnpacker', GenerateShaperDigits=True, shutUpFTBError=1)
 add_svd_reconstruction(main, useNN=False, useCoG=True)
 
 # add SVD-only tracking
-add_reconstruction(main, geometry_version=geom, magnet=not args.magnet_off, vxdtf2=False)
+add_reconstruction(main, geometry_version=geom, magnet=not args.magnet_off, vxdtf2=True)
+
+
+for mod in main.modules():
+    print(mod.name())
+    if mod.name() == 'SectorMapBootstrap':
+        # three hit filter
+        # (#19 <= DistanceInTime <= #20)
+        mod.param('threeHitFilterAdjustFunctions', [(19, "-TMath::Infinity()"), (20, "TMath::Infinity()")])
+        # two hit filters:
+        # (#12 <= DistanceInTimeUside <= #13)
+        # (#10 <= DistanceInTimeVside <= #11)
+        mod.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "TMath::Infinity()"),
+                                                  (10, "-TMath::Infinity()"), (11, "TMath::Infinity()")])
+        mod.logging.log_level = LogLevel.DEBUG
+
 
 # add SVD performance module
 svdperf = register_module('SVDPerformance')
 if (args.magnet_off):
-    svdperf.param('outputFileName', "SVDPerformance_VXDTF1_run111.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF2_run111.root")
 else:
-    svdperf.param('outputFileName', "SVDPerformance_VXDTF1_run400.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF2_run400.root")
 svdperf.param('is2017TBanalysis', True)
 main.add_module(svdperf)
 

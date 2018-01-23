@@ -17,6 +17,7 @@
 #include <boost/python/extract.hpp>
 
 #include <boost/variant.hpp>
+#include <boost/optional.hpp>
 
 #include <map>
 #include <string>
@@ -64,6 +65,9 @@ namespace Belle2 {
     /** check if the python object can be converted to the given boost::variant type */
     template<typename... Types>
     bool checkPythonObject(const boost::python::object& pyObject, const boost::variant<Types...>&);
+    /** check if the python object can be converted to the given boost::optional<T> type */
+    template<typename Type>
+    bool checkPythonObject(const boost::python::object& pyObject, const boost::optional<Type>&);
 
     /** Convert from Python to given type. */
     template<typename Scalar>
@@ -80,6 +84,9 @@ namespace Belle2 {
     /** Convert from Python to given type. */
     template<typename... Types>
     boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject, boost::variant<Types...>);
+    /** Convert from Python to the given boost::optional type */
+    template<typename Type>
+    boost::optional<Type> convertPythonObject(const boost::python::object& pyObject, boost::optional<Type>);
 
     template<typename Scalar>
     boost::python::object convertToPythonObject(const Scalar& value);
@@ -91,6 +98,9 @@ namespace Belle2 {
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple);
     template<typename... Types>
     boost::python::object convertToPythonObject(const boost::variant<Types...>& tuple);
+    /** Convert from the given boost::optional type to Python */
+    template<typename Type>
+    boost::python::object convertToPythonObject(const boost::optional<Type>& optional);
 
     template<typename T> struct Type;
     template<typename T> struct Type<std::vector<T> >;
@@ -140,6 +150,8 @@ namespace Belle2 {
     /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<std::string> { /** type name. */ static std::string name() { return "str"; } };
 
+    /** Converts a template argument into a string for corresponding Python type. */
+    template<typename T> struct Type<boost::optional<T>> { /** type name. */ static std::string name() { return Type<T>::name() + " or None"; } };
 
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename... Types> struct Type<std::tuple<Types...> > { /** type name. */ static std::string name() { return std::string("tuple(") + VariadicType<Types...>::name() + ")"; } };
@@ -277,6 +289,15 @@ namespace Belle2 {
       return CheckVariant(variant, pyObject, SizeT<sizeof...(Types)>());
     }
 
+    /** Check if a python object can be converted to boost::optional
+     * @return true if pyObject is None or convertible to the type of the boost::optional
+     */
+    template<typename Type>
+    bool checkPythonObject(const boost::python::object& pyObject, const boost::optional<Type>&)
+    {
+      return pyObject.is_none() or checkPythonObject(pyObject, Type());
+    }
+
     /**
      * --------------- From C++ TO Python Converter ------------------------
      */
@@ -388,6 +409,23 @@ namespace Belle2 {
     boost::python::object convertToPythonObject(const boost::variant<Types...>& variant)
     {
       return boost::apply_visitor(convertToPythonObjectVisitor(), variant);
+    }
+
+    /**
+     * Convert a boost::optional to python
+     *
+     * @param optional the optional object to convert
+     * @return If the optional is not set return None, otherwise just return
+     *         the converted type it contains.
+     */
+    template<typename Type>
+    boost::python::object convertToPythonObject(const boost::optional<Type>& optional)
+    {
+      if (optional) {
+        return convertToPythonObject(*optional);
+      } else {
+        return boost::python::object();
+      }
     }
 
     /**
@@ -561,6 +599,22 @@ namespace Belle2 {
       boost::variant<Types...> tmpVariant;
       SetVariant(tmpVariant, pyObject, SizeT<sizeof...(Types)>());
       return tmpVariant;
+    }
+
+    /**
+     * Convert a python object to boost::optional.
+     *
+     * @return boost::optional which is not set if pyObject is None. Otherwise
+     *         it will be converted to the type of the boost optional
+     */
+    template<typename Type>
+    boost::optional<Type> convertPythonObject(const boost::python::object& pyObject, boost::optional<Type>)
+    {
+      boost::optional<Type> tmpOptional = boost::none;
+      if (!pyObject.is_none()) {
+        tmpOptional = convertPythonObject(pyObject, Type());
+      }
+      return tmpOptional;
     }
   }
 }

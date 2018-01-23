@@ -120,11 +120,11 @@ def main():
 
     path = basf2.create_path()
 
-    runNumber = 0
+    expNumber = 0
     if phase == 2:
-        runNumber = 1002
+        expNumber = 1002
 
-    path.add_module("EventInfoSetter", evtNumList=[n_events], runList=runNumber)
+    path.add_module("EventInfoSetter", evtNumList=[n_events], expList=expNumber)
 
     if phase == 2:
         path.add_module('Gearbox', fileName="geometry/Beast2_phase2.xml")

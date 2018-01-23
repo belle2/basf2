@@ -35,8 +35,8 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
 
-G4MonopolePhysics::G4MonopolePhysics(const G4String& nam, double magneticCharge)
-  : G4VPhysicsConstructor(nam),
+G4MonopolePhysics::G4MonopolePhysics(double magneticCharge)
+  : G4VPhysicsConstructor("Monopole physics"),
     fMpl(0), fApl(0)
 {
   //No way to store magnetic charge in TDatabasePDG,

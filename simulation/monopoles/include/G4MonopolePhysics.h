@@ -24,7 +24,7 @@ namespace Belle2 {
     class G4MonopolePhysics : public G4VPhysicsConstructor {
     public:
 
-      G4MonopolePhysics(const G4String& nam = "Monopole Physics", double magneticCharge = 1.0);
+      G4MonopolePhysics(double magneticCharge = 1.0);
 
       ~G4MonopolePhysics();
 

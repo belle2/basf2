@@ -122,13 +122,13 @@ void InclusiveBtagReconstructionModule::event()
             append = false;
             break;
           }
-        }
-        if (append) {
-          std::map<int, std::vector<int>>::iterator it = btagDaughtersMap.find(mdstSource);
-          if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
-            it->second.push_back(particle->getArrayIndex());
-          } else {
-            btagDaughtersMap[mdstSource] = {particle->getArrayIndex()};
+          if (append) {
+            std::map<int, std::vector<int>>::iterator it = btagDaughtersMap.find(mdstSource);
+            if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
+              it->second.push_back(particle->getArrayIndex());
+            } else {
+              btagDaughtersMap[mdstSource] = {particle->getArrayIndex()};
+            }
           }
         }
       }
@@ -142,10 +142,37 @@ void InclusiveBtagReconstructionModule::event()
     StoreArray<Particle> particles;
 
     for (std::vector<int> daughterIndices : btagCandidates) {
+      std::map<int, size_t> nonFinalStateIndicesCount;
       TLorentzVector momentum;
       for (int index : daughterIndices) {
+        // check if there are non-final-state particles. If yes, the momentum should be added just once.
+        if ((particles[index]->getFinalStateDaughters()).size() > 1) {
+          std::map<int, size_t>::iterator it = nonFinalStateIndicesCount.find(index);
+          if (it != nonFinalStateIndicesCount.end()) {
+            nonFinalStateIndicesCount[index]++;
+            continue;
+          } else {
+            nonFinalStateIndicesCount[index] = 1;
+          }
+        }
         momentum += particles[index]->get4Vector();
       }
+      // check the number of the daughters to make sure that the not-final-state particles are not mixed with the other particles that come from the same mdstSource
+      bool rightDaughtersCount = true;
+      for (std::map<int, size_t>::iterator it = nonFinalStateIndicesCount.begin(); it != nonFinalStateIndicesCount.end(); ++it) {
+        if (it->second != (particles[(it->first)]->getFinalStateDaughters()).size()) {
+          rightDaughtersCount = false;
+          break;
+        }
+      }
+      if (rightDaughtersCount == false) {
+        continue;
+      }
+      //remove repeated index in daughterIndices
+      std::vector<int>::iterator it;
+      it = std::unique(daughterIndices.begin(), daughterIndices.end());
+      daughterIndices.resize(std::distance(daughterIndices.begin(), it));
+
       Particle btagCandidate(momentum, -1 * bsig->getPDGCode(), bsig->getFlavorType(), daughterIndices, bsig->getArrayPointer());
       Particle* btag = particles.appendNew(btagCandidate);
       btagList->addParticle(btag);

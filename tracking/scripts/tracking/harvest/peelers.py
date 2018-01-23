@@ -193,6 +193,21 @@ def peel_store_array_info(item, key="{part_name}"):
 
 
 @format_crop_keys
+def peel_quality_indicators(reco_track):
+    nan = float("nan")
+
+    crops = dict(
+        quality_indicator=reco_track.getQualityIndicator(),
+        svd_quality_indicator=nan,
+    )
+
+    if reco_track.getRelated('SPTrackCands'):
+        crops["svd_quality_indicator"] = reco_track.getRelated('SPTrackCands').getQualityIndex()
+
+    return crops
+
+
+@format_crop_keys
 def peel_fit_status(reco_track, key="{part_name}"):
     nan = float("nan")
 

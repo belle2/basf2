@@ -24,10 +24,9 @@ Belle 2 Software or for additional information, please
    :maxdepth: 2
 
    framework/doc/index*
+   */doc/index*
    */sphinx_*
    framework/doc/atend*
-
-..   */doc/index*
 
 .. only:: format_html
 

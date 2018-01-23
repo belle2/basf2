@@ -1,0 +1,90 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef EKLMDIGITIZERMODULE_H
+#define EKLMDIGITIZERMODULE_H
+
+/* External headers. */
+#include <TH1F.h>
+
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/geometry/GeometryData.h>
+#include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+
+namespace Belle2 {
+
+  /**
+   * Module EKLMDigitizationModule.
+   * @details
+   * Simple module for reading EKLM hits.
+   */
+  class EKLMDQMModule : public HistoModule {
+
+  public:
+
+    /**
+     * Constructor.
+     */
+    EKLMDQMModule();
+
+    /**
+     * Destructor
+     */
+    virtual ~EKLMDQMModule();
+
+    /**
+     * Definition of the histograms.
+     */
+    virtual void defineHisto();
+
+    /**
+     * Initializer.
+     */
+    virtual void initialize();
+
+    /**
+     * Called when entering a new run.
+     */
+    virtual void beginRun();
+
+    /**
+     * This method is called for each event.
+     */
+    virtual void event();
+
+    /**
+     * This method is called if the current run ends.
+     */
+    virtual void endRun();
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    virtual void terminate();
+
+  private:
+
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
+    /** Digits. */
+    StoreArray<EKLMDigit> m_Digits;
+
+    /* Sector number. */
+    TH1F* m_Sector;
+
+  };
+
+}
+
+#endif
+

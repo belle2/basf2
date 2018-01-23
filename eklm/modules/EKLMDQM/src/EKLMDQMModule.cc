@@ -19,7 +19,7 @@ EKLMDQMModule::EKLMDQMModule() : HistoModule()
 {
   setDescription("EKLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
+  m_Elements = NULL;
 }
 
 EKLMDQMModule::~EKLMDQMModule()
@@ -35,7 +35,7 @@ void EKLMDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_Digits.isRequired();
-  m_GeoDat = &(EKLM::GeometryData::Instance());
+  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 void EKLMDQMModule::beginRun()
@@ -49,7 +49,7 @@ void EKLMDQMModule::event()
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
     eklmDigit = m_Digits[i];
-    sector = m_GeoDat->sectorNumber(
+    sector = m_Elements->sectorNumber(
                eklmDigit->getEndcap(), eklmDigit->getLayer(),
                eklmDigit->getSector());
     m_Sector->Fill(sector);

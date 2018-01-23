@@ -16,7 +16,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -73,8 +73,8 @@ namespace Belle2 {
 
   private:
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_Elements;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;

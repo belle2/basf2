@@ -18,6 +18,7 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/SubEventModule.h>
 #include <framework/core/SwitchDataStoreModule.h>
+#include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
 using namespace boost::python;

@@ -85,16 +85,16 @@ void RT2SPTCConverterModule::initialize()
   initializeCounters();
 
   // check if all required StoreArrays are here
-  StoreArray<SVDCluster>::required(m_SVDClusterName);
-  StoreArray<SpacePoint>::required(m_SVDAndPXDSPName);
+  StoreArray<SVDCluster> SVDClusters; SVDClusters.isRequired(m_SVDClusterName);
+  StoreArray<SpacePoint> SpacePoints; SpacePoints.isRequired(m_SVDAndPXDSPName);
 
 
   StoreArray<RecoTrack> recoTracks(m_RecoTracksName);
-  recoTracks.required(m_RecoTracksName);
+  recoTracks.isRequired(m_RecoTracksName);
 
   // registering StoreArray for SpacePointTrackCand
   StoreArray<SpacePointTrackCand> spTrackCand(m_SPTCName);
-  spTrackCand.registerPersistent(m_SPTCName);
+  spTrackCand.registerInDataStore(m_SPTCName, DataStore::c_ErrorIfAlreadyRegistered);
 
   StoreArray<MCParticle> mcparticles;
   if (mcparticles.isOptional()) {
@@ -102,7 +102,7 @@ void RT2SPTCConverterModule::initialize()
   }
 
   if (m_useTrueHits) {
-    StoreArray<SVDTrueHit>::required();
+    StoreArray<SVDTrueHit> SVDTrueHit; SVDTrueHit.isRequired();
   }
 
   // register Relation to RecoTrack

@@ -69,6 +69,9 @@ namespace Belle2 {
     }
     int getExpNumber() const { return m_expno; }
     int getRunNumber() const { return m_runno; }
+    void setGlobalMaster(const std::string& gmaster) { m_gmaster = gmaster; }
+    const std::string& getGlobalMaster() const { return m_gmaster; }
+    bool isGlobal() const { return m_isglobal; }
 
   private:
     void dbload(int length, const char* data) throw(IOException);
@@ -90,6 +93,8 @@ namespace Belle2 {
     int m_provider_port;
     int m_expno;
     int m_runno;
+    bool m_isglobal;
+    std::string m_gmaster;
 
   protected:
     bool m_showall;

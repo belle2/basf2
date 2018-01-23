@@ -9,6 +9,7 @@
 #pragma link C++ class Belle2::ECLLocalMaximum+;
 #pragma link C++ class Belle2::ECLConnectedRegion+;
 #pragma link C++ class Belle2::ECLEventInformation+;
+#pragma link C++ class Belle2::ECLPureCsIInfo+;
 #pragma link C++ class Belle2::ECLDigit+;
 #pragma link C++ class Belle2::ECLCalDigit+;
 #pragma link C++ class Belle2::ECLDsp+;

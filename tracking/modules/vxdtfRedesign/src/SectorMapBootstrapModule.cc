@@ -22,6 +22,8 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
+// needed for complicated parameter types to not get an undefined reference error
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -98,7 +100,7 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            "and in addition \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. No other "
            "parameter is allowd. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
            "    Example: [(1, \"12\"), (3, \"sin(x)\"), (4, \"x + [0]\")]    PS: use this feature only if you know what you are doing!",
-           m_twoHitFilterAdjustFunctions);
+           m_threeHitFilterAdjustFunctions);
 }
 
 void

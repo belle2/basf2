@@ -42,7 +42,7 @@ void DQMHistAnalysisExampleFlagsModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisExampleFlags: initialized.");
 
-  gROOT->cd();
+  gROOT->cd(); // this seems to be important, or strange things happen
   m_cFlagtest = new TCanvas("c_Flagtest");
   m_hFlagtest = new TH2F("Flagtest", "Flagtest;xxx;yyy", 12, 0, 12, 4, 0, 4);
 }

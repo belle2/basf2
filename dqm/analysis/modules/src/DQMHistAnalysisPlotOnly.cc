@@ -1,6 +1,6 @@
 ﻿//+
 // File : DQMHistAnalysisPlotOnly.cc
-// Description :
+// Description : DQM ANalalysis, plots a list of histograms into canvases
 //
 // Author : B. Spruck
 // Date : 13 - Oct - 2017
@@ -41,7 +41,7 @@ TH1* DQMHistAnalysisPlotOnlyModule::GetHisto(TString histoname)
   TH1* hh1;
   hh1 = findHist(histoname.Data());
   if (hh1 == NULL) {
-    B2INFO("Histo " << histoname << " not in memfile");
+    B2DEBUG(20, "Histo " << histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = histoname;
@@ -54,7 +54,7 @@ TH1* DQMHistAnalysisPlotOnlyModule::GetHisto(TString histoname)
       if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
         auto e = d->GetDirectory(tok);
         if (e) {
-          B2INFO("Cd Dir " << tok);
+          B2DEBUG(20, "Cd Dir " << tok);
           d = e;
         }
         d->cd();
@@ -65,16 +65,16 @@ TH1* DQMHistAnalysisPlotOnlyModule::GetHisto(TString histoname)
     TObject* obj = d->FindObject(tok);
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
-        B2INFO("Histo " << histoname << " found in mem");
+        B2DEBUG(20, "Histo " << histoname << " found in mem");
         hh1 = (TH1*)obj;
       }
     } else {
-      B2INFO("Histo " << histoname << " NOT found in mem");
+      B2DEBUG(20, "Histo " << histoname << " NOT found in mem");
     }
   }
 
   if (hh1 == NULL) {
-    B2INFO("Histo " << histoname << " not found");
+    B2DEBUG(20, "Histo " << histoname << " not found");
   }
 
   return hh1;
@@ -84,7 +84,7 @@ DQMHistAnalysisPlotOnlyModule::~DQMHistAnalysisPlotOnlyModule() { }
 
 void DQMHistAnalysisPlotOnlyModule::initialize()
 {
-  B2INFO("DQMHistAnalysisPlotOnly: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisPlotOnly: initialized.");
 
   m_canvasList.clear();
   for (auto& it : m_histlist) {
@@ -102,7 +102,7 @@ void DQMHistAnalysisPlotOnlyModule::initialize()
 
 void DQMHistAnalysisPlotOnlyModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisPlotOnly: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisPlotOnly: beginRun called.");
 }
 
 void DQMHistAnalysisPlotOnlyModule::event()
@@ -134,13 +134,13 @@ void DQMHistAnalysisPlotOnlyModule::event()
 
 void DQMHistAnalysisPlotOnlyModule::endRun()
 {
-  B2INFO("DQMHistAnalysisPlotOnly: endRun called");
+  B2DEBUG(20, "DQMHistAnalysisPlotOnly: endRun called");
 }
 
 
 void DQMHistAnalysisPlotOnlyModule::terminate()
 {
-  B2INFO("DQMHistAnalysisPlotOnly: terminate called");
+  B2DEBUG(20, "DQMHistAnalysisPlotOnly: terminate called");
 }
 
 

@@ -467,6 +467,7 @@ namespace Belle2 {
           B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
         }
       }
+      return result;
     }
 
     double eclExtTheta(const Particle* particle)
@@ -676,6 +677,8 @@ namespace Belle2 {
                       "Returns the hypothesis ID of this ECL cluster.");
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
+    REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
+                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run.");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi id.");

@@ -27,29 +27,41 @@ bool SVDResultTruthVarSet::extract(const CKFToSVDResult* result)
   const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
-  const RecoTrack* mcTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seedTrack);
+  const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seedTrack);
 
   // Default to false
   var<named("truth_number_of_correct_hits")>() = 0;
   var<named("truth")>() = 0;
+  var<named("truth_svd_cdc_relation")>() = NAN;
   var<named("truth_number_of_mc_pxd_hits")>() = 0;
   var<named("truth_number_of_mc_svd_hits")>() = 0;
   var<named("truth_number_of_mc_cdc_hits")>() = 0;
 
-  if (not mcTrack) {
+  if (not cdcMCTrack) {
     // track is a fake.
     return true;
   }
 
   // Count the number of times the related MC-track is also related to the clusters.
-  const unsigned int numberOfCorrectHits = m_mcUtil.getNumberOfCorrectHits(mcTrack, result->getHits());
+  const unsigned int numberOfCorrectHits = m_mcUtil.getNumberOfCorrectHits(cdcMCTrack, result->getHits());
 
   var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
-  var<named("truth_number_of_mc_svd_hits")>() = mcTrack->getNumberOfSVDHits();
-  var<named("truth_number_of_mc_pxd_hits")>() = mcTrack->getNumberOfPXDHits();
-  var<named("truth_number_of_mc_cdc_hits")>() = mcTrack->getNumberOfCDCHits();
+  var<named("truth_number_of_mc_svd_hits")>() = cdcMCTrack->getNumberOfSVDHits();
+  var<named("truth_number_of_mc_pxd_hits")>() = cdcMCTrack->getNumberOfPXDHits();
+  var<named("truth_number_of_mc_cdc_hits")>() = cdcMCTrack->getNumberOfCDCHits();
 
-  var<named("truth")>() = static_cast<double>(numberOfCorrectHits) / (static_cast<double>(mcTrack->getNumberOfSVDHits()) / 2);
+  var<named("truth")>() = static_cast<double>(numberOfCorrectHits) / (static_cast<double>(cdcMCTrack->getNumberOfSVDHits()) / 2);
+
+  const RecoTrack* relatedSVDRecoTrack = result->getRelatedSVDRecoTrack();
+  if (relatedSVDRecoTrack) {
+    const std::string& svdTrackStoreArrayName = relatedSVDRecoTrack->getArrayName();
+
+    TrackMatchLookUp mcSVDMatchLookUp("MCRecoTracks", svdTrackStoreArrayName);
+    const RecoTrack* svdMCTrack = mcSVDMatchLookUp.getRelatedMCRecoTrack(*relatedSVDRecoTrack);
+
+    // can not be a fake anyways
+    var<named("truth_svd_cdc_relation")>() = svdMCTrack == cdcMCTrack ? 1 : NAN;
+  }
 
   return true;
 }

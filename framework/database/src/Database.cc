@@ -318,27 +318,32 @@ void Database::exposePythonAPI()
   def("get_default_global_tags", &Database::getDefaultGlobalTags, "Get the default global tags for the central database");
   def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
 Set a name for the given experiment number when looking up payloads in the
-central database. Thisf function is deprecated and any calls to it are ignored.)DOCSTRING");
+central database.
+
+.. deprecated:: release-00-09-00
+   This function is deprecated and any calls to it are ignored.)DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
   def("use_database_chain", &DatabaseChain::createInstance,
       (bp::arg("resetIoVs") = true, bp::arg("loglevel") = LogConfig::c_Warning, bp::arg("invertLogging") = false),
       R"DOCSTRING(
 Use a database chain: Multiple database sources are used on a first found
-basis: If the payload is not found in one source try the next and so on.
+basis, if the payload is not found in one source try the next and so on.
 
-If the chain is enabled calls to use_local_database and use_central_database
+If the chain is enabled calls to `use_local_database` and `use_central_database`
 will add these sources to the chain instead of replacing the current source.
-If there was an exisiting single source setup the one source is kept in the
-chain. If there was already a DatabaseChain nothing changes.
+If there was an existing single source setup when `use_database_chain` is
+called this one source is kept as the first entry in the chain. Multiple calls
+to this function don't have any effect.
 
-:param bool resetIoVs: A flag to indicate whether IoVs from non-primary
+Parameters:
+  resetIoVs (bool): A flag to indicate whether IoVs from non-primary
         databases should be set to only the current run and rechecked for the
         next run.
-:param basf2.LogLevel loglevel: The LogLevel of messages from the database
-        chain, defaults to LogLevel.WARNING
-:param bool invertLogging: A flag to indicate whether logging of obtained
+  loglevel (LogLevel): The severity of messages from the database
+        chain, defaults to `WARNING <LogLevel.WARNING>`
+  invertLogging (bool): A flag to indicate whether logging of obtained
         payloads should be inverted. If False a log message with level
-        `loglevel` will be emitted everytime a payload cannot be found. If true
+        ``loglevel`` will be emitted every time a payload cannot be found. If true
         a message will be emitted if a payload is actually found.
 )DOCSTRING");
   def("use_local_database", &LocalDatabase::createInstance,
@@ -347,47 +352,66 @@ chain. If there was already a DatabaseChain nothing changes.
       R"DOCSTRING(
 Use a local database backend: a single file containing the payload information in plain text.
 
-:param str filename: filename containing the payload information, defaults to
+Parameters:
+  filename (str): filename containing the payload information, defaults to
         "database.txt"
-:param str directory: directory containing the payloads, defaults to current
+  directory (str): directory containing the payloads, defaults to current
         directory
-:param bool readonly: if True the database will refuse to create new payloads
-:param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
-        payloads cannot be found, defaults to LogLevel.WARNING
-:param bool invertLogging: A flag to indicate whether logging of obtained
+  readonly (bool): if True the database will refuse to create new payloads
+  loglevel (LogLevel): The severity of messages from this backend when
+        payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
+  invertLogging (bool): A flag to indicate whether logging of obtained
         payloads should be inverted. If False a log message with level
-        `loglevel` will be emitted everytime a payload cannot be found. If true
-        a message will be emitted if a payload is actually found.
+        ``loglevel`` will be emitted ever time a payload cannot be found. If
+        true a message will be emitted if a payload is actually found.
 )DOCSTRING");
-  def("use_central_database", &ConditionsDatabase::createDefaultInstance,
-      (bp::arg("globalTag"), bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("payloaddir")="centraldb"),
-      R"DOCSTRING(
-Use the central database via REST api and the default connection parameters.
+  {
+  //use_central_database has different signatures so the docstring confuses sphinx. Handcraft one complete docstring.
+  docstring_options options(true, false, false);
 
-:param str globalTag: name of the global tag to use for payload lookup
-:param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
-        payloads cannot be found, defaults to LogLevel.WARNING
-:param str payloaddir: directory where to save downloaded payloads
-)DOCSTRING");
+  def("use_central_database", &ConditionsDatabase::createDefaultInstance,
+      (bp::arg("globalTag"), bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("payloaddir")="centraldb"));
   def("use_central_database", &ConditionsDatabase::createInstance,
       (bp::arg("globalTag"), bp::arg("restBaseName"), bp::arg("payloaddir"), bp::arg("fileBaseLocal"),
        bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("invertLogging")=false),
-      R"DOCSTRING(
-Use the central database via REST api and the custom connection parameters.
-This version should only used by experts to debug the conditions database or
-use a different database.
+      R"DOCSTRING(use_central_database(globalTag, restBaseName=None, payloadDir="centraldb", fileBaseLocal=None, loglevel=LogLevel.WARNING, invertLogging=False)
 
-:param str globalTag: name of the global tag to use for payload lookup
-:param str restBaseName: base URL for the REST api
-:param str fileBaseName: base URL for the payload download
-:param str payloaddir: directory where to save downloaded payloads
-:param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
-        payloads cannot be found, defaults to LogLevel.WARNING
-:param bool invertLogging: A flag to indicate whether logging of obtained
+Use the central database to obtain conditions data. Usually users should only
+need to call this with one parameter which is the global tag to identify the
+payloads.
+
+>>> use_central_database("my_global_tag")
+
+It might be useful to also specify the log level and invert the log messages
+when adding an additional global tag for lookups
+
+>>> use_central_database("my_additional_tag", loglevel=LogLevel.WARNING, invertLogging=True)
+
+The ``payloaddir`` specifies a directory where payloads which needed to be
+downloaded will be placed. This could be set to a common absolute directory for
+all jobs to make sure the payloads only need to be downloaded once. The default
+is to place payloads into a directory called :file:`centraldb` in the local
+working directory.
+
+Warning:
+    For debugging purposes this function also allows to set the base URL for
+    the REST api and the file server but these should generally not be
+    modified.
+
+Parameters:
+  globalTag (str): name of the global tag to use for payload lookup
+  restBaseName (str): base URL for the REST api
+  fileBaseName (str): base URL for the payload download
+  payloaddir (str): directory where to save downloaded payloads
+  loglevel (LogLevel): The LogLevel of messages from this backend when
+        payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
+  invertLogging (bool): A flag to indicate whether logging of obtained
         payloads should be inverted. If False a log message with level
-        `loglevel` will be emitted everytime a payload cannot be found. If true
-        a message will be emitted if a payload is actually found.
+        ``loglevel`` will be emitted every time a payload cannot be found. If
+        true a message will be emitted if a payload is actually found.
 )DOCSTRING");
+  }
+
   object f = raw_function(setConditionsNetworkSettings);
   def("set_central_database_networkparams", f);
   // for some reason we cannot directly provide the docstring on def when using
@@ -402,15 +426,22 @@ function will return a dictionary containing the new settings.
     >>> set_central_database_networkparams(connection_timeout=5, max_retries=1)
     {'backoff_factor': 5, 'connection_timeout': 5, 'max_retries': 1, 'stalled_timeout': 60}
 
-:param int connection_timeout: timeout in seconds before connection should be
-    aborted. 0 sets the timeout to the default (300s)
-:param int stalled_timeout: timeout in seconds before a download should be
-    aborted if the speed stays below 10 KB/s, 0 disables this timeout
-:param int max_retries: maximum amount of retries if the server responded with
-    an HTTP response of 500 or more. 0 disables retrying
-:param int backoff_factor: backoff factor for retries in seconds. Retries are
-   performed using something similar to binary backoff: For retry :math:`n` and
-   a `backoff_factor` :math:`f` we wait for a random time chosen uniformely
-   from the interval :math:`[1, (2^{n} - 1) \times f]` in seconds.
+Warning:
+    Modification of these parameters should not be needed, in rare
+    circumstances this could be used to optimize access for many jobs at once
+    but should only be set by experts.
+
+Parameters:
+  connection_timeout (int): timeout in seconds before connection should be
+      aborted. 0 sets the timeout to the default (300s)
+  stalled_timeout (int): timeout in seconds before a download should be
+      aborted if the speed stays below 10 KB/s, 0 disables this timeout
+  max_retries (int): maximum amount of retries if the server responded with
+      an HTTP response of 500 or more. 0 disables retrying
+  backoff_factor (int): backoff factor for retries in seconds. Retries are
+      performed using something similar to binary backoff: For retry :math:`n`
+      and a ``backoff_factor`` :math:`f` we wait for a random time chosen
+      uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
+      seconds.
 )DOCSTRING");
 }

@@ -181,7 +181,7 @@ void ARICHFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   for (size_t i = 0; i < 6; i++) {
     callback.get(vname + StringUtil::form("feb[%d].used", i), used[i]);
     if (hsp.feeser != m_serial) {
-      std::string path = StringUtil::form("db://arich/MB:%d:FEB:%d:", m_serial, i);
+      std::string path = StringUtil::form("db://arich/MB:%d:FEB:%d:", hsp.feeser, i);
       m_o_feb[i] = callback.dbload(path);
       if (m_o_feb[i].getName().size() == 0) {
         std::string path = "db://arich/MB:0:FEB:0:";

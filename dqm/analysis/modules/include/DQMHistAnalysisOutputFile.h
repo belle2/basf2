@@ -6,8 +6,7 @@
 // Date : 11 - Dec - 2017 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisOutputFile_h
-#define _Belle2_DQMHistAnalysisOutputFile_h
+#pragma once
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
@@ -44,4 +43,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

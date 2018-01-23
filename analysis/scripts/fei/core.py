@@ -868,7 +868,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # As metioned above the FEI keeps track of the stages which are already reconstructed during the training
     # so we write out the Summary.pickle here, and increase the stage by one.
-    if configuration.training:
+    if configuration.training or configuration.monitor:
         save_summary(particles, configuration, stage+1)
 
     # Finally we return the path, the stage and the used lists to the user.

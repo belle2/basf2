@@ -89,8 +89,11 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
         pr_to_mc_match_info_crops = self.peel_pr_to_mc_match_info(reco_track)
 
-        # Custom peel function to get hit purity of subdetectors
+        # Peel function to get hit purity of subdetectors
         subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
+
+        # Basic peel function to get QI
+        qualityindex_crops = {'quality_index': reco_track.getRelated('SPTrackCands').getQualityIndex()}
 
         # Get the fit results
         seed_fit_crops = peelers.peel_reco_track_seed(reco_track)
@@ -99,26 +102,42 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         fit_crops = peelers.peel_track_fit_result(fit_result)
         fit_status_crops = peelers.peel_fit_status(reco_track)
 
-        # Event Info
-        event_meta_data = Belle2.PyStoreObj("EventMetaData")
-        event_crops = peelers.peel_event_info(event_meta_data)
-
-        # Store Array for easier joining
-        store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
-        mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
-
-        return dict(
+        crops = dict(
             **mc_particle_crops,
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
             **subdetector_hit_purity_crops,  # Custom
+            **qualityindex_crops,
             **seed_fit_crops,
             **fit_crops,
             **fit_status_crops,
-            **event_crops,
-            **store_array_crops,
-            **mc_store_array_crops
         )
+
+        if self.expert_level >= self.default_expert_level:
+
+            # Event Info
+            event_meta_data = Belle2.PyStoreObj("EventMetaData")
+            event_crops = peelers.peel_event_info(event_meta_data)
+
+            # Store Array for easier joining
+            store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
+            mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
+
+            # Information on PR reco track
+            mc_efficiency_information = {
+                "mc_hit_efficiency": track_match_look_up.getRelatedEfficiency(mc_reco_track) if mc_reco_track else float("nan"),
+                **peelers.peel_subdetector_hit_efficiency(reco_track=reco_track, mc_reco_track=mc_reco_track,
+                                                          key="mc_{part_name}")
+            }
+
+            crops.update(
+                **event_crops,
+                **store_array_crops,
+                **mc_store_array_crops,
+                **mc_efficiency_information
+            )
+
+        return crops
 
     def peel_pr_to_mc_match_info(self, reco_track):
         track_match_look_up = self.track_match_look_up

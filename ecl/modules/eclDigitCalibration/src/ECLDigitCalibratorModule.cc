@@ -22,6 +22,8 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
+#include <ecl/digitization/EclConfigurationPure.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -60,6 +62,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   addParam("backgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 110.0 * Belle2::Unit::ns);
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
+  addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -112,6 +115,10 @@ void ECLDigitCalibratorModule::initialize()
   eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   eclCalDigits.registerRelationTo(eclDigits);
   eclEventInformationPtr.registerInDataStore(eclEventInformationName());
+
+  //Special information for pure CsI simulation
+  StoreArray<ECLPureCsIInfo> eclPureCsIInfo(eclPureCsIInfoArrayName());
+  eclPureCsIInfo.registerInDataStore(eclPureCsIInfoArrayName());
 
   // initialize calibration
   initializeCalibration();
@@ -190,12 +197,15 @@ void ECLDigitCalibratorModule::event()
   // Output Array(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
-  bool is_pure_csi = !strcmp(eclDigitArrayName(), "ECLDigitsPureCsI");
+  // Special Array for Pure CsI Simulation
+  StoreArray<ECLPureCsIInfo> eclPureCsIInfo(eclPureCsIInfoArrayName());
 
   // Loop over the input array
   for (auto& aECLDigit : eclDigits) {
 
     // create eclCalDigits if they dont exist already
+
+    bool is_pure_csi = 0;
 
     // append an ECLCalDigit to the storearray
     const auto aECLCalDigit = eclCalDigits.appendNew();
@@ -211,6 +221,14 @@ void ECLDigitCalibratorModule::event()
     // perform the digit energy calibration: E = A * Ce * Cs
     const int amplitude = aECLDigit.getAmp();
     double calibratedEnergy = 0;
+
+    if (m_simulatePure) {
+      if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName()) != NULL) {
+        if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName())->getPureCsI())
+          is_pure_csi = 1;
+      }
+    }
+
     if (is_pure_csi) {
       calibratedEnergy = amplitude * m_pureCsIEnergyCalib;
     } else {

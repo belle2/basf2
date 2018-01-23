@@ -20,6 +20,6 @@ namespace Belle2 {
   extern template class LayerToggledApplier<CKFToPXDState,
                                             LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
 
-                                            using ChooseableOnPXDStateApplier = LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState,
-                                                TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
+                                            using ChooseableOnPXDStateApplier =
+                                            LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
 }

@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisRooFitExample.cc
-// Description :
+// Description : DQM Histogram analysis module, using roofit to fit the histogram
 //
 // Author : B. Spruck
 // Date : 25 - Mar - 2017

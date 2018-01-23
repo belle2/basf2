@@ -16,7 +16,6 @@
 #include <cmath>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     class CDCWireHit;

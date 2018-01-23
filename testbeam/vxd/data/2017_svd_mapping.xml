@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 1st version: Mapping from Hao edited by hand, could have errors, no way to test it without real data -->
+<SVD>
+<?xml version="1.0"?>
+<layer n="6">
+  <ladder n="1">
+    <sensor n="4">
+      <side side="v">
+        <chip n="42" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="43" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="44" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="45" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+      </side>
+      <side side="u">
+        <chip n="42" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="43" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="44" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="45" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="46" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="47" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+    <sensor n="3">
+      <side side="v">
+        <chip n="36" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="37" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="38" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="39" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+      </side>
+      <side side="u">
+        <chip n="36" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="37" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="38" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="39" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="40" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="41" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+  </ladder>
+</layer>
+<layer n="5">
+  <ladder n="1">
+    <sensor n="3">
+      <side side="v">
+        <chip n="30" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="31" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="32" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="33" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+      </side>
+      <side side="u">
+        <chip n="30" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="31" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="32" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="33" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="34" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="35" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+    <sensor n="2">
+      <side side="v">
+        <chip n="24" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="25" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="26" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="27" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+      </side>
+      <side side="u">
+        <chip n="24" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="25" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="26" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="27" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="28" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="29" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+  </ladder>
+</layer>
+<layer n="4">
+  <ladder n="1">
+    <sensor n="3">
+      <side side="v">
+        <chip n="18" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="19" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="20" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="21" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+      </side>
+      <side side="u">
+        <chip n="18" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="19" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="20" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="21" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="22" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="23" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+    <sensor n="2">
+      <side side="v">
+        <chip n="12" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="13" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="14" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="15" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+      </side>
+      <side side="u">
+        <chip n="12" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="13" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="14" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="15" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="16" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="17" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+  </ladder>
+</layer>
+<layer n="3">
+  <ladder n="1">
+    <sensor n="2">
+      <side side="v">
+        <chip n="6" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="7" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="8" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="9" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+        <chip n="10" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639" />
+        <chip n="11" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767" />
+      </side>
+      <side side="u">
+        <chip n="6" FADCn="1" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="7" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="8" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="9" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+        <chip n="10" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639" />
+        <chip n="11" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767" />
+      </side>
+    </sensor>
+    <sensor n="1">
+      <side side="v">
+        <chip n="0" FADCn="129" strip_number_of_ch0="0" strip_number_of_ch127="127" />
+        <chip n="1" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255" />
+        <chip n="2" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383" />
+        <chip n="3" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511" />
+        <chip n="4" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639" />
+        <chip n="5" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767" />
+      </side>
+      <side side="u">
+        <chip n="0" FADCn="1" strip_number_of_ch0="767" strip_number_of_ch127="640" />
+        <chip n="1" FADCn="1" strip_number_of_ch0="639" strip_number_of_ch127="512" />
+        <chip n="2" FADCn="1" strip_number_of_ch0="511" strip_number_of_ch127="384" />
+        <chip n="3" FADCn="1" strip_number_of_ch0="383" strip_number_of_ch127="256" />
+        <chip n="4" FADCn="1" strip_number_of_ch0="255" strip_number_of_ch127="128" />
+        <chip n="5" FADCn="1" strip_number_of_ch0="127" strip_number_of_ch127="0" />
+      </side>
+    </sensor>
+  </ladder>
+</layer>
+</SVD>

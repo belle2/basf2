@@ -10,13 +10,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

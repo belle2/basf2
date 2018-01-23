@@ -11,6 +11,8 @@
 
 #include <map>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
 
@@ -112,6 +114,51 @@ namespace Belle2 {
         std::cout << WireID(ent.first).getICLayer() << " " << WireID(ent.first).getIWire() << " " << ent.second << std::endl;
       }
     }
+
+    /**
+     * Output the contents in text file format
+     */
+    void outputToFile(std::string fileName) const
+    {
+      std::ofstream fout(fileName);
+
+      if (fout.bad()) {
+        B2ERROR("Specified output file could not be opened!");
+      } else {
+        for (auto const& ent : m_t0s) {
+          fout << std::setw(2) << std::right << WireID(ent.first).getICLayer() << "  " << std::setw(3) << WireID(
+                 ent.first).getIWire() << "  " << std::setw(15) << std::scientific << std::setprecision(8) << ent.second << std::endl;
+        }
+        fout.close();
+      }
+    }
+
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 25;}
+    /// Get global parameter
+    double getGlobalParam(unsigned short element, unsigned short)
+    {
+      return getT0(WireID(element));
+    }
+    /// Set global parameter
+    void setGlobalParam(double value, unsigned short element, unsigned short)
+    {
+      WireID wire(element);
+      //This does not work, tries to insert, but we need an update
+      //setT0(wire.getICLayer(), wire.getIWire(), value);
+      m_t0s[wire.getEWire()] = value;
+    }
+    /// list stored global parameters
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      std::vector<std::pair<unsigned short, unsigned short>> result;
+      for (auto id_t0 : getT0s()) {
+        result.push_back({id_t0.first, 0});
+      }
+      return result;
+    }
+    // ------------------------------------------------------------------------
 
   private:
     std::map<unsigned short, float> m_t0s; /**< t0 list*/

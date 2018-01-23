@@ -9,8 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MVA<BaseSegmentRelationFilter>;
 
 MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
   : Super(std::make_unique<VarSet>(),

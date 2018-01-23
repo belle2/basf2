@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_DBOBJECTS_BEAMPARAMETERS_H
-#define FRAMEWORK_DBOBJECTS_BEAMPARAMETERS_H
 
 #include <framework/dataobjects/MCInitialParticles.h>
 #include <TMatrixDSym.h>
@@ -137,6 +135,9 @@ namespace Belle2 {
     /** Return energy smearing of the CMS */
     //double getEnergySmearingCMS() const;
 
+    /** Return unique ID of BeamParameters in global Millepede calibration (1) */
+    static unsigned short getGlobalUniqueID() { return 1; }
+
   private:
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
      * Negative angles will be treated as angle = M_PI - fabs(angle)
@@ -179,4 +180,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // FRAMEWORK_DBOBJECTS_BEAMPARAMETERS_H

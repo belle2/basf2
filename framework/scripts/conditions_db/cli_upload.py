@@ -100,12 +100,15 @@ def parse_database_file(filename, payload_dir=None, check_existing=True):
     Comments can be started using "#", everything including this character to
     the end of the line will be ignored.
 
-    :param filename: filename of the local database file to parse
-    :param payload_dir: diretories where the payloads should be. In case of None
-                        the directory of the database file will be used.
-    :param check_existing: if True check if the payloads actually exist where they
-                           should be
-    :returns: a list of LocalDatabaseEntry objects or None if there were any errors
+    Parameters:
+      filename (str): filename of the local database file to parse
+      payload_dir (str): directories where the payloads should be. In case of
+            None the directory of the database file will be used.
+      check_existing (bool): if True check if the payloads actually exist where
+            they should be
+
+    Returns:
+        a list of LocalDatabaseEntry objects or None if there were any errors
     """
 
     # make sure the database file exists
@@ -157,7 +160,13 @@ def command_upload(args, db=None):
     Upload a local database to the conditions database.
 
     This command allows uploading a local database which was created by basf2 to
-    the central database. It assumes that the global tag already exists.
+    the central database. It assumes that the global tag already exists so
+    please create it before if necessary using 'tag create'.
+
+    The command requires the tagname to upload the payloads to and a
+    database.txt containing the payloads and their iovs. One can supply a
+    directory where to look for the payloads, by default they are assumed to be
+    in the same directory as the database text file.
     """
 
     if db is None:

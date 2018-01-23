@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/topology/WireLine.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

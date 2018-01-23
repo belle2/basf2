@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

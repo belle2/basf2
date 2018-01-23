@@ -9,15 +9,20 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
 #include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseFacetFilter>;
 
 MCFacetFilter::MCFacetFilter(bool allowReverse)
   : Super(allowReverse)

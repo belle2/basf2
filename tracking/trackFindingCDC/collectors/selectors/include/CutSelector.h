@@ -10,11 +10,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/logging/Logger.h>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -43,11 +46,9 @@ namespace Belle2 {
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;
 
       /// Expose the cut value to the module.
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
-
         moduleParamList->addParameter(prefixed(prefix, "cutValue"), m_param_cutValue,
                                       "Value to cut at.",
                                       m_param_cutValue);
@@ -56,7 +57,6 @@ namespace Belle2 {
       /// Do the cut.
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
-
         const auto& lessThanCutOrNaN = [this](const WeightedRelationItem & relationItem) {
           return std::isnan(relationItem.getWeight()) or relationItem.getWeight() < m_param_cutValue;
         };

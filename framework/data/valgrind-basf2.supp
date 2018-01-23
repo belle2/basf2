@@ -222,3 +222,12 @@
    fun:_ZN6Belle29DataStore14invalidateDataENS0_11EDurabilityE
    ...
 }
+
+{
+   "Conditional jump or move depends on uninitialised value(s)" in TGraph::Eval when called by ECLShowerShapeModule
+   Memcheck:Cond
+   fun:_ZNK6TGraph4EvalEdP7TSplinePKc
+   fun:_ZNK6Belle23ECL20ECLShowerShapeModule25getSecondMomentCorrectionEddi
+   fun:_ZNK6Belle23ECL20ECLShowerShapeModule23setShowerShapeVariablesEPNS_9ECLShowerEb
+   fun:_ZN6Belle23ECL20ECLShowerShapeModule5eventEv
+}

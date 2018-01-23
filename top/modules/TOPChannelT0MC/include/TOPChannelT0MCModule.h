@@ -12,6 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <string>
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPDigit.h>
 
 class TH1F;
 class TF1;
@@ -75,6 +77,10 @@ namespace Belle2 {
 
     std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
     std::string m_outputFile; /**< output root file name */
+
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+
+
   };
 
 } // Belle2 namespace

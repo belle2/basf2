@@ -49,7 +49,7 @@ namespace Belle2 {
     /**
      * Get dx.
      */
-    double getDx();
+    double getDx() const;
 
     /**
      * Set dy.
@@ -59,7 +59,7 @@ namespace Belle2 {
     /**
      * Get dy.
      */
-    double getDy();
+    double getDy() const;
 
     /**
      * Set dalpha.
@@ -69,7 +69,7 @@ namespace Belle2 {
     /**
      * Get dalpha.
      */
-    double getDalpha();
+    double getDalpha() const;
 
   private:
 

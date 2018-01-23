@@ -1,658 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- geometry file for the testbeam at DESY in February 2017 -->
-
-<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
-  <!-- World definitions -->
-  <Name>TBDetector</Name>
-  <Description>Common PXD and SVD TestBeam at DESY in April 2016</Description>
-  <Global>
-    <material>Air</material>
-    <width unit="m">2.0</width>
-    <length unit="m">2.0</length>
-    <height unit="m">2.0</height>
-  </Global>
-  
-  <!-- Material definitions -->
-  <xi:include href="../../geometry/BasicMaterials.xml" />
-  <xi:include href="../../pxd/PXD-Materials.xml" />
-  <xi:include href="../../svd/SVD-Materials.xml" />
-  <xi:include href="./TB-Materials.xml" />
-  
-  <!-- TODO: This makes genfitter working, because it tries to initialize CDC translators which read params from GearBox -->
-  <!--DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
-    <xi:include href="../../cdc/CDC.xml" xpointer="xpointer(//DetectorComponent[@name='CDC']/*)" />
-  </DetectorComponent-->
-  
-  <!-- Magnetic field inside PCMag @ DESY -->
-  <DetectorComponent name="MagneticField" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Description>The magnetic field description for PCMAG Superconducting magnet
-      for common PXD/SVD beam test at DESY February 2017</Description>
-    <Version>0</Version>
-    <Creator>GeoMagneticField</Creator>
-    <Content>
-      <Components>
-        <Component type="Radial">
-          <NumberGridPointsR>601</NumberGridPointsR>
-          <GridPitchR unit="mm">1.0</GridPitchR>
-          <RadiusMin unit="mm">0.0</RadiusMin>
-          <RadiusMax unit="mm">599.9</RadiusMax>
-          <NumberGridPointsZ>1602</NumberGridPointsZ>
-          <GridPitchZ unit="mm">1.0</GridPitchZ>
-          <ZMin unit="mm">-799.9</ZMin>
-          <ZMax unit="mm">799.9</ZMax>
-          <ZOffset unit="cm">0.0</ZOffset>
-          <!-- TODO: I don't understand meaning of these parameters: -->
-          <SlotRMin unit="cm">130.0</SlotRMin>
-          <EndyokeZMin unit="cm">230.0</EndyokeZMin>
-          <GapHeight unit="cm">4.4</GapHeight>
-          <IronPlateThickness unit="cm">4.7</IronPlateThickness>
-          <MapFilename>testbeam/vxd/PCMagFieldMap.dat.gz</MapFilename>
-        </Component>
-        <!--Component type="Constant">
-        <X>0</X>
-        <Y>0</Y>
-        <Z>0.975</Z>       
-        <MaxR unit="mm">599.9</MaxR>
-        <MinZ unit="mm">-799.9</MinZ>
-        <MaxZ unit="mm">799.9</MaxZ>
-        </Component-->      
-      </Components>
-    </Content>
-  </DetectorComponent>
-  
-  <!-- Magnetic field inside PCMag @ DESY -->
-  <DetectorComponent name="MagneticFieldConstant" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="False">
-    <Description>The magnetic field description for PCMAG Superconducting magnet
-      for common PXD/SVD beam test at DESY February 2017</Description>
-    <Version>0</Version>
-    <Creator>GeoMagneticField</Creator>
-    <Content>
-      <Components>
-        <Component type="Constant">
-        <X>0</X>
-        <Y>0</Y>
-        <Z>0.975</Z>       
-        <MaxR unit="mm">599.9</MaxR>
-        <MinZ unit="mm">-799.9</MinZ>
-        <MaxZ unit="mm">799.9</MaxZ>
-        </Component>      
-      </Components>
-    </Content>
-  </DetectorComponent>
-
-  
-  <!-- Subdedectors: PXD -->
-  <!-- modified copy of pxd/data/PXD-phase2.xml -->
-  <DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Creator library="pxd">PXDCreator</Creator>
-    <Content>
-      <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->
-      <DefaultMaterial>Air</DefaultMaterial>
-      <!--If this is true, all dead Material will be ignored and only the active
-      Material will be placed and the rest of the Detector will be filled
-      with DefaultMaterial -->
-      <OnlyActiveMaterial>false</OnlyActiveMaterial>
-      <!-- Set the  stepsize to be used in senistive volumes -->
-      <ActiveStepSize unit="um">5</ActiveStepSize>
-      <!-- If this is true, TrueHits will only be created for primary particles,
-      secondaries produced by Geant4 will not create TrueHits -->
-      <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
-      <!--Settings for background and exposure studies -->
-      <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
-      <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
-      <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>
-      
-      <!-- Displacement parameters -->
-      <xi:include href="2017_displacements.xml"/> 
-      
-      <!-- Include definition of logical volume encapsulating the PXD -->
-      <!-- disabled for phase 2 to allow FANGS or CLAWS to come close to the Beampipe -->
-      <!-- <xi:include href="PXD-Envelope.xml"/> -->
-      <!-- Include the definition of the mechanical support -->
-      
-      <!-- removed the support structure -->
-      <!-- xi:include href="../../pxd/PXD-Support.xml"/ -->
-      
-      <!-- Include the definition of all the components like ladders, sensors and
-      chips -->
-      <!--xi:include href="../../pxd/PXD-Components.xml"/ -->
-      <Components>
-        <!-- Inlude everything from the ladder definitions except forward sensors -->
-        <Ladder layer="1">
-          <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=1]/*[not(self::Sensor[@id=1])])" />
-        </Ladder>
-        <Ladder layer="2">
-          <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=2]/*[not(self::Sensor[@id=1])])" />
-        </Ladder>
-        <!-- now we include all other components from PXD-Components which are not ladder definitions -->
-        <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/*[not(self::Ladder)])" />
-      </Components>
-      <!-- include radiation sensor definition -->
-      <xi:include href="../../pxd/PXD-RadiationSensors.xml"/>
-      
-      <!-- PXD is build as two half shells which will be attached to the beampipe
-      from the sides. We follow this scheme in the simulation geometry for
-      alignment purposes. Each shell consists of a number of ladders for
-      each layer. -->
-      <!-- phase two is identical to the nominal PXD but only one half shell with
-      one ladder per layer -->
-      <HalfShell name="Ying">
-        <!-- removed the support -->
-        <!-- Define the ladders in each layer with increasing phi angle -->
-        <Layer id="1">
-          <Ladder id="1"><phi unit="deg">0</phi></Ladder>
-        </Layer>
-        <Layer id="2">
-          <Ladder id="1"><phi unit="deg">0</phi></Ladder>
-        </Layer>
-      </HalfShell>
-      <!-- the second half shell is empty but we still want the support -->
-      <!-- removed the support -->
-      
-    </Content>
-  </DetectorComponent>
-  
-  <!-- Subdedectors: SVD -->
-  <!-- modified copy of svd/data/SVD-phase2.xml -->
-  <DetectorComponent name="SVD" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <!-- TODO:
-    - Check thickness/material of kapton cables
-    - Add readout boards
-    -->
-    <Creator library="svd">SVDCreator</Creator>
-    <Content>
-      <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->
-      <DefaultMaterial>Air</DefaultMaterial>
-      <!--If this is true, all dead Material will be ignored and only the active
-      Material will be placed and the rest of the Detector will be filled
-      with DefaultMaterial -->
-      <OnlyActiveMaterial>false</OnlyActiveMaterial>
-      <!-- Set the  stepsize to be used in senistive volumes -->
-      <ActiveStepSize unit="um">5</ActiveStepSize>
-      <!-- If this is true, TrueHits will only be created for primary particles,
-      secondaries produced by Geant4 will not create TrueHits -->
-      <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
-      <!--Settings for background and exposure studies -->
-      <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
-      <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
-      <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>
-      
-      <!-- Displacement parameters -->
-      <xi:include href="2017_displacements.xml"/>
-      
-      
-      <!-- removed all the support structure see svd/data/SVD-phase2.xml -->
-      
-      <!-- Include the definition of all the components like ladders, sensors and
-      chips -->
-      <!-- Except that for phase 2 we want the same ladder layout but no windmill so
-      the sensor middle should lie in the accelerator plane and not be shifted.
-      To do this we don't include the full components file but do it in pieces
-      and modify the shifts -->
-      <Components>
-        <!-- Inlude everything from the ladder definition except the shift from phase 3 using xpointer -->
-        <Ladder layer="3">
-          <shift unit="mm">0</shift>
-          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=3]/*[not(self::shift)])" />
-        </Ladder>
-        <Ladder layer="4">
-          <shift unit="mm">0</shift>
-          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=4]/*[not(self::shift)])" />
-        </Ladder>
-        <Ladder layer="5">
-          <shift unit="mm">0</shift>
-          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=5]/*[not(self::shift)])" />
-        </Ladder>
-        <Ladder layer="6">
-          <shift unit="mm">0</shift>
-          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=6]/*[not(self::shift)])" />
-        </Ladder>
-        <!-- now we include all other components from SVD-Components which are not ladder definitions -->
-        <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/*[not(self::Ladder)])" />
-      </Components>
-      
-      <!-- include radiation sensor definition -->
-      <!-- not sure if they are in phase 2 but I think not -->
-      <!-- <xi:include href="SVD-RadiationSensors.xml"/> -->
-      
-      <!-- Only for testing: Each layer with only one ladder to check module positions -->
-      <!--<HalfShell name="Pat">
-      <shellAngle unit="deg">0</shellAngle>
-      <Layer id="3">
-      <Ladder id="1"> <phi unit="deg"> 60</phi></Ladder>
-      </Layer>
-      <Layer id="4">
-      <Ladder id="1"> <phi unit="deg"> 120</phi></Ladder>
-      </Layer>
-      <Layer id="5">
-      <Ladder id="1"> <phi unit="deg"> 180</phi></Ladder>
-      </Layer>
-      <Layer id="6">
-      <Ladder id="1"> <phi unit="deg"> 240</phi></Ladder>
-      </Layer>
-      </HalfShell>
-      -->
-      
-      <!-- For more information about the meaning of these parameter see pxd/PXD.xml -->
-      <HalfShell name="Pat">
-        <shellAngle unit="deg">0</shellAngle>
-        <Layer id="3">
-          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>
-        </Layer>
-        <Layer id="4">
-          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>
-        </Layer>
-        <Layer id="5">
-          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>
-        </Layer>
-        <Layer id="6">
-          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>
-        </Layer>
-      </HalfShell>
-      <HalfShell name="Mat">
-        <shellAngle unit="deg">180</shellAngle>
-      </HalfShell>
-    </Content>
-    <xi:include href="../../svd/svd_mapping.xml"/>
-  </DetectorComponent>
-  
-  <!-- Subdedectors: EUDET -->
-  <DetectorComponent name="Telescopes" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <!-- Displacement parameters -->
-      <xi:include href="2017_displacements.xml"/> 
-      <Volumes>
-        
-        <Volume name="EUDET-Module1">
-          <DX unit="cm">-16.75</DX>              
-          <DZ unit="mm">0.0</DZ>
-          <Theta unit="deg">90</Theta>
-          <Phi unit="deg">90</Phi>
-          <Psi unit="deg">90</Psi>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
-          <Volume name="EUDET-SensitiveArea">
-            <AlignComponent>7.2.1</AlignComponent>
-            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
-            <Active>
-              <SensorID>1</SensorID>
-              <Ladder>2</Ladder>
-              <Layer>7</Layer>
-              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
-            </Active>
-          </Volume>
-        </Volume>
-        
-        <Volume name="EUDET-Module2">
-          <DX unit="cm">-14.75</DX>
-          <DZ unit="mm">0.0</DZ>
-          <Theta unit="deg">90</Theta>
-          <Phi unit="deg">90</Phi>
-          <Psi unit="deg">90</Psi>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
-          <Volume name="EUDET-SensitiveArea">
-            <AlignComponent>7.2.2</AlignComponent>
-            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
-            <Active>
-              <SensorID>2</SensorID>
-              <Ladder>2</Ladder>
-              <Layer>7</Layer>
-              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
-            </Active>
-          </Volume>
-        </Volume>
-        
-        <Volume name="EUDET-Module3">
-          <DX unit="cm">-12.75</DX>
-          <DZ unit="mm">0.0</DZ>
-          <Theta unit="deg">90</Theta>
-          <Phi unit="deg">90</Phi>
-          <Psi unit="deg">90</Psi>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
-          <Volume name="EUDET-SensitiveArea">
-            <AlignComponent>7.2.3</AlignComponent>
-            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
-            <Active>
-              <SensorID>3</SensorID>
-              <Ladder>2</Ladder>
-              <Layer>7</Layer>
-              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
-            </Active>
-          </Volume>
-        </Volume>
-        
-        <Volume name="EUDET-Module4">
-          <DX unit="cm">11.4</DX>
-          <DY unit="mm">0.0</DY>
-          <DZ unit="mm">0.0</DZ>
-          <Theta unit="deg">90</Theta>
-          <Phi unit="deg">90</Phi>
-          <Psi unit="deg">90</Psi>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
-          <Volume name="EUDET-SensitiveArea">
-            <AlignComponent>7.3.4</AlignComponent>
-            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
-            <Active>
-              <SensorID>4</SensorID>
-              <Ladder>3</Ladder>
-              <Layer>7</Layer>
-              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
-            </Active>
-          </Volume>
-        </Volume>
-        
-        <Volume name="EUDET-Module5">
-          <DX unit="cm">13.45</DX>
-          <DY unit="mm">0.0</DY>
-          <DZ unit="mm">0.0</DZ>
-          <Theta unit="deg">90</Theta>
-          <Phi unit="deg">90</Phi>
-          <Psi unit="deg">90</Psi>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
-          <Volume name="EUDET-SensitiveArea">
-            <AlignComponent>7.3.5</AlignComponent>
-            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
-            <Active>
-              <SensorID>5</SensorID>
-              <Ladder>3</Ladder>
-              <Layer>7</Layer>
-              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
-            </Active>
-          </Volume>
-        </Volume>
-        
-        <Volume name="EUDET-Module6">
-          <DX unit="cm">15.45</DX>
-          <DY unit="mm">0.0</DY>
-          <DZ unit="mm">0.0</DZ>
-          <Theta unit="deg">90</Theta>
-          <Phi unit="deg">90</Phi>
-          <Psi unit="deg">90</Psi>
-          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />
-          <Volume name="EUDET-SensitiveArea">
-            <AlignComponent>7.3.6</AlignComponent>
-            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />
-            <Active>
-              <SensorID>6</SensorID>
-              <Ladder>3</Ladder>
-              <Layer>7</Layer>
-              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />
-            </Active>
-          </Volume>
-        </Volume>
-        
-      </Volumes>
-    </Content>
-  </DetectorComponent>
-  
-  <!-- Scintilators -->
-  <DetectorComponent name="Scintilators" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <Volumes>
-        
-        <Volume name="Scintilator1_Front">
-          <!-- TODO: Scintilator material -->
-          <Material>Si</Material>
-          <Shape>Box</Shape>
-          <DZ unit="mm">-20</DZ>
-          <DX unit="cm">-20.5</DX>
-          <DY unit="mm">0</DY>
-          <Theta unit="deg">0</Theta>
-          <Phi unit="deg">0</Phi>
-          <Psi unit="deg">0</Psi>
-          <HalfX unit="mm">9</HalfX>
-          <HalfY unit="mm">15</HalfY>
-          <HalfZ unit="mm">50</HalfZ>
-        </Volume>
-        
-        <Volume name="Scintilator2_Front">
-          <!-- TODO: Scintilator material -->
-          <Material>Si</Material>
-          <Shape>Box</Shape>
-          <DZ unit="mm">0</DZ>
-          <DX unit="cm">-18.45</DX>
-          <DY unit="mm">-20</DY>
-          <Theta unit="deg">0</Theta>
-          <Phi unit="deg">0</Phi>
-          <Psi unit="deg">0</Psi>
-          <HalfX unit="mm">9</HalfX>
-          <HalfY unit="mm">50</HalfY>
-          <HalfZ unit="mm">15</HalfZ> 
-        </Volume>
-        
-        <Volume name="Scintilator3_Back">
-          <!-- TODO: Scintilator material -->
-          <Material>Si</Material>
-          <Shape>Box</Shape>
-          <DZ unit="mm">0</DZ>
-          <DX unit="cm">17.2</DX>
-          <DY unit="mm">-20</DY>
-          <Theta unit="deg">0</Theta>
-          <Phi unit="deg">0</Phi>
-          <Psi unit="deg">0</Psi>
-          <HalfX unit="mm">9</HalfX>
-          <HalfY unit="mm">50</HalfY>
-          <HalfZ unit="mm">15</HalfZ>
-        </Volume>
-        
-        <Volume name="Scintilator4_Back">
-          <!-- TODO: Scintilator material -->
-          <Material>Si</Material>
-          <Shape>Box</Shape>
-          <DZ unit="mm">-20</DZ>
-          <DX unit="cm">19.3</DX>
-          <DY unit="mm">0</DY>
-          <Theta unit="deg">0</Theta>
-          <Phi unit="deg">0</Phi>
-          <Psi unit="deg">0</Psi>
-          <HalfX unit="mm">9</HalfX>
-          <HalfY unit="mm">15</HalfY>
-          <HalfZ unit="mm">50</HalfZ>
-        </Volume>
-        
-      </Volumes>
-    </Content>
-  </DetectorComponent>  
-  
-  
-  <!-- Secondary target (OFF by default, use only one!) -->
-  <DetectorComponent name="Target_Al_5mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <Volumes>
-        <Volume name="Target_Al_5mm">
-          <!-- TODO: Scintilator material -->
-          <Material>Al</Material>
-          <Shape>Box</Shape>
-          <DX unit="cm">-21</DX>
-          <HalfX unit="mm">2.5</HalfX>
-          <HalfY unit="mm">10</HalfY>
-          <HalfZ unit="mm">10</HalfZ>
-        </Volume>
-      </Volumes>
-    </Content>
-  </DetectorComponent>  
-  
-  <!-- Secondary target (OFF by default, use only one!) -->
-  <DetectorComponent name="Target_Al_10mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <Volumes>
-        <Volume name="Target_Al_5mm">
-          <!-- TODO: Scintilator material -->
-          <Material>Al</Material>
-          <Shape>Box</Shape>
-          <DX unit="cm">-21</DX>
-          <HalfX unit="mm">5</HalfX>
-          <HalfY unit="mm">10</HalfY>
-          <HalfZ unit="mm">10</HalfZ>
-        </Volume>
-      </Volumes>
-    </Content>
-  </DetectorComponent>  
-  
-  <!-- Secondary target (OFF by default, use only one!) -->
-  <DetectorComponent name="Target_Pb_5mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <Volumes>
-        <Volume name="Target_Al_5mm">
-          <!-- TODO: Scintilator material -->
-          <Material>Al</Material>
-          <Shape>Box</Shape>
-          <DX unit="cm">-21</DX>
-          <HalfX unit="mm">2.5</HalfX>
-          <HalfY unit="mm">10</HalfY>
-          <HalfZ unit="mm">10</HalfZ>
-        </Volume>
-      </Volumes>
-    </Content>
-  </DetectorComponent>  
-  
-  <!-- Secondary target (OFF by default, use only one!) -->
-  <DetectorComponent name="Target_Pb_10mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <Volumes>
-        <Volume name="Target_Al_5mm">
-          <!-- TODO: Scintilator material -->
-          <Material>Al</Material>
-          <Shape>Box</Shape>
-          <DX unit="cm">-21</DX>
-          <HalfX unit="mm">5</HalfX>
-          <HalfY unit="mm">10</HalfY>
-          <HalfZ unit="mm">10</HalfZ>
-        </Volume>
-      </Volumes>
-    </Content>
-  </DetectorComponent>  
-  
-  
-  <!-- PCMAG magnet material, only composed of Al layers to sum up total radiation length of the magnet wall = 0.2 X0 -->
-  <DetectorComponent name="Magnet" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <Creator library="testbeam">VXDTBCreator</Creator>
-    <Content>
-      <Volumes>
-        <Volume name="Magnet">
-          <Material>Air</Material>
-          <Color>#010101</Color>
-          <Shape>Tube</Shape>
-          <DZ unit="cm">0</DZ>
-          <DX unit="cm">0</DX>
-          <DY unit="um">0</DY>
-          <Theta unit="deg">0</Theta>
-          <Phi unit="deg">0</Phi>
-          <Psi unit="deg">0</Psi>
-          <InnerRadius unit="mm">400.0</InnerRadius>
-          <OuterRadius unit="mm">590.0</OuterRadius>
-          <Hz unit="cm">80</Hz>
-          <Volume name="Magnet_Inner_Wall">
-            <Material>G4_Al</Material>
-            <Color>#010101</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">424.0</InnerRadius>
-            <OuterRadius unit="mm">426.0</OuterRadius>
-            <Hz unit="cm">80</Hz>
-          </Volume>
-          <Volume name="Magnet_Outer_Wall">
-            <Material>G4_Al</Material>
-            <Color>#010101</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">585.0</InnerRadius>
-            <OuterRadius unit="mm">590.0</OuterRadius>
-            <Hz unit="cm">80</Hz>
-          </Volume>
-          <Volume name="Magnet_Superconducting_Coil">
-            <Material>G4_Al</Material>
-            <Color>#999999</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">494.6</InnerRadius>
-            <OuterRadius unit="mm">500.0</OuterRadius>
-            <Hz unit="cm">75</Hz>
-          </Volume>
-          <Volume name="Magnet_Vacuum_Wall_In_1">
-            <Material>G4_Al</Material>
-            <Color>#f00</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">454.0</InnerRadius>
-            <OuterRadius unit="mm">456.1</OuterRadius>
-            <Hz unit="cm">78</Hz>
-          </Volume>
-          <Volume name="Magnet_Vacuum_Wall_In_2">
-            <Material>G4_Al</Material>
-            <Color>#f00</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">474.0</InnerRadius>
-            <OuterRadius unit="mm">474.8</OuterRadius>
-            <Hz unit="cm">78</Hz>
-          </Volume>
-          <Volume name="Magnet_Vacuum_Wall_Out_1">
-            <Material>G4_Al</Material>
-            <Color>#f00</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">523</InnerRadius>
-            <OuterRadius unit="mm">523.8</OuterRadius>
-            <Hz unit="cm">78</Hz>
-          </Volume>
-          <Volume name="Magnet_Vacuum_Wall_Out_2">
-            <Material>G4_Al</Material>
-            <Color>#f00</Color>
-            <Shape>Tube</Shape>
-            <DZ unit="cm">0</DZ>
-            <DX unit="um">0</DX>
-            <DY unit="um">0</DY>
-            <Theta unit="deg">0</Theta>
-            <Phi unit="deg">0</Phi>
-            <Psi unit="deg">0</Psi>
-            <InnerRadius unit="mm">543</InnerRadius>
-            <OuterRadius unit="mm">543.8</OuterRadius>
-            <Hz unit="cm">78</Hz>
-          </Volume>
-        </Volume>
-      </Volumes>
-    </Content>
-  </DetectorComponent>  
-  
-  <!-- VXD Track Finder sectormaps -->
-  <Tracking>
-    <xi:include href="VXDTFindexTB.xml" />
-  </Tracking>
-</Detector>
-
+<?xml version="1.0" encoding="UTF-8"?><!-- geometry file for the testbeam at DESY in February 2017 --><Detector xmlns:xi="http://www.w3.org/2001/XInclude">  <!-- World definitions -->  <Name>TBDetector</Name>  <Description>Common PXD and SVD TestBeam at DESY in April 2016</Description>  <Global>    <material>Air</material>    <width unit="m">2.0</width>    <length unit="m">2.0</length>    <height unit="m">2.0</height>  </Global>    <!-- Material definitions -->  <xi:include href="../../geometry/BasicMaterials.xml" />  <xi:include href="../../pxd/PXD-Materials.xml" />  <xi:include href="../../svd/SVD-Materials.xml" />  <xi:include href="./TB-Materials.xml" />  <xi:include href="../../beast/bgo/BGO-Materials.xml" />  <xi:include href="../../beast/microtpc/MICROTPC-Materials.xml"/>  <xi:include href="../../beast/claws/CLAWS-Materials.xml"/>  <xi:include href="../../beast/fangs/FANGS-Materials.xml"/>  <xi:include href="../../beast/plume/PLUME-Materials.xml"/>    <!-- TODO: This makes genfitter working, because it tries to initialize CDC translators which read params from GearBox -->  <!--DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">    <xi:include href="../../cdc/CDC.xml" xpointer="xpointer(//DetectorComponent[@name='CDC']/*)" />  </DetectorComponent-->    <!-- Magnetic field inside PCMag @ DESY -->  <DetectorComponent name="MagneticField" xmlns:xi="http://www.w3.org/2001/XInclude">    <Description>The magnetic field description for PCMAG Superconducting magnet      for common PXD/SVD beam test at DESY February 2017</Description>    <Version>0</Version>    <Creator>GeoMagneticField</Creator>    <Content>      <Components>        <Component type="Radial">          <NumberGridPointsR>601</NumberGridPointsR>          <GridPitchR unit="mm">1.0</GridPitchR>          <RadiusMin unit="mm">0.0</RadiusMin>          <RadiusMax unit="mm">599.9</RadiusMax>          <NumberGridPointsZ>1602</NumberGridPointsZ>          <GridPitchZ unit="mm">1.0</GridPitchZ>          <ZMin unit="mm">-799.9</ZMin>          <ZMax unit="mm">799.9</ZMax>          <ZOffset unit="cm">0.0</ZOffset>          <!-- TODO: I don't understand meaning of these parameters: -->          <SlotRMin unit="cm">130.0</SlotRMin>          <EndyokeZMin unit="cm">230.0</EndyokeZMin>          <GapHeight unit="cm">4.4</GapHeight>          <IronPlateThickness unit="cm">4.7</IronPlateThickness>          <MapFilename>testbeam/vxd/PCMagFieldMap.dat.gz</MapFilename>        </Component>        <!--Component type="Constant">        <X>0</X>        <Y>0</Y>        <Z>0.975</Z>               <MaxR unit="mm">599.9</MaxR>        <MinZ unit="mm">-799.9</MinZ>        <MaxZ unit="mm">799.9</MaxZ>        </Component-->            </Components>    </Content>  </DetectorComponent>    <!-- Magnetic field inside PCMag @ DESY -->  <DetectorComponent name="MagneticFieldConstant" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="False">    <Description>The magnetic field description for PCMAG Superconducting magnet      for common PXD/SVD beam test at DESY February 2017</Description>    <Version>0</Version>    <Creator>GeoMagneticField</Creator>    <Content>      <Components>        <Component type="Constant">        <X>0</X>        <Y>0</Y>        <Z>0.975</Z>               <MaxR unit="mm">599.9</MaxR>        <MinZ unit="mm">-799.9</MinZ>        <MaxZ unit="mm">799.9</MaxZ>        </Component>            </Components>    </Content>  </DetectorComponent>    <!-- Subdedectors: PXD -->  <!-- modified copy of pxd/data/PXD-phase2.xml -->  <DetectorComponent name="PXD" xmlns:xi="http://www.w3.org/2001/XInclude">    <Creator library="pxd">PXDCreator</Creator>    <Content>      <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->      <DefaultMaterial>Air</DefaultMaterial>      <!--If this is true, all dead Material will be ignored and only the active      Material will be placed and the rest of the Detector will be filled      with DefaultMaterial -->      <OnlyActiveMaterial>false</OnlyActiveMaterial>      <!-- Set the  stepsize to be used in senistive volumes -->      <ActiveStepSize unit="um">5</ActiveStepSize>      <!-- If this is true, TrueHits will only be created for primary particles,      secondaries produced by Geant4 will not create TrueHits -->      <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>      <!--Settings for background and exposure studies -->      <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>      <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>      <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>            <!-- Displacement parameters -->      <xi:include href="2017_displacements.xml"/>             <!-- Include definition of logical volume encapsulating the PXD -->      <!-- disabled for phase 2 to allow FANGS or CLAWS to come close to the Beampipe -->      <!-- <xi:include href="PXD-Envelope.xml"/> -->      <!-- Include the definition of the mechanical support -->            <!-- removed the support structure -->      <!-- xi:include href="../../pxd/PXD-Support.xml"/ -->            <!-- Include the definition of all the components like ladders, sensors and      chips -->      <!--xi:include href="../../pxd/PXD-Components.xml"/ -->      <Components>        <!-- Inlude everything from the ladder definitions except forward sensors -->        <Ladder layer="1">          <!--xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=1]/*[not(self::Sensor[@id=1])])" /-->          <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=1]/*)" />                  </Ladder>        <Ladder layer="2">          <!--xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=2]/*[not(self::Sensor[@id=1])])" /-->          <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=2]/*)" />        </Ladder>        <!-- now we include all other components from PXD-Components which are not ladder definitions -->        <xi:include href="../../pxd/PXD-Components.xml" xpointer="xpointer(/Components/*[not(self::Ladder)])" />      </Components>      <!-- include radiation sensor definition -->      <xi:include href="../../pxd/PXD-RadiationSensors.xml"/>            <!-- PXD is build as two half shells which will be attached to the beampipe      from the sides. We follow this scheme in the simulation geometry for      alignment purposes. Each shell consists of a number of ladders for      each layer. -->      <!-- phase two is identical to the nominal PXD but only one half shell with      one ladder per layer -->      <HalfShell name="Ying">        <!-- removed the support -->        <!-- Define the ladders in each layer with increasing phi angle -->        <Layer id="1">          <Ladder id="1"><phi unit="deg">0</phi></Ladder>        </Layer>        <Layer id="2">          <Ladder id="1"><phi unit="deg">0</phi></Ladder>        </Layer>      </HalfShell>      <!-- the second half shell is empty but we still want the support -->      <!-- removed the support -->          </Content>  </DetectorComponent>    <!-- Subdedectors: SVD -->  <!-- modified copy of svd/data/SVD-phase2.xml -->  <DetectorComponent name="SVD" xmlns:xi="http://www.w3.org/2001/XInclude">    <!-- TODO:    - Check thickness/material of kapton cables    - Add readout boards    -->    <Creator library="svd">SVDCreator</Creator>    <Content>      <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->      <DefaultMaterial>Air</DefaultMaterial>      <!--If this is true, all dead Material will be ignored and only the active      Material will be placed and the rest of the Detector will be filled      with DefaultMaterial -->      <OnlyActiveMaterial>false</OnlyActiveMaterial>      <!-- Set the  stepsize to be used in senistive volumes -->      <ActiveStepSize unit="um">5</ActiveStepSize>      <!-- If this is true, TrueHits will only be created for primary particles,      secondaries produced by Geant4 will not create TrueHits -->      <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>      <!--Settings for background and exposure studies -->      <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>      <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>      <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>            <!-- Displacement parameters -->      <xi:include href="2017_displacements.xml"/>                  <!-- removed all the support structure see svd/data/SVD-phase2.xml -->            <!-- Include the definition of all the components like ladders, sensors and      chips -->      <!-- Except that for phase 2 we want the same ladder layout but no windmill so      the sensor middle should lie in the accelerator plane and not be shifted.      To do this we don't include the full components file but do it in pieces      and modify the shifts -->      <Components>        <!-- Inlude everything from the ladder definition except the shift from phase 3 using xpointer -->        <Ladder layer="3">          <shift unit="mm">0</shift>          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=3]/*[not(self::shift)])" />        </Ladder>        <Ladder layer="4">          <shift unit="mm">0</shift>          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=4]/*[not(self::shift)])" />        </Ladder>        <Ladder layer="5">          <shift unit="mm">0</shift>          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=5]/*[not(self::shift)])" />        </Ladder>        <Ladder layer="6">          <shift unit="mm">0</shift>          <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/Ladder[@layer=6]/*[not(self::shift)])" />        </Ladder>        <!-- now we include all other components from SVD-Components which are not ladder definitions -->        <xi:include href="../../svd/SVD-Components.xml" xpointer="xpointer(/Components/*[not(self::Ladder)])" />      </Components>            <!-- include radiation sensor definition -->      <!-- not sure if they are in phase 2 but I think not -->      <!-- <xi:include href="SVD-RadiationSensors.xml"/> -->            <!-- Only for testing: Each layer with only one ladder to check module positions -->      <!--<HalfShell name="Pat">      <shellAngle unit="deg">0</shellAngle>      <Layer id="3">      <Ladder id="1"> <phi unit="deg"> 60</phi></Ladder>      </Layer>      <Layer id="4">      <Ladder id="1"> <phi unit="deg"> 120</phi></Ladder>      </Layer>      <Layer id="5">      <Ladder id="1"> <phi unit="deg"> 180</phi></Ladder>      </Layer>      <Layer id="6">      <Ladder id="1"> <phi unit="deg"> 240</phi></Ladder>      </Layer>      </HalfShell>      -->            <!-- For more information about the meaning of these parameter see pxd/PXD.xml -->      <HalfShell name="Pat">        <shellAngle unit="deg">0</shellAngle>        <Layer id="3">          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>        </Layer>        <Layer id="4">          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>        </Layer>        <Layer id="5">          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>        </Layer>        <Layer id="6">          <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>        </Layer>      </HalfShell>      <HalfShell name="Mat">        <shellAngle unit="deg">180</shellAngle>      </HalfShell>    </Content>    <xi:include href="../../svd/svd_mapping.xml"/>  </DetectorComponent>    <!-- Subdedectors: EUDET ... NOT USED in DESY beam test 2017/Jan-Mar-->  <!-- DetectorComponent name="Telescopes" xmlns:xi="http://www.w3.org/2001/XInclude">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <xi:include href="2017_displacements.xml"/>       <Volumes>                <Volume name="EUDET-Module1">          <DX unit="cm">-16.75</DX>                        <DZ unit="mm">0.0</DZ>          <Theta unit="deg">90</Theta>          <Phi unit="deg">90</Phi>          <Psi unit="deg">90</Psi>          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />          <Volume name="EUDET-SensitiveArea">            <AlignComponent>7.2.1</AlignComponent>            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />            <Active>              <SensorID>1</SensorID>              <Ladder>2</Ladder>              <Layer>7</Layer>              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />            </Active>          </Volume>        </Volume>                <Volume name="EUDET-Module2">          <DX unit="cm">-14.75</DX>          <DZ unit="mm">0.0</DZ>          <Theta unit="deg">90</Theta>          <Phi unit="deg">90</Phi>          <Psi unit="deg">90</Psi>          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />          <Volume name="EUDET-SensitiveArea">            <AlignComponent>7.2.2</AlignComponent>            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />            <Active>              <SensorID>2</SensorID>              <Ladder>2</Ladder>              <Layer>7</Layer>              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />            </Active>          </Volume>        </Volume>                <Volume name="EUDET-Module3">          <DX unit="cm">-12.75</DX>          <DZ unit="mm">0.0</DZ>          <Theta unit="deg">90</Theta>          <Phi unit="deg">90</Phi>          <Psi unit="deg">90</Psi>          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />          <Volume name="EUDET-SensitiveArea">            <AlignComponent>7.2.3</AlignComponent>            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />            <Active>              <SensorID>3</SensorID>              <Ladder>2</Ladder>              <Layer>7</Layer>              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />            </Active>          </Volume>        </Volume>                <Volume name="EUDET-Module4">          <DX unit="cm">11.4</DX>          <DY unit="mm">0.0</DY>          <DZ unit="mm">0.0</DZ>          <Theta unit="deg">90</Theta>          <Phi unit="deg">90</Phi>          <Psi unit="deg">90</Psi>          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />          <Volume name="EUDET-SensitiveArea">            <AlignComponent>7.3.4</AlignComponent>            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />            <Active>              <SensorID>4</SensorID>              <Ladder>3</Ladder>              <Layer>7</Layer>              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />            </Active>          </Volume>        </Volume>                <Volume name="EUDET-Module5">          <DX unit="cm">13.45</DX>          <DY unit="mm">0.0</DY>          <DZ unit="mm">0.0</DZ>          <Theta unit="deg">90</Theta>          <Phi unit="deg">90</Phi>          <Psi unit="deg">90</Psi>          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />          <Volume name="EUDET-SensitiveArea">            <AlignComponent>7.3.5</AlignComponent>            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />            <Active>              <SensorID>5</SensorID>              <Ladder>3</Ladder>              <Layer>7</Layer>              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />            </Active>          </Volume>        </Volume>                <Volume name="EUDET-Module6">          <DX unit="cm">15.45</DX>          <DY unit="mm">0.0</DY>          <DZ unit="mm">0.0</DZ>          <Theta unit="deg">90</Theta>          <Phi unit="deg">90</Phi>          <Psi unit="deg">90</Psi>          <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Module']/*)" />          <Volume name="EUDET-SensitiveArea">            <AlignComponent>7.3.6</AlignComponent>            <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-SensitiveArea']/*)" />            <Active>              <SensorID>6</SensorID>              <Ladder>3</Ladder>              <Layer>7</Layer>              <xi:include href="Library.xml" xpointer="xpointer(//Snippet[@name='EUDET-Active']/*)" />            </Active>          </Volume>        </Volume>              </Volumes>    </Content>  </DetectorComponent -->    <!-- Scintilators -->  <DetectorComponent name="Scintilators" xmlns:xi="http://www.w3.org/2001/XInclude">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>                <Volume name="Scintilator1_Front">          <!-- TODO: Scintilator material -->          <Material>Si</Material>          <Shape>Box</Shape>          <DZ unit="mm">-20</DZ>          <DX unit="cm">-20.5</DX>          <DY unit="mm">0</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">0</Psi>          <HalfX unit="mm">9</HalfX>          <HalfY unit="mm">15</HalfY>          <HalfZ unit="mm">50</HalfZ>        </Volume>                <Volume name="Scintilator2_Front">          <!-- TODO: Scintilator material -->          <Material>Si</Material>          <Shape>Box</Shape>          <DZ unit="mm">0</DZ>          <DX unit="cm">-18.45</DX>          <DY unit="mm">-20</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">0</Psi>          <HalfX unit="mm">9</HalfX>          <HalfY unit="mm">50</HalfY>          <HalfZ unit="mm">15</HalfZ>         </Volume>                <Volume name="Scintilator3_Back">          <!-- TODO: Scintilator material -->          <Material>Si</Material>          <Shape>Box</Shape>          <DZ unit="mm">0</DZ>          <DX unit="cm">17.2</DX>          <DY unit="mm">-20</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">0</Psi>          <HalfX unit="mm">9</HalfX>          <HalfY unit="mm">50</HalfY>          <HalfZ unit="mm">15</HalfZ>        </Volume>                <Volume name="Scintilator4_Back">          <!-- TODO: Scintilator material -->          <Material>Si</Material>          <Shape>Box</Shape>          <DZ unit="mm">-20</DZ>          <DX unit="cm">19.3</DX>          <DY unit="mm">0</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">0</Psi>          <HalfX unit="mm">9</HalfX>          <HalfY unit="mm">15</HalfY>          <HalfZ unit="mm">50</HalfZ>        </Volume>              </Volumes>    </Content>  </DetectorComponent>        <!-- Secondary target (OFF by default, use only one!) -->  <DetectorComponent name="Target_Al_5mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="Target_Al_5mm">          <!-- TODO: Scintilator material -->          <Material>Al</Material>          <Shape>Box</Shape>          <DX unit="cm">-21</DX>          <HalfX unit="mm">2.5</HalfX>          <HalfY unit="mm">10</HalfY>          <HalfZ unit="mm">10</HalfZ>        </Volume>      </Volumes>    </Content>  </DetectorComponent>      <!-- Secondary target (OFF by default, use only one!) -->  <DetectorComponent name="Target_Al_10mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="Target_Al_5mm">          <!-- TODO: Scintilator material -->          <Material>Al</Material>          <Shape>Box</Shape>          <DX unit="cm">-21</DX>          <HalfX unit="mm">5</HalfX>          <HalfY unit="mm">10</HalfY>          <HalfZ unit="mm">10</HalfZ>        </Volume>      </Volumes>    </Content>  </DetectorComponent>      <!-- Secondary target (OFF by default, use only one!) -->  <DetectorComponent name="Target_Pb_5mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="Target_Al_5mm">          <!-- TODO: Scintilator material -->          <Material>Al</Material>          <Shape>Box</Shape>          <DX unit="cm">-21</DX>          <HalfX unit="mm">2.5</HalfX>          <HalfY unit="mm">10</HalfY>          <HalfZ unit="mm">10</HalfZ>        </Volume>      </Volumes>    </Content>  </DetectorComponent>      <!-- Secondary target (OFF by default, use only one!) -->  <DetectorComponent name="Target_Pb_10mm" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="Target_Al_5mm">          <!-- TODO: Scintilator material -->          <Material>Al</Material>          <Shape>Box</Shape>          <DX unit="cm">-21</DX>          <HalfX unit="mm">5</HalfX>          <HalfY unit="mm">10</HalfY>          <HalfZ unit="mm">10</HalfZ>        </Volume>      </Volumes>    </Content>  </DetectorComponent>        <!-- PCMAG magnet material, only composed of Al layers to sum up total radiation length of the magnet wall = 0.2 X0 -->  <DetectorComponent name="Magnet" xmlns:xi="http://www.w3.org/2001/XInclude">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="Magnet">          <Material>Air</Material>          <Color>#010101</Color>          <Shape>Tube</Shape>          <DZ unit="cm">0</DZ>          <DX unit="cm">0</DX>          <DY unit="um">0</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">0</Psi>          <InnerRadius unit="mm">400.0</InnerRadius>          <OuterRadius unit="mm">590.0</OuterRadius>          <Hz unit="cm">80</Hz>          <Volume name="Magnet_Inner_Wall">            <Material>G4_Al</Material>            <Color>#010101</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">424.0</InnerRadius>            <OuterRadius unit="mm">426.0</OuterRadius>            <Hz unit="cm">80</Hz>          </Volume>          <Volume name="Magnet_Outer_Wall">            <Material>G4_Al</Material>            <Color>#010101</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">585.0</InnerRadius>            <OuterRadius unit="mm">590.0</OuterRadius>            <Hz unit="cm">80</Hz>          </Volume>          <Volume name="Magnet_Superconducting_Coil">            <Material>G4_Al</Material>            <Color>#999999</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">494.6</InnerRadius>            <OuterRadius unit="mm">500.0</OuterRadius>            <Hz unit="cm">75</Hz>          </Volume>          <Volume name="Magnet_Vacuum_Wall_In_1">            <Material>G4_Al</Material>            <Color>#f00</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">454.0</InnerRadius>            <OuterRadius unit="mm">456.1</OuterRadius>            <Hz unit="cm">78</Hz>          </Volume>          <Volume name="Magnet_Vacuum_Wall_In_2">            <Material>G4_Al</Material>            <Color>#f00</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">474.0</InnerRadius>            <OuterRadius unit="mm">474.8</OuterRadius>            <Hz unit="cm">78</Hz>          </Volume>          <Volume name="Magnet_Vacuum_Wall_Out_1">            <Material>G4_Al</Material>            <Color>#f00</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">523</InnerRadius>            <OuterRadius unit="mm">523.8</OuterRadius>            <Hz unit="cm">78</Hz>          </Volume>          <Volume name="Magnet_Vacuum_Wall_Out_2">            <Material>G4_Al</Material>            <Color>#f00</Color>            <Shape>Tube</Shape>            <DZ unit="cm">0</DZ>            <DX unit="um">0</DX>            <DY unit="um">0</DY>            <Theta unit="deg">0</Theta>            <Phi unit="deg">0</Phi>            <Psi unit="deg">0</Psi>            <InnerRadius unit="mm">543</InnerRadius>            <OuterRadius unit="mm">543.8</OuterRadius>            <Hz unit="cm">78</Hz>          </Volume>        </Volume>      </Volumes>    </Content>  </DetectorComponent>    <!-- CLAWS -->  <DetectorComponent name="CLAWS">    <Creator library="beast">CLAWSCreator</Creator>    <Content>      <Ethres>0.05</Ethres>      <ScintCell>16</ScintCell>      <TimeStep>0.8</TimeStep>      <MinTime>0.0</MinTime>      <MaxTime>600.0</MaxTime>      <PEthres>1.0</PEthres>      <Ethres>0.05</Ethres>      <C_keV_to_MIP>805.5</C_keV_to_MIP>      <C_MIP_to_PE>15</C_MIP_to_PE>            <stepLength unit="um">50</stepLength>            <shape name="CLAWS" type="box">	<length unit="mm">200</length>	<width unit="mm">21</width>	<height unit="mm">5.2</height>	<r unit="mm">37.1</r>	<z unit="mm">19</z>	<u unit="mm">0</u>	<phi unit="deg">135, 225</phi>	<shape name="Board" type="box">          <material>G10</material>          <length unit="mm">200</length>          <width unit="mm">21</width>          <height unit="mm">2</height>          <top unit="mm">0</top>	</shape>	<shape name="Cover" type="box">          <material>CLAWS-Cover</material>          <length unit="mm">20.2</length>          <width unit="mm">20.2</width>          <height unit="mm">3.2</height>          <top unit="mm">2</top>          <z unit="mm">71.75, 51.25, 30.75, 10.25, -10.25, -30.75, -51.25, -71.75</z>          <shape name="Scintillator" type="box">            <active>true</active>            <material>Polystyrene</material>            <length unit="mm">20</length>            <width unit="mm">20</width>            <height unit="mm">3</height>            <top unit="mm">0.1</top>          </shape>	</shape>      </shape>    </Content>  </DetectorComponent>  <!-- FANGS -->    <DetectorComponent name="FANGS">    <Creator library="beast">FANGSCreator</Creator>    <Content>      <PixelThreshold>810</PixelThreshold>      <PixelThresholdRMS>150</PixelThresholdRMS>      <ChipColumnNb>80</ChipColumnNb>      <ChipColumnX>1</ChipColumnX>      <ChipRowNb>336</ChipRowNb>      <ChipRowY>0.84</ChipRowY>      <PixelTimeBinNb>256</PixelTimeBinNb>      <PixelTimeBin>25</PixelTimeBin>      <TOTA1>118.25</TOTA1>      <TOTB1>-17.2194</TOTB1>      <TOTC1>35.7857</TOTC1>      <TOTQ1>75</TOTQ1>      <TOTA2>493.11</TOTA2>      <TOTB2>19.1809</TOTB2>      <TOTC2>771.924</TOTC2>      <TOTQ2>75</TOTQ2>      <Workfct>3.6</Workfct>      <Fanofac>0.1</Fanofac>      <sensor_width>0.02</sensor_width>      <v_sensor>0.023</v_sensor>      <shape name="FANGS" type="box">	<length unit="mm">170</length>	<width unit="mm">28.7</width>	<height unit="mm">3.55</height>	<r unit="mm">24.63</r>	<z unit="mm">19</z>	<u unit="mm">4.35</u>	<phi unit="deg">90 180 270</phi>	<shape name="support" type="box">          <material>FANGS-Support</material>          <length unit="mm">170</length>          <width unit="mm">28.7</width>          <height unit="mm">2</height>          <top unit="mm">0</top>	</shape>	<shape name="flex" type="box">          <shape name="flex-glue" type="box">            <material>FANGS-Epoxy</material>            <length unit="mm">170</length>            <width unit="mm">8</width>            <height unit="um">50</height>          </shape>          <material>FANGS-Flex</material>          <length unit="mm">170</length>          <width unit="mm">8</width>          <height unit="um">550</height>          <top unit="mm">3.0</top>          <u unit="mm">10.25</u>	</shape>	<shape name="SensorPack" type="box">          <length unit="mm">20</length>          <width unit="mm">20</width>          <height unit="um">500</height>          <top unit="mm">3.0</top>          <z unit="cm">-4.2, -2.1, 0, 2.1, 4.2</z>          <u unit="mm">-4.35</u>          <shape name="FE-I4-glue" type="box">            <material>FANGS-Epoxy</material>            <length unit="mm">20</length>            <width unit="mm">20</width>            <height unit="um">50</height>            <top unit="mm">0</top>          </shape>          <shape name="FE-I4" type="box">            <material>FANGS-Sensor</material>            <length unit="mm">20</length>            <width unit="mm">20</width>            <height unit="um">150</height>            <top unit="um">50</top>          </shape>          <shape name="Bumps" type="box">            <material>FANGS-Bumps</material>            <length unit="mm">18</length>            <width unit="mm">17</width>            <height unit="um">25</height>            <top unit="um">200</top>            <u unit="mm">-0.5</u>          </shape>          <shape name="Sensor" type="box">            <material>FANGS-Sensor</material>            <active>true</active>            <length unit="mm">20</length>            <width unit="mm">19</width>            <height unit="um">200</height>            <top unit="um">225</top>            <u unit="mm">-0.5</u>          </shape>	</shape>      </shape>    </Content>  </DetectorComponent>  <!-- Thick Aluminium BeamPipe: 2.4 cm in diameter, made out of solid aluminium -->  <DetectorComponent name="BeamPipe" xmlns:xi="http://www.w3.org/2001/XInclude">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="BeamPipe">          <Material>Al</Material>          <Color>#010101</Color>          <Shape>Tube</Shape>          <DZ unit="mm">0</DZ>          <DX unit="mm">0</DX>          <DY unit="mm">2</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">359</Psi>          <InnerRadius unit="mm">0.0</InnerRadius>          <OuterRadius unit="mm">12.0</OuterRadius>          <Hz unit="cm">30</Hz>        </Volume>                </Volumes>    </Content>  </DetectorComponent>  <DetectorComponent name="CarbonCover" xmlns:xi="http://www.w3.org/2001/XInclude">    <Creator library="testbeam">VXDTBCreator</Creator>    <Content>      <Volumes>        <Volume name="CarbonCover">          <Material>C</Material>          <Shape>Tube</Shape>          <DZ unit="mm">0</DZ>          <DX unit="mm">0</DX>          <DY unit="mm">0</DY>          <Theta unit="deg">0</Theta>          <Phi unit="deg">0</Phi>          <Psi unit="deg">360</Psi>          <InnerRadius unit="mm">151.8</InnerRadius>          <OuterRadius unit="mm">152.8</OuterRadius>          <Hz unit="cm">30</Hz>        </Volume>        </Volumes>    </Content>  </DetectorComponent>  <!-- VXD Track Finder sectormaps -->  <Tracking>    <xi:include href="VXDTFindexTB.xml" />  </Tracking></Detector>

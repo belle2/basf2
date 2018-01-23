@@ -10,15 +10,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMExpressRecoMODULE_H_
-#define PXDDQMExpressRecoMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
@@ -54,76 +48,121 @@ namespace Belle2 {
 
   private:
 
-    float m_CutPXDCharge = 0.0;            /**< cut for accepting to hitmap histogram, using strips only, default = 0 */
+    /** cut for accepting to hitmap histogram, using strips only, default = 0 */
+    float m_CutPXDCharge = 0.0;
 
-    std::string m_storePXDDigitsName;      /**< PXDDigits StoreArray name */
-    std::string m_storePXDClustersName;    /**< PXDClusters StoreArray name */
-    std::string m_relPXDClusterDigitName;  /**< PXDClustersToPXDDigits RelationArray name */
-    std::string m_storeFramesName;         /**< Frames StoreArray name */
+    /** PXDDigits StoreArray name */
+    std::string m_storePXDDigitsName;
+    /** PXDClusters StoreArray name */
+    std::string m_storePXDClustersName;
+    /** PXDClustersToPXDDigits RelationArray name */
+    std::string m_relPXDClusterDigitName;
+    /** Frames StoreArray name */
+    std::string m_storeFramesName;
 
-    TDirectory* m_oldDir;                  /**< Basic Directory in output file */
+    /** Basic Directory in output file */
+    TDirectory* m_oldDir;
 
     /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
     std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
-    int m_NoOfEvents;        /** Number of events */
-    int m_NoOfEventsRef;     /** Number of events in reference histogram */
+    /** Number of events */
+    int m_NoOfEvents;
+    /** Number of events in reference histogram */
+    int m_NoOfEventsRef;
 
-    int m_NotUseDB = 0;      /** Using local files instead of DataBase for reference histogram, default=0 */
-    int m_CreateDB = 0;      /** Create and fill reference histograms in DataBase, default=0 */
+    /** Using local files instead of DataBase for reference histogram, default=0 */
+    int m_NotUseDB = 0;
+    /** Create and fill reference histograms in DataBase, default=0 */
+    int m_CreateDB = 0;
 
-    TH1I* m_fHitMapCountsFlag;    /**< Flags of Hitmaps of Digits */
-    TH1I* m_fHitMapClCountsFlag;  /**< Flags of Hitmaps of Clusters*/
-    TH1I* m_fFiredFlag;           /**< Flags of Hitmaps of Digits */
-    TH1I* m_fClustersFlag;        /**< Flags of Clusters per event */
-    TH1I* m_fStartRowFlag;        /**< Flags of Start row distribution */
-    TH1I* m_fChargStartRowFlag;   /**< Flags of Cluster seed charge by distance from the start row */
-    TH1I* m_fStartRowCountFlag;   /**< Flags of counter for Cluster seed charge by distance from the start row */
-    TH1I* m_fClusterChargeFlag;   /**< Flags of Charge of clusters */
-    TH1I* m_fPixelSignalFlag;     /**< Flags of Charge of pixels */
-    TH1I* m_fClusterSizeUFlag;    /**< Flags of u cluster size */
-    TH1I* m_fClusterSizeVFlag;    /**< Flags of v cluster size */
-    TH1I* m_fClusterSizeUVFlag;   /**< Flags of Cluster size */
+    /** Flags of Hitmaps of Digits */
+    TH1I* m_fHitMapCountsFlag;
+    /** Flags of Hitmaps of Clusters*/
+    TH1I* m_fHitMapClCountsFlag;
+    /** Flags of Fired Digits */
+    TH1I* m_fFiredFlag;
+    /** Flags of Clusters per event */
+    TH1I* m_fClustersFlag;
+    /** Flags of Start row distribution */
+    TH1I* m_fStartRowFlag;
+    /** Flags of Cluster seed charge by distance from the start row */
+    TH1I* m_fChargStartRowFlag;
+    /** Flags of counter for Cluster seed charge by distance from the start row */
+    TH1I* m_fStartRowCountFlag;
+    /** Flags of Charge of clusters */
+    TH1I* m_fClusterChargeFlag;
+    /** Flags of Charge of pixels */
+    TH1I* m_fPixelSignalFlag;
+    /** Flags of u cluster size */
+    TH1I* m_fClusterSizeUFlag;
+    /** Flags of v cluster size */
+    TH1I* m_fClusterSizeVFlag;
+    /** Flags of Cluster size */
+    TH1I* m_fClusterSizeUVFlag;
 
-    TH1I* m_hitMapCounts;         /**< Hitmaps of Digits */
-    TH1I* m_hitMapClCounts;       /**< Hitmaps of Clusters*/
-    TH1F** m_fired;               /**< Fired pixels per event */
-    TH1F** m_clusters;            /**< Clusters per event */
-    TH1F** m_startRow;            /**< Start row distribution */
-    TH1F** m_chargStartRow;       /**< Cluster seed charge by distance from the start row */
-    TH1F** m_startRowCount;       /**< counter for Cluster seed charge by distance from the start row */
-    TH1F** m_clusterCharge;       /**< Charge of clusters */
-    TH1F** m_pixelSignal;         /**< Charge of pixels */
-    TH1F** m_clusterSizeU;        /**< u cluster size */
-    TH1F** m_clusterSizeV;        /**< v cluster size */
-    TH1F** m_clusterSizeUV;       /**< Cluster size */
+    /** Hitmaps of Digits */
+    TH1I* m_hitMapCounts;
+    /** Hitmaps of Clusters*/
+    TH1I* m_hitMapClCounts;
+    /** Fired pixels per event */
+    TH1F** m_fired;
+    /** Clusters per event */
+    TH1F** m_clusters;
+    /** Start row distribution */
+    TH1F** m_startRow;
+    /** Cluster seed charge by distance from the start row */
+    TH1F** m_chargStartRow;
+    /** counter for Cluster seed charge by distance from the start row */
+    TH1F** m_startRowCount;
+    /** Charge of clusters */
+    TH1F** m_clusterCharge;
+    /** Charge of pixels */
+    TH1F** m_pixelSignal;
+    /** u cluster size */
+    TH1F** m_clusterSizeU;
+    /** v cluster size */
+    TH1F** m_clusterSizeV;
+    /** Cluster size */
+    TH1F** m_clusterSizeUV;
 
-    int m_nPixels;                   /**< Number of pixels on PXD v direction */
-    int c_nVXDLayers;                /**< Number of VXD layers on Belle II */
-    int c_nPXDLayers;                /**< Number of PXD layers on Belle II */
-    int c_nSVDLayers;                /**< Number of SVD layers on Belle II */
-    int c_firstVXDLayer;             /**< First VXD layer on Belle II */
-    int c_lastVXDLayer;              /**< Last VXD layer on Belle II */
-    int c_firstPXDLayer;             /**< First PXD layer on Belle II */
-    int c_lastPXDLayer;              /**< Last PXD layer on Belle II */
-    int c_firstSVDLayer;             /**< First SVD layer on Belle II */
-    int c_lastSVDLayer;              /**< Last SVD layer on Belle II */
-    int c_nPXDSensors;               /**< Number of PXD sensors on Belle II */
+    /** Number of pixels on PXD v direction */
+    int m_nPixels;
+    /** Number of VXD layers on Belle II */
+    int c_nVXDLayers;
+    /** Number of PXD layers on Belle II */
+    int c_nPXDLayers;
+    /** Number of SVD layers on Belle II */
+    int c_nSVDLayers;
+    /** First VXD layer on Belle II */
+    int c_firstVXDLayer;
+    /** Last VXD layer on Belle II */
+    int c_lastVXDLayer;
+    /** First PXD layer on Belle II */
+    int c_firstPXDLayer;
+    /** Last PXD layer on Belle II */
+    int c_lastPXDLayer;
+    /** First SVD layer on Belle II */
+    int c_firstSVDLayer;
+    /** Last SVD layer on Belle II */
+    int c_lastSVDLayer;
+    /** Number of PXD sensors on Belle II */
+    int c_nPXDSensors;
 
-    /**< Function return index of sensor in plots.
+    /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor
        * @param Ladder Ladder position of sensor
        * @param Sensor Sensor position of sensor
        * @return Index of sensor in plots.
        */
     int getSensorIndex(int Layer, int Ladder, int Sensor);
-    /**< Function return index of sensor in plots.
+    /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
        */
     void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
-    /**< Function return flag histogram filled based on condition from TH1F source.
+    /** Function return flag histogram filled based on condition from TH1F source.
        * Flag values:
        * -3: nonexisting Type
        * -2: histogram is missing or masked
@@ -149,7 +188,7 @@ namespace Belle2 {
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int SetFlag(int Type, int bin, double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist);
-    /**< Function return flag histogram filled based on condition from TH1I source.
+    /** Function return flag histogram filled based on condition from TH1I source.
        * Flag values:
        * -3: nonexisting Type
        * -2: histogram is missing or masked
@@ -176,44 +215,44 @@ namespace Belle2 {
        */
     int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
 
-    /**< Function for filling of TH1F histogram to database.
+    /** Function for filling of TH1F histogram to database.
        * @param HistoBD Histogram for DB.
        */
     void CreateDBHisto(TH1F* HistoBD);
-    /**< Function for filling of TH1I histogram to database.
+    /** Function for filling of TH1I histogram to database.
        * @param HistoBD Histogram for DB.
        */
     void CreateDBHisto(TH1I* HistoBD);
 
-    /**< Function for filling of group of TH1F histogram to database.
+    /** Function for filling of group of TH1F histogram to database.
        * @param HistoBD Histogram for DB.
        * @param Number Number of histograms to glue to one.
        */
     void CreateDBHistoGroup(TH1F** HistoBD, int Number);
-    /**< Function for filling of group of TH1I histogram to database.
+    /** Function for filling of group of TH1I histogram to database.
        * @param HistoBD Histogram for DB.
        * @param Number Number of histograms to glue to one.
        */
     void CreateDBHistoGroup(TH1I** HistoBD, int Nomber);
 
-    /**< Function for loading of TH1F histogram from database.
+    /** Function for loading of TH1F histogram from database.
        * @param HistoBD Histogram for DB.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int LoadDBHisto(TH1F* HistoBD);
-    /**< Function for loading of TH1I histogram from database.
+    /** Function for loading of TH1I histogram from database.
        * @param HistoBD Histogram for DB.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int LoadDBHisto(TH1I* HistoBD);
 
-    /**< Function for loading of group of TH1F histogram from database.
+    /** Function for loading of group of TH1F histogram from database.
        * @param HistoBD Histogram for DB.
        * @param Number Number of histograms to extract from DB.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int LoadDBHistoGroup(TH1F** HistoBD, int Number);
-    /**< Function for loading of group of TH1I histogram from database.
+    /** Function for loading of group of TH1I histogram from database.
        * @param HistoBD Histogram for DB.
        * @param Number Number of histograms to extract from DB.
        * @return Indication of succes of realizing of condition, 1: OK.
@@ -223,5 +262,4 @@ namespace Belle2 {
   };
 
 }
-#endif
 

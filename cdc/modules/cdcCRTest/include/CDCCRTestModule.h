@@ -166,11 +166,6 @@ namespace Belle2 {
       void plotResults(Belle2::RecoTrack* track);
 
       /**
-       * Calculate measurement Drift time
-       */
-      double getCorrectedDriftTime(WireID wireid, unsigned short tdc, unsigned short adc, double z,
-                                   double z0); //get Drift time was correct ToP,...
-      /**
        * Make hit distribution from track candidate.
        */
       void getHitDistInTrackCand(const RecoTrack* track);//Draw hit distribution from track candidate

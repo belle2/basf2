@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/AllTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/MCTrackRelationFilter.h>
@@ -17,11 +19,13 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/PhiTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseTrackRelationFilter>;
 
 TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

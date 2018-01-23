@@ -5,13 +5,14 @@
  * General DB object to store one calibration number per ECL crystal      *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christopher Hearty                                       *
+ * Contributors: Christopher Hearty (hearty@physics.ubc.ca)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 #include <TObject.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -24,13 +25,13 @@ namespace Belle2 {
     ECLCrystalCalib() : m_CalibConst(), m_CalibConstUnc() { };
 
     /** Get vector of calibration constants. One entry per crystal. */
-    std::vector<float> getCalibVector() {return m_CalibConst;};
+    const std::vector<float>& getCalibVector() const {return m_CalibConst;};
 
     /** Get vector of uncertainties on calibration constants. */
-    std::vector<float> getCalibUncVector() {return m_CalibConstUnc;};
+    const std::vector<float>& getCalibUncVector() const {return m_CalibConstUnc;};
 
     /** Set vector of constants with uncertainties. One entry per crystal */
-    void setCalibVector(std::vector<float> CalibConst, std::vector<float> CalibConstUnc)
+    void setCalibVector(const std::vector<float>& CalibConst, const std::vector<float>& CalibConstUnc)
     {
       if (CalibConst.size() != 8736 || CalibConstUnc.size() != 8736) {B2FATAL("ECLCrystalCalib: wrong size vector uploaded, " << CalibConst.size() << " " << CalibConstUnc.size() << " instead of 8736");}
       m_CalibConst = CalibConst;

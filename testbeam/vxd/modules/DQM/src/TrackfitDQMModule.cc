@@ -173,8 +173,8 @@ void TrackfitDQMModule::initialize()
   StoreArray<genfit::Track> storeTrack(m_storeTrackName);
   StoreArray<genfit::TrackCand> storeTrackCand(m_storeTrackCandName);
 
-  //storeClusters.required();
-  //storeDigits.required();
+  //storeClusters.isRequired();
+  //storeDigits.isRequired();
 
   RelationArray relTrackCandTrack(storeTrackCand, storeTrack);
 

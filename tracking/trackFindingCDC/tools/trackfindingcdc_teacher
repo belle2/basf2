@@ -106,7 +106,7 @@ def main():
         "--weight_variable", weight_variable,
         ]
 
-    print(cmd)
+    print(" ".join(cmd))
     subprocess.call(cmd)
 
     if arguments.evaluate:

@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This tool allows to print and create bar graphs of the disk space requirements
+for basf2 events stored in root files.
+
+In it's most simple form, ``%(prog)s FILENAME``, it will just print the sizes
+of each top level branch in the file to the command line. It can however create
+a pdf showing detailed plots of the branch and member sizes using the ``-o``
+option to specify an output pdf.
+
+It can also compare the sizes in multiple files. In this case additional files
+can be specified using ``-f``.
+"""
+
 import sys
 import os
 import argparse
 from collections import defaultdict
 import numpy as np
+import textwrap
 
 # stuff for plotting
 try:
@@ -20,108 +34,112 @@ install it using
 
 from matplotlib import pyplot as pl
 from matplotlib.backends.backend_pdf import PdfPages
-# and reading root files, sadly root is screwing up the argparse help message
-# so give root empty arguments
-args = sys.argv[1:]
-sys.argv = sys.argv[:1]
+from ROOT import PyConfig
+# why does ROOT try to parse the command line arguments? *sigh*
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
 import ROOT as root
 # do not show missing dictionary warnings, we don't need dictionaries just to
 # get the branch sizes
 root.gErrorIgnoreLevel = root.kWarning + 1
 
-parser = argparse.ArgumentParser(
-    description="Print and create bar graphs of the disk space requirements" +
-    " for basf2 events\nstored in root files",
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog="""examples:
-  create eventsize.pdf with a bar chart showing the kb/event required for each
-  top level object in the file filename.root
-      %(prog)s filename.root
 
-  in addition, create a chart for each top level object showing the disk space
-  required per event by each member. Omit the EventMetaData object and all
-  relations from the output
-      %(prog)s --show-member -s EventMetaData --skip-relations filename.root
+def get_argument_parser():
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""\
+    .. rubric:: Examples
 
-  show the top level objects for three files and give them nice labels. In
-  addition, create a chart which shows the reduction factor compared to the
-  first file and save to 'compare.pdf'
-      %(prog)s -o compare.pdf --show-reduction file0.root "before update" \\
-          -f file1.root "after update" -f file2.root "after second update"
+    create eventsize.pdf with a bar chart showing the kb/event required for each
+    top level object in the file filename.root::
+        %(prog)s filename.root
 
-  show gains by using file compression. Notice the + after the filename to
-  indicate that uncompressed size should be shown. Put the legend always in the
-  upper left corner
-      %(prog)s -o compare.pdf --legend='upper left' --show-reduction \\
-          -f file.root+ "uncompressed" -f file.root "compressed"
+    in addition, create a chart for each top level object showing the disk space
+    required per event by each member. Omit the EventMetaData object and all
+    relations from the output::
+        %(prog)s --show-member -s EventMetaData --skip-relations filename.root
 
-  if you want the charts as one page per pdf file I recommend 'pdftk' to split
-  the pdf after creation
-      pdftk eventsize.pdf burst output eventsize-%%02d.pdf
-  """
+    show the top level objects for three files and give them nice labels. In
+    addition, create a chart which shows the reduction factor compared to the
+    first file and save to 'compare.pdf'::
+        %(prog)s -o compare.pdf --show-reduction file0.root "before update" \\
+            -f file1.root "after update" -f file2.root "after second update"
 
-)
-group1 = parser.add_argument_group("visual options", "Options influencing the"
-                                   " visual style of the created pdf")
+    show gains by using file compression. Notice the + after the filename to
+    indicate that uncompressed size should be shown. Put the legend always in the
+    upper left corner::
+        %(prog)s -o compare.pdf --legend='upper left' --show-reduction \\
+            file.root+ "uncompressed" -f file.root "compressed"
 
-group1.add_argument("-o", dest="output", default="eventsize.pdf",
-                    help="""the output PDF filename for the generated graphs,
-                    (default: %(default)s)""", metavar="FILENAME")
-group1.add_argument("--width", default=10, type=float,
-                    help="page width in inches, (default: %(default).1f)")
-group1.add_argument("--height", default=7, type=float,
-                    help="page height in inches, (default: %(default).1f)")
-group1.add_argument("--legend", default="best", type=str,
-                    help="""location for the legend. Could either be 'best' for
-                    automatic placement or (upper, lower) left, center or right
-                    e.g. 'upper left' or 'center', (default: %(default)s)""")
-group1.add_argument("--bar-gap", default=0.2, type=float,
-                    help="""fraction of empty space between bars,
-                    (default: %(default)s)""", metavar="FRACTION")
-group2 = parser.add_argument_group("graph options", "Options influencing" +
-                                   " what objects to show and what graphs to" +
-                                   " create")
-group2.add_argument("--show-fraction", default=False, action="store_true",
-                    help="""create an additional chart showing the fraction of
-                    the total event size for each object""")
-group2.add_argument("--show-reduction", default=False, action='store_true',
-                    help="""create an additional plot showing the size
-                    reduction compared to the first file in the list""")
-group2.add_argument("--skip-total", default=False, action="store_true",
-                    help="""If present, the bar showing the total size will be
-                    omitted from the charts""")
-group2.add_argument("--show-members", default=False, action='store_true',
-                    help="if given also plots for the size of the members of "
-                    "top level objects will be created")
-group2.add_argument("--skip-relations", default=False, action="store_true",
-                    help="""if given, relations will be omitted from output""")
-group2.add_argument("--skip-mcrelations", default=False, action="store_true",
-                    help="""if given, relations from or to MCParticles will be
-                    omitted from output""")
-group2.add_argument("-m", "--skip-member", action="append", default=[],
-                    help="""member to be skipped when displaying member size
-                    (e.g. fBits, fUniqueID), can be supplied more than once""",
-                    metavar="MEMBER_NAME")
-group2.add_argument("-s", "--skip-object", action="append", default=[],
-                    help="""object to be skipped (e.g. EventMetaData), can be
-                    supplied more than once. If an object is omitted then it
-                    will not be included in the total size calculation""",
-                    metavar="OBJECT_NAME")
-parser.add_argument("-f", nargs="+", dest="filename", action="append",
-                    help="""filename and optional label to be used in the plot.
-                    If no label is given, filename itself will be used. If the
-                    filename ends in '+', the uncompressed data size will be
-                    used instead of the compressed. To analyze more than one
-                    file give the -f option multiple times, e.g. %(prog)s -f
-                    file1.root label1 -f file2.root label2 """,
-                    metavar=("filename", "label"))
-parser.add_argument("-n", "--no-plot", dest="noplot", default=False, action="store_true",
-                    help="""if give, no plot is created""")
-# allow one file to be given without -f
-parser.add_argument("filename", nargs="*", default=[], action="append",
-                    help=argparse.SUPPRESS)
-# and finally parse the arguments
-args = parser.parse_args(args)
+    if you want the charts as one page per pdf file I recommend the program
+    ``pdftk`` to split the pdf after creation::
+        pdftk eventsize.pdf burst output eventsize-%%02d.pdf
+    """)
+    )
+    group1 = parser.add_argument_group("Visual Options", "Options influencing the "
+                                       "visual style of the created pdf")
+
+    parser.add_argument("-o", dest="output", default=None,
+                        help="the output PDF filename for the generated graphs. "
+                        "If none is given no pdf will be created.", metavar="FILENAME")
+    group1.add_argument("--width", default=10, type=float,
+                        help="page width in inches, (default: %(default).1f)")
+    group1.add_argument("--height", default=7, type=float,
+                        help="page height in inches, (default: %(default).1f)")
+    group1.add_argument("--legend", default="best", type=str,
+                        help="location for the legend. Could either be 'best' for "
+                        "automatic placement or (upper, lower) left, center or right "
+                        "e.g. 'upper left' or 'center', (default: %(default)s)")
+    group1.add_argument("--bar-gap", default=0.2, type=float,
+                        help="""fraction of empty space between bars,
+                        (default: %(default)s)""", metavar="FRACTION")
+    group2 = parser.add_argument_group("Graph Options", "Options influencing "
+                                       "what objects to show and what graphs to "
+                                       "create")
+    group2.add_argument("--show-fraction", default=False, action="store_true",
+                        help="create an additional chart showing the fraction of "
+                        "the total event size for each object")
+    group2.add_argument("--show-reduction", default=False, action='store_true',
+                        help="create an additional plot showing the size "
+                        "reduction compared to the first file in the list")
+    group2.add_argument("--skip-total", default=False, action="store_true",
+                        help="If present, the bar showing the total size will be "
+                        "omitted from the charts")
+    group2.add_argument("--show-members", default=False, action='store_true',
+                        help="if given also plots for the size of the members of "
+                        "top level objects will be created")
+    group2.add_argument("--skip-relations", default=False, action="store_true",
+                        help="if given, relations will be omitted from output")
+    group2.add_argument("--skip-mcrelations", default=False, action="store_true",
+                        help="if given, relations from or to MCParticles will be "
+                        "omitted from output")
+    group2.add_argument("-m", "--skip-member", action="append", default=[],
+                        help="member to be skipped when displaying member size "
+                        "(e.g. fBits, fUniqueID), can be supplied more than once",
+                        metavar="MEMBER_NAME")
+    group2.add_argument("-s", "--skip-object", action="append", default=[],
+                        help="object to be skipped (e.g. EventMetaData), can be "
+                        "supplied more than once. If an object is omitted then it "
+                        "will not be included in the total size calculation",
+                        metavar="OBJECT_NAME")
+    parser.add_argument("-f", nargs="+", dest="filenames", action="append", default=[],
+                        help="filename and optional label for additional file to "
+                        "be shown in the plot. If no label is given, filename "
+                        "itself will be used. If the filename ends in '+', the "
+                        "uncompressed data size will be used instead of the "
+                        "compressed.",
+                        metavar=("FILENAME", "LABEL"))
+    # allow one file to be given without -f
+    parser.add_argument("filename", help="filename to be used to show the size. "
+                        "If the filename ends in '+', the uncompressed data size "
+                        "will be used instead of the compressed.",
+                        metavar="FILENAME")
+    parser.add_argument("label", nargs="?", default=None,
+                        help="Label for the filename in the plot. If none is "
+                        "given the filename is used.", metavar="LABEL")
+    # and finally return the parser
+    return parser
 
 
 def get_size(branch, zipped=True):
@@ -183,14 +201,6 @@ def create_plot(pdf, labels, legend, values, title, ylabel):
     nlabels, nbars = values.shape
     bar_pos = np.arange(nlabels)
     bar_width = (1. - args.bar_gap) / nbars
-    bar_colors = mpl.cm.get_cmap("jet")
-
-    def get_color(i):
-        # if less then four bars use just rgb
-        if nbars <= 3:
-            return "rgb"[i]
-        # otherwise use jet colormap
-        return bar_colors(1 - i / (nbars - 1.))
 
     # create figure and axes
     f = pl.figure(figsize=(args.width, args.height))
@@ -198,8 +208,7 @@ def create_plot(pdf, labels, legend, values, title, ylabel):
 
     # and plot all bars
     for i, v in enumerate(values.T):
-        a.bar(bar_pos + i * bar_width, v, bar_width,
-              color=get_color(i), label=legend[i])
+        a.bar(bar_pos + i * bar_width, v, bar_width, label=legend[i], align="edge", zorder=20)
 
     # set x axis ticks
     a.set_xticks(bar_pos + (1. - args.bar_gap) / 2)
@@ -211,21 +220,20 @@ def create_plot(pdf, labels, legend, values, title, ylabel):
     a.grid(axis="y")
     # draw legend or append name to title for one file
     if nbars > 1:
-        l = a.legend(loc=args.legend)
-        l.get_frame().set_alpha(0.8)
+        a.legend(loc=args.legend)
     else:
         title += ", " + legend[0]
     # and add title
     a.set_title(title)
     # adjust figure margins to fit labels
-    pl.tight_layout()
+    f.tight_layout()
     # add figure to pdf
     pdf.savefig(f)
     # and close figure
     pl.close(f)
 
 
-def plot_sizes(pdf, files, skip=args.skip_object, branch=None):
+def plot_sizes(pdf, files, skip, branch=None):
     """
     plot the branch sizes of all objects in the given files.
     'files' is a list of (tree, label, compressed) tuples indicating which
@@ -290,6 +298,7 @@ def plot_sizes(pdf, files, skip=args.skip_object, branch=None):
         # and plot again
         create_plot(pdf, labels, legend, reduction, title, "reduction factor")
 
+
 def convert_bytes(bytes):
     bytes = float(bytes)
     if bytes >= 1099511627776:
@@ -307,6 +316,7 @@ def convert_bytes(bytes):
     else:
         size = '%.2fb' % bytes
     return size + '\033[39m'
+
 
 def print_tree(tree, filename):
     branchesList = tree.GetListOfBranches()
@@ -326,55 +336,64 @@ def print_tree(tree, filename):
         print("%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size))
     print("====================================================================")
 
-rootfiles = []
-trees = []
 
-for item in args.filename:
-    # could be an empty positional argument
-    if not item:
-        continue
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    rootfiles = []
+    trees = []
 
-    filename = item[0]
-    # check if we have a label
-    if len(item) > 1:
-        label = " ".join(item[1:])
-    else:
-        label = os.path.basename(filename)
+    # put the positional argument in as first file
+    args.filenames.insert(0, [args.filename])
+    if args.label is not None:
+        args.filenames[0].append(args.label)
 
-    # check whether the filename ends in +, if so we want uncompressed sizes
-    uncompressed = (filename[-1] == "+")
-    if uncompressed:
-        filename = filename[:-1]
+    for item in args.filenames:
+        # could be an empty positional argument
+        if not item:
+            continue
 
-    if not os.path.exists(filename):
-        print("file '{}' could not be found, exiting".format(filename))
-        sys.exit(1)
+        filename = item[0]
+        # check if we have a label
+        if len(item) > 1:
+            label = " ".join(item[1:])
+        else:
+            label = os.path.basename(filename)
 
-    if label is None:
-        label = os.path.basename(filename)
+        # check whether the filename ends in +, if so we want uncompressed sizes
+        uncompressed = (filename[-1] == "+")
+        if uncompressed:
+            filename = filename[:-1]
 
-    rfile = root.TFile(filename)
-    rtree = rfile.Get("tree")
-    if not rtree:
-        print("could not find basf2 tree in '{}', exiting".format(filename))
-        sys.exit(1)
+        if not os.path.exists(filename):
+            print("file '{}' could not be found, exiting".format(filename))
+            sys.exit(1)
 
-    # add TFile to list to prevent destruction
-    rootfiles.append(rfile)
-    trees.append((rtree, label, not uncompressed))
+        if label is None:
+            label = os.path.basename(filename)
 
-if not trees:
-    parser.error("No files given, supply at least one filename to analyze")
+        rfile = root.TFile(filename)
+        rtree = rfile.Get("tree")
+        if not rtree:
+            print("could not find basf2 tree in '{}', exiting".format(filename))
+            sys.exit(1)
 
-for (tree, filename, compressed) in trees:
-    print_tree(tree, filename)
+        # add TFile to list to prevent destruction
+        rootfiles.append(rfile)
+        trees.append((rtree, label, not uncompressed))
 
-if not args.noplot:
-    try:
-        pdf = PdfPages(args.output)
-    except IOError as e:
-        print("Could not open output file:", e)
-        sys.exit(1)
+    if not trees:
+        parser.error("No files given, supply at least one filename to analyze")
 
-    plot_sizes(pdf, trees)
-    pdf.close()
+    for (tree, filename, compressed) in trees:
+        print_tree(tree, filename)
+
+    if args.output is not None:
+        try:
+            pdf = PdfPages(args.output)
+        except IOError as e:
+            print("Could not open output file:", e)
+            sys.exit(1)
+
+        plot_sizes(pdf, trees, args.skip_object)
+        pdf.close()

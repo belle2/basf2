@@ -81,7 +81,8 @@ namespace Belle2 {
   void TRGCDCFitter3D::initialize()
   {
 
-    StoreObjPtr<EventMetaData>::required();
+    StoreObjPtr<EventMetaData> evtMetaData;
+    evtMetaData.isRequired();
 
     // If we are using Monte Carlo information.
     m_mBool["fMc"] = 1;

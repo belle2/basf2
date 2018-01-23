@@ -9,64 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
-
-#include <framework/logging/Logger.h>
-#include <string>
-#include <map>
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-
-    /// Observer listening to the number of yes and no answers from the filter.
-    template<class AFilter>
-    class ObserverFilter : public AFilter {
-
-    private:
-      /// Type of the filter base class.
-      using Super = AFilter;
-
-    public:
-      /// Using constructor of the Super class
-      using AFilter::AFilter;
-
-      /// Object type to be filtered.
-      using Object = typename AFilter::Object;
-
-    public:
-      /// Terminate the filter after event processing.
-      void terminate() override
-      {
-        B2INFO("Filter said " << m_yesAnswers << " times yes and " << m_noAnswers << " times no.");
-        Super::terminate();
-      }
-
-    public:
-      /** Function to evaluate the object.
-       *  Base implementation rejects all objects.
-       *
-       *  @param obj The object to be accepted or rejected.
-       *  @return    A finit float value if the object is accepted.
-       *             NAN if the object is rejected.
-       */
-      Weight operator()(const Object& object) override
-      {
-        Weight result = Super::operator()(object);
-        if (std::isnan(result)) {
-          m_noAnswers += 1;
-        } else {
-          m_yesAnswers += 1;
-        }
-
-        return result;
-      }
-
-    private:
-      /// Number of counted yes answers.
-      unsigned int m_yesAnswers = 0;
-
-      /// Number of counted no answers.
-      unsigned int m_noAnswers = 0;
-    };
-  }
-}
+// This header file is deprecated
+// Instead use one of the following headers depending on the *minimal* needs of your use.
+#include <tracking/trackFindingCDC/filters/base/ObserverFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/ObserverFilter.icc.h>

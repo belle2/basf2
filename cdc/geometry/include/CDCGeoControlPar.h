@@ -528,7 +528,7 @@ namespace Belle2 {
 
       bool m_displacement = true;  /**< Switch for displacement. */
       bool m_alignment = true;  /**< Switch for alignment. */
-      bool m_misalignment = true;  /**< Switch for misalignment. */
+      bool m_misalignment = false;  /**< Switch for misalignment. */
 
       bool m_displacementInputType = true;  /**< Input type for displacement. */
       bool m_alignmentInputType = true;  /**< Input type for alignment. */
@@ -545,7 +545,7 @@ namespace Belle2 {
       bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */
       double m_mapperPhiAngle = 16.7; /**< B-field mapper phi-angle (deg). */
 
-      std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
+      std::string m_displacementFile = "displacement_v2.2.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */
       std::string m_xtFile = "xt_v3_chebyshev.dat.gz";  /**< Xt file. */

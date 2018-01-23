@@ -35,7 +35,7 @@ def add_aafh_generator(path, finalstate='', preselection=False):
                                     6.512e+00]
         aafh_maxSubgeneratorWeight = 1.0
     else:
-        B2FATAL("add_aafh_generator final state not supported: ", finalstate)
+        B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
 
     aafh = path.add_module(
         'AafhInput',
@@ -86,7 +86,7 @@ def add_kkmc_generator(path, finalstate=''):
         kkmc_logfile = 'kkmc_mumu.txt'
         kkmc_tauconfigfile = ''
     else:
-        B2FATAL("add_kkmc_generator final state not supported: ", finalstate)
+        B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
 
     # use KKMC to generate lepton pairs
     kkgeninput = path.add_module(
@@ -109,7 +109,7 @@ def add_evtgen_generator(path, finalstate=''):
     elif finalstate == 'mixed':
         evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
     else:
-        B2FATAL("add_evtgen_generator final state not supported: " + str(finalstate))
+        B2FATAL("add_evtgen_generator final state not supported: {}".format(finalstate))
 
     # use EvtGen
     evtgen = path.add_module(
@@ -118,7 +118,7 @@ def add_evtgen_generator(path, finalstate=''):
     )
 
 
-def add_continuum_generator(path, finalstate='', userdecfile=''):
+def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenparticledata=0):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
@@ -161,7 +161,7 @@ def add_continuum_generator(path, finalstate='', userdecfile=''):
         pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
         kkmc_logfile = 'kkmc_ccbar.txt'
     else:
-        B2FATAL("add_continuum_generator final state not supported: ", finalstate)
+        B2FATAL("add_continuum_generator final state not supported: {}".format(finalstate))
 
     # use KKMC to generate qqbar events (no fragmentation at this stage)
     kkgeninput = path.add_module(
@@ -181,12 +181,34 @@ def add_continuum_generator(path, finalstate='', userdecfile=''):
         UseEvtGen=1,
         DecFile=decay_file,
         UserDecFile=decay_user,
+        useEvtGenParticleData=useevtgenparticledata
     )
 
     # branch to an empty path if PYTHIA failed, this will change the number of events
     # but the file meta data will contain the total number of generated events
     generator_emptypath = create_path()
     fragmentation.if_value('<1', generator_emptypath)
+
+
+def add_bhwide_generator(path, minangle=0.5):
+    """
+    Add the high precision QED generator BHWIDE to the path. Settings are the default L1/HLT study settings
+    with a cross section of about 124000 nb (!)
+    :param path: Add the modules to this path
+    :param minangle: minimum angle of the outgoing electron/positron in the CMS
+    """
+
+    if minangle < 0.0 or minangle > 180.0:
+        B2FATAL("add_bhwide_generator minimum angle too small (<0.0) or too large (>180): {}".format(minangle))
+
+    bhwide = path.add_module("BHWideInput")
+    bhwide.param('ScatteringAngleRangePositron', [minangle, 180.0 - minangle])
+    bhwide.param('ScatteringAngleRangeElectron', [minangle, 180.0 - minangle])
+    bhwide.param('MaxAcollinearity', 180.0)
+    bhwide.param('MinEnergy', 0.10)
+    bhwide.param('VacuumPolarization', 'burkhardt')
+    bhwide.param('WeakCorrections', True)
+    bhwide.param('WtMax', 3.0)
 
 
 def add_babayaganlo_generator(path, finalstate=''):
@@ -211,7 +233,7 @@ def add_babayaganlo_generator(path, finalstate=''):
         babayaganlo.param('FMax', 1.e4)
 
     else:
-        B2FATAL("add_babayaganlo_generator final state not supported: ", finalstate)
+        B2FATAL("add_babayaganlo_generator final state not supported: {}".format(finalstate))
 
 
 def add_phokhara_generator(path, finalstate=''):
@@ -221,7 +243,7 @@ def add_phokhara_generator(path, finalstate=''):
     :param finalstate: One of the possible final states using the PHOKHARA particle naming
     """
 
-    phokhara = path.add_module('')
+    phokhara = path.add_module('PhokharaInput')
 
     if finalstate == 'mu+mu-':
         phokhara.param('FinalState', 0)
@@ -241,7 +263,7 @@ def add_phokhara_generator(path, finalstate=''):
         phokhara.param('NLO', 0)  # no two loop corrections
         phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
     else:
-        B2FATAL("add_phokhara_generator final state not supported: ", finalstate)
+        B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
 
 
 def add_cosmics_generator(path, components=None,

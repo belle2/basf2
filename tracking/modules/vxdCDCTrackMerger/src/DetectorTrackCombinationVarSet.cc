@@ -14,7 +14,7 @@
 #include <TMath.h>
 
 #include <framework/dataobjects/Helix.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace std;
 using namespace Belle2;
@@ -38,7 +38,7 @@ bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationF
   const auto& cdcMomentum = collectorItem->getMomentumSeed();
   const auto cdcCharge = collectorItem->getChargeSeed();
 
-  const double bField = BFieldMap::Instance().getBField(cdcPosition).Z();
+  const double bField = BFieldManager::getField(cdcPosition).Z() / Unit::T;
 
   Belle2::Helix VXDHelix(vxdPosition, vxdMomentum, vxdCharge, bField);
   Belle2::Helix CDCHelix(cdcPosition, cdcMomentum, cdcCharge, bField);

@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 using namespace Belle2;
@@ -37,7 +39,7 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   const bool longArmIsCrossing = startToMiddleIsLong ? startToMiddleIsCrossing : middleToEndIsCrossing;
   const bool shortArmIsCrossing = startToMiddleIsLong ? middleToEndIsCrossing : startToMiddleIsCrossing;
-  const short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
+  const short iLayerDifference = facet.getStartWireHit().getILayer() - facet.getEndWireHit().getILayer();
   const short absILayerDifference = std::abs(iLayerDifference);
 
   var<named("superlayer_id")>() = facet.getISuperLayer();

@@ -10,24 +10,33 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
+
 #include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
-
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCSegmentTriple;
+
     /// Filter for the constuction of segment triples based on monte carlo information
-    class MCSegmentTripleFilter  : public MCSymmetricFilterMixin<Filter<CDCSegmentTriple> > {
+    class MCSegmentTripleFilter  : public MCSymmetric<BaseSegmentTripleFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<Filter<CDCSegmentTriple> >;
+      using Super = MCSymmetric<BaseSegmentTripleFilter>;
 
     public:
       /// Constructor initializing the symmetry flag.
       explicit MCSegmentTripleFilter(bool allowReverse = true);
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Initialize the before event processing.
+      void initialize() final;
 
     public:
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.

@@ -14,14 +14,20 @@
 #include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseClusterFilter>;
 
 ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
+
+ClusterFilterFactory::~ClusterFilterFactory() = default;
 
 std::string ClusterFilterFactory::getIdentifier() const
 {

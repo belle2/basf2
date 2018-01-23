@@ -48,15 +48,12 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
         chargedVariables = ['eIDBelle',
-                            'atcPIDBelle(3,2)', 'Kid_belle',
+                            'atcPIDBelle(3,2)', 'kIDBelle',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
     else:
-        chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
-                            'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
-                            'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
-                            'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
+        chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
 
     if specific:
@@ -69,7 +66,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='piid' if not convertedFromBelle else 'atcPIDBelle(2,3)',
+                                        bestCandidateVariable='pionID' if not convertedFromBelle else 'atcPIDBelle(2,3)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -79,7 +76,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='Kid' if not convertedFromBelle else 'atcPIDBelle(3,2)',
+                                        bestCandidateVariable='kaonID' if not convertedFromBelle else 'atcPIDBelle(3,2)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
@@ -89,7 +86,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                          target='isPrimarySignal'),
                         PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
-                                            bestCandidateVariable='eid' if not convertedFromBelle else 'eIDBelle',
+                                            bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
                                             bestCandidateCut=10),
                         PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
@@ -99,7 +96,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='muid' if not convertedFromBelle else 'muIDBelle',
+                                        bestCandidateVariable='muonID' if not convertedFromBelle else 'muIDBelle',
                                         bestCandidateCut=10),
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
@@ -131,16 +128,16 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
 
     if convertedFromBelle:
 
-        pi0_cut = '0.08 < M < 0.18'
+        pi0_cut = '0.08 < InvM < 0.18'
         if specific:
             pi0_cut += ' and isInRestOfEvent > 0.5'
 
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=['M', 'extraInfo(preCut_rank)',
-                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigMBF)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E'],
                                         target='isSignal'),
                        PreCutConfiguration(userCut=pi0_cut,
-                                           bestCandidateVariable='abs(dM)',
+                                           bestCandidateVariable='abs(SigMBF)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])
@@ -813,10 +810,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
 
 
 def get_unittest_channels(specific=False):
-    chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL', 'extraInfo(preCut_rank)',
-                        'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
-                        'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
-                        'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
+    chargedVariables = ['eid', 'extraInfo(preCut_rank)', 'Kid', 'prid', 'muid',
                         'p', 'pt', 'pz', 'dr', 'dz', 'chiProb']
 
     specific_cut = ''
@@ -828,7 +822,7 @@ def get_unittest_channels(specific=False):
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]' + specific_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='piid',
+                                        bestCandidateVariable='pionID',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -838,7 +832,7 @@ def get_unittest_channels(specific=False):
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]' + specific_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='Kid',
+                                        bestCandidateVariable='kaonID',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
@@ -847,7 +841,7 @@ def get_unittest_channels(specific=False):
                     MVAConfiguration(variables=chargedVariables,
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]' + specific_cut,
-                                        bestCandidateVariable='muid',
+                                        bestCandidateVariable='muonID',
                                         bestCandidateMode='highest',
                                         bestCandidateCut=10),
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
@@ -923,15 +917,12 @@ def get_fr_channels(convertedFromBelle=False):
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
         chargedVariables = ['eIDBelle',
-                            'atcPIDBelle(3,2)', 'Kid_belle',
+                            'atcPIDBelle(3,2)', 'kIDBelle',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
     else:
-        chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
-                            'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
-                            'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
-                            'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
+        chargedVariables = ['electronID', 'kaonID', 'protonID', 'muonID',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
 
     charged_user_cut = '[dr < 2] and [abs(dz) < 4]'
@@ -941,7 +932,7 @@ def get_fr_channels(convertedFromBelle=False):
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='piid' if not convertedFromBelle else 'atcPIDBelle(2,3)',
+                                        bestCandidateVariable='pionID' if not convertedFromBelle else 'atcPIDBelle(2,3)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -951,7 +942,7 @@ def get_fr_channels(convertedFromBelle=False):
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='Kid' if not convertedFromBelle else 'atcPIDBelle(3,2)',
+                                        bestCandidateVariable='kaonID' if not convertedFromBelle else 'atcPIDBelle(3,2)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
@@ -961,7 +952,7 @@ def get_fr_channels(convertedFromBelle=False):
                                          target='isPrimarySignal'),
                         PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
-                                            bestCandidateVariable='eid' if not convertedFromBelle else 'eIDBelle',
+                                            bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
                                             bestCandidateCut=10),
                         PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
@@ -971,7 +962,7 @@ def get_fr_channels(convertedFromBelle=False):
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
                                         bestCandidateMode='highest',
-                                        bestCandidateVariable='muid' if not convertedFromBelle else 'muIDBelle',
+                                        bestCandidateVariable='muonID' if not convertedFromBelle else 'muIDBelle',
                                         bestCandidateCut=10),
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
@@ -998,11 +989,11 @@ def get_fr_channels(convertedFromBelle=False):
     if convertedFromBelle:
 
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=['M', 'extraInfo(preCut_rank)',
-                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigMBF)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E'],
                                         target='isSignal'),
-                       PreCutConfiguration(userCut='0.08 < M < 0.18',
-                                           bestCandidateVariable='abs(dM)',
+                       PreCutConfiguration(userCut='0.08 < InvM < 0.18',
+                                           bestCandidateVariable='abs(SigMBF)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])

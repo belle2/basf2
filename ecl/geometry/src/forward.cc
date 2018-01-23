@@ -89,15 +89,15 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     new G4PVPlacement(G4Translate3D(0, 0, 1960), part4logical, "part4physical", top, false, 0, overlap);
   }
 
-  zr_t vin[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
-  std::vector<zr_t> cin(vin, vin + sizeof(vin) / sizeof(zr_t));
-  G4VSolid* innervolume_solid = new BelleLathe("fwd_innervolume_solid", 0, 2 * M_PI, cin);
+  zr_t cont_array_in[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
+  std::vector<zr_t> contour_in(cont_array_in, cont_array_in + sizeof(cont_array_in) / sizeof(zr_t));
+  G4VSolid* innervolume_solid = new BelleLathe("fwd_innervolume_solid", 0, 2 * M_PI, contour_in);
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att("air"));
   new G4PVPlacement(G4Translate3D(0, 0, 1960), innervolume_logical, "ECLForwardPhysical", top, false, 0, overlap);
 
-  G4VSolid* innervolumesector_solid = new BelleLathe("fwd_innervolumesector_solid", -M_PI / 8, M_PI / 4, cin);
+  G4VSolid* innervolumesector_solid = new BelleLathe("fwd_innervolumesector_solid", -M_PI / 8, M_PI / 4, contour_in);
   G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, Materials::get("G4_AIR"),
       "innervolumesector_logical", 0, 0, 0);
   innervolumesector_logical->SetVisAttributes(att("air"));
@@ -163,11 +163,11 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     Point_t vin[] = {{ZT - zsep, RIp - tand(th0)* zsep}, {ZT - 60, RIp - tand(th0) * 60}, {ZT - 60, RT - 20 - d}, {ZT - zsep, RT - 20 - d}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
-    G4ThreeVector cin[n * 2];
-    for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2);
-    for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2);
+    G4ThreeVector contour_swall[n * 2];
+    for (int i = 0; i < n; i++) contour_swall[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2);
 
-    G4VSolid* septumwall_solid = new BelleCrystal("fwd_septumwall_solid", n, cin);
+    G4VSolid* septumwall_solid = new BelleCrystal("fwd_septumwall_solid", n, contour_swall);
 
     G4LogicalVolume* septumwall_logical = new G4LogicalVolume(septumwall_solid, Materials::get("A5052"),
                                                               "septumwall_logical", 0, 0, 0);
@@ -175,10 +175,10 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0), septumwall_logical,
                       "septumwall_physical", innervolumesector_logical, false, 0, overlap);
 
-    for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
-    for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
 
-    G4VSolid* septumwall2_solid = new BelleCrystal("fwd_septumwall2_solid", n, cin);
+    G4VSolid* septumwall2_solid = new BelleCrystal("fwd_septumwall2_solid", n, contour_swall);
 
     G4LogicalVolume* septumwall2_logical = new G4LogicalVolume(septumwall2_solid, Materials::get("A5052"),
                                                                "septumwall2_logical", 0, 0, 0);
@@ -205,12 +205,12 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     Point_t vin[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20 - d}, {3 + (RT - 20 - d - aRC) / tand(th1), RT - 20 - d}, {3, aRC}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
-    G4ThreeVector cin[n * 2];
+    G4ThreeVector contour_swall[n * 2];
 
-    for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
-    for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
 
-    G4VSolid* septumwall3_solid = new BelleCrystal("fwd_septumwall3_solid", n, cin);
+    G4VSolid* septumwall3_solid = new BelleCrystal("fwd_septumwall3_solid", n, contour_swall);
 
     G4LogicalVolume* septumwall3_logical = new G4LogicalVolume(septumwall3_solid, Materials::get("A5052"),
                                                                "septumwall3_logical", 0, 0, 0);
@@ -463,12 +463,12 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       return solid2_p4;
     };
     double obj2_dz = Z0 - 95;
-    auto place_solid2 = [&](double obj2_dz, double L, double ang, double phi, double mx, double dy) {
+    auto place_solid2 = [&](double dz, double L, double ang, double phi, double mx, double dy) {
       G4Transform3D lt;
       G4LogicalVolume* lsolid2 = new G4LogicalVolume(get_bracket(L, ang, lt), Materials::get("A5052"), "lsolid2", 0, 0, 0);
       lsolid2->SetVisAttributes(att("alum"));
 
-      G4Transform3D tsolid2_p1(G4RotateZ3D(phi)*G4Translate3D(mx, dy, obj2_dz)*lt);
+      G4Transform3D tsolid2_p1(G4RotateZ3D(phi)*G4Translate3D(mx, dy, dz)*lt);
       //  string pname("psolid2_p"); pname += to_string(++sol2count);
       acs->AddPlacedVolume(lsolid2, tsolid2_p1);
       //  new G4PVPlacement(tsolid2_p1, lsolid2, pname.c_str(), crystalSectorLogical, false, 0, overlaps);

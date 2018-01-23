@@ -403,6 +403,7 @@ def vertexTree(
     conf_level=0.001,
     bb_verbose=0,
     massConstraint=[],
+    ipConstraintDim=0,
     path=analysis_main,
 ):
     """
@@ -411,7 +412,8 @@ def vertexTree(
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param bb_verbose   (legacy) BaBar verbosity
-    @param m_constraint list of PDG ids which are mass-constrained
+    @param massConstraint list of PDG ids which are mass-constrained
+    @param ipConstraintDim constrain head production vertex to IP (2 = (x-y) constraint, 3 = 3D (x-y-z) constraint, 0 = none)
     @param path         modules are added to this path
     """
 
@@ -421,6 +423,7 @@ def vertexTree(
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('verbose', bb_verbose)
     treeFitter.param('massConstraintList', massConstraint)
+    treeFitter.param('ipConstraintDimension', ipConstraintDim)
     path.add_module(treeFitter)
 
 

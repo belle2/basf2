@@ -2,8 +2,40 @@
 # -*- coding: utf-8 -*-
 
 """\
-Run basf2 tests of the given packages or sub-directories.
-If no argument is given all tests are run.
+Run basf2 framework tests of the given packages.  If no argument is given all
+tests are run.
+
+For each package execute all files ending in ``*.py`` inside the ``tests/``
+directory as test cases. A return value of 0 is treaded as success, other return
+values are treated as failures. In addition if ``*.out`` or ``*.err`` files with
+the same base name are present in the tests directory they will be treated as
+expected output on stdout or stderr respectively. If the output of the script
+differes from the contents of these files the test is marked as failed as well.
+The first line from stdout will not be compared to allow executing the scripts
+from a different directory.
+
+.. note::
+
+   Tests can decide that they need to be skipped under certain conditions. To do so
+   a test script can write a line beginning with ``TEST SKIPPED:`` followed by the
+   reason for skipping on stderr and exit with a non-zero return code.
+
+.. seealso:: `b2test_utils.skip_test`
+
+--epilog--
+.. rubric:: Examples
+
+* run all tests with 8 tests being run in parallel::
+
+    $ %(prog)s -j8
+
+* run the framework tests and save the output as XML::
+
+    $ %(prog)s --xml=framework-tests.xml framework
+
+* run only tests which where the python filename contains seqroot::
+
+    $ %(prog)s --filter=seqroot
 """
 
 import sys
@@ -34,13 +66,14 @@ print_lock = threading.Lock()
 def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
     """Compare the log output to the content of a template file
 
-    :param release: release directory in which test is found
-    :param name: name of the test
-    :param log: output of the test
-    :param logtype: which type of output? should be "out" or "err"
-    :param ignore_lines: how many lines to ignore at the beginning when
+    Parameters:
+      release: release directory in which test is found
+      name: name of the test
+      log: output of the test
+      logtype: which type of output? should be "out" or "err"
+      ignore_lines: how many lines to ignore at the beginning when
         comparing to the template.  Used to strip of steering file name
-    :param diff_lines: how many lines of the diff to print on the console
+      diff_lines: how many lines of the diff to print on the console
     """
 
     template = name[:-2] + logtype
@@ -248,57 +281,6 @@ def process_top_dir(release_dir, directories, processed_dirs):
     return tests
 
 
-parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("-j", type=int, default=1, help="Number of processes", dest="nprocess", metavar="N")
-parser.add_argument("--xml", type=str, default=None, help="Save results into given file as xml")
-parser.add_argument("-n", "--diff-lines", type=int, default=10, help="Number of lines to show if output is different from template")
-parser.add_argument("-q", "--quiet", action="store_true", default=False, help="if given don't print output of failed tests")
-parser.add_argument("--filter", type=str, default=None, help="If given only run tests where the name "
-                    "of the steering file matches the regular expression given")
-parser.add_argument("directories", nargs="*", help="run all tests included in these directories. "
-                    "If none are specified run all tests")
-parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
-                    help="if given this is the maximum runtime in seconds for each "
-                    "test case before they are killed and marked as failed")
-options = parser.parse_args()
-
-# check whether a release is set up
-if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
-    sys.stderr.write('Error: no release is set up.\n')
-    sys.exit(-1)
-
-# first let's collect all tests
-print("running steering file tests in %d %s" % (options.nprocess, "process" if options.nprocess == 1 else "processes"), flush=True)
-all_tests = []
-processed_dirs = []
-if "BELLE2_LOCAL_DIR" in os.environ:
-    all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs)
-if "BELLE2_RELEASE_DIR" in os.environ:
-    all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
-
-if options.filter is not None:
-    try:
-        re_filter = re.compile(options.filter)
-    except Exception as e:
-        print("The --filter argument %r is not a valid regular expression: %s" %
-              (options.filter, e))
-        sys.exit(1)
-    all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
-
-all_tests.sort()
-print("Collected %d tests..." % len(all_tests), flush=True)
-
-# now let's run them, either in multiprocessing or in a single process
-if options.nprocess > 1:
-    with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
-        # run tests in multiple threads but consume the iterator right away to
-        # avoid a bug in python 3.5 when zipping over a futures result iterator
-        # and then exiting using sys.exit().
-        results = list(pool.map(run_test, all_tests))
-else:
-    results = map(run_test, all_tests)
-
-
 class TestSuite(list):
     """Class to aggregate test case results by directory"""
     def __init__(self):
@@ -326,42 +308,104 @@ class TestSuite(list):
         return (passed is not False)
 
 
-# and present the results
-test_results = TestSuite()
-test_suites = defaultdict(TestSuite)
-tests_failed = []
-for (test, release_dir), result in zip(all_tests, results):
-    if not test_results.add(test, *result):
-        tests_failed.append(test)
-    suite = os.path.dirname(test)
-    if suite.endswith("/tests"):
-        suite = os.path.dirname(suite)
-    test_suites[suite].add(test, *result)
+def get_argument_parser():
+    """Return an argument parser correctly setup for all known options"""
+    description, epilog = __doc__.split("--epilog--", 1)
+    parser = argparse.ArgumentParser(description=description, epilog=epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-j", type=int, default=1, dest="nprocess", metavar="N",
+                        help="Number of test cases to run in parallel")
+    parser.add_argument("--xml", type=str, default=None, help="Save results into given "
+                        "file using xml format compatible with JUnit parsers")
+    parser.add_argument("-n", "--diff-lines", type=int, default=10,
+                        help="Number of lines to show if output is different from template")
+    parser.add_argument("-q", "--quiet", action="store_true", default=False,
+                        help="if given don't print output of failed tests")
+    parser.add_argument("--filter", type=str, default=None, help="Only run tests where the name "
+                        "of the steering file matches the given regular expression")
+    parser.add_argument("directories", nargs="*", help="run all tests included in this directory."
+                        "If none are specified run all tests", metavar="DIRECTORY")
+    parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
+                        help="if given this is the maximum runtime in seconds for each "
+                        "test case before they are killed and marked as failed")
+    return parser
 
-if options.xml and len(all_tests):
-    # now let's make the xml
-    root_el = ET.Element("testsuites", tests=str(len(test_results)), failures=str(test_results.failed),
-                         skipped=str(test_results.skipped), timestamp=datetime.datetime.now().isoformat(),
-                         time=str(test_results.time), name="Basf2 Tests")
-    for suite, tests in sorted(test_suites.items()):
-        suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
-                                 failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
-        for name, passed, message, time, output in tests:
-            test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
-                                    classname=suite, time=str(time))
-            if passed is not True:
-                failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
-                                        type="FAILED" if passed is False else "SKIPPED")
-                if output is not None:
-                    failure.text = output
 
-    tree = ET.ElementTree(root_el)
-    tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
+if __name__ == "__main__":
+    options = get_argument_parser().parse_args()
 
-# print a list of failed tests to find them more easily
-print(flush=True)
-if test_results.failed > 0:
-    print("FAILED TESTS:", "\n    ".join([""] + tests_failed), flush=True)
-# print summary and exit
-print('%d out of %d tests failed, %d were skipped' % (test_results.failed, len(test_results), test_results.skipped), flush=True)
-sys.exit(len(tests_failed))
+    # check whether a release is set up
+    if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
+        sys.stderr.write('Error: no release is set up.\n')
+        sys.exit(-1)
+
+    # first let's collect all tests
+    print("running steering file tests in %d %s" %
+          (options.nprocess, "process" if options.nprocess == 1 else "processes"), flush=True)
+    all_tests = []
+    processed_dirs = []
+    if "BELLE2_LOCAL_DIR" in os.environ:
+        all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs)
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
+
+    if options.filter is not None:
+        try:
+            re_filter = re.compile(options.filter)
+        except Exception as e:
+            print("The --filter argument %r is not a valid regular expression: %s" % (options.filter, e))
+            sys.exit(1)
+        all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
+
+    all_tests.sort()
+    print("Collected %d tests..." % len(all_tests), flush=True)
+
+    # now let's run them, either in multiprocessing or in a single process
+    if options.nprocess > 1:
+        with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
+            # run tests in multiple threads but consume the iterator right away to
+            # avoid a bug in python 3.5 when zipping over a futures result iterator
+            # and then exiting using sys.exit().
+            results = list(pool.map(run_test, all_tests))
+    else:
+        results = map(run_test, all_tests)
+
+    # and present the results
+    test_results = TestSuite()
+    test_suites = defaultdict(TestSuite)
+    tests_failed = []
+    for (test, release_dir), result in zip(all_tests, results):
+        if not test_results.add(test, *result):
+            tests_failed.append(test)
+        suite = os.path.dirname(test)
+        if suite.endswith("/tests"):
+            suite = os.path.dirname(suite)
+        test_suites[suite].add(test, *result)
+
+    if options.xml and len(all_tests):
+        # now let's make the xml
+        root_el = ET.Element("testsuites", tests=str(len(test_results)), failures=str(test_results.failed),
+                             skipped=str(test_results.skipped), timestamp=datetime.datetime.now().isoformat(),
+                             time=str(test_results.time), name="Basf2 Tests")
+        for suite, tests in sorted(test_suites.items()):
+            suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
+                                     failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
+            for name, passed, message, time, output in tests:
+                test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
+                                        classname=suite, time=str(time))
+                if passed is not True:
+                    failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
+                                            type="FAILED" if passed is False else "SKIPPED")
+                    if output is not None:
+                        failure.text = output
+
+        tree = ET.ElementTree(root_el)
+        tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
+
+    # print a list of failed tests to find them more easily
+    print(flush=True)
+    if test_results.failed > 0:
+        print("FAILED TESTS:", "\n    ".join([""] + tests_failed), flush=True)
+    # print summary and exit
+    print('%d out of %d tests failed, %d were skipped' % (test_results.failed, len(test_results), test_results.skipped), flush=True)
+    sys.exit(len(tests_failed))

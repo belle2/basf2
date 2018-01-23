@@ -136,8 +136,6 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
     // If PXD
     if (detectorType == Const::PXD) {
 
-      StoreArray<PXDCluster> pxdClusters("");
-      int npxdclusters = pxdClusters.getEntries();
       if (npxdclusters != 0) {
 
         if (relativeClusterId >= npxdclusters) {

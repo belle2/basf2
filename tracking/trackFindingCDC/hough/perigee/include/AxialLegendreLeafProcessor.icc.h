@@ -29,7 +29,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -41,16 +41,22 @@ namespace Belle2 {
       // Start off by fitting the items of the leaf with a general trajectory
       // that may have a distinct impact != 0
       /////////////////////////////////////////////////////////////////////////
+      auto fitPos = EFitPos::c_RecoPos;
+      auto fitVariance = EFitVariance::c_DriftLength;
+      // Other combinations of fit information
+      // EFitPos::c_RLDriftCircle x EFitVariance::(c_Nominal, c_Pseudo, c_Proper)
+      // have been tried, but found to be worse, which is
+      // not intutive. Probably the perfect circle trajectory
+      // is not as good of a model on the full CDC volume.
+      CDCObservations2D observations2D(fitPos, fitVariance);
+
       CDCKarimakiFitter fitter;
-      // CDCRiemannFitter fitter;
-      // fitter.setFitVariance(EFitVariance::c_Nominal);
-      fitter.setFitVariance(EFitVariance::c_DriftLength); // Best one of the eight combinations of fitters..
-      // fitter.setFitVariance(EFitVariance::c_Pseudo);
-      // fitter.setFitVariance(EFitVariance::c_Proper);
+      // Tested alternative CDCRiemannFitter with only marginal differences;
 
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
       std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted
-      CDCTrajectory2D trajectory2D = fitter.fit(hits);
+      observations2D.appendRange(hits);
+      CDCTrajectory2D trajectory2D = fitter.fit(observations2D);
       {
         const double curv = trajectory2D.getCurvature();
         std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
@@ -87,7 +93,9 @@ namespace Belle2 {
           hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
 
           // Update the current fit
-          trajectory2D = fitter.fit(hits);
+          observations2D.clear();
+          observations2D.appendRange(hits);
+          trajectory2D = fitter.fit(observations2D);
           trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
         }
       }

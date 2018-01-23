@@ -84,6 +84,15 @@ void PXDDQMExpressRecoModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   m_oldDir = gDirectory;
+  // save way to create directories and cd to them, even if they exist already.
+  // if cd fails, Directory points to oldDir, but never ZERO ptr
+  m_oldDir->mkdir("PXDExpReco_Flags");
+  m_oldDir->cd("PXDExpReco_Flags");
+  TDirectory* DirPXDFlags = gDirectory;
+  m_oldDir->mkdir("PXDExpReco");
+  m_oldDir->cd("PXDExpReco");
+  TDirectory* DirPXDBasic = gDirectory;
+  m_oldDir->cd();
 
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -106,11 +115,6 @@ void PXDDQMExpressRecoModule::defineHisto()
       break;
     }
   }
-
-  TDirectory* DirPXDBasic = NULL;
-  TDirectory* DirPXDFlags = NULL;
-  DirPXDFlags = m_oldDir->mkdir("PXDExpReco_Flags");
-  DirPXDBasic = m_oldDir->mkdir("PXDExpReco");
 
   // Create basic histograms:
   DirPXDBasic->cd();
@@ -370,17 +374,17 @@ void PXDDQMExpressRecoModule::event()
   // PXD basic histograms:
   // Fired strips
   vector< set<int> > Pixels(c_nPXDSensors); // sets to eliminate multiple samples per strip
-  for (const PXDDigit& digit : storePXDDigits) {
-    int iLayer = digit.getSensorID().getLayerNumber();
+  for (const PXDDigit& digit2 : storePXDDigits) {
+    int iLayer = digit2.getSensorID().getLayerNumber();
     if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-    int iLadder = digit.getSensorID().getLadderNumber();
-    int iSensor = digit.getSensorID().getSensorNumber();
+    int iLadder = digit2.getSensorID().getLadderNumber();
+    int iSensor = digit2.getSensorID().getSensorNumber();
     int index = getSensorIndex(iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    Pixels.at(index).insert(digit.getUniqueChannelID());
-    if (m_pixelSignal[index] != NULL) m_pixelSignal[index]->Fill(digit.getCharge());
-    if ((m_hitMapCounts != NULL) && (digit.getCharge() > m_CutPXDCharge))
+    Pixels.at(index).insert(digit2.getUniqueChannelID());
+    if (m_pixelSignal[index] != NULL) m_pixelSignal[index]->Fill(digit2.getCharge());
+    if ((m_hitMapCounts != NULL) && (digit2.getCharge() > m_CutPXDCharge))
       m_hitMapCounts->Fill(index);
   }
   for (int i = 0; i < c_nPXDSensors; i++) {
@@ -457,9 +461,9 @@ void PXDDQMExpressRecoModule::endRun()
   m_oldDir->cd();
   NoOfEvents->Write(nameBS.Data());
 
-  TDirectory* DirPXDRefs = NULL;
-  DirPXDRefs = m_oldDir->mkdir("PXDExpReco_Refs");
-  DirPXDRefs->cd();
+  m_oldDir->mkdir("PXDExpReco_Refs");
+  m_oldDir->cd("PXDExpReco_Refs");
+//   TDirectory* DirPXDRefs = gDirectory;
   // Load reference file of histograms:
   TVectorD* NoOfEventsRef;
   NoOfEventsRef = new TVectorD(1);
@@ -522,9 +526,9 @@ void PXDDQMExpressRecoModule::endRun()
     TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
     if (f_RefHistFile->IsOpen()) {
       B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-      TVectorD* NoOfEventsRef = NULL;
-      f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
-      m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+      TVectorD* NoOfEventsRef2 = NULL;
+      f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef2);
+      m_NoOfEventsRef = (int)NoOfEventsRef2->GetMatrixArray()[0];
       //    m_NoOfEventsRef = 2;
       string name = str(format("PXDExpReco/PixelHitmapCounts;1"));
       f_RefHistFile->GetObject(name.c_str(), r_hitMapCounts);
@@ -852,11 +856,11 @@ int PXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
     }
     iret = 1;
   } else if (Type == 10) {
-    float flag  = refhist->Chi2Test(temp);
+    float flag2  = refhist->Chi2Test(temp);
     flaghist->SetBinContent(bin + 1, 0);
-    if (flag > pars[1])
+    if (flag2 > pars[1])
       flaghist->SetBinContent(bin + 1, 2);
-    if (flag > pars[0])
+    if (flag2 > pars[0])
       flaghist->SetBinContent(bin + 1, 1);
     iret = 1;
   } else if (Type == 100) {

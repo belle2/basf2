@@ -113,7 +113,7 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[3].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[4].preCutConfig.userCut, 'goodBelleGamma == 1 and clusterBelleQuality == 0 '
                                                             'and isInRestOfEvent > 0.5')
-        self.assertEqual(particles[5].preCutConfig.userCut, '0.08 < M < 0.18 and isInRestOfEvent > 0.5')
+        self.assertEqual(particles[5].preCutConfig.userCut, '0.08 < InvM < 0.18 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[6].preCutConfig.userCut, '0.4 < M < 0.6 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
 
@@ -127,7 +127,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'B0:semileptonic', 'B+:semileptonic'])
 
         chargedVariables = ['eIDBelle',
-                            'atcPIDBelle(3,2)', 'Kid_belle',
+                            'atcPIDBelle(3,2)', 'kIDBelle',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']

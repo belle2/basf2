@@ -32,8 +32,7 @@ namespace Belle2 {
       m_charge(0) ,
       m_startRow(0),
       m_frameNr(0),
-      m_commonMode(0),
-      m_sorPreWord(0) {};
+      m_commonMode(0) {};
 
 
     /**
@@ -46,9 +45,9 @@ namespace Belle2 {
      * @param commonMode Common Mode correction for this pixel.
      */
     PXDRawHit(VxdID sensorID, short row, short column, short charge,
-              unsigned short startRow, unsigned int frameNr, unsigned int commonMode = 0, unsigned int sorPreWord = 0):
+              unsigned short startRow, unsigned int frameNr, unsigned int commonMode = 0):
       m_sensorID(sensorID), m_row(row), m_column(column),
-      m_charge(charge), m_startRow(startRow), m_frameNr(frameNr), m_commonMode(commonMode), m_sorPreWord(sorPreWord)
+      m_charge(charge), m_startRow(startRow), m_frameNr(frameNr), m_commonMode(commonMode)
     {};
 
     /** Get the sensor ID.
@@ -83,7 +82,7 @@ namespace Belle2 {
       return m_charge;
     }
 
-    /** Get cluster start pixel in u direction.
+    /** Get row where trigger happend / readout started
      * @return row where reading begins.
      */
     unsigned short getStartRow() const
@@ -91,8 +90,8 @@ namespace Belle2 {
       return m_startRow;
     }
 
-    /** Get number of the Frames.
-     * @return Number of the Frames.
+    /** Get frame number.
+     * @return Number of the Frame.
      */
     unsigned short getFrameNr() const
     {
@@ -107,10 +106,6 @@ namespace Belle2 {
       return m_commonMode;
     }
 
-    unsigned int getSorPreWord() const
-    {
-      return m_sorPreWord;
-    }
 
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
@@ -120,10 +115,9 @@ namespace Belle2 {
     unsigned short m_startRow;  /**< pixel row where reading starts */
     unsigned short m_frameNr;    /**< Number of the Frames */
     short m_commonMode;    /**< Common Mode correction */
-    unsigned int m_sorPreWord;
     // ~PXDRawHit();
 
-    ClassDef(PXDRawHit, 3)
+    ClassDef(PXDRawHit, 4)
   };
 
 

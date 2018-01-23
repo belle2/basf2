@@ -9,8 +9,6 @@
 
 #include <testbeam/vxd/modules/spacePointCreatorTEL/SpacePointCreatorTELModule.h>
 
-#include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
-
 #include <framework/logging/Logger.h>
 
 #include <limits>       // std::numeric_limits
@@ -71,8 +69,11 @@ void SpacePointCreatorTELModule::initialize()
 void SpacePointCreatorTELModule::event()
 {
 
-  storeSingleCluster(m_telClusters, m_spacePoints);
-
+  for (unsigned int i = 0; i < uint(m_telClusters.getEntries()); ++i) {
+    const TelCluster* currentCluster = m_telClusters[i];
+    TBSpacePoint* newSP = m_spacePoints.appendNew((currentCluster));
+    newSP->addRelationTo(currentCluster);
+  }
 
   B2DEBUG(1, "SpacePointCreatorTELModule(" << m_nameOfInstance <<
           ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<

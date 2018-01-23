@@ -14,11 +14,14 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/SimpleSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseSegmentTripleFilter>;
 
 SegmentTripleFilterFactory::SegmentTripleFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

@@ -10,6 +10,8 @@
 
 #include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
 
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+
 #include <gtest/gtest.h>
 
 using namespace Belle2;

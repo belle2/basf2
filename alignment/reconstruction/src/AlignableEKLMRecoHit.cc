@@ -15,8 +15,12 @@
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformDataGlobalAligned.h>
+#include <alignment/GlobalDerivatives.h>
+#include <alignment/GlobalLabel.h>
+#include <eklm/dbobjects/EKLMAlignment.h>
 
 using namespace Belle2;
+using namespace alignment;
 
 AlignableEKLMRecoHit::AlignableEKLMRecoHit()
 {
@@ -94,30 +98,25 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 {
 }
 
-std::vector<int> AlignableEKLMRecoHit::labels()
+std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-  std::vector<int> labels;
-  labels.push_back(GlobalLabel(m_Sector, 1));
-  labels.push_back(GlobalLabel(m_Sector, 2));
-  labels.push_back(GlobalLabel(m_Sector, 3));
-  labels.push_back(GlobalLabel(m_Segment, 1));
-  labels.push_back(GlobalLabel(m_Segment, 2));
-  return labels;
-}
 
-TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
-{
+  std::vector<int> labGlobal;
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_Sector.getGlobalNumber(), 1)); // dx
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_Sector.getGlobalNumber(), 2));// dy
+  labGlobal.push_back(GlobalLabel::construct<EKLMAlignment>(m_Sector.getGlobalNumber(), 6)); // drot
+
   /* Local parameters. */
   const double dalpha = 0;
   const double dxs = 0;
   const double dys = 0;
-  const double dy = 0;
+  //const double dy = 0;
   const double sinda = sin(dalpha);
   const double cosda = cos(dalpha);
   /* Local position in segment coordinates. */
   TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
-  double u = pos.X();
-  double v = pos.Y();
+  //double u = pos.X();
+  //double v = pos.Y();
   /* Local position in sector coordinates. */
   HepGeom::Point3D<double> globalPos;
   HepGeom::Transform3D t;
@@ -136,19 +135,19 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
    * Matrix of global derivatives (second dimension is added because of
    * resizing in GblFitterInfo::constructGblPoint()).
    */
-  TMatrixD derGlobal(2, 5);
+  TMatrixD derGlobal(2, 3);
   derGlobal(0, 0) = 0;
   derGlobal(0, 1) = 0;
   derGlobal(0, 2) = 0;
-  derGlobal(0, 3) = 0;
-  derGlobal(0, 4) = 0;
   derGlobal(1, 0) = -(cosda * m_StripV.X() - sinda * m_StripV.Y());
   derGlobal(1, 1) = -(sinda * m_StripV.X() + cosda * m_StripV.Y());
   derGlobal(1, 2) = (x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
                     (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y());
-  derGlobal(1, 3) = -cosda;
-  derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
-  return derGlobal;
+  //derGlobal(1, 3) = -cosda;
+  //derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
+
+  return alignment::GlobalDerivatives(labGlobal, derGlobal);
+
 }
 
 genfit::AbsMeasurement* AlignableEKLMRecoHit::clone() const

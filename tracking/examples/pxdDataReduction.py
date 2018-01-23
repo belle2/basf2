@@ -26,7 +26,7 @@ eventinfoprinter = register_module('EventInfoPrinter')
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.INFO
 
-pxdDataRed = register_module('PXDDataReduction')
+pxdDataRed = register_module('PXDROIFinder')
 pxdDataRed.logging.log_level = LogLevel.DEBUG
 # pxdDataRed.logging.debug_level = 2
 param_pxdDataRed = {
@@ -52,7 +52,7 @@ param_pxdDataRed = {
 }
 pxdDataRed.param(param_pxdDataRed)
 
-pxdDataRedAnalysis = register_module('PXDDataRedAnalysis')
+pxdDataRedAnalysis = register_module('PXDROIFinderAnalysis')
 pxdDataRedAnalysis.logging.log_level = LogLevel.RESULT
 pxdDataRedAnalysis.logging.debug_level = 1
 param_pxdDataRedAnalysis = {

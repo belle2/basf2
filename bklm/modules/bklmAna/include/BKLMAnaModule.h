@@ -15,6 +15,9 @@
 #include <framework/datastore/StoreArray.h>
 #include "bklm/geometry/Module.h"
 #include <bklm/geometry/GeometryPar.h>
+#include <mdst/dataobjects/Track.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include "TFile.h"
 #include "TTree.h"
 #include "TCanvas.h"
@@ -67,6 +70,9 @@ namespace Belle2 {
 
 
   private:
+
+    //! run number
+    int  m_run;
 
     //! number of validated ExtHit in BKLM in one event
     int  m_nExtHit;
@@ -131,6 +137,13 @@ namespace Belle2 {
 
     //! associated efficiencies vs glaoble y, z coordinate
     TH2F* m_effiYZ;
+
+    //! hits2D StoreArray
+    StoreArray<BKLMHit2d> hits2D;
+    //! extHits StoreArray
+    StoreArray<ExtHit> extHits;
+    //! tracks StoreArray
+    StoreArray<Track> tracks;
 
   };
 

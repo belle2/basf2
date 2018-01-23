@@ -11,10 +11,20 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseSegmentRelationFilter>;
 
 MCSegmentRelationFilter::MCSegmentRelationFilter(bool allowReverse)
   : Super(allowReverse)

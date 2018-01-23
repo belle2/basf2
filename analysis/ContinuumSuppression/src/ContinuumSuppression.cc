@@ -71,7 +71,6 @@ namespace Belle2 {
     std::vector<Belle2::Particle*> signalDaughters = particle->getDaughters();
 
     for (const Belle2::Particle* sigFS0 : signalDaughters) {
-      PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
       p3_cms_q_sigA.push_back({p_cms.Vect(), sigFS0->getCharge()});
@@ -84,8 +83,6 @@ namespace Belle2 {
     std::vector<const Belle2::Particle*> signalFSParticles = particle->getFinalStateDaughters();
 
     for (const Belle2::Particle* sigFS1 : signalFSParticles) {
-
-      PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
 
       p3_cms_all.push_back(p_cms.Vect());
@@ -114,15 +111,14 @@ namespace Belle2 {
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
         // Create particle from track with pion hypothesis
-        Particle particle(track, charged);
-        if (particle.getParticleType() == Particle::c_Track) {
-          PCmsLabTransform T;
-          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
+        Particle pion_particle(track, charged);
+        if (pion_particle.getParticleType() == Particle::c_Track) {
+          TLorentzVector p_cms = T.rotateLabToCms() * pion_particle.get4Vector();
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), particle.getCharge()});
+          p3_cms_q_roe.push_back({p_cms.Vect(), pion_particle.getCharge()});
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
@@ -138,16 +134,14 @@ namespace Belle2 {
       for (const ECLCluster* cluster : roeECLClusters) {
 
         if (cluster->isNeutral()) {
-
           // Create particle from ECLCluster with gamma hypothesis
-          Particle particle(cluster);
+          Particle gamma_particle(cluster);
 
-          PCmsLabTransform T;
-          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
+          TLorentzVector p_cms = T.rotateLabToCms() * gamma_particle.get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), particle.getCharge()});
+          p3_cms_q_roe.push_back({p_cms.Vect(), gamma_particle.getCharge()});
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;

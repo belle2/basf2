@@ -27,7 +27,9 @@ namespace Belle2 {
     /** Destructor.*/
     virtual ~TestCalibDBAccessModule();
 
+    /// Initialize
     virtual void initialize() override;
+    /// Event()
     virtual void event() override;
 
   private:

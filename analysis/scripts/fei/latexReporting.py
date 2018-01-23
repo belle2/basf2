@@ -31,7 +31,7 @@ import glob
 
 if __name__ == '__main__':
 
-    particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
+    particles, configuration = monitoring.load_config()
     monitoringParticle = []
     for particle in particles:
         monitoringParticle.append(monitoring.MonitoringParticle(particle))

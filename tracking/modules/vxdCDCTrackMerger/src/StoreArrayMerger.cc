@@ -7,12 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
-#include <framework/dataobjects/Helix.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
+
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/dataobjects/Helix.h>
 
 using namespace Belle2;
 

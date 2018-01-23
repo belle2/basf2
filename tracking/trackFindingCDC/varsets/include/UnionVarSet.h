@@ -21,7 +21,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Class that accomodates many variable sets and presents them as on set of variables
-    template<class AObject>
+    template <class AObject>
     class UnionVarSet : public BaseVarSet<AObject> {
 
     private:
@@ -40,40 +40,9 @@ namespace Belle2 {
       void initialize() final {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
         {
-          varSet->initialize();
+          this->addProcessingSignalListener(varSet.get());
         }
-      }
-
-      /// Signal the beginning of a new run
-      void beginRun() override
-      {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
-          varSet->beginRun();
-        }
-      }
-
-      /// Signal the beginning of a new event
-      void beginEvent() override
-      {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
-          varSet->beginEvent();
-        }
-      }
-
-      /// Signal the end of a run
-      void endRun() override
-      {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
-          varSet->endRun();
-        }
-      }
-
-      /// Terminate all contained variable set after event processing.
-      void terminate() final {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
-        {
-          varSet->terminate();
-        }
+        Super::initialize();
       }
 
       /// Allowing the other variant of the extract method
@@ -97,7 +66,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
         std::vector<Named<Float_t*> > result;
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
@@ -111,7 +80,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(const std::string& varName) override
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           MayBePtr<Float_t> found = varSet->find(varName);
@@ -135,7 +104,7 @@ namespace Belle2 {
       }
 
       /// Return the number of currently contained variable sets
-      size_t size()
+      size_t size() const
       {
         return m_varSets.size();
       }

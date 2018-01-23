@@ -9,13 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
+
     /// Typedef to indicate that an stereo segment is expeected.
     using CDCStereoSegment2D = CDCSegment2D;
   }
 }
-
-

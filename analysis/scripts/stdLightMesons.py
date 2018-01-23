@@ -93,14 +93,14 @@ def loadStdLooseOmega(persistent=True, path=analysis_main):
 
 
 def loadStdLooseEta(persistent=True, path=analysis_main):
-    reconstructDecay('eta:loose1 -> gamma:all gamma:all', '0.4 < M < 0.6', 1, persistent, path)
+    reconstructDecay('eta:loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, persistent, path)
     reconstructDecay('eta:loose2 -> pi0:loose pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
     copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], persistent, path)
     return 'eta:loose'
 
 
 def loadStdLooseEtaPrime(persistent=True, path=analysis_main):
-    reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:all', '0.8 < M < 1.1', 1, persistent, path)
+    reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:loose', '0.8 < M < 1.1', 1, persistent, path)
     reconstructDecay('eta\':loose2 -> pi+:loose pi-:loose eta:loose', '0.8 < M < 1.1', 2, persistent, path)
     copyLists('eta\':loose', ['eta\':loose1', 'eta\':loose2'], persistent, path)
     return 'eta\':loose'

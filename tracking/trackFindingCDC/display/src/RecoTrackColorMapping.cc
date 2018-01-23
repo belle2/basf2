@@ -27,18 +27,22 @@ std::string RecoTrackMatchingStatusColorMap::map(int index __attribute__((unused
   MatchingStatus matchingStatus = recoTrack.getMatchingStatus();
   switch (matchingStatus) {
     case MatchingStatus::c_matched:
+      B2DEBUG(100, "Draw RecoTrack " << index << " as matched");
       return "green";
       break;
 
     case MatchingStatus::c_background:
+      B2DEBUG(100, "Draw RecoTrack " << index << " as background");
       return "purple";
       break;
 
     case MatchingStatus::c_clone:
+      B2DEBUG(100, "Draw RecoTrack " << index << " as clone");
       return "blue";
       break;
 
     case MatchingStatus::c_ghost:
+      B2DEBUG(100, "Draw RecoTrack " << index << " as ghost");
       return "red";
       break;
 

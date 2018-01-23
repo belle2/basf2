@@ -7,14 +7,38 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
+
+#include <framework/logging/Logger.h>
+
+#include <TVector3.h>
+
+#include <ostream>
+#include <type_traits>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class WireLine;
+  }
+}
 CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo)
   : CDCRLWireHit(wireHit, rlInfo, wireHit->getRefDriftLength(), wireHit->getRefDriftLengthVariance())
 {
@@ -96,6 +120,46 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
   return rlWireHit;
 }
 
+const CDCHit* CDCRLWireHit::getHit() const
+{
+  return getWireHit().getHit();
+}
+
+const CDCWire& CDCRLWireHit::getWire() const
+{
+  return getWireHit().getWire();
+}
+
+const WireID& CDCRLWireHit::getWireID() const
+{
+  return getWire().getWireID();
+}
+
+ISuperLayer CDCRLWireHit::getISuperLayer() const
+{
+  return getWire().getISuperLayer();
+}
+
+EStereoKind CDCRLWireHit::getStereoKind() const
+{
+  return getWire().getStereoKind();
+}
+
+bool CDCRLWireHit::isAxial() const
+{
+  return getWire().isAxial();
+}
+
+const Vector2D& CDCRLWireHit::getRefPos2D() const
+{
+  return getWire().getRefPos2D();
+}
+
+double CDCRLWireHit::getRefCylindricalR() const
+{
+  return getWire().getRefCylindricalR();
+}
+
 Vector2D CDCRLWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 {
   const Vector2D& refPos2D = getRefPos2D();
@@ -111,7 +175,7 @@ Vector2D CDCRLWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
   return wirePos2D + disp2D;
 }
 
-Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
+Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z) const
 {
   const EStereoKind stereoType = getStereoKind();
   const ERightLeft rlInfo = getRLInfo();
@@ -119,13 +183,19 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
   if (stereoType == EStereoKind::c_StereoV or stereoType == EStereoKind::c_StereoU) {
     const WireLine& wireLine = getWire().getWireLine();
     const double signedDriftLength = isValid(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
-    return trajectory2D.reconstruct3D(wireLine, signedDriftLength);
+    return trajectory2D.reconstruct3D(wireLine, signedDriftLength, z);
 
   } else { /*if (stereoType == EStereoKind::c_Axial)*/
     const Vector2D recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
-    const double z = 0;
     return Vector3D(recoPos2D, z);
   }
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
+{
+  output << "CDCRLWireHit(" << rlWireHit.getWireHit() << ","
+         << static_cast<typename std::underlying_type<ERightLeft>::type>(rlWireHit.getRLInfo()) << ")" ;
+  return output;
 }

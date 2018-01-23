@@ -13,12 +13,19 @@
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/AllAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/SimpleAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axialSegmentPair/UnionRecordingAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/axialSegmentPair/MVAFeasibleAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axialSegmentPair/MVARealisticAxialSegmentPairFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseAxialSegmentPairFilter>;
 
 AxialSegmentPairFilterFactory::AxialSegmentPairFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -42,6 +49,9 @@ AxialSegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
     {"none", "no axialSegment pair is valid"},
     {"all", "all axialSegment pairs are valid"},
     {"truth", "monte carlo truth"},
+    {"unionrecording", "record many multiple choosable variable set"},
+    {"feasible", "check if the segment relation is feasible"},
+    {"realistic", "check if the segment relation is a good combination"},
     {"simple", "mc free with simple criteria"},
   };
 }
@@ -55,8 +65,14 @@ AxialSegmentPairFilterFactory::create(const std::string& filterName) const
     return std::make_unique<AllAxialSegmentPairFilter>();
   } else if (filterName == "truth") {
     return std::make_unique<MCAxialSegmentPairFilter>();
+  } else if (filterName == "unionrecording") {
+    return std::make_unique<UnionRecordingAxialSegmentPairFilter>();
   } else if (filterName == "simple") {
     return std::make_unique<SimpleAxialSegmentPairFilter>();
+  } else if (filterName == "feasible") {
+    return std::make_unique<MVAFeasibleAxialSegmentPairFilter>();
+  } else if (filterName == "realistic") {
+    return std::make_unique<MVARealisticAxialSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    TestCalibObject(float value): m_value(value) {};
+    explicit TestCalibObject(float value): m_value(value) {};
 
     /**
      * Destructor

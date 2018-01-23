@@ -8,24 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULEPARAMLIST_H_
-#define MODULEPARAMLIST_H_
+#pragma once
 
 #include <framework/core/ModuleParam.h>
-#include <framework/core/FrameworkExceptions.h>
-#include <framework/logging/Logger.h>
-
-#include <framework/core/PyObjConvUtils.h>
-
-#include <boost/shared_ptr.hpp>
 
 #include <map>
+#include <vector>
 #include <string>
+#include <memory>
 
 namespace boost {
   namespace python {
     class list;
-    class dict;
     namespace api {
       class object;
     }
@@ -33,8 +27,13 @@ namespace boost {
   }
 }
 
-
 namespace Belle2 {
+  //------------------------------------------------------
+  //             Define convenient typdefs
+  //------------------------------------------------------
+
+  /// Defines a pointer to a module parameter as a boost shared pointer. */
+  using ModuleParamPtr = std::shared_ptr<ModuleParamBase>;
 
   /**
    * The Module parameter list class.
@@ -42,16 +41,25 @@ namespace Belle2 {
    */
   class ModuleParamList {
 
+  private:
+    /**
+     * Throws an error for a requested parameter that does not exist.
+     *
+     * @param name              The name of the parameter.
+     */
+    [[noreturn]] static void throwNotFoundError(const std::string& name);
+
+    /**
+     * Throws an error for a requested parameter that exists but was request with the wrong type.
+     *
+     * @param name              The name of the parameter.
+     * @param expectedTypeInfo  Type information which the parameter actually has.
+     * @param typeInfo          Type information with which the parameter was looked up.
+     */
+    [[noreturn]] static void throwTypeError(const std::string& name,
+                                            const std::string& expectedTypeInfo,
+                                            const std::string& typeInfo);
   public:
-
-    //Define exceptions
-    /** Exception is thrown if the requested parameter could not be found. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError,
-                            "Could not find the parameter with the name '%1%'! The value of the parameter could NOT be set.");
-    /** Exception is thrown if the type of the requested parameter is different from the expected type. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError,
-                            "The type of the module parameter '%1%' (%2%) is different from the type of the value it should be set to (%3%)!");
-
     /**
      * Constructor.
      */
@@ -161,7 +169,7 @@ namespace Belle2 {
      *
      * @return A python list containing the parameters of this parameter list.
      */
-    boost::shared_ptr<boost::python::list> getParamInfoListPython() const;
+    std::shared_ptr<boost::python::list> getParamInfoListPython() const;
 
     /**
      * Implements a method for setting boost::python objects.
@@ -176,7 +184,6 @@ namespace Belle2 {
     template<typename PythonObject>
     void setParamPython(const std::string& name, const PythonObject& pyObj);
 
-
     /**
      * Returns a python object containing the value or default value of the given parameter.
      *
@@ -189,14 +196,7 @@ namespace Belle2 {
     template<typename PythonObject>
     void getParamValuesPython(const std::string& name, PythonObject& pyOutput, bool defaultValues) const;
 
-
-  protected:
-
-
   private:
-
-    std::map<std::string, ModuleParamPtr> m_paramMap;  /**< Stores the module parameters together with a string name as key. */
-
     /**
      * Returns a ModuleParamPtr to a parameter.
      *
@@ -217,106 +217,9 @@ namespace Belle2 {
      */
     std::string getParamTypeString(const std::string& name) const;
 
+
+  private:
+    /// Stores the module parameters together with a string name as key.
+    std::map<std::string, ModuleParamPtr> m_paramMap;
   };
-
-
-  //======================================================
-  //       Implementation of template based methods
-  //======================================================
-
-  template<typename T>
-  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const std::string& description, const T& defaultValue)
-  {
-    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description, false));
-
-    //Check if a parameter with the given name already exists
-    std::map<std::string, ModuleParamPtr>::iterator mapIter;
-    mapIter = m_paramMap.find(name);
-
-    if (mapIter == m_paramMap.end()) {
-      m_paramMap.insert(std::make_pair(name, newParam));
-      ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(newParam.get());
-      explModParam->setDefaultValue(defaultValue);
-    } else {
-      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.");
-    }
-  }
-
-
-  template<typename T>
-  void ModuleParamList::addParameter(const std::string& name, T& paramVariable, const std::string& description)
-  {
-    ModuleParamPtr newParam(new ModuleParam<T>(paramVariable, description, true));
-
-    //Check if a parameter with the given name already exists
-    std::map<std::string, ModuleParamPtr>::iterator mapIter;
-    mapIter = m_paramMap.find(name);
-
-    if (mapIter == m_paramMap.end()) {
-      m_paramMap.insert(std::make_pair(name, newParam));
-    } else {
-      B2ERROR("A parameter with the name '" + name + "' already exists! The name of a module parameter must be unique within a module.");
-    }
-  }
-
-
-  template<typename T>
-  void ModuleParamList::setParameter(const std::string& name, const T& value)
-  {
-    try {
-      ModuleParam<T>& explModParam = getParameter<T>(name);
-      explModParam.setValue(value);
-    } catch (ModuleParameterNotFoundError& exc) {
-      B2ERROR(exc.what());
-    } catch (ModuleParameterTypeError& exc) {
-      B2ERROR(exc.what());
-    }
-  }
-
-
-  template<typename T>
-  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const
-  {
-    //Check if a parameter with the given name exists
-    std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
-    mapIter = m_paramMap.find(name);
-
-    if (mapIter != m_paramMap.end()) {
-      ModuleParamPtr moduleParam = mapIter->second;
-
-      //Check the type of the stored parameter (currently done using the type identifier string)
-      if (moduleParam->getTypeInfo() == PyObjConvUtils::Type<T>::name()) {
-        ModuleParam<T>* explModParam = static_cast< ModuleParam<T>* >(moduleParam.get());
-        return *explModParam;
-      } else throw (ModuleParameterTypeError() << name << moduleParam->getTypeInfo() << PyObjConvUtils::Type<T>::name());
-    } else throw (ModuleParameterNotFoundError() << name);
-  }
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                   Python API
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  template<typename PythonObject>
-  void ModuleParamList::setParamPython(const std::string& name, const PythonObject& pyObj)
-  {
-
-    ModuleParamPtr p = getParameterPtr(name);
-    p->setValueFromPythonObject(pyObj);
-
-  }
-
-  template<typename PythonObject>
-  void ModuleParamList::getParamValuesPython(const std::string& name, PythonObject& pyOutput, bool defaultValues) const
-  {
-    try {
-      ModuleParamPtr p = getParameterPtr(name);
-      p->setValueToPythonObject(pyOutput, defaultValues);
-    } catch (ModuleParamList::ModuleParameterNotFoundError& exc) {
-      B2ERROR(exc.what());
-    }
-  }
-
 } //end of Belle2 namespace
-
-#endif

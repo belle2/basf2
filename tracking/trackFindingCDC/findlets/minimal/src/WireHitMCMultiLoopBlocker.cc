@@ -10,10 +10,23 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <root/TVector3.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

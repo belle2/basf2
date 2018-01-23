@@ -10,6 +10,12 @@
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
+
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
+#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
+#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
+
 #include <tracking/trackFindingCDC/numerics/Median.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
@@ -209,8 +215,6 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootForLargeSlope)
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
 }
 
-
-
 TEST(TrackFindingCDCTest, numerics_median)
 {
   std::vector<double> fourValues{0.0, 3.0, 5.0, 100};
@@ -225,4 +229,58 @@ TEST(TrackFindingCDCTest, numerics_median)
     {100.0, 0.3},
     {1000.0, 0.3}};
   EXPECT_EQ(100.0, weightedMedian(std::move(weightedValues)));
+}
+
+TEST(TrackFindingCDCTest, covariance_simple_average)
+{
+  // Simple average of two scalar values
+  const ParameterVector<1> par1{ -1};
+  const CovarianceMatrix<1> cov1{2};
+
+  const ParameterVector<1> par2{1};
+  const CovarianceMatrix<1> cov2{2};
+
+  ParameterVector<1> par{};
+  CovarianceMatrix<1> cov{};
+
+  double chi2 = CovarianceMatrixUtil::average(par1, cov1, par2, cov2, par, cov);
+  EXPECT_NEAR(0, par[0], 1E-8);
+  EXPECT_NEAR(1, cov[0], 1E-8);
+  EXPECT_NEAR(1, chi2, 1E-8);
+}
+
+TEST(TrackFindingCDCTest, covariance_half_projection_average)
+{
+  // Same average of two scalar values but one is 'projected' stretched by a factor of 2
+  const JacobianMatrix<1, 1> ambi1{2};// Ambiguity is 2.
+  const ParameterVector<1> par1{ -2}; // Parameter scales with 2
+  const CovarianceMatrix<1> cov1{8};  // Covariance scales with 2 * 2
+
+  const ParameterVector<1> par2{1};
+  const CovarianceMatrix<1> cov2{2};
+
+  ParameterVector<1> par{};
+  CovarianceMatrix<1> cov{};
+
+  double chi2 = CovarianceMatrixUtil::average(par1, cov1, ambi1, par2, cov2, par, cov);
+  EXPECT_NEAR(0, par[0], 1E-8);
+  EXPECT_NEAR(1, cov[0], 1E-8);
+  EXPECT_NEAR(1, chi2, 1E-8);
+}
+
+TEST(TrackFindingCDCTest, covariance_kalman_update_average)
+{
+  // Same average of two scalar values but one is 'projected' / stretched by a factor of 2
+  // Now as an inplace update using the Kalman formula.
+  const JacobianMatrix<1, 1> ambi1{2}; // Ambiguity is 2.
+  const ParameterVector<1> par1{ -2};  // Parameter scales with 2
+  const CovarianceMatrix<1> cov1{8};   // Covariance scales with 2 * 2
+
+  ParameterVector<1> par{1};
+  CovarianceMatrix<1> cov{2};
+
+  double chi2 = CovarianceMatrixUtil::kalmanUpdate(par1, cov1, ambi1, par, cov);
+  EXPECT_NEAR(0, par[0], 1E-8);
+  EXPECT_NEAR(1, cov[0], 1E-8);
+  EXPECT_NEAR(1, chi2, 1E-8);
 }

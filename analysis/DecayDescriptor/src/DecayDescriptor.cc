@@ -132,8 +132,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   int iPDGCode_p = 0;
-  if (const Particle* test = dynamic_cast<const Particle*>(p)) iPDGCode_p = test->getPDGCode();
-  else if (const MCParticle* test = dynamic_cast<const MCParticle*>(p)) iPDGCode_p = test->getPDG();
+  if (const Particle* part_test = dynamic_cast<const Particle*>(p)) iPDGCode_p = part_test->getPDGCode();
+  else if (const MCParticle* mc_test = dynamic_cast<const MCParticle*>(p)) iPDGCode_p = mc_test->getPDG();
   else {
     B2WARNING("Template type not supported!");
     return 0;
@@ -179,24 +179,24 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   // check if the daughters match
   for (int iDaughter_d = 0; iDaughter_d < getNDaughters(); iDaughter_d++) {
     set<int> matches;
-    for (int iDaughter_p = 0; iDaughter_p < nDaughters_p; iDaughter_p++) {
-      const T* daughter = daughterList[iDaughter_p];
+    for (int jDaughter_p = 0; jDaughter_p < nDaughters_p; jDaughter_p++) {
+      const T* daughter = daughterList[jDaughter_p];
       int iPDGCode_daughter_p = 0;
-      if (const Particle* test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = test->getPDGCode();
-      else if (const MCParticle* test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = test->getPDG();
-      if (iDaughter_d == 0 && m_isIgnorePhotons && iPDGCode_daughter_p == 22) matches_global.insert(iDaughter_p);
-      int iMatchResult = m_daughters[iDaughter_d].match(daughter, iDaughter_p);
+      if (const Particle* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
+      else if (const MCParticle* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
+      if (iDaughter_d == 0 && m_isIgnorePhotons && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
+      int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
       if (abs(iMatchResult) == 2 && iCC == 1) continue;
       if (abs(iMatchResult) == 1 && iCC == 2) continue;
       if (abs(iMatchResult) == 2 && iCC == 3) continue;
-      matches.insert(iDaughter_p);
-      matches_global.insert(iDaughter_p);
+      matches.insert(jDaughter_p);
+      matches_global.insert(jDaughter_p);
     }
     if (matches.empty()) return 0;
     if (matches.size() == 1) {
-      int iDaughter_p = *(matches.begin());
-      singlematch.push_back(make_pair(iDaughter_d, iDaughter_p));
+      int jDaughter_p = *(matches.begin());
+      singlematch.push_back(make_pair(iDaughter_d, jDaughter_p));
     } else multimatch.push_back(make_pair(iDaughter_d, matches));
   }
 

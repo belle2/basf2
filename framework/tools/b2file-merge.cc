@@ -5,7 +5,6 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/utilities/KeyValuePrinter.h>
-#include <background/dataobjects/BackgroundInfo.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -22,93 +21,13 @@
 #include <string>
 #include <set>
 
-using namespace   Belle2;
+using namespace Belle2;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 /** Simple typedef to conveniently define a exp,run,evt structure with a
  * working comparison operator */
 typedef std::tuple<int, int, unsigned int> EventInfo;
-
-/** Print the background info.
- * Similar to the function BackgroundInfo::print() but less verbose to just
- * print the values we actually compare for compatibility.
- */
-void printBackgroundInfo(const BackgroundInfo& a)
-{
-  static std::map<BackgroundInfo::EMethod, std::string> methodNames{
-    {BackgroundInfo::c_Mixing, "mixing"},
-    {BackgroundInfo::c_Overlay, "overlay"},
-    {BackgroundInfo::c_Unknown, "unknown"}
-  };
-
-  B2INFO("Background method: " << methodNames[a.getMethod()]);
-  B2INFO("       components: " << (a.getComponents().empty() ? "all" : boost::algorithm::join(a.getComponents(), ",")));
-  B2INFO("      time window: "
-         << "PXD [" << a.getMinTimePXD() << ", " << a.getMaxTimePXD() << "] ns, "
-         << "ECL [" << a.getMinTimeECL() << ", " << a.getMaxTimeECL() << "] ns, "
-         << "other components [" << a.getMinTime() << ", " << a.getMaxTime() << "] ns, ");
-  B2INFO("  wrapping around: " << (a.getWrapAround() ? "enabled" : "disabled"));
-  B2INFO("   ECL energy cut: " << a.getMaxEdepECL() << " GeV");
-  B2INFO("Background samples: ");
-  auto da = a.getBackgroundDescr();
-  auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
-  std::sort(da.begin(), da.end(), cmpfn);
-  for (const auto& d : da) {
-    B2INFO("  " << d.type << ", scale " << d.scaleFactor);
-  }
-}
-
-/** Check if two BackgroundInfo instances are compatible
- * We check that all settings (method, components, min/max times, wrap around,
- * max ECL energy deposition) are the same and that the same background samples
- * are used with the same scale factor.
- *
- * number of events, file names and real time are not checked to allow for
- * different file sets to be used. We cannot check the background rate either
- * since this is slightly fluctuating as it's calculated by #events/real time.
- * @param a basic background info to compare against
- * @param b new background info which has to be compatible
- */
-void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b, const std::string& filename)
-{
-  int errorCount = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
-  if (a.getMethod() != b.getMethod()) B2ERROR("Incompatible background mixing method in " << boost::io::quoted(filename));
-  if (a.getComponents() != b.getComponents())
-    B2ERROR("Incompatible background detector components in " << boost::io::quoted(filename));
-  if (a.getMinTime() != b.getMinTime()) B2ERROR("Incompatible background MinTime in " << boost::io::quoted(filename));
-  if (a.getMaxTime() != b.getMaxTime()) B2ERROR("Incompatible background MaxTime in " << boost::io::quoted(filename));
-  if (a.getMinTimeECL() != b.getMinTimeECL()) B2ERROR("Incompatible background MinTimeECL in " << boost::io::quoted(filename));
-  if (a.getMaxTimeECL() != b.getMaxTimeECL()) B2ERROR("Incompatible background MaxTimeECL in " << boost::io::quoted(filename));
-  if (a.getMinTimePXD() != b.getMinTimePXD()) B2ERROR("Incompatible background MinTimePXD in " << boost::io::quoted(filename));
-  if (a.getMaxTimePXD() != b.getMaxTimePXD()) B2ERROR("Incompatible background MaxTimePXD in " << boost::io::quoted(filename));
-  if (a.getWrapAround() != b.getWrapAround()) B2ERROR("Incompatible background WrapAround in " << boost::io::quoted(filename));
-  if (a.getMaxEdepECL() != b.getMaxEdepECL()) B2ERROR("Incompatible background MaxEdepECL in " << boost::io::quoted(filename));
-
-  auto da = a.getBackgroundDescr();
-  auto db = b.getBackgroundDescr();
-  if (da.size() != db.size()) {
-    B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
-  } else {
-    auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
-    std::sort(da.begin(), da.end(), cmpfn);
-    std::sort(db.begin(), db.end(), cmpfn);
-    for (size_t i = 0; i < da.size(); ++i) {
-      if (da[i].type != db[i].type) {
-        B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
-        break;
-      }
-      if (da[i].scaleFactor != db[i].scaleFactor) {
-        B2ERROR("Incompatible scale factor for " << da[i].type << " in " << boost::io::quoted(filename));
-      }
-    }
-  }
-  if (errorCount < LogSystem::Instance().getMessageCounter(LogConfig::c_Error)) {
-    //at least one error, print background info
-    B2INFO("Incompatible BackgroundInfo:");
-    printBackgroundInfo(b);
-  }
-}
 
 int main(int argc, char* argv[])
 {
@@ -141,9 +60,9 @@ the objects in the persistent tree correctly.
 
 The following restrictions apply:
   - The files have to be created with the same release and steering file
-  - The persistent tree is only allowed to contain FileMetaData, BackgroundInfo
-    and objects inheriting from Mergeable and the same list of objects needs to
-    be present in all files.
+  - The persistent tree is only allowed to contain FileMetaData and objects
+    inheriting from Mergeable and the same list of objects needs to be present
+    in all files.
   - The event tree needs to contain the same DataStore entries in all files.
 )DOC");
     return 1;
@@ -168,8 +87,6 @@ The following restrictions apply:
 
   // the final metadata we will write out
   FileMetaData* outputMetaData{nullptr};
-  // BackgroundInfo of the merged files
-  TClonesArray* outputBackgroundInfo = new TClonesArray(BackgroundInfo::Class(), inputfilenames.size());
   // set of all parent LFNs encountered in any file
   std::set<std::string> allParents;
   // map of all mergeable objects found in the persistent tree. The size_t is
@@ -250,7 +167,6 @@ The following restrictions apply:
       }
     }
 
-    bool foundBackgroundInfo{false};
     // File looks good so far, now fix the persistent stuff, i.e. merge all
     // objects in persistent tree
     for(TObject* brObj: *persistent->GetListOfBranches()){
@@ -258,47 +174,6 @@ The following restrictions apply:
       // FileMetaData is handled separately
       if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
         continue;
-      // special handling for BackgroundInfo.
-      if(br && br->GetTargetClass() == TClonesArray::Class() && std::string(br->GetName()) == "BackgroundInfos") {
-        B2INFO("Found BackgroundInfo");
-        TClonesArray* bginfoArray{nullptr};
-        br->SetAddress(&bginfoArray);
-        if(br->GetEntry(0)<=0) {
-            B2ERROR("Could not read branch " << boost::io::quoted(br->GetName()) << " of entry 0 from persistent tree in "
-                    << boost::io::quoted(input));
-            continue;
-        }
-        // Ok, we want to delete the pointer once we're done with it. So let's create a unique_ptr to take ownership
-        std::unique_ptr<TClonesArray> arrayDestructor{bginfoArray};
-        // empty, assume non-existent
-        if(bginfoArray->GetEntriesFast()==0) continue;
-        // non empty, make sure it's the right class
-        if(bginfoArray->GetClass() != BackgroundInfo::Class()){
-            B2ERROR("Branch BackgroundInfo is of type StoreArray<" << bginfoArray->GetClass()->GetName()
-                    << ">, not StoreArray<BackgroundInfo>");
-            continue;
-        }
-        // ok we have an array of background infos. Add each one to the list
-        // and make sure they are all compatible with each other: same method,
-        // components, settings, types and scaling factors.
-        for(TObject* obj: *bginfoArray){
-            BackgroundInfo* bginfo = static_cast<BackgroundInfo*>(obj);
-            if(outputBackgroundInfo->GetEntriesFast()==0) {
-                printBackgroundInfo(*bginfo);
-                //no background info yet but if outputMetaData exists this is not the first file ...
-                if(outputMetaData) B2ERROR("Found BackgroundInfo in " << boost::io::quoted(input)
-                                           << " which was not present in previous files.");
-            } else {
-                B2INFO("Checking if background info is compatible...");
-                checkBackgroundCompatible(*static_cast<BackgroundInfo*>((*outputBackgroundInfo)[0]), *bginfo, input);
-            }
-            // now add it to the list of all background infos. Since we abort
-            // on error we can just add all even if they are not compatible
-            new(outputBackgroundInfo->AddrAt(outputBackgroundInfo->GetEntriesFast())) BackgroundInfo(*bginfo);
-        }
-        foundBackgroundInfo = true;
-        continue;
-      }
       // Make sure the branch is mergeable
       if(!br || !br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
         B2ERROR("Branch " << boost::io::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
@@ -315,18 +190,17 @@ The following restrictions apply:
       // and either insert it into the map of mergeables or merge with the existing one
       auto it = persistentMergeables.insert(std::make_pair(br->GetName(), std::make_pair(object, 1)));
       if(!it.second) {
-        it.first->second.first->merge(object);
+        try {
+          it.first->second.first->merge(object);
+        }catch(std::exception &e){
+          B2FATAL("Cannot merge " << boost::io::quoted(br->GetName()) << " in " << boost::io::quoted(input) << ": " << e.what());
+        }
         it.first->second.second++;
         // ok, merged, get rid of it.
         delete object;
       }else{
         B2INFO("Found mergeable object " << boost::io::quoted(br->GetName()) << " in persistent tree");
       }
-    }
-
-    // check if we found the background info in this file if we saw it already in previous files
-    if(outputBackgroundInfo->GetEntriesFast()>0 && !foundBackgroundInfo){
-        B2ERROR("No BackgroundInfo in file " << boost::io::quoted(input));
     }
 
     std::string release = fileMetaData->getRelease();
@@ -477,17 +351,13 @@ The following restrictions apply:
   output.cd();
   TTree outputMetaDataTree("persistent", "persistent");
   outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
-  for(auto it: persistentMergeables){
+  for(auto &it: persistentMergeables){
     outputMetaDataTree.Branch(it.first.c_str(), &it.second.first);
-  }
-  if(outputBackgroundInfo->GetEntriesFast()){
-    outputMetaDataTree.Branch("BackgroundInfos", &outputBackgroundInfo);
   }
   outputMetaDataTree.Fill();
   outputMetaDataTree.Write();
 
   // now clean up the mess ...
-  delete outputBackgroundInfo;
   for(auto val: persistentMergeables){
     delete val.second.first;
   }

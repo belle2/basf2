@@ -10,15 +10,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMMODULE_H_
-#define PXDDQMMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
@@ -53,59 +47,95 @@ namespace Belle2 {
 
   private:
 
-    float m_CutPXDCharge = 0.0;            /**< cut for accepting to hitmap histogram, using strips only, default = 0 */
-    int m_UsePixels = 0;                   /**< flag <0,1> for using pixels only, no clusters will be required, default = 0 */
-    int m_SaveOtherHistos = 1;             /**< flag <0,1> for creation of more plots for experts mostly, default = 1 */
+    /** cut for accepting to hitmap histogram, using strips only, default = 0 */
+    float m_CutPXDCharge = 0.0;
+    /** flag <0,1> for using pixels only, no clusters will be required, default = 0 */
+    int m_UsePixels = 0;
+    /** flag <0,1> for creation of more plots for experts mostly, default = 1 */
+    int m_SaveOtherHistos = 1;
 
-    std::string m_storePXDDigitsName;      /**< PXDDigits StoreArray name */
-    std::string m_storePXDClustersName;    /**< PXDClusters StoreArray name */
-    std::string m_relPXDClusterDigitName;  /**< PXDClustersToPXDDigits RelationArray name */
-    std::string m_storeFramesName;         /**< Frames StoreArray name */
+    /** PXDDigits StoreArray name */
+    std::string m_storePXDDigitsName;
+    /** PXDClusters StoreArray name */
+    std::string m_storePXDClustersName;
+    /** PXDClustersToPXDDigits RelationArray name */
+    std::string m_relPXDClusterDigitName;
+    /** Frames StoreArray name */
+    std::string m_storeFramesName;
 
     /** Name of file contain reference histograms, default=PXD-ReferenceHistos */
     std::string m_RefHistFileName = "PXD-ReferenceHistos.root";
     /** Name of file contain output flag histograms, default=PXD-FlagHistos */
     std::string m_OutFlagsFileName = "PXD-FlagHistos.root";
-    int m_NoOfEvents;        /** Number of events */
-    int m_NoOfEventsRef;     /** Number of events in reference histogram */
+    /** Number of events */
+    int m_NoOfEvents;
+    /** Number of events in reference histogram */
+    int m_NoOfEventsRef;
 
-    TH1F** m_fired;          /**< Fired pixels per event */
-    TH1F** m_clusters;       /**< Clusters per event */
-    TH1F** m_hitMapU;        /**< Hitmaps pixels for u */
-    TH1F** m_hitMapV;        /**< Hitmaps pixels for v */
-    TH2F** m_hitMap;         /**< Hitmaps pixels */
-    TH1F** m_hitMapUCl;      /**< Hitmaps clusters for u */
-    TH1F** m_hitMapVCl;      /**< Hitmaps clusters for v */
-    TH2F** m_hitMapCl;       /**< Hitmaps clusters */
-    TH1F** m_charge;         /**< Charge of clusters */
-    TH1F** m_chargePix;      /**< Charge of pixels */
-    TH1F** m_seed;           /**< Seed */
-    TH1F** m_sizeU;          /**< u cluster size */
-    TH1F** m_sizeV;          /**< v cluster size */
-    TH1F** m_size;           /**< Cluster size */
-    TH1F** m_startRow;       /**< Start row distribution */
-    TH1F** m_chargStartRow;  /**< Cluster seed charge by distance from the start row */
-    TH1F** m_StartRowCount;  /**< counter for Cluster seed charge by distance from the start row */
+    /** Fired pixels per event */
+    TH1F** m_fired;
+    /** Clusters per event */
+    TH1F** m_clusters;
+    /** Hitmaps pixels for u */
+    TH1F** m_hitMapU;
+    /** Hitmaps pixels for v */
+    TH1F** m_hitMapV;
+    /** Hitmaps pixels */
+    TH2F** m_hitMap;
+    /** Hitmaps clusters for u */
+    TH1F** m_hitMapUCl;
+    /** Hitmaps clusters for v */
+    TH1F** m_hitMapVCl;
+    /** Hitmaps clusters */
+    TH2F** m_hitMapCl;
+    /** Charge of clusters */
+    TH1F** m_charge;
+    /** Charge of pixels */
+    TH1F** m_chargePix;
+    /** Seed */
+    TH1F** m_seed;
+    /** u cluster size */
+    TH1F** m_sizeU;
+    /** v cluster size */
+    TH1F** m_sizeV;
+    /** Cluster size */
+    TH1F** m_size;
+    /** Start row distribution */
+    TH1F** m_startRow;
+    /** Cluster seed charge by distance from the start row */
+    TH1F** m_chargStartRow;
+    /** counter for Cluster seed charge by distance from the start row */
+    TH1F** m_StartRowCount;
 
-    int c_nVXDLayers;                /**< Number of VXD layers on Belle II */
-    int c_nPXDLayers;                /**< Number of PXD layers on Belle II */
-    int c_nSVDLayers;                /**< Number of SVD layers on Belle II */
-    int c_firstVXDLayer;             /**< First VXD layer on Belle II */
-    int c_lastVXDLayer;              /**< Last VXD layer on Belle II */
-    int c_firstPXDLayer;             /**< First PXD layer on Belle II */
-    int c_lastPXDLayer;              /**< Last PXD layer on Belle II */
-    int c_firstSVDLayer;             /**< First SVD layer on Belle II */
-    int c_lastSVDLayer;              /**< Last SVD layer on Belle II */
-    int c_nPXDSensors;               /**< Number of PXD sensors on Belle II */
+    /** Number of VXD layers on Belle II */
+    int c_nVXDLayers;
+    /** Number of PXD layers on Belle II */
+    int c_nPXDLayers;
+    /** Number of SVD layers on Belle II */
+    int c_nSVDLayers;
+    /** First VXD layer on Belle II */
+    int c_firstVXDLayer;
+    /** Last VXD layer on Belle II */
+    int c_lastVXDLayer;
+    /** First PXD layer on Belle II */
+    int c_firstPXDLayer;
+    /** Last PXD layer on Belle II */
+    int c_lastPXDLayer;
+    /** First SVD layer on Belle II */
+    int c_firstSVDLayer;
+    /** Last SVD layer on Belle II */
+    int c_lastSVDLayer;
+    /** Number of PXD sensors on Belle II */
+    int c_nPXDSensors;
 
-    /**< Function return index of sensor in plots.
+    /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor
        * @param Ladder Ladder position of sensor
        * @param Sensor Sensor position of sensor
        * @return Index of sensor in plots.
        */
     int getSensorIndex(int Layer, int Ladder, int Sensor);
-    /**< Function return index of sensor in plots.
+    /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
@@ -116,5 +146,4 @@ namespace Belle2 {
   };
 
 }
-#endif
 

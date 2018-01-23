@@ -31,7 +31,7 @@ TEST_F(TrackFindingCDCTestWithTopology, filter_facet_FeasibleRLFacetFilter_accep
   filter.initialize();
   filter.beginRun();
 
-  const CDCWireTopology& wireTopology  = CDCWireTopology::getInstance();
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
   const CDCWire& aWire = wireTopology.getWire(0, 0, 0);
   const CDCWire& bWire = wireTopology.getWire(0, 0, 1);
@@ -64,4 +64,7 @@ TEST_F(TrackFindingCDCTestWithTopology, filter_facet_FeasibleRLFacetFilter_accep
     Weight weight = filter(facet);
     EXPECT_TRUE(not std::isnan(weight));
   }
+
+  filter.endRun();
+  filter.terminate();
 }

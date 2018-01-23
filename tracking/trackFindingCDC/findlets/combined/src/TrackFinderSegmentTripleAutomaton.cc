@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentTripleAutomaton.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -41,7 +43,7 @@ void TrackFinderSegmentTripleAutomaton::exposeParameters(ModuleParamList* module
   m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "axialSegmentPair"));
   m_segmentTripleCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTriple"));
   m_segmentTripleRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
-  m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefix);
+  m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
   m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
   m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
   m_trackOrienter.exposeParameters(moduleParamList, prefix);
@@ -62,8 +64,13 @@ void TrackFinderSegmentTripleAutomaton::apply(const std::vector<CDCSegment2D>& i
                                               std::vector<CDCTrack>& tracks)
 {
   m_axialSegmentPairCreator.apply(inputSegments, m_axialSegmentPairs);
+
   m_segmentTripleCreator.apply(inputSegments, m_axialSegmentPairs, m_segmentTriples);
-  m_segmentTripleRelationCreator.apply(m_segmentTriples, m_segmentTripleRelations);
+
+  std::vector<const CDCSegmentTriple*> segmentTriplePtrs =
+    as_pointers<const CDCSegmentTriple>(m_segmentTriples);
+  m_segmentTripleRelationCreator.apply(segmentTriplePtrs, m_segmentTripleRelations);
+
   m_trackCreatorSegmentTripleAutomaton.apply(m_segmentTriples, m_segmentTripleRelations, m_preLinkingTracks);
 
   m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);

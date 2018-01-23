@@ -9,23 +9,29 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
 
 namespace Belle2 {
-
   class CDCSimHit;
+  class CDCHit;
 
   namespace TrackFindingCDC {
-
     // Forward declaration.
     class CDCTrajectory3D;
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
+    class CDCRecoHit2D;
+    class CDCWireHit;
+    class CDCWire;
 
     /**
      *  Class representing a three dimensional reconstructed hit.
@@ -149,7 +155,9 @@ namespace Belle2 {
 
       /// Make the wire hit automatically castable to its underlying cdcHit.
       operator const Belle2::CDCHit* () const
-      { return static_cast<const CDCHit*>(getRLWireHit()); }
+      {
+        return static_cast<const CDCHit*>(getRLWireHit());
+      }
 
       /// Equality comparision based on wire hit, right left passage information and reconstructed position.
       bool operator==(const CDCRecoHit3D& other) const
@@ -172,54 +180,81 @@ namespace Belle2 {
 
       /// Defines wires and the three dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWire& wire)
-      { return recoHit3D.getWire() < wire; }
+      {
+        return recoHit3D.getRLWireHit() < wire;
+      }
 
       /// Defines wires and the three dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCWire& wire, const CDCRecoHit3D& recoHit3D)
-      { return wire < recoHit3D.getWire(); }
+      {
+        return wire < recoHit3D.getRLWireHit();
+      }
 
       /// Defines wire hits and the three dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWireHit& wireHit)
-      { return recoHit3D.getWireHit() < wireHit; }
+      {
+        return recoHit3D.getRLWireHit() < wireHit;
+      }
 
       /// Defines wire hits and the three dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit3D& recoHit3D)
-      { return wireHit < recoHit3D.getWireHit(); }
+      {
+        return wireHit < recoHit3D.getRLWireHit();
+      }
 
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
-      { return getRLWireHit().getStereoKind(); }
+      {
+        return getRLWireHit().getStereoKind();
+      }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const
-      { return getWire().isAxial(); }
+      {
+        return getRLWireHit().isAxial();
+      }
 
       /// Getter for the superlayer id.
       ISuperLayer getISuperLayer() const
-      { return getRLWireHit().getISuperLayer(); }
+      {
+        return getRLWireHit().getISuperLayer();
+      }
 
       /// Getter for the wire.
       const CDCWire& getWire() const
-      { return getRLWireHit().getWire(); }
+      {
+        return getRLWireHit().getWire();
+      }
 
       /// Checks if the reconstructed hit is assoziated with the give wire.
       bool isOnWire(const CDCWire& wire) const
-      { return getRLWireHit().isOnWire(wire); }
+      {
+        return getRLWireHit().isOnWire(wire);
+      }
 
       /// Getter for the wire hit.
       const CDCWireHit& getWireHit() const
-      { return getRLWireHit().getWireHit(); }
+      {
+        return getRLWireHit().getWireHit();
+      }
 
       /// Checks if the reconstructed hit is assoziated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wireHit) const
-      { return getRLWireHit().hasWireHit(wireHit); }
+      {
+        return getRLWireHit().hasWireHit(wireHit);
+      }
 
       /// Getter for the oriented wire hit.
-      const CDCRLWireHit& getRLWireHit() const { return m_rlWireHit; }
+      const CDCRLWireHit& getRLWireHit() const
+      {
+        return m_rlWireHit;
+      }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
       void setRLWireHit(const CDCRLWireHit& rlWireHit)
-      { m_rlWireHit = rlWireHit; }
+      {
+        m_rlWireHit = rlWireHit;
+      }
 
       /**
        *  Getter for the right left passage information.
@@ -228,31 +263,45 @@ namespace Belle2 {
        *  as you at the xy projection.
        */
       ERightLeft getRLInfo() const
-      { return getRLWireHit().getRLInfo(); }
+      {
+        return getRLWireHit().getRLInfo();
+      }
 
       /// Setter the right left passage information.
       void setRLInfo(ERightLeft rlInfo)
-      { m_rlWireHit.setRLInfo(rlInfo); }
+      {
+        m_rlWireHit.setRLInfo(rlInfo);
+      }
 
       /// Getter for the reference position of the wire.
       const Vector2D& getRefPos2D() const
-      { return getRLWireHit().getRefPos2D(); }
+      {
+        return getRLWireHit().getRefPos2D();
+      }
 
       /// Getter for the 3d position of the hit.
       const Vector3D& getRecoPos3D() const
-      { return m_recoPos3D; }
+      {
+        return m_recoPos3D;
+      }
 
       /// Setter for the 3d position of the hit.
       void setRecoPos3D(const Vector3D& recoPos3D)
-      { m_recoPos3D = recoPos3D; }
+      {
+        m_recoPos3D = recoPos3D;
+      }
 
       /// Getter for the 2d position of the hit.
       const Vector2D& getRecoPos2D() const
-      { return getRecoPos3D().xy(); }
+      {
+        return getRecoPos3D().xy();
+      }
 
       /// Getter for the z coordinate of the reconstructed position.
       double getRecoZ() const
-      { return getRecoPos3D().z(); }
+      {
+        return getRecoPos3D().z();
+      }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
       Vector2D getRecoDisp2D() const;
@@ -274,19 +323,16 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference postion.
        */
-      CDCRecoHit2D getRecoHit2D() const
-      { return CDCRecoHit2D(m_rlWireHit, getRecoDisp2D()); }
+      CDCRecoHit2D getRecoHit2D() const;
 
       /**
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference postion.
        */
-      CDCRecoHit2D stereoProjectToRef() const
-      { return getRecoHit2D(); }
+      CDCRecoHit2D stereoProjectToRef() const;
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in.
-      Vector2D getRecoWirePos2D() const
-      { return getWire().getWirePos2DAtZ(getRecoZ()); }
+      Vector2D getRecoWirePos2D() const;
 
       /// Scales the displacement vector in place to lie on the dirft circle.
       void snapToDriftCircle(bool switchSide = false);
@@ -296,7 +342,9 @@ namespace Belle2 {
        *  Dummy implemented as the reference drift length.
        */
       double getSignedRecoDriftLength() const
-      { return getRLWireHit().getSignedRefDriftLength(); }
+      {
+        return getRLWireHit().getSignedRefDriftLength();
+      }
 
       /// Setter to update the drift length of the hit
       void setRecoDriftLength(double driftLength, bool snapRecoPos);
@@ -306,26 +354,33 @@ namespace Belle2 {
        *  Dummy implemented as the reference drift length.
        */
       double getRecoDriftLengthVariance() const
-      { return getRLWireHit().getRefDriftLengthVariance(); }
+      {
+        return getRLWireHit().getRefDriftLengthVariance();
+      }
 
       /// Adjust the travel distance by the given value.
       void shiftArcLength2D(double arcLength2DOffSet)
-      { m_arcLength2D += arcLength2DOffSet; }
+      {
+        m_arcLength2D += arcLength2DOffSet;
+      }
 
       /// Getter for the travel distance in the xy projection.
       double getArcLength2D() const
-      { return m_arcLength2D; }
+      {
+        return m_arcLength2D;
+      }
 
       /// Setter for the travel distance in the xy projection.
       void setArcLength2D(const double arcLength2D)
-      { m_arcLength2D = arcLength2D; }
+      {
+        m_arcLength2D = arcLength2D;
+      }
 
       /**
        *  Indicator if the hit is in the cdc (scaled by the factor) or already outside its boundaries.
        *  Checks for z to be in the range of the wire.
        */
-      bool isInCellZBounds(const double factor = 1) const
-      { return getWire().isInCellZBounds(getRecoPos3D(), factor); }
+      bool isInCellZBounds(const double factor = 1) const;
 
     private:
       /// Memory for the oriented wire hit reference.

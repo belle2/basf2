@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Returns the list of neighbours for a given crystal ID.                 *
+ * Returns the list of neighbours for a given cell ID.                 *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
@@ -37,23 +37,26 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
 
   // fixed number of neighbours:
   if (neighbourDef == "N") {
-    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2 + 1);
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
+            + 1);
     if ((parToInt >= 0) and (parToInt < 6)) initializeN(parToInt);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
   } else if (neighbourDef == "NC") {
-    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x " <<
-           parToInt * 2 + 1);
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
+            <<
+            parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 6)) initializeNC(parToInt, 1);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
   } else if (neighbourDef == "N2C") {
-    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus 2 corners): " << parToInt * 2 + 1 << " x " <<
-           parToInt * 2 + 1);
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus 2 corners): " << parToInt * 2 + 1 <<
+            " x " <<
+            parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 6)) initializeNC(parToInt, 2);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 5)!");
   }
   // or neighbours depend on the distance:
   else if (neighbourDef == "R") {
-    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", radius: " << par << " cm");
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", radius: " << par << " cm");
     if ((par > 0.0) and (par < 30.0 * Belle2::Unit::cm)) initializeR(par);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << par << " is an invalid parameter (must be between 0 cm and 30 cm)!");
   }
@@ -62,7 +65,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
     double parChecked = par;
     if (parChecked > 1.0) parChecked = 1.0;
     else if (parChecked < 0.1) parChecked = 0.1;
-    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", fraction: " << parChecked);
+    B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", fraction: " << parChecked);
     initializeF(parChecked);
   }
   // or wrong type:

@@ -9,11 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;
@@ -62,14 +58,11 @@ EKLMReconstructorModule::~EKLMReconstructorModule()
 
 void EKLMReconstructorModule::initialize()
 {
-  StoreArray<EKLMAlignmentHit> alignmentHits;
-  StoreArray<EKLMHit2d> hit2ds;
-  StoreArray<EKLMDigit> digits;
-  hit2ds.registerInDataStore();
-  alignmentHits.registerInDataStore();
-  digits.isRequired();
-  hit2ds.registerRelationTo(digits);
-  alignmentHits.registerRelationTo(hit2ds);
+  m_Hit2ds.registerInDataStore();
+  m_AlignmentHits.registerInDataStore();
+  m_Digits.isRequired();
+  m_Hit2ds.registerRelationTo(m_Digits);
+  m_AlignmentHits.registerRelationTo(m_Hit2ds);
   m_TransformData =
     new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
   m_GeoDat = &(EKLM::GeometryData::Instance());
@@ -121,15 +114,12 @@ void EKLMReconstructorModule::event()
 {
   int i, n;
   double d1, d2, t, t1, t2, sd;
-  StoreArray<EKLMAlignmentHit> alignmentHits;
-  StoreArray<EKLMDigit> digits;
-  StoreArray<EKLMHit2d> hit2ds;
   std::vector<EKLMDigit*> digitVector;
   std::vector<EKLMDigit*>::iterator it, it2, it3, it4, it5;
-  n = digits.getEntries();
+  n = m_Digits.getEntries();
   for (i = 0; i < n; i++)
-    if (digits[i]->isGood())
-      digitVector.push_back(digits[i]);
+    if (m_Digits[i]->isGood())
+      digitVector.push_back(m_Digits[i]);
   /* Sort by plane. Note that numbers of planes from one sector differ by 1. */
   sort(digitVector.begin(), digitVector.end(), comparePlane);
   it = digitVector.begin();
@@ -161,7 +151,7 @@ void EKLMReconstructorModule::event()
         t1 = getTime(*it4, d1) + 0.5 * sd / Const::speedOfLight;
         t2 = getTime(*it5, d2) - 0.5 * sd / Const::speedOfLight;
         t = (t1 + t2) / 2;
-        EKLMHit2d* hit2d = hit2ds.appendNew(*it4);
+        EKLMHit2d* hit2d = m_Hit2ds.appendNew(*it4);
         hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
         hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
@@ -172,10 +162,9 @@ void EKLMReconstructorModule::event()
         hit2d->addRelationTo(*it4);
         hit2d->addRelationTo(*it5);
         for (i = 0; i < 2; i++) {
-          EKLMAlignmentHit* alignmentHit = alignmentHits.appendNew(i);
+          EKLMAlignmentHit* alignmentHit = m_AlignmentHits.appendNew(i);
           alignmentHit->addRelationTo(hit2d);
         }
-        /* cppcheck-suppress memleak */
       }
     }
     it = it3;

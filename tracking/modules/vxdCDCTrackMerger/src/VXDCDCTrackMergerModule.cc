@@ -7,11 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerModule.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
+
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
@@ -160,7 +160,8 @@ void VXDCDCTrackMergerModule::event()
     }    //end loop on VXD tracks
 
     if (matched_track) {
-      m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack);
+      // -1 is the convention for "before the CDC track" in the related tracks combiner
+      m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack, -1);
     }
   }
 }

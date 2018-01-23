@@ -1,0 +1,31 @@
+# EventType: 1210630000
+# Descriptor: [B+ -> K+ tau+ tau-]cc
+# NickName: Bu_K+tautau_mumu
+# Documentation: SM B-> K tau tau signal MC both taus to muons
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sam Cunliffe
+# Email: samuel.cunliffe@pnnl.gov
+# Cuts: None
+# Date: 20170629
+#
+Alias Mytau+ tau+
+Alias Mytau- tau-
+ChargeConj    Mytau+  Mytau-
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+1.000        K+    Mytau+    Mytau-           BTOSLLBALL;
+Enddecay
+CDecay B-sig
+#
+Decay Mytau-
+1.00      mu-     anti-nu_mu       nu_tau                PHOTOS TAULNUNU;
+Enddecay
+CDecay Mytau+
+#
+End

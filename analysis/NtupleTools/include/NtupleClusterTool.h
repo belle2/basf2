@@ -22,7 +22,8 @@ namespace Belle2 {
   /**
    * NtupleTool to write out ECL cluster quanties for a given Particle
    * - region : detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]
-   * - E9E25  : ratio of energies in inner 3x3 and 5x5 cells
+   * - E1E9   : ratio of energies in central cell and 3x3 cells
+   * - E9E21  : ratio of energies in inner 3x3 and 5x5-corner cells
    * - nHits  : number of hits associated to this cluster
    * - trackM : 1/0 if charged track is/is not Matched to this cluster
    */
@@ -50,8 +51,11 @@ namespace Belle2 {
     /** detection region in the ECL [1 - forward, 2 - barrel, 3 - backward] */
     int* m_region;
 
-    /**  ratio of energies in inner 3x3 and 5x5 cells */
-    float* m_e9e25;
+    /**  ratio of energies in central cell and 3x3 cells */
+    float* m_e1e9;
+
+    /**  ratio of energies in inner 3x3 and 5x5-corner cells */
+    float* m_e9e21;
 
     /** number of hits associated to this cluster */
     int* m_nHits;
@@ -62,10 +66,16 @@ namespace Belle2 {
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
 
+    /** Delete the 'new's */
+    void deallocateMemory();
+
   public:
 
     /** Constuctor. */
     NtupleClusterTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+
+    /** Destructor. */
+    ~NtupleClusterTool() {deallocateMemory();}
 
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

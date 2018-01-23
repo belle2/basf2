@@ -1,0 +1,6 @@
+Import('env')
+
+env['TOOLS_LIBS']['sm_server'] = ['daq', 'framework', '$ROOT_LIBS', 'rt' ]
+env['TOOLS_LIBS']['sm_client'] = ['daq', 'framework', '$ROOT_LIBS', 'rt' ]
+
+Return('env')

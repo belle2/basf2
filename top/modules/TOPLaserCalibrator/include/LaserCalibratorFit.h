@@ -44,7 +44,7 @@ namespace Belle2 {
       /**
        * Constructor
        */
-      LaserCalibratorFit(unsigned moduleID);
+      explicit LaserCalibratorFit(unsigned moduleID);
 
       /**
        * Destructor
@@ -61,7 +61,7 @@ namespace Belle2 {
       * set time fit function
       * @param method  gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball
       */
-      void setFitMethod(std::string method = "gauss") {m_fitMethod = method;}
+      void setFitMethod(std::string& method) {m_fitMethod = method;}
 
       /**
       * set x range in the fit
@@ -104,9 +104,15 @@ namespace Belle2 {
       std::vector<double> getMaxPos()  {return m_maxpos;}
 
       /**
-       * get the center positon of hist max bin
+       * get mean positon after fit
        */
       double getFitT()  {return m_fitT;}
+
+      /**
+       * returns the error mean positon after fit
+       */
+      double getFitTErr() {return m_fitTErr;}
+
 
     private:
 
@@ -132,13 +138,14 @@ namespace Belle2 {
 
       unsigned m_moduleID = 0; /**< one moduleID/slot */
       std::vector<double> m_maxpos; /**< center positon of hist max bin */
+      std::vector<double> m_maxpos_error; /**< error on the center positon of hist max bin */
       double m_xmin = 0; /**< fitting low-edge */
       double m_xmax = 0; /**< fitting upper-edge */
-      double m_fitT; /**< mean position after fit */
+      double m_fitT = 0; /**< mean position after fit */
+      double m_fitTErr = 0.; /**< error on the mean position estimated by the fit */
       std::vector<TH1F*> m_hist; /**< time hist of 512 channels */
       std::vector<TF1*> m_func; /**< fitting function */
       std::string m_fitMethod; /**< fitting method */
-
     };
   }// TOP namespace
 }//Belle2 namespace

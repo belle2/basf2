@@ -34,11 +34,14 @@ namespace Belle2 {
      * Useful constructor
      * @param serialNumber serial number
      * @param moduleCNumber module construction number
+     * @param slotNumber slot number
      * @param arrayNumber number of PMT array
      * @param position position of PMT within array (module)
      */
-    TOPPmtInstallation(const std::string& serialNumber, float lambdaFirst, float lambdaStep, float CE):
-      m_serialNumber(serialNumber), m_moduleCNumber(moduleCNumber), m_arrayNumber(arrayNumber), m_position(position)
+    TOPPmtInstallation(const std::string& serialNumber, int moduleCNumber, int slotNumber,
+                       int arrayNumber, int position):
+      m_serialNumber(serialNumber), m_moduleCNumber(moduleCNumber), m_slotNumber(slotNumber),
+      m_arrayNumber(arrayNumber), m_position(position)
     {}
 
     /**
@@ -52,6 +55,12 @@ namespace Belle2 {
      * @return construction module number
      */
     int getModuleCNumber() const {return m_moduleCNumber;}
+
+    /**
+     * Returns slot number
+     * @return slot number
+     */
+    int getSlotNumber() const {return m_slotNumber;}
 
     /**
      * Returns PMT array number
@@ -70,6 +79,7 @@ namespace Belle2 {
 
     std::string m_serialNumber; /**< serial number, e.g. JTxxxx */
     int m_moduleCNumber = 0;    /**< module construction number (1-based) */
+    int m_slotNumber = 0;       /**< slot number (1-based) */
     int m_arrayNumber = 0;      /**< MCP array number (1-based) */
     int m_position = 0;         /**< position within the TOP module (1-based) */
 

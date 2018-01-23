@@ -66,7 +66,8 @@ void EvtGenInputModule::initialize()
     B2INFO("Using non-standard DECAY file \"" << m_DECFileName << "\"");
   }
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //initial particle for beam parameters
   m_initial.initialize();

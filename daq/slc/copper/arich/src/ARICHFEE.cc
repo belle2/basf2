@@ -28,19 +28,28 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   callback.add(new NSMVHandlerFloat(vname + "th0", true, true, 0));
   callback.add(new NSMVHandlerFloat(vname + "dth", true, true, 0));
   callback.add(new NSMVHandlerFloat(vname + "temp", true, true, 0));
+  callback.add(new NSMVHandlerInt(vname + "fifofull", true, true, 0));
+  callback.add(new NSMVHandlerInt(vname + "interval_time", true, true, 0));
 
   callback.add(new FEE32Handler(vname + "reg[10]", callback, hslb, *this, 0x0010));
   callback.add(new FEE32Handler(vname + "reg[11]", callback, hslb, *this, 0x0011));
   callback.add(new FEE32Handler(vname + "reg[12]", callback, hslb, *this, 0x0012));
   callback.add(new FEE32Handler(vname + "reg[13]", callback, hslb, *this, 0x0013));
-  callback.add(new FEE32Handler(vname + "reg[14]", callback, hslb, *this, 0x0014));
+  callback.add(new FEE32Handler(vname + "reg[15]", callback, hslb, *this, 0x0015));
+  callback.add(new FEE32Handler(vname + "reg[16]", callback, hslb, *this, 0x0016));
+  callback.add(new FEE32Handler(vname + "reg[17]", callback, hslb, *this, 0x0017));
+  callback.add(new NSMVHandlerText(vname + "reg0x14", true, false, ""));
+  callback.add(new NSMVHandlerText(vname + "reg0x18", true, false, ""));
 
+  callback.add(new NSMVHandlerInt("csr", true, true, 6));
+  callback.add(new NSMVHandlerText(vname + "feb.firmware", true, true, "sa03b3fe2-v07cand5.bin"));
   callback.add(new NSMVHandlerInt(vname + "syn_date", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "firm.rev", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "width", true, false, 0));
   callback.add(new NSMVHandlerText(vname + "mode", true, false, ""));
   callback.add(new NSMVHandlerInt(vname + "sckstop", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "reset", true, false, 0));
+  callback.add(new NSMVHandlerInt(vname + "fifobit", true, false, 0));
   for (int i = 0; i < 6; i++) {
     callback.add(new NSMVHandlerInt(vname + StringUtil::form("feb[%d].enable", i), true, false, 0));
     callback.add(new NSMVHandlerInt(vname + StringUtil::form("feb[%d].jtag.enable", i), true, false, 0));
@@ -73,6 +82,9 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
       callback.add(new ARICHHandlerAsicGain(cvname + "gain", callback, hslb, *this, i, j));//yone
     }
   }
+  hsreg_t hsp;
+  hslb.hsreg_getfee(hsp);
+  m_serial = hsp.feeser;
   for (int i = 0; i < 6; i++) {
     for (int j = 0; j < 4; j++) {
       for (int k = 0; k < 36; k++) {
@@ -82,8 +94,20 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     }
     const DBObject& o_feb(obj("feb", i));
     bool used = o_feb.getBool("used");
+    m_serial = 6565;
+    hsreg_t hsp;
+    hslb.hsreg_getfee(hsp);
+    m_serial = hsp.feeser;
     if (used) {
-      m_o_feb[i] = callback.dbload(o_feb.getText("path"));
+      std::string path = StringUtil::form("db://arich/MB:%d:FEB:%d:", m_serial, i);
+      //o_feb.getText("path"), );
+      //LogFile::debug(path);
+      m_o_feb[i] = callback.dbload(path);
+      if (m_o_feb[i].getName().size() == 0) {
+        std::string path = "db://arich/MB:0:FEB:0:";
+        m_o_feb[i] = callback.dbload(path);
+      }
+      LogFile::debug("db://arich/" + m_o_feb[i].getName());
     }
     callback.add(new NSMVHandlerInt(vname + StringUtil::form("feb[%d].used", i), true, true, (int)used));
   }
@@ -100,6 +124,8 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     callback.add(new ARICHHandlerPTM1(cvname + "ptm1", callback, hslb, *this, i));
     callback.add(new ARICHHandlerHDCycle(cvname + "hdcycle", callback, hslb, *this, i));//yone
     callback.add(new ARICHHandlerTrgDelay(cvname + "trgdelay", callback, hslb, *this, i));//yone
+    callback.add(new NSMVHandlerInt(cvname + "hdcycle_set", true, true, -1));
+    callback.add(new NSMVHandlerInt(cvname + "trgdelay_set", true, true, -1));
     callback.add(new NSMVHandlerFloat(cvname + "mona", true, false, 0));
     callback.add(new NSMVHandlerFloat(cvname + "monb", true, false, 0));
     callback.add(new NSMVHandlerFloat(cvname + "monc", true, false, 0));
@@ -149,9 +175,22 @@ void ARICHFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   int used[6] = { 1, 1, 1, 1, 1, 1 };
   const std::string vname = StringUtil::form("arich[%d].", hslb.get_finid());
+  hsreg_t hsp;
+  hslb.hsreg_getfee(hsp);
+  //int i = hslb.get_finid();
   for (size_t i = 0; i < 6; i++) {
     callback.get(vname + StringUtil::form("feb[%d].used", i), used[i]);
+    if (hsp.feeser != m_serial) {
+      std::string path = StringUtil::form("db://arich/MB:%d:FEB:%d:", hsp.feeser, i);
+      m_o_feb[i] = callback.dbload(path);
+      if (m_o_feb[i].getName().size() == 0) {
+        std::string path = "db://arich/MB:0:FEB:0:";
+        m_o_feb[i] = callback.dbload(path);
+      }
+      LogFile::debug("db://arich/" + m_o_feb[i].getName());
+    }
   }
+  m_serial = hsp.feeser;
   std::string mode;
   callback.get(vname + "mode_set", mode);
   ARICHMerger mer(callback, hslb);
@@ -161,8 +200,8 @@ void ARICHFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 void ARICHFEE::start(RCCallback& callback, HSLB& hslb)
 {
   try {
-    unsigned int val = hslb.readfee32(0x11);
-    hslb.writefee32(0x11, (val & 0x0FFFF00) | 0x010000);
+    //unsigned int val = hslb.readfee32(0x11);
+    //hslb.writefee32(0x11, (val & 0x0FFFF00) | 0x010000);
   } catch (const IOException& e) {
     LogFile::error(e.what());
   }
@@ -171,8 +210,8 @@ void ARICHFEE::start(RCCallback& callback, HSLB& hslb)
 void ARICHFEE::stop(RCCallback& callback, HSLB& hslb)
 {
   try {
-    unsigned int val = hslb.readfee32(0x11);
-    hslb.writefee32(0x11, (val & 0x0FFFF00) | 0x010000);
+    //unsigned int val = hslb.readfee32(0x11);
+    //hslb.writefee32(0x11, (val & 0x0FFFF00) | 0x010000);
   } catch (const IOException& e) {
     LogFile::error(e.what());
   }
@@ -190,32 +229,43 @@ float convert_temp(unsigned int d)
 
 void ARICHFEE::monitor(RCCallback& callback, HSLB& hslb)
 {
+  static long count = 0;
+  count++;
+  if (count % 5 != 1) {
+    return;
+  }
   std::string vname = StringUtil::form("arich[%d].", hslb.get_finid());
   m_reg[0x0010] = hslb.readfee32(0x0010);
   m_reg[0x0011] = hslb.readfee32(0x0011);
   m_reg[0x0012] = hslb.readfee32(0x0012);
   m_reg[0x0013] = hslb.readfee32(0x0013);
   m_reg[0x0014] = hslb.readfee32(0x0014);
-  /*
-  hslb.writefee32(0x0011, m_reg[0x0011] & 0xFFFFF0);
-  hslb.writefee32(0x0011, m_reg[0x0011] | 0x1);
-  unsigned int d = hslb.readfee32(0x0015);// & 0xFFFF;
-  float temp = convert_temp(d);
-  LogFile::info("d=0x%x", d, temp);
-  callback.set(vname + "temp", temp);
-  */
+  m_reg[0x0015] = hslb.readfee32(0x0015);
+  m_reg[0x0016] = hslb.readfee32(0x0016);
+  m_reg[0x0017] = hslb.readfee32(0x0017);
+  m_reg[0x0018] = hslb.readfee32(0x0018);
+  unsigned int v = m_reg[0x0012];
+  for (int i = 0; i < 6; i++) {
+    int enable = (int)((v >> i) & 0x1);
+    callback.set(vname + StringUtil::form(".feb[%d].initb", i), enable);
+    enable = (int)((v >> (i + 8)) & 0x1);
+    callback.set(vname + StringUtil::form(".feb[%d].done", i), enable);
+  }
+
+  //float temp = m_reg[0x0015] * 0.49 - 273;
+  //callback.set(vname + "temp", temp);
+  callback.set(vname + "fifo_full", (int)(m_reg[0x0016] & 0xFFFFFF));
+  callback.set(vname + "interval_time", (int)(m_reg[0x0017] & 0xFFFF));
+  ///*
   hslb.writefee32(0x0100, 0x10);
   hslb.writefee32(0x0100, 0x00);
   unsigned int d = (hslb.readfee32(0x0100) & 0xFFFF) >> 6;
   float temp = d * 0.49 - 273;
-  //callback.set(vname + "tempfpga", temp);
   callback.set(vname + "temp", temp);
-  //LogFile::info("d=0x%x", d, temp);
-  callback.set(vname + "reg[10]", (int)m_reg[0x0010]);
-  callback.set(vname + "reg[11]", (int)m_reg[0x0011]);
-  callback.set(vname + "reg[12]", (int)m_reg[0x0012]);
-  callback.set(vname + "reg[13]", (int)m_reg[0x0013]);
-  callback.set(vname + "reg[14]", (int)m_reg[0x0014]);
+  //*/
+  callback.set(vname + "reg0x14", StringUtil::form("0x%08x, %u", m_reg[0x0014]));
+  callback.set(vname + "reg0x18", StringUtil::form("0x%08x, %u", m_reg[0x0018]));
+
   unsigned int val = hslb.readfee32(0x0014);
   callback.set(vname + "feb[0].trgcnt", (int)((val >> 0) & 0xF));
   callback.set(vname + "feb[1].trgcnt", (int)((val >> 4) & 0xF));
@@ -223,6 +273,9 @@ void ARICHFEE::monitor(RCCallback& callback, HSLB& hslb)
   callback.set(vname + "feb[3].trgcnt", (int)((val >> 12) & 0xF));
   callback.set(vname + "feb[4].trgcnt", (int)((val >> 16) & 0xF));
   callback.set(vname + "feb[5].trgcnt", (int)((val >> 20) & 0xF));
+
+  int fifobit = (hslb.readfee32(0x0100) & 0xFFFFFF);
+  callback.set(vname + "fifobit", fifobit);
 
   int used[6] = { 1, 1, 1, 1, 1, 1 };
   for (size_t i = 0; i < 6; i++) {
@@ -265,8 +318,8 @@ void ARICHFEE::monitor(RCCallback& callback, HSLB& hslb)
       unsigned int d2 = sa03.ts2_data();
       float t1 = convert_temp(d1);
       float t2 = convert_temp(d2);
-      //LogFile::debug("ts1(ASIC) = %8.4f (0x%x)", t1, d1);
-      //LogFile::debug("ts2(FPGA) = %8.4f (0x%x)", t2, d2);
+      //LogFile::debug("%s.ts1(ASIC) = %8.4f (0x%x)", cvname.c_str(), t1, d1);
+      //LogFile::debug("%s.ts2(FPGA) = %8.4f (0x%x)", cvname.c_str(), t2, d2);
       callback.set(cvname + "t1", t1);
       callback.set(cvname + "t2", t2);
     }
@@ -342,7 +395,7 @@ void ARICHFEE::readback(RCCallback& callback, HSLB& hslb, const DBObject& /*obj*
       sa03.select(ichip, -1);
       sa03.ndro();
       int val = sa03.rparam();
-      LogFile::debug("feb = %d chip=%d val=0x%x", ifeb, ichip, val);
+      //LogFile::debug("feb = %d chip=%d val=0x%x", ifeb, ichip, val);
       par.rbparam(val);
       std::string cvname = vname + StringUtil::form("feb[%d].", ifeb);
       callback.set(cvname + "busy", (val >> 12) & 0x1);

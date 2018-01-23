@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to include the flavor
 # tagging user interphase into your analysis IN THE
 # SPECIAL CASE you use BELLE MONTE CARLO OR BELLE DATA.
@@ -129,17 +131,15 @@ applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to specify the system build or revision you are using only if you train by yourself!!!
-# Otherwise the flavor tagger automatically looks for the release you set before.
-
-# Alternatively you can download them from my realease:
-# copy the folder in @login.cc.kek.jp:
-# scp -r /home/belle2/abudinen/public/FT-build-20xx-xx-xx/FlavorTagging
-# into your workingDirectory/.
+# You just have to use a special global tag of the conditions database. Check in
+# https://confluence.desy.de/display/BI/Physics+FlavorTagger
+# E.g. for release-00-09-01
+use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
 # The default working directory is '.'
 # If you have an own analysis package it is recomended to use
 # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
+# To save CPU time the weight files should be saved in the same server were you run.
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
@@ -147,7 +147,6 @@ applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 flavorTagger(
     particleLists=['B0:jspiks'],
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
     belleOrBelle2='Belle')
 #
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
@@ -189,7 +188,7 @@ toolsB += ['DeltaEMbc', '^B+']
 toolsB += ['Cluster', 'B+ -> [anti-D0 -> K- pi+ [pi0 -> ^gamma ^gamma]] pi+']
 toolsB += ['MCTruth', '^B+ -> ^anti-D0 pi+']
 toolsB += ['CustomFloats[isSignal]', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[Kid_belle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
+toolsB += ['CustomFloats[kIDBelle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
 
 toolsTrackPI = ['EventMetaData', 'pi+']
 toolsTrackPI += ['Kinematics', '^pi+']
@@ -244,7 +243,7 @@ tools = [
     # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
     # If you set qrCategories, the output of each category is saved.
     '^B0',
-    'FlavorTagging[TMVA-FBDT, FANN-MLP, qrCategories]', '^B0',
+    'FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0',
 ]
 # Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 

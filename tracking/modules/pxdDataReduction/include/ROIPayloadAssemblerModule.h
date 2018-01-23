@@ -35,18 +35,18 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    virtual ~ROIPayloadAssemblerModule();
+    ~ROIPayloadAssemblerModule();
 
     /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
+    void beginRun() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
     /**
      * Termination action.
@@ -62,6 +62,8 @@ namespace Belle2 {
     unsigned int mSendAllDS; /**< Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality */
     unsigned int mSendROIsDS; /**<  Send ROIs downscaler; Workaround for missing ONSEN functionality */
     unsigned int mCutNrROIs; //*< If Nr of ROIs per DHHID reach this, send out only one full sensor ROI */
+    bool mAcceptAll; /*< Accept all event, dont use HLT decision */
+    bool mNoRejectFlag; /*< Never reject, just send no ROI */
 
   };
 }

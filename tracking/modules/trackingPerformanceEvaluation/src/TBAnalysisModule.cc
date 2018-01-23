@@ -215,12 +215,12 @@ void TBAnalysisModule::event()
   if (offlinetracks.getEntries() == 0)
     return;
 
-  const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(offlinetracks[0], "offlineTrackFitResults");
-  if (fitResult == NULL)
+  const TrackFitResult* aFitResult = DataStore::getRelated<TrackFitResult>(offlinetracks[0], "offlineTrackFitResults");
+  if (aFitResult == NULL)
     return;
 
-  m_h1_mom->Fill(fitResult->getMomentum().Mag());
-  if (abs(fitResult->getMomentum().Mag() - 3.5) > 1.5)
+  m_h1_mom->Fill(aFitResult->getMomentum().Mag());
+  if (abs(aFitResult->getMomentum().Mag() - 3.5) > 1.5)
     return;
 
 
@@ -416,26 +416,26 @@ void TBAnalysisModule::event()
 
       if (pxdDigits[pxd]->getSensorID().getLayerNumber() == 2) {
 
-        float L2v = aSensorInfo.getVCellPosition(pxdDigits[pxd]->getVCellID());
-        float L2u = aSensorInfo.getUCellPosition(pxdDigits[pxd]->getUCellID());
+        float L2vCell = aSensorInfo.getVCellPosition(pxdDigits[pxd]->getVCellID());
+        float L2uCell = aSensorInfo.getUCellPosition(pxdDigits[pxd]->getUCellID());
 
         if (aClusterOnL1 && isInFiducialL2)
           if (! isInL2)
-            if (abs(L2v - L2vInter - 0.005) < 0.06 && abs(L2u - L2uInter - 0.01)  < 0.08) {
+            if (abs(L2vCell - L2vInter - 0.005) < 0.06 && abs(L2uCell - L2uInter - 0.01)  < 0.08) {
               //      if ( abs(L2v - L2vInter - 0.005) < 1 && abs(L2u - L2uInter - 0.01)  < 1){
               isInL2 = true;
-              m_h2_uvResidDigit_L2->Fill(L2vInter - L2v - 0.005, L2uInter - L2u - 0.01);
+              m_h2_uvResidDigit_L2->Fill(L2vInter - L2vCell - 0.005, L2uInter - L2uCell - 0.01);
             }
       } else {
 
-        float L1v = aSensorInfo.getVCellPosition(pxdDigits[pxd]->getVCellID());
-        float L1u = aSensorInfo.getUCellPosition(pxdDigits[pxd]->getUCellID());
+        float L1vCell = aSensorInfo.getVCellPosition(pxdDigits[pxd]->getVCellID());
+        float L1uCell = aSensorInfo.getUCellPosition(pxdDigits[pxd]->getUCellID());
 
         if (aClusterOnL2 && isInFiducialL1)
           if (! isInL1)
-            if (abs(L1v - L1vInter - 0.09) < 0.06 && abs(L1u - L1uInter + 0.026)  < 0.04) {
+            if (abs(L1vCell - L1vInter - 0.09) < 0.06 && abs(L1uCell - L1uInter + 0.026)  < 0.04) {
               isInL1 = true;
-              m_h2_uvResidDigit_L1->Fill(L1vInter - L1v - 0.09, L1uInter - L1u + 0.026);
+              m_h2_uvResidDigit_L1->Fill(L1vInter - L1vCell - 0.09, L1uInter - L1uCell + 0.026);
             }
       }
 

@@ -12,7 +12,14 @@
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -82,7 +89,6 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
 
   // Reconstruct the hits to the track
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.isCurler();
 
   using CDCRecoHitWithRLPointer = std::pair<CDCRecoHit3D, const CDCRLWireHit*>;
@@ -94,9 +100,12 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
    * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
    */
   for (const CDCRLWireHit& rlWireHit : rlWireHits) {
-    if (not rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
-      Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
-      const CDCWire& wire = rlWireHit.getWire();
+    if (rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag()) continue;
+
+    const CDCWire& wire = rlWireHit.getWire();
+    const WireLine& wireLine = wire.getWireLine();
+    double signedDriftLength = rlWireHit.getSignedRefDriftLength();
+    for (const Vector3D& recoPos3D : trajectory2D.reconstructBoth3D(wireLine, signedDriftLength)) {
       // Skip hits out of CDC
       if (not wire.isInCellZBounds(recoPos3D, m_param_checkForInWireBoundsFactor)) {
         continue;
@@ -107,7 +116,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
       if (perpS < 0) {
         if (isCurler) {
-          perpS += 2 * TMath::Pi() * radius;
+          perpS += trajectory2D.getArcLength2DPeriod();
         } else if (m_param_checkForB2BTracks) {
           continue;
         }
@@ -156,11 +165,10 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
                         foundStereoHits.end());
 
   // Sort the found stereo hits by same CDCHit and smaller distance to the node
-  const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
-  const double lowerZ0 = node.getLowerZ0();
-  const double upperZ0 = node.getUpperZ0();
+  const double tanLMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
+  const double z0Mean = (node.getLowerZ0() + node.getUpperZ0()) / 2.0;
 
-  const auto& sortByHitAndNodeCenterDistance = [zSlopeMean, lowerZ0, upperZ0](const CDCRecoHitWithRLPointer & lhs,
+  auto sortByHitAndNodeCenterDistance = [tanLMean, z0Mean](const CDCRecoHitWithRLPointer & lhs,
   const CDCRecoHitWithRLPointer & rhs) {
 
     const CDCRecoHit3D& rhsRecoHit = rhs.first;
@@ -177,19 +185,13 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double lhsZ = lhsRecoHit.getRecoZ();
       const double rhsZ = rhsRecoHit.getRecoZ();
 
-      const double lhsR = lhsRecoHit.getRecoPos2D().norm();
-      const double rhsR = rhsRecoHit.getRecoPos2D().norm();
+      const double lhsS = lhsRecoHit.getArcLength2D();
+      const double rhsS = rhsRecoHit.getArcLength2D();
 
-      const double lhsLambda1 = (lhsZ - lowerZ0) / lhsR;
-      const double lhsLambda2 = (lhsZ - upperZ0) / lhsR;
+      const double lhsZDistance = lhsS * tanLMean + z0Mean - lhsZ;
+      const double rhsZDistance = rhsS * tanLMean + z0Mean - rhsZ;
 
-      const double rhsLambda1 = (rhsZ - lowerZ0) / rhsR;
-      const double rhsLambda2 = (rhsZ - upperZ0) / rhsR;
-
-      const double lhsDistanceToNode = fabs((lhsLambda1 + lhsLambda2) / 2 - zSlopeMean);
-      const double rhsDistanceToNode = fabs((rhsLambda1 + rhsLambda2) / 2 - zSlopeMean);
-
-      return lhsDistanceToNode < rhsDistanceToNode;
+      return lhsZDistance < rhsZDistance;
     }
   };
 
@@ -214,7 +216,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
   // Add the found stereo hits to the relation vector. In the moment, all hits get the same weight (may change later).
   for (const CDCRecoHitWithRLPointer& recoHitWithRLPointer : foundStereoHits) {
     const CDCRLWireHit* rlWireHit = recoHitWithRLPointer.second;
-    relationsForCollector.emplace_back(&track, 0, rlWireHit);
+    relationsForCollector.emplace_back(&track, foundStereoHits.size(), rlWireHit);
   }
 }
 

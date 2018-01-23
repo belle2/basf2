@@ -41,7 +41,10 @@ unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf; throw (err_str);
+
   return 0;
 }
 
@@ -79,14 +82,20 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       char err_buf[500];
       sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf; throw (err_str);
+      printf("[DEBUG] %s\n", err_buf);
+      exit(1);
+      //      string err_str = err_buf; throw (err_str);
   }
 
   if (nwords < 0 || nwords > 1e6) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : # of words is strange. %d : %s %s %d\n", nwords,
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : # of words is strange. %d : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            nwords,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str);
+    printf("[DEBUG] %s\n", err_buf);
+    exit(1);
+    //    string err_str = err_buf; throw (err_str);
   }
 
   return nwords;
@@ -99,9 +108,14 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
 unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] ERROR_EVENT : No event # in B2LFEE header. (block %d) Exiting...\n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  sprintf(err_buf,
+          "[FATAL] ERROR_EVENT : No event # in B2LFEE header. (block %d) Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+          n,
+          GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf; throw (err_str);
   return 0;
 }
 
@@ -138,20 +152,21 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+            "[FATAL] ERROR_EVENT : checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
 
   if (err_flag == 1) {
+    printf("[DEBUG] %s\n", err_buf);
     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
     printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
-    string err_str = err_buf;
-    throw (err_str);
-
+    exit(1);
+    //    string err_str = err_buf; throw (err_str);
     //     sleep(1234567);
     //     exit(-1);
   }
@@ -163,9 +178,14 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] ERROR_EVENT : No magic word # in COPPER header (block %d). Exiting...\n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
+  sprintf(err_buf,
+          "[FATAL] ERROR_EVENT : No magic word # in COPPER header (block %d). Exiting...: eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+          n,
+          GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf; throw (err_str);
   return false;
 }
 
@@ -174,8 +194,9 @@ void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf;  throw (err_str);
 }
 
 unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
@@ -187,8 +208,9 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u\n",
          m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf;  throw (err_str);
 
 }
 
@@ -199,8 +221,9 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   sprintf(err_buf, "[FATAL] This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("[DEBUG] %s\n", err_buf);
+  exit(1);
+  //  string err_str = err_buf;  throw (err_str);
 
 }
 
@@ -214,11 +237,13 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   if (finesse_nwords <= 0) {
     char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : The specified finesse(%d) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...\n %s %s %d\n",
-            finesse_num, finesse_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            "[FATAL] ERROR_EVENT : The specified finesse(%c) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...: eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            65 + finesse_num, finesse_nwords,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+    exit(1);
+    //    string err_str = err_buf;    throw (err_str);
   }
 
   int* copper_buf = GetBuffer(n);
@@ -255,30 +280,22 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       //
       // Do not stop data
       //
-      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8u fns %d : data(%x) calc(%x) fns nwords %d type 0x%.8x\n",
-             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num,  *buf , temp_crc16, GetFINESSENwords(n, finesse_num),
-             copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ]);
+      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+             *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+             65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     } else {
       //
       // Stop taking data
       //
-      printf("[FATAL] ERROR_EVENT : POST B2link event CRC16 error without B2link Packet CRC error run %d sub %d eve %8u fns %d: data(%x) calc(%x) fns nwords %d type 0x%.8x\n",
-             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num),
-             copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ]);
-
-      int* temp_buf = GetFINESSEBuffer(n, finesse_num);
-      printf("%.8x ", 0);
-      for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
-        printf("%.8x ", temp_buf[ k ]);
-        if ((k + 1) % 10 == 0) printf("\n%.8x : ", k);
-      }
-      printf("\n");
-      fflush(stdout);
-      sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting... run %d sub %d eve %u\n %s %s %d\n",
-              (unsigned short)(*buf & 0xFFFF), temp_crc16, GetRunNo(n), GetSubRunNo(n), GetEveNo(n), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("[FATAL] ERROR_EVENT : POST B2link event CRC16 error without B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+             *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+             65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
 #ifndef NO_ERROR_STOP
-      string err_str = err_buf;     throw (err_str);
+      exit(1);
+      //      string err_str = err_buf;     throw (err_str);
 #endif
     }
     // Modify XOR checksum due to adding a bit flag

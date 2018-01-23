@@ -83,7 +83,7 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
 
 
@@ -91,7 +91,7 @@ namespace Belle2 {
     /**
      * Prints a header for each new run.
      */
-    virtual void beginRun()
+    void beginRun() override
     {
       InitializeCounters();
 
@@ -106,14 +106,14 @@ namespace Belle2 {
 
 
     /** builds the SegmentNetwork and the TrackNodeNetwork  */
-    virtual void event();
+    void event() override;
 
 
     /** Prints a footer for each run which ended. */
-    virtual void endRun();
+    void endRun() override;
 
     /** clean up: */
-    void terminate()
+    void terminate() override
     {
       // delete the root file if it has been created
       if (m_tfile) {
@@ -240,18 +240,15 @@ namespace Belle2 {
     B2Vector3D m_virtualIPErrors;
 
     // input containers
-    /** contains all the sector to filter maps and with it the VXDTFFilters. */
+    /** reference to the container which contains all the sector to filter maps and with it the VXDTFFilters. */
     FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
-    /** contains all sectorCombinations and Filters including cuts. */
+    /** pointer to the current filter, contains all sectorCombinations and Filters including cuts. */
+    // WARNING: the pointer will change if the DB object is updated!
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */
     std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;
-
-    /** access to the static sectorMap, which will be used in this module */
-
-
 
     // output containers
     /** access to the DirectedNodeNetwork, which will be produced by this module */

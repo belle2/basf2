@@ -40,8 +40,8 @@ SVDClust = register_module('SVDClusterizer')
 vxdtf = register_module('VXDTF')
 SVD_DQM = register_module('SVDDQM')
 vxdtf_dqm = register_module('VXDTFDQM')
-trackfitter = register_module('GenFitter')
-roiprod = register_module('PXDDataReduction')
+trackfitter = register_module('DAFRecoFitter')
+roiprod = register_module('PXDROIFinder')
 roipayload = register_module('ROIPayloadAssembler')
 
 # create a main path

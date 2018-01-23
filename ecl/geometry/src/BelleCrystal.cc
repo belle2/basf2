@@ -13,9 +13,9 @@
 
 //#include "G4Trap.hh"
 #include <map>
-using namespace CLHEP;
 using namespace Belle2;
 using namespace std;
+using namespace ECL;
 
 #define DO_QUOTE(X)        #X
 #define QUOTE(X)           DO_QUOTE(X)
@@ -61,10 +61,10 @@ BelleCrystal::BelleCrystal(const G4String& pName, int n,
 
   auto isConvex = [](std::vector<Point_t>::const_iterator begin, std::vector<Point_t>::const_iterator end) -> bool {
     bool sign = false;
-    int n = end - begin;
-    for (int i0 = 0; i0 < n; i0++)
+    int np = end - begin;
+    for (int i0 = 0; i0 < np; i0++)
     {
-      int i1 = (i0 + 1) % n, i2 = (i0 + 2) % n;
+      int i1 = (i0 + 1) % np, i2 = (i0 + 2) % np;
       const Point_t& r2 = *(begin + i2), &r1 = *(begin + i1), &r0 = *(begin + i0);
       double dx1 = r2.x - r1.x, dy1 = r2.y - r1.y;
       double dx2 = r0.x - r1.x, dy2 = r0.y - r1.y;
@@ -628,7 +628,7 @@ G4ThreeVector BelleCrystal::vertex(unsigned int i) const
 G4ThreeVector BelleCrystal::GetPointOnTriangle(int it) const
 {
   // barycentric coordinates
-  double a1 = RandFlat::shoot(0., 1.), a2 = RandFlat::shoot(0., 1.);
+  double a1 = CLHEP::RandFlat::shoot(0., 1.), a2 = CLHEP::RandFlat::shoot(0., 1.);
   if (a1 + a2 > 1) { a1 = 1 - a1; a2 = 1 - a2;}
   double a0 = 1 - (a1 + a2);
   const unsigned int* iv = ivertx(it);
@@ -688,7 +688,7 @@ G4double BelleCrystal::GetSurfaceArea()
 G4ThreeVector BelleCrystal::GetPointOnSurface() const
 {
   if (fareas.size() == 0) getvolarea();
-  double r = RandFlat::shoot(0., fareas.back());
+  double r = CLHEP::RandFlat::shoot(0., fareas.back());
   std::vector<double>::const_iterator it = std::lower_bound(fareas.begin(), fareas.end(), r);
   return (it != fareas.end()) ? GetPointOnTriangle(it - fareas.begin()) : GetPointOnSurface();
 }

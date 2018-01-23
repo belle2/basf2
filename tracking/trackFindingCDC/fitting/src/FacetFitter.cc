@@ -9,14 +9,21 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <Eigen/Dense>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
+#include <Eigen/Core>
 
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace Eigen;
 
 namespace {
 
@@ -62,27 +69,27 @@ namespace {
     vec = vec.passiveRotatedBy(coordinate.flippedSecond());
   }
 
-  Vector2d fitPhiVecZeroSteps(const Matrix<double, 3, 3>& xylCov, double& chi2)
+  Eigen::Vector2d fitPhiVecZeroSteps(const Eigen::Matrix<double, 3, 3>& xylCov, double& chi2)
   {
     chi2 = xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2);
-    return Vector2d(1, 0);
+    return Eigen::Vector2d(1, 0);
   }
 
-  Vector2d fitPhiVecOneStep(const Matrix<double, 3, 3>& xylCov, double& chi2)
+  Eigen::Vector2d fitPhiVecOneStep(const Eigen::Matrix<double, 3, 3>& xylCov, double& chi2)
   {
     const double phi = (xylCov(0, 1) + xylCov(0, 2)) / xylCov(0, 0);
     chi2 = xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2) - phi * (xylCov(0, 1) + xylCov(0, 2));
-    return Vector2d(std::cos(phi), std::sin(phi));
+    return Eigen::Vector2d(std::cos(phi), std::sin(phi));
   }
 
-  Vector2d fitPhiVecBrent(const Matrix<double, 3, 3>& xylCov, int nIter, double& chi2)
+  Eigen::Vector2d fitPhiVecBrent(const Eigen::Matrix<double, 3, 3>& xylCov, int nIter, double& chi2)
   {
-    const Matrix< double, 2, 2> A = xylCov.topLeftCorner<2, 2>();
-    const Matrix< double, 2, 1> b = xylCov.topRightCorner<2, 1>();
+    const Eigen::Matrix< double, 2, 2> A = xylCov.topLeftCorner<2, 2>();
+    const Eigen::Matrix< double, 2, 1> b = xylCov.topRightCorner<2, 1>();
     const double c = xylCov(2, 2);
 
     auto calcReducedChi2 = [&A, &b](double phi) -> double {
-      Matrix<double, 2, 1> normal(std::sin(phi), -std::cos(phi));
+      Eigen::Matrix<double, 2, 1> normal(std::sin(phi), -std::cos(phi));
       return ((normal.transpose() * A - 2 * b.transpose()) * normal)[0];
     };
 
@@ -93,30 +100,33 @@ namespace {
 
     chi2 = bm.FValMinimum() + c;
     const double phi = bm.XMinimum();
-    return Vector2d(std::cos(phi), std::sin(phi));
+    return Eigen::Vector2d(std::cos(phi), std::sin(phi));
   }
 
   template<int N>
-  UncertainParameterLine2D fit(Matrix<double, N, 3> xyl,
-                               Array<double, N, 1> w,
+  UncertainParameterLine2D fit(Matrix<double, N, 3> xylIn,
+                               Matrix<double, N, 1> wIn,
                                int nSteps)
   {
     /// Rotate in forward direction
-    Vector2D coordinate = getTangentialForwardDirection(xyl);
+    Vector2D coordinate = getTangentialForwardDirection(xylIn);
     // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
     // Make best effort the continue the calculation
     if (coordinate.hasNAN()) {
-      coordinate = getCenterForwardDirection(xyl);
+      coordinate = getCenterForwardDirection(xylIn);
     }
 
-    rotate(coordinate, xyl);
+    rotate(coordinate, xylIn);
 
-    Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
-    Matrix< double, N, 3> deltas = xyl.array().rowwise() - averages;
-    Matrix< double, N, 3> weightedDeltas = deltas.array().colwise() * w;
-    Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
+    auto xyl = mapToEigen(xylIn);
+    auto w = mapToEigen(wIn).array();
 
-    Vector2d phiVec;
+    Eigen::Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
+    Eigen::Matrix< double, N, 3> deltas = xyl.array().rowwise() - averages;
+    Eigen::Matrix< double, N, 3> weightedDeltas = deltas.array().colwise() * w;
+    Eigen::Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
+
+    Eigen::Vector2d phiVec;
     double chi2 = 0.0;
     if (nSteps == 0) {
       phiVec = fitPhiVecZeroSteps(covariances, chi2);
@@ -137,7 +147,7 @@ namespace {
     linePrecision(c_Phi0, c_I) = p * meanArcLength;
     linePrecision(c_I, c_Phi0) = p * meanArcLength;
     linePrecision(c_I, c_I) = p;
-    LineCovariance lineCovariance = linePrecision.inverse();
+    LineCovariance lineCovariance = LineUtil::covarianceFromFullPrecision(linePrecision);
 
     Vector2D tangential(phiVec(0), phiVec(1));
     Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);
@@ -158,33 +168,33 @@ namespace {
 double FacetFitter::fit(const CDCFacet& facet, int nSteps)
 {
   // Measurement matrix
-  Matrix< double, 3, 3> xyl;
+  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
 
   // Weight matrix
-  Array< double, 3, 1> w;
+  Matrix<double, 3, 1> w = Matrix<double, 3, 1>::Zero();
 
   const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
   const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
   const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
 
-  const Vector2D support = middleRLWireHit.getWire().getRefPos2D();
+  const Vector2D support = middleRLWireHit.getWireHit().getRefPos2D();
 
   const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-  const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+  const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
   xyl(0, 0) = startWirePos2D.x() - support.x();
   xyl(0, 1) = startWirePos2D.y() - support.y();
   xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
   w(0) = 1.0 / startDriftLengthVar;
 
   const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-  const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+  const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
   xyl(1, 0) = middleWirePos2D.x() - support.x();
   xyl(1, 1) = middleWirePos2D.y() - support.y();
   xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
   w(1) = 1.0 / middleDriftLengthVar;
 
   const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-  const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+  const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
   xyl(2, 0) = endWirePos2D.x() - support.x();
   xyl(2, 1) = endWirePos2D.y() - support.y();
   xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -202,34 +212,34 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
                                           int nSteps)
 {
   // Observations matrix
-  Matrix< double, 6, 3> xyl;
+  Matrix<double, 6, 3> xyl = Matrix<double, 6, 3>::Zero();
 
   // Weight matrix
-  Array< double, 6, 1> w;
+  Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
 
-  const Vector2D support = Vector2D::average(fromFacet.getMiddleWire().getRefPos2D(),
-                                             toFacet.getMiddleWire().getRefPos2D());
+  const Vector2D support = Vector2D::average(fromFacet.getMiddleWireHit().getRefPos2D(),
+                                             toFacet.getMiddleWireHit().getRefPos2D());
   {
     const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();
     const CDCRLWireHit& middleRLWireHit = fromFacet.getMiddleRLWireHit();
     const CDCRLWireHit& endRLWireHit = fromFacet.getEndRLWireHit();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
     xyl(0, 0) = startWirePos2D.x() - support.x();
     xyl(0, 1) = startWirePos2D.y() - support.y();
     xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
     w(0) = 1.0 / startDriftLengthVar;
 
     const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
     xyl(1, 0) = middleWirePos2D.x() - support.x();
     xyl(1, 1) = middleWirePos2D.y() - support.y();
     xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
     w(1) = 1.0 / middleDriftLengthVar;
 
     const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
     xyl(2, 0) = endWirePos2D.x() - support.x();
     xyl(2, 1) = endWirePos2D.y() - support.y();
     xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -242,21 +252,21 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
     const CDCRLWireHit& endRLWireHit = toFacet.getEndRLWireHit();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
     xyl(3, 0) = startWirePos2D.x() - support.x();
     xyl(3, 1) = startWirePos2D.y() - support.y();
     xyl(3, 2) = startRLWireHit.getSignedRefDriftLength();
     w(3) = 1.0 / startDriftLengthVar;
 
     const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
     xyl(4, 0) = middleWirePos2D.x() - support.x();
     xyl(4, 1) = middleWirePos2D.y() - support.y();
     xyl(4, 2) = middleRLWireHit.getSignedRefDriftLength();
     w(4) = 1.0 / middleDriftLengthVar;
 
     const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
     xyl(5, 0) = endWirePos2D.x() - support.x();
     xyl(5, 1) = endWirePos2D.y() - support.y();
     xyl(5, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -270,7 +280,7 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
 
 
 UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
-                                          Array<double, 3, 1> w,
+                                          Matrix<double, 3, 1> w,
                                           int nSteps)
 {
   return ::fit(std::move(xyl), std::move(w), nSteps);

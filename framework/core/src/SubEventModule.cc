@@ -44,7 +44,7 @@ SubEventModule::~SubEventModule()
 {
 }
 
-void SubEventModule::initSubEvent(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path)
+void SubEventModule::initSubEvent(const std::string& objectName, const std::string& loopOver, std::shared_ptr<Path> path)
 {
   m_objectName = objectName;
   m_loopOverName = loopOver;

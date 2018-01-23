@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARRAYITERATOR_H
-#define ARRAYITERATOR_H
+#pragma once
 
 #include <iterator>
 
@@ -113,5 +112,3 @@ namespace Belle2 {
     int m_index; /**< Current index. */
   };
 }
-
-#endif

@@ -9,12 +9,7 @@
 
 #include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 
 #include <cmath>
 
@@ -35,6 +30,19 @@ CDCTrigger2DFinderModule::countSL(bool* layer)
     if (layer[i] == true) ++lcnt;
   }
   return lcnt;
+}
+
+bool
+CDCTrigger2DFinderModule::shortTrack(bool* layer)
+{
+  unsigned short lcnt = 0;
+  // check axial super layers (even layer number),
+  // break at first layer without hit
+  for (int i = 0; i < CDC_SUPER_LAYERS; i += 2) {
+    if (layer[i] == true) ++lcnt;
+    else break;
+  }
+  return (lcnt >= m_minHitsShort);
 }
 
 /*
@@ -77,8 +85,6 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
 
   unitx = ((x2_s - x1_s) / 2.0);
   unity = ((y2_s - y1_s) / 2.0);
-
-  StoreObjPtr<TMatrix> plane("HoughPlane");
 
   // divide x axis in half
   for (i = 0; i < 2 ; ++i) {
@@ -130,7 +136,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
-      if (nSL >= m_minHits) {
+      if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
@@ -139,7 +145,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
           houghCand.push_back(CDCTriggerHoughCand(idx_list, make_pair(v1, v2),
                                                   nSL, houghCand.size()));
           if (m_storePlane > 0) {
-            (*plane)[ix - (nCells - m_nCellsPhi) / 2][iy - (nCells - m_nCellsR) / 2] = nSL;
+            (*m_houghPlane)[ix - (nCells - m_nCellsPhi) / 2][iy - (nCells - m_nCellsR) / 2] = nSL;
           }
         }
       } else if (m_storePlane > 1) {
@@ -150,7 +156,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
             if (iterations != maxIterations) {
               fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
             } else {
-              (*plane)[ix - (nCells - m_nCellsPhi) / 2][iy - (nCells - m_nCellsR) / 2] = nSL;
+              (*m_houghPlane)[ix - (nCells - m_nCellsPhi) / 2][iy - (nCells - m_nCellsR) / 2] = nSL;
             }
             break;
           }
@@ -170,10 +176,6 @@ CDCTrigger2DFinderModule::connectedRegions()
 {
   vector<vector<CDCTriggerHoughCand>> regions;
   vector<CDCTriggerHoughCand> cpyCand = houghCand;
-
-  StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
-  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   // debug: print candidate list
   B2DEBUG(50, "houghCand number " << cpyCand.size());
@@ -262,20 +264,20 @@ CDCTrigger2DFinderModule::connectedRegions()
 
     // save track
     const CDCTriggerTrack* track =
-      storeTracks.appendNew(x, 2. * y, 0.);
+      m_tracks.appendNew(x, 2. * y, 0.);
     // relations to selected hits
     for (unsigned i = 0; i < selectedList.size(); ++i) {
       unsigned its = selectedList[i];
-      track->addRelationTo(tsHits[its]);
+      track->addRelationTo(m_segmentHits[its]);
     }
     // relations to additional hits get a negative weight
     for (unsigned i = 0; i < unselectedList.size(); ++i) {
       unsigned its = unselectedList[i];
-      track->addRelationTo(tsHits[its], -1.);
+      track->addRelationTo(m_segmentHits[its], -1.);
     }
     // save detail information about the cluster
     const CDCTriggerHoughCluster* cluster =
-      clusters.appendNew(xmin, xmax, ymin, ymax, cellIds);
+      m_clusters.appendNew(xmin, xmax, ymin, ymax, cellIds);
     track->addRelationTo(cluster);
   }
 }
@@ -411,15 +413,13 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
                                               double x1, double x2,
                                               double y1, double y2)
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
-
   double m, a, y1_h, y2_h;
-  for (int iHit = 0; iHit < tsHits.getEntries(); iHit++) {
-    unsigned short iSL = tsHits[iHit]->getISuperLayer();
+  for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
+    unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
     if (iSL % 2) continue;
     //TODO: add options: center cell / active priority cell / all priority cells
     vector<double> phi = {0, 0, 0};
-    phi[0] = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
+    phi[0] = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
     phi[1] = phi[0] + 0.5;
     phi[2] = phi[0] - 0.5;
     vector<double> r = {radius[iSL][0], radius[iSL][1], radius[iSL][1]};
@@ -448,29 +448,27 @@ CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
                                      std::vector<unsigned>& selected,
                                      std::vector<unsigned>& unselected)
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
-
   std::vector<int> bestPerSL(5, -1);
   for (unsigned i = 0; i < list.size(); ++i) {
-    unsigned iax = tsHits[list[i]]->getISuperLayer() / 2;
-    bool firstPriority = (tsHits[list[i]]->getPriorityPosition() == 3);
+    unsigned iax = m_segmentHits[list[i]]->getISuperLayer() / 2;
+    bool firstPriority = (m_segmentHits[list[i]]->getPriorityPosition() == 3);
     if (bestPerSL[iax] < 0) {
       bestPerSL[iax] = i;
     } else {
       unsigned itsBest = list[bestPerSL[iax]];
-      bool firstBest = (tsHits[itsBest]->getPriorityPosition() == 3);
+      bool firstBest = (m_segmentHits[itsBest]->getPriorityPosition() == 3);
       // selection rules:
       // first priority, higher ID
       if ((firstPriority && !firstBest) ||
           (firstPriority == firstBest &&
-           tsHits[list[i]]->getSegmentID() > tsHits[itsBest]->getSegmentID())) {
+           m_segmentHits[list[i]]->getSegmentID() > m_segmentHits[itsBest]->getSegmentID())) {
         bestPerSL[iax] = i;
       }
     }
   }
 
   for (unsigned i = 0; i < list.size(); ++i) {
-    unsigned iax = tsHits[list[i]]->getISuperLayer() / 2;
+    unsigned iax = m_segmentHits[list[i]]->getISuperLayer() / 2;
     if (int(i) == bestPerSL[iax]) selected.push_back(list[i]);
     else unselected.push_back(list[i]);
   }
@@ -482,10 +480,6 @@ CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
 void
 CDCTrigger2DFinderModule::patternClustering()
 {
-  StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
-  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
-
   // fill a matrix of 2 x 2 squares
   TMatrix plane2(m_nCellsPhi / 2, m_nCellsR / 2);
   TMatrix planeIcand(m_nCellsPhi, m_nCellsR);
@@ -633,22 +627,22 @@ CDCTrigger2DFinderModule::patternClustering()
 
       // save track
       const CDCTriggerTrack* track =
-        storeTracks.appendNew(x, 2. * y, 0.);
+        m_tracks.appendNew(x, 2. * y, 0.);
       // relations to selected hits
       for (unsigned i = 0; i < selectedList.size(); ++i) {
         unsigned its = selectedList[i];
-        track->addRelationTo(tsHits[its]);
+        track->addRelationTo(m_segmentHits[its]);
       }
       // relations to additional hits get a negative weight
       for (unsigned i = 0; i < unselectedList.size(); ++i) {
         unsigned its = unselectedList[i];
-        track->addRelationTo(tsHits[its], -1.);
+        track->addRelationTo(m_segmentHits[its], -1.);
       }
       // save detail information about the cluster
       const CDCTriggerHoughCluster* cluster =
-        clusters.appendNew(2 * ix, 2 * (ix + m_clusterSizeX) - 1,
-                           2 * iy, 2 * (iy + m_clusterSizeY) - 1,
-                           cellIds);
+        m_clusters.appendNew(2 * ix, 2 * (ix + m_clusterSizeX) - 1,
+                             2 * iy, 2 * (iy + m_clusterSizeY) - 1,
+                             cellIds);
       track->addRelationTo(cluster);
     }
   }

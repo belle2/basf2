@@ -80,7 +80,7 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
-    B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
+    B2DEBUG(1, "ParticleVertexFitterModule : magnetic field = " << m_Bfield);
 
 
     if (m_decayString != "")
@@ -615,11 +615,11 @@ namespace Belle2 {
 
       std::vector<Particle*> daughters = mother->getDaughters();
 
-      unsigned n = kv.getTrackCount();
-      if (daughters.size() != n)
+      unsigned track_count = kv.getTrackCount();
+      if (daughters.size() != track_count)
         return false;
 
-      for (unsigned iChild = 0; iChild < n; iChild++) {
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
         TLorentzVector childMom(kv.getTrackMomentum(iChild).px(),
                                 kv.getTrackMomentum(iChild).py(),
                                 kv.getTrackMomentum(iChild).pz(),
@@ -706,11 +706,11 @@ namespace Belle2 {
 
       std::vector<Particle*> daughters = mother->getDaughters();
 
-      unsigned n = kmv.getTrackCount();
-      if (daughters.size() != n)
+      unsigned track_count = kmv.getTrackCount();
+      if (daughters.size() != track_count)
         return false;
 
-      for (unsigned iChild = 0; iChild < n; iChild++) {
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
         TLorentzVector childMom(kmv.getTrackMomentum(iChild).px(),
                                 kmv.getTrackMomentum(iChild).py(),
                                 kmv.getTrackMomentum(iChild).pz(),
@@ -797,11 +797,11 @@ namespace Belle2 {
 
       std::vector<Particle*> daughters = mother->getDaughters();
 
-      unsigned n = km.getTrackCount();
-      if (daughters.size() != n)
+      unsigned track_count = km.getTrackCount();
+      if (daughters.size() != track_count)
         return false;
 
-      for (unsigned iChild = 0; iChild < n; iChild++) {
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
         TLorentzVector childMom(km.getTrackMomentum(iChild).px(),
                                 km.getTrackMomentum(iChild).py(),
                                 km.getTrackMomentum(iChild).pz(),
@@ -901,8 +901,8 @@ namespace Belle2 {
         }
       }
 
-      unsigned n = kf.getTrackCount();
-      if (l != n)
+      unsigned track_count = kf.getTrackCount();
+      if (l != track_count)
         return false;
 
       for (unsigned iDaug = 0; iDaug < nd; iDaug++) {

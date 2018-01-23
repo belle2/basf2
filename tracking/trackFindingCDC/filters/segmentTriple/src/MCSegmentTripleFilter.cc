@@ -10,20 +10,40 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
 #include <framework/logging/Logger.h>
 
-#include <TDatabasePDG.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseSegmentTripleFilter>;
 
 MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
   Super(allowReverse),
   m_mcAxialSegmentPairFilter(allowReverse)
 {
   this->addProcessingSignalListener(&m_mcAxialSegmentPairFilter);
+}
+
+void MCSegmentTripleFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
+{
+  m_mcAxialSegmentPairFilter.exposeParameters(moduleParamList, prefix);
+}
+
+void MCSegmentTripleFilter::initialize()
+{
+  Super::initialize();
+  setAllowReverse(m_mcAxialSegmentPairFilter.getAllowReverse());
 }
 
 Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
@@ -62,7 +82,7 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
     setTrajectoryOf(segmentTriple);
 
     Weight cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
-    return cellWeight;
+    return startToMiddleFBInfo > 0 ? cellWeight : -cellWeight;
   }
 
   return NAN;

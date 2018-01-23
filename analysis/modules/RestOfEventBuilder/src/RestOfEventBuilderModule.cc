@@ -50,7 +50,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 void RestOfEventBuilderModule::initialize()
 {
   // input
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
   StoreArray<Particle> particles;
   particles.isRequired();
 
@@ -71,7 +71,10 @@ void RestOfEventBuilderModule::event()
   for (unsigned i = 0; i < nParts; i++) {
     const Particle* particle = plist->getParticle(i);
 
-    //TODO: check if roe with this name already exists
+    // check if a Particle object is already related to a RestOfEvent object
+    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    if (check_roe != nullptr)
+      return;
 
     // create RestOfEvent object
     RestOfEvent* roe = roeArray.appendNew();
@@ -97,7 +100,7 @@ void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, Rest
     const Track* track = tracks[i];
 
     // ignore tracks with charge = 0
-    const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
+    const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::pion);
     int charge = trackFit->getChargeSign();
     if (charge == 0) {
       B2WARNING("Track with charge = 0 not added to ROE!");

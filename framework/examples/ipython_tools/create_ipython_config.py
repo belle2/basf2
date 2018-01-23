@@ -30,7 +30,7 @@ def main():
     print("Will now write your notebook config.")
 
     jupyter_template_file = Belle2.FileSystem.findFile("framework/examples/ipython_tools/jupyter_notebook_config.py.j2")
-    with open(jupyter_template_file, 'r+') as f:
+    with open(jupyter_template_file, 'r') as f:
         template = Template(f.read())
 
         try:

@@ -137,7 +137,6 @@ namespace Belle2 {
     private:
       /// Memory for the line representation
       UncertainSZLine m_szLine;
-
     };
   }
 }

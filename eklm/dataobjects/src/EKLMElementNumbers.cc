@@ -25,54 +25,90 @@ EKLMElementNumbers::~EKLMElementNumbers()
 {
 }
 
-void EKLMElementNumbers::checkEndcap(int endcap) const
+bool EKLMElementNumbers::checkEndcap(int endcap, bool fatalError) const
 {
-  if (endcap <= 0 || endcap > m_MaximalEndcapNumber)
-    B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
+  if (endcap <= 0 || endcap > m_MaximalEndcapNumber) {
+    if (fatalError) {
+      B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
+    }
+    return false;
+  }
+  return true;
 }
 
-void EKLMElementNumbers::checkLayer(int layer) const
+bool EKLMElementNumbers::checkLayer(int layer, bool fatalError) const
 {
-  if (layer <= 0 || layer > m_MaximalLayerNumber)
-    B2FATAL("Number of layer must be from 1 to " << m_MaximalLayerNumber <<
-            ".");
+  if (layer <= 0 || layer > m_MaximalLayerNumber) {
+    if (fatalError) {
+      B2FATAL("Number of layer must be from 1 to " << m_MaximalLayerNumber <<
+              ".");
+    }
+    return false;
+  }
+  return true;
 }
 
-void EKLMElementNumbers::checkDetectorLayer(int endcap, int layer) const
+bool EKLMElementNumbers::checkDetectorLayer(int endcap, int layer,
+                                            bool fatalError) const
 {
   const char* endcapName[2] = {"backward", "forward"};
-  if (layer < 0 || layer > m_MaximalDetectorLayerNumber[endcap - 1])
-    B2FATAL("Number of layer must be less from 1 to the maximal number of "
-            "detector layers in the " << endcapName[endcap - 1] << " endcap ("
-            << m_MaximalDetectorLayerNumber[endcap - 1] << ").");
+  if (layer < 0 || layer > m_MaximalDetectorLayerNumber[endcap - 1]) {
+    if (fatalError) {
+      B2FATAL("Number of layer must be from 1 to the maximal number of "
+              "detector layers in the " << endcapName[endcap - 1] << " endcap ("
+              << m_MaximalDetectorLayerNumber[endcap - 1] << ").");
+    }
+    return false;
+  }
+  return true;
 }
 
-void EKLMElementNumbers::checkSector(int sector) const
+bool EKLMElementNumbers::checkSector(int sector, bool fatalError) const
 {
-  if (sector <= 0 || sector > m_MaximalSectorNumber)
-    B2FATAL("Number of sector must be from 1 to " << m_MaximalSectorNumber <<
-            ".");
+  if (sector <= 0 || sector > m_MaximalSectorNumber) {
+    if (fatalError) {
+      B2FATAL("Number of sector must be from 1 to " << m_MaximalSectorNumber <<
+              ".");
+    }
+    return false;
+  }
+  return true;
 }
 
-void EKLMElementNumbers::checkPlane(int plane) const
+bool EKLMElementNumbers::checkPlane(int plane, bool fatalError) const
 {
-  if (plane <= 0 || plane > m_MaximalPlaneNumber)
-    B2FATAL("Number of plane must be from 1 to " << m_MaximalPlaneNumber <<
-            ".");
+  if (plane <= 0 || plane > m_MaximalPlaneNumber) {
+    if (fatalError) {
+      B2FATAL("Number of plane must be from 1 to " << m_MaximalPlaneNumber <<
+              ".");
+    }
+    return false;
+  }
+  return true;
 }
 
-void EKLMElementNumbers::checkSegment(int segment) const
+bool EKLMElementNumbers::checkSegment(int segment, bool fatalError) const
 {
-  if (segment <= 0 || segment > m_MaximalSegmentNumber)
-    B2FATAL("Number of segment must be from 1 to " << m_MaximalSegmentNumber <<
-            ".");
+  if (segment <= 0 || segment > m_MaximalSegmentNumber) {
+    if (fatalError) {
+      B2FATAL("Number of segment must be from 1 to " <<
+              m_MaximalSegmentNumber << ".");
+    }
+    return false;
+  }
+  return true;
 }
 
-void EKLMElementNumbers::checkStrip(int strip) const
+bool EKLMElementNumbers::checkStrip(int strip, bool fatalError) const
 {
-  if (strip <= 0 || strip > m_MaximalStripNumber)
-    B2FATAL("Number of strip must be from 1 to " << m_MaximalStripNumber <<
-            ".");
+  if (strip <= 0 || strip > m_MaximalStripNumber) {
+    if (fatalError) {
+      B2FATAL("Number of strip must be from 1 to " << m_MaximalStripNumber <<
+              ".");
+    }
+    return false;
+  }
+  return true;
 }
 
 int EKLMElementNumbers::detectorLayerNumber(int endcap, int layer) const
@@ -165,6 +201,19 @@ int EKLMElementNumbers::stripNumber(int endcap, int layer, int sector,
   checkStrip(strip);
   return m_MaximalStripNumber * (planeNumber(endcap, layer, sector, plane) - 1)
          + strip;
+}
+
+void EKLMElementNumbers::stripNumberToElementNumbers(
+  int stripGlobal, int* endcap, int* layer, int* sector, int* plane,
+  int* strip) const
+{
+  static int maxStrip = getMaximalStripGlobalNumber();
+  int planeGlobal;
+  if (stripGlobal <= 0 || stripGlobal > maxStrip)
+    B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
+  *strip = (stripGlobal - 1) % m_MaximalStripNumber + 1;
+  planeGlobal = (stripGlobal - 1) / m_MaximalStripNumber + 1;
+  planeNumberToElementNumbers(planeGlobal, endcap, layer, sector, plane);
 }
 
 int EKLMElementNumbers::stripLocalNumber(int strip) const

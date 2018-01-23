@@ -4,6 +4,7 @@
 from basf2 import *
 
 from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
 
 from tracking import (
     add_mc_tracking_reconstruction,
@@ -24,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
@@ -60,6 +61,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     # add svd_reconstruction
     if components is None or 'SVD' in components:
         add_svd_reconstruction(path)
+
+    # add pxd_reconstruction
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
@@ -284,6 +289,8 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
+        ClusterMatch = register_module('ClusterMatcher')
+        path.add_module(ClusterMatch)
 
 
 def add_pid_module(path, components=None):
@@ -359,6 +366,9 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
+        # ECL T0 extraction
+        path.add_module('ECLEventT0')
+
         # ECL connected region finder
         ecl_crfinder = register_module('ECLCRFinder')
         path.add_module(ecl_crfinder)
@@ -403,7 +413,7 @@ def add_ecl_track_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)

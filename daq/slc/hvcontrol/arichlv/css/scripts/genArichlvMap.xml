@@ -1,0 +1,109 @@
+<data>
+    <merger id="M1" crateid="1" slotid="0" channelid="0">
+        <feb row="1" col="1"/>
+        <feb row="1" col="2"/>
+        <feb row="1" col="3"/>
+        <feb row="2" col="3"/>
+        <feb row="2" col="2"/>
+        <feb row="2" col="1"/>
+    </merger>
+
+    <merger id="M2" crateid="1" slotid="0" channelid="0">
+        <feb row="1" col="4"/>
+        <feb row="2" col="4"/>
+        <feb row="2" col="5"/>
+        <feb row="3" col="4"/>
+        <feb row="3" col="5"/>
+        <feb row="3" col="6"/>
+    </merger>
+
+    <merger id="M3" crateid="1" slotid="0" channelid="4">
+        <feb row="1" col="5"/>
+        <feb row="1" col="6"/>
+        <feb row="1" col="7"/>
+        <feb row="2" col="6"/>
+        <feb row="2" col="7"/>
+        <feb row="2" col="8"/>
+    </merger>
+
+    <merger id="M4" crateid="1" slotid="0" channelid="4">
+        <feb row="3" col="1"/>
+        <feb row="3" col="2"/>
+        <feb row="4" col="1"/>
+        <feb row="4" col="2"/>
+        <feb row="5" col="1"/>
+        <feb row="5" col="2"/>
+    </merger>
+
+    <merger id="M5" crateid="1" slotid="1" channelid="0">
+        <feb row="3" col="3"/>
+        <feb row="4" col="3"/>
+        <feb row="4" col="4"/>
+        <feb row="4" col="5"/>
+        <feb row="5" col="3"/>
+    </merger>
+
+    <merger id="M6" crateid="1" slotid="1" channelid="0">
+        <feb row="3" col="7"/>
+        <feb row="4" col="6"/>
+        <feb row="4" col="7"/>
+        <feb row="4" col="8"/>
+        <feb row="5" col="9"/>
+    </merger>
+
+    <merger id="M7" crateid="1" slotid="1" channelid="4">
+        <feb row="3" col="8"/>
+        <feb row="3" col="9"/>
+        <feb row="4" col="9"/>
+        <feb row="4" col="10"/>
+        <feb row="5" col="10"/>
+        <feb row="5" col="11"/>
+    </merger>
+
+    <merger id="M8" crateid="1" slotid="1" channelid="4">
+        <feb row="6" col="1"/>
+        <feb row="6" col="2"/>
+        <feb row="6" col="3"/>
+        <feb row="7" col="1"/>
+        <feb row="7" col="2"/>
+        <feb row="7" col="3"/>
+    </merger>
+
+    <merger id="M9" crateid="1" slotid="2" channelid="0">
+        <feb row="5" col="4"/>
+        <feb row="5" col="5"/>
+        <feb row="6" col="4"/>
+        <feb row="6" col="5"/>
+        <feb row="7" col="4"/>
+        <feb row="7" col="5"/>
+    </merger>
+
+    <merger id="M10" crateid="1" slotid="2" channelid="0">
+        <feb row="5" col="7"/>
+        <feb row="5" col="8"/>
+        <feb row="6" col="8"/>
+        <feb row="6" col="9"/>
+        <feb row="7" col="9"/>
+        <feb row="7" col="10"/>
+    </merger>
+
+    <merger id="M11" crateid="1" slotid="2" channelid="4">
+        <feb row="6" col="10"/>
+        <feb row="6" col="11"/>
+        <feb row="6" col="12"/>
+        <feb row="7" col="11"/>
+        <feb row="7" col="12"/>
+        <feb row="7" col="13"/>
+    </merger>
+
+    <merger id="M12" crateid="1" slotid="2" channelid="4">
+        <feb row="5" col="6"/>
+        <feb row="6" col="6"/>
+        <feb row="6" col="7"/>
+        <feb row="7" col="6"/>
+        <feb row="7" col="7"/>
+        <feb row="7" col="8"/>
+    </merger>
+
+
+</data>

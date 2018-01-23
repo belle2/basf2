@@ -11,16 +11,21 @@
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-// #include <tracking/dataobjects/RecoTrack.h>
-
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+TrackQualityAsserter::TrackQualityAsserter()
+  : m_param_corrections( {"LayerBreak", "LargeAngle", "OneSuperlayer", "Small"})
+, m_param_onlyNotFittedTracks(false)
+{
+}
 
 std::string TrackQualityAsserter::getDescription()
 {
@@ -28,7 +33,8 @@ std::string TrackQualityAsserter::getDescription()
          "parts of the hits or maybe the whole track.";
 }
 
-void TrackQualityAsserter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackQualityAsserter::exposeParameters(ModuleParamList* moduleParamList,
+                                            const std::string& prefix)
 {
   moduleParamList->addParameter(prefixed(prefix, "corrections"),
                                 m_param_corrections,
@@ -36,17 +42,13 @@ void TrackQualityAsserter::exposeParameters(ModuleParamList* moduleParamList, co
                                 "Choose from LayerBreak, LargeAngle, "
                                 "LargeBreak2, OneSuperlayer, Small, B2B, "
                                 "MoveToNextAxial, None, Split, and "
-  "ArcLength2D.", {
-    std::string("LayerBreak"),
-    std::string("LargeAngle"),
-    std::string("OneSuperlayer"),
-    std::string("Small")
-  });
+                                "ArcLength2D.",
+                                m_param_corrections);
 
   moduleParamList->addParameter(prefixed(prefix, "onlyNotFittedTracks"),
                                 m_param_onlyNotFittedTracks,
                                 "Flag to apply the corrections only to not fitted tracks.",
-                                false);
+                                m_param_onlyNotFittedTracks);
 }
 
 void TrackQualityAsserter::apply(std::vector<CDCTrack>& tracks)

@@ -6,10 +6,10 @@
 
 #include <cstdlib>
 #include "daq/slc/hvcontrol/arichlv/MPOD.h"
-
+#include <math.h>
 using namespace Belle2;
 #define MPODCH(slot,channel) ((slot)*100+(channel))
-
+HSNMP crateHsnmp[10];
 
 /*
   Setting parameters from database at beginings of process
@@ -17,73 +17,103 @@ using namespace Belle2;
 void ArichlvControlCallback::initialize(const HVConfig& config) throw()
 {
   MPOD_Start();
-  LogFile::debug("Initialize %s:%d ", __FILE__, __LINE__);
-  int retval = MPOD_Open(0, "f9mpod2.ijs.si");
-  if (retval != 0) LogFile::error("%s:%d ", __FILE__, __LINE__);
-  retval = MPOD_Open(1, "f9mpod.ijs.si");
-  if (retval != 0) LogFile::error("%s:%d ", __FILE__, __LINE__);
 
-  LogFile::info("%s:%d Initialized", __FILE__, __LINE__);
+  const HVCrateList& crate_v(config.getCrates());
+  for (HVCrateList::const_iterator icrate = crate_v.begin();
+       icrate != crate_v.end(); icrate++) {
+    const HVCrate& crate(*icrate);
+    int crateid = crate.getId();
+    std::string host = crate.getName();
+    if (crateHsnmp[crateid] == 0)  crateHsnmp[crateid] = MPOD_Open(host.c_str());
+    if (crateHsnmp[crateid] == 0) LogFile::error("Initialize error %d", __LINE__);
+    LogFile::info("Wiener MPOD at " + host + " Initialized");
+    for (int module = 0; module < 8; module++)
+      LogFile::info("ModuleDescription crate %d module %d =>%s", crateid, module, getModuleDescription(crateHsnmp[crateid], module));
+
+  }
+
   try {
     load(config, false, true);
   } catch (const HVHandlerException& e) {
     LogFile::error(e.what());
   }
 
-  LogFile::info("%s:%d ", __FILE__, __LINE__);
 }
 
 
 
 void ArichlvControlCallback::update() throw(HVHandlerException)
 {
+
+  const HVConfig& config = getConfig();
+  const HVCrateList& crate_v(config.getCrates());
+  for (HVCrateList::const_iterator icrate = crate_v.begin();
+       icrate != crate_v.end(); icrate++) {
+    const HVCrate& crate(*icrate);
+    const HVChannelList& channel_v(crate.getChannels());
+    int crateid = crate.getId();
+    for (HVChannelList::const_iterator ichannel = channel_v.begin();
+         ichannel != channel_v.end(); ichannel++) {
+      const HVChannel& channel(*ichannel);
+      int slot = channel.getSlot();
+      int ch   = channel.getChannel();
+
+      float vset  = getOutputVoltage(crateHsnmp[crateid], MPODCH(slot, ch));
+      int   onoff = getChannelSwitch(crateHsnmp[crateid], MPODCH(slot, ch));
+      float vmon  = getOutputSenseMeasurement(crateHsnmp[crateid], MPODCH(slot, ch));
+      float imon  = getCurrentMeasurement(crateHsnmp[crateid], MPODCH(slot, ch));
+    }
+  }
+
+  LogFile::debug("ArichlvControlCallback::update()");
   /*performed at the interval of hv.interval*/
 }
 
 void ArichlvControlCallback::setSwitch(int crate, int slot, int channel, bool switchon) throw(IOException)
 {
   int setval = (switchon == true) ? 1 : 0;
-  LogFile::info("%s:%d ", __FILE__, __LINE__);
+
   setChannelSwitch(crateHsnmp[crate], MPODCH(slot, channel), setval);
   /*set channel switch (true:ON, false:OFF)*/
-  LogFile::info("setswitch called : crate = %d, slot = %d, channel = %d, switch: %s",
-                crate, slot, channel, (switchon ? "ON" : "OFF"));
+  LogFile::debug("setswitch called : crate = %d, slot = %d, channel = %d, switch: %d %s",
+                 crate, slot, channel, setval, (switchon ? "ON" : "OFF"));
 }
 
 void ArichlvControlCallback::setRampUpSpeed(int crate, int slot, int channel, float voltage) throw(IOException)
 {
   /*set voltage ramp up speed with unit of [V]*/
-  setModuleRampSpeedVoltage(crateHsnmp[crate], slot, voltage);
-  LogFile::info("setrampup called : crate = %d, slot = %d, channel = %d, voltage: %f ---> Module function common for slot",
-                crate, slot, channel, voltage);
+  //if (crate) setModuleRampSpeedVoltage(crateHsnmp[crate -1], slot, voltage);
+  setOutputRiseRate(crateHsnmp[crate], MPODCH(slot, channel), voltage);
+  LogFile::debug("setrampup called : crate = %d, slot = %d, channel = %d, voltage: %f ---> Module function common for slot",
+                 crate, slot, channel, voltage);
 }
 
 void ArichlvControlCallback::setRampDownSpeed(int crate, int slot, int channel, float voltage) throw(IOException)
 {
   /*set voltage ramp down speed with unit of [V]*/
-  LogFile::info("setrampdown called : not implemeted in MPODf");
+  LogFile::debug("setrampdown called : not implemeted in MPOD");
 }
 
 void ArichlvControlCallback::setVoltageDemand(int crate, int slot, int channel, float voltage) throw(IOException)
 {
   /*set demand voltage with unit of [V]*/
-  setOutputVoltage(crateHsnmp[crate], MPODCH(slot, channel), voltage);
-  LogFile::info("setvoltagedemand called : crate = %d, slot = %d, channel = %d, voltage: %f",
-                crate, slot, channel, voltage);
+  setOutputVoltage(crateHsnmp[crate], MPODCH(slot, channel), fabs(voltage));
+  LogFile::debug("setvoltagedemand called : crate = %d, slot = %d, channel = %d, voltage: %f",
+                 crate, slot, channel, voltage);
 }
 
 void ArichlvControlCallback::setVoltageLimit(int crate, int slot, int channel, float voltage) throw(IOException)
 {
   /*set voltage limit with unit of [V]*/
-  LogFile::info("setvoltagelimit called : not implemeted in MPOD");
+  LogFile::warning("setvoltagelimit called : not implemeted in MPOD");
 }
 
 void ArichlvControlCallback::setCurrentLimit(int crate, int slot, int channel, float current) throw(IOException)
 {
   /*set current limit with unit of [uA]*/
   setOutputCurrent(crateHsnmp[crate], MPODCH(slot, channel), current);
-  LogFile::info("setcurrentlimit called : crate = %d, slot = %d, channel = %d, voltage: %f",
-                crate, slot, channel, current);
+  LogFile::debug("setcurrentlimit called : crate = %d, slot = %d, channel = %d, voltage: %f",
+                 crate, slot, channel, current);
 }
 
 float ArichlvControlCallback::getRampUpSpeed(int crate, int slot, int channel) throw(IOException)
@@ -145,18 +175,116 @@ bool ArichlvControlCallback::getSwitch(int crate, int slot, int channel) throw(I
   return (status) ? true : false;
 }
 
+/*
+typedef enum MpodStatus {
+        outputOn                        =0x1,
+        outputInhibit                   =0x2,
+        outputFailureMinSenseVoltage    =0x4,
+        outputFailureMaxSenseVoltage    =0x8,
+        outputFailureMaxTerminalVoltage =0x10,
+        outputFailureMaxCurrent         =0x20,
+        outputFailureMaxTemperature     =0x40,
+        outputFailureMaxPower           =0x80,
+        outpitReserved                  =0x100,
+        outputFailureTimeout            =0x200,
+        outputCurrentLimited            =0x400,
+        outputRampUp                    =0x800,
+        outputRampDown                  =0x1000,
+        outputEnableKill                =0x2000,
+        outputEmergencyOff              =0x4000,
+        outputAdjusting                 =0x8000,
+        outputConstantVoltage           =0x10000,
+        outputLowCurrentRange           =0x20000,
+        outputCurrentBoundsExceeded     =0x40000,
+        outputFailureCurrentLimit       =0x80000
+} MpodStatus;
+*/
+
+typedef enum MpodStatus {
+  outputOn                        = 0x80,
+  outputInhibit                   = 0x40,
+  outputFailureMinSenseVoltage    = 0x20,
+  outputFailureMaxSenseVoltage    = 0x10,
+  outputFailureMaxTerminalVoltage = 0x8,
+  outputFailureMaxCurrent         = 0x4,
+  outputFailureMaxTemperature     = 0x2,
+  outputFailureMaxPower           = 0x1,
+  outpitReserved                  = 0x8000,
+  outputFailureTimeout            = 0x4000,
+  outputCurrentLimited            = 0x2000,
+  outputRampUp                    = 0x1000,
+  outputRampDown                  = 0x800,
+  outputEnableKill                = 0x400,
+  outputEmergencyOff              = 0x200,
+  outputAdjusting                 = 0x100,
+  outputConstantVoltage           = 0x80000,
+  outputLowCurrentRange           = 0x40000,
+  outputCurrentBoundsExceeded     = 0x20000,
+  outputFailureCurrentLimit       = 0x10000
+} MpodStatus;
+
 int ArichlvControlCallback::getState(int crate, int slot, int channel) throw(IOException)
 {
+  int status = getOutputStatus(crateHsnmp[crate], MPODCH(slot, channel));
+  char strstatus[0xFF] = "";
+
+  if (status & MpodStatus::outputOn) {sprintf(strstatus, "%s On", strstatus); }
+  if (status & MpodStatus::outputInhibit) {sprintf(strstatus, "%s Inhibit", strstatus); }
+  if (status & MpodStatus::outputFailureMinSenseVoltage) {sprintf(strstatus, "%s FailureMinSenseVoltage", strstatus); }
+  if (status & MpodStatus::outputFailureMaxSenseVoltage) {sprintf(strstatus, "%s FailureMaxSenseVoltage", strstatus); }
+  if (status & MpodStatus::outputFailureMaxTerminalVoltage) {sprintf(strstatus, "%s FailureMaxTerminalVoltage", strstatus); }
+  if (status & MpodStatus::outputFailureMaxCurrent) {sprintf(strstatus, "%s FailureMaxCurrent", strstatus); }
+  if (status & MpodStatus::outputFailureMaxTemperature) {sprintf(strstatus, "%s FailureMaxTemperature", strstatus); }
+  if (status & MpodStatus::outputFailureMaxPower) {sprintf(strstatus, "%s FailureMaxPower", strstatus); }
+  if (status & MpodStatus::outputFailureTimeout) {sprintf(strstatus, "%s FailureTimeout", strstatus); }
+  if (status & MpodStatus::outputCurrentLimited) {sprintf(strstatus, "%s CurrentLimited", strstatus); }
+  if (status & MpodStatus::outputRampUp) {sprintf(strstatus, "%s RampUp", strstatus); }
+  if (status & MpodStatus::outputRampDown) {sprintf(strstatus, "%s RampDown", strstatus); }
+  if (status & MpodStatus::outputEnableKill) {sprintf(strstatus, "%s EnableKill", strstatus); }
+  if (status & MpodStatus::outputEmergencyOff) {sprintf(strstatus, "%s EmergencyOff", strstatus); }
+  if (status & MpodStatus::outputAdjusting) {sprintf(strstatus, "%s Adjusting", strstatus); }
+  if (status & MpodStatus::outputConstantVoltage) {sprintf(strstatus, "%s ConstantVoltage", strstatus); }
+  if (status & MpodStatus::outputLowCurrentRange) {sprintf(strstatus, "%s LowCurrentRange", strstatus); }
+  if (status & MpodStatus::outputCurrentBoundsExceeded) {sprintf(strstatus, "%s CurrentBoundsExceeded", strstatus); }
+  if (status & MpodStatus::outputFailureCurrentLimit) {sprintf(strstatus, "%s FailureCurrentLimit", strstatus); }
+  if (!status) {sprintf(strstatus, "%s Off", strstatus); }
+
+  LogFile::debug("getState called : crate = %d, slot = %d, channel = %d : %05x %s", crate, slot, channel, status, strstatus);
+
+
+  if (status & MpodStatus::outputInhibit) return HVMessage::OFF;
+  if (status & MpodStatus::outputFailureMinSenseVoltage) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureMaxSenseVoltage) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureMaxTerminalVoltage) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureMaxCurrent) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureMaxTemperature) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureMaxPower) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureTimeout) return HVMessage::ERR;
+  if (status & MpodStatus::outputCurrentLimited) return HVMessage::OCP;
+  if (status & MpodStatus::outputRampUp) return HVMessage::RAMPUP;
+  if (status & MpodStatus::outputRampDown) return HVMessage::RAMPDOWN;
+  if (status & MpodStatus::outputEnableKill) return HVMessage::ERR;
+  if (status & MpodStatus::outputEmergencyOff) return HVMessage::ETRIP;
+  if (status & MpodStatus::outputAdjusting) return HVMessage::ON;
+  if (status & MpodStatus::outputConstantVoltage) return HVMessage::OVP;
+  if (status & MpodStatus::outputLowCurrentRange) return HVMessage::ERR;
+  if (status & MpodStatus::outputCurrentBoundsExceeded) return HVMessage::ERR;
+  if (status & MpodStatus::outputFailureCurrentLimit) return HVMessage::ERR;
+  if (status & MpodStatus::outputOn) return HVMessage::ON;
   /*
-    return channel status:
-    OFF: power off,
-    ON: power on without error
-    OCP: trip due to over current
-    OVP: trip due to over voltage
-    ERR: another error
-    RAMPUP: ramping up voltage
-    RAMPDOWN: ramping down voltage
+
+      OFF = 0, // power off,
+      ON,      // power on without error
+      OCP,     // trip due to over current
+      OVP,     // trip due to over voltage
+      ERR,     // another error
+      RAMPUP,  // ramping up voltage
+      RAMPDOWN, // ramping down voltage
+      TRIP,     // Trip due to current trip
+      ETRIP,    // External trip
+      INTERLOCK // Inter lock
   */
   return HVMessage::OFF;
 }
+
 

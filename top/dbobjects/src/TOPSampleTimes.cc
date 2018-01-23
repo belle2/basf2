@@ -40,14 +40,24 @@ namespace Belle2 {
   }
 
 
-  double TOPSampleTimes::getFullTime(unsigned window, double sample) const
+  std::vector<double> TOPSampleTimes::getTimeAxis() const
+  {
+    std::vector<double> timeAxis;
+    for (unsigned i = 0; i < c_TimeAxisSize + 1; i++) {
+      timeAxis.push_back(m_timeAxis[i]);
+    }
+    return timeAxis;
+  }
+
+
+  double TOPSampleTimes::getFullTime(int window, double sample) const
   {
 
     int sampleNum = int(sample);
     if (sample < 0) sampleNum--;
     double frac = sample - sampleNum;
 
-    sampleNum += (int)(window * c_WindowSize);  // counted from window 0
+    sampleNum += window * c_WindowSize;  // counted from window 0
     int n = sampleNum / c_TimeAxisSize;
     int k = sampleNum % c_TimeAxisSize;
     if (k < 0) {
@@ -62,7 +72,7 @@ namespace Belle2 {
   }
 
 
-  double TOPSampleTimes::getSample(unsigned window, double time) const
+  double TOPSampleTimes::getSample(int window, double time) const
   {
     time += getFullTime(window, 0);
     int n = int(time / getTimeRange());
@@ -80,9 +90,17 @@ namespace Belle2 {
       }
     }
 
-    return (n * (int) c_TimeAxisSize - (int)(window * c_WindowSize) + i1 +
+    return (n * c_TimeAxisSize - window * c_WindowSize + i1 +
             (t - m_timeAxis[i1]) / (m_timeAxis[i2] - m_timeAxis[i1]));
 
+  }
+
+
+  double TOPSampleTimes::getTimeBin(int window, int sampleNumber) const
+  {
+    int i = (window * c_WindowSize + sampleNumber) % c_TimeAxisSize;
+    if (i < 0) i += c_TimeAxisSize;
+    return m_timeAxis[i + 1] - m_timeAxis[i];
   }
 
 } // end Belle2 namespace

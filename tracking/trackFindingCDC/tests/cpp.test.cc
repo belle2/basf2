@@ -16,6 +16,9 @@
 
 #include <cmath>
 #include <gtest/gtest.h>
+
+#include <boost/optional.hpp>
+
 #include <functional>
 
 #include <map>
@@ -108,4 +111,12 @@ TEST(TrackFindingCDCTest, cpp_remainder)
 
     EXPECT_FLOAT_EQ(1.0 / 2.0, reduced_value);
   }
+}
+
+TEST(TrackFindingCDCTest, boost_optional_reference)
+{
+  std::vector<int> integers({1});
+  boost::optional<std::vector<int>&> ref_integers(integers);
+  int i = ref_integers->at(0);
+  EXPECT_EQ(1, i);
 }

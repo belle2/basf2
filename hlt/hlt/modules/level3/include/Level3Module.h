@@ -12,6 +12,9 @@
 #define LEVEL3MODULE_H
 
 #include <framework/core/Module.h>
+#include "framework/datastore/StoreArray.h"
+#include "hlt/hlt/dataobjects/L3Track.h"
+#include "hlt/hlt/dataobjects/L3Cluster.h"
 #include "hlt/hlt/modules/level3/L3TrackTrigger.h"
 #include "hlt/hlt/modules/level3/L3TriggerManager.h"
 #include "hlt/hlt/modules/level3/FTList.h"
@@ -48,6 +51,9 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    StoreArray<L3Track> m_l3Track; /** Array for L3Track */
+    StoreArray<L3Cluster> m_l3Cluster; /** Array for L3Cluster */
+
     /** L3 reconstruction routine **/
     void reconstruct();
 

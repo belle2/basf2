@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_UTILITIES_INCLUDE_NUMBERSEQUENCE_H_
-#define FRAMEWORK_UTILITIES_INCLUDE_NUMBERSEQUENCE_H_
 
 #include <string>
 #include <set>
@@ -50,5 +48,3 @@ namespace Belle2 {
   std::set<int64_t> generate_number_sequence(const std::string& str);
 
 }
-
-#endif /* FRAMEWORK_UTILITIES_INCLUDE_NUMBERSEQUENCE_H_ */

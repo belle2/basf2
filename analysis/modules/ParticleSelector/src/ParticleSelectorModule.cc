@@ -42,10 +42,10 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("decayString", m_decayString,
-             "Input ParticleList name (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
+             "Input ParticleList name (see https://confluence.desy.de/display/BI/Physics+DecayString).");
 
     addParam("cut", m_cutParameter,
-             "Selection criteria to be applied, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions",
+             "Selection criteria to be applied, see https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions",
              std::string(""));
   }
 

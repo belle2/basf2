@@ -31,6 +31,7 @@ namespace Belle2 {
         m_gateDepth(0), m_doublePixel(true), m_chargeThreshold(0), m_noiseFraction(0), m_integrationStart(0), m_integrationEnd(0)
       {
         m_hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
+        cook();
       }
       /** Change the SensorID, useful to copy the SensorInfo from one sensor and use it for another */
       void setID(VxdID id) { m_id = id; }
@@ -47,6 +48,7 @@ namespace Belle2 {
         std::swap(m_clearBorderSmallPitch, m_clearBorderLargePitch);
         std::swap(m_drainBorderSmallPitch, m_drainBorderLargePitch);
         m_splitLength = (1 - m_splitLength);
+        cook();
       }
 
       /** Set operation parameters like voltages */
@@ -68,7 +70,19 @@ namespace Belle2 {
         m_doublePixel = doublePixel;
         m_chargeThreshold = chargeThreshold;
         m_noiseFraction = noiseFraction;
+        cook();
       }
+
+      /** calculate constants in advance */
+      void cook();
+
+      /** Get pixel number if the given coordinate is in the
+       *  correspondin internal gate trapping region or -1 otherwise
+       * @param x u-coordinate in the local system
+       * @param y v-coordinate in the local system
+       * @return pixel number id = ix + 250*iy, or -1
+       */
+      int getTrappedID(double x, double y) const;
 
       /** Set the time window in which the sensor is active */
       void setIntegrationWindow(double start, double end)
@@ -149,6 +163,12 @@ namespace Belle2 {
        * @result drift velocity of an electron in the E+B field.
        */
       const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
+      /** Return pixel kind ID
+       * @param sensorID the sensor identification
+       * @param v Local v coordinate
+       * @return pixel kind ID in range 0..7, 0-3 for Layer=1, 4-7 for Layer=2
+       */
+      int getPixelKind(const VxdID sensorID, double v) const;
 
     protected:
       /** Calculate Lorentz shift factor.
@@ -191,6 +211,23 @@ namespace Belle2 {
       double m_integrationStart;
       /** The end of the integration window, the timeframe the PXD is sensitive */
       double m_integrationEnd;
+
+      double m_up; /**< pixel pitch in u direction */
+      double m_iup; /**< the reciprocal of the pixel pitch in u direction */
+
+      double m_vsplit; /**< v coordinate which splits small and large pixel regions*/
+
+      double m_vp; /**< large pixel pitch in v direction */
+      double m_ivp; /**< the reciprocal of the large pixel pitch in v direction */
+
+      double m_vp2; /**< small pixel pitch in v direction */
+      double m_ivp2; /**< the reciprocal of the small pixel pitch in v direction */
+
+      double m_hxIG; /**< size in u direction of the internal gate trapping region*/
+      double m_mIGL; /**< middle of the internal gate trapping region for large pixels */
+      double m_sIGL; /**< size in v direction of the internal gate trapping region for large pixels */
+      double m_mIGS; /**< middle of the internal gate trapping region for small pixels */
+      double m_sIGS; /**< size in v direction of the internal gate trapping region for small pixels */
     };
 
   }

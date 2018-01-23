@@ -149,7 +149,7 @@ namespace Belle2 {
      * Sets integral of a pulse (e.g. a value proportional to charge)
      * @param integral
      */
-    void setIntegral(short integral) {m_integral = integral;}
+    void setIntegral(int integral) {m_integral = integral;}
 
     /**
      * Sets error flags
@@ -372,7 +372,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return true if window discontinuity is found between sampleRise and sampleFall+1
      */
-    bool isAtWindowDiscontinuity(unsigned short storageDepth = 512) const;
+    bool isAtWindowDiscontinuity(unsigned short storageDepth = 508) const;
 
     /**
      * Checks if storage windows come in the consecutive order before the last sample
@@ -381,7 +381,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return true, if no gaps before the last sample or m_windows is empty
      */
-    bool areWindowsInOrder(unsigned short storageDepth = 512) const;
+    bool areWindowsInOrder(unsigned short storageDepth = 508) const;
 
     /**
      * Corrects time after window discontinuity by adding missing samples
@@ -389,7 +389,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return time corrected for missing samples if any, otherwise returns input value [samples]
      */
-    double correctTime(double time, unsigned short storageDepth = 512) const;
+    double correctTime(double time, unsigned short storageDepth = 508) const;
 
     /**
      * Checks if the first window number is the same as the first one in m_windows
@@ -454,13 +454,13 @@ namespace Belle2 {
     short m_VPeak = 0;        /**< ADC value at m_sampleRise + m_dSamplePeak */
     short m_VFall0 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall */
     short m_VFall1 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall + 1 */
-    short m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
+    int m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
     unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
     std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
     bool m_offline = false; /**< feature extraction flag: by firmware or software */
 
-    ClassDef(TOPRawDigit, 3); /**< ClassDef */
+    ClassDef(TOPRawDigit, 4); /**< ClassDef */
 
   };
 

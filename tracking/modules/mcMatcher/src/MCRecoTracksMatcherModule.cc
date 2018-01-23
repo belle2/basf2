@@ -242,17 +242,20 @@ void MCRecoTracksMatcherModule::initialize()
     // We make them optional in case of limited detector setup.
     // PXD
     if (m_param_usePXDHits) {
-      StoreArray<PXDCluster>::optional();
+      StoreArray<PXDCluster> pxdClusters;
+      pxdClusters.isOptional();
     }
 
     // SVD
     if (m_param_useSVDHits) {
-      StoreArray<SVDCluster>::optional();
+      StoreArray<SVDCluster> svdClusters;
+      svdClusters.isOptional();
     }
 
     // CDC
     if (m_param_useCDCHits) {
-      StoreArray<CDCHit>::optional();
+      StoreArray<CDCHit> cdcHits;
+      cdcHits.isOptional();
     }
   }
 }
@@ -541,8 +544,8 @@ void MCRecoTracksMatcherModule::event()
     }
   }
 
-
-
+  // Count the categories
+  int nMatched{}, nBackground{}, nClones{}, nGhost{};
 
   // ### Classify the patter recognition tracks ###
   // Means saving the highest purity relation to the data store
@@ -569,6 +572,7 @@ void MCRecoTracksMatcherModule::event()
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_background);
 
       B2DEBUG(100, "Stored PRTrack " << prId << " as background because of too low purity.");
+      ++nBackground;
       continue;
     }
 
@@ -603,6 +607,7 @@ void MCRecoTracksMatcherModule::event()
       B2DEBUG(100, "Stored PRTrack " << prId << " as matched.");
       B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
       B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
+      ++nMatched;
       continue;
     }
 
@@ -613,6 +618,7 @@ void MCRecoTracksMatcherModule::event()
     if (not(weightedEfficiency >= m_param_minimalEfficiency)) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
       B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
+      ++nGhost;
       continue;
     }
 
@@ -621,16 +627,20 @@ void MCRecoTracksMatcherModule::event()
     // Setup the relation purity relation
     prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
+    prRecoTrack->addRelationTo(mcParticle, -purity);
+    ++nClones;
 
     // Add the mc matching relation to the mc particle
-    B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
     B2DEBUG(100, "Stored PRTrack " << prId << " as clone.");
-
-    prRecoTrack->addRelationTo(mcParticle, -purity);
     B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
+    B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
   } // end for prId
 
 
+  B2DEBUG(100, "Number of matches " << nMatched);
+  B2DEBUG(100, "Number of clones " << nClones);
+  B2DEBUG(100, "Number of bkg " << nBackground);
+  B2DEBUG(100, "Number of ghost " << nGhost);
 
   // ### Classify the Monte-Carlo tracks ###
   // Meaning save the highest weighted efficiency relation to the data store.

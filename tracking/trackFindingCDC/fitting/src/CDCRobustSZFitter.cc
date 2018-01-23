@@ -19,11 +19,8 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <functional>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace Eigen;
 
 CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ) const
 {

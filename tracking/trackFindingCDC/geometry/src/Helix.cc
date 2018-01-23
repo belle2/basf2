@@ -9,8 +9,21 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackFindingCDC/geometry/SZLine.h>
+#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
 #include <boost/math/tools/minima.hpp>
 
+#include <utility>
+#include <algorithm>
+#include <limits>
+#include <ostream>
+#include <cstdint>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -81,7 +94,7 @@ HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
   // Fills the upper left 3x3 corner.
   PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(by.xy());
   SZJacobian szJacobian = SZUtil::identity();
-  HelixJacobian jacobian = JacobianMatrixUtil::stackBlocks(perigeeJacobian, szJacobian);
+  HelixJacobian jacobian = HelixUtil::stackBlocks(perigeeJacobian, szJacobian);
 
   double curv = curvatureXY();
   double tanL = tanLambda();
@@ -94,4 +107,14 @@ HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
   jacobian(c_Z0, c_TanL) = sArc;
 
   return jacobian;
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Helix& helix)
+{
+  return output << "Helix("
+         << "curv=" << helix.curvatureXY() << ","
+         << "phi0=" << helix.phi0() << ","
+         << "impact=" << helix.impactXY() << ","
+         << "tanL=" << helix.tanLambda() << ","
+         << "z0=" << helix.z0() << ")";
 }

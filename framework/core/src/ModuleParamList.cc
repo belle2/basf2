@@ -7,19 +7,43 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <framework/core/ModuleParamInfoPython.h>
+#include <framework/core/FrameworkExceptions.h>
 
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
 
-#include <framework/core/ModuleParamList.h>
-
-#include <framework/core/ModuleParamInfoPython.h>
 #include <algorithm>
+#include <utility>
+#include <memory>
 
-using namespace std;
 using namespace Belle2;
-using namespace boost::python;
 
+/** Exception is thrown if the requested parameter could not be found. */
+BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError,
+                        "Could not find the parameter with the "
+                        "name '%1%'! The value of the parameter "
+                        "could NOT be set.");
+
+/** Exception is thrown if the type of the requested parameter is different from the expected type. */
+BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError,
+                        "The type of the module parameter '%1%' "
+                        "(%2%) is different from the type of the "
+                        "value it should be set to (%3%)!");
+
+void ModuleParamList::throwNotFoundError(const std::string& name)
+{
+  throw (ModuleParameterNotFoundError() << name);
+}
+
+void ModuleParamList::throwTypeError(const std::string& name,
+                                     const std::string& expectedTypeInfo,
+                                     const std::string& typeInfo)
+{
+  throw (ModuleParameterTypeError() << name << expectedTypeInfo << typeInfo);
+}
 
 ModuleParamList::ModuleParamList()
 {
@@ -34,18 +58,18 @@ ModuleParamList::~ModuleParamList()
 
 std::vector<std::string> ModuleParamList::getUnsetForcedParams() const
 {
-  vector<string> missingParam;
-  for (const pair<string, ModuleParamPtr>& mapEntry : m_paramMap) {
+  std::vector<std::string> missingParam;
+  for (const std::pair<std::string, ModuleParamPtr>& mapEntry : m_paramMap) {
     if (mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering())
       missingParam.push_back(mapEntry.first);
   }
   return missingParam;
 }
 
-boost::shared_ptr<boost::python::list> ModuleParamList::getParamInfoListPython() const
+std::shared_ptr<boost::python::list> ModuleParamList::getParamInfoListPython() const
 {
-  boost::shared_ptr<boost::python::list> returnList(new boost::python::list);
-  map<string, ModuleParamPtr>::const_iterator mapIter;
+  std::shared_ptr<boost::python::list> returnList(new boost::python::list);
+  std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
 
   for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); ++mapIter) {
     ModuleParamInfoPython newParamInfo;
@@ -124,7 +148,7 @@ std::string ModuleParamList::getParamTypeString(const std::string& name) const
   } else {
     B2FATAL("Module parameter '" + name + "' does not exist!");
   }
-  return string();
+  return std::string();
 }
 
 

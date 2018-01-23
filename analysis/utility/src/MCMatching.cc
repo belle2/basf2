@@ -163,8 +163,8 @@ bool MCMatching::setMCTruth(const Particle* particle)
 
 int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcParticle)
 {
-  auto setStatus = [](Particle * particle, int s) -> int {
-    particle->addExtraInfo(c_extraInfoMCErrors, s);
+  auto setStatus = [](Particle * part, int s) -> int {
+    part->addExtraInfo(c_extraInfoMCErrors, s);
     return s;
   };
 

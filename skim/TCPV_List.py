@@ -38,11 +38,13 @@ def TCPVList():
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):
         reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID)
+        applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4')
         bd_qqs_List.append('B0:TCPV_qqs' + str(chID))
 
     bd_ccs_List = []
     for chID, channel in enumerate(bd_ccs_Channels):
         reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID)
+        applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4')
         bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
     tcpvLists = bd_qqs_List + bd_ccs_List

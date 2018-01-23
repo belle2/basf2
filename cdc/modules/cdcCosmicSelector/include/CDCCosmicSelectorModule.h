@@ -13,6 +13,8 @@
 
 //basf2 framework headers
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 //C++/C standard lib elements.
 //#include <string>
@@ -38,6 +40,7 @@ namespace Belle2 {
     void event();
 
   private:
+    StoreArray<MCParticle> m_mcParticles; /**< array of MCParticle */
     double m_xOfCounter;   /**< x-pos. of counter (cm) */
     double m_yOfCounter;   /**< y-pos. of counter (cm) */
     double m_zOfCounter;   /**< z-pos. of counter (cm) */

@@ -10,7 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+
 #include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
 
 namespace Belle2 {

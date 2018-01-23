@@ -10,6 +10,8 @@ import time
 from hep_ipython_tools import viewer
 from hep_ipython_tools.calculation_process import CalculationProcess
 
+import multiprocessing
+
 
 class Calculation:
 
@@ -51,6 +53,22 @@ class Calculation:
 
         self.map_on_processes(f, index)
 
+    def start_batched_and_wait_for_end(self, max_processes=None):
+        """
+        Start part of the processes and wait for all to finish. If max_processes is None,
+        only n processes will be started where n is the number of cores on the current machine.
+        As soon as one process is finished, a waiting one will be started in order to fill all cores
+        of the machine.
+
+        Parameters:
+          max_processes: The number of processes which can be run at the same time
+        """
+        if not max_processes:
+            max_processes = multiprocessing.cpu_count()
+
+        self.ensure_running(max_processes)
+        self.wait_for_end(max_processes=max_processes)
+
     def start(self, index=None):
         """
         Start the processes in the background.
@@ -66,18 +84,44 @@ class Calculation:
 
         self.map_on_processes(f, index)
 
-    def wait_for_end(self, display_bar=True, send_notification=False):
+    def ensure_running(self, max_processes):
         """
-        Send the calculation into the foreground by halting the notebook as long as the process is running.
-        Shows a progress bar with the number of processed events.
-        Please keep in mind that you can not execute cells in the notebook when having called wait_for_end
-        (but before - although a calculation is running.).
+        Ensure that the max_processes number of processes is running and will start
+        processes which are waiting and have not been started yet.
+        """
 
-        :param display_bar: If true, the display bar is used to show in the notebook that the computation
-                           is complete.
-        :param send_notification: If true, the notify2 library will be used to notify the user if the
-                                 computation is complete. This will only work if the jupyter notebook
-                                 is hosted on the local desktop machine.
+        not_ran_processes = [p for p in self.process_list if p.already_run is False]
+        running_processes = [p for p in self.process_list if self.is_running(p)]
+
+        processes_to_start = max(0, max_processes - len(running_processes))
+
+        for process in self.process_list:
+            # start processes as long as processes_to_start is larger than zero
+            if not process.already_run and processes_to_start > 0:
+                process.start()
+                process.already_run = True
+                processes_to_start = processes_to_start - 1
+
+    def wait_for_end(self, display_bar=True, send_notification=False, max_processes=None):
+        """
+        Send the calculation into the foreground by halting the notebook as
+        long as the process is running.  Shows a progress bar with the number
+        of processed events.  Please keep in mind that you can not execute
+        cells in the notebook when having called wait_for_end (but before -
+        although a calculation is running.)
+
+
+        Parameters:
+          display_bar: If true, the display bar is used to show in the notebook
+                that the computation is complete.
+          send_notification: If true, the notify2 library will be used to
+                notify the user if the computation is complete. This will only
+                work if the jupyter notebook is hosted on the local desktop
+                machine.
+          max_processes: The maximum number of processes which will be run on
+                the machine. This has no effect when start() has been called
+                before.  This parameter can not be used directly, but
+                start_batched_and_wait_for_end() should be used.
         """
 
         if display_bar:
@@ -85,11 +129,15 @@ class Calculation:
             process_bars = {process: viewer.ProgressBarViewer()
                             for process in self.process_list if process.is_valid}
 
-        started_processes = [p for p in self.process_list if p.is_valid]
+        started_processes = [p for p in self.process_list if p.is_valid and p.already_run]
         running_processes = started_processes
         # Update all process bars as long as minimum one process is running
         while len(running_processes) > 0:
 
+            if max_processes:
+                self.ensure_running(max_processes)
+
+            started_processes = [p for p in self.process_list if p.is_valid and p.already_run]
             running_processes = [p for p in started_processes if self.is_running(p)]
             ended_processes = [p for p in started_processes if not self.is_running(p)]
 
@@ -156,7 +204,7 @@ class Calculation:
 
     def map_on_processes(self, map_function, index):
         """
-        Calculate a function on all processes and colltect the results if index is None.
+        Calculate a function on all processes and collect the results if index is None.
         Else calculate the function only one the given process or the process number.
         """
         if len(self.process_list) == 1:
@@ -265,7 +313,7 @@ class Calculation:
 
     def show_log(self, index=None):
         """
-        Show the log of the underlaying process(es).
+        Show the log of the underlying process(es).
         """
 
         def f(process):

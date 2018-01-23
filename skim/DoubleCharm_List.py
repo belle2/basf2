@@ -10,8 +10,11 @@
 from basf2 import *
 from modularAnalysis import *
 
+# VERY HIGH RETENTION RATE: NEEDS TO BE REDUCED
+
 
 def DoubleCharmList():
+    applyEventCuts('nTracks>4')
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     B0_Channels = ['D0:all D0:all',

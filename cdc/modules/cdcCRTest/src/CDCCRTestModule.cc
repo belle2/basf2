@@ -97,10 +97,8 @@ void CDCCRTestModule::defineHisto()
   m_tree->Branch("z", &z, "z/D");
   m_tree->Branch("alpha", &alpha, "alpha/D");
   m_tree->Branch("theta", &theta, "theta/D");
-  m_tree->Branch("z_prop", &z_prop, "z_prop/D");
   m_tree->Branch("t", &t, "t/D");
   m_tree->Branch("evtT0", &evtT0, "evtT0/D");
-  m_tree->Branch("tdc", &tdc, "tdc/I");
   m_tree->Branch("adc", &adc, "adc/s");
   m_tree->Branch("boardID", &boardID, "boardID/I");
   m_tree->Branch("lay", &lay, "lay/I");
@@ -108,14 +106,14 @@ void CDCCRTestModule::defineHisto()
   m_tree->Branch("IWire", &IWire, "IWire/I");
   m_tree->Branch("Pval", &Pval, "Pval/D");
   m_tree->Branch("ndf", &ndf, "ndf/D");
-  m_tree->Branch("Pt", &Pt, "Pt/D");
-  m_tree->Branch("trighit", &trighit, "trighit/I");
+  //  m_tree->Branch("trighit", &trighit, "trighit/I");
   if (m_StoreTrackParams) {
     m_tree->Branch("d0", &d0, "d0/D");
     m_tree->Branch("z0", &z0, "z0/D");
     m_tree->Branch("phi0", &phi0, "phi0/D");
     m_tree->Branch("tanL", &tanL, "tanL/D");
     m_tree->Branch("omega", &omega, "omega/D");
+    m_tree->Branch("Pt", &Pt, "Pt/D");
   }
   if (m_StoreCDCSimHitInfo) {
     m_tree->Branch("z_sim", &z_sim, "z_sim/D");
@@ -126,6 +124,8 @@ void CDCCRTestModule::defineHisto()
     m_tree->Branch("t_fit", &t_fit, "t_fit/D");
   }
   if (!m_SmallerOutput) {
+    m_tree->Branch("tdc", &tdc, "tdc/I");
+    m_tree->Branch("z_prop", &z_prop, "z_prop/D");
     m_tree->Branch("res_b", &res_b, "res_b/D");
     m_tree->Branch("res_u", &res_u, "res_u/D");
     m_tree->Branch("lr", &lr, "lr/I");
@@ -309,18 +309,19 @@ void CDCCRTestModule::event()
 
     if (m_noBFit) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, NDF=4;
     else {ndf = fs->getNdf();}
-    if (ndf < 5) continue;
-
+    double Chi2 = fs->getChi2();
+    TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
+    m_hPval->Fill(TrPval);
+    m_hNDF->Fill(ndf);
+    if (ndf < 15) continue;
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
-      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
         m_hEvtT0->Fill(evtT0);
       } else { continue;}
     }
 
-    double Chi2 = fs->getChi2();
-    TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     d0 = fitresult->getD0();
     z0 = fitresult->getZ0();
     tanL = fitresult->getTanLambda();
@@ -328,8 +329,6 @@ void CDCCRTestModule::event()
     phi0 = fitresult->getPhi0() * 180 / M_PI;
     Pt = fitresult->getMomentum().Perp();
     m_hPhi0->Fill(phi0);
-    m_hPval->Fill(TrPval);
-    m_hNDF->Fill(ndf);
     m_hChi2->Fill(Chi2);
     if (Pt < m_MinimumPt) continue;
     if (m_hitEfficiency && track->getNumberOfCDCHits() > 30 && TrPval > 0.001) {
@@ -466,7 +465,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           t -= cdcgeo.getTimeWalk(wireid, adc);
 
           // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
             //            evtT0 =  m_eventTimeStoreObject->getEventT0();
             t -= evtT0;
           }
@@ -497,33 +496,6 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
     }//end of rawCDC
   }//end of for tp
 }//end of func
-
-
-double CDCCRTestModule::getCorrectedDriftTime(Belle2::WireID wireid, unsigned short tdc, unsigned short adc , double z, double z0)
-{
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  double t0 =  cdcgeo.getT0(wireid);
-  double  tdcBinWidth = cdcgeo.getTdcBinWidth();
-  double DriftT = t0 - tdcBinWidth * tdc;
-  TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
-  const double* rinnerlayer = cdcgeo.innerRadiusWireLayer();
-  const double* routerlayer = cdcgeo.outerRadiusWireLayer();
-  double  rcell = (rinnerlayer[wireid.getICLayer()] + routerlayer[wireid.getICLayer()]) / 2;
-  double  flightLength = sqrt(rcell * rcell + (z - z0) * (z - z0));
-  if (flightLength > 200) {
-    B2WARNING("flight Length from closet point to hit may be larger than det size " << flightLength
-              << "| rcell :" << rcell
-              << "| z: " << z);
-  }
-  B2DEBUG(99, "| rcell :" << rcell << "| z: " << z << " |flightLength" << flightLength);
-  //subtract distance divided by speed of electric signal in the wire from the drift time.
-  DriftT -= (z - m_backWirePos.Z()) * cdcgeo.getPropSpeedInv(wireid.getICLayer());
-  //Correct time of Flight, tentative using distance form hit to IP divide V
-  //  DriftT -= mop.getTime();//trackTime
-  DriftT -= flightLength / 30; //assume vflight=30cm/ns; flight from IP to this wire;
-  if (false) {DriftT -= cdcgeo.getTimeWalk(wireid, adc);}
-  return DriftT;
-}
 
 void CDCCRTestModule::getHitDistInTrackCand(const RecoTrack* track)
 {
@@ -612,12 +584,10 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
   typedef std::pair<double, const RecoHitInformation*> SortingRecoHitPair;
 
   for (const RecoHitInformation::UsedCDCHit* cdchit : track->getCDCHitList()) {
-    RecoHitInformation* recoHitInfo = track->getRecoHitInformation(cdchit);
-    if (recoHitInfo->useInFit()) continue;
+    //    RecoHitInformation* recoHitInfo = track->getRecoHitInformation(cdchit);
+    if (track->getRecoHitInformation(cdchit)->useInFit()) continue;
     // yeah is true, but better to check for the above
     //if ((recoHitInfo->getCreatedTrackPoint())) continue;
-    B2DEBUG(99, "HitID use in fit" << recoHitInfo->useInFit());
-
     // This was wrong: the sorting parameter is not the hitID
     int hitSortingParameter = track->getRecoHitInformation(cdchit)->getSortingParameter();
 
@@ -628,9 +598,9 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     //find closest hit to hit which do not fit
     //    if (hitID < track->getNumberOfCDCHits() / 2) { //case for first part of track, searching forward, stop at first choice
     for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
-      RecoHitInformation const* recoHitInfo = track->getRecoHitInformation(hit);
-      if (recoHitInfo->useInFit()) { //may be should check fit status of that hit, do it later.
-        frontSideHit = std::make_pair(recoHitInfo->getSortingParameter(), recoHitInfo);
+      RecoHitInformation const* recoHitInfo_fw = track->getRecoHitInformation(hit);
+      if (recoHitInfo_fw->useInFit()) { //may be should check fit status of that hit, do it later.
+        frontSideHit = std::make_pair(recoHitInfo_fw->getSortingParameter(), recoHitInfo_fw);
         break;
       }
     }
@@ -639,10 +609,10 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     auto hitListReverse = track->getCDCHitList();
     std::reverse(hitListReverse.begin() , hitListReverse.end());
     for (const RecoHitInformation::UsedCDCHit* hit : hitListReverse) {
-      RecoHitInformation const* recoHitInfo = track->getRecoHitInformation(hit);
-      if (recoHitInfo->useInFit()) {
+      RecoHitInformation const* recoHitInfo_bkw = track->getRecoHitInformation(hit);
+      if (recoHitInfo_bkw->useInFit()) {
         // also get proper id here
-        backsideSideHit = std::make_pair(recoHitInfo->getSortingParameter(), recoHitInfo);
+        backsideSideHit = std::make_pair(recoHitInfo_bkw->getSortingParameter(), recoHitInfo_bkw);
         break;
       }
     }

@@ -11,13 +11,18 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     class CDCSegmentTriple;
     class CDCTrack;
@@ -33,6 +38,9 @@ namespace Belle2 {
     public:
       /// Short description of the findlet
       std::string getDescription() final;
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function of the segment finding by the cellular automaton.
       void apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,

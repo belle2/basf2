@@ -34,27 +34,6 @@ namespace Belle2 {
       m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0),
       m_clsShape(0) {}
 
-    /** Deprecated constructor for backward compatibility - will be removed soon.
-     * Doesn't contain error data.
-     * @param sensorID Sensor compact ID.
-     * @param uPosition Cluster u coordinate (r-phi).
-     * @param vPosition Cluster v coordinate (z).
-     * @param clsCharge The cluster charge.
-     * @param seedCharge The charge of the cluster seed.
-     * @param clsSize size of the cluster in pixels.
-     * @param uSize number of pixel columns contributing to the cluster.
-     * @param vSize number of pixel rows contributing to the cluster.
-     */
-    PXDCluster(VxdID sensorID, float uPosition, float vPosition, float clsCharge,
-               float seedCharge, unsigned short clsSize, unsigned short uSize,
-               unsigned short vSize, unsigned short uStart, unsigned short vStart):
-      m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
-      m_uPositionSigma(1), m_vPositionSigma(1), m_uvRho(0),
-      m_clsCharge(clsCharge), m_seedCharge(seedCharge),  m_clsSize(clsSize),
-      m_uSize(uSize), m_vSize(vSize), m_uStart(uStart), m_vStart(vStart),
-      m_clsShape(0)
-    {}
-
     /** Constructor.
      * @param sensorID Sensor compact ID.
      * @param uPosition Cluster u coordinate (r-phi).
@@ -69,7 +48,7 @@ namespace Belle2 {
      * @param vSize number of pixel rows contributing to the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
-               float vError, float uvRho, float clsCharge, float seedCharge,
+               float vError, float uvRho, unsigned short clsCharge, unsigned short seedCharge,
                unsigned short clsSize, unsigned short uSize, unsigned short vSize,
                unsigned short uStart, unsigned short vStart):
       m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
@@ -94,7 +73,7 @@ namespace Belle2 {
      * @param clsShape ID of shape of the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
-               float vError, float uvRho, float clsCharge, float seedCharge,
+               float vError, float uvRho, unsigned short clsCharge, unsigned short seedCharge,
                unsigned short clsSize, unsigned short uSize, unsigned short vSize,
                unsigned short uStart, unsigned short vStart, short clsShape):
       m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
@@ -137,12 +116,12 @@ namespace Belle2 {
     /** Get collected charge.
      * @return charge collected in the cluster.
      */
-    float getCharge() const { return m_clsCharge; }
+    unsigned short getCharge() const { return m_clsCharge; }
 
     /** Get seed charge.
      * @return seed charge of the cluster.
      */
-    float getSeedCharge() const { return m_seedCharge; }
+    unsigned short getSeedCharge() const { return m_seedCharge; }
 
     /** Get cluster size.
      * @return number of pixels contributing to the cluster.
@@ -195,22 +174,22 @@ namespace Belle2 {
     void setVSigma(float NewvError) { m_vPositionSigma = NewvError; }
 
   protected:
-    unsigned short m_sensorID; /**< Compressed sensor identifier.*/
-    float m_uPosition;         /**< Absolute cell position in r-phi. */
-    float m_vPosition;         /**< Absolute cell position in z. */
-    float m_uPositionSigma;    /**< Error in u position. */
-    float m_vPositionSigma;    /**< Error in v position. */
-    float m_uvRho;             /**< Cluster shape correlation. */
-    float m_clsCharge;         /**< Deposited charge in electrons. */
-    float m_seedCharge;        /**< Cluster seed charge in electrons. */
-    unsigned short m_clsSize;  /**< Cluster size in pixels */
-    unsigned short m_uSize;    /**< Cluster size in pixel columns */
-    unsigned short m_vSize;    /**< Cluster size in pixel rows  */
-    unsigned short m_uStart;   /**< Start column of the cluster */
-    unsigned short m_vStart;   /**< Start row of the cluster */
-    short m_clsShape;          /**< Cluster shape ID */
+    unsigned short m_sensorID;    /**< Compressed sensor identifier.*/
+    float m_uPosition;            /**< Absolute cell position in r-phi. */
+    float m_vPosition;            /**< Absolute cell position in z. */
+    float m_uPositionSigma;       /**< Error in u position. */
+    float m_vPositionSigma;       /**< Error in v position. */
+    float m_uvRho;                /**< Cluster shape correlation. */
+    unsigned short m_clsCharge;   /**< Deposited charge in ADC units. */
+    unsigned short m_seedCharge;  /**< Cluster seed charge in ADC units. */
+    unsigned short m_clsSize;     /**< Cluster size in pixels */
+    unsigned short m_uSize;       /**< Cluster size in pixel columns */
+    unsigned short m_vSize;       /**< Cluster size in pixel rows  */
+    unsigned short m_uStart;      /**< Start column of the cluster */
+    unsigned short m_vStart;      /**< Start row of the cluster */
+    short m_clsShape;             /**< Cluster shape ID */
 
-    ClassDef(PXDCluster, 3)
+    ClassDef(PXDCluster, 4)
   };
 
 

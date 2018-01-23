@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef INPUTCONTROLLER_H
-#define INPUTCONTROLLER_H
+#pragma once
 
 #include <string>
 
@@ -118,4 +117,3 @@ namespace Belle2 {
     static const TChain* s_chain;
   };
 }
-#endif

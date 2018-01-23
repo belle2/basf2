@@ -81,6 +81,15 @@ void PXDDQMModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
+  // save way to create directories and cd to them, even if they exist already.
+  // if cd fails, Directory points to oldDir, but never ZERO ptr
+  oldDir->mkdir("PXD_Basic");
+  oldDir->cd("PXD_Basic");
+  TDirectory* DirPXDBasic = gDirectory;
+  if (m_SaveOtherHistos) oldDir->mkdir("PXD_Advance");
+  oldDir->cd("PXD_Advance");
+  TDirectory* DirPXDAdvance = gDirectory;
+  oldDir->cd();
 
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -102,13 +111,6 @@ void PXDDQMModule::defineHisto()
       }
       break;
     }
-  }
-
-  TDirectory* DirPXDBasic = NULL;
-  TDirectory* DirPXDAdvance = NULL;
-  DirPXDBasic = oldDir->mkdir("PXD_Basic");
-  if (m_SaveOtherHistos) {
-    DirPXDAdvance = oldDir->mkdir("PXD_Advance");
   }
 
   m_fired = new TH1F*[c_nPXDSensors];
@@ -381,22 +383,22 @@ void PXDDQMModule::event()
   // PXD basic histograms:
   // Fired strips
   vector< set<int> > Pixels(c_nPXDSensors); // sets to eliminate multiple samples per strip
-  for (const PXDDigit& digit : storePXDDigits) {
-    int iLayer = digit.getSensorID().getLayerNumber();
+  for (const PXDDigit& digit2 : storePXDDigits) {
+    int iLayer = digit2.getSensorID().getLayerNumber();
     if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-    int iLadder = digit.getSensorID().getLadderNumber();
-    int iSensor = digit.getSensorID().getSensorNumber();
+    int iLadder = digit2.getSensorID().getLadderNumber();
+    int iSensor = digit2.getSensorID().getSensorNumber();
     int index = getSensorIndex(iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    Pixels.at(index).insert(digit.getUniqueChannelID());
-    if (m_chargePix[index] != NULL) m_chargePix[index]->Fill(digit.getCharge());
-    if ((m_hitMapU[index] != NULL) && (digit.getCharge() > m_CutPXDCharge))
-      m_hitMapU[index]->Fill(digit.getUCellID());
-    if ((m_hitMapV[index] != NULL) && (digit.getCharge() > m_CutPXDCharge))
-      m_hitMapV[index]->Fill(digit.getVCellID());
-    if ((m_hitMap[index] != NULL) && (digit.getCharge() > m_CutPXDCharge))
-      m_hitMap[index]->Fill(digit.getUCellID(), digit.getVCellID());
+    Pixels.at(index).insert(digit2.getUniqueChannelID());
+    if (m_chargePix[index] != NULL) m_chargePix[index]->Fill(digit2.getCharge());
+    if ((m_hitMapU[index] != NULL) && (digit2.getCharge() > m_CutPXDCharge))
+      m_hitMapU[index]->Fill(digit2.getUCellID());
+    if ((m_hitMapV[index] != NULL) && (digit2.getCharge() > m_CutPXDCharge))
+      m_hitMapV[index]->Fill(digit2.getVCellID());
+    if ((m_hitMap[index] != NULL) && (digit2.getCharge() > m_CutPXDCharge))
+      m_hitMap[index]->Fill(digit2.getUCellID(), digit2.getVCellID());
   }
   for (int i = 0; i < c_nPXDSensors; i++) {
     if ((m_fired[i] != NULL) && (Pixels[i].size() > 0)) m_fired[i]->Fill(Pixels[i].size());
@@ -495,12 +497,12 @@ void PXDDQMModule::endRun()
     return;
   }
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirPXDFlags = NULL;
   f_OutFlagsFile->cd();
 
-  DirPXDFlags = f_OutFlagsFile->mkdir("PXD_Flags");
-//  DirPXDFlags = oldDir->mkdir("PXD_ClusterShapeCorrections");
-  DirPXDFlags->cd();
+  f_OutFlagsFile->mkdir("PXD_Flags"); // new file, thus we should not get a ZERO ptr back ...
+  f_OutFlagsFile->cd("PXD_Flags");  // still, play it save
+  TDirectory* DirPXDFlags = gDirectory;
+
   TH2F* hf_hitMapCounts = new TH2F("PixelHitmapCounts", "PXD Pixel Hitmaps Counts",
                                    c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
   TH2F* hf_hitMapClCounts = new TH2F("ClusterHitmapCounts", "PXD Cluster Hitmaps Counts",

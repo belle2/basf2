@@ -74,17 +74,6 @@ namespace Belle2 {
     /** Sets the human readable proto-name of the sectorMap. */
     std::string secMapName = "testMap";
 
-    /** Names of Two-hitFilters to be used in that Map. */
-    std::vector<std::string> twoHitFilters = { "distance3D", "distanceXY", "slopeRZ"};
-
-    /** Names of Three-hitFilters to be used in that Map. */
-//  std::vector<std::string> threeHitFilters = { "angles3D", "deltaSlopeRZ", "distance2IP"};
-    std::vector<std::string> threeHitFilters = { "angles3D", "deltaSlopeRZ"};
-
-    /** Names of Four-hitFilters to be used in that Map. */
-//  std::vector<std::string> fourHitFilters = {"deltaDistance2IP"};
-    std::vector<std::string> fourHitFilters = {};
-
     /** Magnetic field value to be set for the filters. */
     double mField = 1.5;
 
@@ -94,8 +83,8 @@ namespace Belle2 {
     /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
     std::pair<double, double> quantiles = {0.005, 1. - 0.005};
 
-
-    ClassDef(SectorMapConfig, 1);
+    //! needed for the root library
+    ClassDef(SectorMapConfig, 2);
 
   };
 }

@@ -132,7 +132,7 @@ def load(obj):
         tf.train.update_checkpoint_state(path, obj[1])
         saver.restore(session, os.path.join(path, obj[1]))
     state = State(session=session)
-    if len(obj) > 3:
+    if len(obj) > 4:
         state.get_from_collection(obj[4])
         for i, extra in enumerate(obj[5:]):
             setattr(state, 'extra_{}'.format(i), extra)

@@ -12,10 +12,13 @@
 #define SVDSIGNAL_H
 
 #include <framework/dataobjects/RelationElement.h>
+#include <string>
+#include <sstream>
 #include <deque>
 #include <map>
 #include <algorithm>
 #include <math.h>
+#include <svd/simulation/SVDSimulationTools.h>
 
 namespace Belle2 {
   namespace SVD {
@@ -53,6 +56,13 @@ namespace Belle2 {
           m_initTime(initTime), m_charge(charge), m_tau(tau), m_particle(particle),
           m_truehit(truehit)
         {}
+        /** Create a string containing data of this Wave object */
+        std::string toString() const
+        {
+          std::ostringstream os;
+          os << m_initTime << '\t' << m_charge << '\t' << m_tau << std::endl;
+          return os.str();
+        }
         /** Start time of the waveform. */
         double m_initTime;
         /** Charge of the wave. */
@@ -77,7 +87,8 @@ namespace Belle2 {
       SVDSignal(): m_charge(0) {}
 
       /** Copy ctor. */
-      SVDSignal(const SVDSignal& other) {
+      SVDSignal(const SVDSignal& other)
+      {
         m_charge = other.getCharge();
         for (Wave wave : other.getFunctions())
           m_functions.push_back(wave);
@@ -99,7 +110,8 @@ namespace Belle2 {
        * @param truehit Index of the truehit corresponding to the particle that contributed
        * the charge.
        */
-      void add(double initTime, double charge, double tau, int particle = -1, int truehit = -1) {
+      void add(double initTime, double charge, double tau, int particle = -1, int truehit = -1)
+      {
         if (charge > 0) {
           m_charge += charge;
           m_functions.push_back(Wave(initTime, charge, tau, particle, truehit));
@@ -113,7 +125,8 @@ namespace Belle2 {
        * @param other The original signal.
        * @return This signal with all quantities set to those of the other.
        */
-      SVDSignal& operator=(const SVDSignal& other) {
+      SVDSignal& operator=(const SVDSignal& other)
+      {
         m_charge = other.getCharge();
         m_functions.clear();
         std::copy(other.getFunctions().begin(), other.getFunctions().end(), m_functions.begin());
@@ -123,13 +136,17 @@ namespace Belle2 {
       /** Waveform shape.
        * @param t The time at which the function is to be calculated.
        * @param initTime The initial time of the waveform.
-       * @param charge The total charge of the waveform.
-       * @param tau The decay time of the waveform.
-       * @return Value of the waveform at time.
+       * @param charge The charge (peak value) of the waveform.
+       * @param tau The scale parameter (decay time) of the waveform.
+       * @param wfun The functional form of the waveform. Default is betaprime.
+       * The function is normalized to peak value of 1.
+       * @return Value of the waveform at t.
        */
-      double waveform(double t, double initTime, double charge, double tau) const {
-        if ((tau <= 0.0) || (t < initTime)) return 0;
-        double z = (t - initTime) / tau; return charge * z * exp(1.0 - z);
+      double waveform(double t, double initTime, double charge, double tau,
+                      waveFunction wfun = w_betaprime) const
+      {
+        double z = (t - initTime) / tau;
+        return charge * wfun(z);
       }
 
       /** Waveform taking parameters from a Wave struct.
@@ -140,12 +157,12 @@ namespace Belle2 {
       double waveform(double t, const Wave& wave) const
       { return waveform(t, wave.m_initTime, wave.m_charge, wave.m_tau); }
 
-      /** Make the SVDSignal a functor.
+      /** Make SVDSignal a functor.
        * @param t The time at which output is to be calculated.
-       * @return Boost tuple containing the summary value of the waveform (observable),
-       * and the relation maps of MCParticles and TrueHits.
+       * @return value of the waveform
        */
-      double operator()(double t) const {
+      double operator()(double t) const
+      {
         double wave_sum = 0;
         for (SVDSignal::Wave wave : m_functions) {
           wave_sum += waveform(t, wave);
@@ -172,6 +189,15 @@ namespace Belle2 {
        * @return SVDSignal::relations_map with TrueHit relations of the signal.
        */
       const relations_map& getTrueHitRelations() const { return m_truehits; }
+      /** Produce a string representation of the object */
+      std::string toString() const
+      {
+        std::ostringstream os;
+        size_t i = 0;
+        for (auto w : m_functions)
+          os << ++i << '\t' << w.toString();
+        return os.str();
+      }
 
     protected:
 
@@ -184,7 +210,7 @@ namespace Belle2 {
       /** Map of TrueHit associations. */
       relations_map m_truehits;
 
-    }; // class SVDDigit
+    }; // class SVDSignal
 
   } // end namespace SVD
 } // end namespace Belle2

@@ -15,7 +15,6 @@
 #include <framework/gearbox/GearDir.h> // needed for reading xml-files
 #include <framework/core/Environment.h> // getNumberProcesses
 #include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <tracking/dataobjects/VXDTFSecMap.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -606,6 +605,8 @@ VXDTFModule::~VXDTFModule()
 
 void VXDTFModule::initialize()
 {
+  B2WARNING("The VXDTF Module (VXDTF1) is deprecated! Support for this module is ceased and the module will be deleted soon! "
+            << "If you have objections, please contact felix.metzner@kit.edu.");
   B2DEBUG(1, "-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance <<
           ") - initialize:");
 
@@ -625,6 +626,8 @@ void VXDTFModule::initialize()
 
 void VXDTFModule::beginRun()
 {
+  B2ERROR("The VXDTF Module (VXDTF1) is deprecated! Support for this module is ceased and the module will be deleted soon! "
+          << "If you have objections, please contact felix.metzner@kit.edu.");
   B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance <<
          ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
   B2DEBUG(50,
@@ -1486,8 +1489,8 @@ void VXDTFModule::the_real_event()
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
-      for (PassData* currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
+      for (PassData* currentPassInner : m_passSetupVector) {
+        cleanEvent(currentPassInner);
       }
       stopTimer = boostClock::now();
       thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -1547,8 +1550,8 @@ void VXDTFModule::the_real_event()
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
-      for (PassData* currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
+      for (PassData* currentPassInner : m_passSetupVector) {
+        cleanEvent(currentPassInner);
       }
       stopTimer = boostClock::now();
       thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -1593,8 +1596,8 @@ void VXDTFModule::the_real_event()
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
-      for (PassData* currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
+      for (PassData* currentPassInner : m_passSetupVector) {
+        cleanEvent(currentPassInner);
       }
       stopTimer = boostClock::now();
       m_TESTERtimeConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
@@ -1660,8 +1663,8 @@ void VXDTFModule::the_real_event()
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
-      for (PassData* currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
+      for (PassData* currentPassInner : m_passSetupVector) {
+        cleanEvent(currentPassInner);
       }
       stopTimer = boostClock::now();
       thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -1822,8 +1825,8 @@ void VXDTFModule::the_real_event()
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
-      for (PassData* currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
+      for (PassData* currentPassInner : m_passSetupVector) {
+        cleanEvent(currentPassInner);
       }
 
       stopTimer = boostClock::now();
@@ -5421,13 +5424,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 
     if (currentPass->zigzagRZ.first == true and nCurrentHits > 4) {
       // in this case we have still got enough hits for this test after removing virtual hit
-      const vector<VXDTFHit*>& currentHits = (*currentTC)->getHits();
+      const vector<VXDTFHit*>& currentHitsInner = (*currentTC)->getHits();
 
-      vector<PositionInfo*> currentHitPositions;
-      for (VXDTFHit* currentHit : currentHits) {
-        currentHitPositions.push_back(currentHit->getPositionInfo());
+      vector<PositionInfo*> currentHitPositionsInner;
+      for (VXDTFHit* currentHit : currentHitsInner) {
+        currentHitPositionsInner.push_back(currentHit->getPositionInfo());
       }
-      currentPass->trackletFilterBox.resetValues(&currentHitPositions);
+      currentPass->trackletFilterBox.resetValues(&currentHitPositionsInner);
 
       isZiggZagging = currentPass->trackletFilterBox.ziggZaggRZ();
       if (isZiggZagging == true) {
@@ -5482,8 +5485,8 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
   }
 
   int numTC = 0;
-  for (VXDTFTrackCandidate* currentTC : currentPass->tcVector) {
-    const vector<VXDTFHit*>& currentHits = currentTC->getHits();
+  for (VXDTFTrackCandidate* currentTCInner : currentPass->tcVector) {
+    const vector<VXDTFHit*>& currentHits = currentTCInner->getHits();
     int nHits = currentHits.size();
     stringstream secNameOutput;
     secNameOutput << endl << "after filtering virtual entries: tc " << numTC << " got " << nHits << " hits and the following secIDs: ";
@@ -5491,13 +5494,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
       unsigned int aSecName = currentHit->getSectorName();
       secNameOutput << aSecName << "/" << FullSecID(aSecName).getFullSecString() << " ";
       if (currentHit->getDetectorType() == Const::PXD) {   // PXD
-        currentHit->getClusterInfoUV()->addTrackCandidate(currentTC);
+        currentHit->getClusterInfoUV()->addTrackCandidate(currentTCInner);
       } else {
-        if (currentHit->getClusterInfoU() != NULL) { currentHit->getClusterInfoU()->addTrackCandidate(currentTC); } else {
+        if (currentHit->getClusterInfoU() != NULL) { currentHit->getClusterInfoU()->addTrackCandidate(currentTCInner); } else {
           B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no UCluster! " <<  aSecName << "/" <<
                     FullSecID(aSecName));
         }
-        if (currentHit->getClusterInfoV() != NULL) { currentHit->getClusterInfoV()->addTrackCandidate(currentTC); } else {
+        if (currentHit->getClusterInfoV() != NULL) { currentHit->getClusterInfoV()->addTrackCandidate(currentTCInner); } else {
           B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no VCluster! " <<  aSecName << "/" <<
                     FullSecID(aSecName));
         }
@@ -6314,8 +6317,8 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
         newTC->setTrackQuality(TMath::Prob(lineFitResult.first, newTC->size() - 3));
         newTC->setFitSucceeded(true);
         survivedCF = true;
-      } catch (FilterExceptions::Straight_Up& anException) {
-        B2ERROR("baselineTF:loLineFit failed too , reason: " << anException.what() << ", killing TC...");
+      } catch (FilterExceptions::Straight_Up& anOtherException) {
+        B2ERROR("baselineTF:loLineFit failed too , reason: " << anOtherException.what() << ", killing TC...");
         survivedCF = false;
       }
     } catch (FilterExceptions::Center_Is_Origin& anException) {

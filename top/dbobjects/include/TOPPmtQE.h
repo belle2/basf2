@@ -36,10 +36,11 @@ namespace Belle2 {
      * @param serialNumber serial number
      * @param lambdaFirst wavelenght of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
-     * @param CE collection efficiency
+     * @param CE collection efficiency at B = 0T
+     * @param CE collection efficiency at B = 1.5T
      */
-    TOPPmtQE(const std::string& serialNumber, float lambdaFirst, float lambdaStep, float CE):
-      m_serialNumber(serialNumber), m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE(CE)
+    TOPPmtQE(const std::string& serialNumber, float lambdaFirst, float lambdaStep, float CE0, float CE):
+      m_serialNumber(serialNumber), m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE_noB(CE0), m_CE_withB(CE)
     {}
 
     /**
@@ -67,7 +68,7 @@ namespace Belle2 {
      */
     float getQE(unsigned channel, float lambda) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
+      if (channel > c_NumChannels) channel = c_NumChannels;
       channel--;
 
       int vsize = m_QE[channel].size();
@@ -80,7 +81,7 @@ namespace Belle2 {
       float lambdaLow  = m_lambdaFirst + ilLow * m_lambdaStep;
       float lambdaHigh = m_lambdaFirst + (ilLow + 1) * m_lambdaStep;
 
-      float qe = (m_QE[ilLow] * (lambda - lambdaLow) + m_QE[ilLow + 1] * (lambdaHigh - lambda)) / m_lambdaStep;
+      float qe = (m_QE[channel].at(ilLow) * (lambdaHigh - lambda) + m_QE[channel].at(ilLow + 1) * (lambda - lambdaLow)) / m_lambdaStep;
       return qe;
     }
 
@@ -97,10 +98,16 @@ namespace Belle2 {
     float getLambdaStep() const {return m_lambdaStep;}
 
     /**
-     * Returns collection efficiency
+     * Returns collection efficiency (for no B field)
      * @return collection efficiency
      */
-    float getCE() const {return m_CE;}
+    float getCE0() const {return m_CE_noB;}
+
+    /**
+     * Returns collection efficiency (for B field = 1.5T)
+     * @return collection efficiency
+     */
+    float getCE() const {return m_CE_withB;}
 
 
   private:
@@ -109,7 +116,8 @@ namespace Belle2 {
     std::vector<float> m_QE[c_NumChannels]; /**< QE data points */
     float m_lambdaFirst = 0; /**< wavelength of the first data point [nm] */
     float m_lambdaStep = 0;  /**< wavelength step [nm] */
-    float m_CE = 0;          /**< relative collection efficiency */
+    float m_CE_noB = 0;      /**< relative collection efficiency, without B field */
+    float m_CE_withB = 0;    /**< relative collection efficiency, with B field */
 
     ClassDef(TOPPmtQE, 1); /**< ClassDef */
 

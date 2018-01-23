@@ -19,11 +19,10 @@ from basf2 import *
 from simulation import add_simulation
 import os
 
-from rawdata import add_raw_seqoutput
+from rawdata import add_raw_seqoutput, add_unpackers
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
-    add_unpackers,
     add_softwaretrigger_reconstruction,
     DEFAULT_HLT_COMPONENTS,
 )
@@ -130,7 +129,7 @@ output.param("RingBufferName", argvs[2])
 
 # Output object list
 objlist = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
-           'RawARICHs', 'RawECLs', 'RawKLMs',
+           'RawARICHs', 'RawECLs', 'RawKLMs', 'ROIs',
            'SoftwareTriggerResult', 'SoftwareTriggerVariables'
            ]
 output.param("saveObjs", objlist)

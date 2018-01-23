@@ -44,6 +44,7 @@ def printHex(evt, wordwidth=32, linewidth=8, paraheight=4):
     paras = (['\n'.join(lines[n:n + paraheight]) for n in range(0, len(lines), paraheight)])
     print('\n\n'.join(paras))
 
+
 data = []
 if pickleIt:
     pica = pickleSigFile if isPickleFile else re.sub(r'.+/', '', re.sub(r'sroot', 'p', srootFile))

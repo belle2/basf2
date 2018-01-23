@@ -41,7 +41,10 @@ REG_MODULE(SVDPacker)
 //                 Implementation
 //-----------------------------------------------------------------
 
+std::string Belle2::SVD::SVDPackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
+
 SVDPackerModule::SVDPackerModule() : Module(),
+  m_mapping(m_xmlFileName),
   m_FADCTriggerNumberOffset(0)
 {
   // Set module properties
@@ -50,11 +53,11 @@ SVDPackerModule::SVDPackerModule() : Module(),
   // Parameter definitions
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
-  //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
-  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
+  //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
+  addParam("simulate3sampleData", m_simulate3sampleData, "Simulate 3-sample RAW Data", bool(false));
   // initialize event #
   n_basf2evt = 0;
 
@@ -70,10 +73,9 @@ SVDPackerModule::~SVDPackerModule()
 void SVDPackerModule::initialize()
 {
 
-  StoreArray<RawSVD>::registerPersistent(m_rawSVDListName);
-  StoreArray<SVDDigit>::required(m_svdDigitListName);
-  m_eventMetaDataPtr.required();
-  loadMap();
+  m_rawSVD.registerInDataStore(m_rawSVDListName);
+  m_svdDigit.isRequired(m_svdDigitListName);
+  m_eventMetaDataPtr.isRequired();
   prepFADClist();
 
 }
@@ -81,7 +83,7 @@ void SVDPackerModule::initialize()
 
 void SVDPackerModule::beginRun()
 {
-
+  if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 }
 
 
@@ -181,10 +183,15 @@ void SVDPackerModule::event()
 
   // for each buffer in RawSVD object we store 12 FTBs/FADCs (48 in total)
   unsigned int j_buf[3]; // table of values indicating where new buffer begins
+  bool sim3sample;
 
   for (unsigned int iFADC = 0; iFADC < 48; iFADC++) {
 
     iCRC = 0;
+    sim3sample = false;
+
+    // if m_simulate3sampleData==true, 3-sample data will be simulated for FADCs: 168,144,48,24
+    if (m_simulate3sampleData and iFADCnumber[iFADC] % 24 == 0) sim3sample = true;
 
     // here goes FTB header
     data32 = 0xffaa0000;
@@ -197,7 +204,7 @@ void SVDPackerModule::event()
     //adds data32 to data vector and to crc16Input for further crc16 calculation
     addData32(data32);
 
-    m_FTBHeader.errorsField = 0;
+    m_FTBHeader.errorsField = 0xf0;
     m_FTBHeader.eventNumber = (m_eventMetaDataPtr->getEvent() & 0xFFFFFF);
 
     addData32(data32);
@@ -210,6 +217,10 @@ void SVDPackerModule::event()
     m_MainHeader.onebit = 0;
     m_MainHeader.FADCnum = iFADCnumber[iFADC]; // write original FADC number
     m_MainHeader.evtType = 0;
+
+    m_MainHeader.DAQMode = 2;
+    if (sim3sample) m_MainHeader.DAQMode = 1;
+
     m_MainHeader.runType = 0x2; //zero-suppressed mode
     m_MainHeader.check = 6; // 110
 
@@ -221,10 +232,10 @@ void SVDPackerModule::event()
       m_APVHeader.CMC1 = 0;
       m_APVHeader.CMC2 = 0;
 
-      m_APVHeader.FIFOfullErr = 0;
-      m_APVHeader.FrameErr = 0;
-      m_APVHeader.DetectErr = 0;
-      m_APVHeader.APVErr = 0;
+      m_APVHeader.fifoErr = 0;
+      m_APVHeader.frameErr = 0;
+      m_APVHeader.detectErr = 0;
+      m_APVHeader.apvErr = 0;
 
       m_APVHeader.pipelineAddr = 0;
       m_APVHeader.APVnum = iAPV;
@@ -238,13 +249,16 @@ void SVDPackerModule::event()
       if (apv_data_vec.size() > 0) { // if any data for given FADC/APV
         for (std::vector<DataInfo>::iterator apv_data = apv_data_vec.begin(); apv_data != apv_data_vec.end(); ++apv_data) {
 
-          m_data_A.sample1 = apv_data->data[0];
-          m_data_A.sample2 = apv_data->data[1];
-          m_data_A.sample3 = apv_data->data[2];
-          m_data_A.stripNum = apv_data->channel;
-          m_data_A.check = 0;
+          //skip 1st data frame if simulate 3-sample data
+          if (not sim3sample) {
+            m_data_A.sample1 = apv_data->data[0];
+            m_data_A.sample2 = apv_data->data[1];
+            m_data_A.sample3 = apv_data->data[2];
+            m_data_A.stripNum = apv_data->channel;
+            m_data_A.check = 0;
 
-          addData32(data32);
+            addData32(data32);
+          }
 
           m_data_B.sample4 = apv_data->data[3];
           m_data_B.sample5 = apv_data->data[4];
@@ -253,6 +267,7 @@ void SVDPackerModule::event()
           m_data_B.check = 0;
 
           addData32(data32);
+
         }
       }
 
@@ -261,10 +276,10 @@ void SVDPackerModule::event()
     // here goes FADC trailer
     m_FADCTrailer.FTBFlags = 0x001f;
     m_FADCTrailer.emPipeAddr = 0;
-    m_FADCTrailer.wiredOrErr = 0;
-    m_FADCTrailer.error0 = 0;
-    m_FADCTrailer.error1 = 0;
-    m_FADCTrailer.error2 = 0;
+    m_FADCTrailer.fifoErrOR = 0;
+    m_FADCTrailer.frameErrOR = 0;
+    m_FADCTrailer.detectErrOR = 0;
+    m_FADCTrailer.apvErrOR = 0;
     m_FADCTrailer.check = 14;
 
     addData32(data32);
@@ -346,8 +361,6 @@ void SVDPackerModule::event()
 
 void SVDPackerModule::terminate()
 {
-  delete m_map;
-
 }
 
 
@@ -356,12 +369,6 @@ void SVDPackerModule::endRun()
 
 }
 
-//load the sensor MAP from xml file
-void SVDPackerModule::loadMap()
-{
-  m_map = new SVDOnlineToOfflineMap(m_xmlMapFileName);
-
-}
 
 // mapping FADC numbers as 0-47
 void SVDPackerModule::prepFADClist()

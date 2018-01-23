@@ -12,6 +12,8 @@ import sys
 import inspect
 from vertex import *
 from analysisPath import *
+from variables import variables
+import basf2_mva
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -51,7 +53,7 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entrySequence=None):
+def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -70,17 +72,18 @@ def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entr
 
     @param environmentType type of the environment to be loaded
     @param filename the name of the file to be loaded
-    @param modules are added to this path
+    @param path modules are added to this path
     @param skipNEvents N events of the input file are skipped
     @param entrySequence The number sequences (e.g. 23:42,101) defining the entries which are processed.
+    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     """
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence)
+    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, entrySequences=None):
+def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -101,10 +104,11 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
 
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
-    @param modules are added to this path
+    @param path modules are added to this path
     @param skipNEvents N events of the input files are skipped
     @param entrySequences The number sequences (e.g. 23:42,101) defining the entries which are processed for
         each inputFileName.
+    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     """
 
     roinput = register_module('RootInput')
@@ -112,15 +116,18 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     roinput.param('skipNEvents', skipNEvents)
     if entrySequences is not None:
         roinput.param('entrySequences', entrySequences)
+    roinput.param('parentLevel', parentLevel)
 
     path.add_module(roinput)
     progress = register_module('ProgressBar')
     path.add_module(progress)
 
+    # None means don't create custom magnetic field, use whatever comes from the
+    # DB
     environToMagneticField = {'MC5': 'MagneticFieldConstant',
-                              'MC6': 'MagneticField',
-                              'MC7': 'MagneticField',
-                              'default': 'MagneticField',
+                              'MC6': None,
+                              'MC7': None,
+                              'default': None,
                               'Belle': 'MagneticFieldConstantBelle'}
 
     fixECLClusters = {'MC5': True,
@@ -130,8 +137,10 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
                       'Belle': False}
 
     if environmentType in environToMagneticField:
-        path.add_module('Gearbox')
-        path.add_module('Geometry', ignoreIfPresent=False, components=[environToMagneticField.get(environmentType)])
+        fieldType = environToMagneticField[environmentType]
+        if fieldType is not None:
+            path.add_module('Gearbox')
+            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -250,6 +259,50 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], 
     outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
                dataDescription=dataDescription)
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+
+
+def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
+    """
+    Write out all particle lists as an index file to be reprocessed using parentLevel flag.
+    Additional branches necessary for file to be read are automatically included.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
+
+    @param str filename the name of the output index file
+    @param str path modules are added to this path
+    @param list(str) includeArrays: datastore arrays/objects to write to the output
+        file in addition to particl lists and related information
+    @param bool keepParents whether the parents of the input event will be saved as the parents of the same event
+        in the output index file. Useful if you are only adding more information to another index file
+    @param bool mc whether the input data is MC or not
+    """
+
+    # Module to mark all branches to not be saved except particle lists
+    onlyPLists = register_module('OnlyWriteOutParticleLists')
+    path.add_module(onlyPLists)
+
+    # Set up list of all other branches we need to make index file complete
+    partBranches = [
+        'Particles',
+        'ParticlesToMCParticles',
+        'ParticlesToPIDLikelihoods',
+        'ParticleExtraInfoMap',
+        'EventExtraInfo'
+    ]
+    branches = ['EventMetaData']
+    persistentBranches = ['FileMetaData']
+    if mc:
+        branches += []
+        # persistentBranches += ['BackgroundInfos']
+    branches += partBranches
+    branches += includeArrays
+
+    r1 = register_module('RootOutput')
+    r1.param('outputFileName', filename)
+    r1.param('additionalBranchNames', branches)
+    r1.param('branchNamesPersistent', persistentBranches)
+    r1.param('keepParents', keepParents)
+    path.add_module(r1)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):
@@ -389,6 +442,9 @@ def correctFSR(
     Takes the particles from the given lepton list copies them to the output list and adds the
     4-vector of the closest photon (considered as radiative) to the lepton, if the given
     criteria for maximal angle and energy are fulfilled.
+    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
+    Information attached to the track is only available for the old lepton, accessable via the daughter
+    metavariable, e.g. <daughter(0, eid)>.
 
     @param outputListName The output lepton list containing the corrected leptons.
     @param inputListName The initial lepton list containing the leptons to correct, should already exists.
@@ -544,15 +600,16 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=analysis_main):
+                      path=analysis_main,
+                      enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'Kid>0.1')
-    pions = ('pi+:std', 'piid>0.1')
+    kaons = ('K+:std', 'kaonID>0.1')
+    pions = ('pi+:std', 'pionID>0.1')
     fillParticleLists([kaons, pions])
 
     The type of the particles to be loaded is specified via the decayString module parameter.
@@ -571,12 +628,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -585,6 +648,7 @@ def fillParticleList(
     cut,
     writeOut=False,
     path=analysis_main,
+    enforceFitHypothesis=False
 ):
     """
     Creates Particles of the desired type from the corresponding MDST dataobjects,
@@ -608,12 +672,18 @@ def fillParticleList(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -622,6 +692,7 @@ def fillParticleListWithTrackHypothesis(
     cut,
     hypothesis,
     writeOut=False,
+    enforceFitHypothesis=False,
     path=analysis_main,
 ):
     """
@@ -631,6 +702,11 @@ def fillParticleListWithTrackHypothesis(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     @param path          modules are added to this path
     """
 
@@ -639,6 +715,7 @@ def fillParticleListWithTrackHypothesis(
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -706,7 +783,7 @@ def fillParticleListsFromMC(
     The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
     For example:
     kaons = ('K+:gen', '')
-    pions = ('pi+:gen', 'piid>0.1')
+    pions = ('pi+:gen', 'pionID>0.1')
     fillParticleListsFromMC([kaons, pions])
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
@@ -742,6 +819,21 @@ def applyCuts(list_name, cut, path=analysis_main):
     path.add_module(pselect)
 
 
+def applyEventCuts(cut, path=analysis_main):
+    """
+    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+
+    @param cut  Events that do not pass these selection criteria are skipped
+    @param path      modules are added to this path
+    """
+
+    eselect = register_module('VariableToReturnValue')
+    eselect.param('variable', 'passesEventCut(' + cut + ')')
+    path.add_module(eselect)
+    empty_path = create_path()
+    eselect.if_value('<1', empty_path)
+
+
 def reconstructDecay(
     decayString,
     cut,
@@ -749,6 +841,7 @@ def reconstructDecay(
     writeOut=False,
     path=analysis_main,
     candidate_limit=None,
+    ignoreIfTooManyCandidates=True,
 ):
     """
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
@@ -765,12 +858,16 @@ def reconstructDecay(
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
-                       the number of candidates is exceeded no candidate will be
-                       reconstructed for that event and a Warning will be
+                       the number of candidates is exceeded a Warning will be
                        printed.
+                       By default, all these candidates will be removed and event will be ignored.
+                       This behaviour can be changed by \'ignoreIfTooManyCandidates\' flag.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
+                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+                       otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -781,6 +878,7 @@ def reconstructDecay(
     pmake.param('writeOut', writeOut)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
 
 
@@ -1726,14 +1824,173 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     path.add_module(btag)
 
 
+def selectDaughters(particle_list_name, decay_string, path=analysis_main):
+    """
+    Redefine the Daughters of a particle: select from decayString
+
+    @param particle_list_name input particle list
+    @para decay_string  for selecting the Daughters to be preserved
+    """
+    seld = register_module('SelectDaughters')
+    seld.set_name('SelectDaughters_' + particle_list_name)
+    seld.param('listName', particle_list_name)
+    seld.param('decayString', decay_string)
+    path.add_module(seld)
+
+
 if __name__ == '__main__':
     desc_list = []
     for function_name in sorted(list_functions(sys.modules[__name__])):
         function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getargspec(function))
+        signature = inspect.formatargspec(*inspect.getfullargspec(function))
         signature = signature.replace(repr(analysis_main), 'analysis_main')
         desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 
     from pager import Pager
     with Pager('List of available functions in modularAnalysis'):
         pretty_print_description_list(desc_list)
+
+
+def markDuplicate(particleList, prioritiseV0, path=analysis_main):
+    """
+    Call DuplicateVertexMarker to find duplicate particles in a list and
+    flag the ones that should be kept
+
+    @param particleList input particle list
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    markdup = register_module('DuplicateVertexMarker')
+    markdup.param('particleList', particleList)
+    markdup.param('prioritiseV0', prioritiseV0)
+    path.add_module(markdup)
+
+
+def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
+    """
+    Merge two particle lists, vertex them and trim duplicates
+
+    @param firstList first particle list to merge
+    @param secondList second particle list to merge
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    listName = firstList.split(':')[0]
+    if (listName == secondList.split(':')[0]):
+        outList = listName + ':merged'
+        copyLists(outList, [firstList, secondList], False, path)
+        vertexKFit(outList, 0.0, '', '', path)
+        markDuplicate(outList, prioritiseV0, path)
+        applyCuts(outList, 'extraInfo(highQualityVertex)')
+    else:
+        B2ERROR("Lists to be merged contain different particles")
+
+
+PI0ETAVETO_COUNTER = 0
+
+
+def writePi0EtaVeto(
+    particleList,
+    decayString,
+    workingDirectory='.',
+    pi0vetoname='Pi0_Prob',
+    etavetoname='Eta_Prob',
+    downloadFlag=True,
+    selection='',
+    path=analysis_main,
+):
+    """
+    Give pi0/eta probability for hard photon.
+
+    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    current default weight files are optimised by MC9.
+    The Input Variables are as below. Aliases are set to some variables when training.
+    M : pi0/eta candidates Invariant mass
+    lowE : soft photon energy in lab frame
+    cTheta : soft photon ECL cluster's polar angle
+    Zmva : soft photon output of MVA using Zernike moments of the cluster
+    minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+
+    If you don't have weight files in your workingDirectory,
+    these files are downloaded from database to your workingDirectory automatically.
+    Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
+    about how to use this function.
+
+    NOTE for debug
+    Please don't use following ParticleList names elsewhere.
+    'gamma:HARDPHOTON', pi0:PI0VETO, eta:ETAVETO,
+    'gamma:PI0SOFT' + str(PI0ETAVETO_COUNTER), 'gamma:ETASOFT' + str(PI0ETAVETO_COUNTER)
+    Please don't use "lowE", "cTheta", "Zmva", "minC2Hdist" as alias elsewhere.
+
+    @param particleList     The input ParticleList
+    @param decayString specify Particle to be added to the ParticleList
+    @param workingDirectory The weight file directory
+    @param downloadFlag whether download default weight files or not
+    @param pi0vetoname extraInfo name of pi0 probability
+    @param etavetoname extraInfo name of eta probability
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param path       modules are added to this path
+    """
+    global PI0ETAVETO_COUNTER
+
+    if PI0ETAVETO_COUNTER == 0:
+        variables.addAlias('lowE', 'daughter(1,E)')
+        variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
+        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+
+    PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
+
+    roe_path = create_path()
+
+    deadEndPath = create_path()
+
+    signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
+
+    fillSignalSideParticleList('gamma:HARDPHOTON', decayString, path=roe_path)
+
+    pi0softname = 'gamma:PI0SOFT'
+    etasoftname = 'gamma:ETASOFT'
+    softphoton1 = pi0softname + str(PI0ETAVETO_COUNTER)
+    softphoton2 = etasoftname + str(PI0ETAVETO_COUNTER)
+
+    fillParticleList(
+        softphoton1,
+        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
+        path=roe_path)
+    applyCuts(softphoton1, 'abs(clusterTiming)<120', path=roe_path)
+    fillParticleList(
+        softphoton2,
+        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
+        path=roe_path)
+    applyCuts(softphoton2, 'abs(clusterTiming)<120', path=roe_path)
+
+    reconstructDecay('pi0:PI0VETO -> gamma:HARDPHOTON ' + softphoton1, '', path=roe_path)
+    reconstructDecay('eta:ETAVETO -> gamma:HARDPHOTON ' + softphoton2, '', path=roe_path)
+
+    if not os.path.isdir(workingDirectory):
+        os.mkdir(workingDirectory)
+        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root'):
+        if downloadFlag:
+            use_central_database('development')
+            basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
+            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/etaveto.root'):
+        if downloadFlag:
+            use_central_database('development')
+            basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
+            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
+                        identifier=workingDirectory + '/pi0veto.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO'], extraInfoName='EtaVeto',
+                        identifier=workingDirectory + '/etaveto.root')
+
+    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', 1, path=roe_path)
+    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', 1, path=roe_path)
+
+    variableToSignalSideExtraInfo('pi0:PI0VETO', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
+
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

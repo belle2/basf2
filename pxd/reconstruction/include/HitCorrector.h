@@ -15,6 +15,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <string>
 #include <memory>
+#include <fstream>
 #include <functional>
 
 namespace Belle2 {
@@ -22,6 +23,13 @@ namespace Belle2 {
   namespace PXD {
     /**
     * Singleton class that provides hit reconstruction corrections.
+    *
+    * @see PXDClusterShape
+    * @see PXDClusterShapeCalibration
+    * @see PXDClusterShapeCalibrationAlgorithm
+    * @see pxdMergeClusterShapeCorrections
+    * @see PXDDQMClusterShape
+    *
     */
     class HitCorrector {
 
@@ -34,6 +42,14 @@ namespace Belle2 {
       * @filename Name of data file containing correction data.
       */
       void initialize(std::string filename);
+      /** Read correction data from DataBase and initialize the corrector.
+      */
+      void initialize();
+
+      /** If the name of log file is defined, HitCorrectorr records all corrections in a log file. .
+      * @filename Name of log file
+      */
+      void setLogFile(std::string filename) { m_logFileName = filename; }
 
       /** Get initialization status of the corrector.
        * Optimally, could be used to switch off correcting altogether.
@@ -97,7 +113,7 @@ namespace Belle2 {
       * @param type Type of values:
       * 0: Bias of position (m_CorrectionBiasMap)
       * 1: Correction of error estimate (m_CorrectionErrorEstimationMap)
-      * 2: Correction of error correlation estimate (m_CorrectionErrorEstimationCorrelationMap)
+      * 2: Correction of error Covariance estimate (m_CorrectionErrorEstimationCovarianceMap)
       * 3: Error of position bias estimate (m_CorrectionBiasMapErr)
       * @param direction Direction in which we want correction: 0: u, 1: v.
       * @param shape Index of shape kind.
@@ -115,6 +131,10 @@ namespace Belle2 {
 
       /** Flag to indicate if  the calibration maps have been properly initialized. Set to true by a successful call to initialize(), otherwise false. */
       bool m_isInitialized = false;
+      /** Name of log file name. If "", no logging takes place.*/
+      std::string m_logFileName = "";
+      /** Log file object */
+      std::ofstream m_logFile;
       /** Number of shapes in current calibration file */
       int m_shapes = 0;     // 1 .. 15, 0: shape not set
       /** Number of pixel kinds in current calibration file */
@@ -134,8 +154,8 @@ namespace Belle2 {
       PXDCalibrationMap m_CorrectionBiasMap;
       /** Map holding corrections of position error estimates */
       PXDCalibrationMap m_CorrectionErrorEstimateMap;
-      /** Map holding corrections of error correlation estimates */
-      PXDCalibrationMap m_CorrectionErrorEstimateCorrelationMap;
+      /** Map holding corrections of error Covariance estimates */
+      PXDCalibrationMap m_CorrectionErrorEstimateCovarianceMap;
       /** Map holding estimates of bias correction errors */
       PXDCalibrationMap m_CorrectionBiasMapErr;
     };

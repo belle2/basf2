@@ -1,4 +1,5 @@
-#include "iostream"
+#include <iostream>
+#include <iomanip>
 #include <cdc/calibration/SpaceResolutionCalibration.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
@@ -113,11 +114,10 @@ void SpaceResolutionCalibration::createHisto()
 
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
+  int ith = -99;
+  int ial = -99;
+  int ilr = -99;
   for (int i = 0; i < nEntries; ++i) {
-    int ith = -99;
-    int ial = -99;
-    int lr = -99;
-
     tree->GetEntry(i);
     //cut
     if (std::fabs(x_b) < 0.02 || std::fabs(x_u) < 0.02) continue;
@@ -137,9 +137,9 @@ void SpaceResolutionCalibration::createHisto()
       }
     }
 
-    lr = x_u > 0 ? 1 : 0;
+    ilr = x_u > 0 ? 1 : 0;
 
-    if (ial == -99 || ith == -99 || lr == -99) {
+    if (ial == -99 || ith == -99 || ilr == -99) {
       TString command = Form("Error in alpha=%3.2f and theta = %3.2f>> error", alpha, theta);
       //      gSystem->Exec(command);
       B2FATAL("ERROR" << command);
@@ -147,8 +147,8 @@ void SpaceResolutionCalibration::createHisto()
     absRes_u = fabs(x_mea) - fabs(x_u);
     absRes_b = fabs(x_mea) - fabs(x_b);
 
-    hist_u[lay][lr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
-    hist_b[lay][lr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
+    hist_u[lay][ilr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
+    hist_b[lay][ilr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
 
   }
 
@@ -250,7 +250,7 @@ void SpaceResolutionCalibration::createHisto()
             B2WARNING("number of element might out of range"); continue;
           }
 
-          // Intrinsic resolution
+          //Intrinsic resolution
           B2DEBUG(199, "Create Histo for layer-lr: " << il << " " << lr);
           gr[il][lr][al][th] = new TGraphErrors(xl.size(), &xl.at(0), &sigma.at(0), &dxl.at(0), &dsigma.at(0));
           gr[il][lr][al][th]->SetMarkerSize(0.5);
@@ -314,26 +314,18 @@ bool SpaceResolutionCalibration::calibrate()
           //boundary parameters,
           if (m_BField) {
             if (i < 8) {
-              upFit = halfCSize[i] + 0.15;
-              intp6 = halfCSize[i] + 0.1;
+              upFit = halfCSize[i] + 0.15; intp6 = halfCSize[i] + 0.1;
             } else {
               if (fabs(ialpha[al]) < 25) {
-                upFit = halfCSize[i];
-                intp6 = halfCSize[i];
+                upFit = halfCSize[i]; intp6 = halfCSize[i];
               } else {
-                upFit = halfCSize[i] + 0.2;
-                intp6 = halfCSize[i] + 0.4 ;
+                upFit = halfCSize[i] + 0.2; intp6 = halfCSize[i] + 0.4 ;
               }
             }
             //no B case
           } else {
-            if (i < 8) {
-              upFit = halfCSize[i] + 0.1;
-              intp6 = halfCSize[i] + 0.1;
-            } else {
-              upFit = halfCSize[i] - 0.07;
-              intp6 = halfCSize[i];
-            }
+            if (i < 8) {upFit = halfCSize[i] + 0.1; intp6 = halfCSize[i] + 0.1;}
+            else {  upFit = halfCSize[i] - 0.07; intp6 = halfCSize[i];}
           }
 
           if (upFit > 0.9) upFit = 0.9;
@@ -641,26 +633,26 @@ void SpaceResolutionCalibration::readSigmaFromText()
     }
     ++nRead;
 
-    int itheta = -99;
+    int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {
       if (fabs(theta - itheta_old[i]) < epsi) {
-        itheta = i;
+        ith = i;
         break;
       }
     }
-    if (itheta < 0) cout << "CDCGeometryPar: thetas in sigma.dat are inconsistent !" << endl;
+    if (ith < 0) cout << "CDCGeometryPar: thetas in sigma.dat are inconsistent !" << endl;
 
-    int ialpha = -99;
+    int ial = -99;
     for (unsigned short i = 0; i < nalpha_old; ++i) {
       if (fabs(alpha - ialpha_old[i]) < epsi) {
-        ialpha = i;
+        ial = i;
         break;
       }
     }
-    if (ialpha < 0) cout << "CDCGeometryPar: alphas in sigma.dat are inconsistent !" << endl;
+    if (ial < 0) cout << "CDCGeometryPar: alphas in sigma.dat are inconsistent !" << endl;
 
     for (int i = 0; i < np; ++i) {
-      sigma_old[iCL][iLR][ialpha][itheta][i] = sigma[i];
+      sigma_old[iCL][iLR][ial][ith][i] = sigma[i];
     }
   }  //end of while loop
   ifs.close();

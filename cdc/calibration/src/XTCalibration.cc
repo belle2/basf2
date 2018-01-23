@@ -17,7 +17,8 @@
 #include <TChain.h>
 #include <TTree.h>
 #include <TSystem.h>
-#include "iostream"
+#include <iostream>
+#include <iomanip>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/Database.h>
@@ -502,32 +503,32 @@ void XTCalibration::readXTFromText()
     }
     ++nRead;
 
-    int itheta = -99;
+    int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {
       if (fabs(theta - itheta_old[i]) < epsi) {
-        itheta = i;
+        ith = i;
         break;
       }
     }
-    if (itheta < 0) {
+    if (ith < 0) {
       gSystem->Exec("echo xt_theta error binning>> error");
       return;
     }
 
-    int ialpha = -99;
+    int ial = -99;
     for (unsigned short i = 0; i < nalpha_old; ++i) {
       if (fabs(alpha - ialpha_old[i]) < epsi) {
-        ialpha = i;
+        ial = i;
         break;
       }
     }
-    if (ialpha < 0) {
+    if (ial < 0) {
       gSystem->Exec("echo xt_alpha error binning>> error");
       return;
     }
 
     for (int i = 0; i < np; ++i) {
-      xtold[iCL][iLR][ialpha][itheta][i] = xtc[i];
+      xtold[iCL][iLR][ial][ith][i] = xtc[i];
     }
 
   }  //end of while loop

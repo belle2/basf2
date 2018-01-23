@@ -144,7 +144,7 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
 }
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
-                                                      unsigned char APV25, unsigned char channel, short samples[6], float time, float timeError)
+                                                      unsigned char APV25, unsigned char channel, short samples[6], float time, SVDModeByte mode)
 {
   // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
@@ -157,7 +157,7 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
   SVDShaperDigit::APVRawSamples rawSamples;
   copy(samples, samples + SVDShaperDigit::c_nAPVSamples, rawSamples.begin());
 
-  return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, timeError);
+  return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
 }
 
 

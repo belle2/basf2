@@ -9,20 +9,17 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/IsDetected.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
-#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /**
-     *  Type predicate to check if Ts is iterable by means of std::begin().
-     *  Result type is equivalent to std::true_type or does not compile,
-     *  because it attempts to find the iterator type of the range or fails to do so.
-     *  Therefore, the expression is currently limited to be used within enable_if type expressions.
-     */
+    /// Type predicate to check if Ts is iterable by means of std::begin().
     template<class Ts>
-    using IsIterable = std::integral_constant<bool, not std::is_void<GetIterator<Ts> >::value >;
-
+    constexpr bool isIterable()
+    {
+      return isDetected<GetIterator, Ts>();
+    }
   }
 }

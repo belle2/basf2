@@ -13,55 +13,80 @@
 
 #include <string>
 
-//#include <CLHEP/Matrix/Vector.h>
-//#include <CLHEP/Matrix/Matrix.h>
-//#include <TMath.h>
-
-//class HepVector ;
-//class HepMatrix ;
-//class TVector3;
-//class BField ;
-//class HepPoint ;
-
-//using namespace CLHEP;
+#include <framework/dataobjects/Helix.h>
+#include <framework/dataobjects/UncertainHelix.h>
+#include <analysis/modules/TreeFitter/EigenTypes.h>
 
 namespace TreeFitter {
   class HelixUtils {
   public:
-    enum VertexCoor {in_x = 0, in_y, in_z, in_px, in_py, in_pz} ;
-    enum HelixCoor  {ex_d0 = 0, ex_phi0, ex_omega, ex_z0, ex_tanDip, ex_flt} ;
+    enum VertexCoor {iX = 0, iY, iZ, iPx, iPy, iPz} ;
+    enum HelixCoor  {iD0 = 0, iPhi0, iOmega, iZ0, iTanLambda, iArcLength2D} ;
 
-    static void vertexFromHelix(const CLHEP::HepVector& helixpar,
-                                //const BField& fieldmap,
-                                double Bz,
-                                CLHEP::HepVector& vertexpar, int& charge) ;
+    /** get helix from a vertex */
+    static void helixFromVertex(const EigenTypes::ColVector& position,
+                                const EigenTypes::ColVector& momentum,
+                                int charge, double Bz,
+                                Belle2::Helix& helix,
+                                double& L,
+                                EigenTypes::MatrixXd& jacobian);
+    /** get helix from a vertex */
+    static void helixFromVertexNumerical(const EigenTypes::ColVector& position,
+                                         const EigenTypes::ColVector& momentum,
+                                         int charge, double Bz,
+                                         Belle2::Helix& helix,
+                                         double& flt,
+                                         EigenTypes::MatrixXd& jacobian);
+    static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+                                                       int charge, double Bz,
+                                                       Belle2::Helix& helix,
+                                                       Eigen::Matrix<double, 5, 6>& jacobian);
 
-    static void helixFromVertex(const CLHEP::HepVector& vertexpar, int charge,
-                                //const BField& fieldmap,
-                                double Bz,
-                                CLHEP::HepVector& helixpar, CLHEP::HepMatrix& jacobian) ;
+    static void helixFromVertex(Eigen::Matrix<double, 1, 6>& positionAndMomentum ,
+                                int charge, double Bz,
+                                Belle2::Helix& helix,
+                                double& L,
+                                Eigen::Matrix<double, 5, 6>& jacobian);
 
-    static void helixFromVertexNumerical(const CLHEP::HepVector& vertexpar, int charge,
-                                         //const BField& fieldmap,
-                                         double Bz,
-                                         CLHEP::HepVector& helixpar, CLHEP::HepMatrix& jacobian) ;
+
+
+
+    static void vertexFromHelix(const Belle2::Helix& helix,
+                                double L, double Bz,
+                                TVector3& position,
+                                TVector3& momentum, int& charge);
+
+    static void helixFromVertex(const TVector3& position,
+                                const TVector3& momentum,
+                                int charge, double Bz,
+                                Belle2::Helix& helix,
+                                double& L,
+                                CLHEP::HepMatrix& jacobian);
+
+    static void helixFromVertexNumerical(const TVector3& position,
+                                         const TVector3& momentum,
+                                         int charge, double Bz,
+                                         Belle2::Helix& helix,
+                                         double& flt,
+                                         CLHEP::HepMatrix& jacobian) ;
 
     static std::string helixParName(int i) ;
     static std::string vertexParName(int i) ;
     static void printHelixPar(const CLHEP::HepVector& helixpar) ;
-    static void printVertexPar(const CLHEP::HepVector& vertexpar, int charge) ;
+    static void printVertexPar(const TVector3& position, const TVector3& momentum, int charge) ;
 
-    static double helixPoca(const CLHEP::HepVector& helixpar1,
-                            const CLHEP::HepVector& helixpar2,
+    static double helixPoca(const Belle2::Helix& helix1,
+                            const Belle2::Helix& helix2,
                             double& flt1, double& flt2,
-                            TVector3& v, bool parallel = false) ;
-    static double helixPoca(const CLHEP::HepVector& helixpar, const TVector3& point,
+                            TVector3& vertex, bool parallel = false) ;
+
+    static double helixPoca(const Belle2::Helix& helix, const TVector3& point,
                             double& flt) ;
+
     static double phidomain(const double phi) ;
 
+    static void helixTest();
 
-    //FT: Added for testing:
-    //    void HelixTest();
   } ;
 
 }

@@ -156,7 +156,7 @@ void EvtYmSToYnSpipiCLEOboost::decay(EvtParticle* p)
     // Now create a two-body decay from the Y(mS) in its rest frame
     // of Y(mS) -> Y(nS) + X
 
-    double masses[2];
+    double masses[30];
     masses[0] = M_nS;
     masses[1] = mX;
 

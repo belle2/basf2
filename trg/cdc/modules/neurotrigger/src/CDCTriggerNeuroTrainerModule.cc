@@ -10,9 +10,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
@@ -135,6 +135,11 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            "1 value or same as SLpattern.", m_parameters.SLpatternMask);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
+  addParam("T0fromHits", m_parameters.T0fromHits,
+           "If true, the event time is determined from all relevant hits "
+           "in a sector, if there is no valid event time from the event time finder. "
+           "If false, no drift times are used if there is no valid event time.",
+           m_parameters.T0fromHits);
   addParam("selectSectorByMC", m_selectSectorByMC,
            "If true, track parameters for sector selection are taken "
            "from MCParticle instead of CDCTriggerTrack.", false);
@@ -197,13 +202,13 @@ void
 CDCTriggerNeuroTrainerModule::initialize()
 {
   // register store objects
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
-  StoreObjPtr<EventT0>::required(m_EventTimeName);
+  m_tracks.isRequired(m_inputCollectionName);
   if (m_trainOnRecoTracks) {
-    StoreArray<RecoTrack>::required(m_targetCollectionName);
+    StoreArray<RecoTrack> targets(m_targetCollectionName);
+    targets.isRequired(m_targetCollectionName);
   } else {
-    StoreArray<MCParticle>::required(m_targetCollectionName);
+    StoreArray<MCParticle> targets(m_targetCollectionName);
+    targets.isRequired(m_targetCollectionName);
   }
   // load or initialize neurotrigger
   if (!m_load ||
@@ -221,7 +226,7 @@ CDCTriggerNeuroTrainerModule::initialize()
       }
     }
   }
-  m_NeuroTrigger.setCollectionNames(m_hitCollectionName, m_EventTimeName);
+  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName);
   // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<
@@ -284,8 +289,7 @@ CDCTriggerNeuroTrainerModule::initialize()
 void
 CDCTriggerNeuroTrainerModule::event()
 {
-  StoreArray<CDCTriggerTrack> tracks(m_inputCollectionName);
-  for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
+  for (int itrack = 0; itrack < m_tracks.getEntries(); ++itrack) {
     // get related MCParticle/RecoTrack for target
     // and retrieve track parameters
     float phi0Target = 0;
@@ -294,7 +298,7 @@ CDCTriggerNeuroTrainerModule::event()
     float zTarget = 0;
     if (m_trainOnRecoTracks) {
       RecoTrack* recoTrack =
-        tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
+        m_tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
       if (!recoTrack) {
         B2DEBUG(150, "Skipping CDCTriggerTrack without relation to RecoTrack.");
         continue;
@@ -306,20 +310,26 @@ CDCTriggerNeuroTrainerModule::event()
       for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
         if (!recoTrack->wasFitSuccessful(reps[irep]))
           continue;
-        // get state (position, momentum etc.) from first hit
-        genfit::MeasuredStateOnPlane state =
-          recoTrack->getMeasuredStateOnPlaneFromFirstHit(reps[irep]);
+        // get state (position, momentum etc.) from hit closest to IP and
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
+          genfit::MeasuredStateOnPlane state =
+            recoTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), reps[irep]);
           reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
+          // flip tracks if necessary, such that trigger tracks and reco tracks
+          // point in the same direction
+          if (state.getMom().Dot(m_tracks[itrack]->getDirection()) < 0) {
+            state.setPosMom(state.getPos(), -state.getMom());
+            state.setChargeSign(-state.getCharge());
+          }
+          // get track parameters
+          phi0Target = state.getMom().Phi();
+          invptTarget = state.getCharge() / state.getMom().Pt();
+          thetaTarget = state.getMom().Theta();
+          zTarget = state.getPos().Z();
         } catch (...) {
           continue;
         }
-        // get track parameters
-        phi0Target = state.getMom().Phi();
-        invptTarget = reps[irep]->getCharge(state) / state.getMom().Pt();
-        thetaTarget = state.getMom().Theta();
-        zTarget = state.getPos().Z();
         // break loop
         foundValidRep = true;
       }
@@ -329,7 +339,7 @@ CDCTriggerNeuroTrainerModule::event()
       }
     } else {
       MCParticle* mcTrack =
-        tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
+        m_tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
       if (!mcTrack) {
         B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
         continue;
@@ -341,12 +351,12 @@ CDCTriggerNeuroTrainerModule::event()
     }
 
     // update 2D track variables
-    m_NeuroTrigger.updateTrack(*tracks[itrack]);
+    m_NeuroTrigger.updateTrack(*m_tracks[itrack]);
 
     // find all matching sectors
-    float phi0 = tracks[itrack]->getPhi0();
-    float invpt = tracks[itrack]->getKappa(1.5);
-    float theta = atan2(1., tracks[itrack]->getCotTheta());
+    float phi0 = m_tracks[itrack]->getPhi0();
+    float invpt = m_tracks[itrack]->getKappa(1.5);
+    float theta = atan2(1., m_tracks[itrack]->getCotTheta());
     if (m_selectSectorByMC) {
       phi0 = phi0Target;
       invpt = invptTarget;
@@ -380,7 +390,7 @@ CDCTriggerNeuroTrainerModule::event()
         // using only related hits suppresses background EXCEPT for curling tracks
         if (m_trainOnRecoTracks) {
           RecoTrack* recoTrack =
-            tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
+            m_tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
           for (const CDCTriggerSegmentHit& hit :
                recoTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
             // get relative id
@@ -389,7 +399,7 @@ CDCTriggerNeuroTrainerModule::event()
           }
         } else {
           MCParticle* mcTrack =
-            tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
+            m_tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
           for (const CDCTriggerSegmentHit& hit :
                mcTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
             // get relative id
@@ -408,8 +418,10 @@ CDCTriggerNeuroTrainerModule::event()
         if (m_trainSets[isector].nSamples() > (nTrainMax + m_nValid + m_nTest)) {
           continue;
         }
+        // read out or determine event time
+        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack]);
         // check hit pattern
-        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *tracks[itrack]);
+        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack]);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
@@ -417,15 +429,15 @@ CDCTriggerNeuroTrainerModule::event()
           continue;
         }
         // get training data
-        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks[itrack]);
+        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
         if (m_saveDebug) {
           phiHistsMC[isector]->Fill(phi0Target);
           ptHistsMC[isector]->Fill(invptTarget);
           thetaHistsMC[isector]->Fill(thetaTarget);
           zHistsMC[isector]->Fill(zTarget);
-          phiHists2D[isector]->Fill(tracks[itrack]->getPhi0());
-          ptHists2D[isector]->Fill(tracks[itrack]->getKappa(1.5));
+          phiHists2D[isector]->Fill(m_tracks[itrack]->getPhi0());
+          ptHists2D[isector]->Fill(m_tracks[itrack]->getKappa(1.5));
         }
         if (m_trainSets[isector].nSamples() % 1000 == 0) {
           B2DEBUG(50, m_trainSets[isector].nSamples() << " samples collected for sector " << isector);
@@ -454,8 +466,13 @@ CDCTriggerNeuroTrainerModule::event()
 void
 CDCTriggerNeuroTrainerModule::terminate()
 {
+  // save the training data
+  saveTraindata(m_trainFilename, m_trainArrayname);
   // do training for all sectors with sufficient training samples
   for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
+    // skip sectors that have already been trained
+    if (m_NeuroTrigger[isector].isTrained())
+      continue;
     float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_NeuroTrigger[isector].nWeights() : m_nTrainMin;
     if (m_trainSets[isector].nSamples() < (nTrainMin + m_nValid + m_nTest)) {
       B2WARNING("Not enough training samples for sector " << isector << " (" << (nTrainMin + m_nValid + m_nTest)
@@ -463,6 +480,7 @@ CDCTriggerNeuroTrainerModule::terminate()
       continue;
     }
     train(isector);
+    m_NeuroTrigger[isector].trained = true;
     // set sector ranges
     vector<unsigned> indices = m_NeuroTrigger.getRangeIndices(m_parameters, isector);
     vector<float> phiRange = m_parameters.phiRange[indices[0]];
@@ -476,10 +494,9 @@ CDCTriggerNeuroTrainerModule::terminate()
     m_NeuroTrigger[isector].phiRange = phiRange;
     m_NeuroTrigger[isector].invptRange = invptRange;
     m_NeuroTrigger[isector].thetaRange = thetaRange;
+    // save all networks (including the newly trained)
+    m_NeuroTrigger.save(m_filename, m_arrayname);
   }
-  // save everything to file
-  m_NeuroTrigger.save(m_filename, m_arrayname);
-  saveTraindata(m_trainFilename, m_trainArrayname);
 }
 
 void

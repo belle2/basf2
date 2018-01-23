@@ -42,7 +42,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         del parameters['nTrees']
     if isinstance(parameters, collections.Mapping):
         param.update(parameters)
-    return State(100, param)
+    return State(nTrees, param)
 
 
 def feature_importance(state):

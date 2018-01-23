@@ -18,7 +18,7 @@
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationsObject.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <vxd/geometry/GeoCache.h>
 
@@ -76,8 +76,10 @@ EffPlotsModule::~EffPlotsModule()
 void EffPlotsModule::initialize()
 {
 
-  StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<V0ValidationVertex>::required(m_V0sName);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired(m_MCParticlesName);
+  StoreArray<V0ValidationVertex> v0ValidationVertices;
+  v0ValidationVertices.isRequired(m_V0sName);
 
   StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
   trackFitResults.isRequired();
@@ -85,7 +87,8 @@ void EffPlotsModule::initialize()
   StoreArray<Track> tracks(m_TrackColName);
   tracks.isRequired();
 
-  StoreArray<RecoTrack>::required(m_MCRecoTracksName);
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_MCRecoTracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -529,8 +532,7 @@ void EffPlotsModule::event()
 
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
 
-  BFieldMap& bfieldMap = BFieldMap::Instance();
-  TVector3 magField = bfieldMap.getBField(TVector3(0, 0, 0));
+  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(99, "+++++ 1. loop on MCParticles");
   BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {

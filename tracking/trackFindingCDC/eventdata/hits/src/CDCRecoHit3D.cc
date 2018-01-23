@@ -7,14 +7,32 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
+
+#include <framework/logging/Logger.h>
+
+#include <cmath>
+#include <climits>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -177,4 +195,24 @@ void CDCRecoHit3D::setRecoDriftLength(double driftLength, bool snapRecoPos)
     bool switchSide = sign(oldDriftLength) != sign(driftLength);
     snapToDriftCircle(switchSide);
   }
+}
+
+CDCRecoHit2D CDCRecoHit3D::getRecoHit2D() const
+{
+  return CDCRecoHit2D(m_rlWireHit, getRecoDisp2D());
+}
+
+CDCRecoHit2D CDCRecoHit3D::stereoProjectToRef() const
+{
+  return getRecoHit2D();
+}
+
+Vector2D CDCRecoHit3D::getRecoWirePos2D() const
+{
+  return getWire().getWirePos2DAtZ(getRecoZ());
+}
+
+bool CDCRecoHit3D::isInCellZBounds(const double factor) const
+{
+  return getWire().isInCellZBounds(getRecoPos3D(), factor);
 }

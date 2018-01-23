@@ -11,16 +11,8 @@
 #include <reconstruction/modules/CDCDedxPID/CDCDedxPIDModule.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -31,8 +23,6 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
 #include <genfit/MaterialEffects.h>
@@ -41,6 +31,7 @@
 #include <TFile.h>
 #include <TH2F.h>
 #include <TMath.h>
+#include <TRandom.h>
 
 #include <memory>
 #include <cassert>
@@ -62,20 +53,25 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC.");
 
   //Parameter definitions
-  addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.", false);
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
-
-  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
+  addParam("trackLevel", m_trackLevel,
+           "Use track-level MC. If false, use hit-level MC", false);
+  addParam("usePrediction", m_usePrediction,
+           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", false);
+  addParam("removeLowest", m_removeLowest,
+           "portion of events with low dE/dx that should be discarded", double(0.05));
+  addParam("removeHighest", m_removeHighest,
+           "portion of events with high dE/dx that should be discarded", double(0.25));
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
-  addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
-  m_eventID = -1;
-  m_trackID = 0;
+  addParam("useIndividualHits", m_useIndividualHits,
+           "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
+           true);
+
+  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
+           "Only save data for primary particles (as determined by MC truth)", false);
+  addParam("ignoreMissingParticles", m_ignoreMissingParticles,
+           "Ignore particles for which no PDFs are found", false);
 }
 
 CDCDedxPIDModule::~CDCDedxPIDModule() { }
@@ -83,121 +79,77 @@ CDCDedxPIDModule::~CDCDedxPIDModule() { }
 void CDCDedxPIDModule::initialize()
 {
 
-  // check for a pdf file - necessary for likelihood calculations
-  if (!m_pdfFile.empty()) {
-
-    std::string fullPath = FileSystem::findFile(m_pdfFile);
-    if (fullPath.empty()) {
-      B2ERROR("PDF file " << m_pdfFile << " not found!");
-    }
-    m_pdfFile = fullPath;
-  }
-  if (!m_enableDebugOutput and m_pdfFile.empty()) {
-    B2ERROR("No PDFFile given and debug output disabled. This module will produce no output!");
-  }
-
   // required inputs
-  StoreArray<Track> tracks;
-  StoreArray<RecoTrack> recoTracks;
-  StoreArray<TrackFitResult> trackfitResults;
+  m_tracks.isRequired();
+  m_recoTracks.isRequired();
 
-  tracks.isRequired();
-  recoTracks.isRequired();
-  trackfitResults.isRequired();
+  // optional inputs
+  m_mcparticles.isOptional();
+  m_tracks.optionalRelationTo(m_mcparticles);
 
-  //optional inputs
-  StoreArray<MCParticle> mcparticles;
-  mcparticles.isOptional();
-  tracks.optionalRelationTo(mcparticles);
-  StoreArray<CDCHit>::required();
+  // register optional outputs
+  if (m_enableDebugOutput) {
+    m_dedxTracks.registerInDataStore();
+    m_tracks.registerRelationTo(m_dedxTracks);
+  }
 
   // register outputs
-  if (m_enableDebugOutput) {
-    StoreArray<CDCDedxTrack> dedxTracks;
-    dedxTracks.registerInDataStore();
-    tracks.registerRelationTo(dedxTracks);
-  }
+  m_dedxLikelihoods.registerInDataStore();
+  m_tracks.registerRelationTo(m_dedxLikelihoods);
 
-  if (!m_pdfFile.empty()) {
-    StoreArray<CDCDedxLikelihood> dedxLikelihoods;
-    dedxLikelihoods.registerInDataStore();
-    tracks.registerRelationTo(dedxLikelihoods);
+  //load dedx:momentum PDFs
+  int nBinsX, nBinsY;
+  double xMin, xMax, yMin, yMax;
+  nBinsX = nBinsY = -1;
+  xMin = xMax = yMin = yMax = 0.0;
+  for (unsigned int iPart = 0; iPart < 6; iPart++) {
+    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
+    m_pdfs[iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getCDCTruncatedPDF(iPart) : m_DBDedxPDFs->getCDCPDF(iPart);
 
-    //load pdfs
-    TFile* pdfFile = new TFile(m_pdfFile.c_str(), "READ");
-    if (!pdfFile->IsOpen())
-      B2FATAL("Couldn't open pdf file: " << m_pdfFile);
-
-    //load dedx:momentum PDFs
-    const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
-    int nBinsX, nBinsY;
-    double xMin, xMax, yMin, yMax;
-    nBinsX = nBinsY = -1;
-    xMin = xMax = yMin = yMax = 0.0;
-    for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-      const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-      m_pdfs[2][iPart] =
-        dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_d%i_%i%s", 2, pdgCode, suffix)));
-      //dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_%i%s", pdgCode, suffix)));
-
-      if (!m_pdfs[2][iPart]) {
-        if (m_ignoreMissingParticles)
-          continue;
-        B2FATAL("Couldn't find PDF for PDG " << pdgCode << suffix);
-      }
-
-      //check that PDFs have the same dimensions and same binning
-      const double epsFactor = 1e-5;
-      if (nBinsX == -1 and nBinsY == -1) {
-        nBinsX = m_pdfs[2][iPart]->GetNbinsX();
-        nBinsY = m_pdfs[2][iPart]->GetNbinsY();
-        xMin = m_pdfs[2][iPart]->GetXaxis()->GetXmin();
-        xMax = m_pdfs[2][iPart]->GetXaxis()->GetXmax();
-        yMin = m_pdfs[2][iPart]->GetYaxis()->GetXmin();
-        yMax = m_pdfs[2][iPart]->GetYaxis()->GetXmax();
-      } else if (nBinsX != m_pdfs[2][iPart]->GetNbinsX()
-                 or nBinsY != m_pdfs[2][iPart]->GetNbinsY()
-                 or fabs(xMin - m_pdfs[2][iPart]->GetXaxis()->GetXmin()) > epsFactor * xMax
-                 or fabs(xMax - m_pdfs[2][iPart]->GetXaxis()->GetXmax()) > epsFactor * xMax
-                 or fabs(yMin - m_pdfs[2][iPart]->GetYaxis()->GetXmin()) > epsFactor * yMax
-                 or fabs(yMax - m_pdfs[2][iPart]->GetYaxis()->GetXmax()) > epsFactor * yMax) {
-        B2FATAL("PDF for PDG " << pdgCode << suffix << " has binning/dimensions differing from previous PDF.");
-      }
+    if (m_pdfs[iPart].GetEntries() == 0) {
+      if (m_ignoreMissingParticles)
+        continue;
+      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
     }
 
-    //leaking pdfFile so I can access the histograms
+    //check that PDFs have the same dimensions and same binning
+    const double epsFactor = 1e-5;
+    if (nBinsX == -1 and nBinsY == -1) {
+      nBinsX = m_pdfs[iPart].GetNbinsX();
+      nBinsY = m_pdfs[iPart].GetNbinsY();
+      xMin = m_pdfs[iPart].GetXaxis()->GetXmin();
+      xMax = m_pdfs[iPart].GetXaxis()->GetXmax();
+      yMin = m_pdfs[iPart].GetYaxis()->GetXmin();
+      yMax = m_pdfs[iPart].GetYaxis()->GetXmax();
+    } else if (nBinsX != m_pdfs[iPart].GetNbinsX()
+               or nBinsY != m_pdfs[iPart].GetNbinsY()
+               or fabs(xMin - m_pdfs[iPart].GetXaxis()->GetXmin()) > epsFactor * xMax
+               or fabs(xMax - m_pdfs[iPart].GetXaxis()->GetXmax()) > epsFactor * xMax
+               or fabs(yMin - m_pdfs[iPart].GetYaxis()->GetXmin()) > epsFactor * yMax
+               or fabs(yMax - m_pdfs[iPart].GetYaxis()->GetXmax()) > epsFactor * yMax) {
+      B2FATAL("PDF for PDG " << pdgCode << " has binning/dimensions differing from previous PDF.");
+    }
   }
 
-  // load constants
-  // setting these manually for now, but they should be read in from the DB
-  m_curvepars[0] = 0.00392444;
-  m_curvepars[1] = 26.8709;
-  m_curvepars[2] = 3.78296;
-  m_curvepars[3] = -0.534117;
-  m_curvepars[4] = 6.63276;
-  m_curvepars[5] = 0.494768;
-  m_curvepars[6] = -1.9872;
-  m_curvepars[7] = -0.000117405;
-  m_curvepars[8] = 0.00283862;
-  m_curvepars[9] = -0.0131518;
-  m_curvepars[10] = 0.706402;
-  m_curvepars[11] = 0.0803046;
-  m_curvepars[12] = 1.08118;
-  m_curvepars[13] = 0.543991;
-  m_curvepars[14] = 0.0031143;
+  // lookup table for number of wires per layer (indexed on superlayer)
+  m_nLayerWires[0] = 1280;
+  for (int i = 1; i < 9; ++i) {
+    m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
+  }
 
-  m_sigmapars[0] = 0.0115507;
-  m_sigmapars[1] = 0.0773491;
-  m_sigmapars[2] = 3.9199e-05;
-  m_sigmapars[3] = -0.00345398;
-  m_sigmapars[4] = 0.111907;
-  m_sigmapars[5] = -1.59311;
-  m_sigmapars[6] = 9.16672;
-  m_sigmapars[7] = 43.9322;
-  m_sigmapars[8] = -124.213;
-  m_sigmapars[9] = 127.56;
-  m_sigmapars[10] = -56.7759;
-  m_sigmapars[11] = 10.3113;
+  // make sure the curve and resolution parameters are reasonable
+  if (m_DBCurvePars->getSize() == 0)
+    B2ERROR("No dE/dx curve parameters!");
+  else m_curvepars = m_DBCurvePars->getCurvePars();
+
+  if (m_DBSigmaPars->getSize() == 0)
+    B2ERROR("No dE/dx sigma parameters!");
+  else m_sigmapars = m_DBSigmaPars->getSigmaPars();
+
+  // get the hadron correction parameters
+  if (m_DBHadronCor->getSize() == 0)
+    B2ERROR("No hadron correction parameters!");
+  else m_hadronpars = m_DBHadronCor->getHadronPars();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -213,17 +165,10 @@ void CDCDedxPIDModule::event()
   // get fitresult and RecoTrack and do extrapolations, save corresponding dE/dx and likelihood values
   //   get hit indices through RecoTrack::getHitPointsWithMeasurement(...)
   //   create one CDCDedxTrack per fitresult/recoTrack
-  //create one DedkLikelihood per Track (plus rel)
-  m_eventID++;
+  // create one DedkLikelihood per Track (plus rel)
 
   // inputs
-  StoreArray<Track> tracks;
-  StoreArray<MCParticle> mcparticles;
-  const int numMCParticles = mcparticles.getEntries();
-
-  // outputs
-  StoreArray<CDCDedxTrack> dedxArray;
-  StoreArray<CDCDedxLikelihood> likelihoodArray;
+  const int numMCParticles = m_mcparticles.getEntries();
 
   // get the geometry of the cdc
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -234,18 +179,17 @@ void CDCDedxPIDModule::event()
   //
   // **************************************************
 
-  for (const auto& track : tracks) {
-    m_trackID++;
+  m_dedxTracks.clear();
+  m_dedxLikelihoods.clear();
 
+  int mtrack = 0;
+  for (const auto& track : m_tracks) {
     std::shared_ptr<CDCDedxTrack> dedxTrack = std::make_shared<CDCDedxTrack>();
-    dedxTrack->m_eventID = m_eventID;
-    dedxTrack->m_trackID = m_trackID;
+    dedxTrack->m_track = mtrack++;
 
-    // get pion fit hypothesis for now
-    //  Should be ok in most cases, for MC fitting this will return the fit with the
-    //  true PDG value. At some point, it might be worthwhile to look into using a
-    //  different fit if the differences are large
-    const TrackFitResult* fitResult = track.getTrackFitResult(Const::pion);
+    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // the tracking will not always successfully fit with a pion hypothesis
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for track ...");
       continue;
@@ -262,25 +206,30 @@ void CDCDedxPIDModule::event()
 
         //add some MC truths to CDCDedxTrack object
         dedxTrack->m_pdg = mcpart->getPDG();
+        dedxTrack->m_mcmass = mcpart->getMass();
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
 
         const TVector3 trueMomentum = mcpart->getMomentum();
         dedxTrack->m_p_true = trueMomentum.Mag();
       }
+    } else {
+      dedxTrack->m_pdg = -999;
     }
 
     // get momentum (at origin) from fit result
     const TVector3& trackMom = fitResult->getMomentum();
     dedxTrack->m_p = trackMom.Mag();
     bool nomom = (dedxTrack->m_p != dedxTrack->m_p);
-    if (nomom) {
-      dedxTrack->m_cosTheta = std::cos(std::atan(1 / fitResult->getCotTheta()));
-      dedxTrack->m_charge = 1.0;
-    } else {
-      dedxTrack->m_cosTheta = trackMom.CosTheta();
-      dedxTrack->m_charge = fitResult->getChargeSign();
+    double costh = std::cos(std::atan(1 / fitResult->getCotTheta()));
+    int charge = 1;
+    if (!nomom) {
+      costh = trackMom.CosTheta();
+      charge = fitResult->getChargeSign();
     }
+    dedxTrack->m_cosTheta = costh;
+    dedxTrack->m_charge = charge;
+
     // dE/dx values will be calculated using associated RecoTrack
     const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
     if (!recoTrack) {
@@ -294,9 +243,22 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
+    // scale factor to make electron dE/dx ~ 1
+    dedxTrack->m_scale = m_DBScaleFactor->getScaleFactor();
+
+    // store run gains
+    dedxTrack->m_rungain = m_DBRunGain->getRunGain();
+
+    // get the cosine correction
+    dedxTrack->m_coscor = m_DBCosineCor->getMean(costh);
+
+    // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
     double layerdx = 0.0; // total path length in current layer
     double cdcMom = 0.0; // momentum valid in the CDC
+    int nhitscombined = 0; // number of hits combined per layer
+    int wirelongesthit = 0; // wire number of longest hit
+    double longesthit = 0; // path length of longest hit
 
     // loop over all CDC hits from this track
     // Get the TrackPoints, which contain the hit information we need.
@@ -322,20 +284,26 @@ void CDCDedxPIDModule::event()
         continue;
       }
 
-      // get the global wire ID (between 0 and 14336) and the layer info
+      // get the wire ID (not between 0 and 14336) and the layer info
       WireID wireID = cdcRecoHit->getWireID();
-      const int wire = wireID.getEWire();
-      int layer = cdcHit->getILayer();
+      const int wire = wireID.getIWire(); // use getEWire() for encoded wire number
+      int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
+
+      // continuous layer number
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
+
+      // dense packed wire number (between 0 and 14336)
+      const int iwire = (superlayer == 0) ? 160 * layer + wire : m_nLayerWires[superlayer - 1] + (160 + 32 *
+                        (superlayer - 1)) * layer + wire;
 
       // if multiple hits in a layer, we may combine the hits
       const bool lastHit = (tp + 1 == gftrackPoints.end());
       bool lastHitInCurrentLayer = lastHit;
       if (!lastHit) {
         // peek at next hit
-        genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
-        const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
+        genfit::AbsMeasurement* aAbsMeasurementPtrNext = (*(tp + 1))->getRawMeasurement(0);
+        const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtrNext);
         // if next hit fails, assume this is the last hit in the layer
         if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo())) {
           lastHitInCurrentLayer = true;
@@ -394,14 +362,14 @@ void CDCDedxPIDModule::event()
         //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
 
         // uses the plane determined by the track fit.
-        B2Vector3D pocaOnWire = mop.getPlane()->getO();
+        B2Vector3D pocaOnWire = mop.getPlane()->getO(); // DOUBLE CHECK THIS --\/
 
         // The vector from the wire to the track.
         B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
 
         // the sign of the doca is defined here to be positive in the +x dir
         double doca = B2WireDoca.Perp();
-        if (B2WireDoca.X() < 0) doca = -1.0 * doca;
+        if (B2WireDoca.X() < 0) doca = -1.0 * doca; // FIX ME! x changes versus phi!!! We want to know which side of the wire we are on...
 
         // The opening angle of the track momentum direction
         const double px = pocaMom.x();
@@ -413,9 +381,12 @@ void CDCDedxPIDModule::event()
         double entAng = atan2(cross, dot);
 
         LinearGlobalADCCountTranslator translator;
-        double adcCount = cdcHit->getADCCount(); // pedestal subtracted?
+        int adcCount = cdcHit->getADCCount(); // pedestal subtracted?
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();
+
+        // we want electrons to be one, so artificially scale the adcCount
+        double dadcCount = 1.0 * adcCount / dedxTrack->m_scale;
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -426,81 +397,135 @@ void CDCDedxPIDModule::event()
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
 
-          layerdE += adcCount;
+          // get the wire gain constant
+          double wiregain = m_DBWireGains->getWireGain(iwire);
+
+          // get the 2D correction
+          double twodcor = m_DB2DCor->getMean(currentLayer, doca, entAng);
+
+          // get the 1D cleanup correction
+          double onedcor = m_DB1DCleanup->getMean(currentLayer, entAng);
+
+          // apply the calibration to dE to propagate to both hit and layer measurements
+          double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain * twodcor * onedcor;
+          if (correction == 0) dadcCount = 0;
+          else dadcCount = dadcCount / correction;
+
+          layerdE += dadcCount;
           layerdx += celldx;
 
+          if (celldx > longesthit && dadcCount != 0) {
+            longesthit = celldx;
+            wirelongesthit = iwire;
+          }
+
           // save individual hits
-          double cellDedx = (adcCount / celldx);
+          double cellDedx = (dadcCount / celldx);
           if (nomom) cellDedx *= sin(std::atan(1 / fitResult->getCotTheta()));
           else  cellDedx *= sin(trackMom.Theta());
 
           if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes);
+            dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                              driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
+          nhitscombined++;
         }
       } catch (genfit::Exception) {
-        B2WARNING("Event " << m_eventID << ", Track: " << m_trackID << ": genfit::MeasuredStateOnPlane exception...");
+        B2WARNING("Track: " << mtrack << ": genfit::MeasuredStateOnPlane exception...");
         continue;
       }
 
       // check if there are any more hits in this layer
       if (lastHitInCurrentLayer) {
-        double totalDistance;
-        if (nomom) totalDistance = layerdx / sin(std::atan(1 / fitResult->getCotTheta()));
-        else  totalDistance = layerdx / sin(trackMom.Theta());
-        double layerDedx = layerdE / totalDistance;
+        if (layerdx > 0) {
+          double totalDistance;
+          if (nomom) totalDistance = layerdx / sin(std::atan(1 / fitResult->getCotTheta()));
+          else  totalDistance = layerdx / sin(trackMom.Theta());
+          double layerDedx = layerdE / totalDistance;
 
-        // save the information for this layer
-        if (layerDedx > 0) {
-          dedxTrack->addDedx(currentLayer, totalDistance, layerDedx);
-          // save the PID information if using individual hits
-          if (!m_pdfFile.empty() and m_useIndividualHits) {
-            // use the momentum valid in the cdc
-            saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[2]);
+          // save the information for this layer
+          if (layerDedx > 0) {
+            dedxTrack->addDedx(nhitscombined, wirelongesthit, currentLayer, totalDistance, layerDedx);
+            // save the PID information if using individual hits
+            if (m_useIndividualHits) {
+              // use the momentum valid in the cdc
+              saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx);
+            }
           }
         }
 
         layerdE = 0;
         layerdx = 0;
+        nhitscombined = 0;
+        wirelongesthit = 0;
+        longesthit = 0;
       }
     } // end of loop over CDC hits for this track
 
-    if (dedxTrack->dedx.empty()) {
+    if (dedxTrack->l_dedx.empty()) {
       B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
+    } else {
+      // determine the number of hits for this track (used below)
+      const int numDedx = dedxTrack->l_dedx.size();
+      dedxTrack->l_nHits = numDedx;
+      // add a factor of 0.5 here to make sure we are rounding appropriately...
+      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
+      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+      dedxTrack->l_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
     }
 
-    // calculate likelihoods for truncated mean
+    // Get the truncated mean
+    //
+    // If using track-level MC, get the predicted mean and resolution and throw a random
+    // number to get the simulated dE/dx truncated mean. Otherwise, calculate the truncated
+    // mean from the simulated hits (hit-level MC).
     if (!m_useIndividualHits or m_enableDebugOutput) {
       calculateMeans(&(dedxTrack->m_dedx_avg),
                      &(dedxTrack->m_dedx_avg_truncated),
                      &(dedxTrack->m_dedx_avg_truncated_err),
-                     dedxTrack->dedx);
-      const int numDedx = dedxTrack->dedx.size();
-      dedxTrack->m_nLayerHits = numDedx;
-      // add a factor of 0.5 here to make sure we are rounding appropriately...
-      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
-      dedxTrack->m_nLayerHitsUsed = highEdgeTrunc - lowEdgeTrunc;
-      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_nLayerHitsUsed);
+                     dedxTrack->l_dedx);
     }
 
-    // save the PID information if not using individual hits
-    if (!m_useIndividualHits) {
-      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
+    if (dedxTrack->m_pdg != -999 && dedxTrack->m_mcmass > 0 && dedxTrack->m_p_true != 0) {
+      // determine the predicted mean and resolution
+      double mean = getMean(dedxTrack->m_p_true / dedxTrack->m_mcmass);
+      double sigma = getSigma(mean, dedxTrack->l_nHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
+      dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+      while (dedxTrack->m_dedx < 0)
+        dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+    } else {
+      B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
+      dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
     }
+
+    if (m_trackLevel) {
+      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
+    } else
+      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
+
+    // save the PID information for both lookup tables and parameterized means and resolutions
+    if (!m_useIndividualHits)
+      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated);
+
+    // save CDCDedxLikelihood
+    // use parameterized method if called or if pdf file for lookup tables is empty
+    double* pidvalues;
+    if (m_usePrediction) {
+      pidvalues = dedxTrack->m_cdcChi;
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
+        pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
+      }
+    } else pidvalues = dedxTrack->m_cdcLogl;
+
+    CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
+    track.addRelationTo(likelihoodObj);
 
     if (m_enableDebugOutput) {
       // book the information for this track
-      CDCDedxTrack* newCDCDedxTrack = dedxArray.appendNew(*dedxTrack);
+      CDCDedxTrack* newCDCDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
       track.addRelationTo(newCDCDedxTrack);
-    }
-
-    // save CDCDedxLikelihood
-    if (!m_pdfFile.empty()) {
-      CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_cdcLogl);
-      track.addRelationTo(likelihoodObj);
     }
 
   } // end of loop over tracks
@@ -509,8 +534,7 @@ void CDCDedxPIDModule::event()
 void CDCDedxPIDModule::terminate()
 {
 
-  B2INFO("CDCDedxPIDModule exiting after processing " << m_trackID <<
-         " tracks in " << m_eventID + 1 << " events.");
+  B2DEBUG(50, "CDCDedxPIDModule exiting");
 }
 
 void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
@@ -527,9 +551,9 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
 
-  // add a factor of 0.5 here to make sure we are rounding appropriately...
-  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+  // add a factor of 0.51 here to make sure we are rounding appropriately...
+  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.51);
+  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.51);
   for (int i = 0; i < numDedx; i++) {
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
@@ -559,26 +583,27 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx,
-                                      TH2F* const* pdf) const
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx) const
 {
   //all pdfs have the same dimensions
-  const Int_t binX = pdf[0]->GetXaxis()->FindFixBin(p);
-  const Int_t binY = pdf[0]->GetYaxis()->FindFixBin(dedx);
-
+  const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
+  const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    if (!pdf[iPart]) //might be NULL if m_ignoreMissingParticles is set
+    TH2F pdf = m_pdfs[iPart];
+    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+      B2WARNING("NO CDC PDFS...");
       continue;
+    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf[iPart]->GetNbinsX()
-        or binY < 1 or binY > pdf[iPart]->GetNbinsY()) {
-      probability = pdf[iPart]->GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf.GetNbinsX()
+        or binY < 1 or binY > pdf.GetNbinsY()) {
+      probability = pdf.GetBinContent(binX, binY);
     } else {
       //in normal histogram range
-      probability = pdf[iPart]->Interpolate(p, dedx);
+      probability = pdf.Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -592,18 +617,61 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
   }
 }
 
-double CDCDedxPIDModule::bgCurve(double* x, double* par) const
+double CDCDedxPIDModule::D2I(const double cosTheta, const double D) const
+{
+  double absCosTheta   = fabs(cosTheta);
+  double projection    = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+  double chargeDensity = D / projection;
+  double numerator     = 1 + m_hadronpars[0] * chargeDensity;
+  double denominator   = 1 + m_hadronpars[1] * chargeDensity;
+
+  double I = D * m_hadronpars[4] * numerator / denominator;
+
+  return I;
+}
+
+double CDCDedxPIDModule::I2D(const double cosTheta, const double I) const
+{
+  double absCosTheta = fabs(cosTheta);
+  double projection  = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+
+  double a =  m_hadronpars[0] / projection;
+  double b =  1 - m_hadronpars[1] / projection * (I / m_hadronpars[4]);
+  double c = -1.0 * I / m_hadronpars[4];
+
+  if (b == 0 && a == 0) {
+    B2WARNING("both a and b coefficiants for hadron correction are 0");
+    return I;
+  }
+
+  double D = (a != 0) ? (-b + sqrt(b * b - 4.0 * a * c)) / (2.0 * a) : -c / b;
+  if (D < 0) {
+    B2WARNING("D is less 0! will try another solution");
+    D = (a != 0) ? (-b - sqrt(b * b + 4.0 * a * c)) / (2.0 * a) : -c / b;
+    if (D < 0) {
+      B2WARNING("D is still less 0! just return uncorrectecd value");
+      return I;
+    }
+  }
+
+  return D;
+}
+
+double CDCDedxPIDModule::bgCurve(double* x, double* par, int version) const
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
   // this is done with a different function depending on the value of bg
   double f = 0;
-  if (par[0] == 1)
-    f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
-        (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
-  else if (par[0] == 2)
-    f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
-  else if (par[0] == 3)
-    f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
+
+  if (version == 0) {
+    if (par[0] == 1)
+      f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
+          (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
+    else if (par[0] == 2)
+      f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
+    else if (par[0] == 3)
+      f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
+  }
 
   return f;
 }
@@ -632,25 +700,26 @@ double CDCDedxPIDModule::getMean(double bg) const
   }
 
   // calculate dE/dx from the Bethe-Bloch curve
-  double partA = bgCurve(x, parsA);
-  double partB = bgCurve(x, parsB);
-  double partC = bgCurve(x, parsC);
+  double partA = bgCurve(x, parsA, 0);
+  double partB = bgCurve(x, parsB, 0);
+  double partC = bgCurve(x, parsC, 0);
 
   return (A * partA + B * partB + C * partC);
 }
 
-double CDCDedxPIDModule::sigmaCurve(double* x, double* par) const
+double CDCDedxPIDModule::sigmaCurve(double* x, double* par, int version) const
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
   // this is done with a different function depending dE/dx, nhit, and sin(theta)
   double f = 0;
-  if (par[0] == 1) {
-    // return dedx parameterization
-    f = par[1] + par[2] * x[0];
-  } else if (par[0] == 2) {
-    // return nhit or sin(theta) parameterization
-    f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
-        par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
+
+  if (version == 0) {
+    if (par[0] == 1) { // return dedx parameterization
+      f = par[1] + par[2] * x[0];
+    } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
+      f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
+          par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
+    }
   }
 
   return f;
@@ -676,25 +745,20 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
 
   // determine sigma from the parameterization
   x[0] = dedx;
-  double corDedx = sigmaCurve(x, dedxpar);
+  double corDedx = sigmaCurve(x, dedxpar, 0);
   x[0] = nhit;
-  double corNHit = sigmaCurve(x, nhitpar);
-  if (nhit > 35) corNHit = 1.0;
+  double corNHit = sigmaCurve(x, nhitpar, 0);
+  if (nhit > 42) corNHit = 1.0;
   x[0] = sin;
-  double corSin = sigmaCurve(x, sinpar);
+  double corSin = sigmaCurve(x, sinpar, 0);
 
   return (corDedx * corSin * corNHit);
 }
-
 
 void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
                                     double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
                                     double sin, int nhit) const
 {
-  // account for the fact that electron truncated mean peaks near 60 units -> scale to 1
-  // this should be done via calibration
-  dedx = dedx / 59.267;
-
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
   for (const Const::ChargedStable& pdgIter : set) {

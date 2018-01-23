@@ -18,16 +18,26 @@ using namespace std;
 void NtupleMCKinematicsTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
-  int nDecayProducts = strNames.size();
-  m_fTruthP = new float[nDecayProducts];
-  m_fTruthP4 = new float*[nDecayProducts];
-  m_fTruthM = new float[nDecayProducts];
-  for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
+  m_nDecayProducts = strNames.size();
+  m_fTruthP = new float[m_nDecayProducts];
+  m_fTruthP4 = new float*[m_nDecayProducts];
+  m_fTruthM = new float[m_nDecayProducts];
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_TruthP").c_str(), &m_fTruthP[iProduct], (strNames[iProduct] + "_TruthP/F").c_str());
     m_fTruthP4[iProduct] = new float[4];
     m_tree->Branch((strNames[iProduct] + "_TruthP4").c_str(), &m_fTruthP4[iProduct][0], (strNames[iProduct] + "_TruthP4[4]/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthM").c_str(), &m_fTruthM[iProduct], (strNames[iProduct] + "_TruthM/F").c_str());
   }
+}
+
+void NtupleMCKinematicsTool::deallocateMemory()
+{
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
+    delete [] m_fTruthP4[iProduct];
+  }
+  delete [] m_fTruthP4;
+  delete [] m_fTruthP;
+  delete [] m_fTruthM;
 }
 
 void NtupleMCKinematicsTool::eval(const Particle* particle)

@@ -7,10 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
+
+#include <ostream>
 #include <cmath>
 
 using namespace Belle2;
@@ -347,8 +356,18 @@ Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;
 
-  using boost::math::sinc_pi;
-  double atX = arcLength * sinc_pi(chiHalf) * sin(chiHalf) + impact();
-  double atY = -arcLength * sinc_pi(chi);
+  double atX = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
+  double atY = -arcLength * sinc(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const GeneralizedCircle& circle)
+{
+  if (circle.isLine()) {
+    output << "Line support point = " << circle.perigee();
+    return output;
+  } else {
+    output << "CircleCenter = " << circle.center() << ", Radius = " << circle.absRadius();
+    return output;
+  }
 }

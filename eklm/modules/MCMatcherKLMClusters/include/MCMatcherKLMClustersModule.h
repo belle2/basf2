@@ -13,6 +13,8 @@
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
 
@@ -62,6 +64,9 @@ namespace Belle2 {
 
     /** Add relations for BKLMHit2d and EKLMHit2d. */
     bool m_Hit2dRelations;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_KLMClusters;
 
   };
 

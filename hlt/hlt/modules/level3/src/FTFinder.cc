@@ -946,12 +946,12 @@ FTFinder::VertexFit(int z_flag)
   double wzSum(0.);
   for (int i = 0; i != n; i++) {
     if (vtx_chi2[i] > 10.) continue;
-    double w(std::exp(-vtx_chi2[i]));
-    m_vx += vx[i] * w2[i] * w;
-    m_vy += vy[i] * w2[i] * w;
-    m_vz += vz[i] * wz2[i] * w;
-    wSum += w2[i] * w;
-    wzSum += wz2[i] * w;
+    double wInner(std::exp(-vtx_chi2[i]));
+    m_vx += vx[i] * w2[i] * wInner;
+    m_vy += vy[i] * w2[i] * wInner;
+    m_vz += vz[i] * wz2[i] * wInner;
+    wSum += w2[i] * wInner;
+    wzSum += wz2[i] * wInner;
   }
   int rtn_flag = 0;
   if (wSum <= 0.) {

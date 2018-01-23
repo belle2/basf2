@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/geometry/LineParameters.h>
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <cmath>
+#include <cstddef>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

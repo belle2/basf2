@@ -31,14 +31,14 @@ namespace Belle2 {
   public:
     /** construct a helix with given helix parameters, as defined for Track objects */
     HelixHelper(float z0, float d0, float omega, float cotTheta, float phi):
-      z0(z0), d0(d0), omega(omega), cotTheta(cotTheta), phi(phi),
-      poca(d0 * sin(phi), -d0 * cos(phi), z0)
+      m_z0(z0), m_d0(d0), m_omega(omega), m_cotTheta(cotTheta), m_phi(phi),
+      m_poca(d0 * sin(phi), -d0 * cos(phi), z0)
     { }
 
 
     /** construct a helix at an arbitrary position 'poca' (helices built at different points are not comparable) */
     HelixHelper(const TVector3& poca, const TVector3& momentum_in_poca, int charge):
-      poca(poca)
+      m_poca(poca)
     {
       const double pt = momentum_in_poca.Pt();
       const double R = pt / c_cTimesB; //c and magnetic field, should come from some common database later...
@@ -46,7 +46,7 @@ namespace Belle2 {
       const TVector3& dirInPoca = momentum_in_poca.Unit();
 
       //determine the angle phi, distribute it from -pi to pi
-      phi = atan2(dirInPoca.y() , dirInPoca.x());
+      m_phi = atan2(dirInPoca.y() , dirInPoca.x());
 
       //determine sign of d0
       //calculate the sign of the projection of pt(dirInPoca) at d0(poca)
@@ -54,10 +54,10 @@ namespace Belle2 {
                                         + poca.y() * dirInPoca.y());
 
       //Now set the helix parameters
-      d0 = d0Sign * poca.Perp();
-      omega = 1 / R * charge;
-      z0 = poca.z();
-      cotTheta = dirInPoca.z() / dirInPoca.Pt();
+      m_d0 = d0Sign * poca.Perp();
+      m_omega = 1 / R * charge;
+      m_z0 = poca.z();
+      m_cotTheta = dirInPoca.z() / dirInPoca.Pt();
     }
 
     /** returns the path length (along the helix) to the helix point closest to p.
@@ -107,11 +107,11 @@ namespace Belle2 {
      */
     TVector3 momentum(double s = 0) const
     {
-      const float pt = c_cTimesB / TMath::Abs(omega);
+      const float pt = c_cTimesB / TMath::Abs(m_omega);
       return TVector3(
-               pt * cos(phi - 2 * omega * s),
-               pt * sin(phi - 2 * omega * s),
-               pt * cotTheta
+               pt * cos(m_phi - 2 * m_omega * s),
+               pt * sin(m_phi - 2 * m_omega * s),
+               pt * m_cotTheta
              );
     }
 
@@ -119,28 +119,28 @@ namespace Belle2 {
     TVector3 position(double s) const
     {
       //aproximation (but it does work for straight tracks)
-      return poca + TVector3(
-               s * s * omega / 2 * sin(phi) + s * cos(phi),
-               -s * s * omega / 2 * cos(phi) + s * sin(phi),
-               s * cotTheta
+      return m_poca + TVector3(
+               s * s * m_omega / 2 * sin(m_phi) + s * cos(m_phi),
+               -s * s * m_omega / 2 * cos(m_phi) + s * sin(m_phi),
+               s * m_cotTheta
              );
     }
 
   private:
     // helix parameters, with same convention as those stored in Track objects
     /** minimal z distance of point of closest approach to origin */
-    float z0;
+    float m_z0;
     /** minimal r distance of point of closest approach to origin */
-    float d0;
+    float m_d0;
     /** signed curvature */
-    float omega;
+    float m_omega;
     /** cotangens of polar angle */
-    float cotTheta;
+    float m_cotTheta;
     /** Phi at the perigee [-pi, pi]. */
-    float phi;
+    float m_phi;
 
     /** point of closest approach to origin */
-    TVector3 poca;
+    TVector3 m_poca;
 
     /** minimization function, calculates distance to minimize_distance_to_point */
     static double distanceToPoint(double s)

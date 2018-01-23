@@ -282,7 +282,6 @@ namespace Belle2 {
     bool m_BeamBackHits = false; /**<  if true add also background hits */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
-    int m_BGInfoIndex = -1; /**< index of BackgroundInfo object in the store array */
 
     std::map<std::string, int> m_rejected; /**< messages: rejected events */
     std::map<std::string, int> m_reused;  /**< messages: rejused events */

@@ -335,12 +335,12 @@ void FilterCalculatorModule::initialize()
   for (int i = 0; i < numCuts - 1; ++i) {
     string secMapName = (boost::format("%1%$%2%to%3%MeV_%4%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(i) * 1000) % int(
                            m_PARAMpTcuts.at(i + 1) * 1000) % m_detectorName).str();
-    for (int i = 0; i < int(secMapName.length()); ++i) {
-      switch (secMapName.at(i)) {
+    for (int j = 0; j < int(secMapName.length()); ++j) {
+      switch (secMapName.at(j)) {
         case '$':
-          secMapName.at(i) = '-';
+          secMapName.at(j) = '-';
         case '.':
-          secMapName.at(i) = '-';
+          secMapName.at(j) = '-';
       }
     }
     m_PARAMsecMapNames.push_back(secMapName);

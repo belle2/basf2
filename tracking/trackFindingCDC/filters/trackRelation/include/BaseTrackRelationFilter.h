@@ -9,54 +9,31 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrack;
+
+    // Guard to prevent repeated instantiations
+    extern template class RelationFilter<const CDCTrack>;
+
     /// Base class for filtering the neighborhood of tracks
-    class BaseTrackRelationFilter : public Filter<Relation<const CDCTrack> > {
+    class BaseTrackRelationFilter : public RelationFilter<const CDCTrack> {
 
     public:
-      /// Returns the full range of tracks.
-      template<class ACDCTrackIterator>
-      boost::iterator_range<ACDCTrackIterator>
-      getPossibleNeighbors(const CDCTrack& track  __attribute__((unused)),
-                           const ACDCTrackIterator& itBegin,
-                           const ACDCTrackIterator& itEnd) const
-      {
-        return boost::iterator_range<ACDCTrackIterator>(itBegin, itEnd);
-      }
+      /// Default constructor
+      BaseTrackRelationFilter();
 
-      /**
-       *  Main filter method returning the weight of the neighborhood relation.
-       *  Return always returns NAN to reject all track neighbors.
-       */
-      virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
-                                const CDCTrack& to  __attribute__((unused)))
-      {
-        return 1;
-      }
+      /// Default destructor
+      ~BaseTrackRelationFilter();
 
-      /**
-       *  Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.
-       */
-      Weight operator()(const Relation<const CDCTrack>& relation) override
-      {
-        const CDCTrack* ptrFrom(relation.first);
-        const CDCTrack* ptrTo(relation.second);
-        if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return this->operator()(*ptrFrom, *ptrTo);
-      }
+      /// Reenforce that the full range of tracks is possible as no particular default is applicable.
+      std::vector<const CDCTrack*> getPossibleTos(
+        const CDCTrack* from,
+        const std::vector<const CDCTrack*>& tracks) const final;
     };
   }
 }

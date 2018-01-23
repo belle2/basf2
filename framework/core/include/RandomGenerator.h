@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_CORE_RANDOMGENERATOR_H
-#define FRAMEWORK_CORE_RANDOMGENERATOR_H
 
 #include <stdint.h>
 #include <TRandom.h>
@@ -274,5 +272,3 @@ namespace Belle2 {
 #endif
   }
 }
-
-#endif // FRAMEWORK_CORE_RANDOMGENERATOR_H

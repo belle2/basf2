@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/trees/BoxDivisionHoughTree.h>
-#include <TTree.h>
-#include <TFile.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

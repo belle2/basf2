@@ -116,6 +116,12 @@ namespace Belle2 {
     Manager::FunctionPtr isNAN(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the given value in the second argument if the given variable value is nan
+     * First argument in the argument vector must be the name of variable. The second a number.
+     */
+    Manager::FunctionPtr ifNANgiveX(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the true if the variable value is infinity
      * First argument in the argument vector must be the name of variable
      */
@@ -158,13 +164,6 @@ namespace Belle2 {
      * and a particle from the provided particle list is in the cut and 0 if it is not.
      */
     Manager::FunctionPtr veto(const std::vector<std::string>& arguments);
-
-    /**
-      * Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.
-      * First arguments must be TOP or ARICH
-      * Second argument must be a valid variable name
-      */
-    Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments);
 
     /**
      * Returns the number of non-overlapping particles in the given particle lists

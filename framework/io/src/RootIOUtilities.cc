@@ -22,6 +22,7 @@ using namespace Belle2;
 const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
 const std::string RootIOUtilities::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
 const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
+const std::string RootIOUtilities::c_SteerAdditionalBranchNames[] = { "additionalBranchNames", "additionalBranchNamesPersistent" };
 
 std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter,
                                                       const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
@@ -29,7 +30,7 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
   set<string> branchSet, excludeBranchSet;
   for (string b : branches) {
     if (branchesToFilter.count(b) == 0)
-      B2INFO("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
+      B2WARNING("The branch " << b << " given in " << c_SteerBranchNames[durability] << " does not exist.");
     if (!branchSet.insert(b).second)
       B2WARNING(c_SteerBranchNames[durability] << " has duplicate entry " << b);
   }
@@ -105,7 +106,7 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
   const long minor = event;
 
   if (!tree->GetTreeIndex()) {
-    B2INFO("No TTreeIndex found, rebuild it...");
+    B2DEBUG(100, "No TTreeIndex found, rebuild it...");
     buildIndex(tree);
   }
   long entry = tree->GetEntryNumberWithIndex(major, minor);
@@ -188,6 +189,7 @@ void RootIOUtilities::setCreationData(FileMetaData& metadata)
   auto commitid = RootIOUtilities::getCommitID();
   metadata.setCreationData(date, site, user, commitid);
 }
+
 std::string RootIOUtilities::getCommitID()
 {
   return GIT_COMMITID;

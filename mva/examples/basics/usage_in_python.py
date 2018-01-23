@@ -12,8 +12,8 @@ if __name__ == "__main__":
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVADatabaseIdentifier"
-    general_options.m_variables = basf2_mva.vector('M', 'p', 'pz', 'pt', 'phi', 'daughter(0, Kid)', 'daughter(0, piid)',
-                                                   'daughter(1, Kid)', 'daughter(1, piid)', 'chiProb', 'dr', 'dz', 'dphi')
+    general_options.m_variables = basf2_mva.vector('M', 'p', 'pz', 'pt', 'phi', 'daughter(0, kaonID)', 'daughter(0, pionID)',
+                                                   'daughter(1, kaonID)', 'daughter(1, pionID)', 'chiProb', 'dr', 'dz', 'dphi')
     general_options.m_target_variable = "isSignal"
 
     fastbdt_options = basf2_mva.FastBDTOptions()

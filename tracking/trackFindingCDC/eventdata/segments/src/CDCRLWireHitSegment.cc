@@ -7,15 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 std::vector<const CDCWire*> CDCRLWireHitSegment::getWireSegment() const
 {
-  std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
+  std::vector<const CDCWire*> wireSegment;
   for (const CDCRLWireHit& rlWireHit : *this) {
     wireSegment.push_back(&(rlWireHit.getWire()));
   }

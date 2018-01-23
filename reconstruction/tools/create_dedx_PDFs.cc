@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
             break;
           case Dedx::c_SVD:
             flayer_selection = TString::Format("%s < -2", flayer_var);
-            dedx_cutoff = 2.5e4;
+            dedx_cutoff = 5e6;
             break;
           case Dedx::c_CDC:
             break;
@@ -137,24 +137,16 @@ int main(int argc, char* argv[])
           tree->Project(histname.Data(),
                         TString::Format("%s:VXDDedxTracks.m_p", varname),
                         TString::Format("%s < %g && abs(VXDDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
-
-        //TString::Format("%s < %g && abs(log(VXDDedxTracks.m_chi2)) < 5 && abs(VXDDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
-
       } //detector type
 
       // now add the CDC histograms
       int detector = (int)Dedx::c_CDC;
       std::cout << "i " << i << ", d" << detector << "\n";
-      const char* flayer_var = "CDCDedxTracks.dedxLayer";
-      TString flayer_selection;
       double dedx_cutoff = 0;
-      flayer_selection = TString::Format("%s >= 0", flayer_var);
-      //  const double dedx_cutoff = use_truncated_mean?((pdg_code==211)?2.5e-6:2e-5):(2e-5);
-      //  TODO: if sample doesn't contain slow particles this can be reduced
-      dedx_cutoff = 150.0;
+      dedx_cutoff = 3.0;
 
       const TString histname = TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix);
-      const char* varname = use_truncated_mean ? "CDCDedxTracks.m_dedx_avg_truncated" : "CDCDedxTracks.dedx";
+      const char* varname = use_truncated_mean ? "CDCDedxTracks.m_dedx_avg_truncated" : "CDCDedxTracks.l_dedx";
 
       hists[detector] = new TH2F(histname.Data(), histname.Data(),
                                  num_p_bins, pbins,
@@ -163,16 +155,11 @@ int main(int argc, char* argv[])
       if (use_truncated_mean)
         tree->Project(histname.Data(),
                       TString::Format("%s[][%i]:CDCDedxTracks.m_p_cdc", varname, detector),
-                      TString::Format("CDCDedxTracks.m_nLayerHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff,
-                                      pdg_code, flayer_selection.Data()));
+                      TString::Format("CDCDedxTracks.l_nHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
       else
         tree->Project(histname.Data(),
                       TString::Format("%s:CDCDedxTracks.m_p_cdc", varname),
-                      TString::Format("CDCDedxTracks.m_nLayerHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff,
-                                      pdg_code, flayer_selection.Data()));
-
-      //TString::Format("%s < %g && abs(log(CDCDedxTracks.m_chi2)) < 5 && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
-
+                      TString::Format("CDCDedxTracks.l_nHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
 
       //{{{ for each momentum bin, normalize pdf (disable if you want to keep the orginals, e.g. for fitting)
       if (true) {

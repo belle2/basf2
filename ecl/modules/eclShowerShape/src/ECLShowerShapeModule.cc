@@ -53,7 +53,7 @@ REG_MODULE(ECLShowerShapePureCsI)
 ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
 {
   // Set description
-  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E21)");
+  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variables (e.g. E9oE21)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zernike_n1_rho0", m_zernike_n1_rho0,
@@ -245,7 +245,7 @@ void ECLShowerShapeModule::event()
     //Start by finding the N2 shower and calculating it's shower shape variables
     //Assumes that there is only 1 N2 Shower per CR!!!!!!
     ECLShower* N2shower = nullptr;
-    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>()) {
+    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
       if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N2) {
         N2shower = &eclShower;
         setShowerShapeVariables(N2shower, true);
@@ -259,7 +259,7 @@ void ECLShowerShapeModule::event()
 
     double prodN1zernikeMVAs = 1.0;
     //Calculate shower shape variables for the rest of the showers
-    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>()) {
+    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
       if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N2) continue; //shower shape variables already calculated for N2
 
       bool calculateZernikeMVA = true;
@@ -278,7 +278,7 @@ void ECLShowerShapeModule::event()
 std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::projectECLDigits(const ECLShower& shower) const
 {
   std::vector<ProjectedECLDigit> tmpProjectedECLDigits; //Will be returned at the end of the function
-  auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>();
+  auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 //   tmpProjectedECLDigits.resize( showerDigitRelations.size() );
   //---------------------------------------------------------------------
   // Get shower parameters.
@@ -484,7 +484,7 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
   double energy1 = 0.0; // to check: 'highest energy' data member may not always be the right one
   double energy9 = 0.0;
 
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto caldigit = relatedDigitsPairs.object(iRel);
@@ -505,7 +505,7 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
 
   }
 
-  if (energy9 >= 0.0) return energy1 / energy9;
+  if (energy9 > 1e-9) return energy1 / energy9;
   else return 0.0;
 }
 
@@ -522,7 +522,7 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
   double energy9 = 0.0;
   double energy21 = 0.0;
 
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto caldigit = relatedDigitsPairs.object(iRel);

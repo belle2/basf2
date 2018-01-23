@@ -210,7 +210,7 @@ param_mctrackfinder = {
 }
 mctrackfinder.param(param_mctrackfinder)
 
-spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.logging.log_level = LogLevel.INFO
 spCreatorSVD.logging.debug_level = 5
 param_spCreatorSVD = {'OnlySingleClusterSpacePoints': False,
@@ -218,7 +218,7 @@ param_spCreatorSVD = {'OnlySingleClusterSpacePoints': False,
                       'SpacePoints': 'nosingleSP'}
 spCreatorSVD.param(param_spCreatorSVD)
 
-spCreatorPXD = register_module('SpacePointCreatorPXD')
+spCreatorPXD = register_module('PXDSpacePointCreator')
 spCreatorPXD.logging.log_level = LogLevel.INFO
 spCreatorPXD.logging.debug_level = 5
 spCreatorPXD.param('NameOfInstance', 'pxdOnly')

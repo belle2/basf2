@@ -17,7 +17,7 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
     sump += (*p).Mag();
 
 
-  TVector3 rvec, Axis;
+  TVector3 Axis;
 
   // Thrust and thrust vectors
 

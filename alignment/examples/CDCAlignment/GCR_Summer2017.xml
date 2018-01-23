@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Name>Belle2Detector</Name>
+  <Description>The Belle II detector</Description>
+  <Global>
+    <material>Air</material>
+    <width  unit="m">8.0</width>
+    <length unit="m">8.0</length>
+    <height unit="m">8.0</height>
+  </Global>
+
+  <!-- Define materials -->
+  <xi:include href="BasicMaterials.xml"/>
+  <xi:include href="../structure/STR-Materials.xml"/>
+  <xi:include href="../ir/IR-Materials.xml"/>
+  <xi:include href="../vxd/VXD-Materials.xml"/>
+  <xi:include href="../pxd/PXD-Materials.xml"/>
+  <xi:include href="../svd/SVD-Materials.xml"/>
+  <xi:include href="../cdc/CDC-Materials.xml"/>
+  <xi:include href="../top/TOP-Materials.xml"/>
+  <xi:include href="../arich/ARICH-Materials.xml"/>
+  <xi:include href="../ecl/ECL-Materials.xml"/>
+  <xi:include href="../bklm/BKLM-Materials.xml"/>
+  <xi:include href="../eklm/EKLMMaterials.xml"/>
+
+  <!-- Magnetic field -->
+  <xi:include href="../geometry/MagneticFieldConstant.xml"/>
+  <xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/>
+  <xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/>
+  <xi:include href="../geometry/MagneticField2d.xml"/>
+  <xi:include href="../geometry/MagneticField3dQuadBeamline.xml"/>
+  <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
+
+  <!-- Accelerator -->
+  <xi:include href="SuperKEKB.xml"/>
+
+  <!-- Subdedectors -->
+  <xi:include href="../structure/COIL.xml"/>
+  <xi:include href="../structure/STR.xml"/>
+  <xi:include href="../ir/BeamPipe-phase2.xml"/>
+  <xi:include href="../ir/Cryostat.xml"/>
+  <xi:include href="../ir/FarBeamLine.xml"/>
+  <xi:include href="../vxd/HeavyMetalShield.xml"/>
+  <!-- <xi:include href="../pxd/PXD-phase2.xml"/> -->
+  <!-- <xi:include href="../svd/SVD-phase2.xml"/> -->
+  <xi:include href="../cdc/CDC.xml"/>
+  <xi:include href="../top/TOP.xml"/>
+  <!-- <xi:include href="../arich/ARICH.xml"/> -->
+  <xi:include href="../ecl/ECL.xml"/>
+  <xi:include href="../bklm/BKLM.xml"/>
+  <xi:include href="../eklm/EKLM.xml"/>
+
+  <!-- VXD Tracking and MUID muon identification -->
+  <Tracking>
+    <xi:include href="../tracking/VXDTFindex.xml"/>
+    <xi:include href="../tracking/MuidParameters.xml"/>
+  </Tracking>
+</Detector>

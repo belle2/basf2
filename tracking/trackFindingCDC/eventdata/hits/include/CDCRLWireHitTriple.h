@@ -12,13 +12,24 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <iosfwd>
+#include <cassert>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHit;
+    class CDCWire;
 
-    /** Class representing a triple of neighboring wire hits.
+    /**
+     *  Class representing a triple of neighboring wire hits.
      *  The first is taken as a single, while the second and the third are grouped into a pair.
      *  In this way we can save some object creations during lookups of a triple following this one,
-     *  since the projection to the last pair can be done by reference.*/
+     *  since the projection to the last pair can be done by reference.
+     */
     class CDCRLWireHitTriple {
     public:
       /// Type for the different shapes of a triple of neighboring wire hits
@@ -26,50 +37,37 @@ namespace Belle2 {
 
       public:
         /// Default constructor for an invalid shape
-        Shape()
-          : m_startToMiddleCellDistance(CHAR_MAX / 2),
-            m_middleToEndCellDistance(CHAR_MAX / 2),
-            m_oClockDelta(SHRT_MIN)
-        {}
+        Shape();
 
         /// Constructor from cell extend and o'clock direction change
         Shape(const short startToMiddleCellDistance,
               const short middleToEndCellDistance,
-              const short oClockDelta)
-          : m_startToMiddleCellDistance(startToMiddleCellDistance),
-            m_middleToEndCellDistance(middleToEndCellDistance),
-            m_oClockDelta(oClockDelta)
-        {}
+              const short oClockDelta);
 
         /// Getter for the start to middle cell distance
-        short getStartToMiddleCellDistance() const
-        { return m_startToMiddleCellDistance; }
+        short getStartToMiddleCellDistance() const;
 
         /// Getter for the middle to end cell distance
-        short getMiddleToEndCellDistance() const
-        { return m_middleToEndCellDistance; }
+        short getMiddleToEndCellDistance() const;
 
         /// Getter for the sum of cell distances from start to middle and middle to end.
-        short getCellExtend() const
-        { return m_startToMiddleCellDistance + m_middleToEndCellDistance; }
+        short getCellExtend() const;
 
         /// Getter for the o'clock direction difference from start to middle compared to middle to end.
-        short getOClockDelta() const
-        { return m_oClockDelta; }
+        short getOClockDelta() const;
 
         /// Check if the shape is considered valid.
-        bool isValid() const
-        { return getCellExtend() >= 2 and getCellExtend() <= 4; }
+        bool isValid() const;
 
       private:
         /// The cell distances from start to middle.
-        char m_startToMiddleCellDistance = 0;
+        char m_startToMiddleCellDistance;
 
         /// The cell distances from middle to end.
-        char m_middleToEndCellDistance = 0;
+        char m_middleToEndCellDistance;
 
         /// The o'clock direction difference from start to middle compared to middle to end.
-        short m_oClockDelta = 0;
+        short m_oClockDelta;
       };
 
       /// Default constructor for ROOT
@@ -108,8 +106,10 @@ namespace Belle2 {
                   getRearRLWireHitPair() < other.getRearRLWireHitPair())));
       }
 
-      /// Define oriented wire hit pairs to be coaligned with oriented wire hit
-      /// triples on the first two oriented wire hits.
+      /**
+       *  Define oriented wire hit pairs to be coaligned with oriented wire hit
+       *  triples on the first two oriented wire hits.
+       */
       friend bool operator< (const CDCRLWireHitTriple& rlWireHitTriple,
                              const CDCRLWireHitPair& rlWireHitPair)
       {
@@ -132,140 +132,190 @@ namespace Belle2 {
                   rlWireHitPair.getToRLWireHit() < rlWireHitTriple.getMiddleRLWireHit())));
       }
 
-      /// Standard output operator for debugging purposes.
-      friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHitTriple& rlWireHitTriple)
-      {
-        return (output <<
-                "Start : "  << rlWireHitTriple.getStartWireHit() <<
-                " with rl " << static_cast<int>(rlWireHitTriple.getStartRLInfo()) <<
-                " Middle : " << rlWireHitTriple.getMiddleWireHit() <<
-                " with rl " << static_cast<int>(rlWireHitTriple.getMiddleRLInfo()) <<
-                " End : "    << rlWireHitTriple.getEndWireHit()  <<
-                " with rl " << static_cast<int>(rlWireHitTriple.getEndRLInfo()));
-      }
-
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
       Shape getShape() const;
 
       /// Getter for the common superlayer id of the pair
       ISuperLayer getISuperLayer() const
-      { return ISuperLayerUtil::getCommon(getStartRLWireHit(), getRearRLWireHitPair()); }
+      {
+        assert(getStartRLWireHit().getISuperLayer() == getRearRLWireHitPair().getISuperLayer());
+        return getStartRLWireHit().getISuperLayer();
+      }
 
       /// Getter for the common stereo type of the superlayer of the pair.
       EStereoKind getStereoKind() const
-      { return ISuperLayerUtil::getStereoKind(getISuperLayer()); }
+      {
+        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+      }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
-      { return getStereoKind() == EStereoKind::c_Axial; }
+      {
+        return getStereoKind() == EStereoKind::c_Axial;
+      }
 
       /// Getter for the wire the first oriented wire hit is based on.
       const CDCWire& getStartWire() const
-      { return getStartRLWireHit().getWire(); }
+      {
+        return getStartRLWireHit().getWire();
+      }
 
       /// Getter for the wire the second oriented wire hit is based on.
       const CDCWire& getMiddleWire() const
-      { return getMiddleRLWireHit().getWire(); }
+      {
+        return getMiddleRLWireHit().getWire();
+      }
 
       /// Getter for the wire the third oriented wire hit is based on.
       const CDCWire& getEndWire() const
-      { return getEndRLWireHit().getWire(); }
+      {
+        return getEndRLWireHit().getWire();
+      }
 
       /// Indicator if any of the three oriented wire hits is based on the given wire.
       bool hasWire(const CDCWire& wire) const
-      { return getStartRLWireHit().isOnWire(wire) or getRearRLWireHitPair().hasWire(wire); }
+      {
+        return getStartRLWireHit().isOnWire(wire) or getRearRLWireHitPair().hasWire(wire);
+      }
 
       /// Getter for the right left passage information of the first oriented wire hit.
       ERightLeft getStartRLInfo() const
-      { return getStartRLWireHit().getRLInfo(); }
+      {
+        return getStartRLWireHit().getRLInfo();
+      }
 
       /// Getter for the right left passage information of the second oriented wire hit.
       ERightLeft getMiddleRLInfo() const
-      { return getMiddleRLWireHit().getRLInfo(); }
+      {
+        return getMiddleRLWireHit().getRLInfo();
+      }
 
       /// Getter for the right left passage information of the third oriented wire hit.
       ERightLeft getEndRLInfo() const
-      { return getEndRLWireHit().getRLInfo(); }
+      {
+        return getEndRLWireHit().getRLInfo();
+      }
 
       /// Getter for the hit wire of the first oriented wire hit.
       const CDCWireHit& getStartWireHit() const
-      { return getStartRLWireHit().getWireHit(); }
+      {
+        return getStartRLWireHit().getWireHit();
+      }
 
       /// Getter for the hit wire of the second oriented wire hit.
       const CDCWireHit& getMiddleWireHit() const
-      { return getMiddleRLWireHit().getWireHit(); }
+      {
+        return getMiddleRLWireHit().getWireHit();
+      }
 
       /// Getter for the hit wire of the third oriented wire hit.
       const CDCWireHit& getEndWireHit() const
-      { return getEndRLWireHit().getWireHit(); }
+      {
+        return getEndRLWireHit().getWireHit();
+      }
 
       /// Indicator if any of the three oriented wire hits is based on the given wire hit.
       bool hasWireHit(const CDCWireHit& wirehit) const
-      { return getStartWireHit() == wirehit or getRearRLWireHitPair().hasWireHit(wirehit); }
+      {
+        return getStartRLWireHit().hasWireHit(wirehit) or
+               getRearRLWireHitPair().hasWireHit(wirehit);
+      }
 
       /// Getter for the first oriented wire hit.
       CDCRLWireHit& getStartRLWireHit()
-      { return m_startRLWireHit; }
+      {
+        return m_startRLWireHit;
+      }
 
       /// Getter for the second oriented wire hit.
       CDCRLWireHit& getMiddleRLWireHit()
-      { return getRearRLWireHitPair().getFromRLWireHit(); }
+      {
+        return getRearRLWireHitPair().getFromRLWireHit();
+      }
 
       /// Getter for the third oriented wire hit.
       CDCRLWireHit& getEndRLWireHit()
-      { return getRearRLWireHitPair().getToRLWireHit(); }
+      {
+        return getRearRLWireHitPair().getToRLWireHit();
+      }
 
       /// Constant getter for the first oriented wire hit.
       const CDCRLWireHit& getStartRLWireHit() const
-      { return m_startRLWireHit; }
+      {
+        return m_startRLWireHit;
+      }
 
       /// Constant getter for the second oriented wire hit.
       const CDCRLWireHit& getMiddleRLWireHit() const
-      { return getRearRLWireHitPair().getFromRLWireHit(); }
+      {
+        return getRearRLWireHitPair().getFromRLWireHit();
+      }
 
       /// Constant getter for the third oriented wire hit.
       const CDCRLWireHit& getEndRLWireHit() const
-      { return getRearRLWireHitPair().getToRLWireHit(); }
+      {
+        return getRearRLWireHitPair().getToRLWireHit();
+      }
 
       /// Getter for the pair of second and third oriented wire hit.
       CDCRLWireHitPair& getRearRLWireHitPair()
-      { return m_rearRLWireHitPair; }
+      {
+        return m_rearRLWireHitPair;
+      }
 
       /// Constant getter for the pair of second and third oriented wire hit.
       const CDCRLWireHitPair& getRearRLWireHitPair() const
-      { return m_rearRLWireHitPair; }
+      {
+        return m_rearRLWireHitPair;
+      }
 
       /// Setter for the first oriented wire hit.
       void setStartRLWireHit(const CDCRLWireHit& startRLWireHit)
-      { m_startRLWireHit = startRLWireHit; }
+      {
+        m_startRLWireHit = startRLWireHit;
+      }
 
       /// Setter for the second oriented wire hit.
       void setMiddleRLWireHit(const CDCRLWireHit& middleRLWireHit)
-      { m_rearRLWireHitPair.setFromRLWireHit(middleRLWireHit); }
+      {
+        m_rearRLWireHitPair.setFromRLWireHit(middleRLWireHit);
+      }
 
       /// Setter for the third oriented wire hit.
       void setEndRLWireHit(const CDCRLWireHit& endRLWireHit)
-      { m_rearRLWireHitPair.setToRLWireHit(endRLWireHit); }
+      {
+        m_rearRLWireHitPair.setToRLWireHit(endRLWireHit);
+      }
 
       /// Setter for the right left passage information of the first oriented wire hit.
       void setStartRLInfo(const ERightLeft startRLInfo)
-      { m_startRLWireHit.setRLInfo(startRLInfo); }
+      {
+        m_startRLWireHit.setRLInfo(startRLInfo);
+      }
 
       /// Setter for the right left passage information of the second oriented wire hit.
       void setMiddleRLInfo(const ERightLeft middleRLInfo)
-      {  getRearRLWireHitPair().setFromRLInfo(middleRLInfo); }
+      {
+        getRearRLWireHitPair().setFromRLInfo(middleRLInfo);
+      }
 
       /// Setter for the right left passage information of the third oriented wire hit.
       void setEndRLInfo(const ERightLeft endRLInfo)
-      {  getRearRLWireHitPair().setToRLInfo(endRLInfo); }
+      {
+        getRearRLWireHitPair().setToRLInfo(endRLInfo);
+      }
 
       /// Getter for the cluster id
       int getICluster() const
-      { return m_rearRLWireHitPair.getICluster(); }
+      {
+        return m_rearRLWireHitPair.getICluster();
+      }
 
       /// Setter for the cluster id
       void setICluster(int iCluster)
-      { m_rearRLWireHitPair.setICluster(iCluster); }
+      {
+        m_rearRLWireHitPair.setICluster(iCluster);
+      }
 
     protected:
       /// Memory for the start oriented wire hit.
@@ -273,7 +323,8 @@ namespace Belle2 {
 
       /// Memory for the second and third wire hits.
       CDCRLWireHitPair m_rearRLWireHitPair;
-
     };
+
+    std::ostream& operator<<(std::ostream& output, const CDCRLWireHitTriple& rlWireHitTriple);
   }
 }

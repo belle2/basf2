@@ -11,12 +11,14 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
-
-#include <boost/range/adaptor/indirected.hpp>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <vector>
 #include <string>
@@ -65,20 +67,19 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
     }
     B2ASSERT("Expect the clusters to be sorted", std::is_sorted(cluster.begin(), cluster.end()));
 
+    // Obtain the set of wire hits as references
+    const std::vector<CDCWireHit*>& wireHits = cluster;
+
     // Create the neighborhood of wire hits on the cluster
     m_wireHitRelations.clear();
-    auto wireHits = cluster | boost::adaptors::indirected;
-    WeightedNeighborhood<const CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-                                                        wireHits,
-                                                        m_wireHitRelations);
+    RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
 
     B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.",
-             WeightedRelationUtil<const CDCWireHit>::areSymmetric(m_wireHitRelations));
+             WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
     // Create the facets
     std::size_t nBefore = facets.size();
-    WeightedNeighborhood<const CDCWireHit> wirehitNeighborhood(m_wireHitRelations);
-    createFacets(cluster, wirehitNeighborhood, facets);
+    createFacets(cluster, m_wireHitRelations, facets);
     std::size_t nAfter = facets.size();
 
     VectorRange<CDCFacet> facetsInCluster(facets.begin() + nBefore, facets.begin() + nAfter);
@@ -95,8 +96,8 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
   }
 }
 
-void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
-                                const WeightedNeighborhood<const CDCWireHit>& neighborhood,
+void FacetCreator::createFacets(const std::vector<CDCWireHit*>& wireHits,
+                                const std::vector<WeightedRelation<CDCWireHit> >& wireHitRelations,
                                 std::vector<CDCFacet>& facets)
 {
   for (const CDCWireHit* ptrMiddleWireHit : wireHits) {
@@ -104,15 +105,17 @@ void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
     const CDCWireHit& middleWireHit = *ptrMiddleWireHit;
     if (middleWireHit->hasTakenFlag()) continue;
 
-    const auto neighbors = neighborhood.equal_range(ptrMiddleWireHit);
-    for (const WeightedRelation<const CDCWireHit>& startWireHitRelation : neighbors) {
+    const auto neighbors = asRange(
+                             std::equal_range(wireHitRelations.begin(), wireHitRelations.end(), ptrMiddleWireHit));
+
+    for (const WeightedRelation<CDCWireHit>& startWireHitRelation : neighbors) {
       const CDCWireHit* ptrStartWireHit(startWireHitRelation.getTo());
 
       if (not ptrStartWireHit) continue;
       const CDCWireHit& startWireHit = *ptrStartWireHit;
       if (startWireHit->hasTakenFlag()) continue;
 
-      for (const WeightedRelation<const CDCWireHit>& endWireHitRelation : neighbors) {
+      for (const WeightedRelation<CDCWireHit>& endWireHitRelation : neighbors) {
         const CDCWireHit* ptrEndWireHit(endWireHitRelation.getTo());
 
         if (not ptrEndWireHit) continue;
@@ -120,9 +123,9 @@ void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
         if (endWireHit->hasTakenFlag()) continue;
 
         // Skip combinations where the facet starts and ends on the same wire
-        if (not(ptrStartWireHit->getWire() == ptrEndWireHit->getWire())) {
-          createFacetsForHitTriple(startWireHit, middleWireHit, endWireHit, facets);
-        }
+        if (ptrStartWireHit->isOnWire(ptrEndWireHit->getWire())) continue;
+
+        createFacetsForHitTriple(startWireHit, middleWireHit, endWireHit, facets);
       } // end for itEndWireHit
     } // end for itStartWireHit
   } // end for itMiddleWireHit

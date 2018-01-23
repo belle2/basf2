@@ -94,10 +94,6 @@ void TBTelEvent::addPXDPlane(unsigned short planeNo,
                                                    cols.at(iVec),
                                                    // vCellID -> row id
                                                    rows.at(iVec),
-                                                   // uCellPosition -> 0
-                                                   0,
-                                                   // vCellPosition -> 0
-                                                   0,
                                                    // charge value
                                                    signals.at(iVec)));
   }
@@ -113,10 +109,6 @@ void TBTelEvent::addPXDPixel(unsigned short planeNo,
       col,
       // vCellID -> row id
       row,
-      // uCellPosition -> 0
-      0,
-      // vCellPosition -> 0
-      0,
       // charge value
       signal));
 }

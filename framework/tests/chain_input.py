@@ -37,6 +37,7 @@ class TestModule(Module):
 
         self.iEvent += 1
 
+
 inputfiles = [
     Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
     Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')
@@ -50,7 +51,7 @@ main.add_module(NoopModule())
 
 main.add_module('RootInput', logLevel=LogLevel.WARNING, inputFileNames=inputfiles)
 main.add_module('EventInfoPrinter')
-main.add_module('PrintCollections')
+main.add_module('PrintCollections', printForEvent=0)
 
 main.add_module(TestModule())
 

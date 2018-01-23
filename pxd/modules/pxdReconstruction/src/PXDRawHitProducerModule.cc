@@ -48,7 +48,7 @@ void PXDRawHitProducerModule::initialize()
   storeRawHits.registerInDataStore();
 
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  storeDigits.required();
+  storeDigits.isRequired();
 
   m_storeRawHitsName = storeRawHits.getName();
   m_storeDigitsName = storeDigits.getName();
@@ -68,17 +68,17 @@ void PXDRawHitProducerModule::event()
   VxdID currentSensorID(0);
   unsigned short frameCounter = 0;
   unsigned short startRow = 0;
-  for (const PXDDigit& digit : storeDigits) {
-    VxdID sensorID = digit.getSensorID();
+  for (const PXDDigit& storeDigit : storeDigits) {
+    VxdID sensorID = storeDigit.getSensorID();
     if (sensorID != currentSensorID) {
       // We are in a new sensor, so reset sensor-specific settings
       currentSensorID = sensorID;
       startRow = gRandom->Integer(nRows);
       frameCounter = 2;
     }
-    if (frameCounter == 2 && digit.getVCellID() >= startRow) frameCounter = 1;
+    if (frameCounter == 2 && storeDigit.getVCellID() >= startRow) frameCounter = 1;
     storeRawHits.appendNew(
-      sensorID, digit.getVCellID(), digit.getUCellID(), digit.getCharge(),
+      sensorID, storeDigit.getVCellID(), storeDigit.getUCellID(), storeDigit.getCharge(),
       startRow, frameCounter, 0);
   }
   // That's not all, folks. We have to destroy all current PXDDigits.

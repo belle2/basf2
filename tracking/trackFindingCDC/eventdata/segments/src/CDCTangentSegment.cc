@@ -7,9 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
+
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

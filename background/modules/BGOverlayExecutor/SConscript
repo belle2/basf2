@@ -9,6 +9,7 @@ env['LIBS'] = ['framework',
                'ecl_dataobjects',
                'bklm_dataobjects',
                'eklm_dataobjects',
+               'background_dataobjects',
                '$ROOT_LIBS']
 
 Return('env')

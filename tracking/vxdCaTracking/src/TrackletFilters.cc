@@ -129,43 +129,44 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
 
   try {
     fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
-  } catch (FilterExceptions::Straight_Line& anException) {
-    B2DEBUG(1, "Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what());
+  } catch (FilterExceptions::Straight_Line& firstException) {
+    B2DEBUG(1, "Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << firstException.what());
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
       B2DEBUG(1, "After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  <<
               "\nwhile using following hits:\n" << printHits(m_hits) << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() <<
               " " << fitResults.second.Z() << "\n");
 
-    } catch (FilterExceptions::Straight_Up& anException) {
+    } catch (FilterExceptions::Straight_Up& secondException) {
       try {
+
         fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
-      } catch (FilterExceptions::Straight_Line& anException) {
-        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what());
+      } catch (FilterExceptions::Straight_Line& thirdException) {
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << thirdException.what());
       }
     }
 
-  } catch (FilterExceptions::Center_Is_Origin& anException) {
-    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what());
+  } catch (FilterExceptions::Center_Is_Origin& fourthException) {
+    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << fourthException.what());
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
-    } catch (FilterExceptions::Straight_Up& anException) {
+    } catch (FilterExceptions::Straight_Up& fifthException) {
       try {
         fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
-      } catch (FilterExceptions::Straight_Line& anException) {
-        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what());
+      } catch (FilterExceptions::Straight_Line& sixthException) {
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << sixthException.what());
       }
     }
-  } catch (FilterExceptions::Invalid_result_Nan& anException) {
-    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() <<
+  } catch (FilterExceptions::Invalid_result_Nan& seventhException) {
+    B2INFO("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << seventhException.what() <<
            "\nwhile using following hits:\n" << printHits(m_hits));
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
-    } catch (FilterExceptions::Straight_Up& anException) {
+    } catch (FilterExceptions::Straight_Up& eighthException) {
       try {
         fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
-      } catch (FilterExceptions::Straight_Line& anException) {
-        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what());
+      } catch (FilterExceptions::Straight_Line& ninthException) {
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << ninthException.what());
       }
     }
   }

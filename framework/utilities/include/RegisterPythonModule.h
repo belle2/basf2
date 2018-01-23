@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REGISTERPYTHONMODULE_H
-#define REGISTERPYTHONMODULE_H
-
+#pragma once
 
 namespace Belle2 {
   /** Proxy class to register python modules (the things you can 'import').
@@ -73,4 +71,3 @@ namespace Belle2 {
    */
 #define REGISTER_PYTHON_MODULE_AUTOIMPORT(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, PyInit_##moduleName, true);
 }
-#endif

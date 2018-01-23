@@ -3,8 +3,7 @@
 /// @author Ryosuke Itoh
 /// @date Feb 22 2010
 
-#ifndef RING_BUFFER_H
-#define RING_BUFFER_H
+#pragma once
 
 #include <sys/types.h>
 #include <string>
@@ -128,4 +127,3 @@ namespace Belle2 {
   };
 
 }
-#endif

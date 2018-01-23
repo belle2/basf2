@@ -11,7 +11,7 @@ extern "C" {
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1944 /* protocol version */
-#define NSM_PACKAGE_VERSION  1947 /* package  version */
+#define NSM_PACKAGE_VERSION  1952 /* package  version */
 
 /*
   20120723 1900 file created
@@ -60,6 +60,11 @@ extern "C" {
   20150808 1945 updates for PNNL summer school tutorial
   20160420 1946 suppress debug output of nsmd2 and b2lib
   20170613 1947 nsmd2 update for USRCPYMEM protection
+  20170927 1948 nsmd2 touchsys pos fix, log cleanup for send/recv
+  20170929 1949 nsmd2 ackdaemon fix
+  20170102 1950 nsmd2 ackdaemon more fix
+  20171002 1951 nsmd2 destroyconn/ackdaemon fix
+  20171002 1952 nsmd2 recv buffer to global
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

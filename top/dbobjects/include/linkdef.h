@@ -10,11 +10,6 @@
 #pragma link C++ class Belle2::TOPASICChannel+;
 #pragma link C++ class Belle2::TOPChannelMap+;
 #pragma link C++ class Belle2::TOPFrontEndMap+;
-#pragma link C++ class Belle2::TOPSampleTimes+;
-#pragma link C++ class Belle2::TOPCalTimebase+;
-#pragma link C++ class Belle2::TOPCalChannelT0+;
-#pragma link C++ class Belle2::TOPCalModuleT0+;
-#pragma link C++ class Belle2::TOPCalCommonT0+;
 #pragma link C++ class Belle2::TOPGeoBase+;
 #pragma link C++ class Belle2::TOPGeoPMT+;
 #pragma link C++ class Belle2::TOPGeoPMTArray+;
@@ -36,10 +31,22 @@
 #pragma link C++ class Belle2::TOPNominalTDC+;
 #pragma link C++ class Belle2::TOPGeometry+;
 #pragma link C++ class Belle2::TOPPmtGainPar+;
+#pragma link C++ class Belle2::TOPPmtInstallation+;
+#pragma link C++ class Belle2::TOPPmtObsoleteData+;
+#pragma link C++ class Belle2::TOPPmtQE+;
+#pragma link C++ class Belle2::TOPPmtTTSHisto+;
+#pragma link C++ class Belle2::TOPPmtTTSPar+;
+#pragma link C++ class Belle2::TOPSampleTimes+;
+#pragma link C++ class Belle2::TOPCalTimebase+;
+#pragma link C++ class Belle2::TOPCalChannelT0+;
+#pragma link C++ class Belle2::TOPCalModuleT0+;
+#pragma link C++ class Belle2::TOPCalCommonT0+;
 #pragma link C++ class Belle2::TOPCalChannelMask+;
 #pragma link C++ class Belle2::TOPCalModuleAlignment+;
 #pragma link C++ class Belle2::TOPCalChannelThreshold+;
 #pragma link C++ class Belle2::TOPCalChannelThresholdEff+;
+#pragma link C++ class Belle2::TOPCalChannelPulseHeight+;
+#pragma link C++ class Belle2::TOPCalChannelNoise+;
 #pragma link C++ class Belle2::TOPSignalShape+;
 
 #endif

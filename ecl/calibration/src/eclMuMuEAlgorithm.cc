@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace ECL;
 
 //..Novosibirsk function, plus constant
 //  H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426
@@ -68,8 +69,8 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   gROOT->SetBatch();
 
   //..Histograms containing the data collected by eclMuMuECollectorModule
-  auto& EmuVsCellID0 = getObject<TH2F>("EmuVsCellID0");
-  auto& MuonLabPvsCellID0 = getObject<TH1F>("MuonLabPvsCellID0");
+  auto EmuVsCellID0 = getObjectPtr<TH2F>("EmuVsCellID0");
+  auto MuonLabPvsCellID0 = getObjectPtr<TH1F>("MuonLabPvsCellID0");
 
   //..Output histogram
   TH1F* CalibVsCellID0 = new TH1F("CalibVsCellID0", "Calibration constant vs cellID;cellID from 0;counts per GeV", 8736, 0, 8736);
@@ -96,10 +97,10 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
 
 
   //..Record integral (excluding underflows and overflows) from eclEMuMuCollector per crystal
-  int ny = EmuVsCellID0.GetNbinsY();
+  int ny = EmuVsCellID0->GetNbinsY();
   int histEntries = 999999;
   for (int ID = 0; ID < 8736; ID++) {
-    int IDInt = EmuVsCellID0.Integral(ID + 1, ID + 1, 1, ny);
+    int IDInt = EmuVsCellID0->Integral(ID + 1, ID + 1, 1, ny);
     IntegralVsCellID0->SetBinContent(ID + 1, IDInt);
     if (ID >= cellIDLo && ID <= cellIDHi && IDInt < histEntries) {histEntries = IDInt; }
   }
@@ -109,8 +110,8 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
 
   //..Write out the basic histograms in all cases
   IntegralVsCellID0->Write();
-  EmuVsCellID0.Write();
-  MuonLabPvsCellID0.Write();
+  EmuVsCellID0->Write();
+  MuonLabPvsCellID0->Write();
 
   //..If we are not fitting, we can quit now
   if (!performFits) {
@@ -128,8 +129,8 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   }
 
   //..Loop over specified crystals
-  double histMin = EmuVsCellID0.GetYaxis()->GetXmin();
-  double histMax = EmuVsCellID0.GetYaxis()->GetXmax();
+  double histMin = EmuVsCellID0->GetYaxis()->GetXmin();
+  double histMax = EmuVsCellID0->GetYaxis()->GetXmax();
   for (int ID = cellIDLo; ID <= cellIDHi; ID++) {
     int ID100 = ID / 100;
     ID100 = 100 * ID100;
@@ -137,7 +138,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     //.. Project 1D histogram of energy in this crystal
     TString name = "DigitAmplitude";
     name += ID;
-    TH1D* hEnergy = EmuVsCellID0.ProjectionY(name, ID + 1, ID + 1);
+    TH1D* hEnergy = EmuVsCellID0->ProjectionY(name, ID + 1, ID + 1);
 
     //..Fit function (xmin, xmax, nparameters) for this histogram
     TF1* func = new TF1("eclNovoConst", eclNovoConst, histMin, histMax, 5);
@@ -241,7 +242,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     double trueConst = 0.1799;
     double trueSlope = 0.005838;
     int histbin = PeakVsCellID0->GetXaxis()->FindBin(ID + 0.001);
-    double LogMuonPlab = log(MuonLabPvsCellID0.GetBinContent(histbin));
+    double LogMuonPlab = log(MuonLabPvsCellID0->GetBinContent(histbin));
     double peakTrueE = trueConst + trueSlope * LogMuonPlab;
 
     //..Calibration constant is ratio of peak of Novo fit over predicted peak true energy

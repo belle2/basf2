@@ -11,6 +11,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

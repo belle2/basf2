@@ -44,7 +44,6 @@ eklmdigi = register_module('EKLMDigitizer')
 
 # EKLM packer
 eklmpack = register_module('EKLMRawPacker')
-eklmpack.param('MaxEventNum', 1000)
 
 # EKLM unpacker
 eklmUpack = register_module('EKLMUnpacker')

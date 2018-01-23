@@ -37,7 +37,8 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Particle>::registerPersistent();
+      StoreArray<Particle> particles;
+      particles.registerInDataStore();
       StoreArray<ECLCluster> eclClusters;
       eclClusters.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
@@ -235,7 +236,7 @@ namespace {
       return s;
     }
 
-    explicit TestParticleList(std::string decayString) : decayString(decayString)
+    explicit TestParticleList(std::string _decayString) : decayString(_decayString)
     {
 
       DecayDescriptor decaydescriptor;

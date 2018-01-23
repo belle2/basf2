@@ -14,8 +14,6 @@
 
 // stl:
 #include <vector>
-// #include <memory>    // std::shared_ptr
-
 
 
 namespace Belle2 {
@@ -53,16 +51,24 @@ namespace Belle2 {
     /** contains a MetaInfo for doing extra-stuff (whatever you need) */
     MetaInfoType m_metaInfo;
 
+    /** identifier for all connected nodes */
+    short m_family;
+
 
     /** ************************* CONSTRUCTORS ************************* */
 
     /** protected constructor. accepts an entry which can not be changed any more */
-    DirectedNode(EntryType& entry) : m_entry(entry), m_metaInfo(MetaInfoType()) {}
+    DirectedNode(EntryType& entry) : m_entry(entry), m_metaInfo(MetaInfoType()), m_family(-1)
+    {
+      // Reserve some space for the vectors, TODO: can still be fine-tuned
+      m_innerNodes.reserve(10);
+      m_outerNodes.reserve(10);
+    }
 
 
     /** copy constructor */
     DirectedNode(const DirectedNode& node) : m_entry(node.m_entry), m_innerNodes(node.m_innerNodes), m_outerNodes(node.m_outerNodes),
-      m_metaInfo(node.m_metaInfo)
+      m_metaInfo(node.m_metaInfo), m_family(-1)
     { B2ERROR("DirectedNode-copy-constructor has been called!"); }
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
@@ -129,6 +135,12 @@ namespace Belle2 {
 
     /** returns reference to MetaInfoType attached to this node */
     MetaInfoType& getMetaInfo() { return m_metaInfo; }
+
+    /** returns identifier of this cell */
+    short getFamily() const { return m_family; }
+
+    /** assign a family identifier to this cell */
+    void setFamily(short family) { m_family = family; }
   };
 
   /** ************************* NON-MEMBER FUNCTIONS ************************* */

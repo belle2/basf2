@@ -22,27 +22,32 @@ namespace Belle2 {
   static char const* const svdResultVarNames[] = {
     "chi2_vxd_max",
     "chi2_vxd_min",
-    "chi2_vxd_mean",
-    "chi2_vxd_full",
-    "number_of_hits",
-    "pt",
     "chi2_cdc",
+    "chi2",
+
+    "number_of_hits",
+
+    "pt",
+    "theta",
+
     "number_of_holes",
+
+    "cdc_lowest_layer",
+
     "last_hit_layer",
     "first_hit_layer",
-    "chi2",
+
     "weight_sum",
+
     "has_missing_layer_1",
     "has_missing_layer_2",
     "has_missing_layer_3",
     "has_missing_layer_4",
     "has_missing_layer_5",
     "has_missing_layer_6",
-    "number_of_overlap_hits",
-    "theta",
+
     "distance_to_cdc_track",
     "distance_to_cdc_track_xy",
-    "number_of_hits_related_svd_track",
   };
 
   /// Vehicle class to transport the variable names

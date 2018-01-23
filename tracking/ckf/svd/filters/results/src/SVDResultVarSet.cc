@@ -33,32 +33,28 @@ void SVDResultVarSet::initialize()
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 {
-  const RecoTrack* seedTrack = result->getSeed();
+  const TVector3& resultMomentum = result->getMomentum();
+  var<named("pt")>() = resultMomentum.Pt();
+  var<named("theta")>() = resultMomentum.Theta();
 
-  B2ASSERT("A result without a seed?", seedTrack);
-  B2ASSERT("RecoTrack should be fitted at this stage!", seedTrack->wasFitSuccessful());
+  const std::vector<const SpacePoint*>& spacePoints = result->getHits();
 
-  const std::vector<const SpacePoint*> spacePoints = result->getHits();
+  var<named("number_of_hits")>() = spacePoints.size();
 
-  genfit::MeasuredStateOnPlane mSoP = result->getMSoP();
-
-  std::vector<unsigned int> layerUsed;
-  layerUsed.resize(7, 0);
+  std::vector<bool> layerUsed;
+  layerUsed.resize(7, false);
 
   for (const SpacePoint* spacePoint : spacePoints) {
-    layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
+    layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
   }
+  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), true);
 
-  var<named("chi2")>() = result->getChi2();
-  var<named("chi2_vxd_full")>() = result->getChi2();
-  var<named("chi2_vxd_max")>() = result->getMaximalChi2();
-  var<named("chi2_vxd_min")>() = result->getMinimalChi2();
-  var<named("weight_sum")>() = result->getWeightSum();
-  var<named("chi2_vxd_mean")>() = result->getChi2() / spacePoints.size();
-  var<named("number_of_hits")>() = spacePoints.size();
-  var<named("pt")>() = mSoP.getMom().Pt();
-  var<named("chi2_cdc")>() = seedTrack->getTrackFitStatus()->getChi2();
-  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), 0);
+  var<named("has_missing_layer_1")>() = layerUsed[1] == 0;
+  var<named("has_missing_layer_2")>() = layerUsed[2] == 0;
+  var<named("has_missing_layer_3")>() = layerUsed[3] == 0;
+  var<named("has_missing_layer_4")>() = layerUsed[4] == 0;
+  var<named("has_missing_layer_5")>() = layerUsed[5] == 0;
+  var<named("has_missing_layer_6")>() = layerUsed[6] == 0;
 
   if (spacePoints.empty()) {
     var<named("last_hit_layer")>() = -1;
@@ -68,18 +64,18 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
     var<named("first_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
   }
 
-  var<named("has_missing_layer_1")>() = layerUsed[1] == 0;
-  var<named("has_missing_layer_2")>() = layerUsed[2] == 0;
-  var<named("has_missing_layer_3")>() = layerUsed[3] == 0;
-  var<named("has_missing_layer_4")>() = layerUsed[4] == 0;
-  var<named("has_missing_layer_5")>() = layerUsed[5] == 0;
-  var<named("has_missing_layer_6")>() = layerUsed[6] == 0;
+  const RecoTrack* cdcTrack = result->getSeed();
+  const auto& cdcHits = cdcTrack->getCDCHitList();
+  B2ASSERT("CDC hits must be present", not cdcHits.empty());
 
-  var<named("number_of_overlap_hits")>() = std::count(layerUsed.begin(), layerUsed.end(), 2);
+  const auto sortByCDCLayer = [](const CDCHit * lhs, const CDCHit * rhs) {
+    return lhs->getICLayer() < rhs->getICLayer();
+  };
 
-  var<named("theta")>() = mSoP.getMom().Theta();
+  const auto& firstCDCHitIterator = std::min_element(cdcHits.begin(), cdcHits.end(), sortByCDCLayer);
+  var<named("cdc_lowest_layer")>() = (*firstCDCHitIterator)->getICLayer();
 
-
+  genfit::MeasuredStateOnPlane mSoP = result->getMSoP();
   const genfit::MeasuredStateOnPlane& firstCDCHit = result->getSeedMSoP();
   m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());
 
@@ -87,14 +83,10 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   var<named("distance_to_cdc_track")>() = distance.Mag();
   var<named("distance_to_cdc_track_xy")>() = distance.Pt();
 
-
-
-  const RecoTrack* relatedSVDRecoTrack = result->getRelatedSVDRecoTrack();
-  if (relatedSVDRecoTrack) {
-    var<named("number_of_hits_related_svd_track")>() = relatedSVDRecoTrack->getNumberOfSVDHits();
-  } else {
-    var<named("number_of_hits_related_svd_track")>() = -1;
-  }
-
+  var<named("chi2")>() = result->getChi2();
+  var<named("chi2_vxd_max")>() = result->getMaximalChi2();
+  var<named("chi2_vxd_min")>() = result->getMinimalChi2();
+  var<named("chi2_cdc")>() = cdcTrack->getTrackFitStatus()->getChi2();
+  var<named("weight_sum")>() = result->getWeightSum();
   return true;
 }

@@ -45,7 +45,6 @@ void CurlerCloneRejecter::exposeParameters(ModuleParamList* moduleParamList, con
                                 "Marking expected clones from curlers as background.",
                                 m_param_markAsBackground);
 
-  m_curlerCloneFilter.exposeParameters(moduleParamList, prefix);
   moduleParamList->addParameter(prefixed(prefix, "deleteCurlerClones"),
                                 m_param_deleteCurlerClones,
                                 "Delete the tracks instead of marking them as background.",

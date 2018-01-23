@@ -41,17 +41,31 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCurlerCloneLookUp::getMa
   return mapMCTrackIDToCDCTracks;
 }
 
-CDCTrack* CDCMCCurlerCloneLookUp::findNonCurlerCloneCDCTrack(std::vector<CDCTrack*> matchedTrackPtrs)
+/// Functor definition of comparison function for findNonCurlerCloneTrack
+bool CompareCurlerTracks::operator()(const CDCTrack* ptrTrack1,  const CDCTrack* ptrTrack2) const
 {
+  // Maybe add reference of instance in functor ctor?
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
 
-  /// TODO: this is so ugly, maybe replace by a loops-based approach
+  Index firstNLoopsTrack1 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack1);
+  Index firstNLoopsTrack2 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack2);
+  bool isTrack1Better;
+
+  // look for track with smallest NLoops of first hit
+  // if it is equal, use track with the larger amount of hits
+  if (firstNLoopsTrack1 == firstNLoopsTrack2) {
+    isTrack1Better = ptrTrack1->size() > ptrTrack2->size();
+  } else {
+    isTrack1Better = (firstNLoopsTrack1 < firstNLoopsTrack2);
+  }
+  return isTrack1Better;
+}
+
+CDCTrack* CDCMCCurlerCloneLookUp::findNonCurlerCloneTrack(std::vector<CDCTrack*> matchedTrackPtrs)
+{
+  CompareCurlerTracks compareCurlerTracks;
   CDCTrack* ptrNonCurlerCloneTrack =
-    *(std::min_element(matchedTrackPtrs.begin(), matchedTrackPtrs.end(),
-  [&cdcMCTrackLookUp](CDCTrack * ptrTrack1, CDCTrack * ptrTrack2) {
-    return cdcMCTrackLookUp.getFirstNLoops(ptrTrack1)
-           < cdcMCTrackLookUp.getFirstNLoops(ptrTrack2);
-  }));
+    *(std::min_element(matchedTrackPtrs.begin(), matchedTrackPtrs.end(), compareCurlerTracks));
   return ptrNonCurlerCloneTrack;
 }
 
@@ -81,9 +95,9 @@ void CDCMCCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
 
     } else { // multiple matching tracks
       for (const CDCTrack* ptrCDCTrack : matchedTrackPtrs) {
-        m_cdcTrackIsCurlerCloneMap[ptrCDCTrack] = true; // is clone
+        m_cdcTrackIsCurlerCloneMap[ptrCDCTrack] = true; // default that all are clones
       }
-      const CDCTrack* ptrNonCurlerCloneTrack = findNonCurlerCloneCDCTrack(matchedTrackPtrs);
+      const CDCTrack* ptrNonCurlerCloneTrack = findNonCurlerCloneTrack(matchedTrackPtrs);
       m_cdcTrackIsCurlerCloneMap[ptrNonCurlerCloneTrack] = false; // not clone
     }
   }

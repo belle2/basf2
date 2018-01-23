@@ -151,6 +151,7 @@ namespace Belle2 {
 
       G4double endpointDistance;
 
+      G4double fThreshold_Trap_Energy;        //  Assume monopoles below this can bound to material FIXME should be dependent on e.g. density
       // Thresholds for looping particles:
       //
       G4double fThreshold_Warning_Energy;     //  Warn above this energy

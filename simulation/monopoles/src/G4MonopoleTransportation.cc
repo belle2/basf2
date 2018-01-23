@@ -37,6 +37,7 @@ G4MonopoleTransportation::G4MonopoleTransportation(const G4Monopole* mpl,
     fParticleIsLooping(false),
     fPreviousSftOrigin(0., 0., 0.),
     fPreviousSafety(0.0),
+    fThreshold_Trap_Energy(10 * MeV),
     fThreshold_Warning_Energy(100 * MeV),
     fThreshold_Important_Energy(250 * MeV),
     fThresholdTrials(10),
@@ -462,6 +463,17 @@ G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
   //
   fParticleChange.SetPointerToVectorOfAuxiliaryPoints
   (fFieldPropagator->GimmeTrajectoryVectorAndForgetIt());
+
+  //Monopole bounding
+  if (fTransportEndKineticEnergy < fThreshold_Trap_Energy) {
+    fParticleChange.ProposeTrackStatus(fStopAndKill);
+#ifdef G4VERBOSE
+    if ((verboseLevel > 2)) {//TODO print with B2DEBUG
+      G4cout << "### Monopole bound in " << fCurrentTouchableHandle->GetVolume()->GetName() << G4endl;
+      G4cout << "### with energy " << fTransportEndKineticEnergy << " MeV" << G4endl;
+    }
+#endif
+  }
 
   return &fParticleChange ;
 }

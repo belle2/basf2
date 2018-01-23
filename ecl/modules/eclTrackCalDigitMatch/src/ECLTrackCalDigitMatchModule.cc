@@ -14,6 +14,8 @@
 #include <framework/logging/Logger.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/Helix.h>
+
 
 using namespace Belle2;
 using namespace std;
@@ -56,8 +58,9 @@ void ECLTrackCalDigitMatchModule::initialize()
   geom = ECL::ECLGeometryPar::Instance();
 
   // based on the (fix) endcap gap positions, get the fwd and bwd z positions
-  m_extZFWD = m_extRadius / std::tan(m_angleFWDGap);
-  m_extZBWD = m_extRadius / std::tan(m_angleBWDGap);
+  m_extZFWD = m_extRadius / std::tan(m_angleFWDGap * 0.0174533);
+  m_extZBWD = m_extRadius / std::tan(m_angleBWDGap * 0.0174533);
+  B2DEBUG(50, "m_extZFWD: " << m_extZFWD << ", m_extZBWD: " << m_extZBWD);
 
   // fill maps that related phi id to list of cell ids (ECLGeometryPar returns IDs from 0..)
   for (unsigned int i = 0; i < 144; ++i) {
@@ -106,20 +109,29 @@ void ECLTrackCalDigitMatchModule::event()
     if (closestMassFitResult == nullptr) continue;
 
     // get the track parameters
-    const double d0        = closestMassFitResult->getD0();
-    const double phi0      = closestMassFitResult->getPhi0();
-    const double omega     = closestMassFitResult->getOmega();
     const double z0        = closestMassFitResult->getZ0();
     const double tanlambda = closestMassFitResult->getTanLambda();
 
-    // try to extrapolate the track to the requested radius
-    double l = fabs(acos((d0 * d0 * omega * omega + 2 * d0 * omega - m_extRadius * m_extRadius * omega * omega + 2) /
-                         (2 * d0 * omega + 2)) / omega); //check but there are two solutions with opposite sign
-    const double x = sin(phi0 + omega * l) / omega - (1 / omega + d0) * sin(phi0); //check
-    const double y = -cos(phi0 + omega * l) / omega + (1 / omega + d0) * cos(phi0); //check
-    const double z = z0 + l * tanlambda; //check
-    const double exttheta = atan2(m_extRadius, z);
-    const double extphi = atan2(y, x);
+    // use the helix class
+    Helix h = closestMassFitResult->getHelix();
+
+    // extrapolate to radius
+    const double lHelixRadius = h.getArcLength2DAtCylindricalR(m_extRadius) > 0 ? h.getArcLength2DAtCylindricalR(m_extRadius) : 999999.;
+
+    // extrapolate to FWD z
+    const double lFWD = (m_extZFWD - z0) / tanlambda > 0 ? (m_extZFWD - z0) / tanlambda : 999999.;
+
+    // extrapolate to backward z
+    const double lBWD = (m_extZBWD - z0) / tanlambda > 0 ? (m_extZBWD - z0) / tanlambda : 999999.;
+
+    // pick smalles arclength
+    const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
+
+    B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
+
+    TVector3 posHelix = h.getPositionAtArcLength2D(l);
+    const double exttheta = atan2(posHelix.Perp(), posHelix.Z());
+    const double extphi = atan2(posHelix.Y(), posHelix.X());
 
     const auto anainfo = m_anaEnergyCloseToTrack.appendNew();
     track.addRelationTo(anainfo);
@@ -172,13 +184,7 @@ void ECLTrackCalDigitMatchModule::event()
       anainfo->setExtPhi(extphi);
       anainfo->setExtPhiId(phiid);
 
-      B2DEBUG(150, "theta from track = " << closestMassFitResult->getMomentum().Theta() << ", phi from track=" <<
-              closestMassFitResult->getMomentum().Phi());
-      B2DEBUG(150, "theta from extrapolation = " << exttheta << ", phi from extrapolation = " << extphi);
-
     }
-
-    B2DEBUG(150, "pathlength on track circle, l=" << l << ", ext radius=" << m_extRadius << ", x=" << x << ", y=" << y << ", z=" << z);
 
   }
 }

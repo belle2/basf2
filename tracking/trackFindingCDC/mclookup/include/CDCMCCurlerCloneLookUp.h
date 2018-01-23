@@ -33,9 +33,11 @@ namespace Belle2 {
       /// TODO: Manage singleton by MCManager? Then, ctor needs to be public.
       CDCMCCurlerCloneLookUp() = default;
 
+      /// Helper function which returns a map of MCTrackIDs to vectors of CDTrack pointers.
+      /// Need that to find clone candidates: tracks with same MCTrackID
       std::map<const ITrackType, std::vector<CDCTrack*>> getMapMCIDToCDCTracks(std::vector<CDCTrack>& cdcTracks);
 
-      /// Takes a vector of pointers to CDCTracks which are matched to the same MC particle
+      /// Helper function which takes a vector of pointers to CDCTracks which are matched to the same MC particle.
       /// Returns track ptr which is assumed to be not a clone from a curler.
       CDCTrack* findNonCurlerCloneTrack(std::vector<CDCTrack*> matchedTrackPtrs);
 
@@ -43,13 +45,15 @@ namespace Belle2 {
       std::map<const CDCTrack*, bool> m_cdcTrackIsCurlerCloneMap;
     };
     //
-    // Compare Functor with decision logic, which from multiple curler tracks to use
+    // Compare Functor which which decides from two tracks to declare non-clone
     struct CompareCurlerTracks {
       /// marker function for the isFunctor test
       operator FunctorTag();
 
       CompareCurlerTracks() = default;
 
+      // Return true if Track1 has a lower NLoops of first hit than Track1, in the reversed case return false
+      // If both tracks have the same firstNLoops, return true if Track1 has larger number hits.
       bool operator()(const CDCTrack* ptrTrack1,  const CDCTrack* ptrTrack2) const;
     };
   }

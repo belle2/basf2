@@ -29,13 +29,17 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCurlerCloneLookUp::getMa
 
   for (CDCTrack& cdcTrack : cdcTracks) {
     CDCTrack* ptrCDCTrack = &cdcTrack;
+
     ITrackType mcTrackID = cdcMCTrackLookUp.getMCTrackId(ptrCDCTrack);
 
-    if (mapMCTrackIDToCDCTracks.find(mcTrackID) == mapMCTrackIDToCDCTracks.end()) {
-      // mcTrackID not yet in map, so add element
-      mapMCTrackIDToCDCTracks.emplace(mcTrackID, std::vector<CDCTrack*> {ptrCDCTrack});
-    } else { // mcTrackID already in map, so add Track to vector of tracks
-      mapMCTrackIDToCDCTracks[mcTrackID].push_back(ptrCDCTrack);
+    /// only if matching MCTrack with 50% minimal purity was found
+    if (mcTrackID != INVALID_ITRACK) {
+      if (mapMCTrackIDToCDCTracks.find(mcTrackID) == mapMCTrackIDToCDCTracks.end()) {
+        // mcTrackID not yet in map, so add element
+        mapMCTrackIDToCDCTracks.emplace(mcTrackID, std::vector<CDCTrack*> {ptrCDCTrack});
+      } else { // mcTrackID already in map, so add Track to vector of tracks
+        mapMCTrackIDToCDCTracks[mcTrackID].push_back(ptrCDCTrack);
+      }
     }
   }
   return mapMCTrackIDToCDCTracks;
@@ -51,8 +55,8 @@ bool CompareCurlerTracks::operator()(const CDCTrack* ptrTrack1,  const CDCTrack*
   Index firstNLoopsTrack2 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack2);
   bool isTrack1Better;
 
-  // look for track with smallest NLoops of first hit
-  // if it is equal, use track with the larger amount of hits
+  // Look for track with smallest NLoops of first hit.
+  // If it is equal, use track with the larger amount of hits.
   if (firstNLoopsTrack1 == firstNLoopsTrack2) {
     isTrack1Better = ptrTrack1->size() > ptrTrack2->size();
   } else {

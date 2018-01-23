@@ -193,7 +193,7 @@ def peel_store_array_info(item, key="{part_name}"):
 
 
 @format_crop_keys
-def peel_quality_indicators(reco_track):
+def peel_quality_indicators(reco_track, key="{part_name}"):
     nan = float("nan")
 
     crops = dict(

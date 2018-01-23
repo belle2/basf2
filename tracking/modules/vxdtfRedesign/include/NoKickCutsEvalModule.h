@@ -122,7 +122,8 @@ namespace Belle2 {
     std::vector<double> m_histoLim; /**< limits of DeltaX histograms */
     std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo; /**< DeltaX histograms */
 
-    std::vector<TString> m_namePar = { /**< name of track parameters */
+    /**< name of track parameters */
+    std::vector<TString> m_namePar = {
       "#omega",
       "d0",
       "#phi0",
@@ -130,7 +131,8 @@ namespace Belle2 {
       "tan#lambda"
     };
 
-    std::vector<TString> m_unitPar = { /**< units of tracks parameters */
+    /**< units of tracks parameters */
+    std::vector<TString> m_unitPar = {
       "[cm^{-1}]",
       "[cm]",
       "[rad]",

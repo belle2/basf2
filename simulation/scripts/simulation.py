@@ -50,22 +50,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
 
     add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2, svd_cluster='__ROIsvdClusters')
 
-    pxdDataRed = register_module('PXDROIFinder')
-    param_pxdDataRed = {
-        'recoTrackListName': svd_reco_tracks,
-        'PXDInterceptListName': 'PXDIntercepts',
-        'ROIListName': 'ROIs',
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
+    add_roiFinder(path, svd_reco_tracks)
 
     # Filtering of PXDDigits
     pxd_digifilter = register_module('PXDdigiFilter')
@@ -89,6 +74,31 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
                                                  '__ROIsvdRecoTracksToRecoHitInformations',
                                                  '__ROIsvdRecoTracksToSPTrackCands__ROI'])
         path.add_module(datastore_cleaner)
+
+
+def add_roiFinder(path, reco_tracks):
+    """
+    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
+    :param path: Where to add the module to.
+    :param reco_tracks: Which tracks to use in the extrapolation step.
+    """
+
+    pxdDataRed = register_module('PXDROIFinder')
+    param_pxdDataRed = {
+        'recoTrackListName': reco_tracks,
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
 
 
 def add_simulation(

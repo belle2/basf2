@@ -148,7 +148,7 @@ namespace Belle2 {
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename... Types> struct Type<boost::variant<Types...> > { /** type name. */ static std::string name() { return std::string("variant(") + VariadicType<Types...>::name() + ")"; } };
 
-    /** Som modules take a path as argument so let's add this as well */
+    /** Some modules take a path as argument so let's add this as well */
     template<> struct Type<std::shared_ptr<Path>> {
       static std::string name() { return std::string("Path"); }
     };

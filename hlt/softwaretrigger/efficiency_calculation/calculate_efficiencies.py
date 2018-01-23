@@ -136,7 +136,6 @@ if __name__ == "__main__":
         "mumu",
         "mumu_kkgen",
 
-        "ee",
         "gg",
 
         "continuum_ccbar",

@@ -25,6 +25,7 @@
 
 from basf2 import *
 import argparse
+from testbeam.utils import *
 
 
 # ---------------------------------------------------------------------------------------
@@ -41,6 +42,7 @@ arg_parser.add_argument('--train_sample', '-i', type=str, action='append',
 arguments = arg_parser.parse_args(sys.argv[1:])
 train_data = arguments.train_sample
 assert len(train_data) > 0, 'No data sample for training provided!'
+assert len(train_data) <= 1, 'Only one input file supported!'
 # secmap_name = arguments.secmap
 # use the same name base as the input data (first in the list) to have it reproducable
 secmap_name = "SecMap_" + train_data[0]
@@ -59,6 +61,29 @@ path = create_path()
 # in the prepared training sample root file.
 eventinfosetter = register_module('EventInfoSetter')
 path.add_module(eventinfosetter)
+
+
+# retrieve geometry and magnet from name of input file
+# assumes that files (and names) are created by trainingPreparation.py
+geometry_file = ""
+if "afterMarch1st" in train_data[0]:
+    geometry_file = "testbeam/vxd/2017_geometry_1.xml"
+else:
+    geometry_file = "testbeam/vxd/2017_geometry.xml"
+
+
+magnetOn = False
+if "MagnetOn" in train_data[0]:
+    magnetOn = True
+if "MagnetOff" in train_data[0]:
+    magnetOn = False
+
+print("using magnet on = " + str(magnetOn))
+print("using geometry = " + geometry_file)
+
+# removed the upstream scintilators, as they may produce curlers
+add_geometry(path, magnet=magnetOn, geometry_xml=geometry_file,
+             geometry_version=-666, excluded_components=['Scintilators'])
 
 # SecMapBootStrap Module is requiered, as it loads the SecMap config and is responsible
 # for storing the trained SecMap.

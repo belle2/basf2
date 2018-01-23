@@ -11,10 +11,10 @@ environment for the execution of the Belle2 software.
 Installation
 ------------
 
-In case you don't have a centrally provided Belle 2 Software you need to
+In case you don't have a centrally provided Belle II Software you need to
 install the tools locally.  Once you have `uploaded your ssh key
 <Git/Stash Introduction>`_ to https://stash.desy.de can obtain the
-software tools from the central Belle 2 code repository with the following
+software tools from the central Belle II code repository with the following
 command::
 
     $ git clone ssh://git@stash.desy.de:7999/b2/tools.git
@@ -31,7 +31,7 @@ After first time installation of the tools you need to run ::
 
     $ tools/prepare_belle2.sh
 
-to make sure that all software requirements for installing the Belle 2 Software
+to make sure that all software requirements for installing the Belle II Software
 are met on your Machine.
 
 .. note:: This will require root permissions
@@ -42,12 +42,12 @@ are met on your Machine.
 Setup
 -----
 
-Once the tools are installed you need to setup the Belle 2 environment by
+Once the tools are installed you need to setup the Belle II environment by
 sourcing ``tools/setup_belle2``::
 
     $ source tools/setup_belle2
 
-.. warning:: this has to be done in every shell you plan on using the Belle 2 Software
+.. warning:: this has to be done in every shell you plan on using the Belle II Software
 
 The behaviour of the tools can be customized by setting the following
 environment variables before sourcing ``tools/setup_belle2``:

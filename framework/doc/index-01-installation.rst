@@ -15,7 +15,7 @@ Belle2 Software is to use it via CVMFS_ which is readily available on KEKCC and
 many HEP specific software resources.  It can also easily be installed on your
 local machine following the `CVMFS Client Quick Start`_ guide.
 
-If you want to install the Belle 2 Software without cvmfs please have a look at
+If you want to install the Belle II Software without cvmfs please have a look at
 the following documents, otherwise if you have cvmfs available please continue with :ref:`cvmfs-setup`
 
 .. toctree:: 
@@ -27,8 +27,8 @@ the following documents, otherwise if you have cvmfs available please continue w
 
 .. _cvmfs-setup:
 
-Setup Of the Belle 2 Software
------------------------------
+Setup Of the Belle II Software
+------------------------------
 
 If CVMS is available on your machine you only have to setup
 the :ref:`belle2-tools` by running ::
@@ -42,12 +42,12 @@ distributions from the list at at the top of this page.
    <belle2-tools-setup>` which can be set to customize the belle2 setup
 
 .. note:: If you use the software without CVMFS please change the path to
-  where you :ref:`installed the Belle 2 Software tools <belle2-tools-installation>`
+  where you :ref:`installed the Belle II Software tools <belle2-tools-installation>`
 
 .. warning:: There is a custom setup script on KEKCC. If you work on KEKCC
   please source ``/sw/belle2/tools/setup_belle2`` instead.
 
-Now the only thing left to do is to setup which version of the Belle 2 Software
+Now the only thing left to do is to setup which version of the Belle II Software
 you want to use ::
 
   $ setuprel release-01-00-00
@@ -57,7 +57,7 @@ to use.
 
 .. hint:: to get a list of the available releases run ``get_release.sh``
 
-.. warning:: this has to be done in every shell you plan on using the Belle 2 Software
+.. warning:: this has to be done in every shell you plan on using the Belle II Software
 
 
 Physics Analysis Setup

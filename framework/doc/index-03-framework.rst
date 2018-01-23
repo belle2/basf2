@@ -92,7 +92,7 @@ Other Related Classes
 Logging
 -------
 
-The Logging system of the Belle 2 Software is rather flexible and allows
+The Logging system of the Belle II Software is rather flexible and allows
 extensive configurations. In the most simple case a call to
 `set_log_level` is all that is needed to set the minimum severity of
 messages to be printed. However in addition to this global log level one can

@@ -54,7 +54,7 @@ def main():
     output_file = os.environ.get("output_file")
 
     output_variables_file = output_file.replace(".root", "_variables.pkl")
-    output_results_file = output_file.replace(".root", "_results.pkl")
+    output_results_file = output_file.replace(".root", "_hlt_results.pkl")
     output_l1_results_file = output_file.replace(".root", "_l1_results.pkl")
 
     log_file = output_file.replace(".root", ".log")

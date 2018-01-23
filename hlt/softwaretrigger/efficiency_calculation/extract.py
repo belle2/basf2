@@ -66,7 +66,7 @@ def extract_efficiencies(channels, storage_location):
         channel_path = os.path.join(storage_location, channel)
         analysed_path = os.path.join(channel_path, "analysed")
 
-        for filename in glob(os.path.join(analysed_path, "*_results.pkl")):
+        for filename in glob(os.path.join(analysed_path, "*_hlt_results.pkl")):
             result_list += pd.read_pickle(filename)
 
         if len(result_list) == 0:

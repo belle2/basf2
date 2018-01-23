@@ -40,7 +40,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 
   const std::vector<const SpacePoint*> spacePoints = result->getHits();
 
-  genfit::MeasuredStateOnPlane mSoP = result->getSeedMSoP();
+  genfit::MeasuredStateOnPlane mSoP = result->getMSoP();
 
   std::vector<unsigned int> layerUsed;
   layerUsed.resize(7, 0);

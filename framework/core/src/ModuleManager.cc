@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace std;
 
-#define MAP_FILE_EXTENSION ".map"
+#define MAP_FILE_EXTENSION ".b2modmap"
 #define LIB_FILE_EXTENSION ".so"
 
 

@@ -1,5 +1,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Path.h>
+#include <boost/optional.hpp>
 
 template class Belle2::ModuleParam<bool>;
 template class Belle2::ModuleParam<char>;
@@ -30,5 +31,9 @@ template class Belle2::ModuleParam<std::vector<unsigned long long>>;
 template class Belle2::ModuleParam<std::vector<float>>;
 template class Belle2::ModuleParam<std::vector<double>>;
 template class Belle2::ModuleParam<std::vector<std::string>>;
+
+template class Belle2::ModuleParam<boost::optional<int>>;
+template class Belle2::ModuleParam<boost::optional<double>>;
+template class Belle2::ModuleParam<boost::optional<std::string>>;
 
 template class Belle2::ModuleParam<std::shared_ptr<Belle2::Path>>;

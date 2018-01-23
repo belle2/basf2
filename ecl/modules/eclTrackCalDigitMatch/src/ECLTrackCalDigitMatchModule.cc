@@ -38,6 +38,7 @@ ECLTrackCalDigitMatchModule::ECLTrackCalDigitMatchModule() : Module()
   addParam("extRadius", m_extRadius, "radius to which tracks are extrapolated [cm]", 130.00);
   addParam("angleFWDGap", m_angleFWDGap, "FWD gap angle [deg]", 31.80);
   addParam("angleBWDGap", m_angleBWDGap, "BWD gap angle [deg]", 129.70);
+  addParam("trackHypothesis", m_trackHypothesis, "Track hypothesis (PDG code) used in extrapolation", 11);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -103,8 +104,11 @@ void ECLTrackCalDigitMatchModule::event()
 
   for (const Track& track : m_tracks) {
 
+    const auto anainfo = m_anaEnergyCloseToTrack.appendNew();
+    track.addRelationTo(anainfo);
+
     // get the trackfit results for this track
-    Const::ChargedStable chargedStable(abs(11));
+    Const::ChargedStable chargedStable(abs(m_trackHypothesis));
     auto closestMassFitResult = track.getTrackFitResultWithClosestMass(chargedStable);
     if (closestMassFitResult == nullptr) continue;
 
@@ -132,9 +136,6 @@ void ECLTrackCalDigitMatchModule::event()
     TVector3 posHelix = h.getPositionAtArcLength2D(l);
     const double exttheta = atan2(posHelix.Perp(), posHelix.Z());
     const double extphi = atan2(posHelix.Y(), posHelix.X());
-
-    const auto anainfo = m_anaEnergyCloseToTrack.appendNew();
-    track.addRelationTo(anainfo);
 
     // check if the extrapolation reaches the requested radius
     if (!isnan(exttheta)) {

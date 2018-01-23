@@ -9,16 +9,15 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-
 #include <tracking/modules/vxdtfRedesign/TrackFinderVXDCosmicsStandalone.h>
-#include "../include/TrackFinderVXDCosmicsStandalone.h"
-
 
 using namespace Belle2;
 
 REG_MODULE(TrackFinderVXDCosmicsStandalone);
 
-
+/**
+ * The TrackFinderVXDCosmicsStandaloneModule
+ */
 TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() : Module()
 {
   //Set module properties
@@ -42,7 +41,6 @@ TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() :
 
   addParam("MaxRejectedSPs", m_maxRejectedSPs,
            "Maximal number of rejected SPs in the event.", m_maxRejectedSPs);
-
 }
 
 
@@ -50,12 +48,6 @@ void TrackFinderVXDCosmicsStandaloneModule::initialize()
 {
   m_spacePoints.isRequired(m_spacePointsName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
-}
-
-
-void TrackFinderVXDCosmicsStandaloneModule::beginRun()
-{
-  B2WARNING("Starting with cosmic track finding...");
 }
 
 

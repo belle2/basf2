@@ -453,6 +453,22 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterTrigger(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        const bool matcher = shower->hasTriggerClusterMatching();
+
+        if (matcher) {
+          result = shower->isTriggerCluster();
+        } else {
+          B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
+        }
+      }
+    }
+
     double eclExtTheta(const Particle* particle)
     {
       double result = -1.0;

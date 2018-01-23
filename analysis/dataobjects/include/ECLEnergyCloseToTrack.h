@@ -55,7 +55,6 @@ namespace Belle2 {
     /** Get m_energy3BWDEndcap */
     float getEnergy3BWDEndcap() const {return m_energy3BWDEndcap;}
 
-
     /** Set m_extTheta */
     void setExtTheta(float theta) {m_extTheta = theta;}
 

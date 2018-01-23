@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZERMODULE_H
-#define EKLMDIGITIZERMODULE_H
+#ifndef EKLMDQMMODULE_H
+#define EKLMDQMMODULE_H
 
 /* External headers. */
 #include <TH1F.h>

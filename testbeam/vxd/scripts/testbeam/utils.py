@@ -382,7 +382,8 @@ def add_vxdtf_v2(path=None,
                  filter_overlapping=True,
                  use_segment_network_filters=True,
                  observerType=0,
-                 quality_estimator='circleFit',
+                 # quality_estimator='circleFit',
+                 quality_estimator='tripletFit',
                  overlap_filter='greedy',
                  log_level=LogLevel.ERROR,
                  usedGeometry='TB2017newGeo',
@@ -451,16 +452,17 @@ def add_vxdtf_v2(path=None,
                                  reco_tracks="RecoTracks",
                                  components=tf2_components,
                                  suffix="",
-                                 useTwoStepSelection=False,
+                                 useTwoStepSelection=True,
                                  sectormap_file=Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name),
                                  PXDminSVDSPs=0)  # This module was not in the old function, so reproduce no action for now
 
     set_module_parameters(path, 'SectorMapBootstrap', SetupToRead='testbeamTEST')
-    set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
+    # set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
     set_module_parameters(path, 'SegmentNetworkProducer', sectorMapName='testbeamTEST')
-    set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
+    # set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
     if filter_overlapping:
-        set_module_parameters(path, 'SVDOverlapResolver', ResolveMethod=overlap_filter.lower())
+        print("doing nothing")
+        # set_module_parameters(path, 'SVDOverlapResolver', ResolveMethod=overlap_filter.lower())
     else:
         # Would originally not add the module to the path
         # Instead use crude workaround to create new path without the module

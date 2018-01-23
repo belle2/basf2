@@ -85,7 +85,7 @@ for mod in main.modules():
         # (#10 <= DistanceInTimeVside <= #11)
         mod.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "TMath::Infinity()"),
                                                   (10, "-TMath::Infinity()"), (11, "TMath::Infinity()")])
-        mod.logging.log_level = LogLevel.DEBUG
+        # mod.logging.log_level = LogLevel.DEBUG
 
 
 # add SVD performance module

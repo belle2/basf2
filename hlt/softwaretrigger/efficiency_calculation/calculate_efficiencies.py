@@ -22,6 +22,7 @@ All former results in the same store location (given by console argument) will b
 from glob import glob
 import os
 import argparse
+import time
 
 from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficiencies
 from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
@@ -164,6 +165,12 @@ if __name__ == "__main__":
                         type=int, default=3)
 
     args = parser.parse_args()
+
+    if args.phase == 2:
+        print("\n!!!!\n You selected to run with Phase 2 configuration.")
+        print("Did you also set BELLE2_BACKGROUND_DIR to phase 2 background?")
+        print("Continuing in 5 seconds")
+        time.sleep(5)
 
     # better to put the storage location as absolute path, because the jobs will be executed
     # in differen folders later

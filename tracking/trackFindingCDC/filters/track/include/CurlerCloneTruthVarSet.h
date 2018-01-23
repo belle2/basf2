@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
@@ -22,6 +25,7 @@ namespace Belle2 {
       "weight", // 0 for fakes, 1 for MC matched tracks
       "track_is_curler_clone_truth", // track is clone
       "truth", // not clone, either best match or fake (which is then not used due to weight 0)
+      "truth_event_id",
     };
 
     /// Vehicle class to transport the variable names
@@ -43,10 +47,6 @@ namespace Belle2 {
      */
     class CurlerCloneTruthVarSet : public VarSet<CurlerCloneTruthVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<CurlerCloneTruthVarNames>;
-
     public:
       /// Require the Monte Carlo truth information at initialisation
       void initialize() final;
@@ -56,6 +56,12 @@ namespace Belle2 {
 
       /// Generate and assign the contained variables
       bool extract(const CDCTrack* track) override;
+
+    private:
+      /// Type of the base class
+      using Super = VarSet<CurlerCloneTruthVarNames>;
+
+      StoreObjPtr<EventMetaData> m_eventMetaData;
     };
   }
 }

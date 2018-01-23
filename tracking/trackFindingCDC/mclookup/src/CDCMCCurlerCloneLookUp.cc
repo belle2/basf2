@@ -111,11 +111,13 @@ bool CDCMCCurlerCloneLookUp::isTrackCurlerClone(const CDCTrack& cdcTrack)
 {
   const CDCTrack* ptrCDCTrack = &cdcTrack;
 
-  if (m_cdcTrackIsCurlerCloneMap.find(ptrCDCTrack) == m_cdcTrackIsCurlerCloneMap.end()) {
-    B2FATAL("No entry for this CDC track in m_cdcTrackIsCurlerCloneMap");
+  const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
+  if (cdcMCTrackLookUp.getMCTrackId(ptrCDCTrack) == INVALID_ITRACK) {
+    return false; // track is not matched
+  } else {
+    if (m_cdcTrackIsCurlerCloneMap.find(ptrCDCTrack) == m_cdcTrackIsCurlerCloneMap.end()) {
+      B2FATAL("No entry for this CDC track in m_cdcTrackIsCurlerCloneMap");
+    }
+    return m_cdcTrackIsCurlerCloneMap[ptrCDCTrack];
   }
-  if (m_cdcTrackIsCurlerCloneMap.size() == 0) {
-    B2FATAL("m_cdcTrackIsCurlerCloneMap is empty.");
-  }
-  return m_cdcTrackIsCurlerCloneMap[ptrCDCTrack];
 }

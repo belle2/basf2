@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCCurlerCloneLookUp.h>
 
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -68,5 +67,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* track)
   var<named("weight")>() = trackIsFake;
   var<named("track_is_curler_clone_truth")>() = trackIsClone;
   var<named("truth")>() = not trackIsClone;
+
+  var<named("truth_event_id")>() = m_eventMetaData->getEvent();
   return true;
 }

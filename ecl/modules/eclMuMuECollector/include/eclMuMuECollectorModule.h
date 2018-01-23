@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christopher Hearty                                       *
@@ -45,8 +45,8 @@ namespace Belle2 {
     /** Neighbours of each ECL crystal. 4 Neighbours for barrel and outer endcap; ;~8 otherwise */
     int firstcellIDN4 = 1009; /**< first cellID where we only need 4 neighbours */
     int lastcellIDN4 = 7920; /**< last cellID where we only need 4 neighbours */
-    ECL::ECLNeighbours* myNeighbours4;
-    ECL::ECLNeighbours* myNeighbours8;
+    ECL::ECLNeighbours* myNeighbours4; /**< class to return 4 nearest neighbours to crystal */
+    ECL::ECLNeighbours* myNeighbours8; /**< class to return 8 nearest neighbours to crystal */
 
     /** Some other useful quantities */
     double cotThetaLabMin;  /**< m_thetaLabMinDeg converted to cotangent */
@@ -56,15 +56,15 @@ namespace Belle2 {
 
     /** Expected energies from database */
     DBObjPtr<ECLCrystalCalib> m_ECLExpMuMuE;
-    std::vector<float> ExpMuMuE;
+    std::vector<float> ExpMuMuE; /**< vector obtained from DB object */
 
     /** Electronics calibration from database */
     DBObjPtr<ECLCrystalCalib> m_ElectronicsCalib;
-    std::vector<float> ElectronicsCalib;
+    std::vector<float> ElectronicsCalib; /**< vector obtained from DB object */
 
     /** Existing single crystal calibration from DB; will be updated by CAF */
     DBObjPtr<ECLCrystalCalib> m_MuMuECalib;
-    std::vector<float> MuMuECalib;
+    std::vector<float> MuMuECalib; /**< vector obtained from DB object */
 
   };
 }

@@ -73,13 +73,16 @@ namespace Belle2 {
 
   private:
 
+    /** Directory for EKLM DQM histograms in ROOT file. */
+    std::string m_HistogramDirectoryName;
+
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
 
-    /* Sector number. */
+    /** Sector number. */
     TH1F* m_Sector;
 
   };

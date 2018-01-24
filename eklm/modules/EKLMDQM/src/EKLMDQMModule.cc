@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
 #include <TDirectory.h>
 
 /* Belle2 headers. */
@@ -21,7 +22,11 @@ EKLMDQMModule::EKLMDQMModule() : HistoModule()
 {
   setDescription("EKLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("histogramDirectoryName", m_HistogramDirectoryName,
+           "Directory for EKLM DQM histograms in ROOT file.",
+           std::string("EKLM"));
   m_Elements = NULL;
+  m_Sector = NULL;
 }
 
 EKLMDQMModule::~EKLMDQMModule()
@@ -30,8 +35,12 @@ EKLMDQMModule::~EKLMDQMModule()
 
 void EKLMDQMModule::defineHisto()
 {
-  printf("%s\n", gDirectory->GetName());
+  TDirectory* oldDirectory, *newDirectory;
+  oldDirectory = gDirectory;
+  newDirectory = oldDirectory->mkdir(m_HistogramDirectoryName.c_str());
+  newDirectory->cd();
   m_Sector = new TH1F("eklm_sector", "Sector number", 112, 0.5, 112.5);
+  oldDirectory->cd();
 }
 
 void EKLMDQMModule::initialize()
@@ -43,6 +52,7 @@ void EKLMDQMModule::initialize()
 
 void EKLMDQMModule::beginRun()
 {
+  m_Sector->Reset();
 }
 
 void EKLMDQMModule::event()

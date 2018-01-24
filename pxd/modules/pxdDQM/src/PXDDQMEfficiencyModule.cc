@@ -45,6 +45,8 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));
 
+  addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
+
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
 
 }
@@ -80,9 +82,9 @@ void PXDDQMEfficiencyModule::event()
     //If fit failed assume position pointed to is useless anyway
     if (!a_track.wasFitSuccessful()) continue;
 
-    //todo more cuts on fit status?
-    //const genfit::FitStatus* fitstatus = NULL;
-    //fitstatus = a_track.getTrackFitStatus();
+    const genfit::FitStatus* fitstatus = NULL;
+    fitstatus = a_track.getTrackFitStatus();
+    if (fitstatus->getPVal() < m_pcut) continue;
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();

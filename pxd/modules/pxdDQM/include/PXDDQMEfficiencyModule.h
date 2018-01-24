@@ -107,6 +107,7 @@ namespace Belle2 {
     StoreArray<ROIid> m_ROIs;
 
     double m_distcut; //distance cut in cm!
+    double m_pcut; //pValue-Cut for tracks
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;

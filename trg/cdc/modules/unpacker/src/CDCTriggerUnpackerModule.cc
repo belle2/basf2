@@ -176,7 +176,11 @@ namespace Belle2 {
             const int j = (offsetBitWidth + pos + iTSF * numTS * TSWidth) / 32;
             const int k = (offsetBitWidth + pos + iTSF * numTS * TSWidth) % 32;
             std::bitset<32> word(data32tab[iFinesse][i + j]);
-            inputClock->m_signal[iTSF][iTracker][9 + pos] = word[31 - k] + 2;
+            // MSB (leftmost) in firmware -> smallest index in Bitstream's
+            // std::array (due to XSIM) -> largest index in std::bitset
+            // so the index is reversed in this assignment
+            inputClock->m_signal[iTSF][iTracker][clockCounterWidth + pos] =
+              std_logic(word[31 - k]);
           }
           if (debugLevel >= 100) {
             display_hex(inputClock->m_signal[iTSF][iTracker]);

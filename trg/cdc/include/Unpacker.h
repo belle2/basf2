@@ -28,6 +28,9 @@ namespace Belle2 {
 
     static constexpr int nMax2DTracksPerClock = 6;
 
+    // bit width of the clock counter
+    static constexpr int clockCounterWidth = 9;
+
     /* number of mergers in axial super layers */
     static constexpr std::array<int, nAxialTSF> nAxialMergers = {10, 12, 16, 20, 24};
     /* number of wires in a super layer*/
@@ -104,6 +107,15 @@ namespace Belle2 {
     const char one_val  = 3;
     /** '0' in XSI VHDL simulation */
     const char zero_val = 2;
+
+    char std_logic(bool inBit)
+    {
+      char outBit = zero_val;
+      if (inBit) {
+        outBit = one_val;
+      }
+      return outBit;
+    }
 
     std::string display_value(const char* count, int size)
     {

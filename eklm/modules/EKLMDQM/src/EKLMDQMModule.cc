@@ -39,7 +39,7 @@ void EKLMDQMModule::defineHisto()
   oldDirectory = gDirectory;
   newDirectory = oldDirectory->mkdir(m_HistogramDirectoryName.c_str());
   newDirectory->cd();
-  m_Sector = new TH1F("eklm_sector", "Sector number", 112, 0.5, 112.5);
+  m_Sector = new TH1F("eklm_sector", "Sector number", 104, 0.5, 104.5);
   oldDirectory->cd();
 }
 

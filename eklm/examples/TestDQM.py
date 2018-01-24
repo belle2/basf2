@@ -5,7 +5,7 @@
 # Use ParticleGun/FullReconstruction.py to generate the input data.
 
 from basf2 import *
-from ROOT import Belle2
+from daqdqm.commondqm import *
 import sys
 
 # Set the global log level
@@ -19,14 +19,19 @@ input.param('inputFileName', 'ParticleGunMuonsFull.root')
 histo = register_module('HistoManager')
 histo.param('histoFileName', 'EKLMDQM.root')
 
-# DQM
-eklm_dqm = register_module('EKLMDQM')
+# Gearbox
+gearbox = register_module('Gearbox')
+
+# Geometry
+geometry = register_module('Geometry')
 
 # Create paths
 main = create_path()
 main.add_module(input)
 main.add_module(histo)
-main.add_module(eklm_dqm)
+main.add_module(gearbox)
+main.add_module(geometry)
+add_common_dqm(main, components=['EKLM'])
 
 # Process events
 process(main)

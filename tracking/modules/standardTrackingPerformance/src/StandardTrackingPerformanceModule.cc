@@ -291,8 +291,8 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   // remove photons from list
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
-  for (auto mcParticle : daughterMcParticles) {
-    daughterPDGs.push_back(mcParticle->getPDG());
+  for (auto daughterMCParticle : daughterMcParticles) {
+    daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 
   std::sort(daughterPDGs.begin(), daughterPDGs.end());

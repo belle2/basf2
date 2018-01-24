@@ -24,6 +24,10 @@ def add_common_dqm(path, components=None):
     if components is None or 'BKLM' in components:
         bklmdqm = register_module("BKLMDQM")
         path.add_module(bklmdqm)
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmdqm = register_module('EKLMDQM')
+        path.add_module(eklmdqm)
     # ECLTRG
     if components is None or 'TRG' in components:
         trgecldqm = register_module('TRGECLDQM')

@@ -89,7 +89,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
         pr_to_mc_match_info_crops = self.peel_pr_to_mc_match_info(reco_track)
 
-        # Custom peel function to get hit purity of subdetectors
+        # Peel function to get hit purity of subdetectors
         subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
 
         # Basic peel function to get Quality Indicators

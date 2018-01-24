@@ -69,6 +69,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                             trackFitHypotheses=additionalTrackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
+            add_track_mva_quality_estimation(path, do_training=True)
+
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
@@ -1047,3 +1049,25 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=Tr
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
     path.add_module(dafRecoFitter)
+
+
+def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_reco_tracks="SVDCDCRecoTracks",
+                                     cdc_reco_tracks="CDCRecoTracks", svd_reco_tracks="SVDRecoTracks",
+                                     pxd_reco_tracks="PXDRecoTracks",
+                                     do_training=False):
+    if(not do_training):
+        trackQualityEstimatorMVA = register_module('TrackQualityEstimatorMVA', recoTracksStoreArrayName=reco_tracks,
+                                                   SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
+                                                   CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+                                                   SVDRecoTracksStoreArrayName=svd_reco_tracks,
+                                                   PXDRecoTracksStoreArrayName=pxd_reco_tracks)
+        # trackQualityEstimatorMVA.param('...', quality_estimator)
+        path.add_module(trackQualityEstimatorMVA)
+    else:
+        trackQETrainingDataCollector = register_module('TrackQETrainingDataCollector', recoTracksStoreArrayName=reco_tracks,
+                                                       SVDCDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
+                                                       CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+                                                       SVDRecoTracksStoreArrayName=svd_reco_tracks,
+                                                       PXDRecoTracksStoreArrayName=pxd_reco_tracks)
+        trackQETrainingDataCollector.param('TrainingDataOutputName', 'FullRecoTrack-MVA-Training.root')
+        path.add_module(trackQETrainingDataCollector)

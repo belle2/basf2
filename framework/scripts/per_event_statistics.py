@@ -82,7 +82,14 @@ class PerEventStatisticsGetterModule(basf2.Module):
 
             for i, stat in enumerate(module_stats):
                 module_name = stat.name
-                ttree.Branch(module_name + "_" + str(i), self.ttree_inputs[i], module_name + "_" + str(i) + "/D")
+                # escape the module names in ROOT-safe manner. Otherwise weird stuff happens like
+                # sub-branches get created or the branch cannot be opened in the TBrowser
+                escaped_module_name = module_name.replace(":", "_").replace("+", "_plus_").replace("-", "_minus_")
+                escaped_module_name = escaped_module_name.replace("*", "_star_").replace(" ", "_")
+                escaped_module_name = escaped_module_name.replace("<", "_smaller_").replace(">", "_larger_")
+                escaped_module_name = escaped_module_name.replace("(", "_lbracket_").replace(")", "_rbracket_")
+
+                ttree.Branch(escaped_module_name + "_" + str(i), self.ttree_inputs[i], escaped_module_name + "_" + str(i) + "/D")
 
             self.branches_added = True
 

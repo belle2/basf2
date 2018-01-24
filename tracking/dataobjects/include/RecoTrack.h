@@ -222,7 +222,7 @@ namespace Belle2 {
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reverded = false);
+                                bool reversed = false, double minimalWeight = NAN);
 
     /**
      * Adds a cdc hit with the given information to the reco track.

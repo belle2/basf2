@@ -64,7 +64,8 @@ namespace Belle2 {
     bool m_reconstructed = 0; /**< flag for reconstructed track */
     double m_charge = 0; /**< charge of the track */
 
-    hitXP() {} /** empty constructor of the class */
+    /** empty constructor of the class */
+    hitXP() {}
 
     /** get the relative memeber */
     TVector3 getPositionMid() const { return m_positionMid; }
@@ -390,6 +391,7 @@ namespace Belle2 {
       {return v.m_time < u.m_time;}
     };
 
+    //! needed by root
     ClassDef(hitXP, 1);
   };
 } /** end namespace Belle2 */

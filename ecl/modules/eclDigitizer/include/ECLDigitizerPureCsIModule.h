@@ -139,6 +139,8 @@ namespace Belle2 {
     static constexpr const char* eclDigitArrayName() { return "ECLDigitsPureCsI"; }
     /** Pure CsI DSP array name. */
     static constexpr const char* eclDspArrayName() { return "ECLDspsPureCsI"; }
+    /** Pure CsI Info array name. */
+    static constexpr const char* eclPureCsIInfoArrayName() { return "ECLPureCsIInfo"; }
   };
 }//Belle2
 

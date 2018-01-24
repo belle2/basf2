@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace std;
 
-#define MAP_FILE_EXTENSION ".map"
+#define MAP_FILE_EXTENSION ".b2modmap"
 #define LIB_FILE_EXTENSION ".so"
 
 
@@ -175,27 +175,27 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
 
   //Read each line of the map file and use boost regular expression to find the module name string in brackets.
   string::const_iterator start, end;
-  std::regex expression("\\((.+)\\)");
+  std::regex expression("^REG_MODULE\\((.+)\\)$");
   std::match_results<std::string::const_iterator> matchResult;
 
+  int lineNr{0};
   while (getline(mapFile, currentLine)) {
+    ++lineNr;
     start = currentLine.begin();
     end = currentLine.end();
-    std::regex_search(start, end, matchResult, expression, std::regex_constants::match_default);
 
-    //We expect exactly two result entries: [0] the string that matched the regular expression
-    //                                      [1] the string that matched sub-expressions (here: the string inside the quotes)
-    if (matchResult.size() == 2) {
-      string moduleName(matchResult[1].first, matchResult[1].second);
-      //Add result to map
-      if (moduleNameLibMap.count(moduleName) == 0) {
-        moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
-      } else {
-        B2ERROR("There seems to be more than one module called '" << moduleName <<
-                "'. Since module names are unique, you must rename one of them!");
-      }
+    if (!std::regex_match(currentLine, matchResult, expression)) {
+      B2ERROR("Problem parsing map file " << mapPath << ": Invalid entry in line " << lineNr << ", skipping remaining file");
+      return;
+    }
+
+    string moduleName(matchResult[1].first, matchResult[1].second);
+    //Add result to map
+    if (moduleNameLibMap.count(moduleName) == 0) {
+      moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
     } else {
-      B2ERROR("Regular expression did not work. Is the module map file well formatted?");
+      B2ERROR("There seems to be more than one module called '" << moduleName <<
+              "'. Since module names are unique, you must rename one of them!");
     }
   }
 

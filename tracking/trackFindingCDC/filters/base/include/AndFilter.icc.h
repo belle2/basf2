@@ -43,11 +43,11 @@ namespace Belle2 {
     Weight AndFilter<AFilter>::operator()(const typename AFilter::Object& obj)
     {
       Weight lhsResult = (*m_lhsFilter)(obj);
-      Weight rhsResult = (*m_rhsFilter)(obj);
 
       if (std::isnan(lhsResult)) {
         return NAN;
       } else {
+        Weight rhsResult = (*m_rhsFilter)(obj);
         return rhsResult;
       }
     }

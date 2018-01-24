@@ -14,9 +14,14 @@ differes from the contents of these files the test is marked as failed as well.
 The first line from stdout will not be compared to allow executing the scripts
 from a different directory.
 
-Tests can decide that they need to be skipped under certain conditions. To do so
-a test script can write a line beginning with ``TEST SKIPPED:`` followed by the
-reason for skipping on stderr and exit with a non-zero return code.
+.. note::
+
+   Tests can decide that they need to be skipped under certain conditions. To do so
+   a test script can write a line beginning with ``TEST SKIPPED:`` followed by the
+   reason for skipping on stderr and exit with a non-zero return code.
+
+.. seealso:: `b2test_utils.skip_test`
+
 --epilog--
 .. rubric:: Examples
 
@@ -61,13 +66,14 @@ print_lock = threading.Lock()
 def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
     """Compare the log output to the content of a template file
 
-    :param release: release directory in which test is found
-    :param name: name of the test
-    :param log: output of the test
-    :param logtype: which type of output? should be "out" or "err"
-    :param ignore_lines: how many lines to ignore at the beginning when
+    Parameters:
+      release: release directory in which test is found
+      name: name of the test
+      log: output of the test
+      logtype: which type of output? should be "out" or "err"
+      ignore_lines: how many lines to ignore at the beginning when
         comparing to the template.  Used to strip of steering file name
-    :param diff_lines: how many lines of the diff to print on the console
+      diff_lines: how many lines of the diff to print on the console
     """
 
     template = name[:-2] + logtype

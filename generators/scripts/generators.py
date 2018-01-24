@@ -14,7 +14,7 @@ def get_default_decayfile():
     return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
 
 
-def add_aafh_generator(path, finalstate='', preselection=False):
+def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, subweights=[], maxsubweight=1, maxfinalweight=3.0):
     """
     Add the default two photon generator for four fermion final states
     :param finalstate: e+e-e+e-, e+e-mu+mu-
@@ -23,17 +23,24 @@ def add_aafh_generator(path, finalstate='', preselection=False):
 
     aafh = register_module('AafhInput')
     aafh_mode = 5
-    aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
-    aafh_maxSubgeneratorWeight = 1.0
-    aafh_maxFinalWeight = 3.0
+    if not subweights:  # default subweights are for minmass=0.5
+        aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
+    else:
+        aafh_subgeneratorWeights = subweights
+    aafh_maxSubgeneratorWeight = maxsubweight
+    aafh_maxFinalWeight = maxfinalweight
+
+    if abs(minmass - 0.5) > 0.01 and not subweights:
+        B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
 
     if finalstate == 'e+e-e+e-':
         pass
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
-        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00,
-                                    6.512e+00]
-        aafh_maxSubgeneratorWeight = 1.0
+        if not subweights:
+            aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
+        else:
+            aafh_subgeneratorWeights = subweights
     else:
         B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
 
@@ -45,7 +52,7 @@ def add_aafh_generator(path, finalstate='', preselection=False):
         maxFinalWeight=aafh_maxFinalWeight,
         subgeneratorWeights=aafh_subgeneratorWeights,
         suppressionLimits=[1e100] * 4,
-        minMass=0.50
+        minMass=minmass
     )
 
     if preselection:
@@ -211,25 +218,27 @@ def add_bhwide_generator(path, minangle=0.5):
     bhwide.param('WtMax', 3.0)
 
 
-def add_babayaganlo_generator(path, finalstate=''):
+def add_babayaganlo_generator(path, finalstate='', minenergy=0.15, minangle=10.0):
     """
     Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006
     :param path: Add the modules to this path
     :param finalstate: ee or gg
+    :param minenergy: minimum particle energy
+    :param minangle: angular range from minangle to 180-minangle for primary particles
     """
 
     babayaganlo = path.add_module("BabayagaNLOInput")
 
     if finalstate == 'ee':
         babayaganlo.param('FinalState', 'ee')
-        babayaganlo.param('ScatteringAngleRange', [10.0, 170.0])
-        babayaganlo.param('MinEnergy', 0.15)
+        babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
+        babayaganlo.param('MinEnergy', minenergy)
         babayaganlo.param('FMax', 1.e5)
 
     elif finalstate == 'gg':
         babayaganlo.param('FinalState', 'gg')
-        babayaganlo.param('ScatteringAngleRange', [10.0, 170.0])
-        babayaganlo.param('MinEnergy', 0.15)
+        babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
+        babayaganlo.param('MinEnergy', minenergy)
         babayaganlo.param('FMax', 1.e4)
 
     else:

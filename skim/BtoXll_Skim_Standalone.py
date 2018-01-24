@@ -33,6 +33,8 @@ loadStdSkimPhoton()
 stdPi0s('loose')
 stdPhotons('loose')
 loadStdCharged()
+stdK('95eff')
+stdPi('95eff')
 stdKshorts()
 loadStdLightMesons()
 

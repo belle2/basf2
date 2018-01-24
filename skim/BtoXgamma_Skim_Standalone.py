@@ -35,6 +35,8 @@ stdPhotons('loose')
 loadStdSkimPhoton()
 loadStdSkimPi0()
 loadStdCharged()
+stdK('95eff')
+stdPi('95eff')
 stdKshorts()
 loadStdLightMesons()
 cutAndCopyList('gamma:E15', 'gamma:skim', '1.5 < E < 100')
@@ -46,7 +48,7 @@ skimOutputUdst('BtoXgamma', XgammaList)
 summaryOfLists(XgammaList)
 
 
-# printDataStore()
+printDataStore()
 
 process(analysis_main)
 

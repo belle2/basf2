@@ -130,18 +130,6 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
 
 
 @format_crop_keys
-def peel_reco_track_quality_indicator(reco_track, key="{part_name}"):
-    if(reco_track.hasPXDHits()):
-        print('peeler: PXD QI', reco_track.getRelatedTo('PXDRecoTracks').getQualityIndicator())
-    if(reco_track.hasSVDHits()):
-        print('peeler: SVD QI', reco_track.getRelatedTo('SVDCDCRecoTracks').getRelatedTo('SVDRecoTracks').getQualityIndicator())
-    if(reco_track.hasCDCHits()):
-        print('peeler: CDC QI', reco_track.getRelatedTo('SVDCDCRecoTracks').getRelatedTo('CDCRecoTracks').getQualityIndicator())
-
-    return dict()
-
-
-@format_crop_keys
 def peel_reco_track_seed(reco_track, key="{part_name}"):
     if reco_track:
         seed_fit_result = get_seed_track_fit_result(reco_track)

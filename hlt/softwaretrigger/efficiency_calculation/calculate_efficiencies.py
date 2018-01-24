@@ -169,6 +169,10 @@ if __name__ == "__main__":
     if args.phase == 2:
         print("\n!!!!\n You selected to run with Phase 2 configuration.")
         print("Did you also set BELLE2_BACKGROUND_DIR to phase 2 background?")
+        if "BELLE2_BACKGROUND_DIR" in os.environ:
+            print("Currently, BELLE2_BACKGROUND_DIR is " + os.environ["BELLE2_BACKGROUND_DIR"])
+        else:
+            print("Currently, BELLE2_BACKGROUND_DIR is not set at all !")
         print("Continuing in 5 seconds")
         time.sleep(5)
 

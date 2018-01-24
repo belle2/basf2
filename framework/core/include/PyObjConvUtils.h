@@ -150,6 +150,7 @@ namespace Belle2 {
 
     /** Some modules take a path as argument so let's add this as well */
     template<> struct Type<std::shared_ptr<Path>> {
+      /** type name */
       static std::string name() { return std::string("Path"); }
     };
 

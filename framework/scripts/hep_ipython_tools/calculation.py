@@ -90,7 +90,6 @@ class Calculation:
         processes which are waiting and have not been started yet.
         """
 
-        not_ran_processes = [p for p in self.process_list if p.already_run is False]
         running_processes = [p for p in self.process_list if self.is_running(p)]
 
         processes_to_start = max(0, max_processes - len(running_processes))

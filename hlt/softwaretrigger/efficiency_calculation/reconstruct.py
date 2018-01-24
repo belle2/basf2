@@ -38,7 +38,7 @@ def main():
 
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
-    add_tsim(path, Belle2Phase="Phase{}".format(phase))
+    add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True)
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
     add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring")

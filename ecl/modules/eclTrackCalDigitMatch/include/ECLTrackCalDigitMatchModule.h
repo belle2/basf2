@@ -17,10 +17,7 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 namespace Belle2 {
@@ -42,9 +39,6 @@ namespace Belle2 {
 
     /** event */
     virtual void event();
-
-    /** Check if extrapolated hit is inside ECL. */
-    bool isECLHit(const ExtHit& extHit) const;
 
   private:
 

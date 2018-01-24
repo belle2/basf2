@@ -190,11 +190,4 @@ void ECLTrackCalDigitMatchModule::event()
   }
 }
 
-bool ECLTrackCalDigitMatchModule::isECLHit(const ExtHit& extHit) const
-{
-  if ((extHit.getDetectorID() != Const::EDetector::ECL)) return false;
-  ExtHitStatus extHitStatus = extHit.getStatus();
-  if (extHitStatus == EXT_ECLCROSS || extHitStatus == EXT_ECLNEAR) return true;
-  else return false;
-}
 

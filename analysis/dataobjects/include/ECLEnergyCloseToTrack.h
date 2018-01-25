@@ -14,6 +14,7 @@
 
 namespace Belle2 {
 
+  /** Class to store energy information for ECL hits closest to a track */
   class ECLEnergyCloseToTrack : public RelationsObject {
 
   public:

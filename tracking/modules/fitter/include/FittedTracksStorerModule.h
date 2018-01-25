@@ -12,36 +12,29 @@
 #include <framework/core/Module.h>
 #include <string>
 
-
 namespace Belle2 {
-
   class RecoTrack;
 
-  /** A module to copy only the fitted reco tracks to the output store array. */
+  /// A module to copy only the fitted reco tracks to the output store array.
   class FittedTracksStorerModule : public Module {
 
   public:
-    /**
-     * Constructor.
-     */
+    /// Constructor.
     FittedTracksStorerModule();
 
-    /**
-     * Initialize the store arrays.
-     */
+    /// Initialize the store arrays.
     void initialize() override;
 
-    /**
-     * Do the copying.
-     */
+    /// Do the copying.
     void event() override;
-
 
   private:
     /** StoreArray name of the input reco tracks. */
     std::string m_param_inputRecoTracksStoreArrayName = "PrefitRecoTracks";
     /** StoreArray name of the output reco tracks. */
     std::string m_param_outputRecoTracksStoreArrayName = "RecoTracks";
+    /// Minimal weight for copying the hits.
+    double m_param_minimalWeight = NAN;
   };
 }
 

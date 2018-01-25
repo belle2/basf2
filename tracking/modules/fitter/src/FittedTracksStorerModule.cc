@@ -21,11 +21,13 @@ FittedTracksStorerModule::FittedTracksStorerModule() :
   Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
+  setDescription("A module to copy only the fitted reco tracks to the output store array.");
 
   addParam("inputRecoTracksStoreArrayName", m_param_inputRecoTracksStoreArrayName, "StoreArray name of the input reco tracks.",
            m_param_inputRecoTracksStoreArrayName);
   addParam("outputRecoTracksStoreArrayName", m_param_outputRecoTracksStoreArrayName, "StoreArray name of the output reco tracks.",
            m_param_outputRecoTracksStoreArrayName);
+  addParam("minimalWeight", m_param_minimalWeight, "Minimal weight for copying the hits.", m_param_minimalWeight)
 }
 
 void FittedTracksStorerModule::initialize()
@@ -63,7 +65,7 @@ void FittedTracksStorerModule::event()
   for (RecoTrack& recoTrack : inputRecoTracks) {
     if (recoTrack.wasFitSuccessful()) {
       auto newRecoTrack = recoTrack.copyToStoreArray(outputRecoTracks);
-      newRecoTrack->addHitsFromRecoTrack(&recoTrack, 0, false, 1e-3);
+      newRecoTrack->addHitsFromRecoTrack(&recoTrack, 0, false, m_param_minimalWeight);
 
       // Add also relations
       auto relatedTrack = recoTrack.getRelated<Track>();

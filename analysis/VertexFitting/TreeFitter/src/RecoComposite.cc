@@ -82,6 +82,7 @@ namespace TreeFitter {
         m_covariance(row, col) = cov7in[3 + row][3 + col];
       }
     }
+    std::cout << "Updated covariance in " << this->name() << "\n" << m_covariance  << std::endl;
   }// end updateParams()
 
   RecoComposite::~RecoComposite() {}
@@ -91,7 +92,7 @@ namespace TreeFitter {
     int posindex = posIndex() ;
     int momindex = momIndex() ;
     int size = dimMeas();
-    p.getResiduals().segment(0, 3) = fitparams.getStateVector().segment(posindex, 4) - m_params.segment(0, 3);
+    p.getResiduals().segment(0, 3) = fitparams.getStateVector().segment(posindex, 3) - m_params.segment(0, 3);
     if (size == 7) {
       p.getResiduals().segment(3, 4) = fitparams.getStateVector().segment(momindex, 4) - m_params.segment(3, 4);
     } else if (size == 6) {

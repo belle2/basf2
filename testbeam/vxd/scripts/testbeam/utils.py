@@ -173,15 +173,8 @@ def add_reconstruction(
                          usedGeometry=useThisGeometry
                          )
         else:
-            add_vxdtf(
-                path,
-                magnet=magnet,
-                svd_only=svd_only,
-                momentum=momentum,
-                filterOverlaps='hopfield',
-                usedGeometry=useThisGeometry
-            )
-            path.add_module('RecoTrackCreator', trackCandidatesStoreArrayName='__TrackCands')
+            print("ERROR: VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
+            exit(1)
 
     # path.add_module('GenFitterVXDTB')
     daf = register_module('DAFRecoFitter')
@@ -414,10 +407,11 @@ def add_vxdtf_v2(path=None,
     secmap_name = ""
     if magnet_on:
         if use_pxd:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOnVXD.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOnSVD.root'
             elif usedGeometry == 'TB2017newGeo':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOnVXD_afterMarch1st.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOnSVD_afterMarch1st.root'
             else:
                 print('ERROR: no sectormap for that setting')
                 exit()
@@ -431,10 +425,11 @@ def add_vxdtf_v2(path=None,
                 exit()
     else:  # magnet off
         if use_pxd:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOffVXD.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOffSVD.root'
             elif usedGeometry == 'TB2017newGeo':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOffVXD_afterMarch1st.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOffSVD_afterMarch1st.root'
             else:
                 print('ERROR: no sectormap for that setting')
                 exit()
@@ -460,6 +455,22 @@ def add_vxdtf_v2(path=None,
     # set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
     set_module_parameters(path, 'SegmentNetworkProducer', sectorMapName='testbeamTEST')
     # set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
+
+    # for testbeam deactivate all timing filters in the VXDTF2 as timing has never been tuned for TB
+
+    for mod in main.modules():
+        print(mod.name())
+        if mod.name() == 'SectorMapBootstrap':
+            # three hit filter
+            # (#19 <= DistanceInTime <= #20)
+            mod.param('threeHitFilterAdjustFunctions', [(19, "-TMath::Infinity()"), (20, "TMath::Infinity()")])
+            # two hit filters:
+            # (#12 <= DistanceInTimeUside <= #13)
+            # (#10 <= DistanceInTimeVside <= #11)
+            mod.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "TMath::Infinity()"),
+                                                      (10, "-TMath::Infinity()"), (11, "TMath::Infinity()")])
+            # mod.logging.log_level = LogLevel.DEBUG
+
     if filter_overlapping:
         print("doing nothing")
         # set_module_parameters(path, 'SVDOverlapResolver', ResolveMethod=overlap_filter.lower())

@@ -189,6 +189,21 @@ void ECLTrackingPerformanceModule::event()
         if (eclCluster != nullptr) {
           m_trackProperties.matchedToECLCluster = 1;
           m_trackProperties.hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
+          // find highest rated ECLCluster
+          const ECLCluster* eclClusterWithHighestWeight = nullptr;
+          maximumWeight = -2;
+          const auto& relatedECLClusters = mcParticle.getRelationsWith<ECLCluster>();
+          for (unsigned int index = 0; index < relatedECLClusters.size(); ++index) {
+            const ECLCluster* relatedECLCluster = relatedECLClusters.object(index);
+            const double weight = relatedECLClusters.weight(index);
+            if (weight > maximumWeight) {
+              eclClusterWithHighestWeight = relatedECLCluster;
+              maximumWeight = weight;
+            }
+          }
+          if (eclClusterWithHighestWeight == eclCluster) {
+            m_matchedToECLClusterWithHighestWeight = 1;
+          }
           for (const MCParticle& eclClusterMCParticle : eclCluster->getRelationsTo<MCParticle>()) {
             if (eclClusterMCParticle.getPDG() == 22) {
               m_photonCluster = 1;
@@ -260,6 +275,7 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("pValue", m_pValue);
 
   addVariableToTree("ECLMatch", m_trackProperties.matchedToECLCluster);
+  addVariableToTree("CorrectECLMatch", m_matchedToECLClusterWithHighestWeight);
   addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_trackProperties.hypothesisOfMatchedECLCluster);
 
@@ -366,6 +382,8 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
   m_pValue = -999;
 
   m_photonCluster = 0;
+
+  m_matchedToECLClusterWithHighestWeight = 0;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

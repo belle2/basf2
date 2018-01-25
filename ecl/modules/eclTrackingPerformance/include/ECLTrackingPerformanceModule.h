@@ -80,6 +80,9 @@ namespace Belle2 {
     /**< boolean for matched ECL cluster */
     double m_photonCluster;
 
+    /**< boolean whether matched to ECL cluster with highest weight */
+    int m_matchedToECLClusterWithHighestWeight;
+
     /**
      * Sets all variables to the default value, here -999.
      * */

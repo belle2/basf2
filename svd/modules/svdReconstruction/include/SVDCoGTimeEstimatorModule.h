@@ -133,6 +133,12 @@ namespace Belle2 {
     /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
     std::string m_relRecoDigitShaperDigitName;
 
+    /** Parameters for the corrections */
+    bool Correction_1;
+    bool Correction_2;
+    bool Correction_3;
+    bool Correction_4;
+
     /** Name of the relation between SVDShaperDigits and MCParticles */
     std::string m_relShaperDigitMCParticleName;
     /** Name of the relation between SVDShaperDigits and SVDTrueHits */

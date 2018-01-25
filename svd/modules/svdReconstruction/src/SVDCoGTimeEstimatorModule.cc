@@ -33,6 +33,11 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
            "RecoDigits collection name", string(""));
   addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
            float(6.0));
+  addParam("Correction_1", Correction_1, "Apply first correction (strip-dependent, CalPeakTime)", true);
+  addParam("Correction_2", Correction_2, "Apply second correction (Trigger-bin dependent)", true);
+  addParam("Correction_3", Correction_3, "Apply third correction (Subtract average)", true);
+  addParam("Correction_4", Correction_4, "Apply forth correction (Subtract trigger-bin-dependent average)", true);
+
 
 }
 
@@ -76,17 +81,16 @@ void SVDCoGTimeEstimatorModule::initialize()
   m_relShaperDigitTrueHitName = relShaperDigitTrueHits.getName();
   m_relShaperDigitMCParticleName = relShaperDigitMCParticles.getName();
 
-  B2INFO(" 1. COLLECTIONS:");
-  B2INFO(" -->  MCParticles:        " << m_storeMCParticlesName);
-  B2INFO(" -->  Digits:             " << m_storeShaperDigitsName);
-  B2INFO(" -->  RecoDigits:           " << m_storeRecoDigitsName);
-  B2INFO(" -->  TrueHits:           " << m_storeTrueHitsName);
-  B2INFO(" -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2INFO(" -->  RecoDigitMCRel:       " << m_relRecoDigitMCParticleName);
-  B2INFO(" -->  RecoDigitDigitRel:    " << m_relRecoDigitShaperDigitName);
-  B2INFO(" -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2INFO(" -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
-
+  B2DEBUG(1, " 1. COLLECTIONS:");
+  B2DEBUG(1, " -->  MCParticles:        " << m_storeMCParticlesName);
+  B2DEBUG(1, " -->  Digits:             " << m_storeShaperDigitsName);
+  B2DEBUG(1, " -->  RecoDigits:           " << m_storeRecoDigitsName);
+  B2DEBUG(1, " -->  TrueHits:           " << m_storeTrueHitsName);
+  B2DEBUG(1, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(1, " -->  RecoDigitMCRel:       " << m_relRecoDigitMCParticleName);
+  B2DEBUG(1, " -->  RecoDigitDigitRel:    " << m_relRecoDigitShaperDigitName);
+  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(1, " -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
 
 }
 void SVDCoGTimeEstimatorModule::beginRun()
@@ -130,11 +134,14 @@ void SVDCoGTimeEstimatorModule::event()
 
   for (const SVDShaperDigit& shaper : m_storeShaper) {
 
+    m_StopCreationReco = false;
+
+
     SVDModeByte modeByte = shaper.getModeByte();
     m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
     B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
 
-    if (m_NumberOfAPVSamples == -1)
+    if (m_StopCreationReco)
       continue;
 
     samples_vec = shaper.getSamples();
@@ -146,24 +153,32 @@ void SVDCoGTimeEstimatorModule::event()
 
     //call of the functions doomed to calculate the required quantities
     m_weightedMeanTime = CalculateWeightedMeanPeakTime(samples_vec);
+    if (m_StopCreationReco)
+      continue;
     m_weightedMeanTimeError = CalculateWeightedMeanPeakTimeError();
     m_amplitude = CalculateAmplitude(samples_vec);
     m_amplitudeError = CalculateAmplitudeError(thisSensorID, thisSide, thisCellID);
     m_chi2 = CalculateChi2();
 
+    //check too high ADC
+    if (m_amplitude > 255)
+      B2DEBUG(10, "ERROR: m_amplitude = " << m_amplitude << ", should be <= 255");
+
     //CALIBRATION
     //convert ADC into #e- and apply offset to shift estimated peak time to hit time (to be completed)
     m_amplitude = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, m_amplitude);
     m_amplitudeError = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, m_amplitudeError);
-    m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
-    SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
-    m_weightedMeanTime -= (DeltaT / 8 + ((int)triggerBin) * DeltaT / 4);
-    m_weightedMeanTime -= m_PulseShapeCal.getTimeShiftCorrection(thisSensorID, thisSide, thisCellID);
-    m_weightedMeanTime -= m_PulseShapeCal.getTriggerBinDependentCorrection(thisSensorID, thisSide, thisCellID, (int)triggerBin);
+    if (Correction_1) //first correction
+      m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
+    SVDModeByte::baseType triggerBin = (shaper.getModeByte()).getTriggerBin();
+    if (Correction_2) //second correction
+      m_weightedMeanTime -= (DeltaT / 8 + ((int)triggerBin) * DeltaT / 4);
+    if (Correction_3) //third correction
+      m_weightedMeanTime -= m_PulseShapeCal.getTimeShiftCorrection(thisSensorID, thisSide, thisCellID);
+    if (Correction_4) //fourth correction
+      m_weightedMeanTime -= m_PulseShapeCal.getTriggerBinDependentCorrection(thisSensorID, thisSide, thisCellID, (int)triggerBin);
 
     //check high charges and too high ADC
-    if (m_amplitude > 255)
-      B2DEBUG(10, "AAA: m_amplitude = " << m_amplitude);
     if (m_amplitude > 100000) {
       B2DEBUG(42, "Charge = " << m_amplitude);
       B2DEBUG(42, "corresponding ADC = " << m_PulseShapeCal.getADCFromCharge(thisSensorID, thisSide, thisCellID, m_amplitude));
@@ -208,7 +223,6 @@ void SVDCoGTimeEstimatorModule::event()
 
 void SVDCoGTimeEstimatorModule::endRun()
 {
-
 }
 
 
@@ -229,6 +243,7 @@ int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
 
   B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
   return -1;
+
 }
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
@@ -240,8 +255,14 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaper
     averagetime += k * samples[k];
     mean += samples[k];
   }
-  averagetime /= (mean);
-  averagetime *= DeltaT;
+  if (mean != 0) {
+    averagetime /= (mean);
+    averagetime *= DeltaT;
+  } else {
+    averagetime == -42;
+    m_StopCreationReco = true;
+    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is NULL! Skipping this SVDShaperDigit!");
+  }
 
   return averagetime;
 }

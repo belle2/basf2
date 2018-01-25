@@ -134,7 +134,6 @@ if __name__ == "__main__":
         "tau",
 
         "mumu",
-        "mumu_kkgen",
 
         "gg",
 

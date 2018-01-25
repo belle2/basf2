@@ -145,7 +145,23 @@ void DQMHistAnalysisPXDERModule::initialize()
     m_clusterSizeUV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr));
     m_ref_clusterSizeUV.emplace_back("ref/" + m_clusterSizeUV.back());
   }
-#if 0
+#if 1
+//   m_fHitMapCountsFlag = NULL;
+//   m_fHitMapClCountsFlag = NULL;
+  m_fFiredFlag = NULL;
+  m_fClustersFlag = NULL;
+  m_fStartRowFlag = NULL;
+  m_fChargStartRowFlag = NULL;
+  m_fStartRowCountFlag = NULL;
+  m_fClusterChargeFlag = NULL;
+  m_fPixelSignalFlag = NULL;
+  m_fClusterSizeUFlag = NULL;
+  m_fClusterSizeVFlag = NULL;
+  m_fClusterSizeUVFlag = NULL;
+
+//   m_hitMapCounts = NULL;
+//   m_hitMapClCounts = NULL;
+#else
   // Create flag histograms:
   DirPXDFlags->cd();
   m_fFiredFlag = new TH1I("DQMER_PXD_FiredFlag", "DQM ER PXD Fired Flag",

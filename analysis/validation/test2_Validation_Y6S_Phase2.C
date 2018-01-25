@@ -1,6 +1,6 @@
 /*
 <header>
-<input>Y6S_nonbsbs_Phase2.ntup.root</input>
+<input>../Y6S_nonbsbs_Phase2.ntup.root</input>
 <output>Y6S_Validation_Phase2.root</output>
 <contact>Bryan Fulsom, bryan.fulsom@pnnl.gov; Cate MacQueen, cmq.centaurus@gmail.com</contact>
 <description>Reconstruction efficiency for single particles for Y(6S) in phase 2 geometry</description>

@@ -76,11 +76,11 @@ void ECLTrackingPerformanceModule::initialize()
 void ECLTrackingPerformanceModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  unsigned long eventNumber = eventMetaData->getEvent();
-  unsigned long runNumber = eventMetaData->getRun();
-  unsigned long expNumber = eventMetaData->getExperiment();
+  m_iEvent = eventMetaData->getEvent();
+  m_iRun = eventMetaData->getRun();
+  m_iExperiment = eventMetaData->getExperiment();
 
-  B2DEBUG(99, "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
+  B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   StoreArray<MCParticle> mcParticles;
@@ -101,6 +101,7 @@ void ECLTrackingPerformanceModule::event()
       m_nGeneratedChargedStableMcParticles++;
 
       m_trackProperties.cosTheta_gen = mcParticle.getMomentum().CosTheta();
+      m_trackProperties.phi_gen = mcParticle.getMomentum().Phi();
       m_trackProperties.ptot_gen = mcParticle.getMomentum().Mag();
       m_trackProperties.pt_gen = mcParticle.getMomentum().Pt();
       m_trackProperties.px_gen = mcParticle.getMomentum().Px();
@@ -113,10 +114,6 @@ void ECLTrackingPerformanceModule::event()
 
       const RecoTrack* recoTrack = nullptr;
       double maximumWeight = -2;
-      /*// MIMIK OLD MODULE, which took always the last one (which is probably a CDC track).
-      for(const Track& relatedTrack : mcParticle.getRelationsWith<Track>()) {
-        b2Track = &relatedTrack;
-      }*/
       // find highest rated Track
       const auto& relatedRecoTracks = mcParticle.getRelationsWith<RecoTrack>(m_recoTracksStoreArrayName);
       for (unsigned int index = 0; index < relatedRecoTracks.size(); ++index) {
@@ -143,6 +140,7 @@ void ECLTrackingPerformanceModule::event()
         // write some data to the root tree
         TVector3 mom = fitResult->getMomentum();
         m_trackProperties.cosTheta = mom.CosTheta();
+        m_trackProperties.phi = mom.Phi();
         m_trackProperties.ptot = mom.Mag();
         m_trackProperties.pt = mom.Pt();
         m_trackProperties.px = mom.Px();
@@ -187,8 +185,8 @@ void ECLTrackingPerformanceModule::event()
         }
         ECLCluster* eclCluster = b2Track->getRelatedTo<ECLCluster>();
         if (eclCluster != nullptr) {
-          m_trackProperties.matchedToECLCluster = 1;
-          m_trackProperties.hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
+          m_matchedToECLCluster = 1;
+          m_hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
           // find highest rated ECLCluster
           const ECLCluster* eclClusterWithHighestWeight = nullptr;
           maximumWeight = -2;
@@ -240,10 +238,17 @@ void ECLTrackingPerformanceModule::setupTree()
   if (m_dataTree == NULL) {
     B2FATAL("Data tree was not created.");
   }
+  addVariableToTree("expNo", m_iExperiment);
+  addVariableToTree("runNo", m_iRun);
+  addVariableToTree("evtNo", m_iEvent);
+
   addVariableToTree("pdgCode", m_trackProperties.pdg_gen);
 
   addVariableToTree("cosTheta", m_trackProperties.cosTheta);
   addVariableToTree("cosTheta_gen",  m_trackProperties.cosTheta_gen);
+
+  addVariableToTree("phi", m_trackProperties.phi);
+  addVariableToTree("phi_gen", m_trackProperties.phi_gen);
 
   addVariableToTree("px", m_trackProperties.px);
   addVariableToTree("px_gen", m_trackProperties.px_gen);
@@ -269,15 +274,12 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("ptot", m_trackProperties.ptot);
   addVariableToTree("ptot_gen", m_trackProperties.ptot_gen);
 
-  addVariableToTree("mass", m_trackProperties.mass);
-  addVariableToTree("mass_gen", m_trackProperties.mass_gen);
-
   addVariableToTree("pValue", m_pValue);
 
-  addVariableToTree("ECLMatch", m_trackProperties.matchedToECLCluster);
+  addVariableToTree("ECLMatch", m_matchedToECLCluster);
   addVariableToTree("CorrectECLMatch", m_matchedToECLClusterWithHighestWeight);
   addVariableToTree("PhotonCluster", m_photonCluster);
-  addVariableToTree("HypothesisID", m_trackProperties.hypothesisOfMatchedECLCluster);
+  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
 
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
@@ -381,9 +383,13 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
 
   m_pValue = -999;
 
+  m_matchedToECLCluster = 0;
+
   m_photonCluster = 0;
 
   m_matchedToECLClusterWithHighestWeight = 0;
+
+  m_hypothesisOfMatchedECLCluster = 0;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

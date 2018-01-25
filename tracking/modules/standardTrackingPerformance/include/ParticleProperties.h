@@ -26,6 +26,7 @@ namespace Belle2 {
     double pt; /**< measured transverse momentum */
     double ptot; /**< measured total momentum */
     double cosTheta; /**< polar angle of measured momentum vector */
+    double phi; /**< azimuthal angle of measured momentum vector */
     double x; /** < measured x value of position */
     double y; /** < measured y value of position */
     double z; /** < measured z value of position */
@@ -37,9 +38,6 @@ namespace Belle2 {
     int nWeights;  /** Number of entries in weights array  */
     float weights[maxNweights];  /** Weights of the hits in sequence  */
 
-    int matchedToECLCluster; /**< boolean if matched to ECL cluster */
-    int hypothesisOfMatchedECLCluster; /**< hypothesis ID of matched ECL cluster */
-
     int pdg_gen; /** PDG code of generated particle */
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
@@ -48,6 +46,7 @@ namespace Belle2 {
     double pt_gen; /**< generated transverse momentum */
     double ptot_gen; /**< generated total momentum */
     double cosTheta_gen; /**< polar angle of generated momentum vector */
+    double phi_gen; /**< azimuthal angle of generated momentum vector */
     double x_gen; /**< x value of generated position */
     double y_gen; /**< y value of generated position */
     double z_gen; /**< z value of generated position */
@@ -65,6 +64,7 @@ namespace Belle2 {
       pt = value;
       ptot = value;
       cosTheta = value;
+      phi = value;
       x = value;
       y = value;
       z = value;
@@ -77,9 +77,6 @@ namespace Belle2 {
       for (int i = 0; i < maxNweights; ++i)
         weights[i] = 0;
 
-      matchedToECLCluster = 0;
-      hypothesisOfMatchedECLCluster = 0;
-
       pdg_gen = 0;
       mass_gen = value;
       px_gen = value;
@@ -89,6 +86,7 @@ namespace Belle2 {
       pt_gen = value;
       ptot_gen = value;
       cosTheta_gen = value;
+      phi_gen = value;
       x_gen = value;
       y_gen = value;
       z_gen = value;

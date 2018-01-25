@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: iorch, Michel Villanueva                                 *
+ * Contributors: Jorge Martinez, Michel Villanueva                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -100,7 +100,6 @@ TVector3 ThrustOfEventModule::getThrustOfEvent(vector<string> particleLists){
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
-      //const MCParticle* mcparticle=part->getRelatedTo<MCParticle>();
       TVector3 p = part->getMomentum();
       TLorentzVector p_lab = part->get4Vector();
       TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
@@ -110,10 +109,6 @@ TVector3 ThrustOfEventModule::getThrustOfEvent(vector<string> particleLists){
 
   TVector3 th = Thrust::calculateThrust(forthrust);
 
-  //std::srand(std::time(0)); // use current time as seed for random generator
-  //float random_variable0 = std::rand()/1.0;
-  //float random_variable1 = std::rand()/1.0;
-  //float random_variable = std::min(random_variable0,random_variable1)/
-  //                          std::max(random_variable0,random_variable1);
+
   return th;
 }

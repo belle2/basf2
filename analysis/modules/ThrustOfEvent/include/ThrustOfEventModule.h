@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: iorch, Michel Villanueva                                 *                                                    *
+ * Contributors: Jorge Martinez, Michel Villanueva                        *                                                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,7 +20,6 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <framework/gearbox/Const.h>
@@ -72,39 +71,8 @@ namespace Belle2 {
     /** Count the total number of particles */
     int m_nParticles;
 
-    /**
-     * Adds all tracks from StoreArray<Track> that are used in reconstruction of given particle.
-     *
-     * @param reconstructed particle for which ThrustOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with selected tracks
-     * @param selection criteria for the selected tracks
-     */
-    void addSelectedTracks(const Particle* particle, RestOfEvent* roeECLClusters);
-
-    /**
-     * Adds all ECL clusters from StoreArray<ECLCluster> that are used in reconstruction of given particle.
-     *
-     * @param reconstructed particle for which ThrustOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with selected ECL clusters
-     * @param selection criteria for the selected ECL objects
-     */
-    void addSelectedECLClusters(const Particle* particle, RestOfEvent* roe);
-
-    /**
-     * Adds all KLM clusters from StoreArray<KLMCluster> that are used in reconstruction of given particle.
-     *
-     * @param reconstructed particle for which ThrustOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with selected KLM clusters
-     * @param selection criteria for the selected KLM objects
-     */
-    void addSelectedKLMClusters(const Particle* particle, RestOfEvent* roe);
-
     TVector3 getThrustOfEvent(std::vector<std::string>  m_particleList);
 
-    /**
-     * for debugging purposes
-     */
-    void printParticle(const Particle* particle);
   };
 }
 

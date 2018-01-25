@@ -54,6 +54,7 @@ namespace TreeFitter {
 
   bool Fitter::fit()
   {
+
     const int nitermax = 10;
     const int maxndiverging = 3;
     const double dChisqConv = m_prec;
@@ -77,6 +78,7 @@ namespace TreeFitter {
       B2DEBUG(80, "############################");
 
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
+
 
         EigenTypes::ColVector prevpar = m_fitparams->getStateVector();
 

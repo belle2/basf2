@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -90,4 +90,5 @@ namespace TreeFitter {
       }
     }//end for block
   }//end function
+
 }// end namespace

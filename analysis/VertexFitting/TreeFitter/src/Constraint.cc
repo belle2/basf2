@@ -94,7 +94,6 @@ namespace TreeFitter {
     B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
             " NDF" << m_dim << " for " << this->name());
 
-
     /* FIXME get the math in RecoPhoton right so that the reduced constraint can be projected
      * this is a hack that works but projection 3d instead of 4d photon would be better :  <15-12-17, jkrohn> */
     const unsigned int NDF = (this->type() == photon)

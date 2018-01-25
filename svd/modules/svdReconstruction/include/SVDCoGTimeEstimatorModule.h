@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Time width of a sampling */
     float DeltaT = 31.44; //ns
 
-    /** To stop program if something is wrong */
+    /** To stop creation of the SVDShaperDigit if something is wrong */
     bool m_StopCreationReco = false;
 
   protected:

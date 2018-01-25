@@ -34,9 +34,9 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
            float(6.0));
   addParam("Correction_1", Correction_1, "Apply first correction (strip-dependent, CalPeakTime)", true);
-  addParam("Correction_2", Correction_2, "Apply second correction (Trigger-bin dependent)", true);
+  addParam("Correction_2", Correction_2, "Apply second correction (Trigger-bin dependent)", false);
   addParam("Correction_3", Correction_3, "Apply third correction (Subtract average)", true);
-  addParam("Correction_4", Correction_4, "Apply forth correction (Subtract trigger-bin-dependent average)", true);
+  addParam("Correction_4", Correction_4, "Apply fourth correction (Subtract trigger-bin-dependent average)", false);
 
 
 }
@@ -249,14 +249,14 @@ int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
 {
   float averagetime = 0;
-  float mean = 0;
-  //calculate weighted average time and mean
+  float sumAmplitudes = 0;
+  //calculate weighted average time
   for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
     averagetime += k * samples[k];
-    mean += samples[k];
+    sumAmplitudes += samples[k];
   }
-  if (mean != 0) {
-    averagetime /= (mean);
+  if (sumAmplitudes != 0) {
+    averagetime /= (sumAmplitudes);
     averagetime *= DeltaT;
   } else {
     averagetime == -42;

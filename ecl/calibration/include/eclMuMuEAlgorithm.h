@@ -19,7 +19,6 @@
 namespace Belle2 {
   namespace ECL {
 
-
     /** Calibrate ecl crystals using muon pair events */
     class eclMuMuEAlgorithm : public CalibrationAlgorithm {
     public:

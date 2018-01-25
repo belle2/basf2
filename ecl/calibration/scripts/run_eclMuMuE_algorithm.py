@@ -32,7 +32,7 @@ from ROOT import Belle2
 
 # Specified output file contains many diagnostic histograms.
 
-algo = Belle2.eclMuMuEAlgorithm()
+algo = Belle2.ECL.eclMuMuEAlgorithm()
 fileNames = ['eclMuMuECollectorOutput.root']
 algo.setInputFileNames(fileNames)
 # barrel is [1153,7776]

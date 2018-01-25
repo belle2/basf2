@@ -148,6 +148,7 @@ if usePXD:
 
 spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+spCreatorSVD.param('MinClusterTime', -float('inf'))
 # spCreatorSVD.param('NameOfInstance', 'SpacePointsCreatorSVD')
 spCreatorSVD.param('SpacePoints', 'SpacePoints')
 path.add_module(spCreatorSVD)

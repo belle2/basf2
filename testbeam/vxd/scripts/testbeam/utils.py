@@ -159,6 +159,7 @@ def add_reconstruction(
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
+        print("add vxdtf2")
         if(vxdtf2):
             add_vxdtf_v2(path,
                          use_pxd=False,
@@ -166,8 +167,6 @@ def add_reconstruction(
                          filter_overlapping=True,
                          use_segment_network_filters=True,
                          observerType=0,
-                         quality_estimator='circleFit',
-                         overlap_filter='greedy',  # 'hopfield' or 'greedy'
                          log_level=LogLevel.ERROR,
                          debug_level=1,
                          usedGeometry=useThisGeometry
@@ -175,7 +174,6 @@ def add_reconstruction(
         else:
             print("ERROR: VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
             exit(1)
-
     # path.add_module('GenFitterVXDTB')
     daf = register_module('DAFRecoFitter')
     daf.param('initializeCDCTranslators', False)
@@ -210,163 +208,6 @@ def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, mo
     track_creator.param('trackColName', 'offlineTracks')
     track_creator.param('trackFitResultColName', 'offlineTrackFitResults')
     path.add_module(track_creator)
-
-
-# adds the vxdtf to the path
-def add_vxdtf(path, magnet=True, svd_only=False, momentum=5., filterOverlaps='hopfield', usedGeometry='TB2017'):
-    vxdtf_module = get_vxdtf(magnet, svd_only, momentum, filterOverlaps, usedGeometry=usedGeometry)
-    path.add_module(vxdtf_module)
-
-
-def add_offline_vxdtf(
-        path,
-        magnet=True,
-        svd_only=False,
-        momentum=5.,
-        filterOverlaps='hopfield',
-        loglevel=LogLevel.ERROR,
-        usedGeometry='TB2017newGeo'):
-
-    vxdtf_module = get_vxdtf(
-        magnet=magnet,
-        svd_only=svd_only,
-        momentum=momentum,
-        filterOverlaps=filterOverlaps,
-        usedGeometry=usedGeometry)
-    vxdtf_module.param('GFTrackCandidatesColName', 'offlineTrackCands')
-    path.add_module(vxdtf_module)
-
-
-# function which returns a vxdtf module with the default settings, so that one can change parameters afterwards
-def get_vxdtf(magnet=True, svd_only=False, momentum=5., filterOverlaps='hopfield', usedGeometry='TB2017newGeo'):
-    if magnet:
-        if not svd_only:
-            # SVD and PXD sec map
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOnPXDSVD-moreThan1000MeV_PXDSVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOnPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        else:
-            # only SVD:
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOnSVD-moreThan1000MeV_SVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOnSVD_afterMarch1st-moreThan1000MeV_SVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        qiType = 'circleFit'  # circleFit
-    else:
-        if not svd_only:
-            # To turn off magnetic field:
-            # SVD and PXD sec map:
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOffPXDSVD-moreThan1000MeV_PXDSVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOffPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        else:
-            # only SVD
-            if usedGeometry == 'TB2016':
-                secSetup = ['TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD']
-            elif usedGeometry == 'TB2017':
-                secSetup = ['SecMapTB2017MagnetOffSVD-moreThan1000MeV_SVD']
-            elif usedGeometry == 'TB2017newGeo':
-                secSetup = ['SecMapTB2017MagnetOffSVD_afterMarch1st-moreThan1000MeV_SVD']
-            else:
-                print('not supported option for usedGeometry!')
-                exit()
-        qiType = 'straightLine'  # straightLine
-
-    vxdtf = register_module('VXDTF')
-    vxdtf.logging.debug_level = 2
-    # calcQIType:
-    # Supports 'kalman', 'circleFit' or 'trackLength.
-    # 'circleFit' has best performance at the moment
-
-    # filterOverlappingTCs:
-    # Supports 'hopfield', 'greedy' or 'none'.
-    # 'hopfield' has best performance at the moment
-    param_vxdtf = {  # normally we don't know the particleID, but in the case of the testbeam,
-        # we can expect (anti-?)electrons...
-        # True
-        # 'artificialMomentum': 5., ## uncomment if there is no magnetic field!
-        # 7
-        # 'activateDistance3D': [False],
-        # 'activateDistanceZ': [True],
-        # 'activateAngles3D': [False],
-        # 'activateAnglesXY': [True],  #### noMagnet
-        # ### withMagnet
-        # 'activateAnglesRZHioC': [True], #### noMagnet
-        # ### withMagnet r51x
-        # True
-
-        # activateBaselineTF was 1: but this TF caused lots of problems last TB so I turned it off,
-        # it should work now but better play it safe
-        'activateBaselineTF': 0,
-        'debugMode': 0,
-        'tccMinState': [2],
-        'tccMinLayer': [3],
-        'reserveHitsThreshold': [0.],
-        'highestAllowedLayer': [6],
-        'standardPdgCode': -11,
-        'artificialMomentum': 3,
-        'sectorSetup': secSetup,
-        'calcQIType': qiType,
-        'killEventForHighOccupancyThreshold': 500,
-        'highOccupancyThreshold': 111,
-        'cleanOverlappingSet': False,
-        'filterOverlappingTCs': filterOverlaps,
-        'TESTERexpandedTestingRoutines': True,
-        'qiSmear': False,
-        'smearSigma': 0.000001,
-        'GFTrackCandidatesColName': '__TrackCands',
-        'tuneCutoffs': 0.51,
-        'activateDistanceXY': [False],
-        'activateDistance3D': [True],
-        'activateDistanceZ': [False],
-        'activateSlopeRZ': [False],
-        'activateNormedDistance3D': [False],
-        'activateAngles3D': [True],
-        'activateAnglesXY': [False],
-        'activateAnglesRZ': [False],
-        'activateDeltaSlopeRZ': [False],
-        'activateDistance2IP': [False],
-        'activatePT': [False],
-        'activateHelixParameterFit': [False],
-        'activateAngles3DHioC': [True],
-        'activateAnglesXYHioC': [True],
-        'activateAnglesRZHioC': [False],
-        'activateDeltaSlopeRZHioC': [False],
-        'activateDistance2IPHioC': [False],
-        'activatePTHioC': [False],
-        'activateHelixParameterFitHioC': [False],
-        'activateDeltaPtHioC': [False],
-        'activateDeltaDistance2IPHioC': [False],
-        'activateZigZagXY': [False],
-        'activateZigZagRZ': [False],
-        'activateDeltaPt': [False],
-        'activateCircleFit': [False],
-    }
-
-    if not magnet:
-        param_vxdtf['artificialMomentum'] = momentum
-        param_vxdtf['activateAnglesXY'] = [True]
-        param_vxdtf['activateAnglesRZHioC'] = [True]
-
-    vxdtf.param(param_vxdtf)
-    return vxdtf
 
 
 def add_vxdtf_v2(path=None,
@@ -416,6 +257,7 @@ def add_vxdtf_v2(path=None,
                 print('ERROR: no sectormap for that setting')
                 exit()
         else:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
                 secmap_name = 'SecMap_testbeamTEST_MagnetOnSVD.root'
             elif usedGeometry == 'TB2017newGeo':
@@ -434,6 +276,7 @@ def add_vxdtf_v2(path=None,
                 print('ERROR: no sectormap for that setting')
                 exit()
         else:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
                 secmap_name = 'SecMap_testbeamTEST_MagnetOffSVD.root'
             elif usedGeometry == 'TB2017newGeo':
@@ -448,17 +291,14 @@ def add_vxdtf_v2(path=None,
                                  components=tf2_components,
                                  suffix="",
                                  useTwoStepSelection=True,
-                                 sectormap_file=Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name),
-                                 PXDminSVDSPs=0)  # This module was not in the old function, so reproduce no action for now
-
+                                 sectormap_file=Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name))
     set_module_parameters(path, 'SectorMapBootstrap', SetupToRead='testbeamTEST')
     # set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
     set_module_parameters(path, 'SegmentNetworkProducer', sectorMapName='testbeamTEST')
     # set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
 
     # for testbeam deactivate all timing filters in the VXDTF2 as timing has never been tuned for TB
-
-    for mod in main.modules():
+    for mod in path.modules():
         print(mod.name())
         if mod.name() == 'SectorMapBootstrap':
             # three hit filter
@@ -470,6 +310,9 @@ def add_vxdtf_v2(path=None,
             mod.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "TMath::Infinity()"),
                                                       (10, "-TMath::Infinity()"), (11, "TMath::Infinity()")])
             # mod.logging.log_level = LogLevel.DEBUG
+
+    # adds also the SpacePoint creator which uses timing:
+    set_module_parameters(path, 'SVDSpacePointCreator', MinClusterTime=-float('inf'))
 
     if filter_overlapping:
         print("doing nothing")

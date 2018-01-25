@@ -89,6 +89,9 @@ namespace Belle2 {
     /** Time width of a sampling */
     float DeltaT = 31.44; //ns
 
+    /** To stop program if something is wrong */
+    bool m_StopCreationReco = false;
+
   protected:
 
     /** Create lookup maps for relations

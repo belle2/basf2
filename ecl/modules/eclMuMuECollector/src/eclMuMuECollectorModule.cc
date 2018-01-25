@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <ecl/modules/eclMuMuECollector/eclMuMuECollectorModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -149,6 +147,11 @@ void eclMuMuECollectorModule::prepare()
     if (MuMuECalib[crysID] == 0) {B2FATAL("eclMuMuECollector: MuMuECalib = 0 for crysID = " << crysID);}
   }
 
+  /**----------------------------------------------------------------------------------------*/
+  /** Required data objects */
+  TrackArray.isRequired();
+  eclDigitArray.isRequired();
+
 }
 
 
@@ -192,7 +195,6 @@ void eclMuMuECollectorModule::collect()
 
   //------------------------------------------------------------------------
   /** Event selection. First, require at least two tracks */
-  StoreArray<Track> TrackArray;
   int nTrack = TrackArray.getEntries();
   if (nTrack < 2) {return;}
 
@@ -257,7 +259,6 @@ void eclMuMuECollectorModule::collect()
   //------------------------------------------------------------------------
   /** Record ECL digit amplitude as a function of CrysID */
   memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
-  StoreArray<ECLDigit> eclDigitArray;
   for (auto& eclDigit : eclDigitArray) {
     int crysID = eclDigit.getCellId() - 1;
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());

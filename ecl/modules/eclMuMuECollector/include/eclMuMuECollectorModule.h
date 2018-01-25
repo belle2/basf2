@@ -14,6 +14,9 @@
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <ecl/dataobjects/ECLDigit.h>
 
 namespace Belle2 {
 
@@ -47,6 +50,11 @@ namespace Belle2 {
     int lastcellIDN4 = 7920; /**< last cellID where we only need 4 neighbours */
     ECL::ECLNeighbours* myNeighbours4; /**< class to return 4 nearest neighbours to crystal */
     ECL::ECLNeighbours* myNeighbours8; /**< class to return 8 nearest neighbours to crystal */
+
+    /** Required arrays */
+    StoreArray<Track> TrackArray; /**< Required input array of tracks */
+    StoreArray<ECLDigit> eclDigitArray; /**< Required input array of eclDigits */
+
 
     /** Some other useful quantities */
     double cotThetaLabMin;  /**< m_thetaLabMinDeg converted to cotangent */

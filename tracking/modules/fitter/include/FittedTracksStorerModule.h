@@ -11,6 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <string>
+#include <cmath>
 
 namespace Belle2 {
   class RecoTrack;

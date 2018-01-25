@@ -27,7 +27,7 @@ FittedTracksStorerModule::FittedTracksStorerModule() :
            m_param_inputRecoTracksStoreArrayName);
   addParam("outputRecoTracksStoreArrayName", m_param_outputRecoTracksStoreArrayName, "StoreArray name of the output reco tracks.",
            m_param_outputRecoTracksStoreArrayName);
-  addParam("minimalWeight", m_param_minimalWeight, "Minimal weight for copying the hits.", m_param_minimalWeight)
+  addParam("minimalWeight", m_param_minimalWeight, "Minimal weight for copying the hits.", m_param_minimalWeight);
 }
 
 void FittedTracksStorerModule::initialize()

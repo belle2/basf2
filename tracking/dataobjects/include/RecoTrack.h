@@ -219,6 +219,7 @@ namespace Belle2 {
      *        this reco track.
      * @param reversed: add the hits in a reversed order - each sorting parameter is set to
      *        maximal sorting parameter - sorting parameter + offset
+     * @param minimalWeight: if not NAN, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,

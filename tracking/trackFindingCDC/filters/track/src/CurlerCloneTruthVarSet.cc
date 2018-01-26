@@ -32,16 +32,16 @@ void CurlerCloneTruthVarSet::beginEvent()
   Super::beginEvent();
 }
 
-bool CurlerCloneTruthVarSet::extract(const CDCTrack* track)
+bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
 {
-  if (not track) return false;
+  if (not ptrCDCTrack) return false;
 
   // Find the MC track with the highest number of hits in the segment
-  const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
-  const CDCMCHitLookUp& hitLookup = CDCMCHitLookUp::getInstance();
+  const CDCMCTrackLookUp& mcTrackLookUp = CDCMCTrackLookUp::getInstance();
+  const CDCMCHitLookUp& hitLookUp = CDCMCHitLookUp::getInstance();
   CDCMCCurlerCloneLookUp& curlerCloneLookUp = CDCMCCurlerCloneLookUp::getInstance();
 
-  ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(track);
+  ITrackType trackMCMatch = mcTrackLookUp.getMCTrackId(ptrCDCTrack);
   bool trackIsFake = false;
 
   if (trackMCMatch == INVALID_ITRACK) {
@@ -50,24 +50,25 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* track)
 
     unsigned int numberOfCorrectHits = 0;
     unsigned int sumHitLoopNumbers = 0;
-    for (const CDCRecoHit3D& recoHit : *track) {
-      sumHitLoopNumbers += hitLookup.getNLoops(recoHit.getWireHit().getHit());
-      if (hitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch) {
+    for (const CDCRecoHit3D& recoHit : *ptrCDCTrack) {
+      sumHitLoopNumbers += hitLookUp.getNLoops(recoHit.getWireHit().getHit());
+      if (hitLookUp.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch) {
         numberOfCorrectHits++;
       }
     }
-    if ((double)numberOfCorrectHits / track->size() < 0.8) {
+    if ((double)numberOfCorrectHits / ptrCDCTrack->size() < 0.8) {
       trackIsFake = true;
     } else {
       trackIsFake = false;
     }
   }
-  bool trackIsClone = curlerCloneLookUp.isTrackCurlerClone(*track);
+  bool trackIsClone = curlerCloneLookUp.isTrackCurlerClone(*ptrCDCTrack);
 
   var<named("weight")>() = trackIsFake;
   var<named("track_is_curler_clone_truth")>() = trackIsClone;
   var<named("truth")>() = not trackIsClone;
-
+  var<named("truth_first_nloops")>() = mcTrackLookUp.getFirstNLoops(ptrCDCTrack);
   var<named("truth_event_id")>() = m_eventMetaData->getEvent();
+  var<named("truth_MCTrackID")>() = trackMCMatch;
   return true;
 }

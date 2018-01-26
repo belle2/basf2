@@ -1,6 +1,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCCurlerCloneLookUp.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/logging/Logger.h>
 
@@ -10,7 +11,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 CDCMCCurlerCloneLookUp& CDCMCCurlerCloneLookUp::getInstance()
 {
@@ -46,17 +46,59 @@ std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCurlerCloneLookUp::getMa
 }
 
 /// Functor definition of comparison function for findNonCurlerCloneTrack
-bool CompareCurlerTracks::operator()(const CDCTrack* ptrTrack1,  const CDCTrack* ptrTrack2) const
+bool CompareCurlerTracks::operator()(const CDCTrack* ptrTrack1, const CDCTrack* ptrTrack2) const
 {
   // Maybe add reference of instance in functor ctor?
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
 
   Index firstNLoopsTrack1 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack1);
   Index firstNLoopsTrack2 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack2);
-  bool isTrack1Better;
+
+  /// Debug Code start
+  const CDCMCHitLookUp& cdcMCHitLookUp = CDCMCHitLookUp::getInstance();
+
+  if (firstNLoopsTrack1 < 0) {
+    B2WARNING("\ngetFirstNLoops returned c_InvalidIndex for ptrTrack1 !!!");
+    const CDCHit* ptrHit1 = cdcMCTrackLookUp.getFirstHit(ptrTrack1);
+    const MCParticle* ptrMCParticle1 = cdcMCHitLookUp.getMCParticle(ptrHit1);
+
+    if (ptrMCParticle1) {
+      if (cdcMCHitLookUp.getMCTrackId(ptrHit1) == cdcMCTrackLookUp.getMCTrackId(ptrTrack1)) {
+        B2WARNING(
+          "Matching MCParticle for first hit EXIST matched track is matched to CORRECT track.");
+      } else {
+        B2WARNING(
+          "Matching MCParticle for first hit EXIST matched track is matched to WRONG track.");
+      }
+    } else {
+      B2WARNING("Matching MCParticle for first hit DOES NOT EXIST");
+    }
+    B2FATAL("-----");
+  }
+
+  if (firstNLoopsTrack2 < 0) {
+    B2WARNING("\ngetFirstNLoops returned c_InvalidIndex for ptrTrack2 !!!");
+    const CDCHit* ptrHit2 = cdcMCTrackLookUp.getFirstHit(ptrTrack2);
+    const MCParticle* ptrMCParticle2 = cdcMCHitLookUp.getMCParticle(ptrHit2);
+
+    if (ptrMCParticle2) {
+      if (cdcMCHitLookUp.getMCTrackId(ptrHit2) == cdcMCTrackLookUp.getMCTrackId(ptrTrack2)) {
+        B2WARNING(
+          "Matching MCParticle for first hit EXIST matched track is matched to CORRECT track.");
+      } else {
+        B2WARNING(
+          "Matching MCParticle for first hit EXIST matched track is matched to WRONG track.");
+      }
+    } else {
+      B2WARNING("Matching MCParticle for first hit DOES NOT EXIST");
+    }
+    B2FATAL("-----");
+  }
+  /// Debug Code end
 
   // Look for track with smallest NLoops of first hit.
   // If it is equal, use track with the larger amount of hits.
+  bool isTrack1Better;
   if (firstNLoopsTrack1 == firstNLoopsTrack2) {
     isTrack1Better = ptrTrack1->size() > ptrTrack2->size();
   } else {
@@ -88,7 +130,8 @@ void CDCMCCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
   }
 
   /// get lookup table of MC track IDs to vectors of CDC track pointers
-  std::map<const ITrackType, std::vector<CDCTrack*>> mapMCIDToCDCTracks = getMapMCIDToCDCTracks(cdcTracks);
+  std::map<const ITrackType, std::vector<CDCTrack*>> mapMCIDToCDCTracks =
+                                                    getMapMCIDToCDCTracks(cdcTracks);
 
   for (auto& mcIDToCDCTracks : mapMCIDToCDCTracks) {
     /// Vector of track pointers which are mapped to this mcTrackID

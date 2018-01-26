@@ -25,7 +25,9 @@ namespace Belle2 {
       "weight", // 0 for fakes, 1 for MC matched tracks
       "track_is_curler_clone_truth", // track is clone
       "truth", // not clone, either best match or fake (which is then not used due to weight 0)
+      "truth_first_nloops",
       "truth_event_id",
+      "truth_MCTrackID",
     };
 
     /// Vehicle class to transport the variable names
@@ -55,7 +57,7 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Generate and assign the contained variables
-      bool extract(const CDCTrack* track) override;
+      bool extract(const CDCTrack* ptrCDCTrack) override;
 
     private:
       /// Type of the base class

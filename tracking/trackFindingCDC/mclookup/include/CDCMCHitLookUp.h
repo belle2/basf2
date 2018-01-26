@@ -74,7 +74,7 @@ namespace Belle2 {
       /// Returns if this hit is considered background
       bool isBackground(const CDCHit* ptrHit) const;
 
-      /// Returns the position if the wire hit in the track along the travel direction
+      /// Returns the position of the wire hit in the track along the travel direction
       Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Returns the id of the segment in the track.

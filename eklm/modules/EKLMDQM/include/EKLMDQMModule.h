@@ -85,6 +85,9 @@ namespace Belle2 {
     /** Sector number. */
     TH1F* m_Sector;
 
+    /** Hit time. */
+    TH1F* m_Time;
+
   };
 
 }

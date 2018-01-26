@@ -39,7 +39,8 @@ void EKLMDQMModule::defineHisto()
   oldDirectory = gDirectory;
   newDirectory = oldDirectory->mkdir(m_HistogramDirectoryName.c_str());
   newDirectory->cd();
-  m_Sector = new TH1F("eklm_sector", "Sector number", 104, 0.5, 104.5);
+  m_Sector = new TH1F("sector", "Sector number", 104, 0.5, 104.5);
+  m_Time = new TH1F("time", "Hit time", 50, 0, 50);
   oldDirectory->cd();
 }
 
@@ -53,6 +54,7 @@ void EKLMDQMModule::initialize()
 void EKLMDQMModule::beginRun()
 {
   m_Sector->Reset();
+  m_Time->Reset();
 }
 
 void EKLMDQMModule::event()
@@ -62,10 +64,17 @@ void EKLMDQMModule::event()
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
     eklmDigit = m_Digits[i];
+    /*
+     * Reject digits that are below the threshold (such digits may appear
+     * for simulated events).
+     */
+    if (!eklmDigit->isGood())
+      continue;
     sector = m_Elements->sectorNumber(
                eklmDigit->getEndcap(), eklmDigit->getLayer(),
                eklmDigit->getSector());
     m_Sector->Fill(sector);
+    m_Time->Fill(eklmDigit->getTime());
   }
 }
 

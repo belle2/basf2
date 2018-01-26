@@ -36,7 +36,7 @@ namespace Belle2 {
     CDCDedxTrack() :
       RelationsObject(),
       m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_p_cdc(0),
-      m_pdg(0), m_mother_pdg(0), m_p_true(0), m_length(0.0),
+      m_pdg(-999), m_mcmass(0), m_mother_pdg(0), m_p_true(0), m_length(0.0),
       m_scale(0), m_coscor(0), m_rungain(0),
       l_nHits(0), l_nHitsUsed(0), h_nHits(0)
     {
@@ -44,6 +44,8 @@ namespace Belle2 {
 
       // set default values for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+        m_predmean[i] = 0.0;
+        m_predres[i] = 0.0;
         m_cdcChi[i] = -999.;
         m_cdcLogl[i] = 0.0;
       }
@@ -133,7 +135,7 @@ namespace Belle2 {
     // Layer level
 
     /** Return the number of layer hits for this track */
-    int getNLayerHits() const { return l_nHits; }
+    int getNLayerHits() const { return l_dedx.size(); }
     /** Return the number of hits used to determine the truncated mean */
     double getNLayerHitsUsed() const { return l_nHitsUsed; }
 
@@ -155,7 +157,7 @@ namespace Belle2 {
     // Hit level
 
     /** Return the number of hits for this track */
-    int size() const { return h_nHits; }
+    int size() const { return h_dedx.size(); }
 
     /** Return the sensor ID for this hit: wire number in the layer */
     int getWireInLayer(int i) const { return h_lwire[i]; }
@@ -257,7 +259,7 @@ namespace Belle2 {
     std::vector<double> h_cellHeight;    /**< height of the CDC cell */
     std::vector<double> h_cellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 6); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 7); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

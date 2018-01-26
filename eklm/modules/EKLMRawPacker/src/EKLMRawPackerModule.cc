@@ -123,8 +123,7 @@ void EKLMRawPackerModule::event()
  *         Bit  13-15 - data type: RPC=0x010 scintillator=0x100
  * Word 2: 15 bits of ctime.
  * Word 3: TDC in 10 bits.
- * Word 4: 12 bits of charge. We use 15 yet since EDep from mc does not fit
- *         12 bits, e.g. after packing/unpacking variable changes 4829 -> 733
+ * Word 4: 12 bits of charge.
  */
 void EKLMRawPackerModule::formatData(
   const EKLMDataConcentratorLane* lane, int plane, int strip,
@@ -141,7 +140,7 @@ void EKLMRawPackerModule::formatData(
   bword1 |= (4 << 13);
   bword2 |= (ctime & 0xFFFF);
   bword3 |= (((int)time) & 0x3FF);
-  bword4 |= (charge & 0xFFFF);  //SHOULD BE 12 BITS!!!
+  bword4 |= (charge & 0xFFF);
 }
 
 void EKLMRawPackerModule::endRun()

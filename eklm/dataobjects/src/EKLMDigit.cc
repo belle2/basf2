@@ -97,9 +97,9 @@ float EKLMDigit::getNPE() const
 void EKLMDigit::setNPE(float npe)
 {
   m_Charge = uint16_t(npe * 32);
-  /* 15 bits for charge. */
-  if (m_Charge >= 0x8000)
-    m_Charge = 0x7FFF;
+  /* 12 bits for charge. */
+  if (m_Charge >= 0x1000)
+    m_Charge = 0x0FFF;
 }
 
 int EKLMDigit::getGeneratedNPE() const

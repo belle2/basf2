@@ -109,9 +109,7 @@ void EKLMUnpackerModule::event()
           lane.setLane((bword1 >> 8) & 0x1F);
           uint16_t ctime  =   bword2 & 0xFFFF;
           uint16_t tdc    =   bword3 & 0x7FF;
-          uint16_t charge =   bword4 & 0xFFFF;  // !!! THERE IS 15 BITS NOW!!!
-          // !!! SHOULD BE 12 BITS !!!
-
+          uint16_t charge =   bword4 & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == NULL) {
             B2ERROR("Lane with copper = " << lane.getCopper() <<

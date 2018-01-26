@@ -1994,3 +1994,15 @@ def writePi0EtaVeto(
     variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def buildThrustOfEvent(ParticleLists, path=analysis_main):
+    """
+    Calculates the Thrust of the particles in ParticleList and stores in the variable 'thrustOfEvent'.
+    :param ParticleLists: List of ParticleList used to calculate the Thrust
+    :param path: modules are added to this path
+    """
+    thrustModule = register_module('ThrustOfEvent')
+    thrustModule.set_name('ThrustOfEvent_')
+    thrustModule.param('particleLists', ParticleLists)
+    path.add_module(thrustModule)

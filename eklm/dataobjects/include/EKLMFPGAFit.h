@@ -79,14 +79,14 @@ namespace Belle2 {
     void setBackgroundAmplitude(float amplitude);
 
     /**
-     * Get maximal amplitude (ADC output).
+     * Get minimal amplitude (ADC output).
      */
-    int getMaximalAmplitude() const;
+    int getMinimalAmplitude() const;
 
     /**
-     * Set maximal amplitude.
+     * Set minimal amplitude.
      */
-    void setMaximalAmplitude(int amplitude);
+    void setMinimalAmplitude(int amplitude);
 
   private:
 
@@ -99,8 +99,8 @@ namespace Belle2 {
     /** Background amplitude. */
     float m_BackgroundAmplitude;
 
-    /** Maximal amplitude. */
-    int m_MaximalAmplitude;
+    /** Minimal amplitude. */
+    int m_MinimalAmplitude;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMFPGAFit, 1);

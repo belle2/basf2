@@ -182,7 +182,7 @@ void EKLM::FiberAndElectronics::processEntry()
    * Fit. Threshold is 7 photoelectron signal, it has average simulated maximal
    * amplitude about 3 maximal amplitudes of 1 photoelectron signal.
    */
-  threshold = m_DigPar->getADCPedestal() +
+  threshold = m_DigPar->getADCPedestal() -
               m_DigPar->getADCPEAmplitude() * m_Threshold;
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
@@ -410,11 +410,11 @@ void EKLM::FiberAndElectronics::simulateADC()
   int i;
   double amp;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    amp = m_DigPar->getADCPedestal() +
+    amp = m_DigPar->getADCPedestal() -
           m_DigPar->getADCPEAmplitude() * m_amplitude[i];
-    if (amp > m_DigPar->getADCSaturation())
+    if (amp < m_DigPar->getADCSaturation())
       amp = m_DigPar->getADCSaturation();
-    m_ADCAmplitude[i] = amp;
+    m_ADCAmplitude[i] = floor(amp);
   }
 }
 

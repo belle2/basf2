@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DigitizationParams>
-  <ADCRange desc="ADC range">1024</ADCRange>
+  <ADCRange desc="ADC range">4096</ADCRange>
   <ADCSamplingTime desc="ns">1.0</ADCSamplingTime>
   <nDigitizations desc="">200</nDigitizations>
-  <ADCPedestal desc="ADC pedestal">100</ADCPedestal>
-  <ADCPEAmplitude desc="ADC photoelectron amplitude">30</ADCPEAmplitude>
-  <ADCSaturation desc="ADC readout corresponding to saturation">1023
+  <ADCPedestal desc="ADC pedestal">3700</ADCPedestal>
+  <ADCPEAmplitude desc="ADC photoelectron amplitude">20</ADCPEAmplitude>
+  <ADCSaturation desc="ADC readout corresponding to saturation">1000
   </ADCSaturation>
   <nPEperMeV desc="">22</nPEperMeV>
   <MaxTotalIRAngle desc="deg">26.7</MaxTotalIRAngle>

@@ -168,8 +168,10 @@ void InclusiveBtagReconstructionModule::event()
       if (rightDaughtersCount == false) {
         continue;
       }
+
       //remove repeated index in daughterIndices
       std::vector<int>::iterator it;
+      std::sort(daughterIndices.begin(), daughterIndices.end());
       it = std::unique(daughterIndices.begin(), daughterIndices.end());
       daughterIndices.resize(std::distance(daughterIndices.begin(), it));
 

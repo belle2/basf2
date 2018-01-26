@@ -302,51 +302,9 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::maskAllButOneModule(int moduleToKeep)
-  {
-    // declare db object to be imported -- and construct it
-    DBImportObjPtr<TOPCalChannelMask> channelMask;
-    channelMask.construct();
-
-    // set up for loop channel mapper
-    auto& chMapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
-    const size_t nModules = TOP::TOPGeometryPar::Instance()->getGeometry()->getNumModules();
-    unsigned ncall = 0;
-    unsigned nall = 0;
-
-    // loop over module (1-based)
-    for (size_t moduleID = 1; moduleID <= nModules; moduleID++) {
-
-      // loop over boardStack*carrierBoard*assic*channel to get channel (0 to 512)
-      // TODO: get these loop limits from some sensible enum somewhere
-      for (int boardStack = 0; boardStack < 4; boardStack++) {
-        for (int carrierBoard = 0; carrierBoard < 4; carrierBoard++) {
-          for (int asic = 0; asic < 4; asic++) {
-            for (int chan = 0; chan < 8; chan++) {
-              auto channel = chMapper.getChannel(boardStack, carrierBoard, asic, chan);
-              nall++;
-              if (moduleID != moduleToKeep) {
-                channelMask->setNoisy(moduleID, channel);
-                ncall++;
-              }
-            }
-          }
-        }
-      }
-    } // module
-
-    // declare interval of validity
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
-    channelMask.import(iov);
-
-    B2WARNING("Generated and imported a fake channel mask to database for testing: "
-              << ncall << "/" << nall);
-    return;
-  }
-
-
   void TOPDatabaseImporter::printSampleTimeCalibration()
   {
+
     DBObjPtr<TOPCalTimebase> timeBase;
     if (!timeBase.isValid()) {
       B2ERROR("No time base calibration available");

@@ -82,7 +82,6 @@ namespace TreeFitter {
         m_covariance(row, col) = cov7in[3 + row][3 + col];
       }
     }
-    std::cout << "Updated covariance in " << this->name() << "\n" << m_covariance  << std::endl;
   }// end updateParams()
 
   RecoComposite::~RecoComposite() {}

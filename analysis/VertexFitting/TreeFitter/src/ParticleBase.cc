@@ -319,6 +319,9 @@ namespace TreeFitter {
     int tauindex = tauIndex();
     int momindex = momIndex();
 
+    std::cout << "      -> " << this->name() << " tauindex " << tauindex  << std::endl;
+    std::cout << "         posindexmother " << posindexmother << " posindex " << posindex << " momindex " << momindex  << std::endl;
+
     double tau =  fitparams.getStateVector()(tauindex);
 
     EigenTypes::ColVector momentumVec = fitparams.getStateVector().segment(momindex, 3);
@@ -329,13 +332,16 @@ namespace TreeFitter {
     // linear approximation is fine
     //JFK: TODO move to block operations 2017-09-28
     for (int row = 0; row < 3; ++row) {
+
+      std::cout << "           working on  " << posindexmother + row << " posindex " << posindex + row << " momindex " << momindex + row
+                << std::endl;
       posxmother = fitparams.getStateVector()(posindexmother + row);
       posx       = fitparams.getStateVector()(posindex + row);
       momx       = fitparams.getStateVector()(momindex + row);
-      p.getResiduals()(row) = posxmother - posx + tau * momx / mom;
+      p.getResiduals()(row) = posxmother - (posx + tau * momx);
       p.getH()(row, posindexmother + row) =    1;
       p.getH()(row, posindex + row) =        -1;
-      p.getH()(row, momindex + row) = tau / mom; // JFK was just tau before
+      p.getH()(row, momindex + row) = tau; // JFK was just tau before
       p.getH()(row, tauindex)       =      momx;
     }
     return ErrCode::success;

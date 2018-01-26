@@ -54,7 +54,6 @@ namespace TreeFitter {
 
   bool Fitter::fit()
   {
-
     const int nitermax = 10;
     const int maxndiverging = 3;
     const double dChisqConv = m_prec;
@@ -72,16 +71,14 @@ namespace TreeFitter {
       int ndiverging = 0;
       bool finished = false;
       double deltachisq = 1e10;
-
-      B2DEBUG(80, "############################");
-      B2DEBUG(80, "# Fitter: Begin Iterations #");
-      B2DEBUG(80, "############################");
-
+      std::cout << "#########################################################################################"  << std::endl;
+      std::cout << "Starting to FIt fit pars are:\n" << m_fitparams->getStateVector()  << std::endl;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
 
 
         EigenTypes::ColVector prevpar = m_fitparams->getStateVector();
 
+        std::cout << m_niter << " ------------------------------- filter" << std::endl;
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
@@ -90,14 +87,8 @@ namespace TreeFitter {
 
         deltachisq = chisq - m_chiSquare;
 
-        B2DEBUG(80, "----------------------------------------------------------------------");
-        B2DEBUG(80, "Fitter: Iteration #" << m_niter << " with Chi2 = " << chisq << " and deltachisq = " << deltachisq);
-        B2DEBUG(80, "----------------------------------------------------------------------");
 
         if (m_errCode.failure()) {
-          B2DEBUG(80, "____________________________________________________________");
-          B2DEBUG(80, "-----------> Fitter: VertexStatus::FAILED      <-----------");
-          B2DEBUG(80, "____________________________________________________________");
           finished = true ;
           m_status = VertexStatus::Failed;
         } else {
@@ -108,29 +99,17 @@ namespace TreeFitter {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
-              B2DEBUG(10, "____________________________________________________________");
-              B2DEBUG(10, "->->->->->-> Fitter: VertexStatus::SUCCESS      <-<-<-<-<-<-");
-              B2DEBUG(10, "____________________________________________________________");
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
               m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
               m_errCode = ErrCode::fastdivergingfit;
-              B2DEBUG(10, "____________________________________________________________");
-              B2DEBUG(10, "-----------> Fitter: ErrCode::fastdivergingfit  <-----------");
-              B2DEBUG(10, "____________________________________________________________");
               finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode::slowdivergingfit;
-              B2DEBUG(10, "____________________________________________________________");
-              B2DEBUG(10, "-----------> Fitter: ErrCode::slowdivergingfit  <-----------");
-              B2DEBUG(10, "____________________________________________________________");
               finished = true ;
             } else if (deltachisq > 0) {
-              B2DEBUG(10, "____________________________________________________________");
-              B2DEBUG(10, "-----------> Fitter: reduce stepsize            <-----------");
-              B2DEBUG(10, "____________________________________________________________");
             }
           }
 

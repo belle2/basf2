@@ -269,19 +269,25 @@ namespace TreeFitter {
     // now add the daughters
     const double posprecision = 1e-4; // 1mu
 
+    std::cout << "    -> kine mother " << this->name() << " maxrow  "  << std::endl;
     for (const auto daughter : m_daughters) {
       // just to be sure ...
       int dautauindex = 0, daumomindex = 0, maxrow = 0;
       double mass = 0, e2 = 0, px = 0, py = 0, energy = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
-
       dautauindex = daughter->tauIndex();
       daumomindex = daughter->momIndex();
       mass = daughter->pdgMass();
       maxrow = daughter->hasEnergy() ? 4 : 3;
+
+      std::cout << "    -> kine daughter " << daughter->name() << " maxrow  " << maxrow << std::endl;
+      std::cout << "       dautauindex " << dautauindex << " daumomindex " << daumomindex << ""  << std::endl;
+
       e2 = mass * mass;
       //e2 += fitparams.getStateVector().segment(daumomindex, maxrow).transpose() * fitparams.getStateVector().segment(daumomindex, maxrow);
       //p.getResiduals().segment(0, maxrow) -= fitparams.getStateVector().segment(0, maxrow);
       for (int imom = 0; imom < maxrow; ++imom) {
+        std::cout << "           mom taken from " << daumomindex + imom << std::endl;
+
         px = fitparams.getStateVector()(daumomindex + imom);
         e2 += px * px;
         p.getResiduals()(imom) += -px;

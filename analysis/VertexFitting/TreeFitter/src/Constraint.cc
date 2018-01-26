@@ -75,6 +75,7 @@ namespace TreeFitter {
 
       if (!status.failure()) {
 
+        std::cout << iter << " -> " << this->name()  << std::endl;
         status |= kalman.calculateGainMatrix(p.getResiduals(), p.getH(), fitpar, &p.getV());
 
         if (!status.failure()) {

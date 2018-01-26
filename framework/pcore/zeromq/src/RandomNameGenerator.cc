@@ -1,5 +1,6 @@
 #include <framework/pcore/zeromq/RandomNameGenerator.h>
 #include <TRandom.h>
+#include <algorithm>
 #include <fstream>
 
 namespace Belle2 {

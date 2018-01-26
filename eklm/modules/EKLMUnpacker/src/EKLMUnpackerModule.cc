@@ -49,8 +49,8 @@ void EKLMUnpackerModule::beginRun()
 void EKLMUnpackerModule::event()
 {
   /*
-   * Length of one hit in 4 byte words. This is needed find the hits in the
-   * detector buffer
+   * Length of one hit in 4-byte words. This is needed to find the hits in the
+   * detector buffer.
    */
   const int hitLength = 2;
   int endcap, layer, sector;
@@ -77,7 +77,6 @@ void EKLMUnpackerModule::event()
       lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
-        //addendum: There is always an additional word (count) in the end
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
@@ -108,7 +107,7 @@ void EKLMUnpackerModule::event()
            * always correct.
            */
           lane.setLane((bword1 >> 8) & 0x1F);
-          uint16_t ctime  =   bword2 & 0xFFFF; //full bword
+          uint16_t ctime  =   bword2 & 0xFFFF;
           uint16_t tdc    =   bword3 & 0x7FF;
           uint16_t charge =   bword4 & 0xFFFF;  // !!! THERE IS 15 BITS NOW!!!
           // !!! SHOULD BE 12 BITS !!!
@@ -134,9 +133,9 @@ void EKLMUnpackerModule::event()
           eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
           eklmDigit->setCharge(charge);
         }
-      } //finesse boards
-    }  //copper boards
-  }   // events... There should be only 1...
+      }
+    }
+  }
 }
 
 void EKLMUnpackerModule::endRun()

@@ -87,12 +87,6 @@ namespace Belle2 {
     float getNPE() const;
 
     /**
-     * Set the number of photoelectrons (fit result).
-     * @param[in] npe Number of photoelectrons.
-     */
-    void setNPE(float npe);
-
-    /**
      * Get generated number of photoelectrons.
      * @return Number of photoelectrons.
      */

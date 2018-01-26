@@ -60,7 +60,7 @@ DigitBase::EAppendStatus EKLMDigit::addBGDigit(const DigitBase* bg)
   this->setEDep(this->getEDep() + bgDigit->getEDep());
   if (this->getTime() > bgDigit->getTime())
     this->setTime(bgDigit->getTime());
-  this->setNPE(this->getNPE() + bgDigit->getNPE());
+  this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));
   this->setGeneratedNPE(this->getGeneratedNPE() + bgDigit->getGeneratedNPE());
   return DigitBase::c_DontAppend;
 }
@@ -92,14 +92,6 @@ void EKLMDigit::setCTime(uint16_t charge)
 float EKLMDigit::getNPE() const
 {
   return float(m_Charge) / 32;
-}
-
-void EKLMDigit::setNPE(float npe)
-{
-  m_Charge = uint16_t(npe * 32);
-  /* 12 bits for charge. */
-  if (m_Charge >= 0x1000)
-    m_Charge = 0x0FFF;
 }
 
 int EKLMDigit::getGeneratedNPE() const

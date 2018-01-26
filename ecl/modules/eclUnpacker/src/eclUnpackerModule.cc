@@ -387,12 +387,20 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             if (eclWaveformSamples.size() != nADCSamplesPerChannel)
               B2ERROR("Wrong number of ADC samples. Actual number of read samples "
-                      << eclWaveformSamples.size() << " != number of sumples in header "
+                      << eclWaveformSamples.size() << " != number of samples in header "
                       << nADCSamplesPerChannel);
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-            m_eclDsps.appendNew(cellID, eclWaveformSamples);
+            if (cellID > 0) {
+              m_eclDsps.appendNew(cellID, eclWaveformSamples);
+            } else {
+              B2ERROR("Got ADC samples from non-existent channel " << cellID <<
+                      ": iCrate = " << iCrate <<
+                      ", iShaper = " << iShaper <<
+                      ", iChannel = " << iChannel);
+            }
+
           }
 
           nRead++;

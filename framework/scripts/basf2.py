@@ -26,7 +26,8 @@ import cppyy
 # However importing ROOT.kIsConstMethod and kIsStatic is a bad idea
 # here since it triggers final setup of ROOT and thus starts a gui thread
 # (probably) and consumes command lines if not disabled *sigh*. So we take them
-# as literal values from TDictionary.h
+# as literal values from TDictionary.h. We do have a unit test to make sure
+# they don't change silently though.
 
 #: EProperty::kIsStatic value from TDictionary.h
 _ROOT_kIsStatic = 0x00004000

@@ -221,6 +221,41 @@ namespace Belle2 {
      */
     double eclClusterTrigger(const Particle* particle);
 
+    /**
+     * return theta of extrapolated track
+     */
+    double eclExtTheta(const Particle* particle);
+
+    /**
+     * return phi of extrapolated track
+     */
+    double eclExtPhi(const Particle* particle);
+
+    /**
+     * return phi id of extrapolated track
+     */
+    double eclExtPhiId(const Particle* particle);
+
+    /**
+     * return three digit energy sum FWD barrel
+     */
+    double eclEnergy3FWDBarrel(const Particle* particle);
+
+    /**
+     * return three digit energy sum FWD endcap
+     */
+    double eclEnergy3FWDEndcap(const Particle* particle);
+
+    /**
+     * return three digit energy sum BWD barrel
+     */
+    double eclEnergy3BWDBarrel(const Particle* particle);
+
+    /**
+     * return three digit energy sum BWD endcap
+     */
+    double eclEnergy3BWDEndcap(const Particle* particle);
+
 
   }
 } // Belle2 namespace

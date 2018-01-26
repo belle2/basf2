@@ -196,13 +196,20 @@ def peel_store_array_info(item, key="{part_name}"):
 def peel_quality_indicators(reco_track, key="{part_name}"):
     nan = float("nan")
 
+    svd_qi = nan
+    space_point_track_cand = reco_track.getRelated('SPTrackCands')
+
+    if not space_point_track_cand:
+        space_point_track_cand = reco_track.getRelated('SVDCDCRecoTracks').\
+            getRelated('SVDRecoTracks').getRelated('SPTrackCands')
+
+    if space_point_track_cand:
+        svd_qi = space_point_track_cand.getQualityIndex()
+
     crops = dict(
         quality_indicator=reco_track.getQualityIndicator(),
-        svd_quality_indicator=nan,
+        svd_quality_indicator=svd_qi,
     )
-
-    if reco_track.getRelated('SPTrackCands'):
-        crops["svd_quality_indicator"] = reco_track.getRelated('SPTrackCands').getQualityIndex()
 
     return crops
 

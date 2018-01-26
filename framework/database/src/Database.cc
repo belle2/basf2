@@ -367,7 +367,7 @@ Parameters:
 )DOCSTRING");
   {
   //use_central_database has different signatures so the docstring confuses sphinx. Handcraft one complete docstring.
-  docstring_options options(true, false, false);
+  docstring_options subOptions(true, false, false);
 
   def("use_central_database", &ConditionsDatabase::createDefaultInstance,
       (bp::arg("globalTag"), bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("payloaddir")="centraldb"));

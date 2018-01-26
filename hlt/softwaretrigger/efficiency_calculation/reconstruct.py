@@ -5,7 +5,6 @@ Script to be called by gridcontrol to reconstruct already simulated events.
 import basf2
 import os
 
-from L1trigger import add_tsim
 from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, DEFAULT_HLT_COMPONENTS, \
     RAW_SAVE_STORE_ARRAYS
 
@@ -37,8 +36,6 @@ def main():
         path.add_module("Gearbox")
 
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
-
-    add_tsim(path, Belle2Phase="Phase{}".format(phase))
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
     add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring")

@@ -58,6 +58,15 @@ float Vertex::getMCDeltaT()
   return m_MCdeltaT;
 }
 
+int Vertex::getFitType()
+{
+  return m_FitType;
+}
+
+int Vertex::getNTracks()
+{
+  return m_NTracks;
+}
 
 void Vertex::setTagVertex(TVector3 TagVertex)
 {
@@ -99,6 +108,15 @@ void Vertex::setMCDeltaT(float MCDeltaT)
   m_MCdeltaT = MCDeltaT;
 }
 
+void Vertex::setFitType(float FitType)
+{
+  m_FitType = FitType;
+}
+
+void Vertex::setNTracks(int NTracks)
+{
+  m_NTracks = NTracks;
+}
 
 void  Vertex::resetTagVertexErrorMatrix()
 {

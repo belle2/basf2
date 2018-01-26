@@ -8,11 +8,13 @@ import basf2
 import os
 
 import generators
-from softwaretrigger.path_functions import RAW_SAVE_STORE_ARRAYS, DEFAULT_HLT_COMPONENTS
+from softwaretrigger.path_functions import RAW_SAVE_STORE_ARRAYS, ALWAYS_SAVE_REGEX, DEFAULT_HLT_COMPONENTS
 from background import get_background_files
 
 from rawdata import add_packers
 from simulation import add_simulation
+
+from L1trigger import add_tsim
 
 
 def add_generation(path, event_class):
@@ -138,11 +140,13 @@ def main():
     # at this stage
     add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
 
+    add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True)
+
     add_packers(path, components=DEFAULT_HLT_COMPONENTS)
 
     # We are adding the PXDDigits here on purpose, as they will be in the final data (stored on tape)
     path.add_module("RootOutput",
-                    branchNames=["EventMetaData", "PXDDigits"] + RAW_SAVE_STORE_ARRAYS,
+                    branchNames=["PXDDigits"] + RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX,
                     outputFileName=output_file)
 
     basf2.log_to_file(log_file)

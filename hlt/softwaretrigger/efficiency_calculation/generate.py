@@ -29,40 +29,27 @@ def add_generation(path, event_class):
 
     # 4 lepton final states
     elif event_class == "eeee":
-        generators.add_aafh_generator(path, finalstate="e+e-e+e-", preselection=False)
+        generators.add_aafh_generator(path, finalstate='e+e-e+e-', minmass=0.1,
+                                      subweights=[1.000e+00, 1.384e+02, 1.574e+07, 3.018e+07,
+                                                  1.000e+00, 1.293e+00, 2.418e+00, 1.131e+00],
+                                      maxsubweight=2.0, maxfinalweight=6.0)
     elif event_class == "eemumu":
-        generators.add_aafh_generator(path, finalstate="e+e-mu+mu-", preselection=False)
+        generators.add_aafh_generator(path, finalstate='e+e-mu+mu-', minmass=0.1,
+                                      subweights=[1.000e+00, 1.234e+01, 1.160e+04, 2.906e+04,
+                                                  1.000e+00, 1.123e+00, 3.892e+00, 4.169e+00],
+                                      maxsubweight=2.0, maxfinalweight=1.5)
 
     # Tau events
     elif event_class == "tau":
         generators.add_kkmc_generator(path, finalstate="tau+tau-")
 
-    # TODO:
-    # elif event_class == "tau_to_1_prong_1_prong":
-    #     add_kkgen_input(path, input_file='tau.input.dat', tau_decay_table_name="1_prong_1_prong",
-    #                     use_preselection=True)
-    # elif event_class == "tau_to_e_gamma":
-    #     add_kkgen_input(path, input_file='tau.input.dat', tau_decay_table_name="1_prong_e_gamma",
-    #                     use_preselection=True, n_photons_min=1)
-    # elif event_class == "tau_to_mu_gamma":
-    #     add_kkgen_input(path, input_file='tau.input.dat', tau_decay_table_name="1_prong_mu_gamma",
-    #                     use_preselection=True, n_photons_min=1)
-    # elif event_class == "tau_to_e_nu":
-    #     add_kkgen_input(path, input_file='tau.input.dat', tau_decay_table_name="1_prong_e_nu",
-    #                     use_preselection=True)
-    # elif event_class == "tau_to_mu_nu":
-    #     add_kkgen_input(path, input_file='tau.input.dat', tau_decay_table_name="1_prong_mu_nu",
-    #                     use_preselection=True)
-
     # 2 lepton final states, Bhabha
     elif event_class == "mumu":
-        generators.add_phokhara_generator(path, finalstate="mu+mu-")
-    elif event_class == "mumu_kkgen":
         generators.add_kkmc_generator(path, finalstate="mu+mu-")
     elif event_class == "ee":
-        generators.add_babayaganlo_generator(path, finalstate="ee")
+        generators.add_bhwide_generator(path, minangle=0.5)
     elif event_class == "gg":
-        generators.add_babayaganlo_generator(path, finalstate="gg")
+        generators.add_babayaganlo_generator(path, finalstate="gg", minangle=0.0, minenergy=0.01)
 
     # Continuum
     elif event_class == "continuum_ccbar":
@@ -79,15 +66,6 @@ def add_generation(path, event_class):
         generators.add_evtgen_generator(path, finalstate="charged")
     elif event_class == "BB_mixed":
         generators.add_evtgen_generator(path, finalstate="mixed")
-    # TODO:
-    # elif event_class == "B_to_nu_nu":
-    #     add_evtgen_input(path, userDECFile='B_to_nu_nu')
-    # elif event_class == "B_to_pi0_pi0":
-    #     add_evtgen_input(path, userDECFile='B_to_pi0_pi0')
-    # elif event_class == "B_to_rho0_gamma":
-    #     add_evtgen_input(path, userDECFile='B_to_rho0_gamma')
-    # elif event_class == "B_to_JpsiKS_e_e":
-    #     add_evtgen_input(path, userDECFile='B_to_JpsiKS_e_e')
 
     # pi pi
     elif event_class == "pipi":

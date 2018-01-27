@@ -106,12 +106,6 @@ def main():
 
     path.add_module("EventInfoSetter", evtNumList=[n_events], expList=expNumber)
 
-    if phase == 2:
-        path.add_module('Gearbox', fileName="geometry/Beast2_phase2.xml")
-    else:
-        path.add_module("Gearbox")
-    path.add_module("Geometry")
-
     add_generation(path, event_class=channel)
 
     # We do not want to have PXD data reduction in the simulation - as this is not performed in the real detector at

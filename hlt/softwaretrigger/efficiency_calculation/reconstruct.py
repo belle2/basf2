@@ -30,11 +30,6 @@ def main():
     path = basf2.create_path()
     path.add_module("RootInput", inputFileName=input_file)
 
-    if phase == 2:
-        path.add_module("Gearbox", fileName="geometry/Beast2_phase2.xml")
-    else:
-        path.add_module("Gearbox")
-
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables

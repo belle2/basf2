@@ -5,6 +5,8 @@ from enum import Enum
 from argparse import ArgumentParser
 from basf2 import *
 from tracking import add_tracking_reconstruction, add_cr_tracking_reconstruction
+from svd import add_svd_reconstruction, add_svd_simulation
+from pxd import add_pxd_reconstruction, add_pxd_simulation
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -66,6 +68,14 @@ main.add_module(gearbox)
 # Geometry
 geometry = register_module('Geometry')
 main.add_module(geometry)
+geometry.param('components', [
+        'MagneticField',
+        'BeamPipe',
+        'PXD',
+        'SVD',
+        'CDC',
+        'TOP',
+])
 
 # Particle gun: generate multiple tracks
 particlegun = register_module('ParticleGun')
@@ -113,9 +123,50 @@ elif opts.particlegun == ParticleGunConfig.FROMSIDE:
     particlegun.param('zVertexParams', [0])
 
 main.add_module(particlegun)
+# Simulation
+simulation = register_module('FullSim')
+main.add_module(simulation)
 
-add_simulation(main)
-add_reconstruction(main)
+add_svd_simulation(main)
+add_pxd_simulation(main)
+
+# PXD digitization & clustering
+add_pxd_reconstruction(main)
+
+# SVD digitization & clustering
+add_svd_reconstruction(main)
+
+# CDC digitization
+cdcDigitizer = register_module('CDCDigitizer')
+main.add_module(cdcDigitizer)
+
+# TOP digitization
+topdigi = register_module('TOPDigitizer')
+main.add_module(topdigi)
+
+# tracking
+if opts.cosmics:
+    add_cr_tracking_reconstruction(main)
+else:
+    # then we want the normal tracking reconstruction
+    add_tracking_reconstruction(main)
+
+# Track extrapolation
+ext = register_module('Ext')
+main.add_module(ext)
+
+# TOP reconstruction
+top_cm = register_module('TOPChannelMasker')
+main.add_module(top_cm)
+topreco = register_module('TOPReconstructorPDF')
+topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
+topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
+topreco.param("writeNPdfs", opts.npdfs)
+main.add_module(topreco)
+
+# TOP DQM
+topdqm = register_module('TOPDQM')
+main.add_module(topdqm)
 
 # Output
 output = register_module('RootOutput')

@@ -191,9 +191,11 @@ def extract_file_sizes(channels, storage_location):
     print("\n### Final File Sizes per channel in bytes ###\n")
     print(all_filesizes)
 
-    # add some units
-    all_filesizes = all_filesizes.divide(1000)
-    all_filesizes.columns = [cname + " [kB]" for cname in all_filesizes.columns]
+    # add some units, make sure the columns with the compression ratio are not converted to kB
+    storage_size_columns = [c for c in all_filesizes.columns if not c.endswith("_comp_ratio")]
+    for colname in storage_size_columns:
+        all_filesizes[colname] = all_filesizes[colname] / 1000
+    all_filesizes.columns = [cname + " [kB]" if not cname.endswith("_comp_ratio") else cname for cname in all_filesizes.columns]
 
     render_to_latex(all_filesizes, "File Sizes", "all_filesizes")
 

@@ -112,7 +112,7 @@ def main():
     # at this stage
     add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
 
-    add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True)
+    add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True, shortTracks=True)
 
     add_packers(path, components=DEFAULT_HLT_COMPONENTS)
 

@@ -132,15 +132,15 @@ namespace Belle2 {
       // shrinking is not performed, as the number of active sectors is constant
       m_activeSectors.clear();
 
-      int size = m_segments.size();
-      m_segments.resize(size / 5);
-      m_segments.shrink_to_fit();
-      m_segments.clear();
-
-      size = m_trackNodes.size();
-      m_trackNodes.resize(size / 10);
+      int size = m_trackNodes.size();
+      m_trackNodes.resize(size / 5);
       m_trackNodes.shrink_to_fit();
       m_trackNodes.clear();
+
+      size = m_segments.size();
+      m_segments.resize(size / 10);
+      m_segments.shrink_to_fit();
+      m_segments.clear();
 
       // Clearing the segmentNetwork is important as the following modules will process the event
       // if it still contains entries.

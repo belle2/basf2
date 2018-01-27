@@ -65,10 +65,12 @@ ECLUnpackerModule::ECLUnpackerModule() :
 
   addParam("InitFileName",  m_eclMapperInitFileName, "Initialization file",             string("/ecl/data/ecl_channels_map.txt"));
   addParam("ECLDigitsName", m_eclDigitsName,         "Name of the ECLDigits container", string("ECLDigits"));
-  addParam("ECLDspsName",   m_eclDspsName,            "Name of the ECLDsp container",    string("ECLDsps"));
+  addParam("ECLDspsName",   m_eclDspsName,           "Name of the ECLDsp container",    string("ECLDsps"));
   addParam("ECLTrigsName",  m_eclTrigsName,          "Name of the ECLTrig container",   string("ECLTrigs"));
   // flag to store trigger times needed for calibration with pulse generator only, so false by default
   addParam("storeTrigTime", m_storeTrigTime,         "Store trigger time",              false);
+  addParam("storeUnmapped", m_storeUnmapped,         "Store ECLDsp for channels that don't "
+           "exist in ECL mapping", false);
 
   m_EvtNum = 0;
 }
@@ -392,13 +394,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-            if (cellID > 0) {
+            if (cellID > 0 || m_storeUnmapped) {
               m_eclDsps.appendNew(cellID, eclWaveformSamples);
-            } else {
-              B2ERROR("Got ADC samples from non-existent channel " << cellID <<
-                      ": iCrate = " << iCrate <<
-                      ", iShaper = " << iShaper <<
-                      ", iChannel = " << iChannel);
             }
 
           }

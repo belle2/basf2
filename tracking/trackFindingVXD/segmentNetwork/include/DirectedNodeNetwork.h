@@ -175,6 +175,15 @@ namespace Belle2 {
       return createLink(*(m_nodeMap[outerNodeID]), *(m_nodeMap[innerNodeID]));
     }
 
+    /// Clear directed node network
+    void clear()
+    {
+      m_nodes.clear();
+      m_innerEnds.clear();
+      m_outerEnds.clear();
+      m_nodeMap.clear();
+    }
+
 /// getters:
 
 

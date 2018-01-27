@@ -121,6 +121,14 @@ namespace Belle2 {
     /** returns reference to the actual trackNodes stored in this container, intended for read and write access */
     std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
 
+    /// Clear segment network
+    void clear()
+    {
+      m_activeSectors.clear();
+      m_segments.clear();
+      m_trackNodes.clear();
+      m_SegmentNetwork.clear();
+    }
 
     /** passes parameters for creating a virtual interaction point */
     void setVirtualInteractionPoint(B2Vector3D& pos, B2Vector3D& posError)

@@ -124,9 +124,21 @@ namespace Belle2 {
     /// Clear segment network
     void clear()
     {
+      int size = m_activeSectors.size();
       m_activeSectors.clear();
+      m_activeSectors.resize(size / 10);
+      m_activeSectors.shrink_to_fit();
+
+      size = m_segments.size();
       m_segments.clear();
+      m_segments.resize(size / 10);
+      m_segments.shrink_to_fit();
+
+      size = m_trackNodes.size();
       m_trackNodes.clear();
+      m_trackNodes.resize(size / 10);
+      m_trackNodes.shrink_to_fit();
+
       m_SegmentNetwork.clear();
     }
 

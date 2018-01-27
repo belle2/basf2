@@ -178,9 +178,21 @@ namespace Belle2 {
     /// Clear directed node network
     void clear()
     {
+      int size = m_nodes.size();
       m_nodes.clear();
+      m_nodes.resize(size / 10);
+      m_nodes.shrink_to_fit();
+
+      size = m_innerEnds.size();
       m_innerEnds.clear();
+      m_innerEnds.resize(size / 10);
+      m_innerEnds.shrink_to_fit();
+
+      size = m_outerEnds.size();
       m_outerEnds.clear();
+      m_outerEnds.resize(size / 10);
+      m_outerEnds.shrink_to_fit();
+
       m_nodeMap.clear();
     }
 

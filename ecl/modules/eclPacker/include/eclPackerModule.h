@@ -10,12 +10,16 @@
 #pragma once
 
 
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawECL.h>
-#include <framework/core/Module.h>
+
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
 
 
 namespace Belle2 {

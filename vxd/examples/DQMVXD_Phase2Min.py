@@ -16,6 +16,8 @@ from reconstruction import add_reconstruction
 from L1trigger import add_tsim
 import glob
 
+from daqdqm.commondqm import add_common_dqm
+
 # background (collision) files
 # bg = glob.glob('./BG/*.root')
 # on KEKCC: (choose one of the sets)
@@ -63,10 +65,11 @@ svddqmExpRecoMin = register_module('SVDDQMExpressRecoMin')
 svddqmExpReco = register_module('SVDDQMExpressReco')
 vxddqmExpRecoMin = register_module('VXDDQMExpressRecoMin')
 vxddqmExpReco = register_module('VXDDQMExpressReco')
-# main.add_module(pxddqmExpReco)
 main.add_module(pxddqmExpRecoMin)
 main.add_module(svddqmExpRecoMin)
 main.add_module(vxddqmExpRecoMin)
+# # The following should do the same as above
+# add_common_dqm(main,['PXD', 'SVD'])
 
 # DQM of tracking
 main.add_module('TrackDQM')

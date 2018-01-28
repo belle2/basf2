@@ -54,6 +54,12 @@ namespace Belle2 {
     /** cut for accepting to hitmap histogram, using strips only, default = 22 */
     float m_CutSVDCharge = 22.0;
 
+    /** No of FADCs, for Phase2: 5,
+     *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
+     *  keep universal code for Phase 2 and 3
+    */
+    int c_nFADC = 5;
+
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
 
@@ -96,6 +102,15 @@ namespace Belle2 {
     TH1F** m_clusterTimeU;
     /** v time */
     TH1F** m_clusterTimeV;
+
+    /** Counter of APV errors (16) */
+    TH1I** m_CounterAPVErrors;
+    /** Counter of FTB errors (256) */
+    TH1I** m_CounterFTBErrors;
+    /** Counter of apvErrorOR (16) */
+    TH1I** m_CounterApvErrorORErrors;
+    /** Counter of FTB Flags (32) */
+    TH1I** m_CounterFTBFlags;
 
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;

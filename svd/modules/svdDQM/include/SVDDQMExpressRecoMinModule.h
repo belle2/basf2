@@ -54,7 +54,8 @@ namespace Belle2 {
     /** cut for accepting to hitmap histogram, using strips only, default = 22 */
     float m_CutSVDCharge = 22.0;
 
-    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
 
     /** SVDShaperDigits StoreArray name */
     std::string m_storeSVDShaperDigitsName;
@@ -62,40 +63,6 @@ namespace Belle2 {
     std::string m_storeSVDClustersName;
     /** SVD diagnostics module name */
     std::string m_svdDAQDiagnosticsListName;
-
-
-    /** Flags of u Hitmaps of Digits */
-    TH1I* m_fHitMapCountsUFlag;
-    /** Flags of v Hitmaps of Digits */
-    TH1I* m_fHitMapCountsVFlag;
-    /** Flags of u Hitmaps of Clusters*/
-    TH1I* m_fHitMapClCountsUFlag;
-    /** Flags of v Hitmaps of Clusters*/
-    TH1I* m_fHitMapClCountsVFlag;
-    /** Flags of Hitmaps in U of Digits */
-    TH1I* m_fFiredUFlag;
-    /** Flags of Hitmaps in V of Digits */
-    TH1I* m_fFiredVFlag;
-    /** Flags of u Clusters per event */
-    TH1I* m_fClustersUFlag;
-    /** Flags of v Clusters per event */
-    TH1I* m_fClustersVFlag;
-    /** Flags of u Charge of clusters */
-    TH1I* m_fClusterChargeUFlag;
-    /** Flags of v Charge of clusters */
-    TH1I* m_fClusterChargeVFlag;
-    /** Flags of u Charge of strips */
-    TH1I* m_fStripSignalUFlag;
-    /** Flags of v Charge of strips */
-    TH1I* m_fStripSignalVFlag;
-    /** Flags of u cluster size */
-    TH1I* m_fClusterSizeUFlag;
-    /** Flags of v cluster size */
-    TH1I* m_fClusterSizeVFlag;
-    /** Flags of u time */
-    TH1I* m_fClusterTimeUFlag;
-    /** Flags of v time */
-    TH1I* m_fClusterTimeVFlag;
 
     /** Hitmaps u of Digits */
     TH1I* m_hitMapCountsU;

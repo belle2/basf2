@@ -137,7 +137,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     //----------------------------------------------------------------
-    // Number of fired strips per frame
+    // Number of fired strips per sensor
     //----------------------------------------------------------------
     string name = str(format("DQMER_SVD_%1%_FiredU") % sensorDescr);
     string title = str(format("DQM ER SVD Sensor %1% Fired strips in U") % sensorDescr);
@@ -150,7 +150,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_firedV[i]->GetXaxis()->SetTitle("# of fired v strips");
     m_firedV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
-    // Number of clusters per frame
+    // Number of clusters per sensor
     //----------------------------------------------------------------
     name = str(format("DQMER_SVD_%1%_ClustersU") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Number of clusters in U") % sensorDescr);

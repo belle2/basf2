@@ -19,7 +19,6 @@
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
 
@@ -64,13 +63,6 @@ namespace Belle2 {
     /** SVD diagnostics module name */
     std::string m_svdDAQDiagnosticsListName;
 
-
-    /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
-    std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
-    /** Number of events */
-    int m_NoOfEvents;
-    /** Number of events in reference histogram */
-    int m_NoOfEventsRef;
 
     /** Flags of u Hitmaps of Digits */
     TH1I* m_fHitMapCountsUFlag;

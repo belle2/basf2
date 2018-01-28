@@ -12,8 +12,6 @@
 
 #include "svd/modules/svdDQM/SVDDQMExpressRecoMinModule.h"
 
-#include <framework/core/HistoModule.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -27,11 +25,7 @@
 
 #include <boost/format.hpp>
 
-#include "TVector3.h"
 #include "TDirectory.h"
-#include "TFile.h"
-#include "TVectorD.h"
-#include "TF1.h"
 
 using namespace std;
 using boost::format;
@@ -279,7 +273,6 @@ void SVDDQMExpressRecoMinModule::beginRun()
     if (m_clusterTimeU[i] != NULL) m_clusterTimeU[i]->Reset();
     if (m_clusterTimeV[i] != NULL) m_clusterTimeV[i]->Reset();
   }
-  m_NoOfEvents = 0;
 }
 
 
@@ -294,7 +287,6 @@ void SVDDQMExpressRecoMinModule::event()
   //SVDDAQDiagnostic* currentDAQDiagnostic;
   //map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
 
-  m_NoOfEvents++;
   if (!storeSVDShaperDigits || !storeSVDShaperDigits.getEntries()) {
     return;
   }

@@ -108,13 +108,6 @@ namespace Belle2 {
     /** Cut threshold of SVD time window for accepting to correlations, default = 70 ns */
     float m_CutCorrelationTimeSVD = 70;
 
-    /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
-    std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
-    /** Number of events */
-    int m_NoOfEvents;
-    /** Number of events in reference histogram */
-    int m_NoOfEventsRef;
-
     /** Correlations and hit maps from space points */
     TH2F** m_correlationsSP;
     /** Correlations and hit maps from space points - differencies in Phi*/

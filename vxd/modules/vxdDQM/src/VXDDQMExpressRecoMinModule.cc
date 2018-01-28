@@ -12,8 +12,6 @@
 
 #include "vxd/modules/vxdDQM/VXDDQMExpressRecoMinModule.h"
 
-#include <framework/core/HistoModule.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -29,13 +27,9 @@
 
 #include <TMath.h>
 
-//#include <set>
 #include <boost/format.hpp>
 
-#include "TVector3.h"
 #include "TDirectory.h"
-#include "TFile.h"
-#include "TVectorD.h"
 
 using namespace std;
 using boost::format;

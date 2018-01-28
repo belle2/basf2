@@ -95,6 +95,9 @@ void SVDDQMExpressRecoMinModule::defineHisto()
       break;
     }
   }
+  // TODO: after available use:
+  // VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  // c_nFADC = geo.getFADCs().size();
 
   // Create basic histograms:
   m_hitMapCountsU = new TH1I("DQMER_SVD_StripHitmapCountsU", "DQM ER SVD U Strip Hitmaps Counts",
@@ -119,6 +122,11 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_clustersU = new TH1F*[c_nSVDSensors];
   m_clustersV = new TH1F*[c_nSVDSensors];
 
+  m_CounterAPVErrors = new TH1I*[c_nFADC];
+  m_CounterFTBErrors = new TH1I*[c_nFADC];
+  m_CounterApvErrorORErrors = new TH1I*[c_nFADC];
+  m_CounterFTBFlags = new TH1I*[c_nFADC];
+
   m_clusterChargeU = new TH1F*[c_nSVDSensors];
   m_clusterChargeV = new TH1F*[c_nSVDSensors];
   m_stripSignalU = new TH1F*[c_nSVDSensors];
@@ -127,6 +135,41 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_clusterSizeV = new TH1F*[c_nSVDSensors];
   m_clusterTimeU = new TH1F*[c_nSVDSensors];
   m_clusterTimeV = new TH1F*[c_nSVDSensors];
+
+  for (int i = 0; i < c_nFADC; i++) {
+    //----------------------------------------------------------------
+    // Counter of APV errors (16) per FADC
+    //----------------------------------------------------------------
+    string name = str(format("DQMER_SVD_FADC_%1%_CounterOfAPVErrors") % i);
+    string title = str(format("DQM ER SVD FADC %1% Counter of APV errors") % i);
+    m_CounterAPVErrors[i] = new TH1I(name.c_str(), title.c_str(), 16, 0, 16);
+    m_CounterAPVErrors[i]->GetXaxis()->SetTitle("Error ID");
+    m_CounterAPVErrors[i]->GetYaxis()->SetTitle("counts");
+    //----------------------------------------------------------------
+    // Counter of FTB errors (256) per FADC
+    //----------------------------------------------------------------
+    name = str(format("DQMER_SVD_FADC_%1%_CounterOfFTBErrors") % i);
+    title = str(format("DQM ER SVD FADC %1% Counter of FTB errors") % i);
+    m_CounterFTBErrors[i] = new TH1I(name.c_str(), title.c_str(), 256, 0, 256);
+    m_CounterFTBErrors[i]->GetXaxis()->SetTitle("Error ID");
+    m_CounterFTBErrors[i]->GetYaxis()->SetTitle("counts");
+    //----------------------------------------------------------------
+    // Counter of apvErrorOR (16) per FADC
+    //----------------------------------------------------------------
+    name = str(format("DQMER_SVD_FADC_%1%_CounterOfApvErrorOR") % i);
+    title = str(format("DQM ER SVD FADC %1% Counter of ApvErrorOR") % i);
+    m_CounterApvErrorORErrors[i] = new TH1I(name.c_str(), title.c_str(), 16, 0, 16);
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetTitle("Error ID");
+    m_CounterApvErrorORErrors[i]->GetYaxis()->SetTitle("counts");
+    //----------------------------------------------------------------
+    // Counter of FTB Flags (32) per FADC
+    //----------------------------------------------------------------
+    name = str(format("DQMER_SVD_FADC_%1%_CounterFTBFlags") % i);
+    title = str(format("DQM ER SVD FADC %1% Counter of FTB flags") % i);
+    m_CounterFTBFlags[i] = new TH1I(name.c_str(), title.c_str(), 32, 0, 32);
+    m_CounterFTBFlags[i]->GetXaxis()->SetTitle("Flag");
+    m_CounterFTBFlags[i]->GetYaxis()->SetTitle("counts");
+  }
 
   for (int i = 0; i < c_nSVDSensors; i++) {
     int iLayer = 0;
@@ -259,6 +302,12 @@ void SVDDQMExpressRecoMinModule::beginRun()
   if (m_hitMapCountsV != NULL) m_hitMapCountsV->Reset();
   if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Reset();
   if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Reset();
+  for (int i = 0; i < c_nFADC; i++) {
+    if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Reset();
+    if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Reset();
+    if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Reset();
+    if (m_CounterFTBFlags[i] != NULL) m_CounterFTBFlags[i]->Reset();
+  }
   for (int i = 0; i < c_nSVDSensors; i++) {
     if (m_firedU[i] != NULL) m_firedU[i]->Reset();
     if (m_firedV[i] != NULL) m_firedV[i]->Reset();
@@ -281,7 +330,7 @@ void SVDDQMExpressRecoMinModule::event()
 
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-  StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
+  StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
 
   //vector<SVDDAQDiagnostic*> diagnosticVector;
   //SVDDAQDiagnostic* currentDAQDiagnostic;
@@ -293,18 +342,19 @@ void SVDDQMExpressRecoMinModule::event()
 
   // SVD basic histograms:
   // DAQ Diagnostic
-  //SVDDAQDiagnostic SVDDiag;
-  //SVDDiag->getAPVError();
-//  for (const SVDShaperDigit& digitIn : storeSVDShaperDigits) {
-  //printf("--> kuk \n");
-//    printf("--> kuk %i \n", DAQDiagnostics.size());
-//   for (auto& DAQDiag : DAQDiagnostics) {
-  //printf("--> kuk1 %i \n", (int)DAQDiag.getAPVError());
-//   }
-//    for (auto& DAQDiag : diagnosticMap) {
-//      DAQDiag.getAPVError();
-//    }
-//  }
+
+  // if object exist and is mapped on expected size:
+  if (storeDAQDiagnostics.getEntries() == c_nFADC) {
+    int i = 0;
+    for (auto& DAQDiag : storeDAQDiagnostics) {
+      // for (int i = 0; i < c_nFADC; i++) {
+      if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Fill((int)(DAQDiag.getAPVError()));
+      if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Fill((int)DAQDiag.getFTBError());
+      if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Fill((int)DAQDiag.getAPVErrorOR());
+      if (m_CounterFTBFlags[i] != NULL) m_CounterFTBFlags[i]->Fill((int)DAQDiag.getFTBFlags());
+      i++;
+    }
+  }
 
   // Fired strips
   vector< set<int> > uStrips(c_nSVDSensors); // sets to eliminate multiple samples per strip

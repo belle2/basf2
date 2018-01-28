@@ -55,6 +55,8 @@ namespace Belle2 {
     /** cut for accepting to hitmap histogram, using strips only, default = 22 */
     float m_CutSVDCharge = 22.0;
 
+    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
     /** SVDShaperDigits StoreArray name */
     std::string m_storeSVDShaperDigitsName;
     /** SVDClusters StoreArray name */
@@ -63,20 +65,12 @@ namespace Belle2 {
     std::string m_svdDAQDiagnosticsListName;
 
 
-    /** Basic Directory in output file */
-    TDirectory* m_oldDir;
-
     /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
     std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
     /** Number of events */
     int m_NoOfEvents;
     /** Number of events in reference histogram */
     int m_NoOfEventsRef;
-
-    /** Using local files instead of DataBase for reference histogram, default=0 */
-    int m_NotUseDB = 0;
-    /** Create and fill reference histograms in DataBase, default=0 */
-    int m_CreateDB = 0;
 
     /** Flags of u Hitmaps of Digits */
     TH1I* m_fHitMapCountsUFlag;
@@ -178,7 +172,7 @@ namespace Belle2 {
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
        */
-    void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
+    void getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor);
 
   };
 

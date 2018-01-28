@@ -48,6 +48,8 @@ namespace Belle2 {
 
   private:
 
+    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
     /** flag <0,1> for using digits only, no clusters will be required, default = 0 */
     int m_UseDigits = 0;
     /** flag <0,1> very special case for swap of u-v coordinates */
@@ -106,20 +108,12 @@ namespace Belle2 {
     /** Cut threshold of SVD time window for accepting to correlations, default = 70 ns */
     float m_CutCorrelationTimeSVD = 70;
 
-    /** Basic Directory in output file */
-    TDirectory* m_oldDir;
-
     /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
     std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
     /** Number of events */
     int m_NoOfEvents;
     /** Number of events in reference histogram */
     int m_NoOfEventsRef;
-
-    /** Using local files instead of DataBase for reference histogram, default=0 */
-    int m_NotUseDB = 0;
-    /** Create and fill reference histograms in DataBase, default=0 */
-    int m_CreateDB = 0;
 
     /** Correlations and hit maps from space points */
     TH2F** m_correlationsSP;
@@ -138,7 +132,7 @@ namespace Belle2 {
        * @param Index Index of layer in plots.
        * @param Layer return layer position.
        */
-    void getLayerIDsFromLayerIndex(int Index, int* Layer);
+    void getLayerIDsFromLayerIndex(int Index, int& Layer);
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor.
        * @param Ladder Ladder position of sensor.
@@ -152,7 +146,8 @@ namespace Belle2 {
        * @param Ladder return Ladder position of sensor.
        * @param Sensor return Sensor position of sensor.
        */
-    void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
+    void getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor);
+
   };
 
 }

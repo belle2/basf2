@@ -34,12 +34,8 @@
 
 #include "TVector3.h"
 #include "TDirectory.h"
-#include "TVectorD.h"
 #include "TFile.h"
-
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBObjPtr.h>
+#include "TVectorD.h"
 
 using namespace std;
 using boost::format;
@@ -80,11 +76,8 @@ VXDDQMExpressRecoMinModule::VXDDQMExpressRecoMinModule() : HistoModule()
   addParam("TB", m_IsTB,
            "flag <0,1> for using for testbeam (paralel particles in x direction), default = 0 ", m_IsTB);
 
-  addParam("NotUseDB", m_NotUseDB,
-           "Using local files instead of DataBase for reference histogram, default=0 ", m_NotUseDB);
-  addParam("CreateDB", m_CreateDB,
-           "Create and fill reference histograms in DataBase, default=0 ", m_CreateDB);
-
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("VXDExpReco"));
 }
 
 
@@ -99,7 +92,11 @@ VXDDQMExpressRecoMinModule::~VXDDQMExpressRecoMinModule()
 void VXDDQMExpressRecoMinModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
-  m_oldDir = gDirectory;
+  TDirectory* oldDir = gDirectory;
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not use return value with ->cd(), its ZERO if dir already exists
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   if (m_CorrelationGranulation > 5.0) m_CorrelationGranulation = 5.0;  //  set maximum of gramularity to 1 degree
   if (m_CorrelationGranulation < 0.02) m_CorrelationGranulation = 0.02;  //  set minimum of gramularity to 0.02 degree
@@ -141,11 +138,7 @@ void VXDDQMExpressRecoMinModule::defineHisto()
     }
   }
 
-  TDirectory* DirVXDBasic = NULL;
-  DirVXDBasic = m_oldDir->mkdir("VXDExpReco");
-
   // Create basic histograms:
-  DirVXDBasic->cd();
 
   m_correlationsSP = (TH2F**) new TH2F*[c_nVXDLayers * c_nVXDLayers];
   m_correlationsSP1DPhi = (TH1F**) new TH1F*[c_nVXDLayers * c_nVXDLayers];
@@ -296,7 +289,7 @@ void VXDDQMExpressRecoMinModule::defineHisto()
     }
   }
 
-  m_oldDir->cd();
+  oldDir->cd();
 }
 
 
@@ -698,28 +691,24 @@ int VXDDQMExpressRecoMinModule::getLayerIndex(int Layer)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     if (Layer == layer.getLayerNumber()) {
-      tempend = 1;
+      return tempcounter;
     }
-    if (tempend == 1) break;
     tempcounter++;
   }
   return tempcounter;
 }
 
-void VXDDQMExpressRecoMinModule::getLayerIDsFromLayerIndex(int Index, int* Layer)
+void VXDDQMExpressRecoMinModule::getLayerIDsFromLayerIndex(int Index, int& Layer)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     if (tempcounter == Index) {
-      *Layer = layer.getLayerNumber();
-      tempend = 1;
+      Layer = layer.getLayerNumber();
+      return;
     }
-    if (tempend == 1) break;
     tempcounter++;
   }
 }
@@ -728,7 +717,6 @@ int VXDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     // if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
     for (VxdID ladder : geo.getLadders(layer)) {
@@ -736,41 +724,32 @@ int VXDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
         if ((Layer == layer.getLayerNumber()) &&
             (Ladder == ladder.getLadderNumber()) &&
             (Sensor == sensor.getSensorNumber())) {
-          tempend = 1;
+          return tempcounter;
         }
-        if (tempend == 1) break;
         tempcounter++;
       }
-      if (tempend == 1) break;
     }
-    if (tempend == 1) break;
   }
-  // printf("  --> SVD uvnitr sensor %i: %i_%i_%i\n", tempcounter, Layer, Ladder, Sensor);
   return tempcounter;
 }
 
-void VXDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor)
+void VXDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     // if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
         if (tempcounter == Index) {
-          *Layer = layer.getLayerNumber();
-          *Ladder = ladder.getLadderNumber();
-          *Sensor = sensor.getSensorNumber();
-          tempend = 1;
+          Layer = layer.getLayerNumber();
+          Ladder = ladder.getLadderNumber();
+          Sensor = sensor.getSensorNumber();
+          return;
         }
-        if (tempend == 1) break;
         tempcounter++;
       }
-      if (tempend == 1) break;
     }
-    if (tempend == 1) break;
   }
-  // printf("  --> VXD sensor %i: %i_%i_%i\n", Index, *Layer, *Ladder, *Sensor);
 }
 

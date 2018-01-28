@@ -33,10 +33,6 @@
 #include "TVectorD.h"
 #include "TF1.h"
 
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBObjPtr.h>
-
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -62,12 +58,8 @@ SVDDQMExpressRecoMinModule::SVDDQMExpressRecoMinModule() : HistoModule()
 
   addParam("CutSVDCharge", m_CutSVDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 22 ", m_CutSVDCharge);
-  addParam("ReferenceHistosFileName", m_RefHistFileName,
-           "Name of file contain reference histograms, default=vxd/data/VXD-DQMReferenceHistos.root", m_RefHistFileName);
-  addParam("NotUseDB", m_NotUseDB,
-           "Using local files instead of DataBase for reference histogram, default=0 ", m_NotUseDB);
-  addParam("CreateDB", m_CreateDB,
-           "Create and fill reference histograms in DataBase, default=0 ", m_CreateDB);
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("SVDExpReco"));
 }
 
 
@@ -82,7 +74,11 @@ SVDDQMExpressRecoMinModule::~SVDDQMExpressRecoMinModule()
 void SVDDQMExpressRecoMinModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
-  m_oldDir = gDirectory;
+  TDirectory* oldDir = gDirectory;
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not use return value with ->cd(), its ZERO if dir already exists
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -106,11 +102,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     }
   }
 
-  TDirectory* DirSVDBasic = NULL;
-  DirSVDBasic = m_oldDir->mkdir("SVDExpReco");
-
   // Create basic histograms:
-  DirSVDBasic->cd();
   m_hitMapCountsU = new TH1I("DQMER_SVD_StripHitmapCountsU", "DQM ER SVD U Strip Hitmaps Counts",
                              c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapCountsU->GetXaxis()->SetTitle("Sensor ID");
@@ -143,11 +135,10 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_clusterTimeV = new TH1F*[c_nSVDSensors];
 
   for (int i = 0; i < c_nSVDSensors; i++) {
-    DirSVDBasic->cd();
     int iLayer = 0;
     int iLadder = 0;
     int iSensor = 0;
-    getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+    getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
@@ -235,7 +226,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     int iLayer = 0;
     int iLadder = 0;
     int iSensor = 0;
-    getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+    getIDsFromIndex(i, iLayer, iLadder, iSensor);
     TString AxisTicks = Form("%i_%i_%i", iLayer, iLadder, iSensor);
     m_hitMapCountsU->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_hitMapCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
@@ -243,7 +234,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_hitMapClCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
-  m_oldDir->cd();
+  oldDir->cd();
 }
 
 
@@ -315,9 +306,9 @@ void SVDDQMExpressRecoMinModule::event()
 //  for (const SVDShaperDigit& digitIn : storeSVDShaperDigits) {
   //printf("--> kuk \n");
 //    printf("--> kuk %i \n", DAQDiagnostics.size());
-  for (auto& DAQDiag : DAQDiagnostics) {
-    //printf("--> kuk1 %i \n", (int)DAQDiag.getAPVError());
-  }
+//   for (auto& DAQDiag : DAQDiagnostics) {
+  //printf("--> kuk1 %i \n", (int)DAQDiag.getAPVError());
+//   }
 //    for (auto& DAQDiag : diagnosticMap) {
 //      DAQDiag.getAPVError();
 //    }
@@ -407,7 +398,6 @@ int SVDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
     for (VxdID ladder : geo.getLadders(layer)) {
@@ -415,40 +405,31 @@ int SVDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
         if ((Layer == layer.getLayerNumber()) &&
             (Ladder == ladder.getLadderNumber()) &&
             (Sensor == sensor.getSensorNumber())) {
-          tempend = 1;
+          return tempcounter;
         }
-        if (tempend == 1) break;
         tempcounter++;
       }
-      if (tempend == 1) break;
     }
-    if (tempend == 1) break;
   }
-  // printf("  --> SVD uvnitr sensor %i: %i_%i_%i\n", tempcounter, Layer, Ladder, Sensor);
   return tempcounter;
 }
 
-void SVDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor)
+void SVDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
         if (tempcounter == Index) {
-          *Layer = layer.getLayerNumber();
-          *Ladder = ladder.getLadderNumber();
-          *Sensor = sensor.getSensorNumber();
-          tempend = 1;
+          Layer = layer.getLayerNumber();
+          Ladder = ladder.getLadderNumber();
+          Sensor = sensor.getSensorNumber();
+          return;
         }
-        if (tempend == 1) break;
         tempcounter++;
       }
-      if (tempend == 1) break;
     }
-    if (tempend == 1) break;
   }
-  // printf("  --> SVD sensor %i: %i_%i_%i\n", Index, *Layer, *Ladder, *Sensor);
 }

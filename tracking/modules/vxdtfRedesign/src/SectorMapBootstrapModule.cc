@@ -13,8 +13,7 @@
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
-#include "tracking/vxdCaTracking/PassData.h"
-#include "tracking/dataobjects/VXDTFSecMap.h"
+//#include "tracking/dataobjects/VXDTFSecMap.h"
 #include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/SectorMapConfig.h"
 #include <tracking/spacePointCreation/SpacePoint.h>

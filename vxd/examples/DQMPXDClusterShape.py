@@ -210,8 +210,7 @@ add_tracking_reconstruction(main,
                             components=['MagneticField', 'PXD', 'SVD', 'CDC'],
                             additionalTrackFitHypotheses=[211, -211, 11, -11],
                             skipGeometryAdding=False,
-                            reco_tracks="RecoTracks",
-                            use_vxdtf2=False
+                            reco_tracks="RecoTracks"
                             )
 
 main.add_module(histomanager)

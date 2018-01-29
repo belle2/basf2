@@ -142,13 +142,9 @@ def add_reconstruction(
         path,
         magnet=True,
         svd_only=False,
-        telescopes=False,
-        momentum=5.,
         vxdtf2=False,
         mc=False,
-        useOldSecMaps=False,
-        geometry_version=1
-):
+        geometry_version=1):
     add_clusterizer(path, svd_only)
 
     useThisGeometry = 'TB2017newGeo'
@@ -159,7 +155,6 @@ def add_reconstruction(
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
-        print("add vxdtf2")
         if(vxdtf2):
             add_vxdtf_v2(path,
                          use_pxd=False,
@@ -172,7 +167,7 @@ def add_reconstruction(
                          usedGeometry=useThisGeometry
                          )
         else:
-            print("ERROR: VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
+            B2ERROR("VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
             exit(1)
     # path.add_module('GenFitterVXDTB')
     daf = register_module('DAFRecoFitter')
@@ -192,10 +187,9 @@ def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, mo
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
-        add_offline_vxdtf(path, magnet=magnet, svd_only=svd_only, momentum=momentum, filterOverlaps='hopfield')
-        path.add_module('RecoTrackCreator',
-                        recoTracksStoreArrayName='offlineRecoTracks',
-                        trackCandidatesStoreArrayName='offlineTrackCands')
+        B2ERROR("VXDTFv1 is not supported any more! This function was not yet changed to use the VXDTF2!")
+        exit(1)
+        # here was once a call of the function add_offline_vxdtf, which now no longer exists, as the vxdtf1 was removed
     path.add_module('DAFRecoFitter',
                     initializeCDCTranslators=False,
                     recoTracksStoreArrayName='offlineRecoTracks')
@@ -219,23 +213,18 @@ def add_vxdtf_v2(path=None,
                  # quality_estimator='circleFit',
                  quality_estimator='tripletFit',
                  overlap_filter='greedy',
-                 log_level=LogLevel.ERROR,
-                 usedGeometry='TB2017newGeo',
-                 debug_level=1):
+                 usedGeometry='TB2017newGeo'):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
     Result is a store array containing reco tracks called 'RecoTracks'.
-    :param sec_map_file: training data for segment network.
     :param path: basf2.Path
+    :param magnet_on: whether magnet was turned on or not.
     :param use_pxd: if true use pxd hits. Default False.
-    :param use_svd: if true use svd hits. Default True.
     :param quality_estimator: which fit to use to determine track quality. Options 'circle', 'random'. Default 'circle'.
     :param filter_overlapping: if true overlapping tracks are reduced to a single track using the qualitiy indicator.
     :param use_segment_network_filters: if true use filters for segmentMap training. Default True.
-    :param observe_network_filters: FOR DEBUG ONLY! If true results for FilterVariables are stored to a root file. Default False.
     :param overlap_filter: which filter network to use. Options 'hopfield', 'greedy'. Default 'hopfield'.
-    :param log_level: LogLevel of all modules in the chain
-    :param debug_level: debug level of all modules in the chain.
+    :param usedGeometry: Which geometry is to be used.
     :return:
     """
 

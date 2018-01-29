@@ -29,16 +29,16 @@ namespace Belle2 {
 
   namespace PXD {
 
-    /** The PXDUnpackerBS module.
+    /** The PXDUnpackerNew module.
      *
      * This module is responsible for unpacking the Raw PXD data to Pixels in v_cellID and u_cellID (global tracking coordinates system)
      * Doing that, sophisticated error and consistency checking is done from the lowest data level on
      */
-    class PXDUnpackerBSModule : public Module {
+    class PXDUnpackerNewModule : public Module {
 
     public:
       /** Constructor defining the parameters */
-      PXDUnpackerBSModule();
+      PXDUnpackerNewModule();
 
       /** Initialize the module */
       virtual void initialize();
@@ -154,14 +154,6 @@ namespace Belle2 {
        * @param data pointer to cluster data
        * @param vxd_id vertex Detector ID
        */
-
-      /** Remaps rows of inner forward (IF) and outer backward (OB) modules of the PXD */
-      void remap_IF_OB(unsigned int& row, unsigned int& col, unsigned int dhp_id, unsigned int dhe_ID);
-
-      /** Remaps cols of inner backward (IB) and outer forward (OF) modules of the PXD */
-      void remap_IB_OF(unsigned int& row, unsigned int& col, unsigned int dhp_id, unsigned int dhe_ID);
-
-      void test_mapping(void);
 
       /** Error Mask set per packet / frame*/
       PXDErrorFlags m_errorMask;

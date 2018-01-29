@@ -150,11 +150,32 @@ def extract_file_sizes(channels, storage_location):
             if not tree:
                 continue
             root_events = tree.GetEntriesFast() * 1.0
+
+            rawPXD_unzipped = None
+            rawPXD_zipped = None
+
             for branch in tree.GetListOfBranches():
-                result[branch.GetName()] = branch.GetZipBytes('*') / root_events
-                result[branch.GetName() + " unzipped"] = branch.GetTotalSize() / root_events
+                zipped_size = branch.GetZipBytes('*') / root_events
+                unzipped_size = branch.GetTotBytes("*") / root_events
+
+                result[branch.GetName()] = zipped_size
+                result[branch.GetName() + "_unzipped"] = unzipped_size
+                result[branch.GetName() + "_comp_ratio"] = unzipped_size / zipped_size
+
+                if branch.GetName() == "RawPXDs":
+                    rawPXD_unzipped = unzipped_size
+                    rawPXD_zipped = zipped_size
+
             result["root_total_size"] = tree.GetZipBytes() / root_events
             result["root_total_size_unzipped"] = tree.GetTotBytes() / root_events
+
+            # special number to compute, as the PXD data are the online raw objects whiche are not
+            # streamed through the HLT online reconstruction nodes but seperately via the ONSEN
+            # This number can then be used to understand how much data needs to be streamed through the
+            # HLT basf2 process
+            result["root_total_size_noPXD"] = (tree.GetZipBytes() / root_events) - rawPXD_unzipped
+            result["root_total_size_noPXD_unzipped"] = tree.GetTotBytes() / root_events - rawPXD_zipped
+
             result["total_size_on_disk"] = os.path.getsize(filename) / root_events
             result_list.append(result)
 
@@ -170,9 +191,11 @@ def extract_file_sizes(channels, storage_location):
     print("\n### Final File Sizes per channel in bytes ###\n")
     print(all_filesizes)
 
-    # add some units
-    all_filesizes = all_filesizes.divide(1000)
-    all_filesizes.columns = [cname + " [kB]" for cname in all_filesizes.columns]
+    # add some units, make sure the columns with the compression ratio are not converted to kB
+    storage_size_columns = [c for c in all_filesizes.columns if not c.endswith("_comp_ratio")]
+    for colname in storage_size_columns:
+        all_filesizes[colname] = all_filesizes[colname] / 1000
+    all_filesizes.columns = [cname + " [kB]" if not cname.endswith("_comp_ratio") else cname for cname in all_filesizes.columns]
 
     render_to_latex(all_filesizes, "File Sizes", "all_filesizes")
 

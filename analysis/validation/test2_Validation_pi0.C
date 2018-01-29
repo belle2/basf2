@@ -1,6 +1,6 @@
 /*
 <header>
-<input>GenericB.ntup.root</input>
+<input>../GenericB.ntup.root</input>
 <output>test2_Validation_pi0_output.root</output>
 <contact>Sam Cunliffe (sam.cunliffe@desy.de), Mario Merola (mario.merola@na.infn.it)</contact>
 <description>

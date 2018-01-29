@@ -95,11 +95,15 @@ namespace Belle2 {
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
-      if (uCluster->getClsTime() < minClusterTime)
+      if (uCluster->getClsTime() < minClusterTime) {
+        B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
+      }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
-        if (vCluster->getClsTime() < minClusterTime)
+        if (vCluster->getClsTime() < minClusterTime) {
+          B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
           continue;
+        }
         foundCombinations.push_back({uCluster, vCluster});
 
       }

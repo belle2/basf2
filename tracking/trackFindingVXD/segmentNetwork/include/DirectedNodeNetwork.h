@@ -175,6 +175,34 @@ namespace Belle2 {
       return createLink(*(m_nodeMap[outerNodeID]), *(m_nodeMap[innerNodeID]));
     }
 
+    /** Clear directed node network
+     * Called to clear the directed node network if its size grows to large.
+     * This is necessary to
+     * a) prevent to following modules from processing events with only partly filled networks;
+     * b) shrink the member vectors again to an acceptable size.
+     */
+    void clear()
+    {
+      int size = m_nodes.size();
+      m_nodes.resize(size / 10);
+      m_nodes.shrink_to_fit();
+      m_nodes.clear();
+
+      size = m_innerEnds.size();
+      m_innerEnds.resize(size / 10);
+      m_innerEnds.shrink_to_fit();
+      m_innerEnds.clear();
+
+      size = m_outerEnds.size();
+      m_outerEnds.resize(size / 10);
+      m_outerEnds.shrink_to_fit();
+      m_outerEnds.clear();
+
+      // Clearing the unordered_map is important as the following modules will process the event
+      // if it still contains entries.
+      m_nodeMap.clear();
+    }
+
 /// getters:
 
 

@@ -37,7 +37,7 @@ namespace Belle2 {
      *  @param identifier       A database identifier or local file name.
      *  @param variableSet      The names and pointers to the variables to be fed to the mva method
      */
-    MVAExpert(std::string identifier, std::vector<Named<float*>>& namedVariables);
+    MVAExpert(const std::string& identifier, std::vector<Named<float*>> namedVariables);
 
     /// Initialise the mva method
     void initialize();
@@ -53,7 +53,10 @@ namespace Belle2 {
 
   private:
     /// References to the named values from the source variable set.
-    std::vector<Named<float*>>& m_namedVariables;
+    std::vector<Named<float*>> m_allNamedVariables;
+
+    /// References to the *selected* named values from the source variable set.
+    std::vector<Named<float*>> m_selectedNamedVariables;
 
     /// Database pointer to the Database representation of the weightfile
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile> > m_weightfileRepresentation;

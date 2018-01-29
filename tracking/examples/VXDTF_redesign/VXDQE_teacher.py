@@ -79,6 +79,13 @@ def main():
         help="Evaluate the method after the training is finished"
     )
 
+    argument_parser.add_argument(
+        "-n",
+        "--fillnan",
+        action="store_true",
+        help="Fill nan and inf values with actual numbers in evaluation"
+    )
+
     arguments = argument_parser.parse_args()
 
     records_file_path = arguments.records_file_path
@@ -144,6 +151,8 @@ def main():
             "--treename", treename,
             "-o", evaluation_pdf
         ]
+        if arguments.fillnan:
+            cmd.append("-n")
         print(cmd)
         subprocess.call(cmd)
 

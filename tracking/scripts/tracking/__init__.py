@@ -876,7 +876,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     trackFinder.param('printNetworks', False)
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
-    trackFinder.param('xBestPerFamily', 5)
+    trackFinder.param('xBestPerFamily', 30)
     trackFinder.param('strictSeeding', TFstrictSeeding)
     trackFinder.param('storeSubsets', TFstoreSubsets)
     path.add_module(trackFinder)

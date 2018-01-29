@@ -28,8 +28,12 @@ namespace Belle2 {
    */
   template< typename MaxType >
   class ClosedUpperBoundedSet {
+
+    /// maximum of the set
     MaxType m_max;
+
   public:
+    /// constructors
     ClosedUpperBoundedSet(MaxType max):  m_max(max) {};
     ClosedUpperBoundedSet():  m_max(0) {};
 
@@ -64,6 +68,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** Set the branch address of the specified leafes to the data members
+     * @param t: tree for which the Branch addresses will be set
+     * @param variableName: specifier for the branch name
+    */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {

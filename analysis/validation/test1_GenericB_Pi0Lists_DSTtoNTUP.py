@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>GenericB_GENSIMRECtoDST.dst.root</input>
-  <output>GenericB.ntup.root</output>
+  <input>../GenericB_GENSIMRECtoDST.dst.root</input>
+  <output>../GenericB_Pi0s.ntup.root</output>
   <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
@@ -36,7 +36,7 @@ stdPi0s('eff60')
 
 
 # ----> NtupleMaker module
-ntupleFile('GenericB_PhaseII.root')
+ntupleFile('GenericB_Pi0s.ntup.root')
 
 # ----> if run on the grid
 # ntupleFile('GenericB.ntup.root')

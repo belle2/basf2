@@ -96,9 +96,6 @@ namespace Belle2 {
     /** Maximal number of families in event; if exceeded, the execution of the trackfinder will be stopped. */
     unsigned short m_PARAMmaxFamilies = 10000;
 
-    /** Maximal size of segment network; if exceeded, the execution of the trackfinder will be stopped. */
-    unsigned short m_PARAMmaxNetworkSize = 50000;
-
     /// member variables
     /** CA algorithm */
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>

@@ -549,6 +549,20 @@ def add_ckf_based_track_finding(path,
                 add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                             use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
 
+        elif svd_ckf_mode == "VXDTF2_after":
+            add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                        use_mc_truth=use_mc_truth, direction="backward", phase2=phase2)
+            if add_both_directions:
+                add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, phase2=phase2)
+
+            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+            add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                                 use_mc_truth=use_mc_truth, direction="backward")
+            if add_both_directions:
+                add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                                     use_mc_truth=use_mc_truth, direction="forward")
+
         else:
             raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
 

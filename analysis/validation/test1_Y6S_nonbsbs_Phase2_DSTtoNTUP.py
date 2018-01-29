@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>Y6S_nonbsbs_Phase2.dst.root</input>
-  <output>Y6S_nonbsbs_Phase2.ntup.root</output>
+  <input>../Y6S_nonbsbs_Phase2.dst.root</input>
+  <output>../Y6S_nonbsbs_Phase2.ntup.root</output>
   <contact>Cate MacQueen; cmq.centaurus@gmail.com</contact>
 </header>
 """

@@ -142,9 +142,9 @@ def add_reconstruction(
         path,
         magnet=True,
         svd_only=False,
+        vxdtf2=False,
         mc=False,
-        geometry_version=1
-):
+        geometry_version=1):
     add_clusterizer(path, svd_only)
 
     useThisGeometry = 'TB2017newGeo'
@@ -155,16 +155,20 @@ def add_reconstruction(
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
-        add_vxdtf_v2(path,
-                     use_pxd=False,
-                     magnet_on=magnet,
-                     filter_overlapping=True,
-                     use_segment_network_filters=True,
-                     quality_estimator='circleFit',
-                     overlap_filter='greedy',  # 'hopfield' or 'greedy'
-                     usedGeometry=useThisGeometry
-                     )
-
+        if(vxdtf2):
+            add_vxdtf_v2(path,
+                         use_pxd=False,
+                         magnet_on=magnet,
+                         filter_overlapping=True,
+                         use_segment_network_filters=True,
+                         observerType=0,
+                         log_level=LogLevel.ERROR,
+                         debug_level=1,
+                         usedGeometry=useThisGeometry
+                         )
+        else:
+            print("ERROR: VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
+            exit(1)
     # path.add_module('GenFitterVXDTB')
     daf = register_module('DAFRecoFitter')
     daf.param('initializeCDCTranslators', False)
@@ -177,12 +181,40 @@ def add_reconstruction(
     path.add_module(track_creator)
 
 
+def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, momentum=5., mc=False):
+
+    path.add_module('SetupGenfitExtrapolation')
+    if mc:
+        path.add_module('TrackFinderMCTruthRecoTracks')
+    else:
+        print("ERROR: VXDTFv1 is not supported any more! This function was not yet changed to use the VXDTF2!")
+        exit(1)
+        add_offline_vxdtf(path, magnet=magnet, svd_only=svd_only, momentum=momentum, filterOverlaps='hopfield')
+        path.add_module('RecoTrackCreator',
+                        recoTracksStoreArrayName='offlineRecoTracks',
+                        trackCandidatesStoreArrayName='offlineTrackCands')
+    path.add_module('DAFRecoFitter',
+                    initializeCDCTranslators=False,
+                    recoTracksStoreArrayName='offlineRecoTracks')
+
+    track_creator = register_module('TrackCreator')
+    track_creator.logging.log_level = LogLevel.RESULT
+    track_creator.param('beamSpot', [-20., 0., 0.])
+    track_creator.param('pdgCodes', [11])
+    track_creator.param('recoTrackColName', 'offlineRecoTracks')
+    track_creator.param('trackColName', 'offlineTracks')
+    track_creator.param('trackFitResultColName', 'offlineTrackFitResults')
+    path.add_module(track_creator)
+
+
 def add_vxdtf_v2(path=None,
                  use_pxd=False,
                  magnet_on=True,
                  filter_overlapping=True,
                  use_segment_network_filters=True,
-                 quality_estimator='circleFit',
+                 observerType=0,
+                 # quality_estimator='circleFit',
+                 quality_estimator='tripletFit',
                  overlap_filter='greedy',
                  usedGeometry='TB2017newGeo'):
     """
@@ -208,14 +240,16 @@ def add_vxdtf_v2(path=None,
     secmap_name = ""
     if magnet_on:
         if use_pxd:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOnVXD.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOnSVD.root'
             elif usedGeometry == 'TB2017newGeo':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOnVXD_afterMarch1st.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOnSVD_afterMarch1st.root'
             else:
                 print('ERROR: no sectormap for that setting')
                 exit()
         else:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
                 secmap_name = 'SecMap_testbeamTEST_MagnetOnSVD.root'
             elif usedGeometry == 'TB2017newGeo':
@@ -225,14 +259,16 @@ def add_vxdtf_v2(path=None,
                 exit()
     else:  # magnet off
         if use_pxd:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOffVXD.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOffSVD.root'
             elif usedGeometry == 'TB2017newGeo':
-                secmap_name = 'SecMap_testbeamTEST_MagnetOffVXD_afterMarch1st.root'
+                secmap_name = 'SecMap_testbeamTEST_MagnetOffSVD_afterMarch1st.root'
             else:
                 print('ERROR: no sectormap for that setting')
                 exit()
         else:
+            print("WARNING: will use the SVD-only sector maps")
             if usedGeometry == 'TB2017':
                 secmap_name = 'SecMap_testbeamTEST_MagnetOffSVD.root'
             elif usedGeometry == 'TB2017newGeo':
@@ -246,16 +282,33 @@ def add_vxdtf_v2(path=None,
                                  reco_tracks="RecoTracks",
                                  components=tf2_components,
                                  suffix="",
-                                 useTwoStepSelection=False,
-                                 sectormap_file=Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name),
-                                 PXDminSVDSPs=0)  # This module was not in the old function, so reproduce no action for now
-
+                                 useTwoStepSelection=True,
+                                 sectormap_file=Belle2.FileSystem.findFile("data/testbeam/vxd/" + secmap_name))
     set_module_parameters(path, 'SectorMapBootstrap', SetupToRead='testbeamTEST')
-    set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
+    # set_module_parameters(path, 'SegmentNetworkProducer', allFiltersOff=not use_segment_network_filters)
     set_module_parameters(path, 'SegmentNetworkProducer', sectorMapName='testbeamTEST')
-    set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
+    # set_module_parameters(path, 'QualityEstimatorVXD', EstimationMethod=quality_estimator)
+
+    # for testbeam deactivate all timing filters in the VXDTF2 as timing has never been tuned for TB
+    for mod in path.modules():
+        print(mod.name())
+        if mod.name() == 'SectorMapBootstrap':
+            # three hit filter
+            # (#19 <= DistanceInTime <= #20)
+            mod.param('threeHitFilterAdjustFunctions', [(19, "-TMath::Infinity()"), (20, "TMath::Infinity()")])
+            # two hit filters:
+            # (#12 <= DistanceInTimeUside <= #13)
+            # (#10 <= DistanceInTimeVside <= #11)
+            mod.param('twoHitFilterAdjustFunctions', [(12, "-TMath::Infinity()"), (13, "TMath::Infinity()"),
+                                                      (10, "-TMath::Infinity()"), (11, "TMath::Infinity()")])
+            # mod.logging.log_level = LogLevel.DEBUG
+
+    # adds also the SpacePoint creator which uses timing:
+    set_module_parameters(path, 'SVDSpacePointCreator', MinClusterTime=-float('inf'))
+
     if filter_overlapping:
-        set_module_parameters(path, 'SVDOverlapResolver', ResolveMethod=overlap_filter.lower())
+        print("doing nothing")
+        # set_module_parameters(path, 'SVDOverlapResolver', ResolveMethod=overlap_filter.lower())
     else:
         # Would originally not add the module to the path
         # Instead use crude workaround to create new path without the module

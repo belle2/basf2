@@ -280,8 +280,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   configTB.pTmax = 8.0; // minimal relevant version // Feb18-onePass-Test
   configTB.pTSmear = 0.;
   configTB.allowedLayers = {0, 3, 4, 5, 6};
-  configTB.uSectorDivider = { 1.}; // standard relevant version
-  configTB.vSectorDivider = { 1.}; // standard relevant version
+  configTB.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  configTB.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  //configTB.uSectorDivider = { 1.}; // standard relevant version // was the first version
+  //configTB.vSectorDivider = { 1.}; // standard relevant version // was the first version
   configTB.pdgCodesAllowed = { -11, 11};
   configTB.seedMaxDist2IPXY = 23.5;
   configTB.seedMaxDist2IPZ = 23.5;

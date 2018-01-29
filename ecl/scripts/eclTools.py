@@ -22,3 +22,21 @@ def matchTriggerClusters(minClusterEnergy=0.1, maxAngle=0.1, minFracEnergy=0.0, 
     matchtrgclust.param('minClusterEnergy', minClusterEnergy)
 
     path.add_module(matchtrgclust)
+
+
+def matchTrackECLCalDigits(extRadius=130.0, angleFWDGap=31.80, angleBWDGap=129.7, trackHypothesis=11, path=analysis_main):
+    """
+    Matching of tracks to ECLCalDigits that are close to gaps
+    @param extRadius Radius to which track is extrapolated
+    @param angleFWDGap center of FWD gap (deg)
+    @param angleBWDGap center of BWD gap (deg)
+    @param trackHypothesis track hypothesis
+    """
+
+    matchtrkdig = register_module('ECLTrackCalDigitMatch')
+    matchtrkdig.param('extRadius', extRadius)
+    matchtrkdig.param('angleFWDGap', angleFWDGap)
+    matchtrkdig.param('angleBWDGap', angleBWDGap)
+    matchtrkdig.param('trackHypothesis', trackHypothesis)
+
+    path.add_module(matchtrkdig)

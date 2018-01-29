@@ -37,11 +37,15 @@ namespace Belle2 {
 
       // virtual ~PXDRawDQMModule();
 
-      virtual void initialize();
+    private:
+      void initialize() override final;
 
-      virtual void beginRun();
+      void beginRun() override final;
 
-      virtual void event();
+      void event() override final;
+
+      void defineHisto() override final;
+
 
     private:
 
@@ -83,8 +87,6 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCommonMode[64];
       /** Histogram raw pixel trigger window */
       TH1F* hrawPxdHitsTimeWindow[64];
-
-      virtual void defineHisto();
 
     };//end class declaration
 

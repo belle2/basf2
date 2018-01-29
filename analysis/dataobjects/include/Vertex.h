@@ -45,6 +45,8 @@ namespace Belle2 {
       m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
+      m_FitType = 0;
+      m_NTracks = -1;
     }
 
 
@@ -89,6 +91,16 @@ namespace Belle2 {
     float getMCDeltaT();
 
     /**
+     * Returns fit algo type
+     */
+    int getFitType() ;
+
+    /**
+     * Returns number of tracks used in the fit
+     */
+    int getNTracks() ;
+
+    /**
      * Set BTag Vertex
      */
     void setTagVertex(TVector3 TagVertex);
@@ -128,6 +140,15 @@ namespace Belle2 {
      */
     void setMCDeltaT(float DeltaT);
 
+    /**
+     * Set fit algo type
+     */
+    void setFitType(float FitType) ;
+
+    /**
+     * Set number of tracks used in the fit
+     */
+    void setNTracks(int nTracks) ;
   private:
     TVector3 m_tagVertex;               /**< Btag vertex */
     TMatrixFSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
@@ -137,6 +158,8 @@ namespace Belle2 {
     TVector3 m_MCtagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
     float m_MCdeltaT;                   /**< generated Delta t */
+    int m_FitType;                      /**< Fit algo used */
+    int m_NTracks;                      /**< Number of tracks used in the fit */
 
 
     /**

@@ -2,11 +2,24 @@
 # -*- coding: utf-8 -*-
 
 """
-pdg
----
+pdg - access particle definitions
+---------------------------------
 
-Small wrapper module to ease access to pdg codes for particle gun or similar
-usage in the steering file
+This module helps to access particle definitions. When the software is loaded a
+list of known particles is read from the EvtGen particle definition file
+:file:`{$BELLE2_EXTERNALS_DIR}/share/evtgen/evt.pdl`. This file contains all
+well known standard model particles and their properties: mass, width, charge,
+...
+
+This module allows to easily access this information (see `get`) or if necessary
+add new particles using `add_particle` and even replace the whole particle
+definition list using `load`.
+
+It also provides simple getters to convert `PDG codes`_ into particle names and
+vice versa for use with modules which require a list of PDG codes for the
+particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
+
+.. _PDG codes: http://pdg.lbl.gov/2017/reviews/rpp2017-rev-monte-carlo-numbering.pdf
 """
 
 import basf2
@@ -71,7 +84,7 @@ def to_names(pdg_codes):
     """
     for a list/tuple of pdg codes, return list of paricle names.
 
-    >>> pdg.to_names([11,-11,-211,3212])
+    >>> pdg.to_names([11, -11, -211, 3212])
     ['e-', 'e+', 'pi-', 'Sigma0']
     """
 

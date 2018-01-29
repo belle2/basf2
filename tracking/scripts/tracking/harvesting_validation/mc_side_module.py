@@ -142,12 +142,20 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
             # Store Array for easier joining
             store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
 
+            # Information on PR reco track
+            pr_purity_information = {
+                "pr_hit_purity": track_match_look_up.getRelatedPurity(reco_track) if reco_track else float("nan"),
+                **peelers.peel_subdetector_hit_purity(reco_track=reco_track, mc_reco_track=mc_reco_track,
+                                                      key="pr_{part_name}")
+            }
+
             crops.update(dict(**hit_content_crops,
                               **mc_particle_crops,
                               **subdetector_hit_efficiency_crops,
                               **mc_hit_efficiencies_in_all_pr_tracks_crops,
                               **event_crops,
-                              **store_array_crops
+                              **store_array_crops,
+                              **pr_purity_information
                               ))
 
         return crops

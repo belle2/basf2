@@ -1,6 +1,6 @@
 /*
 <header>
-<input>GenericB.ntup.root</input>
+<input>../GenericB.ntup.root</input>
 <output>test2_Validation_Efficiency_output.root</output>
 <contact>Sam Cunliffe (sam.cunliffe@desy.de); Phillip Urquijo (phillip.urquijo@unimelb.edu.au)</contact>
 <description>Check the reconstruction efficiency for single particles</description>

@@ -69,6 +69,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** sets branch addresses of the given tree to the m_min and m_msx. Note: it assumes a certain oder for
+     * @param t: the tree of the which the branch addresses need to be set
+     * @param variableName: specifier for the leafs
+    */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
@@ -104,6 +108,9 @@ namespace Belle2 {
     }
 
   private:
+
+    // NOTE: the persit function assumes that these data members (m_min, m_max) are in exactly that
+    // order defined! So DO NOT move these declarations!!!!
     /// the minimum of this range
     MinType m_min;
     /// the maximum of this range

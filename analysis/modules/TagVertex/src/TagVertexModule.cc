@@ -69,6 +69,8 @@ namespace Belle2 {
              "Choose the fit algorithm: boost,breco, standard, standard_pxd, singleTrack, singleTrack_pxd, no ", string("standard"));
     addParam("askMCInformation", m_MCInfo,
              "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
+    addParam("reqPXDHits", m_reqPXDHits,
+             "Minium number of PXD hits for a track to be used in the vertex fit", 0);
 
 
   }
@@ -140,6 +142,8 @@ namespace Belle2 {
           ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(m_mcPDG);
           ver->setMCDeltaT(m_MCdeltaT);
+          ver->setFitType(m_FitType);
+          ver->setNTracks(m_tagTracks.size());
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -206,28 +210,44 @@ namespace Belle2 {
     /* Depending on the user's choice, one of the possible algorithms is chosen for the fit. In case the algorithm does not converge, in order to assure
        high efficiency, the next algorithm less restictive is used. I.e, if standard_PXD does not work, the program tries with standard.
     */
+    m_FitType = 0;
     if (m_useFitAlgorithm == "singleTrack_PXD") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
-      if (ok) ok = makeGeneralFit();
+      if (ok) {
+        ok = makeGeneralFit();
+        m_FitType = 1;
+      }
     }
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "singleTrack") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 0);
-      if (ok) ok = makeGeneralFit();
+      if (ok) {
+        ok = makeGeneralFit();
+        m_FitType = 2;
+      }
     }
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard_PXD") {
       ok = getTagTracks_standardAlgorithm(Breco, 1);
-      if (ok) ok = makeGeneralFit();
+      if (ok) {
+        ok = makeGeneralFit();
+        m_FitType = 3;
+      }
     }
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
         || m_useFitAlgorithm == "boost" || m_useFitAlgorithm == "noConstraint") {
-      ok = getTagTracks_standardAlgorithm(Breco, 0);
-      if (ok) ok = makeGeneralFit();
+      ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
+      if (ok) {
+        ok = makeGeneralFit();
+        m_FitType = 4;
+      }
     }
 
     if ((ok == false || m_fitPval <= 0.) && m_useFitAlgorithm != "noConstraint") {
       ok = findConstraintBoost(cut * 200000.);
-      if (ok) ok = getTagTracks_standardAlgorithm(Breco, 0);
-      if (ok) ok = makeGeneralFit();
+      if (ok) ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
+      if (ok) {
+        ok = makeGeneralFit();
+        m_FitType = 5;
+      }
     }
 
     return ok;

@@ -786,21 +786,40 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
-def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", quality_cut=0.0001):
-    name_sps = 'SpacePoints'
+def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", spacepoints_name="SpacePoints",
+                                      quality_cut=0.0001, min_sps=3, max_rejected_sps=5):
+    """
+    Convenience function for adding VXD standalone cosmics track finding for B = 0 Tesla
+    to the path.
+
+    The result is a StoreArray with name @param reco_tracks containing one or zero reco tracks per event.
+    This track candidates have an arbitrary but large momentum seed in the direction of the fitted line.
+    The position and momentum seed is obtained using a principal component analysis method.
+
+    :param path: basf2 path
+    :param reco_tracks: Name of the output RecoTracks; defaults to RecoTracks.
+    :param spacepoints_name: name of store array containing the spacepoints; defaults to SpacePoints
+    :param quality_cut: Cut on the chi squared value of the line fit; candidates with values above the cut will be
+                        rejected; defaults to 0.0001
+    :param min_sps: Minimal number of SpacePoints required to build a track candidate; defaults to 3;
+    :param max_rejected_sps: Maximal number of retries to refit a track after the worst spacepoint was removed;
+                             defaults to 5;
+    """
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', name_sps)
+    sp_creator_pxd.param('SpacePoints', spacepoints_name)
     path.add_module(sp_creator_pxd)
 
     sp_creator_svd = register_module('SVDSpacePointCreator')
-    sp_creator_svd.param('SpacePoints', name_sps)
+    sp_creator_svd.param('SpacePoints', spacepoints_name)
     path.add_module(sp_creator_svd)
 
     track_finder = register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")
-    track_finder.param('SpacePoints', name_sps)
+    track_finder.param('SpacePoints', spacepoints_name)
     track_finder.param('QualityCut', quality_cut)
+    track_finder.param('MinSPs', min_sps)
+    track_finder.param('MaxRejectedSPs', max_rejected_sps)
     path.add_module(track_finder)
 
     converter = register_module('SPTC2RTConverter')

@@ -100,12 +100,15 @@ def parse_database_file(filename, payload_dir=None, check_existing=True):
     Comments can be started using "#", everything including this character to
     the end of the line will be ignored.
 
-    :param filename: filename of the local database file to parse
-    :param payload_dir: diretories where the payloads should be. In case of None
-                        the directory of the database file will be used.
-    :param check_existing: if True check if the payloads actually exist where they
-                           should be
-    :returns: a list of LocalDatabaseEntry objects or None if there were any errors
+    Parameters:
+      filename (str): filename of the local database file to parse
+      payload_dir (str): directories where the payloads should be. In case of
+            None the directory of the database file will be used.
+      check_existing (bool): if True check if the payloads actually exist where
+            they should be
+
+    Returns:
+        a list of LocalDatabaseEntry objects or None if there were any errors
     """
 
     # make sure the database file exists

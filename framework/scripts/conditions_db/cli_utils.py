@@ -31,7 +31,8 @@ class ItemFilter:
         """
         Add arguments to the parser
 
-        :param name: Name of the objects to be filtered in the help text
+        Parameters:
+          name: Name of the objects to be filtered in the help text
         """
         self._args.add_argument("-f", "--filter", metavar="SEARCHTERM",
                                 help="only {} matching this pattern will be "
@@ -91,7 +92,8 @@ class ItemFilter:
         Check an item. True is returned if it should be kept, False if it is
         filtered out or excluded.
 
-        :param item: item to be filtered
+        Parameters:
+          item: item to be filtered
         """
         if self._filter is not None and not self._filter.search(item):
             return False

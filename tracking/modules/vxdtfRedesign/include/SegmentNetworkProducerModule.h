@@ -223,6 +223,11 @@ namespace Belle2 {
     /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
     bool m_PARAMallFiltersOff;
 
+    /** Maximal size of segment network; if exceeded, filling of the SegmentNetwork will be stopped and the
+     *  SegmentNetwork will be cleared.
+     */
+    unsigned short m_PARAMmaxNetworkSize = 50000;
+
     /** integer switch to decide which observer to use: see enum eObserverTypes
       NOTE: that observing filters make the code slow! So only use for debugging purposes
     */

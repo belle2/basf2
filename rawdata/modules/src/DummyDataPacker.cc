@@ -169,7 +169,7 @@ void DummyDataPackerModule::event()
   m_eventMetaDataPtr->setRun(rawcprpacker_info.run_subrun_num);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
-  printf("Event # %.8d\n", n_basf2evt);
+  B2DEBUG(0, "Event # " <<  n_basf2evt << endl);
   fflush(stdout);
 
   //
@@ -177,8 +177,7 @@ void DummyDataPackerModule::event()
   //
   if (max_nevt >= 0) {
     if (n_basf2evt >= max_nevt && max_nevt > 0) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n",
-             max_nevt , n_basf2evt);
+      B2DEBUG(0, "[DEBUG] RunStop was detected. ( Setting:  Max event #" << max_nevt << ") Processed Event" << n_basf2evt << endl);
       fflush(stdout);
       m_eventMetaDataPtr->setEndOfData();
     }

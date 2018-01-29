@@ -77,11 +77,6 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
            m_PARAMmaxFamilies);
 
-  addParam("maxNetworkSize",
-           m_PARAMmaxNetworkSize,
-           "Maximal size of the segment network; if exceeded, the event execution will be skipped.",
-           m_PARAMmaxNetworkSize);
-
 }
 
 
@@ -113,12 +108,6 @@ void TrackFinderVXDBasicPathFinderModule::event()
   m_eventCounter++;
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
-
-  if (segmentNetwork.size() > m_PARAMmaxNetworkSize) {
-    B2ERROR("Size of network provided by the SegmentNetworkProducer exceeds the limit of " << m_PARAMmaxNetworkSize
-            << ". Network size is " << segmentNetwork.size() << ".");
-    return;
-  }
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_PARAMsecMapName + "_BasicPF_Ev" + std::to_string(m_eventCounter);

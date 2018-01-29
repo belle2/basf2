@@ -6,8 +6,7 @@
 // Date : 13 - Oct - 2017
 //-
 
-#ifndef _Belle2_DQMHistAnalysisPlotOnly_h
-#define _Belle2_DQMHistAnalysisPlotOnly_h
+#pragma once
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
@@ -49,4 +48,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

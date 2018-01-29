@@ -4,6 +4,7 @@
 from basf2 import *
 from tracking import add_tracking_reconstruction
 from reconstruction import add_dedx_modules
+from simulation import add_svd_simulation
 
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction with bunch finder
@@ -73,10 +74,7 @@ pxd_clusterizer = register_module('PXDClusterizer')
 main.add_module(pxd_clusterizer)
 
 # SVD digitization & clustering
-svd_digitizer = register_module('SVDDigitizer')
-main.add_module(svd_digitizer)
-svd_clusterizer = register_module('SVDClusterizer')
-main.add_module(svd_clusterizer)
+add_svd_simulation(main)
 
 # CDC digitization
 cdcDigitizer = register_module('CDCDigitizer')

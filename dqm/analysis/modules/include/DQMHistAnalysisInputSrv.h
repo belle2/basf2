@@ -7,8 +7,7 @@
 // based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
-#ifndef _Belle2_DQMHistAnalysisInputSrv_h
-#define _Belle2_DQMHistAnalysisInputSrv_h
+#pragma once
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -58,4 +57,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

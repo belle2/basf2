@@ -15,6 +15,7 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from validation import statistics_plots, event_timing_plot
+from background import get_background_files
 import validationtools
 
 set_random_seed(12345)
@@ -44,8 +45,7 @@ generatorpreselection.param({
 generatorpreselection.if_value('<1', emptypath)
 
 # detector simulation
-bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=get_background_files())
 
 # reconstruction
 add_reconstruction(main)

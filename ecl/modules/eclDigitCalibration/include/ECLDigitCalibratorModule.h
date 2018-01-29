@@ -26,6 +26,7 @@
 
 // ECL
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
 
 // OTHER
 #include <vector>
@@ -78,6 +79,10 @@ namespace Belle2 {
     /** Name of the ECLEventInformation.*/
     virtual const char* eclEventInformationName() const
     { return "ECLEventInformation" ; }
+
+    /** Name of the ECL pure CsI Information.*/
+    virtual const char* eclPureCsIInfoArrayName() const
+    { return "ECLPureCsIInfo" ; }
 
   protected:
 
@@ -148,6 +153,8 @@ namespace Belle2 {
     const int c_nominalBG = 183; /**< Number of out of time digits at BGx1.0. */
     double m_averageBG; /** < Average dose per crystal calculated from m_th1dBackground */
     const double c_minT99 = 3.5;
+
+    bool m_simulatePure = 0; /** < Flag to set pure CsI simulation option */
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */

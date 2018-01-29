@@ -83,7 +83,7 @@ namespace Belle2 {
     /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
     std::pair<double, double> quantiles = {0.005, 1. - 0.005};
 
-
+    //! needed for the root library
     ClassDef(SectorMapConfig, 2);
 
   };

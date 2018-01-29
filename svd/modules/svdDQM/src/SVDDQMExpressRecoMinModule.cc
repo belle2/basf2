@@ -224,12 +224,12 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     name = str(format("DQMER_SVD_%1%_StripChargeU") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Strip charge in U") % sensorDescr);
     m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
-    m_stripSignalU[i]->GetXaxis()->SetTitle("charge of u clusters [ADU]");
+    m_stripSignalU[i]->GetXaxis()->SetTitle("charge of u strips [ADU]");
     m_stripSignalU[i]->GetYaxis()->SetTitle("count");
     name = str(format("DQMER_SVD_%1%_StripChargeV") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Strip charge in V") % sensorDescr);
     m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
-    m_stripSignalV[i]->GetXaxis()->SetTitle("charge of v clusters [ADU]");
+    m_stripSignalV[i]->GetXaxis()->SetTitle("charge of v strips [ADU]");
     m_stripSignalV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Cluster size distribution

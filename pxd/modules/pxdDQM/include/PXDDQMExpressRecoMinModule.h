@@ -5,7 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

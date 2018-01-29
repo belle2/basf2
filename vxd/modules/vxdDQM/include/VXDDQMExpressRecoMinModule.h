@@ -5,7 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-  /** SVD DQM Module */
+  /** VXD DQM Module */
   class VXDDQMExpressRecoMinModule : public HistoModule {  // <- derived from HistoModule class
 
   public:

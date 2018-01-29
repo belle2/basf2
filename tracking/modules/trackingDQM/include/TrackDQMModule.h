@@ -5,7 +5,8 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for cluster shape correction quality check                    *
+ * Prepared for track quality check                                       *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

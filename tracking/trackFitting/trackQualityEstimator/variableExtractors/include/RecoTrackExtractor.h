@@ -14,12 +14,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <genfit/AbsTrackRep.h>
 #include <genfit/FitStatus.h>
-#include <genfit/AbsFitter.h>
-#include <genfit/DAF.h>
-#include <genfit/RKTrackRep.h>
-#include <genfit/KalmanFitterInfo.h>
+#include <root/TVector3.h>
+#include <limits>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
@@ -58,6 +55,7 @@ namespace Belle2 {
       addVariable(prefix + "Fit_Ndf", variableSet);
 //      addVariable(prefix + "Fit_NFailedPoints", variableSet);
       addVariable(prefix + "Fit_PVal", variableSet);
+      addVariable(prefix + "Fit_Successful", variableSet);
 
       addVariable(prefix + "POCA_Pos_Pt", variableSet);
       addVariable(prefix + "POCA_Mom_Pz", variableSet);
@@ -97,12 +95,14 @@ namespace Belle2 {
 //        m_variables.at(m_prefix + "Fit_NFailedPoints") = rt_TrackFitStatus->getNFailedPoints();
         m_variables.at(m_prefix + "Fit_PVal") = rt_TrackFitStatus->getPVal();
       } else {
-        m_variables.at(m_prefix + "Fit_Charge") = NAN;
-        m_variables.at(m_prefix + "Fit_Chi2") = NAN;
-        m_variables.at(m_prefix + "Fit_Ndf") = NAN;
-//        m_variables.at(m_prefix + "Fit_NFailedPoints") = NAN;
-        m_variables.at(m_prefix + "Fit_PVal") = NAN;
+        m_variables.at(m_prefix + "Fit_Charge") = -std::numeric_limits<float>::max();
+        m_variables.at(m_prefix + "Fit_Chi2") = -1.;
+        m_variables.at(m_prefix + "Fit_Ndf") = -1.;
+//        m_variables.at(m_prefix + "Fit_NFailedPoints") = -1.;
+        m_variables.at(m_prefix + "Fit_PVal") = -1.;
       }
+
+      m_variables.at(m_prefix + "Fit_Successful") = recoTrack.wasFitSuccessful();
 
       if (recoTrack.wasFitSuccessful()) {
         TVector3 linePoint(0., 0., 0.);
@@ -112,18 +112,18 @@ namespace Belle2 {
         try {
           reco_sop = recoTrack.getMeasuredStateOnPlaneFromFirstHit();
           reco_sop.extrapolateToLine(linePoint, lineDirection);
-          m_variables.at("POCA_Pos_Pt") = reco_sop.getPos().Pt();
-          m_variables.at("POCA_Mom_Pz") = reco_sop.getMom().Pz();
+          m_variables.at(m_prefix + "POCA_Pos_Pt") = reco_sop.getPos().Pt();
+          m_variables.at(m_prefix + "POCA_Mom_Pz") = reco_sop.getMom().Pz();
         } catch (genfit::Exception const& e) {
           // extrapolation not possible, skip this track
           B2WARNING("RecoTrackExtractor: recoTrack BeamPipe POCA extrapolation failed!\n"
                     << "-->" << e.what());
-          m_variables.at("POCA_Pos_Pt") = NAN;
-          m_variables.at("POCA_Mom_Pz") = NAN;
+          m_variables.at(m_prefix + "POCA_Pos_Pt") = -std::numeric_limits<float>::max();
+          m_variables.at(m_prefix + "POCA_Mom_Pz") = -std::numeric_limits<float>::max();
         }
       } else {
-        m_variables.at("POCA_Pos_Pt") = NAN;
-        m_variables.at("POCA_Mom_Pz") = NAN;
+        m_variables.at(m_prefix + "POCA_Pos_Pt") = -std::numeric_limits<float>::max();
+        m_variables.at(m_prefix + "POCA_Mom_Pz") = -std::numeric_limits<float>::max();
       }
 
     }

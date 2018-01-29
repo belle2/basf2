@@ -76,8 +76,5 @@ namespace Belle2 {
 
     /// set of named variables to be used in MVA
     std::vector<Named<float*>>  m_variableSet;
-
-    /** number of RecoTracks in an event*/
-    float m_nRecoTracks = NAN;
   };
 }

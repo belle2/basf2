@@ -14,9 +14,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-#include "genfit/TrackCand.h"
-#include "genfit/Track.h"
-#include "genfit/RKTrackRep.h"
+#include <genfit/MeasuredStateOnPlane.h>
+#include <root/TVector3.h>
+#include <root/TMatrixDSym.h>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
@@ -32,6 +32,8 @@ namespace Belle2 {
       addVariable("PXD_QI", variableSet);
 
       addVariable("SVD_has_SPTC", variableSet);
+      addVariable("SVD_FitSuccessful", variableSet);
+      addVariable("CDC_FitSuccessful", variableSet);
 
       initializeStats("SVD_CDC_CDCwall_Pos", variableSet);
       initializeStats("SVD_CDC_CDCwall_Mom", variableSet);
@@ -44,20 +46,30 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(RecoTrack const* CDCrecoTrack, RecoTrack const* SVDrecoTrack, RecoTrack const* PXDrecoTrack)
     {
-      m_variables.at("CDC_QI") = CDCrecoTrack ? CDCrecoTrack->getQualityIndicator() : NAN;
-      m_variables.at("PXD_QI") = PXDrecoTrack ? PXDrecoTrack->getQualityIndicator() : NAN;
+      if (PXDrecoTrack) {
+        float qi = PXDrecoTrack->getQualityIndicator();
+        m_variables.at("PXD_QI") = isnan(qi) ? 0. : qi;
+      } else {
+        m_variables.at("PXD_QI") = -1.;
+      }
+
+      if (CDCrecoTrack) {
+        float qi = CDCrecoTrack->getQualityIndicator();
+        m_variables.at("CDC_QI") = isnan(qi) ? 0. : qi;
+        m_variables.at("CDC_FitSuccessful") = CDCrecoTrack->wasFitSuccessful();
+      } else {
+        m_variables.at("CDC_QI") = -1.;
+        m_variables.at("CDC_FitSuccessful") = -1.;
+      }
 
       if (SVDrecoTrack) {
         m_variables.at("SVD_QI") = SVDrecoTrack->getQualityIndicator();
-
-        if (SVDrecoTrack->getRelatedTo<SpacePointTrackCand>("SPTrackCands"))
-          m_variables.at("SVD_has_SPTC") = 1.;
-        else
-          m_variables.at("SVD_has_SPTC") = 0.;
-
+        m_variables.at("SVD_FitSuccessful") = SVDrecoTrack->wasFitSuccessful();
+        m_variables.at("SVD_has_SPTC") = bool(SVDrecoTrack->getRelatedTo<SpacePointTrackCand>("SPTrackCands"));
       } else {
-        m_variables.at("SVD_QI") = NAN;
-        m_variables.at("SVD_has_SPTC") = 0;
+        m_variables.at("SVD_QI") = -1.;
+        m_variables.at("SVD_has_SPTC") = -1.;
+        m_variables.at("SVD_FitSuccessful") = -1.;
       }
 
       if (SVDrecoTrack and CDCrecoTrack and SVDrecoTrack->wasFitSuccessful() and CDCrecoTrack->wasFitSuccessful()) {
@@ -68,7 +80,7 @@ namespace Belle2 {
       } else {
         setDiffs("SVD_CDC_CDCwall_Pos", NULL, NULL);
         setDiffs("SVD_CDC_CDCwall_Mom", NULL, NULL);
-        m_variables.at("SVD_CDC_CDCwall_Chi2") = NAN;
+        m_variables.at("SVD_CDC_CDCwall_Chi2") = -1.;
 
         setDiffs("SVD_CDC_POCA_Pos", NULL, NULL);
         setDiffs("SVD_CDC_POCA_Mom", NULL, NULL);
@@ -92,21 +104,21 @@ namespace Belle2 {
     void setDiffs(std::string identifier, const TVector3* svd_vec, const TVector3* cdc_vec)
     {
       if (not(svd_vec and cdc_vec)) {
-        m_variables.at(identifier + "_diff_Z") = NAN;
-        m_variables.at(identifier + "_diff_Pt") = NAN;
-        m_variables.at(identifier + "_diff_Theta") = NAN;
-        m_variables.at(identifier + "_diff_Phi") = NAN;
-        m_variables.at(identifier + "_diff_Mag") = NAN;
-        m_variables.at(identifier + "_diff_Eta") = NAN;
+        m_variables.at(identifier + "_diff_Z") = -1.;
+        m_variables.at(identifier + "_diff_Pt") = -1.;
+        m_variables.at(identifier + "_diff_Theta") = -1.;
+        m_variables.at(identifier + "_diff_Phi") = -1.;
+        m_variables.at(identifier + "_diff_Mag") = -1.;
+        m_variables.at(identifier + "_diff_Eta") = -1.;
         return;
       }
 
-      m_variables.at(identifier + "_diff_Z") = cdc_vec->Z() - svd_vec->Z();
-      m_variables.at(identifier + "_diff_Pt") = cdc_vec->Pt() - svd_vec->Pt();
-      m_variables.at(identifier + "_diff_Theta") = cdc_vec->Theta() - svd_vec->Theta();
-      m_variables.at(identifier + "_diff_Phi") = cdc_vec->Phi() - svd_vec->Phi();
-      m_variables.at(identifier + "_diff_Mag") = cdc_vec->Mag() - svd_vec->Mag();
-      m_variables.at(identifier + "_diff_Eta") = cdc_vec->Eta() - svd_vec->Eta();
+      m_variables.at(identifier + "_diff_Z") = fabs(cdc_vec->Z() - svd_vec->Z());
+      m_variables.at(identifier + "_diff_Pt") = fabs(cdc_vec->Pt() - svd_vec->Pt());
+      m_variables.at(identifier + "_diff_Theta") = fabs(cdc_vec->Theta() - svd_vec->Theta());
+      m_variables.at(identifier + "_diff_Phi") = fabs(cdc_vec->Phi() - svd_vec->Phi());
+      m_variables.at(identifier + "_diff_Mag") = fabs(cdc_vec->Mag() - svd_vec->Mag());
+      m_variables.at(identifier + "_diff_Eta") = fabs(cdc_vec->Eta() - svd_vec->Eta());
 
     }
 
@@ -129,7 +141,7 @@ namespace Belle2 {
                   << "-->" << e.what());
         setDiffs("SVD_CDC_CDCwall_Pos", NULL, NULL);
         setDiffs("SVD_CDC_CDCwall_Mom", NULL, NULL);
-        m_variables.at("SVD_CDC_CDCwall_Chi2") = NAN;
+        m_variables.at("SVD_CDC_CDCwall_Chi2") = -1.;
         return;
       }
 
@@ -152,7 +164,7 @@ namespace Belle2 {
         // extrapolation not possible, skip this track
         B2WARNING("SubRecoTrackExtractor: Matrix is singular!\n"
                   << "-->" << e.what());
-        m_variables.at("SVD_CDC_CDCwall_Chi2") = NAN;
+        m_variables.at("SVD_CDC_CDCwall_Chi2") = -1.;
         return;
       }
     }

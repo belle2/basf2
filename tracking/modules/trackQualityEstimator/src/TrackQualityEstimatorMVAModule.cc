@@ -45,8 +45,6 @@ void TrackQualityEstimatorMVAModule::initialize()
   m_subRecoTrackExtractor = std::make_unique<SubRecoTrackExtractor>(m_variableSet);
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
-  m_variableSet.emplace_back("N_RecoTracks", &m_nRecoTracks);
-
   m_mvaExpert = std::make_unique<MVAExpert>(m_WeightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
 }
@@ -59,8 +57,6 @@ void TrackQualityEstimatorMVAModule::beginRun()
 void TrackQualityEstimatorMVAModule::event()
 {
   for (RecoTrack& recoTrack : m_recoTracks) {
-    m_nRecoTracks = m_recoTracks.getEntries();
-
     RecoTrack* svdcdcRecoTrack; RecoTrack* cdcRecoTrack; RecoTrack* svdRecoTrack; RecoTrack* pxdRecoTrack;
 
     svdcdcRecoTrack = recoTrack.getRelatedTo<RecoTrack>(m_svdcdcRecoTracksStoreArrayName);

@@ -12,7 +12,8 @@
 
 #include <tracking/trackFindingVXD/variableExtractors/VariableExtractor.h>
 #include <tracking/dataobjects/RecoTrack.h>
-//#include <tracking/dataobjects/RecoHitInformation.h>
+
+#include <limits>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
@@ -47,10 +48,10 @@ namespace Belle2 {
       m_variables.at("N_RecoTracks") = recoTracks.getEntries();
 
       int n_pxdRecoTracks = 0; int n_svdRecoTracks = 0; int n_cdcRecoTracks = 0;
-      float min_mom_diff_mag = std::numeric_limits<float>::infinity();   int min_mom_diff_mag_idx = -1;
-      float min_mom_diff_Pt = std::numeric_limits<float>::infinity();    int min_mom_diff_Pt_idx = -1;
-      float min_pos_diff_Theta = std::numeric_limits<float>::infinity(); int min_pos_diff_Theta_idx = -1;
-      float min_pos_diff_Phi = std::numeric_limits<float>::infinity();   int min_pos_diff_Phi_idx = -1;
+      float min_mom_diff_mag = std::numeric_limits<float>::max();   int min_mom_diff_mag_idx = -1;
+      float min_mom_diff_Pt = std::numeric_limits<float>::max();    int min_mom_diff_Pt_idx = -1;
+      float min_pos_diff_Theta = std::numeric_limits<float>::max(); int min_pos_diff_Theta_idx = -1;
+      float min_pos_diff_Phi = std::numeric_limits<float>::max();   int min_pos_diff_Phi_idx = -1;
 
       for (const RecoTrack& recoTrack : recoTracks) {
         if (recoTrack.hasPXDHits())

@@ -203,6 +203,11 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
 
     if reco_track.getRelated('SPTrackCands'):
         crops["svd_quality_indicator"] = reco_track.getRelated('SPTrackCands').getQualityIndex()
+    elif reco_track.getRelatedTo('SVDCDCRecoTracks'):
+        svdcdc_reco_track = reco_track.getRelatedTo('SVDCDCRecoTracks')
+        if svdcdc_reco_track.getRelatedTo('SVDRecoTracks'):
+            svd_reco_track = svdcdc_reco_track.getRelatedTo('SVDRecoTracks')
+            crops["svd_quality_indicator"] = svd_reco_track.getQualityIndicator()
 
     return crops
 

@@ -9,10 +9,14 @@
  **************************************************************************/
 
 #pragma once
-#include <tracking/trackFindingVXD/utilities/Named.h>
 #include <tracking/trackFindingVXD/variableExtractors/VariableExtractor.h>
-#include <numeric>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 
+#include <genfit/KalmanFitterInfo.h>
+#include <genfit/TrackPoint.h>
+#include <numeric>
+#include <algorithm>
 
 namespace Belle2 {
   /// class to extract info from individual clusters and combine for SPTC
@@ -92,11 +96,11 @@ namespace Belle2 {
 
       int size = values.size();
       if (values.size() == 0) {
-        m_variables.at(identifier + "_max") = NAN;
-        m_variables.at(identifier + "_min") = NAN;
-        m_variables.at(identifier + "_mean") = NAN;
-        m_variables.at(identifier + "_std") = NAN;
-        m_variables.at(identifier + "_median") = NAN;
+        m_variables.at(identifier + "_max") =  -1.;
+        m_variables.at(identifier + "_min") =  -1.;
+        m_variables.at(identifier + "_mean") =  -1.;
+        m_variables.at(identifier + "_std") =  -1.;
+        m_variables.at(identifier + "_median") =  -1.;
 //        m_variables.at(identifier + "_n_zeros") = NAN;
         return;
       }

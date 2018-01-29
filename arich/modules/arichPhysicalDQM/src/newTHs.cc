@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <arich/modules/arichTreeMaker/newTHs.h>
+#include <arich/modules/arichPhysicalDQM/newTHs.h>
 
 #include <framework/logging/Logger.h>
 

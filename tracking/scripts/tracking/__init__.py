@@ -12,8 +12,7 @@ from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
-                                use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                use_quality_estimator_mva=False):
+                                use_second_cdc_hits=False, skipHitPreparerAdding=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -58,7 +57,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
-                          use_second_cdc_hits=use_second_cdc_hits, use_quality_estimator_mva=use_quality_estimator_mva)
+                          use_second_cdc_hits=use_second_cdc_hits)
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
@@ -364,8 +363,7 @@ def add_track_finding(
         trigger_mode="all",
         reco_tracks="RecoTracks",
         prune_temporary_tracks=True,
-        use_second_cdc_hits=False,
-        use_quality_estimator_mva=False):
+        use_second_cdc_hits=False):
     """
     Adds the realistic track finding to the path.
     The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
@@ -405,8 +403,7 @@ def add_track_finding(
             svd_reco_tracks = reco_tracks
 
         if trigger_mode in ["hlt", "all"]:
-            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks,
-                                         use_quality_estimator_mva=use_quality_estimator_mva)
+            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
 
     if use_svd and use_cdc:
         if use_pxd:
@@ -759,8 +756,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=True, PXDminSVDSPs=3,
-                                 use_quality_estimator_mva=False,
+                                 useTwoStepSelection=True, PXDminSVDSPs=3, use_quality_estimator_mva=False,
                                  QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
                                  sectormap_file=None, custom_setup_name=None,
                                  filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
@@ -790,6 +786,8 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param TFstoreSubsets: DEBUGGING ONLY: Whether to store subsets of paths in the TrackFinder. Default: False
     :param quality_estimator: DEBUGGING ONLY: Which QualityEstimator to use.
                               Default: tripletFit ('tripletFit' currently does not work with PXD)
+    :param use_quality_estimator_mva: Whether to use the MVA methode to refine the quality estimator; default is False
+    :param QEMVA_weight_file: Weight file to be used by the MVA Quality Estimator
     :param use_quality_index_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs
                                       with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
                                       Default: False

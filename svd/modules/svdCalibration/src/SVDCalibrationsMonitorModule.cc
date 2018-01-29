@@ -39,6 +39,9 @@ void SVDCalibrationsMonitorModule::initialize()
   //  for (int i = 0; i < m_maxLayers; i++) {
   m_histoList_noise = new TList;
   m_histoList_noiseInElectrons = new TList;
+  m_histoList_gainInElectrons = new TList;
+  m_histoList_peakTime = new TList;
+  m_histoList_pulseWidth = new TList;
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -96,6 +99,29 @@ void SVDCalibrationsMonitorModule::initialize()
           TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
           h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 199.5, 1499.5,
                                                             "strip noise (e-)", m_histoList_noiseInElectrons);
+
+
+          // GAIN
+          NameOfHisto = "gainInElectrons_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Gain (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
+          h_gainInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 0., 600,
+                                                           "Gain (electron charge)",
+                                                           m_histoList_gainInElectrons);
+
+          //PEAK TIME
+          NameOfHisto = "peakTime_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Peak time (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
+          h_peakTime[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5, "Peak Time (ns)",
+                                                                      m_histoList_peakTime);
+
+
+          //PULSE WIDTH
+          NameOfHisto = "pulseWidth_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Pulse width (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
+          h_pulseWidth[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5, "Pulse width (ns)",
+                                                      m_histoList_pulseWidth);
+
+
         }
         //histogram created
         ++itSvdSensors;
@@ -145,12 +171,20 @@ void SVDCalibrationsMonitorModule::event()
 
 
 
-          float ADCNoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
-
+          float ADCnoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
           double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 1, Ustrip);
 
-          h_noise[layer][ladder][sensor][1]->Fill(ADCNoise);
+          float ELECgain = m_PulseShapeCal.getChargeFromADC(theVxdID, 1, Ustrip, 1);
+
+          float time = m_PulseShapeCal.getPeakTime(theVxdID, 1, Ustrip);
+          float width =  m_PulseShapeCal.getWidth(theVxdID, 1, Ustrip);
+
+
+          h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
           h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
+          h_gainInElectrons[layer][ladder][sensor][1]->Fill(ELECgain);
+          h_peakTime[layer][ladder][sensor][1]->Fill(time);
+          h_pulseWidth[layer][ladder][sensor][1]->Fill(width);
 
         } //histogram filled for U side
 
@@ -159,12 +193,21 @@ void SVDCalibrationsMonitorModule::event()
 
 
 
-          float ADCNoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
+          float ADCnoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
 
           double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 0, Vstrip);
 
-          h_noise[layer][ladder][sensor][0]->Fill(ADCNoise);
+          float ELECgain = m_PulseShapeCal.getChargeFromADC(theVxdID, 0, Vstrip, 1);
+
+          float time = m_PulseShapeCal.getPeakTime(theVxdID, 0, Vstrip);
+          float width =  m_PulseShapeCal.getWidth(theVxdID, 0, Vstrip);
+
+
+          h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
           h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
+          h_gainInElectrons[layer][ladder][sensor][0]->Fill(ELECgain);
+          h_peakTime[layer][ladder][sensor][0]->Fill(time);
+          h_pulseWidth[layer][ladder][sensor][0]->Fill(width);
 
         } //histogram filled for V side
 
@@ -203,8 +246,37 @@ void SVDCalibrationsMonitorModule::terminate()
       obj->Write();
 
 
+
+    //writing the histrogram list for the gains in electron charge
+    m_rootFilePtr->mkdir("gain_electronsCharge");
+    m_rootFilePtr->cd("gain_electronsCharge");
+    TIter nextH_gainInElectrons(m_histoList_gainInElectrons);
+    while ((obj = nextH_gainInElectrons()))
+      obj->Write();
+
+
+    //writing the histrogram list for the peak times in ns
+    m_rootFilePtr->mkdir("peakTime");
+    m_rootFilePtr->cd("peakTime");
+
+    TIter nextH_peakTime(m_histoList_peakTime);
+    while ((obj = nextH_peakTime()))
+      obj->Write();
+
+    //writing the histrogram list for the pulse widths in ns
+    m_rootFilePtr->mkdir("pulseWidth");
+    m_rootFilePtr->cd("pulseWidth");
+
+    TIter nextH_width(m_histoList_pulseWidth);
+    while ((obj = nextH_width()))
+      obj->Write();
+
+
+
     m_rootFilePtr->Close();
     B2RESULT("The rootfile containing the list of histrograms has been filled and closed.");
+
+
   }
 }
 

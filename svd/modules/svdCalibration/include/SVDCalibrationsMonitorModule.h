@@ -73,11 +73,21 @@ namespace Belle2 {
 
     TList* m_histoList_noise;
     TList* m_histoList_noiseInElectrons;
+    TList* m_histoList_gainInElectrons;
+    TList* m_histoList_peakTime;
+    TList* m_histoList_pulseWidth;
 
     //NOISES
 
     TH1F* h_noise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // noise in ADC units
     TH1F* h_noiseInElectrons[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // noise in electrons
+
+    //PULSE PEAK (gain)
+    TH1F* h_gainInElectrons[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // gain in electrons
+
+    //PULSE PEAK (peak Time and Width)
+    TH1F* h_peakTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // peakTime in ns
+    TH1F* h_pulseWidth[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // pulse width in ns
 
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,

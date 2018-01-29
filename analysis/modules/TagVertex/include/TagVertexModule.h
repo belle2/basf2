@@ -97,6 +97,12 @@ namespace Belle2 {
     double m_shiftZ;              /**< parameter for testing the systematic errror from the IP measurement*/
     DBObjPtr<BeamParameters> m_beamParams; /**< Beam parameters */
     int m_FitType;                /**< fit algo used  */
+    double m_tagVl;               /**< tagV component in the boost direction  */
+    double m_truthTagVl;          /**< MC tagV component in the boost direction  */
+    double m_tagVlErr;            /**< Error of the tagV component in the boost direction  */
+    double m_tagVol;              /**< tagV component in the direction orthogonal to the boost */
+    double m_truthTagVol;         /**< MC tagV component in the direction orthogonal to the boost */
+    double m_tagVolErr;           /**< Error of the tagV component in the direction orthogonal to the boost */
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);

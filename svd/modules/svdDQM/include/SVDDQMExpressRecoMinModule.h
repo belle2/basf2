@@ -33,21 +33,21 @@ namespace Belle2 {
     virtual ~SVDDQMExpressRecoMinModule();
 
     /** Module function initialize */
-    virtual void initialize();
+    void initialize() override final;
     /** Module function beginRun */
-    virtual void beginRun();
+    void beginRun() override final;
     /** Module function event */
-    virtual void event();
+    void event() override final;
     /** Module function endRun */
-    virtual void endRun();
+    void endRun() override final;
     /** Module function terminate */
-    virtual void terminate();
+    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 

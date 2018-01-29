@@ -126,7 +126,7 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc
 
 
 def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_truth=False,
-                filter_cut=0.1, overlap_cut=0.2, use_best_results=5, use_best_seeds=10,
+                filter_cut=0.1, overlap_cut=None, use_best_results=5, use_best_seeds=10,
                 direction="backward"):
     """
     Convenience function to add the SVD ckf to the path.
@@ -149,6 +149,12 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_tru
         reverse_seed = True
     else:
         reverse_seed = False
+
+    if overlap_cut is None:
+        if phase2:
+            overlap_cut = 0.0
+        else:
+            overlap_cut = 0.2
 
     if use_mc_truth:
         module_parameters = dict(

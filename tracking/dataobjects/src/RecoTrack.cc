@@ -227,7 +227,7 @@ const genfit::TrackPoint* RecoTrack::getCreatedTrackPoint(const RecoHitInformati
 }
 
 size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset, bool reversed,
-                                       double minimalWeight)
+                                       boost::optional<double> optionalMinimalWeight)
 {
   size_t hitsCopied = 0;
 
@@ -252,10 +252,11 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int 
     return sortingParameters + sortingParameterOffset;
   };
 
-  const auto testHitWeight = [recoTrack, minimalWeight](const RecoHitInformation * recoHitInformation) {
-    if (std::isnan(minimalWeight)) {
+  const auto testHitWeight = [recoTrack, optionalMinimalWeight](const RecoHitInformation * recoHitInformation) {
+    if (not optionalMinimalWeight) {
       return true;
     }
+    double minimalWeight = *optionalMinimalWeight;
     const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
       genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();

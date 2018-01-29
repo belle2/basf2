@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <boost/optional.hpp>
 #include <string>
 #include <cmath>
 
@@ -35,7 +36,7 @@ namespace Belle2 {
     /** StoreArray name of the output reco tracks. */
     std::string m_param_outputRecoTracksStoreArrayName = "RecoTracks";
     /// Minimal weight for copying the hits.
-    double m_param_minimalWeight = NAN;
+    boost::optional<double> m_param_minimalWeight = boost::none;
   };
 }
 

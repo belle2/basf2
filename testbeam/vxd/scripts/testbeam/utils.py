@@ -167,7 +167,7 @@ def add_reconstruction(
                          usedGeometry=useThisGeometry
                          )
         else:
-            print("ERROR: VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
+            B2ERROR("VXDTFv1 is not supported any more! Please use VXDTFv2 or an older version of the code!")
             exit(1)
     # path.add_module('GenFitterVXDTB')
     daf = register_module('DAFRecoFitter')
@@ -187,12 +187,9 @@ def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, mo
     if mc:
         path.add_module('TrackFinderMCTruthRecoTracks')
     else:
-        print("ERROR: VXDTFv1 is not supported any more! This function was not yet changed to use the VXDTF2!")
+        B2ERROR("VXDTFv1 is not supported any more! This function was not yet changed to use the VXDTF2!")
         exit(1)
-        add_offline_vxdtf(path, magnet=magnet, svd_only=svd_only, momentum=momentum, filterOverlaps='hopfield')
-        path.add_module('RecoTrackCreator',
-                        recoTracksStoreArrayName='offlineRecoTracks',
-                        trackCandidatesStoreArrayName='offlineTrackCands')
+        # here was once a call of the function add_offline_vxdtf, which now no longer exists, as the vxdtf1 was removed
     path.add_module('DAFRecoFitter',
                     initializeCDCTranslators=False,
                     recoTracksStoreArrayName='offlineRecoTracks')

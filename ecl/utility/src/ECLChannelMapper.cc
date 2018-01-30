@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
@@ -43,6 +44,14 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
     int arrayCount = 0;
     while (mapFile.good()) {
 
+      // Ignoring commented lines
+      char ch = mapFile.get();
+      if (ch == '#' || ch == '\n') {
+        B2INFO("Ignored comment/empty line");
+        mapFile.ignore(256, '\n');
+        continue;
+      }
+      mapFile.unget();
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 

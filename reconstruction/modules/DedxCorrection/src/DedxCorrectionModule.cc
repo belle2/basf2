@@ -120,7 +120,7 @@ void DedxCorrectionModule::event()
     calculateMeans(&(dedxTrack.m_dedx_avg),
                    &(dedxTrack.m_dedx_avg_truncated),
                    &(dedxTrack.m_dedx_avg_truncated_err),
-                   dedxTrack.l_dedx);
+                   dedxTrack.m_lDedx);
   } // end loop over tracks
 }
 

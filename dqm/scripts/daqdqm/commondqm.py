@@ -16,6 +16,21 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                             If running on the hlt, you may want to output less or other DQM plots
                             due to the limited bandwith of the HLT nodes.
     """
+    # PXD (not useful on HLT)
+    if dqm_environment == "expressreco":
+        if components is None or 'PXD' in components:
+            pxddqm = register_module('PXDDQMExpressRecoMin')
+            path.add_module(pxddqm)
+    # SVD
+    if dqm_environment == "expressreco":
+        if components is None or 'SVD' in components:
+            svddqm = register_module('SVDDQMExpressRecoMin')
+            path.add_module(svddqm)
+    # VXD (PXD/SVD common)
+    if dqm_environment == "expressreco":
+        if components is None or 'PXD' in components or 'SVD' in components:
+            vxddqm = register_module('VXDDQMExpressRecoMin')
+            path.add_module(vxddqm)
     # CDC
     if components is None or 'CDC' in components:
         cdcdqm = register_module('cdcDQM7')

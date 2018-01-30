@@ -14,31 +14,33 @@
 
 #include <framework/core/HistoModule.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
+#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
 
-  /** PXD DQM Module */
-  class PXDDQMExpressRecoMinModule : public HistoModule {  // <- derived from HistoModule class
+  /** SVD DQM Module */
+  class SVDDQMExpressRecoMinModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
-    PXDDQMExpressRecoMinModule();
+    SVDDQMExpressRecoMinModule();
     /* Destructor */
-    virtual ~PXDDQMExpressRecoMinModule();
+    virtual ~SVDDQMExpressRecoMinModule();
 
-  private:
-    /** Module functions */
+    /** Module function initialize */
     void initialize() override final;
+    /** Module function beginRun */
     void beginRun() override final;
+    /** Module function event */
     void event() override final;
+    /** Module function endRun */
     void endRun() override final;
+    /** Module function terminate */
     void terminate() override final;
 
     /**
@@ -49,44 +51,66 @@ namespace Belle2 {
 
   private:
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 0 */
-    float m_CutPXDCharge = 0.0;
+    /** cut for accepting to hitmap histogram, using strips only, default = 22 */
+    float m_CutSVDCharge = 22.0;
 
-    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+    /** No of FADCs, for Phase2: 5,
+     *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
+     *  keep universal code for Phase 2 and 3
+    */
+    int c_nFADC = 5;
 
-    /** PXDDigits StoreArray name */
-    std::string m_storePXDDigitsName;
-    /** PXDClusters StoreArray name */
-    std::string m_storePXDClustersName;
-    /** PXDClustersToPXDDigits RelationArray name */
-    std::string m_relPXDClusterDigitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
 
-    /** Hitmaps of Digits */
-    TH1I* m_hitMapCounts;
-    /** Hitmaps of Clusters*/
-    TH1I* m_hitMapClCounts;
-    /** Fired pixels per event */
-    TH1F** m_fired;
-    /** Clusters per event */
-    TH1F** m_clusters;
-    /** Start row distribution */
-    TH1F** m_startRow;
-    /** Cluster seed charge by distance from the start row */
-    TH1F** m_chargStartRow;
-    /** counter for Cluster seed charge by distance from the start row */
-    TH1F** m_startRowCount;
-    /** Charge of clusters */
-    TH1F** m_clusterCharge;
-    /** Charge of pixels */
-    TH1F** m_pixelSignal;
-    /** u cluster size */
+    /** SVDShaperDigits StoreArray name */
+    std::string m_storeSVDShaperDigitsName;
+    /** SVDClusters StoreArray name */
+    std::string m_storeSVDClustersName;
+    /** SVD diagnostics module name */
+    std::string m_svdDAQDiagnosticsListName;
+
+    /** Hitmaps u of Digits */
+    TH1I* m_hitMapCountsU;
+    /** Hitmaps v of Digits */
+    TH1I* m_hitMapCountsV;
+    /** Hitmaps u of Clusters*/
+    TH1I* m_hitMapClCountsU;
+    /** Hitmaps v of Clusters*/
+    TH1I* m_hitMapClCountsV;
+    /** Fired u strips per event */
+    TH1F** m_firedU;
+    /** Fired v strips per event */
+    TH1F** m_firedV;
+    /** u clusters per event */
+    TH1F** m_clustersU;
+    /** v clusters per event */
+    TH1F** m_clustersV;
+    /** u charge of clusters */
+    TH1F** m_clusterChargeU;
+    /** v charge of clusters */
+    TH1F** m_clusterChargeV;
+    /** u charge of strips */
+    TH1F** m_stripSignalU;
+    /** v charge of strips */
+    TH1F** m_stripSignalV;
+    /** u size */
     TH1F** m_clusterSizeU;
-    /** v cluster size */
+    /** v size */
     TH1F** m_clusterSizeV;
-    /** Cluster size */
-    TH1F** m_clusterSizeUV;
+    /** u time */
+    TH1F** m_clusterTimeU;
+    /** v time */
+    TH1F** m_clusterTimeV;
+
+    /** Counter of APV errors (16) */
+    TH1I** m_CounterAPVErrors;
+    /** Counter of FTB errors (256) */
+    TH1I** m_CounterFTBErrors;
+    /** Counter of apvErrorOR (16) */
+    TH1I** m_CounterApvErrorORErrors;
+    /** Counter of FTB Flags (32) */
+    TH1I** m_CounterFTBFlags;
 
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
@@ -106,8 +130,8 @@ namespace Belle2 {
     int c_firstSVDLayer;
     /** Last SVD layer on Belle II */
     int c_lastSVDLayer;
-    /** Number of PXD sensors on Belle II */
-    int c_nPXDSensors;
+    /** Number of SVD sensors on Belle II */
+    int c_nSVDSensors;
 
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor
@@ -127,4 +151,3 @@ namespace Belle2 {
   };
 
 }
-

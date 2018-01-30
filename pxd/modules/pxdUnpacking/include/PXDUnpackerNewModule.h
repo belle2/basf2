@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                                       *
+ * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,14 +40,14 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDUnpackerNewModule();
 
-      /** Initialize the module */
-      virtual void initialize();
-      /** do the unpacking */
-      virtual void event();
-      /** Terminate the module */
-      virtual void terminate();
-
     private:
+
+      /** Initialize the module */
+      void initialize() override final;
+      /** do the unpacking */
+      void event() override final;
+      /** Terminate the module */
+      void terminate() override final;
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray of processed RawPXDs */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */

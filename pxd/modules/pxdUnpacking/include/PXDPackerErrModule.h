@@ -34,19 +34,15 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDPackerErrModule();
 
-      /** Initialize the module */
-      virtual void initialize();
-      /** do the packing */
-      virtual void event();
-      /** Terminate the module */
-      virtual void terminate();
-
     private:
+      /** Initialize the module */
+      void initialize() override final;
+      /** do the packing */
+      void event() override final;
+      /** Terminate the module */
+      void terminate() override final;
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
-
-      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
-      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
@@ -113,15 +109,17 @@ namespace Belle2 {
 
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
+      /** Check if we want this type of error in this event */
+      bool isErrorIn(uint32_t enr);
+
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 
       unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];//! temporary hitmap buffer for pixel to raw data conversion
 
-      /** Check if we want this type of error in this event */
-      bool isErrorIn(uint32_t enr);
 
-      // ignore common mode for now...
+      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
+      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
 
     };//end class declaration
 

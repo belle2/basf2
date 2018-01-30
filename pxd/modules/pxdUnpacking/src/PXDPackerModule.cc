@@ -63,6 +63,8 @@ PXDPackerModule::PXDPackerModule() :
   addParam("PXDDigitsName", m_PXDDigitsName, "The name of the StoreArray of PXDDigits to be processed", std::string(""));
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
+  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"premapped\" coordinates", false);
+  addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
 
 }
 
@@ -326,12 +328,12 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 {
   B2DEBUG(20, "PXD Packer --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
   // dhe_id is not dhe_id ...
-  int dhe_reformat = 0; /// unless stated otherwise, DHH will not reformat coordinates
+  bool dhe_reformat = m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
 
-  if (dhe_reformat != 0) {
+  if (dhe_reformat) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
-    assert(dhe_reformat == 0);
+    B2FATAL("Inverse Mapping not implemented in Packer");
   }
 
   /// DHE Start
@@ -393,7 +395,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else {
             // fill ADC ... convert float to unsigned char, clamp to 0 - 255 , no scaling ... and how about common mode?
-            if (dhe_reformat == 0) {
+            if (dhe_reformat) {
               do_the_reverse_mapping(row, col, layer, sensor);
             }
             halfladder_pixmap[row][col] = (unsigned char) boost::algorithm::clamp(lrint(it->getCharge()), 0, 255);
@@ -402,16 +404,20 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
       }
     }
 
-    for (int i = 0; i < 4; i++) {
-      if (dhp_active & 0x1) {
-        pack_dhp(i, dhe_id, dhe_reformat);
-        /// The following lines "simulate" a full frame readout frame ... not for production yet!
+    if (m_Clusterize) {
+      B2FATAL("Clusterizer not supported in Packer");
+    } else {
+      for (int i = 0; i < 4; i++) {
+        if (dhp_active & 0x1) {
+          pack_dhp(i, dhe_id, dhe_reformat ? 1 : 0);
+          /// The following lines "simulate" a full frame readout frame ... not for production yet!
 //         if (m_trigger_nr == 0x11) {
 //           pack_dhp_raw(i, dhe_id, false);
 //           pack_dhp_raw(i, dhe_id, true);
 //         }
+        }
+        dhp_active >>= 1;
       }
-      dhp_active >>= 1;
     }
   }
 
@@ -437,6 +443,7 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
 
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
 {
+  B2FATAL("This code needs to be checked agains new firmware");
   B2DEBUG(20, "PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id << " Mode " << adcpedestal);
   start_frame();
   /// DHP data Frame
@@ -450,6 +457,7 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
   if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
 
   if (adcpedestal) {
+    // ADC:Pedestal is not supported by firmware anymore?
     for (int row = 0; row < PACKER_NUM_ROWS; row++) {
       for (int col = c1; col < c2; col++) {
         append_int16((halfladder_pixmap[row][col] << 8) | ((row + col) & 0xFF));
@@ -458,12 +466,15 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
         append_int16(0);
       }
     }
+    // size may be variable, depend on firmware
+    // for test, we use maximum
     for (int row = PACKER_NUM_ROWS; row < 1024; row++) {
       for (int col = 0; col < 64; col++) {
         append_int16(0);
       }
     }
   } else {
+    // Pedestal data / memdump
     for (int row = 0; row < PACKER_NUM_ROWS; row++) {
       for (int col = c1; col < c2; col++) {
         append_int8(halfladder_pixmap[row][col]);
@@ -472,6 +483,8 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
         append_int8(0);
       }
     }
+    // size may be variable, depend on firmware
+    // for test, we use maximum
     for (int row = PACKER_NUM_ROWS; row < 1024; row++) {
       for (int col = 0; col < 64; col++) {
         append_int8(0);

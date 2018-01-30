@@ -20,8 +20,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-// #include <tracking/trackFindingVXD/analyzingTools/TicTocTimer.h>
-
 using namespace std;
 using namespace Belle2;
 

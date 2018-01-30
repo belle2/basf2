@@ -26,6 +26,8 @@
 #include <TFile.h>
 #include <TF1.h>
 
+#include <memory>
+
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -149,20 +151,8 @@ void DQMHistAnalysisPXDERModule::initialize()
 //   m_fHitMapClCountsFlag = NULL;
 //   m_hitMapCounts = NULL;
 //   m_hitMapClCounts = NULL;
-#if 0
-  m_fFiredFlag = NULL;
-  m_fClustersFlag = NULL;
-  m_fStartRowFlag = NULL;
-  m_fChargStartRowFlag = NULL;
-  m_fStartRowCountFlag = NULL;
-  m_fClusterChargeFlag = NULL;
-  m_fPixelSignalFlag = NULL;
-  m_fClusterSizeUFlag = NULL;
-  m_fClusterSizeVFlag = NULL;
-  m_fClusterSizeUVFlag = NULL;
 
-#else
-  // Create flag histograms:
+// Create flag histograms:
 //   DirPXDFlags->cd();
   m_fFiredFlag = new TH1I("DQMER_PXD_FiredFlag", "DQM ER PXD Fired Flag",
                           c_nPXDSensors, 0, c_nPXDSensors);
@@ -235,7 +225,6 @@ void DQMHistAnalysisPXDERModule::initialize()
     m_fClusterSizeUVFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 //   m_oldDir->cd();
-#endif
 }
 
 void DQMHistAnalysisPXDERModule::beginRun()
@@ -260,43 +249,6 @@ void DQMHistAnalysisPXDERModule::beginRun()
 }
 
 
-#if 0
-TH1* DQMHistAnalysisPXDERModule::findHistLocal(TString& a)
-{
-  B2INFO("Histo " << a << " not in memfile");
-  // the following code sux ... is there no root function for that?
-  TDirectory* d = gROOT;
-  TString myl = a;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        B2INFO("Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histo " << a << " found in mem");
-      return (TH1*)obj;
-    }
-  } else {
-    B2INFO("Histo " << a << " NOT found in mem");
-  }
-  return NULL;
-}
-#endif
-
 void DQMHistAnalysisPXDERModule::event()
 {
 
@@ -313,102 +265,6 @@ void DQMHistAnalysisPXDERModule::event()
   if (m_fClusterSizeUFlag != NULL) m_fClusterSizeUFlag->Reset();
   if (m_fClusterSizeVFlag != NULL) m_fClusterSizeVFlag->Reset();
   if (m_fClusterSizeUVFlag != NULL) m_fClusterSizeUVFlag->Reset();
-
-#if 0
-  {
-    TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
-    if (f_RefHistFile->IsOpen()) {
-      B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-      TVectorD* NoOfEventsRef2 = NULL;
-      f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef2);
-      m_NoOfEventsRef = (int)NoOfEventsRef2->GetMatrixArray()[0];
-      //    m_NoOfEventsRef = 2;
-      string name = str(format("PXDExpReco/PixelHitmapCounts;1"));
-      f_RefHistFile->GetObject(name.c_str(), r_hitMapCounts);
-      if (r_hitMapCounts == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/ClusterHitmapCounts;1"));
-      f_RefHistFile->GetObject(name.c_str(), r_hitMapClCounts);
-      if (r_hitMapClCounts == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      for (int i = 0; i < c_nPXDSensors; i++) {
-        int iLayer = 0;
-        int iLadder = 0;
-        int iSensor = 0;
-        getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
-        string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-        name = str(format("PXDExpReco/PXD_%1%_Fired") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_fired[i]);
-        if (r_fired[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_Clusters") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_clusters[i]);
-        if (r_clusters[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_StartRow") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_startRow[i]);
-        if (r_startRow[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_AverageSeedByStartRow") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_chargStartRow[i]);
-        if (r_chargStartRow[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_SeedCountsByStartRow") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_startRowCount[i]);
-        if (r_startRowCount[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_ClusterCharge") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_clusterCharge[i]);
-        if (r_clusterCharge[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_PixelSignal") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_pixelSignal[i]);
-        if (r_pixelSignal[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_ClusterSizeU") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeU[i]);
-        if (r_clusterSizeU[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_ClusterSizeV") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeV[i]);
-        if (r_clusterSizeV[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-        name = str(format("PXDExpReco/PXD_%1%_ClusterSizeUV") % sensorDescr);
-        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeUV[i]);
-        if (r_clusterSizeUV[i] == NULL) {
-          B2INFO("There is missing histogram in reference file: " << name.c_str());
-          return;
-        }
-      }
-      // f_RefHistFile->Close();
-    } else {
-      B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
-      return;
-    }
-  }
-#endif
 
   // Compare histograms with reference histograms and create flags:
   for (int i = 0; i < c_nPXDSensors; i++) {
@@ -511,7 +367,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
 
   // What happens if they are TH1I, TH1D and not TH1F
 
-  TH1F* temp = new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
+  auto temp = new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
   double NEvents = 0;
   double flagInt = 0;
   double flagrInt = 0;

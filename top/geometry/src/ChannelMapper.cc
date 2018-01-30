@@ -12,7 +12,6 @@
 #include <framework/database/DBImportArray.h>
 #include <unordered_set>
 #include <framework/logging/LogSystem.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <iostream>
 
 using namespace std;
@@ -243,20 +242,6 @@ namespace Belle2 {
 
     }
 
-    void ChannelMapper::getModuleLocalXY(int module, int pixel, double& x, double& y) const
-    {
-      unsigned row = pixel / c_numPixelColumns; // integer division gives the floor
-      unsigned col = pixel % c_numPixelColumns - 1; // remainder (-1 to make it zero based)
-      // TODO: why don't these two lines work ?
-      // x = TOPGeometryPar::Instance()->getGeometry()->getModule(module).getPMTArray().getX(col);
-      // y = TOPGeometryPar::Instance()->getGeometry()->getModule(module).getPMTArray().getY(row);
-      auto pmtarray = TOPGeometryPar::Instance()->getGeometry()->getModule(module).getPMTArray();
-      double dx = pmtarray.getDx();
-      double dy = pmtarray.getDy();
-      x = (col + 0.5) * dx;
-      y = (row + 0.5) * dy;
-      return;
-    }
 
     void ChannelMapper::print() const
     {

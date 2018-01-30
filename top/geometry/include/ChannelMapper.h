@@ -163,26 +163,6 @@ namespace Belle2 {
       int getPixelID(unsigned channel) const;
 
       /**
-       * Converts pixel ID to local cartesian (bar) x,y coordinates
-       * @param pixel pixel ID (1-based)
-       * @param module module number (optional)
-       * @param x local bar x coord [output]
-       * @param y local bar y coord [output]
-       */
-      void getModuleLocalXY(int module, int pixel, double& x, double& y) const;
-
-      /**
-       * Converts pixel ID to local cartesian (bar) x,y coordinates
-       * @param pixel pixel ID (1-based)
-       * @param x local bar x coord [output]
-       * @param y local bar y coord [output]
-       */
-      void getLocalXY(int pixel, double& x, double& y) const
-      {
-        return getModuleLocalXY(1, pixel, x, y);
-      }
-
-      /**
        * Print mappings to terminal screen
        */
       void print() const;

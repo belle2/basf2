@@ -79,7 +79,7 @@ namespace Belle2 {
 
 using namespace Belle2;
 
-SVDFTBFEE::SVDFTBFEE()
+SVDFTBFEE::SVDFTBFEE() : FEE("svdftb")
 {
 }
 

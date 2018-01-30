@@ -29,7 +29,7 @@ class Pager(object):
     @param quit_if_one_screen a bool indicating whether the Pager should quit
         automatically if the content fits on one screen. This implies that the
         content stays visible on pager exit. True is similar to the behavior of
-        git diff, False is similar to git --help
+        :program:`git diff`, False is similar to :program:`git --help`
     """
 
     def __init__(self, prompt=None, quit_if_one_screen=False):

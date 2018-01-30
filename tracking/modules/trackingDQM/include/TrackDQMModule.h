@@ -5,20 +5,15 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for cluster shape correction quality check                    *
+ * Prepared for track quality check                                       *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TrackDQMMODULE_H_
-#define TrackDQMMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 
 #include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
@@ -39,20 +34,20 @@ namespace Belle2 {
     /** Constructor */
     TrackDQMModule();
     /* Destructor */
-    virtual ~TrackDQMModule();
+    ~TrackDQMModule();
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
     * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
     /** Name of the collection to use for the Reco Track */
@@ -90,6 +85,4 @@ namespace Belle2 {
   };  //end class declaration
 
 }  // end namespace Belle2
-
-#endif  // TrackDQMMODULE_H_
 

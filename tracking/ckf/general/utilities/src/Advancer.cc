@@ -11,7 +11,7 @@
 #include <tracking/ckf/general/utilities/Advancer.h>
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>

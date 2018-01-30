@@ -19,6 +19,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/C2TDistanceUtility.h>
+#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 //MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -452,6 +453,148 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterTrigger(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        const bool matcher = shower->hasTriggerClusterMatching();
+
+        if (matcher) {
+          result = shower->isTriggerCluster();
+        } else {
+          B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
+        }
+      }
+      return result;
+    }
+
+    double eclExtTheta(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getExtTheta();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclExtPhi(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getExtPhi();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclExtPhiId(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getExtPhiId();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3FWDBarrel(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3FWDBarrel();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3FWDEndcap(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3FWDEndcap();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3BWDEndcap(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3BWDEndcap();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3BWDBarrel(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3BWDBarrel();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
@@ -534,5 +677,14 @@ namespace Belle2 {
                       "Returns the hypothesis ID of this ECL cluster.");
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
+    REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
+                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run.");
+    REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
+    REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
+    REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi id.");
+    REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "Returns energy sum of three crystals in FWD barrel");
+    REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "Returns energy sum of three crystals in FWD endcap");
+    REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
+    REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
   }
 }

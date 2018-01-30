@@ -80,8 +80,10 @@ namespace Belle2 {
              "if true, make waveforms for all 8192 channels "
              "(note: this will slow-down digitization)", false);
     addParam("useDatabase", m_useDatabase,
-             "if true, use channel dependent constants from database",
+             "if true, use channel dependent constants from database (incl. time base)",
              false);
+    addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
+             "if true, use only time base calibration from database", false);
     addParam("simulateTTS", m_simulateTTS,
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",
@@ -103,6 +105,7 @@ namespace Belle2 {
   {
     // input from datastore
     m_simHits.isRequired();
+    m_simCalPulses.isOptional();
     m_mcParticles.isOptional();
 
     // output to datastore
@@ -139,6 +142,8 @@ namespace Belle2 {
       m_pulseHeights = new DBObjPtr<TOPCalChannelPulseHeight>;
       m_thresholds = new DBObjPtr<TOPCalChannelThreshold>;
       m_noises = new DBObjPtr<TOPCalChannelNoise>;
+    } else if (m_useSampleTimeCalibration) {
+      m_timebases = new DBObjPtr<TOPCalTimebase>;
     }
 
     // time range for digitization
@@ -173,7 +178,14 @@ namespace Belle2 {
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+    } else if (m_useSampleTimeCalibration) {
+      if (!(*m_timebases).isValid()) {
+        B2FATAL("Sample time calibration constants requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
     }
+
   }
 
   void TOPDigitizerModule::event()
@@ -229,6 +241,22 @@ namespace Belle2 {
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, pulseHeight, hitType, &simHit);
+    }
+
+    // add calibration pulses
+
+    for (const auto& simCalPulses : m_simCalPulses) {
+      auto moduleID = simCalPulses.getModuleID();
+      auto pixelID = simCalPulses.getPixelID();
+      auto pulseHeight = simCalPulses.getAmplitude();
+      auto time = simCalPulses.getTime();
+      auto hitType = TimeDigitizer::c_CalPulse;
+      TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
+                              m_rmsNoise, m_sampleTimes);
+      if (!digitizer.isValid()) continue;
+      unsigned id = digitizer.getUniqueID();
+      Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
+      it->second.addTimeOfHit(time, pulseHeight, hitType);
     }
 
     // add randomly distributed dark noise (maybe not needed anymore?)

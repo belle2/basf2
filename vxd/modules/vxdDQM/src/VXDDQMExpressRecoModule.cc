@@ -19,7 +19,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
@@ -38,7 +38,6 @@
 #include "TFile.h"
 
 #include <framework/database/DBImportObjPtr.h>
-// #include <framework/database/DBImportArray.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -60,7 +59,7 @@ VXDDQMExpressRecoModule::VXDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
   setDescription("VXD DQM module for Express Reco "
-                 "Recommended Number of events for monito is 40 kEvents or more to fill all histograms "
+                 "Recommended Number of events for monitor is 40 kEvents or more to fill all histograms "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
@@ -334,19 +333,22 @@ void VXDDQMExpressRecoModule::initialize()
 
   //Register collections
   StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
-  StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
+  StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
-  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
+  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDShaperDigits);
   m_storePXDClustersName = storePXDClusters.getName();
   m_relPXDClusterDigitName = relPXDClusterDigits.getName();
   m_storeSVDClustersName = storeSVDClusters.getName();
   m_relSVDClusterDigitName = relSVDClusterDigits.getName();
 
+  storePXDDigits.isRequired();
+  storeSVDShaperDigits.isRequired();
+
   //Store names to speed up creation later
   m_storePXDDigitsName = storePXDDigits.getName();
-  m_storeSVDDigitsName = storeSVDDigits.getName();
+  m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();
 }
 
 void VXDDQMExpressRecoModule::beginRun()
@@ -366,20 +368,20 @@ void VXDDQMExpressRecoModule::event()
 {
 
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
-  const StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
+  const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
 
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
 
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits, m_relSVDClusterDigitName);
+  const RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDShaperDigits, m_relSVDClusterDigitName);
 
   // If there are no digits, leave
-  if (!storePXDDigits && !storeSVDDigits) return;
+  if (!storePXDDigits && !storeSVDShaperDigits) return;
 
   int MaxHits = 0;
   if (m_UseDigits) {
-    MaxHits = storeSVDDigits.getEntries() + storePXDDigits.getEntries();
+    MaxHits = storeSVDShaperDigits.getEntries() + storePXDDigits.getEntries();
   } else {
     MaxHits = storeSVDClusters.getEntries() + storePXDClusters.getEntries();
   }
@@ -427,17 +429,23 @@ void VXDDQMExpressRecoModule::event()
           }
         }
       } else {                                  // SVD digits/clusters:
-        const SVDDigit& digitSVD1 = *storeSVDDigits[i1 - storePXDDigits.getEntries()];
+        const SVDShaperDigit& digitSVD1 = *storeSVDShaperDigits[i1 - storePXDDigits.getEntries()];
         iLayer1 = digitSVD1.getSensorID().getLayerNumber();
         if ((iLayer1 < c_firstSVDLayer) || (iLayer1 > c_lastSVDLayer)) continue;
         index1 = iLayer1 - c_firstVXDLayer;
-        float fCharge1 = digitSVD1.getCharge();
-        fTime1 = digitSVD1.getTime();
+        fTime1 = digitSVD1.getFADCTime();
         VxdID sensorID1 = digitSVD1.getSensorID();
         auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
+        SVDShaperDigit::APVFloatSamples samples = digitSVD1.getSamples();
         if (digitSVD1.isUStrip()) {
-          if (fCharge1 < m_CutCorrelationSigUSVD) continue;
-          TVector3 rLocal1(digitSVD1.getCellPosition(), 0 , 0);
+          int iCont = 0;
+          for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
+            float fCharge1 = samples[i];
+            if (fCharge1 > m_CutCorrelationSigUSVD) iCont = 1;
+          }
+          if (iCont == 0) continue;
+          float possi = info.getUCellPosition(digitSVD1.getCellID());
+          TVector3 rLocal1(possi, 0 , 0);
           TVector3 ral1 = info.pointToGlobal(rLocal1);
           iIsU1 = 1;
           fPosSPU1 = ral1.Phi() / TMath::Pi() * 180;
@@ -445,8 +453,17 @@ void VXDDQMExpressRecoModule::event()
             fPosSPU1 = ral1.Y();
           }
         } else {
-          if (fCharge1 < m_CutCorrelationSigVSVD) continue;
-          TVector3 rLocal1(0, digitSVD1.getCellPosition(), 0);
+          int iCont = 0;
+          for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
+            float fCharge1 = samples[i];
+            if (fCharge1 > m_CutCorrelationSigVSVD) iCont = 1;
+          }
+          if (iCont == 0) continue;
+
+          //float possi = digitSVD1.getCellPosition();  //   is not work anymore
+          float possi = info.getVCellPosition(digitSVD1.getCellID());
+
+          TVector3 rLocal1(0, possi, 0);
           TVector3 ral1 = info.pointToGlobal(rLocal1);
           iIsV1 = 1;
           fPosSPV1 = ral1.Theta() / TMath::Pi() * 180;
@@ -494,7 +511,7 @@ void VXDDQMExpressRecoModule::event()
         VxdID sensorID1 = clusterSVD1.getSensorID();
         auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
         if (clusterSVD1.isUCluster()) {
-          if (fCharge1 < m_CutCorrelationSigUSVD) continue;
+          if (fCharge1 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
           TVector3 rLocal1(clusterSVD1.getPosition(), 0 , 0);
           TVector3 ral1 = info.pointToGlobal(rLocal1);
           iIsU1 = 1;
@@ -503,7 +520,7 @@ void VXDDQMExpressRecoModule::event()
             fPosSPU1 = ral1.Y();
           }
         } else {
-          if (fCharge1 < m_CutCorrelationSigVSVD) continue;
+          if (fCharge1 < m_CutCorrelationSigVSVD * 200) continue;  // in electrons
           TVector3 rLocal1(0, clusterSVD1.getPosition(), 0);
           TVector3 ral1 = info.pointToGlobal(rLocal1);
           iIsV1 = 1;
@@ -563,17 +580,24 @@ void VXDDQMExpressRecoModule::event()
             }
           }
         } else {                                  // SVD digits/clusters:
-          const SVDDigit& digitSVD2 = *storeSVDDigits[i2 - storePXDDigits.getEntries()];
+          const SVDShaperDigit& digitSVD2 = *storeSVDShaperDigits[i2 - storePXDDigits.getEntries()];
           iLayer2 = digitSVD2.getSensorID().getLayerNumber();
           if ((iLayer2 < c_firstSVDLayer) || (iLayer2 > c_lastSVDLayer)) continue;
           index2 = iLayer2 - c_firstVXDLayer;
-          float fCharge2 = digitSVD2.getCharge();
-          fTime2 = digitSVD2.getTime();
+          fTime2 = digitSVD2.getFADCTime();
           VxdID sensorID2 = digitSVD2.getSensorID();
           auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
+
+          SVDShaperDigit::APVFloatSamples samples = digitSVD2.getSamples();
           if (digitSVD2.isUStrip()) {
-            if (fCharge2 < m_CutCorrelationSigUSVD) continue;
-            TVector3 rLocal2(digitSVD2.getCellPosition(), 0 , 0);
+            int iCont = 0;
+            for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
+              float fCharge2 = samples[i];
+              if (fCharge2 > m_CutCorrelationSigUSVD) iCont = 1;
+            }
+            if (iCont == 0) continue;
+            float possi = info.getUCellPosition(digitSVD2.getCellID());
+            TVector3 rLocal2(possi, 0 , 0);
             TVector3 ral2 = info.pointToGlobal(rLocal2);
             iIsU2 = 1;
             fPosSPU2 = ral2.Phi() / TMath::Pi() * 180;
@@ -581,8 +605,14 @@ void VXDDQMExpressRecoModule::event()
               fPosSPU2 = ral2.Y();
             }
           } else {
-            if (fCharge2 < m_CutCorrelationSigVSVD) continue;
-            TVector3 rLocal2(0, digitSVD2.getCellPosition(), 0);
+            int iCont = 0;
+            for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
+              float fCharge2 = samples[i];
+              if (fCharge2 > m_CutCorrelationSigVSVD) iCont = 1;
+            }
+            if (iCont == 0) continue;
+            float possi = info.getVCellPosition(digitSVD2.getCellID());
+            TVector3 rLocal2(0, possi, 0);
             TVector3 ral2 = info.pointToGlobal(rLocal2);
             iIsV2 = 1;
             fPosSPV2 = ral2.Theta() / TMath::Pi() * 180;
@@ -630,7 +660,7 @@ void VXDDQMExpressRecoModule::event()
           VxdID sensorID2 = clusterSVD2.getSensorID();
           auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
           if (clusterSVD2.isUCluster()) {
-            if (fCharge2 < m_CutCorrelationSigUSVD) continue;
+            if (fCharge2 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
             TVector3 rLocal2(clusterSVD2.getPosition(), 0 , 0);
             TVector3 ral2 = info.pointToGlobal(rLocal2);
             iIsU2 = 1;
@@ -639,7 +669,7 @@ void VXDDQMExpressRecoModule::event()
               fPosSPU2 = ral2.Y();
             }
           } else {
-            if (fCharge2 < m_CutCorrelationSigVSVD) continue;
+            if (fCharge2 < m_CutCorrelationSigVSVD * 200) continue;  // in electrons
             TVector3 rLocal2(0, clusterSVD2.getPosition(), 0);
             TVector3 ral2 = info.pointToGlobal(rLocal2);
             iIsV2 = 1;

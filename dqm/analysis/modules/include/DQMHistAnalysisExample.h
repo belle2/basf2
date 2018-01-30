@@ -6,8 +6,7 @@
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisExample_h
-#define _Belle2_DQMHistAnalysisExample_h
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -50,4 +49,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

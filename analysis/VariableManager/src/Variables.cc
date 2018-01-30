@@ -417,46 +417,6 @@ namespace Belle2 {
 
     }
 
-    double VertexZDist(const Particle* part)
-    {
-      double z0_daughters[2] = { -99., -99. };
-      const double alpha = 1.0 / (1.5 * TMath::C()) * 1E11;
-      const std::vector<Particle*> daughters = part->getDaughters();
-      for (unsigned i = 0; i <= 1; i++) {
-        TLorentzVector dt;
-        dt = daughters[i]->get4Vector();
-        double charge = daughters[i]->getCharge();
-
-        double x = dt.X();
-        double y = dt.Y();
-        double z = dt.Z();
-        double px = dt.Px();
-        double py = dt.Py();
-        double pz = dt.Pz();
-
-        // We find the perigee parameters by inverting this system of
-        // equations and solving for the six variables d0, phi, omega, z0,
-        // cotTheta, chi.
-
-        const double ptinv = 1 / hypot(px, py);
-        const double omega = charge * ptinv / alpha;
-        const double cotTheta = ptinv * pz;
-
-        const double cosphichi = charge * ptinv * px;  // cos(phi + chi)
-        const double sinphichi = charge * ptinv * py;  // sin(phi + chi)
-
-        // Helix center in the (x, y) plane:
-        const double helX = x + charge * py * alpha;
-        const double helY = y - charge * px * alpha;
-        const double phi = atan2(helY, helX) + charge * M_PI / 2;
-        const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
-        const double chi = asin(sinchi);
-        z0_daughters[i] = z + charge / omega * cotTheta * chi;
-      }
-
-      return abs(z0_daughters[1] - z0_daughters[0]);
-    }
-
     double ImpactXY(const Particle* particle)
     {
       double px = particle->getPx();
@@ -1164,118 +1124,6 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
-    // TDCPV related ---------------------------------------------------------
-    double particleMCTagBFlavor(const Particle* particle)
-    {
-      double result = 1000.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
-    }
-
-    double particleTagVx(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().X();
-
-      return result;
-    }
-
-    double particleTagVy(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Y();
-
-      return result;
-    }
-
-    double particleTagVz(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaTErr(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaTErr();
-
-      return result;
-    }
-
-    double particleMCDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaZ(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = particle->getZ() - vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaB(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert) {
-        PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
-        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-        double c = Const::speedOfLight / 1000.; // cm ps-1
-        result = vert->getDeltaT() * bg * c;
-      }
-      return result;
-    }
 
 // Recoil Kinematics related ---------------------------------------------
 
@@ -1509,8 +1357,6 @@ namespace Belle2 {
                       "and the momentum of the given particle in the lab frame.\n"
                       "Else: 0.");
 
-    REGISTER_VARIABLE("VertexZDist", VertexZDist,
-                      "Z - distance of two daughter tracks at vertex point");
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
     REGISTER_VARIABLE("distance", particleDistance,
@@ -1622,18 +1468,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
-
-    VARIABLE_GROUP("TDCPV");
-    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
-    REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,

@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 

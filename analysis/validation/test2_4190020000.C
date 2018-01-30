@@ -25,7 +25,7 @@
 /* Validation script to determine benchmarks for PID cuts. */
 void plot_Mrecoil_pipi(TFile* pfile, TTree* ptree, TFile* outputFile){
  
-   TString pidCut("Upsilon6S_pi0_PIDpi > 0.1 && Upsilon6S_pi1_PIDpi > 0.1");
+   TString pidCut("Upsilon6S_pi0_pionID > 0.1 && Upsilon6S_pi1_pionID > 0.1");
    TString mcCuts("(Upsilon6S_pi0_mcPDG ==211 ) && (Upsilon6S_pi1_mcPDG == -211)");
    TString Cuts(pidCut+"&&"+mcCuts);
 
@@ -46,7 +46,7 @@ void plot_Mrecoil_pipi(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_Mrecoil_pi(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString pidCut("Upsilon6S_pi_PIDpi > 0.1");
+   TString pidCut("Upsilon6S_pi_pionID > 0.1");
    TString nHits("Upsilon6S_pi_nPXDHits > 0");
    TString Cuts(pidCut+"&&"+nHits);
 

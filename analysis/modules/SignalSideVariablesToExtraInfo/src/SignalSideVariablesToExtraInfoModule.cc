@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/SignalSideVariablesToExtraInfo/SignalSideVariablesToExtraInfoModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>

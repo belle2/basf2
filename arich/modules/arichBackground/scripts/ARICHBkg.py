@@ -25,7 +25,7 @@ print('')
 print('example: basf2 ARICHBkg.py RBB /gpfs/home/belle/nakayama/basf2_opt/release_201502_development/Work_MCgen/output/ 2 100 0')
 print('will analyse files in output dir with index numbers from 200-299.')
 print('Background tag is int appended to all hits (to identify contributions from different sources at later analysis')
-print('use 0 for RBB, 1 for BHWide, 2 Touschek_HER, 3 Touschek_LER, 4 Coulomb_HER, 5 Coulomb_LER, 6 2-photon')
+print('use 0 for RBB, 1 for BHWide, 2 Touschek_HER, 3 Touschek_LER, 4 Coulomb_HER, 5 Coulomb_LER, 6 2-photon, 7 BHWideLargeAngle')
 print('')
 
 # -------------------------
@@ -58,8 +58,8 @@ for i in range(n * nfiles, (n + 1) * nfiles):
     fnames.append(filenn)
 
 # output file name
-out = 'arich_' + typee + '_' + sys.argv[3] + '_phase2.root'
-# out = 'arich_' + typee + '_' + sys.argv[4] + '.root'
+out = 'arich_' + typee + '_' + sys.argv[3] + '.root'
+# out = 'arich_' + typee + '_' + sys.argv[3] + '_phase2.root'
 
 print('Output file: ' + out)
 

@@ -9,23 +9,20 @@
  **************************************************************************/
 
 #include <ecl/modules/eclMuMuECollector/eclMuMuECollectorModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <framework/datastore/RelationVector.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/gearbox/Const.h>
-
+#include <framework/dataobjects/EventMetaData.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -38,80 +35,75 @@ REG_MODULE(eclMuMuECollector)
 
 //-----------------------------------------------------------------------------------------------------
 
-//** we should have a parameter related to L1 and HLT trigger bits. For now, restrict the
-//   tracks to the specified angular region covered by the L1 trigger
-eclMuMuECollectorModule::eclMuMuECollectorModule() : CalibrationCollectorModule()
+eclMuMuECollectorModule::eclMuMuECollectorModule() : CalibrationCollectorModule(), m_ECLExpMuMuE("ECLExpMuMuE"),
+  m_ElectronicsCalib("ECLCrystalElectronics"), m_MuMuECalib("ECLCrystalEnergyMuMu")
 {
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using muons");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("minPairMass", m_minPairMass, "minimum invariant mass of the muon pair (GeV/c^2)", 9.0);
   addParam("minTrackLength", m_minTrackLength, "minimum extrapolated track length in the crystal (cm)", 30.);
-  addParam("MaxNeighborAmp", m_MaxNeighborAmp, "maximum signal allowed in a neighboring crystal (adc counts)", 200.);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum muon theta in lab (degrees)", 24.);
-  addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum muon theta in lab (degrees)", 134.);
-  addParam("useTrueEnergy", m_useTrueEnergy, "store MC true deposited energy", false);
+  addParam("MaxNeighbourE", m_MaxNeighbourE, "maximum energy allowed in a neighbouring crystal (GeV)", 0.010);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum muon theta in lab (degrees)", 17.);
+  addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum muon theta in lab (degrees)", 150.);
+  addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
+  addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);
 }
 
-//-----------------------------------------------------------------------------------------------------
+/**----------------------------------------------------------------------------------------*/
+/**----------------------------------------------------------------------------------------*/
 void eclMuMuECollectorModule::prepare()
 {
 
-  //..Create the histograms and register them in the data store
-  auto EmuVsCellID0 = new TH2F("EmuVsCellID0", "ECLDigit amplitude vs cell ID;cellID from 0;Amplitude", 8736, 0, 8736, 240, 2000,
-                               8000);
-  auto MuonLabPvsCellID0 = new TH1F("MuonLabPvsCellID0", "Muon lab momentum for each cell;cellID from 0;Momentum (GeV/c)", 8736, 0,
-                                    8736);
-  registerObject<TH2F>("EmuVsCellID0", EmuVsCellID0);
-  registerObject<TH1F>("MuonLabPvsCellID0", MuonLabPvsCellID0);
+  /**----------------------------------------------------------------------------------------*/
+  /** MetaData */
+  StoreObjPtr<EventMetaData> evtMetaData;
+  B2INFO("eclMuMuECollector: Experiment = " << evtMetaData->getExperiment() << "  run = " << evtMetaData->getRun());
+
+  /**----------------------------------------------------------------------------------------*/
+  /** Create the histograms and register them in the data store */
+  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", 8736, 0, 8736, 120, 0.1, 2.5);
+  registerObject<TH2F>("EnVsCrysID", EnVsCrysID);
+
+  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy vs crystal ID;crystal ID;Energy (GeV)", 8736, 0, 8736);
+  registerObject<TH1F>("ExpEvsCrys", ExpEvsCrys);
+
+  auto ElecCalibvsCrys = new TH1F("ElecCalibvsCrys", "Sum electronics calib const vs crystal ID;crystal ID;calibration constant",
+                                  8736, 0, 8736);
+  registerObject<TH1F>("ElecCalibvsCrys", ElecCalibvsCrys);
+
+  auto InitialCalibvsCrys = new TH1F("InitialCalibvsCrys",
+                                     "Sum initial muon pair calib const vs crystal ID;crystal ID;calibration constant", 8736, 0, 8736);
+  registerObject<TH1F>("InitialCalibvsCrys", InitialCalibvsCrys);
+
+  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal", 8736,
+                                     0, 8736);
+  registerObject<TH1F>("CalibEntriesvsCrys", CalibEntriesvsCrys);
+
+  /** Raw digit quantities for debugging purposes only */
+  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude", 8736, 0, 8736, 250, 0,
+                                    25000);
+  registerObject<TH2F>("RawDigitAmpvsCrys", RawDigitAmpvsCrys);
+
+  auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Digit Time vs crystal ID;crystal ID;Time", 8736, 0, 8736, 200, -2000,
+                                     2000);
+  registerObject<TH2F>("RawDigitTimevsCrys", RawDigitTimevsCrys);
+
 
   //------------------------------------------------------------------------
-  //..Four or ~eight nearest neighbors, plus crystal itself. cellID starts from 1 in ECLNeighbours
+  /** Four or ~eight nearest neighbours, plus crystal itself. ECLNeighbour uses cellID, 1--8736 */
   myNeighbours4 = new ECLNeighbours("NC", 1);
   myNeighbours8 = new ECLNeighbours("N", 1);
 
-  //------------------------------------------------------------------------
-  //..Find the nominal (beam-energy) muon momentum for each crystal in the lab frame
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-  PCmsLabTransform boostrotate;
-  double beamE = 0.5 * boostrotate.getCMSEnergy();
-  double muonP = sqrt(beamE * beamE - Const::muonMass * Const::muonMass);
-  MuPlab.resize(8736);
-
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    TVector3 CellPosition = eclp->GetCrystalPos(iECLCell);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
-    CellLab.SetE(1.);
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
-
-    //..Set mass and energy to match a beam energy muon
-    CellCOM.SetE(beamE);
-    CellCOM.SetRho(muonP);
-
-    //..And boost back to lab frame
-    TLorentzVector MuonLab = boostrotate.rotateCmsToLab() * CellCOM;
-    MuPlab[iECLCell] = MuonLab.Rho();
-
-    if (iECLCell % 1000 == 0) {
-      B2DEBUG(1, "ECLGeom: " << iECLCell << " " << CellLab.Theta() << " " << CellLab.Phi() << " " << CellLab.M() << " " << CellLab.E());
-      B2DEBUG(1, "     " << CellCOM.Theta() << " " << CellCOM.Phi() << " " << CellCOM.M() << " " << CellCOM.E());
-      B2DEBUG(1, "     " << MuonLab.Theta() << " " << MuonLab.Phi() << " " << MuonLab.M() << " " << MuonLab.E() << " "  << MuonLab.Rho());
-    }
-  }
-
 
   //------------------------------------------------------------------------
-  //..Parameters
+  /** Parameters */
   B2INFO("Input parameters to eclMuMuECollector:");
   B2INFO("minPairMass: " << m_minPairMass);
   B2INFO("minTrackLength: " << m_minTrackLength);
-  B2INFO("MaxNeighborAmp: " << m_MaxNeighborAmp);
+  B2INFO("MaxNeighbourE: " << m_MaxNeighbourE);
   B2INFO("thetaLabMinDeg: " << m_thetaLabMinDeg);
   B2INFO("thetaLabMaxDeg: " << m_thetaLabMaxDeg);
-  B2INFO("useTrueEnergy: " << m_useTrueEnergy);
   if (m_thetaLabMinDeg < 1.) {
     cotThetaLabMax = 9999.;
   } else if (m_thetaLabMinDeg > 179.) {
@@ -128,43 +120,93 @@ void eclMuMuECollectorModule::prepare()
     double thetaLabMax = m_thetaLabMaxDeg * TMath::Pi() / 180.;
     cotThetaLabMin = 1. / tan(thetaLabMax);
   }
+  B2INFO("cotThetaLabMin: " << cotThetaLabMin);
+  B2INFO("cotThetaLabMax: " << cotThetaLabMax);
+  B2INFO("measureTrueEnergy: " << m_measureTrueEnergy);
+  B2INFO("requireL1: " << m_requireL1);
 
-  //..Resize vectors
-  EnergyPerCell.resize(8736);
+  /** Resize vectors */
+  EperCrys.resize(8736);
+
+  /**----------------------------------------------------------------------------------------*/
+  /** Get expected energies and calibration constants from DB. Need to call hasChanged() for later comparison */
+  if (m_ECLExpMuMuE.hasChanged()) {ExpMuMuE = m_ECLExpMuMuE->getCalibVector();}
+  if (m_ElectronicsCalib.hasChanged()) {ElectronicsCalib = m_ElectronicsCalib->getCalibVector();}
+  if (m_MuMuECalib.hasChanged()) {MuMuECalib = m_MuMuECalib->getCalibVector();}
+
+  /** Write out a few for quality control */
+  for (int ic = 1; ic < 9000; ic += 1000) {
+    B2INFO("DB constants for cellID=" << ic << ": ExpMuMuE = " << ExpMuMuE[ic - 1] << " ElectronicsCalib = " << ElectronicsCalib[ic - 1]
+           << " MuMuECalib = " << MuMuECalib[ic - 1]);
+  }
+
+  /** Verify that we have valid values for the starting calibrations */
+  for (int crysID = 0; crysID < 8736; crysID++) {
+    if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclMuMuECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
+    if (ExpMuMuE[crysID] == 0) {B2FATAL("eclMuMuECollector: ExpMuMuE = 0 for crysID = " << crysID);}
+    if (MuMuECalib[crysID] == 0) {B2FATAL("eclMuMuECollector: MuMuECalib = 0 for crysID = " << crysID);}
+  }
+
+  /**----------------------------------------------------------------------------------------*/
+  /** Required data objects */
+  TrackArray.isRequired();
+  eclDigitArray.isRequired();
+
 }
 
 
-//-----------------------------------------------------------------------------------------------------
+/**----------------------------------------------------------------------------------------*/
+/**----------------------------------------------------------------------------------------*/
 void eclMuMuECollectorModule::collect()
 {
 
-  //..First event, record the muon kinematics
+  /** Record the input database constants for the first call */
   if (iEvent == 0) {
-    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      getObjectPtr<TH1F>("MuonLabPvsCellID0")->SetBinContent(iECLCell + 1, MuPlab[iECLCell]);
-      getObjectPtr<TH1F>("MuonLabPvsCellID0")->SetBinError(iECLCell + 1, 0);
+    for (int crysID = 0; crysID < 8736; crysID++) {
+      getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysID + 0.001, ExpMuMuE[crysID]);
+      getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
+      getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, MuMuECalib[crysID]);
+      getObjectPtr<TH1F>("CalibEntriesvsCrys")->Fill(crysID + 0.001);
     }
   }
+
   if (iEvent % 10000 == 0) {B2INFO("eclMuMuECollector: iEvent = " << iEvent);}
   iEvent++;
 
+  /**----------------------------------------------------------------------------------------*/
+  /** Check if DB objects have changed */
+  if (m_ECLExpMuMuE.hasChanged()) { B2FATAL("eclMuMuECollector: ExpMuMuE has changed");}
+  if (m_ElectronicsCalib.hasChanged()) {B2FATAL("eclMuMuECollector: ElectronicsCalib has changed");}
+  if (m_MuMuECalib.hasChanged()) {
+    B2INFO("eclMuMuECollector: new values for MuMuECalib");
+    MuMuECalib = m_MuMuECalib->getCalibVector();
+    for (int ic = 1; ic < 9000; ic += 1000) {
+      B2INFO("Updated MuMuECalib for cellID=" << ic << ": MuMuECalib = " << MuMuECalib[ic - 1]);
+    }
+  }
+
+  /**----------------------------------------------------------------------------------------*/
+  /** If requested, require a level 1 trigger  */
+  if (m_requireL1) {
+    StoreObjPtr<TRGSummary> TRGResults;
+    unsigned int L1TriggerResults = TRGResults->getTRGSummary(0);
+    if (L1TriggerResults == 0) {return;}
+  }
+
   //------------------------------------------------------------------------
-  //..Event selection. First, require at least two tracks
-  StoreArray<Track> TrackArray;
+  /** Event selection. First, require at least two tracks */
   int nTrack = TrackArray.getEntries();
   if (nTrack < 2) {return;}
 
-  //..Look for highest pt negative and positive tracks in specified theta lab region. Negative first, positive 2nd
+  /** Look for highest pt negative and positive tracks in specified theta lab region. Negative first, positive 2nd. Use the pion (211) mass hypothesis, only one that is always available */
   double maxpt[2] = {0., 0.};
   int iTrack[2] = { -1, -1};
   for (int it = 0; it < nTrack; it++) {
-    const TrackFitResult* temptrackFit = TrackArray[it]->getTrackFitResult(Const::ChargedStable(pdgmuon));
-    if (not temptrackFit) {
-      B2WARNING("Skipping track without myon hypothesis.");
-      continue;
-    }
+    const TrackFitResult* temptrackFit = TrackArray[it]->getTrackFitResult(Const::ChargedStable(211));
+    if (not temptrackFit) {continue;}
     int imu = 0;
     if (temptrackFit->getChargeSign() == 1) {imu = 1; }
+
     double temppt = temptrackFit->getTransverseMomentum();
     double cotThetaLab = temptrackFit->getCotTheta();
     if (temppt > maxpt[imu] && cotThetaLab > cotThetaLabMin && cotThetaLab < cotThetaLabMax) {
@@ -173,17 +215,17 @@ void eclMuMuECollectorModule::collect()
     }
   }
 
-  //..Quit if we are missing a track
+  /** Quit if we are missing a track */
   if (iTrack[0] == -1 || iTrack[1] == -1) { return; }
 
-  //..Quit if the invariant mass of the two tracks is too low
-  TLorentzVector mu0 = TrackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(pdgmuon))->get4Momentum();
-  TLorentzVector mu1 = TrackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(pdgmuon))->get4Momentum();
+  /** Quit if the invariant mass of the two tracks is too low */
+  TLorentzVector mu0 = TrackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  TLorentzVector mu1 = TrackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
   if ((mu0 + mu1).M() < m_minPairMass) { return; }
 
   //------------------------------------------------------------------------
-  //..Extrapolate these two tracks into the ECL
-  int extCellID0[2] = { -1, -1};
+  /** Extrapolate these two tracks into the ECL using muon (13) hypothesis */
+  int extCrysID[2] = { -1, -1};
   Const::EDetector eclID = Const::EDetector::ECL;
   for (int imu = 0; imu < 2; imu++) {
     TVector3 temppos[2] = {};
@@ -191,78 +233,87 @@ void eclMuMuECollectorModule::collect()
     for (auto& extHit : TrackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
       int pdgCode = extHit.getPdgCode();
       Const::EDetector detectorID = extHit.getDetectorID(); // subsystem ID
-      int tempID0 = extHit.getCopyID();  // ID within that subsystem; for ecl it is cellID from 0
+      int temp0 = extHit.getCopyID();  // ID within that subsystem; for ecl it is crystal ID
 
-      //..This extrapolation is the entrance point to an ECL crystal, assuming muon hypothesis
-      if (detectorID == eclID && TMath::Abs(pdgCode) == pdgmuon && extHit.getStatus() == EXT_ENTER) {
-        IDEnter = tempID0;
+      /** This extrapolation is the entrance point to an ECL crystal, assuming muon hypothesis */
+      if (detectorID == eclID && TMath::Abs(pdgCode) == 13 && extHit.getStatus() == EXT_ENTER) {
+        IDEnter = temp0;
         temppos[0] = extHit.getPosition();
       }
 
-      //..Now we have the exit point of the same ECL crystal
-      if (detectorID == eclID && TMath::Abs(pdgCode) == pdgmuon && extHit.getStatus() == EXT_EXIT && tempID0 == IDEnter) {
+      /** Now we have the exit point of the same ECL crystal */
+      if (detectorID == eclID && TMath::Abs(pdgCode) == 13 && extHit.getStatus() == EXT_EXIT && temp0 == IDEnter) {
         temppos[1] = extHit.getPosition();
 
-        //..Keep track of this crystal if the track length is long enough. Note that if minTrackLength
-        //  is less than half the crystal length, we will keep only the first extrapolation due to break
+        /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */
         double trackLength = (temppos[1] - temppos[0]).Mag();
-        if (trackLength > m_minTrackLength) {extCellID0[imu] = tempID0;}
+        if (trackLength > m_minTrackLength) {extCrysID[imu] = temp0;}
         break;
       }
     }
   }
 
-  //..Quit if neither track has a successful extrapolation
-  if (extCellID0[0] == -1 && extCellID0[1] == -1) { return; }
+  /** Quit if neither track has a successful extrapolation */
+  if (extCrysID[0] == -1 && extCrysID[1] == -1) { return; }
 
   //------------------------------------------------------------------------
-  //..MC true deposited energy, if requested
-  double TrueEnergy[2] = {};
-  if (m_useTrueEnergy) {
+  /** Record ECL digit amplitude as a function of CrysID */
+  memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
+  for (auto& eclDigit : eclDigitArray) {
+    int crysID = eclDigit.getCellId() - 1;
+    getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
+
+    /** MuMuECalib is negative if the previous iteration of the algorithm was unable to calculate a value. In this case, the input value has been stored with a minus sign */
+    EperCrys[crysID] = eclDigit.getAmp() * abs(MuMuECalib[crysID]) * ElectronicsCalib[crysID];
+    if (EperCrys[crysID] > 0.01) {
+      getObjectPtr<TH2F>("RawDigitTimevsCrys")->Fill(crysID + 0.001, eclDigit.getTimeFit());
+    }
+  }
+
+  /** Overwrite using ECLCalDigits if we are using these events to determine MC deposited energy */
+  if (m_measureTrueEnergy) {
     StoreArray<ECLCalDigit> eclCalDigitArray;
     for (auto& eclCalDigit : eclCalDigitArray) {
-      int tempcellID0 = eclCalDigit.getCellId() - 1;
-      int imu = -1;
-      if (tempcellID0 == extCellID0[0]) {imu = 0;}
-      if (tempcellID0 == extCellID0[1]) {imu = 1;}
-      if (imu >= 0) {
-        auto relatedParticlePairs = eclCalDigit.getRelationsWith<MCParticle>();
-        int nrel = (int)relatedParticlePairs.size();
-        for (int irel = 0; irel < nrel; irel++) { TrueEnergy[imu] += relatedParticlePairs.weight(irel);}
-      }
+      int tempCrysID = eclCalDigit.getCellId() - 1;
+      EperCrys[tempCrysID] = eclCalDigit.getEnergy();
     }
   }
 
   //------------------------------------------------------------------------
-  //..Record ECL digit amplitude as a function of cellID0
-  memset(&EnergyPerCell[0], 0, EnergyPerCell.size()*sizeof EnergyPerCell[0]);
-  StoreArray<ECLDigit> eclDigitArray;
-  for (auto& eclDigit : eclDigitArray) {
-    int tempID0 = eclDigit.getCellId() - 1;
-    EnergyPerCell[tempID0] = eclDigit.getAmp();
-  }
-
-  //..Require that the energy in immediately adjacent crystals is below threshold
+  /** Require that the energy in immediately adjacent crystals is below threshold */
   for (int imu = 0; imu < 2; imu++) {
-    int ID0 = extCellID0[imu];
-    if (ID0 > -1) {
+    int crysID = extCrysID[imu];
+    int cellID = crysID + 1;
+    if (crysID > -1) {
 
-      bool noNeighborSignal = true;
-      if (ID0 >= firstID0N4 && ID0 <= lastID0N4) {
-        for (const auto& tempID1 : myNeighbours4->getNeighbours(ID0 + 1)) {
-          if (tempID1 - 1 != ID0 && EnergyPerCell[tempID1 - 1] > m_MaxNeighborAmp) {noNeighborSignal = false; break;}
+      bool noNeighbourSignal = true;
+      if (cellID >= firstcellIDN4 && crysID <= lastcellIDN4) {
+        for (const auto& tempCellID : myNeighbours4->getNeighbours(cellID)) {
+          int tempCrysID = tempCellID - 1;
+          if (tempCellID != cellID && EperCrys[tempCrysID] > m_MaxNeighbourE) {
+            noNeighbourSignal = false;
+            break;
+          }
         }
       } else {
-        for (const auto& tempID1 : myNeighbours8->getNeighbours(ID0 + 1)) {
-          if (tempID1 - 1 != ID0 && EnergyPerCell[tempID1 - 1] > m_MaxNeighborAmp) {noNeighborSignal = false; break;}
+        for (const auto& tempCellID : myNeighbours8->getNeighbours(cellID)) {
+          int tempCrysID = tempCellID - 1;
+          if (tempCellID != cellID && EperCrys[tempCrysID] > m_MaxNeighbourE) {
+            noNeighbourSignal = false;
+            break;
+          }
         }
       }
 
-      //..Fill the histogram if no significant signal in a neighboring crystal
-      if (noNeighborSignal) {
-        double eStore = EnergyPerCell[extCellID0[imu]];
-        if (m_useTrueEnergy) {eStore = MCCalibConstant * TrueEnergy[imu];}
-        getObjectPtr<TH2F>("EmuVsCellID0")->Fill(extCellID0[imu] + 0.001, eStore);
+      /** Fill the histogram if no significant signal in a neighbouring crystal */
+      if (noNeighbourSignal) {
+
+        /** ExpMuMuE is negative if the algorithm was unable to calculate a value. In this case, the nominal input value has been stored with a minus sign */
+        getObjectPtr<TH2F>("EnVsCrysID")->Fill(crysID + 0.001, EperCrys[crysID] / abs(ExpMuMuE[crysID]));
+        getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysID + 0.001, ExpMuMuE[crysID]);
+        getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
+        getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, MuMuECalib[crysID]);
+        getObjectPtr<TH1F>("CalibEntriesvsCrys")->Fill(crysID + 0.001);
       }
     }
   }

@@ -12,7 +12,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 

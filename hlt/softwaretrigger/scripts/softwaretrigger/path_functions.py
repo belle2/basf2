@@ -3,12 +3,14 @@ from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
 
+import softwaretrigger.hltdqm as hltdqm
+
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
     add_calibration_software_trigger, add_calcROIs_software_trigger
 
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
-ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
+ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
 
@@ -118,6 +120,10 @@ def add_softwaretrigger_reconstruction(
         fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
 
     path.add_path(fast_reco_reconstruction_path)
+
+
+def add_softwaretrigger_dqm(path):
+    hltdqm.standard_hltdqm(path)
 
 
 def get_store_only_metadata_path():

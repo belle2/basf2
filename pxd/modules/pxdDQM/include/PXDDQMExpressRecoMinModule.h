@@ -5,20 +5,14 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMExpressRecoMinMODULE_H_
-#define PXDDQMExpressRecoMinMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
@@ -39,23 +33,26 @@ namespace Belle2 {
     /* Destructor */
     virtual ~PXDDQMExpressRecoMinModule();
 
+  private:
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 
     /** cut for accepting to hitmap histogram, using strips only, default = 0 */
     float m_CutPXDCharge = 0.0;
+
+    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
     /** PXDDigits StoreArray name */
     std::string m_storePXDDigitsName;
@@ -130,5 +127,4 @@ namespace Belle2 {
   };
 
 }
-#endif
 

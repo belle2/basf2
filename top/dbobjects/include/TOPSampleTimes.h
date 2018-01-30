@@ -92,14 +92,7 @@ namespace Belle2 {
      * Returns time axis (sample times)
      * @return vector of sample times
      */
-    std::vector<double> getTimeAxis() const
-    {
-      std::vector<double> timeAxis;
-      for (unsigned i = 0; i < c_TimeAxisSize + 1; i++) {
-        timeAxis.push_back(m_timeAxis[i]);
-      }
-      return timeAxis;
-    }
+    std::vector<double> getTimeAxis() const;
 
     /**
      * Returns time in respect to sample 0 of window 0
@@ -110,7 +103,7 @@ namespace Belle2 {
      * @param sample sample counted from the first one in the specified ASIC window
      * @return time in [ns]
      */
-    double getFullTime(unsigned window, double sample) const;
+    double getFullTime(int window, double sample) const;
 
     /**
      * Returns time in respect to sample 0 of the specified ASIC window.
@@ -121,7 +114,7 @@ namespace Belle2 {
      * @param sample sample counted from the first one in the specified ASIC window
      * @return time in [ns]
      */
-    double getTime(unsigned window, double sample) const
+    double getTime(int window, double sample) const
     {
       return getFullTime(window, sample) - getFullTime(window, 0);
     }
@@ -136,7 +129,7 @@ namespace Belle2 {
      * @param sample1 sample counted from the first sample of the specified ASIC window
      * @return time difference in [ns]
      */
-    double getDeltaTime(unsigned window, double sample2, double sample1) const
+    double getDeltaTime(int window, double sample2, double sample1) const
     {
       return getFullTime(window, sample2) - getFullTime(window, sample1);
     }
@@ -148,11 +141,7 @@ namespace Belle2 {
      * @param sampleNumber sample number counted from begin of the specified ASIC window
      * @return time bin in [ns]
      */
-    double getTimeBin(unsigned window, unsigned sampleNumber) const
-    {
-      unsigned i = (window * c_WindowSize + sampleNumber) % c_TimeAxisSize;
-      return m_timeAxis[i + 1] - m_timeAxis[i];
-    }
+    double getTimeBin(int window, int sampleNumber) const;
 
     /**
      * Returns sample in respect to sample 0 of the specified ASIC window
@@ -164,7 +153,7 @@ namespace Belle2 {
      * @param time time in respect to time of sample 0 of the specified ASIC window
      * @return sample
      */
-    double getSample(unsigned window, double time) const;
+    double getSample(int window, double time) const;
 
     /**
      * Is time axis calibrated or equidistant

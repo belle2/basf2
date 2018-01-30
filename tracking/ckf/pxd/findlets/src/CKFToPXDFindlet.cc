@@ -27,7 +27,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

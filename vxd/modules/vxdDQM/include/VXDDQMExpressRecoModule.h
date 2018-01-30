@@ -65,8 +65,8 @@ namespace Belle2 {
 
     /** PXDDigits StoreArray name */
     std::string m_storePXDDigitsName;
-    /** SVDDigits StoreArray name */
-    std::string m_storeSVDDigitsName;
+    /** SVDShaperDigits StoreArray name */
+    std::string m_storeSVDShaperDigitsName;
     /** PXDClusters StoreArray name */
     std::string m_storePXDClustersName;
     /** SVDClusters StoreArray name */

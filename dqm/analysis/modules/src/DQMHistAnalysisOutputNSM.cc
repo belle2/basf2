@@ -103,13 +103,13 @@ void DQMHistAnalysisOutputNSMModule::event()
       std::string pname = i->first;
       std::string vname = StringUtil::replace(pname, "/", ".");
       switch (i->second) {
-        case INT:
+        case c_ParamINT:
           m_callback->add(new NSMVHandlerInt(vname, true, false, vints[pname]));
           break;
-        case FLOAT:
+        case c_ParamFLOAT:
           m_callback->add(new NSMVHandlerFloat(vname, true, false, vfloats[pname]));
           break;
-        case TEXT:
+        case c_ParamTEXT:
           m_callback->add(new NSMVHandlerText(vname, true, false, texts[pname]));
           break;
       }
@@ -120,13 +120,13 @@ void DQMHistAnalysisOutputNSMModule::event()
       std::string pname = i->first;
       std::string vname = StringUtil::replace(pname, "/", ".");
       switch (i->second) {
-        case INT:
+        case c_ParamINT:
           m_callback->set(vname, vints[pname]);
           break;
-        case FLOAT:
+        case c_ParamFLOAT:
           m_callback->set(vname, vfloats[pname]);
           break;
-        case TEXT:
+        case c_ParamTEXT:
           m_callback->set(vname, texts[pname]);
           break;
       }

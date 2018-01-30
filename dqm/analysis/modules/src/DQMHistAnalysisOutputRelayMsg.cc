@@ -1,10 +1,10 @@
 //+
 // File : DQMHistAnalysisOutputRelayMsg.cc
-// Description :
+// Description : DQM Output, send Canvases to jsroot server.
 //
 // Author : B. Spruck
 // Date : 25 - Mar - 2017
-// based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
+// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 
@@ -36,7 +36,7 @@ DQMHistAnalysisOutputRelayMsgModule::DQMHistAnalysisOutputRelayMsgModule()
   //Parameter definition
   addParam("Hostname", m_hostname, "Hostname of THTTP", std::string("localhost"));
   addParam("Port", m_port, "Port number to THTTP", 9191);
-  B2DEBUG(1, "DQMHistAnalysisOutputRelayMsg: Constructor done.");
+  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: Constructor done.");
 }
 
 
@@ -45,19 +45,19 @@ DQMHistAnalysisOutputRelayMsgModule::~DQMHistAnalysisOutputRelayMsgModule() { }
 void DQMHistAnalysisOutputRelayMsgModule::initialize()
 {
   m_sock = new TSocket(m_hostname.c_str(), m_port);
-  B2INFO("DQMHistAnalysisOutputRelayMsg: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: initialized.");
 }
 
 
 void DQMHistAnalysisOutputRelayMsgModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisOutputRelayMsg: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: beginRun called.");
 }
 
 
 void DQMHistAnalysisOutputRelayMsgModule::event()
 {
-  B2INFO("DQMHistAnalysisOutputRelayMsg: event called.");
+  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: event called.");
   TMessage mess(kMESS_OBJECT);
 
   TIter nextkey(gROOT->GetListOfCanvases());
@@ -74,13 +74,13 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
 
 void DQMHistAnalysisOutputRelayMsgModule::endRun()
 {
-  B2INFO("DQMHistAnalysisOutputRelayMsg: endRun called");
+  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: endRun called");
 }
 
 
 void DQMHistAnalysisOutputRelayMsgModule::terminate()
 {
-  B2INFO("DQMHistAnalysisOutputRelayMsg: terminate called");
+  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: terminate called");
   delete m_sock;
 }
 

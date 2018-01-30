@@ -24,7 +24,6 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPPDFCollection.h>
-#include <top/dataobjects/TOPSmallestPullCollection.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 
@@ -129,10 +128,6 @@ namespace Belle2 {
     pdfCollection.registerInDataStore();
     tracks.registerRelationTo(pdfCollection);
 
-    StoreArray<TOPSmallestPullCollection> pullCollection;
-    pullCollection.registerInDataStore();
-    tracks.registerRelationTo(pullCollection);
-
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
       m_debugLevel = getLogConfig().getDebugLevel();
@@ -163,7 +158,6 @@ namespace Belle2 {
     // output: log likelihoods
     StoreArray<TOPLikelihood> likelihoods;
     StoreArray<TOPPDFCollection> pdfCollection;
-    StoreArray<TOPSmallestPullCollection> pullCollection;
 
     // create reconstruction object
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
@@ -299,13 +293,6 @@ namespace Belle2 {
           aveWidth /= sumPhotons;
           pulls_from_weightedAve[i] = (t - avePos) / aveWidth;
         } // end loop over (ALL) digits
-
-        // FIXME should split this up for each TOPDigit and register reltation
-        TOPSmallestPullCollection* tspc = pullCollection.appendNew();
-        tspc->setSmallestPulls(smallest_pulls);
-        tspc->setPullsFromSmallestDiff(pulls_from_smallest_diffs);
-        tspc->setPullsFromWeightedAve(pulls_from_weightedAve);
-        track.addRelationTo(tspc);
 
       } // closes if statement about optional writing out pulls
 

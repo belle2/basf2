@@ -64,7 +64,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   }
   bool trackIsClone = curlerCloneLookUp.isTrackCurlerClone(*ptrCDCTrack);
 
-  var<named("weight")>() = trackIsFake;
+  var<named("weight")>() = not trackIsFake;
   var<named("track_is_curler_clone_truth")>() = trackIsClone;
   var<named("truth")>() = not trackIsClone;
   var<named("truth_first_nloops")>() = mcTrackLookUp.getFirstNLoops(ptrCDCTrack);

@@ -54,48 +54,6 @@ bool CompareCurlerTracks::operator()(const CDCTrack* ptrTrack1, const CDCTrack* 
   Index firstNLoopsTrack1 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack1);
   Index firstNLoopsTrack2 = cdcMCTrackLookUp.getFirstNLoops(ptrTrack2);
 
-  /// Debug Code start
-  const CDCMCHitLookUp& cdcMCHitLookUp = CDCMCHitLookUp::getInstance();
-
-  if (firstNLoopsTrack1 < 0) {
-    B2WARNING("\ngetFirstNLoops returned c_InvalidIndex for ptrTrack1 !!!");
-    const CDCHit* ptrHit1 = cdcMCTrackLookUp.getFirstHit(ptrTrack1);
-    const MCParticle* ptrMCParticle1 = cdcMCHitLookUp.getMCParticle(ptrHit1);
-
-    if (ptrMCParticle1) {
-      if (cdcMCHitLookUp.getMCTrackId(ptrHit1) == cdcMCTrackLookUp.getMCTrackId(ptrTrack1)) {
-        B2WARNING(
-          "Matching MCParticle for first hit EXIST matched track is matched to CORRECT track.");
-      } else {
-        B2WARNING(
-          "Matching MCParticle for first hit EXIST matched track is matched to WRONG track.");
-      }
-    } else {
-      B2WARNING("Matching MCParticle for first hit DOES NOT EXIST");
-    }
-    B2FATAL("-----");
-  }
-
-  if (firstNLoopsTrack2 < 0) {
-    B2WARNING("\ngetFirstNLoops returned c_InvalidIndex for ptrTrack2 !!!");
-    const CDCHit* ptrHit2 = cdcMCTrackLookUp.getFirstHit(ptrTrack2);
-    const MCParticle* ptrMCParticle2 = cdcMCHitLookUp.getMCParticle(ptrHit2);
-
-    if (ptrMCParticle2) {
-      if (cdcMCHitLookUp.getMCTrackId(ptrHit2) == cdcMCTrackLookUp.getMCTrackId(ptrTrack2)) {
-        B2WARNING(
-          "Matching MCParticle for first hit EXIST matched track is matched to CORRECT track.");
-      } else {
-        B2WARNING(
-          "Matching MCParticle for first hit EXIST matched track is matched to WRONG track.");
-      }
-    } else {
-      B2WARNING("Matching MCParticle for first hit DOES NOT EXIST");
-    }
-    B2FATAL("-----");
-  }
-  /// Debug Code end
-
   // Look for track with smallest NLoops of first hit.
   // If it is equal, use track with the larger amount of hits.
   bool isTrack1Better;

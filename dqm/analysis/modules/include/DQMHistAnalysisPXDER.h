@@ -35,14 +35,16 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisPXDERModule();
     /* Destructor */
-    virtual ~DQMHistAnalysisPXDERModule();
+    ~DQMHistAnalysisPXDERModule() override final;
+
+  private:
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
   private:
 
@@ -152,14 +154,14 @@ namespace Belle2 {
        * @param Sensor Sensor position of sensor
        * @return Index of sensor in plots.
        */
-    int getSensorIndex(int Layer, int Ladder, int Sensor);
+    int getSensorIndex(int Layer, int Ladder, int Sensor) const;
     /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
        */
-    void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
+    void getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor)  const;
     /** Function return flag histogram filled based on condition from TH1F source.
        * Flag values:
        * -3: nonexisting Type

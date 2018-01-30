@@ -91,7 +91,7 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iLayer = 0;
     int iLadder = 0;
     int iSensor = 0;
-    getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+    getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
@@ -145,9 +145,11 @@ void DQMHistAnalysisPXDERModule::initialize()
     m_clusterSizeUV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr));
     m_ref_clusterSizeUV.emplace_back("ref/" + m_clusterSizeUV.back());
   }
-#if 1
 //   m_fHitMapCountsFlag = NULL;
 //   m_fHitMapClCountsFlag = NULL;
+//   m_hitMapCounts = NULL;
+//   m_hitMapClCounts = NULL;
+#if 0
   m_fFiredFlag = NULL;
   m_fClustersFlag = NULL;
   m_fStartRowFlag = NULL;
@@ -159,11 +161,9 @@ void DQMHistAnalysisPXDERModule::initialize()
   m_fClusterSizeVFlag = NULL;
   m_fClusterSizeUVFlag = NULL;
 
-//   m_hitMapCounts = NULL;
-//   m_hitMapClCounts = NULL;
 #else
   // Create flag histograms:
-  DirPXDFlags->cd();
+//   DirPXDFlags->cd();
   m_fFiredFlag = new TH1I("DQMER_PXD_FiredFlag", "DQM ER PXD Fired Flag",
                           c_nPXDSensors, 0, c_nPXDSensors);
   m_fFiredFlag->GetXaxis()->SetTitle("Sensor ID");
@@ -184,14 +184,14 @@ void DQMHistAnalysisPXDERModule::initialize()
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fStartRowCountFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fStartRowCountFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapCountsFlag = new TH1I("DQMER_PXD_PixelHitmapCountsFlag", "DQM ER PXD Pixel Hitmaps Counts Flag",
-                                 c_nPXDSensors, 0, c_nPXDSensors);
-  m_fHitMapCountsFlag->GetXaxis()->SetTitle("Sensor ID");
-  m_fHitMapCountsFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapClCountsFlag = new TH1I("DQMER_PXD_ClusterHitmapCountsFlag", "DQM ER PXD Cluster Hitmaps Counts Flag",
-                                   c_nPXDSensors, 0, c_nPXDSensors);
-  m_fHitMapClCountsFlag->GetXaxis()->SetTitle("Sensor ID");
-  m_fHitMapClCountsFlag->GetYaxis()->SetTitle("flag");
+//   m_fHitMapCountsFlag = new TH1I("DQMER_PXD_PixelHitmapCountsFlag", "DQM ER PXD Pixel Hitmaps Counts Flag",
+//                                  c_nPXDSensors, 0, c_nPXDSensors);
+//   m_fHitMapCountsFlag->GetXaxis()->SetTitle("Sensor ID");
+//   m_fHitMapCountsFlag->GetYaxis()->SetTitle("flag");
+//   m_fHitMapClCountsFlag = new TH1I("DQMER_PXD_ClusterHitmapCountsFlag", "DQM ER PXD Cluster Hitmaps Counts Flag",
+//                                    c_nPXDSensors, 0, c_nPXDSensors);
+//   m_fHitMapClCountsFlag->GetXaxis()->SetTitle("Sensor ID");
+//   m_fHitMapClCountsFlag->GetYaxis()->SetTitle("flag");
   m_fClusterChargeFlag = new TH1I("DQMER_PXD_ClusterChargeFlag", "DQM ER PXD Cluster Charge Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterChargeFlag->GetXaxis()->SetTitle("Sensor ID");
@@ -217,24 +217,24 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iLayer = 0;
     int iLadder = 0;
     int iSensor = 0;
-    getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+    getIDsFromIndex(i, iLayer, iLadder, iSensor);
     TString AxisTicks = Form("%i_%i_%i", iLayer, iLadder, iSensor);
-    m_hitMapCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapClCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+//     m_hitMapCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+//     m_hitMapClCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fFiredFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fClustersFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fStartRowFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fChargStartRowFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fStartRowCountFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_fHitMapCountsFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_fHitMapClCountsFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+//     m_fHitMapCountsFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+//     m_fHitMapClCountsFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fClusterChargeFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fPixelSignalFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fClusterSizeUFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fClusterSizeVFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_fClusterSizeUVFlag->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
-  m_oldDir->cd();
+//   m_oldDir->cd();
 #endif
 }
 
@@ -454,11 +454,10 @@ void DQMHistAnalysisPXDERModule::terminate()
 {
 }
 
-int DQMHistAnalysisPXDERModule::getSensorIndex(int Layer, int Ladder, int Sensor)
+int DQMHistAnalysisPXDERModule::getSensorIndex(int Layer, int Ladder, int Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
     for (VxdID ladder : geo.getLadders(layer)) {
@@ -466,40 +465,33 @@ int DQMHistAnalysisPXDERModule::getSensorIndex(int Layer, int Ladder, int Sensor
         if ((Layer == layer.getLayerNumber()) &&
             (Ladder == ladder.getLadderNumber()) &&
             (Sensor == sensor.getSensorNumber())) {
-          tempend = 1;
+          return tempcounter;
         }
-        if (tempend == 1) break;
         tempcounter++;
       }
-      if (tempend == 1) break;
     }
-    if (tempend == 1) break;
   }
   return tempcounter;
 }
 
 
-void DQMHistAnalysisPXDERModule::getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor)
+void DQMHistAnalysisPXDERModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-  int tempend = 0;
   for (VxdID layer : geo.getLayers()) {
     if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
         if (tempcounter == Index) {
-          *Layer = layer.getLayerNumber();
-          *Ladder = ladder.getLadderNumber();
-          *Sensor = sensor.getSensorNumber();
-          tempend = 1;
+          Layer = layer.getLayerNumber();
+          Ladder = ladder.getLadderNumber();
+          Sensor = sensor.getSensorNumber();
+          return;
         }
-        if (tempend == 1) break;
         tempcounter++;
       }
-      if (tempend == 1) break;
     }
-    if (tempend == 1) break;
   }
 }
 

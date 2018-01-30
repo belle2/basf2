@@ -1,17 +1,106 @@
+
+import sys
 import basf2
 from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
-
+import ROOT
 import softwaretrigger.hltdqm as hltdqm
 
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
     add_calibration_software_trigger, add_calcROIs_software_trigger
 
+from daqdqm.collisiondqm import add_collision_dqm
+from daqdqm.cosmicdqm import add_cosmic_dqm
+
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+
+
+def setup_basf2_and_db():
+
+    basf2.set_log_level(basf2.LogLevel.ERROR)
+    ##########
+    # Local DB specification
+    ##########
+    basf2.reset_database()
+    basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
+
+    if len(sys.argv) > 4:
+        basf2.set_nprocesses(int(sys.argv[4]))
+    else:
+        basf2.B2WARNING("Cannot set number of processes as no command line argument is provided.")
+
+
+def create_hlt_path():
+    path = basf2.create_path()
+    # todo: insert crash handling path
+    # crashsafe_path = basf2.create_path()
+
+    ##########
+    # Input
+    ##########
+    # Input from ringbuffer (for raw data)
+    input = basf2.register_module('Raw2Ds')
+    input.param("RingBufferName", sys.argv[1])
+
+    path.add_module(input)
+
+    ##########
+    # Histogram Handling
+    ##########
+    # HistoManager for real HLT
+    histoman = basf2.register_module('DqmHistoManager')
+    histoman.param("Port", int(sys.argv[3]))
+    histoman.param("Port", 9991)
+    histoman.param("DumpInterval", 1000)
+    path.add_module(histoman)
+
+    return path
+
+
+def finalize_hlt_path(path):
+    ##########
+    # Output
+    ##########
+    # Output to RingBuffer
+    # todo: needs to changed to Ring Buffer output for testing
+    # output = basf2.register_module("Ds2Rbuf")
+    # output.param("RingBufferName", argvs[2])
+
+    # Output to SeqRoot
+    output = basf2.register_module("SeqRootOutput")
+    output.param('outputFileName', 'HLTout.sroot')
+    # output file name should be specified with -o option
+
+    # Specification of output objects
+    output.param("saveObjs", ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)
+
+    path.add_module(output)
+
+    ##########
+    # Other utilities
+    ##########
+    progress = basf2.register_module('Progress')
+    path.add_module(progress)
+
+    etime = basf2.register_module('ElapsedTime')
+    path.add_module(etime)
+
+
+def add_hlt_reconstruction(path, run_type="collision",
+                           with_bfield=True,
+                           components=DEFAULT_HLT_COMPONENTS,
+                           softwaretrigger_mode='hlt_filter'):
+    add_unpackers(path, components=components)
+
+    # todo: forward the the mag field and run_type mode into this method call
+    add_softwaretrigger_reconstruction(path,
+                                       softwaretrigger_mode=softwaretrigger_mode,
+                                       run_type=run_type,
+                                       addDqmModules=True)
 
 
 def add_softwaretrigger_reconstruction(
@@ -20,7 +109,9 @@ def add_softwaretrigger_reconstruction(
         components=DEFAULT_HLT_COMPONENTS,
         additionalTrackFitHypotheses=[],
         softwaretrigger_mode='hlt_filter',
-        calcROIs=True):
+        calcROIs=True,
+        addDqmModules=False,
+        run_type="collision"):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
     reconstruction stack in the HLT using the software trigger modules. Several steps are performed:
@@ -116,14 +207,26 @@ def add_softwaretrigger_reconstruction(
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
+        add_softwaretrigger_dqm(hlt_reconstruction_path, run_type)
+
     elif softwaretrigger_mode == 'softwaretrigger_off':
-        fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+        # make sure to still add the DQM modules, they can give at least some FW runtime info
+        # and some unpacked hit information
+        add_softwaretrigger_dqm(path, run_type)
+        pruner_path = get_store_only_rawdata_path()
+        fast_reco_reconstruction_path.add_path(pruner_path)
 
     path.add_path(fast_reco_reconstruction_path)
 
 
-def add_softwaretrigger_dqm(path):
-    hltdqm.standard_hltdqm(path)
+def add_softwaretrigger_dqm(path, run_type):
+
+    if run_type == "collision":
+        add_collision_dqm(path, dqm_environment="hlt")
+    elif run_type == "cosmics":
+        add_cosmic_dqm(path, dqm_environment="hlt")
+    else:
+        basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
 
 def get_store_only_metadata_path():

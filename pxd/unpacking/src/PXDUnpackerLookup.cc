@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <pxd/unpacking/PXDUnpackerLookup.h>
+#include <framework/logging/Logger.h>
 
 #include <stdio.h>
 #include <vector>
@@ -73,8 +74,18 @@ void PXDUnpackerLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int&
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
+void PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+                                           unsigned int dhe_ID)
 {
+  B2FATAL("Code to be written");
+  unsigned int row;
+  if ((dhe_ID  & 0x20) == 0) { //if inner module
+    row = 768 - 1 - v_cellID ;
+  } else { //if outer module
+    row = v_cellID;
+  }
+  v_cellID = row;
+  u_cellID = 0;
 }
 
 /** Remaps of inner backward (IB) and outer forward (OF) modules of the PXD */
@@ -133,8 +144,19 @@ void PXDUnpackerLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int&
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
+void PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+                                           unsigned int dhe_ID)
 {
+  B2FATAL("Code to be written");
+  // slow way until we have tables
+  unsigned int row;
+  if ((dhe_ID  & 0x20) == 0) { //if inner module
+    row = 768 - 1 - v_cellID ;
+  } else { //if outer module
+    row = v_cellID;
+  }
+  v_cellID = row;
+  u_cellID = 0;
 }
 
 void PXDUnpackerLookup::write_mapping_to_file(void)
@@ -217,4 +239,46 @@ void PXDUnpackerLookup::write_mapping_to_file(void)
 
 void PXDUnpackerLookup::write_inversemapping_to_file(void)
 {
+  B2FATAL("Code to be written");
+}
+
+
+void PXDUnpackerLookup::check(void)
+{
+  unsigned int dhe_ID[4] = {0x02, 0x03, 0x22, 0x23};// one of each kind, IB, OB, IF, OF
+  for (int i = 0; i < 4; i++) {
+    unsigned int dhe = dhe_ID[i];
+    for (unsigned int u_org = 0; i < 768; i++) {
+      for (unsigned int v_org = 0; v_org < 250; v_org++) {
+        unsigned int r, c, u, v;
+        unsigned int dhp_id = 0;
+
+        // if we call IF-OB with wrong DHE ID, we do not expect the correct result _BUT_ still it should be consistent
+        c = u_org;
+        v = v_org;
+        map_uv_to_rc_IF_OB(r, c, dhp_id, dhe);
+        v = r;
+        u = c;
+        map_rc_to_uv_IF_OB(v, u, dhp_id, dhe);
+
+        if (u != u_org || v != v_org) {
+          B2ERROR("Mapping failed (IF-OB)! DHE $%02X V/U %u %u -> R/C %u %u DHP (%u) -> V/U %u %u" <<
+                  dhe << v_org << u_org << r << c << dhp_id << v << u);
+        }
+
+        // if we call IB-OF with wrong DHE ID, we do not expect the correct result _BUT_ still it should be consistent
+        c = u_org;
+        r = v_org;
+        map_uv_to_rc_IB_OF(r, c, dhp_id, dhe);
+        v = r;
+        u = c;
+        map_rc_to_uv_IB_OF(v, u, dhp_id, dhe);
+
+        if (u != u_org || v != v_org) {
+          B2ERROR("Mapping failed (IB-OF)! DHE $%02X V/U %u %u -> R/C %u %u DHP (%u) -> V/U %u %u" <<
+                  dhe << v_org << u_org << r << c << dhp_id << v << u);
+        }
+      }
+    }
+  }
 }

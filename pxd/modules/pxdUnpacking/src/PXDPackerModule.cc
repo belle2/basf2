@@ -23,6 +23,9 @@
 
 #include <boost/spirit/home/support/detail/endian.hpp>
 
+#include <pxd/unpacking/PXDUnpackerLookup.h>
+
+
 #include <TRandom.h>
 
 using namespace std;
@@ -425,7 +428,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int& /*col*/, unsigned short /*layer*/,
                                              unsigned short /*sensor*/)
 {
+  B2FATAL("code needs to be written");
   // work to be done
+  //
+  // PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
+  // PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
 }
 
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)

@@ -445,62 +445,6 @@ namespace Belle2 {
     double particleMCRecoilMass(const Particle* particle);
 
     /**
-     * return X component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVx(const Particle* particle);
-
-    /**
-     * return Y component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVy(const Particle* particle);
-
-    /**
-     * return Z component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVz(const Particle* particle);
-
-    /**
-     * return Delta T (Brec - Btag) in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaT(const Particle* particle);
-
-    /**
-     * return Delta T error in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaTErr(const Particle* particle);
-
-    /**
-     * return generated Delta T (Brec - Btag) in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleMCDeltaT(const Particle* particle);
-
-    /**
-     * return Delta Z (Brec - Btag) in cm
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaZ(const Particle* particle);
-
-    /**
-     * return Delta Boost direction (Brec - Btag) in cm
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaB(const Particle* particle);
-
-    /**
      * return magnitude of 3-momentum recoiling against given Particle
      */
     double recoilMomentum(const Particle* particle);

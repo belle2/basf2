@@ -7,6 +7,7 @@
 //-
 
 
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
 #include <TROOT.h>
 #include <TSystem.h>
@@ -223,7 +224,7 @@ void DQMHistComparitorModule::event()
 //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
 //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
 #ifdef _BELLE2_EPICS
-    if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, &it->mychid, (void*)&data), "ca_set failure");
+    if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
 #endif
     it->canvas->cd();
     hist2->SetLineStyle(2);// 2 or 3

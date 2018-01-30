@@ -33,11 +33,14 @@ namespace Belle2 {
 
       // virtual ~PXDROIDQMModule();
 
-      virtual void initialize();
+    private:
+      void initialize() override final;
 
-      virtual void beginRun();
+      void beginRun() override final;
 
-      virtual void event();
+      void event() override final;
+
+      void defineHisto() override final;
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -75,8 +78,6 @@ namespace Belle2 {
       TH2F* hrawROIEVTsWithOneSource; /** Histogram  */
 
       //map<int,int> sensor_to_histindex;
-
-      virtual void defineHisto();
 
     };//end class declaration
 

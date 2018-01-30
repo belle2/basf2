@@ -5,7 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,18 +33,19 @@ namespace Belle2 {
     /* Destructor */
     virtual ~PXDDQMExpressRecoMinModule();
 
+  private:
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 

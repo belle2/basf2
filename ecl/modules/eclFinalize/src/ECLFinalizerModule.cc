@@ -21,13 +21,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-
-// MDST
-#include <mdst/dataobjects/ECLCluster.h>
-
 // OTHER
 #include <ecl/utility/ECLShowerId.h>
 
@@ -69,12 +62,9 @@ ECLFinalizerModule::~ECLFinalizerModule()
 void ECLFinalizerModule::initialize()
 {
   // Register in datastore.
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-  eclShowers.registerInDataStore();
-  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
-  eclClusters.registerInDataStore();
-  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
-  eclCalDigits.registerInDataStore();
+  eclShowers.registerInDataStore(eclShowerArrayName());
+  eclClusters.registerInDataStore(eclClusterArrayName());
+  eclCalDigits.registerInDataStore(eclCalDigitArrayName());
 
   // Register relations.
   eclClusters.registerRelationTo(eclShowers);
@@ -90,11 +80,6 @@ void ECLFinalizerModule::beginRun()
 
 void ECLFinalizerModule::event()
 {
-  // Input array
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-
-  // Output array
-  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
 
   // loop over all ECLShowers
   for (const auto& eclShower : eclShowers) {

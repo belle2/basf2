@@ -10,10 +10,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLFINALIZERMODULE_H_
-#define ECLFINALIZERMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
+
+#include <framework/datastore/StoreArray.h>
+
+#include <mdst/dataobjects/ECLCluster.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 namespace Belle2 {
 
@@ -45,6 +50,10 @@ namespace Belle2 {
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
+
+    StoreArray<ECLCalDigit> eclCalDigits; /**< ECLCalDigits */
+    StoreArray<ECLShower> eclShowers; /**< ECLShowers */
+    StoreArray<ECLCluster> eclClusters; /**< ECLClusters */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -82,5 +91,3 @@ namespace Belle2 {
   }; // end of ECLFinalizerPureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

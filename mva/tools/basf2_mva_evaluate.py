@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     if args.fillnan:
         for column in variable_abbreviations.values():
-            variables_data[column] = np.nan_to_num(variables_data[column])
+            np.nan_to_num(variables_data[column], copy=False)
 
     spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
 

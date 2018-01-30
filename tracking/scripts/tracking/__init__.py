@@ -518,6 +518,8 @@ def add_ckf_based_track_finding(path,
             # Otherwise we assume that the tracks are already in this store array
             add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
 
+            # This fitter is actually not needed (the CKF modules fit on their own), but separates out the module times
+            # better
             path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
 
     if use_mc_truth:
@@ -571,8 +573,6 @@ def add_ckf_based_track_finding(path,
 
         else:
             raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
-
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
 
         # Write out the combinations of tracks
         path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
@@ -765,7 +765,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=True, PXDminSVDSPs=3, use_quality_estimator_mva=False,
+                                 useTwoStepSelection=True, PXDminSVDSPs=3, use_quality_estimator_mva=True,
                                  QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
                                  sectormap_file=None, custom_setup_name=None,
                                  filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
@@ -795,7 +795,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param TFstoreSubsets: DEBUGGING ONLY: Whether to store subsets of paths in the TrackFinder. Default: False
     :param quality_estimator: DEBUGGING ONLY: Which QualityEstimator to use.
                               Default: tripletFit ('tripletFit' currently does not work with PXD)
-    :param use_quality_estimator_mva: Whether to use the MVA methode to refine the quality estimator; default is False
+    :param use_quality_estimator_mva: Whether to use the MVA methode to refine the quality estimator; default is True
     :param QEMVA_weight_file: Weight file to be used by the MVA Quality Estimator
     :param use_quality_index_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs
                                       with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
@@ -885,7 +885,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     trackFinder.param('printNetworks', False)
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
-    trackFinder.param('xBestPerFamily', 5)
+    trackFinder.param('xBestPerFamily', 30)
     trackFinder.param('strictSeeding', TFstrictSeeding)
     trackFinder.param('storeSubsets', TFstoreSubsets)
     path.add_module(trackFinder)

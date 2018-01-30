@@ -116,9 +116,6 @@ bool CDCMCCurlerCloneLookUp::isTrackCurlerClone(const CDCTrack& cdcTrack)
   if (cdcMCTrackLookUp.getMCTrackId(ptrCDCTrack) == INVALID_ITRACK) {
     return false; // track is not matched
   } else {
-    if (m_cdcTrackIsCurlerCloneMap.find(ptrCDCTrack) == m_cdcTrackIsCurlerCloneMap.end()) {
-      B2FATAL("No entry for this CDC track in m_cdcTrackIsCurlerCloneMap");
-    }
-    return m_cdcTrackIsCurlerCloneMap[ptrCDCTrack];
+    return m_cdcTrackIsCurlerCloneMap.at(ptrCDCTrack);
   }
 }

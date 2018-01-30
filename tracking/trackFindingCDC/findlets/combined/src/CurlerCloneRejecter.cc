@@ -32,7 +32,7 @@ CurlerCloneRejecter::CurlerCloneRejecter(const std::string& defaultFilterName)
 
 std::string CurlerCloneRejecter::getDescription()
 {
-  return "Classifies tracks which are expected to be clones from curlers.";
+  return "Classify CDC tracks which are expected to be clones from curler arms, as they are for example found by the Cellular Automaton (CA) track finding";
 }
 
 void CurlerCloneRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

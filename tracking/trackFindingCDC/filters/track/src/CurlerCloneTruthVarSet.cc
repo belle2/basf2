@@ -36,7 +36,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
 {
   if (not ptrCDCTrack) return false;
 
-  // Find the MC track with the highest number of hits in the segment
+  /// Find the MC track with the highest number of hits in the segment
   const CDCMCTrackLookUp& mcTrackLookUp = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& hitLookUp = CDCMCHitLookUp::getInstance();
   CDCMCCurlerCloneLookUp& curlerCloneLookUp = CDCMCCurlerCloneLookUp::getInstance();
@@ -44,7 +44,10 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   ITrackType trackMCMatch = mcTrackLookUp.getMCTrackId(ptrCDCTrack);
   bool trackIsFake = false;
 
-  if (trackMCMatch == INVALID_ITRACK) {
+  /// Flag if CDCTrack is matched in CDCMCTrackLookUp, which uses m_minimalMatchPurity = 0.5
+  bool trackHasMinimalMatchPurity = (trackMCMatch != INVALID_ITRACK);
+
+  if (not trackHasMinimalMatchPurity) {
     trackIsFake = true;
   } else {
 
@@ -56,6 +59,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
         numberOfCorrectHits++;
       }
     }
+    /// For information if CDCTrack is fake or true, use stricter 80% threshold
     if ((double)numberOfCorrectHits / ptrCDCTrack->size() < 0.8) {
       trackIsFake = true;
     } else {
@@ -64,7 +68,9 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   }
   bool trackIsClone = curlerCloneLookUp.isTrackCurlerClone(*ptrCDCTrack);
 
-  var<named("weight")>() = not trackIsFake;
+  var<named("weight")>() = trackHasMinimalMatchPurity;
+  var<named("track_is_fake")>() = trackIsFake;
+  var<named("track_is_matched")>() = not trackIsFake;
   var<named("track_is_curler_clone_truth")>() = trackIsClone;
   var<named("truth")>() = not trackIsClone;
   var<named("truth_first_nloops")>() = mcTrackLookUp.getFirstNLoops(ptrCDCTrack);

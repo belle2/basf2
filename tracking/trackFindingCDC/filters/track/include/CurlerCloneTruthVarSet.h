@@ -20,11 +20,12 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Names of the variables to be generated
-    constexpr
-    static char const* const curlerCloneTruthVarNames[] = {
-      "weight", // 0 for fakes, 1 for MC matched tracks
+    constexpr static char const* const curlerCloneTruthVarNames[] = {
+      "weight", // if CDCTrack has minimalMatchPurity (50%)
+      "track_is_fake", // less than 80% purity in CDC
+      "track_is_matched", // not fake
       "track_is_curler_clone_truth", // track is clone
-      "truth", // not clone, either best match or fake (which is then not used due to weight 0)
+      "truth", // CDC track is not clone
       "truth_first_nloops",
       "truth_event_id",
       "truth_MCTrackID",

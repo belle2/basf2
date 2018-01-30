@@ -23,6 +23,7 @@
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -72,9 +73,12 @@ void ECLFinalizerModule::initialize()
   eclShowers.registerInDataStore();
   StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
   eclClusters.registerInDataStore();
+  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
+  eclCalDigits.registerInDataStore();
 
   // Register relations.
   eclClusters.registerRelationTo(eclShowers);
+  eclClusters.registerRelationTo(eclCalDigits);
 
 }
 
@@ -130,14 +134,6 @@ void ECLFinalizerModule::event()
       };
       eclCluster->setCovarianceMatrix(covmat);
 
-      //TMatrixDSym covmatecls = eclShower.getCovarianceMatrix3x3();
-      //covmatecls.Print();
-      //TMatrixDSym covmatecl = eclCluster->getCovarianceMatrix3x3();
-      //covmatecl.Print();
-
-      // m_deltaL is set in track-cluster matching
-      // m_minTrkDistance is set in track-cluster matching
-
       eclCluster->setAbsZernike40(eclShower.getAbsZernike40());
       eclCluster->setAbsZernike51(eclShower.getAbsZernike51());
       eclCluster->setZernikeMVA(eclShower.getZernikeMVA());
@@ -154,6 +150,15 @@ void ECLFinalizerModule::event()
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);
+
+      // set relation to ECLCalDigits
+      auto showerDigitRelations = eclShower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
+      for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
+        const auto calDigit = showerDigitRelations.object(iRel);
+        const auto weight = showerDigitRelations.weight(iRel);
+
+        eclCluster->addRelationTo(calDigit, weight);
+      }
 
     }
   }

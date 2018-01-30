@@ -57,6 +57,10 @@ namespace Belle2 {
     virtual const char* eclClusterArrayName() const
     { return "ECLClusters"; }
 
+    /** Default name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    {return "ECLCalDigits";}
+
   }; // end of ECLFinalizerModule
 
 
@@ -72,6 +76,9 @@ namespace Belle2 {
     virtual const char* eclClusterArrayName() const override
     { return "ECLClustersPureCsI"; }
 
+    /** PureCsI name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    {return "ECLCalDigitsPureCsI";}
   }; // end of ECLFinalizerPureCsIModule
 
 } // end of Belle2 namespace

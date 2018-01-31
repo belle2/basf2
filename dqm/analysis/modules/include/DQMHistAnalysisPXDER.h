@@ -154,7 +154,7 @@ namespace Belle2 {
        * @param Sensor Sensor position of sensor
        * @return Index of sensor in plots.
        */
-    int getSensorIndex(const int Layer, int Ladder, int Sensor) const;
+    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
     /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor

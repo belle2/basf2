@@ -369,7 +369,6 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
 
   auto temp = std::unique_ptr<TH1F>(new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(),
                                              hist->GetXaxis()->GetXmax()));
-//  auto temp = new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
   double NEvents = 0;
   double flagInt = 0;
   double flagrInt = 0;

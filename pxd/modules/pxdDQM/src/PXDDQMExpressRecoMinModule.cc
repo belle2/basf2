@@ -340,7 +340,8 @@ void PXDDQMExpressRecoMinModule::event()
   }
 }
 
-int PXDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip) const
+int PXDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, const int Sensor, const int ChipU,
+                                             const int ChipV) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -351,7 +352,7 @@ int PXDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
         if ((Layer == layer.getLayerNumber()) &&
             (Ladder == ladder.getLadderNumber()) &&
             (Sensor == sensor.getSensorNumber())) {
-          return tempcounter + Chip;
+          return tempcounter + ChipU * c_nPXDChipsLv + ChipV;
         }
         tempcounter = tempcounter + (c_nPXDChipsLu * c_nPXDChipsLv);
       }
@@ -360,7 +361,8 @@ int PXDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
   return tempcounter;
 }
 
-void PXDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip) const
+void PXDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& ChipU,
+                                                     int& ChipV) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -377,7 +379,8 @@ void PXDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer
             Layer = layer.getLayerNumber();
             Ladder = ladder.getLadderNumber();
             Sensor = sensor.getSensorNumber();
-            Chip = iChip;
+            ChipU = iChip / c_nPXDChipsLv;
+            ChipV = iChip % c_nPXDChipsLv;
             return;
           }
         }

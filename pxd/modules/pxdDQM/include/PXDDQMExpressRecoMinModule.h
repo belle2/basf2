@@ -115,18 +115,20 @@ namespace Belle2 {
        * @param Layer Layer position of sensor
        * @param Ladder Ladder position of sensor
        * @param Sensor Sensor position of sensor
-       * @param Chip Chip position on sensor
+       * @param ChipU Chip position on sensor in U direction - DCDs
+       * @param ChipV Chip position on sensor in V direction - Switchers
        * @return Index of sensor in plots.
        */
-    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip) const;
+    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int ChipU, const int ChipV) const;
     /** Function return position indexes of chipID in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
-       * @param Chip return Chip position on sensor
+       * @param ChipU return Chip position on sensor in U direction - DCDs
+       * @param ChipV return Chip position on sensor in V direction - Switchers
        */
-    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip) const;
+    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& ChipU, int& ChipV) const;
 
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor

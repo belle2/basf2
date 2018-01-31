@@ -74,14 +74,10 @@ namespace Belle2 {
     TH1I* m_hitMapClCountsU;
     /** Hitmaps v of Clusters*/
     TH1I* m_hitMapClCountsV;
-    /** Hitmaps u of Digits on chips */
-    TH1I* m_hitMapCountsUChip;
-    /** Hitmaps v of Digits on chips */
-    TH1I* m_hitMapCountsVChip;
-    /** Hitmaps u of Clusters on chips */
-    TH1I* m_hitMapClCountsUChip;
-    /** Hitmaps v of Clusters on chips */
-    TH1I* m_hitMapClCountsVChip;
+    /** Hitmaps of digits on chips */
+    TH1I* m_hitMapCountsChip;
+    /** Hitmaps of clusters on chips */
+    TH1I* m_hitMapClCountsChip;
     /** Fired u strips per event */
     TH1F** m_firedU;
     /** Fired v strips per event */

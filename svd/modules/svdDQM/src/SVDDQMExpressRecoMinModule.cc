@@ -132,22 +132,14 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_hitMapClCountsV->GetYaxis()->SetTitle("counts");
 
   // basic counters per chip:
-  m_hitMapCountsUChip = new TH1I("DQMER_SVD_StripHitmapCountsUChip", "DQM ER SVD Integrated number of fired U strips per chip",
-                                 c_nSVDChips, 0, c_nSVDChips);
-  m_hitMapCountsUChip->GetXaxis()->SetTitle("Sensor ID");
-  m_hitMapCountsUChip->GetYaxis()->SetTitle("counts");
-  m_hitMapCountsVChip = new TH1I("DQMER_SVD_StripHitmapCountsVChip", "DQM ER SVD Integrated number of fired V strips per chip",
-                                 c_nSVDChips, 0, c_nSVDChips);
-  m_hitMapCountsVChip->GetXaxis()->SetTitle("Sensor ID");
-  m_hitMapCountsVChip->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsUChip = new TH1I("DQMER_SVD_ClusterHitmapCountsUChip", "DQM ER SVD Integrated number of U clusters per chip",
-                                   c_nSVDChips, 0, c_nSVDChips);
-  m_hitMapClCountsUChip->GetXaxis()->SetTitle("Sensor ID");
-  m_hitMapClCountsUChip->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsVChip = new TH1I("DQMER_SVD_ClusterHitmapCountsVChip", "DQM ER SVD Integrated number of V clusters per chip",
-                                   c_nSVDChips, 0, c_nSVDChips);
-  m_hitMapClCountsVChip->GetXaxis()->SetTitle("Sensor ID");
-  m_hitMapClCountsVChip->GetYaxis()->SetTitle("counts");
+  m_hitMapCountsChip = new TH1I("DQMER_SVD_StripHitmapCountsChip", "DQM ER SVD Integrated number of fired strips per chip",
+                                c_nSVDChips, 0, c_nSVDChips);
+  m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
+  m_hitMapClCountsChip = new TH1I("DQMER_SVD_ClusterHitmapCountsChip", "DQM ER SVD Integrated number of clusters per chip",
+                                  c_nSVDChips, 0, c_nSVDChips);
+  m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
 
 
   m_firedU = new TH1F*[c_nSVDSensors];
@@ -314,10 +306,8 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     TString AxisTicks = Form("%i_%i_%i_u%i", iLayer, iLadder, iSensor, iChip);
     if (!IsU)
       AxisTicks = Form("%i_%i_%i_v%i", iLayer, iLadder, iSensor, iChip);
-    m_hitMapCountsUChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapCountsVChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapClCountsUChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapClCountsVChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapClCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
   oldDir->cd();
@@ -352,10 +342,8 @@ void SVDDQMExpressRecoMinModule::beginRun()
   if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Reset();
   if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Reset();
 
-  if (m_hitMapCountsUChip != NULL) m_hitMapCountsUChip->Reset();
-  if (m_hitMapCountsVChip != NULL) m_hitMapCountsVChip->Reset();
-  if (m_hitMapClCountsUChip != NULL) m_hitMapClCountsUChip->Reset();
-  if (m_hitMapClCountsVChip != NULL) m_hitMapClCountsVChip->Reset();
+  if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Reset();
+  if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Reset();
   for (int i = 0; i < c_nFADC; i++) {
     if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Reset();
     if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Reset();
@@ -432,7 +420,7 @@ void SVDDQMExpressRecoMinModule::event()
         if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(samples[i]);
         if (samples[i] > m_CutSVDCharge) {
           if (m_hitMapCountsU != NULL) m_hitMapCountsU->Fill(index);
-          if (m_hitMapCountsUChip != NULL) m_hitMapCountsUChip->Fill(indexChip);
+          if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
         }
       }
     } else {
@@ -446,7 +434,7 @@ void SVDDQMExpressRecoMinModule::event()
         if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(samples[i]);
         if (samples[i] > m_CutSVDCharge) {
           if (m_hitMapCountsV != NULL) m_hitMapCountsV->Fill(index);
-          if (m_hitMapCountsVChip != NULL) m_hitMapCountsVChip->Fill(indexChip);
+          if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
         }
       }
     }
@@ -474,7 +462,7 @@ void SVDDQMExpressRecoMinModule::event()
       int indexChip = getChipIndex(iLayer, iLadder, iSensor, (int)(SensorInfo.getUCellID(cluster.getPosition()) / c_nSVDChannelsPerChip),
                                    1);
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
-      if (m_hitMapClCountsUChip != NULL) m_hitMapClCountsUChip->Fill(indexChip);
+      if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge());
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
@@ -483,7 +471,7 @@ void SVDDQMExpressRecoMinModule::event()
       int indexChip = getChipIndex(iLayer, iLadder, iSensor, (int)(SensorInfo.getVCellID(cluster.getPosition()) / c_nSVDChannelsPerChip),
                                    0);
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
-      if (m_hitMapClCountsVChip != NULL) m_hitMapClCountsVChip->Fill(indexChip);
+      if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge());
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
       if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());

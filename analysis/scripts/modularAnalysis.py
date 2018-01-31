@@ -899,6 +899,7 @@ def reconstructMissingKLDecay(
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
+    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     @param path        modules are added to this path
     """
 

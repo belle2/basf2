@@ -1,9 +1,9 @@
 /*************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2018 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Benjamin Oberhof                                         *
+* Contributors: B.Oberhof, benjamin.oberhof@lnf.infn.it                  *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -60,9 +60,9 @@ namespace Belle2 {
              "Suffix attached to the output K_L list, if not defined it is set to '_reco' \n", std::string("_reco"));
 
     // initializing the rest of private memebers
-    m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
+    //m_pdgCode   = 0;
+    //m_isSelfConjugatedParticle = 0;
+    //m_generator = 0;
   }
 
   void KLMomentumCalculatorModule::initialize()
@@ -70,6 +70,8 @@ namespace Belle2 {
     // clear everything
     m_pdgCode = 0;
     m_listName = "";
+    m_isSelfConjugatedParticle = 0;
+    m_generator = 0;
 
     // obtain the input and output particle lists from the decay string
     bool valid = m_decaydescriptor.init(m_decayString);
@@ -180,16 +182,20 @@ namespace Belle2 {
       double m_sum = (m_b * m_b) - (m_j * m_j) - (m_k * m_k);
       double e_j = pDaughters.E();
 
-      k_mag1 = (s_p * m_sum + TMath::Sqrt((s_p * s_p) * (m_sum * m_sum) - 4 * ((e_j * e_j) - (s_p * s_p)) * ((e_j * e_j) * (m_k * m_k) -
-                                          (m_sum * m_sum) / 4))) / (2 * (e_j * e_j - s_p * s_p));
-      k_mag2 = (s_p * m_sum - TMath::Sqrt((s_p * s_p) * (m_sum * m_sum) - 4 * ((e_j * e_j) - (s_p * s_p)) * ((e_j * e_j) * (m_k * m_k) -
-                                          (m_sum * m_sum) / 4))) / (2 * (e_j * e_j - s_p * s_p));
+      double s_p2 = s_p * s_p;
+      double m_sum2 = m_sum * m_sum;
+      double s_pm = s_p * m_sum;
+      double e_j2 = e_j * e_j;
+      double m_k2 = m_k * m_k;
+
+      k_mag1 = (s_pm + std::sqrt((s_p2) * (m_sum2) - 4 * ((e_j2) - (s_p2)) * ((e_j2) * (m_k2) - (m_sum2) / 4))) / (2 * (e_j2 - s_p2));
+      k_mag2 = (s_pm - std::sqrt((s_p2) * (m_sum2) - 4 * ((e_j2) - (s_p2)) * ((e_j2) * (m_k2) - (m_sum2) / 4))) / (2 * (e_j2 - s_p2));
 
       if (k_mag1 > 0)
         missDaughters.SetVect(k_mag1 * (klDaughters.Vect().Unit()));
       else
         missDaughters.SetVect(k_mag2 * (klDaughters.Vect().Unit()));
-      missDaughters.SetE(TMath::Sqrt(m_k * m_k + missDaughters.Vect().Mag2()));
+      missDaughters.SetE(std::sqrt(m_k * m_k + missDaughters.Vect().Mag2()));
 
       for (unsigned i = 0; i < daughters.size(); i++) {
         if (daughters[i]->getPDGCode() == Const::Klong.getPDGCode()) {

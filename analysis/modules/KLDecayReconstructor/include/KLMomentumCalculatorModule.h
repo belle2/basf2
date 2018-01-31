@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Benjamin Oberhof                                         *
+ * Contributors: B.Oberhof, benjamin.oberhof@lnf.infn.it                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

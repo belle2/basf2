@@ -1,9 +1,9 @@
 /*************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2018 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Benjamin Oberhof                                         *
+* Contributors: B.Oberhof, benjamin.oberhof@lnf.infn.it                  *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -61,9 +61,9 @@ namespace Belle2 {
              std::string("_reco"));
 
     // initializing the rest of private memebers
-    m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
+    //m_pdgCode   = 0;
+    //m_isSelfConjugatedParticle = 0;
+    //m_generator = 0;
   }
 
   void KLDecayReconstructorModule::initialize()
@@ -71,6 +71,8 @@ namespace Belle2 {
     // clear everything
     m_pdgCode = 0;
     m_listName = "";
+    m_isSelfConjugatedParticle = 0;
+    m_generator = 0;
 
     // obtain the input and output particle lists from the decay string
     bool valid = m_decaydescriptor.init(m_decayString);

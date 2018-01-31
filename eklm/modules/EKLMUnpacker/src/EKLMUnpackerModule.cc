@@ -122,7 +122,7 @@ void EKLMUnpackerModule::event()
                                                  &endcap, &layer, &sector);
           eklmDigit = m_Digits.appendNew();
           eklmDigit->setCTime(ctime);
-          eklmDigit->setTime(tdc);
+          eklmDigit->setTDC(tdc);
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);
           eklmDigit->setSector(sector);

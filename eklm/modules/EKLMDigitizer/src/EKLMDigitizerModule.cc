@@ -227,10 +227,10 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     eklmDigit->setGeneratedNPE(fes.getGeneratedNPE());
     eklmDigit->addRelationTo(simHit);
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit) {
-      eklmDigit->setTime(fes.getFPGAFit()->getStartTime());
+      eklmDigit->setTDC(fes.getFPGAFit()->getStartTime());
       eklmDigit->setCharge(fes.getFPGAFit()->getMinimalAmplitude());
     } else {
-      eklmDigit->setTime(0.);
+      eklmDigit->setTDC(0);
       eklmDigit->setCharge(0);
     }
     eklmDigit->setFitStatus(fes.getFitStatus());

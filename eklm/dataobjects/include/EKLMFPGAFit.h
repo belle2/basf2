@@ -46,15 +46,15 @@ namespace Belle2 {
     ~EKLMFPGAFit();
 
     /**
-     * Get signal start time.
+     * Get signal start time (in TDC counts).
      */
-    float getStartTime() const;
+    int getStartTime() const;
 
     /**
-     * Set signal start time.
+     * Set signal start time (in TDC counts).
      * @param[in] startTime Signal start time.
      */
-    void setStartTime(float startTime);
+    void setStartTime(int startTime);
 
     /**
      * Get amplitude.
@@ -91,7 +91,7 @@ namespace Belle2 {
   private:
 
     /** Start of signal. */
-    float m_StartTime;
+    int m_StartTime;
 
     /** Amplitude. */
     float m_Amplitude;
@@ -103,7 +103,7 @@ namespace Belle2 {
     int m_MinimalAmplitude;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMFPGAFit, 1);
+    ClassDef(Belle2::EKLMFPGAFit, 2);
 
   };
 

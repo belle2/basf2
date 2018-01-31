@@ -26,12 +26,12 @@ EKLMFPGAFit::~EKLMFPGAFit()
 {
 }
 
-float EKLMFPGAFit::getStartTime() const
+int EKLMFPGAFit::getStartTime() const
 {
   return m_StartTime;
 }
 
-void EKLMFPGAFit::setStartTime(float startTime)
+void EKLMFPGAFit::setStartTime(int startTime)
 {
   m_StartTime = startTime;
 }

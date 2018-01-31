@@ -77,7 +77,7 @@ namespace Belle2 {
      * @param[in]  strip  Strip number.
      * @param[in]  charge Charge.
      * @param[in]  ctime  CTine.
-     * @param[in]  time   Time.
+     * @param[in]  tdc    TDC.
      * @param[out] bword1 First word.
      * @param[out] bword2 Second word.
      * @param[out] bword3 Third word.
@@ -85,7 +85,7 @@ namespace Belle2 {
      */
     void formatData(const EKLMDataConcentratorLane* lane,
                     int plane, int strip, int charge,
-                    uint16_t ctime, float time,
+                    uint16_t ctime, uint16_t tdc,
                     uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
                     uint16_t& bword4);
 

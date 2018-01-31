@@ -74,7 +74,7 @@ void EKLMRawPackerModule::event()
       B2FATAL("Incomplete EKLM electronics map.");
     formatData(lane, eklmDigit->getPlane(),
                eklmDigit->getStrip(), eklmDigit->getCharge(),
-               eklmDigit->getCTime(), eklmDigit->getTime(),
+               eklmDigit->getCTime(), eklmDigit->getTDC(),
                bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
@@ -127,7 +127,7 @@ void EKLMRawPackerModule::event()
  */
 void EKLMRawPackerModule::formatData(
   const EKLMDataConcentratorLane* lane, int plane, int strip,
-  int charge, uint16_t ctime, float time,
+  int charge, uint16_t ctime, uint16_t tdc,
   uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
   bword1 = 0;
@@ -139,7 +139,7 @@ void EKLMRawPackerModule::formatData(
   bword1 |= ((lane->getLane() & 0x1F) << 8);
   bword1 |= (4 << 13);
   bword2 |= (ctime & 0xFFFF);
-  bword3 |= (((int)time) & 0x3FF);
+  bword3 |= (tdc & 0x3FF);
   bword4 |= (charge & 0xFFF);
 }
 

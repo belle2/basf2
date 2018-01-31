@@ -671,17 +671,7 @@ void VXDDQMExpressRecoMinModule::event()
 }
 
 
-void VXDDQMExpressRecoMinModule::endRun()
-{
-}
-
-
-void VXDDQMExpressRecoMinModule::terminate()
-{
-}
-
-
-int VXDDQMExpressRecoMinModule::getLayerIndex(int Layer)
+int VXDDQMExpressRecoMinModule::getLayerIndex(const int Layer) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -694,7 +684,7 @@ int VXDDQMExpressRecoMinModule::getLayerIndex(int Layer)
   return tempcounter;
 }
 
-void VXDDQMExpressRecoMinModule::getLayerIDsFromLayerIndex(int Index, int& Layer)
+void VXDDQMExpressRecoMinModule::getLayerIDsFromLayerIndex(const int Index, int& Layer) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -707,7 +697,7 @@ void VXDDQMExpressRecoMinModule::getLayerIDsFromLayerIndex(int Index, int& Layer
   }
 }
 
-int VXDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor)
+int VXDDQMExpressRecoMinModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -727,7 +717,7 @@ int VXDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
   return tempcounter;
 }
 
-void VXDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor)
+void VXDDQMExpressRecoMinModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;

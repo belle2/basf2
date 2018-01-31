@@ -340,16 +340,7 @@ void PXDDQMExpressRecoMinModule::event()
   }
 }
 
-
-void PXDDQMExpressRecoMinModule::endRun()
-{
-}
-
-void PXDDQMExpressRecoMinModule::terminate()
-{
-}
-
-int PXDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor)
+int PXDDQMExpressRecoMinModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -369,7 +360,7 @@ int PXDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
   return tempcounter;
 }
 
-void PXDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor)
+void PXDDQMExpressRecoMinModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;

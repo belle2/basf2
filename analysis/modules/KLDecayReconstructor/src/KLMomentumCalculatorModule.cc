@@ -59,15 +59,11 @@ namespace Belle2 {
     addParam("recoList", m_recoList,
              "Suffix attached to the output K_L list, if not defined it is set to '_reco' \n", std::string("_reco"));
 
-    // initializing the rest of private memebers
-    //m_pdgCode   = 0;
-    //m_isSelfConjugatedParticle = 0;
-    //m_generator = 0;
   }
 
   void KLMomentumCalculatorModule::initialize()
   {
-    // clear everything
+    // clear everything, initialize private members
     m_pdgCode = 0;
     m_listName = "";
     m_isSelfConjugatedParticle = 0;

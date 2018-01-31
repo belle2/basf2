@@ -60,15 +60,11 @@ namespace Belle2 {
              "Suffix attached to the original K_L input list to identify the output list of the FindKLMomentum module; this is the input for this module, if not defined it is set to '_reco' \n",
              std::string("_reco"));
 
-    // initializing the rest of private memebers
-    //m_pdgCode   = 0;
-    //m_isSelfConjugatedParticle = 0;
-    //m_generator = 0;
   }
 
   void KLDecayReconstructorModule::initialize()
   {
-    // clear everything
+    // clear everything, initialize private members
     m_pdgCode = 0;
     m_listName = "";
     m_isSelfConjugatedParticle = 0;

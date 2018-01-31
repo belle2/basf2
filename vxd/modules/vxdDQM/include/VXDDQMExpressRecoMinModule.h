@@ -37,8 +37,6 @@ namespace Belle2 {
     void initialize() override final;
     void beginRun() override final;
     void event() override final;
-    void endRun() override final;
-    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -120,26 +118,26 @@ namespace Belle2 {
        * @param Layer Layer position.
        * @return Index of layer in plots.
        */
-    int getLayerIndex(int Layer);
+    int getLayerIndex(const int Layer) const;
     /** Function return index of layer in plots.
        * @param Index Index of layer in plots.
        * @param Layer return layer position.
        */
-    void getLayerIDsFromLayerIndex(int Index, int& Layer);
+    void getLayerIDsFromLayerIndex(const int Index, int& Layer) const;
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor.
        * @param Ladder Ladder position of sensor.
        * @param Sensor Sensor position of sensor.
        * @return Index of sensor in plots.
        */
-    int getSensorIndex(int Layer, int Ladder, int Sensor);
+    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
     /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor.
        * @param Ladder return Ladder position of sensor.
        * @param Sensor return Sensor position of sensor.
        */
-    void getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor);
+    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
 
   };
 

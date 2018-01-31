@@ -24,6 +24,13 @@
 // OTHER
 #include <ecl/utility/ECLShowerId.h>
 
+//ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
 // ROOT
 #include <TVector3.h>
 #include <TMatrixFSym.h>
@@ -62,13 +69,13 @@ ECLFinalizerModule::~ECLFinalizerModule()
 void ECLFinalizerModule::initialize()
 {
   // Register in datastore.
-  eclShowers.registerInDataStore(eclShowerArrayName());
-  eclClusters.registerInDataStore(eclClusterArrayName());
-  eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclClusters.registerInDataStore(eclClusterArrayName());
+  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
 
   // Register relations.
-  eclClusters.registerRelationTo(eclShowers);
-  eclClusters.registerRelationTo(eclCalDigits);
+  m_eclClusters.registerRelationTo(m_eclShowers);
+  m_eclClusters.registerRelationTo(m_eclCalDigits);
 
 }
 
@@ -82,7 +89,7 @@ void ECLFinalizerModule::event()
 {
 
   // loop over all ECLShowers
-  for (const auto& eclShower : eclShowers) {
+  for (const auto& eclShower : m_eclShowers) {
 
     // get shower time, energy and highest energy for cuts
     const double showerTime = eclShower.getTime();
@@ -97,7 +104,7 @@ void ECLFinalizerModule::event()
         and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
 
       // create an mdst cluster for each ecl shower
-      const auto eclCluster = eclClusters.appendNew();
+      const auto eclCluster = m_eclClusters.appendNew();
 
       // set all variables
       eclCluster->setStatus(eclShower.getStatus());

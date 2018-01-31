@@ -16,11 +16,11 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-
 namespace Belle2 {
+
+  class ECLShower;
+  class ECLCluster;
+  class ECLCalDigit;
 
   /** Class to perform the shower correction */
   class ECLFinalizerModule : public Module {
@@ -51,9 +51,9 @@ namespace Belle2 {
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
 
-    StoreArray<ECLCalDigit> eclCalDigits; /**< ECLCalDigits */
-    StoreArray<ECLShower> eclShowers; /**< ECLShowers */
-    StoreArray<ECLCluster> eclClusters; /**< ECLClusters */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
+    StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
+    StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/

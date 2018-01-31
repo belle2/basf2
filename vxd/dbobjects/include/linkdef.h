@@ -13,6 +13,12 @@
 #pragma link C++ class Belle2::VXDBoxTypesPar+;  // implicit
 #pragma link C++ class Belle2::VXDBoxPositionsPar+; // implicit
 #pragma link C++ class Belle2::VXDSlotsPar+; // implicit
+#pragma link C++ class Belle2::VXDMaterialGeometryPar+;
+#pragma link C++ class Belle2::BeastMaterialsPar+;  // implicit
+#pragma link C++ class Belle2::BeastEclMaterialsPar+;  // implicit
+#pragma link C++ class Belle2::GapMomVolBackPar+;  // implicit
+#pragma link C++ class Belle2::GapMomVolForPar+;  // implicit
+
 
 
 #pragma link C++ class Belle2::VXDGeometryPar+;

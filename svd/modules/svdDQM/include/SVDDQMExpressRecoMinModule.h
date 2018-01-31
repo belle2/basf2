@@ -108,6 +108,12 @@ namespace Belle2 {
     /** Counter of FTB Flags (32) */
     TH1I** m_CounterFTBFlags;
 
+    /** Number of SVD chips per sensor in u,v in layer 3 (=6) on Belle II */
+    int c_nSVDChipsL3;
+    /** Number of SVD chips per sensor in u in layers 4,5,6 (=6) on Belle II */
+    int c_nSVDChipsLu;
+    /** Number of SVD chips per sensor in v in layers 4,5,6 (=4) on Belle II */
+    int c_nSVDChipsLv;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */
@@ -129,6 +135,23 @@ namespace Belle2 {
     /** Number of SVD sensors on Belle II */
     int c_nSVDSensors;
 
+    /** Function return index of chip in plots.
+       * @param Layer Layer position of sensor
+       * @param Ladder Ladder position of sensor
+       * @param Sensor Sensor position of sensor
+       * @param Chip Chip position on sensor
+       * @return Index of sensor in plots.
+       */
+    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip) const;
+    /** Function return position indexes of chipID in plots.
+       * @param Index Index of sensor in plots.
+       * @param Layer return Layer position of sensor
+       * @param Ladder return Ladder position of sensor
+       * @param Sensor return Sensor position of sensor
+       * @param Chip return Chip position on sensor
+       */
+    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip) const;
+
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor
        * @param Ladder Ladder position of sensor
@@ -136,7 +159,7 @@ namespace Belle2 {
        * @return Index of sensor in plots.
        */
     int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
+    /** Function return position indexes of sensorID in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor

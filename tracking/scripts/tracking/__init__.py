@@ -518,10 +518,6 @@ def add_ckf_based_track_finding(path,
             # Otherwise we assume that the tracks are already in this store array
             add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
 
-            # This fitter is actually not needed (the CKF modules fit on their own), but separates out the module times
-            # better
-            path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
-
     if use_mc_truth:
         # MC CKF needs MC matching information
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False, UseCDCHits=True,
@@ -529,6 +525,10 @@ def add_ckf_based_track_finding(path,
                         prRecoTracksStoreArrayName=cdc_reco_tracks)
 
     if trigger_mode in ["hlt", "all"]:
+        # This fitter is actually not needed (the CKF modules fit on their own), but separates out the module times
+        # better
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
         if svd_ckf_mode == "VXDTF2_before":
             add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
             add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DigitizationParams>
   <ADCRange desc="ADC range">4096</ADCRange>
-  <ADCSamplingTime desc="ns">1.0</ADCSamplingTime>
+  <ADCSamplingFrequency desc="GHz">1.017728000</ADCSamplingFrequency>
   <nDigitizations desc="">200</nDigitizations>
   <ADCPedestal desc="ADC pedestal">3700</ADCPedestal>
   <ADCPEAmplitude desc="ADC photoelectron amplitude">20</ADCPEAmplitude>

@@ -121,6 +121,31 @@ namespace Belle2 {
     /** returns reference to the actual trackNodes stored in this container, intended for read and write access */
     std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
 
+    /** Clear directed node network container
+     * Called to clear the directed node network container if the segment network size grows to large.
+     * This is necessary to
+     * a) prevent to following modules from processing events with a only partly filled network;
+     * b) shrink the member vectors again to an acceptable size.
+     */
+    void clear()
+    {
+      // shrinking is not performed, as the number of active sectors is constant
+      m_activeSectors.clear();
+
+      int size = m_trackNodes.size();
+      m_trackNodes.resize(size / 5);
+      m_trackNodes.shrink_to_fit();
+      m_trackNodes.clear();
+
+      size = m_segments.size();
+      m_segments.resize(size / 10);
+      m_segments.shrink_to_fit();
+      m_segments.clear();
+
+      // Clearing the segmentNetwork is important as the following modules will process the event
+      // if it still contains entries.
+      m_SegmentNetwork.clear();
+    }
 
     /** passes parameters for creating a virtual interaction point */
     void setVirtualInteractionPoint(B2Vector3D& pos, B2Vector3D& posError)

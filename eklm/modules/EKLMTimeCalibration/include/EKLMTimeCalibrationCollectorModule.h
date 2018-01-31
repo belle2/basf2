@@ -65,6 +65,9 @@ namespace Belle2 {
 
   private:
 
+    /** Use enent T0 or not. */
+    bool m_UseEventT0;
+
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
 

@@ -26,10 +26,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
-#include <tracking/trackFindingVXD/displayInterfaceTF/TrackCandidateTFInfo.h>
-#include <tracking/trackFindingVXD/displayInterfaceTF/CellTFInfo.h>
-#include <tracking/trackFindingVXD/displayInterfaceTF/SectorTFInfo.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
@@ -127,13 +123,6 @@ namespace Belle2 {
     /** Add a CDCTriggerTrack. */
     void addCDCTriggerTrack(const std::string& collectionName,
                             const CDCTriggerTrack& track);
-
-    /** Add VXDTF track candidate. */
-    void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);
-    /** Add VXDTF cell. */
-    void addCellTFInfo(CellTFInfo* info);
-    /** Add VXDTF sector. */
-    void addSectorTFInfo(SectorTFInfo* info);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
     template <class T> void addSimHits(const StoreArray<T>& hits)

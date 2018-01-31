@@ -147,13 +147,15 @@ void SubEventModule::endRun()
 
 void SubEventModule::event()
 {
+  const int numEntries = m_loopOver.getEntries();
+  // Nothing to do? fine, don't do anything
+  if (numEntries == 0) return;
+
   //disable statistics for subevent
   const bool noStats = Environment::Instance().getNoStats();
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   //Environment::Instance().setNoStats(true);
   processStatistics->suspendGlobal();
-
-  const int numEntries = m_loopOver.getEntries();
 
   //get event map and make a deep copy of the StoreEntry objects
   //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
@@ -164,6 +166,10 @@ void SubEventModule::event()
 
   //don't call processBeginRun/EndRun() again (we do that in our implementations)
   m_previousEventMetaData = *(StoreObjPtr<EventMetaData>());
+
+  //remember the state of the object before we loop over it
+  TObject* prevObject = objectEntry.object;
+  TObject* prevPtr = objectEntry.ptr;
 
   for (int i = 0; i < numEntries; i++) {
     //set loopObject
@@ -178,13 +184,9 @@ void SubEventModule::event()
     restoreContents(eventMapCopy, eventMap);
   }
 
-  // object is not allowed to be nullptr, otherwise multi processing crashes
-  // on the other hand, it is not allowed to be a reference to another object in the corresponding
-  // StoreArray, otherwise it will crash (double free), again.
-  // Therefore we create a new deletable TObject :-)
-  // cppcheck-suppress memleak
-  objectEntry.object = new TObject; //will be cleaned by DataStore.
-  objectEntry.ptr = nullptr;
+  // Let's reset the object to the way it was
+  objectEntry.object = prevObject;
+  objectEntry.ptr = prevPtr;
 
   Environment::Instance().setNoStats(noStats);
 

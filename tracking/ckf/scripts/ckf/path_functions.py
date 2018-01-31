@@ -20,7 +20,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, d
         result_filter_parameters = {}
     else:
         result_filter = "mva_with_relations"
-        result_filter_parameters = {"cut": 0.2}
+        result_filter_parameters = {"cut": 0.6}
 
     if direction == "forward":
         reverse_seed = True

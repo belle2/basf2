@@ -34,13 +34,17 @@ namespace {
 
   /// Basic recording filter for SVD - CDC results.
   using RecordingSVDResultFilter =
+    RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet>>;
+
+  /// Basic recording filter for SVD - CDC results.
+  using RecordingSVDSeededResultFilter =
     RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet, RelationSVDResultVarSet>>;
 
   /// Filter using a trained MVA method
   using MVASVDResultFilter = MVAFilter<SVDResultVarSet>;
 
   /// Filter using a trained MVA method
-  using MVASVDSeededResultFilter = MVAFilter<VariadicUnionVarSet<RelationSVDResultVarSet>>;
+  using MVASVDSeededResultFilter = MVAFilter<VariadicUnionVarSet<SVDResultVarSet, RelationSVDResultVarSet>>;
 }
 
 
@@ -67,6 +71,7 @@ std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAn
     {"none", "no combination is valid"},
     {"all", "all combination are valid"},
     {"recording", "record variables to a TTree"},
+    {"recording_with_relations", "record variables to a TTree"},
     {"mva", "filter based on the trained MVA method"},
     {"mva_with_relations", "filter based on the trained MVA method"},
     {"size", "ordering according to size"},
@@ -84,6 +89,8 @@ SVDResultFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDResultFilter>>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDResultFilter>();
+  } else if (filterName == "recording_with_relations") {
+    return std::make_unique<RecordingSVDSeededResultFilter>();
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDResultFilter>("tracking/data/ckf_CDCToSVDResult.xml");
   } else if (filterName == "mva_with_relations") {

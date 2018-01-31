@@ -3,7 +3,7 @@
 
 """
 <header>
-  <output>Y6S_nonbsbs_Phase3.dst.root</output>
+  <output>../Y6S_nonbsbs_Phase3.dst.root</output>
   <contact>Cate MacQueen, cmq.centaurus@gmail.com</contact>
 </header>
 """

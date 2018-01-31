@@ -16,6 +16,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -81,10 +82,16 @@ void ECLDigitizerPureCsIModule::initialize()
   m_nEvent  = 0 ;
   EclConfigurationPure::m_tickPure = m_tickFactor * EclConfiguration::m_tick / EclConfiguration::m_ntrg;
 
-  StoreArray<ECLDsp>    ecldsp(eclDspArrayName()); ecldsp.registerInDataStore();
-  StoreArray<ECLDigit> ecldigi(eclDigitArrayName()); ecldigi.registerInDataStore();
+  StoreArray<ECLDsp>    ecldsp(eclDspArrayName());
+  ecldsp.registerInDataStore();
+  StoreArray<ECLDigit> ecldigi(eclDigitArrayName());
+  ecldigi.registerInDataStore();
 
   ecldigi.registerRelationTo(ecldsp);
+
+  StoreArray<ECLPureCsIInfo> eclpurecsiinfo(eclPureCsIInfoArrayName());
+  eclpurecsiinfo.registerInDataStore();
+  ecldigi.registerRelationTo(eclpurecsiinfo);
 
   StoreArray<ECLHit> hitList;
   ecldigi.registerRelationTo(hitList);
@@ -105,6 +112,8 @@ void ECLDigitizerPureCsIModule::event()
 
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
   StoreArray<ECLDsp> eclDsps(eclDspArrayName());
+
+  StoreArray<ECLPureCsIInfo> eclPureCsIInfos(eclPureCsIInfoArrayName());
 
   /* add trigger resolution defined in a module paramer
      shifting the waveform starting time by a random deltaT,
@@ -200,6 +209,11 @@ void ECLDigitizerPureCsIModule::event()
       eclDigit->setTimeFit(int(tFit * 10)); // time is in 0.1 ns units
       eclDigit->setQuality(qualityFit);
 
+      auto AeclPureCsIInfo = eclPureCsIInfos.appendNew();
+      eclDigit->addRelationTo(AeclPureCsIInfo);
+      AeclPureCsIInfo->setPureCsI(1);
+      AeclPureCsIInfo->setCellId(CellId);
+
       eclDigit->addRelationTo(eclDsp);
       for (const auto& hit : hitmap[j])
         eclDigit->addRelationTo(hit);
@@ -219,6 +233,11 @@ void ECLDigitizerPureCsIModule::event()
       eclDigitClone->setAmp(eclDigit.getAmp());
       eclDigitClone->setTimeFit(eclDigit.getTimeFit());
       eclDigitClone->setQuality(eclDigit.getQuality());
+      //eclDigitClone->setPureCsI(0);
+      auto AeclPureCsIInfo = eclPureCsIInfos.appendNew();
+      eclDigitClone->addRelationTo(AeclPureCsIInfo);
+      AeclPureCsIInfo->setPureCsI(0);
+      AeclPureCsIInfo->setCellId(cellid);
     }
   }
 

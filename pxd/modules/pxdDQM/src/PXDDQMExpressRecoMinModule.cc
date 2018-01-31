@@ -72,7 +72,6 @@ PXDDQMExpressRecoMinModule::~PXDDQMExpressRecoMinModule()
 
 void PXDDQMExpressRecoMinModule::defineHisto()
 {
-  /** Basic Directory in output file */
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {

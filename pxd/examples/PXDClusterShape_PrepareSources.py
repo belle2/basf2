@@ -250,8 +250,7 @@ if (args.SplitSourcePreparing == 0):
                                     components=['MagneticField', 'PXD', 'SVD', 'CDC'],
                                     additionalTrackFitHypotheses=[211, -211, 11, -11],
                                     skipGeometryAdding=False,
-                                    reco_tracks="RecoTracks",
-                                    use_vxdtf2=False
+                                    reco_tracks="RecoTracks"
                                     )
         """ This work for VXD only, so better use add_tracking_reconstruction.
         main.add_module(SetupGenfitExtrapolation)
@@ -285,8 +284,7 @@ if (args.SplitSourcePreparing == 2):  # continuing of tracking in existing BB si
                                 components=['MagneticField', 'PXD', 'SVD', 'CDC'],
                                 additionalTrackFitHypotheses=[211, -211, 11, -11],
                                 skipGeometryAdding=False,
-                                reco_tracks="RecoTracks",
-                                use_vxdtf2=True
+                                reco_tracks="RecoTracks"
                                 )
 if (args.SplitSourcePreparing != 1):
     main.add_module(PXDSHCAL)

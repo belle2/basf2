@@ -1,6 +1,6 @@
 /*
 <header>
-<input>GenericB.ntup.root</input>
+<input>../GenericB.ntup.root</input>
 <output>test2_Validation_RecoStats_output.root</output>
 <contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
 </header>

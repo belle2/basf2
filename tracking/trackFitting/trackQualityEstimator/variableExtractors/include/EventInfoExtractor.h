@@ -25,9 +25,9 @@ namespace Belle2 {
       VariableExtractor()
     {
       addVariable("N_RecoTracks", variableSet);
-//      addVariable("N_PXDRecoTracks", variableSet);
-//      addVariable("N_SVDRecoTracks", variableSet);
-//      addVariable("N_CDCRecoTracks", variableSet);
+      addVariable("N_PXDRecoTracks", variableSet);
+      addVariable("N_SVDRecoTracks", variableSet);
+      addVariable("N_CDCRecoTracks", variableSet);
       addVariable("N_diff_PXD_SVD_RecoTracks", variableSet);
       addVariable("N_diff_SVD_CDC_RecoTracks", variableSet);
 
@@ -89,6 +89,10 @@ namespace Belle2 {
         }
 
       }
+
+      m_variables.at("N_PXDRecoTracks") = n_pxdRecoTracks;
+      m_variables.at("N_SVDRecoTracks") = n_svdRecoTracks;
+      m_variables.at("N_CDCRecoTracks") = n_cdcRecoTracks;
 
       m_variables.at("N_diff_PXD_SVD_RecoTracks") = n_svdRecoTracks - n_pxdRecoTracks;
       m_variables.at("N_diff_SVD_CDC_RecoTracks") = n_cdcRecoTracks - n_svdRecoTracks;

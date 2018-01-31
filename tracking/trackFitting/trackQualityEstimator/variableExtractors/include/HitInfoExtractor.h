@@ -30,6 +30,7 @@ namespace Belle2 {
       VariableExtractor()
     {
       addVariable("N_TP_noKalmanFitterInfo", variableSet);
+      addVariable("N_no_TrackPoint", variableSet);
 
       initializeStats("weight", variableSet);
       initializeStats("smoothedChi2", variableSet);
@@ -39,11 +40,11 @@ namespace Belle2 {
     void extractVariables(const RecoTrack& recoTrack)
     {
       //get fitting parameters
-      const std::vector<RecoHitInformation*>& relatedRecoHitInformation = recoTrack.getRecoHitInformations();
+      const std::vector<RecoHitInformation*>& relatedRecoHitInformation = recoTrack.getRecoHitInformations(true);
       std::vector<const genfit::KalmanFitterInfo*> kalmanFitterInfos;
       kalmanFitterInfos.reserve(relatedRecoHitInformation.size());
 
-      int n_trackPoint_noKalmanFitterInfo = 0;
+      int n_no_KalmanFitterInfo = 0; int n_no_trackPoint = 0;
 
       for (const RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
         const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
@@ -52,26 +53,44 @@ namespace Belle2 {
           if (kalmanFitterInfo) {
             kalmanFitterInfos.push_back(kalmanFitterInfo);
           } else {
-            n_trackPoint_noKalmanFitterInfo++;
+            n_no_KalmanFitterInfo++;
           }
+        } else {
+          n_no_trackPoint++;
         }
       }
-      m_variables.at("N_TP_noKalmanFitterInfo") = n_trackPoint_noKalmanFitterInfo;
+      m_variables.at("N_TP_noKalmanFitterInfo") = n_no_KalmanFitterInfo;
+      m_variables.at("N_no_TrackPoint") = n_no_trackPoint;
 
       std::vector<float> values(kalmanFitterInfos.size());
 
+      int i_lastSVDhit = recoTrack.hasSVDHits() ?
+                         recoTrack.getNumberOfPXDHits() + recoTrack.getNumberOfSVDHits() - 1 - n_no_KalmanFitterInfo - n_no_trackPoint
+                         : -1;
+      int i_firstCDChit = recoTrack.hasCDCHits() ? i_lastSVDhit + 1 : -1;
+
       for (unsigned int i = 0; i < kalmanFitterInfos.size(); ++i) {
         values[i] = kalmanFitterInfos[i]->getWeights().front();
+        if (i == i_lastSVDhit) {
+          m_variables.at("weight_lastSVDhit") = values[i];
+        } else if (i == i_firstCDChit) {
+          m_variables.at("weight_firstCDChit") = values[i];
+        }
       }
       setStats("weight", values);
 
       for (unsigned int i = 0; i < kalmanFitterInfos.size(); ++i) {
         try {
-          values[i] = kalmanFitterInfos[i]->getSmoothedChi2(); //produces error for event 98
+          values[i] = kalmanFitterInfos[i]->getSmoothedChi2();
         } catch (const std::exception& e) {
           B2WARNING("HitInfoExtractor: Caught exception in kalmanFitterInfos[i]->getSmoothedChi2() \n"
                     << "-->" << e.what());
-          values[i] = NAN;
+          values[i] = -1;
+        }
+        if (i == i_lastSVDhit) {
+          m_variables.at("smoothedChi2_lastSVDhit") = values[i];
+        } else if (i == i_firstCDChit) {
+          m_variables.at("smoothedChi2_firstCDChit") = values[i];
         }
       }
       setStats("smoothedChi2", values);
@@ -87,7 +106,9 @@ namespace Belle2 {
       addVariable(identifier + "_mean", variables);
       addVariable(identifier + "_std", variables);
       addVariable(identifier + "_median", variables);
-//      addVariable(identifier + "_n_zeros", variables);
+      addVariable(identifier + "_n_zeros", variables);
+      addVariable(identifier + "_firstCDChit", variables);
+      addVariable(identifier + "_lastSVDhit", variables);
     }
 
     /// calculated statistics and saves them in variable set
@@ -101,7 +122,9 @@ namespace Belle2 {
         m_variables.at(identifier + "_mean") =  -1.;
         m_variables.at(identifier + "_std") =  -1.;
         m_variables.at(identifier + "_median") =  -1.;
-//        m_variables.at(identifier + "_n_zeros") = NAN;
+        m_variables.at(identifier + "_n_zeros") = -1;
+        m_variables.at(identifier + "_firstCDChit") = -1;
+        m_variables.at(identifier + "_lastSVDhit") = -1;
         return;
       }
 
@@ -111,14 +134,14 @@ namespace Belle2 {
       float mean = sum / size;
       m_variables.at(identifier + "_mean") = mean;
 
-      float variance = 0.; //int n_zeros = 0;
+      float variance = 0.; int n_zeros = 0;
       for (float value : values) {
         variance += (value - mean) * (value - mean);
-//        if (value == 0)
-//          n_zeros++;
+        if (value == 0)
+          n_zeros++;
       }
       // number of 0 values
-//      m_variables.at(identifier + "_n_zeros") = n_zeros;
+      m_variables.at(identifier + "_n_zeros") = n_zeros;
       // variance and standard deviation
       variance /= size - 1;
       float stddev = std::sqrt(variance);

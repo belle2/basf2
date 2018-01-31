@@ -237,7 +237,8 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       eklmDigit->setCharge(0);
     }
     eklmDigit->setTDC(tdc);
-    eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
+    eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc) +
+                       m_DigitizationInitialTime);
     eklmDigit->setFitStatus(fes.getFitStatus());
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
       EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());

@@ -187,15 +187,6 @@ void EKLM::FiberAndElectronics::processEntry()
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
-  /**
-   * TODO: Change units.
-   * FPGA fitter now uses units:
-   * time = ADC conversion time,
-   * amplitude = amplitude * 0.5 * m_DigPar->ADCRange.
-   */
-  m_FPGAFit.setStartTime(m_FPGAFit.getStartTime() *
-                         m_DigPar->getADCSamplingTime() +
-                         m_DigitizationInitialTime);
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();

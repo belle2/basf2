@@ -13,6 +13,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 #include <pxd/dbobjects/PXDClusterOffsetPar.h>
 
@@ -30,32 +31,65 @@ namespace Belle2 {
     ~ PXDClusterShapeClassifierPar() {}
 
     /**Returns offsets */
-    PXDClusterOffsetPar& getOffset(int shape_index, int feature_index)   { return m_offsets[shape_index][feature_index];}
+    PXDClusterOffsetPar& getOffset(int shape_index, int eta_index)   { return m_offsets[shape_index][eta_index];}
 
     /** Returns True if there are valid position corrections available */
-    bool hasOffset(int shape_index) const
+    bool hasOffset(int shape_index, unsigned int eta_index) const
     {
-      if (m_offsets.find(shape_index) == m_offsets.end())
+      auto it = m_offsets.find(shape_index);
+      if (it == m_offsets.end()) {
         return false;
+      } else {
+        auto offset_vector = it->second;
+        if (eta_index >= offset_vector.size())
+          return false;
+      }
       return true;
     }
 
-    /** Set array with percentiles for shape index */
-    void setPercentiles(int index, const std::vector<float>& percentiles) {m_percentiles[index] = percentiles;}
+    /** Add shape*/
+    void addShape(int shape_index)
+    {
+      m_percentiles[shape_index] = std::vector<float>();
+      m_likelyhoods[shape_index] = std::vector<float>();
+      m_offsets[shape_index] = std::vector<PXDClusterOffsetPar>();
+    }
 
-    /** Return array with percentiles map  */
+    /** Add shape likelyhood*/
+    void addShapeLikelyhood(int shape_index, float likelyhood) {m_shape_likelyhoods[shape_index] = likelyhood;}
+
+    /** Add percentile*/
+    void addPercentile(int shape_index, float percentile) {m_percentiles[shape_index].push_back(percentile);}
+
+    /** Add likelyhood*/
+    void addLikelyhood(int shape_index, float likelyhood) {m_likelyhoods[shape_index].push_back(likelyhood);}
+
+    /** Add offset */
+    void addOffset(int shape_index, PXDClusterOffsetPar& offset) { m_offsets[shape_index].push_back(offset);}
+
+    /** Return percentiles map  */
     const std::map<int, std::vector<float>>& getPercentilesMap() const { return m_percentiles; }
 
-    /** Set offsets */
-    void setOffsetMap(int shape_index, const std::vector<PXDClusterOffsetPar>& offsets) { m_offsets[shape_index] = offsets;}
+    /** Return likelyhood map  */
+    const std::map<int, std::vector<float>>& getLikelyhoodMap() const { return m_likelyhoods; }
+
+    /** Return offset map  */
+    const std::map<int, std::vector<PXDClusterOffsetPar> >& getOffsetMap() const { return m_offsets; }
+
+    /** Return shape likelyhood map  */
+    const std::map<int, float>& getShapeLikelyhoodMap() const { return m_shape_likelyhoods; }
+
+
 
   private:
     /** Map of position offsets in u-v  */
     std::map<int, std::vector<PXDClusterOffsetPar> > m_offsets;
-    /** Map of cluster shape likelyhood, normalized to training data */
-    std::map<int, std::vector<float> > m_probs;
+    /** Map of cluster shape + eta likelyhoods */
+    std::map<int, std::vector<float> > m_likelyhoods;
     /** Map of percentiles  */
     std::map<int, std::vector<float>>  m_percentiles;
+    /** Map of shape only likelyhoods */
+    std::map<int, float> m_shape_likelyhoods;
 
     ClassDef(PXDClusterShapeClassifierPar, 1);   /**< ClassDef, must be the last term before the closing {}*/
   };

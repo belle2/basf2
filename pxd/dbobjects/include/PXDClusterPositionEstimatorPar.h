@@ -32,8 +32,32 @@ namespace Belle2 {
     /** Destructor */
     ~ PXDClusterPositionEstimatorPar() {}
 
-    /** Returns grids map */
-    const std::map<int, TH2F>& getGrids() const {return m_grids; }
+    /** Add pixelkind with angular grid */
+    void addPixelkind(int pixelkind, TH2F& grid)
+    {
+      m_grids[pixelkind] = grid;
+      m_shapeClassifiers[pixelkind] = std::vector<PXDClusterShapeClassifierPar>();
+
+      for (auto uBin = 1; uBin <= m_grids[pixelkind].GetXaxis()->GetNbins(); uBin++) {
+        for (auto vBin = 1; vBin <= m_grids[pixelkind].GetYaxis()->GetNbins(); vBin++) {
+          auto size = m_shapeClassifiers[pixelkind].size();
+          m_grids[pixelkind].SetBinContent(uBin, vBin, size);
+          m_shapeClassifiers[pixelkind].push_back(PXDClusterShapeClassifierPar());
+        }
+      }
+    }
+
+    /** Returns vector of pixelkinds */
+    std::vector<int> getPixelkinds()
+    {
+      auto pixelkinds = std::vector<int>();
+      for (auto it = m_grids.begin(); it != m_grids.end(); ++it)
+        pixelkinds.push_back(it->first);
+      return pixelkinds;
+    }
+
+    /** Return grid */
+    TH2F& getGrid(int pixelkind) {return m_grids[pixelkind]; }
 
     /** Set shape classifier*/
     void setShapeClassifier(const PXDClusterShapeClassifierPar& classifier, int uBin, int vBin, int pixelkind)
@@ -75,7 +99,7 @@ namespace Belle2 {
 
       // Check index is valid
       const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(uBin, vBin, pixelkind);
-      if (not classifier.hasOffset(shape_index))
+      if (not classifier.hasOffset(shape_index, feature_index))
         return false;
 
       return true;

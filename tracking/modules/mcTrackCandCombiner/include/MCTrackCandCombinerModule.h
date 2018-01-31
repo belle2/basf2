@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #pragma once
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 #include <string>
 
@@ -89,5 +91,7 @@ namespace Belle2 {
     int m_nCdcTcsWithoutPartner;                  /**< total number of output TCs that have only hits in the CDC */
     int m_nVxdTcsWithoutPartner;                  /**< total number of output TCs that have only hits in the VXD */
     bool m_useMCpdg;                             /**< if true the correct PDG code from the MCParticle and the MCParticleID will be put in the output track candidates*/
+
+    StoreArray<MCParticle> m_mcParticles;
   };
 }

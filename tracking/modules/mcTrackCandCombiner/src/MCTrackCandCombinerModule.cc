@@ -10,11 +10,9 @@
 
 #include <tracking/modules/mcTrackCandCombiner/MCTrackCandCombinerModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -68,8 +66,7 @@ MCTrackCandCombinerModule::~MCTrackCandCombinerModule()
 
 void MCTrackCandCombinerModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
+  m_mcParticles.isRequired();
 
   // at least one of the two store arrays has to be present
   if (StoreArray<genfit::TrackCand>::optional(m_vxdTrackCandColName) == false) {
@@ -79,7 +76,7 @@ void MCTrackCandCombinerModule::initialize()
   //output store arrays have to be registered in initialize()
   StoreArray<genfit::TrackCand> outCands(m_combinedTrackCandColName);
   outCands.registerInDataStore();
-  outCands.registerRelationTo(mcParticles);
+  outCands.registerRelationTo(m_mcParticles);
 }
 
 void MCTrackCandCombinerModule::beginRun()
@@ -103,8 +100,7 @@ void MCTrackCandCombinerModule::event()
   B2DEBUG(100, "*******   MCTrackCandCombinerModule processing event number: " << eventCounter << " *******");
 
   //all the input containers. First: MCParticles
-  StoreArray<MCParticle> mcParticles;
-  const int nMcParticles = mcParticles.getEntries();
+  const int nMcParticles = m_mcParticles.getEntries();
   B2DEBUG(100, "Number of MCParticles in this Event: " << nMcParticles);
 
   //PXD clusters
@@ -138,7 +134,7 @@ void MCTrackCandCombinerModule::event()
 
   // loop over MCParticles.
   for (int iPart = 0; iPart not_eq nMcParticles; ++iPart) {
-    MCParticle* aMcParticle = mcParticles[iPart];
+    MCParticle* aMcParticle = m_mcParticles[iPart];
     const int truePdgCode = aMcParticle->getPDG();
     if (isNotAChargedStable(truePdgCode)) {
       B2DEBUG(49, "The MCParticle with PDG code " << truePdgCode << " is not a chargedstable one. Skip it.");

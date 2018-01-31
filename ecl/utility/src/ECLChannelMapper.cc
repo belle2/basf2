@@ -3,13 +3,9 @@
 
 #include <fstream>
 #include <string>
-#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
-
-//#define BECL_ID  0x05000000 // tentative
-//#define EECL_ID  0x06000000 // tentative
 
 using namespace Belle2;
 using namespace std;
@@ -46,12 +42,17 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
 
       // Ignoring commented lines
       char ch = mapFile.get();
-      if (ch == '#' || ch == '\n') {
-        B2INFO("Ignored comment/empty line");
-        mapFile.ignore(256, '\n');
-        continue;
+      switch (ch) {
+        case '#':
+          mapFile.ignore(256, '\n');
+        case '\n':
+          B2DEBUG(100, "Ignored comment/empty line");
+          continue;
+          break;
+
+        default:
+          mapFile.unget();
       }
-      mapFile.unget();
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 

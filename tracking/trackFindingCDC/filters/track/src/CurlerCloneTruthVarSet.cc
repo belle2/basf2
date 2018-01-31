@@ -17,6 +17,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -50,15 +52,13 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   if (not trackHasMinimalMatchPurity) {
     trackIsFake = true;
   } else {
+    // count number of correct hits
+    auto hitIsCorrect = [&hitLookUp, &trackMCMatch](const CDCRecoHit3D & recoHit) {
+      return hitLookUp.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch;
+    };
+    unsigned int numberOfCorrectHits =
+      std::count_if(ptrCDCTrack->begin(), ptrCDCTrack->end(), hitIsCorrect);
 
-    unsigned int numberOfCorrectHits = 0;
-    unsigned int sumHitLoopNumbers = 0;
-    for (const CDCRecoHit3D& recoHit : *ptrCDCTrack) {
-      sumHitLoopNumbers += hitLookUp.getNLoops(recoHit.getWireHit().getHit());
-      if (hitLookUp.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch) {
-        numberOfCorrectHits++;
-      }
-    }
     /// For information if CDCTrack is fake or true, use stricter 80% threshold
     if ((double)numberOfCorrectHits / ptrCDCTrack->size() < 0.8) {
       trackIsFake = true;

@@ -17,6 +17,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
@@ -77,6 +78,9 @@ namespace Belle2 {
 
     /** Electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+
+    /** Time conversion. */
+    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;

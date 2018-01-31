@@ -44,6 +44,10 @@ void EKLMUnpackerModule::initialize()
 
 void EKLMUnpackerModule::beginRun()
 {
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("No EKLM electronics map.");
+  if (!m_TimeConversion.isValid())
+    B2FATAL("EKLM time conversion parameters are not available.");
 }
 
 void EKLMUnpackerModule::event()
@@ -57,8 +61,6 @@ void EKLMUnpackerModule::event()
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
-  if (!m_ElectronicsMap.isValid())
-    B2FATAL("No EKLM electronics map.");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2ERROR("RawKLM with index " << i << " has " <<
@@ -123,6 +125,7 @@ void EKLMUnpackerModule::event()
           eklmDigit = m_Digits.appendNew();
           eklmDigit->setCTime(ctime);
           eklmDigit->setTDC(tdc);
+          eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);
           eklmDigit->setSector(sector);

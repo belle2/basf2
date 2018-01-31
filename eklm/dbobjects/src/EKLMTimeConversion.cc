@@ -32,3 +32,14 @@ void EKLMTimeConversion::setTimeOffset(double offset)
 {
   m_TimeOffset = offset;
 }
+
+double EKLMTimeConversion::getTimeByTDC(uint16_t tdc)
+{
+  return m_TDCPeriod * tdc + m_TimeOffset;
+}
+
+uint16_t EKLMTimeConversion::getTDCByTime(double time)
+{
+  return (time - m_TimeOffset) / m_TDCPeriod;
+}
+

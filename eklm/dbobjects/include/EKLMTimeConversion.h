@@ -43,6 +43,16 @@ namespace Belle2 {
      */
     void setTimeOffset(double offset);
 
+    /**
+     * Get time by TDC.
+     */
+    double getTimeByTDC(uint16_t tdc);
+
+    /**
+     * Get TDC by time.
+     */
+    uint16_t getTDCByTime(double time);
+
   private:
 
     /** TDC period in ns. */

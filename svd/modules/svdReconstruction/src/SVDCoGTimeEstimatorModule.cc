@@ -33,10 +33,14 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
            "RecoDigits collection name", string(""));
   addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
            float(6.0));
-  addParam("Correction_1", Correction_1, "Apply first correction (strip-dependent, CalPeakTime)", true);
-  addParam("Correction_2", Correction_2, "Apply second correction (Trigger-bin dependent)", false);
-  addParam("Correction_3", Correction_3, "Apply third correction (Subtract average)", true);
-  addParam("Correction_4", Correction_4, "Apply fourth correction (Subtract trigger-bin-dependent average)", false);
+
+  addParam("Correction_StripCalPeakTime", Correction_1,
+           "Correct for the different peaking times of the strips, obtained from local run calibration", true);
+  addParam("Correction_TBTimeWindow", Correction_2,
+           "Subtract the central value of the time window corresponding to the event Trigger Bin", true);
+  addParam("Correction_ShiftMeanToZero", Correction_3, "Apply correction to shift the mean of the time distribution to zero", true);
+  addParam("Correction_ShiftMeanToZeroTBDep", Correction_4,
+           "Apply correction to shift the mean of the time distribution to zero, Trigger Bin dependent", false);
 
 
 }

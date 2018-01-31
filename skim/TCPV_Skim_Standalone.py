@@ -16,7 +16,7 @@ from stdPi0s import *
 from stdV0s import *
 from stdLightMesons import *
 from stdDiLeptons import *
-gb2_setuprel = 'build-2017-10-16'
+gb2_setuprel = 'release-01-00-00'
 set_log_level(LogLevel.INFO)
 
 
@@ -31,11 +31,12 @@ fileList = \
 
 
 inputMdstList('default', fileList)
-stdPhotons('loose')
-stdPi0s('loose')
+
 loadStdSkimPi0()
 loadStdSkimPhoton()
+stdPi0s('loose')
 loadStdCharged()
+stdPhotons('loose')
 loadStdKS()
 loadStdDiLeptons(True)
 loadStdLightMesons()
@@ -46,6 +47,9 @@ tcpvList = TCPVList()
 skimOutputUdst('TCPV', tcpvList)
 summaryOfLists(tcpvList)
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

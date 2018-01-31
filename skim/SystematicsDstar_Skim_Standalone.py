@@ -11,10 +11,11 @@
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
+from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'build-2017-10-16'
+gb_setuprel = 'release-01-00-00'
 import sys
 import os
 import glob
@@ -34,8 +35,12 @@ loadStdCharged()
 from SystematicsDstar_List import *
 SysList = SystematicsList()
 skimOutputUdst('SystematicsDstar', SysList)
+
 summaryOfLists(SysList)
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 print(statistics)

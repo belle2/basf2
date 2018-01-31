@@ -14,7 +14,6 @@ from stdCharged import *
 from stdLightMesons import *
 from stdV0s import *
 from stdPi0s import *
-gb2_setuprel = 'build-2017-10-16'
 import sys
 import os
 import glob
@@ -27,18 +26,17 @@ fileList = \
 
 inputMdstList('default', fileList)
 
-
+loadStdSkimPi0()
 loadStdCharged()
 loadStdKS()
-stdPhotons('loose')
 stdPi0s('loose')
-loadStdSkimPhoton()
-loadStdSkimPi0()
+stdPhotons('loose')
 loadStdLightMesons()
 # Had Skim
 from CharmlessHad_List import *
 HadList = CharmlessHadList()
 skimOutputUdst('CharmlessHad', HadList)
+
 summaryOfLists(HadList)
 
 process(analysis_main)

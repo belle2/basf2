@@ -10,10 +10,10 @@
 
 from basf2 import *
 from modularAnalysis import *
-
+from stdPhotons import *
+from skimExpertFunctions import *
 set_log_level(LogLevel.ERROR)
-gb2_setuprel = 'build-2017-10-16'
-
+gb2_setuprel = 'release-01-00-00'
 import sys
 import os
 import glob
@@ -25,11 +25,18 @@ fileList = [
 inputMdstList('default', fileList)
 
 
+stdPhotons('loose')
+
 # Bottomonium Skim
 from BottomoniumEtabExclusive_List import *
 EtabList = EtabList()
 skimOutputUdst('BottomoniumEtabExclusive', EtabList)
 summaryOfLists(EtabList)
+
+
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

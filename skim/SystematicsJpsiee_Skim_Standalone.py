@@ -12,9 +12,9 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 
-
+gb2_setuprel = 'release-01-00-00'
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2017-10-16'
+
 
 import sys
 import os
@@ -35,8 +35,12 @@ loadStdCharged()
 from SystematicsJpsiee_List import *
 SysList = SystematicsList()
 skimOutputUdst('SystematicsJpsiee', SysList)
+
 summaryOfLists(SysList)
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 print(statistics)

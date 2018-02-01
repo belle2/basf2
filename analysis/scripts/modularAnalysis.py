@@ -899,8 +899,8 @@ def reconstructMissingKLDecay(
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
-    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     @param path        modules are added to this path
+    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     """
 
     pcalc = register_module('KLMomentumCalculator')
@@ -909,7 +909,7 @@ def reconstructMissingKLDecay(
     pcalc.param('cut', cut)
     pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
-    pcalc.param('recoList', "_reco")
+    pcalc.param('recoList', recoList)
     analysis_main.add_module(pcalc)
 
     rmake = register_module('KLDecayReconstructor')
@@ -918,7 +918,7 @@ def reconstructMissingKLDecay(
     rmake.param('cut', cut)
     rmake.param('decayMode', dmID)
     rmake.param('writeOut', writeOut)
-    rmake.param('recoList', "_reco")
+    rmake.param('recoList', recoList)
     analysis_main.add_module(rmake)
 
 

@@ -115,6 +115,11 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            "If set to True, store BremsstrahlungPhotons over a kinetic energy cut in MCParticles. Otherwise do not store them.", false);
   addParam("BremsstrahlungPhotonsEnergyCut", m_bremsstrahlungPhotonsEnergyCut,
            "[MeV] Kinetic energy cut for storing bremsstrahlung photons", 10.0);
+  addParam("StorePairConversions", m_storePairConversions,
+           "If set to True, store e+ or e- from pair conversions over a kinetic energy cut in MCParticles. Otherwise do not store them.",
+           false);
+  addParam("PairConversionsEnergyCut", m_pairConversionsEnergyCut,
+           "[MeV] Kinetic energy cut for storing e+ or e- from pair conversions", 10.0);
 
   addParam("magneticField", m_magneticFieldName,
            "Chooses the magnetic field stepper used by Geant4. Possible values are: default, nystrom, expliciteuler, simplerunge",
@@ -254,6 +259,9 @@ void FullSimModule::initialize()
   trackingAction->setSecondariesEnergyCut(m_secondariesEnergyCut);
   trackingAction->setIgnoreBremsstrahlungPhotons(!m_storeBremsstrahlungPhotons);
   trackingAction->setBremsstrahlungPhotonsEnergyCut(m_bremsstrahlungPhotonsEnergyCut);
+  trackingAction->setIgnorePairConversions(!m_storePairConversions);
+  trackingAction->setPairConversionsEnergyCut(m_pairConversionsEnergyCut);
+
   runManager.SetUserAction(trackingAction);
 
   //Add the stepping action which provides additional security checks

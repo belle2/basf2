@@ -117,6 +117,8 @@ namespace Belle2 {
     double m_secondariesEnergyCut;         /**< kinetic energy cut for the stored Geant secondaries */
     bool m_storeBremsstrahlungPhotons;     /**< controls storing of bremsstrahlung photons in MCParticles */
     double m_bremsstrahlungPhotonsEnergyCut;/**< kinetic energy cut for the stored bremsstrahlung photons */
+    bool m_storePairConversions;           /**< controls storing of e+ or e- from pair conversions in MCParticles */
+    double m_pairConversionsEnergyCut;     /**< kinetic energy cut for the stored e+ or e- from pair conversions */
 
     std::string m_magneticFieldName;       /**< magnetic field stepper to use */
     double m_magneticCacheDistance;        /**< minimal distance for magnetic field lookup. If distance is smaller, return last value */

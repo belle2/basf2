@@ -30,6 +30,7 @@ TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   m_ignoreOpticalPhotons(false),
   m_ignoreSecondaries(false), m_secondariesEnergyCut(0.0),
   m_ignoreBremsstrahlungPhotons(false), m_bremsstrahlungPhotonsEnergyCut(0.0),
+  m_ignorePairConversions(false), m_pairConversionsEnergyCut(0.0),
   m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
@@ -170,6 +171,14 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
           // Do not store the generator info in the final MCParticles block
           // if the ignore flag is set or its energy is too low in [MeV].
           if (m_ignoreBremsstrahlungPhotons || daughterTrack->GetKineticEnergy() < m_bremsstrahlungPhotonsEnergyCut)
+            daughterParticle.setIgnore();
+
+        } else if (daughterTrack->GetCreatorProcess()->GetProcessSubType() == fGammaConversion) {
+
+          // e+ or e- created by gamma conversion to pairs
+          // Do not store the generator info in the final MCParticles block
+          // if the ignore flag is set or kinetic energy is too low in [MeV].
+          if (m_ignorePairConversions || daughterTrack->GetKineticEnergy() < m_pairConversionsEnergyCut)
             daughterParticle.setIgnore();
 
         } else {

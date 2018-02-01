@@ -882,6 +882,46 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def reconstructMissingKLDecay(
+    decayString,
+    cut,
+    dmID=0,
+    writeOut=False,
+    path=analysis_main,
+    recoList="_reco",
+):
+    """
+    Creates mother particle accounting for missing momentum.
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param dmID        user specified decay mode identifier
+    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    @param path        modules are added to this path
+    """
+
+    pcalc = register_module('KLMomentumCalculator')
+    pcalc.set_name('KLMomentumCalculator_' + decayString)
+    pcalc.param('decayString', decayString)
+    pcalc.param('cut', cut)
+    pcalc.param('decayMode', dmID)
+    pcalc.param('writeOut', writeOut)
+    pcalc.param('recoList', "_reco")
+    analysis_main.add_module(pcalc)
+
+    rmake = register_module('KLDecayReconstructor')
+    rmake.set_name('KLDecayReconstrucotr_' + decayString)
+    rmake.param('decayString', decayString)
+    rmake.param('cut', cut)
+    rmake.param('decayMode', dmID)
+    rmake.param('writeOut', writeOut)
+    rmake.param('recoList', "_reco")
+    analysis_main.add_module(rmake)
+
+
 def replaceMass(
     replacerName,
     particleLists=[],

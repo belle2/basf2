@@ -101,7 +101,7 @@ namespace PrepBoardstackFE {
       cout << "Feature Extraction Mode = " << featureExtModeList[mode] << endl;
     } else {
       int mode_ext = 3;
-      callback.get("ScrodfeMode", mode_ext);
+      callback.get(StringUtil::form("top[%d].ScrodfeMode", hslb.get_finid()), mode_ext);
       Write_Register(hslb, SCROD_PS_featureExtMode, mode_ext, 0, 0);
       cout << "Feature Extraction Mode = " << featureExtModeList[mode_ext] << endl;
     }

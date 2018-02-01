@@ -64,7 +64,8 @@ BHWideInputModule::~BHWideInputModule()
 
 void BHWideInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Beam Parameters, initial particle - BHWIDE cannot handle beam energy spread
   m_initial.initialize();

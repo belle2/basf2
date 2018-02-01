@@ -5,7 +5,6 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/utilities/KeyValuePrinter.h>
-#include <background/dataobjects/BackgroundInfo.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>

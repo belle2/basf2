@@ -10,8 +10,6 @@
 
 #include "reconstruction/modules/DedxSkim/DedxSkimModule.h"
 
-#include "framework/datastore/StoreArray.h"
-
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -58,11 +56,7 @@ void DedxSkimModule::initialize()
 {
 
   // requred inputs
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
-  StoreArray<RecoTrack>::required();
-  StoreArray<CDCHit>::required();
-  //  StoreArray<ECLCluster>::required();
+  m_tracks.isRequired();
 }
 
 void DedxSkimModule::event()
@@ -103,17 +97,13 @@ void DedxSkimModule::event()
     }
   }
 
-  // inputs
-  StoreArray<Track> tracks;
-  //  StoreArray<ECLCluster> clusters;
-
   int nGoodElectrons = 0;
   int nGoodMuons = 0;
 
   // loop over each track in the event and cut on track quality information
   m_trackID = 0;
-  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-    const Track* track = tracks[iTrack];
+  for (int iTrack = 0; iTrack < m_tracks.getEntries(); iTrack++) {
+    const Track* track = m_tracks[iTrack];
     m_trackID++;
 
     // if no type is specified, just clean up based on missing track fits

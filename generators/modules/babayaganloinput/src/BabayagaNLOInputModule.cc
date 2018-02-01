@@ -100,7 +100,8 @@ BabayagaNLOInputModule::~BabayagaNLOInputModule()
 void BabayagaNLOInputModule::initialize()
 {
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //open extrafile
   if (m_fileNameExtraInfo != "") {

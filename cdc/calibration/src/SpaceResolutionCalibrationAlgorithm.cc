@@ -416,7 +416,7 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
 {
   B2INFO("store histo");
 
-  TFile*  ff = new TFile("sigma_histo.root", "RECREATE");
+  TFile*  ff = new TFile("histSigma.root", "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
 
@@ -454,64 +454,24 @@ void SpaceResolutionCalibrationAlgorithm::write()
   int nfitted = 0;
   int nfailure = 0;
 
-  ofstream ofs(m_outputSigmaFileName.c_str());
-  ofs << m_nAlphaBins << endl;
-  for (int i = 0; i < m_nAlphaBins; ++i) {
-    ofs << std::setprecision(4) << m_lowerAlpha[i] << "   " << std::setprecision(4) << m_upperAlpha[i] << "   " << std::setprecision(
-          4) << m_iAlpha[i] << endl;
-  }
-
-  ofs << m_nThetaBins << endl;
-  for (int i = 0; i < m_nThetaBins; ++i) {
-    ofs << std::setprecision(4) << m_lowerTheta[i] << "   " << std::setprecision(4) << m_upperTheta[i] << "   " << std::setprecision(
-          4) << m_iTheta[i] << endl;
-  }
-
-  ofs << 0 << "  " << 7 << endl; //mode and number of params;
-  for (int al = 0; al < m_nAlphaBins; ++al) {
-    for (int th = 0; th < m_nThetaBins; ++th) {
-      for (int i = 0; i < 56; ++i) {
-        for (int lr = 1; lr >= 0; --lr) {
-          ofs << i << std::setw(4) << m_iTheta[th] << std::setw(4) << m_iAlpha[al] << std::setw(4) << lr << std::setw(15);
-          if (m_fitStatus[i][lr][al][th] == 1) {
-            nfitted += 1;
-            for (int p = 0; p < 7; ++p) {
-              if (p != 6) { ofs << std::setprecision(7) << m_sigma[i][lr][al][th][p] << std::setw(15);}
-              if (p == 6) { ofs << std::setprecision(7) << m_sigma[i][lr][al][th][p] << std::endl;}
-            }
-          } else {
-            B2WARNING("Old sigma will be used. (Layer " << i << ") (lr = " << lr << ") (al = " << al << ") (th = " << th << ")");
-            nfailure += 1;
-            for (int p = 0; p < 7; ++p) {
-              if (p != 6) { ofs << std::setprecision(7) << m_sigmaPost[i][lr][al][th][p] << std::setw(15);}
-              if (p == 6) { ofs << std::setprecision(7) << m_sigmaPost[i][lr][al][th][p] << std::endl;}
-            }
-          }
-        }
-      }
-    }
-  }
-  ofs.close();
-  B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
-  B2RESULT("Histos succesfully fitted: " << nfitted);
-  B2RESULT("Histos fit failure: " << nfailure);
-
   CDCSpaceResols* dbSigma = new CDCSpaceResols();
-  const double deg2rad = M_PI / 180.0;
-  std::array<float, 3> alpha3;
+
+  const float deg2rad = M_PI / 180.0;
+
   for (unsigned short i = 0; i < m_nAlphaBins; ++i) {
-    for (unsigned short j = 0; j < 3; ++j) {
-      alpha3[j] *= deg2rad;
-    }
+    std::array<float, 3> alpha3 = {m_lowerAlpha[i]* deg2rad,
+                                   m_upperAlpha[i]* deg2rad,
+                                   m_iAlpha[i]*   deg2rad
+                                  };
     dbSigma->setAlphaBin(alpha3);
   }
 
-  std::array<float, 3> theta3;
 
   for (unsigned short i = 0; i < m_nThetaBins; ++i) {
-    for (unsigned short j = 0; j < 3; ++j) {
-      theta3[j] *= deg2rad;
-    }
+    std::array<float, 3> theta3 = {m_lowerTheta[i]* deg2rad,
+                                   m_upperTheta[i]* deg2rad,
+                                   m_iTheta[i]* deg2rad
+                                  };
     dbSigma->setThetaBin(theta3);
   }
 
@@ -535,7 +495,18 @@ void SpaceResolutionCalibrationAlgorithm::write()
       }
     }
   }
+
+  if (m_textOutput == true) {
+    dbSigma->outputToFile(m_outputFileName);
+  }
+
   saveCalibration(dbSigma, "CDCSpaceResols");
+
+  B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
+  B2RESULT("Histos succesfully fitted: " << nfitted);
+  B2RESULT("Histos fit failure: " << nfailure);
+
+
 }
 
 void SpaceResolutionCalibrationAlgorithm::prepare()

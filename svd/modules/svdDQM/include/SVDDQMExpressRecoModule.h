@@ -61,12 +61,10 @@ namespace Belle2 {
     /** cut for accepting to hitmap histogram, using strips only, default = 22 */
     float m_CutSVDCharge = 22.0;
 
-    /** SVDDigits StoreArray name */
-    std::string m_storeSVDDigitsName;
+    /** SVDShaperDigits StoreArray name */
+    std::string m_storeSVDShaperDigitsName;
     /** SVDClusters StoreArray name */
     std::string m_storeSVDClustersName;
-    /** SVDClustersToSVDDigits RelationArray name */
-    std::string m_relSVDClusterDigitName;
 
     /** Basic Directory in output file */
     TDirectory* m_oldDir;

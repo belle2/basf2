@@ -37,7 +37,7 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components, use_vxdtf2=True,
+def add_PXDDataReduction(path, components,
                          pxd_unfiltered_digits='pxd_unfiltered_digits',
                          doCleanup=True):
 
@@ -48,24 +48,9 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
     # SVD tracking
     svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2, svd_cluster='__ROIsvdClusters')
+    add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters')
 
-    pxdDataRed = register_module('PXDROIFinder')
-    param_pxdDataRed = {
-        'recoTrackListName': svd_reco_tracks,
-        'PXDInterceptListName': 'PXDIntercepts',
-        'ROIListName': 'ROIs',
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
+    add_roiFinder(path, svd_reco_tracks)
 
     # Filtering of PXDDigits
     pxd_digifilter = register_module('PXDdigiFilter')
@@ -91,6 +76,31 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
         path.add_module(datastore_cleaner)
 
 
+def add_roiFinder(path, reco_tracks):
+    """
+    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
+    :param path: Where to add the module to.
+    :param reco_tracks: Which tracks to use in the extrapolation step.
+    """
+
+    pxdDataRed = register_module('PXDROIFinder')
+    param_pxdDataRed = {
+        'recoTrackListName': reco_tracks,
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
+
+
 def add_simulation(
         path,
         components=None,
@@ -98,7 +108,6 @@ def add_simulation(
         bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
-        use_vxdtf2=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False):
     """
@@ -179,7 +188,7 @@ def add_simulation(
     # ECL digitization
     if components is None or 'ECL' in components:
         ecl_digitizer = register_module('ECLDigitizer')
-        if bkgfiles is not None:
+        if bkgfiles:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
@@ -194,7 +203,7 @@ def add_simulation(
         path.add_module(eklm_digitizer)
 
     # background overlay executor - after all digitizers
-    if bkgfiles is not None and bkgOverlay:
+    if bkgfiles and bkgOverlay:
         path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
         if components is None or 'PXD' in components:
             path.add_module("PXDDigitSorter", digits=pxd_digits_name)
@@ -204,7 +213,7 @@ def add_simulation(
 
     # PXD data reduction - after background overlay executor
     if (components is None or 'PXD' in components) and usePXDDataReduction:
-        add_PXDDataReduction(path, components, use_vxdtf2, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
+        add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

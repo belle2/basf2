@@ -25,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=True,
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
@@ -54,7 +54,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
-    :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
@@ -74,7 +73,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
                                 additionalTrackFitHypotheses=additionalTrackFitHypotheses,
-                                use_vxdtf2=use_vxdtf2,
                                 use_second_cdc_hits=use_second_cdc_hits)
 
     # Statistics summary
@@ -413,7 +411,7 @@ def add_ecl_track_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)

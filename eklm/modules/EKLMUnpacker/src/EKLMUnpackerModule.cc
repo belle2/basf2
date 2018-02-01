@@ -27,7 +27,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
-           "Name of EKLMDigit store array", string("Digits"));
+           "Name of EKLMDigit store array", string(""));
   m_GeoDat = NULL;
 }
 
@@ -87,7 +87,7 @@ void EKLMUnpackerModule::event()
           continue;
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
-          //uint16_t bword2 =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          uint16_t bword2 =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
           uint16_t bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
           uint16_t bword4 =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
           uint16_t bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
@@ -108,7 +108,7 @@ void EKLMUnpackerModule::event()
            * always correct.
            */
           lane.setLane((bword1 >> 8) & 0x1F);
-          //uint16_t ctime  =   bword2 & 0xFFFF; //full bword      unused yet
+          uint16_t ctime  =   bword2 & 0xFFFF; //full bword
           uint16_t tdc    =   bword3 & 0x7FF;
           uint16_t charge =   bword4 & 0xFFFF;  // !!! THERE IS 15 BITS NOW!!!
           // !!! SHOULD BE 12 BITS !!!
@@ -124,6 +124,7 @@ void EKLMUnpackerModule::event()
           m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
                                                  &endcap, &layer, &sector);
           eklmDigit = m_Digits.appendNew();
+          eklmDigit->setCTime(ctime);
           eklmDigit->setTime(tdc);
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);

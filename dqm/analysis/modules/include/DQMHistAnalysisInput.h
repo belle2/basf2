@@ -6,13 +6,12 @@
 // Date : 25 - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisInput_h
-#define _Belle2_DQMHistAnalysisInput_h
+#pragma once
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <dqm/DqmMemFile.h>
+#include <daq/dqm/DqmMemFile.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
@@ -48,6 +47,7 @@ namespace Belle2 {
     std::string m_mempath;
     int m_memsize;
     int m_interval;
+    bool m_autocanvas;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;
@@ -59,4 +59,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

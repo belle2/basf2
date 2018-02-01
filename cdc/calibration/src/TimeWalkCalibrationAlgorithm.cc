@@ -134,7 +134,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   //Write histogram to file
   if (m_storeHisto) {
     B2INFO("Storing histogram");
-    TFile* fhist = new TFile("tw_histo.root", "recreate");
+    TFile* fhist = new TFile("histTw.root", "recreate");
     TDirectory* old = gDirectory;
     TDirectory* h1D = old->mkdir("h1D");
     TDirectory* h2D = old->mkdir("h2D");
@@ -167,6 +167,11 @@ void TimeWalkCalibrationAlgorithm::write()
   for (int ib = 0; ib < 300; ++ib) {
     dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
   }
+
+  if (m_textOutput == true) {
+    dbTw->outputToFile(m_outputFileName);
+  }
+
   saveCalibration(dbTw, "CDCTimeWalks");
 }
 

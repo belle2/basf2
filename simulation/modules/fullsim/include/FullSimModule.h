@@ -103,6 +103,8 @@ namespace Belle2 {
     int m_emProcessVerbosity;              /**< Loss Table verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     std::string m_physicsList;             /**< The name of the physics list which is used for the simulation. */
     bool m_optics;                         /*!< If set to true, registers the optical physics list. */
+    bool m_monopoles;                      /*!< If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.*/
+    double m_monopoleMagneticCharge;       /*!< The value of monopole magnetic charge in units of e+.*/
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */
     int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */

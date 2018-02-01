@@ -3,28 +3,20 @@
 
 from basf2 import *
 
+from daqdqm.commondqm import add_common_dqm
 
-def add_cosmic_dqm(path, components=None):
+
+def add_cosmic_dqm(path, components=None, dqm_environment="expressreco"):
     """
     This function adds DQMs for CRT
+
+    @param components: A list of the detector components which are available in this
+                       run of basf2
+    @param dqm_environment: The environment the DQM modules are running in
+                            "expressreco" (default) if running on the ExpressReco system
+                            "hlt" if running on the HLT online reconstructon nodes
+                            If running on the hlt, you may want to output less or other DQM plots
+                            due to the limited bandwith of the HLT nodes.
     """
-    # CDC
-    if components is None or 'CDC' in components:
-        cdcdqm = register_module('cdcDQM7')
-        path.add_module(cdcdqm)
-    # ECL
-    if components is None or 'ECL' in components:
-        ecldqm = register_module('ECLDQM')
-        path.add_module(ecldqm)
-    # TOP
-    if components is None or 'TOP' in components:
-        topdqm = register_module('TOPDataQualityOnline')
-        path.add_module(topdqm)
-    # BKLM
-    if components is None or 'BKLM' in components:
-        bklmdqm = register_module("bklmDQM")
-        path.add_module(bklmdqm)
-    # ECLTRG
-    if components is None or 'TRG' in components:
-        trgecldqm = register_module('TRGECLDQM')
-        path.add_module(trgecldqm)
+
+    add_common_dqm(path, components, dqm_environment)

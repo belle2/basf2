@@ -276,14 +276,16 @@ for method in methods:
 
     # Fit for calibration plot
     print(' ')
-    print('****************** CALIBRATION CHECK FOR COMBINER USING ' + method + ' ***************************************')
+    print('****************************** CALIBRATION CHECK FOR COMBINER USING ' +
+          method + ' ***************************************')
     print(' ')
     print('Fit ploynomial of first order to the calibration plot. Expected value ~0.5')
     print(' ')
     histo_calib_B0.Fit(diag, 'TEST')
     print('       ')
-    print('****************** MEASURED EFFECTIVE EFFICIENCY FOR COMBINER USING ' + method + ' ***************************')
-    print('*                                                                                                  *')
+    print('****************************** MEASURED EFFECTIVE EFFICIENCY FOR COMBINER USING ' +
+          method + ' ***************************')
+    print('*                                                                                                              *')
     # get total number of entries
     total_tagged = histo_entries_per_bin.GetEntries()
     total_tagged_B0 = histo_entries_per_binB0.GetEntries()
@@ -330,21 +332,36 @@ for method in methods:
     iEffEfficiencyB0barUncertainty = array('f', [0] * r_size)
     iDeltaEffEfficiency = array('f', [0] * r_size)
     iDeltaEffEfficiencyUncertainty = array('f', [0] * r_size)
+    muParam = array('f', [0] * r_size)
     # intervallEff = array('f', [0] * r_size)
 
-    print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *')
-    print('*                                                                                                  *')
-    print('* ------------------------------------------------------------------------------------------------ *')
-    print('*   r-interval          <r>        Efficiency   Delta_Effcy         w               Delta_w        *')
-    print('* ------------------------------------------------------------------------------------------------ *')
+    print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                                      *')
+    print('*                                                                                                              *')
+    print('*  Note: mu = Delta_Effcy/(2*Efficiency). Needed for CP analysis together with w and  Delta_w                  *')
+    print('*                                                                                                              *')
+    print('* ------------------------------------------------------------------------------------------------------------ *')
+    print('*   r-interval          <r>        Efficiency   Delta_Effcy     mu              w                Delta_w       *')
+    print('* ------------------------------------------------------------------------------------------------------------ *')
     performance = []
     for i in range(1, r_size):
         # get the average r-value
+        entries[i] = histo_entries_per_bin.GetBinContent(i)
+        entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
+        entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
+        # fraction of events/all events
+        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
+        event_fractionB0[i] = entriesB0[i] / total_entriesB0
+        event_fractionB0bar[i] = entriesB0bar[i] / total_entriesB0bar
+
+        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
+
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
         rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
-        rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
-        rvalueStdB0[i] = math.sqrt(histo_ms_rB0.GetBinContent(i) - (histo_avr_rB0.GetBinContent(i))**2)
-        rvalueStdB0bar[i] = math.sqrt(histo_ms_rB0bar.GetBinContent(i) - (histo_avr_rB0bar.GetBinContent(i))**2)
+        rvalueB0Average[i] = histo_avr_r.GetBinContent(i)  # (rvalueB0[i] + rvalueB0bar[i]) / 2
+        rvalueStdB0[i] = math.sqrt(histo_ms_rB0.GetBinContent(
+            i) - (histo_avr_rB0.GetBinContent(i))**2) / math.sqrt(entriesB0[i] - 1)
+        rvalueStdB0bar[i] = math.sqrt(histo_ms_rB0bar.GetBinContent(
+            i) - (histo_avr_rB0bar.GetBinContent(i))**2) / math.sqrt(entriesB0bar[i] - 1)
         rvalueStdB0Average[i] = math.sqrt(rvalueStdB0[i]**2 + rvalueStdB0bar[i]**2) / 2
         # math.sqrt(histo_ms_r.GetBinContent(i) - (histo_avr_r.GetBinContent(i))**2)
         # calculate the wrong tag fractin (only true if MC data good)
@@ -355,15 +372,6 @@ for method in methods:
         wvalueDiffUncertainty[i] = math.sqrt((rvalueStdB0[i] / 2)**2 + (rvalueStdB0bar[i] / 2)**2)
         wvalue[i] = (wvalueB0[i] + wvalueB0bar[i]) / 2
         wvalueUncertainty[i] = wvalueDiffUncertainty[i] / 2
-        entries[i] = histo_entries_per_bin.GetBinContent(i)
-        entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
-        entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
-        # fraction of events/all events
-        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
-        event_fractionB0[i] = entriesB0[i] / total_entriesB0
-        event_fractionB0bar[i] = entriesB0bar[i] / total_entriesB0bar
-
-        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
 
         iEffEfficiency[i] = tagging_eff * (event_fractionB0[i] * rvalueB0[i] * rvalueB0[i] +
                                            event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]) / 2
@@ -399,12 +407,14 @@ for method in methods:
         uncertainty_eff_effAverage = uncertainty_eff_effAverage + iEffEfficiencyUncertainty[i]**2
         uncertainty_eff_effB0 = uncertainty_eff_effB0 + iEffEfficiencyB0Uncertainty[i]**2
         uncertainty_eff_effB0bar = uncertainty_eff_effB0bar + iEffEfficiencyB0barUncertainty[i]**2
+        muParam[i] = event_fractionDiff[i] / (2 * event_fractionTotal[i])
 
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
         print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '   ' +
               '{:.3f}'.format(rvalueB0Average[i]) + ' +- ' + '{:.4f}'.format(rvalueStdB0Average[i]) + '    ' +
               '{:.4f}'.format(event_fractionTotal[i]) + '      ' +
               '{: .4f}'.format(event_fractionDiff[i]) + '     ' +
+              '{: .4f}'.format(muParam[i]) + '     ' +
               '{:.4f}'.format(wvalue[i]) + ' +- ' + '{:.4f}'.format(wvalueUncertainty[i]) + '   ' +
               '{: .4f}'.format(wvalueDiff[i]) + ' +- ' + '{:.4f}'.format(wvalueDiffUncertainty[i]) + '  *')
 
@@ -414,7 +424,7 @@ for method in methods:
     uncertainty_eff_effB0bar = math.sqrt(uncertainty_eff_effB0bar)
     diff_eff = tot_eff_effB0 - tot_eff_effB0bar
     diff_eff_Uncertainty = math.sqrt(diff_eff_Uncertainty)
-    print('* ------------------------------------------------------------------------------------------------ *')
+    print('* ------------------------------------------------------------------------------------------------------------ *')
     print('*                                                                                                  *')
     print('*    __________________________________________________________________________________________    *')
     print('*   |                                                                                          |   *')
@@ -499,7 +509,10 @@ for method in methods:
     print('*     wrong calculated eff all:     ' + '{:.3f}'.format(wrong_eff * 100) +
           ' %                                                       *')
     print('*                                                                                                  *')
-
+    print('****************************************************************************************************')
+    print('')
+    print('Table For B2TIP')
+    print('')
     # write out the histograms
     # histo_avr_r.Write('', ROOT.TObject.kOverwrite)
     # histo_entries_per_bin.Write('', ROOT.TObject.kOverwrite)
@@ -522,7 +535,7 @@ for method in methods:
 
     # produce a pdf
     ROOT.gStyle.SetOptStat(0)
-    Canvas1 = ROOT.TCanvas('Bla', 'Final Output', 1200, 800)
+    Canvas1 = ROOT.TCanvas('Bla' + method, 'Final Output', 1200, 800)
     Canvas1.cd()  # activate
     histo_belleplotB0.SetFillColorAlpha(ROOT.kBlue, 0.2)
     histo_belleplotB0.SetFillStyle(1001)
@@ -553,7 +566,7 @@ for method in methods:
         Canvas1.SaveAs(workingDirectory + '/' + 'PIC_Belleplot_both' + method + '.pdf')
 
     # produce the nice calibration plot
-    Canvas2 = ROOT.TCanvas('Bla2', 'Calibration plot for true B0', 1200, 800)
+    Canvas2 = ROOT.TCanvas('Bla2' + method, 'Calibration plot for true B0', 1200, 800)
     Canvas2.cd()  # activate
     histo_calib_B0.SetFillColorAlpha(ROOT.kBlue, 0.2)
     histo_calib_B0.SetFillStyle(1001)
@@ -591,30 +604,31 @@ for method in methods:
     Canvas1.Clear()
     Canvas2.Clear()
 
-    print('\\begin{tabular}{ l  r  r  r  r  r  r  r }\n\\hline')
-    print(r'$r$- Interval & $\varepsilon_i\ $ & $w_i \pm \delta w_i\ $ ' +
-          r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}$ ' +
-          r' & & & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i} $\\ \hline\hline')
+    print('\\begin{tabularx}{1\\textwidth}{@{}r  r  r  r  r  r  r@{}}\n\\hline')
+    print(r'$r$- Interval $\enskip$ & $\varepsilon_i\ $ &  $\Delta\varepsilon_i\ $ & $w_i \pm \delta w_i\enskip\, $ ' +
+          r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}\enskip$ ' +
+          r' & $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i}\enskip $\\ \hline\hline')
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 6.1f}'.format(event_fractionTotal[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(wvalue[i] * 100) + " \pm " + '{:2.1f}'.format(wvalueUncertainty[i] * 100) + r'\enskip $ & $' +
-              '{: 6.1f}'.format(wvalueDiff[i] * 100) + " \pm " +
-              '{:2.1f}'.format(wvalueDiffUncertainty[i] * 100) + r'\enskip\enskip $ & $' +
-              '{: 6.2f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
-              " \pm " + '{:2.2f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\enskip $ & & & $' +
-              '{: 6.2f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
-              " \pm " + '{:2.2f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
-              r'\ \quad $ \\ ')
+              '{: 7.3f}'.format(event_fractionDiff[i] * 100) + '$ & $' +
+              '{: 7.3f}'.format(wvalue[i] * 100) + " \pm " + '{:2.3f}'.format(wvalueUncertainty[i] * 100) + r' $ & $' +
+              '{: 7.3f}'.format(wvalueDiff[i] * 100) + " \pm " +
+              '{:2.3f}'.format(wvalueDiffUncertainty[i] * 100) + r'\, $ & $' +
+              '{: 8.4f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
+              " \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + r'\, $ & $' +
+              '{: 6.4f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
+              " \pm " + '{:2.4f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
+              r'\enskip\enskip $ \\ ')
     print('\hline\hline')
-    print(r'\multicolumn{1}{r}{Total} &  & \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
+    print(r'\multicolumn{1}{r}{Total} &  & \multicolumn{5}{r}{ $\varepsilon_\text{eff} = ' +
           r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-          '{: 6.1f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.1f}'.format(uncertainty_eff_effAverage * 100) + r'\quad$ }')
-    print(r'& & \multicolumn{2}{r}{ $\Delta \varepsilon_\text{eff} = ' +
-          '{: 6.1f}'.format(diff_eff * 100) + " \pm " + '{: 6.1f}'.format(diff_eff_Uncertainty * 100) + r'\ \enskip\quad $ }' +
+          '{: 6.2f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.2f}'.format(uncertainty_eff_effAverage * 100) + r'\enskip\, ')
+    print(r'\Delta \varepsilon_\text{eff} = ' +
+          '{: 6.2f}'.format(diff_eff * 100) + " \pm " + '{: 6.2f}'.format(diff_eff_Uncertainty * 100) + r'\quad\  $ }' +
           r' \\')
     print('\\hline\n\\end{tabular}')
-
+    print('')
 
 # **********************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
@@ -832,11 +846,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     iDeltaEffEfficiencyUncertainty = array('f', [0] * r_size)
 
     for i in range(1, r_size):
-        rvalueB0[i] = hist_avr_rB0.GetBinContent(i)
-        rvalueB0bar[i] = hist_avr_rB0bar.GetBinContent(i)
-        rvalueStdB0[i] = math.sqrt(abs(hist_ms_rB0.GetBinContent(i) - (hist_avr_rB0.GetBinContent(i))**2))
-        rvalueStdB0bar[i] = math.sqrt(abs(hist_ms_rB0bar.GetBinContent(i) - (hist_avr_rB0bar.GetBinContent(i))**2))
-        # wvalue[i] = (1 - rvalueB0[i]) / 2
+
         entriesBoth[i] = entriesB0bar[i] + entriesB0[i]
         entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
         entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
@@ -845,6 +855,22 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
         # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalueB0[i]), 'entriesB0: ' +
         # str(event_fractionB0[i] * 100) + ' % (' + str(entriesB0[i]) + '/' +
         # str(total_entriesB0) + ')'
+
+        rvalueB0[i] = hist_avr_rB0.GetBinContent(i)
+        rvalueB0bar[i] = hist_avr_rB0bar.GetBinContent(i)
+
+        rvalueStdB0[i] = 0
+        rvalueStdB0bar[i] = 0
+
+        if entriesB0[i] > 1:
+            rvalueStdB0[i] = math.sqrt(abs(hist_ms_rB0.GetBinContent(
+                i) - (hist_avr_rB0.GetBinContent(i))**2)) / math.sqrt(entriesB0[i] - 1)
+
+        if entriesB0bar[i] > 1:
+            rvalueStdB0bar[i] = math.sqrt(abs(hist_ms_rB0bar.GetBinContent(
+                i) - (hist_avr_rB0bar.GetBinContent(i))**2)) / math.sqrt(entriesB0bar[i] - 1)
+        # wvalue[i] = (1 - rvalueB0[i]) / 2
+
         tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] \
             * rvalueB0[i]
         tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] \
@@ -911,6 +937,9 @@ print('*                                                                        
       '                       *')
 print('**************************************************************************************************************************' +
       '************************')
+print('')
+print('Table For B2TIP')
+print('')
 print('\\begin{tabular}{ l  r  r }\n\hline')
 print(r'Categories & $\varepsilon_\text{eff} \pm \delta\varepsilon_\text{eff} $& ' +
       r'$\Delta\varepsilon_\text{eff} \pm \delta\Delta\varepsilon_\text{eff}$\\ \hline\hline')

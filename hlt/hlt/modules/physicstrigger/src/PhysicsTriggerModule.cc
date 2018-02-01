@@ -10,11 +10,9 @@
 
 // own include
 #include <hlt/hlt/modules/physicstrigger/PhysicsTriggerModule.h>
-#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -69,7 +67,7 @@ PhysicsTriggerModule::~PhysicsTriggerModule()
 void PhysicsTriggerModule::initialize()
 {
   B2INFO("PhysicsTriggerModule processing");
-  StoreArray<PhysicsTriggerInformation>::registerPersistent();
+  m_physicsTriggerInformation.registerInDataStore();
   m_cut = Variable::Cut::compile(m_hltcut);
 }
 

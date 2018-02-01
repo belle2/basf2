@@ -24,6 +24,7 @@ namespace Belle2 {
     unsigned char read1(unsigned int address);
     unsigned int read2(unsigned int address);
     unsigned int read4(unsigned int address);
+    int num() { return m_num; }
 
   private:
     int write(unsigned int address, unsigned char v);

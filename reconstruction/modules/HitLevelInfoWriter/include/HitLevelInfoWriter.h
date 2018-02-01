@@ -60,6 +60,10 @@ namespace Belle2 {
 
   private:
 
+    StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array of CDCDedxTracks */
+    StoreArray<Track> m_tracks; /**< Required array of input Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< Required array of input TrackFitResults */
+
     /** Fill the TTree with the information from the track fit */
     void fillTrack(const TrackFitResult* fitResult);
 

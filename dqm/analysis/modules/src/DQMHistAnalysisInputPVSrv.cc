@@ -1,13 +1,13 @@
 ﻿//+
 // File : DQMHistAnalysisInputPVSrv.cc
-// Description :
+// Description : DQM input module, convert epics PVs to histograms for analysis
 //
 // Author : B. Spruck
 // Date : 25 - Mar - 2017
-// based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistAnalysisInputPVSrv.h>
 #include <TSystem.h>
 #include <TDirectory.h>
@@ -89,7 +89,7 @@ DQMHistAnalysisInputPVSrvModule::DQMHistAnalysisInputPVSrvModule()
   addParam("HistoList", m_histlist, "pvname, histname, histtitle, (bins,min,max[,bins,min,max])");
   addParam("Callback", m_callback, "Using EPICS callback for changes", true);
   addParam("Server", m_server, "Start http server on port 8082", false);
-  B2DEBUG(1, "DQMHistAnalysisInputPVSrv: Constructor done.");
+  B2DEBUG(20, "DQMHistAnalysisInputPVSrv: Constructor done.");
 }
 
 
@@ -128,10 +128,10 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
           TDirectory* e;
           e = d->GetDirectory(tok);
           if (e) {
-            B2INFO("Cd Dir " << tok);
+            B2DEBUG(20, "Cd Dir " << tok);
             d = e;
           } else {
-            B2INFO("Create Dir " << tok);
+            B2DEBUG(20, "Create Dir " << tok);
             d = d->mkdir(tok);
           }
           d->cd();
@@ -140,7 +140,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
         }
       }
 
-      B2INFO("Create Histo " << tok);
+      B2DEBUG(20, "Create Histo " << tok);
 
       Int_t x;
       Double_t xmin, xmax;
@@ -182,13 +182,13 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
   }
 
 #endif
-  B2INFO("DQMHistAnalysisInputPVSrv: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisInputPVSrv: initialized.");
 }
 
 
 void DQMHistAnalysisInputPVSrvModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisInputPVSrv: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisInputPVSrv: beginRun called.");
 }
 
 void DQMHistAnalysisInputPVSrvModule::event()
@@ -222,7 +222,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
       if (!n->histo) {
         // this should NEVER happen
         continue;
-//         B2INFO("Create Histo " << tok);
+//         B2DEBUG(20, "Create Histo " << tok);
 //         n->histo=new TH1F(ca_name(n->mychid),ca_name(n->mychid),ca_element_count(n->mychid),0,ca_element_count(n->mychid));
       }
       unsigned int bins;
@@ -266,7 +266,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
           break;
       }
     }
-    delete bufferorg;
+    delete[] bufferorg;
   }
 #endif
   do { // call at least once!
@@ -278,13 +278,13 @@ void DQMHistAnalysisInputPVSrvModule::event()
 
 void DQMHistAnalysisInputPVSrvModule::endRun()
 {
-  B2INFO("DQMHistAnalysisInputPVSrv: endRun called");
+  B2DEBUG(20, "DQMHistAnalysisInputPVSrv: endRun called");
 }
 
 
 void DQMHistAnalysisInputPVSrvModule::terminate()
 {
-  B2INFO("DQMHistAnalysisInputPVSrv: terminate called");
+  B2DEBUG(20, "DQMHistAnalysisInputPVSrv: terminate called");
 #ifdef _BELLE2_EPICS
   ca_context_destroy();
 #endif

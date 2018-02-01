@@ -109,8 +109,8 @@ class TestModule(basf2.Module):
         give info for both modules and warnings in the case of mismatches
         """
         oldT0 = Belle2.PyStoreObj("CDCTriggerEventTime").obj().getTiming()
-        if Belle2.PyStoreObj("EventT0").hasEventT0():
-            newT0 = Belle2.PyStoreObj("EventT0").obj().getBinnedEventT0()
+        if Belle2.PyStoreObj("BinnedEventT0").hasBinnedEventT0(Belle2.Const.CDC):
+            newT0 = Belle2.PyStoreObj("BinnedEventT0").obj().getBinnedEventT0(Belle2.Const.CDC)
         else:
             newT0 = 9999
         if oldT0 == newT0:

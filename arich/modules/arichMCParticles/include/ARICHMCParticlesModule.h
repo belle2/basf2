@@ -11,7 +11,13 @@
 #ifndef ARICHMCPARTICLESMODULE_H
 #define ARICHMCPARTICLESMODULE_H
 
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+
 #include <string>
 #include <TFile.h>
 #include <TNtuple.h>
@@ -70,6 +76,11 @@ namespace Belle2 {
     void printModuleParams() const;
 
   private:
+
+    // required input
+    StoreArray<Track> m_tracks; /**< Required input array of Tracks */
+    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
+    StoreArray<MCParticle> m_arichMCPs; /**< Required input array of MCParticles */
 
   };
 

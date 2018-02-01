@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial runs over skims of centrally produced B->KsPi0 or continuum MC
 # mdst files and reconstructs B->KsPi0 decays, applies the MVAExpert module,
 # and writes out flat NTuples containing all variables used in the continuum

@@ -8,44 +8,55 @@ import glob
 
 numEvents = 2000
 
-'''
-globalTag = "development"
-reset_database()
-use_database_chain()
-use_central_database(globalTag)
-'''
+bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
+bkgFiles = None  # uncomment to remove  background
+simulateJitter = False
+
+ROIfinding = False
+Phase2 = False
+MCTracking = True
+# set this string to identify the output rootfiles
+tag = "_Y4S_noJitter_noBKG_noROI_MCTF.root"
 
 main = create_path()
 
 set_random_seed(1)
 
+expList = [0]
+if Phase2:
+    expList = [1002]
+
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [0])
-eventinfosetter.param('runList', [1])
+eventinfosetter.param('expList', expList)
+eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [numEvents])
 main.add_module(eventinfosetter)
 main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
-bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
-# bkgFiles = ""
-
-ROIfinding = False
-
-add_simulation(main, components=['MagneticField', 'BeamPipe', 'PXD', 'SVD'], bkgfiles=bkgFiles, usePXDDataReduction=ROIfinding)
+add_simulation(
+    main,
+    components=[
+        'MagneticField',
+        'BeamPipe',
+        'PXD',
+        'SVD'],
+    bkgfiles=bkgFiles,
+    usePXDDataReduction=ROIfinding,
+    simulateT0jitter=simulateJitter)
 
 add_svd_reconstruction(main)
+
 
 add_tracking_reconstruction(
     main,
     components=["SVD"],
-    use_vxdtf2=True,
-    mcTrackFinding=True,
+    mcTrackFinding=MCTracking,
     additionalTrackFitHypotheses=[211],
     skipHitPreparerAdding=True)
 
 
-tag = "_Y4S_wBKG_noROI_MCTF.root"
+tag = "_Y4S_jitter10ns_wBKG_noROI_MCTF.root"
 clseval = register_module('SVDClusterEvaluation')
 clseval.param('outputFileName', "ClusterEvaluation" + str(tag))
 main.add_module(clseval)

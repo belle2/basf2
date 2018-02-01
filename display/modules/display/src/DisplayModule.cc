@@ -75,34 +75,31 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 void DisplayModule::initialize()
 {
   //optional inputs
-  StoreArray<MCParticle>::optional();
-  StoreArray<MCParticleTrajectory>::optional();
-  StoreArray<CDCSimHit>::optional();
-  StoreArray<PXDSimHit>::optional();
-  StoreArray<SVDSimHit>::optional();
-  StoreArray<BKLMSimHit>::optional();
-  StoreArray<EKLMSimHit>::optional();
-  StoreArray<ECLCluster>::optional();
-  StoreArray<KLMCluster>::optional();
-  StoreArray<BKLMHit2d>::optional();
-  StoreArray<Track>::optional();
-  StoreArray<TrackFitResult>::optional();
-  StoreArray<RecoTrack>::optional();
-  StoreArray<genfit::GFRaveVertex>::optional();
-  StoreObjPtr<DisplayData>::optional();
-  StoreArray<PXDCluster>::optional();
-  StoreArray<SVDCluster>::optional();
-  StoreArray<CDCHit>::optional();
-  StoreArray<CDCTriggerSegmentHit>::optional();
-  StoreArray<ARICHHit>::optional();
-  StoreArray<TOPDigit>::optional();
-  StoreArray<ROIid>::optional();
-  StoreArray<RecoHitInformation::UsedPXDHit>::optional();
-  StoreArray<RecoHitInformation::UsedSVDHit>::optional();
-  StoreArray<RecoHitInformation::UsedCDCHit>::optional();
-  StoreArray<TrackCandidateTFInfo>::optional();
-  StoreArray<CellTFInfo>::optional();
-  StoreArray<SectorTFInfo>::optional();
+  StoreArray<MCParticle> MCParticles; MCParticles.isOptional();
+  StoreArray<MCParticleTrajectory> MCParticleTrajectorys; MCParticleTrajectorys.isOptional();
+  StoreArray<CDCSimHit> CDCSimHits; CDCSimHits.isOptional();
+  StoreArray<PXDSimHit> PXDSimHits; PXDSimHits.isOptional();
+  StoreArray<SVDSimHit> SVDSimHits; SVDSimHits.isOptional();
+  StoreArray<BKLMSimHit> BKLMSimHits; BKLMSimHits.isOptional();
+  StoreArray<EKLMSimHit> EKLMSimHits; EKLMSimHits.isOptional();
+  StoreArray<ECLCluster> ECLClusters; ECLClusters.isOptional();
+  StoreArray<KLMCluster> KLMClusters; KLMClusters.isOptional();
+  StoreArray<BKLMHit2d> BKLMHit2ds; BKLMHit2ds.isOptional();
+  StoreArray<Track> Tracks; Tracks.isOptional();
+  StoreArray<TrackFitResult> TrackFitResults; TrackFitResults.isOptional();
+  StoreArray<RecoTrack> RecoTracks; RecoTracks.isOptional();
+  StoreArray<genfit::GFRaveVertex> GFRaveVertexs; GFRaveVertexs.isOptional();
+  StoreObjPtr<DisplayData> DisplayDatas; DisplayDatas.isOptional();
+  StoreArray<PXDCluster> PXDClusters; PXDClusters.isOptional();
+  StoreArray<SVDCluster> SVDClusters; SVDClusters.isOptional();
+  StoreArray<CDCHit> CDCHits; CDCHits.isOptional();
+  StoreArray<CDCTriggerSegmentHit> CDCTriggerSegmentHits; CDCTriggerSegmentHits.isOptional();
+  StoreArray<ARICHHit> ARICHHits; ARICHHits.isOptional();
+  StoreArray<TOPDigit> TOPDigits; TOPDigits.isOptional();
+  StoreArray<ROIid> ROIids; ROIids.isOptional();
+  StoreArray<RecoHitInformation::UsedPXDHit> UsedPXDHits; UsedPXDHits.isOptional();
+  StoreArray<RecoHitInformation::UsedSVDHit> UsedSVDHits; UsedSVDHits.isOptional();
+  StoreArray<RecoHitInformation::UsedCDCHit> UsedCDCHits; UsedCDCHits.isOptional();
 
   m_display = new DisplayUI(m_automatic);
   if (hasCondition())
@@ -205,22 +202,6 @@ void DisplayModule::event()
     StoreArray<ROIid> testbeamROIs("ROIs");
     for (int i = 0 ; i < testbeamROIs.getEntries(); i++)
       m_visualizer->addROI(testbeamROIs[i]);
-
-    //special VXDTF objects
-    StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
-    for (auto& currentTC : tfcandTFInfo) {
-      m_visualizer->addTrackCandidateTFInfo(&currentTC);
-    }
-
-    StoreArray<CellTFInfo> cellTFInfo;
-    for (auto& currentCell : cellTFInfo) {
-      m_visualizer->addCellTFInfo(&currentCell);
-    }
-
-    StoreArray<SectorTFInfo> sectorTFInfo;
-    for (auto& currentSector : sectorTFInfo) {
-      m_visualizer->addSectorTFInfo(&currentSector);
-    }
   }
 
   if (m_showCDCHits || m_showTriggerObjects) {

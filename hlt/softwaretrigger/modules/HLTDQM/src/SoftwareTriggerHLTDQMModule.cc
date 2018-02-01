@@ -39,12 +39,13 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 
   addParam("triggerVariables", m_param_triggerVariables, "List of trigger variables"
            "that should be written into histograms. The option preScaleStoreDebugOutputToDataStore of the "
-           "SoftwareTriggerModule needs to be enabled for this to work.");
+           "SoftwareTriggerModule needs to be enabled for this to work.", m_param_triggerVariables);
 
   addParam("baseIdentifier", m_param_baseIdentifier, "Base identifier for all variables and cut results reported",
            m_param_baseIdentifier);
 
-  addParam("cutIdentifiers", m_param_cutIdentifiers, "List of identifiers for the different cuts to include in the plotting");
+  addParam("cutIdentifiers", m_param_cutIdentifiers, "List of identifiers for the different cuts to include in the plotting",
+           m_param_cutIdentifiers);
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
            "SoftwareTrigger DQM histograms will be put into this directory", m_param_histogramDirectoryName);

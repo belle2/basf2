@@ -31,7 +31,7 @@ namespace Belle2 {
 
       /**
        * If trigger jitter was simulated, in every event one has to give an estimate of the effect.
-       * To reproduce the old behaviour, the other extracted event T0s are deleted before.
+       * To reproduce the old behaviour, we replace the final event t0 here
        * */
       void setEventTime(double eventTime = 0) __attribute__((deprecated))
       {
@@ -39,8 +39,7 @@ namespace Belle2 {
           m_eventTimeStoreObject.create();
         }
 
-        m_eventTimeStoreObject->clear();
-        m_eventTimeStoreObject->addEventT0(eventTime, 0, Const::CDC);
+        m_eventTimeStoreObject->setEventT0(eventTime, 0, Const::CDC);
       }
 
       /**

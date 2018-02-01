@@ -29,10 +29,10 @@ namespace Belle2 {
     PruneRecoTracksModule();
 
     // Declare required StoreArray
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Event processing, prunes the RecoTracks contained in each event
-    virtual void event() override;
+    void event() override;
 
   private:
     /// Name of the StoreArray to prune.

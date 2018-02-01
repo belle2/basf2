@@ -59,8 +59,6 @@ parser.add_argument('--momentum', dest='momentum', action='store', default=6., t
                     help='Nominal momentum of particles (if magnet is off). Default = 6 GeV/c')
 parser.add_argument('--pxd-tracking', dest='pxd_tracking', action='store_const', const=True,
                     default=False, help='Use Sector Maps including PXD in the track finding')
-parser.add_argument('--vxdtf2', dest='vxdtf2', action='store_const', const=True,
-                    default=False, help='Use VXDTF2 instead of 1.')
 parser.add_argument(
     '--histo-file',
     dest='histo_file',
@@ -108,7 +106,6 @@ setupGenfit.param('useVXDAlignment', useAlignment)
 
 # Unpacker
 SVDUNPACK = register_module('SVDUnpacker')
-SVDUNPACK.param('xmlMapFileName', 'testbeam/vxd/data/2017_svd_mapping.xml')
 
 SVDDIGISORTER = register_module('SVDDigitSorter')
 
@@ -148,7 +145,7 @@ daf.logging.log_level = LogLevel.ERROR
 
 track_creator = register_module('TrackCreator')
 track_creator.param('beamSpot', [0., 0., 0.])
-track_creator.param('defaultPDGCode', 11)
+track_creator.param('pdgCodes', 11)
 track_creator.logging.log_level = LogLevel.ERROR
 
 
@@ -236,30 +233,18 @@ useThisGeometry = 'TB2017'
 if args.after_run341:
     useThisGeometry = 'TB2017newGeo'
 
-if(args.vxdtf2):
-    add_vxdtf_v2(main,
-                 use_pxd=args.pxd_tracking,
-                 magnet_on=magnetOn,
-                 filter_overlapping=True,
-                 use_segment_network_filters=True,
-                 observerType=0,
-                 quality_estimator='circleFit',
-                 overlap_filter='greedy',  # 'hopfield' or 'greedy'
-                 log_level=LogLevel.ERROR,
-                 debug_level=1,
-                 usedGeometry=useThisGeometry
-                 )
-else:
-    add_vxdtf(
-        main,
-        magnet=magnetOn,
-        svd_only=not args.pxd_tracking,
-        momentum=args.momentum,
-        filterOverlaps='hopfield',
-        usedGeometry=useThisGeometry
-    )
-    # Crashes on sroot-files
-    main.add_module('RecoTrackCreator', trackCandidatesStoreArrayName='__TrackCands')
+add_vxdtf_v2(main,
+             use_pxd=args.pxd_tracking,
+             magnet_on=magnetOn,
+             filter_overlapping=True,
+             use_segment_network_filters=True,
+             observerType=0,
+             quality_estimator='circleFit',
+             overlap_filter='greedy',  # 'hopfield' or 'greedy'
+             log_level=LogLevel.ERROR,
+             debug_level=1,
+             usedGeometry=useThisGeometry
+             )
 main.add_module(daf)
 main.add_module(track_creator)
 

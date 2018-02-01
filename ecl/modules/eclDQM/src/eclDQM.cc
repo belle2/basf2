@@ -107,7 +107,7 @@ void ECLDQMModule::defineHisto()
 
   //Energy deposition.
 
-  h_edep = new TH1F("edep", "Energy deposition in event", 100 * (int)m_EnergyUpperThr, 0, m_EnergyUpperThr);
+  h_edep = new TH1F("edep", "Energy deposition in event", int(100 * m_EnergyUpperThr), 0, m_EnergyUpperThr);
   h_edep->GetXaxis()->SetTitle("energy, [GeV]");
   h_edep->SetOption("LIVE");
 
@@ -250,7 +250,6 @@ void ECLDQMModule::event()
 
   int NHitsEvent = ECLCalDigits.getEntries();
   int trigtag1 = 0;
-  int temp = 65535;
   int flagtag = 1;
 
   if (ECLDigits.getEntries() != NHitsEvent) B2ERROR("ECLDigit and ECLCalDigit objects have different number of entries!!!");
@@ -281,7 +280,7 @@ void ECLDQMModule::event()
   trigtag1 /= ECLTrigs.getEntries();
 
 
-  int compar = (temp & m_iEvent);
+  int compar = (65535 & m_iEvent);
   if (compar == trigtag1) flagtag = 0;
 
   h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.

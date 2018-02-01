@@ -29,7 +29,6 @@
 //ROOT
 #include "TH1F.h"
 #include "TH2F.h"
-//#include <TH2Poly.h>
 
 
 namespace Belle2 {

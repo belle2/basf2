@@ -9,6 +9,7 @@
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
   namespace CDCTriggerUnpacker {
@@ -261,8 +262,12 @@ namespace Belle2 {
       // shift omega to 16 bits, cast it to signed 16-bit int, and shift it back to 7 bits
       // thus the signed bit is preserved (when right-shifting)
       int omegaFirm = (int16_t (omega.to_ulong() << shift)) >> shift;
+      // B field is 1.5T
+      const double BField = 1.5e-4;
+      // omega in 1/cm
+      // omega = 1/R = c * B / pt
       // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
-      trackOut.omega = 29.97 * 1.5e-4 * omegaFirm;
+      trackOut.omega = Const::speedOfLight * BField / 0.3 / 34 * omegaFirm;
       int phi0 = std::bitset<trackLens[2]>(trackIn.substr(trackPos[2], trackLens[2])).to_ulong();
       trackOut.phi0 = pi() / 4 + pi() / 2 / 80 * (phi0 + 1);
       for (unsigned i = 0; i < 5; ++i) {

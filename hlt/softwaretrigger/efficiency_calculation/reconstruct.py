@@ -13,6 +13,7 @@ from simulation import add_roiFinder
 
 
 def main():
+    """Reconstruct the already generated events and store the results to disk"""
     # Get all parameters for this calculation
     input_file = os.environ.get("input_file")
     output_file = os.environ.get("output_file")

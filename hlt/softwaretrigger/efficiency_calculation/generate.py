@@ -79,6 +79,7 @@ def add_generation(path, event_class):
 
 
 def main():
+    """Generate the given amount and type of events and store them to disk"""
     # Get all parameters for this calculation
     channel = os.environ.get("channel")
     output_file = os.environ.get("output_file")

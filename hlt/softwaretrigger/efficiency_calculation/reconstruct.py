@@ -18,6 +18,7 @@ def main():
     input_file = os.environ.get("input_file")
     output_file = os.environ.get("output_file")
     phase = int(os.environ.get("phase"))
+    roi_filter = bool(os.environ.get("roi_filter"))
 
     print("input_file:", input_file)
     print("output_file:", output_file)
@@ -38,7 +39,10 @@ def main():
 
     # TODO: until the ROI finding HLT setup is handled properly, we have to do this "manually" here
     add_roiFinder(path, reco_tracks="RecoTracks")
-    path.add_module('PXDdigiFilter', PXDDigitsInsideROIName='PXDDigitsInsideROI', ROIidsName='ROIs')
+    if roi_filter:
+        # todo: this creates a second, filtered PXD digit list and does not overrive the PXD Digits which are
+        # packed one line below
+        path.add_module('PXDdigiFilter', PXDDigitsInsideROIName='PXDDigitsInsideROI', ROIidsName='ROIs')
     add_packers(path, components=["PXD"])
 
     path.add_module("RootOutput", outputFileName=output_file,

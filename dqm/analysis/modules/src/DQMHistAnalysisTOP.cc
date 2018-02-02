@@ -1,11 +1,12 @@
-//+
-// File : DQMHistAnalysisTOP.cc
-// Description :
-//
-// Author : Boqun, Wang
-// Date : Feb - 2018
-//-
-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Boqun Wang                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisTOP.h>
 #include <boost/format.hpp>

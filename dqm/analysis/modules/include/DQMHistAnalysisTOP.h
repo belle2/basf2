@@ -1,10 +1,12 @@
-//+
-// File : DQMHistAnalysisTOP.h
-// Description : An example module for DQM histogram analysis
-//
-// Author : Boqun Wang
-// Date : Feb - 2018
-//-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Boqun Wang                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #pragma once
 

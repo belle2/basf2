@@ -3,20 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric,  Dan Santel                                *
+ * Contributors: Marko Staric, Dan Santel, Boqun Wang                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
-
-// I copied 6 lines below from PXDDQMModule.h - is it realy needed?
-#undef DQM
-#ifndef DQM
-#include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 
 #include <framework/core/Module.h>
 #include <string>

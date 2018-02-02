@@ -43,7 +43,6 @@ execute eclComputePulseTemplates_Step4.py
 //
 
 struct crystalInfo {
-  int cellID;
   vector<double> PhotonWaveformPars;
 };
 
@@ -55,30 +54,26 @@ int main()
 
   TTree* ParameterTree = new TTree("ParTree", "");
   double PhotonWaveformPar[11];
-  for (int k = 0; k < 11; k++) {
-    PhotonWaveformPar[k] = 0;
-  }
-  int mcellid = 0;
-  ParameterTree->Branch("mcellid", &mcellid, "mcellid/I");
+  for (int k = 0; k < 11; k++)  PhotonWaveformPar[k] = 0;
+  //
   ParameterTree->Branch("PhotonPar", &PhotonWaveformPar, "PhotonWaveformPar[11]/D");
   //
-  vector<crystalInfo> cellIDcheck(8737);
+  vector<crystalInfo> cellIDcheck(8736);
   //
-  ifstream PhotonFile("params_gamma_shape.dat");
+  ifstream PhotonFile("/home/belle2/longos/WaveformFitting/ecl/tools/params_gamma_shape.dat");
   if (PhotonFile.is_open()) {
     vector<double> templine(12);
-    for (int k = 0; k < 8737; k++) {
+    for (int k = 0; k < 8736; k++) {
       for (unsigned int j = 0; j < templine.size(); j++)  PhotonFile >> templine[j];
-      cellIDcheck[int(templine[0])].PhotonWaveformPars.resize(11);
-      cellIDcheck[int(templine[0])].PhotonWaveformPars[0] = templine[1];
-      for (int j = 0; j < 10; j++)  cellIDcheck[int(templine[0])].PhotonWaveformPars[j + 1] = templine[j + 2];
+      cellIDcheck[int(templine[0]) - 1].PhotonWaveformPars.resize(11);
+      cellIDcheck[int(templine[0]) - 1].PhotonWaveformPars[0] = templine[1];
+      for (int j = 0; j < 10; j++)  cellIDcheck[int(templine[0]) - 1].PhotonWaveformPars[j + 1] = templine[j + 2];
       std::cout << int(templine[0]) << " " << templine[1] << endl;
     }
     PhotonFile.close();
   }
   //
   for (unsigned int f = 0; f < cellIDcheck.size(); f++) {
-    mcellid = cellIDcheck[f].cellID;
     for (int k = 0; k < 11; k++)  PhotonWaveformPar[k] = cellIDcheck[f].PhotonWaveformPars[k];
     ParameterTree->Fill();
   }

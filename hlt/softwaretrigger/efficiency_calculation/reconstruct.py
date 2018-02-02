@@ -34,7 +34,7 @@ def main():
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
-    add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring")
+    add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring", pruneDataStore=False)
 
     # TODO: until the ROI finding HLT setup is handled properly, we have to do this "manually" here
     add_roiFinder(path, reco_tracks="RecoTracks")

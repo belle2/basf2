@@ -1,7 +1,0 @@
-Import('env')
-
-# env['CONTINUE'] = False
-
-env['LIBS'] = ['framework', 'ecl', 'cdc', 'mdst_dataobjects', 'cdc_dataobjects', 'ecl_dataobjects', 'hlt_hlt_dataobjects']
-
-Return('env')

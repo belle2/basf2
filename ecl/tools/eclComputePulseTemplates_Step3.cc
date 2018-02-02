@@ -77,8 +77,13 @@ TF1* FitPulse(TGraph* gin, int ShapeFlag, double* pulseInputPara)
     //
     if (nFits == 20 && Attempt == 0 && (Check > 0.01)) {
       //Try new initial conditions
-      double ParMin11t[11] = {36.1232, -0.284876, 0.350343, 0.432839, 0.445749, 0.27693, 0.00899611, 6.11111, 0.788569, 0.570159, -0.411252};
-      for (int k = 0; k < 11; k++)ParMin11[k] = ParMin11t[k];
+      if (ShapeFlag == 1) {
+        double ParMin11t[11] = {36.1232, -0.284876, 0.350343, 0.432839, 0.445749, 0.27693, 0.00899611, 6.11111, 0.788569, 0.570159, -0.411252};
+        for (int k = 0; k < 11; k++)ParMin11[k] = ParMin11t[k];
+      } else {
+        double ParMin11t[11] = {10, 0.031, 4.2e-5, 0.74, 0.43, 0.61, 0.03, 3.8, 0.81, 0.77, 0.59};
+        for (int k = 0; k < 11; k++)ParMin11[k] = ParMin11t[k];
+      }
       Attempt++;
       nFits = 0;
     }
@@ -93,6 +98,8 @@ TF1* FitPulse(TGraph* gin, int ShapeFlag, double* pulseInputPara)
 int main(int argc, char* argv[])
 {
   //
+  TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
+  //
   int LowCellID = atoi(argv[1]);
   int HighCellID = atoi(argv[2]);
   //
@@ -100,7 +107,7 @@ int main(int argc, char* argv[])
   double PhotonValues_A[1000];
   double HadronValues_A[1000];
   double DiodeValues_A[1000];
-  TFile* HadronShapeFile  = new TFile(Form("HadronShapes_Low%d_High%d.root", LowCellID, HighCellID));
+  TFile* HadronShapeFile  = new TFile(OutputDirectory + Form("HadronShapes_Low%d_High%d.root", LowCellID, HighCellID));
   TTree* chain = (TTree*) HadronShapeFile->Get("HadronTree");
   chain->SetBranchAddress("TimeAll_A", &TimeAll_A);
   chain->SetBranchAddress("ValuePhoton_A", &PhotonValues_A);
@@ -114,7 +121,7 @@ int main(int argc, char* argv[])
   double MaxResHadron_A = 0;
   double MaxValHadron_A = 0;
   //
-  TFile* f = new TFile(Form("HadronPars_Low%d_High%d.root", LowCellID, HighCellID), "RECREATE");
+  TFile* f = new TFile(OutputDirectory + Form("HadronPars_Low%d_High%d.root", LowCellID, HighCellID), "RECREATE");
   TTree* WaveformParametersTree = new TTree("HadronWaveformInfo", "");
   WaveformParametersTree->Branch("TempHadronPar11_A", &TempHadronPar11_A, "TempHadronPar11_A[11]/D");
   WaveformParametersTree->Branch("TempDiodePar11_A", &TempDiodePar11_A, "TempDiodePar11_A[11]/D");
@@ -146,9 +153,11 @@ int main(int argc, char* argv[])
       TF1* F2_A =  FitPulse(G2_A, 0, InputPara_A_H);
       TF1* F3_A =  FitPulse(G3_A, 1, InputPara_A_D);
       //
-      for (int k = 0; k < 11; k++) {
-        TempHadronPar11_A[k] = F2_A->GetParameter(k);
-        TempDiodePar11_A[k] = F3_A->GetParameter(k);
+      TempHadronPar11_A[0] = F2_A->GetParameter(24);
+      TempDiodePar11_A[0] = F3_A->GetParameter(24);
+      for (int k = 0; k < 10; k++) {
+        TempHadronPar11_A[k + 1] = F2_A->GetParameter(k + 4);
+        TempDiodePar11_A[k + 1] = F3_A->GetParameter(k + 4);
       }
       //
       MaxResHadron_A = GetMaxRes(G2_A, F2_A);
@@ -161,7 +170,7 @@ int main(int argc, char* argv[])
       WaveformParametersTree->Fill();
       //
       //Set to true to draw fit results in output file
-      if (true) {
+      if (false) {
         G2_A->SetMarkerColor(kBlue);
         G3_A->SetMarkerColor(kRed);
         G1_A->GetYaxis()->SetRangeUser(-0.5, 2);

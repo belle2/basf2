@@ -101,10 +101,12 @@ def GetShaperOutput(ratio, flg, shaperMuonFunc):
         return Time_us, ShaperDSP_output_array
 
 
+#
+OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/"
 Low = int(sys.argv[1])
 High = int(sys.argv[2])
 #
-f1 = ROOT.TFile("PhotonShapes_Low" + str(Low) + "_High" + str(High) + ".root", "update")
+f1 = ROOT.TFile(OutputDirectory + "PhotonShapes_Low" + str(Low) + "_High" + str(High) + ".root", "update")
 f1.cd()
 mt = f1.Get("mtree")
 entries = mt.GetEntries()
@@ -112,7 +114,7 @@ print(entries)
 #
 TFactor = 30
 #
-outFile = TFile("HadronShapes_Low" + str(Low) + "_High" + str(High) + ".root", "RECREATE")
+outFile = TFile(OutputDirectory + "HadronShapes_Low" + str(Low) + "_High" + str(High) + ".root", "RECREATE")
 outTree = ROOT.TTree("HadronTree", "")
 TimeAll_A = array('d', 1000 * [0.])
 ValuePhoton_A = array('d', 1000 * [0.])

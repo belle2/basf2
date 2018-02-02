@@ -32,6 +32,9 @@ eclComputePulseTemplates_Step4.cc - organizes photon, hadron and diode templates
 
 To run calibration :
 
+Note "OutputDirectory" variable in eclComputePulseTemplates_Stepx.cc files should be modified to a temp directory before running scripts.
+recompile with "scons ecl"
+
 execute eclComputePulseTemplates_Step0 0
 for i=0 i<873 i++
   execute eclComputePulseTemplates_Step1 i*10 (i+1)*10
@@ -55,12 +58,15 @@ struct crystalInfo {
 int main(int argc, char* argv[])
 {
   //
-  int Flag = atoi(argv[1]);
+  TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
   //
-  TString ParameterTreeOutputName = "PhotonWaveformParameters.root";
+  int Flag = atoi(argv[1]);
+  TString InputDirectory = OutputDirectory;
+  //
+  TString ParameterTreeOutputName = OutputDirectory + "PhotonWaveformParameters.root";
   if (Flag == 1) ParameterTreeOutputName = "DigitWaveformParameters.root";
   TFile* ParameterTreeOutputFile = new TFile(ParameterTreeOutputName, "RECREATE");
-
+  //
   TTree* ParameterTree = new TTree("ParTree", "");
   double PhotonWaveformPar[11];
   double HadronWaveformPar[11];
@@ -103,12 +109,13 @@ int main(int argc, char* argv[])
       for (int k = 0; k < 11; k++)  PhotonWaveformPar[k] = cellIDcheck[f].PhotonWaveformPars[k];
       ParameterTree->Fill();
     }
-  } else {
+  } else if (Flag == 1) {
     int batch = 10;
     for (int k = 0; k < 874; k++) {
       int low = k * batch;
       int high = (k + 1) * batch;
-      TFile* TempFile = new TFile(Form("HadronPars_Low%d_High%d.root", low, high), "READ");
+      //std::cout<<k<<std::endl;
+      TFile* TempFile = new TFile(InputDirectory + Form("HadronPars_Low%d_High%d.root", low, high), "READ");
       TTree* TempTree = (TTree*)  TempFile->Get("HadronWaveformInfo");
       double tHadronShapePars_A[11];
       double tDiodeShapePars_A[11];
@@ -124,12 +131,22 @@ int main(int argc, char* argv[])
       TempTree->SetBranchAddress("MaxValHadron_A", &tMaxValHadron_A);
       //
       for (int j = 0; j < batch; j++) {
-        TempTree->GetEntry(j);
-        //
         int tCellID = (k * batch) + j;
+        if (tCellID >= 8736)continue;
+        TempTree->GetEntry(j);
         cellIDcheck[tCellID].HadronWaveformPars.resize(11);
         cellIDcheck[tCellID].DiodeWaveformPars.resize(11);
-        for (int p = 0; p < 11; p++)  cellIDcheck[tCellID].HadronWaveformPars[p] = tHadronShapePars_A[p];
+        for (int p = 0; p < 11; p++) {
+          if (tHadronShapePars_A[p] > 100 || tHadronShapePars_A[p] < -100) {
+            std::cout << "Warning  large parameter for: " << tCellID << " " << tHadronShapePars_A[p] << std::endl;
+            for (int h = 0; h < 11; h++)std::cout << tHadronShapePars_A[h] << " , ";
+            std::cout << std::endl;
+          }
+          cellIDcheck[tCellID].HadronWaveformPars[p] = tHadronShapePars_A[p];
+        }
+        //std::cout<<tCellID<<std::endl;
+        //for(int h=0;h<11;h++ )std::cout<<tHadronShapePars_A[h]<<" , ";
+        //std::cout<<std::endl;
         cellIDcheck[tCellID].MaxResHadron = tMaxResidualHadron_A;
         cellIDcheck[tCellID].MaxValHadron = tMaxValHadron_A;
         for (int p = 0; p < 11; p++)  cellIDcheck[tCellID].DiodeWaveformPars[p] = tDiodeShapePars_A[p];

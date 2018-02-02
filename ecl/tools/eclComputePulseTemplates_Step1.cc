@@ -13,21 +13,23 @@
 int main(int argc, char* argv[])
 {
   //
-  int LowCellIDLimit = atoi(argv[1]);
-  int HighCellIDLimit = atoi(argv[2]);
+  TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
+  //
+  int LowIDLimit = atoi(argv[1]);
+  int HighIDLimit = atoi(argv[2]);
   //
   double PhotonWaveformPar[11];
-  TFile* PhotonParFile = new TFile("PhotonWaveformParameters.root");
+  TFile* PhotonParFile = new TFile(OutputDirectory + "PhotonWaveformParameters.root");
   TTree* chain = (TTree*) PhotonParFile->Get("ParTree");
   chain->SetBranchAddress("PhotonPar", &PhotonWaveformPar);
   //
-  TFile* f = new TFile(Form("PhotonShapes_Low%d_High%d.root", LowCellIDLimit, HighCellIDLimit), "RECREATE");
+  TFile* f = new TFile(OutputDirectory + Form("PhotonShapes_Low%d_High%d.root", LowIDLimit, HighIDLimit), "RECREATE");
   f->cd();
   TTree* mtree = new TTree("mtree", "");
   double PhotonWaveformArray[100000];
   mtree->Branch("PhotonArray", &PhotonWaveformArray, "PhotonWaveformArray[100000]/D");
   //
-  for (Long64_t jentry = LowCellIDLimit; jentry < HighCellIDLimit; jentry++) {
+  for (Long64_t jentry = LowIDLimit; jentry < HighIDLimit; jentry++) {
     chain->GetEntry(jentry);
     TF1 PhotonShapeFunc = TF1(Form("photonShape_%lld", jentry), WaveFuncTwoComp, 0, 20, 26);;
     PhotonShapeFunc.SetNpx(1000);

@@ -19,6 +19,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
@@ -92,8 +93,8 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw ROIs. */
       StoreArray<PXDRawROIs> m_storeROIs;
-      /** Output array for DAQ Status. */ // TODO Why Array, can be object?
-      StoreArray<PXDDAQStatus> m_storeDAQEvtStats;
+      /** Output array for DAQ Status. */
+      StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
       /** Output array for Raw Adc:Pedestals. */
@@ -106,7 +107,7 @@ namespace Belle2 {
        * @param inx Index of RawPXD packet
        * @param daqevtstat Daq Status Object
        */
-      void unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus* daqevtstat);
+      void unpack_rawpxd(RawPXD& px, int inx);
 
       /** Unpack one frame (within an event).
        * @param data pointer to frame

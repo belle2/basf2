@@ -144,20 +144,20 @@ void PXDUnpackerNewModule::event()
   m_meta_experiment = evtPtr->getExperiment();
   m_meta_time = evtPtr->getTime();
 
-  PXDDAQStatus* daqevtstat = m_storeDAQEvtStats.appendNew(EPXDErrMask::c_NO_ERROR);
+  m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
 
   int inx = 0; // count index for output objects
   for (auto& it : m_storeRawPXD) {
     if (verbose) {
       B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
     };
-    unpack_rawpxd(it, inx++, daqevtstat);
+    unpack_rawpxd(it, inx++);
   }
 
   if (nRaws == 0) m_errorMask |= EPXDErrMask::c_NO_PXD;
 
   m_errorMaskEvent |= m_errorMask;
-  daqevtstat->setErrorMask(m_errorMaskEvent);
+  m_storeDAQEvtStats->setErrorMask(m_errorMaskEvent);
 
   m_unpackedEventsCount++;
   {
@@ -171,7 +171,7 @@ void PXDUnpackerNewModule::event()
   setReturnValue(0 == (m_criticalErrorMask & m_errorMaskEvent));
 }
 
-void PXDUnpackerNewModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus* daqevtstat)
+void PXDUnpackerNewModule::unpack_rawpxd(RawPXD& px, int inx)
 {
   int Frames_in_event;
   int fullsize;
@@ -180,7 +180,7 @@ void PXDUnpackerNewModule::unpack_rawpxd(RawPXD& px, int inx, PXDDAQStatus* daqe
   m_errorMaskDHE = 0;
   m_errorMaskDHC = 0;
   m_errorMaskPacket = 0;
-  PXDDAQPacketStatus& daqpktstat = daqevtstat->newPacket(inx);
+  PXDDAQPacketStatus& daqpktstat = m_storeDAQEvtStats->newPacket(inx);
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
     B2ERROR("PXD Unpacker --> invalid packet size (32bit words) $" << hex << px.size());

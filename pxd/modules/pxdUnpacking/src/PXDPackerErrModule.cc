@@ -23,6 +23,9 @@
 
 #include <boost/spirit/home/support/detail/endian.hpp>
 
+#include <pxd/unpacking/PXDUnpackerLookup.h>
+
+
 #include <TRandom.h>
 
 using namespace std;
@@ -115,6 +118,8 @@ PXDPackerErrModule::PXDPackerErrModule() :
 
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
+  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"premapped\" coordinates", false);
+  addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
 
 }
 
@@ -364,9 +369,11 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int32((EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
                (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16);
-  append_int16(((m_meta_time << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
-  append_int16((m_meta_time >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
-  append_int16((m_meta_time >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
+
+  uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
+  append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
+  append_int16((mm >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
+  append_int16((mm >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
   append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
   if (!isErrorIn(7)) append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8
   if (!isErrorIn(13)) add_frame_to_payload();
@@ -412,7 +419,7 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
   if (isErrorIn(37)) dhp_active = 0; // mark as no DHP, but send them (see below)
   B2DEBUG(20, "PXD Packer Err --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
   // dhe_id is not dhe_id ...
-  int dhe_reformat = 1; /// unless stated otherwise, DHH will not reformat coordinates
+  bool dhe_reformat = m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
 
   if (dhe_reformat != 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
@@ -505,7 +512,7 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
       row = gRandom->Integer(ladder_max_row);// hardware starts counting at 0!
       col = gRandom->Integer(ladder_max_col);// hardware starts counting at 0!
       charge = gRandom->Integer(256);// 0-255
-      if (dhe_reformat == 0) {
+      if (dhe_reformat) {
         do_the_reverse_mapping(row, col, layer, sensor);
       }
       halfladder_pixmap[row][col] = charge;
@@ -514,7 +521,7 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
     if (isErrorIn(38)) dhp_active = 0; // no DHP data even if we expect it
     for (int i = 0; i < 4; i++) {
       if ((dhp_active & 0x1) or isErrorIn(37)) {
-        pack_dhp(i, dhe_id, dhe_reformat);
+        pack_dhp(i, dhe_id, dhe_reformat ? 1 : 0);
         /// The following lines "simulate" a full frame readout frame ... not for production yet!
 //         if (m_trigger_nr == 0x11) {
 //           pack_dhp_raw(i, dhe_id, false);
@@ -545,7 +552,11 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
 void PXDPackerErrModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int& /*col*/, unsigned short /*layer*/,
                                                 unsigned short /*sensor*/)
 {
+  B2FATAL("code needs to be written");
   // work to be done
+  //
+  // PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
+  // PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
 }
 
 void PXDPackerErrModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
@@ -606,7 +617,7 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
   if (dhe_reformat != 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
-//     assert(dhe_reformat == 0);
+    assert(dhe_reformat == 0);
   }
 
   start_frame();

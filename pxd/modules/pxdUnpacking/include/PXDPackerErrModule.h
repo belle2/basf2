@@ -44,6 +44,9 @@ namespace Belle2 {
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
+      bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
+      bool m_Clusterize; /** Use clusterizer (FCE format) */
+
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
 
@@ -115,8 +118,8 @@ namespace Belle2 {
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];//! temporary hitmap buffer for pixel to raw data conversion
-
+      /** temporary hitmap buffer for pixel to raw data conversion */
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
 
       unsigned int dhe_byte_count;/**< Byte count in current DHE package */
       unsigned int dhc_byte_count;/**< Byte count in current DHC package */

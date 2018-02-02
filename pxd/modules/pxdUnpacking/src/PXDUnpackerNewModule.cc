@@ -830,9 +830,9 @@ void PXDUnpackerNewModule::unpack_dhc_frame(void* data, const int len, const int
             B2ERROR("Meta ns from 127MHz: " << hex << mm << " Diff: " << (tt - mm));
           }
         } else {
-          B2INFO("DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<
-                 dhc.data_dhc_start_frame->time_tag_lo_and_type << " META " << m_meta_time << " TRG Type " <<
-                 (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF));
+          B2DEBUG(20, "DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<
+                  dhc.data_dhc_start_frame->time_tag_lo_and_type << " META " << m_meta_time << " TRG Type " <<
+                  (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF));
         }
       }
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();

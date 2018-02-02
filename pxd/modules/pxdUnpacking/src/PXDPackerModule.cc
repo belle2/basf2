@@ -293,9 +293,11 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int32((EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
                (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16);
-  append_int16(((m_meta_time << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
-  append_int16((m_meta_time >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
-  append_int16((m_meta_time >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
+
+  uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
+  append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
+  append_int16((mm >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
+  append_int16((mm >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
   append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
   append_int16(m_run_nr_word2); // Exp NR 9-0 | Run Nr 13-8
   add_frame_to_payload();

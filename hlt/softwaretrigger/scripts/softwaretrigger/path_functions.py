@@ -21,6 +21,7 @@ def add_softwaretrigger_reconstruction(
         additionalTrackFitHypotheses=[],
         softwaretrigger_mode='hlt_filter',
         additonal_store_arrays_to_keep=[],
+        pruneDataStore=True,
         calcROIs=True):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
@@ -63,10 +64,15 @@ def add_softwaretrigger_reconstruction(
     :param additonal_store_arrays_to_keep: StoreArray names which will kept together with the Raw objects after
                                            the HLT processing is complete. The content of the StoreArray will only
                                            be kept if the event is not filtered or the monitoring mode is used.
+    :param pruneDataStore: If this is false, none of the reconstruction content will be removed from the datestore
+                           after the reconstruction and software trigger is complete. Default is true.
     """
     # In the following, we will need some paths:
     # (1) A "store-metadata" path (deleting everything except the trigger tags and some metadata)
-    store_only_metadata_path = get_store_only_metadata_path()
+    if pruneDataStore:
+        store_only_metadata_path = get_store_only_metadata_path()
+    else:
+        store_only_metadata_path = basf2.create_path()
     # (3) A path doing the fast reco reconstruction
     fast_reco_reconstruction_path = basf2.create_path()
     # (4) A path doing the hlt reconstruction
@@ -110,7 +116,8 @@ def add_softwaretrigger_reconstruction(
         add_calcROIs_software_trigger(calibration_and_store_only_rawdata_path, calcROIs=calcROIs)
         # Fill the calibration_and_store_only_rawdata_path path
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
-        calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
+        if pruneDataStore:
+            calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
         if softwaretrigger_mode == 'hlt_filter':
             # There are two possibilities for the output of this module
             # (1) the event is rejected -> only store the metadata
@@ -121,11 +128,12 @@ def add_softwaretrigger_reconstruction(
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
-        fast_reco_reconstruction_path.add_module(
-            "PruneDataStore",
-            matchEntries=ALWAYS_SAVE_REGEX +
-            RAW_SAVE_STORE_ARRAYS +
-            additonal_store_arrays_to_keep)
+        if pruneDataStore:
+            fast_reco_reconstruction_path.add_module(
+                "PruneDataStore",
+                matchEntries=ALWAYS_SAVE_REGEX +
+                RAW_SAVE_STORE_ARRAYS +
+                additonal_store_arrays_to_keep)
 
     path.add_path(fast_reco_reconstruction_path)
 

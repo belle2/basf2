@@ -95,11 +95,25 @@ void SVDDQMExpressRecoMinModule::defineHisto()
       break;
     }
   }
+  c_nSVDChips = 0;
+  for (VxdID layer : geo.getLayers()) {
+    for (VxdID ladder : geo.getLadders(layer)) {
+      if (layer.getLayerNumber() > c_lastPXDLayer) {  // SVD
+        if (layer.getLayerNumber() == 3)
+          c_nSVDChips += geo.getLadders(layer).size() * geo.getSensors(ladder).size() * (c_nSVDChipsL3 + c_nSVDChipsL3);
+        else
+          c_nSVDChips += geo.getLadders(layer).size() * geo.getSensors(ladder).size() * (c_nSVDChipsLu + c_nSVDChipsLv);
+      }
+      break;
+    }
+  }
   // TODO: after available use:
   // VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   // c_nFADC = geo.getFADCs().size();
 
   // Create basic histograms:
+
+  // basic counters per sensor:
   m_hitMapCountsU = new TH1I("DQMER_SVD_StripHitmapCountsU", "DQM ER SVD Integrated number of fired U strips per sensor",
                              c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapCountsU->GetXaxis()->SetTitle("Sensor ID");
@@ -116,6 +130,17 @@ void SVDDQMExpressRecoMinModule::defineHisto()
                                c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapClCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsV->GetYaxis()->SetTitle("counts");
+
+  // basic counters per chip:
+  m_hitMapCountsChip = new TH1I("DQMER_SVD_StripHitmapCountsChip", "DQM ER SVD Integrated number of fired strips per chip",
+                                c_nSVDChips, 0, c_nSVDChips);
+  m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
+  m_hitMapClCountsChip = new TH1I("DQMER_SVD_ClusterHitmapCountsChip", "DQM ER SVD Integrated number of clusters per chip",
+                                  c_nSVDChips, 0, c_nSVDChips);
+  m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
+
 
   m_firedU = new TH1F*[c_nSVDSensors];
   m_firedV = new TH1F*[c_nSVDSensors];
@@ -271,6 +296,20 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_hitMapClCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
+  for (int i = 0; i < c_nSVDChips; i++) {
+    int iLayer = 0;
+    int iLadder = 0;
+    int iSensor = 0;
+    int iChip = 0;
+    int IsU = 0;
+    getIDsFromChipIndex(i, iLayer, iLadder, iSensor, iChip, IsU);
+    TString AxisTicks = Form("%i_%i_%i_u%i", iLayer, iLadder, iSensor, iChip);
+    if (!IsU)
+      AxisTicks = Form("%i_%i_%i_v%i", iLayer, iLadder, iSensor, iChip);
+    m_hitMapCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapClCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+  }
+
   oldDir->cd();
 }
 
@@ -302,6 +341,9 @@ void SVDDQMExpressRecoMinModule::beginRun()
   if (m_hitMapCountsV != NULL) m_hitMapCountsV->Reset();
   if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Reset();
   if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Reset();
+
+  if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Reset();
+  if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Reset();
   for (int i = 0; i < c_nFADC; i++) {
     if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Reset();
     if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Reset();
@@ -369,21 +411,31 @@ void SVDDQMExpressRecoMinModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (digitIn.isUStrip()) {
       uStrips.at(index).insert(digitIn.getCellID());
+      int Chip = (int)(digitIn.getCellID() / c_nSVDChannelsPerChip);
+      int isU = 1;
+      int indexChip = getChipIndex(iLayer, iLadder, iSensor, Chip, isU);
       // 6-to-1 relation weights are equal to digit signals, modulo rounding error
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
       for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
         if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(samples[i]);
-        if ((m_hitMapCountsU != NULL) && (samples[i] > m_CutSVDCharge))
-          m_hitMapCountsU->Fill(index);
+        if (samples[i] > m_CutSVDCharge) {
+          if (m_hitMapCountsU != NULL) m_hitMapCountsU->Fill(index);
+          if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+        }
       }
     } else {
       vStrips.at(index).insert(digitIn.getCellID());
+      int Chip = (int)(digitIn.getCellID() / c_nSVDChannelsPerChip);
+      int isU = 0;
+      int indexChip = getChipIndex(iLayer, iLadder, iSensor, Chip, isU);
       // 6-to-1 relation weights are equal to digit signals, modulo rounding error
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
       for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
         if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(samples[i]);
-        if ((m_hitMapCountsV != NULL) && (samples[i] > m_CutSVDCharge))
-          m_hitMapCountsV->Fill(index);
+        if (samples[i] > m_CutSVDCharge) {
+          if (m_hitMapCountsV != NULL) m_hitMapCountsV->Fill(index);
+          if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+        }
       }
     }
   }
@@ -407,13 +459,19 @@ void SVDDQMExpressRecoMinModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (cluster.isUCluster()) {
       countsU.at(index).insert(SensorInfo.getUCellID(cluster.getPosition()));
+      int indexChip = getChipIndex(iLayer, iLadder, iSensor, (int)(SensorInfo.getUCellID(cluster.getPosition()) / c_nSVDChannelsPerChip),
+                                   1);
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
+      if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge());
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
+      int indexChip = getChipIndex(iLayer, iLadder, iSensor, (int)(SensorInfo.getVCellID(cluster.getPosition()) / c_nSVDChannelsPerChip),
+                                   0);
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
+      if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge());
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
       if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
@@ -428,15 +486,88 @@ void SVDDQMExpressRecoMinModule::event()
 }
 
 
-void SVDDQMExpressRecoMinModule::endRun()
+int SVDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip,
+                                             const int IsU) const
 {
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  int tempcounter = 0;
+//  int Chip =
+  for (VxdID layer : geo.getLayers()) {
+    if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
+    for (VxdID ladder : geo.getLadders(layer)) {
+      for (VxdID sensor : geo.getSensors(ladder)) {
+        if ((Layer == layer.getLayerNumber()) &&
+            (Ladder == ladder.getLadderNumber()) &&
+            (Sensor == sensor.getSensorNumber())) {
+          int iChip = Chip;
+          if (Layer == 3)
+            if (!IsU)
+              iChip += c_nSVDChipsL3;
+          if (Layer > 3)
+            if (!IsU)
+              iChip += c_nSVDChipsLu;
+          return tempcounter + iChip;
+        }
+        if (Layer == 3)
+          tempcounter = tempcounter + (2 * c_nSVDChipsL3);
+        if (Layer > 3)
+          tempcounter = tempcounter + (c_nSVDChipsLu + c_nSVDChipsLv);
+      }
+    }
+  }
+  return tempcounter;
 }
 
-void SVDDQMExpressRecoMinModule::terminate()
+void SVDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
+                                                     int& IsU) const
 {
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  int tempcounter = 0;
+  for (VxdID layer : geo.getLayers()) {
+    if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
+    for (VxdID ladder : geo.getLadders(layer)) {
+      for (VxdID sensor : geo.getSensors(ladder)) {
+        Layer = layer.getLayerNumber();
+        Ladder = ladder.getLadderNumber();
+        Sensor = sensor.getSensorNumber();
+        int Chips = 0;
+        if (layer.getLayerNumber() == 3)
+          Chips = 2 * c_nSVDChipsL3;
+        if (layer.getLayerNumber() > 3)
+          Chips = c_nSVDChipsLu + c_nSVDChipsLv;
+        for (int iChip = 0; iChip < Chips; iChip++) {
+          if (tempcounter + iChip == Index) {
+            Layer = layer.getLayerNumber();
+            Ladder = ladder.getLadderNumber();
+            Sensor = sensor.getSensorNumber();
+            Chip = iChip;
+            IsU = 1;
+            if (Layer == 3) {
+              if (iChip >= c_nSVDChipsL3) {
+                Chip = iChip - c_nSVDChipsL3;
+                IsU = 0;
+              }
+            }
+            if (Layer > 3) {
+              if (iChip >= c_nSVDChipsLu) {
+                Chip = iChip - c_nSVDChipsLu;
+                IsU = 0;
+              }
+            }
+            return;
+          }
+        }
+        if (Layer == 3)
+          tempcounter = tempcounter + (2 * c_nSVDChipsL3);
+        if (Layer > 3)
+          tempcounter = tempcounter + (c_nSVDChipsLu + c_nSVDChipsLv);
+      }
+    }
+  }
 }
 
-int SVDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor)
+
+int SVDDQMExpressRecoMinModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -456,7 +587,7 @@ int SVDDQMExpressRecoMinModule::getSensorIndex(int Layer, int Ladder, int Sensor
   return tempcounter;
 }
 
-void SVDDQMExpressRecoMinModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor)
+void SVDDQMExpressRecoMinModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;

@@ -63,7 +63,7 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
-def run_reconstruction(channels, storage_location, local_execution, phase):
+def run_reconstruction(channels, storage_location, local_execution, phase, roi_filter):
     """
     Helper function to call gridcontrol on the reconstruct.py steering file with
     the correct arguments. Will run one job per generated file.
@@ -81,7 +81,7 @@ def run_reconstruction(channels, storage_location, local_execution, phase):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
 
-            parameter = {"input_file": input_file, "output_file": output_file, "phase": phase}
+            parameter = {"input_file": input_file, "output_file": output_file, "phase": phase, "roi_filter": roi_filter}
 
             parameters.append(parameter)
 
@@ -162,6 +162,8 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--phase", help="Select the phase of the Belle II Detector. Can be 2 or 3 (default)",
                         type=int, default=3)
+    parser.add_argument("--no-roi-filter", help="Don't apply the Region-Of-Interest filter for the PXD hits",
+                        action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -189,7 +191,8 @@ if __name__ == "__main__":
     # Reconstruct each channel
     run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,
                        local_execution=args.local,
-                       phase=args.phase)
+                       phase=args.phase,
+                       roi_filter=not args.no_roi_filter)
 
     # Calculate file size and efficiencies for each channel
     calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,

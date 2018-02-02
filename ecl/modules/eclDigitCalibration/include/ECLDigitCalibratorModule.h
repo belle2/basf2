@@ -72,6 +72,10 @@ namespace Belle2 {
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
 
+    /** Name of the ECLDsp.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDsps" ; }
+
     /** Name of the ECLCalDigit.*/
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }

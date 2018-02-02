@@ -32,7 +32,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
@@ -79,10 +78,11 @@ void ECLWaveformFitModule::beginRun()
 
 }
 //
-vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
-                                                 vector<double> PhotonPars11,
-                                                 vector<double> HadronPars11,
-                                                 int ComponentNumber)
+std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
+
+                                                      std::vector<double> PhotonPars11,
+                                                      std::vector<double> HadronPars11,
+                                                      int ComponentNumber)
 {
   //
   //InitialAmp: = Starting Fit Amp
@@ -136,7 +136,7 @@ vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
        k++)  OfflineFitChiSquareTwoComp += (pow((WaveformAmp[k] - FitROOTHadron->Eval(WaveformTime[k])), 2) / (pow(WaveformAmpError[k],
                                               2)));
   //
-  vector<double> tempResult(5);
+  std::vector<double> tempResult(5);
   tempResult[0] = FitROOTHadron->GetParameter(2) + FitROOTHadron->GetParameter(3); //Total Amp
   tempResult[1] = FitROOTHadron->GetParameter(3); //Hadron Amp
   tempResult[2] = OfflineFitChiSquareTwoComp; //Chi2
@@ -210,12 +210,12 @@ void ECLWaveformFitModule::event()
       }
       //
       if (CurrentPhotonPar11[0] == 0 || CurrentSecondCompPar11[0] == 0) {
-        B2WARNING("Warning cellID: " << CurrentCellID << " has no waveforms." << endl);
+        B2WARNING("Warning cellID: " << CurrentCellID << " has no waveforms." << std::endl);
         continue;
       }
       //
       //Fit using ROOT::Fit with Photon + Hadron or Diode Templates
-      vector<double> theROOTFit;
+      std::vector<double> theROOTFit;
       theROOTFit = FitWithROOT(OnlineAmp, CurrentPhotonPar11, CurrentSecondCompPar11, 2);
       //
       aECLDsp.setTwoCompTotalAmp(theROOTFit[0]);

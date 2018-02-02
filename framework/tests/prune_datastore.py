@@ -40,7 +40,7 @@ class TestModule(Module):
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         assert evtmetadata
 
-
+set_log_level(LogLevel.ERROR)
 set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently

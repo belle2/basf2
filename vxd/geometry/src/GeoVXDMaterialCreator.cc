@@ -95,6 +95,29 @@ namespace Belle2 {
         );
         vxdMaterialGeometryPar.getbeastEclMaterials().push_back(MaterialPar);
       }
+
+      GearDir content5(content, "CDCGAPS/BackwardGAP");
+      // Read parameters for Backward Gap Mom Volume
+      ThicknessBackPar ThickBackPar;
+      for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 144; j++) {
+          const double thick = content5.getLength("Bthick_" + to_string(i) + "_" + to_string(j)) / Unit::mm;
+          ThickBackPar.appendNode(thick);
+        }
+      }
+      vxdMaterialGeometryPar.getthickBack() = ThickBackPar;
+
+      GearDir content6(content, "CDCGAPS/ForwardGAP");
+      // Read parameters for Forward Gap Mom Volume
+      ThicknessForPar ThickForPar;
+      for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 144; j++) {
+          const double thick = content6.getLength("Fthick_" + to_string(i) + "_" + to_string(j)) / Unit::mm;
+          ThickForPar.appendNode(thick);
+        }
+      }
+      vxdMaterialGeometryPar.getthickFor() = ThickForPar;
+
       return vxdMaterialGeometryPar;
     }
 
@@ -124,32 +147,37 @@ namespace Belle2 {
       G4LogicalVolume* logical_gap_back = new G4LogicalVolume(solid_gap_back, medAir, "VXD.GAPBack", 0, 0, 0);
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_back, "VXD.GAPBack", &topVolume, false, 1);
 
-
       //      Create Materials from BEAST 2  between CDC and ECL.
+      const auto& ThickBack = parameters.getthickBack();
+      std::vector<double> ThicknessBack =  ThickBack.getThick();
+      const auto& ThickFor = parameters.getthickFor();
+      std::vector<double> ThicknessFor =  ThickFor.getThick();
+
       G4Material* medAluminum = geometry::Materials::get("Al");
-//      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (const BeastMaterialsPar& material : parameters.getbeastMaterials()) {
         const int materialID = material.getIdentifier();
         const double materialInnerR = material.getInnerR() / Unit::mm;
         const double materialOuterR = material.getOuterR() / Unit::mm;
         const double materialBackwardZ = material.getBackwardZ() / Unit::mm;
         const double materialForwardZ = material.getForwardZ() / Unit::mm;
-        const double cellR = (materialOuterR - materialInnerR) / 140;
+        const double cellR = (materialOuterR - materialInnerR) / 16;
         if (materialID < 2) {
           int blockid = 0;
-          for (int iR = 0; iR < 140; iR++) {
+          for (int iR = 0; iR < 16; iR++) {
             const double rmin = materialInnerR + iR * cellR;
             const double rmax = materialInnerR + (iR + 1) * cellR;
-            const double materialThick = fabs(materialForwardZ - materialBackwardZ);
+//            const double materialThick = fabs(materialForwardZ - materialBackwardZ);
             const double materialPosZ = materialBackwardZ;
             for (int iPhi = 0; iPhi < 144; iPhi++) {
               const double SPhi = 360 / 144.*iPhi;
               const double DPhi = 360 / 144.;
               const int blockID = blockid;
               if (materialID < 1) {
+                const double materialThick = ThicknessBack[blockid];
                 createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medAluminum, blockID, logical_gap_back);
               }
               if (materialID >= 1) {
+                const double materialThick = ThicknessFor[blockid];
                 createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medAluminum, blockID, logical_gap_for);
               }
               blockid++;
@@ -167,7 +195,9 @@ namespace Belle2 {
               const double SPhi = 360 / 144.*iPhi;
               const double DPhi = 360 / 144.;
               const int blockID = blockid;
-              createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medAluminum,  blockID, logical_gap_for);
+              G4Material* medArichGap = geometry::Materials::get("ArichGap_" + to_string(iZ) + "_" + to_string(iPhi));
+//              G4Material* medArichGap = geometry::Materials::get("Al");
+              createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medArichGap,  blockID, logical_gap_for);
               blockid++;
             }
           }
@@ -182,7 +212,9 @@ namespace Belle2 {
             const double SPhi = 360 / 144.*iPhi;
             const double DPhi = 360 / 144.;
             const int blockID = blockid;
-            createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medAluminum,  blockID, logical_gap_for);
+            G4Material* medTopGap = geometry::Materials::get("TopGap_" + to_string(iPhi));
+//            G4Material* medTopGap = geometry::Materials::get("Al");
+            createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medTopGap,  blockID, logical_gap_for);
             blockid++;
           }
         }
@@ -208,10 +240,17 @@ namespace Belle2 {
           for (int iPhi = 0; iPhi < 144; iPhi++) {
             const double SPhi = (360 / 144.) * iPhi;
             const double DPhi = 360 / 144.;
-            G4Material* medAl = geometry::Materials::get("Al");
             const string storageName = "forward storage_" + to_string(iZ) + "_" + to_string(iPhi);
-            if (materialID == 0) createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medAl, storageName, logical_gap_back);
-            if (materialID == 1) createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medAl, storageName, logical_gap_for);
+            if (materialID == 0) {
+              G4Material* medECLback = geometry::Materials::get("ECLback_" + to_string(iZ) + "_" + to_string(iPhi));
+//            G4Material* medECLback = geometry::Materials::get("Al");
+              createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLback, storageName, logical_gap_back);
+            }
+            if (materialID == 1) {
+              G4Material* medECLfor = geometry::Materials::get("ECLfor_" + to_string(iZ) + "_" + to_string(iPhi));
+//            G4Material* medECLfor = geometry::Materials::get("Al");
+              createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLfor, storageName, logical_gap_for);
+            }
           }
         }
       }
@@ -226,9 +265,7 @@ namespace Belle2 {
       const string physicalName = "VXD.physical_" + to_string(id) + "_" + to_string(blockid);
       G4Tubs* solidV = new G4Tubs(solidName.c_str(), rmin * CLHEP::mm, rmax * CLHEP::mm,
                                   thick * CLHEP::mm / 2.0, SPhi * CLHEP::deg, DPhi * CLHEP::deg);
-      G4LogicalVolume* logicalV = new G4LogicalVolume(solidV, med,
-                                                      logicalName.c_str(), 0, 0, 0);
-//      logicalV->SetVisAttributes(m_VisAttributes.back());
+      G4LogicalVolume* logicalV = new G4LogicalVolume(solidV, med, logicalName.c_str(), 0, 0, 0);
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::mm + thick * CLHEP::mm / 2.0), logicalV,
                         physicalName.c_str(), logical_gap, false, id);
     }
@@ -243,7 +280,6 @@ namespace Belle2 {
       G4Cons* storageConeShape = new G4Cons(solidName.c_str(), rmin1 * CLHEP::mm, rmax1 * CLHEP::mm,     rmin2 * CLHEP::mm,
                                             rmax2 * CLHEP::mm, thick * CLHEP::mm / 2.0, SPhi *  CLHEP::deg, DPhi * CLHEP::deg);
       G4LogicalVolume* storageCone = new G4LogicalVolume(storageConeShape, med, logicalName.c_str(), 0,   0, 0);
-      //         storageCone->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::mm + thick * CLHEP::mm / 2.0), storageCone, physicalName.c_str(), top,
                         false, 0);
 

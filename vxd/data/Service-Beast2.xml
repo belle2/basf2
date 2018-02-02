@@ -2,6 +2,7 @@
 <DetectorComponent name="VXDBeast2Material" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="vxd">VXDMaterialCreator</Creator>
   <Content>
+    <xi:include href="CDCGAPS-thickness.xml"/>
     <GapMomVolBack id="0" desc="Backward Material">
       <ZBound id="0">
         <Z unit="mm">-1220.0</Z>

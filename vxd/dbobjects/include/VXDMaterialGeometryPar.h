@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/gearbox/GearDir.h>
 #include <TObject.h>
 #include <string>
 #include <vector>
@@ -198,6 +199,71 @@ namespace Belle2 {
   };
 
   /**
+  * The thickness for backward CDC gap element cell
+  */
+  class ThicknessBackPar: public TObject {
+
+  public:
+    /** Constructor */
+    ThicknessBackPar() {}
+
+    //! Destructor.
+    ~ThicknessBackPar() {}
+
+    //! Append a new node.
+    void appendNode(double thick)
+    {
+      m_thick.push_back(thick);
+    }
+
+    //! Get the number of the mother volume nodes.
+    int getNNodes() const { return m_thick.size();}
+    //! Get the list of the Rmin corrdinates.
+    std::vector<double> getThick() const { return m_thick;}
+
+
+  private:
+    std::vector<double> m_thick; /**< Thickness list of backward CDC gap element cell. */
+
+    ClassDef(ThicknessBackPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+
+  };
+
+
+  /**
+  * The thickness for Forward CDC gap element cell
+  */
+  class ThicknessForPar: public TObject {
+
+  public:
+    /** Constructor */
+    ThicknessForPar() {}
+
+    //! Destructor.
+    ~ThicknessForPar() {}
+
+    //! Append a new node.
+    void appendNode(double thick)
+    {
+      m_thick.push_back(thick);
+    }
+
+    //! Get the number of the mother volume nodes.
+    int getNNodes() const { return m_thick.size();}
+    //! Get the list of the Rmin corrdinates.
+    std::vector<double> getThick() const { return m_thick;}
+
+
+  private:
+    std::vector<double> m_thick; /**< Thickness list of forward CDC gap element cell. */
+
+    ClassDef(ThicknessForPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+
+  };
+
+
+
+  /**
   * The Class for VXD service geometry
   */
   class VXDMaterialGeometryPar: public TObject {
@@ -241,6 +307,14 @@ namespace Belle2 {
     const std::vector<BeastEclMaterialsPar>& getbeastEclMaterials(void) const { return m_beastEclMaterials; }
     //! Get Beast Materials at ECL.
     std::vector<BeastEclMaterialsPar>& getbeastEclMaterials(void)  { return m_beastEclMaterials; }
+    //! Get Forward Gap element cell Thickness.
+    const ThicknessForPar& getthickFor(void) const { return m_thickfor; }
+    //! Get Forward Gap element cell Thickness.
+    ThicknessForPar& getthickFor(void)  { return m_thickfor; }
+    //! Get Backward Gap element cell Thickness.
+    const ThicknessBackPar& getthickBack(void) const { return m_thickback; }
+    //! Get Backward Gap element cell Thickness.
+    ThicknessBackPar& getthickBack(void)  { return m_thickback; }
 
 
   private:
@@ -253,6 +327,8 @@ namespace Belle2 {
     std::vector<BeastEclMaterialsPar> m_beastEclMaterials; /**< Vector with Beast Materials between barrel and endcap of ECL. */
     GapMomVolBackPar m_momvolback;
     GapMomVolForPar m_momvolfor;
+    ThicknessBackPar m_thickback;
+    ThicknessForPar m_thickfor;
 
     ClassDef(VXDMaterialGeometryPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

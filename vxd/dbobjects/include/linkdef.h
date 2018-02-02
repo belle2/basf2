@@ -18,6 +18,8 @@
 #pragma link C++ class Belle2::BeastEclMaterialsPar+;  // implicit
 #pragma link C++ class Belle2::GapMomVolBackPar+;  // implicit
 #pragma link C++ class Belle2::GapMomVolForPar+;  // implicit
+#pragma link C++ class Belle2::ThicknessBackPar+;  // implicit
+#pragma link C++ class Belle2::ThicknessForPar+;  // implicit
 
 
 

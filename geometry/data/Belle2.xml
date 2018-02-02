@@ -24,6 +24,7 @@
   <xi:include href="../vxd/VXD-Materials.xml"/>
   <xi:include href="../pxd/PXD-Materials.xml"/>
   <xi:include href="../svd/SVD-Materials.xml"/>
+  <xi:include href="../vxd/ECLGAPS-Materials.xml"/>
   <xi:include href="../cdc/CDC-Materials.xml"/>
   <xi:include href="../top/TOP-Materials.xml"/>
   <xi:include href="../arich/ARICH-Materials.xml"/>

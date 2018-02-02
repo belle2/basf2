@@ -10,6 +10,8 @@
 #include <iostream>
 #include <ecl/digitization/OfflineFitFunction.h>
 //
+// See eclComputePulseTemplates_Step0.cc for README instructions.
+//
 //Check Maximum residual for fit to template shape.
 double GetMaxRes(TGraph* gin, TF1* fit)
 {

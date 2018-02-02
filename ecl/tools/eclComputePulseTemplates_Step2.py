@@ -11,6 +11,8 @@ import cppyy
 import libPyROOT as _backend
 from array import array
 #
+# See eclComputePulseTemplates_Step0.cc for README instructions.
+#
 
 
 def EvalGamComp(tin, ttrg):

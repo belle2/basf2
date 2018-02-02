@@ -60,7 +60,7 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
 
     if skip_if_files_exist and all_output_files_exist:
         return
-    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
 def run_reconstruction(channels, storage_location, local_execution, phase):
@@ -89,7 +89,7 @@ def run_reconstruction(channels, storage_location, local_execution, phase):
         steering_file="reconstruct.py",
         parameters=parameters,
         local_execution=local_execution)
-    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
 def calculate_efficiencies(channels, storage_location, local_execution):
@@ -118,7 +118,7 @@ def calculate_efficiencies(channels, storage_location, local_execution):
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(steering_file="analyse.py", parameters=parameters, local_execution=local_execution)
-    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=0)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
     extract_efficiencies(channels=channels, storage_location=storage_location)
     extract_l1_efficiencies(channels=channels, storage_location=storage_location)

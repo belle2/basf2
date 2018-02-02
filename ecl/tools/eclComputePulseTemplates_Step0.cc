@@ -35,8 +35,8 @@ To run calibration :
 execute eclComputePulseTemplates_Step0.cc
 for i=0 i<873 i++
   execute eclComputePulseTemplates_Step1.cc i*10 (i+1)*10
-  execute eclComputePulseTemplates_Step2.cc i*10 (i+1)*10
-  execute eclComputePulseTemplates_Step3.py i*10 (i+1)*10
+  basf2 eclComputePulseTemplates_Step2.py i*10 (i+1)*10
+  execute eclComputePulseTemplates_Step3.cc i*10 (i+1)*10
 execute eclComputePulseTemplates_Step4.py
 //
 */

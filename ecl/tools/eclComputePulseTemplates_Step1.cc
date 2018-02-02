@@ -22,6 +22,7 @@ int main(int argc, char* argv[])
   chain->SetBranchAddress("PhotonPar", &PhotonWaveformPar);
   //
   TFile* f = new TFile(Form("PhotonShapes_Low%d_High%d.root", LowCellIDLimit, HighCellIDLimit), "RECREATE");
+  f->cd();
   TTree* mtree = new TTree("mtree", "");
   double PhotonWaveformArray[100000];
   mtree->Branch("PhotonArray", &PhotonWaveformArray, "PhotonWaveformArray[100000]/D");

@@ -465,7 +465,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
     }
     iret = 1;
   } else if (Type == 10) {
-    float flag2  = refhist->Chi2Test(temp);
+    float flag2  = refhist->Chi2Test(temp.get());
     flaghist->SetBinContent(bin + 1, 0);
     if (flag2 > pars[1])
       flaghist->SetBinContent(bin + 1, 2);

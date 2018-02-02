@@ -16,7 +16,6 @@
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <memory>
 
-using namespace Belle2::PXD::PXDError;
 
 namespace Belle2 {
 
@@ -29,6 +28,8 @@ namespace Belle2 {
    * stored. This preserves information which would normally get lost
    * during unpacking
    */
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   class PXDDAQStatus : public TObject {
   public:
 

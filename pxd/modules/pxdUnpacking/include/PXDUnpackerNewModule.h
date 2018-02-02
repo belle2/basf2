@@ -23,8 +23,6 @@
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 
-using namespace Belle2::PXD::PXDError;
-
 namespace Belle2 {
 
   namespace PXD {
@@ -34,6 +32,7 @@ namespace Belle2 {
      * This module is responsible for unpacking the Raw PXD data to Pixels in v_cellID and u_cellID (global tracking coordinates system)
      * Doing that, sophisticated error and consistency checking is done from the lowest data level on
      */
+
     class PXDUnpackerNewModule : public Module {
 
     public:
@@ -85,7 +84,7 @@ namespace Belle2 {
       /** Event counter */
       unsigned int m_unpackedEventsCount;
       /** Error counters */
-      unsigned int m_errorCounter[ONSEN_MAX_TYPE_ERR];
+      unsigned int m_errorCounter[PXDError::ONSEN_MAX_TYPE_ERR];
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;
@@ -156,15 +155,15 @@ namespace Belle2 {
        */
 
       /** Error Mask set per packet / frame*/
-      PXDErrorFlags m_errorMask;
+      PXDError::PXDErrorFlags m_errorMask;
       /** Error Mask set per packet / DHE */
-      PXDErrorFlags m_errorMaskDHE;
+      PXDError::PXDErrorFlags m_errorMaskDHE;
       /** Error Mask set per packet / DHC */
-      PXDErrorFlags m_errorMaskDHC;
+      PXDError::PXDErrorFlags m_errorMaskDHC;
       /** Error Mask set per packet / packet */
-      PXDErrorFlags m_errorMaskPacket;
+      PXDError::PXDErrorFlags m_errorMaskPacket;
       /** Error Mask set per packet / event */
-      PXDErrorFlags m_errorMaskEvent;
+      PXDError::PXDErrorFlags m_errorMaskEvent;
       /** give verbose unpacking information -> TODO will be a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */

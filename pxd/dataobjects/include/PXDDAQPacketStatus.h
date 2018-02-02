@@ -14,8 +14,6 @@
 #include <pxd/dataobjects/PXDDAQDHCStatus.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
 
-using namespace Belle2::PXD::PXDError;
-
 namespace Belle2 {
 
   /**
@@ -25,6 +23,8 @@ namespace Belle2 {
    * It will record if the data of DHC/DHE/sensors (readout by this packet) is useable.
    *
    */
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   class PXDDAQPacketStatus {
   public:
 

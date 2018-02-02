@@ -15,7 +15,6 @@
 #include <pxd/dataobjects/PXDDAQDHPStatus.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
 
-using namespace Belle2::PXD::PXDError;
 
 namespace Belle2 {
 
@@ -29,6 +28,7 @@ namespace Belle2 {
 
   // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
   typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
+  using Belle2::PXD::PXDError::PXDErrorFlags;
 
   class PXDDAQDHEStatus {
   public:

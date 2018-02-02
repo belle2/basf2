@@ -12,22 +12,9 @@
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
-#include <framework/logging/Logger.h>
 
-#include <boost/crc.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/spirit/home/support/detail/endian.hpp>
-
-using namespace std;
-using namespace Belle2;
-using namespace Belle2::PXD;
-using namespace Belle2::PXD::PXDError;
-
-using namespace boost::spirit::endian;
-
-/// define our CRC function
-using boost::crc_optimal;
-typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhc_crc_32_type;
 
 
 ///*********************************************************************************
@@ -42,6 +29,11 @@ namespace Belle2 {
      * Encapsules the access for different bits within the header
      * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
      */
+
+    using boost::spirit::endian::ubig16_t;
+    using boost::spirit::endian::ubig32_t;
+    using Belle2::PXD::PXDError::PXDErrorFlags;
+
     struct dhc_frame_header_word0 {
       const ubig16_t data;
       /// fixed length
@@ -61,29 +53,7 @@ namespace Belle2 {
       {
         return data & 0x3FF;
       };
-      void print(void) const
-      {
-        const char* dhc_type_name[16] = {
-          (const char*)"DHP_RAW",
-          (const char*)"FCE_RAW",
-          (const char*)"GHOST  ",
-          (const char*)"H_START",
-          (const char*)"H_END  ",
-          (const char*)"DHP_ZSD",
-          (const char*)"COMMODE",
-          (const char*)"undef  ",
-          (const char*)"undef  ",
-          (const char*)"ONS_FCE",
-          (const char*)"undef  ",
-          (const char*)"C_START",
-          (const char*)"C_END  ",
-          (const char*)"ONS_DHP",
-          (const char*)"ONS_TRG",
-          (const char*)"ONS_ROI"
-        };
-        B2DEBUG(20, "DHC FRAME TYP $" << hex << getFrameType() << " -> " << dhc_type_name[getFrameType()] << " (ERR " << getErrorFlag() <<
-                ") data " << data);
-      };
+      void print(void) const;
     };
 
     /** DHC start frame data struct.
@@ -107,32 +77,12 @@ namespace Belle2 {
       inline unsigned short getEventNrLo(void) const { return trigger_nr_lo; };
       inline unsigned short getEventNrHi(void) const {    return trigger_nr_hi;  };
 
-      bool isFakedData(void) const
-      {
-        if (word0.data != 0x5800) return false;
-        if (trigger_nr_lo != 0) return false;
-        if (trigger_nr_hi != 0) return false;
-        if (time_tag_lo_and_type != 0) return false;
-        if (time_tag_mid != 0) return false;
-        if (time_tag_hi != 0) return false;
-        if (run_subrun != 0) return false;
-        if (exp_run != 0) return false;
-        if (crc32 != 0x4829214d) return false;
-        return true;
-      };
+      bool isFakedData(void) const;
       inline unsigned int getFixedSize(void) const
       {
         return 20;// bytes
       };
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex <<
-                time_tag_lo_and_type
-                << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Exp/Run/Subrun $" << hex << exp_run << " $" <<
-                run_subrun
-                << " CRC $" << hex << crc32);
-      };
+      void print(void) const;
       inline unsigned short get_active_dhe_mask(void) const {return word0.getMisc() & 0x1F;};
       inline unsigned short get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
       inline unsigned short get_subrun(void) const {return run_subrun & 0x00FF;};
@@ -160,17 +110,7 @@ namespace Belle2 {
       inline unsigned short getTriggerOffsetRow(void) const   {    return sfnr_offset & 0x03FF;  }; // and trigger row offset
       inline unsigned int getFixedSize(void) const  {    return 16; };// 8 words
 
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhe_time_tag_lo << " DTTHI $" << hex <<
-                dhe_time_tag_hi
-                << " DHEID $" << hex << getDHEId()
-                << " DHPMASK $" << hex << getActiveDHPMask()
-                << " SFNR $" << hex << getStartFrameNr()
-                << " OFF $" << hex << getTriggerOffsetRow()
-                << " CRC " << hex << crc32);
-      };
+      void print(void) const;
       inline unsigned int getActiveDHPMask(void) const {return word0.getMisc() & 0xF;};
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
     };
@@ -203,13 +143,7 @@ namespace Belle2 {
       /// and finally a 32 bit checksum
 
       inline unsigned short getEventNrLo(void) const   {    return trigger_nr_lo;  };
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $"
-                <<
-                getDHPPort());
-      };
+      void print(void) const;
       inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
       inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
       inline bool getDataReformattedFlag(void) const {return (word0.getMisc() >> 3) & 0x1;};
@@ -256,33 +190,8 @@ namespace Belle2 {
       inline unsigned short get_subrun2(void) const {return trigtag2 & 0xFF;};
       inline unsigned short get_run2(void) const {return ((trigtag2 & 0x003FFF00) >> 8);};
       inline unsigned short get_experiment2(void) const {return (trigtag2 & 0xFFC00000) >> 22 ;};
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "ONSEN Trigger Frame TNRLO $" << hex << trignr0);
-      };
-      PXDErrorFlags check_error(bool ignore_datcon_flag = false) const
-      {
-        PXDErrorFlags m_errorMask = EPXDErrMask::c_NO_ERROR;
-        if ((magic1 & 0xFFFF0000) != 0xCAFE0000) {
-          B2ERROR("ONSEN Trigger Magic 1 error $" << hex << magic1);
-          m_errorMask |= EPXDErrMask::c_HLTROI_MAGIC;
-        }
-        if ((magic2 & 0xFFFF0000) != 0xCAFE0000) {
-          B2ERROR("ONSEN Trigger Magic 2 error $" << hex << magic2);
-          m_errorMask |= EPXDErrMask::c_HLTROI_MAGIC;
-        }
-        if (is_fake_datcon()) {
-          if (!ignore_datcon_flag) B2WARNING("ONSEN Trigger Frame: No DATCON data $" << hex << trignr1 << "!=$" << trignr2);
-          m_errorMask |= EPXDErrMask::c_NO_DATCON;
-        } else {
-          if (trignr1 != trignr2) {
-            B2ERROR("ONSEN Trigger Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
-            m_errorMask |= EPXDErrMask::c_MERGER_TRIGNR;
-          }
-        }
-        return m_errorMask;
-      };
+      void print(void) const;
+      PXDError::PXDErrorFlags check_error(bool ignore_datcon_flag = false) const;
 
       inline bool is_fake_datcon(void) const { return (magic2 == 0xCAFE0000 && trignr2 == 0x00000000 && trigtag2 == 0x00000000);};
       inline bool is_Accepted(void) const  {    return (magic1 & 0x8000) != 0;  };
@@ -302,24 +211,8 @@ namespace Belle2 {
       /// plus checksum 32bit
 
       inline unsigned short get_trig_nr0(void) const   {    return trignr0;  };
-      PXDErrorFlags check_error(int length) const
-      {
-        PXDErrorFlags m_errorMask = 0;
-        // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
-        if (length < getMinSize()) {
-          B2ERROR("DHC ONSEN HLT/ROI Frame too small to hold any ROIs!");
-          m_errorMask |= c_ROI_PACKET_INV_SIZE;
-        } else if ((length - getMinSize()) % 8 != 0) {
-          B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
-          m_errorMask |= c_ROI_PACKET_INV_SIZE;
-        }
-        return m_errorMask;
-      };
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC HLT/ROI Frame");
-      };
+      PXDError::PXDErrorFlags check_error(int length) const;
+      void print(void) const;
       // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       inline int getMinSize(void) const {return 4 + 4 + 4;};
       unsigned int check_inner_crc(unsigned int /*length*/) const
@@ -342,12 +235,7 @@ namespace Belle2 {
       /// fixed length
 
       inline unsigned int getFixedSize(void) const  {    return 8;  };
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC Ghost Frame TNRLO $" << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" << getDHPPort() <<
-                " CRC $");
-      };
+      void print(void) const;
       inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
       inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
     };
@@ -366,21 +254,8 @@ namespace Belle2 {
 
       unsigned int get_words(void) const  {    return wordsinevent;  }
       inline unsigned int getFixedSize(void) const  {    return 16;  };
-      bool isFakedData(void) const
-      {
-        if (word0.data != 0x6000) return false;
-        if (trigger_nr_lo != 0) return false;
-        if (wordsinevent != 0) return false;
-        if (errorinfo != 0) return false;
-        if (crc32 != 0xF7BCA507) return false;
-        return true;
-      };
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC End Frame TNRLO $" << hex << trigger_nr_lo << " WIEVT $" << hex << wordsinevent << " ERR $" << hex << errorinfo
-                << " CRC " << hex << crc32);
-      };
+      bool isFakedData(void) const;
+      void print(void) const;
       inline unsigned int get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
     };
 
@@ -399,179 +274,77 @@ namespace Belle2 {
 
       unsigned int get_words(void) const  {    return wordsineventlo | ((unsigned int)wordsineventhi << 16);  }
       inline unsigned int getFixedSize(void) const  {    return 16;  };
-      void print(void) const
-      {
-        word0.print();
-        B2DEBUG(20, "DHC DHE End Frame TNRLO $" << hex << trigger_nr_lo << " WIEVT $" << hex << wordsineventhi << "." << wordsineventlo <<
-                " ERR $"
-                << hex << errorinfo
-                << " CRC " << hex << crc32);
-      };
+      void print(void) const;
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
     };
 
-  } // end namespace for keeping structs private to translation unit
 
 ///*********************************************************************************
 ///****************** DHC Frame Wrapper Code starts here **************************
 ///*********************************************************************************
 
-  /** DHC frame wrapper class.
-   * Contains functions common for all type of frames (CRC etc)
-   * Provides a union pointer to the different struct types
-   * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
-   */
-  class dhc_frames {
-  public:
-    union {
-      const void* data;/// no type
-      const dhc_onsen_trigger_frame* data_onsen_trigger_frame;
-      const dhc_start_frame* data_dhc_start_frame;
-      const dhc_end_frame* data_dhc_end_frame;
-      const dhc_dhe_start_frame* data_dhe_start_frame;
-      const dhc_dhe_end_frame* data_dhe_end_frame;
-      const dhc_commode_frame* data_commode_frame;
-      const dhc_direct_readout_frame* data_direct_readout_frame;
-      const dhc_direct_readout_frame_raw* data_direct_readout_frame_raw;
-      const dhc_direct_readout_frame_zsd* data_direct_readout_frame_zsd;
-      const dhc_ghost_frame* data_ghost_frame;
-      const dhc_onsen_roi_frame* data_onsen_roi_frame;
-    };
-    unsigned int datasize;
-    int type;
-    int length;
+    /** DHC frame wrapper class.
+     * Contains functions common for all type of frames (CRC etc)
+     * Provides a union pointer to the different struct types
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
+    class dhc_frames {
+    public:
+      union {
+        const void* data;/// no type
+        const dhc_onsen_trigger_frame* data_onsen_trigger_frame;
+        const dhc_start_frame* data_dhc_start_frame;
+        const dhc_end_frame* data_dhc_end_frame;
+        const dhc_dhe_start_frame* data_dhe_start_frame;
+        const dhc_dhe_end_frame* data_dhe_end_frame;
+        const dhc_commode_frame* data_commode_frame;
+        const dhc_direct_readout_frame* data_direct_readout_frame;
+        const dhc_direct_readout_frame_raw* data_direct_readout_frame_raw;
+        const dhc_direct_readout_frame_zsd* data_direct_readout_frame_zsd;
+        const dhc_ghost_frame* data_ghost_frame;
+        const dhc_onsen_roi_frame* data_onsen_roi_frame;
+      };
+      unsigned int datasize;
+      int type;
+      int length;
 
-    dhc_frames(void)
-    {
-      data = 0;
-      datasize = 0;
-      type = -1;
-      length = 0;
-    };
-    int getFrameType(void)
-    {
-      return type;
-    };
-    void set(void* d, unsigned int t)
-    {
-      data = d;
-      type = t;
-      length = 0;
-    };
-    void set(void* d, unsigned int t, unsigned int l)
-    {
-      data = d;
-      type = t;
-      length = l;
-    };
-    void set(void* d)
-    {
-      data = d;
-      type = ((dhc_frame_header_word0*)data)->getFrameType();
-      length = 0;
-    };
-    inline unsigned int getEventNrLo(void) const   {    return ((ubig16_t*)data)[1];  };
-    PXDErrorFlags check_padding(void)
-    {
-      unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
-      if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
-        /// TODO many false positives, we should remove that check after we KNOW tht it has been fixed in DHH Firmware
-        B2WARNING("Suspicious Padding $" << hex << crc);
-        return EPXDErrMask::c_SUSP_PADDING;
-      }
-      return EPXDErrMask::c_NO_ERROR;
-    };
+      dhc_frames(void)
+      {
+        data = 0;
+        datasize = 0;
+        type = -1;
+        length = 0;
+      };
+      int getFrameType(void)
+      {
+        return type;
+      };
+      void set(void* d, unsigned int t)
+      {
+        data = d;
+        type = t;
+        length = 0;
+      };
+      void set(void* d, unsigned int t, unsigned int l)
+      {
+        data = d;
+        type = t;
+        length = l;
+      };
+      void set(void* d)
+      {
+        data = d;
+        type = ((dhc_frame_header_word0*)data)->getFrameType();
+        length = 0;
+      };
+      inline unsigned int getEventNrLo(void) const   {    return ((ubig16_t*)data)[1];  };
+      PXDError::PXDErrorFlags check_padding(void);
 
-    PXDErrorFlags check_crc(void)
-    {
-      dhc_crc_32_type bocrc;
-
-      if (length > 65536 * 16) {
-        B2WARNING("DHC Data Frame CRC not calculated because of too large packet (>1MB)!");
-      } else {
-        bocrc.process_bytes(data, length - 4);
-      }
-      unsigned int c;
-      c = bocrc.checksum();
-
-      ubig32_t crc32;
-      crc32 = *(ubig32_t*)(((unsigned char*)data) + length - 4);
-
-      if (c == crc32) {
-//       if (verbose)
-        //         B2INFO("DHE Data Frame CRC: " << hex << c << "==" << crc32);
-//         B2INFO("DHC Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-//                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-      } else {
-//       crc_error++;
-//       if (verbose) {
-        B2ERROR("DHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(((
-                  unsigned char*)data) + length - 8) << " "
-                << * (unsigned int*)(((unsigned char*)data) + length - 6) << " " << * (unsigned int*)(((unsigned char*)data) + length - 4) <<
-                " len $" << length);
-        /// others would be interessting but possible subjects to access outside of buffer
-        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
-        //if (length <= 32) {
-        //  for (int i = 0; i < length / 4; i++) {
-        //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
-        //  }
-        //}
-//       };
-//       error_flag = true;
-        return EPXDErrMask::c_DHE_CRC;
-      }
-      return EPXDErrMask::c_NO_ERROR;
-    };
+      PXDError::PXDErrorFlags check_crc(void);
 
 
-    unsigned int getFixedSize(void)
-    {
-      unsigned int s = 0;
-      switch (getFrameType()) {
-        case EDHCFrameHeaderDataType::c_DHP_RAW:
-          s = 0; /// size is not a fixed number
-          break;
-        case EDHCFrameHeaderDataType::c_ONSEN_DHP:
-        case EDHCFrameHeaderDataType::c_DHP_ZSD:
-          s = 0; /// size is not a fixed number
-          break;
-        case EDHCFrameHeaderDataType::c_ONSEN_FCE:
-        case EDHCFrameHeaderDataType::c_FCE_RAW:
-          s = 0; /// size is not a fixed number
-          break;
-        case EDHCFrameHeaderDataType::c_COMMODE:
-          s = data_commode_frame->getFixedSize();
-          break;
-        case EDHCFrameHeaderDataType::c_GHOST:
-          s = data_ghost_frame->getFixedSize();
-          break;
-        case EDHCFrameHeaderDataType::c_DHE_START:
-          s = data_dhe_start_frame->getFixedSize();
-          break;
-        case EDHCFrameHeaderDataType::c_DHE_END:
-          s = data_dhe_end_frame->getFixedSize();
-          break;
-        case EDHCFrameHeaderDataType::c_DHC_START:
-          s = data_dhc_start_frame->getFixedSize();
-          break;
-        case EDHCFrameHeaderDataType::c_DHC_END:
-          s = data_dhc_end_frame->getFixedSize();
-          break;
-        case EDHCFrameHeaderDataType::c_ONSEN_ROI:
-          s = 0; /// size is not a fixed number
-          break;
-        case EDHCFrameHeaderDataType::c_ONSEN_TRG:
-          s = data_onsen_trigger_frame->getFixedSize();
-          break;
-        default:
-          B2ERROR("Error: not a valid data frame!");
-//         error_flag = true;
-          s = 0;
-          break;
-      }
-      datasize = s;
-      return s;
-    };
+      unsigned int getFixedSize(void);
 
+    };
   };
 };

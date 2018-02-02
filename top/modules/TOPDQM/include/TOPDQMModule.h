@@ -91,11 +91,12 @@ namespace Belle2 {
     double m_momentumCut; /**< momentum cut */
     double m_pValueCut;   /**< pValue cut */
     bool m_usePionID; /**< use pion ID in track selection */
+    int m_ADCCutLow = 0; /**< lower cut for ADC */
+    int m_ADCCutHigh = 0; /**< upper cut for ADC */
+    int m_PulseWidthCutLow = 0; /**< lower cut for PulseWidth */
+    int m_PulseWidthCutHigh = 0; /**< upper cut for PulseWidth */
 
     // histograms
-    TH1F* m_barHits = 0;  /**< number of hits per bar */
-    std::vector<TH1F*> m_pixelHits; /**< number of hits per pixel for each bar */
-    std::vector<TH1F*> m_hitTimes;  /**< time distribution for each bar */
     TH1F* m_recoTime = 0;           /**< time distribution */
     TH1F* m_recoTimeBg = 0;         /**< time distribution background */
     TH1F* m_recoTimeMinT0 = 0;      /**< time distribution in respect to the first peak */
@@ -103,6 +104,14 @@ namespace Belle2 {
     TH1F* m_recoPull = 0;           /**< pull distribution */
     TH2F* m_recoTimeDiff_Phic = 0;  /**< residuals vs phiCer */
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
+
+    TH1F* m_particleHits = nullptr; /**< Histogram for number ofaccumulated particle hits */
+    TH1F* m_otherHits = nullptr; /**< Histogram for number ofaccumulated other hits */
+    std::vector<TH2F*> m_allHitsXY; /**< Histograms (2D) for channel hits per module*/
+    std::vector<TH1F*> m_allTdc; /**< Histograms for TDC distribution per module*/
+    std::vector<TH1F*> m_particleChannelHits; /**< Histograms for particle channel hits per module*/
+    std::vector<TH1F*> m_particleHitsPerEvent; /**< Histograms for particle hits per event per module*/
+    std::vector<TH1F*> m_otherHitsPerEvent; /**< Histograms for other hits per event per module*/
 
     // other
     int m_numModules = 0; /**< number of TOP modules */

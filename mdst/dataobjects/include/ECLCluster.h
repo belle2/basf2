@@ -58,6 +58,8 @@ namespace Belle2 {
       m_zernikeMVA(0.),
       m_E1oE9(0.),
       m_E9oE21(0.),
+      m_ClusterHadronIntensity(-999),
+      m_NumberofHadronDigits(0),
       m_secondMoment(0.),
       m_LAT(0.),
       m_numberOfCrystals(0.),
@@ -143,6 +145,12 @@ namespace Belle2 {
     /** Set E9/E21 energy ratio. */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
+    /** set Cluster Hadron Component Intensity. */
+    void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
+
+    /** set Number of hadron digits in cluster . */
+    void setNumberofHadronDigits(int NumberofHadronDigits) { m_NumberofHadronDigits = NumberofHadronDigits; }
+
     /** Set SecondMoment. */
     void setSecondMoment(double secondmoment) { m_secondMoment = secondmoment; }
 
@@ -214,6 +222,12 @@ namespace Belle2 {
 
     /** Return E9/E21 (shower shape variable). */
     double getE9oE21() const { return m_E9oE21; }
+
+    /** Return Cluster hadron intensity*/
+    double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
+
+    /** Return number of hadron digits in cluster*/
+    int getNumberofHadronDigits() const { return m_NumberofHadronDigits; }
 
     /** Return second moment (shower shape variable). */
     double getSecondMoment() const { return m_secondMoment; }
@@ -381,8 +395,15 @@ namespace Belle2 {
     /** Log. Highest Crystal Energy [GeV]. */
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
+    /** Cluster Hadron Component Intensity. */
+    Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.6, 18]
+
+    /** Number of hadron digits in cluster */
+    int m_NumberofHadronDigits;  //[-1, 200., 18]
+
     /** Class definition */
-    ClassDef(ECLCluster, 10);
+    ClassDef(ECLCluster, 11);
+    // 11: Added m_ClusterHadronIntensity an m_NumberofHadronDigits variables
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId

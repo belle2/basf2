@@ -11,6 +11,7 @@
 #pragma link C++ class Belle2::MuidHit+;
 #pragma link C++ class Belle2::TrackClusterSeparation+;
 #pragma link C++ class Belle2::V0ValidationVertex+;
+#pragma link C++ class Belle2::FullSecID+;
 
 #pragma link C++ class pair <bool, double>+;
 #pragma link C++ class pair <bool, int>+;

@@ -235,25 +235,25 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_SVD_%1%_ClusterChargeU") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Cluster charge in U") % sensorDescr);
-    m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 300000);
-    m_clusterChargeU[i]->GetXaxis()->SetTitle("charge of u clusters [el]");
+    m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 300);
+    m_clusterChargeU[i]->GetXaxis()->SetTitle("charge of u clusters [ke-]");
     m_clusterChargeU[i]->GetYaxis()->SetTitle("count");
     name = str(format("DQMER_SVD_%1%_ClusterChargeV") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Cluster charge in V") % sensorDescr);
-    m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 300000);
-    m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [el]");
+    m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 300);
+    m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [ke-]");
     m_clusterChargeV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Charge of strips
     //----------------------------------------------------------------
     name = str(format("DQMER_SVD_%1%_StripChargeU") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Strip charge in U") % sensorDescr);
-    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
+    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 256);
     m_stripSignalU[i]->GetXaxis()->SetTitle("charge of u strips [ADU]");
     m_stripSignalU[i]->GetYaxis()->SetTitle("count");
     name = str(format("DQMER_SVD_%1%_StripChargeV") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Strip charge in V") % sensorDescr);
-    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
+    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 256);
     m_stripSignalV[i]->GetXaxis()->SetTitle("charge of v strips [ADU]");
     m_stripSignalV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
@@ -463,7 +463,7 @@ void SVDDQMExpressRecoMinModule::event()
                                    1);
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
-      if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge());
+      if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
     } else {
@@ -472,7 +472,7 @@ void SVDDQMExpressRecoMinModule::event()
                                    0);
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
-      if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge());
+      if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
       if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
     }

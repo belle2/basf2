@@ -49,7 +49,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
                     )
 
 
-def add_pxd_ckf(path, *args ** kwargs):
+def add_pxd_ckf(path, *args, **kwargs):
     """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
     condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
     phase2_path = basf2.create_path()
@@ -136,7 +136,7 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc
                     **module_parameters)
 
 
-def add_svd_ckf(path, *args ** kwargs):
+def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
     condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
     phase2_path = basf2.create_path()

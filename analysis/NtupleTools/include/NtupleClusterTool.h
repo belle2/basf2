@@ -54,6 +54,13 @@ namespace Belle2 {
     /**  ratio of energies in central cell and 3x3 cells */
     float* m_e1e9;
 
+    /**  cluster hadron scintillation component intensity*/
+    float* m_ClusterHadronIntensity;
+
+    /**  number of cluster digits with significant hadorn component light output*/
+    int* m_NumberofHadronDigits;
+
+
     /**  ratio of energies in inner 3x3 and 5x5-corner cells */
     float* m_e9e21;
 

@@ -24,6 +24,8 @@ void NtupleClusterTool::setupTree()
   m_e1e9   = new float[nDecayProducts];
   m_e9e21  = new float[nDecayProducts];
   m_nHits  = new int[nDecayProducts];
+  m_ClusterHadronIntensity  = new float[nDecayProducts];
+  m_NumberofHadronDigits = new int[nDecayProducts];
   m_trackM = new int[nDecayProducts];
 
   m_uncorrE = new float[nDecayProducts];
@@ -42,6 +44,10 @@ void NtupleClusterTool::setupTree()
                    (strNames[iProduct] + "_clusterE9E21/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterNHits").c_str(),      &m_nHits[iProduct],
                    (strNames[iProduct] + "_clusterNHits/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterHadronIntensity").c_str(),      &m_ClusterHadronIntensity[iProduct],
+                   (strNames[iProduct] + "_clusterHadronIntensity/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterNumberofHadronDigits").c_str(),      &m_NumberofHadronDigits[iProduct],
+                   (strNames[iProduct] + "_clusterNumberofHadronDigits/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterTrackMatch").c_str(), &m_trackM[iProduct],
                    (strNames[iProduct] + "_clusterTrackMatch/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterUncorrE").c_str(),    &m_uncorrE[iProduct],
@@ -64,6 +70,8 @@ void NtupleClusterTool::deallocateMemory()
   delete [] m_region;
   delete [] m_e1e9;
   delete [] m_e9e21;
+  delete [] m_ClusterHadronIntensity;
+  delete [] m_NumberofHadronDigits;
   delete [] m_nHits;
   delete [] m_trackM;
 

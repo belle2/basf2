@@ -36,6 +36,26 @@
 namespace Belle2 {
   namespace Variable {
 
+    double eclClusterHadronIntensity(const Particle* particle)
+    {
+      double result = 0.0;
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getClusterHadronIntensity();
+      }
+      return result;
+    }
+
+    int eclClusterNumberofHadronDigits(const Particle* particle)
+    {
+      int result = 0;
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getNumberofHadronDigits();
+      }
+      return result;
+    }
+
     double eclClusterDetectionRegion(const Particle* particle)
     {
       double result = 0.0;
@@ -671,6 +691,10 @@ namespace Belle2 {
                       "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
+    REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
+                      "Returns ECL cluster's hadron scintillation component intensity.");
+    REGISTER_VARIABLE("ClusterNumverofHadronDigits", eclClusterNumberofHadronDigits,
+                      "Returns ECL cluster's number of hadron digits.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,

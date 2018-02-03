@@ -58,8 +58,6 @@ namespace Belle2 {
       m_zernikeMVA(0.),
       m_E1oE9(0.),
       m_E9oE21(0.),
-      m_ClusterHadronIntensity(-999),
-      m_NumberofHadronDigits(0),
       m_secondMoment(0.),
       m_LAT(0.),
       m_numberOfCrystals(0.),
@@ -70,7 +68,9 @@ namespace Belle2 {
       m_r(0.),
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
-      m_logEnergyHighestCrystal(-5.) {}
+      m_logEnergyHighestCrystal(-5.),
+      m_ClusterHadronIntensity(-999),
+      m_NumberofHadronDigits(0) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }

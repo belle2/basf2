@@ -12,9 +12,7 @@ using namespace std;
 
 /*
 
-hadron and diode code by Savino Longo (longos@uvic.ca)
-
-Sample scripts to compute hadron and diode templates.
+Sample scripts to compute hadron and diode templates by Savino Longo (longos@uvic.ca)
 
 Note photon shape calibrations are needed to compute hadron and diode templates.
 Photon calibrations should be placed in file named params_gamma_shape.dat in same directiory as this script.
@@ -30,17 +28,21 @@ eclComputePulseTemplates_Step2.py - produce hadron and diode array input for ecl
 eclComputePulseTemplates_Step3.cc - computed hadron and diode shape parameters and organizes into temp ntuple
 eclComputePulseTemplates_Step4.cc - organizes photon, hadron and diode templates into final ntuple to produce dbobject.
 
-To run calibration :
+To run template calculation:
 
-Note "OutputDirectory" variable in eclComputePulseTemplates_Stepx.cc files should be modified to a temp directory before running scripts.
+First "OutputDirectory" variable in eclComputePulseTemplates_Stepx.cc files should be modified to a temp directory before running scripts.
 recompile with "scons ecl"
 
-execute eclComputePulseTemplates_Step0 0
-for i=0 i<873 i++
-  execute eclComputePulseTemplates_Step1 i*10 (i+1)*10
-  basf2 eclComputePulseTemplates_Step2.py i*10 (i+1)*10
-  execute eclComputePulseTemplates_Step3 i*10 (i+1)*10
-execute eclComputePulseTemplates_Step0 1
+1) execute eclComputePulseTemplates_Step0 0
+2) for i=0 i<873 i++
+3)   execute eclComputePulseTemplates_Step1 i*10 (i+1)*10
+4)   basf2 eclComputePulseTemplates_Step2.py i*10 (i+1)*10
+5)   execute eclComputePulseTemplates_Step3 i*10 (i+1)*10
+6) execute eclComputePulseTemplates_Step0 1
+7) execute eclWriteWaveformParametersLocalDB
+Final step will create local db object.
+
+
 //
 */
 //
@@ -58,7 +60,12 @@ struct crystalInfo {
 int main(int argc, char* argv[])
 {
   //
-  TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
+  TString OutputDirectory = "";
+  if (OutputDirectory == "") {
+    std::cout << "Error set ouput directory" << std::endl;
+    return -1;
+  }
+  //TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
   //
   int Flag = atoi(argv[1]);
   TString InputDirectory = OutputDirectory;

@@ -4,7 +4,9 @@
 #include <fstream>
 #include <TFile.h>
 #include <TTree.h>
-
+//
+//See  eclComputePulseTemplates_Step0.cc for README instructions.
+///
 int main()
 {
   //

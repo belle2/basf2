@@ -13,7 +13,12 @@
 int main(int argc, char* argv[])
 {
   //
-  TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
+  TString OutputDirectory = "";
+  if (OutputDirectory == "") {
+    std::cout << "Error set ouput directory" << std::endl;
+    return -1;
+  }
+  //TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
   //
   int LowIDLimit = atoi(argv[1]);
   int HighIDLimit = atoi(argv[2]);

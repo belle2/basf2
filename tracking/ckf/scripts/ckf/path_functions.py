@@ -1,3 +1,6 @@
+import basf2
+
+
 def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
     """
     Convenience function to add the SVD track finding using VXDTF2 and the merger based on the CKF to the path.

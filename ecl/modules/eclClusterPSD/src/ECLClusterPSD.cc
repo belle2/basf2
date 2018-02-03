@@ -99,6 +99,10 @@ void ECLClusterPSDModule::event()
     if (nWaveforminCluster > 0) {
       if (Cluster2CTotalEnergy != 0) eclshowers[ishowers]->setShowerHadronIntensity(Clust2CHadronEnergy / Cluster2CTotalEnergy);
       eclshowers[ishowers]->setNumberofHadronDigits(NumberofHadronDigits);
+      //
+      //
+      //
+      //
     } else {
       eclshowers[ishowers]->setShowerHadronIntensity(-999);
       eclshowers[ishowers]->setNumberofHadronDigits(-1);

@@ -26,7 +26,7 @@ namespace Belle2 {
      * return number of digits in cluster with significant scintillation emission in the hadronic scintillation component
      * Variable is used to separater hadronic showers from electromagnetic showers
      */
-    int eclNumberofHadronDigits(const Particle* particle);
+    int eclClusterNumberofHadronDigits(const Particle* particle);
 
     /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region

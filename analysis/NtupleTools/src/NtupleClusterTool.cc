@@ -105,5 +105,7 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_theta[iProduct]    = Variable::eclClusterTheta(selparticles[iProduct]);
     m_phi[iProduct]      = Variable::eclClusterPhi(selparticles[iProduct]);
     m_distance[iProduct] = Variable::eclClusterR(selparticles[iProduct]);
+    m_ClusterHadronIntensity[iProduct]  = Variable::eclClusterHadronIntensity(selparticles[iProduct]);
+    m_NumberofHadronDigits[iProduct]  = int(Variable::eclClusterNumberofHadronDigits(selparticles[iProduct]));
   }
 }

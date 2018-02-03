@@ -231,7 +231,7 @@ namespace Belle2 {
     /** Maximal size of hit network; if exceeded, filling of the HitNetwork will be stopped, the
     *  HitsNetwork will be cleared and the respective event will be skipped.
     */
-    unsigned short m_PARAMmaxHitNetworkSize = 2000;
+    unsigned short m_PARAMmaxHitNetworkSize = 3000;
 
     /** integer switch to decide which observer to use: see enum eObserverTypes
       NOTE: that observing filters make the code slow! So only use for debugging purposes

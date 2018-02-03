@@ -311,6 +311,7 @@ void
 SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 {
 
+  // TODO: change naming! This is poor naming as these include also Triplet filters!
   VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 

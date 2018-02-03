@@ -10,7 +10,7 @@ from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_tri
     add_calibration_software_trigger, add_calcROIs_software_trigger
 
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
-ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
+ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
 

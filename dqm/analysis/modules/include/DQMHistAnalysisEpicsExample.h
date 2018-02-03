@@ -6,8 +6,7 @@
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisEpicsExample_h
-#define _Belle2_DQMHistAnalysisEpicsExample_h
+#pragma once
 
 // EPICS
 //#include "cadef.h"
@@ -56,4 +55,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

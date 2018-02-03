@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMDQMMODULE_H
-#define BKLMDQMMODULE_H
+#pragma once
 
 // Copied 6 lines below from PXDDQMModule.h
 #undef DQM
@@ -19,8 +18,8 @@
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 #endif
 
-#include <framework/dataobjects/DigitBase.h>   //Missing
-#include <bklm/dataobjects/BKLMStatus.h>       //Missing
+#include <framework/dataobjects/DigitBase.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
@@ -86,35 +85,30 @@ namespace Belle2 {
 
     // module parameters
 
-    //! Histogram: number of hits per layer
-    TH1F* m_LayerHits;
+    // histograms
+    TH1F* h_layerHits;          /* number of hits per layer */
+    TH1F* h_ctime;              /* Lowest 16 bits of the B2TT CTIME signal */
+    TH1F* h_simtime;            /* MC simulation event hit time */
+    TH1F* h_time;               /* Reconstructed hit time relative to trigger */
+    TH1F* h_simEDep;            /* MC simulation pulse height */
+    TH1F* h_eDep;               /* Reconstructed pulse height */
+    TH1F* h_simNPixel;          /* Simulated number of MPPC pixels */
+    TH1F* h_nPixel;             /* Reconstructed number MPPC pixels */
+    TH1F* h_moduleID;           /* detector-module identifier */
+    TH1F* h_zStrips;            /* z-measuring strip numbers of the 2D hit */
+    TH1F* h_phiStrip;           /* Phi strip number of muon hit */
+    TH1F* h_sector;             /* Sector number of muon hit */
+    TH1F* h_layer;              /* Layer number of muon hit */
+    TH1F* h_rBKLMHit2ds;        /* Distance from z axis in transverse plane of muon hit */
+    TH1F* h_zBKLMHit2ds;        /* Axial position of muon hit */
+    TH2F* h_yvsxBKLMHit2ds;     /* Position projected into transverse plane of muon hit */
+    TH2F* h_xvszBKLMHit2ds;     /* Position projected into x-z plane of muon hit */
+    TH2F* h_yvszBKLMHit2ds;     /* Position projected into y-z plane of muon hit */
 
-    //! Histogram: Lowest 16 bits of the B2TT CTIME signal
-    TH1F* m_CTime;
-
-    //! Histogram: MC simulation event hit time
-    TH1F* m_SimTime;
-
-    //! Histogram: Reconstructed hit time relative to trigger
-    TH1F* m_Time;
-
-    //! Histogram: MC simulation pulse height
-    TH1F* m_SimEDep;
-
-    //! Histogram: Reconstructed pulse height
-    TH1F* m_EDep;
-
-    //! Histogram: Simulated number of MPPC pixels
-    TH1F* m_SimNPixel;
-
-    //! Histogram: Reconstructed number MPPC pixels
-    TH1F* m_NPixel;
-
+    // other
     //! name of BKLMDigit store array
-    std::string m_OutputDigitsName;
-
+    std::string m_outputDigitsName;
+    std::string m_outputHitsName;
   };
 
 } // Belle2 namespace
-
-#endif

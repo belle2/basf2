@@ -247,10 +247,10 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_scale = m_DBScaleFactor->getScaleFactor();
 
     // store run gains
-    dedxTrack->m_rungain = m_DBRunGain->getRunGain();
+    dedxTrack->m_runGain = m_DBRunGain->getRunGain();
 
     // get the cosine correction
-    dedxTrack->m_coscor = m_DBCosineCor->getMean(costh);
+    dedxTrack->m_cosCor = m_DBCosineCor->getMean(costh);
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -407,7 +407,7 @@ void CDCDedxPIDModule::event()
           double onedcor = m_DB1DCleanup->getMean(currentLayer, entAng);
 
           // apply the calibration to dE to propagate to both hit and layer measurements
-          double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain * twodcor * onedcor;
+          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
           if (correction == 0) dadcCount = 0;
           else dadcCount = dadcCount / correction;
 
@@ -461,17 +461,16 @@ void CDCDedxPIDModule::event()
       }
     } // end of loop over CDC hits for this track
 
-    if (dedxTrack->l_dedx.empty()) {
+    if (dedxTrack->m_lDedx.empty()) {
       B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
     } else {
       // determine the number of hits for this track (used below)
-      const int numDedx = dedxTrack->l_dedx.size();
-      dedxTrack->l_nHits = numDedx;
+      const int numDedx = dedxTrack->m_lDedx.size();
       // add a factor of 0.5 here to make sure we are rounding appropriately...
       const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
       const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
-      dedxTrack->l_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
+      dedxTrack->m_lNHitsUsed = highEdgeTrunc - lowEdgeTrunc;
     }
 
     // Get the truncated mean
@@ -483,13 +482,13 @@ void CDCDedxPIDModule::event()
       calculateMeans(&(dedxTrack->m_dedx_avg),
                      &(dedxTrack->m_dedx_avg_truncated),
                      &(dedxTrack->m_dedx_avg_truncated_err),
-                     dedxTrack->l_dedx);
+                     dedxTrack->m_lDedx);
     }
 
     if (dedxTrack->m_pdg != -999 && dedxTrack->m_mcmass > 0 && dedxTrack->m_p_true != 0) {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_p_true / dedxTrack->m_mcmass);
-      double sigma = getSigma(mean, dedxTrack->l_nHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
+      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
       dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_dedx < 0)
         dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
@@ -500,10 +499,10 @@ void CDCDedxPIDModule::event()
 
     if (m_trackLevel) {
       saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
     } else
       saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
 
     // save the PID information for both lookup tables and parameterized means and resolutions
     if (!m_useIndividualHits)

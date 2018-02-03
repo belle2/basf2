@@ -7,8 +7,7 @@
 // based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
-#ifndef _Belle2_DQMHistAnalysisOutputRelayMsg_h
-#define _Belle2_DQMHistAnalysisOutputRelayMsg_h
+#pragma once
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <TSocket.h>
@@ -44,4 +43,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

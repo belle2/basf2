@@ -15,6 +15,7 @@ from basf2 import *
 from simulation import add_simulation
 from L1trigger import add_tsim
 from validation import statistics_plots, event_timing_plot
+from background import get_background_files
 import validationtools
 
 set_random_seed(12345)
@@ -28,8 +29,7 @@ main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
 main.add_module('EvtGenInput')
 
 # detector simulation
-bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=get_background_files())
 
 # trigger simulation
 add_tsim(main)

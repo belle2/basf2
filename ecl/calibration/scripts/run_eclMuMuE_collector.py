@@ -12,22 +12,31 @@
 # -----------------------------------------------------------
 
 # Usage: basf2 run_eclMuMuE_collector.py
+# option: basf2 run_eclMuMuE_collector.py OutputFileName.root
+
 # Run just the collector part of the eclMuMuE calibration, which calibrates the single crystal
 # energy response using muon pairs.
-# Input file should be MC e+e- --> mu+mu- including ecl digits and track extrapolation.
+# Input file should be a muon pair skim (or MC) and include ECLDigits and tracks.
+# Also requires ECLCalDigits if code is being used to find expected deposited energies.
 # Output histograms are written to specified output file.
 # run_eclMuMuE_algorithm.py is then used to perform calibration using these histograms, or to simply copy
 # them to an output file.
-# run_eclMuMuE.py performs both stages of the calibration in a single job.
 
 import os
 import sys
 from basf2 import *
 from ROOT import Belle2
 
+
 main = create_path()
-main.add_module('RootInput', inputFileNames=['/nfs/dust/belle2/user/ferber/data/kkmc_mumu/kkmc-mumu-1485213008/out-*.root'])
-main.add_module("HistoManager", histoFileName="eclMuMuECollectorOutput.root")
+DR2 = '/ghi/fs01/belle2/bdata/users/karim/MC/DR2/release-00-09-02/mdst_calib/*.root'
+main.add_module('RootInput', inputFileNames=[DR2])
+
+narg = len(sys.argv)
+outputName = "eclMuMuECollectorOutput.root"
+if(narg >= 2):
+    outputName = sys.argv[1]
+main.add_module("HistoManager", histoFileName=outputName)
 
 # Genfit and track extrapolation
 gearbox = register_module('Gearbox')
@@ -46,12 +55,12 @@ main.add_module(ext)
 eclMuMuE = register_module('eclMuMuECollector')
 eclMuMuE.param('minPairMass', 9.0)
 eclMuMuE.param('minTrackLength', 30.)
-eclMuMuE.param('MaxNeighborAmp', 200.)
-# 3 axial SL = [24,134];  4 axial SL = [30,126]
-eclMuMuE.param('thetaLabMinDeg', 30.)
-eclMuMuE.param('thetaLabMaxDeg', 126.)
-# Can fill histograms with MC true deposited energy if eclCalDigits have been stored
-eclMuMuE.param('useTrueEnergy', False)
+eclMuMuE.param('MaxNeighbourE', 0.010)
+eclMuMuE.param('thetaLabMinDeg', 17.)
+eclMuMuE.param('thetaLabMaxDeg', 150.)
+# Can fill histograms with MC eclCalDigits to calculate true deposited energy
+eclMuMuE.param('measureTrueEnergy', False)
+eclMuMuE.param('requireL1', True)
 main.add_module(eclMuMuE)
 
 main.add_module('Progress')

@@ -6,8 +6,7 @@
 // Date : 2017
 //-
 
-#ifndef _Belle2_DQMHistAnalysisExampleFlags_h
-#define _Belle2_DQMHistAnalysisExampleFlags_h
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -51,4 +50,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

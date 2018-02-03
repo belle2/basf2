@@ -12,5 +12,5 @@ import basf2
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 import ROOT
-assert ROOT.kIsStatic == basf2.ROOT_kIsStatic, "kIsStatic has changed its value"
-assert ROOT.kIsConstMethod == basf2.ROOT_kIsConstMethod, "kIsConstMethod has changed its value"
+assert ROOT.kIsStatic == basf2._ROOT_kIsStatic, "kIsStatic has changed its value"
+assert ROOT.kIsConstMethod == basf2._ROOT_kIsConstMethod, "kIsConstMethod has changed its value"

@@ -12,7 +12,7 @@
 #pragma once
 #include <TObject.h>
 #include <vector>
-
+#include <TString.h>
 namespace Belle2 {
 
   template < class T  >
@@ -33,7 +33,9 @@ namespace Belle2 {
     // The SVD is a vector of SVDLayers
     typedef std::vector< SVDLayer > SVD;
 
+
     SVD calibrations;
+
 
   public:
 
@@ -44,8 +46,10 @@ namespace Belle2 {
     /** The default constructor initialize all the vectors
      */
     SVDCalibrationsBase(typename T::calibrationType defaultT =
-                          typename T::calibrationType())
+                          typename T::calibrationType(),
+                        const TString& uniqueID = ""): m_uniqueID(uniqueID)    // Add a string as unique identifier for a given configuration dataset
     {
+
       calibrations.resize(7); // Layers 0 1 2 3 4 5 6
       int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
       for (unsigned int layer = 0 ; layer < calibrations.size() ; layer ++) {
@@ -120,7 +124,10 @@ namespace Belle2 {
       // tertium non datur
     }
 
-    ClassDef(SVDCalibrationsBase, 1)
+  private:
+    TString m_uniqueID; //The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.
+
+    ClassDef(SVDCalibrationsBase, 2)
   };
 
 }

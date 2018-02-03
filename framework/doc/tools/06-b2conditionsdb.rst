@@ -1,3 +1,5 @@
+.. _b2conditionsdb:
+
 ``b2conditionsdb``: Conditions DB interface
 +++++++++++++++++++++++++++++++++++++++++++
 

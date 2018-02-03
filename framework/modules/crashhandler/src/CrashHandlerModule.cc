@@ -67,10 +67,21 @@ CrashHandlerModule::CrashHandlerModule():
   m_procHandler(1, true)
 {
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
-  setDescription("Internal module for graceful crash handling. If any of the wrapped modules abort, crash, etc., execution will continue after this module. The return value of this module is set to 0(false) in case of aborts (the DataStore will not contain any output from the wrapped modules); and to 1(true) if all modules executed normally. \nThis is a stopgap measure to avoid stopping the HLT because of software errors. It does not absolve you of the responsibility to fix your software.");
+  setDescription(R"DOCSTRING(
+Internal module for graceful crash handling. If any of the wrapped modules
+abort, crash, etc., execution will continue after this module. The return value
+of this module is set to 0 (False) in case of aborts (the DataStore will not
+contain any output from the wrapped modules); and to 1(true) if all modules
+executed normally.
+
+.. warning:: This is a stopgap measure to avoid stopping the HLT because of
+    software errors and has severe performance penalties.  It does not absolve
+    you of the responsibility to fix your software.)DOCSTRING");
 
   addParam("path", m_path,
-           "Path with crash-prone modules. All modules need the ability to run in parallel (c_ParallelProcessingCertified flag set).");
+           "Path with crash-prone modules. All modules need the ability to run "
+           "in parallel (`PARALLELPROCESSINGCERTIFIED <ModulePropFlags.PARALLELPROCESSINGCERTIFIED>` flag "
+           "set using `Module.set_property_flags`).");
 }
 
 CrashHandlerModule::~CrashHandlerModule()

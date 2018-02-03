@@ -20,6 +20,7 @@ EKLMDigit::EKLMDigit()
   m_Plane = -1;
   m_Strip = -1;
   m_Charge = 0;
+  m_CTime = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -32,6 +33,7 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Charge = 0;
+  m_CTime = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -71,6 +73,16 @@ uint16_t EKLMDigit::getCharge() const
 void EKLMDigit::setCharge(uint16_t charge)
 {
   m_Charge = charge;
+}
+
+uint16_t EKLMDigit::getCTime() const
+{
+  return m_CTime;
+}
+
+void EKLMDigit::setCTime(uint16_t charge)
+{
+  m_CTime = charge;
 }
 
 /*

@@ -111,6 +111,7 @@ def add_softwaretrigger_reconstruction(
         softwaretrigger_mode='hlt_filter',
         addDqmModules=False,
         run_type="collision",
+        additonal_store_arrays_to_keep=[],
         pruneDataStore=True,
         calcROIs=True):
     """
@@ -151,6 +152,9 @@ def add_softwaretrigger_reconstruction(
                                  fast_reco_filter: enable reconstruction, fast_reco filter is on, hlt filter is off
                                  hlt_filter: default mode, enable all software activities
                                              including reconstruction, fast_reco and hlt filters.
+    :param additonal_store_arrays_to_keep: StoreArray names which will kept together with the Raw objects after
+                                           the HLT processing is complete. The content of the StoreArray will only
+                                           be kept if the event is not filtered or the monitoring mode is used.
     :param pruneDataStore: If this is false, none of the reconstruction content will be removed from the datestore
                            after the reconstruction and software trigger is complete. Default is true.
     """
@@ -204,7 +208,7 @@ def add_softwaretrigger_reconstruction(
         # Fill the calibration_and_store_only_rawdata_path path
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
         if pruneDataStore:
-            calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
+            calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
         if softwaretrigger_mode == 'hlt_filter':
             # There are two possibilities for the output of this module
             # (1) the event is rejected -> only store the metadata
@@ -221,7 +225,11 @@ def add_softwaretrigger_reconstruction(
         # and some unpacked hit information
         add_softwaretrigger_dqm(path, run_type)
         if pruneDataStore:
-            fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+            fast_reco_reconstruction_path.add_module(
+                "PruneDataStore",
+                matchEntries=ALWAYS_SAVE_REGEX +
+                RAW_SAVE_STORE_ARRAYS +
+                additonal_store_arrays_to_keep)
 
     path.add_path(fast_reco_reconstruction_path)
 
@@ -252,7 +260,7 @@ def get_store_only_metadata_path():
     return store_metadata_path
 
 
-def get_store_only_rawdata_path():
+def get_store_only_rawdata_path(additonal_store_arrays_to_keep=[]):
     """
     Helper function to create a path which deletes (prunes) everything from the data store except
     raw objects from the detector and things that are really needed, e.g. the event meta data and the results of the
@@ -263,8 +271,11 @@ def get_store_only_rawdata_path():
     :return: The created path.
     """
     store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
-        .set_name("KeepRawData")
+    store_rawdata_path.add_module(
+        "PruneDataStore",
+        matchEntries=ALWAYS_SAVE_REGEX +
+        RAW_SAVE_STORE_ARRAYS +
+        additonal_store_arrays_to_keep) .set_name("KeepRawData")
 
     return store_rawdata_path
 

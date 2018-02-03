@@ -475,9 +475,8 @@ def add_ckf_based_track_finding(path,
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
                                 pxd_reco_tracks="PXDRecoTracks",
-                                phase2=False,
                                 use_mc_truth=False,
-                                svd_ckf_mode=None,
+                                svd_ckf_mode="VXDTF2_after",
                                 add_both_directions=True,
                                 use_second_cdc_hits=False,
                                 components=None):
@@ -498,12 +497,6 @@ def add_ckf_based_track_finding(path,
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param components: the list of geometry components in use or None for all components.
     """
-    if not svd_ckf_mode:
-        if phase2:
-            svd_ckf_mode = "VXDTF2_after"
-        else:
-            svd_ckf_mode = "VXDTF2_before_with_second_ckf"
-
     if not is_svd_used(components):
         raise ValueError("SVD must be present in the components!")
 
@@ -545,24 +538,24 @@ def add_ckf_based_track_finding(path,
                 add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
                                      use_mc_truth=use_mc_truth, direction="forward")
             add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="backward", phase2=phase2)
+                        use_mc_truth=use_mc_truth, direction="backward")
             if add_both_directions:
                 add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, phase2=phase2)
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
 
         elif svd_ckf_mode == "only_ckf":
             add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="backward", phase2=phase2)
+                        use_mc_truth=use_mc_truth, direction="backward")
             if add_both_directions:
                 add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, phase2=phase2)
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
 
         elif svd_ckf_mode == "VXDTF2_after":
             add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="backward", phase2=phase2)
+                        use_mc_truth=use_mc_truth, direction="backward")
             if add_both_directions:
                 add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
-                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, phase2=phase2)
+                            use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
 
             add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
             add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
@@ -582,7 +575,7 @@ def add_ckf_based_track_finding(path,
     if trigger_mode in ["all"]:
         if is_pxd_used(components):
             add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks,
-                        use_mc_truth=use_mc_truth, phase2=phase2)
+                        use_mc_truth=use_mc_truth)
 
             path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
                             VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=reco_tracks)

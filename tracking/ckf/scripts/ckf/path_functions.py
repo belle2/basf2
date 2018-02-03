@@ -49,6 +49,17 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
                     )
 
 
+def add_pxd_ckf(path, *args ** kwargs):
+    """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
+    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
+    phase2_path = basf2.create_path()
+    _add_pxd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
+    phase3_path = basf2.create_path()
+    _add_pxd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
+    condition.if_true(phase2_path, basf2.AfterConditionPath.CONTINUE)
+    condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
+
+
 def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False, filter_cut=0.03,
                 overlap_cut=None, use_best_seeds=10, use_best_results=2):
     """
@@ -125,9 +136,20 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc
                     **module_parameters)
 
 
-def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_truth=False,
-                filter_cut=0.1, overlap_cut=None, use_best_results=5, use_best_seeds=10,
-                direction="backward"):
+def add_svd_ckf(path, *args ** kwargs):
+    """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
+    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
+    phase2_path = basf2.create_path()
+    _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
+    phase3_path = basf2.create_path()
+    _add_svd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
+    condition.if_true(phase2_path, basf2.AfterConditionPath.CONTINUE)
+    condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
+
+
+def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_truth=False,
+                                filter_cut=0.1, overlap_cut=None, use_best_results=5, use_best_seeds=10,
+                                direction="backward"):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to

@@ -5,7 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,18 +33,17 @@ namespace Belle2 {
     /* Destructor */
     virtual ~PXDDQMExpressRecoMinModule();
 
+  private:
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 
@@ -87,6 +86,10 @@ namespace Belle2 {
     /** Cluster size */
     TH1F** m_clusterSizeUV;
 
+    /** Number of PXD chips per sensor in u (DCD) (=4) on Belle II */
+    int c_nPXDChipsLu;
+    /** Number of PXD chips per sensor in v (Swichers) (=6) on Belle II */
+    int c_nPXDChipsLv;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */
@@ -108,20 +111,39 @@ namespace Belle2 {
     /** Number of PXD sensors on Belle II */
     int c_nPXDSensors;
 
+    /** Function return index of chip in plots.
+       * @param Layer Layer position of sensor
+       * @param Ladder Ladder position of sensor
+       * @param Sensor Sensor position of sensor
+       * @param ChipU Chip position on sensor in U direction - DCDs
+       * @param ChipV Chip position on sensor in V direction - Switchers
+       * @return Index of sensor in plots.
+       */
+    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int ChipU, const int ChipV) const;
+    /** Function return position indexes of chipID in plots.
+       * @param Index Index of sensor in plots.
+       * @param Layer return Layer position of sensor
+       * @param Ladder return Ladder position of sensor
+       * @param Sensor return Sensor position of sensor
+       * @param ChipU return Chip position on sensor in U direction - DCDs
+       * @param ChipV return Chip position on sensor in V direction - Switchers
+       */
+    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& ChipU, int& ChipV) const;
+
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor
        * @param Ladder Ladder position of sensor
        * @param Sensor Sensor position of sensor
        * @return Index of sensor in plots.
        */
-    int getSensorIndex(int Layer, int Ladder, int Sensor);
+    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
     /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
        */
-    void getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor);
+    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
 
   };
 

@@ -79,12 +79,16 @@ def add_generation(path, event_class):
 
 
 def main():
+    """Generate the given amount and type of events and store them to disk"""
     # Get all parameters for this calculation
     channel = os.environ.get("channel")
     output_file = os.environ.get("output_file")
     random_seed = os.environ.get("random_seed")
     n_events = int(os.environ.get("n_events"))
     phase = int(os.environ.get("phase"))
+
+    # reset the background folder, this get overwritten when basf2 is sourced
+    os.environ["BELLE2_BACKGROUND_DIR"] = os.environ["GC_BELLE2_BACKGROUND_DIR"]
 
     print("Parameters: ")
     print("channel:", channel)

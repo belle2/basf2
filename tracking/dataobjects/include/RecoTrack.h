@@ -18,6 +18,8 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
@@ -219,10 +221,11 @@ namespace Belle2 {
      *        this reco track.
      * @param reversed: add the hits in a reversed order - each sorting parameter is set to
      *        maximal sorting parameter - sorting parameter + offset
+     * @param minimalWeight: if set, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reverded = false);
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.

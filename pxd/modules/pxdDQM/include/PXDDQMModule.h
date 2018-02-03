@@ -32,18 +32,19 @@ namespace Belle2 {
     /* Destructor */
     virtual ~PXDDQMModule();
 
+  private:
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 

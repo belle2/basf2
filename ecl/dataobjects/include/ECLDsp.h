@@ -31,26 +31,32 @@ namespace Belle2 {
       m_TwoCompChi2 = -1;  /**< Offline two component chi2*/
       m_TwoCompTime = 1;  /**< Offline two component time */
       m_TwoCompBaseline = 1;  /**< Offline two component baseline */
-
+      m_DataMCFlag = false;  /**< Data = true MC = false */
     }
 
     /** Constructor for data*/
-    ECLDsp(int CellId, int NADCPoints, int* ADCData)
+    ECLDsp(int CellId, int NADCPoints, int* ADCData, bool flag)
     {
       m_CellId     = CellId;
       m_DspAVector.assign(ADCData, ADCData + NADCPoints);
+      m_DataMCFlag = flag;
     }
 
     /** Constructor for data*/
-    ECLDsp(int CellId, std::vector<int> ADCData)
+    ECLDsp(int CellId, std::vector<int> ADCData, bool flag)
     {
       m_CellId     = CellId;
       m_DspAVector = ADCData;
+      m_DataMCFlag = flag;
     }
 
     /*! Set Cell ID
      */
     void setCellId(int CellId) { m_CellId = CellId; }
+
+    /*! Set Data or MC flag. MC = false. Data = true
+     */
+    void setDataMCFlag(bool flag) { m_DataMCFlag = flag; }
 
     /*! Set Dsp array
      */
@@ -90,6 +96,11 @@ namespace Belle2 {
      * @return cell ID
      */
     int getCellId() const { return m_CellId; }
+
+    /*! Get Data or MC flag
+     * @return Data or MC flag. MC=false Data=true;
+     */
+    bool getDataMCFlag() const { return m_DataMCFlag; }
 
     /*! Get Dsp Array
      * @return Dsp Array 0~31
@@ -146,6 +157,7 @@ namespace Belle2 {
   private:
 
     int m_CellId;      /**< Cell ID */
+    bool m_DataMCFlag;      /**< Data = true, MC = false*/
     double m_TwoCompTotalAmp; /**< Two comp total amp */
     double m_TwoCompHadronAmp;   /**< Two comp hadron amp */
     double m_TwoCompChi2; /**< Two comp chi2 */

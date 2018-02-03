@@ -47,7 +47,7 @@ REG_MODULE(ECLWaveformFit)
 ECLWaveformFitModule::ECLWaveformFitModule()
 {
   // Set module properties
-  setDescription("");
+  setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy Threshold for Fitting Waveforms", 0.05);
   addParam("FitType", m_FitType, "Fit Type Flag for second component. 0 = Hadron, 1 = Diode.", 0);
 }
@@ -162,6 +162,8 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoCompChi2(-1);
     aECLDsp.setTwoCompTime(-1);
     aECLDsp.setTwoCompBaseline(-1);
+    //
+    if (aECLDsp.getDataMCFlag() == false)  continue; //Currently for data only
     //
     int CurrentCellID = aECLDsp.getCellId();
     //

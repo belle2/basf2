@@ -489,9 +489,7 @@ def add_ckf_based_track_finding(path,
     :param svd_reco_tracks: The store array name where to output the svd tracks
     :param pxd_reco_tracks: The store array name where to output the pxd tracks
     :param use_mc_truth: Use the truth information in the CKF modules
-    :param phase2: Use phase 2 configuration instead of phase 3.
-    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without). Defaults to "VXDTF2_before_with_second_ckf"
-           for phase 3 and "VXDTF2_after" for phase 2.
+    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without). Defaults to "VXDTF2_after".
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
            extrapolate also in the other direction.
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not

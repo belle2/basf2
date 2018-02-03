@@ -48,6 +48,7 @@ ECLWaveformFitModule::ECLWaveformFitModule()
 {
   // Set module properties
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy Threshold for Fitting Waveforms", 0.05);
   addParam("FitType", m_FitType, "Fit Type Flag for second component. 0 = Hadron, 1 = Diode.", 0);
 }

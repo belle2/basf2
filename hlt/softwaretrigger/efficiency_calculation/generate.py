@@ -87,6 +87,9 @@ def main():
     n_events = int(os.environ.get("n_events"))
     phase = int(os.environ.get("phase"))
 
+    # reset the background folder, this get overwritten when basf2 is sourced
+    os.environ["BELLE2_BACKGROUND_DIR"] = os.environ["GC_BELLE2_BACKGROUND_DIR"]
+
     print("Parameters: ")
     print("channel:", channel)
     print("output_file:", output_file)

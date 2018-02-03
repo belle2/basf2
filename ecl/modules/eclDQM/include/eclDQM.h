@@ -28,6 +28,8 @@
 
 //ROOT
 #include "TH1F.h"
+#include "TH2F.h"
+
 
 namespace Belle2 {
 
@@ -65,8 +67,20 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     /** Upper threshold of energy deposition in event, [GeV]. */
     double m_EnergyUpperThr;
+    /** Lower threshold of pedestal distribution. */
+    int m_PedestalMeanLowerThr;
+    /** Upper threshold of pedestal distribution. */
+    int m_PedestalMeanUpperThr;
+    /** Upper threshold of pedestal rms error distribution. */
+    double m_PedestalRmsUpperThr;
+    /** WF sampling points for digit array.   */
+    int m_DspArray[8736][31];
+    /** Pedestal average values.   */
+    int m_PedestalMean[8736];
+    /** Pedestal rms error values.    */
+    int m_PedestalRms[8736];
 
-    /** Histogram: Crystal Cell IDs. */
+    /** Histogram: Crystal Cell IDs w/o software threshold.  */
     TH1F* h_cid;
     /** Histogram: Crystal Cell IDs above threshold = 5 MeV.  */
     TH1F* h_cid_Thr5MeV;
@@ -90,6 +104,20 @@ namespace Belle2 {
     TH1F* h_time_endcaps_Thr50MeV;
     /** Histogram: Fit quality flag (0 - good, 1 - large amplitude, 3 - bad chi2). */
     TH1F* h_quality;
-  }; // end Belle2 namespace
-}
+    /** Histogram: Number of hits in each event w/o software threshold.  */
+    TH1F* h_ncev;
+    /** Histogram: Number of hits in each event above the treshold = 10 MeV.  */
+    TH1F* h_ncev_Thr10MeV;
+    /** Histogram: Trigger tag flag #1. */
+    TH1F* h_trigtag1;
+    /** Histogram: Trigger time vs. Trig Cell ID.  */
+    TH2F* h_trigtime_trigid;
+    /** Histogram: Trigger tag flag #2 vs. Trig Cell ID.   */
+    TH2F* h_trigtag2_trigid;
+    /** Histogram: Pedestal Average vs. Cell ID.   */
+    TH2F* h_pedmean_cellid;
+    /** Histogram: Pedestal rms error vs. Cell ID.   */
+    TH2F* h_pedrms_cellid;
+  }; // end ECL namespace
+}; // end Belle2 namespace
 #endif

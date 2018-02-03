@@ -360,9 +360,6 @@ def add_ecl_modules(path, components=None):
     """
     # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
-        # ECL offline waveform fitting
-        ecl_waveform_fit = register_module('ECLWaveformFit')
-        path.add_module(ecl_waveform_fit)
 
         # ECL digit calibration
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
@@ -399,7 +396,7 @@ def add_ecl_modules(path, components=None):
         ecl_showershape = register_module('ECLShowerShape')
         path.add_module(ecl_showershape)
 
-        # ECL Clcuster Pulse Shape Discrimation
+        # ECL Cluster Pulse Shape Discrimination
         ecl_clusterPSD = register_module('ECLClusterPSD')
         path.add_module(ecl_clusterPSD)
 

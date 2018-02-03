@@ -65,7 +65,6 @@ int main(int argc, char* argv[])
     std::cout << "Error set ouput directory" << std::endl;
     return -1;
   }
-  //TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
   //
   int Flag = atoi(argv[1]);
   TString InputDirectory = OutputDirectory;

@@ -4,7 +4,6 @@
 #include <TFile.h>
 #include <TGraph.h>
 #include <iostream>
-
 //
 /*
  See eclComputePulseTemplates_Step0.cc for README instructions.
@@ -18,7 +17,6 @@ int main(int argc, char* argv[])
     std::cout << "Error set ouput directory" << std::endl;
     return -1;
   }
-  //TString OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/";
   //
   int LowIDLimit = atoi(argv[1]);
   int HighIDLimit = atoi(argv[2]);

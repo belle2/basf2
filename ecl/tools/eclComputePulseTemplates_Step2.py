@@ -106,8 +106,6 @@ if(OutputDirectory == ""):
     print("Error set ouput directory")
     sys.exit()
 #
-# OutputDirectory = "/group/belle2/users/longos/WaveformShapesPars/"
-#
 Low = int(sys.argv[1])
 High = int(sys.argv[2])
 #

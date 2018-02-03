@@ -90,17 +90,35 @@ def finalize_hlt_path(path):
     path.add_module(etime)
 
 
-def add_hlt_reconstruction(path, run_type="collision",
-                           with_bfield=True,
-                           components=DEFAULT_HLT_COMPONENTS,
-                           softwaretrigger_mode='hlt_filter'):
+def add_hlt_processing(path, run_type="collision",
+                       with_bfield=True,
+                       pruneDataStore=True,
+                       components=DEFAULT_HLT_COMPONENTS,
+                       softwaretrigger_mode='hlt_filter'):
     add_unpackers(path, components=components)
 
-    # todo: forward the the mag field and run_type mode into this method call
-    add_softwaretrigger_reconstruction(path,
-                                       softwaretrigger_mode=softwaretrigger_mode,
-                                       run_type=run_type,
-                                       addDqmModules=True)
+    if run_type == "collision":
+        # todo: forward the the mag field and run_type mode into this method call
+        add_softwaretrigger_reconstruction(path,
+                                           components=components,
+                                           softwaretrigger_mode=softwaretrigger_mode,
+                                           run_type=run_type,
+                                           addDqmModules=True)
+    elif run_type == "cosmics":
+        # no filtering,
+        # todo: correct data taking period here, when SVD is in the components,
+        # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
+        add_cosmics_reconstruction(path, components=components)
+        add_hlt_dqm(path, run_type)
+        if pruneDataStore:
+            fast_reco_reconstruction_path.add_module(
+                "PruneDataStore",
+                matchEntries=ALWAYS_SAVE_REGEX +
+                RAW_SAVE_STORE_ARRAYS +
+                additonal_store_arrays_to_keep)
+
+    else:
+        basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
 
 def add_softwaretrigger_reconstruction(
@@ -218,12 +236,12 @@ def add_softwaretrigger_reconstruction(
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
-        add_softwaretrigger_dqm(hlt_reconstruction_path, run_type)
+        add_hlt_dqm(hlt_reconstruction_path, run_type)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
         # make sure to still add the DQM modules, they can give at least some FW runtime info
         # and some unpacked hit information
-        add_softwaretrigger_dqm(path, run_type)
+        add_hlt_dqm(path, run_type)
         if pruneDataStore:
             fast_reco_reconstruction_path.add_module(
                 "PruneDataStore",
@@ -234,8 +252,7 @@ def add_softwaretrigger_reconstruction(
     path.add_path(fast_reco_reconstruction_path)
 
 
-def add_softwaretrigger_dqm(path, run_type):
-
+def add_hlt_dqm(path, run_type):
     if run_type == "collision":
         add_collision_dqm(path, dqm_environment="hlt")
     elif run_type == "cosmics":

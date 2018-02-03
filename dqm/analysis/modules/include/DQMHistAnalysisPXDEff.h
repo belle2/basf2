@@ -1,8 +1,9 @@
 //+
-// File : DQMHistAnalysisPXDFits.h
-// Description : An example module for DQM histogram analysis
+// File : DQMHistAnalysisPXDEff.h
+// Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //
-// Author : Tomoyuki Konno, Tokyo Metroplitan Univerisity
+// Modified to efficiency by Uwe Gebauer
+// Based on work from: Tomoyuki Konno, Tokyo Metroplitan Univerisity
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
@@ -20,8 +21,11 @@
 #include <TH2.h>
 #include <TCanvas.h>
 
+//todo debug: remove
+#include <TFile.h>
+#include <TKey.h>
+
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
 
   class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
 
@@ -46,31 +50,35 @@ namespace Belle2 {
     int m_u_bins;
     int m_v_bins;
     std::string m_histogramDirectoryName;
+    bool m_singleHists;
 
     VXD::GeoCache& m_vxdGeometry;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    //todo canvas for these? only when option selected?
-    //should these be printed out?
+    //IDs of only the sensors of layer 1/2, to iterate the summary histograms
+    std::vector<VxdID> m_PXDLayer1;
+    std::vector<VxdID> m_PXDLayer2;
+
     //Individual efficiency for each module
     std::map<VxdID, TH2D*> m_hEffModules;
     std::map<VxdID, TCanvas*> m_cEffModules;
 
     //Make four summary plots for each module type
-    TH2D* m_hEffIF;
-    TH2D* m_hEffIB;
-    TH2D* m_hEffOF;
-    TH2D* m_hEffOB;
-    TCanvas* m_cEffIF;
-    TCanvas* m_cEffIB;
-    TCanvas* m_cEffOF;
-    TCanvas* m_cEffOB;
+    std::map<std::string, TH2D*> m_hEffMerge;
+    std::map<std::string, TCanvas*> m_cEffMerge;
 
-    //One bin for each module in the geometry
-    TH1D* m_hEffAll;
-    TCanvas* m_cEffAll;
+    //One bin for each module in the geometry, one histogram for each layer
+    TH1D* m_hEffAll1;
+    TCanvas* m_cEffAll1;
+    TH1D* m_hEffAll2;
+    TCanvas* m_cEffAll2;
+
+    TH1* findHistLocal(TString& a);
+
+    //todo debug
+    TFile* somestuff;
 
   };
 } // end namespace Belle2

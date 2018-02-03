@@ -21,9 +21,6 @@
 #include <TH2.h>
 #include <TCanvas.h>
 
-//todo debug: remove
-#include <TFile.h>
-#include <TKey.h>
 
 namespace Belle2 {
 
@@ -76,9 +73,6 @@ namespace Belle2 {
     TCanvas* m_cEffAll2;
 
     TH1* findHistLocal(TString& a);
-
-    //todo debug
-    TFile* somestuff;
 
   };
 } // end namespace Belle2

@@ -13,9 +13,6 @@
 #include <TROOT.h>
 #include <TClass.h>
 
-//todo remove
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 
@@ -134,13 +131,6 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
 
-
-
-  //todo debug
-  somestuff = new TFile("../176_dqm2.root");
-  cout << "Opened file? " << somestuff->IsOpen() << endl;
-
-
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -186,7 +176,6 @@ void DQMHistAnalysisPXDEffModule::event()
     Hits = (TH2D*)findHist(m_histogramDirectoryName, std::string("track_hits_" + buff));
     Matches = (TH2D*)findHist(m_histogramDirectoryName, std::string("matched_cluster_" + buff));
 
-    //todo debug?
     //Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr) {
       TString locationHits = "track_hits_" + buff;
@@ -295,29 +284,6 @@ void DQMHistAnalysisPXDEffModule::event()
     m_cEffAll2->Update();
   }
 
-
-
-  //todo debug
-  TFile outputF("dqm_output.root", "RECREATE");
-  outputF.cd();
-  m_hEffAll1->Write();
-  m_hEffAll2->Write();
-  for (auto& histo : m_hEffModules) {
-    histo.second->Write();
-  }
-  if (singleHists) {
-    for (auto& histo : m_cEffModules) {
-      histo.second->Write();
-    }
-  }
-  for (auto& histo : m_hEffMerge) {
-    histo.second->Write();
-  }
-  for (auto& histo : m_cEffMerge) {
-    histo.second->Write();
-  }
-  outputF.Write();
-  outputF.Close();
 }
 
 void DQMHistAnalysisPXDEffModule::endRun()
@@ -328,9 +294,6 @@ void DQMHistAnalysisPXDEffModule::endRun()
 
 void DQMHistAnalysisPXDEffModule::terminate()
 {
-  //todo debug
-  delete somestuff;
-
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
 }
 
@@ -339,17 +302,6 @@ TH1* DQMHistAnalysisPXDEffModule::findHistLocal(TString& a)
   B2INFO("Histo " << a << " not in memfile");
   // the following code sux ... is there no root function for that?
   TDirectory* d = gROOT;
-
-  //todo debug
-  somestuff->cd();
-  TH1* hhh = 0;
-  somestuff->GetObject(a, hhh);
-  if (hhh != 0) {
-    cout << "Found " << hhh->GetName() << endl;
-    return hhh;
-  }
-
-
 
   TString myl = a;
   TString tok;

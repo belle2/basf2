@@ -6,7 +6,6 @@
 // Date : 2 - Aug - 2013
 //-
 #include <daq/rawdata/DesSer.h>
-#include <sys/uio.h>
 
 //#define DEBUG
 using namespace std;

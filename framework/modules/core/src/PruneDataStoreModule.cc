@@ -41,11 +41,22 @@ void PruneDataStoreModule::initialize()
 {
   // prepare the regex_matchers, otherwise this nede to be done for each DataStore item
   for (auto& kEntry : m_matchEntries) {
-    m_compiled_regex.push_back(std::regex(kEntry));
+    m_compiled_regex.push_back(compileAndCatch(kEntry));
   }
   // also get the regex for the implicit keeps
   for (auto& kEntry : m_keepEntriesImplicit) {
-    m_compiled_regex_implicit.push_back(std::regex(kEntry));
+    m_compiled_regex_implicit.push_back(compileAndCatch(kEntry));
+  }
+}
+
+std::regex PruneDataStoreModule::compileAndCatch(std::string& regexString) const
+{
+  try {
+    return std::regex(regexString);
+  } catch (const std::regex_error& e) {
+    B2FATAL("Regex '" << regexString << "' cannot be compiled: " <<  e.what());
+    // keep the compiler happy and return something
+    return std::regex();
   }
 }
 

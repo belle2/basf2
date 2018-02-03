@@ -66,10 +66,18 @@ void DQMHistAnalysisPXDEffModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
 
+
+  int nu = 1;//If this does not get overwritten, the histograms will anyway never contain anything useful
+  int nv = 1;
   //Have been promised that all modules have the same number of pixels, so just take from the first one
-  VXD::SensorInfoBase cellGetInfo = m_vxdGeometry.getSensorInfo(m_PXDModules[0]);
-  int nu = cellGetInfo.getUCells();
-  int nv = cellGetInfo.getVCells();
+  if (m_PXDModules.size() == 0) {
+    //This could as well be a B2FATAL, the module won't do anything useful if this happens
+    B2ERROR("No PXDModules found! Can't really do anything useful now...");
+  } else {
+    VXD::SensorInfoBase cellGetInfo = m_vxdGeometry.getSensorInfo(m_PXDModules[0]);
+    nu = cellGetInfo.getUCells();
+    nv = cellGetInfo.getVCells();
+  }
 
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
@@ -126,7 +134,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
     m_hEffAll1->GetXaxis()->SetBinLabel(i, ModuleName);
   }
   for (unsigned int i = 1; i <= m_PXDLayer2.size(); i++) {
-    TString ModuleName = (std::string)m_PXDModules[i - 1];
+    TString ModuleName = (std::string)m_PXDLayer2[i - 1];
     m_hEffAll2->GetXaxis()->SetBinLabel(i, ModuleName);
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs

@@ -15,7 +15,6 @@
 #include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <mdst/dataobjects/ECLCluster.h>
-
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -41,7 +40,7 @@ ECLClusterPSDModule::ECLClusterPSDModule()
   // Set module properties
   setDescription("Module uses offline two component fit results to compute pulse shape discrimation variables for particle identification.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Chi2Threshold", m_Chi2Threshold, "Chi2 Threshold", 30.);
+  addParam("Chi2Threshold", m_Chi2Threshold, "Chi2 Threshold", 20.);
   addParam("CrystalHadronEnergyThreshold", m_CrystalHadronEnergyThreshold,
            "Hadron component energy threshold to identify as hadron digit.(GeV)", 0.003);
 }
@@ -99,10 +98,6 @@ void ECLClusterPSDModule::event()
     if (nWaveforminCluster > 0) {
       if (Cluster2CTotalEnergy != 0) eclshowers[ishowers]->setShowerHadronIntensity(Clust2CHadronEnergy / Cluster2CTotalEnergy);
       eclshowers[ishowers]->setNumberofHadronDigits(NumberofHadronDigits);
-      //
-      //
-      //
-      //
     } else {
       eclshowers[ishowers]->setShowerHadronIntensity(-999);
       eclshowers[ishowers]->setNumberofHadronDigits(-1);

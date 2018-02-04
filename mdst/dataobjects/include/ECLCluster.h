@@ -70,7 +70,7 @@ namespace Belle2 {
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.),
       m_ClusterHadronIntensity(-999),
-      m_NumberofHadronDigits(0) {}
+      m_NumberofHadronDigits(-1) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
@@ -396,10 +396,10 @@ namespace Belle2 {
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
     /** Cluster Hadron Component Intensity. */
-    Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.6, 18]
+    Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
 
     /** Number of hadron digits in cluster */
-    int m_NumberofHadronDigits;  //[-1, 200., 18]
+    int m_NumberofHadronDigits;  //[-1, 244., 8]
 
     /** Class definition */
     ClassDef(ECLCluster, 11);

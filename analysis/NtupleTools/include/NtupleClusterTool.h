@@ -60,7 +60,6 @@ namespace Belle2 {
     /**  number of cluster digits with significant hadorn component light output*/
     int* m_NumberofHadronDigits;
 
-
     /**  ratio of energies in inner 3x3 and 5x5-corner cells */
     float* m_e9e21;
 

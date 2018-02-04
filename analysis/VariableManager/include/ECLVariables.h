@@ -17,14 +17,14 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * return hadron scintillation component intensity of cluster computer from digits with offline waveforms saved.
-     * Variable is used to separater hadronic showers from electromagnetic showers
+     * return hadron scintillation component intensity of cluster computed from digits with offline waveforms saved.
+     * Variable is used to separate hadronic showers from electromagnetic showers
      */
     double eclClusterHadronIntensity(const Particle* particle);
 
     /**
-     * return number of digits in cluster with significant scintillation emission in the hadronic scintillation component
-     * Variable is used to separater hadronic showers from electromagnetic showers
+     * return number of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
+     * Variable is used to separate hadronic showers from electromagnetic showers
      */
     int eclClusterNumberofHadronDigits(const Particle* particle);
 

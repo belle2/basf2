@@ -48,7 +48,7 @@ namespace Belle2 {
 
     int eclClusterNumberofHadronDigits(const Particle* particle)
     {
-      int result = -1;
+      int result = 0;
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
         result = shower->getNumberofHadronDigits();

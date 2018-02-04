@@ -95,8 +95,6 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
     """
-    import cdc.cr as cosmics_setup
-
     # make sure CDC is used
     if not is_cdc_used(components):
         return
@@ -110,23 +108,21 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 
-    cosmics_setup.set_cdc_cr_parameters(data_taking_period)
-
     # track finding
-    add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
-                             trigger_point=tuple(cosmics_setup.triggerPos))
+    add_cr_track_finding(path, reco_tracks="RecoTracks", components=components, data_taking_period=data_taking_period,
+                         merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
 
     # track fitting
-    add_cdc_cr_track_fit_and_track_creator(path, components, prune_tracks=prune_tracks,
-                                           event_timing_extraction=event_time_extraction,
-                                           data_taking_period=data_taking_period, top_in_counter=top_in_counter)
+    add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
+                                       event_timing_extraction=event_time_extraction,
+                                       data_taking_period=data_taking_period, top_in_counter=top_in_counter)
 
     if merge_tracks:
         # Do also fit the not merged tracks
-        add_cdc_cr_track_fit_and_track_creator(path, components, prune_tracks=prune_tracks,
-                                               event_timing_extraction=False,
-                                               data_taking_period=data_taking_period, top_in_counter=top_in_counter,
-                                               reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
+        add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
+                                           event_timing_extraction=False,
+                                           data_taking_period=data_taking_period, top_in_counter=top_in_counter,
+                                           reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
 def add_geometry_modules(path, components=None):
@@ -217,10 +213,10 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
         add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
-def add_cdc_cr_track_fit_and_track_creator(path, components=None,
-                                           data_taking_period='gcr2017', top_in_counter=False,
-                                           prune_tracks=False, event_timing_extraction=True,
-                                           reco_tracks="RecoTracks", tracks=""):
+def add_cr_track_fit_and_track_creator(path, components=None,
+                                       data_taking_period='gcr2017', top_in_counter=False,
+                                       prune_tracks=False, event_timing_extraction=True,
+                                       reco_tracks="RecoTracks", tracks=""):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.
@@ -240,36 +236,40 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
            (assuming PMT is put at -z of the counter).
     """
 
-    import cdc.cr as cosmics_setup
+    if data_taking_period != "phase2":
+        import cdc.cr as cosmics_setup
 
-    cosmics_setup.set_cdc_cr_parameters(data_taking_period)
+        cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
-    # Time seed
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    recoTracksStoreArrayName=reco_tracks,
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=cosmics_setup.triggerPos,
-                    triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
-                    useFittedInformation=False)
+        # Time seed
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks,
+                        pdgCodeToUseForEstimation=13,
+                        triggerPlanePosition=cosmics_setup.triggerPos,
+                        triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
+                        useFittedInformation=False)
 
-    # Initial track fitting
-    path.add_module("DAFRecoFitter",
-                    recoTracksStoreArrayName=reco_tracks,
-                    probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
+        # Initial track fitting
+        path.add_module("DAFRecoFitter",
+                        recoTracksStoreArrayName=reco_tracks,
+                        probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
 
-    # Correct time seed
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    recoTracksStoreArrayName=reco_tracks,
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=cosmics_setup.triggerPos,
-                    triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
-                    useFittedInformation=True,
-                    useReadoutPosition=top_in_counter,
-                    readoutPosition=cosmics_setup.readOutPos,
-                    readoutPositionPropagationSpeed=cosmics_setup.lightPropSpeed
-                    )
+        # Correct time seed
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks,
+                        pdgCodeToUseForEstimation=13,
+                        triggerPlanePosition=cosmics_setup.triggerPos,
+                        triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
+                        useFittedInformation=True,
+                        useReadoutPosition=top_in_counter,
+                        readoutPosition=cosmics_setup.readOutPos,
+                        readoutPositionPropagationSpeed=cosmics_setup.lightPropSpeed
+                        )
+    else:
+        path.add_module("IPTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
 
     # Track fitting
     path.add_module("DAFRecoFitter",
@@ -448,6 +448,66 @@ def add_track_finding(
             if prune_temporary_tracks:
                 path.add_module('PruneRecoTracks',
                                 storeArrayName=pxd_reco_tracks)
+
+
+def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='gcr2017',
+                         merge_tracks=True, use_second_cdc_hits=False):
+    import cdc.cr as cosmics_setup
+
+    if data_taking_period != "phase2":
+        cosmics_setup.set_cdc_cr_parameters(data_taking_period)
+
+        # track finding
+        add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
+                                 trigger_point=tuple(cosmics_setup.triggerPos))
+
+    else:
+        # make sure SVD is used
+        if not is_svd_used(components):
+            raise ValueError("SVD must be present in the components!")
+
+        cdc_reco_tracks = "CDCRecoTracks"
+        svd_reco_tracks = "SVDRecoTracks"
+        pxd_reco_tracks = "PXDRecoTracks"
+
+        if merge_tracks:
+            unmerged_reco_tracks = "UnmergedRecoTracks"
+        else:
+            unmerged_reco_tracks = reco_tracks
+
+        if is_pxd_used(components):
+            svd_cdc_reco_tracks = "SVDCDCRecoTracks"
+        else:
+            svd_cdc_reco_tracks = unmerged_reco_tracks
+
+        # CDC track finding with default settings
+        add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
+                                 reco_tracks=cdc_reco_tracks)
+
+        # This fitter is actually not needed (the CKF modules fit on their own), but separates out the module times
+        # better
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
+        # add CKF for cosmics
+        add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks, direction="backward")
+        add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks, direction="forward",
+                    filter_cut=0.01)
+
+        # Write out the combinations of tracks
+        path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
+                        CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+                        recoTracksStoreArrayName=svd_cdc_reco_tracks)
+
+        if is_pxd_used(components):
+            add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks)
+
+            path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
+                            VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=unmerged_reco_tracks)
+
+        if merge_tracks:
+            # merge the tracks together
+            # TODO
+            pass
 
 
 def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):

@@ -227,8 +227,7 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  //The output collection name will be always "MCParticles",
-  //which is created by the geometry module. (Rather awkward.)
+  //The output collection name will be always "MCParticles".
   EventAction* eventAction = new EventAction("", m_mcParticleGraph);
   runManager.SetUserAction(eventAction);
 

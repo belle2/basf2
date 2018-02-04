@@ -60,7 +60,7 @@ namespace Belle2 {
   private:
     std::vector< std::vector<double> > m_PhotonPars;  /**< photon parameters all crystals*/
     std::vector< std::vector<double> > m_HadronPars;  /**< hadron parameters all crystals*/
-    std::vector< std::vector<double> > m_DiodePars;   /**< didoe parameters all crystals*/
+    std::vector< std::vector<double> > m_DiodePars;   /**< diode parameters all crystals*/
 
     //1 Initial Version
     ClassDef(ECLDigitWaveformParameters, 1); /**< ClassDef */

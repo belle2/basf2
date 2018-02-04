@@ -168,44 +168,49 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
     return a list of all particles containing the given pattern as substring
     ignoring case with two special cases:
 
-    - if ``name`` begins with "^", only particles
-      beginning with the pattern will be searched. The "^" will not be part of the search.
+    - if ``name`` begins with "^", only particles beginning with the pattern
+      will be searched. The "^" will not be part of the search.
     - if ``name`` ends with "$" the pattern will only be matched to the end
       of the particle name. The "$" will not be part of the search.
 
     If ``include_width=True`` the search will include all particles if their
     (mass ± width) is within the given limit. If ``include_width`` is a positive
     number then the particle will be returned if $m ± n*\Gamma$ is within the
-    required range where n is the value of ``include_width``
+    required range where n is the value of ``include_width`` and $\Gamma$ the
+    width of the particle.
 
     Examples:
+        Return a list of all particles
+
+        >>> search()
+
         Search for all particles containing a "pi" somewhere in the name and ignore the case
 
-        >>> search_name("pi")
+        >>> search("pi")
 
         Search for all particles beginning with K or k
 
-        >>> search_name("^K")
+        >>> search("^K")
 
         Search for all particles ending with "+" and having a maximal mass of 3 GeV:
 
-        >>> search_name("+$", max_mass=3.0)
+        >>> search("+$", max_mass=3.0)
 
         Search for all particles which contain a capital D and have a minimal mass of 1 GeV
 
-        >>> search_name("~D", min_mass=1.0)
+        >>> search("~D", min_mass=1.0)
 
         Search for all partiles which contain a set of parenthesis containing a number
 
-        >>> search_name(".*\(\d*\).*", regex=True)
+        >>> search(".*\(\d*\).*", name_regex=True)
 
         Search all particles whose mass ± width covers 1 to 1.2 GeV
 
-        >>> search_mass(min_mass=1.0, max_mass=1.2, include_width=True)
+        >>> search(min_mass=1.0, max_mass=1.2, include_width=True)
 
         Search all particles whose mass ± 3*width touches 1 GeV
 
-        >>> search_mass(min_mass=1.0, max_mass=1.0, include_width=3)
+        >>> search(min_mass=1.0, max_mass=1.0, include_width=3)
 
 
     Parameters:
@@ -213,19 +218,22 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
             or as regular expression if ``name_regex=True``
         min_mass (float): minimal mass for all returned particles or None for no limit
         max_mass (float): maximal mass for all returned particles or None for no limit
-        name_regex (bool): if True then ``name`` will be treated as a regula expression
+        name_regex (bool): if True then ``name`` will be treated as a regular expression
         include_width (float or bool): if True or >0 include the particles if
-            (mass ± include_width*width) falls within the mass limits """
+            (mass ± include_width*width) falls within the mass limits
+    """
 
     pattern = None
-    if name is not None:
+    if name:
         options = re.IGNORECASE
         if name[0] == "~":
             name = name[1:]
             options = 0
 
-        if name_regex is False:
-            if name[0] == "^":
+        if not name_regex:
+            if name[0] == "^" and name[-1] == "$":
+                name = "^{}$".format(re.escape(name[1:-1]))
+            elif name[0] == "^":
                 name = "^{}.*".format(re.escape(name[1:]))
             elif name[-1] == "$":
                 name = ".*{}$".format(re.escape(name[:-1]))

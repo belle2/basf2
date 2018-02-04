@@ -17,6 +17,7 @@ from daqdqm.cosmicdqm import add_cosmic_dqm
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 
 def setup_basf2_and_db():
@@ -108,10 +109,10 @@ def add_hlt_processing(path, run_type="collision",
         # no filtering,
         # todo: correct data taking period here, when SVD is in the components,
         # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
-        add_cosmics_reconstruction(path, components=components)
+        reconstruction.add_cosmics_reconstruction(path, components=components)
         add_hlt_dqm(path, run_type)
         if pruneDataStore:
-            fast_reco_reconstruction_path.add_module(
+            path.add_module(
                 "PruneDataStore",
                 matchEntries=ALWAYS_SAVE_REGEX +
                 RAW_SAVE_STORE_ARRAYS +
@@ -119,6 +120,28 @@ def add_hlt_processing(path, run_type="collision",
 
     else:
         basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+
+
+def add_expressreco_processing(path, run_type="collision",
+                               with_bfield=True,
+                               components=DEFAULT_EXPRESSRECO_COMPONENTS,
+                               do_reconstruction=True):
+    add_unpackers(path, components=components)
+
+    if run_type == "collision":
+        if do_reconstruction:
+            reconstruction.add_reconstruction(path,
+                                              skipGeometryAdding=True,
+                                              components=components)
+    elif run_type == "cosmics":
+        # no filtering,
+        # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
+        if do_reconstruction:
+            reconstruction.add_cosmics_reconstruction(path, components=components)
+    else:
+        basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+
+    add_express_reco_dqm(path, run_type)
 
 
 def add_softwaretrigger_reconstruction(

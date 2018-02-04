@@ -103,6 +103,9 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   rio_sh_wreg(callback, hslb, 0xFFF, 0x221, obj.getInt("run_type"));
   rio_sh_wreg(callback, hslb, 0xFFF, 0x223, obj.getInt("adc_data_len"));
 
+  // Reset ADC on ShaperDSP (initialize time cycle)
+  rio_sh_wreg(callback, hslb, 0xFFF, 0x800, 1);
+
   const DBObjectList o_reg30s(obj.getObjects("reg30"));
   for (size_t i = 0; i < o_reg30s.size(); i++) {
     const DBObject& o_reg30(o_reg30s[i]);

@@ -179,12 +179,12 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   //----------------------------------------------------------------
   name = str(format("DQMER_SVD_ClusterTimeUAll"));
   title = str(format("DQM ER SVD Cluster time in U for all sensors"));
-  m_clusterTimeUAll = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
+  m_clusterTimeUAll = new TH1F(name.c_str(), title.c_str(), 200, -100, 100);
   m_clusterTimeUAll->GetXaxis()->SetTitle("time of u clusters [ns]");
   m_clusterTimeUAll->GetYaxis()->SetTitle("count");
   name = str(format("DQMER_SVD_ClusterTimeVAll"));
   title = str(format("DQM ER SVD Cluster time in V for all sensors"));
-  m_clusterTimeVAll = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
+  m_clusterTimeVAll = new TH1F(name.c_str(), title.c_str(), 200, -100, 100);
   m_clusterTimeVAll->GetXaxis()->SetTitle("time of v clusters [ns]");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
 

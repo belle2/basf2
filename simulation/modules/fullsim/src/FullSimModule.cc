@@ -227,8 +227,9 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  //Instead of creating a new MCParticle collection, the old one is updated and reused.
-  EventAction* eventAction = new EventAction(m_mcParticleInputColName, m_mcParticleGraph);
+  //The output collection name will be always "MCParticles",
+  //which is created by the geometry module. (Rather awkward.)
+  EventAction* eventAction = new EventAction("", m_mcParticleGraph);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.

@@ -275,13 +275,21 @@ def add_softwaretrigger_reconstruction(
     path.add_path(fast_reco_reconstruction_path)
 
 
-def add_hlt_dqm(path, run_type):
+def add_online_dqm(path, run_type, dqm_environment):
     if run_type == "collision":
-        add_collision_dqm(path, dqm_environment="hlt")
+        add_collision_dqm(path, dqm_environment=dqm_environment)
     elif run_type == "cosmics":
-        add_cosmic_dqm(path, dqm_environment="hlt")
+        add_cosmic_dqm(path, dqm_environment=dqm_environment)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
+
+
+def add_hlt_dqm(path, run_type):
+    add_online_dqm(path, run_type, "hlt")
+
+
+def add_expressreco_dqm(path, run_type):
+    add_online_dqm(path, run_type, "expressreco")
 
 
 def get_store_only_metadata_path():

@@ -76,15 +76,15 @@ namespace Belle2 {
 
     protected:
     private:
-      std::vector<double> gamma_params_forPSD;
-      std::vector<double> psd_params_forPSD;
       //
-      std::vector<double> FitWithROOT(double, std::vector<double>, std::vector<double>, int);
+      std::vector<double> FitWithROOT(double, std::vector<double>, std::vector<double>, int);  /** Fit with ROOT::Fit function.*/
       //
-      double m_CurrentPulseArray31[EclConfiguration::m_nsmp];
-      int m_FitType;
-      double m_ChiThreshold;
-      double m_EnergyThreshold;
+      double m_CurrentPulseArray31[EclConfiguration::m_nsmp];  /** Current waveform adc values.*/
+      int m_FitType;  /**0 = photon + hadron, 1 = photon + diode*/
+      double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
+      std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
+      std::vector< std::vector<double> > m_PhotonTemplates; /**photon templates*/
+      std::vector< std::vector<double> > m_SecondComponentTemplates; /**hadron or diode templates*/
     };
   } // end ECL namespace
 } // end Belle2 namespace

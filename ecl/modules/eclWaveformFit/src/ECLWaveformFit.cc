@@ -58,6 +58,14 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 {
 }
 //
+//// callback for templates
+//void ECLWaveformFitModule::callbackTemplates(DBObjPtr<ECLDigitWaveformParameters>& pars, std::vector<double>& photpars,std::vector<double>& hadpars)
+//{
+//  constants = cal->getCalibVector();
+//  constantsUnc = cal->getCalibUncVector();
+//}
+
+//
 // initialize
 void ECLWaveformFitModule::initialize()
 {
@@ -76,11 +84,29 @@ void ECLWaveformFitModule::initialize()
 // begin run
 void ECLWaveformFitModule::beginRun()
 {
-
+  //
+  DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
+  m_ADCtoEnergy.resize(8736);
+  if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
+  if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
+  //
+  DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
+  m_PhotonTemplates.resize(8736);
+  m_SecondComponentTemplates.resize(8736);
+  for (int i = 0; i < 8736; i++) {
+    m_PhotonTemplates[i] = WavePars->getPhotonParameters(i + 1);
+    if (m_FitType == 0) {
+      m_SecondComponentTemplates[i] = WavePars->getHadronParameters(i + 1);
+    } else {
+      m_SecondComponentTemplates[i] = WavePars->getDiodeParameters(i + 1);
+    }
+    if (m_PhotonTemplates[i][0] == 0 || m_SecondComponentTemplates[i][0] == 0) {
+      B2WARNING("Warning cellID: " << i + 1 << " has no waveforms." << std::endl);
+    }
+  }
 }
 //
 std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
-
                                                       std::vector<double> PhotonPars11,
                                                       std::vector<double> HadronPars11,
                                                       int ComponentNumber)
@@ -185,8 +211,7 @@ void ECLWaveformFitModule::event()
       continue;
     }
     //
-    DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
-    const double OnlineEnergy = OnlineAmp *= Ael->getCalibVector()[CurrentCellID - 1] * Aen->getCalibVector()[CurrentCellID - 1];
+    const double OnlineEnergy = OnlineAmp *= m_ADCtoEnergy[CurrentCellID - 1];
     if (OnlineEnergy < m_EnergyThreshold)  continue;
     //
     if (aECLDsp.getNADCPoints() > 0) {
@@ -203,23 +228,9 @@ void ECLWaveformFitModule::event()
       }
       if (TriggerCheck < 100) continue;
       //
-      DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
-      std::vector<double> CurrentPhotonPar11, CurrentSecondCompPar11;
-      CurrentPhotonPar11 = WavePars->getPhotonParameters(CurrentCellID);
-      if (m_FitType == 0) {
-        CurrentSecondCompPar11 = WavePars->getHadronParameters(CurrentCellID);
-      } else {
-        CurrentSecondCompPar11 = WavePars->getDiodeParameters(CurrentCellID);
-      }
-      //
-      if (CurrentPhotonPar11[0] == 0 || CurrentSecondCompPar11[0] == 0) {
-        B2WARNING("Warning cellID: " << CurrentCellID << " has no waveforms." << std::endl);
-        continue;
-      }
-      //
       //Fit using ROOT::Fit with Photon + Hadron or Diode Templates
       std::vector<double> theROOTFit;
-      theROOTFit = FitWithROOT(OnlineAmp, CurrentPhotonPar11, CurrentSecondCompPar11, 2);
+      theROOTFit = FitWithROOT(OnlineAmp, m_PhotonTemplates[CurrentCellID - 1], m_SecondComponentTemplates[CurrentCellID - 1], 2);
       //
       aECLDsp.setTwoCompTotalAmp(theROOTFit[0]);
       aECLDsp.setTwoCompHadronAmp(theROOTFit[1]);

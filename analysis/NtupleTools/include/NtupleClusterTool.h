@@ -57,7 +57,7 @@ namespace Belle2 {
     /**  cluster hadron scintillation component intensity*/
     float* m_ClusterHadronIntensity;
 
-    /**  number of cluster digits with significant hadorn component light output*/
+    /**  number of cluster digits with significant (>3 MeV) hadron component light output*/
     int* m_NumberofHadronDigits;
 
     /**  ratio of energies in inner 3x3 and 5x5-corner cells */

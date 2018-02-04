@@ -84,6 +84,8 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   hslb.writefee8(0x20, obj.getInt("shaper_mask_low"));
   hslb.writefee8(0x21, obj.getInt("shaper_mask_high"));
 
+  hslb.writefee8(0x38, obj.getInt("relay_g"));
+
   callback.log(LogFile::INFO, "write fee-8 %x << %x", 0x38, obj.getInt("ttd_trg_rare_factor"));
   hslb.writefee8(0x38, obj.getInt("ttd_trg_rare_factor"));
   callback.log(LogFile::INFO, "read fee-8 %x >> %x", 0x38, hslb.readfee8(0x38));

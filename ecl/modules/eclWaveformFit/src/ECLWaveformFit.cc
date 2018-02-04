@@ -58,14 +58,6 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 {
 }
 //
-//// callback for templates
-//void ECLWaveformFitModule::callbackTemplates(DBObjPtr<ECLDigitWaveformParameters>& pars, std::vector<double>& photpars,std::vector<double>& hadpars)
-//{
-//  constants = cal->getCalibVector();
-//  constantsUnc = cal->getCalibUncVector();
-//}
-
-//
 // initialize
 void ECLWaveformFitModule::initialize()
 {

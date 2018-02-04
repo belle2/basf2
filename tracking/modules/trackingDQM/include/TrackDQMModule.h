@@ -60,11 +60,23 @@ namespace Belle2 {
     /** Chi2 / NDF */
     TH1F* m_Chi2NDF;
     /** Unbiased residuals for PXD u vs v */
-    TH2F* m_UBResidualsPXD;
+    // TH2F* m_UBResidualsPXD;
     /** Unbiased residuals for SVD u vs v */
-    TH2F* m_UBResidualsSVD;
+    // TH2F* m_UBResidualsSVD;
     /** Unbiased residuals for PXD and SVD u vs v per sensor*/
-    TH2F** m_UBResidualsSensor;
+    // TH2F** m_UBResidualsSensor;
+    /** Unbiased residuals for PXD u */
+    TH1F* m_UBResidualsPXDU;
+    /** Unbiased residuals for SVD u */
+    TH1F* m_UBResidualsSVDU;
+    /** Unbiased residuals for PXD and SVD u per sensor*/
+    TH1F** m_UBResidualsSensorU;
+    /** Unbiased residuals for PXD v */
+    TH1F* m_UBResidualsPXDV;
+    /** Unbiased residuals for SVD v */
+    TH1F* m_UBResidualsSVDV;
+    /** Unbiased residuals for PXD and SVD v per sensor*/
+    TH1F** m_UBResidualsSensorV;
     /** Track related clusters - hitmap in IP angle range */
     TH2F** m_TRClusterHitmap;
     /** Track related clusters - neighbor corelations in Phi */

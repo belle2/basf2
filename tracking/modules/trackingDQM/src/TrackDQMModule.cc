@@ -126,6 +126,7 @@ void TrackDQMModule::defineHisto()
       break;
     }
   }
+  float ResidualRange = 400;  // in um
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -161,24 +162,50 @@ void TrackDQMModule::defineHisto()
   m_Chi2NDF->GetYaxis()->SetTitle("counts");
 
   /** Unbiased residuals for PXD u vs v */
-  name = str(format("UBResidualsPXD"));
+  /* name = str(format("UBResidualsPXD"));
   title = str(format("Unbiased residuals for PXD"));
-  m_UBResidualsPXD = new TH2F(name.c_str(), title.c_str(), 200, -200, 200, 200, -200, 200);
+  m_UBResidualsPXD = new TH2F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange, 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXD->GetXaxis()->SetTitle("u residual [#mum]");
   m_UBResidualsPXD->GetYaxis()->SetTitle("v residual [#mum]");
   m_UBResidualsPXD->GetZaxis()->SetTitle("counts");
+  */
   /** Unbiased residuals for SVD u vs v */
-  name = str(format("UBResidualsSVD"));
+  /* name = str(format("UBResidualsSVD"));
   title = str(format("Unbiased residuals for SVD"));
-  m_UBResidualsSVD = new TH2F(name.c_str(), title.c_str(), 200, -200, 200, 200, -200, 200);
+  m_UBResidualsSVD = new TH2F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange, 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVD->GetXaxis()->SetTitle("u residual [#mum]");
   m_UBResidualsSVD->GetYaxis()->SetTitle("v residual [#mum]");
   m_UBResidualsSVD->GetZaxis()->SetTitle("counts");
+  */
+  /** Unbiased residuals for PXD u, v */
+  name = str(format("UBResidualsPXDU"));
+  title = str(format("Unbiased residuals in U for PXD"));
+  m_UBResidualsPXDU = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDU->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDU->GetYaxis()->SetTitle("counts");
+  name = str(format("UBResidualsPXDV"));
+  title = str(format("Unbiased residuals in V for PXD"));
+  m_UBResidualsPXDV = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDV->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDV->GetYaxis()->SetTitle("counts");
+  /** Unbiased residuals for SVD u, v */
+  name = str(format("UBResidualsSVDU"));
+  title = str(format("Unbiased residuals in U for SVD"));
+  m_UBResidualsSVDU = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDU->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDU->GetYaxis()->SetTitle("counts");
+  name = str(format("UBResidualsSVDV"));
+  title = str(format("Unbiased residuals in V for SVD"));
+  m_UBResidualsSVDV = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDV->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDV->GetYaxis()->SetTitle("counts");
 
   m_TRClusterHitmap = (TH2F**) new TH2F*[c_nVXDLayers];
   m_TRClusterCorrelationsPhi = (TH2F**) new TH2F*[c_nVXDLayers - 1];
   m_TRClusterCorrelationsTheta = (TH2F**) new TH2F*[c_nVXDLayers - 1];
-  m_UBResidualsSensor = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
+  // m_UBResidualsSensor = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
+  m_UBResidualsSensorU = (TH1F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
+  m_UBResidualsSensorV = (TH1F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
 
   for (int i = 0; i < c_nVXDLayers; i++) {
     /** Track related clusters - hitmap in IP angle range */
@@ -306,13 +333,19 @@ void TrackDQMModule::defineHisto()
     getIDsFromIndex(i, iLayer, iLadder, iSensor);
     /** Unbiased residuals for PXD u vs v per sensor*/
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-    name = str(format("UBResiduals_%1%") % sensorDescr);
+    name = str(format("UBResidualsU_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
-    title = str(format("PXD Unbiased residuals for sensor %1%") % sensorDescr);
-    m_UBResidualsSensor[i] = new TH2F(name.c_str(), title.c_str(), 200, -200, 200, 200, -200, 200);
-    m_UBResidualsSensor[i]->GetXaxis()->SetTitle("u residual [#mum]");
-    m_UBResidualsSensor[i]->GetYaxis()->SetTitle("v residual [#mum]");
-    m_UBResidualsSensor[i]->GetZaxis()->SetTitle("counts");
+    title = str(format("PXD Unbiased U residuals for sensor %1%") % sensorDescr);
+    m_UBResidualsSensorU[i] = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+    m_UBResidualsSensorU[i]->GetXaxis()->SetTitle("residual [#mum]");
+    m_UBResidualsSensorU[i]->GetYaxis()->SetTitle("counts");
+    sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+    name = str(format("UBResidualsV_%1%") % sensorDescr);
+    sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
+    title = str(format("PXD Unbiased V residuals for sensor %1%") % sensorDescr);
+    m_UBResidualsSensorV[i] = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+    m_UBResidualsSensorV[i]->GetXaxis()->SetTitle("residual [#mum]");
+    m_UBResidualsSensorV[i]->GetYaxis()->SetTitle("counts");
   }
 
   oldDir->cd();
@@ -325,8 +358,12 @@ void TrackDQMModule::beginRun()
   if (m_Chi2 != NULL) m_Chi2->Reset();
   if (m_NDF != NULL) m_NDF->Reset();
   if (m_Chi2NDF != NULL) m_Chi2NDF->Reset();
-  if (m_UBResidualsPXD != NULL) m_UBResidualsPXD->Reset();
-  if (m_UBResidualsSVD != NULL) m_UBResidualsSVD->Reset();
+  // if (m_UBResidualsPXD != NULL) m_UBResidualsPXD->Reset();
+  // if (m_UBResidualsSVD != NULL) m_UBResidualsSVD->Reset();
+  if (m_UBResidualsPXDU != NULL) m_UBResidualsPXDU->Reset();
+  if (m_UBResidualsSVDU != NULL) m_UBResidualsSVDU->Reset();
+  if (m_UBResidualsPXDV != NULL) m_UBResidualsPXDV->Reset();
+  if (m_UBResidualsSVDV != NULL) m_UBResidualsSVDV->Reset();
 
   for (int i = 0; i < c_nVXDLayers; i++) {
     if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
@@ -336,7 +373,9 @@ void TrackDQMModule::beginRun()
     if (m_TRClusterCorrelationsTheta[i] != NULL) m_TRClusterCorrelationsTheta[i]->Reset();
   }
   for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
+    // if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
+    if (m_UBResidualsSensorU[i] != NULL) m_UBResidualsSensorU[i]->Reset();
+    if (m_UBResidualsSensorV[i] != NULL) m_UBResidualsSensorV[i]->Reset();
   }
   if (m_MomX != NULL) m_MomX->Reset();
   if (m_MomY != NULL) m_MomY->Reset();
@@ -450,9 +489,13 @@ void TrackDQMModule::event()
           iLayerPrev = iLayer;
           fPosSPUPrev = fPosSPU;
           fPosSPVPrev = fPosSPV;
-          m_UBResidualsPXD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+          // m_UBResidualsPXD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+          m_UBResidualsPXDU->Fill(ResidUPlaneRHUnBias);
+          m_UBResidualsPXDV->Fill(ResidVPlaneRHUnBias);
           int index = getSensorIndex(iLayer, sensorID.getLadderNumber(), sensorID.getSensorNumber());
-          m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+          // m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+          m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
+          m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
           m_TRClusterHitmap[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
         }
         if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
@@ -484,9 +527,13 @@ void TrackDQMModule::event()
               iLayerPrev = iLayer;
               fPosSPUPrev = fPosSPU;
               fPosSPVPrev = fPosSPV;
-              m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+              // m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+              m_UBResidualsSVDU->Fill(ResidUPlaneRHUnBias);
+              m_UBResidualsSVDV->Fill(ResidVPlaneRHUnBias);
               int index = getSensorIndex(iLayer, sensorID.getLadderNumber(), sensorID.getSensorNumber());
-              m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+              // m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+              m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
+              m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
               m_TRClusterHitmap[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
             }
             if (sensorIDPrew != sensorID) { // other sensor, reset

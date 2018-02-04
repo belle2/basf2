@@ -360,8 +360,7 @@ void ECLFEE::writeThresholds(RCCallback& callback, HSLB& hslb, const DBObject& o
       hslb.writefee32(thr_addr, vals[ch]);
       thr_addr += 2;
     }
-  }
-               );
+  });
 }
 
 // Write potentiometer (aka attenuator) data.
@@ -378,8 +377,7 @@ void ECLFEE::writeAttnData(RCCallback& callback, HSLB& hslb, const DBObject& obj
       rio_sh_wreg(callback, hslb, mask, attn_addr_reg, pot_addr);
       pot_addr++;
     }
-  }
-               );
+  });
 }
 
 void ECLFEE::writeADCComp(RCCallback& callback, HSLB& hslb, const DBObject& obj)
@@ -391,8 +389,7 @@ void ECLFEE::writeADCComp(RCCallback& callback, HSLB& hslb, const DBObject& obj)
       rio_sh_wreg(callback, hslb, mask, adc_comp_addr, vals[ch]);
       adc_comp_addr++;
     }
-  }
-               );
+  });
 }
 
 void ECLFEE::writeRelays(RCCallback& callback, HSLB& hslb, const DBObject& obj)
@@ -403,9 +400,7 @@ void ECLFEE::writeRelays(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   [&](int mask, int vals[16]) {
     rio_sh_wreg(callback, hslb, mask, sh_relay_addr, vals[0]);
     usleep(100000);
-  },
-  false
-               );
+  }, false);
 }
 
 /************************************************/

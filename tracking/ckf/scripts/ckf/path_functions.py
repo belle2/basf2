@@ -63,8 +63,8 @@ def add_pxd_ckf(path, *args, **kwargs):
     condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
 
 
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False, filter_cut=0.03,
-                overlap_cut=None, use_best_seeds=10, use_best_results=2):
+def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,
+                                filter_cut=0.03, overlap_cut=None, use_best_seeds=10, use_best_results=2):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to

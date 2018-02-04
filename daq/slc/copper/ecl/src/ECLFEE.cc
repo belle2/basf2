@@ -61,14 +61,21 @@ void ECLFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 
 void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
-  // TODO: Split into sh_data_before && sh_data_after
-  const DBObjectList o_sh_datas(obj.getObjects("sh_data"));
-  for (size_t i = 0; i < o_sh_datas.size(); i++) {
-    const DBObject& o_sh_data(o_sh_datas[i]);
-    unsigned int sh_num  = o_sh_data.getInt("sh_num"); // 0xFFF format
-    unsigned int reg_num = o_sh_data.getInt("reg_num");
-    unsigned int reg_wdata = o_sh_data.getInt("reg_wdata");
-    rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
+  // NOTE: sh_data became obsolete in this version. TODO: Remove it after new version
+  // is proven to work stably.
+
+  if (obj.hasObject("sh_data_before")) {
+    const DBObjectList o_sh_datas(obj.getObjects("sh_data_before"));
+    for (size_t i = 0; i < o_sh_datas.size(); i++) {
+      const DBObject& o_sh_data(o_sh_datas[i]);
+      unsigned int sh_num    = o_sh_data.getInt("mask"); // 0xFFF format
+      unsigned int reg_num   = o_sh_data.getInt("addr");
+      unsigned int reg_wdata = o_sh_data.getInt("data");
+      // Print description for custom register into log
+      callback.log(LogFile::INFO, "ecl[%d]: %s", hslb.get_finid(),
+                   o_sh_data.getText("desc"));
+      rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
+    }
   }
 
   callback.log(LogFile::INFO, "Load ecl[%d] with config %s",
@@ -94,17 +101,27 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   hslb.writefee8(0x47, obj.getInt("calib_delay_step_high"));
   hslb.writefee8(0x48, obj.getInt("calib_events_per_step"));
 
-
-  callback.log(LogFile::INFO, "Loading shaper parameters: relays");
-  writeRelays(callback, hslb, obj);
-
   rio_sh_wreg(callback, hslb, 0xFFF, 0x220, obj.getInt("trg2adc_data_end"));
   // 0 for normal run, 4 for testpulse
   rio_sh_wreg(callback, hslb, 0xFFF, 0x221, obj.getInt("run_type"));
   rio_sh_wreg(callback, hslb, 0xFFF, 0x223, obj.getInt("adc_data_len"));
 
-  // Reset ADC on ShaperDSP (initialize time cycle)
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x800, 1);
+  callback.log(LogFile::INFO, "Loading shaper parameters: relays");
+  writeRelays(callback, hslb, obj);
+
+  if (obj.hasObject("sh_data_after")) {
+    const DBObjectList o_sh_datas(obj.getObjects("sh_data_after"));
+    for (size_t i = 0; i < o_sh_datas.size(); i++) {
+      const DBObject& o_sh_data(o_sh_datas[i]);
+      unsigned int sh_num    = o_sh_data.getInt("mask"); // 0xFFF format
+      unsigned int reg_num   = o_sh_data.getInt("addr");
+      unsigned int reg_wdata = o_sh_data.getInt("data");
+      // Print description for custom register into log
+      callback.log(LogFile::INFO, "ecl[%d]: %s", hslb.get_finid(),
+                   o_sh_data.getText("desc"));
+      rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
+    }
+  }
 
   const DBObjectList o_reg30s(obj.getObjects("reg30"));
   for (size_t i = 0; i < o_reg30s.size(); i++) {

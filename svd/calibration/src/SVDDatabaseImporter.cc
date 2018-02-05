@@ -293,7 +293,7 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
   // chips will be discarded by the clusterizer.
   // That is: please please pleaseeee do not upload calibrations
   // with incomplete setup.
-  svdnoisecal.construct(-1.0);
+  svdnoisecal.construct(-1.0 , xmlFileName);
 
   // This is the property tree
   ptree pt;
@@ -351,6 +351,15 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
                 if (apvChannel % 127 == 0)
                   cout << layer << "_"  << ladder << "_" << sensor << "_" << side << "_" << strip << "( " << apvChannel <<
                        ") " << noise << "\n";
+                if (errorTollerant || layer != layerId || ladder != ladderId   // ||
+                    // test on the sensor != f( hybrid) anr apv perhaps
+                   )
+                  B2ERROR("Inconsistency among maps: xml files tels \n" <<
+                          "layer " << layerId << " ladder " << ladderId << " hybridID " << hybridId << "\n" <<
+                          "while the BASF2 map tels \n" <<
+                          "layer " << layer << " ladder " << ladder << " sensor " << sensor << "\n");
+
+
                 svdnoisecal->set(layer, ladder, sensor, side , strip, noise);
               }
               apv25ADCid ++;

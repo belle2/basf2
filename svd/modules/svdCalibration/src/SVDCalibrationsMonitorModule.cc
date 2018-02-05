@@ -42,6 +42,8 @@ void SVDCalibrationsMonitorModule::initialize()
   m_histoList_gainInElectrons = new TList;
   m_histoList_peakTime = new TList;
   m_histoList_pulseWidth = new TList;
+  m_histoList_timeshift = new TList;
+  m_histoList_triggerbin = new TList;
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -121,6 +123,20 @@ void SVDCalibrationsMonitorModule::initialize()
           h_pulseWidth[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5, "Pulse width (ns)",
                                                       m_histoList_pulseWidth);
 
+          //CoG TIME SHIFT
+          NameOfHisto = "timeShift_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "CoG_ShiftMeanToZero (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_timeshift[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
+                                                     "CoG_ShiftMeanToZero (ns)",
+                                                     m_histoList_timeshift);
+          //CoG TRIGGER BIN CORRECTION
+          NameOfHisto = "triggerbin_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "CoG_ShiftMeanToZeroTBDep (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_triggerbin[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
+                                                      "CoG_ShiftMeanToZeroTBDep (ns)",
+                                                      m_histoList_triggerbin);
 
         }
         //histogram created
@@ -166,6 +182,7 @@ void SVDCalibrationsMonitorModule::event()
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
         const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+
         for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
           //fill your histogram for U side
 
@@ -178,13 +195,18 @@ void SVDCalibrationsMonitorModule::event()
 
           float time = m_PulseShapeCal.getPeakTime(theVxdID, 1, Ustrip);
           float width =  m_PulseShapeCal.getWidth(theVxdID, 1, Ustrip);
+          float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, 1, Ustrip);
 
+          float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 1, Ustrip,
+                                   0); /*reading by default the trigger bin #0*/
 
           h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
           h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
           h_gainInElectrons[layer][ladder][sensor][1]->Fill(ELECgain);
           h_peakTime[layer][ladder][sensor][1]->Fill(time);
           h_pulseWidth[layer][ladder][sensor][1]->Fill(width);
+          h_timeshift[layer][ladder][sensor][1]->Fill(time_shift);
+          h_triggerbin[layer][ladder][sensor][1]->Fill(triggerbin_shift);
 
         } //histogram filled for U side
 
@@ -201,6 +223,9 @@ void SVDCalibrationsMonitorModule::event()
 
           float time = m_PulseShapeCal.getPeakTime(theVxdID, 0, Vstrip);
           float width =  m_PulseShapeCal.getWidth(theVxdID, 0, Vstrip);
+          float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, 0, Vstrip);
+          float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 0, Vstrip,
+                                   0); /*reading by default the trigger bin #0*/
 
 
           h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
@@ -208,6 +233,8 @@ void SVDCalibrationsMonitorModule::event()
           h_gainInElectrons[layer][ladder][sensor][0]->Fill(ELECgain);
           h_peakTime[layer][ladder][sensor][0]->Fill(time);
           h_pulseWidth[layer][ladder][sensor][0]->Fill(width);
+          h_timeshift[layer][ladder][sensor][0]->Fill(time_shift);
+          h_triggerbin[layer][ladder][sensor][0]->Fill(triggerbin_shift);
 
         } //histogram filled for V side
 
@@ -269,6 +296,22 @@ void SVDCalibrationsMonitorModule::terminate()
 
     TIter nextH_width(m_histoList_pulseWidth);
     while ((obj = nextH_width()))
+      obj->Write();
+
+    //writing the histrogram list for the time shift correction in ns
+    m_rootFilePtr->mkdir("CoG_ShiftMeanToZero");
+    m_rootFilePtr->cd("CoG_ShiftMeanToZero");
+
+    TIter nextH_timeshift(m_histoList_timeshift);
+    while ((obj = nextH_timeshift()))
+      obj->Write();
+
+    //writing the histrogram list for the trigger bin correction in ns
+    m_rootFilePtr->mkdir("CoG_ShiftMeanToZeroTBDep");
+    m_rootFilePtr->cd("CoG_ShiftMeanToZeroTBDep");
+
+    TIter nextH_triggerbin(m_histoList_triggerbin);
+    while ((obj = nextH_triggerbin()))
       obj->Write();
 
 

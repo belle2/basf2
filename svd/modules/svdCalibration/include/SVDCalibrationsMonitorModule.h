@@ -76,6 +76,9 @@ namespace Belle2 {
     TList* m_histoList_gainInElectrons;
     TList* m_histoList_peakTime;
     TList* m_histoList_pulseWidth;
+    TList* m_histoList_timeshift;
+    /* the following is currently not needed because this correction is not implemented yet*/
+    TList* m_histoList_triggerbin;
 
     //NOISES
 
@@ -88,6 +91,14 @@ namespace Belle2 {
     //PULSE PEAK (peak Time and Width)
     TH1F* h_peakTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // peakTime in ns
     TH1F* h_pulseWidth[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // pulse width in ns
+
+    //CoG TIME SHIFT
+    TH1F* h_timeshift[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // time shift in ns
+
+
+    //CoG TRIGGER BIN CORRECTION
+    TH1F* h_triggerbin[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                          1][m_maxSides]; // thime shift due to the trigger bin correction in ns
 
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,

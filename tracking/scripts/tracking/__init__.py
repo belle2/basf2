@@ -509,8 +509,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
 
         if merge_tracks:
             # merge the tracks together
-            # TODO
-            pass
+            path.add_module("CosmicsTrackMerger", inputRecoTracks=unmerged_reco_tracks, outputRecoTracks=reco_tracks)
 
 
 def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):

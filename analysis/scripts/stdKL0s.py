@@ -5,7 +5,8 @@
 #
 # Author(s): B.Oberhof (benjamin.oberhof@lnf.infn.it)
 #
-# more documentation: https://confluence.desy.de/XXXXX
+# more documentation:
+# https://confluence.desy.de/display/BI/Klong+ID
 #
 ########################################################
 

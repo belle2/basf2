@@ -78,6 +78,8 @@ def get_argument_parser():
                         help="sort the list by the given value", default="name")
     parser.add_argument("-r", "--reverse", action="store_true", default=False,
                         help="reverse sorting if given")
+    parser.add_argument("--pdg", action="append", type=int,
+                        help="If given show particles with the given PDG Code")
     return parser
 
 
@@ -99,6 +101,8 @@ if __name__ == "__main__":
 
     outputlist = []
     for p in particles:
+        if args.pdg and not p.PdgCode() in args.pdg:
+            continue
         outputlist.append([p.PdgCode(), p.GetName(), "%7.5g" % p.Mass(), p.Width(), "%.6g" % p.Lifetime(),
                            "%.2f" % (p.Charge()/3.), "%.1f" % (p.Spin())])
 

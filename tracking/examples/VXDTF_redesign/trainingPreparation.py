@@ -65,8 +65,8 @@ path.add_module(eventinfoprinter)
 setup_Geometry(path)
 
 # Event counter
-eventCounter = register_module('EventCounter')
-path.add_module(eventCounter)
+# eventCounter = register_module('EventCounter')
+# path.add_module(eventCounter)
 
 
 # put PXD and SVD SpacePoints into the same StoreArray

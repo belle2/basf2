@@ -18,6 +18,8 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
@@ -217,9 +219,13 @@ namespace Belle2 {
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
      *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
      *        this reco track.
+     * @param reversed: add the hits in a reversed order - each sorting parameter is set to
+     *        maximal sorting parameter - sorting parameter + offset
+     * @param minimalWeight: if set, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
-    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -756,7 +762,7 @@ namespace Belle2 {
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
-    float m_qualityIndicator;
+    float m_qualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

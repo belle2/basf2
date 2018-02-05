@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdUnpacking/PXDRawDataDefinitions.h>
+#include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDUnpackerDHHModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>

@@ -23,11 +23,11 @@ namespace Belle2 {
   public:
     SPTC2RTConverterModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void terminate();
+    void terminate() override;
 
 
   protected:

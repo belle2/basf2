@@ -1,23 +1,9 @@
 #include <tracking/modules/V0Finder/V0FinderModule.h>
 
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/V0.h>
-#include <tracking/dataobjects/V0ValidationVertex.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/v0Finding/dataobjects/VertexVector.h>
-#include <tracking/v0Finding/fitter/V0Fitter.h>
-#include <TMath.h>
-#include <TLorentzVector.h>
 
-// TODO: This dependency can be removed, because the initialization of genfit happens centralized.
-#include "genfit/FieldManager.h"
-#include "genfit/MaterialEffects.h"
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 
@@ -35,32 +21,32 @@ V0FinderModule::V0FinderModule() : Module()
 
                  "Outside the beam pipe only a chi^2 cut is applied "
                  "('vertexChi2CutOutside').\n"
-                 "The value used as beam pipe radius is a parameter and"
+                 "The value used as beam pipe radius is a parameter and "
                  "can be changed.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input tracks
-  addParam("RecoTrackColName", m_RecoTrackColName,
-           "RecoTrack collection name (input)", std::string(""));
-  addParam("TFRColName", m_TFRColName,
-           "Belle2::TrackFitResult collection name (input).  Note that the V0s "
-           "use pointers indices into these arrays, so all hell may break loose "
+  addParam("RecoTracks", m_arrayNameRecoTrack,
+           "RecoTrack StoreArray name (input)", std::string(""));
+  addParam("TrackFitResults", m_arrayNameTFResult,
+           "Belle2::TrackFitResult StoreArray name (in- and output).\n"
+           "Note that the V0s use pointers indices into these arrays, so all hell may break loose, "
            "if you change this.", std::string(""));
-  addParam("TrackColName", m_TrackColName,
-           "Belle2::Track collection name (input).  Note that the V0s use "
-           "pointers indices into these arrays, so all hell may break loose "
+  addParam("Tracks", m_arrayNameTrack,
+           "Belle2::Track StoreArray name (input).\n"
+           "Note that the V0s use pointers indices into these arrays, so all hell may break loose, "
            "if you change this.", std::string(""));
 
   // output: V0s
-  addParam("V0ColName", m_V0ColName, "V0 collection name (output)", std::string(""));
+  addParam("V0s", m_arrayNameV0, "V0 StoreArry name (output).", std::string(""));
   addParam("Validation", m_validation, "Create output for validation.", bool(false));
-  addParam("V0ValidationVertexColName", m_V0ValidationVertexColName, "V0ValidationVertex collection name (optional output)",
+  addParam("V0ValidationVertices", m_arrayNameV0ValidationVertex, "V0ValidationVertex StoreArray name (optional output)",
            std::string(""));
 
   addParam("beamPipeRadius", m_beamPipeRadius,
-           "Radius at which we switch between the two classes of cuts.  The "
-           "default is a little inside the beam pipe to allow some tolerance.",
+           "Radius at which we switch between the two classes of cuts. "
+           "The default is a little inside the beam pipe to allow some tolerance.",
            1.);
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
@@ -68,105 +54,55 @@ V0FinderModule::V0FinderModule() : Module()
 }
 
 
-V0FinderModule::~V0FinderModule()
-{
-}
-
-
 void V0FinderModule::initialize()
 {
-  StoreArray<Track> tracks(m_TrackColName);
-  tracks.isRequired();
-
-  StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
-  trackFitResults.isRequired();
-
-  StoreArray<RecoTrack> recoTracks(m_RecoTrackColName);
-  recoTracks.isRequired();
-
-  StoreArray<V0> v0s(m_V0ColName);
-  v0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-
-  if (m_validation) {
-    B2DEBUG(300, "Register DataStore for validation.");
-    StoreArray<V0ValidationVertex> validationV0s(m_V0ValidationVertexColName);
-    validationV0s.registerInDataStore(DataStore::c_WriteOut);
-  }
-
-  if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
-  }
-
-  if (!genfit::FieldManager::getInstance()->isInitialized()) {
-    B2FATAL("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
-  }
+  m_tracks.isRequired(m_arrayNameTrack);
+  StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
+  m_tracks.requireRelationTo(recoTracks);
+  //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
+  m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
+                                          m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
 }
 
-
-void V0FinderModule::beginRun()
-{
-}
 
 void V0FinderModule::event()
 {
-  StoreArray<Track> tracks(m_TrackColName);
-  const int nTracks = tracks.getEntries();
-
-  if (nTracks == 0)
-    return;
-
-  B2DEBUG(200, nTracks << " tracks in event.");
+  B2DEBUG(200, m_tracks.getEntries() << " tracks in event.");
 
   // Group tracks into positive and negative tracks.
   std::vector<const Track*> tracksPlus;
-  tracksPlus.reserve(nTracks);
+  tracksPlus.reserve(m_tracks.getEntries());
 
   std::vector<const Track*> tracksMinus;
-  tracksMinus.reserve(nTracks);
+  tracksMinus.reserve(m_tracks.getEntries());
 
-  for (const auto& track : tracks) {
-    const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
+  for (const auto& track : m_tracks) {
+    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>();
+    B2ASSERT(recoTrack, "No RecoTrack available for given Track.");
 
-    if (!recoTrack) {
-      B2WARNING("No RecoTrack for this track");
-      continue;
-    }
-
-    const double charge = recoTrack->getChargeSeed();
-    if (charge == +1) {
+    if (recoTrack->getChargeSeed() > 0) {
       tracksPlus.push_back(&track);
-    } else {
+    }
+    if (recoTrack->getChargeSeed() < 0) {
       tracksMinus.push_back(&track);
     }
   }
 
   // Reject boring events.
-  if (tracksPlus.size() == 0 || tracksMinus.size() == 0) {
-    B2DEBUG(200, "No interesting tracks.");
+  if (tracksPlus.empty() || tracksMinus.empty()) {
+    B2DEBUG(200, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
     return;
   }
 
-  V0Fitter v0Fitter(m_TFRColName, m_V0ColName, m_V0ValidationVertexColName, m_RecoTrackColName);
-  v0Fitter.initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
-  if (m_validation) {
-    v0Fitter.enableValidation();
-  }
+  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
 
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Kshort);
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::photon);
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Lambda);
-      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
     }
   }
-}
-
-void V0FinderModule::endRun()
-{
-}
-
-void V0FinderModule::terminate()
-{
 }

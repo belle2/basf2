@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRawDQMModule_H
-#define PXDRawDQMModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
@@ -38,11 +37,15 @@ namespace Belle2 {
 
       // virtual ~PXDRawDQMModule();
 
-      virtual void initialize();
+    private:
+      void initialize() override final;
 
-      virtual void beginRun();
+      void beginRun() override final;
 
-      virtual void event();
+      void event() override final;
+
+      void defineHisto() override final;
+
 
     private:
 
@@ -85,12 +88,9 @@ namespace Belle2 {
       /** Histogram raw pixel trigger window */
       TH1F* hrawPxdHitsTimeWindow[64];
 
-      virtual void defineHisto();
-
     };//end class declaration
 
 
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDRawDQMModule_H

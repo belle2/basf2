@@ -32,7 +32,7 @@ EclPainterFactory::EclPainterFactory()
 }
 
 EclPainter* EclPainterFactory::createPainter(EclPainterType type, EclData* data,
-                                             ECLChannelMapper* mapper,
+                                             ECL::ECLChannelMapper* mapper,
                                              EclData::EclSubsystem subsys)
 {
   EclPainter* painter = 0;

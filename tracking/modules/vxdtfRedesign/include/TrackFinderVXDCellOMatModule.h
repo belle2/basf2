@@ -48,13 +48,13 @@ namespace Belle2 {
     TrackFinderVXDCellOMatModule();
 
     /** initialize */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** beginRun */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** event */
-    virtual void event() override;
+    void event() override;
 
 
   protected:
@@ -95,9 +95,6 @@ namespace Belle2 {
 
     /** Maximal number of families in event; if exceeded, the execution of the trackfinder will be stopped. */
     unsigned short m_PARAMmaxFamilies = 10000;
-
-    /** Maximal size of segment network; if exceeded, the execution of the trackfinder will be stopped. */
-    unsigned short m_PARAMmaxNetworkSize = 50000;
 
     /// member variables
     /** CA algorithm */

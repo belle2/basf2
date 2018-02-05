@@ -39,7 +39,7 @@ namespace Belle2 {
   private:
 
     ClassDef(KlId,
-             1); /**< K_L0 ID object. The actual ID is stored as the weight of a relation to this object. The klongID is a classfier ouput. This means it is a frequency relative to the Klong fraction of the sample the id is trained on and the performance of the classification. */
+             2); /**< K_L0 ID object. The actual ID is stored as the weight of a relation to this object. The klongID is a classfier ouput. This means it is a frequency relative to the Klong fraction of the sample the id is trained on and the performance of the classification. */
   };
 }
 #endif

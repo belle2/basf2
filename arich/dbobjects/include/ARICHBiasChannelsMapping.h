@@ -38,7 +38,7 @@ namespace Belle2 {
      * @param type type of inner cable
      * @return channelID power supply channel ID number
      */
-    int getChannelID(int crate, int slot, int connectionID, int innerID, std::string type) const;
+    int getChannelID(int crate, int slot, int connectionID, int innerID, const std::string& type) const;
 
     /**
      * Get bias power supply cratem slot and channel ID from inner cable type and ID
@@ -47,7 +47,7 @@ namespace Belle2 {
      * @param connectionID connection number
      * @return channel power supply channel numbers; crate, slot, channelID
      */
-    std::vector<int> getChannelValues(int connectionID, int innerID, std::string type) const;
+    std::vector<int> getChannelValues(int connectionID, int innerID, const std::string& type) const;
 
     /**
     * Get inner cable pin ID from bias power supply channel ID

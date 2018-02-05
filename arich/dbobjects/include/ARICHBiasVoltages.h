@@ -41,11 +41,14 @@ namespace Belle2 {
      */
     void addVoltages(const std::string& hapdID, std::vector<int> biasVoltages);
 
+    /**
+    * Print voltages for PS channels
+    */
     void print();
 
   private:
 
-    std::map<std::string, std::vector<int>> m_hapd2voltages; /**< map of modules to cables */
+    std::map<std::string, std::vector<int>> m_hapd2voltages; /**< map of voltages to power supply */
 
     ClassDef(ARICHBiasVoltages, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

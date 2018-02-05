@@ -159,7 +159,7 @@ namespace Belle2 {
 
       /** Error Mask set per packet / event*/
       uint64_t m_errorMask;
-      /** give verbose unpacking information -> will eb a parameter in next release */
+      /** give verbose unpacking information -> will be a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */
       bool ignore_datcon_flag = true;

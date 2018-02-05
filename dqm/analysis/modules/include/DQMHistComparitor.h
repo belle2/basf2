@@ -6,8 +6,7 @@
 // Date : yesterday
 //-
 
-#ifndef _Belle2_DQMHistComparitor_h
-#define _Belle2_DQMHistComparitor_h
+#pragma once
 
 // EPICS
 #ifdef _BELLE2_EPICS
@@ -73,4 +72,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

@@ -65,7 +65,7 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* s
     B2WARNING("SeqFile: error opening '" << filename << "': " << strerror(errno)
               << ", trying again with '.gz'");
     m_compressed = true;
-    openFile(filename, readonly);
+    openFile(m_filename, readonly);
   }
   // is the file open now?
   if (m_fd < 0) {

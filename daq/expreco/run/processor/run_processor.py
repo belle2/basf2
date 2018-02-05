@@ -10,9 +10,8 @@ global proc
 
 # Signal Handler
 def cleanup(num, frame):
-    #    os.kill(proc.pid, signal.SIGKILL)
-    #    os.kill(proc.pid, signal.SIGINT)
-    os.killpg(proc.pid, signal.SIGINT)
+    os.kill(proc.pid, signal.SIGKILL)
+#    os.kill(proc.pid, signal.SIGINT)
     exit()
 
 # main
@@ -35,8 +34,7 @@ ncore = "20"
 script = "processor.py"
 
 # run basf2
-proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb +
-                        " " + histport + " " + ncore, shell=True, preexec_fn=os.setsid)
+proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb + " " + histport + " " + ncore, shell=True)
 
 # Just sleep
 proc.wait()

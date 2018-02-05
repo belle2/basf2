@@ -17,8 +17,9 @@
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParam.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -36,7 +37,8 @@ namespace Belle2 {
 
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "enableOverlapResolving"),
                                   m_param_enableOverlapResolving,
-                                  "Enable the overlap resolving.", m_param_enableOverlapResolving);
+                                  "Enable the overlap resolving.",
+                                  m_param_enableOverlapResolving);
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useBestNInSeed"),
                                   m_param_useBestNInSeed,
                                   "In seed mode, use only the best seeds.",

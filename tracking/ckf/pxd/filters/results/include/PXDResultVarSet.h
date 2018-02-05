@@ -15,32 +15,37 @@
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/utilities/PXDAdvancer.h>
-#include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const pxdResultVarNames[] = {
-    "chi2_vxd_full",
     "chi2_vxd_max",
     "chi2_vxd_min",
-    "chi2_vxd_mean",
-    "number_of_hits",
-    "pt",
     "chi2_seed",
+    "chi2",
+
+    "number_of_hits",
+
+    "pt",
+    "theta",
+
     "number_of_holes",
+
     "last_hit_layer",
     "first_hit_layer",
-    "chi2",
-    "prob",
+
+    "weight_sum",
+
     "has_missing_layer_1",
     "has_missing_layer_2",
     "has_missing_layer_3",
     "has_missing_layer_4",
     "has_missing_layer_5",
     "has_missing_layer_6",
+
     "number_of_overlap_hits",
-    "theta",
+
     "distance_to_seed_track",
     "distance_to_seed_track_xy",
   };
@@ -65,8 +70,11 @@ namespace Belle2 {
    * which knows the truth information if two tracks belong together or not.
    */
   class PXDResultVarSet : public TrackFindingCDC::VarSet<PXDResultVarNames> {
+    using Super = TrackFindingCDC::VarSet<PXDResultVarNames>;
 
   public:
+    PXDResultVarSet();
+
     void initialize() override;
 
     /// Generate and assign the variables from the object.
@@ -75,7 +83,5 @@ namespace Belle2 {
   private:
     /// Findlet for advancing
     PXDAdvancer m_advancer;
-    /// Findlet for kalman step
-    PXDKalmanStepper m_kalmanStepper;
   };
 }

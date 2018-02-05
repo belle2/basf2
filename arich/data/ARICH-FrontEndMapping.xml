@@ -1,5 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<FrontEndMapping xmlns:xi='http://www.w3.org/2001/XInclude'>
+<?xml version="1.0" encoding="UTF-8"?>
+<FrontEndMapping descr="Mapping of FE boards to merger boards and merger boards to COOPER boards">
   <Merger id='1' sn='53'>
     <Modules>
       <Module FEBSlot='6'>

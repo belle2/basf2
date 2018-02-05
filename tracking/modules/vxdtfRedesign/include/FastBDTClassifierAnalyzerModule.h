@@ -27,9 +27,9 @@ namespace Belle2 {
 
     FastBDTClassifierAnalyzerModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void terminate();
+    void terminate() override;
 
   private:
 

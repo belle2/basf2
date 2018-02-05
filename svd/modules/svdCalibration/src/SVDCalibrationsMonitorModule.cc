@@ -124,14 +124,14 @@ void SVDCalibrationsMonitorModule::initialize()
                                                       m_histoList_pulseWidth);
 
           //CoG TIME SHIFT
-          NameOfHisto = "timeShift_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          NameOfHisto = "CoG_ShiftMeanToZero" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "CoG_ShiftMeanToZero (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
                          " side)";
           h_timeshift[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
                                                      "CoG_ShiftMeanToZero (ns)",
                                                      m_histoList_timeshift);
           //CoG TRIGGER BIN CORRECTION
-          NameOfHisto = "triggerbin_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          NameOfHisto = "CoG_ShiftMeanToZeroTBDep" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "CoG_ShiftMeanToZeroTBDep (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
                          " side)";
           h_triggerbin[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,

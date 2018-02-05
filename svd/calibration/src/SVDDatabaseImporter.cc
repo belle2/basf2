@@ -12,9 +12,14 @@
 // Own include
 #include <svd/calibration/SVDDatabaseImporter.h>
 
+// Map from the online world (FADC id, ADC id, APV ch id)
+// to the offline world (layer, ladder, sensor, view, cell)
+#include <svd/online/SVDOnlineToOfflineMap.h>
+
 // framework - Database
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
@@ -33,6 +38,9 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -48,21 +56,25 @@
 
 using namespace std;
 using namespace Belle2;
+using boost::property_tree::ptree;
 
-void SVDDatabaseImporter::importSVDChannelMapping()
+void SVDDatabaseImporter::importSVDChannelMapping(const std::string& fileName)
 {
 
-  IntervalOfValidity iov = IntervalOfValidity::always();
-  const std::string filename = FileSystem::findFile("svd/data/svd_mapping.xml"); //phase 3 xmlMapping
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
+  const std::string filename = FileSystem::findFile(fileName); //phase 3 xmlMapping
+  B2INFO("Importing the svd online -> offline map " << fileName << "\n");
   //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
   const std::string payloadname = "SVDChannelMapping.xml";
-  Database::Instance().addPayload(payloadname, filename, iov);
+  if (Database::Instance().addPayload(payloadname, filename, iov))
+    B2INFO("Success!");
+  else
+    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
 }
 
 
 void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 {
-
   DBImportObjPtr<SVDPulseShapeCalibrations::t_time_payload > svdTimeShiftCal(SVDPulseShapeCalibrations::time_name);
 
   svdTimeShiftCal.construct(25);
@@ -262,6 +274,103 @@ void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 
 }
 
+
+void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  DBImportObjPtr< SVDNoiseCalibrations::t_payload > svdnoisecal(SVDNoiseCalibrations::name);
+
+  DBObjPtr<PayloadFile> OnlineToOfflineMapFileName("SVDChannelMapping.xml");
+
+  OnlineToOfflineMapFileName.hasChanged();
+
+  unique_ptr<SVDOnlineToOfflineMap> map =
+    make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
+
+  // We do initialize the noise to a negative value so that
+  // the SNR for not properly initialized channels is negative
+  // CAVEAT EMPTOR: if thou will disable an APV25 chip and will
+  // not update the noise.... the hits on the previously disabled
+  // chips will be discarded by the clusterizer.
+  // That is: please please pleaseeee do not upload calibrations
+  // with incomplete setup.
+  svdnoisecal.construct(-1.0);
+
+  // This is the property tree
+  ptree pt;
+
+  // Load the XML file into the property tree. If reading fails
+  // (cannot open file, parse error), an exception is thrown.
+  read_xml(xmlFileName, pt);
+
+  for (ptree::value_type const& backEndLayoutChild :
+       pt.get_child("cfg_document.back_end_layout")) {
+
+    if (backEndLayoutChild.first == "fadc") {
+      int FADCid(0);
+      string FADCidString = backEndLayoutChild.second.get<string>("<xmlattr>.id");
+      stringstream ss;
+      ss << std::hex << FADCidString;
+      ss >> FADCid;
+
+      for (ptree::value_type const& fadcChild : backEndLayoutChild.second.get_child("")) {
+        if (fadcChild.first == "adc") {
+          int ADCid = fadcChild.second.get<int>("<xmlattr>.id") ;
+          cout << "  ADC id    = " << ADCid << "\n";
+
+          int layerId = fadcChild.second.get<int>("<xmlattr>.layer_id");
+          cout << "  layer_id  = " << layerId << "\n";
+
+          int ladderId = fadcChild.second.get<int>("<xmlattr>.ladder_id") ;
+          cout << "  ladder_id = " << ladderId << "\n";
+
+          int hybridId = fadcChild.second.get<int>("<xmlattr>.hybrid_id");
+          cout << "  hybrid_id = " << hybridId  << "\n";
+
+          cout << "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25") << "\n";
+
+          int apv25ADCid = 0;
+          for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
+            if (apvChild.first == "apv25") {
+              string noises = apvChild.second.get<string>("noises") ;
+              cout << "noises APV25ID" << apv25ADCid << " " << noises << "\n~~~~~~~~\n";
+
+              stringstream ssn;
+              ssn << noises;
+              double noise;
+              for (int apvChannel  = 0 ; apvChannel < 128; apvChannel ++) {
+                ssn >> noise;
+                const SVDOnlineToOfflineMap::SensorInfo& info = map->getSensorInfo(FADCid, ADCid * 6 + apv25ADCid);
+
+                short strip = map->getStripNumber(apvChannel, info);
+                int side = info.m_uSide ?
+                           SVDCalibrationsBase<SVDCalibrationsScalar<float>>::Uindex :
+                           SVDCalibrationsBase<SVDCalibrationsScalar<float>>::Vindex ;
+                int layer = info.m_sensorID.getLayerNumber();
+                int ladder = info.m_sensorID.getLadderNumber();
+                int sensor = info.m_sensorID.getSensorNumber();
+                if (apvChannel % 127 == 0)
+                  cout << layer << "_"  << ladder << "_" << sensor << "_" << side << "_" << strip << "( " << apvChannel <<
+                       ") " << noise << "\n";
+                svdnoisecal->set(layer, ladder, sensor, side , strip, noise);
+              }
+              apv25ADCid ++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdnoisecal.import(iov);
+
+  B2RESULT("SVDNoiseCalibrations imported to database.");
+
+}
 
 void SVDDatabaseImporter::importSVDNoiseCalibrations()
 {

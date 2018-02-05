@@ -165,7 +165,7 @@ void TimeWalkCalibrationAlgorithm::write()
   B2INFO("Save to the local DB");
   CDCTimeWalks* dbTw = new CDCTimeWalks();
   for (int ib = 0; ib < 300; ++ib) {
-    dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
+    //temp    dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
   }
 
   if (m_textOutput == true) {
@@ -183,7 +183,7 @@ void TimeWalkCalibrationAlgorithm::prepare()
   DBStore::Instance().update();
   const int nEntries = dbTw->getEntries();
   for (int ib = 0; ib < nEntries; ++ib) {
-    m_twPost[ib] = dbTw->getTimeWalkParam(ib);
+    //temp    m_twPost[ib] = dbTw->getTimeWalkParam(ib);
   }
 }
 void TimeWalkCalibrationAlgorithm::doSliceFitY(int boardId, int minHitCut = 0)

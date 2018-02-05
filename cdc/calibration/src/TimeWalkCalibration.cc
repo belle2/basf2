@@ -144,8 +144,8 @@ void TimeWalkCalibration::Write()
     DBImportObjPtr<CDCTimeWalks> tw;
     tw.construct();
     for (int ib = 0; ib < 300; ++ib) {
-      double tw_old = oldDB->getTimeWalkParam(ib);
-      tw->setTimeWalkParam(ib, tw_old + m_tw[ib]);
+      //temp      double tw_old = oldDB->getTimeWalkParam(ib);
+      //temp      tw->setTimeWalkParam(ib, tw_old + m_tw[ib]);
     }
     IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                            m_lastExperiment, m_lastRun);

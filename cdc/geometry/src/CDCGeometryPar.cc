@@ -236,7 +236,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_materialDefinitionMode = CDCGeoControlPar::getInstance().getMaterialDefinitionMode();
   //  std::cout << m_materialDefinitionMode << std::endl;
   if (m_materialDefinitionMode == 0) {
-    B2DEBUG(150, "CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
+    B2DEBUG(100, "CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
     //    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
     B2FATAL("CDCGeometryPar: Materialdefinition=2 is disabled for now.");
@@ -247,7 +247,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   // Get mode for wire z-position
   m_senseWireZposMode = CDCGeoControlPar::getInstance().getSenseWireZposMode();
   //Set z corrections (from input data)
-  B2DEBUG(150, "CDCGeometryPar: Sense wire z mode:" << m_senseWireZposMode);
+  B2DEBUG(100, "CDCGeometryPar: Sense wire z mode:" << m_senseWireZposMode);
 
   //
   // The DB version should be implemented ASAP.
@@ -319,9 +319,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).");
     m_clockFreq4TDC = tmp;
   }
-  B2DEBUG(150, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
+  B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
   m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
-  B2DEBUG(150, "CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).");
+  B2DEBUG(100, "CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).");
 
   m_nominalDriftV    = 4.e-3;  //in cm/ns
   m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm
@@ -334,10 +334,10 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set displacement params. (from input data)
   m_displacement = CDCGeoControlPar::getInstance().getDisplacement();
-  B2DEBUG(150, "CDCGeometryPar: Load displacement params. (=1); not load (=0):" << m_displacement);
+  B2DEBUG(100, "CDCGeometryPar: Load displacement params. (=1); not load (=0):" << m_displacement);
   if (m_displacement) {
     if (gcp.getDisplacementInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read displacement from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read displacement from DB");
       setDisplacement();
     } else {
       readWirePositionParams(c_Base, &geom);
@@ -346,11 +346,11 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set alignment params. (from input data)
   m_alignment = CDCGeoControlPar::getInstance().getAlignment();
-  B2DEBUG(150, "CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
+  B2DEBUG(100, "CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
           m_alignment);
   if (m_alignment) {
     if (gcp.getAlignmentInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read alignment from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read alignment from DB");
       setWirPosAlignParams();
     } else {
       readWirePositionParams(c_Aligned, &geom);
@@ -359,11 +359,11 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set misalignment params. (from input data)
   m_misalignment = CDCGeoControlPar::getInstance().getMisalignment();
-  B2DEBUG(150, "CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
+  B2DEBUG(100, "CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
           m_misalignment);
   if (m_misalignment) {
     if (gcp.getMisalignmentInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read misalignment from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read misalignment from DB");
       setWirPosMisalignParams();
     } else {
       readWirePositionParams(c_Misaligned, &geom);
@@ -385,53 +385,54 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_XTetc = true;
   if (m_XTetc) {
     if (gcp.getXtInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read xt from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read xt from DB");
       setXtRel();  //Set xt param. (from DB)
     } else {
       readXT(gbxParams);  //Read xt params. (from file)
     }
 
     if (gcp.getSigmaInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read sigma from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read sigma from DB");
       setSResol();  //Set sigma param. (from DB)
     } else {
       readSigma(gbxParams);  //Read sigma params. (from file)
     }
 
     if (gcp.getPropSpeedInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read prop-speed from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read prop-speed from DB");
       setPropSpeed();  //Set prop-speed (from DB)
     } else {
       readPropSpeed(gbxParams);  //Read propagation speed
     }
 
     if (gcp.getT0InputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read t0 from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read t0 from DB");
       setT0();  //Set t0 (from DB)
     } else {
       readT0(gbxParams);  //Read t0 (from file)
     }
 
     if (gcp.getBwInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read badwire from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read badwire from DB");
       setBadWire();  //Set bad-wire (from DB)
     } else {
       readBadWire(gbxParams);  //Read bad-wire (from file)
     }
 
     if (gcp.getChMapInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read ch-map from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read ch-map from DB");
       setChMap();  //Set ch-map (from DB)
     } else {
       readChMap();  //Read ch-map
     }
 
     if (gcp.getTwInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read time-walk from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read time-walk from DB");
       setTW();  //Set time-walk coeffs. (from DB)
     } else {
       readTW(gbxParams);  //Read time-walk coeffs. (from file)
     }
+    B2DEBUG(100, "CDCGeometryPar: Time-walk param. mode= " << m_twParamMode);
   }
 
   m_XTetc4Recon = 0;
@@ -1077,15 +1078,22 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
   //  openFile(ifs, fileName0);
   openFileA(ifs, fileName0);
 
-  unsigned iBoard = 0;
-  float coef = 0.;
-  unsigned nRead = 0;
+  unsigned short nPars(0);
+  ifs >> m_twParamMode >> nPars;
+  if (m_twParamMode > 1) {
+    B2FATAL("CDCGeometryPar::readTW: invalid mode specified!");
+  }
+  if (nPars > 2) {
+    B2FATAL("CDCGeometryPar::readTW: invalid #params specified!");
+  }
 
-  while (true) {
-    // Read board id and coefficient
-    ifs >> iBoard >> coef;
-    if (ifs.eof()) break;
-    m_timeWalkCoef[iBoard] = coef;
+  unsigned iBoard = 0;
+  unsigned nRead = 0;
+  // Read board id and coefficients
+  while (ifs >> iBoard) {
+    for (unsigned short i = 0; i < nPars; ++i) {
+      ifs >> m_timeWalkCoef[iBoard][i];
+    }
     ++nRead;
   }
 
@@ -1159,8 +1167,14 @@ void CDCGeometryPar::setPropSpeed()
 // Set time-walk coefficient (from DB)
 void CDCGeometryPar::setTW()
 {
+  //  (*m_timeWalkFromDB)->dump();
+  m_twParamMode = (*m_timeWalkFromDB)->getTwParamMode();
+
   for (unsigned short iBd = 0; iBd < (*m_timeWalkFromDB)->getEntries(); ++iBd) {
-    m_timeWalkCoef[iBd] = (*m_timeWalkFromDB)->getTimeWalkParam(iBd);
+    int np = ((*m_timeWalkFromDB)->getTimeWalkParams(iBd)).size();
+    for (int i = 0; i < np; ++i) {
+      m_timeWalkCoef[iBd][i] = ((*m_timeWalkFromDB)->getTimeWalkParams(iBd))[i];
+    }
   }
 }
 

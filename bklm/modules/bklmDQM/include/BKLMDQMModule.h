@@ -142,6 +142,7 @@ namespace Belle2 {
     // other
     //! name of BKLMDigit store array
     std::string m_outputDigitsName;
+    //! name of BKLMHit store array
     std::string m_outputHitsName;
   };
 

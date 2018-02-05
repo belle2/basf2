@@ -60,11 +60,11 @@ namespace Belle2 {
     /** Chi2 / NDF */
     TH1F* m_Chi2NDF;
     /** Unbiased residuals for PXD u vs v */
-    // TH2F* m_UBResidualsPXD;
+    TH2F* m_UBResidualsPXD;
     /** Unbiased residuals for SVD u vs v */
-    // TH2F* m_UBResidualsSVD;
+    TH2F* m_UBResidualsSVD;
     /** Unbiased residuals for PXD and SVD u vs v per sensor*/
-    // TH2F** m_UBResidualsSensor;
+    TH2F** m_UBResidualsSensor;
     /** Unbiased residuals for PXD u */
     TH1F* m_UBResidualsPXDU;
     /** Unbiased residuals for SVD u */
@@ -85,6 +85,12 @@ namespace Belle2 {
     TH2F** m_TRClusterCorrelationsTheta;
 
 
+    /** Track momentum Pt.Phi */
+    TH1F* m_MomPhi;
+    /** Track momentum Pt.Theta */
+    TH1F* m_MomTheta;
+    /** Track momentum Pt.CosTheta */
+    TH1F* m_MomCosTheta;
     /** Track momentum Pt.X */
     TH1F* m_MomX;
     /** Track momentum Pt.Y */

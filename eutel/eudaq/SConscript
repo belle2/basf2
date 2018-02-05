@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'vxd_dataobjects', 'pxd_dataobjects', 'testbeam_vxd_dataobjects', 'pthread']
-
-env['SUBLIB'] = True
-
-Return('env')

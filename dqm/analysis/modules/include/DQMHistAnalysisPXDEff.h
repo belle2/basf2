@@ -69,7 +69,7 @@ namespace Belle2 {
     TH1D* m_hEffAll2;
     TCanvas* m_cEffAll2;
 
-    TH1* findHistLocal(TString& a);
+    TH1* GetHisto(TString a);
 
   };
 } // end namespace Belle2

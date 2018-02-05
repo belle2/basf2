@@ -60,15 +60,15 @@ class Pager(object):
         if self.tmp_file is None:
             return
 
-        pager = [self.pager]
+        pager_cmd = [self.pager]
         if self.pager == "less":
             if self.prompt is None:
                 self.prompt = ''  # same as default prompt
             self.prompt += ' (press h for help or q to quit)'
-            pager += ['-R', '-Ps' + self.prompt.strip()]
+            pager_cmd += ['-R', '-Ps' + self.prompt.strip()]
             if self.quit_if_one_screen:
-                pager += ['-F', '-X']
-        p = subprocess.Popen(pager + [self.tmp_file.name])
+                pager_cmd += ['-F', '-X']
+        p = subprocess.Popen(pager_cmd + [self.tmp_file.name])
         p.communicate()
         self.tmp_file.close()
         sys.stdout = sys.__stdout__

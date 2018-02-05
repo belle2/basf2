@@ -14,7 +14,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TH1.h>
@@ -48,8 +47,6 @@ namespace Belle2 {
     int m_v_bins;
     std::string m_histogramDirectoryName;
     bool m_singleHists;
-
-    VXD::GeoCache& m_vxdGeometry;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

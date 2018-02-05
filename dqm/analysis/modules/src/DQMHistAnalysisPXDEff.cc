@@ -12,6 +12,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TClass.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
@@ -25,7 +26,7 @@ REG_MODULE(DQMHistAnalysisPXDEff)
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
+DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
   //Parameter definition
 
@@ -44,10 +45,13 @@ DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule() { }
 
 void DQMHistAnalysisPXDEffModule::initialize()
 {
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   //collect the list of all PXD Modules in the geometry here
-  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+  std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
-    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
+    VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
+    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID);
 
@@ -73,8 +77,9 @@ void DQMHistAnalysisPXDEffModule::initialize()
   if (m_PXDModules.size() == 0) {
     //This could as well be a B2FATAL, the module won't do anything useful if this happens
     B2ERROR("No PXDModules found! Can't really do anything useful now...");
+    // set some default size to nu, nv?
   } else {
-    VXD::SensorInfoBase cellGetInfo = m_vxdGeometry.getSensorInfo(m_PXDModules[0]);
+    VXD::SensorInfoBase cellGetInfo = geo.getSensorInfo(m_PXDModules[0]);
     nu = cellGetInfo.getUCells();
     nv = cellGetInfo.getVCells();
   }

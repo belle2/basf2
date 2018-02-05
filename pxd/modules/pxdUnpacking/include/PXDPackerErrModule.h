@@ -14,29 +14,27 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawPXD.h>
-#include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {
 
   namespace PXD {
 
-    /** The PXDPacker module.
+    /** The PXDPackerErr module.
      *
-     * This module is responsible for packing (simulated) Pixels back to
-     * Raw PXD data. This is usefull as input for ONSEN as well
-     * as for rechecking the unpacking process with well defined data.
-     * Not yet ready for MC Production, only lab use recommended.
+     * This module is used to challenge the unpacker by creating broken events.
+     * Thus allowing for ctest checking of features.
+     * No actual simulated data is used as input, we create random data.
+     *
      */
-    class PXDPackerModule : public Module {
+    class PXDPackerErrModule : public Module {
       enum {PACKER_NUM_ROWS = 768};
       enum {PACKER_NUM_COLS = 250};
 
     public:
       /** Constructor defining the parameters */
-      PXDPackerModule();
+      PXDPackerErrModule();
 
     private:
-
       /** Initialize the module */
       void initialize() override final;
       /** do the packing */
@@ -44,7 +42,6 @@ namespace Belle2 {
       /** Terminate the module */
       void terminate() override final;
 
-      std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
@@ -53,14 +50,13 @@ namespace Belle2 {
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
 
-//       /** mapping calculated from m_dhe_to_dhc for easier handling */
-//       std::map <int, int> dhe_mapto_dhc;
-
       /** mapping calculated from m_dhe_to_dhc for easier handling */
       std::map <int, std::vector <int>> m_dhc_mapto_dhe;
 
       /** Event counter */
       unsigned int m_packed_events;
+      /** Real Trigger Nr */
+      unsigned int m_real_trigger_nr;
       /** Trigger Nr */
       unsigned int m_trigger_nr;
       /** Run+Subrun Nr */
@@ -79,8 +75,6 @@ namespace Belle2 {
       /** For current processed frames */
       std::vector <unsigned char> m_current_frame;
 
-      /** Input array for Digits. */
-      StoreArray<PXDDigit> m_storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
 
@@ -118,14 +112,17 @@ namespace Belle2 {
 
       void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
+      /** Check if we want this type of error in this event */
+      bool isErrorIn(uint32_t enr);
+
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
       unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
 
-      unsigned int dhe_byte_count; /**< Byte count in current DHE package */
-      unsigned int dhc_byte_count; /**< Byte count in current DHC package */
+      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
+      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
 
     };//end class declaration
 

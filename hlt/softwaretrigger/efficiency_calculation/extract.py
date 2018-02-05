@@ -154,6 +154,9 @@ def extract_file_sizes(channels, storage_location):
             rawPXD_unzipped = None
             rawPXD_zipped = None
 
+            rawPXD_unzipped_filtered = 0
+            rawPXD_zipped_filtered = 0
+
             for branch in tree.GetListOfBranches():
                 zipped_size = branch.GetZipBytes('*') / root_events
                 unzipped_size = branch.GetTotBytes("*") / root_events
@@ -166,15 +169,22 @@ def extract_file_sizes(channels, storage_location):
                     rawPXD_unzipped = unzipped_size
                     rawPXD_zipped = zipped_size
 
-            result["root_total_size"] = tree.GetZipBytes() / root_events
-            result["root_total_size_unzipped"] = tree.GetTotBytes() / root_events
+                if branch.GetName() == "RawPXDsFiltered":
+                    rawPXD_unzipped_filtered = unzipped_size
+                    rawPXD_zipped_filtered = zipped_size
+
+            # remove the unfiltered PXD hits here, because they will not end up on disk
+            # for the final configuration
+            result["root_total_size"] = (tree.GetZipBytes() / root_events) - rawPXD_zipped
+            result["root_total_size_unzipped"] = (tree.GetTotBytes() / root_events) - rawPXD_unzipped
 
             # special number to compute, as the PXD data are the online raw objects whiche are not
             # streamed through the HLT online reconstruction nodes but seperately via the ONSEN
             # This number can then be used to understand how much data needs to be streamed through the
             # HLT basf2 process
-            result["root_total_size_noPXD"] = (tree.GetZipBytes() / root_events) - rawPXD_unzipped
-            result["root_total_size_noPXD_unzipped"] = tree.GetTotBytes() / root_events - rawPXD_zipped
+            result["root_total_size_noPXD"] = (tree.GetZipBytes() / root_events) - rawPXD_zipped - rawPXD_zipped_filtered
+            result["root_total_size_noPXD_unzipped"] = (
+                tree.GetTotBytes() / root_events) - rawPXD_unzipped - rawPXD_unzipped_filtered
 
             result["total_size_on_disk"] = os.path.getsize(filename) / root_events
             result_list.append(result)

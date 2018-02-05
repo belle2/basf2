@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <string>
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -168,7 +168,6 @@ namespace Belle2 {
     /**
      * CDC geometory parameter.
      */
-    //    CDC::CDCGeometryPar& m_cdcgp = CDC::CDCGeometryPar::Instance();
     int m_firstExperiment; /**< First experiment. */
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */

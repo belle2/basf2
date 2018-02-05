@@ -175,8 +175,8 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
 
     If ``include_width=True`` the search will include all particles if their
     (mass ± width) is within the given limit. If ``include_width`` is a positive
-    number then the particle will be returned if $m ± n*\Gamma$ is within the
-    required range where n is the value of ``include_width`` and $\Gamma$ the
+    number then the particle will be returned if :math:`m ± n*\Gamma` is within the
+    required range where n is the value of ``include_width`` and :math:`\Gamma` the
     width of the particle.
 
     Examples:

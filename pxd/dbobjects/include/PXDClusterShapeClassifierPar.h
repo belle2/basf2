@@ -17,6 +17,8 @@
 
 #include <pxd/dbobjects/PXDClusterOffsetPar.h>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
 
@@ -31,18 +33,20 @@ namespace Belle2 {
     ~ PXDClusterShapeClassifierPar() {}
 
     /**Returns offsets */
-    PXDClusterOffsetPar& getOffset(int shape_index, int eta_index)   { return m_offsets[shape_index][eta_index];}
+    const PXDClusterOffsetPar& getOffset(int shape_index, int eta_index) const
+    {
+      return m_offsets.at(shape_index)[eta_index];
+    }
 
     /** Returns True if there are valid position corrections available */
     bool hasOffset(int shape_index, unsigned int eta_index) const
     {
-      auto it = m_offsets.find(shape_index);
-      if (it == m_offsets.end()) {
+      if (m_offsets.find(shape_index) == m_offsets.end()) {
         return false;
-      } else {
-        auto offset_vector = it->second;
-        if (eta_index >= offset_vector.size())
-          return false;
+      }
+      auto offset_vector = m_offsets.at(shape_index);
+      if (eta_index >= offset_vector.size()) {
+        return false;
       }
       return true;
     }
@@ -58,14 +62,14 @@ namespace Belle2 {
     /** Add shape likelyhood*/
     void addShapeLikelyhood(int shape_index, float likelyhood) {m_shape_likelyhoods[shape_index] = likelyhood;}
 
-    /** Add percentile*/
-    void addPercentile(int shape_index, float percentile) {m_percentiles[shape_index].push_back(percentile);}
+    /** Add eta percentile to shape*/
+    void addEtaPercentile(int shape_index, float percentile) {m_percentiles[shape_index].push_back(percentile);}
 
-    /** Add likelyhood*/
-    void addLikelyhood(int shape_index, float likelyhood) {m_likelyhoods[shape_index].push_back(likelyhood);}
+    /** Add eta likelyhood to shape*/
+    void addEtaLikelyhood(int shape_index, float likelyhood) {m_likelyhoods[shape_index].push_back(likelyhood);}
 
-    /** Add offset */
-    void addOffset(int shape_index, PXDClusterOffsetPar& offset) { m_offsets[shape_index].push_back(offset);}
+    /** Add offset to shape  */
+    void addEtaOffset(int shape_index, PXDClusterOffsetPar& offset) { m_offsets[shape_index].push_back(offset);}
 
     /** Return percentiles map  */
     const std::map<int, std::vector<float>>& getPercentilesMap() const { return m_percentiles; }
@@ -82,13 +86,13 @@ namespace Belle2 {
 
 
   private:
-    /** Map of position offsets in u-v  */
+    /** Map of position offsets (corrections)  */
     std::map<int, std::vector<PXDClusterOffsetPar> > m_offsets;
-    /** Map of cluster shape + eta likelyhoods */
-    std::map<int, std::vector<float> > m_likelyhoods;
     /** Map of percentiles  */
     std::map<int, std::vector<float>>  m_percentiles;
-    /** Map of shape only likelyhoods */
+    /** Map of likelyhoods  */
+    std::map<int, std::vector<float>>  m_likelyhoods;
+    /** Map of shape likelyhoods */
     std::map<int, float> m_shape_likelyhoods;
 
     ClassDef(PXDClusterShapeClassifierPar, 1);   /**< ClassDef, must be the last term before the closing {}*/

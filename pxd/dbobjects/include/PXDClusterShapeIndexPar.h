@@ -34,7 +34,7 @@ namespace Belle2 {
     }
 
     /** Returns shape index from shape string */
-    int getShapeIndex(const std::string& shape)
+    int getShapeIndex(const std::string& shape) const
     {
       for (auto it = m_shapeIndex.begin(); it != m_shapeIndex.end(); ++it)
         if (it->second == shape)
@@ -42,10 +42,11 @@ namespace Belle2 {
       return -1;
     }
 
-    /** Returns shape index from shape string */
-    std::string& getShapeString(int index)
+    /** Returns shape name from index */
+    const std::string& getShapeName(int index) const
     {
-      return m_shapeIndex[index];
+      const std::string& name = m_shapeIndex.find(index)->second;
+      return name;
     }
 
     /** Returns shape index from shape string */

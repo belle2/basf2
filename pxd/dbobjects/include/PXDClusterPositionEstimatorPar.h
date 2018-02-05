@@ -17,6 +17,8 @@
 #include <pxd/dbobjects/PXDClusterShapeClassifierPar.h>
 #include <pxd/dbobjects/PXDClusterOffsetPar.h>
 
+#include <framework/logging/Logger.h>
+
 
 namespace Belle2 {
 
@@ -32,68 +34,66 @@ namespace Belle2 {
     /** Destructor */
     ~ PXDClusterPositionEstimatorPar() {}
 
-    /** Add pixelkind with angular grid */
-    void addPixelkind(int pixelkind, TH2F& grid)
+    /** Add grid for pixelkind */
+    void addGrid(int pixelkind, const TH2F& grid)
     {
-      m_grids[pixelkind] = grid;
+      m_gridmap[pixelkind] = grid;
       m_shapeClassifiers[pixelkind] = std::vector<PXDClusterShapeClassifierPar>();
 
-      for (auto uBin = 1; uBin <= m_grids[pixelkind].GetXaxis()->GetNbins(); uBin++) {
-        for (auto vBin = 1; vBin <= m_grids[pixelkind].GetYaxis()->GetNbins(); vBin++) {
+      for (auto uBin = 1; uBin <= m_gridmap[pixelkind].GetXaxis()->GetNbins(); uBin++) {
+        for (auto vBin = 1; vBin <= m_gridmap[pixelkind].GetYaxis()->GetNbins(); vBin++) {
           auto size = m_shapeClassifiers[pixelkind].size();
-          m_grids[pixelkind].SetBinContent(uBin, vBin, size);
+          m_gridmap[pixelkind].SetBinContent(uBin, vBin, size);
           m_shapeClassifiers[pixelkind].push_back(PXDClusterShapeClassifierPar());
         }
       }
     }
 
-    /** Returns vector of pixelkinds */
-    std::vector<int> getPixelkinds()
+    /** Return grid map*/
+    const std::map<int, TH2F>& getGridMap() const
     {
-      auto pixelkinds = std::vector<int>();
-      for (auto it = m_grids.begin(); it != m_grids.end(); ++it)
-        pixelkinds.push_back(it->first);
-      return pixelkinds;
+      return m_gridmap;
     }
-
-    /** Return grid */
-    TH2F& getGrid(int pixelkind) {return m_grids[pixelkind]; }
 
     /** Set shape classifier*/
     void setShapeClassifier(const PXDClusterShapeClassifierPar& classifier, int uBin, int vBin, int pixelkind)
     {
-      int key = m_grids[pixelkind].GetBinContent(uBin, vBin);
+      int key = m_gridmap[pixelkind].GetBinContent(uBin, vBin);
       m_shapeClassifiers[pixelkind][key] = classifier;
     }
 
     /** Returns shape classifier */
-    const PXDClusterShapeClassifierPar& getShapeClassifier(int uBin, int vBin, int pixelkind)
+    const PXDClusterShapeClassifierPar& getShapeClassifier(int uBin, int vBin, int pixelkind) const
     {
-      int key = m_grids[pixelkind].GetBinContent(uBin, vBin);
-      return m_shapeClassifiers[pixelkind][key];
+      int key = m_gridmap.at(pixelkind).GetBinContent(uBin, vBin);
+      const PXDClusterShapeClassifierPar& classifier = m_shapeClassifiers.at(pixelkind)[key];
+      return classifier;
     }
 
     /** Returns shape classifier for incidence angles and pixelkind */
-    PXDClusterShapeClassifierPar& getShapeClassifier(double thetaU, double thetaV, int pixelkind)
+    const PXDClusterShapeClassifierPar& getShapeClassifier(double thetaU, double thetaV, int pixelkind) const
     {
-      int uBin = m_grids[pixelkind].GetXaxis()->FindBin(thetaU);
-      int vBin = m_grids[pixelkind].GetYaxis()->FindBin(thetaV);
-      int key = m_grids[pixelkind].GetBinContent(uBin, vBin);
-      return m_shapeClassifiers[pixelkind][key];
+      auto grid = m_gridmap.at(pixelkind);
+      int uBin = grid.GetXaxis()->FindBin(thetaU);
+      int vBin = grid.GetYaxis()->FindBin(thetaV);
+      int key = grid.GetBinContent(uBin, vBin);
+      return m_shapeClassifiers.at(pixelkind)[key];
     }
 
     /** Returns True if there are valid position corrections available */
-    bool hasOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind)
+    bool hasOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind) const
     {
       //Check pixelkind is valid
-      if (m_grids.find(pixelkind) == m_grids.end())
+      if (m_gridmap.find(pixelkind) == m_gridmap.end()) {
         return false;
+      }
 
       // Check thetaU, thetaV are inside grid
-      int uBin = m_grids[pixelkind].GetXaxis()->FindBin(thetaU);
-      int vBin = m_grids[pixelkind].GetYaxis()->FindBin(thetaV);
-      int uBins = m_grids[pixelkind].GetXaxis()->GetNbins();
-      int vBins = m_grids[pixelkind].GetYaxis()->GetNbins();
+      auto grid = m_gridmap.at(pixelkind);
+      int uBin = grid.GetXaxis()->FindBin(thetaU);
+      int vBin = grid.GetYaxis()->FindBin(thetaV);
+      int uBins = grid.GetXaxis()->GetNbins();
+      int vBins = grid.GetYaxis()->GetNbins();
       if ((uBin < 1) || (uBin > uBins) || (vBin < 1) || (vBin > vBins))
         return false;
 
@@ -105,23 +105,18 @@ namespace Belle2 {
       return true;
     }
 
-    /**
-    Returns hit data for label. Hit is implemented as tuple (offset, cov, prob)
-    offset: position corrrection for shape, relative to center of pixel (uStart,vStart) in cluster
-    cov   : covariance matrix for offsets
-    prob  : probability for observing shape, relative to training data for shape classifier
-    */
-    PXDClusterOffsetPar& getOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind)
+    /** Returns correction (offset) for cluster shape relative to center of pixel (startU/startV)*/
+    const PXDClusterOffsetPar& getOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind) const
     {
-      PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
+      const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
       return classifier.getOffset(shape_index, feature_index);
     }
 
   private:
 
-    /** Map of angular grids for all pixelkinds  */
-    std::map<int, TH2F> m_grids;
-    /** Map of cluster shape classifiers */
+    /** Map of angular grids for different pixelkinds  */
+    std::map<int, TH2F> m_gridmap;
+    /** Map of cluster shape classifiers for different pixelkinds*/
     std::map<int, std::vector<PXDClusterShapeClassifierPar> > m_shapeClassifiers;
 
     ClassDef(PXDClusterPositionEstimatorPar, 1);   /**< ClassDef, must be the last term before the closing {}*/

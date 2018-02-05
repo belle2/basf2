@@ -471,7 +471,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         pxd_reco_tracks = "PXDRecoTracks"
 
         if merge_tracks:
-            unmerged_reco_tracks = "UnmergedRecoTracks"
+            unmerged_reco_tracks = "NonMergedRecoTracks"
         else:
             unmerged_reco_tracks = reco_tracks
 
@@ -499,7 +499,10 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
                         recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
         if is_pxd_used(components):
-            add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks)
+            add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks,
+                        only_use_tracks_with_svd=False, direction="backward", filter_cut=0.0)
+            add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks,
+                        only_use_tracks_with_svd=False, direction="forward", filter_cut=0.0)
 
             path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
                             VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=unmerged_reco_tracks)

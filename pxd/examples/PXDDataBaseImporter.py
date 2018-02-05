@@ -44,6 +44,7 @@ print('number of unique shapes is ', len(unique_shapes))
 indexer_payload = Belle2.PXDClusterShapeIndexPar()
 
 for index, shape in enumerate(unique_shapes):
+    print(shape)
     indexer_payload.addShape(str(shape), index)
 
 # Create position estimator
@@ -53,7 +54,7 @@ estimator_payload = Belle2.PXDClusterPositionEstimatorPar()
 for pixelkind in hit_estimator.getPixelkinds():
 
     grid = ROOT.TH2F("grid_{:d}".format(pixelkind), "grid_{:d}".format(pixelkind), 18, -90.0, +90.0, 18, -90.0, +90.0)
-    estimator_payload.addPixelkind(pixelkind, grid)
+    estimator_payload.addGrid(pixelkind, grid)
 
     print('pixelkind: ', pixelkind)
 
@@ -73,8 +74,7 @@ for pixelkind in hit_estimator.getPixelkinds():
                 print("shape " + shape + " has index {:d}".format(shape_index))
 
                 # Likelyhood to create shape
-                shape_likelyhood = classifier.getDigitalProb(shape)
-                classifier_payload.addShapeLikelyhood(shape_index, shape_likelyhood)
+                classifier_payload.addShapeLikelyhood(shape_index, classifier.getDigitalProb(shape))
 
                 percentiles = classifier.getPercentiles(shape)
 
@@ -94,23 +94,14 @@ for pixelkind in hit_estimator.getPixelkinds():
                     offset_payload.setUSigma2(cov[0, 0])
                     offset_payload.setVSigma2(cov[1, 1])
                     offset_payload.setUVCovariance(cov[1, 0])
-
-                    # ... and fill offset into shape classifier payload
-                    classifier_payload.addOffset(shape_index, offset_payload)
+                    classifier_payload.addEtaOffset(shape_index, offset_payload)
 
                     # Read percentile (FIXME: the index shift is not nice)
-                    percentile = percentiles[eta_index - 1]
+                    classifier_payload.addEtaPercentile(shape_index, percentiles[eta_index - 1])
+                    classifier_payload.addEtaLikelyhood(shape_index, hit[2])
 
-                    # ... and fill it
-                    classifier_payload.addPercentile(shape_index, percentile)
-
-                    # Read likelyhood to create shape and eta index
-                    likelyhood = hit[2]
-                    # ... and fill it
-                    classifier_payload.addLikelyhood(shape_index, likelyhood)
-
-                    print("  OFFSET  likelyhood {:.5f}".format(likelyhood))
-                    print("  OFFSET  percentile {:.5f}".format(percentile))
+                    print("  OFFSET  percentile {:.5f}".format(percentiles[eta_index - 1]))
+                    print("  OFFSET  likelyhood {:.5f}".format(hit[2]))
 
             # and fill into position estimator payload
             estimator_payload.setShapeClassifier(classifier_payload, uBin, vBin, pixelkind)

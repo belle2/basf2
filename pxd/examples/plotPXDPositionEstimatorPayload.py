@@ -68,7 +68,9 @@ def plot_estimator(estimator, indexer, resultdir):
     # Create nice clean folder for results
     os.mkdir(os.getcwd() + '/' + resultdir)
 
-    for pixelkind in estimator.getPixelkinds():
+    for pair in estimator.getGridMap():
+        pixelkind = pair.first
+        grid = pair.second
 
         # Keep some numbers to gain overview
         summary_dict = {'shapes': [],
@@ -83,15 +85,15 @@ def plot_estimator(estimator, indexer, resultdir):
                         }
 
         # Loop over angular grid and plot shape classifiers
-        for uBin in range(1, estimator.getGrid(pixelkind).GetXaxis().GetNbins() + 1):
-            for vBin in range(1, estimator.getGrid(pixelkind).GetYaxis().GetNbins() + 1):
+        for uBin in range(1, grid.GetXaxis().GetNbins() + 1):
+            for vBin in range(1, grid.GetYaxis().GetNbins() + 1):
 
                 # Shape classifier for angle bin
                 shape_classifier = estimator.getShapeClassifier(uBin, vBin, pixelkind)
 
                 # Bin is centered around angles
-                thetaU = estimator.getGrid(pixelkind).GetXaxis().GetBinCenter(uBin)
-                thetaV = estimator.getGrid(pixelkind).GetYaxis().GetBinCenter(vBin)
+                thetaU = grid.GetXaxis().GetBinCenter(uBin)
+                thetaV = grid.GetYaxis().GetBinCenter(vBin)
 
                 # Create  plots for classifier
                 stats = plot_classifier(shape_classifier, indexer, pixelkind)
@@ -255,7 +257,7 @@ def plot_classifier(shape_classifier, indexer, pixelkind):
 
     for item in offsetMap:
         shape_index = item.first
-        shape_name = indexer.getShapeString(shape_index)
+        shape_name = indexer.getShapeName(shape_index)
         offsets_array = item.second
         shape_likelyhood = shapeLikelyhoodMap[shape_index]
 

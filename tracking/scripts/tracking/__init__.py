@@ -699,22 +699,9 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_sec
                     corrections=[
                         "LayerBreak",
                         "OneSuperlayer",
-                        "Small"])
+                        "Small",
+                    ])
 
-    path.add_module("TFCDC_TrackOrienter",
-                    inputTracks="CDCTrackVector",
-                    tracks="OrientedCDCTrackVector",
-                    TrackOrientation="downwards")
-
-    # Correct time seed - assumes velocity near light speed
-    path.add_module("TFCDC_TrackFlightTimeAdjuster",
-                    inputTracks="OrientedCDCTrackVector")
-
-    # Export CDCTracks to RecoTracks representation
-    path.add_module("TFCDC_TrackExporter",
-                    inputTracks="OrientedCDCTrackVector",
-                    RecoTracksStoreArrayName=reco_tracks)
-    """
     if with_ca:
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
@@ -728,7 +715,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_sec
     path.add_module("IPTrackTimeEstimator",
                     useFittedInformation=False,
                     recoTracksStoreArrayName=reco_tracks)
-    """
+
     # run fast t0 estimation from CDC hits only
     path.add_module("CDCHitBasedT0Extraction")
 

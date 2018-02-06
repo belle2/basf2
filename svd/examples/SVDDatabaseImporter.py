@@ -40,7 +40,8 @@ class dbImporterModule(Module):
         dbImporter = SVDDatabaseImporter(0, 0, -1, -1)
 #        print("classdefined")
         # import the noises
-        dbImporter.importSVDNoiseCalibrationsFromXML("Hao_noise.xml")
+#        dbImporter.importSVDNoiseCalibrationsFromXML("Hao_noise.xml")
+        dbImporter.importSVDCalAmpCalibrationsFromXML("Hao_noise.xml")
 
         print("importNoise_Done")
 

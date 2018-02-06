@@ -227,25 +227,18 @@ void DQMHistAnalysisPXDEffModule::event()
     m_hEffModules[aPXDModule]->Reset();
 
     TH2D* Hits, *Matches;
-    Hits = (TH2D*)GetHisto(m_histogramDirectoryName  + "/" + std::string("track_hits_" + buff));
-    Matches = (TH2D*)GetHisto(m_histogramDirectoryName  + "/" + std::string("matched_cluster_" + buff));
+    TString locationHits = "track_hits_" + buff;
+    if (m_histogramDirectoryName != "") {
+      locationHits = m_histogramDirectoryName + "/" + locationHits;
+    }
+    Hits = (TH2D*)GetHisto(locationHits);
+    TString locationMatches = "matched_cluster_" + buff;
+    if (m_histogramDirectoryName != "") {
+      locationMatches = m_histogramDirectoryName + "/" + locationMatches;
+    }
+    Matches = (TH2D*)GetHisto(locationMatches);
 
     //Finding only one of them should only happen in very strange situations...
-    if (Hits == nullptr) {
-      TString locationHits = "track_hits_" + buff;
-      if (m_histogramDirectoryName != "") {
-        locationHits = m_histogramDirectoryName + "/" + locationHits;
-      }
-      Hits = (TH2D*)GetHisto(locationHits);
-    }
-    if (Matches == nullptr)    {
-      TString locationMatches = "matched_cluster_" + buff;
-      if (m_histogramDirectoryName != "") {
-        locationMatches = m_histogramDirectoryName + "/" + locationMatches;
-      }
-      Matches = (TH2D*)GetHisto(locationMatches);
-    }
-
     if (Hits == nullptr || Matches == nullptr) {
       B2ERROR("Missing histogram for sensor " << aPXDModule);
       mapHits[aPXDModule] = nullptr;

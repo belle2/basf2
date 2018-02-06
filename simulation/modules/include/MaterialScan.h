@@ -25,11 +25,52 @@ class TH2D;
 
 namespace Belle2 {
 
+  /** Base class for Material Scans */
+  class MaterialScanBase: public G4UserSteppingAction {
+  public:
+    /** This is indeed the constructor and it creates a TDirectory in the
+     * output root file and sets all variables */
+    MaterialScanBase(TFile* rootFile, const std::string& name, const std::string& axisLabel):
+      m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel)
+    {
+      m_rootFile->mkdir(name.c_str());
+    }
+    /** Return the name of the scan */
+    std::string getName() const { return m_name; }
+    /** Return the number of rays necessary to perform the scan */
+    virtual int getNRays() const = 0;
+    /** Get the origin and direction for the next scan particle.
+     * @param[out] origin Origin of the next scan particle
+     * @param[out[ direction Direction of the next scan particle
+     * @return false if the scan is finished
+     */
+    virtual bool createNext(G4ThreeVector& origin, G4ThreeVector& direction) = 0;
+
+  protected:
+    /** check for stuck tracks by looking at the step length */
+    bool checkStep(const G4Step* step);
+    /** Pointer to the root file for the histograms */
+    TFile* m_rootFile;
+    /** Name of the scan, will be prefixed to all histogram names */
+    std::string m_name;
+    /** Labels for the coordinate axes */
+    std::string m_axisLabel;
+  private:
+    /** maximum Step length to be considered zero */
+    static constexpr double c_zeroTolerance = 1e-6;
+    /** maximum number of consecutive zero steps before nudging the track along */
+    static constexpr int c_maxZeroStepsNudge = 10;
+    /** maximum number of consecutive zero steps before killing the track */
+    static constexpr int c_maxZeroStepsKill = 20;
+    /** Count the number of steps with (almost) zero length */
+    int m_zeroSteps {0};
+  };
+
   /** Base class to create a Material Scan of the detector geometry.
    * This class is used to record the Material budget encountered by a particle
    * and provide origin and directions of all particles used for the scan.
    */
-  class MaterialScan: public G4UserSteppingAction {
+  class MaterialScan2D: public MaterialScanBase {
   public:
     /**Helper struct to Store Parameters of a Scan. */
     struct ScanParams {
@@ -55,35 +96,23 @@ namespace Belle2 {
       bool splitByMaterials;
     };
 
-    /** maximum Step length to be considered zero */
-    static constexpr double c_zeroTolerance = 1e-6;
-    /** maximum number of consecutive zero steps before nudging the track along */
-    static constexpr int c_maxZeroStepsNudge = 10;
-    /** maximum number of consecutive zero steps before killing the track */
-    static constexpr int c_maxZeroStepsKill = 20;
-
     /** Constructor
      * @param rootFile Pointer to the ROOTFile where the histograms will be stored.
      * @param name Prefix to preprend to all Histograms
      * @param axisLabel Labels for the histogram axes, separated by semicolon
      * @param params Parameters for the scan
      */
-    MaterialScan(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params);
-
-    /** virtual destructor */
-    virtual ~MaterialScan() {};
+    MaterialScan2D(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params);
 
     /** Get the origin and direction for the next scan particle.
      * @param[out] origin Origin of the next scan particle
      * @param[out[ direction Direction of the next scan particle
      * @return false if the scan is finished
      */
-    bool createNext(G4ThreeVector& origin, G4ThreeVector& direction);
+    bool createNext(G4ThreeVector& origin, G4ThreeVector& direction) override;
 
-    /** Return the name of the scan */
-    std::string getName() const { return m_name; }
-    /** Return the number of rays necessary to perform the scan */
-    int getNRays() const { return m_params.nU * m_params.nV; }
+    /** Return the number of rays in this scan */
+    int getNRays() const override { return m_params.nU * m_params.nV; }
 
     /** Record the material budget for each step of the particles */
     void UserSteppingAction(const G4Step* step);
@@ -106,12 +135,6 @@ namespace Belle2 {
      */
     void fillValue(const std::string& name, double value);
 
-    /** Pointer to the root file for the histograms */
-    TFile* m_rootFile;
-    /** Name of the scan, will be prefixed to all histogram names */
-    std::string m_name;
-    /** Labels for the coordinate axes */
-    std::string m_axisLabel;
     /** Parameters for the scan */
     ScanParams m_params;
     /** Current value of the parametetr u */
@@ -124,8 +147,6 @@ namespace Belle2 {
     double m_stepV;
     /** Tracklength of the current Ray */
     double m_curDepth;
-    /** Count the number of steps with (almost) zero length */
-    int m_zeroSteps {0};
     /** Map holding pointers to all created histograms */
     std::map<std::string, TH2D*> m_regions;
   };
@@ -133,7 +154,7 @@ namespace Belle2 {
   /** Specific implementation of MaterialScan to do Spherical scanning.
    * That is shooting rays from the origin with varying aximuth and polar angle.
    */
-  class MaterialScanSpherical: public MaterialScan {
+  class MaterialScanSpherical: public MaterialScan2D {
   public:
     /** Create a Spherical Scan object with the given parameters
      * @param rootFile pointer to the ROOT File containing the histograms
@@ -141,7 +162,7 @@ namespace Belle2 {
      * @param params Parameters of the scan
      */
     MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, ScanParams params, bool doCosTheta):
-      MaterialScan(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin),
+      MaterialScan2D(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin),
       m_doCosTheta(doCosTheta)
     {
       if (doCosTheta) {
@@ -170,7 +191,7 @@ namespace Belle2 {
    * directions of the grid coordinates u and v. The flight direction is
    * determined by the cross product between the u and v axis.
    */
-  class MaterialScanPlanar: public MaterialScan {
+  class MaterialScanPlanar: public MaterialScan2D {
   public:
     /** Create a Planar Scan object with the given parameters
      * @param rootFile pointer to the ROOT File containing the histograms
@@ -181,7 +202,7 @@ namespace Belle2 {
      */
     MaterialScanPlanar(TFile* rootFile, const G4ThreeVector& origin, const G4ThreeVector& dirU, const G4ThreeVector& dirV,
                        ScanParams params):
-      MaterialScan(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()),
+      MaterialScan2D(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()),
       m_dirW(m_dirU.cross(m_dirV))
     {
     }
@@ -242,9 +263,9 @@ namespace Belle2 {
     /** Name of the plane to use for scanning */
     std::string m_planeName;
     /** Scan parameters for the spherical scan */
-    MaterialScan::ScanParams m_spherical;
+    MaterialScan2D::ScanParams m_spherical;
     /** Scan parameters for the planar scan */
-    MaterialScan::ScanParams m_planar;
+    MaterialScan2D::ScanParams m_planar;
     /** Custom plane definition if m_planName is "custom" */
     std::vector<double> m_customPlane;       /** Custom plane parameter  */
     std::vector<double> m_sphericalOrigin;   /** original position in spherical coordinate  */

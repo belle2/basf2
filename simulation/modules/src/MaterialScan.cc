@@ -41,8 +41,42 @@ REG_MODULE(MaterialScan);
 //                 Implementation
 //-----------------------------------------------------------------
 
-MaterialScan::MaterialScan(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params):
-  G4UserSteppingAction(), m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel), m_params(params), m_curDepth(0)
+bool MaterialScanBase::checkStep(const G4Step* step)
+{
+  double stlen = step->GetStepLength();
+  G4StepPoint* preStepPoint = step->GetPreStepPoint();
+  G4Region* region = preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetRegion();
+  if (stlen < c_zeroTolerance) {
+    ++m_zeroSteps;
+  } else {
+    m_zeroSteps = 0;
+  }
+  if (m_zeroSteps > c_maxZeroStepsNudge) {
+    if (m_zeroSteps > c_maxZeroStepsKill) {
+      B2ERROR("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
+              << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+              << " (" << region->GetName() << "): "
+              << m_zeroSteps << " consecutive steps with length less then "
+              << c_zeroTolerance << " mm, killing it");
+      step->GetTrack()->SetTrackStatus(fStopAndKill);
+    } else {
+      B2WARNING("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
+                << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+                << " (" << region->GetName() << "): "
+                << m_zeroSteps << " consecutive steps with length less then "
+                << c_zeroTolerance << " mm, nudging it along");
+      G4ThreeVector pos = step->GetTrack()->GetPosition();
+      G4ThreeVector dir = step->GetTrack()->GetMomentumDirection();
+      step->GetTrack()->SetPosition(pos + c_zeroTolerance * dir);
+    }
+    return false;
+  }
+  return true;
+}
+
+
+MaterialScan2D::MaterialScan2D(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params):
+  MaterialScanBase(rootFile, name, axisLabel), m_params(params), m_curDepth(0)
 {
   //Sort the parameters accordingly
   if (m_params.minU > m_params.maxU) std::swap(m_params.minU, m_params.maxU);
@@ -57,12 +91,10 @@ MaterialScan::MaterialScan(TFile* rootFile, const std::string& name, const std::
   m_params.maxDepth /= Unit::mm;
   //Sort the list of ignored materials so that we can use binary search
   std::sort(m_params.ignoredMaterials.begin(), m_params.ignoredMaterials.end());
-  //Create a directory in the root file to store all histograms in
-  m_rootFile->mkdir(m_name.c_str());
 }
 
 
-bool MaterialScan::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
+bool MaterialScan2D::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
 {
   if (m_regions.empty()) {
     // create summary histogram right now, not on demand, to make sure it is in the file
@@ -90,7 +122,7 @@ bool MaterialScan::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
   return (m_curV <= m_params.maxV);
 }
 
-TH2D* MaterialScan::getHistogram(const std::string& name)
+TH2D* MaterialScan2D::getHistogram(const std::string& name)
 {
   TH2D*& hist = m_regions[name];
   if (!hist) {
@@ -103,13 +135,13 @@ TH2D* MaterialScan::getHistogram(const std::string& name)
   return hist;
 }
 
-void MaterialScan::fillValue(const std::string& name, double value)
+void MaterialScan2D::fillValue(const std::string& name, double value)
 {
   TH2D* hist = getHistogram(name);
   hist->Fill(m_curU, m_curV, value);
 }
 
-void MaterialScan::UserSteppingAction(const G4Step* step)
+void MaterialScan2D::UserSteppingAction(const G4Step* step)
 {
   //Get information about radiation and interaction length
   G4StepPoint* preStepPoint = step->GetPreStepPoint();
@@ -122,30 +154,7 @@ void MaterialScan::UserSteppingAction(const G4Step* step)
           << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
           << " (" << region->GetName() << ")"
           << " with length=" << stlen << " mm");
-  if (stlen < c_zeroTolerance) {
-    ++m_zeroSteps;
-  } else {
-    m_zeroSteps = 0;
-  }
-  if (m_zeroSteps > c_maxZeroStepsNudge) {
-    if (m_zeroSteps > c_maxZeroStepsKill) {
-      B2ERROR("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
-              << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
-              << " (" << region->GetName() << "): "
-              << m_zeroSteps << " consecutive steps with length less then "
-              << c_zeroTolerance << " mm, killing it");
-      step->GetTrack()->SetTrackStatus(fStopAndKill);
-    } else {
-      B2WARNING("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
-                << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
-                << " (" << region->GetName() << "): "
-                << m_zeroSteps << " consecutive steps with length less then "
-                << c_zeroTolerance << " mm, nudging it along");
-      G4ThreeVector pos = step->GetTrack()->GetPosition();
-      G4ThreeVector dir = step->GetTrack()->GetMomentumDirection();
-      step->GetTrack()->SetPosition(pos + c_zeroTolerance * dir);
-    }
-  }
+  checkStep(step);
 
   //check if the depth is limited
   if (m_params.maxDepth > 0) {
@@ -337,7 +346,7 @@ void MaterialScanModule::beginRun()
   //We create our own stepping actions which will
   //- create the vectors for shooting rays
   //- record the material budget for each ray
-  vector<MaterialScan*> scans;
+  vector<MaterialScanBase*> scans;
   if (m_doSpherical) {
     G4ThreeVector origin(m_sphericalOrigin[0], m_sphericalOrigin[1], m_sphericalOrigin[2]);
     scans.push_back(new MaterialScanSpherical(m_rootFile, origin, m_spherical, m_doCosTheta));
@@ -358,7 +367,7 @@ void MaterialScanModule::beginRun()
   }
 
   //Do each configured scan
-  for (MaterialScan* scan : scans) {
+  for (MaterialScanBase* scan : scans) {
     //Set the Scan as steppingaction to see material
     eventManager->SetUserAction(scan);
     //Now we can scan

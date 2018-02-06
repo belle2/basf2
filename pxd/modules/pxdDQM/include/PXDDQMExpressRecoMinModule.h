@@ -65,6 +65,10 @@ namespace Belle2 {
     TH1I* m_hitMapCounts;
     /** Hitmaps of Clusters*/
     TH1I* m_hitMapClCounts;
+    /** Hitmaps of digits on chips */
+    TH1I* m_hitMapCountsChip;
+    /** Hitmaps of clusters on chips */
+    TH1I* m_hitMapClCountsChip;
     /** Fired pixels per event */
     TH1F** m_fired;
     /** Clusters per event */
@@ -87,9 +91,11 @@ namespace Belle2 {
     TH1F** m_clusterSizeUV;
 
     /** Number of PXD chips per sensor in u (DCD) (=4) on Belle II */
-    int c_nPXDChipsLu;
+    int c_nPXDChipsLu = 4;
     /** Number of PXD chips per sensor in v (Swichers) (=6) on Belle II */
-    int c_nPXDChipsLv;
+    int c_nPXDChipsLv = 6;
+    /** Number of PXD chips per sensor on Belle II */
+    int c_nPXDChips;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */
@@ -115,20 +121,20 @@ namespace Belle2 {
        * @param Layer Layer position of sensor
        * @param Ladder Ladder position of sensor
        * @param Sensor Sensor position of sensor
-       * @param ChipU Chip position on sensor in U direction - DCDs
-       * @param ChipV Chip position on sensor in V direction - Switchers
+       * @param Chip Chip position on sensor - DCDs or Switchers
+       * @param IsU Info if Chip is on u direction (DCD)
        * @return Index of sensor in plots.
        */
-    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int ChipU, const int ChipV) const;
+    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip, const int IsU) const;
     /** Function return position indexes of chipID in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
-       * @param ChipU return Chip position on sensor in U direction - DCDs
-       * @param ChipV return Chip position on sensor in V direction - Switchers
+       * @param Chip return Chip position on sensor - DCDs or Switchers
+       * @param IsU return info if Chip is on u direction (DCD)
        */
-    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& ChipU, int& ChipV) const;
+    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip, int& IsU) const;
 
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor

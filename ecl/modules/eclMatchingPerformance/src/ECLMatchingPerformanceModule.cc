@@ -16,6 +16,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
+#include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -50,6 +51,7 @@ void ECLMatchingPerformanceModule::initialize()
   StoreArray<Track>::required();
   StoreArray<TrackFitResult>::required();
   StoreArray<ECLCluster>::required();
+  StoreArray<ExtHit>::required();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -104,6 +106,15 @@ void ECLMatchingPerformanceModule::event()
           }
         }
       }
+      for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
+        ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
+        if (eclClusterNear) {
+          double distance = (eclClusterNear->getClusterPosition() - extHit.getPosition()).Mag();
+          if (m_distance < 0 || distance < m_distance) {
+            m_distance = distance;
+          }
+        }
+      }
       m_dataTree->Fill(); // write data to tree
     }
   }
@@ -145,6 +156,8 @@ void ECLMatchingPerformanceModule::setupTree()
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
   addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
+
+  addVariableToTree("MinDistance", m_distance);
 }
 
 void ECLMatchingPerformanceModule::writeData()
@@ -172,6 +185,8 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
   m_photonCluster = 0;
 
   m_hypothesisOfMatchedECLCluster = 0;
+
+  m_distance = -999;
 }
 
 void ECLMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

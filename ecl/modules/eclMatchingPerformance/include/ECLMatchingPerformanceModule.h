@@ -77,6 +77,9 @@ namespace Belle2 {
     /**< boolean for photon being related to matched ECL cluster */
     int m_photonCluster;
 
+    /**< minimal distance between track and ECLCluster */
+    double m_distance;
+
     /**
      * Sets all variables to the default value, here -999.
      * */

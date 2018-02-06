@@ -344,11 +344,11 @@ double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double
 {
   double theta_RMS;
   if (eclDetectorRegion == 1) { /* RMS for FWD */
-    theta_RMS = 0.00761 + exp(-3.45 - 6.9 * transverseMomentum); // valid for pt > 0.15
+    theta_RMS = 0.00761 + exp(-3.52 - 6.65 * transverseMomentum); // valid for pt > 0.11
   } else if (eclDetectorRegion == 2 || eclDetectorRegion == 11 || eclDetectorRegion == 13) { /* RMS for barrel and gaps */
-    theta_RMS = 0.011062 + exp(-2.668 - 6.10 * transverseMomentum); // valid for pt > 0.3
+    theta_RMS = 0.011041 + exp(-2.830 - 5.78 * transverseMomentum); // valid for pt > 0.3
   } else if (eclDetectorRegion == 3) { /* RMS for BWD */
-    theta_RMS = 0.01093 + exp(-3.36 - 4.71 * transverseMomentum); // valid for pt > 0.15
+    theta_RMS = 0.01090 + exp(-3.38 - 4.65 * transverseMomentum); // valid for pt > 0.14
   } else { /* ECL cluster below acceptance */
     return 0;
   }

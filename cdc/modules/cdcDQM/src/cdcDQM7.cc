@@ -1,4 +1,5 @@
 /* Nanae Taniguchi 2017.07.12 */
+/* Nanae Taniguchi 2018.02.06 */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
 
@@ -7,12 +8,15 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
 
 #include "TH1F.h"
 #include "TH1D.h"
+#include "TH2D.h"
 #include <stdio.h>
 
 #include <TDirectory.h>
+#include <TStyle.h>
 
 using namespace std;
 using namespace Belle2;
@@ -49,12 +53,14 @@ TH1D* h_tdc_sL[9] = {0}; // tdc each super layer
 TH1D* h_adc_sL[9] = {0}; // adc each super layer
 
 TH1D* h_fast_tdc; // fastest TDC in each event
+TH2D* bmap_2; // board status map 2D
 
 void cdcDQM7Module::defineHisto()
 {
 
   TDirectory* oldDir = gDirectory;
   TDirectory* dirDAQ = oldDir->mkdir("CDC");
+
   dirDAQ->cd();
 
   int bmin = 0;
@@ -110,8 +116,12 @@ void cdcDQM7Module::defineHisto()
     h_adc_sL[s]->SetFillColor(8);
   }
 
-  h_fast_tdc = new TH1D("fast_tdc", "fastest TDC", 250, 4200, 5200);
+  h_fast_tdc = new TH1D("fast_tdc", "fastest TDC", 50, 4800, 5000);
   h_fast_tdc->SetFillColor(6);
+
+  //
+
+  bmap_2 = new TH2D("bmap_2", "", 20, 0, 20, 15, 0, 15);
 
   // LIVE
   h_tdc_sL[0]->SetOption("LIVE"); // small
@@ -119,6 +129,11 @@ void cdcDQM7Module::defineHisto()
   h_adc_sL[0]->SetOption("LIVE"); // small
   h_adc_sL[8]->SetOption("LIVE"); // outer most
   h_fast_tdc->SetOption("LIVE"); // fastest TDC
+  h_fast_tdc->SetStats(1);
+  bmap_2->SetOption("LIVE"); //
+  bmap_2->SetOption("zcol"); //
+  bmap_2->SetStats(0);
+
 
   oldDir->cd();//
 
@@ -144,7 +159,7 @@ void cdcDQM7Module::beginRun()
   }
 
   h_fast_tdc->Reset();
-
+  bmap_2->Reset();
   //
 }
 
@@ -201,6 +216,29 @@ void cdcDQM7Module::event()
 
   h_fast_tdc->Fill(ftdc);
 
+  //
+  StoreArray<CDCRawHit> cdcRawHits;
+  int r_nent = cdcRawHits.getEntries();
+
+  // new
+  int board = 0;
+  int x = 0;
+  int y = 0;
+
+  for (int j = 0; j < r_nent; j++) {
+    CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
+
+    board = cdcrawhit->getBoardId();
+
+    x = board % 20;
+    y = (board - (board % 20)) / 20;
+    bmap_2->Fill(x, y);
+
+  }// cdcrawhits
+
+  int h_ent = bmap_2->GetEntries();
+  double fac = 20.*0.5;
+  bmap_2->SetMaximum(h_ent / (300 * fac));
 
 }
 

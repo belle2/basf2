@@ -234,7 +234,7 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int 
   unsigned int maximalSortingParameter = 0;
 
   if (reversed) {
-    const auto& recoHitInformations = getRecoHitInformations();
+    const auto& recoHitInformations = recoTrack->getRecoHitInformations();
     const auto sortBySP = [](const RecoHitInformation * lhs, const RecoHitInformation * rhs) {
       return lhs->getSortingParameter() < rhs->getSortingParameter();
     };

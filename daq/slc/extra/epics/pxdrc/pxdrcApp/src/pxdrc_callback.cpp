@@ -79,7 +79,7 @@ void eventCallback(struct event_handler_args eha)
       g_callback->set(pvname, pvdata);
       LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       std::string val = pvdata;
-      if (pvname == "B2.PXD.RC.State.cur.S") {
+      if (strcmp(pvname_c, PXDRCCallback::pvRCcur) == 0) {
 	if (val == "NOTREADY") {
 	  g_callback->setState(RCState::NOTREADY_S);
 	} else if (val == "READY") {
@@ -88,7 +88,9 @@ void eventCallback(struct event_handler_args eha)
 	  g_callback->setState(RCState::RUNNING_S);
 	} else if (val == "LOADING") {
 	  g_callback->setState(RCState::LOADING_TS);
-	} else if (val == "UNLOADING" || val == "ABORTING") {
+	} else if (val == "ABORTING") {
+	  g_callback->setState(RCState::ABORTING_RS);
+	} else if (val == "UNLOADING") {
 	  g_callback->setState(RCState::ABORTING_RS);
 	} else if (val == "STARTING") {
 	  g_callback->setState(RCState::STARTING_TS);
@@ -99,7 +101,28 @@ void eventCallback(struct event_handler_args eha)
 	} else if (val == "ERROR") {
 	  g_callback->setState(RCState::ERROR_ES);
 	}
-      } else if (pvname == "B2.PXD.RC.State.req.S") {
+      } else if (strcmp(pvname_c, PXDRCCallback::pvRCreq) == 0) {
+	if (val == "NOTREADY") {
+	  g_callback->setStateRequest(RCState::NOTREADY_S);
+	} else if (val == "READY") {
+	  g_callback->setStateRequest(RCState::READY_S);
+	} else if (val == "RUNNING") {
+	  g_callback->setStateRequest(RCState::RUNNING_S);
+	} else if (val == "LOADING") {
+	  g_callback->setStateRequest(RCState::LOADING_TS);
+	} else if (val == "ABORTING") {
+	  g_callback->setStateRequest(RCState::ABORTING_RS);
+	} else if (val == "UNLOADING") {
+	  g_callback->setStateRequest(RCState::ABORTING_RS);
+	} else if (val == "STARTING") {
+	  g_callback->setStateRequest(RCState::STARTING_TS);
+	} else if (val == "STOPPING") {
+	  g_callback->setStateRequest(RCState::STOPPING_TS);
+	} else if (val == "UNKNOWN") {
+	  g_callback->setStateRequest(RCState::UNKNOWN);
+	} else if (val == "ERROR") {
+	  g_callback->setStateRequest(RCState::ERROR_ES);
+	}
 	if (val == "NOTREADY") {
 	  g_callback->setStateRequest(RCState::NOTREADY_S);
 	} else if (val == "READY") {

@@ -11,13 +11,14 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
+#include <iostream>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
-
+#include <unordered_set>
 
 namespace Belle2 {
   /** This class implements the methods to map raw SVD hits to BASF2 SVD hits.
@@ -195,6 +196,18 @@ namespace Belle2 {
     { return (info.m_channel0 + ((unsigned short)channel) * (info.m_parallel ? 1 : -1)); }
 
 
+    /**container for FADC numbers from current mapping file */
+    std::unordered_set<unsigned char> FADCnumbers;
+
+    /** function that maps FADC numbers as 0-(nFADCboards-1) from FADCnumbers unordered_set */
+    typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
+    void prepFADCmaps(FADCmap&, FADCmap&);
+
+    unsigned short getFADCboardsNumber()
+    {
+      return FADCnumbers.size();
+    }
+
   private:
 
     /** Read from the ptree v in the xml file the layer nLayer
@@ -221,6 +234,7 @@ namespace Belle2 {
     std::unordered_map< SensorID::baseType, std::vector<ChipInfo> > m_chips; // for packer
 
 
+
     /** add chipN on FADCn to the map
      */
     void addChip(unsigned char  chipN,
@@ -237,6 +251,7 @@ namespace Belle2 {
 
     ChipInfo m_currentChipInfo; /**< internal instance of chipinfo used by the getter */
     SensorInfo m_currentSensorInfo;
+
 
   };
 

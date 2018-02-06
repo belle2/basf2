@@ -90,6 +90,10 @@ namespace Belle2 {
     TH1F** m_clusterChargeU;
     /** v charge of clusters */
     TH1F** m_clusterChargeV;
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll;
     /** u charge of strips */
     TH1F** m_stripSignalU;
     /** v charge of strips */
@@ -102,6 +106,10 @@ namespace Belle2 {
     TH1F** m_clusterTimeU;
     /** v time */
     TH1F** m_clusterTimeV;
+    /** u time of clusters for all sensors */
+    TH1F* m_clusterTimeUAll;
+    /** v time of clusters for all sensors */
+    TH1F* m_clusterTimeVAll;
 
     /** Counter of APV errors (16) */
     TH1I** m_CounterAPVErrors;

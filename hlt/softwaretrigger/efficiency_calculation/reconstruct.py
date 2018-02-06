@@ -28,6 +28,8 @@ def main():
 
     log_file = output_file.replace(".root", ".log")
 
+    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
+
     # Now start the real basf2 calculation
     path = basf2.create_path()
     path.add_module("RootInput", inputFileName=input_file)
@@ -43,12 +45,21 @@ def main():
         # todo: this creates a second, filtered PXD digit list and does not overrive the PXD Digits which are
         # packed one line below
         path.add_module('PXDdigiFilter', PXDDigitsInsideROIName='PXDDigitsInsideROI', ROIidsName='ROIs')
+
+        # add PXD packer and make sure it reads for the StoreArray which has been
+        # filtered
+        add_packers(path, components=["PXD"])
+        for m in path.modules():
+            if m.name() == "PXDPacker":
+                m.param({"PXDDigitsName": "PXDDigitsInsideROI", "RawPXDsName": "RawPXDsFiltered"})
+        raw_save_store_arrays_without_rois.append("RawPXDsFiltered")
+
+    # add PXD packer again which will fill RawPXDs StoreArray with the unfiltered PXD hits
     add_packers(path, components=["PXD"])
 
     path.add_module("RootOutput", outputFileName=output_file,
                     branchNames=["EventMetaData", "SoftwareTriggerResult", "SoftwareTriggerVariables", "TRGSummary"])
 
-    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
     raw_save_store_arrays_without_rois.pop(raw_save_store_arrays_without_rois.index("ROIs"))
     raw_save_store_arrays_without_rois.append("RawPXDs")
 

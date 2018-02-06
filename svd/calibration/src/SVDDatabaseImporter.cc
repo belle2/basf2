@@ -277,7 +277,24 @@ void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 
 void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
-  DBImportObjPtr< SVDNoiseCalibrations::t_payload > svdnoisecal(SVDNoiseCalibrations::name);
+  // We do initialize the noise to a negative value so that
+  // the SNR for not properly initialized channels is negative
+  // CAVEAT EMPTOR: if thou will disable an APV25 chip and will
+  // not update the noise.... the hits on the previously disabled
+  // chips will be discarded by the clusterizer.
+  // That is: please please pleaseeee do not upload calibrations
+  // with incomplete setup.
+  importSVDCalibrationsFromXML< SVDNoiseCalibrations  >(xmlFileName, "noises", -1.0, errorTollerant);
+}
+
+template< class SVDcalibrationWrapper >
+void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& xmlFileName,
+                                                       const std::string& xmlTag,
+                                                       typename SVDcalibrationWrapper::t_calibrationCtype defaultValue,
+                                                       bool errorTollerant)
+{
+  DBImportObjPtr< typename SVDcalibrationWrapper::t_payload >
+  payload(SVDcalibrationWrapper::name);
 
   DBObjPtr<PayloadFile> OnlineToOfflineMapFileName("SVDChannelMapping.xml");
 
@@ -286,14 +303,7 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
   unique_ptr<SVDOnlineToOfflineMap> map =
     make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
-  // We do initialize the noise to a negative value so that
-  // the SNR for not properly initialized channels is negative
-  // CAVEAT EMPTOR: if thou will disable an APV25 chip and will
-  // not update the noise.... the hits on the previously disabled
-  // chips will be discarded by the clusterizer.
-  // That is: please please pleaseeee do not upload calibrations
-  // with incomplete setup.
-  svdnoisecal.construct(-1.0 , xmlFileName);
+  payload.construct(defaultValue , xmlFileName);
 
   // This is the property tree
   ptree pt;
@@ -331,26 +341,26 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
           int apv25ADCid = 0;
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
-              string noises = apvChild.second.get<string>("noises") ;
-              cout << "noises APV25ID" << apv25ADCid << " " << noises << "\n~~~~~~~~\n";
+              string valuesString = apvChild.second.get<string>(xmlTag) ;
+              cout << xmlTag << " APV25ID" << apv25ADCid << " " << valuesString << "\n~~~~~~~~\n";
 
               stringstream ssn;
-              ssn << noises;
-              double noise;
+              ssn << valuesString;
+              double value;
               for (int apvChannel  = 0 ; apvChannel < 128; apvChannel ++) {
-                ssn >> noise;
+                ssn >> value;
                 const SVDOnlineToOfflineMap::SensorInfo& info = map->getSensorInfo(FADCid, ADCid * 6 + apv25ADCid);
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
-                           SVDCalibrationsBase<SVDCalibrationsScalar<float>>::Uindex :
-                           SVDCalibrationsBase<SVDCalibrationsScalar<float>>::Vindex ;
+                           SVDcalibrationWrapper::t_payload::Uindex :
+                           SVDcalibrationWrapper::t_payload::Vindex ;
                 int layer = info.m_sensorID.getLayerNumber();
                 int ladder = info.m_sensorID.getLadderNumber();
                 int sensor = info.m_sensorID.getSensorNumber();
                 if (apvChannel % 127 == 0)
                   cout << layer << "_"  << ladder << "_" << sensor << "_" << side << "_" << strip << "( " << apvChannel <<
-                       ") " << noise << "\n";
+                       ") " << value << "\n";
                 if (errorTollerant || layer != layerId || ladder != ladderId   // ||
                     // test on the sensor != f( hybrid) anr apv perhaps
                    )
@@ -360,7 +370,7 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
                           "layer " << layer << " ladder " << ladder << " sensor " << sensor << "\n");
 
 
-                svdnoisecal->set(layer, ladder, sensor, side , strip, noise);
+                payload->set(layer, ladder, sensor, side , strip, value);
               }
               apv25ADCid ++;
             }
@@ -375,9 +385,9 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
 
-  svdnoisecal.import(iov);
+  payload.import(iov);
 
-  B2RESULT("SVDNoiseCalibrations imported to database.");
+  B2RESULT("Imported to database.");
 
 }
 

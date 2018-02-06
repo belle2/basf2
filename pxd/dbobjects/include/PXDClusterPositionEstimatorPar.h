@@ -81,7 +81,7 @@ namespace Belle2 {
     }
 
     /** Returns True if there are valid position corrections available */
-    bool hasOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind) const
+    bool hasOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
     {
       //Check pixelkind is valid
       if (m_gridmap.find(pixelkind) == m_gridmap.end()) {
@@ -99,17 +99,17 @@ namespace Belle2 {
 
       // Check index is valid
       const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(uBin, vBin, pixelkind);
-      if (not classifier.hasOffset(shape_index, feature_index))
+      if (not classifier.hasOffset(shape_index, eta))
         return false;
 
       return true;
     }
 
     /** Returns correction (offset) for cluster shape relative to center of pixel (startU/startV)*/
-    const PXDClusterOffsetPar& getOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind) const
+    const PXDClusterOffsetPar& getOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
     {
       const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
-      return classifier.getOffset(shape_index, feature_index);
+      return classifier.getOffset(shape_index, eta);
     }
 
   private:

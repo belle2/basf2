@@ -33,18 +33,20 @@ namespace Belle2 {
     ~ PXDClusterShapeClassifierPar() {}
 
     /**Returns offsets */
-    const PXDClusterOffsetPar& getOffset(int shape_index, int eta_index) const
+    const PXDClusterOffsetPar& getOffset(int shape_index, float eta) const
     {
+      auto eta_index = getEtaIndex(shape_index, eta);
       return m_offsets.at(shape_index)[eta_index];
     }
 
     /** Returns True if there are valid position corrections available */
-    bool hasOffset(int shape_index, unsigned int eta_index) const
+    bool hasOffset(int shape_index, float eta) const
     {
       if (m_offsets.find(shape_index) == m_offsets.end()) {
         return false;
       }
       auto offset_vector = m_offsets.at(shape_index);
+      auto eta_index = getEtaIndex(shape_index, eta);
       if (eta_index >= offset_vector.size()) {
         return false;
       }
@@ -70,6 +72,17 @@ namespace Belle2 {
 
     /** Add offset to shape  */
     void addEtaOffset(int shape_index, PXDClusterOffsetPar& offset) { m_offsets[shape_index].push_back(offset);}
+
+    /** Get eta index from shape and eta */
+    unsigned int getEtaIndex(int shape_index, float eta) const
+    {
+      auto etaPercentiles = m_percentiles.at(shape_index);
+      for (std::size_t i = 0; i != etaPercentiles.size(); ++i) {
+        if (eta <= etaPercentiles[i])
+          return i;
+      }
+      return etaPercentiles.size();
+    }
 
     /** Return percentiles map  */
     const std::map<int, std::vector<float>>& getPercentilesMap() const { return m_percentiles; }

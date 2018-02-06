@@ -47,7 +47,6 @@ namespace Belle2 {
 
     TH2D* bmap_2; /* board status map 2D */
 
-
   };
 }
 #endif

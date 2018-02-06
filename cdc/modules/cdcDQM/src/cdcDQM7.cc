@@ -134,7 +134,6 @@ void cdcDQM7Module::defineHisto()
   bmap_2->SetOption("zcol"); //
   bmap_2->SetStats(0);
 
-
   oldDir->cd();//
 
 }

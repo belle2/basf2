@@ -115,9 +115,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
                       "Returns the PSNM status of i-th trigger bit.");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit ,
-                      "Returns the FTDL status of i-th trigger bit.");
+                      "Returns the FTDL (Final Trigger Decision Logic before prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
-                      "Returns the PSNM prescale of i-th trigger bit.");
+                      "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
 
   }
 }

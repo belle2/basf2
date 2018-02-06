@@ -232,6 +232,9 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
       unsigned char  chipN = tags.get<unsigned char>("<xmlattr>.n");
       unsigned char  FADCn = tags.get<unsigned char>("<xmlattr>.FADCn");
 
+      //getting FADC numbers for Packer's maps
+      FADCnumbers.insert(FADCn);
+
       ChipID cid(FADCn, chipN);
 
       auto sensorIter = m_sensors.find(cid);
@@ -269,3 +272,15 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
 
   m_chips[sid] = vecInfo;  // for packer
 }
+
+void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
+{
+  unsigned short it = 0;
+
+  for (auto ifadc = FADCnumbers.begin(); ifadc != FADCnumbers.end(); ++ifadc) {
+    map2[it] = *ifadc;
+    map1[*ifadc] = it++;
+    //std::cout << (unsigned short)(*ifadc) << ", ";
+  }
+}
+

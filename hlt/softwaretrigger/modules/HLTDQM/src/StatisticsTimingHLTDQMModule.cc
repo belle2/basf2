@@ -44,11 +44,11 @@ StatisticsTimingHLTDQMModule::StatisticsTimingHLTDQMModule() : HistoModule()
 {
   //Set module properties
 
-  setDescription("Monitor recontruction of cosmic ray on HLT");
+  setDescription("Monitor reconstruction runtime on HLT");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
-           "Cosmic Ray DQM histograms on HLT will be put into this directory", std::string("StatisticsTiming_HLT"));
+           "Runtime DQM histograms on HLT will be put into this directory", std::string("StatisticsTiming_HLT"));
 
 }
 

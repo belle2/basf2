@@ -38,10 +38,6 @@ namespace Belle2 {
     void beginRun() override final;
     /** Module function event */
     void event() override final;
-    /** Module function endRun */
-    void endRun() override final;
-    /** Module function terminate */
-    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -78,6 +74,10 @@ namespace Belle2 {
     TH1I* m_hitMapClCountsU;
     /** Hitmaps v of Clusters*/
     TH1I* m_hitMapClCountsV;
+    /** Hitmaps of digits on chips */
+    TH1I* m_hitMapCountsChip;
+    /** Hitmaps of clusters on chips */
+    TH1I* m_hitMapClCountsChip;
     /** Fired u strips per event */
     TH1F** m_firedU;
     /** Fired v strips per event */
@@ -90,6 +90,10 @@ namespace Belle2 {
     TH1F** m_clusterChargeU;
     /** v charge of clusters */
     TH1F** m_clusterChargeV;
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll;
     /** u charge of strips */
     TH1F** m_stripSignalU;
     /** v charge of strips */
@@ -102,6 +106,10 @@ namespace Belle2 {
     TH1F** m_clusterTimeU;
     /** v time */
     TH1F** m_clusterTimeV;
+    /** u time of clusters for all sensors */
+    TH1F* m_clusterTimeUAll;
+    /** v time of clusters for all sensors */
+    TH1F* m_clusterTimeVAll;
 
     /** Counter of APV errors (16) */
     TH1I** m_CounterAPVErrors;
@@ -112,6 +120,14 @@ namespace Belle2 {
     /** Counter of FTB Flags (32) */
     TH1I** m_CounterFTBFlags;
 
+    /** Number of SVD chips per sensor in u,v in layer 3 (=6) on Belle II */
+    int c_nSVDChipsL3 = 6;
+    /** Number of SVD chips per sensor in u in layers 4,5,6 (=6) on Belle II */
+    int c_nSVDChipsLu = 6;
+    /** Number of SVD chips per sensor in v in layers 4,5,6 (=4) on Belle II */
+    int c_nSVDChipsLv = 4;
+    /** Number of SVD strips per chip on Belle II */
+    int c_nSVDChannelsPerChip = 128;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */
@@ -132,6 +148,25 @@ namespace Belle2 {
     int c_lastSVDLayer;
     /** Number of SVD sensors on Belle II */
     int c_nSVDSensors;
+    /** Number of SVD chips on Belle II */
+    int c_nSVDChips;
+
+    /** Function return index of chip in plots.
+       * @param Layer Layer position of sensor
+       * @param Ladder Ladder position of sensor
+       * @param Sensor Sensor position of sensor
+       * @param Chip Chip position on sensor
+       * @return Index of sensor in plots.
+       */
+    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip, const int IsU) const;
+    /** Function return position indexes of chipID in plots.
+       * @param Index Index of sensor in plots.
+       * @param Layer return Layer position of sensor
+       * @param Ladder return Ladder position of sensor
+       * @param Sensor return Sensor position of sensor
+       * @param Chip return Chip position on sensor
+       */
+    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip, int& IsU) const;
 
     /** Function return index of sensor in plots.
        * @param Layer Layer position of sensor
@@ -139,14 +174,14 @@ namespace Belle2 {
        * @param Sensor Sensor position of sensor
        * @return Index of sensor in plots.
        */
-    int getSensorIndex(int Layer, int Ladder, int Sensor);
-    /** Function return index of sensor in plots.
+    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
+    /** Function return position indexes of sensorID in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
        * @param Sensor return Sensor position of sensor
        */
-    void getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor);
+    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
 
   };
 

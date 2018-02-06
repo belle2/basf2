@@ -13,10 +13,12 @@ from simulation import add_roiFinder
 
 
 def main():
+    """Reconstruct the already generated events and store the results to disk"""
     # Get all parameters for this calculation
     input_file = os.environ.get("input_file")
     output_file = os.environ.get("output_file")
     phase = int(os.environ.get("phase"))
+    roi_filter = bool(os.environ.get("roi_filter"))
 
     print("input_file:", input_file)
     print("output_file:", output_file)
@@ -26,6 +28,8 @@ def main():
 
     log_file = output_file.replace(".root", ".log")
 
+    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
+
     # Now start the real basf2 calculation
     path = basf2.create_path()
     path.add_module("RootInput", inputFileName=input_file)
@@ -33,17 +37,29 @@ def main():
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
-    add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring")
+    add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring", pruneDataStore=False)
 
     # TODO: until the ROI finding HLT setup is handled properly, we have to do this "manually" here
     add_roiFinder(path, reco_tracks="RecoTracks")
-    path.add_module('PXDdigiFilter', PXDDigitsInsideROIName='PXDDigitsInsideROI', ROIidsName='ROIs')
+    if roi_filter:
+        # todo: this creates a second, filtered PXD digit list and does not overrive the PXD Digits which are
+        # packed one line below
+        path.add_module('PXDdigiFilter', PXDDigitsInsideROIName='PXDDigitsInsideROI', ROIidsName='ROIs')
+
+        # add PXD packer and make sure it reads for the StoreArray which has been
+        # filtered
+        add_packers(path, components=["PXD"])
+        for m in path.modules():
+            if m.name() == "PXDPacker":
+                m.param({"PXDDigitsName": "PXDDigitsInsideROI", "RawPXDsName": "RawPXDsFiltered"})
+        raw_save_store_arrays_without_rois.append("RawPXDsFiltered")
+
+    # add PXD packer again which will fill RawPXDs StoreArray with the unfiltered PXD hits
     add_packers(path, components=["PXD"])
 
     path.add_module("RootOutput", outputFileName=output_file,
                     branchNames=["EventMetaData", "SoftwareTriggerResult", "SoftwareTriggerVariables", "TRGSummary"])
 
-    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
     raw_save_store_arrays_without_rois.pop(raw_save_store_arrays_without_rois.index("ROIs"))
     raw_save_store_arrays_without_rois.append("RawPXDs")
 

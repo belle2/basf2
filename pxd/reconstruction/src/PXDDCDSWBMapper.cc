@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <pxd/reconstruction/PXDDCDSWBMapper.h>
-//#include <pxd/geometry/SensorInfo.h>
-//#include <geometry/SensorInfo.h>
-//#include <vxd/dataobjects/VxdID.h>
 
 using namespace std;
 

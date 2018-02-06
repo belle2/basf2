@@ -13,7 +13,6 @@
 
 #include <cstring>
 #include <deque>
-//#include <pxd/reconstruction/Pixel.h>
 #include <vxd/geometry/GeoCache.h>
 
 namespace Belle2 {

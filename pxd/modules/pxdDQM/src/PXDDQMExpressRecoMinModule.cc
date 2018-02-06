@@ -34,7 +34,6 @@
 #include "TFile.h"
 #include "TVectorD.h"
 #include "TF1.h"
-#include "../../../dataobjects/include/PXDDigit.h"
 
 using namespace std;
 using boost::format;

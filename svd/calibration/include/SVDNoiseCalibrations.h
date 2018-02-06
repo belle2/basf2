@@ -33,9 +33,7 @@ namespace Belle2 {
   class SVDNoiseCalibrations {
   public:
     static std::string name;
-    typedef float t_calibrationCtype;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector<
-    t_calibrationCtype> > t_payload;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
 
     /** Constructor, no input argument is required */
     SVDNoiseCalibrations(): m_aDBObjPtr(name)

@@ -284,17 +284,19 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
   // chips will be discarded by the clusterizer.
   // That is: please please pleaseeee do not upload calibrations
   // with incomplete setup.
-  importSVDCalibrationsFromXML< SVDNoiseCalibrations  >(xmlFileName, "noises", -1.0, errorTollerant);
+  importSVDCalibrationsFromXML< SVDNoiseCalibrations::t_payload  >(SVDNoiseCalibrations::name,
+      xmlFileName, "noises",
+      -1.0, errorTollerant);
 }
 
-template< class SVDcalibrationWrapper >
-void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& xmlFileName,
+template< class SVDcalibration >
+void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
+                                                       const std::string& xmlFileName,
                                                        const std::string& xmlTag,
-                                                       typename SVDcalibrationWrapper::t_calibrationCtype defaultValue,
+                                                       typename SVDcalibration::t_perSideContainer::calibrationType defaultValue,
                                                        bool errorTollerant)
 {
-  DBImportObjPtr< typename SVDcalibrationWrapper::t_payload >
-  payload(SVDcalibrationWrapper::name);
+  DBImportObjPtr< SVDcalibration> payload(condDbname);
 
   DBObjPtr<PayloadFile> OnlineToOfflineMapFileName("SVDChannelMapping.xml");
 
@@ -353,8 +355,8 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& xmlFil
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
-                           SVDcalibrationWrapper::t_payload::Uindex :
-                           SVDcalibrationWrapper::t_payload::Vindex ;
+                           SVDcalibration::Uindex :
+                           SVDcalibration::Vindex ;
                 int layer = info.m_sensorID.getLayerNumber();
                 int ladder = info.m_sensorID.getLadderNumber();
                 int sensor = info.m_sensorID.getSensorNumber();

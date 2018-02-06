@@ -421,8 +421,8 @@ void CDCDedxPIDModule::event()
 
           // save individual hits
           double cellDedx = (dadcCount / celldx);
-          if (nomom) cellDedx *= sin(std::atan(1 / fitResult->getCotTheta()));
-          else  cellDedx *= sin(trackMom.Theta());
+          if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
+          else  cellDedx *= std::sin(trackMom.Theta());
 
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
@@ -438,8 +438,8 @@ void CDCDedxPIDModule::event()
       if (lastHitInCurrentLayer) {
         if (layerdx > 0) {
           double totalDistance;
-          if (nomom) totalDistance = layerdx / sin(std::atan(1 / fitResult->getCotTheta()));
-          else  totalDistance = layerdx / sin(trackMom.Theta());
+          if (nomom) totalDistance = layerdx / std::sin(std::atan(1 / fitResult->getCotTheta()));
+          else  totalDistance = layerdx / std::sin(trackMom.Theta());
           double layerDedx = layerdE / totalDistance;
 
           // save the information for this layer
@@ -582,14 +582,14 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx) const
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx)
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    TH2F pdf = m_pdfs[iPart];
+    TH2F& pdf = m_pdfs[iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       B2WARNING("NO CDC PDFS...");
       continue;
@@ -611,7 +611,6 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
     //my pdfs aren't perfect...
     if (probability == 0.0)
       probability = m_useIndividualHits ? (1e-5) : (1e-3); //likelihoods for truncated mean are much higher
-
     logl[iPart] += log(probability);
   }
 }

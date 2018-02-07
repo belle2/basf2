@@ -70,10 +70,6 @@ namespace Belle2 {
              "track p-value cut used to histogram pulls etc.", 0.001);
     addParam("usePionID", m_usePionID,
              "use pion ID from TOP to histogram pulls etc.", true);
-    addParam("ADCCutLow", m_ADCCutLow, "lower bound of ADC cut", 100);
-    addParam("ADCCutHigh", m_ADCCutHigh, "higher bound of ADC cut", 2048);
-    addParam("PulseWidthCutLow",  m_PulseWidthCutLow, "lower bound of PulseWidth cut", 3);
-    addParam("PulseWidthCutHigh", m_PulseWidthCutHigh, "higher bound of PulseWidth cut", 10);
   }
 
 
@@ -125,44 +121,83 @@ namespace Belle2 {
     m_recoPull_Phic->GetYaxis()->SetTitle("pulls");
 
     // Histograms from TOPDataQualtiyOnline
-    m_particleHits = new TH1F("particle_hits", "Number of particle hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-    m_otherHits = new TH1F("other_hits", "Number of other hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-    m_particleHits->SetOption("LIVE");
-    m_otherHits->SetOption("LIVE");
+    m_goodHits = new TH1F("good_hits", "Number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_badHits = new TH1F("bad_hits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_goodHits->SetOption("LIVE");
+    m_badHits->SetOption("LIVE");
 
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
+      string name, title;
+      TH1F* h1;
+      TH2F* h2;
 
-      string name1 = str(format("all_hits_xy_%1%") % (module));
-      string title1 = str(format("Number of hits in x-y for module #%1%") % (module));
-      TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
-      h1->SetOption("LIVE");
-      m_allHitsXY.push_back(h1);
-
-      string name2 = str(format("all_TDC_%1%") % (module));
-      string title2 = str(format("TDC distribution for module #%1%") % (module));
-      TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), numTDCbins, 0, numTDCbins);
+      name = str(format("good_hits_xy_%1%") % (module));
+      title = str(format("Number of good hits in x-y for slot #%1%") % (module));
+      h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetOption("LIVE");
-      m_allTdc.push_back(h2);
+      m_goodHitsXY.push_back(h2);
 
-      string name3 = str(format("particle_channel_hits_%1%") % (module));
-      string title3 = str(format("Number of particle hits by channel of module #%1%") % (module));
+      name = str(format("bad_hits_xy_%1%") % (module));
+      title = str(format("Number of bad hits in x-y for slot #%1%") % (module));
+      h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
+      h2->SetOption("LIVE");
+      m_badHitsXY.push_back(h2);
+
+      name = str(format("good_hits_asics_%1%") % (module));
+      title = str(format("Number of good hits for asics for slot #%1%") % (module));
+      h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
+      h2->SetOption("LIVE");
+      m_goodHitsAsics.push_back(h2);
+
+      name = str(format("bad_hits_asics_%1%") % (module));
+      title = str(format("Number of bad hits for asics for slot #%1%") % (module));
+      h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
+      h2->SetOption("LIVE");
+      m_badHitsAsics.push_back(h2);
+
+      name = str(format("good_TDC_%1%") % (module));
+      title = str(format("TDC distribution of good hits for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
+      h1->SetOption("LIVE");
+      m_goodTdc.push_back(h1);
+
+      name = str(format("bad_TDC_%1%") % (module));
+      title = str(format("TDC distribution of bad hits for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
+      h1->SetOption("LIVE");
+      m_badTdc.push_back(h1);
+
+      name = str(format("good_timing_%1%") % (module));
+      title = str(format("Timing distribution of good hits for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), 100, -20, 80);
+      h1->SetOption("LIVE");
+      m_goodTiming.push_back(h1);
+
+      name = str(format("good_channel_hits_%1%") % (module));
+      title = str(format("Number of good hits by channel for slot #%1%") % (module));
       int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
-      TH1F* h3 = new TH1F(name3.c_str(), title3.c_str(), numPixels, 0.5, numPixels + 0.5);
-      h3->SetOption("LIVE");
-      m_particleChannelHits.push_back(h3);
+      h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0.5, numPixels + 0.5);
+      h1->SetOption("LIVE");
+      m_goodChannelHits.push_back(h1);
 
-      string name4 = str(format("particle_hits_per_event%1%") % (module));
-      string title4 = str(format("Number of particle hits per event of module #%1%") % (module));
-      TH1F* h4 = new TH1F(name4.c_str(), title4.c_str(), 50, 0, 50);
-      h4->SetOption("LIVE");
-      m_particleHitsPerEvent.push_back(h4);
+      name = str(format("bad_channel_hits_%1%") % (module));
+      title = str(format("Number of bad hits by channel for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0.5, numPixels + 0.5);
+      h1->SetOption("LIVE");
+      m_badChannelHits.push_back(h1);
 
-      string name5 = str(format("other_hits_per_event%1%") % (module));
-      string title5 = str(format("Number of other hits per event of module #%1%") % (module));
-      TH1F* h5 = new TH1F(name5.c_str(), title5.c_str(), 50, 0, 50);
-      h5->SetOption("LIVE");
-      m_otherHitsPerEvent.push_back(h5);
+      name = str(format("good_hits_per_event%1%") % (module));
+      title = str(format("Number of good hits per event for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+      h1->SetOption("LIVE");
+      m_goodHitsPerEvent.push_back(h1);
+
+      name = str(format("bad_hits_per_event%1%") % (module));
+      title = str(format("Number of bad hits per event for slot #%1%") % (module));
+      h1 = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+      h1->SetOption("LIVE");
+      m_badHitsPerEvent.push_back(h1);
     }
 
     // cd back to root directory
@@ -189,21 +224,29 @@ namespace Belle2 {
     m_recoTime->Reset();
     m_recoTimeBg->Reset();
     m_recoTimeMinT0->Reset();
-    m_particleHits->Reset();
-    m_otherHits->Reset();
 
+    m_goodHits->Reset();
+    m_badHits->Reset();
     for (int i = 0; i < m_numModules; i++) {
-      m_allHitsXY[i]->Reset();
-      m_allTdc[i]->Reset();
-      m_particleChannelHits[i]->Reset();
+      m_goodHitsXY[i]->Reset();
+      m_badHitsXY[i]->Reset();
+      m_goodHitsAsics[i]->Reset();
+      m_badHitsAsics[i]->Reset();
+      m_goodTdc[i]->Reset();
+      m_badTdc[i]->Reset();
+      m_goodTiming[i]->Reset();
+      m_goodChannelHits[i]->Reset();
+      m_badChannelHits[i]->Reset();
+      m_goodHitsPerEvent[i]->Reset();
+      m_badHitsPerEvent[i]->Reset();
     }
   }
 
   void TOPDQMModule::event()
   {
 
-    int n_particle[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int n_other[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int n_good[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int n_bad[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
@@ -211,23 +254,32 @@ namespace Belle2 {
         continue;
       }
 
-      m_allHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
-      m_allTdc[i]->Fill(digit.getRawTime());
-      double ph = digit.getPulseHeight();
-      double pw = digit.getPulseWidth();
-      if (ph > m_ADCCutLow && ph < m_ADCCutHigh && pw > m_PulseWidthCutLow && pw < m_PulseWidthCutHigh) { // particle hits
-        m_particleHits->Fill(i + 1);
-        m_particleChannelHits[i]->Fill(digit.getPixelID());
-        n_particle[i]++;
-      } else { // background hits
-        m_otherHits->Fill(i + 1);
-        n_other[i]++;
+      int ch = digit.getChannel();
+      int asic_no = ch / 8, asic_ch = ch % 8;
+
+      if (digit.getHitQuality() == TOPDigit::c_Good) { // good hits
+        m_goodHits->Fill(i + 1);
+        m_goodHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
+        m_goodHitsAsics[i]->Fill(asic_no, asic_ch);
+        m_goodTdc[i]->Fill(digit.getRawTime());
+        m_goodTiming[i]->Fill(digit.getTime());
+        m_goodChannelHits[i]->Fill(digit.getPixelID());
+        n_good[i]++;
+      } else { // other hits = background hits
+        m_badHits->Fill(i + 1);
+        m_badHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
+        m_badHitsAsics[i]->Fill(asic_no, asic_ch);
+        m_badTdc[i]->Fill(digit.getRawTime());
+        m_badChannelHits[i]->Fill(digit.getPixelID());
+        n_bad[i]++;
       }
     }
 
     for (int i = 0; i < 16; i++) {
-      m_particleHitsPerEvent[i]->Fill(n_particle[i]);
-      m_otherHitsPerEvent[i]->Fill(n_other[i]);
+      if (n_good[i] != 0)
+        m_goodHitsPerEvent[i]->Fill(n_good[i]);
+      if (n_bad[i] != 0)
+        m_badHitsPerEvent[i]->Fill(n_bad[i]);
     }
 
     for (const auto& track : m_tracks) {

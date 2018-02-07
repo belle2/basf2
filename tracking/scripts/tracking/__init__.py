@@ -209,7 +209,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # will be used for electrons which gives a better result as GenFit's current electron
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
-                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
+                    pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks)
 

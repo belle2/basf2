@@ -89,9 +89,6 @@ void PXDDQMExpressRecoMinModule::defineHisto()
   c_nPXDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size();
   c_firstPXDLayer = c_firstVXDLayer;
   c_lastPXDLayer = c_nPXDLayers;
-  c_nSVDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::SVD).size();
-  c_firstSVDLayer = c_nPXDLayers + c_firstPXDLayer;
-  c_lastSVDLayer = c_firstSVDLayer + c_nSVDLayers;
 
   c_nPXDSensors = 0;
   for (VxdID layer : geo.getLayers()) {
@@ -102,7 +99,7 @@ void PXDDQMExpressRecoMinModule::defineHisto()
       break;
     }
   }
-  c_nPXDChips = c_nPXDSensors * (c_nPXDChipsLu + c_nPXDChipsLv);
+  c_nPXDChips = c_nPXDSensors * (c_nPXDChipsU + c_nPXDChipsV);
 
   // Create basic histograms:
   m_hitMapCounts = new TH1I("DQMER_PXD_PixelHitmapCounts", "DQM ER PXD Integrated number of fired pixels per sensor",
@@ -404,12 +401,12 @@ int PXDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
         if ((Layer == layer.getLayerNumber()) &&
             (Ladder == ladder.getLadderNumber()) &&
             (Sensor == sensor.getSensorNumber())) {
-          int iChip = Chip;
+          int iChip = Chip - 1;
           if (!IsU)
-            iChip += c_nPXDChipsLu;
+            iChip += c_nPXDChipsU;
           return tempcounter + iChip;
         }
-        tempcounter = tempcounter + (c_nPXDChipsLu + c_nPXDChipsLv);
+        tempcounter = tempcounter + (c_nPXDChipsU + c_nPXDChipsV);
       }
     }
   }
@@ -428,22 +425,22 @@ void PXDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer
         Layer = layer.getLayerNumber();
         Ladder = ladder.getLadderNumber();
         Sensor = sensor.getSensorNumber();
-        int Chips = c_nPXDChipsLu + c_nPXDChipsLv;
+        int Chips = c_nPXDChipsU + c_nPXDChipsV;
         for (int iChip = 0; iChip < Chips; iChip++) {
           if (tempcounter + iChip == Index) {
             Layer = layer.getLayerNumber();
             Ladder = ladder.getLadderNumber();
             Sensor = sensor.getSensorNumber();
-            Chip = iChip;
+            Chip = iChip + 1;
             IsU = 1;
-            if (iChip >= c_nPXDChipsLu) {
-              Chip = iChip - c_nPXDChipsLu;
+            if (iChip >= c_nPXDChipsU) {
+              Chip = iChip + 1 - c_nPXDChipsU;
               IsU = 0;
             }
             return;
           }
         }
-        tempcounter = tempcounter + (c_nPXDChipsLu + c_nPXDChipsLv);
+        tempcounter = tempcounter + (c_nPXDChipsU + c_nPXDChipsV);
       }
     }
   }

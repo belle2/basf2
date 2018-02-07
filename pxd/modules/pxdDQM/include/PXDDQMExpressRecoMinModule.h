@@ -47,7 +47,7 @@ namespace Belle2 {
 
   private:
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 0 */
+    /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
     float m_CutPXDCharge = 0.0;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -91,17 +91,15 @@ namespace Belle2 {
     TH1F** m_clusterSizeUV;
 
     /** Number of PXD chips per sensor in u (DCD) (=4) on Belle II */
-    int c_nPXDChipsLu = 4;
-    /** Number of PXD chips per sensor in v (Swichers) (=6) on Belle II */
-    int c_nPXDChipsLv = 6;
+    int c_nPXDChipsU = 4;
+    /** Number of PXD chips per sensor in v (Switchers) (=6) on Belle II */
+    int c_nPXDChipsV = 6;
     /** Number of PXD chips per sensor on Belle II */
     int c_nPXDChips;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */
     int c_nPXDLayers;
-    /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
     /** First VXD layer on Belle II */
     int c_firstVXDLayer;
     /** Last VXD layer on Belle II */
@@ -110,10 +108,6 @@ namespace Belle2 {
     int c_firstPXDLayer;
     /** Last PXD layer on Belle II */
     int c_lastPXDLayer;
-    /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
-    /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
     /** Number of PXD sensors on Belle II */
     int c_nPXDSensors;
 

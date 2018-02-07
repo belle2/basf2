@@ -18,7 +18,7 @@ namespace Belle2 {
 
     PXDDCDSWBMapper::~PXDDCDSWBMapper() {}
 
-    /** get ID of DCD for giving pixel, range: 0..3. */
+    /** get ID of DCD for giving pixel, range: 1..4. */
     int PXDDCDSWBMapper::getDCDID(const int u, const int v, const VxdID sensorID) const
     {
 
@@ -41,13 +41,13 @@ namespace Belle2 {
         if ((v % 4) >= 2) fID = fID + Direction;
       }
       ret = (int)fID;
-      return ret;
+      return ret + 1;
     } //getDCDID
 
-    /** get ID of SWB for giving pixel, range: 0..5. */
+    /** get ID of SWB for giving pixel, range: 1..6. */
     int PXDDCDSWBMapper::getSWBID(const int v) const
     {
-      return (int)(v / 128);
+      return (int)(v / 128) + 1;
     }  //getSWBID
 
   } //PXD namespace

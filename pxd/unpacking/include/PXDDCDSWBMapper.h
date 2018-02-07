@@ -11,8 +11,8 @@
 #ifndef PXDDCDSWBMAPPER_H
 #define PXDDCDSWBMAPPER_H
 
-#include <cstring>
-#include <deque>
+//#include <cstring>
+//#include <deque>
 #include <vxd/geometry/GeoCache.h>
 
 namespace Belle2 {
@@ -30,7 +30,7 @@ namespace Belle2 {
       /** Delete the cache and free the memory */
       ~PXDDCDSWBMapper();
 
-      /** get ID of DCD for giving pixel, range: 0..3.
+      /** get ID of DCD for giving pixel, range: 1..4.
        * @param u pixels coordinate in u
        * @param v pixels coordinate in u
        * @param sensorID sensor details for PXD sensors
@@ -38,7 +38,7 @@ namespace Belle2 {
        */
 
       int getDCDID(const int u, const int v, const VxdID sensorID) const;
-      /** get ID of SWB for giving pixel, range: 0..5.
+      /** get ID of SWB for giving pixel, range: 1..6.
        * @param v pixels coordinate in u
        * @returns SWB ID
        */

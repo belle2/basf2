@@ -1,4 +1,3 @@
-
 import sys
 import basf2
 from softwaretrigger import (

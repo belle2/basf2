@@ -160,7 +160,7 @@ def add_expressreco_processing(path, run_type="collision",
     else:
         basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
-    add_express_reco_dqm(path, run_type)
+    add_expressreco_dqm(path, run_type)
 
 
 def add_softwaretrigger_reconstruction(

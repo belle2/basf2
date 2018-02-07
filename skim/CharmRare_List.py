@@ -6,6 +6,7 @@
 # Charm skims
 # P. Urquijo, 15/Jan/2015
 # G. Casarosa, 7/Oct/2016
+# L.K. Li, 23/Nov/2017
 #
 ######################################################
 
@@ -14,9 +15,11 @@ from modularAnalysis import *
 
 
 def CharmRareList():
-    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
+    charmcuts = '1.7 < M < 2.0  and useCMSFrame(p)>2'
     D0_Channels = ['gamma:skim gamma:skim',
                    'e+:loose e-:loose',
+                   'mu+:loose mu-:loose',
+                   'e+:loose e-:loose pi0:skim',
                    'mu+:loose mu-:loose pi0:skim'
                    ]
 

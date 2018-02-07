@@ -50,9 +50,6 @@ pdg.load(Belle2.FileSystem.findFile('/decfiles/dec/Y6S.pdl'))
 # add_simulation(main, bkgfiles=bg)
 add_simulation(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # reconstruction
 add_reconstruction(main)
 

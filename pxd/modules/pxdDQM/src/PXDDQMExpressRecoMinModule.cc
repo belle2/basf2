@@ -23,7 +23,7 @@
 #include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <pxd/reconstruction/PXDDCDSWBMapper.h>
+#include <pxd/unpacking/PXDDCDSWBMapper.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 

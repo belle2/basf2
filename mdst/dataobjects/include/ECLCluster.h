@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCLUSTER_H
-#define ECLCLUSTER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -27,6 +26,22 @@ namespace Belle2 {
    */
   class ECLCluster : public RelationsObject {
   public:
+
+    /** The hypothis ID for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
+    enum Hypothesis {
+      /** CR is split into a muon and n photons*/
+      c_muonNPhotons = 1,
+      /** CR is reconstructed as a charged hadron*/
+      c_chargedHadron = 2,
+      /** CR is split into an electron and n photonss*/
+      c_electronNPhotons = 3,
+      /** CR is split into n photons*/
+      c_nPhotons = 5,
+      /** CR is reconstructed as a neutral hadron*/
+      c_neutralHadron = 6,
+      /** CR is reconstructed as merged pi0*/
+      c_mergedPi0 = 7
+    };
 
     /** The status information for the ECLCluster. */
     enum StatusBit {
@@ -383,6 +398,7 @@ namespace Belle2 {
 
     /** Class definition */
     ClassDef(ECLCluster, 10);
+    // 11: Added hypothesis enum
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId
@@ -394,5 +410,3 @@ namespace Belle2 {
   };
 
 }// end namespace Belle2
-
-#endif

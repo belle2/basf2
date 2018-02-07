@@ -26,10 +26,10 @@ eventinfoprinter = register_module('EventInfoPrinter')
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.INFO
 
-pxdDataRed = register_module('PXDROIFinder')
-pxdDataRed.logging.log_level = LogLevel.DEBUG
-# pxdDataRed.logging.debug_level = 2
-param_pxdDataRed = {
+pxdROIFinder = register_module('PXDROIFinder')
+pxdROIFinder.logging.log_level = LogLevel.DEBUG
+# pxdROIFinder.logging.debug_level = 2
+param_pxdROIFinder = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
@@ -50,19 +50,19 @@ param_pxdDataRed = {
     'maxWidthU': 0.5,
     'maxWidthV': 0.5,
 }
-pxdDataRed.param(param_pxdDataRed)
+pxdROIFinder.param(param_pxdROIFinder)
 
-pxdDataRedAnalysis = register_module('PXDROIFinderAnalysis')
-pxdDataRedAnalysis.logging.log_level = LogLevel.RESULT
-pxdDataRedAnalysis.logging.debug_level = 1
-param_pxdDataRedAnalysis = {
+pxdROIFinderAnalysis = register_module('PXDROIFinderAnalysis')
+pxdROIFinderAnalysis.logging.log_level = LogLevel.RESULT
+pxdROIFinderAnalysis.logging.debug_level = 1
+param_pxdROIFinderAnalysis = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'writeToRoot': True,
     'rootFileName': 'pxdDataRedAnalysis_SVDCDC_MCTF_test',
 }
-pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
+pxdROIFinderAnalysis.param(param_pxdROIFinderAnalysis)
 
 # Create paths
 main = create_path()
@@ -73,8 +73,8 @@ main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
 add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC'], usePXDDataReduction=False)
 add_tracking_reconstruction(main, ['SVD', 'CDC'], mcTrackFinding=True)
-main.add_module(pxdDataRed)
-main.add_module(pxdDataRedAnalysis)
+main.add_module(pxdROIFinder)
+main.add_module(pxdROIFinderAnalysis)
 # display = register_module("Display")
 # main.add_module(display)
 

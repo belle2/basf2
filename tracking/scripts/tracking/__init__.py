@@ -42,7 +42,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components=components)
 
-    if not skipHitPreparerAdding:
+    if not skipHitPreparerAdding and trigger_mode in ["all", "hlt"]:
         add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations
@@ -72,7 +72,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
                                    data_taking_period="gcr2017", top_in_counter=False,
-                                   merge_tracks=True, use_second_cdc_hits=False):
+                                   merge_tracks=False, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
@@ -102,6 +102,8 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     if not skip_geometry_adding:
         # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components)
+
+    add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:

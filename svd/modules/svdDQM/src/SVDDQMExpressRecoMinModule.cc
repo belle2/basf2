@@ -130,6 +130,17 @@ void SVDDQMExpressRecoMinModule::defineHisto()
                                c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapClCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsV->GetYaxis()->SetTitle("counts");
+  for (int i = 0; i < c_nSVDSensors; i++) {
+    int iLayer = 0;
+    int iLadder = 0;
+    int iSensor = 0;
+    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+    TString AxisTicks = Form("%i_%i_%i", iLayer, iLadder, iSensor);
+    m_hitMapCountsU->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapClCountsU->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapClCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+  }
 
   // basic counters per chip:
   m_hitMapCountsChip = new TH1I("DQMER_SVD_StripHitmapCountsChip", "DQM ER SVD Integrated number of fired strips per chip",

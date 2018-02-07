@@ -34,6 +34,7 @@
 // DB objects
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
@@ -260,6 +261,56 @@ namespace Belle2 {
 
     B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: "
              << nCalTot << "/ 8192");
+  }
+
+
+
+  void TOPDatabaseImporter::importModuleT0Calibration(string fileName)
+  {
+
+
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+
+
+    ifstream inFile(fileName);
+    B2INFO("--> Opening constants file " << fileName);
+
+    if (!inFile) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO("--> " << fileName << ": open for reading");
+
+
+    B2INFO("--> importing constants");
+
+    while (!inFile.eof()) {
+      int slot = 0;
+      int dummy = 0;
+      double T0 = 0;
+      double T0_err = 0;
+
+      inFile >> slot >> dummy >> T0 >> T0_err;
+      if (slot < 1 or slot > 16) {
+        B2ERROR("Module ID is not valid. Skipping the entry.");
+        continue;
+      }
+      moduleT0->setT0(slot, T0, T0_err);
+
+    }
+    inFile.close();
+    B2INFO("--> Input file closed");
+
+    IntervalOfValidity iov(0, 0, -1, -1);
+    moduleT0.import(iov);
+
+    B2INFO("Summary: ");
+    for (int iSlot = 1; iSlot < 17; iSlot++) {
+      B2INFO("--> Time offset of Slot " << iSlot << " = " << moduleT0->getT0(iSlot));
+    }
+
+
   }
 
 

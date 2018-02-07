@@ -30,26 +30,30 @@ public:
   {release();}
   counted_ptr(const counted_ptr& r) throw()
   {acquire(r.itsCounter);}
-  counted_ptr& operator=(const counted_ptr& r) {
+  counted_ptr& operator=(const counted_ptr& r)
+  {
     if (this != &r) {
       release();
       acquire(r.itsCounter);
     }
     return *this;
   }
-  counted_ptr& operator=(X* p) {
+  counted_ptr& operator=(X* p)
+  {
     release();
     if (p) itsCounter = new counter(p);
     return *this;
   }
-  operator bool () const {
+  operator bool () const
+  {
     return get() != 0;
   }
 #ifndef NO_MEMBER_TEMPLATES
   template <class Y> friend class counted_ptr;
   template <class Y> counted_ptr(const counted_ptr<Y>& r) throw()
   {acquire(r.itsCounter);}
-  template <class Y> counted_ptr& operator=(const counted_ptr<Y>& r) {
+  template <class Y> counted_ptr& operator=(const counted_ptr<Y>& r)
+  {
     if (this != &r) {
       release();
       acquire(r.itsCounter);
@@ -58,19 +62,22 @@ public:
   }
 #endif // NO_MEMBER_TEMPLATES
 
-  X& operator*()  const throw() {
+  X& operator*()  const throw()
+  {
 #ifdef _GLIBCXX_DEBUG
     if (!itsCounter || !itsCounter->ptr) EUDAQ_DIE;
 #endif
     return *itsCounter->ptr;
   }
-  X* operator->() const throw() {
+  X* operator->() const throw()
+  {
 #ifdef _GLIBCXX_DEBUG
     if (!itsCounter || !itsCounter->ptr) EUDAQ_DIE;
 #endif
     return itsCounter->ptr;
   }
-  X* get()        const throw() {
+  X* get()        const throw()
+  {
 #ifdef _GLIBCXX_DEBUG
     //if (!itsCounter || !itsCounter->ptr) EUDAQ_DIE;
 #endif
@@ -87,13 +94,15 @@ private:
     unsigned    count;
   }* itsCounter;
 
-  void acquire(counter* c) throw() {
+  void acquire(counter* c) throw()
+  {
     // increment the count
     itsCounter = c;
     if (c) ++c->count;
   }
 
-  void release() {
+  void release()
+  {
     // decrement the count, delete if it is 0
     if (itsCounter) {
       if (--itsCounter->count == 0) {

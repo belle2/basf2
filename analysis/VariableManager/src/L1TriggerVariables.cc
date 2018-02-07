@@ -31,13 +31,13 @@ namespace Belle2 {
 
       StoreObjPtr<TRGSummary> trg;
       for (unsigned int i = 0; i < ntrgWords; ++i) {
-        if (trg->getTRGSummary(i) > 0) return 1.0;
+        if (trg->getPsnmBits(i) > 0) return 1.0;
       }
 
       return 0.0;
     }
 
-    double L1TriggerBit(const Particle*, const std::vector<double>& bit)
+    double L1PSNMBit(const Particle*, const std::vector<double>& bit)
     {
       double isL1Trigger = 0.0;
 
@@ -53,7 +53,33 @@ namespace Belle2 {
 
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
       StoreObjPtr<TRGSummary> trg;
-      const unsigned int trgWord = trg->getTRGSummary(ntrgWord);
+      const unsigned int trgWord = trg->getPsnmBits(ntrgWord);
+      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
+      isL1Trigger = (trgWord >> bitInWord) & 1;
+
+      return isL1Trigger;
+    }
+
+    double L1FTDLBit(const Particle*, const std::vector<double>& bit)
+    {
+      double isL1Trigger = 0.0;
+
+      if (bit.size() != 1) return isL1Trigger;
+
+      // The number of trigger words is hardcoded in the mdst dataobject and no getter for the full array exists
+
+      const unsigned int trgWordSize = 32;
+      const unsigned int ntrgWords = 10;
+      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return isL1Trigger;
+
+      // Get the trigger word that contains this bit (we could also convert the full array into a bitset or vector<bool> but that is a bit slower)
+
+      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
+
+      // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
+
+      StoreObjPtr<TRGSummary> trg;
+      const unsigned int trgWord = trg->getFtdlBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
 
@@ -61,7 +87,7 @@ namespace Belle2 {
     }
 
 
-    double L1TriggerBitPrescale(const Particle*, const std::vector<double>& bit)
+    double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit)
     {
       double prescale = 0.0;
 
@@ -85,11 +111,13 @@ namespace Belle2 {
 
     VARIABLE_GROUP("L1Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
-                      "Returns 1 if at least one L1 trigger bit is true.");
-    REGISTER_VARIABLE("L1TriggerBit(i)", L1TriggerBit ,
-                      "Returns the status of i-th trigger bit.");
-    REGISTER_VARIABLE("L1TriggerBitPrescale(i)", L1TriggerBitPrescale,
-                      "Returns the prescale of i-th trigger bit.");
+                      "Returns 1 if at least one PSNM L1 trigger bit is true.");
+    REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
+                      "Returns the PSNM status of i-th trigger bit.");
+    REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit ,
+                      "Returns the FTDL (Final Trigger Decision Logic before prescale) status of i-th trigger bit.");
+    REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
+                      "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
 
   }
 }

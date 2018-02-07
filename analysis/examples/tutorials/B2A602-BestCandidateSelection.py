@@ -14,7 +14,7 @@
 # ntuple tool.
 #
 # To look at the results, one might use:
-# ntuple->Scan("D0__dM:D0__chiProb:D0__absdM_rank:D0__chiProb_rank:D0_mcErrors")
+# ntuple->Scan("D0_dM:D0_chiProb:D0_dM_rank:D0_chiProb_rank:D0_mcErrors")
 #
 #
 # based on B2A403-KFit-VertexFit.py
@@ -49,21 +49,24 @@ reconstructDecay('D0 -> K-:loose pi+:all', '1.8 < M < 1.9')
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexKFit('D0', 0.0)
 
-# smaller |M_rec - M| is better
-rankByLowest('D0', 'abs(dM)')
+# smaller |M_rec - M| is better, add here a different output variable name, due to parentheses
+rankByLowest('D0', 'abs(dM)', outputVariable='abs_dM_rank')
 
 # maybe not the best idea, but might cut away candidates with failed fits
 rankByHighest('D0', 'chiProb')
 
+# add rank variable aliases for easier use
+variables.addAlias('dM_rank', 'extraInfo(abs_dM_rank)')
+variables.addAlias('chiProb_rank', 'extraInfo(chiProb_rank)')
+
 # perform MC matching (MC truth asociation)
 matchMCTruth('D0')
-
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsDST = ['EventMetaData', '^D0']
 toolsDST += ['CMSKinematics', '^D0']
 # save ranks and associated variables
-toolsDST += ['CustomFloats[dM:chiProb:extraInfo(abs(dM)_rank):extraInfo(chiProb_rank)]', '^D0']
+toolsDST += ['CustomFloats[dM:chiProb:dM_rank:chiProb_rank]', '^D0']
 toolsDST += ['Vertex', '^D0']
 toolsDST += ['MCVertex', '^D0']
 toolsDST += ['MCTruth', '^D0 -> ^K- ^pi+']

@@ -42,7 +42,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components=components)
 
-    if not skipHitPreparerAdding:
+    if not skipHitPreparerAdding and trigger_mode in ["all", "hlt"]:
         add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations

@@ -319,7 +319,6 @@ void PXDDQMExpressRecoMinModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     Pixels.at(index).insert(digit2.getUniqueChannelID());
-//    int iChip = mapper.getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int iChip = mapper.getDCDID(digit2.getUCellID(), digit2.getVCellID(), sensorID);
     int indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 1);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);

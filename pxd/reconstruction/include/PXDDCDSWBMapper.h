@@ -36,12 +36,12 @@ namespace Belle2 {
        * @param sensorID sensor details for PXD sensors
        * @returns DCD ID
        */
-      int getDCDID(int& u, int& v, const VxdID sensorID) const;
+      int getDCDID(const int u, const int v, const VxdID sensorID) const;
       /** get ID of SWB for giving pixel, range: 0..5.
        * @param v pixels coordinate in u
        * @returns SWB ID
        */
-      int getSWBID(int& v) const;
+      int getSWBID(const int v) const;
 
     };
 

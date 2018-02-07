@@ -265,51 +265,43 @@ namespace Belle2 {
 
 
 
-  void TOPDatabaseImporter::importModuleT0Calibration(string fNames)
+  void TOPDatabaseImporter::importModuleT0Calibration(string fileName)
   {
-    vector<string> fileNames;
-    stringstream ss(fNames);
-    string fName;
-    while (ss >> fName) {
-      fileNames.push_back(fNames);
-    }
 
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     DBImportObjPtr<TOPCalModuleT0> moduleT0;
     moduleT0.construct();
 
-    for (const auto& fileName : fileNames) {
-      ifstream inFile("minuit021_390.dat");
-      B2INFO("--> Opening constants file " << fileName);
 
-      if (!inFile) {
-        B2ERROR("openFile: " << fileName << " *** failed to open");
+    ifstream inFile(fileName);
+    B2INFO("--> Opening constants file " << fileName);
+
+    if (!inFile) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO("--> " << fileName << ": open for reading");
+
+
+    B2INFO("--> importing constants");
+
+    while (!inFile.eof()) {
+      int slot = 0;
+      int dummy = 0;
+      double T0 = 0;
+      double T0_err = 0;
+
+      inFile >> slot >> dummy >> T0 >> T0_err;
+      if (slot < 1 or slot > 16) {
+        B2ERROR("Module ID is not valid. Skipping the entry.");
         continue;
       }
-      B2INFO("--> " << fileName << ": open for reading");
+      moduleT0->setT0(slot, T0, T0_err);
 
-      int slot[16] = {0};
-      int slot_err[16] = {0};
-      double T0[16] = {0};
-      double T0_err[16] = {0};
-
-      B2INFO("--> importing constants");
-
-      int index = 0;
-
-      while (!inFile.eof()) {
-        inFile >> slot[ index ] >> slot_err[ index ] >> T0[ index ] >> T0_err[ index ];
-        if (slot[ index ] < 1 || slot[ index ] > 16) {
-          B2ERROR("Module ID is not valid. Skipping the entry.");
-          continue;
-        }
-        moduleT0->setT0(slot[ index ], T0[ index ], T0_err[ index ]);
-        index++;
-      }
-      inFile.close();
-      B2INFO("--> Input file closed");
     }
+    inFile.close();
+    B2INFO("--> Input file closed");
+
     IntervalOfValidity iov(0, 0, -1, -1);
     moduleT0.import(iov);
 

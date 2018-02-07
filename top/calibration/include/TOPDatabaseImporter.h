@@ -57,9 +57,9 @@ namespace Belle2 {
     /**
      * Import module T0 calibration constants to database
      * The input is the text file
-     * @param fileNames file names separated by space (since vector doesn't work!)
+     * @param fileName name of the dat file with constants of all modules
      */
-    void importModuleT0Calibration(std::string fileNames);
+    void importModuleT0Calibration(std::string fileName);
 
 
     /**

@@ -103,6 +103,8 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
         # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components)
 
+    add_hit_preparation_modules(path, components=components)
+
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation',

@@ -11,7 +11,7 @@
 # *****************************************************************************
 
 from basf2 import *
-from simulation
+import simulation
 from ROOT import Belle2
 from EventSelectorVXD import EventSelectorVXD
 import sys

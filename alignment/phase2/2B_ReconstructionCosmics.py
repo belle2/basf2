@@ -17,7 +17,6 @@ import reconstruction
 from modularAnalysis import *
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
-from VXDHits import VXDHits
 
 inname = "generation.root"
 outname = "reconstruction.root"
@@ -60,9 +59,9 @@ tracking.add_cr_tracking_reconstruction(
 
 main.add_module('Ext')
 
-reconstruction.add_ecl_modules(store, components)
-store.add_module('ECLTrackShowerMatch')
-store.add_module('ECLElectronId')
+reconstruction.add_ecl_modules(main, components)
+main.add_module('ECLTrackShowerMatch')
+main.add_module('ECLElectronId')
 
 main.add_module('EKLMReconstructor')
 main.add_module('BKLMReconstructor')
@@ -75,7 +74,7 @@ main.add_module('ClusterMatcher')
 main.add_module(
     "MergerCosmicTracks",
     recoTracksStoreArrayName="RecoTracks",
-    MergedRecoTracksStoreArrayName="CosmicRecoTracks",
+    mergedRecoTracksStoreArrayName="CosmicRecoTracks",
     usingMagneticField=True)
 
 # if magnetic field is not in components:
@@ -83,7 +82,7 @@ main.add_module(
 main.add_module(
     "MergerCosmicTracks",
     recoTracksStoreArrayName="RecoTracks",
-    MergedRecoTracksStoreArrayName="CosmicRecoTracks",
+    mergedRecoTracksStoreArrayName="CosmicRecoTracks",
     usingMagneticField=False)
 """
 

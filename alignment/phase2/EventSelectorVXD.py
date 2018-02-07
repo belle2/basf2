@@ -49,4 +49,4 @@ class EventSelectorVXD(Module):
             event = EventMetaData.getEvent()
             print('Event', event, 'has PXD or SVD SimHits. It will be stored')
 
-        super(EventSelector, self).return_value(someOK)
+        super(EventSelectorVXD, self).return_value(someOK)

@@ -277,8 +277,9 @@ void ECLDQMModule::event()
 
   }
 
-  trigtag1 /= ECLTrigs.getEntries();
-
+  if (ECLTrigs.getEntries() > 0) {
+    trigtag1 /= ECLTrigs.getEntries();
+  }
 
   int compar = (65535 & m_iEvent);
   if (compar == trigtag1) flagtag = 0;

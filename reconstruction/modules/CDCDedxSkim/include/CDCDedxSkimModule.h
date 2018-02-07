@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DEDXSKIMMODULE_H
-#define DEDXSKIMMODULE_H
+#ifndef CDCDEDXSKIMMODULE_H
+#define CDCDEDXSKIMMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -32,15 +32,15 @@ namespace Belle2 {
    * subsequent use of the sample.
    */
 
-  class DedxSkimModule : public Module {
+  class CDCDedxSkimModule : public Module {
 
   public:
 
     /** Constructor, for setting module description and parameters */
-    DedxSkimModule();
+    CDCDedxSkimModule();
 
     /** Destructor */
-    virtual ~DedxSkimModule();
+    virtual ~CDCDedxSkimModule();
 
     /** Initialize routine **/
     virtual void initialize();
@@ -55,9 +55,6 @@ namespace Belle2 {
     bool isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable);
 
   private:
-
-    // required input
-    StoreArray<Track> m_tracks; /**< Required array of input tracks */
 
     /** the event number */
     int m_eventID;

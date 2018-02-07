@@ -8,7 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "reconstruction/modules/DedxSkim/DedxSkimModule.h"
+#include "reconstruction/modules/CDCDedxSkim/CDCDedxSkimModule.h"
+
+#include "framework/datastore/StoreArray.h"
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -25,9 +27,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(DedxSkim)
+REG_MODULE(CDCDedxSkim)
 
-DedxSkimModule::DedxSkimModule() : Module()
+CDCDedxSkimModule::CDCDedxSkimModule() : Module()
 {
 
   setDescription("Apply clean up cuts for dE/dx purposes.");
@@ -50,16 +52,20 @@ DedxSkimModule::DedxSkimModule() : Module()
   m_trackID = 0;
 }
 
-DedxSkimModule::~DedxSkimModule() {}
+CDCDedxSkimModule::~CDCDedxSkimModule() {}
 
-void DedxSkimModule::initialize()
+void CDCDedxSkimModule::initialize()
 {
 
   // requred inputs
-  m_tracks.isRequired();
+  StoreArray<Track>::required();
+  StoreArray<TrackFitResult>::required();
+  StoreArray<RecoTrack>::required();
+  StoreArray<CDCHit>::required();
+  //  StoreArray<ECLCluster>::required();
 }
 
-void DedxSkimModule::event()
+void CDCDedxSkimModule::event()
 {
 
   m_eventID++;
@@ -97,13 +103,17 @@ void DedxSkimModule::event()
     }
   }
 
+  // inputs
+  StoreArray<Track> tracks;
+  //  StoreArray<ECLCluster> clusters;
+
   int nGoodElectrons = 0;
   int nGoodMuons = 0;
 
   // loop over each track in the event and cut on track quality information
   m_trackID = 0;
-  for (int iTrack = 0; iTrack < m_tracks.getEntries(); iTrack++) {
-    const Track* track = m_tracks[iTrack];
+  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
+    const Track* track = tracks[iTrack];
     m_trackID++;
 
     // if no type is specified, just clean up based on missing track fits
@@ -116,7 +126,9 @@ void DedxSkimModule::event()
     // only using the electron hypothesis
     if (m_Bhabha == true || m_RadBhabha == true || m_TwoPhoton == true) {
 
-      const TrackFitResult* fitResult = track->getTrackFitResult(Const::electron);
+      if (!isGoodTrack(track, Const::electron)) break;
+
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
       TVector3 trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_e * mass_e);
       double EoverP = trackEnergy / trackMom.Mag();
@@ -130,7 +142,9 @@ void DedxSkimModule::event()
     // only using the muon hypothesis
     if (m_DiMuon == true || m_RadDiMuon == true) {
 
-      const TrackFitResult* fitResult = track->getTrackFitResult(Const::muon);
+      if (!isGoodTrack(track, Const::muon)) break;
+
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::muon);
       TVector3 trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_mu * mass_mu);
       double EoverP = trackEnergy / trackMom.Mag();
@@ -149,7 +163,7 @@ void DedxSkimModule::event()
   setReturnValue(pass);
 }
 
-bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable)
+bool CDCDedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable)
 {
 
   // check if the track fit failed
@@ -180,9 +194,9 @@ bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable&
   return true;
 }
 
-void DedxSkimModule::terminate()
+void CDCDedxSkimModule::terminate()
 {
 
-  B2INFO("DedxSkimModule exiting after processing " << m_trackID <<
+  B2INFO("CDCDedxSkimModule exiting after processing " << m_trackID <<
          " tracks in " << m_eventID + 1 << " events.");
 }

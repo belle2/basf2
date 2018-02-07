@@ -1,3 +1,5 @@
+.. _DecayString:
+
 DecayString
 ===========
 The DecayString is an elegant way of telling the analysis modules about the structure and the particles of a decay tree. The syntax is borrowed mainly from the LHCb software. Here comes the first example of a DecayString (you probably can already guess the meaning):

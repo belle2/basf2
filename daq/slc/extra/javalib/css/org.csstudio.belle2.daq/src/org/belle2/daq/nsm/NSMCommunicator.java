@@ -8,15 +8,13 @@ package org.belle2.daq.nsm;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.belle2.daq.database.DBObject;
 import org.belle2.daq.io.SocketDataReader;
 import org.belle2.daq.io.SocketDataWriter;
 
 /**
- * 
+ *
  * @author tkonno
  */
 public class NSMCommunicator extends Thread {
@@ -33,7 +31,10 @@ public class NSMCommunicator extends Thread {
 	private SocketDataWriter m_writer;
 	private Socket m_socket;
 	private int retry = 0;
-	
+	private ArrayList<NSMMessage> m_msg;
+	private NSMCommunicator m_com;
+	private boolean m_closed = false;
+
 	public static ArrayList<NSMCommunicator> get() {
 		return g_coms;
 	}
@@ -93,45 +94,101 @@ public class NSMCommunicator extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
-			if (m_socket == null) {
-				try {
-					reconnect();
-					synchronized (m_handler) {
-						int nhandlers = m_handler.size();
-						for (int n = 0; n < nhandlers; n++) {
-							m_handler.get(n).connected(this);
+		m_com = this;
+		new Thread() {
+			public void run() {
+				while (true) {
+					System.err.println("debug : 1-1");
+					if (m_socket == null) {
+						try {
+							System.err.println("debug : 1-2");
+							reconnect();
+							synchronized (m_handler) {
+								int nhandlers = m_handler.size();
+								for (int n = 0; n < nhandlers; n++) {
+									System.err.println("debug : 1-3");
+									m_handler.get(n).connected(m_com);
+								}
+							}
+						} catch (IOException ex) {
+							retry++;
+							close();
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException ex1) {
+								close();
+								g_coms.remove(this);
+								m_closed = true;
+								return;
+							}
 						}
 					}
-				} catch (IOException ex) {
-					retry++;
-					close();
 					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException ex1) {
+						while (true) {
+							System.err.println("debug : 1-4");
+							NSMMessage msg = waitMessage();
+							synchronized (m_msg) {
+								System.err.println("debug : 1-5");
+								m_msg.add(msg);
+							}
+						}
+					}catch (IOException ex) {
 						close();
-						g_coms.remove(this);
-						return;
+						try {
+							Thread.sleep(10000);
+						} catch (InterruptedException ex1) {
+							close();
+							System.out.println("closed");
+							g_coms.remove(this);
+							m_closed = true;
+							return;
+						}
+						if (retry <= 1) {
+							System.err.println(m_hostname+":"+m_port+" closed");
+						}
 					}
-					//Logger.getLogger(NSMCommunicator.class.getName()).log(Level.SEVERE, null, m_hostname+":"+m_port+" closed");
 				}
 			}
+		}.start();
+		while (true) {
 			try {
-				while (true) {
-					NSMMessage msg = waitMessage();
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+
+			}
+			if (m_closed == true) return;
+			synchronized (m_msg) {
+				for (NSMMessage msg : m_msg) {
+					System.err.println("debug : 2-1");
 					NSMCommand cmd = new NSMCommand(msg.getReqName());
+					System.err.println("debug : 2-2");
 					if (cmd.equals(NSMCommand.ERROR)) {
-						Logger logger = Logger.getLogger(msg.getNodeName());
-						logger.log(Level.WARNING, msg.getData());
+						//Logger logger = Logger.getLogger(msg.getNodeName());
+						//logger.log(Level.WARNING, msg.getData());
 						continue;
 					}
 					if (cmd.equals(NSMCommand.OK)) {
-						Logger logger = Logger.getLogger(msg.getNodeName());
-						logger.log(Level.INFO, msg.getData());
+						//Logger logger = Logger.getLogger(msg.getNodeName());
+						//logger.log(Level.INFO, msg.getData());
 						continue;
 					}
-					ArrayList<NSMRequestHandler> handlers = new ArrayList<>();
+					//ArrayList<NSMRequestHandler> handlers = new ArrayList<>();
 					synchronized (m_handler) {
+						for (NSMRequestHandler handler : m_handler) {
+							System.err.println("debug : 2-3");
+							try {
+								if (!handler.isOnce() || !handler.isDone()) {
+									System.err.println("debug : 2-4");
+									if (handler.handle(cmd, msg, this)) {
+										handler.isDone(true);
+									}
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+
+						}
+						/*
 						int nhandlers = m_handler.size();
 						for (int i = 0; i < nhandlers; i++) {
 							handlers.add(m_handler.get(i));
@@ -147,22 +204,15 @@ public class NSMCommunicator extends Thread {
 								e.printStackTrace();
 							}
 						}
+						*/
 					}
 				}
-			} catch (IOException ex) {
-				close();
 				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException ex1) {
-					close();
-					System.out.println("closed");
-					g_coms.remove(this);
-					return;
+					System.err.println("debug : 2-5");
+					m_msg.clear();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				if (retry <= 1) {
-					System.err.println(m_hostname+":"+m_port+" closed");
-				}
-				//Logger.getLogger(NSMCommunicator.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -241,7 +291,7 @@ public class NSMCommunicator extends Thread {
 		}
 		throw new IOException("Socket to "+ m_hostname + ":" + m_port + " is not avaialble");
 	}
-	
+
 	public String getHostNamePort() {
 		return m_hostname+":"+m_port;
 	}
@@ -257,6 +307,7 @@ public class NSMCommunicator extends Thread {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static void closeAll() {
 		for (NSMCommunicator com : g_coms) {
 			com.close();
@@ -280,5 +331,5 @@ public class NSMCommunicator extends Thread {
 			}
 		}
 	}
-	
+
 }

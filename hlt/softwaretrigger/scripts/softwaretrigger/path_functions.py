@@ -6,6 +6,7 @@ from softwaretrigger import (
 )
 import ROOT
 import softwaretrigger.hltdqm as hltdqm
+import generators
 
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
@@ -112,6 +113,7 @@ def add_hlt_processing(path, run_type="collision",
         # no filtering,
         # todo: correct data taking period here, when SVD is in the components,
         # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
+        # currently, not hlt triggering of cosmic events, but regular full reconstruction
         reconstruction.add_cosmics_reconstruction(path, components=components)
         add_hlt_dqm(path, run_type)
         if pruneDataStore:
@@ -329,6 +331,26 @@ def get_store_only_rawdata_path(additonal_store_arrays_to_keep=[]):
         additonal_store_arrays_to_keep) .set_name("KeepRawData")
 
     return store_rawdata_path
+
+
+def create_test_path(path, runtype="collision"):
+    path = basf2.create_path()
+    # specify number of events to be generated
+    path.add_module('EventInfoSetter', evtNumList=[1])
+    path.add_module("HistoManager", histoFileName=os.path.join(tempfolder, "hlt_steering_file_test.root"))
+
+    if runtype == "collision":
+        generators.add_continuum_generator(path, finalstate="uubar")
+    elif runtype == "cosmics":
+        generators.add_cosmics_generator(path)
+
+    return (path, tempfolder)
+
+
+def finalize_test_path(path, tempfolder):
+
+    basf2.process(path)
+    shutil.rmtree(tempfolder)
 
 
 def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME,

@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # --------------------------------------------------------------------------------
-# Example of using Database importer for importing TBC constants to local database
-# User has to set the path to TOPTimeBaseCalibrator output files correctly
+# Example of using Database importer for importing Module T0 constants to local database
 # Name and location of local DB can also be changed
 # --------------------------------------------------------------------------------
 

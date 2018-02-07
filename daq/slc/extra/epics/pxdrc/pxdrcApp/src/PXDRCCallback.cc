@@ -18,6 +18,8 @@
 
 using namespace Belle2;
 
+const char* PXDRCCallback::pvPScur = "PXD:B:PSC-State:cur:S";
+const char* PXDRCCallback::pvPSreq = "PXD:B:PSC-State:req:S";
 const char* PXDRCCallback::pvRCcur = "PXD:RC:State:cur:S";
 const char* PXDRCCallback::pvRCreq = "PXD:RC:State:req:S";
 

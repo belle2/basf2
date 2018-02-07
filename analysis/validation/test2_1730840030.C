@@ -26,8 +26,8 @@
 /* Validation script to determine benchmarks for PID cuts. */
 void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString muidCut("Upsilon3S_Upsilon_mu0_PIDmu > 0.1 && Upsilon3S_Upsilon_mu1_PIDmu > 0.1");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.1 && Upsilon3S_pi1_PIDpi > 0.1");
+   TString muidCut("Upsilon3S_Upsilon_mu0_muonID > 0.1 && Upsilon3S_Upsilon_mu1_muonID > 0.1");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon_VtxPvalue > 0.001") ;
    TString Cuts(muidCut+"&&"+ver_fitCut+"&&"+piidCut);
 
@@ -57,8 +57,8 @@ void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString eidCut("Upsilon3S_Upsilon_e0_PIDe > 0.1 && Upsilon3S_Upsilon_e1_PIDe > 0.1");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.1 && Upsilon3S_pi1_PIDpi > 0.1");
+   TString eidCut("Upsilon3S_Upsilon_e0_electronID > 0.1 && Upsilon3S_Upsilon_e1_electronID > 0.1");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon_VtxPvalue > 0.001") ;
    TString Cuts(eidCut+"&&"+ver_fitCut+"&&"+piidCut);
 
@@ -86,8 +86,8 @@ void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_2Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString muidCut("Upsilon3S_Upsilon2S_mu0_PIDmu > 0.1 && Upsilon3S_Upsilon2S_mu1_PIDmu > 0.1");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.1 && Upsilon3S_pi1_PIDpi > 0.1");
+   TString muidCut("Upsilon3S_Upsilon2S_mu0_muonID > 0.1 && Upsilon3S_Upsilon2S_mu1_muonID > 0.1");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon2S_VtxPvalue > 0.001");
    TString Cuts(muidCut+"&&"+piidCut+"&&"+ver_fitCut);
 
@@ -117,8 +117,8 @@ void plot_2Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_2See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString eidCut("Upsilon3S_Upsilon2S_e0_PIDe > 0.1 && Upsilon3S_Upsilon2S_e1_PIDe > 0.1 ");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.1 && Upsilon3S_pi1_PIDpi > 0.1");
+   TString eidCut("Upsilon3S_Upsilon2S_e0_electronID > 0.1 && Upsilon3S_Upsilon2S_e1_electronID > 0.1 ");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon2S_VtxPvalue > 0.001");
    TString Cuts(eidCut+"&&"+piidCut+"&&"+ver_fitCut);
 
@@ -147,10 +147,15 @@ void plot_2See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_Mrecoil(TFile* pfile,TTree *ptree, TFile* outputFile){
 
-   TString piidCut(" Upsilon3S_pi0_PIDpi > 0.01 &&  Upsilon3S_pi1_PIDpi > 0.01");
+   TString piidCut(" Upsilon3S_pi0_pionID > 0.01 &&  Upsilon3S_pi1_pionID > 0.01");
 
    TH1F* h_MRecoil_pipi = new TH1F("h_MRecoil_pipi","M(pipi)_recoil",500,9.3,10.3);
    ptree->Project("h_MRecoil_pipi","Upsilon3S_Mrecoil",piidCut);
+   h_MRecoil_pipi->GetXaxis()->SetTitle("MM_{#pi#pi} (GeV/c^{2})");
+   h_MRecoil_pipi->GetYaxis()->SetTitle("Events / 2MeV/c^{2}"); 
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Description","the recoil pi+ pi- mass for Y(3S)->pi+ pi- [Y(1S,2S)-> mu+ mu-]"));
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Check","Y(1S) and Y(2S) peaks visible at 9.46 and 10.0 GeV/c^2"));
 
    outputFile->cd();
 

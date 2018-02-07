@@ -96,7 +96,7 @@ namespace Belle2 {
       // 1. Collections
       /** Name of the collection for the MCParticles */
       std::string m_storeMCParticlesName;
-      /** Name of the collection for the SVDDigits */
+      /** Name of the (optional) collection for the SVDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection for the SVDSimhits */
       std::string m_storeSimHitsName;
@@ -112,9 +112,9 @@ namespace Belle2 {
       std::string m_relDigitTrueHitName;
 
       // 1* Production of SVDShaperDigits
-      /** Whether or not to generate compound SVDShaperDigits */
-      bool m_generateShaperDigits;
-      /** Name of the (optional) collection for the SVDShaperDigits */
+      /** Whether or not to generate single-sample SVDDigits */
+      bool m_generateDigits;
+      /** Name of the collection for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;
       /** Name of the relation between SVDShaperDigits and MCParticles */
       std::string m_relShaperDigitMCParticleName;
@@ -131,11 +131,13 @@ namespace Belle2 {
 
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge */
-      bool   m_applyPoisson;
+      bool  m_applyPoisson = true;
       /** Whether or not to apply Gaussian noise */
-      bool  m_applyNoise;
+      bool  m_applyNoise = false;
       /** Zero-suppression cut. */
-      double m_SNAdjacent;
+      double m_SNAdjacent = 3.0;
+      /** Use 3-sample filter? */
+      bool m_3sampleFilter = true;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction;
 

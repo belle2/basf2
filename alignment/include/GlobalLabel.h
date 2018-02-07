@@ -135,6 +135,13 @@ namespace Belle2 {
      */
     GlobalLabel(EKLMElementID eklmElement, gidTYPE paramId);
 
+    /**
+     * @brief Construct label for given DB object (template argument) and its element and parameter
+     *
+     * @param element Element id in DB object (wire, sensor etc.)
+     * @param param Paremetr id of the element (shift, angle, etc.)
+     * @return GlobalLabel
+     */
     template<class DBObjType>
     static GlobalLabel construct(gidTYPE element, gidTYPE param)
     {
@@ -143,7 +150,14 @@ namespace Belle2 {
       return label;
     }
 
-    //TODO
+    /**
+     * @brief Construct label for given DB object id and its element and parameter
+     *
+     * @param dbObjId id of the DB object in global calibration
+     * @param element Element id in DB object (wire, sensor etc.)
+     * @param param Paremetr id of the element (shift, angle, etc.)
+     * @return GlobalLabel
+     */
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
       if (m_components.empty() or m_components.find(dbObjId) != m_components.end())
@@ -152,6 +166,10 @@ namespace Belle2 {
         construct(0, 0);
     }
 
+    /**
+     * @brief Set which DB objects have non-zero labels (by their id)
+     * @param components set of global ids of DB objects
+     */
     static void setComponents(const std::set<unsigned short>& components)
     {
       m_components = components;
@@ -234,10 +252,15 @@ namespace Belle2 {
     //! Is this Beam label?
     bool    isBeam()         const {return (eid > 0 && eid < vxdOffset);}
 
-    //TODO
+
+    /**
+     * @brief Returns the global id identifing DB object for constantwith this label
+     */
     gidTYPE getUniqueId() const {return eid / 100000;}
 
-    //TODO
+    /**
+     * @brief Returns the element id (like VxdID for silicon sensors) to identify sets of parameters in DB objects
+     */
     gidTYPE getElementId() const {return eid % 100000;}
 
     //! Get id of alignment/calibration parameter
@@ -297,6 +320,7 @@ namespace Belle2 {
     }
 
   private:
+    //! Set of global ids of components for which to return non-zero labels
     static std::set<unsigned short> m_components;
 
     //! Constructor for any detector

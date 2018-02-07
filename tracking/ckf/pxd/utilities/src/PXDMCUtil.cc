@@ -75,7 +75,7 @@ unsigned int MCUtil::getNumberOfCorrectPXDHits(const RecoTrack* mcRecoTrack, con
   return numberOfCorrectHits;
 }
 
-bool MCUtil::allStatesCorrect(const std::vector<const CKFToPXDState*>& states) const
+bool MCUtil::allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& states) const
 {
   const RecoTrack* seed = states.front()->getSeed();
 

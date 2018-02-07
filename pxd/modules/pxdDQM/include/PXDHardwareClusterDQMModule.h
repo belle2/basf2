@@ -8,15 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDHARDWARECLUSTERDQMMODULE_H
-#define PXDHARDWARECLUSTERDQMMODULE_H
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -53,11 +47,17 @@ namespace Belle2 {
       /** Default Constructor */
       //virtual ~PXDHardwareClusterDQMModule();
 
-      virtual void initialize();
+    private:
+      /** Module functions */
+      void initialize() override final;
+      void beginRun() override final;
+      void event() override final;
 
-      virtual void beginRun();
-
-      virtual void event();
+      /**
+       * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+       * to be placed in this function.
+      */
+      void defineHisto() override final;
 
     private:
 
@@ -84,12 +84,9 @@ namespace Belle2 {
       TH1F* hHardClusterSeedAdc;
 
 
-      virtual void defineHisto();
-
     };//end class declaration
 
 
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDHardwareClusterDQMModule_H

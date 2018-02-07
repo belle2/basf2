@@ -35,7 +35,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance3D-filter */
-  class SquaredDistance3D : public SelectionVariable< spacePoint , float > {
+  class SquaredDistance3D : public SelectionVariable< spacePoint , 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance3D"; };
@@ -52,7 +52,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance2D-filter in XY */
-  class SquaredDistance2Dxy : public SelectionVariable< spacePoint , float > {
+  class SquaredDistance2Dxy : public SelectionVariable< spacePoint , 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance2Dxy"; };
@@ -68,7 +68,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance1D-filter in X */
-  class SquaredDistance1Dx : public SelectionVariable< spacePoint , float > {
+  class SquaredDistance1Dx : public SelectionVariable< spacePoint , 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance1Dx"; };
@@ -83,7 +83,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
-  class BooleanVariable : public SelectionVariable< spacePoint , bool > {
+  class BooleanVariable : public SelectionVariable< spacePoint , 2, bool > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "BooleanVariable"; };

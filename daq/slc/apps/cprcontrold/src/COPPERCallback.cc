@@ -311,7 +311,7 @@ void COPPERCallback::boot(const std::string& opt, const DBObject& obj) throw(RCH
         if (success[i]) {
           FEE& fee(*m_fee[i]);
           try {
-            PThread th(new FEELoad(*this, fee, hslb, o_fee));
+            PThread th(new FEEBoot(*this, fee, hslb, o_fee));
             while (th.is_alive()) {
               wait(1);
             }
@@ -333,7 +333,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
   m_ttrx.monitor();
   if (m_ttrx.isError()) {
     m_ttrx.close();
-    throw (RCHandlerException("TTRX Link error"));
+    //throw (RCHandlerException("TTRX Link error"));
   }
   try {
     int flag = 0;
@@ -953,6 +953,6 @@ std::string COPPERCallback::staths(HSLB& hslb) throw (HSLBHandlerException)
   set(vname + "staths", msg);
   logging(iserr && (getNode().getState() == RCState::RUNNING_S ||
                     getNode().getState() == RCState::LOADING_TS),
-          LogFile::ERROR, "HSLB-%c : %s", i, state);
+          LogFile::ERROR, "HSLB-%c : %s", 'a' + i, state);
   return state;
 }

@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 
 Weight AllSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 {
-  const std::vector<const CKFToSVDState*>& previousStates = pair.first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair.first;
   CKFToSVDState* currentState = pair.second;
 
   if (previousStates.size() < 3) {

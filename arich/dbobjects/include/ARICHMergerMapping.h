@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Luka Santelj, Manca Mrvar                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <TObject.h>
 #include <iostream>
 
@@ -54,12 +55,27 @@ namespace Belle2 {
     unsigned getFEBSlot(unsigned moduleID) const;
 
     /**
+     * Get ID of merger from serial number
+     * @param mergerSN merger serial number
+     * @return mergerID merger ID number
+     */
+    unsigned getMergerIDfromSN(unsigned mergerSN) const;
+
+    /**
+     * Get serial number of marger from its ID
+     * @param mergerID merger ID number
+     * @return mergerSN merger serial number
+     */
+    unsigned getMergerSN(unsigned mergerID) const;
+
+    /**
      * Add mapping entry
      * @param moduleID module ID number
      * @param mergerID merger ID number
+     * @param mergerSN merger serial number
      * @param febSlot FEB slot
      */
-    void addMapping(unsigned moduleID, unsigned mergerID, unsigned febSlot);
+    void addMapping(unsigned moduleID, unsigned mergerID, unsigned febSlot, unsigned mergerSN);
 
     /**
      * Pring mapping
@@ -68,12 +84,13 @@ namespace Belle2 {
 
   private:
 
-    std::vector<uint16_t> m_merger2module; /**< map of mergers to modules */
-    std::vector<uint16_t> m_module2merger; /**< map of modules to mergers */
+    std::vector<uint16_t> m_merger2module;  /**< map of mergers to modules */
+    std::vector<uint16_t> m_module2merger;  /**< map of modules to mergers */
 
-    std::vector<bool> m_isMapped;          /**< vector of mapped modules */
+    std::vector<bool> m_isMapped;           /**< vector of mapped modules */
+    std::map<unsigned, unsigned> m_mergerID; /**< map mergers ID to SN */
 
-    ClassDef(ARICHMergerMapping, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHMergerMapping, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

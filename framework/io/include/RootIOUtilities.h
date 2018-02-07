@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROOTIOUTILITIES_H
-#define ROOTIOUTILITIES_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -86,4 +85,3 @@ namespace Belle2 {
     extern const std::string c_SteerAdditionalBranchNames[];
   }
 }
-#endif

@@ -5,7 +5,7 @@
 <header>
 <input>../1150720000.dst.root</input>
 <output>../1150720000.ntup.root</output>
-<contact>Mario Merola; mario.merola@na.infn.it </contact>
+<contact>Matic Lubej; matic.lubej@ijs.si</contact>
 </header>
 """
 

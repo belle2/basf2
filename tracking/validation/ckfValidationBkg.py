@@ -23,12 +23,17 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 
 
+def setupFinderModule(path):
+    tracking.add_hit_preparation_modules(path, components=["SVD", "PXD"])
+    tracking.add_ckf_based_track_finding(path)
+
+
 class CKFBkg(TrackingValidationRun):
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     root_input_file = '../EvtGenSim.root'
-    finder_module = staticmethod(tracking.add_ckf_based_track_finding)
+    finder_module = staticmethod(setupFinderModule)
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': True,

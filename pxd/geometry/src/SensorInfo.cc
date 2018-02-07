@@ -95,8 +95,8 @@ const TVector3 SensorInfo::getLorentzShift(double u, double v) const
   for (int iz = 0; iz < 5; ++iz) {
     // This is OK as long as E only depends on z
     TVector3 currentEField = getEField(TVector3(0, 0, zKnots[iz]));
-    TVector3 v = getDriftVelocity(currentEField, currentBField);
-    position += weightGL[iz] / v.Z() * v;
+    TVector3 velocity = getDriftVelocity(currentEField, currentBField);
+    position += weightGL[iz] / velocity.Z() * velocity;
   } // for knots
   position.SetZ(0);
   position.SetX(position.X() - u);
@@ -104,4 +104,60 @@ const TVector3 SensorInfo::getLorentzShift(double u, double v) const
   return position;
 }
 
+void SensorInfo::cook()
+{
+  m_iup = m_uCells / m_width;
+  m_up = m_width / m_uCells;
 
+  m_vsplit = m_length * (m_splitLength - 0.5);
+
+  m_vp = m_length * m_splitLength / m_vCells;
+  m_ivp = 1 / m_vp;
+
+  m_vp2 = m_length * (1 - m_splitLength) / m_vCells2;
+  m_ivp2 = 1 / m_vp2;
+
+  m_hxIG = 0.5 * m_up  - m_clearBorderSmallPitch;
+  m_mIGL = 0.5 * (m_vp - m_sourceBorderLargePitch + m_drainBorderLargePitch);
+  m_sIGL = 0.5 * (m_vp - m_sourceBorderLargePitch - m_drainBorderLargePitch);
+  m_mIGS = 0.5 * (m_vp2 - m_sourceBorderSmallPitch + m_drainBorderSmallPitch);
+  m_sIGS = 0.5 * (m_vp2 - m_sourceBorderSmallPitch - m_drainBorderSmallPitch);
+}
+
+int SensorInfo::getTrappedID(double x, double y) const
+{
+  double huCells = 0.5 * m_uCells;
+  double ix = floor(x * m_iup + huCells);
+  int jx = ix;
+  double x0 = (ix + 0.5 - huCells) * m_up;
+
+  if (fabs(x - x0) < m_hxIG) {
+    if ((unsigned)jx >= (unsigned)m_uCells) return -1;
+    double ys = y - m_vsplit;
+    if (ys >= 0) {
+      double iy = floor(ys * m_ivp2);
+      int jy = iy;
+      iy = jy / 2;
+      double y0 = iy * m_vp2 * 2 + m_vp2;
+      double yl = fabs(ys - y0);
+      if (fabs(yl - m_mIGS) < m_sIGS) {
+        if ((unsigned)jy >= (unsigned)m_vCells2) return -1;
+        return jx + m_uCells * (jy + m_vCells);
+      }
+      return -1;
+    } else {
+      ys = y + 0.5 * m_length;
+      double iy = floor(ys * m_ivp);
+      int jy = iy;
+      iy = jy / 2;
+      double y0 = iy * m_vp * 2 + m_vp;
+      double yl = fabs(ys - y0);
+      if (fabs(yl - m_mIGL) < m_sIGL) {
+        if ((unsigned)jy >= (unsigned)m_vCells) return -1;
+        return jx + m_uCells * jy;
+      }
+      return -1;
+    }
+  }
+  return -1;
+}

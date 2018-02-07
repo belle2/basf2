@@ -51,7 +51,8 @@ namespace TreeFitter {
     m_Rinverse = RInvtemp.inverse();
 
     //JFK: if one of the elements is infty or nan we can stop here 2017-09-28
-    if ((!std::isfinite(m_Rinverse(0, 0))) || (!std::isfinite(m_Rinverse(1, 1))) || (!std::isfinite(m_Rinverse(2, 2)))) {
+    // min matrix size is one
+    if (!std::isfinite(m_Rinverse(0, 0))) {
       return ErrCode::inversionerror;
     }
 
@@ -64,18 +65,6 @@ namespace TreeFitter {
   {
     fitparams->getStateVector() -= m_K * m_res;
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
-  }
-
-  [[gnu::maybe_unused]] void KalmanCalculator::updateState(const EigenTypes::ColVector& prediction, FitParams* fitparams)
-  {
-    //JFK: transposing here is a bit annoying... 2017-09-21
-    EigenTypes::ColVector tempColVec = prediction - fitparams->getStateVector();
-    EigenTypes::RowVector temp = m_res +  m_G * tempColVec;
-
-    EigenTypes::RowVector result = prediction - m_K * temp;
-    fitparams->getStateVector() = result;
-
-    m_chisq = result * m_Rinverse.selfadjointView<Eigen::Lower>() * result.transpose();
   }
 
   void KalmanCalculator::updateCovariance(FitParams* fitparams)

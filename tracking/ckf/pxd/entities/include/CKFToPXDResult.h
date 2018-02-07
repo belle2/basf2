@@ -17,12 +17,13 @@ namespace Belle2 {
 
   /// Specialized CKF Result for extrapolating into the PXD
   class CKFToPXDResult : public CKFResult<RecoTrack, SpacePoint> {
+    /// The parent class
     using Super = CKFResult<RecoTrack, SpacePoint>;
   public:
-    using Super::Super;
+    /// Constructor using a path.
+    CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& path);
 
-    CKFToPXDResult(const std::vector<const CKFToPXDState*>& path);
-
+    /// Called in the exporter findlet for adding this to a already created reco track.
     void addToRecoTrack(RecoTrack& recoTrack) const;
   };
 }

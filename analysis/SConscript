@@ -9,12 +9,10 @@ env['LIBS'] = [
     'RooFit',
     'RooFitCore',
     'RooStats',
-    'hlt_L1Emulator_dataobjects',
     'boost_program_options',
     'fann',
     'analysis_utility',
     'analysis_ContinuumSuppression',
-    'reconstruction_dataobjects',
     'analysis_ClusterUtility'
 ]
 

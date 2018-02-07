@@ -77,18 +77,18 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 }
 
 
-void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_value(const std::string& expression, std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   m_conditions.emplace_back(expression, path, afterConditionPath);
 }
 
 
-void Module::if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   if_value("<1", path, afterConditionPath);
 }
 
-void Module::if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
+void Module::if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
   if_value(">=1", path, afterConditionPath);
 }
@@ -111,7 +111,7 @@ bool Module::evalCondition() const
   return false;
 }
 
-boost::shared_ptr<Path> Module::getConditionPath() const
+std::shared_ptr<Path> Module::getConditionPath() const
 {
   PathPtr p;
   if (m_conditions.empty()) return p;
@@ -148,9 +148,9 @@ Module::EAfterConditionPath Module::getAfterConditionPath() const
 
   return EAfterConditionPath::c_End;
 }
-std::vector<boost::shared_ptr<Path>> Module::getAllConditionPaths() const
+std::vector<std::shared_ptr<Path>> Module::getAllConditionPaths() const
 {
-  std::vector<boost::shared_ptr<Path>> allConditionPaths;
+  std::vector<std::shared_ptr<Path>> allConditionPaths;
   for (const auto& condition : m_conditions) {
     allConditionPaths.push_back(condition.getPath());
   }
@@ -177,7 +177,7 @@ bool Module::hasUnsetForcedParams() const
 }
 
 
-boost::shared_ptr<PathElement> Module::clone() const
+std::shared_ptr<PathElement> Module::clone() const
 {
   ModulePtr newModule = ModuleManager::Instance().registerModule(getType());
   newModule->m_moduleParamList.setParameters(getParamList());
@@ -320,6 +320,9 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_true_overloads, if_true, 1, 2)
 
 void Module::exposePythonAPI()
 {
+  // to avoid confusion between std::arg and boost::python::arg we want a shorthand namespace as well
+  namespace bp = boost::python;
+
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
 
   void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
@@ -327,9 +330,12 @@ void Module::exposePythonAPI()
   enum_<Module::EAfterConditionPath>("AfterConditionPath",
                                      R"(Determines execution behaviour after a conditional path has been executed:
 
-END
-  End current event after the conditional path. (this is the default for if_value() etc.)
-CONTINUE
+.. attribute:: END
+
+  End processing of this path after the conditional path. (this is the default for if_value() etc.)
+
+.. attribute:: CONTINUE
+
   After the conditional path, resume execution after this module.)")
   .value("END", Module::EAfterConditionPath::c_End)
   .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
@@ -346,13 +352,18 @@ CONTINUE
   ;
 
   enum_<Module::EModulePropFlags>("ModulePropFlags",
-                                  R"(Flags to indicate certain low-level features of modules, see :func:`basf2.Module.set_property_flags()`, :func:`basf2.Module.has_properties()`. Most useful flags are:
+                                  R"(Flags to indicate certain low-level features of modules, see :func:`Module.set_property_flags()`, :func:`Module.has_properties()`. Most useful flags are:
 
-PARALLELPROCESSINGCERTIFIED
-  This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not write any files.)
-HISTOGRAMMANAGER
+.. attribute:: PARALLELPROCESSINGCERTIFIED
+
+    This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not write any files.)
+
+.. attribute:: HISTOGRAMMANAGER
+
   This module is used to manage histograms accumulated by other modules
-TERMINATEINALLPROCESSES
+
+.. attribute:: TERMINATEINALLPROCESSES
+
   When using parallel processing, call this module's terminate() function in all processes. This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process.
 )")
   .value("INPUT", Module::EModulePropFlags::c_Input)
@@ -364,43 +375,30 @@ TERMINATEINALLPROCESSES
   ;
 
   //Python class definition
-  class_<Module, PyModule>("Module", R"(
+  class_<Module, PyModule> module("Module", R"(
 Base class for Modules.
 
 A module is the smallest building block of the framework.
 A typical event processing chain consists of a Path containing
 modules. By inheriting from this base class, various types of
-modules can be created.
-
-
-To use a module, please refer to :func:`basf2.Path.add_module()`.
-A list of modules is available by running ``basf2 -m`` or ``basf2 -m package``,
-detailed information on parameters is given by e.g. ``basf2 -m RootInput``.
-
-Modules can also define a return value (int or bool) using setReturnValue(),
-which can be used in the steering file to split the Path based on the set value:
-
-    >>> module_with_condition.if_value("<1", another_path)
-
-In case the module condition for a given event is less than 1, the execution
-will be diverted into another_path for this event. You could for example set
-a special return value if an error occurs, and divert the execution into a
-path containing RootOutput if it is found; saving only the data producing/
-produced by the error.
-
-After a conditional path has executed, basf2 will by default stop processing
-the current event. This behaviour can be changed by setting the
-:class:`basf2.AfterConditionPath` argument.
+modules can be created. To use a module, please refer to
+:func:`Path.add_module()`.  A list of modules is available by running
+``basf2 -m`` or ``basf2 -m package``, detailed information on parameters is
+given by e.g. ``basf2 -m RootInput``.
 
 The 'Module Development' section in the manual provides detailed information
 on how to create modules, setting parameters, or using return values/conditions:
-https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
+https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development
+
+)");
+  module
   .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>(),
-       "Returns the name of the module. Can be changed via :func:`set_name() <basf2.Module.set_name()>`, use :func:`type() <basf2.Module.type()>` for identifying a particular module class.")
+       "Returns the name of the module. Can be changed via :func:`set_name() <Module.set_name()>`, use :func:`type() <Module.type()>` for identifying a particular module class.")
   .def("type", &Module::getType, return_value_policy<copy_const_reference>(),
        "Returns the type of the module (i.e. class name minus 'Module')")
-  .def("set_name", &Module::setName, R"(Set custom name, e.g. to distinguish multiple modules of the same type.
+  .def("set_name", &Module::setName, args("name"), R"(
+Set custom name, e.g. to distinguish multiple modules of the same type.
 
 >>> path.add_module('EventInfoSetter')
 >>> ro = path.add_module('RootOutput', branchNames=['EventMetaData'])
@@ -409,35 +407,129 @@ https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
 [EventInfoSetter -> RootOutput_metadata_only]
 
 )")
-  .def("description", &Module::getDescription, return_value_policy<copy_const_reference>(), "Returns a description of this module.")
-  .def("package", &Module::getPackage, return_value_policy<copy_const_reference>(), "Returns package this module belongs to.")
-  .def("available_params", &_getParamInfoListPython, "Return list of all module parameters")
-  .def("has_properties", &Module::hasProperties)
-  .def("set_property_flags", &Module::setPropertyFlags, "Set module properties in the form of an ORed set of `basf2.ModulePropFlags`.")
-  .def("if_value", &Module::if_value, if_value_overloads())
-  .def("if_false", &Module::if_false, if_false_overloads())
-  .def("if_true", &Module::if_true, if_true_overloads())
-  .def("has_condition", &Module::hasCondition)
-  .def("get_all_condition_paths", &_getAllConditionPathsPython)
-  .def("get_all_conditions", &_getAllConditionsPython)
-  .add_property("logging",
-                make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
+  .def("description", &Module::getDescription, return_value_policy<copy_const_reference>(),
+       "Returns the description of this module.")
+  .def("package", &Module::getPackage, return_value_policy<copy_const_reference>(),
+       "Returns the package this module belongs to.")
+  .def("available_params", &_getParamInfoListPython,
+       "Return list of all module parameters as `ModuleParamInfo` instances")
+  .def("has_properties", &Module::hasProperties, (bp::arg("properties")),
+       R"DOCSTRING(Allows to check if the module has the given properties out of `ModulePropFlags` set.
+
+>>> if module.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
+>>>     ...
+
+Parameters:
+  properties (int): bitmask of `ModulePropFlags` to check for.
+)DOCSTRING")
+  .def("set_property_flags", &Module::setPropertyFlags, args("property_mask"),
+       "Set module properties in the form of an OR combination of `ModulePropFlags`.")
+  .def("if_value", &Module::if_value, (bp::arg("expression"), bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+       R"DOCSTRING(Sets a conditional sub path which will be executed after this
+module if the return value set in the module passes the given ``expression``.
+
+Modules can define a return value (int or bool) using ``setReturnValue()``,
+which can be used in the steering file to split the Path based on this value, for example
+
+>>> module_with_condition.if_value("<1", another_path)
+
+In case the return value of the ``module_with_condition`` for a given event is
+less than 1, the execution will be diverted into ``another_path`` for this event.
+
+You could for example set a special return value if an error occurs, and divert
+the execution into a path containing :b2:module:`RootOutput` if it is found;
+saving only the data producing/ produced by the error.
+
+After a conditional path has executed, basf2 will by default stop processing
+the path for this event. This behaviour can be changed by setting the
+``after_condition_path`` argument.
+
+Parameters:
+  expression (str): Expression to determine if the conditional path should be executed.
+      This should be one of the comparison operators ``<``, ``>``, ``<=``,
+      ``>=``, ``==``, or ``!=`` followed by a numerical value for the return value
+  condition_path (Path): path to execute in case the expression is fulfilled
+  after_condition_path (AfterConditionPath): What to do once the ``condition_path`` has been executed.
+)DOCSTRING")
+  .def("if_false", &Module::if_false, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+       "Sets a conditional sub path which will be executed after this module if "
+       "the return value of the module evaluates to False. This is equivalent to "
+       "calling `if_value` with ``expression=\"<1\"``")
+  .def("if_true", &Module::if_true, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+       "Sets a conditional sub path which will be executed after this module if "
+       "the return value of the module evaluates to True. It is equivalent to "
+       "calling `if_value` with ``expression=\">=1\"``")
+  .def("has_condition", &Module::hasCondition,
+       "Return true if a conditional path has been set for this module "
+       "using `if_value`, `if_true` or `if_false`")
+  .def("get_all_condition_paths", &_getAllConditionPathsPython,
+       "Return a list of all conditional paths set for this module using "
+       "`if_value`, `if_true` or `if_false`")
+  .def("get_all_conditions", &_getAllConditionsPython,
+       "Return a list of all conditional path expressions set for this module using "
+       "`if_value`, `if_true` or `if_false`")
+  .add_property("logging", make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)
-  .def("param", &Module::setParamPython, "Set parameter with given name to value.", args("name", "value"))
-  .def("param", &Module::setParamPythonDict,
-       "Set parameters using a dictionary: parameters given by the dictionary keys will be set to the corresponding values.")
-  .def("return_value", setReturnValueInt)
-  .def("set_log_level", &Module::setLogLevel)
-  .def("set_debug_level", &Module::setDebugLevel)
-  .def("set_abort_level", &Module::setAbortLevel)
-  .def("set_log_info", &Module::setLogInfo)
+  .def("return_value", setReturnValueInt, bp::arg("value"), \
+       "Set a return value. Can be used by custom modules to set the return value "
+       "used to determine if conditional paths are executed")
+  .def("set_log_level", &Module::setLogLevel, bp::arg("log_level"),
+       "Set the log level for this module. Messages below that level will be suppressed\n\n"
+       "Parameters:\n  log_level (LogLevel): Minimum level for messages to be displayed")
+  .def("set_debug_level", &Module::setDebugLevel, bp::arg("debug_level"),
+       "Set the debug level for this module. Debug messages with a higher level will "
+       "be suppressed. This function has no visible effect if the log level is "
+       "not set to `DEBUG <LogLevel.DEBUG>`\n\n"
+       "Parameters:\n  debug_level (int): Maximum debug level for messages to be displayed.")
+  .def("set_abort_level", &Module::setAbortLevel, bp::arg("abort_level"),
+       "Set the log level which will cause processing to be aborted. Usually "
+       "processing is only aborted for `FATAL <LogLevel.FATAL>` messages "
+       "but with this function it's possible to set this to a lower value\n\n"
+       "Parameters:\n  abort_level (LogLevel): log level which will cause processing to be aborted.")
+  .def("set_log_info", &Module::setLogInfo, args("log_info"),
+       "Set a `LogInfo` configuration object for this module to determine how log messages should be formatted")
   //tell python about the default implementations of virtual functions
-  .def("initialize", &Module::def_initialize)
-  .def("beginRun", &Module::def_beginRun)
-  .def("event", &Module::def_event)
-  .def("endRun", &Module::def_endRun)
-  .def("terminate", &Module::def_terminate)
+  .def("initialize", &Module::def_initialize,
+       "This function is called by the processing just once before processing any data "
+       "is processed. Modules can override this method to perform some actions at "
+       "startup once all parameters are set")
+  .def("beginRun", &Module::def_beginRun,
+       "This function is called by the processing just before a new run of data "
+       "is processed. Modules can override this method to perform actions which "
+       "are run dependent")
+  .def("event", &Module::def_event,
+       "This function is called by the processing once for each event."
+       "Modules should override this method to perform actions during event processing")
+  .def("endRun", &Module::def_endRun,
+       "This function is called by the processing just after a new run of data "
+       "is processed. Modules can override this method to perform actions which "
+       "are run dependent")
+  .def("terminate", &Module::def_terminate,
+       "This function is called by the processing once after all data "
+       "is processed. Modules can override this method to perform some cleanup at "
+       "shutdown. The terminate functions of all modules are called in reverse "
+       "order of the `initialize` calls.")
   ;
+  {
+    // The param function is overloaded with different signatures which makes
+    // the boost docstring very useless so we handcraft a docstring
+    docstring_options param_options(true, false, false); //userdef, py sigs, c++ sigs
+    module
+    .def("param", &Module::setParamPython)
+    .def("param", &Module::setParamPythonDict, R"DOCSTRING(param(key, value=None)
+This method can be used to set module parameters. There are two ways of
+calling this function:
+
+1. With two arguments where the first is the name of the parameter and the second is the value.
+
+   >>> module.param("parameterName", "parameterValue")
+
+2. Or with just one parameter which is a dictionary mapping multiple parameter names to their values
+
+   >>> module.param({"parameter1": "value1", "parameter2": True})
+)DOCSTRING")
+    ;
+  }
 
   register_ptr_to_python<ModulePtr>();
 }

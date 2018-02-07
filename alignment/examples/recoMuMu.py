@@ -10,6 +10,7 @@ import modularAnalysis as ana
 main = basf2.create_path()
 
 main.add_module("RootInput")
+main.add_module("HistoManager", histoFileName="CollectorOutput.root")
 main.add_module("Gearbox")
 main.add_module("Geometry")
 

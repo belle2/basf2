@@ -45,24 +45,24 @@ namespace Belle2 {
     SecMapTrainerBaseModule();
 
     /** SecMapTrainerVXDTFModule destructor. */
-    virtual ~SecMapTrainerBaseModule() {}
+    ~SecMapTrainerBaseModule() {}
 
     /** initialize. */
-    virtual void initialize();
+    void initialize() override;
 
     /** beginRun. */
-    virtual void beginRun()
+    void beginRun() override
     { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - beginRun ~~~~~~~~~~"); }
 
     /** event. */
-    virtual void event();
+    void event() override;
 
     /** endRun. */
-    virtual void endRun()
+    void endRun() override
     { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - end of endRun ~~~~~~~~~~"); }
 
     /** terminate. */
-    virtual void terminate();
+    void terminate() override;
 
     /** initialize variables to avoid nondeterministic behavior. */
     void InitializeVariables() {}

@@ -48,18 +48,38 @@ def get_path(
     path.add_module('Progress')
 
     path.add_module('Gearbox', fileName=gearboxFile) if gearboxFile else path.add_module('Gearbox')
-    path.add_module('Geometry', components=geometryComponents if geometryComponents else [],
-                    excludedComponents=['MagneticField'] if magnetOff else [])
+
+    if geometryComponents:
+        path.add_module('Geometry', components=geometryComponents, excludedComponents=['MagneticField'] if magnetOff else [])
+    else:
+        path.add_module('Geometry', excludedComponents=['MagneticField'] if magnetOff else [])
 
     if doReconstruction:
-        reco.add_reconstruction(path, pruneTracks=False, components=geometryComponents if geometryComponents else [])
+        if geometryComponents:
+            reco.add_reconstruction(path, pruneTracks=False, components=geometryComponents)
+        else:
+            reco.add_reconstruction(path, pruneTracks=False)
 
     if doCosmicsReconstruction:
-        reco.add_cosmics_reconstruction(
-            path,
-            pruneTracks=False,
-            components=geometryComponents if geometryComponents else [],
-            merge_tracks=True)
+        import pxd
+        import svd
+
+        if not geometryComponents or 'PXD' in geometryComponents:
+            pxd.add_pxd_reconstruction(path)
+        if not geometryComponents or 'SVD' in geometryComponents:
+            svd.add_svd_reconstruction(path)
+
+        if geometryComponents:
+            reco.add_cosmics_reconstruction(
+                path,
+                pruneTracks=False,
+                components=geometryComponents,
+                merge_tracks=True)
+        else:
+            reco.add_cosmics_reconstruction(
+                path,
+                pruneTracks=False,
+                merge_tracks=True)
 
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)

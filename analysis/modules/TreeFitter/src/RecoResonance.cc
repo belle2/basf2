@@ -20,7 +20,7 @@ namespace TreeFitter {
   RecoResonance::RecoResonance(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoComposite(particle, mother) {}
 
-  ErrCode RecoResonance::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoResonance::initParticleWithMother([[gnu::unused]] FitParams* fitparams)
   {
     return ErrCode::success;
   }

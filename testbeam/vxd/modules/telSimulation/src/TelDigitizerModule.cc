@@ -72,9 +72,9 @@ void TelDigitizerModule::initialize()
 
   storeDigits.registerInDataStore();
   /* This always makes problems.
-  storeMCParticles.required();
-  storeSimHits.required();
-  storeTrueHits.required();
+  storeMCParticles.isRequired();
+  storeSimHits.isRequired();
+  storeTrueHits.isRequired();
   */
 
   RelationArray relDigitsToMCParticles(storeDigits, storeMCParticles);

@@ -34,6 +34,7 @@ namespace Belle2 {
       , m_positionError(0)
       , m_SNR(0)
       , m_seedSNR(0)
+      , m_seedIndex(-1)
       , m_strips(4) {m_strips.clear();};
 
     bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
@@ -124,7 +125,11 @@ namespace Belle2 {
                                              0.5 * landauTail * landauTail);
       }
 
+      //Lorentz shift correction
+      const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(m_vxdID));
+      m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);
 
+      m_timeError = 6; //order of magnitude
     };
 
     bool SimpleClusterCandidate::isGoodCluster()

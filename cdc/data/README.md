@@ -16,6 +16,11 @@ Format: super layerID (0-8), layerID in the super-layer (0-), wireID(0-), boardI
  - sort in order of alpha
  (- Unit: cm and nsec).
  (- unsigned driftL).
+* xt_v3.0.1_chebyshev.dat.gz : went back to xt_v2.1.dat; modified strange two
+                               bins (lyr=9,lr=0,thet=60,alpha=60 and
+                               lyr=11,lr=0,theta=60,alpha=50); recreated simple
+                               poly. ver. of xt.dat; then converted to
+                               chebyshev poly. version.
 * xt_v3_chebyshev.dat.gz     : created from xt_v3.
 * xt_v3.dat                  : created from xt_v2.1 <- obsolete.
 * xt_noB_v1_chebyshev.dat.gz : created from xt_noB_v1.

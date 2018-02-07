@@ -34,17 +34,17 @@ configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', t
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
-analysis_main.add_module('MCMatcherParticles', listName='Bplus:generic', looseMCMatching=True)
+analysis_main.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
 
 # now the FEI reconstruction is done
 # and we're back in analysis_main pathB
 
 # apply some very loose cuts to reduce the number
 # of Btag candidates
-applyCuts('Bplus:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
+applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200')
 
 
-BplushadronicList = ['Bplus:generic']
+BplushadronicList = ['B+:generic']
 
 
 skimOutputUdst('feiHadronicBplus', BplushadronicList)

@@ -71,7 +71,8 @@ B2INFO('Some other message')
 for (level, num) in logging.log_stats.items():
     print('Messages for level %8s: %2d' % (level.name, num))
 
-eventinfosetter = register_module('EventInfoSetter')
+main = create_path()
+eventinfosetter = main.add_module('EventInfoSetter')
 # configure logging for the EventInfoSetter module:
 # loglevel ERROR and info for ERROR message is file name and line number
 eventinfosetter.logging.log_level = LogLevel.ERROR
@@ -86,8 +87,6 @@ logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 
 # run some events to see time stamp
 set_log_level(LogLevel.INFO)
-main = create_path()
-main.add_module(eventinfosetter)
 eventinfosetter.param('evtNumList', [30])
 main.add_module('EventInfoPrinter', logLevel=LogLevel.DEBUG)
 process(main)

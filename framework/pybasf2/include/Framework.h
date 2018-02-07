@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FRAMEWORK_H_
-#define FRAMEWORK_H_
+#pragma once
 
 #include <boost/python/object.hpp>
 
@@ -163,5 +162,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* FRAMEWORK_H_ */

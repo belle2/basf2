@@ -24,11 +24,12 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
       StoreArray<Particle> particles;
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
+      particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();

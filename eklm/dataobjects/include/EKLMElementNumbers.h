@@ -35,48 +35,63 @@ namespace Belle2 {
     virtual ~EKLMElementNumbers();
 
     /**
-     * Check if endcap number is correct (fatal error if not).
-     * @param[in] endcap Endcap number.
+     * Check if endcap number is correct.
+     * @param[in] endcap     Endcap number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the endcap number is correct.
      */
-    void checkEndcap(int endcap) const;
+    bool checkEndcap(int endcap, bool fatalError = true) const;
 
     /**
-     * Check if layer number is correct (fatal error if not).
-     * @param[in] layer Layer number.
+     * Check if layer number is correct.
+     * @param[in] layer      Layer number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the layer number is correct.
      */
-    void checkLayer(int layer) const;
+    bool checkLayer(int layer, bool fatalError = true) const;
 
     /**
      * Check if detector layer number is correct (fatal error if not).
      * Endcap number must be checked separately.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
+     * @param[in] endcap     Endcap number.
+     * @param[in] layer      Layer number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the detector layer number is correct.
      */
-    void checkDetectorLayer(int endcap, int layer) const;
+    bool checkDetectorLayer(int endcap, int layer,
+                            bool fatalError = true) const;
 
     /**
      * Check if sector number is correct (fatal error if not).
-     * @param[in] sector Sector number.
+     * @param[in] sector     Sector number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the sector number is correct.
      */
-    void checkSector(int sector) const;
+    bool checkSector(int sector, bool fatalError = true) const;
 
     /**
      * Check if plane number is correct (fatal error if not).
-     * @param[in] plane Plane number.
+     * @param[in] plane      Plane number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the plane number is correct.
      */
-    void checkPlane(int plane) const;
+    bool checkPlane(int plane, bool fatalError = true) const;
 
     /**
      * Check if segment number is correct (fatal error if not).
-     * @param[in] segment Segment number.
+     * @param[in] segment    Segment number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the segment number is correct.
      */
-    void checkSegment(int segment) const;
+    bool checkSegment(int segment, bool fatalError = true) const;
 
     /**
      * Check if strip number is correct (fatal error if not).
-     * @param[in] strip Strip number.
+     * @param[in] strip      Strip number.
+     * @param[in] fatalError Issue fatal error (default) or not.
+     * @return True if the strip number is correct.
      */
-    void checkStrip(int strip) const;
+    bool checkStrip(int strip, bool fatalError = true) const;
 
     /**
      * Get detector layer number.
@@ -104,7 +119,7 @@ namespace Belle2 {
      * @param[in] sector Sector number.
      * @return Number of sector.
      * @details
-     * Number is from 1 to 4*14*2 = 112.
+     * Number is from 1 to 4*26 = 104.
      */
     int sectorNumber(int endcap, int layer, int sector) const;
 

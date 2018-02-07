@@ -37,14 +37,20 @@ args = sys.argv
 
 
 class Ntuple(Module):
+    ''' t0const ntpule infomation '''
+
     global t0const
+    #: t0 constant per channel per slot
     t0const = {0: 0.0}
 
+    #: input t0const root file
     f = ROOT.TFile.Open('t0const_slot' + str(args[1]) + '.root')
     for event in f.chT0:
         t0const[event.channel] = event.t0Const
 
+    #: scatter plot before t0 calibartion
     histTimeCh = TH2F('before T0Cal slot#' + str(args[1]), 'before T0Cal slot#' + str(args[1]), 512, 0, 511, 500, 50, 100)
+    #: scatter plot after t0 calibartion
     histCalTimeCh = TH2F('after T0Cal slot#' + str(args[1]), 'after T0Cal slot#' + str(args[1]), 512, 0, 511, 500, 50, 100)
 
     histTimeCh.GetXaxis().SetTitle('channel')
@@ -53,8 +59,13 @@ class Ntuple(Module):
     histCalTimeCh.GetYaxis().SetTitle('time [ns]')
 
     def initialize(self):
+        ''' Initialize the Module: output root file '''
+
+        #: output file name
         self.file = ROOT.TFile('t0CalTime_slot' + str(args[1]) + '.root', 'recreate')
+        #: output tree name
         self.tree = ROOT.TTree('laser', '')
+        #: tree strruct
         self.data = TreeStruct()
 
         for key in TreeStruct.__dict__.keys():
@@ -65,6 +76,8 @@ class Ntuple(Module):
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def event(self):
+        ''' Event processor: fill the tree and scatter plots '''
+
         digits = Belle2.PyStoreArray('TOPDigits')
         for digit in digits:
             if digit.getModuleID() == int(args[1]):
@@ -85,9 +98,11 @@ class Ntuple(Module):
                 self.tree.Fill()
 
                 self.histTimeCh.Fill(digit.getChannel(), digit.getTime())
-                self.histCalTimeCh.Fill(digit.getChannel(), digit.getTime() + t0const.get(digit.getChannel()))
+                self.histCalTimeCh.Fill(digit.getChannel(), digit.getTime() - t0const.get(digit.getChannel()))
 
     def terminate(self):
+        ''' Write the file '''
+
         self.file.cd()
         self.file.Write()
         self.histTimeCh.Write()

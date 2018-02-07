@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to load reconstructed
 # final state particles as Particles:
 # - Tracks are loaded as e/mu/pi/K/p Particles

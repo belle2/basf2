@@ -30,7 +30,7 @@ namespace TreeFitter {
   {
   }
 
-  ErrCode RecoParticle::initMotherlessParticle(FitParams* fitparams)
+  ErrCode RecoParticle::initMotherlessParticle([[gnu::unused]]  FitParams* fitparams)
   {
     return ErrCode::success;
   }

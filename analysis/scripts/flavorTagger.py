@@ -232,24 +232,24 @@ KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
-flavorTaggerVariables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC, SVD)')
-flavorTaggerVariables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
-flavorTaggerVariables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
-flavorTaggerVariables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+flavorTaggerVariables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+flavorTaggerVariables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
+flavorTaggerVariables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
+flavorTaggerVariables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
 
-flavorTaggerVariables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC, SVD)')
-flavorTaggerVariables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
-flavorTaggerVariables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
-flavorTaggerVariables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+flavorTaggerVariables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+flavorTaggerVariables.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
+flavorTaggerVariables.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
+flavorTaggerVariables.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
 
-flavorTaggerVariables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC, SVD)')
-flavorTaggerVariables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
-flavorTaggerVariables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
-flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC, SVD)')
+flavorTaggerVariables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+flavorTaggerVariables.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
+flavorTaggerVariables.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
+flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
 
-flavorTaggerVariables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
-flavorTaggerVariables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
-flavorTaggerVariables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC, SVD)')
+flavorTaggerVariables.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
+flavorTaggerVariables.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
+flavorTaggerVariables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
 
 
 def setVariables():
@@ -379,10 +379,8 @@ def setVariables():
         'M',
         'cosAngleBetweenMomentumAndVertexVector',
         'lambdaZError',
-        'daughter(0,pionID)',
         'daughter(0,p)',
         'daughter(0,useCMSFrame(p))',
-        'daughter(1,protonID)',
         'daughter(1,p)',
         'daughter(1,useCMSFrame(p))',
         'useCMSFrame(p)',
@@ -390,6 +388,10 @@ def setVariables():
         'distance',
         'chiProb',
     ]
+    if getBelleOrBelle2() != "Belle":
+        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
+        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
+
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',

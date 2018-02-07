@@ -92,10 +92,10 @@ void RandomGenerator::setState(int barrier)
   hash.getHash(sizeof(m_state), (unsigned char*) m_state);
 
   //Only prepare debugoutput if we actually want to show it. This is almost
-  //equivalent to B2DEBUG(10, ...); but we need to loop over states for
+  //equivalent to B2DEBUG(200, ...); but we need to loop over states for
   //printing so we could not put it in a normal B2DEBUG statement easily.
 #ifndef LOG_NO_B2DEBUG
-  if (Belle2::LogSystem::Instance().isLevelEnabled(Belle2::LogConfig::c_Debug, 100, PACKAGENAME())) {
+  if (Belle2::LogSystem::Instance().isLevelEnabled(Belle2::LogConfig::c_Debug, 200, PACKAGENAME())) {
     std::stringstream info;
     info << "Random Generator State info:\n";
     info << "  seed (" << std::dec << m_seed.size() << "):\n    ";
@@ -115,7 +115,7 @@ void RandomGenerator::setState(int barrier)
     for (int i = 0; i < 16; ++i) {
       info << ((i % 4 == 0) ? "\n    " : " ") << std::setw(16) << std::setfill('0') << std::hex << m_state[i];
     }
-    _B2LOGMESSAGE(Belle2::LogConfig::c_Debug, 100, info.str(), PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
+    _B2LOGMESSAGE(Belle2::LogConfig::c_Debug, 200, info.str(), PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
   }
 #endif
 }

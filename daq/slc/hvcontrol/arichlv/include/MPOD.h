@@ -78,6 +78,8 @@ EXPORT int     setChannelSwitch(HSNMP session, int channel, int value);
 EXPORT int     setOutputSwitch(HSNMP session, int channel, int value);
 EXPORT int     getChannelSwitch(HSNMP session, int channel);
 EXPORT int     getOutputSwitch(HSNMP session, int channel);
+EXPORT int     getOutputUserConfig(HSNMP session, int channel);
+EXPORT int     setOutputUserConfig(HSNMP session, int channel, int value);
 EXPORT int     setHighVoltageGroupsSwitch(HSNMP session, int value);
 EXPORT int     getHighVoltageGroupsSwitch(HSNMP session);
 EXPORT int     setLowVoltageGroupsSwitch(HSNMP session, int value);

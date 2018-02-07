@@ -22,7 +22,7 @@ REG_MODULE(PXDRawDHHDumper)
 
 void PXDRawDHHDumperModule::initialize(void)
 {
-  m_storeRaw.required();
+  m_storeRaw.isRequired();
 }
 
 void PXDRawDHHDumperModule::event(void)

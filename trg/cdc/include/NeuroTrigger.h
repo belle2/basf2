@@ -3,6 +3,11 @@
 
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/BinnedEventT0.h>
+
 namespace Belle2 {
 
   class CDCTriggerSegmentHit;
@@ -77,6 +82,8 @@ namespace Belle2 {
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
+      /** If true, determine event time from relevant hits if it is missing. */
+      bool T0fromHits = false;
     };
 
     /** Default constructor. */
@@ -110,12 +117,9 @@ namespace Belle2 {
     /** set fixed point precision */
     void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
 
-    /** set name of the data store elements */
-    void setCollectionNames(std::string hitCollectionName, std::string eventTimeName)
-    {
-      m_hitCollectionName = hitCollectionName;
-      m_eventTimeName = eventTimeName;
-    }
+    /** set the hit collection and event time to required
+     * and store the hit collection name */
+    void initializeCollections(std::string hitCollectionName, std::string eventTimeName);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -128,20 +132,21 @@ namespace Belle2 {
     /** add an MLP to the list of networks */
     void addMLP(const CDCTriggerMLP& newMLP) { m_MLPs.push_back(newMLP); }
 
-    /** Select one expert MLP based on the track parameters of the given track
-     * and the hit pattern.
-     * This function assumes that sectors are unique.
-     * The first matching sector is returned without checking the rest.
-     * @return index of the selected MLP, -1 if the track does not fit any sector
-     */
-    int selectMLP(const CDCTriggerTrack& track);
-
     /** Select all matching expert MLPs based on the given track parameters.
-     * This function is used only during training to train overlapping sectors.
-     * At the end of the training, sectors are redefined to be unique.
+     * If the sectors are overlapping, there may be more than one matching expert.
+     * During training this is intended, afterwards sectors should be redefined to be unique.
+     * For unique geometrical sectors, this function can still find several experts
+     * with different sector patterns.
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
     std::vector<int> selectMLPs(float phi0, float invpt, float theta);
+
+    /** Select one MLP from a list of sector indices.
+     * The selected expert either matches the given sector pattern,
+     * or has no pattern restriction. An unrestricted expert is returned only
+     * if there is no exactly matching expert.
+     * @return index of the selected MLP, -1 if no matching MLP is found */
+    int selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);
@@ -152,6 +157,12 @@ namespace Belle2 {
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
+
+    /** Read out the event time and store it.
+     * If there is no valid event time, it can be determined
+     * from the shortest priority time of all hit candidates,
+     * if the option is enabled for the given sector. */
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track);
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
@@ -196,6 +207,10 @@ namespace Belle2 {
     double m_idRef[9][2] = {};
     /** 2D crossing angle of current track */
     double m_alpha[9][2] = {};
+    /** Event time of current event / track */
+    int m_T0 = 0;
+    /** Flag to show if stored event time is valid */
+    bool m_hasT0 = false;
     /** Fixed point precision in bit after radix point.
      *  8 values:
      *  - 2D track parameters: omega, phi
@@ -204,10 +219,13 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
+
+    /** StoreArray containing the input track segment hits. */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** StoreObjPtr containing the event time. */
+    StoreObjPtr<BinnedEventT0> m_eventTime;
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
-    /** Name of the StoreObjPtr containing the event time. */
-    std::string m_eventTimeName;
   };
 }
 #endif

@@ -11,17 +11,20 @@
 #ifndef VXDTFFILTERS_HH
 #define VXDTFFILTERS_HH
 
-#include "tracking/dataobjects/FullSecID.h"
+#include <tracking/dataobjects/FullSecID.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/DistanceInTimeUside.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/DistanceInTimeVside.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DistanceInTime.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
@@ -34,14 +37,16 @@
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
-#include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
+#include <tracking/trackFindingVXD/filterTools/ObserverPrintResults.h>
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h> // empty observer
 
 #include <tracking/dataobjects/SectorMapConfig.h>
 
-#include "vxd/dataobjects/VxdID.h"
+#include <framework/logging/Logger.h>
+
+#include <vxd/dataobjects/VxdID.h>
 #include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
-#include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
+#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 
 #include <TString.h>
 //#include <unordered_map>
@@ -51,7 +56,11 @@
 
 namespace Belle2 {
 
-
+  /**
+    Class that contains all the static sectors to which the filters are attached.
+    It contains functions that are used to attach and retrieve filters.
+    Also the type of the filters is defined in this class
+  */
   template<class point_t>
   class VXDTFFilters final {
   public:
@@ -64,11 +73,13 @@ namespace Belle2 {
     /// big working 2-hits-example used for redesign of VXDTF.
     typedef decltype(
       (
-        0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.&&
-        0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.
+        0. <= DistanceInTimeUside<point_t>() <= 0. &&
+        0. <= DistanceInTimeVside<point_t>() <= 0. &&
+        0. <= Distance3DSquared<point_t>() <= 0.&&
+        0. <= Distance2DXYSquared<point_t>() <= 0.&&
+        0. <= Distance1DZ<point_t>() <= 0.&&
+        0. <= SlopeRZ<point_t>() <= 0.&&
+        0. <= Distance3DNormed<point_t>() <= 0.
       )
     ) twoHitFilter_t;
 
@@ -88,6 +99,7 @@ namespace Belle2 {
     /// big working example for 3-hits:
     typedef decltype(
       (
+        0. <= DistanceInTime<point_t>() <= 0. &&
         0. <= Angle3DSimple<point_t>()   <= 0.&&
         0. <= CosAngleXY<point_t>()   <= 0.&&
         0. <= AngleRZSimple<point_t>()   <= 0.&&
@@ -161,7 +173,7 @@ namespace Belle2 {
       return addedSectors;
     }
 
-
+    /// adds a two hit filter
     int addTwoHitFilter(FullSecID outer,
                         FullSecID inner,
                         const twoHitFilter_t& filter)
@@ -175,7 +187,7 @@ namespace Belle2 {
     }
 
 
-
+    /// adds a three hit filter
     int addThreeHitFilter(FullSecID outer,
                           FullSecID center,
                           FullSecID inner,
@@ -204,7 +216,9 @@ namespace Belle2 {
     //  std::pair<float, float> normalizedLocalCoordinates) const
     //  {  }
 
-    /// returns pointer to static sector for given fullSecID. if fullSecID is not found, a nullptr is returned.
+    /** returns pointer to static sector for given fullSecID. if fullSecID is not found, a nullptr is returned.
+      @param secID: FullSecID of the filter to be retrieved
+    */
     const staticSector_t* getStaticSector(const FullSecID secID) const
     {
       auto sectorPosition = m_compactSecIDsMap[ secID ];
@@ -212,7 +226,10 @@ namespace Belle2 {
       return m_staticSectors[ sectorPosition ];
     }
 
-
+    /** retrieves a two hit filter:
+      @param outer: FullSecID of the outer static sector this filter is attached to
+      @param inner: FullSecID of the inner static sector this filter is attached to
+    */
     const twoHitFilter_t getTwoHitFilters(const FullSecID& outer,
                                           const FullSecID& inner) const
     {
@@ -255,6 +272,9 @@ namespace Belle2 {
 
     /// returns the configuration settings for this VXDTFFilters.
     const SectorMapConfig& getConfig(void) const { return m_testConfig; }
+    /** set the configuration which is used to create this filter
+      @param config: the new configuration
+    */
     void setConfig(const SectorMapConfig& config) { m_testConfig = config; }
 
 
@@ -286,6 +306,10 @@ namespace Belle2 {
     /// Retrieves from the current TDirectory all the VXDTFFilters
     bool retrieveFromRootFile(const TString* dirName)
     {
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2FATAL("Trying to modify a locked filter! A locked filter is not supposed to be changed anymore!");
+      }
 
       if (! m_testConfig.Read("config"))
         return false;
@@ -299,11 +323,16 @@ namespace Belle2 {
       return true;
     };
 
-    /// during the trainings phase the sublayer ids have to be updated
-    /// @param sector : FullSecID of the sector to be updated (SubLayerID of sector will be ignored while searching for it!)
-    /// @param sublayer : new value for the sublayer, the new SubLayerID will be 0 if sublayer==0, and 1 else
+    /** during the trainings phase the sublayer ids have to be updated
+      @param sector : FullSecID of the sector to be updated (SubLayerID of sector will be ignored while searching for it!)
+      @param sublayer : new value for the sublayer, the new SubLayerID will be 0 if sublayer==0, and 1 else */
     bool setSubLayerIDs(FullSecID sector, int sublayer)
     {
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2FATAL("Trying to modify a locked filter! A locked filter is not supposed to be changed anymore!");
+      }
+
       // first update the static sector
       // the static sector is retrieved from the compactid which automatically ignores the sublayer id
       auto sectorPosition = m_compactSecIDsMap[ sector ];
@@ -315,6 +344,45 @@ namespace Belle2 {
       // then update the fullsectorid in the compactsectoridmap, the sublayerid of sector will be ignored when searching for sector to update
       return m_compactSecIDsMap.setSubLayerID(sector, sublayer);
     }
+
+    /** This function should be called only AFTER all adjustments to the filters have been performed.
+      It sets m_preventModification to true and the VXDTFFilter is locked meaning that all function trying to modify it
+      will be doing nothing. After a filter is locked it can NOT be unlocked. */
+    void lockFilters() { m_preventModification = true; };
+
+    /** modifies the 2SP-filters according to the functions given
+        @param adjustFunctions: a vector of vectors that contain exactly two strings, the first string will be interpreted
+                                integer, the second one will be interpreted TF1 regexp. */
+    void modify2SPFilters(const std::vector< std::tuple<int, std::string > >& adjustFunctions)
+    {
+
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2FATAL("Trying to modify a locked filter! A locked filter is not supposed to be changed anymore!");
+      }
+
+      for (auto staticSector : m_staticSectors) {
+        if (staticSector == nullptr) continue;
+        staticSector->modify2SPFilters(adjustFunctions);
+      }
+    };
+
+    /** modifies the 3SP-filters according to the functions given
+        @param adjustFunctions: a vector of vectors that contain exactly two strings, the first string will be interpreted
+                                 integer, the second one will be interpreted as regexp to generate a TF1. */
+    void modify3SPFilters(const std::vector< std::tuple<int, std::string > >& adjustFunctions)
+    {
+
+      // locked filters cannot be modified
+      if (m_preventModification) {
+        B2FATAL("Trying to modify a locked filter! A locked filter is not supposed to be changed anymore!");
+      }
+
+      for (auto staticSector : m_staticSectors) {
+        if (staticSector == nullptr) continue;
+        staticSector->modify3SPFilters(adjustFunctions);
+      }
+    };
 
   private:
 
@@ -367,19 +435,19 @@ namespace Belle2 {
       treeName.Append(c_CompactSecIDstreeName);
       TTree* tree = (TTree*) gFile->Get(treeName);
       UInt_t layer, ladder, sensor;
-      tree->SetBranchAddress("layer" , & layer);
-      tree->SetBranchAddress("ladder", & ladder);
-      tree->SetBranchAddress("sensor", & sensor);
+      if (tree->SetBranchAddress("layer" , & layer) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (tree->SetBranchAddress("ladder", & ladder) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (tree->SetBranchAddress("sensor", & sensor) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       std::vector< double >* normalizedUsup = new std::vector< double> ();
-      tree->SetBranchAddress("normalizedUsup", & normalizedUsup);
+      if (tree->SetBranchAddress("normalizedUsup", & normalizedUsup) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
-      tree->SetBranchAddress("normalizedVsup", & normalizedVsup);
+      if (tree->SetBranchAddress("normalizedVsup", & normalizedVsup) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       std::vector< std::vector< unsigned int > >* fullSecIDs =
         new std::vector< std::vector< unsigned int > > ();
-      tree->SetBranchAddress("fullSecID", & fullSecIDs);
+      if (tree->SetBranchAddress("fullSecID", & fullSecIDs) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
 
       for (Long64_t i = 0; i < tree->GetEntries() ; i++) {
@@ -462,8 +530,8 @@ namespace Belle2 {
       twoHitFilter.setBranchAddress(sp2tree, "filter");
 
       unsigned int outerFullSecID2sp, innerFullSecID2sp;
-      sp2tree->SetBranchAddress("outerFullSecID", & outerFullSecID2sp);
-      sp2tree->SetBranchAddress("innerFullSecID", & innerFullSecID2sp);
+      if (sp2tree->SetBranchAddress("outerFullSecID", & outerFullSecID2sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (sp2tree->SetBranchAddress("innerFullSecID", & innerFullSecID2sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       for (Long64_t i = 0 ; i < sp2tree->GetEntries() ; i++) {
         sp2tree->GetEntry(i);
@@ -483,9 +551,9 @@ namespace Belle2 {
 
       unsigned int outerFullSecID3sp, centerFullSecID3sp,
                innerFullSecID3sp;
-      sp3tree->SetBranchAddress("outerFullSecID", & outerFullSecID3sp);
-      sp3tree->SetBranchAddress("centerFullSecID", & centerFullSecID3sp);
-      sp3tree->SetBranchAddress("innerFullSecID", & innerFullSecID3sp);
+      if (sp3tree->SetBranchAddress("outerFullSecID", & outerFullSecID3sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (sp3tree->SetBranchAddress("centerFullSecID", & centerFullSecID3sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (sp3tree->SetBranchAddress("innerFullSecID", & innerFullSecID3sp) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 
       for (Long64_t i = 0 ; i < sp3tree->GetEntries() ; i++) {
         sp3tree->GetEntry(i);
@@ -499,6 +567,9 @@ namespace Belle2 {
       return true;
     }
 
+    /** Adds the static sector:
+      TODO: need documentation for the parameters
+    */
     int addSectorsOnSensor(const std::vector< double>&   normalizedUsup,
                            const std::vector< double>&   normalizedVsup,
                            const std::vector< std::vector< unsigned int >>&
@@ -532,8 +603,14 @@ namespace Belle2 {
     parameters, etc.  */
     SectorMapConfig m_testConfig;
 
+    /// name of the tree the SecIDs are stored in when persisted
     const char* c_CompactSecIDstreeName = "CompactSecIDs";
 
+    /** The filters are not supposed to be altered after initialization (typically in the Module::initialize() function).
+    To prevent accidental alteration of the contained filters one can set this parameter to true
+    which will not allow further modification of the stored filters.
+    A check of this variable should be included in every public function that modifies filters! */
+    bool m_preventModification = false;
   };
 
 }

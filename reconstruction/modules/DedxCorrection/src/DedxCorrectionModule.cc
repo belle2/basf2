@@ -36,11 +36,6 @@ DedxCorrectionModule::DedxCorrectionModule() : Module()
 
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
-
-  // !!!!! At some point functionality to import the calibration constants
-  // should be added here (for now just use some arbitrary numbers for testing)
-  initializeParameters();
-
 }
 
 DedxCorrectionModule::~DedxCorrectionModule() { }
@@ -51,9 +46,32 @@ void DedxCorrectionModule::initialize()
   // register in datastore
   m_cdcDedxTracks.isRequired();
 
-  // prepare the calibration constants
-  for (auto awire : m_DBGains)
-    m_wireGains[awire.getWireID()] = awire.getWireGain();
+
+  // make sure the calibration constants are reasonable
+  // run gains
+  if (m_DBRunGain->getRunGain() == 0)
+    B2ERROR("Run gain is zero!");
+
+  // wire gains
+  for (unsigned int i = 0; i < 14336; ++i) {
+    if (m_DBWireGains->getWireGain(i) == 0)
+      B2ERROR("Wire gain " << i << " is zero!");
+  }
+
+  // cosine correction (store the bin edges for extrapolation)
+  int ncosbins = m_DBCosineCor->getNBins();
+  for (int i = 0; i < ncosbins; ++i) {
+    double gain = m_DBCosineCor->getMean(2 / ncosbins - 1);
+    if (gain == 0)
+      B2ERROR("Cosine gain is zero...");
+  }
+
+  // these are arbitrary and should be extracted from the calibration
+  m_alpha = 1.35630e-02;
+  m_gamma = -6.78907e-04;
+  m_delta = 1.18037e-02;
+  m_power = 1.66268e+00;
+  m_ratio = 9.94775e-01;
 }
 
 void DedxCorrectionModule::event()
@@ -81,19 +99,28 @@ void DedxCorrectionModule::event()
     //
     // **************************************************
 
+    // hit level
     int nhits = dedxTrack.size();
     for (int i = 0; i < nhits; ++i) {
 
-      double newdedx = StandardCorrection(dedxTrack.getWire(i), dedxTrack.getDedx(i));
+      double newdedx = dedxTrack.getDedx(i);
+      StandardCorrection(dedxTrack.getWire(i), dedxTrack.getCosTheta(), newdedx);
       dedxTrack.setDedx(i, newdedx);
+    } // end loop over hits
+
+    // layer level
+    int nlhits = dedxTrack.getNLayerHits();
+    for (int i = 0; i < nlhits; ++i) {
+
+      double newdedx = dedxTrack.getLayerDedx(i);
+      StandardCorrection(dedxTrack.getWireLongestHit(i), dedxTrack.getCosTheta(), newdedx);
+      dedxTrack.setLayerDedx(i, newdedx);
     } // end loop over hits
 
     calculateMeans(&(dedxTrack.m_dedx_avg),
                    &(dedxTrack.m_dedx_avg_truncated),
                    &(dedxTrack.m_dedx_avg_truncated_err),
-                   dedxTrack.dedx);
-
-    //    CDCDedxTrack* newCDCDedxTrack = dedxArray.appendNew(dedxTrack);
+                   dedxTrack.m_lDedx);
   } // end loop over tracks
 }
 
@@ -103,70 +130,49 @@ void DedxCorrectionModule::terminate()
   B2INFO("DedxCorrectionModule exiting...");
 }
 
-void DedxCorrectionModule::initializeParameters()
+void DedxCorrectionModule::RunGainCorrection(double& dedx) const
 {
 
-  B2INFO("DedxCorrectionModule: initializing calibration constants...");
-
-  // For now just initialize the parameters to an arbitrary values for
-  // debugging. Eventually, this should get the constants from the
-  // calibration database.
-  m_runGain = 1.0;
-
-  // these are arbitrary and should be extracted from the calibration
-  m_alpha = 1.35630e-02;
-  m_gamma = -6.78907e-04;
-  m_delta = 1.18037e-02;
-  m_power = 1.66268e+00;
-  m_ratio = 9.94775e-01;
+  double gain = m_DBRunGain->getRunGain();
+  if (gain != 0)
+    dedx = dedx / gain;
 }
 
-double DedxCorrectionModule::RunGainCorrection(double& dedx) const
+void DedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
 {
 
-  if (m_runGain != 0) {
-    double newDedx = dedx / m_runGain;
-    return newDedx;
-  } else
-    return dedx;
+  double gain = m_DBWireGains->getWireGain(wireID);
+  if (gain != 0)
+    dedx = dedx / gain;
 }
 
-double DedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
+void DedxCorrectionModule::CosineCorrection(double costh, double& dedx) const
 {
 
-  auto it = m_wireGains.find(wireID);
-  if (it != m_wireGains.end()) {
-    //    double cor = it->second/66.18;
-    //    B2INFO("correcting by " << it->second/66.18 << ": " << dedx << "\t" << dedx/cor);
-    double newDedx = dedx / it->second;
-    return newDedx;
-  } else
-    return dedx;
+  double coscor = m_DBCosineCor->getMean(costh);
+  if (coscor != 0)
+    dedx = dedx / coscor;
 }
 
-double DedxCorrectionModule::HadronCorrection(double costheta, double dedx) const
+void DedxCorrectionModule::HadronCorrection(double costheta, double& dedx) const
 {
 
-  dedx = dedx / 550.00;
-
-  return D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx) * 550;
+  dedx = D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx) * 550;
 }
 
-double DedxCorrectionModule::StandardCorrection(int wireID, double dedx) const
+void DedxCorrectionModule::StandardCorrection(int wireID, double costheta, double& dedx) const
 {
 
-  double temp = dedx;
+  RunGainCorrection(dedx);
 
-  //temp = RunGainCorrection(temp);
+  WireGainCorrection(wireID, dedx);
 
-  temp = WireGainCorrection(wireID, temp);
+  CosineCorrection(costheta, dedx);
 
-  //temp = HadronCorrection(costheta, temp);
-
-  return temp;
+  //HadronCorrection(costheta, dedx);
 }
 
-double DedxCorrectionModule::D2I(const double& cosTheta, const double& D) const
+double DedxCorrectionModule::D2I(const double cosTheta, const double D) const
 {
 
   double absCosTheta   = fabs(cosTheta);
@@ -180,7 +186,7 @@ double DedxCorrectionModule::D2I(const double& cosTheta, const double& D) const
   return I;
 }
 
-double DedxCorrectionModule::I2D(const double& cosTheta, const double& I) const
+double DedxCorrectionModule::I2D(const double cosTheta, const double I) const
 {
 
   double absCosTheta = fabs(cosTheta);
@@ -219,16 +225,18 @@ void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, d
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;
-  double sum_of_squares = 0.0;
+  double sumOfSquares = 0.0;
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
-  const int lowEdgeTrunc = int(numDedx * m_removeLowest);
-  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest));
+
+  // add a factor of 0.51 here to make sure we are rounding appropriately...
+  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.51);
+  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.51);
   for (int i = 0; i < numDedx; i++) {
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
       truncatedMeanTmp += sortedDedx[i];
-      sum_of_squares += sortedDedx[i] * sortedDedx[i];
+      sumOfSquares += sortedDedx[i] * sortedDedx[i];
       numValuesTrunc++;
     }
   }
@@ -246,7 +254,7 @@ void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, d
   *truncatedMean = truncatedMeanTmp;
 
   if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
+    *truncatedMeanErr = sqrt(sumOfSquares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
                           numValuesTrunc - 1);
   } else {
     *truncatedMeanErr = 0;

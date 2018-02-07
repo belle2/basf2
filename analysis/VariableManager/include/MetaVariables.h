@@ -116,6 +116,12 @@ namespace Belle2 {
     Manager::FunctionPtr isNAN(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the given value in the second argument if the given variable value is nan
+     * First argument in the argument vector must be the name of variable. The second a number.
+     */
+    Manager::FunctionPtr ifNANgiveX(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the true if the variable value is infinity
      * First argument in the argument vector must be the name of variable
      */

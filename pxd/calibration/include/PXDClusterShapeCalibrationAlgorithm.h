@@ -17,6 +17,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <TCut.h>
+#include <TVectorD.h>
 #include <boost/functional/hash.hpp>
 #include <framework/gearbox/Unit.h>
 
@@ -385,8 +386,6 @@ namespace Belle2 {
     /** estimated sigma in V of residuals for unbiased track */
     float m_SigmaVResUnBias = 0.0;
 
-
-    ClassDef(PXDClusterShapeCalibrationAlgorithm, 1); /**< Class implementing PXD cluster shape calibration algorithm */
 
   };
 } // namespace Belle2

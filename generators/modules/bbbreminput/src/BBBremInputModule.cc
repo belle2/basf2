@@ -57,7 +57,8 @@ BBBremInputModule::~BBBremInputModule()
 
 void BBBremInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Beam Parameters, initial particle - BBBREM cannot handle beam energy spread
   m_initial.initialize();

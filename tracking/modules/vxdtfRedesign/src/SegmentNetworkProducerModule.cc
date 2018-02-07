@@ -91,6 +91,16 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
            bool(false));
 
+  addParam("maxNetworkSize",
+           m_PARAMmaxNetworkSize,
+           "Maximal size of the SegmentNetwork; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxNetworkSize);
+
+  addParam("maxHitNetworkSize",
+           m_PARAMmaxHitNetworkSize,
+           "Maximal size of the HitNetwork; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxHitNetworkSize);
+
   addParam("observerType",
            m_PARAMobserverType,
            "Use this option for debugging ONLY!"
@@ -117,8 +127,8 @@ SegmentNetworkProducerModule::initialize()
   if (filters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
                                     "' does not exist! Can not continue...");
 
-  B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
-         filters->size());
+  B2DEBUG(1, "SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
+          filters->size());
 
   if (m_PARAMprintToMathematica) {
     SecMapHelper::printStaticSectorRelations(*filters, filters->getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
@@ -222,16 +232,16 @@ void SegmentNetworkProducerModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents);
-  B2WARNING("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << ", results:\n "
-            << "matchSpacePoints-nSPsFound/nSPsLost/nRawSectorsFound: " << m_nSPsFound << "/" << m_nSPsLost << "/" << m_nRawSectorsFound << "\n"
-            << ", buildActiveSectorNetwork-nBadSector InnerNotActive/NoInnerActive/NoInnerExisting: " << m_nBadSectorInnerNotActive << "/" <<
-            m_nBadSectorNoInnerActive << "/" << m_nBadSectorNoInnerExisting << ", nGoodSectors/nSectorsLinked: " << m_nGoodSectorsFound << "/"
-            << m_nSectorsLinked << "\n"
-            << ", buildTrackNodeNetwork-nTrackNodesAccepted/nTrackNodesRejected/nTrackNodeLinksCreated: " << m_nTrackNodesAccepted << "/" <<
-            m_nTrackNodesRejected << "/" << m_nTrackNodeLinksCreated << "\n"
-            << ", buildSegmentNetwork-nSegmentsAccepted/nSegmentsRejected/nSegmentLinksCreated: " << m_nSegmentsAccepted << "/" <<
-            m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n");
+  B2DEBUG(1, "SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents);
+  B2DEBUG(1, "SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << ", results:\n "
+          << "matchSpacePoints-nSPsFound/nSPsLost/nRawSectorsFound: " << m_nSPsFound << "/" << m_nSPsLost << "/" << m_nRawSectorsFound << "\n"
+          << ", buildActiveSectorNetwork-nBadSector InnerNotActive/NoInnerActive/NoInnerExisting: " << m_nBadSectorInnerNotActive << "/" <<
+          m_nBadSectorNoInnerActive << "/" << m_nBadSectorNoInnerExisting << ", nGoodSectors/nSectorsLinked: " << m_nGoodSectorsFound << "/"
+          << m_nSectorsLinked << "\n"
+          << ", buildTrackNodeNetwork-nTrackNodesAccepted/nTrackNodesRejected/nTrackNodeLinksCreated: " << m_nTrackNodesAccepted << "/" <<
+          m_nTrackNodesRejected << "/" << m_nTrackNodeLinksCreated << "\n"
+          << ", buildSegmentNetwork-nSegmentsAccepted/nSegmentsRejected/nSegmentLinksCreated: " << m_nSegmentsAccepted << "/" <<
+          m_nSegmentsRejected << "/" << m_nSegmentsLinksCreated << "\n");
 }
 
 
@@ -464,6 +474,14 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
           } else {
             hitNetwork.addInnerToLastOuterNode(innerNodeID);
           }
+
+          if (hitNetwork.size() > m_PARAMmaxHitNetworkSize) {
+            B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize << "!"
+                    << " Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
+            hitNetwork.clear();
+            return;
+          }
+
         } // inner hit loop
       } // outer hit loop
     } // inner sector loop
@@ -518,8 +536,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         // the filter accepts spacepoint combinations
         // ->observe gives back an observed version of the filter
-        bool accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
-                                                                    innerHit->getEntry().getHit());
+        bool accepted = false;
+        // there is an uncaught exception thrown by the CircleCenterXY filter variable if the points are on a straight line
+        try {
+          accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
+                                                                 innerHit->getEntry().getHit());
+        } catch (...) {
+          // this may produce too much output, so consider to demote it to a B2DEBUG message
+          B2WARNING("SegmentNetworkProducerModule: exception caught thrown by one of the three hit filters");
+        }
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));
@@ -565,6 +590,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         } else {
           segmentNetwork.addInnerToLastOuterNode(innerSegmentID);
         }
+
+        if (segments.size() > m_PARAMmaxNetworkSize) {
+          B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
+                  << ". Network size is " << segmentNetwork.size()
+                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_network.clear();
+          return;
+        }
+
       } // innerHit-loop
     } // centerHit-loop
   } // outerHit-loop

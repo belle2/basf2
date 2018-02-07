@@ -28,6 +28,8 @@
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <memory>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 
 namespace Belle2 {
 
@@ -60,9 +62,8 @@ namespace Belle2 {
 
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
-      std::string m_xmlMapFileName;
 
-      bool m_generateShaperDigts;
+      bool m_generateShaperDigits;
       std::string m_svdShaperDigitListName;
       std::string m_svdDAQDiagnosticsListName;
 
@@ -75,10 +76,11 @@ namespace Belle2 {
 
       std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //unsigned short m_runType;
+      static std::string m_xmlFileName;
+      DBObjPtr<PayloadFile> m_mapping;
 
       SVDModeByte m_SVDModeByte;
 
-      void loadMap();
       void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
 
       // The following assumes i386 byte order: MSB comes last!
@@ -159,7 +161,9 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
 
       int m_shutUpFTBError;
       int m_FADCTriggerNumberOffset;

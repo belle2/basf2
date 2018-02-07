@@ -16,13 +16,9 @@
 #include <TCanvas.h>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMAlignmentAlongStrips/EKLMAlignmentAlongStripsCollectorModule.h>
-
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 using namespace Belle2;
@@ -51,10 +47,10 @@ void EKLMAlignmentAlongStripsCollectorModule::prepare()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_TransformData =
     new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
-  StoreArray<EKLMHit2d>::required();
-  StoreArray<EKLMDigit>::required();
-  StoreArray<Track>::required();
-  StoreArray<ExtHit>::required();
+  m_EKLMDigits.isRequired();
+  m_Tracks.isRequired();
+  StoreArray<ExtHit> extHits;
+  m_Tracks.requireRelationTo(extHits);
   t = new TTree("calibration_data", "");
   t->Branch("event", &m_Event);
   registerObject<TTree>("calibration_data", t);
@@ -67,16 +63,15 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   const HepGeom::Transform3D* tr;
   TVector3 hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
-  StoreArray<Track> tracks;
-  StoreArray<EKLMDigit> digits;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, it2, itLower, itUpper;
   std::set<int> digitVolumes;
   ExtHit* extHit;
+  TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   /* Create volume - extHit map. */
-  n = tracks.getEntries();
+  n = m_Tracks.getEntries();
   for (i = 0; i < n; i++) {
-    RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
+    RelationVector<ExtHit> extHits = m_Tracks[i]->getRelationsTo<ExtHit>();
     n2 = extHits.size();
     for (j = 0; j < n2; j++) {
       if (extHits[j]->getDetectorID() != Const::EDetector::EKLM)
@@ -88,11 +83,12 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
     }
   }
   /* Create set of strips with signal. */
-  n = digits.getEntries();
+  n = m_EKLMDigits.getEntries();
   for (i = 0; i < n; i++) {
-    vol = m_GeoDat->stripNumber(digits[i]->getEndcap(), digits[i]->getLayer(),
-                                digits[i]->getSector(), digits[i]->getPlane(),
-                                digits[i]->getStrip());
+    vol = m_GeoDat->stripNumber(
+            m_EKLMDigits[i]->getEndcap(), m_EKLMDigits[i]->getLayer(),
+            m_EKLMDigits[i]->getSector(), m_EKLMDigits[i]->getPlane(),
+            m_EKLMDigits[i]->getStrip());
     digitVolumes.insert(vol);
   }
   /* Search for strips with extHits, but without signal. */
@@ -129,12 +125,12 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
         m_GeoDat->segmentNumber(
           m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
           (m_Event->strip - 1) / m_GeoDat->getNStripsSegment() + 1);
-      getObject<TTree>("calibration_data").Fill();
+      calibrationData->Fill();
     }
   }
 }
 
-void EKLMAlignmentAlongStripsCollectorModule::terminate()
+void EKLMAlignmentAlongStripsCollectorModule::finish()
 {
   delete m_TransformData;
 }

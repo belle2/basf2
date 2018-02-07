@@ -11,16 +11,12 @@
 #include <bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
@@ -60,6 +56,9 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
   addParam("Alignment correction flag", m_ifAlign,
            "flag for alignment correction, do the correction (true) or not (false), default is false",
            bool(false));
+  addParam("load time window from db", m_loadTimingFromDB,
+           "locad timing window from database (true) or not (false), default is true",
+           bool(true));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -68,14 +67,11 @@ BKLMReconstructorModule::~BKLMReconstructorModule()
 
 void BKLMReconstructorModule::initialize()
 {
-  StoreArray<BKLMDigit>::required();
+  digits.isRequired();
 
   // Force creation and persistence of BKLM output datastores and relations
-  StoreArray<BKLMHit1d> hit1ds;
   hit1ds.registerInDataStore();
-  StoreArray<BKLMHit2d> hit2ds;
   hit2ds.registerInDataStore();
-  StoreArray<BKLMDigit> digits;
   hit1ds.registerRelationTo(digits);
   hit2ds.registerRelationTo(hit1ds);
 
@@ -86,7 +82,14 @@ void BKLMReconstructorModule::initialize()
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, "BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+
+  if (m_loadTimingFromDB) {
+    m_DtMax = m_timing->getCoincidenceWindow();
+    m_PromptTime = m_timing->getPromptTime();
+    m_PromptWindow = m_timing->getPromptWindow();
+  }
+
 }
 
 void BKLMReconstructorModule::event()
@@ -94,7 +97,6 @@ void BKLMReconstructorModule::event()
 
   // Construct StoreArray<BKLMHit1D> from StoreArray<BKLMDigit>
 
-  StoreArray<BKLMDigit> digits;
   // sort by module+strip number
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
@@ -105,7 +107,6 @@ void BKLMReconstructorModule::event()
   }
   if (volIDToDigits.empty()) return;
 
-  StoreArray<BKLMHit1d> hit1ds;
   hit1ds.clear();
 
   std::vector<BKLMDigit*> cluster;
@@ -127,7 +128,6 @@ void BKLMReconstructorModule::event()
 
   // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
 
-  StoreArray<BKLMHit2d> hit2ds;
   hit2ds.clear();
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {

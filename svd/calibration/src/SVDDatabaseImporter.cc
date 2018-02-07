@@ -23,14 +23,19 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <framework/utilities/FileSystem.h>
+
 // wrapper objects
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <TFile.h>
 #include <TVectorF.h>
 /*
@@ -43,6 +48,17 @@
 
 using namespace std;
 using namespace Belle2;
+
+void SVDDatabaseImporter::importSVDChannelMapping()
+{
+
+  IntervalOfValidity iov = IntervalOfValidity::always();
+  const std::string filename = FileSystem::findFile("svd/data/svd_mapping.xml"); //phase 3 xmlMapping
+  //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
+  const std::string payloadname = "SVDChannelMapping.xml";
+  Database::Instance().addPayload(payloadname, filename, iov);
+}
+
 
 void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 {
@@ -407,6 +423,27 @@ void SVDDatabaseImporter::importSVDLocalRunBadStrips(/*std::string fileName*/)
 
 }
 
+void SVDDatabaseImporter::importSVDHitTimeNeuralNetwork(string fileName, bool threeSamples)
+{
+  ifstream xml(fileName);
+  if (!xml.good()) {
+    B2RESULT("ERROR: File not found.\nNeural network from " << fileName << " could not be imported.");
+    return;
+  }
+  string label("SVDTimeNet_6samples");
+  if (threeSamples)
+    label = "SVDTimeNet_3samples";
+  stringstream buffer;
+  buffer << xml.rdbuf();
+  DBImportObjPtr<DatabaseRepresentationOfWeightfile> importObj(label);
+  importObj.construct();
+  importObj->m_data = buffer.str();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  importObj.import(iov);
+  B2RESULT("Neural network from " << fileName << " successfully imported.");
+}
 
 void SVDDatabaseImporter::printSVDPulseShapeCalibrations()
 {

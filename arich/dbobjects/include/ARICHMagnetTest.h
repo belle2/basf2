@@ -59,7 +59,7 @@ namespace Belle2 {
      * Set results of all measurements
      * @param fraction of dead time
      */
-    void setDeadTime(std::vector<float> deadTime) {m_deadTime = deadTime;}
+    void setDeadTime(const std::vector<float>& deadTime) {m_deadTime = deadTime;}
 
     /**
      * Return size of the list of dead time fractions

@@ -64,9 +64,6 @@ namespace Belle2 {
     /** Debug mode. */
     bool m_Debug;
 
-    /** To make objects storable. */
-    ClassDef(EKLMTimeCalibrationAlgorithm, 2);
-
   };
 
 }

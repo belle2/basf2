@@ -61,7 +61,7 @@ void PXDDigitSorterModule::initialize()
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  storeDigits.required();
+  storeDigits.isRequired();
   storeMCParticles.isOptional();
   storeTrueHits.isOptional();
 

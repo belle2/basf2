@@ -62,11 +62,8 @@ namespace Belle2 {
     /// returns a center wire.
     const TRGCDCWire& center(void) const;
 
-/// returns priority wire.
+    /// returns priority wire.
     const TRGCDCWire& priority(void) const;
-
-/// compare 2 wires. return faster wire.
-    const TRGCDCWire& fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
 
     /// returns trigger output. Null will returned if no signal.
     const TRGSignal& signal(void) const;
@@ -91,10 +88,10 @@ namespace Belle2 {
     /// fastest time in TSHit that is larger of equal to clk0.
     float fastestTime(int clk0) const;
 
-/// return found time in TSHit.
+    /// return found time in TSHit.
     float foundTime(void)const;
 
-/// return priority time in TSHit.
+    /// return priority time in TSHit.
     float priorityTime(void) const;
 
     /// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left

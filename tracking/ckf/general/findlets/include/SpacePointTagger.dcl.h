@@ -10,15 +10,21 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/core/ModuleParamList.dcl.h>
+
 #include <set>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   class SpacePoint;
 
   /// Findlet for tagging all space points in the results vector as used
   template <class AResult, class ACluster>
   class SpacePointTagger : public TrackFindingCDC::Findlet<const AResult, const SpacePoint* const> {
+    /// The parent class
+    using Super = TrackFindingCDC::Findlet<const AResult, const SpacePoint* const>;
+
   public:
     /// Clear the used clusters
     void beginEvent() override;

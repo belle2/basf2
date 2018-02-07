@@ -20,10 +20,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <math.h>
 #include <arpa/inet.h>
 
 namespace Belle2 {
@@ -38,6 +34,8 @@ namespace Belle2 {
      * This module is responsible for unpacking the Raw PXD data to Pixels in v_cellID and u_cellID (global tracking coordinates system)
      */
     class PXDUnpackerModule : public Module {
+
+      // enum { ONSEN_MAX_TYPE_ERR=64};
 
     public:
       /** Constructor defining the parameters */
@@ -98,7 +96,7 @@ namespace Belle2 {
       StoreArray<RawPXD> m_storeRawPXD;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
-      /** Output array for Raw Hits. */
+      /** Output array for Raw ROIs. */
       StoreArray<PXDRawROIs> m_storeROIs;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
@@ -107,10 +105,8 @@ namespace Belle2 {
       /** Output array for Clusters. */
       StoreArray<PXDRawCluster> m_storeRawCluster;
 
-
-      /** Unpack one event (several frames) stored in RawPXD object./ Unpack one cluster stored in Cluster object.
+      /** Unpack one event (several frames) stored in RawPXD object.
        * @param px RawPXD data object
-       * @param cl Cluster data object
        */
       void unpack_event(RawPXD& px);
 

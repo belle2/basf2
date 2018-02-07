@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <vector>
 #include <TObject.h>
 #include <TH1F.h>
 
@@ -28,29 +29,41 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPPmtTTSHisto()
+    TOPPmtTTSHisto():
+      m_serialNumber(""), m_hv(0), m_histo()
     {}
 
     /**
      * Full constructor
      * @param serialNumber serial number
+     * @param hv HV setting
      */
-    TOPPmtTTSHisto(const std::string& serialNumber):
-      m_serialNumber(serialNumber)
+    TOPPmtTTSHisto(const std::string& serialNumber,
+                   int hv):
+      m_serialNumber(serialNumber), m_hv(hv), m_histo()
     {}
 
+    /**
+     * Set PMT serial number
+     * @param serNum serial number
+     */
+    void setSerialNumber(const std::string& serNum) {m_serialNumber = serNum;}
 
     /**
-     * Append new element to the map
-     * @param channel PMT channel number (1-based)
-     * @param hv high voltage used in taking the TTS histogram
-     * @param histo TH1F of the TTS histogram
+     * Set HV setting used for TTS measurement
+     * @param hv high voltage setting
      */
-    void appendHistogram(unsigned channel, double hv, TH1F* histo)
-    {
-      m_histo[channel - 1][hv] = histo;
-    }
+    void setHv(int hv) {m_hv = hv;}
 
+    /**
+     * Append new element to the array
+     * @param channel channel number (1-based)
+     * @param histo vector of TH1F's for the TTS histograms
+     */
+    void setHistogram(int channel, TH1F histo)
+    {
+      m_histo[channel - 1] = histo;
+    }
 
     /**
      * Returns PMT serial number
@@ -59,11 +72,17 @@ namespace Belle2 {
     const std::string& getSerialNumber() const {return m_serialNumber;}
 
     /**
-     * Returns map of TTS histograms, all HV settings for a given channel
-     * @param channel channel number
-     * @return map of TTS histograms
+     * Returns HV setting used for TTS measurement
+     * @return hv
      */
-    const std::map<float, TH1F*>& getTtsHisto(unsigned channel) const
+    int getHv() const {return m_hv;}
+
+    /**
+     * Returns TTS histogram for a specified channel and HV setting
+     * @param channel channel number
+     * @return TTS histogram (TH1F*)
+     */
+    TH1F getTtsHisto(int channel) const
     {
       if (channel > c_NumChannels) channel = c_NumChannels;
       channel--;
@@ -73,10 +92,11 @@ namespace Belle2 {
 
   private:
 
-    std::string m_serialNumber;                   /**< serial number, e.g. JTxxxx */
-    std::map<float, TH1F*> m_histo[c_NumChannels];  /**< histograms of measured TTS (one for each channel,
-                 *   for several HV settings)
-                 */
+    std::string m_serialNumber;      /**< serial number, e.g. JTxxxx */
+    int m_hv;                        /**< HV setting for which the set of histograms were taken */
+    TH1F m_histo[c_NumChannels];     /**< array of TTS histograms of measured TTS (one for each channel),
+              *   for the specific HV setting
+              */
 
     ClassDef(TOPPmtTTSHisto, 1); /**< ClassDef */
 

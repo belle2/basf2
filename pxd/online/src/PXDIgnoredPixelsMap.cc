@@ -27,7 +27,7 @@ PXDIgnoredPixelsMap::PXDIgnoredPixelsMap(const string& xmlFilename):
   // If the xmlFilename is empty, the user apparently doesn't want the map.
   // So keep low-profile, don't bother.
   if (xmlFilename == "") {
-    B2INFO("No xml list of ignored pixels specified.");
+    B2DEBUG(10, "No xml list of ignored pixels specified.");
     return;
   }
   // Create an empty property tree object
@@ -62,19 +62,19 @@ PXDIgnoredPixelsMap::PXDIgnoredPixelsMap(const string& xmlFilename):
   try {
     // traverse the xml tree: navigate through the daughters of <PXD>
     VxdID sensorID;
-    for (ptree::value_type const & layer : propertyTree.get_child("PXD"))
+    for (ptree::value_type const& layer : propertyTree.get_child("PXD"))
       if (layer.first == "layer") {
         sensorID.setLayerNumber(static_cast<unsigned short>(layer.second.get<int>("<xmlattr>.n")));
-        for (ptree::value_type const & ladder : layer.second)
+        for (ptree::value_type const& ladder : layer.second)
           if (ladder.first == "ladder") {
             sensorID.setLadderNumber(static_cast<unsigned short>(ladder.second.get<int>("<xmlattr>.n")));
-            for (ptree::value_type const & sensor : ladder.second)
+            for (ptree::value_type const& sensor : ladder.second)
               if (sensor.first == "sensor") {
                 sensorID.setSensorNumber(static_cast<unsigned short>(sensor.second.get<int>("<xmlattr>.n")));
                 PXDIgnoredPixelsMap::IgnoredPixelsRangeSet ranges;
                 PXDIgnoredPixelsMap::IgnoredSinglePixelsSet singles;
                 const VXD::SensorInfoBase& info = VXD::GeoCache::getInstance().get(sensorID);
-                for (ptree::value_type const & tag : sensor.second) {
+                for (ptree::value_type const& tag : sensor.second) {
                   if (tag.first == "pixels") {
                     auto limits = tag.second;
                     // All possible attributes, default = -1 (att not present)

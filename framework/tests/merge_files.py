@@ -6,25 +6,11 @@ import sys
 import re
 import subprocess
 import itertools
-import tempfile
 import ROOT
 from ROOT.Belle2 import FileMetaData, EventMetaData
-from contextlib import contextmanager
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
-
-
-@contextmanager
-def clean_working_directory():
-    """Context manager to create a temporary directory and directly us it as
-    current working directory"""
-    dirname = os.getcwd()
-    try:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
-            yield tempdir
-    finally:
-        os.chdir(dirname)
+from b2test_utils import clean_working_directory
 
 
 def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[], **argk):
@@ -79,8 +65,10 @@ def get_metadata(name="output.root"):
 def merge_files(*args, output="output.root", filter_modified=False):
     """run the merging tool on all passed files
 
-    :param output: name of the output file
-    :param filter_modified: if True omit warnings that the release is modified and consistency cannot be checked
+    Parameters:
+      output: name of the output file
+      filter_modified: if True omit warnings that the release is modified and
+          consistency cannot be checked
     """
     process = subprocess.run(["merge_basf2_files", "-q", output] + list(args), stdout=subprocess.PIPE)
     # do we want to filter the modified release warning?

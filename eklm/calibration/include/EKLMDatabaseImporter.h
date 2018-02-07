@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/dbobjects/EKLMChannels.h>
+#include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
@@ -113,6 +114,30 @@ namespace Belle2 {
      */
     void importDisplacement();
 
+    /**
+     * Load default electronics map. This function actually only initializes
+     * the database object pointer, but does not load anything. All data should
+     * be loaded by calling addSectorLane().
+     */
+    void loadDefaultElectronicsMap();
+
+    /**
+     * Add sector-lane pair.
+     * @param[in] endcap           Endcap number.
+     * @param[in] layer            Layer number.
+     * @param[in] sector           Sector number.
+     * @param[in] copper           Copper identifier.
+     * @param[in] dataConcentrator Data concentrator number.
+     * @param[in] lane             Lane number.
+     */
+    void addSectorLane(int endcap, int layer, int sector,
+                       int copper, int dataConcentrator, int lane);
+
+    /**
+     * Import electronics map.
+     */
+    void importElectronicsMap();
+
   private:
 
     /** Channel data. */
@@ -120,6 +145,9 @@ namespace Belle2 {
 
     /** Displacement. */
     DBImportObjPtr<EKLMAlignment> m_Displacement;
+
+    /** Electronics map. */
+    DBImportObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
 
     /** Low experiment. */
     int m_ExperimentLow;

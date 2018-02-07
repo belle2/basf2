@@ -18,11 +18,8 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMTimeCalibration/EKLMTimeCalibrationCollectorModule.h>
-
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 using namespace Belle2;
@@ -34,6 +31,8 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
 {
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("UseEventT0", m_UseEventT0, "Calibrate relatively to event T0.",
+           false);
   m_ev = {0, 0, 0};
   m_Strip = 0;
   m_TransformData = NULL;
@@ -48,10 +47,14 @@ void EKLMTimeCalibrationCollectorModule::prepare()
 {
   TTree* t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  StoreArray<EKLMHit2d>::required();
-  StoreArray<EKLMDigit>::required();
-  StoreArray<Track>::required();
-  StoreArray<ExtHit>::required();
+  m_EKLMHit2ds.isRequired();
+  m_Tracks.isRequired();
+  StoreArray<EKLMDigit> eklmDigits;
+  m_EKLMHit2ds.requireRelationTo(eklmDigits);
+  StoreArray<ExtHit> extHits;
+  m_Tracks.requireRelationTo(extHits);
+  if (m_UseEventT0)
+    m_EventT0.isRequired("EventT0");
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
   t = new TTree("calibration_data", "");
   t->Branch("time", &m_ev.time, "time/F");
@@ -67,15 +70,21 @@ void EKLMTimeCalibrationCollectorModule::collect()
   double l, hitTime;
   TVector3 hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
-  StoreArray<Track> tracks;
-  StoreArray<EKLMHit2d> hit2ds;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, itLower, itUpper;
   ExtHit* extHit, *entryHit[2], *exitHit[2];
   const HepGeom::Transform3D* tr;
-  n = tracks.getEntries();
+  TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
+  n = m_Tracks.getEntries();
+  if (m_UseEventT0) {
+    if (!m_EventT0->hasEventT0()) {
+      B2ERROR("Event T0 is not determined. "
+              "Cannot collect data for EKLM time calibration.");
+      return;
+    }
+  }
   for (i = 0; i < n; i++) {
-    RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
+    RelationVector<ExtHit> extHits = m_Tracks[i]->getRelationsTo<ExtHit>();
     n2 = extHits.size();
     for (j = 0; j < n2; j++) {
       if (extHits[j]->getDetectorID() != Const::EDetector::EKLM)
@@ -86,11 +95,18 @@ void EKLMTimeCalibrationCollectorModule::collect()
                                                extHits[j]));
     }
   }
-  n = hit2ds.getEntries();
+  n = m_EKLMHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    RelationVector<EKLMDigit> digits = hit2ds[i]->getRelationsTo<EKLMDigit>();
+    RelationVector<EKLMDigit> digits =
+      m_EKLMHit2ds[i]->getRelationsTo<EKLMDigit>();
     if (digits.size() != 2)
       B2FATAL("Wrong number of related EKLMDigits.");
+    /*
+     * This is possible if the threshold was crossed, but the pedestal level
+     * has been estimated incorrectly.
+     */
+    if (digits[0]->getNPE() == 0 || digits[1]->getNPE() == 0)
+      continue;
     for (j = 0; j < 2; j++) {
       entryHit[j] = NULL;
       exitHit[j] = NULL;
@@ -128,6 +144,8 @@ void EKLMTimeCalibrationCollectorModule::collect()
       continue;
     for (j = 0; j < 2; j++) {
       hitTime = 0.5 * (entryHit[j]->getTOF() + exitHit[j]->getTOF());
+      if (m_UseEventT0)
+        hitTime = hitTime + m_EventT0->getEventT0();
       hitPosition = 0.5 * (entryHit[j]->getPosition() +
                            exitHit[j]->getPosition());
       l = m_GeoDat->getStripLength(digits[j]->getStrip()) / CLHEP::mm *
@@ -144,12 +162,12 @@ void EKLMTimeCalibrationCollectorModule::collect()
         m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
                               digits[j]->getSector(), digits[j]->getPlane(),
                               digits[j]->getStrip());
-      getObject<TTree>("calibration_data").Fill();
+      calibrationData->Fill();
     }
   }
 }
 
-void EKLMTimeCalibrationCollectorModule::terminate()
+void EKLMTimeCalibrationCollectorModule::finish()
 {
   if (m_TransformData != NULL)
     delete m_TransformData;

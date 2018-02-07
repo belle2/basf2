@@ -75,7 +75,7 @@ void SVDSimpleClusterizerModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeDigits.required();
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -152,8 +152,8 @@ void SVDSimpleClusterizerModule::event()
 
 
   //create a dummy cluster just to start
-  SimpleClusterCandidate* clusterCandidate = new SimpleClusterCandidate(storeDigits[0]->getSensorID(), storeDigits[0]->isUStrip(),
-      m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+  SimpleClusterCandidate clusterCandidate(storeDigits[0]->getSensorID(), storeDigits[0]->isUStrip(),
+                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
 
   //loop over the SVDRecoDigits
   int i = 0;
@@ -165,9 +165,10 @@ void SVDSimpleClusterizerModule::event()
     int thisCellID = storeDigits[i]->getCellID();
 
     //Ignore digits with insufficient signal
-    float ADCnoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-    float thisNoise = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
+    float thisNoise = m_NoiseCal.getNoiseInElectrons(thisSensorID, thisSide, thisCellID);
     float thisCharge = storeDigits[i]->getCharge();
+    B2DEBUG(10, "Noise = " << thisNoise << " e-, Charge = " << thisCharge);
+
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
       i++;
       continue;
@@ -182,25 +183,21 @@ void SVDSimpleClusterizerModule::event()
     aStrip.time = storeDigits[i]->getTime();
 
     //try to add the strip to the existing cluster
-    if (! clusterCandidate->add(thisSensorID, thisSide, aStrip)) {
+    if (! clusterCandidate.add(thisSensorID, thisSide, aStrip)) {
 
       //if the strip is not added, write the cluster, if present and good:
-      if (clusterCandidate->size() > 0) {
-        clusterCandidate->finalizeCluster();
-        if (clusterCandidate->isGoodCluster()) {
-          writeClusters(*clusterCandidate);
+      if (clusterCandidate.size() > 0) {
+        clusterCandidate.finalizeCluster();
+        if (clusterCandidate.isGoodCluster()) {
+          writeClusters(clusterCandidate);
         }
       }
 
       //prepare for the next cluster:
-
-      //      clusterCandidate->clear(); //not needed with pointer
-      delete clusterCandidate;
-
-      clusterCandidate = new SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
 
       //start another cluster:
-      if (! clusterCandidate->add(thisSensorID, thisSide, aStrip))
+      if (! clusterCandidate.add(thisSensorID, thisSide, aStrip))
         B2WARNING("this state is forbidden!!");
 
     }
@@ -208,10 +205,10 @@ void SVDSimpleClusterizerModule::event()
   } //exit loop on RecoDigits
 
   //write the last cluster, if good
-  if (clusterCandidate->size() > 0) {
-    clusterCandidate->finalizeCluster();
-    if (clusterCandidate->isGoodCluster())
-      writeClusters(*clusterCandidate);
+  if (clusterCandidate.size() > 0) {
+    clusterCandidate.finalizeCluster();
+    if (clusterCandidate.isGoodCluster())
+      writeClusters(clusterCandidate);
   }
 
   B2DEBUG(1, "Number of clusters: " << storeClusters.getEntries());

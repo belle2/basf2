@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_GEOMETRY_BFIELDMANAGER_H
-#define FRAMEWORK_GEOMETRY_BFIELDMANAGER_H
 
 #include <vector>
 #include <framework/logging/Logger.h>
@@ -103,5 +101,3 @@ namespace Belle2 {
     fieldvec.GetXYZ(field);
   }
 }
-
-#endif // FRAMEWORK_GEOMETRY_BFIELDMANAGER_H

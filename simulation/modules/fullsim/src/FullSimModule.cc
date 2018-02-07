@@ -30,6 +30,8 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
+#include <simulation/monopoles/G4MonopolePhysics.h>
+
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
 #include <G4VUserPhysicsList.hh>
@@ -60,6 +62,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
+using namespace Belle2::Monopoles;
 using namespace G4InuclParticleNames;
 
 //-----------------------------------------------------------------
@@ -93,12 +96,14 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
+  addParam("RegisterMonopoles", m_monopoles, "If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.", false);
+  addParam("MonopoleMagCharge", m_monopoleMagneticCharge, "The value of monopole magnetic charge in units of e+.", 1.0);
   addParam("ProductionCut", m_productionCut,
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
-  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.35);
+  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
   addParam("StoreAllSecondaries", m_storeSecondaries,
@@ -147,8 +152,10 @@ void FullSimModule::initialize()
   //Register the collections we want to use
   StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
   mcParticles.registerInDataStore();
-  StoreArray<MCParticle>::required(m_mcParticleInputColName);
-  StoreObjPtr<EventMetaData>::required();
+
+  //Make sure these collections already exist
+  StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.
   RunManager& runManager = RunManager::Instance();
@@ -168,6 +175,9 @@ void FullSimModule::initialize()
   if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
   physicsList->RegisterPhysics(new ExtPhysicsConstructor);
   if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
+  if (m_monopoles) {
+    physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
+  }
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)
@@ -215,9 +225,9 @@ void FullSimModule::initialize()
 
     //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
     G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
-    B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
+    B2DEBUG(1, "Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
     chordFinder->SetDeltaChord(m_deltaChordInMagneticField * CLHEP::mm);
-    B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
+    B2DEBUG(1, "DeltaChord after reset = " << chordFinder->GetDeltaChord());
 
     //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
   }

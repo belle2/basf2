@@ -10,21 +10,14 @@ import numpy as np
 
 set_debug_level(1000)
 
-# Only initialize RootInput, as we do not loop over events,
-# only load persistent objects stored during data collection
-input = register_module('RootInput')
-input.param('inputFileName', 'RootOutput.root')
 gear = register_module('Gearbox')
 geom = register_module('Geometry')
 geom.param('components', ['PXD', 'SVD'])
-
-main = create_path()
-main.add_module(input)
-main.add_module(gear)
-main.add_module(geom)
-process(main)
+gear.initialize()
+geom.initialize()
 
 algo = Belle2.MillepedeAlgorithm()
+algo.setInputFileNames(['RootOutput.root'])
 algo.steering().command('method diagonalization 1 0.1')
 # algo.steering().command('entries 100')
 algo.steering().command('hugecut 100000')
@@ -153,21 +146,11 @@ if algo.result().getNoEigenPairs():
 if condition:
     print("Condition number of the matrix: ", condition)
 
-# Example how to access collected data (but you need exp and run number)
-chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
-pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
-
 # Skip into interactive environment
 # You can draw something in the trees or the profile
 # Exit with Ctrl+D
 print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 print(' You are now in interactive environment. You can still access the algorithm')
-print(' or the DataStore. Try e.g.:')
-print('')
-print(' >>> pval.Draw()')
-print(' >>> vxdtree.Draw("value:layer")')
-print(' >>> vxd.dump()')
-print(' >>> profile.Draw()')
 print('')
 print(' Look into this script and use TAB or python ? help to play more...')
 print(' Exit with [Ctrl] + [D] and then [Enter]')

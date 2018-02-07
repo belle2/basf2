@@ -16,10 +16,12 @@
 #include <map>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dbobjects/EKLMElectronicsMap.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
@@ -68,29 +70,9 @@ namespace Belle2 {
 
   private:
 
-    /** Use default elect id, if not found in mapping file. */
-    bool m_useDefaultElectId;
-
-    /** Number of events in a run. */
-    int m_MaxNEvents;
-
-    /** Number of events. */
-    int m_NEvents;
-
-    /** Event metadata. */
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
-
-    /** RawKLM array. */
-    StoreArray<RawKLM> m_RawKLMArray;
-
-    /** Map of logical coordinates to hardware coordinates. */
-    std::map<int, int> m_ModuleIdToelectId;
-
     /**
      * Creation of raw data.
-     * @param[in]  endcap Endcap number.
-     * @param[in]  layer  Layer number.
-     * @param[in]  sector Sector number.
+     * @param[in]  lane   Data concentrator lane.
      * @param[in]  plane  Plane number.
      * @param[in]  strip  Strip number.
      * @param[in]  charge Charge.
@@ -100,15 +82,25 @@ namespace Belle2 {
      * @param[out] bword3 Third word.
      * @param[out] bword4 Fourth word.
      */
-    void formatData(int endcap, int layer, int plane, int strip,
-                    int charge, float ctime, int finesse_num,
+    void formatData(const EKLMDataConcentratorLane* lane,
+                    int plane, int strip, int charge, float time,
                     uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
                     uint16_t& bword4);
 
-    /**
-     * Fill m_ModuleIdToelectId.
-     */
-    void loadMap();
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
+    /** Electronics map. */
+    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+
+    /** Number of events. */
+    int m_NEvents;
+
+    /** Raw data. */
+    StoreArray<RawKLM> m_RawKLMs;
+
+    /** Digits. */
+    StoreArray<EKLMDigit> m_Digits;
 
   };
 

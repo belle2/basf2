@@ -24,7 +24,7 @@
 
 void plot_pipipsi(TFile* pfile, TTree* ptree, TFile *outputFile){
 
-  TString pidCuts("vpho_psi2S_Jpsi_mu0_muid>0.1||vpho_psi2S_Jpsi_mu1_muid>0.1");
+  TString pidCuts("vpho_psi2S_Jpsi_mu0_muonID>0.1||vpho_psi2S_Jpsi_mu1_muonID>0.1");
 
   TH1F* h_mm2 = new TH1F("h_mm2","MM^{2}(#pi#pi#psi(2S))",100,-4,4);
   ptree->Project("h_mm2", "vpho_m2Recoil", pidCuts);
@@ -68,8 +68,7 @@ void plot_pipipsi(TFile* pfile, TTree* ptree, TFile *outputFile){
 
 void test2_2411460000(){
 
-//  TString inputfile("../2411460000.ntup.root");
-  TString inputfile("2411460000.root");
+  TString inputfile("../2411460000.ntup.root");
 
   TFile* sample = new TFile(inputfile);
   TTree* tree = (TTree*)sample->Get("h1");

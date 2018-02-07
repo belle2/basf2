@@ -45,6 +45,7 @@ namespace Belle2 {
     /** Methods that actually interface to Genfit.  */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
+    /** Get the genfit projection H matrix (to U,V)  */
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
 
     /** @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters

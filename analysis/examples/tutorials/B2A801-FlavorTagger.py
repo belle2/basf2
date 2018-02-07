@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to include the flavor
 # tagging user interphase into your analysis.
 # The following decay chain:
@@ -90,8 +92,7 @@ use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 flavorTagger(
     particleLists=['B0:jspiks'],
-    weightFiles='B2JpsiKs_muBGx1',
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data')
+    weightFiles='B2JpsiKs_muBGx1')
 #
 # BGx0 stays for MC generated without machine Background.
 # Please use B2JpsiKs_muBGx1 if you use MC generated with machine background.

@@ -46,10 +46,6 @@ vxdtf = sys.argv[4]
 
 release = 'merged'
 
-useVXDTF2 = False
-if (vxdtf == 'vxdtf2'):
-    useVXDTF2 = True
-
 print('Performance evaluated on: ')
 print('simulation: ' + roi + ' ' + bkg)
 print('reconstruction: ' + vxdtf)
@@ -115,7 +111,7 @@ else:
 
 path.add_module(progress)
 
-add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction, useVXDTF2)
+add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction)
 
 add_tracking_reconstruction(
     path,
@@ -123,8 +119,7 @@ add_tracking_reconstruction(
     pruneTracks=False,
     mcTrackFinding=mcTrackFinding,
     trigger_mode="all",
-    skipGeometryAdding=False,
-    use_vxdtf2=useVXDTF2
+    skipGeometryAdding=False
 )
 
 

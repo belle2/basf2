@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from svd import add_svd_simulation
 from ROOT import Belle2, TFile, TTree
 import os
 import numpy
@@ -17,7 +18,6 @@ DigitsSort = True  # sort digits by sensor
 printouts = False  # print SVDDigits <-> SVDShaperDigits comparison
 
 
-mapping_file = Belle2.FileSystem.findFile("svd/data/svd_mapping.xml")
 svd_digits_pack_unpack_collection = "SVDDigits_test"
 svd_shaperdigits_pack_unpack_collection = "SVDShaperDigits_test"
 set_random_seed(42)
@@ -123,7 +123,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for svd only
-simulation.add_simulation(main, components=['SVD'])
+add_svd_simulation(main, createDigits=True)
 
 main.add_module(progress)
 
@@ -132,22 +132,21 @@ Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
-Packer.param('xmlMapFileName', mapping_file)
+
+# optionally produce 3-sample data for specific FADCs
+Packer.param('simulate3sampleData', False)
+
 main.add_module(Packer)
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
-unPacker.param('GenerateShaperDigts', True)
+unPacker.param('GenerateShaperDigits', True)
 unPacker.param('svdShaperDigitListName', svd_shaperdigits_pack_unpack_collection)
 unPacker.param('svdDAQDiagnosticsListName', 'myDAQDiagnostics')
-unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
 
-# run custom test module to check if the SVDDigits and the
-# svd_digits_pack_unpack_collection collections are equal
 main.add_module(SvdShaperDigitTestModule())
-
 
 # Process events
 process(main)

@@ -122,10 +122,12 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     progress = register_module('ProgressBar')
     path.add_module(progress)
 
+    # None means don't create custom magnetic field, use whatever comes from the
+    # DB
     environToMagneticField = {'MC5': 'MagneticFieldConstant',
-                              'MC6': 'MagneticField',
-                              'MC7': 'MagneticField',
-                              'default': 'MagneticField',
+                              'MC6': None,
+                              'MC7': None,
+                              'default': None,
                               'Belle': 'MagneticFieldConstantBelle'}
 
     fixECLClusters = {'MC5': True,
@@ -135,8 +137,10 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
                       'Belle': False}
 
     if environmentType in environToMagneticField:
-        path.add_module('Gearbox')
-        path.add_module('Geometry', ignoreIfPresent=False, components=[environToMagneticField.get(environmentType)])
+        fieldType = environToMagneticField[environmentType]
+        if fieldType is not None:
+            path.add_module('Gearbox')
+            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -255,6 +259,50 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], 
     outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
                dataDescription=dataDescription)
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+
+
+def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
+    """
+    Write out all particle lists as an index file to be reprocessed using parentLevel flag.
+    Additional branches necessary for file to be read are automatically included.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
+
+    @param str filename the name of the output index file
+    @param str path modules are added to this path
+    @param list(str) includeArrays: datastore arrays/objects to write to the output
+        file in addition to particl lists and related information
+    @param bool keepParents whether the parents of the input event will be saved as the parents of the same event
+        in the output index file. Useful if you are only adding more information to another index file
+    @param bool mc whether the input data is MC or not
+    """
+
+    # Module to mark all branches to not be saved except particle lists
+    onlyPLists = register_module('OnlyWriteOutParticleLists')
+    path.add_module(onlyPLists)
+
+    # Set up list of all other branches we need to make index file complete
+    partBranches = [
+        'Particles',
+        'ParticlesToMCParticles',
+        'ParticlesToPIDLikelihoods',
+        'ParticleExtraInfoMap',
+        'EventExtraInfo'
+    ]
+    branches = ['EventMetaData']
+    persistentBranches = ['FileMetaData']
+    if mc:
+        branches += []
+        # persistentBranches += ['BackgroundInfos']
+    branches += partBranches
+    branches += includeArrays
+
+    r1 = register_module('RootOutput')
+    r1.param('outputFileName', filename)
+    r1.param('additionalBranchNames', branches)
+    r1.param('branchNamesPersistent', persistentBranches)
+    r1.param('keepParents', keepParents)
+    path.add_module(r1)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):
@@ -832,6 +880,46 @@ def reconstructDecay(
         pmake.param("maximumNumberOfCandidates", candidate_limit)
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
+
+
+def reconstructMissingKLDecay(
+    decayString,
+    cut,
+    dmID=0,
+    writeOut=False,
+    path=analysis_main,
+    recoList="_reco",
+):
+    """
+    Creates mother particle accounting for missing momentum.
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param dmID        user specified decay mode identifier
+    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param path        modules are added to this path
+    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    """
+
+    pcalc = register_module('KLMomentumCalculator')
+    pcalc.set_name('KLMomentumCalculator_' + decayString)
+    pcalc.param('decayString', decayString)
+    pcalc.param('cut', cut)
+    pcalc.param('decayMode', dmID)
+    pcalc.param('writeOut', writeOut)
+    pcalc.param('recoList', recoList)
+    analysis_main.add_module(pcalc)
+
+    rmake = register_module('KLDecayReconstructor')
+    rmake.set_name('KLDecayReconstrucotr_' + decayString)
+    rmake.param('decayString', decayString)
+    rmake.param('cut', cut)
+    rmake.param('decayMode', dmID)
+    rmake.param('writeOut', writeOut)
+    rmake.param('recoList', recoList)
+    analysis_main.add_module(rmake)
 
 
 def replaceMass(

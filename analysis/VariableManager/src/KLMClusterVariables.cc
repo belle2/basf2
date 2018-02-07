@@ -3,15 +3,15 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Torben Ferber                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 // Own include
 #include <analysis/VariableManager/KLMClusterVariables.h>
-
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -103,6 +103,24 @@ namespace Belle2 {
       return result;
     }
 
+    double maximumKLMAngleCMS(const Particle* part)
+    {
+      PCmsLabTransform T;
+      const TVector3 pcms = (T.rotateLabToCms() * part->get4Vector()).Vect();
+      double maxangle = -999.0;
+
+      StoreArray<KLMCluster> klmClusters;
+      for (int iKLM = 0; iKLM < klmClusters.getEntries(); iKLM++) {
+        const TVector3 klmmomcms = (T.rotateLabToCms() * klmClusters[iKLM]->getMomentum()).Vect();
+        double angle = pcms.Angle(klmmomcms);
+
+        if (angle > maxangle) {
+          maxangle = angle;
+        }
+      }
+
+      return maxangle;
+    }
 
     VARIABLE_GROUP("KLM Cluster");
 
@@ -113,6 +131,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
                       "Returns KLM cluster's number of the innermost layer with hits.");
     REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns KLM cluster's number of layers with hits.");
+    REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
+                      "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
 
   }
 }

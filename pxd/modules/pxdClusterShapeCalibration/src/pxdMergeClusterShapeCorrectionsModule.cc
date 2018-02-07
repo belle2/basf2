@@ -14,6 +14,8 @@
 // #include <framework/database/DBImportArray.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBObjPtr.h>
+#include <TH1F.h>
+#include <TH1I.h>
 
 using namespace Belle2;
 using namespace Belle2::PXD;

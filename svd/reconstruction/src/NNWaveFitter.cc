@@ -36,31 +36,20 @@ using namespace Eigen;
  * activation is applied. So we have i1,...i(m_nLayers - 1).
  */
 
-int NNWaveFitter::readNetworkData(const string& xmlFileName)
+int NNWaveFitter::readNetworkData(const string& xmlData)
 {
   using namespace boost::property_tree;
   using boost::property_tree::ptree;
 
   ptree propertyTree;
 
-  // Load the XML file into the property tree. If reading fails
-  // (cannot open file, parse error), an exception is thrown.
-  string xmlFullPath = FileSystem::findFile(xmlFileName);
-
-  if (! FileSystem::fileExists(xmlFullPath)) {
-    B2ERROR("The xml filename: " << xmlFileName <<
-            "resolved to: " << xmlFullPath <<
-            " by FileSystem::findFile and seems not to exist." << endl;
-           );
-    return -1;
-  }
-
   try {
-    B2DEBUG(400, "Reading " << xmlFullPath);
-    read_xml(xmlFullPath, propertyTree);
+    B2DEBUG(400, "Reading xml");
+    stringstream ss;
+    ss << xmlData;
+    read_xml(ss, propertyTree);
   } catch (const ptree_error& e) {
-    B2ERROR("PropertyTree excpetion : " << e.what() << " in parsing.");
-    return -1;
+    B2ERROR("Failed to parse xml data: " << e.what());
   } catch (std::exception const& ex) {
     B2ERROR("STD excpetion " << ex.what() << " in parsing.");
     return -1;
@@ -262,19 +251,19 @@ bool NNWaveFitter::checkCoefficients(const std::string& dumpname, double tol)
   return result;
 }
 
-void NNWaveFitter::setNetwrok(const string& xmlFileName)
+void NNWaveFitter::setNetwrok(const string& xmlData)
 {
-  if ((xmlFileName != "") && (readNetworkData(xmlFileName) == 0)) {
+  if ((xmlData != "") && (readNetworkData(xmlData) == 0)) {
     m_isValid = true;
   } else m_isValid = false;
   // We don't issue any additional warnings here.
 }
 
 
-NNWaveFitter::NNWaveFitter(string xmlFileName)
+NNWaveFitter::NNWaveFitter(string xmlData)
 {
   m_wave = w_betaprime;
-  if (xmlFileName != "") setNetwrok(xmlFileName);
+  if (xmlData != "") setNetwrok(xmlData);
 }
 
 

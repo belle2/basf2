@@ -35,17 +35,26 @@ namespace Belle2 {
     /// Default destructor
     ~LayerSVDRelationFilter();
 
+    /// Return all states the given state is possible related to.
     std::vector<CKFToSVDState*> getPossibleTos(CKFToSVDState* from,
-                                               const std::vector<CKFToSVDState*>& states) const override;
+                                               const std::vector<CKFToSVDState*>& states) const final;
 
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+    /// Expose the parameters of the filter
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-    TrackFindingCDC::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) override;
+
+    /// Give a final weight to the possibilities by asking the filter.
+    TrackFindingCDC::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) final;
+
+    /// Initialize the maximal ladder cache
+    void beginRun() final;
 
   private:
     /// Parameter: Make it possible to jump over N layers.
     int m_param_hitJumping = 1;
     /// Filter for rejecting the states
     AFilter m_filter;
+    /// Cached number of ladders per layer
+    std::map<short, unsigned long> m_maximalLadderCache;
   };
 }

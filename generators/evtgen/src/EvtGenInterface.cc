@@ -47,7 +47,7 @@ EvtGenInterface::~EvtGenInterface()
 
 EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName)
 {
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
   initLogCapture.start();
   EvtRandom::setRandomEngine(&EvtGenInterface::m_eng);
 
@@ -64,15 +64,17 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName)
   EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
   return new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
                     radCorrEngine, &extraModels, EvtCPUtil::Coherent);
+
+  initLogCapture.finish();
 }
 
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
                            const std::string& userFileName)
 {
-  B2INFO("Begin initialisation of EvtGen Interface.");
+  B2DEBUG(150, "Begin initialisation of EvtGen Interface.");
 
   //tauola prints normal things to stderr.. oh well.
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
   initLogCapture.start();
   if (!m_Generator) {
     m_Generator = createEvtGen(DECFileName);
@@ -85,7 +87,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   m_ParentParticle = EvtPDL::getId(parentParticle);
   initLogCapture.finish();
 
-  B2INFO("End initialisation of EvtGen Interface.");
+  B2DEBUG(150, "End initialisation of EvtGen Interface.");
 
   return 0;
 }
@@ -137,11 +139,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
   int iPart = addParticles2Graph(m_parent, graph, pPrimaryVertex);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
-  //  B2INFO("convert EvtGen particles to MCParticle list using MCParticleGraph");
-
   m_parent->deleteTree();
-
-  //  B2INFO("finished event simulation");
 
   return iPart; //returns the number of generated particles from evtgen
 }
@@ -182,9 +180,6 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
     int nGrandChildren = currDaughter->getNDaug();
 
-    //    B2INFO(" mother of current daughter: "<<graphDaughter->getMother()->getMass());
-    //B2INFO(" mother of current daughter: "<<currMother->getDaughters()[0]->getMass());
-
     if (nGrandChildren == 0)
       graphDaughter->addStatus(MCParticle::c_StableInGenerator);
     else {
@@ -214,7 +209,6 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->set4Vector(p4);
 
   EvtVector4R Evtpos = eParticle->get4Pos();
-  //  B2INFO("position EVT: "<<EvtPDL::getStdHep(eParticle->getId())<<"  "<<Evtpos);
 
   TVector3 pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
   pVertex = pVertex + pPrimaryVertex;

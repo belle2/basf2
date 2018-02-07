@@ -309,18 +309,19 @@ void CDCCRTestModule::event()
 
     if (m_noBFit) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, NDF=4;
     else {ndf = fs->getNdf();}
+    double Chi2 = fs->getChi2();
+    TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
+    m_hPval->Fill(TrPval);
+    m_hNDF->Fill(ndf);
     if (ndf < 15) continue;
-
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
-      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
         m_hEvtT0->Fill(evtT0);
       } else { continue;}
     }
 
-    double Chi2 = fs->getChi2();
-    TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     d0 = fitresult->getD0();
     z0 = fitresult->getZ0();
     tanL = fitresult->getTanLambda();
@@ -328,8 +329,6 @@ void CDCCRTestModule::event()
     phi0 = fitresult->getPhi0() * 180 / M_PI;
     Pt = fitresult->getMomentum().Perp();
     m_hPhi0->Fill(phi0);
-    m_hPval->Fill(TrPval);
-    m_hNDF->Fill(ndf);
     m_hChi2->Fill(Chi2);
     if (Pt < m_MinimumPt) continue;
     if (m_hitEfficiency && track->getNumberOfCDCHits() > 30 && TrPval > 0.001) {
@@ -466,7 +465,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           t -= cdcgeo.getTimeWalk(wireid, adc);
 
           // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
             //            evtT0 =  m_eventTimeStoreObject->getEventT0();
             t -= evtT0;
           }

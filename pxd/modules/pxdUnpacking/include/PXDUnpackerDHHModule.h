@@ -25,14 +25,13 @@ namespace Belle2 {
 
   namespace PXD {
 
-#define ONSEN_MAX_TYPE_ERR  64
-
-
     /** The PXDUnpackerDHH module.
      *
      * This module is responsible for unpacking the Raw PXD data to Pixels
      */
     class PXDUnpackerDHHModule : public Module {
+
+      enum { ONSEN_MAX_TYPE_ERR = 64};
 
     public:
       /** Constructor defining the parameters */
@@ -160,7 +159,7 @@ namespace Belle2 {
 
       /** Error Mask set per packet / event*/
       uint64_t m_errorMask;
-      /** give verbose unpacking information -> will eb a parameter in next release */
+      /** give verbose unpacking information -> will be a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */
       bool ignore_datcon_flag = true;

@@ -5,6 +5,6 @@ env['LIBS'] = ['$ROOT_LIBS', 'display', 'framework',
                'bklm_dataobjects', 'mdst_dataobjects', 'eklm_dataobjects',
                'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects',
                'simulation_dataobjects', 'tracking_dataobjects', 'arich_dataobjects',
-               'top_dataobjects', 'genfit2']
+               'top_dataobjects', 'trg_cdc_dataobjects', 'genfit2']
 
 Return('env')

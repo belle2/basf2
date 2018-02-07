@@ -1,4 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
+from abc import ABC, abstractmethod
 import subprocess
 import multiprocessing as mp
 from collections import defaultdict
@@ -24,6 +28,9 @@ _input_data_file_path = "input_data_files.data"
 
 
 def get_input_data():
+    """
+    Simple pickle load of the default input data pickle file name for the CAF
+    """
     with open(_input_data_file_path, 'br') as input_data_file:
         input_data = list(pickle.load(input_data_file))
     return input_data
@@ -48,8 +55,13 @@ class Job:
         """
 
         def __init__(self, job, subjob_id, input_files=None):
+            """
+            """
+            #: Id of Subjob
             self.id = subjob_id
+            #: Job() instance of parent to this SubJob
             self.parent = job
+            #: Input files specific to this subjob
             self.input_files = input_files
 
         @property
@@ -137,10 +149,11 @@ class Job:
         Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
         """
         if self.subjobs:
-            if all(map(lambda x: x.result.ready(), self.subjobs.values())):
-                return True
+            for subjob in self.subjobs.values():
+                if not subjob.result.ready():
+                    return False
             else:
-                return False
+                return True
         else:
             return self.result.ready()
 
@@ -209,24 +222,27 @@ class Job:
                 subjob.post_process()
 
 
-class Backend():
+class Backend(ABC):
     """
     Base class for backend of CAF.
     Classes derived from this will implement their own submission of basf2 jobs
     to whatever backend they describe. Common methods/attributes go here.
     """
-
+    #: Default submission script name
     submit_script = "submit.sh"
 
     def __init__(self):
+        """
+        """
         pass
 
+    @abstractmethod
     def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
-        raise NotImplementedError('Need to implement a submit() method in {} backend.'.format(self.__class__.__name__))
+        pass
 
     @staticmethod
     def _dump_input_data(job):
@@ -468,7 +484,7 @@ class Batch(Backend):
         """
         Init method for Batch Backend. Does default setup based on config file.
         """
-        self.subjobs_to_files = None
+        #: ConfigParser object containing some setup config for this class
         self.config = configparser.ConfigParser()
         self.config.read(default_config_file)
 
@@ -481,12 +497,12 @@ class Batch(Backend):
                                    "method in {} backend.".format(self.__class__.__name__)))
 
     @classmethod
+    @abstractmethod
     def _submit_to_batch(cls, cmd):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        raise NotImplementedError(("Need to implement a _submit_to_batch(cls, cmd) "
-                                   "method in {} backend.".format(self.__class__.__name__)))
+        pass
 
     @method_dispatch
     def submit(self, job):
@@ -603,12 +619,18 @@ class Batch(Backend):
         B2INFO('All Requested Jobs Submitted')
 
     @classmethod
+    @abstractmethod
     def _create_job_result(cls, job, batch_output):
-        raise NotImplementedError("Need to implement a _create_job_result(job, batch_output) method")
+        """
+        """
+        pass
 
     @classmethod
+    @abstractmethod
     def _create_cmd(cls, job):
-        raise NotImplementedError("Need to implement a _create_cmd(job) method")
+        """
+        """
+        pass
 
 
 class PBS(Batch):
@@ -652,11 +674,15 @@ class PBS(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.replace("\n", "")
         job.result = cls.Result(job, job_id)
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         return submission_cmd
@@ -666,7 +692,7 @@ class PBS(Batch):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, env={})
         return sub_out
 
     class Result():
@@ -686,16 +712,21 @@ class PBS(Batch):
             self.job = job
             #: Job ID from backend
             self.job_id = job_id
+            #: Quicker accessonce result is ready
+            self._is_ready = False
 
         def ready(self):
             """
             Function that queries qstat to check for jobs that are still running.
             """
+            if self._is_ready:
+                return True
             try:
                 d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             except subprocess.CalledProcessError as cpe:
                 first_line = cpe.output.splitlines()[0]
                 if "Unknown Job Id Error" in first_line:
+                    self._is_ready = True
                     return True
             else:
                 return False
@@ -750,6 +781,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         submission_cmd = " ".join(submission_cmd)
@@ -780,15 +813,20 @@ class LSF(Batch):
             self.job = job
             #: job id given by LSF
             self.job_id = job_id
+            #: Quicker way to know if it's ready once it has been checked
+            self._is_ready = False
 
         def ready(self):
             """
             Function that queries bjobs to check for jobs that are still running.
             """
+            if self._is_ready:
+                return True
             output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             stat_line = output.split("\n")[1]
             status = stat_line.split()[2]
             if "DONE" in output or "EXIT" in output:
+                self._is_ready = True
                 return True
             else:
                 return False
@@ -806,6 +844,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")

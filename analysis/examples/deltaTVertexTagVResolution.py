@@ -63,6 +63,7 @@ else:
 
 
 fitResults = []
+numberOfEntries = []
 
 for VXDReq in VXDReqs:
     iResult = []
@@ -112,7 +113,7 @@ for VXDReq in VXDReqs:
     DTagZ = ROOT.RooRealVar("DSigZ", "DSigZ", 0., -limZTag, limZTag, "cm")
     # DTagZ = ROOT.RooFormulaVar("DTagZ", "DTagZ", "@@0-@@1", ROOT.RooArgList(B0_TagVz, B0_TruthTagVz))
 
-    cut = "abs(B0_qrMC) == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
+    cut = "B0_isSignal == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
 
     if VXDReq == 'PXD1':
         cut = cut + "&& (B0_Jpsi_mu0_nPXDHits> 0 || B0_Jpsi_mu1_nPXDHits> 0) "
@@ -140,7 +141,7 @@ for VXDReq in VXDReqs:
     argSet.add(B0_Jpsi_mu0_nSVDHits)
     argSet.add(B0_Jpsi_mu1_nSVDHits)
 
-    # argSet.add(B0_isSignal)
+    argSet.add(B0_isSignal)
 
     # argSet.add(B0_X)
     # argSet.add(B0_TruthX)
@@ -153,7 +154,7 @@ for VXDReq in VXDReqs:
     # argSet.add(B0_TruthTagVy)
 
     # argSet.add(deltaTErr)
-    argSet.add(B0_qrMC)
+    # argSet.add(B0_qrMC)
 
     data = ROOT.RooDataSet(
         "data",
@@ -164,12 +165,12 @@ for VXDReq in VXDReqs:
 
     if VXDReq == 'PXD1' or VXDReq == 'PXD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_qrMC, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
     elif VXDReq == 'SVD1' or VXDReq == 'SVD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_qrMC, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
     else:
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_qrMC, deltaTErr), cut)
+        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr), cut)
 
     # fitData.append(data)
 
@@ -202,6 +203,7 @@ for VXDReq in VXDReqs:
     fitDataDT.Print()
     fitDataSigZ.Print()
     fitDataTagZ.Print()
+    numberOfEntries.append(data.numEntries())
 
 # Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
 
@@ -642,6 +644,11 @@ print('*                                                             *')
 print('*    ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + '   *')
 print('*                                                             *')
 print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
+print('*                                                             *')
+print('* Efficiency                                                  *')
+print('*                                                             *')
+print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
+      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%  *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

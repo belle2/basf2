@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef EVENTMETADATA_H
-#define EVENTMETADATA_H
+
+#pragma once
 
 #include <TObject.h>
 
@@ -201,4 +201,3 @@ namespace Belle2 {
     ClassDef(EventMetaData, 4); /**< Store event number, run number, and experiment number. */
   }; //class
 } // namespace Belle2
-#endif // EVENTMETADATA

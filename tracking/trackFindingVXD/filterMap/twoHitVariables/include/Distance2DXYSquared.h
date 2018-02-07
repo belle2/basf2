@@ -19,7 +19,7 @@ namespace Belle2 {
 
   /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 2D on the X-Y-plane */
   template <typename PointType>
-  class DISTANCE2DXYSQUARED_NAME : public SelectionVariable< PointType , double > {
+  class DISTANCE2DXYSQUARED_NAME : public SelectionVariable< PointType , 2, double > {
   public:
 
     /** is expanded as "static const std:string name(void)" frunction which returns name of the Class */

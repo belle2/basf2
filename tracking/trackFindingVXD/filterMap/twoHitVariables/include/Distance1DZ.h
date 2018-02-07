@@ -21,7 +21,7 @@ namespace Belle2 {
    *
    * (please note that this is defined for positive and negative values) */
   template <typename PointType >
-  class DISTANCE1DZ_NAME : public SelectionVariable< PointType , double > {
+  class DISTANCE1DZ_NAME : public SelectionVariable< PointType , 2 , double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(DISTANCE1DZ_NAME);

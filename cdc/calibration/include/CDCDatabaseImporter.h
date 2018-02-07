@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <string>
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -65,6 +65,22 @@ namespace Belle2 {
      * print it.
      */
     void printTimeZero();
+
+    /**
+     * Import ADC delta pedestal table to the data base specifying the text data.
+     */
+    void importADCDeltaPedestal(std::string fileName);
+
+    /**
+     * Import ADC delta pedestal with all 0.
+     */
+    void importADCDeltaPedestal();
+
+    /**
+     * Get the ADC delta pedestal table from the database and
+     * print it.
+     */
+    void printADCDeltaPedestal();
 
     /**
      * Import badwire table to the data base.
@@ -152,7 +168,6 @@ namespace Belle2 {
     /**
      * CDC geometory parameter.
      */
-    //    CDC::CDCGeometryPar& m_cdcgp = CDC::CDCGeometryPar::Instance();
     int m_firstExperiment; /**< First experiment. */
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */

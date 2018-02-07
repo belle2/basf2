@@ -9,6 +9,6 @@ env['TOOLS_LIBS']['b2file-metadata-show'] = ['$XML_LIBS', 'framework', 'boost_pr
 env['TOOLS_LIBS']['b2file-metadata-add'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
 
 env['TOOLS_LIBS']['b2file-catalog-add'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
-env['TOOLS_LIBS']['b2file-merge'] = ['background_dataobjects', 'framework_io', 'framework', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['b2file-merge'] = ['framework_io', 'framework', 'boost_program_options', '$ROOT_LIBS']
 
 Return('env')

@@ -25,13 +25,13 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
   if (filPtr) {
     if (filPtr->getMcEvents() == 0) m_realData = true;
-    //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
+//    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
   } else { //judge from MCParticle
     StoreArray<MCParticle> mcp;
     if (!mcp) m_realData = true;
-    //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
+//    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
   }
-  //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
+//  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -41,14 +41,12 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
 #endif
 }
 
-double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
-                                                   const WireID& wireID,
-                                                   double timeOfFlightEstimator,
-                                                   bool leftRight,
-                                                   double z,
-                                                   double alpha,
-                                                   double theta,
-                                                   unsigned short adcCount)
+
+double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
+                                                 const WireID& wireID,
+                                                 double timeOfFlightEstimator,
+                                                 double z,
+                                                 unsigned short adcCount)
 {
   // translate TDC Count into time information:
   // N.B. No correction (+ or -0.5 count) is needed in the translation since no bias is in the real TDC count on average (info. from KEK electronics division).
@@ -77,7 +75,7 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   }
 
   // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
     driftTime -= m_eventTimeStoreObject->getEventT0();
   }
 
@@ -92,6 +90,23 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
     //  } else {
     //    B2INFO("RealisticTDCCountTranslator:: no time-walk corr. for MC now.");
   }
+
+  return driftTime;
+}
+
+
+double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
+                                                   const WireID& wireID,
+                                                   double timeOfFlightEstimator,
+                                                   bool leftRight,
+                                                   double z,
+                                                   double alpha,
+                                                   double theta,
+                                                   unsigned short adcCount)
+{
+  const double driftTime = getDriftTime(tdcCount, wireID, timeOfFlightEstimator, z, adcCount);
+
+  unsigned short layer = wireID.getICLayer();
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric,  Dan Santel                                *
+ * Contributors: Marko Staric, Dan Santel, Boqun Wang                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -70,6 +70,10 @@ namespace Belle2 {
              "track p-value cut used to histogram pulls etc.", 0.001);
     addParam("usePionID", m_usePionID,
              "use pion ID from TOP to histogram pulls etc.", true);
+    addParam("ADCCutLow", m_ADCCutLow, "lower bound of ADC cut", 100);
+    addParam("ADCCutHigh", m_ADCCutHigh, "higher bound of ADC cut", 2048);
+    addParam("PulseWidthCutLow",  m_PulseWidthCutLow, "lower bound of PulseWidth cut", 3);
+    addParam("PulseWidthCutHigh", m_PulseWidthCutHigh, "higher bound of PulseWidth cut", 10);
   }
 
 
@@ -87,36 +91,6 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
     int numTDCbins = geo->getNominalTDC().getNumWindows() * 64;
-
-    // book histograms
-    m_barHits = new TH1F("barHits", "Number of hits per bar",
-                         m_numModules, 0.5, m_numModules + 0.5);
-    m_barHits->GetXaxis()->SetTitle("bar ID");
-    m_barHits->GetYaxis()->SetTitle("hits per bar");
-
-    for (int i = 0; i < m_numModules; i++) {
-      int moduleID = i + 1;
-      string name = str(format("hitsBar%1%") % (moduleID));
-      string title = str(format("Number of hits per pixel, bar#%1%") % (moduleID));
-      int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
-      TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
-                          numPixels, 0.5, numPixels + 0.5);
-      h1->GetXaxis()->SetTitle("pixel ID");
-      h1->GetYaxis()->SetTitle("hits per pixel");
-      m_pixelHits.push_back(h1);
-    }
-
-    for (int i = 0; i < m_numModules; i++) {
-      int moduleID = i + 1;
-      string name = str(format("timeBar%1%") % (moduleID));
-      string title = str(format("Time distribution, bar#%1%") % (moduleID));
-      TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
-                          numTDCbins, 0, numTDCbins);
-      h1->GetXaxis()->SetTitle("time [samples]");
-      h1->GetYaxis()->SetTitle("hits per sample");
-      m_hitTimes.push_back(h1);
-    }
-
 
     m_recoTime = new TH1F("recoTime", "reco: time distribution",
                           500, 0, 50);
@@ -150,6 +124,47 @@ namespace Belle2 {
     m_recoPull_Phic->GetXaxis()->SetTitle("Cerenkov azimuthal angle [deg]");
     m_recoPull_Phic->GetYaxis()->SetTitle("pulls");
 
+    // Histograms from TOPDataQualtiyOnline
+    m_particleHits = new TH1F("particle_hits", "Number of particle hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_otherHits = new TH1F("other_hits", "Number of other hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_particleHits->SetOption("LIVE");
+    m_otherHits->SetOption("LIVE");
+
+    for (int i = 0; i < m_numModules; i++) {
+      int module = i + 1;
+
+      string name1 = str(format("all_hits_xy_%1%") % (module));
+      string title1 = str(format("Number of hits in x-y for module #%1%") % (module));
+      TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
+      h1->SetOption("LIVE");
+      m_allHitsXY.push_back(h1);
+
+      string name2 = str(format("all_TDC_%1%") % (module));
+      string title2 = str(format("TDC distribution for module #%1%") % (module));
+      TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), numTDCbins, 0, numTDCbins);
+      h2->SetOption("LIVE");
+      m_allTdc.push_back(h2);
+
+      string name3 = str(format("particle_channel_hits_%1%") % (module));
+      string title3 = str(format("Number of particle hits by channel of module #%1%") % (module));
+      int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
+      TH1F* h3 = new TH1F(name3.c_str(), title3.c_str(), numPixels, 0.5, numPixels + 0.5);
+      h3->SetOption("LIVE");
+      m_particleChannelHits.push_back(h3);
+
+      string name4 = str(format("particle_hits_per_event%1%") % (module));
+      string title4 = str(format("Number of particle hits per event of module #%1%") % (module));
+      TH1F* h4 = new TH1F(name4.c_str(), title4.c_str(), 50, 0, 50);
+      h4->SetOption("LIVE");
+      m_particleHitsPerEvent.push_back(h4);
+
+      string name5 = str(format("other_hits_per_event%1%") % (module));
+      string title5 = str(format("Number of other hits per event of module #%1%") % (module));
+      TH1F* h5 = new TH1F(name5.c_str(), title5.c_str(), 50, 0, 50);
+      h5->SetOption("LIVE");
+      m_otherHitsPerEvent.push_back(h5);
+    }
+
     // cd back to root directory
     oldDir->cd();
   }
@@ -159,33 +174,64 @@ namespace Belle2 {
     // Register histograms (calls back defineHisto)
     REG_HISTOGRAM;
 
-    StoreArray<TOPDigit>::required();
-    StoreArray<Track>::optional();
+    // register dataobjects
+    m_digits.isRequired();
+    m_tracks.isOptional();
 
   }
 
   void TOPDQMModule::beginRun()
   {
+    m_recoTimeDiff->Reset();
+    m_recoTimeDiff_Phic->Reset();
+    m_recoPull->Reset();
+    m_recoPull_Phic->Reset();
+    m_recoTime->Reset();
+    m_recoTimeBg->Reset();
+    m_recoTimeMinT0->Reset();
+    m_particleHits->Reset();
+    m_otherHits->Reset();
+
+    for (int i = 0; i < m_numModules; i++) {
+      m_allHitsXY[i]->Reset();
+      m_allTdc[i]->Reset();
+      m_particleChannelHits[i]->Reset();
+    }
   }
 
   void TOPDQMModule::event()
   {
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
-      m_barHits->Fill(digit.getModuleID());
+    int n_particle[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int n_other[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
-        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i);
+        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i + 1);
         continue;
       }
-      m_pixelHits[i]->Fill(digit.getPixelID());
-      m_hitTimes[i]->Fill(digit.getRawTime());
+
+      m_allHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
+      m_allTdc[i]->Fill(digit.getRawTime());
+      double ph = digit.getPulseHeight();
+      double pw = digit.getPulseWidth();
+      if (ph > m_ADCCutLow && ph < m_ADCCutHigh && pw > m_PulseWidthCutLow && pw < m_PulseWidthCutHigh) { // particle hits
+        m_particleHits->Fill(i + 1);
+        m_particleChannelHits[i]->Fill(digit.getPixelID());
+        n_particle[i]++;
+      } else { // background hits
+        m_otherHits->Fill(i + 1);
+        n_other[i]++;
+      }
     }
 
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
-      const auto* trackFit = track.getTrackFitResult(Const::pion);
+    for (int i = 0; i < 16; i++) {
+      m_particleHitsPerEvent[i]->Fill(n_particle[i]);
+      m_otherHitsPerEvent[i]->Fill(n_other[i]);
+    }
+
+    for (const auto& track : m_tracks) {
+      const auto* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit) continue;
       if (trackFit->getMomentum().Mag() < m_momentumCut) continue;
       if (trackFit->getPValue() < m_pValueCut) continue;

@@ -24,6 +24,9 @@
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 //
 
 
@@ -51,7 +54,9 @@ namespace Belle2 {
 
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
-      std::string m_xmlMapFileName;
+
+
+      bool m_simulate3sampleData;
 
 
     private:
@@ -65,8 +70,10 @@ namespace Belle2 {
       int n_basf2evt; //event number
       int m_nodeid; // Node ID
 
+      static std::string m_xmlFileName;
+      DBObjPtr<PayloadFile> m_mapping;
 
-      SVDOnlineToOfflineMap* m_map;
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //SVDStripNoiseMap* m_noiseMap;
       std::unordered_map<unsigned short, unsigned short> fadcNumbers;
       short iCRC;
@@ -74,15 +81,14 @@ namespace Belle2 {
       uint32_t crc16Input[1000];
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
-      void inline addData32(uint32_t data32)
+      void inline addData32(uint32_t adata32)
       {
-        data_words.push_back(data32);
-        crc16Input[iCRC] = data32;
+        data_words.push_back(adata32);
+        crc16Input[iCRC] = adata32;
         iCRC++;
       }
 
 
-      void loadMap();
       void prepFADClist();
       void binPrintout(unsigned int nwords);
 
@@ -104,7 +110,8 @@ namespace Belle2 {
         unsigned int trgTiming : 3;
         unsigned int onebit : 1;
         unsigned int FADCnum : 8;
-        unsigned int evtType : 3;
+        unsigned int evtType : 1; // Event type(0): 0…TTD event, 1…standalone event
+        unsigned int DAQMode : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
         unsigned int runType : 2;
         unsigned int check : 3; //MSB
       };
@@ -167,7 +174,10 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
+
       int m_FADCTriggerNumberOffset;
 
     };

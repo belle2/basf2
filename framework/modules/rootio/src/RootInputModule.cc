@@ -381,9 +381,6 @@ void RootInputModule::readTree()
       B2FATAL("Could not read data from parent file!");
   }
 
-  const StoreObjPtr<EventMetaData> eventMetaData;
-  if (!m_recovery or fileMetaData)
-    eventMetaData->setParentLfn(fileMetaData->getLfn());
 }
 
 
@@ -524,7 +521,7 @@ bool RootInputModule::readParentTrees()
     TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
-      B2DEBUG(50, "Opening parent file: " << parentPfn);
+      B2DEBUG(100, "Opening parent file: " << parentPfn);
       TFile* file = TFile::Open(parentPfn.c_str(), "READ");
       dir->cd();
       if (!file || !file->IsOpen()) {

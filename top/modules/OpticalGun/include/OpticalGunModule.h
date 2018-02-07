@@ -16,6 +16,11 @@
 #include <TVector3.h>
 #include <TRotation.h>
 
+// DataStore
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <top/dataobjects/TOPSimCalPulse.h>
+
 namespace Belle2 {
 
   /**
@@ -100,6 +105,10 @@ namespace Belle2 {
     TVector3 m_translate;  /**< translation to Belle II frame */
     TRotation m_rotate;    /**< rotation to Belle II frame */
     TRotation m_rotateBar; /**< rotation of a bar */
+
+    // data store objects
+    StoreArray<MCParticle> m_MCParticles; /**< MC particles collection */
+    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< simulated cal pulse collection */
 
     /**
      * Checks if photon flies through the slit

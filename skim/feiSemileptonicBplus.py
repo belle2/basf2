@@ -17,15 +17,21 @@ from basf2 import *
 from modularAnalysis import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
-gb2_setuprel = 'build-2017-09-08'
-reset_database()
-use_local_database('/cvmfs/belle.cern.ch/conditions/GT_gen_prod_003.01_Master-20170721-132500-FEI-skim-a.txt', readonly=True)
 
 
-fileList =\
-    ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000273/s00/e0000/4S/r00000/signal/sub00/*'
-     ]
+gb2_setuprel = 'release-01-00-00'
+
+use_central_database('production', LogLevel.WARNING, 'fei_database')
+
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
+
 inputMdstList('default', fileList)
+
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
 
 
 import fei

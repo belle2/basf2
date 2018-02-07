@@ -110,6 +110,16 @@ void PXDDQMExpressRecoMinModule::defineHisto()
                               c_nPXDSensors, 0, c_nPXDSensors);
   m_hitMapClCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCounts->GetYaxis()->SetTitle("counts");
+  for (int i = 0; i < c_nPXDSensors; i++) {
+    int iLayer = 0;
+    int iLadder = 0;
+    int iSensor = 0;
+    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+    TString AxisTicks = Form("%i_%i_%i", iLayer, iLadder, iSensor);
+    m_hitMapCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+    m_hitMapClCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
+  }
+
   m_fired = new TH1F*[c_nPXDSensors];
   m_clusters = new TH1F*[c_nPXDSensors];
   m_startRow = new TH1F*[c_nPXDSensors];

@@ -163,8 +163,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
   config1.pTmin = 0.02; // minimal relevant version
-//   config1.pTmax = 0.15; // minimal relevant version
-  config1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
+  config1.pTmax = 6.0; // minimal relevant version // Feb18-onePass-Test
   config1.pTSmear = 0.;
   config1.allowedLayers = {0, 3, 4, 5, 6};
 //   config1.uSectorDivider = { .15, .5, .85, 1.};
@@ -192,7 +191,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
   config1point1.pTmin = 0.02; // minimal relevant version
-  config1point1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
+  config1point1.pTmax = 6.0; // minimal relevant version // Feb18-onePass-Test
   config1point1.pTSmear = 0.;
   config1point1.allowedLayers = {0, 1, 2, 3, 4, 5, 6};
   config1point1.uSectorDivider = { .3, .7, 1.}; // standard relevant version
@@ -230,7 +229,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   SectorMapConfig config3;
 //   config3.pTCuts = {0.290, 3.5};
   config3.pTmin = 0.290;
-  config3.pTmax = 3.5;
+  config3.pTmax = 6.0;
   config3.pTSmear = 0.;
   config3.allowedLayers = {0, 3, 4, 5, 6};
   config3.uSectorDivider = { .15, .5, .85, 1.};
@@ -260,13 +259,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config4.seedMaxDist2IPZ = 23.5;
   config4.nHitsMin = 3;
   config4.vIP = B2Vector3D(0, 0, 0);
-
   config4.secMapName = "STRESS";
   config4.mField = 1.5;
   config4.rarenessThreshold = 0.001;
   config4.quantiles = {0.005, 1. - 0.005};
-
-
   for (double stress = .1; stress < 1.; stress += .1) {
     config4.uSectorDivider.push_back(stress);
     config4.vSectorDivider.push_back(stress);
@@ -311,6 +307,7 @@ void
 SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 {
 
+  // TODO: change naming! This is poor naming as these include also Triplet filters!
   VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 

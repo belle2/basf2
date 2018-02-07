@@ -17,16 +17,22 @@ from modularAnalysis import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from stdCharged import *
-gb2_setuprel = 'build-2017-09-08'
-reset_database()
-use_local_database('/cvmfs/belle.cern.ch/conditions/GT_gen_prod_003.01_Master-20170721-132500-FEI-skim-a.txt', readonly=True)
+gb2_setuprel = 'release-01-00-00'
 
 
-fileList =\
-    ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000273/s00/e0000/4S/r00000/signal/sub00/*'
-     ]
+use_central_database('production', LogLevel.WARNING, 'fei_database')
+
+
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
+
+
 inputMdstList('default', fileList)
 
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
 particles = fei.get_default_channels()
@@ -38,34 +44,18 @@ analysis_main.add_module('MCMatcherParticles', listName='B+:semileptonic', loose
 
 # now the FEI reconstruction is done
 # and we're back in analysis_main pathB
-
-from variables import variables
-variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
-# apply some very loose cuts to reduce the number
-# of Btag candidates
-applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
-# now signal side
 stdMu('all')
 stdE('all')
+from feiSLBplusWithOneLep_List import *
+UpsilonList = BplusSLWithOneLep()
 
-
-reconstructDecay('B+:sig1 -> e+:all', 'Mbc>0', 1)
-reconstructDecay('B+:sig2 -> mu+:all', 'Mbc>0', 2)
-reconstructDecay('B+:sig3 -> e-:all', 'Mbc>0', 3)
-reconstructDecay('B+:sig4 -> mu-:all', 'Mbc>0', 4)
-
-copyLists('B+:all', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'])
-
-reconstructDecay('Upsilon(4S):sig -> B-:semileptonic B+:all', '')
-
-buildRestOfEvent('Upsilon(4S):sig')
-
-UpsilonList = ['Upsilon(4S):sig']
-
-skimOutputUdst('feiSemileptonicBpluswithOneLep', UpsilonList)
+skimOutputUdst('feiSLBplusWithOneLep', UpsilonList)
 summaryOfLists(UpsilonList)
 
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

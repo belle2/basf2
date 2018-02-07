@@ -107,7 +107,7 @@ main.add_module(progress)
 nodeid = 0
 Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
-Packer.param('svdDigitListName', 'SVDDigits')
+Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 main.add_module(Packer)
 

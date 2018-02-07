@@ -356,26 +356,6 @@ def get_store_only_rawdata_path(additonal_store_arrays_to_keep=[]):
     return store_rawdata_path
 
 
-def create_test_path(path, runtype="collision"):
-    path = basf2.create_path()
-    # specify number of events to be generated
-    path.add_module('EventInfoSetter', evtNumList=[1])
-    path.add_module("HistoManager", histoFileName=os.path.join(tempfolder, "hlt_steering_file_test.root"))
-
-    if runtype == "collision":
-        generators.add_continuum_generator(path, finalstate="uubar")
-    elif runtype == "cosmics":
-        generators.add_cosmics_generator(path)
-
-    return (path, tempfolder)
-
-
-def finalize_test_path(path, tempfolder):
-
-    basf2.process(path)
-    shutil.rmtree(tempfolder)
-
-
 def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME,
                                           production_global_tag_name="development"):
     """

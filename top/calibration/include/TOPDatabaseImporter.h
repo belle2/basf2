@@ -53,6 +53,15 @@ namespace Belle2 {
     void importLocalT0Calibration(std::string fileNames);
 
 
+
+    /**
+     * Import module T0 calibration constants to database
+     * The input is the text file
+     * @param fileNames file names separated by space (since vector doesn't work!)
+     */
+    void importModuleT0Calibration(std::string fileNames);
+
+
     /**
      * Prints sample time calibration info about constants stored in database
      */

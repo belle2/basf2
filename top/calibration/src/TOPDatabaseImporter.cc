@@ -34,6 +34,7 @@
 // DB objects
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
@@ -260,6 +261,64 @@ namespace Belle2 {
 
     B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: "
              << nCalTot << "/ 8192");
+  }
+
+
+
+  void TOPDatabaseImporter::importModuleT0Calibration(string fNames)
+  {
+    vector<string> fileNames;
+    stringstream ss(fNames);
+    string fName;
+    while (ss >> fName) {
+      fileNames.push_back(fNames);
+    }
+
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+
+    for (const auto& fileName : fileNames) {
+      ifstream inFile("minuit021_390.dat");
+      B2INFO("--> Opening constants file " << fileName);
+
+      if (!inFile) {
+        B2ERROR("openFile: " << fileName << " *** failed to open");
+        continue;
+      }
+      B2INFO("--> " << fileName << ": open for reading");
+
+      int slot[16] = {0};
+      int slot_err[16] = {0};
+      double T0[16] = {0};
+      double T0_err[16] = {0};
+
+      B2INFO("--> importing constants");
+
+      int index = 0;
+
+      while (!inFile.eof()) {
+        inFile >> slot[ index ] >> slot_err[ index ] >> T0[ index ] >> T0_err[ index ];
+        if (slot[ index ] < 1 || slot[ index ] > 16) {
+          B2ERROR("Module ID is not valid. Skipping the entry.");
+          continue;
+        }
+        moduleT0->setT0(slot[ index ], T0[ index ], T0_err[ index ]);
+        index++;
+      }
+      inFile.close();
+      B2INFO("--> Input file closed");
+    }
+    IntervalOfValidity iov(0, 0, -1, -1);
+    moduleT0.import(iov);
+
+    B2INFO("Summary: ");
+    for (int iSlot = 1; iSlot < 17; iSlot++) {
+      B2INFO("--> Time offset of Slot " << iSlot << " = " << moduleT0->getT0(iSlot));
+    }
+
+
   }
 
 

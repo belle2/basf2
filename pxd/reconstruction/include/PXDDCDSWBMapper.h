@@ -21,6 +21,7 @@ namespace Belle2 {
 
     /** Class to return ID of DCD and SWB (switcher) chip in sensor.
      * Deatails: in PXD WhiteBook 3.1.3 Sensor Design and Appendix #3
+     * https://confluence.desy.de/display/BI/PXD+WebHome?preview=/34029260/56330158/PXDwb.pdf
      *
      */
     class PXDDCDSWBMapper {
@@ -35,14 +36,12 @@ namespace Belle2 {
        * @param sensorID sensor details for PXD sensors
        * @returns DCD ID
        */
-      int getDCDID(const int& u, const int& v, VxdID sensorID);
+      int getDCDID(int& u, int& v, const VxdID sensorID) const;
       /** get ID of SWB for giving pixel, range: 0..5.
        * @param v pixels coordinate in u
        * @returns SWB ID
        */
-      int getSWBID(const int& v);
-
-    private:
+      int getSWBID(int& v) const;
 
     };
 

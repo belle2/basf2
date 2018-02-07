@@ -64,7 +64,8 @@ def add_pxd_ckf(path, *args, **kwargs):
 
 
 def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,
-                                filter_cut=0.03, overlap_cut=None, use_best_seeds=10, use_best_results=2):
+                                filter_cut=0.03, overlap_cut=None, use_best_seeds=10, use_best_results=2,
+                                only_use_tracks_with_svd=True, direction="backward"):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
@@ -76,6 +77,8 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
     :param overlap_cut: CKF parameter for MVA overlap filter. Default is 0.2 for phase 3 and 0 for phase 2.
     :param use_best_results: CKF parameter for useBestNInSeed
     :param use_best_seeds: CKF parameter for UseNStates
+    :param only_use_tracks_with_svd: Include a cut on the input tracks to have SVD hits
+    :param direction: where to extrapolate to. Valid options are forward and backward
     """
 
     if "PXDSpacePointCreator" not in path:
@@ -83,7 +86,10 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
-    direction = "backward"
+    if direction == "forward":
+        reverse_seed = True
+    else:
+        reverse_seed = False
 
     if use_mc_truth:
         path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
@@ -135,7 +141,9 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
                     outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
 
-                    reverseSeed=False,
+                    onlyUseTracksWithSVD=only_use_tracks_with_svd,
+
+                    reverseSeed=reverse_seed,
                     **module_parameters)
 
 

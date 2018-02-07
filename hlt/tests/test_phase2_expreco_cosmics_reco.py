@@ -10,4 +10,4 @@ add_expressreco_processing(path, run_type="cosmics")
 
 # also has softwaretriggerresult, because the ST modules
 # are always added, even in the default reco
-finalize_test_path(path, tempfolder)
+finalize_test_path(path, tempfolder, has_softwaretriggerresult=False)

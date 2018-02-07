@@ -18,7 +18,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
-using namespace CDC;
 
 REG_MODULE(MergerCosmicTracks);
 

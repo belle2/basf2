@@ -18,7 +18,7 @@ def add_softwaretrigger_reconstruction(
         path,
         store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
-        additionalTrackFitHypotheses=[],
+        trackFitHypotheses=[211],
         softwaretrigger_mode='hlt_filter',
         additonal_store_arrays_to_keep=[],
         pruneDataStore=True,
@@ -93,7 +93,7 @@ def add_softwaretrigger_reconstruction(
     # Add fast reco reconstruction
     if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:
         reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True,
-                                          components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+                                          components=components, trackFitHypotheses=trackFitHypotheses)
         # Add fast reco cuts
         fast_reco_cut_module = add_fast_reco_software_trigger(fast_reco_reconstruction_path, store_array_debug_prescale)
         if softwaretrigger_mode in ['fast_reco_filter', 'hlt_filter']:
@@ -108,7 +108,7 @@ def add_softwaretrigger_reconstruction(
 
         # Add hlt reconstruction
         reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
-                                          components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+                                          components=components, trackFitHypotheses=trackFitHypotheses)
 
         hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 

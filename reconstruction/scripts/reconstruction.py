@@ -57,14 +57,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
-    # add svd_reconstruction
-    if components is None or 'SVD' in components:
-        add_svd_reconstruction(path)
-
-    # add pxd_reconstruction
-    if components is None or 'PXD' in components:
-        add_pxd_reconstruction(path)
-
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
                                 components=components,

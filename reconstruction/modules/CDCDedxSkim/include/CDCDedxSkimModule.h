@@ -56,6 +56,9 @@ namespace Belle2 {
 
   private:
 
+    // required input
+    StoreArray<Track> m_tracks; /**< Required array of input tracks */
+
     /** the event number */
     int m_eventID;
     /** the track number (for one event) */

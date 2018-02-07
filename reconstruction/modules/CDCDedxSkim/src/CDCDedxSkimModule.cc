@@ -58,11 +58,7 @@ void CDCDedxSkimModule::initialize()
 {
 
   // requred inputs
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
-  StoreArray<RecoTrack>::required();
-  StoreArray<CDCHit>::required();
-  //  StoreArray<ECLCluster>::required();
+  m_tracks.isRequired();
 }
 
 void CDCDedxSkimModule::event()
@@ -103,17 +99,13 @@ void CDCDedxSkimModule::event()
     }
   }
 
-  // inputs
-  StoreArray<Track> tracks;
-  //  StoreArray<ECLCluster> clusters;
-
   int nGoodElectrons = 0;
   int nGoodMuons = 0;
 
   // loop over each track in the event and cut on track quality information
   m_trackID = 0;
-  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-    const Track* track = tracks[iTrack];
+  for (int iTrack = 0; iTrack < m_tracks.getEntries(); iTrack++) {
+    const Track* track = m_tracks[iTrack];
     m_trackID++;
 
     // if no type is specified, just clean up based on missing track fits
@@ -128,7 +120,7 @@ void CDCDedxSkimModule::event()
 
       if (!isGoodTrack(track, Const::electron)) break;
 
-      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
+      const TrackFitResult* fitResult = track->getTrackFitResult(Const::electron);
       TVector3 trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_e * mass_e);
       double EoverP = trackEnergy / trackMom.Mag();
@@ -144,7 +136,7 @@ void CDCDedxSkimModule::event()
 
       if (!isGoodTrack(track, Const::muon)) break;
 
-      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::muon);
+      const TrackFitResult* fitResult = track->getTrackFitResult(Const::muon);
       TVector3 trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_mu * mass_mu);
       double EoverP = trackEnergy / trackMom.Mag();

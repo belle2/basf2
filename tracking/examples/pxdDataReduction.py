@@ -60,7 +60,7 @@ param_pxdROIFinderAnalysis = {
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'writeToRoot': True,
-    'rootFileName': 'pxdROIFinderAnalysis_SVDCDC_MCTF_test',
+    'rootFileName': 'pxdDataRedAnalysis_SVDCDC_MCTF_test',
 }
 pxdROIFinderAnalysis.param(param_pxdROIFinderAnalysis)
 
@@ -72,7 +72,7 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
 add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC'], usePXDDataReduction=False)
-add_tracking_reconstruction(main, ['SVD', 'CDC'], use_vxdtf2=False, mcTrackFinding=True)
+add_tracking_reconstruction(main, ['SVD', 'CDC'], mcTrackFinding=True)
 main.add_module(pxdROIFinder)
 main.add_module(pxdROIFinderAnalysis)
 # display = register_module("Display")

@@ -29,7 +29,7 @@ evtgeninput.logging.log_level = LogLevel.INFO
 pxdROIFinder = register_module('PXDROIFinder')
 pxdROIFinder.logging.log_level = LogLevel.DEBUG
 # pxdROIFinder.logging.debug_level = 2
-param_pxdDataRed = {
+param_pxdROIFinder = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
@@ -50,7 +50,7 @@ param_pxdDataRed = {
     'maxWidthU': 0.5,
     'maxWidthV': 0.5,
 }
-pxdROIFinder.param(param_pxdDataRed)
+pxdROIFinder.param(param_pxdROIFinder)
 
 # PXD digitization module
 PXDDIGI = register_module('PXDDigitizer')

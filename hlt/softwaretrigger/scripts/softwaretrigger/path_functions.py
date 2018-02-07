@@ -14,6 +14,8 @@ from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_tri
 from daqdqm.collisiondqm import add_collision_dqm
 from daqdqm.cosmicdqm import add_cosmic_dqm
 
+from rawdata import add_unpackers
+
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
@@ -94,6 +96,7 @@ def finalize_hlt_path(path):
 def add_hlt_processing(path, run_type="collision",
                        with_bfield=True,
                        pruneDataStore=True,
+                       additonal_store_arrays_to_keep=[],
                        components=DEFAULT_HLT_COMPONENTS,
                        softwaretrigger_mode='hlt_filter'):
     add_unpackers(path, components=components)

@@ -377,10 +377,10 @@ namespace Belle2 {
     {
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_weight_variable);
       int nentries = getNumberOfEvents();
-      std::vector<float> values(nentries);
+      std::vector<float> values(nentries, 1.);
+
       if (branchName.empty()) {
         B2INFO("No TBranch name given for weights. Using 1s as default weights.");
-        std::fill(values.begin(), values.end(), 1.);
         return values;
       }
 
@@ -390,7 +390,6 @@ namespace Belle2 {
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
       if (not branch) {
         B2WARNING("TBranch for weights named '" << branchName.c_str()  << "' does not exist! Using 1s as default weights.");
-        std::fill(values.begin(), values.end(), 1.);
         return values;
       }
       branch->SetAddress(&object);
@@ -415,6 +414,9 @@ namespace Belle2 {
 
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
     {
+      if (iFeature >= getNumberOfFeatures()) {
+        B2ERROR("Feature index " << iFeature << " is out of bounds of given number of features: " << getNumberOfFeatures());
+      }
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
@@ -423,6 +425,9 @@ namespace Belle2 {
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      if (not branch) {
+        B2ERROR("TBranch for features named '" << branchName.c_str()  << "' does not exist!");
+      }
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         auto entry = m_tree->LoadTree(i);
@@ -445,6 +450,10 @@ namespace Belle2 {
 
     std::vector<float> ROOTDataset::getSpectator(unsigned int iSpectator)
     {
+      if (iSpectator >= getNumberOfSpectators()) {
+        B2ERROR("Spectator index " << iSpectator << " is out of bounds of given number of spectators: " << getNumberOfSpectators());
+      }
+
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
@@ -453,6 +462,9 @@ namespace Belle2 {
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      if (not branch) {
+        B2ERROR("TBranch for spectators named '" << branchName.c_str()  << "' does not exist!");
+      }
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         auto entry = m_tree->LoadTree(i);

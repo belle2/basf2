@@ -378,11 +378,21 @@ namespace Belle2 {
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_weight_variable);
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
+      if (branchName.empty()) {
+        B2INFO("No TBranch name given for weights. Using 1s as default weights.");
+        std::fill(values.begin(), values.end(), 1.);
+        return values;
+      }
 
       float object;
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      if (not branch) {
+        B2WARNING("TBranch for weights named '" << branchName.c_str()  << "' does not exist! Using 1s as default weights.");
+        std::fill(values.begin(), values.end(), 1.);
+        return values;
+      }
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         auto entry = m_tree->LoadTree(i);

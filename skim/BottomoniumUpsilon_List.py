@@ -18,7 +18,7 @@ def UpsilonList():
     fillParticleList('mu+:stiff', 'p<15 and p>3.5')
     fillParticleList('e+:stiff', 'p<15 and p>3.5')
     fillParticleList('pi+:soft', 'p<1.5 and pt>0.05')
-    cutAndCopyList('gamma:soft', 'gamma:skim', 'E>0.15')
+    cutAndCopyList('gamma:soft', 'gamma:loose', 'E>0.15')
     reconstructDecay('Upsilon:ee -> e+:stiff e-:stiff', 'M > 8')
     reconstructDecay('Upsilon:mumu -> mu+:stiff mu-:stiff', 'M > 8')
     copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'])

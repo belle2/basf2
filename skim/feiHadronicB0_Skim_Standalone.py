@@ -17,10 +17,8 @@ from basf2 import *
 from modularAnalysis import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
-
-
+from skimExpertFunctions import *
 gb2_setuprel = 'release-01-00-00'
-
 use_central_database('production', LogLevel.WARNING, 'fei_database')
 
 fileList = [
@@ -33,32 +31,25 @@ inputMdstList('default', fileList)
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
-
 import fei
 particles = fei.get_default_channels()
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
-analysis_main.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
+analysis_main.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 
-# now the FEI reconstruction is done
-# and we're back in analysis_main pathB
-
-# apply some very loose cuts to reduce the number
-# of Btag candidates
-
-applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and extraInfo(decayModeID)<8')
-# rank Btag canidates according to their SignalProbability
+from feiHadronicB0_List import *
+B0hadronicList = B0hadronic()
+skimOutputUdst('feiHadronicB0', B0hadronicList)
+summaryOfLists(B0hadronicList)
 
 
-BplusSemiLeptonicList = ['B+:semileptonic']
-
-
-skimOutputUdst('feiSemiLeptonicBplus', BplusSemiLeptonicList)
-summaryOfLists(BplusSemiLeptonicList)
-
-
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
+    if module.type() == "MCMatcher":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

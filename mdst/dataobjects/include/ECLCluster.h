@@ -398,7 +398,6 @@ namespace Belle2 {
 
     /** Class definition */
     ClassDef(ECLCluster, 10);
-    // 11: Added hypothesis enum
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId

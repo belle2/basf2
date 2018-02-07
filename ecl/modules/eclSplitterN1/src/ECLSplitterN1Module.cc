@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Main reconstruction splitter code for the Nn photon hypothesis.        *
+ * Main reconstruction splitter code for the n photon hypothesis.         *
  * Based on a connected region (CR) we look for local maxima and          *
  * create one shower for each local maximum (LM). In case of multiple     *
  * LM in one CR the energy is shared between the showers based on         *
@@ -733,7 +733,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Get unique ID
       aECLShower->setShowerId(iShower);
       ++iShower;
-      aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+      aECLShower->setHypothesisId(ECLCluster::c_nPhotons);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 
       // Add relation to the CR.

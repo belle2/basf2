@@ -572,10 +572,10 @@ void ECLShowerShapeModule::prepareSecondMomentCorrectionsCallback()
   }
 
   //   Check that all corrections are there
-  if (m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N1].GetN() == 0 or
-      m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N1].GetN() == 0 or
-      m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N2].GetN() == 0 or
-      m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N2].GetN() == 0) {
+  if (m_secondMomentCorrections[c_thetaType][ECLCluster::c_nPhotons].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLCluster::c_nPhotons].GetN() == 0 or
+      m_secondMomentCorrections[c_thetaType][ECLCluster::c_neutralHadron].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLCluster::c_neutralHadron].GetN() == 0) {
     B2FATAL("Missing corrections for second moments..");
   }
 }

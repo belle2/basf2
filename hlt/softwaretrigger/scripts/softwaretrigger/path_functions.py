@@ -24,6 +24,9 @@ DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 
 def setup_basf2_and_db():
+    """
+    Setupl local database usage for HLT
+    """
 
     basf2.set_log_level(basf2.LogLevel.ERROR)
     ##########
@@ -39,6 +42,9 @@ def setup_basf2_and_db():
 
 
 def create_hlt_path():
+    """
+    Create and return a path used for HLT and ExpressReco running
+    """
     path = basf2.create_path()
     # todo: insert crash handling path
     # crashsafe_path = basf2.create_path()
@@ -66,6 +72,9 @@ def create_hlt_path():
 
 
 def finalize_hlt_path(path):
+    """
+    Add the required output modules for HLT
+    """
     ##########
     # Output
     ##########
@@ -100,6 +109,9 @@ def add_hlt_processing(path, run_type="collision",
                        additonal_store_arrays_to_keep=[],
                        components=DEFAULT_HLT_COMPONENTS,
                        softwaretrigger_mode='hlt_filter'):
+    """
+    Add all modules for processing on HLT filter machines
+    """
     add_unpackers(path, components=components)
 
     if run_type == "collision":
@@ -131,6 +143,9 @@ def add_expressreco_processing(path, run_type="collision",
                                with_bfield=True,
                                components=DEFAULT_EXPRESSRECO_COMPONENTS,
                                do_reconstruction=True):
+    """
+    Add all modules for processing on the ExpressReco machines
+    """
     add_unpackers(path, components=components)
 
     if run_type == "collision":
@@ -281,6 +296,9 @@ def add_softwaretrigger_reconstruction(
 
 
 def add_online_dqm(path, run_type, dqm_environment):
+    """
+    Add DQM plots for a specific run type and dqm environment
+    """
     if run_type == "collision":
         add_collision_dqm(path, dqm_environment=dqm_environment)
     elif run_type == "cosmics":
@@ -290,10 +308,16 @@ def add_online_dqm(path, run_type, dqm_environment):
 
 
 def add_hlt_dqm(path, run_type):
+    """
+    Add all the DQM modules for HLT to the path
+    """
     add_online_dqm(path, run_type, "hlt")
 
 
 def add_expressreco_dqm(path, run_type):
+    """
+    Add all the DQM modules for ExpressReco to the path
+    """
     add_online_dqm(path, run_type, "expressreco")
 
 

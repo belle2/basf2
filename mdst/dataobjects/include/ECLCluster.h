@@ -33,7 +33,7 @@ namespace Belle2 {
       c_muonNPhotons = 1,
       /** CR is reconstructed as a charged hadron*/
       c_chargedHadron = 2,
-      /** CR is split into an electron and n photonss*/
+      /** CR is split into an electron and n photons*/
       c_electronNPhotons = 3,
       /** CR is split into n photons*/
       c_nPhotons = 5,

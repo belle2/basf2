@@ -3,7 +3,7 @@
 
 ######################################################
 # This steering file creates the Belle II detector
-# geometry and checks for overlaps
+# geometry at phase 2
 ######################################################
 
 from basf2 import *
@@ -16,8 +16,7 @@ gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
 
 # Geometry builder
 geometry = register_module('Geometry')
-# geometry.param('excludedComponents', ['ECL'])
-geometry.param('excludedComponents', ['ECL', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+geometry.param('excludedComponents', ['ECL'])
 
 # Overlap checker
 overlapchecker = register_module('OverlapChecker')

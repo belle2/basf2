@@ -3,22 +3,17 @@
 
 # *****************************************************************************
 
-# title           : 1_Generation.py
-# description     : Generation & simulation cosmic events (CRY generator)
+# title           : 1_GenerationCosmics.py
+# description     : Generation & simulation cosmic events in VXD (Phase2)
 # author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 7. 11. 2017
+# date            : 8. 2. 2018
 
 # *****************************************************************************
 
 from basf2 import *
-from modularAnalysis import *
-from simulation import add_simulation
-from reconstruction import add_cosmics_reconstruction
-import tracking
+from simulation
 from ROOT import Belle2
-from svd import add_svd_reconstruction
-from pxd import add_pxd_reconstruction
-from EventSelector import EventSelector
+from EventSelectorVXD import EventSelectorVXD
 import sys
 import math
 import os
@@ -51,6 +46,7 @@ cry = register_module('CRYInput')
 cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/cryinput/'))
 
 # user input file
+# setting of date: month-day-year
 cry.param('SetupFile', 'cry.setup')
 
 # acceptance half-lengths - at least one particle has to enter that box to use that event
@@ -77,32 +73,30 @@ main.add_module("Gearbox", fileName='/geometry/Beast2_phase2.xml', override=[
 
 # Register the geometry module
 geometry = register_module('Geometry')
+
 components = [
-    'BeamPipe',
     'MagneticField',
+    'BeamPipe',
     'PXD',
     'SVD',
     'CDC',
     'EKLM',
-    'BKLM']
-
-"""
-'TOP',
-'ARICH',
-'ECL'
-"""
+    'BKLM',
+    'ECL']
 
 geometry.param('components', components)
 main.add_module(geometry)
 
+# main.add_module('Cosmics')
 main.add_module(cry)
 
-add_simulation(main, components=components, usePXDDataReduction=False)
+# simulation cosmic tracks
+simulation.add_simulation(main, components=components, usePXDDataReduction=False)
 
 store = create_path()
-EventSelector = EventSelector()
-EventSelector.if_true(store, AfterConditionPath.CONTINUE)
-main.add_module(EventSelector)
+EventSelectorVXD = EventSelectorVXD()
+EventSelectorVXD.if_true(store, AfterConditionPath.CONTINUE)
+main.add_module(EventSelectorVXD)
 
 # output
 output = register_module('RootOutput')

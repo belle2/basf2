@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# *****************************************************************************
 
-#
-# Opens a .root/.sroot file and shows MCParticles,
-# SimHits and Tracks using the Display module.
-# Usage:
-#  basf2 display/example/display.py -i MyInputFile.root
-#
-# Note: this file is also used by the 'b2display' command,
-# so the following is also possible:
-#  b2display MyInputFile.root
-#
-# If you want custom settings for b2display, you thus only need to
-# edit this steering file.
+# title           : displayData.py
+# description     : Display data in phase2 geometry
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
+
+#  basf2 displayData.py -i MyInputFile.root
 
 from basf2 import *
 from ROOT import Belle2
@@ -33,8 +30,7 @@ gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
 geometry = register_module('Geometry')
 # new ECL geometry contains custom objects that cannot be converted to TGeo
 # add MagneticField off B-field (also greatly speeds up startup)
-geometry.param('excludedComponents', ['ECL', 'TOP', 'ARICH'])
-# geometry.param('excludedComponents', ['ECL'])
+geometry.param('excludedComponents', ['ECL'])
 
 main.add_module(rootinput)
 main.add_module(gearbox)

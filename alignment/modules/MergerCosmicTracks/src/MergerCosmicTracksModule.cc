@@ -24,8 +24,7 @@ REG_MODULE(MergerCosmicTracks);
 
 MergerCosmicTracksModule::MergerCosmicTracksModule() : Module()
 {
-  setDescription("Select cosmic events containing two tracks (up/down) and merge two tracks"
-                 "Old reco tracks store array will be deleted afterwards, if the parameter is set to do so.");
+  setDescription("Select cosmic events containing two tracks (up/down) and merge two tracks");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,

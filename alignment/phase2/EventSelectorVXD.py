@@ -8,10 +8,9 @@ from basf2 import *
 
 import ROOT
 from ROOT import Belle2
-# from ROOT import gROOT, AddressOf
 
 
-class EventSelector(Module):
+class EventSelectorVXD(Module):
 
     """
     Python module to select cosmic events
@@ -20,7 +19,7 @@ class EventSelector(Module):
 
     def __init__(self):
         """ init """
-        super(EventSelector, self).__init__()
+        super(EventSelectorVXD, self).__init__()
 
     def isOK(self, SimHit):
         """ Events with empty VXD (SVD or PXD) SimHits are removed."""

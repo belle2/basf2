@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# *****************************************************************************
 
-"""
-Created on Sun Feb  8 12:39:00 2015
-Plot (mis)alignment of VXD at phase 2
-@author: Jakub Kandra
-"""
+# title           : plotVXDALignmentPayloadPhase2.py
+# description     : Produce png file loaded from localdb for phase 2
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
+
+
 import os
 import sys
 import numpy as np
@@ -26,10 +30,7 @@ if len(sys.argv) < 2:
 inputroot = sys.argv[1]
 file = ROOT.TFile(inputroot, "OPEN")
 vxd = file.Get("VXDAlignment")
-"""
-fileName = 'values.txt'
-fileName = 'errors.txt'
-"""
+
 fileName = inputroot + '.txt'
 text_file = open(fileName, "w")
 text_file.write("layer ladder sensor param value\n")
@@ -335,7 +336,5 @@ for i in range(0, 18):
     line = ['NAN', r'$u$ = NAN', r'$v$ = NAN', r'$w$ = NAN', r'$\alpha$ = NAN', r'$\beta$ = NAN', r'$\gamma$ = NAN']
 
 ax.axis('off')
-# fig.savefig('errors.png', dpi=300)
-# fig.savefig('values.png', dpi=300)
 fig.savefig('output.png', dpi=300)
 plt.show()

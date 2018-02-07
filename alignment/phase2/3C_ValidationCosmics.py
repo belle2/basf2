@@ -3,21 +3,18 @@
 
 # *****************************************************************************
 
-# title           : 3_ValidationCRY.py
+# title           : 3_ValidationCosmics.py
 # description     : Validation of cosmic tracks in phase II
 # author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 29. 11. 2017
+# date            : 8. 2. 2018
 
 # *****************************************************************************
 
 from basf2 import *
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 from modularAnalysis import *
-from VXDHits import VXDHits
+from CosmicAnalysis import CosmicAnalysis
 
 inname = "reconstruction.root"
-outname = "reconstruction.root"
 
 if len(sys.argv) == 3:
     inname = (sys.argv)[1]
@@ -31,25 +28,8 @@ main.add_module('Gearbox')
 
 main.add_module('Geometry')
 
-# detector reconstruction
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'BKLM',
-    'EKLM',
-    'ECL'
-]
-
-VXDHits = VXDHits()
-main.add_module(VXDHits)
-
-# output
-# main.add_module('RootOutput', outputFileName=outname)
+CosmicAnalysis = CosmicAnalysis()
+main.add_module(CosmicAnalysis)
 
 progress = register_module('ProgressBar')
 main.add_module(progress)

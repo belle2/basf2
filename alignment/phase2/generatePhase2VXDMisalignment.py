@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# *****************************************************************************
+
+# title           : generatePhase2VXDMisalignment.py
+# description     : Generation VXD misalignment in phase 2 geometry
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
+
 
 import os
 import sys

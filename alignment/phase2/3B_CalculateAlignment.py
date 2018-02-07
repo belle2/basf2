@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# *****************************************************************************
+
+# title           : 3B_CalculateAlignment.py
+# description     : Calculate alignment using collected data
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
+
 import os
 import sys
 import inspect
@@ -35,15 +44,15 @@ millepede = alignment.MillepedeCalibration(['VXDAlignment', 'BeamParameters'],
                                            path=main)
 millepede.algo.invertSign()
 
-millepede.fixPXDYing()
-millepede.fixPXDYang()
-millepede.fixSVDPat()
-millepede.fixSVDMat()
+# millepede.fixPXDYing()
+# millepede.fixPXDYang()
+# millepede.fixSVDPat()
+# millepede.fixSVDMat()
 
 # Fix all ladders (only ladder=1 in Beast II)
-ladder = 1
-for layer in range(1, 7):
-    millepede.fixVXDid(layer, ladder, 0)
+# ladder = 1
+# for layer in range(1, 7):
+#    millepede.fixVXDid(layer, ladder, 0)
 
 beast2_sensors = [
     (1, 1, 1), (1, 1, 2),

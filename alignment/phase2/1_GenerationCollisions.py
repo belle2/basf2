@@ -3,10 +3,10 @@
 
 # *****************************************************************************
 
-# title           : 1_Generation.py
-# description     : Generation & simulation collision events
+# title           : 1_GenerationCollisions.py
+# description     : Generation & simulation collision events (Phase2)
 # author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 28. 12. 2017
+# date            : 8. 2. 2018
 
 # *****************************************************************************
 
@@ -50,13 +50,8 @@ components = [
     'SVD',
     'CDC',
     'EKLM',
-    'BKLM']
-
-"""
-'TOP',
-'ARICH',
-'ECL'
-"""
+    'BKLM',
+    'ECL']
 
 geometry.param('components', components)
 main.add_module(geometry)
@@ -70,12 +65,10 @@ main.add_module('EvtGenInput')
 # kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
 # kkgeninput.param('taudecaytableFile', '')
 # kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
-
 # main.add_module(kkgeninput)
 
 # detector simulation
-add_simulation(main, components=components)
-# add_simulation(main, bkgfiles=bg)
+add_simulation(main, components=components, bkgfiles=bg)
 
 # trigger simulation
 add_tsim(main)

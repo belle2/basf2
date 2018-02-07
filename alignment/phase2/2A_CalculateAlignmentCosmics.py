@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# *****************************************************************************
+
+# title           : 2A_CalculateAlignmentCosmics.py
+# description     : Calculate alignment using cosmic data (Phase2)
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
 
 from basf2 import *
-
 import os
 import sys
 import ROOT
 
 from ROOT import Belle2
-
 from caf import backends
 from caf.framework import Calibration, CAF
 from alignment import MillepedeCalibration
@@ -27,7 +33,6 @@ if not len(inputFiles):
 # Pre-collector full standard reconstruction path
 main = create_path()
 main.add_module("RootInput")
-# path.add_module("Gearbox")
 main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
 components = [
     'MagneticField',
@@ -36,33 +41,59 @@ components = [
     'SVD',
     'CDC',
     'EKLM',
-    'BKLM']
+    'BKLM',
+    'ECL']
 
+# reconstruction of cosmic track
 add_svd_reconstruction(main)
 add_pxd_reconstruction(main)
 tracking.add_geometry_modules(main, components=components)
-tracking.add_ckf_based_track_finding(main, components=components, reco_tracks="RecoTracks")
-main.add_module("TrackCreator", recoTrackColName="RecoTracks", useClosestHitToIP=True)
+tracking.add_cr_tracking_reconstruction(
+    main,
+    components=components,
+    prune_tracks=False,
+    skip_geometry_adding=True,
+    event_time_extraction=True,
+    merge_tracks=False,
+    data_taking_period='phase2',
+    top_in_counter=False,
+    use_second_cdc_hits=False)
+
+main.add_module('Ext')
+
+reconstruction.add_ecl_modules(main, components)
+main.add_module('ECLTrackShowerMatch')
+main.add_module('ECLElectronId')
+
 main.add_module('EKLMReconstructor')
 main.add_module('BKLMReconstructor')
 main.add_module('KLMK0LReconstructor')
 main.add_module('Muid')
+main.add_module('KLMExpert')
+main.add_module('ClusterMatcher')
+
+# if magnetic field is in components:
 main.add_module(
-    "CDCCosmicTrackMerger",
+    "MergerCosmicTracks",
     recoTracksStoreArrayName="RecoTracks",
     MergedRecoTracksStoreArrayName="CosmicRecoTracks",
-    deleteOtherRecoTracks=True)
+    usingMagneticField=True)
+
+# if magnetic field is not in components:
+"""
+main.add_module(
+    "MergerCosmicTracks",
+    recoTracksStoreArrayName="RecoTracks",
+    MergedRecoTracksStoreArrayName="CosmicRecoTracks",
+    usingMagneticField=False)
+"""
+
 main.add_module(
     "TrackCreator",
     recoTrackColName="CosmicRecoTracks",
     trackColName="CosmicTracks",
     trackFitResultColName="CosmicTrackFitResult",
     useClosestHitToIP=True)
-
-# We assume that we start from non-recontructed data
-# as we change reco-constants in each iteration, std
-# reco needs to be repeated after each calibration.
-# reco.add_reconstruction(path, pruneTracks=False)
 
 # Now use analysis to select alignment tracks/decays
 # Select single muons for aligment...
@@ -83,15 +114,15 @@ millepede = MillepedeCalibration(['VXDAlignment'],
 # For simulated data:
 millepede.algo.invertSign()
 
-millepede.fixPXDYing()
-millepede.fixPXDYang()
-millepede.fixSVDPat()
-millepede.fixSVDMat()
+# millepede.fixPXDYing()
+# millepede.fixPXDYang()
+# millepede.fixSVDPat()
+# millepede.fixSVDMat()
 
 # Fix all ladders (only ladder=1 in Beast II)
-ladder = 1
-for layer in range(1, 7):
-    millepede.fixVXDid(layer, ladder, 0)
+# ladder = 1
+# for layer in range(1, 7):
+#    millepede.fixVXDid(layer, ladder, 0)
 
 beast2_sensors = [
     (1, 1, 1), (1, 1, 2),

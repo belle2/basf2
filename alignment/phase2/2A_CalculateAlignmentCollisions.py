@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import basf2
 
+# *****************************************************************************
+
+# title           : 2A_CalculateAlignmentCollisions.py
+# description     : Calculate alignment using collision data (Phase2)
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
+
+import basf2
 import os
 import sys
 import ROOT
 
 from ROOT import Belle2
-
 from caf import backends
 from caf.framework import Calibration, CAF
 from alignment import MillepedeCalibration
@@ -23,7 +31,6 @@ if not len(inputFiles):
 # Pre-collector full standard reconstruction path
 path = basf2.create_path()
 path.add_module("RootInput")
-# path.add_module("Gearbox")
 path.add_module("Gearbox", fileName='/geometry/Beast2_phase2.xml')
 
 components = [
@@ -33,7 +40,8 @@ components = [
     'SVD',
     'CDC',
     'EKLM',
-    'BKLM']
+    'BKLM',
+    'ECL']
 
 # We assume that we start from non-recontructed data
 # as we change reco-constants in each iteration, std
@@ -57,15 +65,15 @@ millepede = MillepedeCalibration(['VXDAlignment', 'BeamParameters'],
 # For simulated data:
 millepede.algo.invertSign()
 
-millepede.fixPXDYing()
+# millepede.fixPXDYing()
 # millepede.fixPXDYang()
-millepede.fixSVDPat()
+# millepede.fixSVDPat()
 # millepede.fixSVDMat()
 
 # Fix all ladders (only ladder=1 in Beast II)
-ladder = 1
-for layer in range(1, 7):
-    millepede.fixVXDid(layer, ladder, 0)
+# ladder = 1
+# for layer in range(1, 7):
+#    millepede.fixVXDid(layer, ladder, 0)
 
 beast2_sensors = [
     (1, 1, 1), (1, 1, 2),

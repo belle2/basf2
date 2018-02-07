@@ -305,34 +305,58 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     path.add_module(r1)
 
 
-def generateY4S(noEvents, decayTable=None, path=analysis_main):
+def setupEventInfo(noEvents, path=analysis_main):
     """
-    Generated e+e- -> Y(4S) events with EvtGen event generator.
-    The Y(4S) decays according to the user specifed decay table.
-
+    Prepare to generate events. This function sets up the EventInfoSetter.
+    You should call this before adding a generator from generators.
     The experiment and run numbers are set to 1.
 
-    If the simulation and reconstruction is not performed in the sam job,
-    then the Gearbox needs to be loaded. Use loadGearbox(path) function
-    for this purpose.
+    @param noEvents   number of events to be generated
+    @param path       modules are added to this path
+    """
+    evtnumbers = register_module('EventInfoSetter')
+    evtnumbers.param('evtNumList', [noEvents])
+    evtnumbers.param('runList', [1])
+    evtnumbers.param('expList', [1])
+    path.add_module(evtnumbers)
+
+
+def generateY4S(noEvents, decayTable=None, path=analysis_main):
+    """
+    Warning:
+        This functions is deprecated. Please call ``setupForGeneration`` then
+        ``add_evtgen_generator`` from the `generators`` package.
+
+    ::
+        from modularAnalysis import setupEventInfo
+        from generators import add_evtgen_generator
+        setupEventInfo(noEvents, path)
+        add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)
+        # or, for example:
+        add_evtgen_generator(path=analysis_main, finalstate='mixed')
 
     @param noEvents   number of events to be generated
     @param decayTable file name of the decay table to be used
     @param path       modules are added to this path
     """
 
-    evtnumbers = register_module('EventInfoSetter')
-    evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
-    evtgeninput = register_module('EvtGenInput')
-    if decayTable is not None:
-        if os.path.exists(decayTable):
-            evtgeninput.param('userDECFile', decayTable)
-        else:
-            B2ERROR('The specifed decay table file does not exist:' + decayTable)
-    path.add_module(evtnumbers)
-    path.add_module(evtgeninput)
+    message = (
+        "The generateY4S function from modularAnalysis is deprecated.\n"
+        "This function will be removed in release - 02. Please update your scripts.\n"
+        "Please replace it with functions from generators. Here is some example code: \n"
+        "\n"
+        "    from modularAnalysis import setupEventInfo"
+        "    from generators import add_evtgen_generator\n"
+        "    setupEventInfo(noEvents)\n"
+        "    add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)\n"
+    )
+    B2WARNING(message)
+
+    from generators import add_evtgen_generator
+    setupForGeneration(noEvents, path)
+    if not os.path.exists(decayTable):
+        B2FATAL('The specifed decay table file does not exist:' + decayTable)
+    add_evtgen_generator(path, 'signal', decayTable)
 
 
 def generateContinuum(
@@ -343,14 +367,15 @@ def generateContinuum(
     path=analysis_main,
 ):
     """
-    Generated e+e- -> gamma* -> qq-bar where light quarks hadronize
-    and decay in user specified way (via specified decay table).
+    Warning:
+        This functions is deprecated. Please call ``setupForGeneration`` then
+        ``add_continuum_generator`` from the `generators`` package.
 
-    The experiment and run numbers are set to 1.
-
-    If the simulation and reconstruction is not performed in the sam job,
-    then the Gearbox needs to be loaded. Use loadGearbox(path) function
-    for this purpose.
+    ::
+        from modularAnalysis import setupForGeneration
+        from generators import add_continuum_generator
+        setupForGeneration(noEvents, path)
+        add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
     @param noEvents   number of events to be generated
     @param inclusiveP each event will contain this particle
@@ -358,21 +383,28 @@ def generateContinuum(
     @param inclusiveT whether (2) or not (1) charge conjugated inclusive Particles should be included
     @param path       modules are added to this path
     """
+    message = (
+        "The generateContinuum function from modularAnalysis is deprecated.\n"
+        "This function will be removed in release - 02. Please update your scripts.\n"
+        "Please replace it with functions from generators. Here is some example code: \n"
+        "\n"
+        "    from modularAnalysis import setupEventInfo\n"
+        "    from generators import add_continuum_generator\n"
+        "    setupEventInfo(noEvents)\n"
+        "    add_continuum_generator(path, \"ccbar\")  # for example"
+    )
+    B2WARNING(message)
 
-    evtnumbers = register_module('EventInfoSetter')
-    evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
-    evtgeninput = register_module('EvtGenInput')
-    if os.path.exists(decayTable):
-        evtgeninput.param('userDECFile', decayTable)
-    else:
-        B2ERROR('The specifed decay table file does not exist:' + decayTable)
-    evtgeninput.param('ParentParticle', 'vpho')
-    evtgeninput.param('InclusiveParticle', inclusiveP)
-    evtgeninput.param('InclusiveType', inclusiveT)
-    path.add_module(evtnumbers)
-    path.add_module(evtgeninput)
+    from generators import add_continuum_generator
+    setupEventInfo(noEvents)
+    for finalstate in ['uubar', 'ddbar', 'ssbar', 'ccbar']:
+        if decayTable.count(finalstate):
+            B2INFO("Have parsed your decfile and will generate %s" % finalstate)
+            add_continuum_generator(path, finalstate)
+            return
+
+    add_continuum_generator(path, finalstate='', userdecfile=decayTable)
+    return
 
 
 def loadGearbox(path=analysis_main):

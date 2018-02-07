@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * This module calculates the covariance matrix for a N1 showers.         *
+ * This module calculates the covariance matrix for photon showers.       *
  * The matrix depends on the shower region (FWD, Bartel, BWD)             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -19,6 +19,9 @@
 
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
@@ -77,7 +80,7 @@ void ECLCovarianceMatrixModule::event()
   for (auto& eclShower : m_eclShowers) {
 
     // Only correct for N1 showers!
-    if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
+    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
 
       const double energy = eclShower.getEnergy();
 

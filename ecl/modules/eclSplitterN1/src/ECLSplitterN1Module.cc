@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Main reconstruction splitter code for the N1 hypothesis.               *
+ * Main reconstruction splitter code for the Nn photon hypothesis.        *
  * Based on a connected region (CR) we look for local maxima and          *
  * create one shower for each local maximum (LM). In case of multiple     *
  * LM in one CR the energy is shared between the showers based on         *
@@ -29,6 +29,8 @@
 // ECL
 #include <ecl/utility/Position.h>
 
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 // OTHER
 #include <string>
 #include <utility>      // std::pair
@@ -56,7 +58,7 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
   m_eclEventInformation(eclEventInformationName())
 {
   // Set description.
-  setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the all photon hypothesis (N1).");
+  setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the n photon hypothesis.");
   addParam("fullBkgdCount", m_fullBkgdCount, "Number of background digits at full background (as provided by ECLEventInformation).",
            182);
 
@@ -346,7 +348,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
     // Fill shower Ids
     aECLShower->setShowerId(1); // always one (only this single shower in the CR)
-    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+    aECLShower->setHypothesisId(Belle2::ECLCluster::c_nPhotons);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).

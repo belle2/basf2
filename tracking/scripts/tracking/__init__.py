@@ -72,7 +72,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
                                    data_taking_period="gcr2017", top_in_counter=False,
-                                   merge_tracks=True, use_second_cdc_hits=False):
+                                   merge_tracks=False, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 

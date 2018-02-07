@@ -1,23 +1,11 @@
-import basf2
-import generators
-from softwaretrigger.path_functions import setup_basf2_and_db, create_hlt_path, add_hlt_reconstruction, finalize_hlt_path
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from softwaretrigger.path_functions import add_hlt_processing
+from softwaretrigger.test_support import create_test_path, finalize_test_path
 
-
-path = basf2.create_path()
-
-basf2.set_random_seed(12345)
-
-# specify number of events to be generated
-path.add_module('EventInfoSetter', evtNumList=[1], runList=[1], expList=[1])
-path.add_module("HistoManager", histoFileName="RemoveMePlease.root")
-
-# generate BBbar events
-# path.add_module('EvtGenInput')
-generators.add_continuum_generator(path, finalstate="ccbar")
+path, tempfolder = create_test_path(runtype="collision")
 
 # no reconstruction or software trigger added at all
 add_hlt_processing(path, run_type="collision", softwaretrigger_mode="monitor")
 
-finalize_hlt_path(path)
-basf2.print_path(path)
-basf2.process(path)
+finalize_test_path(path, tempfolder)

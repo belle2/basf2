@@ -1,34 +1,11 @@
-import basf2
-import generators
-import tempfile
-import shutil
-import os
-from softwaretrigger.path_functions import add_hlt_processing, get_store_only_rawdata_path
-from rawdata import add_packers
-from simulation import add_simulation
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from softwaretrigger.path_functions import add_hlt_processing
+from softwaretrigger.test_support import create_test_path, finalize_test_path
 
-path = basf2.create_path()
+path, tempfolder = create_test_path(runtype="collision")
 
-basf2.set_random_seed(12345)
-
-test_directory = tempfile.mkdtemp()
-
-# specify number of events to be generated
-path.add_module('EventInfoSetter', evtNumList=[1])
-path.add_module("HistoManager", histoFileName=os.path.join(test_directory, "RemoveMePlease.root"))
-
-generators.add_cosmics_generator(path)
-add_simulation(path, usePXDDataReduction=False)
-add_packers(path)
-
-# remove everything but HLT input raw objects
-path.add_path(get_store_only_rawdata_path())
-
-path.add_module("PrintCollections", printForEvent=0)
 # no reconstruction or software trigger added at all
 add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitor")
 
-basf2.print_path(path)
-basf2.process(path)
-
-shutil.rmtree(test_directory)
+finalize_test_path(path, tempfolder, has_softwaretriggerresult=False)

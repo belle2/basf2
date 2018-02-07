@@ -23,9 +23,10 @@ gb2_setuprel = 'release-01-00-00'
 
 use_central_database('production', LogLevel.WARNING, 'fei_database')
 
-fileList =\
-    ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000273/s00/e0000/4S/r00000/signal/sub00/*'
-     ]
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
 inputMdstList('default', fileList)
 

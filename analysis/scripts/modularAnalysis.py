@@ -321,7 +321,7 @@ def setupEventInfo(noEvents, path=analysis_main):
     path.add_module(evtnumbers)
 
 
-def generateY4S(noEvents, decayTable=None, path=analysis_main):
+def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=False):
     """
     Warning:
         This functions is deprecated. Please call ``setupForGeneration`` then
@@ -338,6 +338,7 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main):
     @param noEvents   number of events to be generated
     @param decayTable file name of the decay table to be used
     @param path       modules are added to this path
+    @param override_fatal force this function to run ignoring the deprecation
     """
 
     message = (
@@ -350,7 +351,10 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main):
         "    setupEventInfo(noEvents)\n"
         "    add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)\n"
     )
-    B2WARNING(message)
+    if (override_fatal):
+        B2ERROR(message)
+    else:
+        B2FATAL(message)
 
     from generators import add_evtgen_generator
     setupForGeneration(noEvents, path)
@@ -365,6 +369,7 @@ def generateContinuum(
     decayTable,
     inclusiveT=2,
     path=analysis_main,
+    override_fatal=False,
 ):
     """
     Warning:
@@ -382,6 +387,7 @@ def generateContinuum(
     @param decayTable file name of the decay table to be used
     @param inclusiveT whether (2) or not (1) charge conjugated inclusive Particles should be included
     @param path       modules are added to this path
+    @param override_fatal force this function to run ignoring the deprecation
     """
     message = (
         "The generateContinuum function from modularAnalysis is deprecated.\n"
@@ -393,7 +399,10 @@ def generateContinuum(
         "    setupEventInfo(noEvents)\n"
         "    add_continuum_generator(path, \"ccbar\")  # for example"
     )
-    B2WARNING(message)
+    if (override_fatal):
+        B2ERROR(message)
+    else:
+        B2FATAL(message)
 
     from generators import add_continuum_generator
     setupEventInfo(noEvents)

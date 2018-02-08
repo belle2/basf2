@@ -5,7 +5,6 @@ from softwaretrigger import (
 )
 import ROOT
 import softwaretrigger.hltdqm as hltdqm
-import generators
 
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \

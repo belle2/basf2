@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   namespace PXD {
-    class PXDUnpackerLookup {
+    class PXDMappingLookup {
 
     public:
 

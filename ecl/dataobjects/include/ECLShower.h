@@ -36,6 +36,9 @@ namespace Belle2 {
       /** bit 1:  Hot crystal within nominal shower neighbour region.  */
       c_hasHotCrystal = 2 << 0,
 
+      /** bit 2:  Shower has pulse shape discrimination variables.  */
+      c_hasPulseShapeDiscrimination = 3 << 0,
+
       /** combined flag to test whether the shower is 'problematic' */
       c_hasProblematicCrystal = c_hasDeadCrystal | c_hasHotCrystal,
     };
@@ -74,8 +77,8 @@ namespace Belle2 {
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
-      m_ShowerHadronIntensity = -999;         /**< Shower Hadron Intensity*/
-      m_NumberofHadronDigits = -1;         /**< Shower Number of hadron digits*/
+      m_ShowerHadronIntensity = 0;         /**< Shower Hadron Intensity*/
+      m_NumberofHadronDigits = 0;         /**< Shower Number of hadron digits*/
 
     }
 
@@ -408,6 +411,12 @@ namespace Belle2 {
      */
     bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
 
+    /**
+     * Add bitmask to current status.
+     * @param bitmask The status code which should be added.
+     */
+    void addStatus(unsigned short int bitmask) { m_status |= bitmask; }
+
     /*! Check if shower contains a hot crystal
      */
     bool hasHotCrystal() const;
@@ -457,7 +466,7 @@ namespace Belle2 {
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
     Double32_t m_ShowerHadronIntensity;            /**< Shower Hadron Intensity*/
-    int m_NumberofHadronDigits;            /**< Number of crystals with large hadron component energy. */
+    uint8_t m_NumberofHadronDigits;            /**< Number of crystals with large hadron component energy. */
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -487,7 +496,6 @@ namespace Belle2 {
   {
     return hasStatus(c_hasProblematicCrystal);
   }
-
 
 } // end namespace Belle2
 

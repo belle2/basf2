@@ -98,9 +98,10 @@ void ECLClusterPSDModule::event()
     if (nWaveforminCluster > 0) {
       if (Cluster2CTotalEnergy != 0) eclshowers[ishowers]->setShowerHadronIntensity(Clust2CHadronEnergy / Cluster2CTotalEnergy);
       eclshowers[ishowers]->setNumberofHadronDigits(NumberofHadronDigits);
+      eclshowers[ishowers]->addStatus(ECLShower::c_hasPulseShapeDiscrimination);
     } else {
-      eclshowers[ishowers]->setShowerHadronIntensity(-999);
-      eclshowers[ishowers]->setNumberofHadronDigits(-1);
+      eclshowers[ishowers]->setShowerHadronIntensity(0);
+      eclshowers[ishowers]->setNumberofHadronDigits(0);
     }
   }
 }
@@ -113,6 +114,5 @@ void ECLClusterPSDModule::endRun()
 // terminate
 void ECLClusterPSDModule::terminate()
 {
-
 }
 

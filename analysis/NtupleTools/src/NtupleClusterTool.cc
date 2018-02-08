@@ -24,6 +24,7 @@ void NtupleClusterTool::setupTree()
   m_e1e9   = new float[nDecayProducts];
   m_e9e21  = new float[nDecayProducts];
   m_nHits  = new int[nDecayProducts];
+  m_ClusterPSD  = new int[nDecayProducts];
   m_ClusterHadronIntensity  = new float[nDecayProducts];
   m_NumberofHadronDigits = new int[nDecayProducts];
   m_trackM = new int[nDecayProducts];
@@ -44,6 +45,8 @@ void NtupleClusterTool::setupTree()
                    (strNames[iProduct] + "_clusterE9E21/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterNHits").c_str(),      &m_nHits[iProduct],
                    (strNames[iProduct] + "_clusterNHits/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterPSD").c_str(),      &m_ClusterPSD[iProduct],
+                   (strNames[iProduct] + "_clusterPSD/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterHadronIntensity").c_str(),      &m_ClusterHadronIntensity[iProduct],
                    (strNames[iProduct] + "_clusterHadronIntensity/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterNumberofHadronDigits").c_str(),      &m_NumberofHadronDigits[iProduct],
@@ -70,6 +73,7 @@ void NtupleClusterTool::deallocateMemory()
   delete [] m_region;
   delete [] m_e1e9;
   delete [] m_e9e21;
+  delete [] m_ClusterPSD;
   delete [] m_ClusterHadronIntensity;
   delete [] m_NumberofHadronDigits;
   delete [] m_nHits;
@@ -97,6 +101,7 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_e1e9[iProduct]    = Variable::eclClusterE1E9(selparticles[iProduct]);
     m_e9e21[iProduct]   = Variable::eclClusterE9E21(selparticles[iProduct]);
     m_nHits[iProduct]   = int(Variable::eclClusterNHits(selparticles[iProduct]));
+    m_ClusterPSD[iProduct]   = int(Variable::eclClusterPulseShapeDiscrimination(selparticles[iProduct]));
     m_trackM[iProduct]  = int(Variable::eclClusterTrackMatched(selparticles[iProduct]));
 
     m_uncorrE[iProduct]  = Variable::eclClusterUncorrectedE(selparticles[iProduct]);

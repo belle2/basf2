@@ -473,6 +473,17 @@ namespace Belle2 {
       return result;
     }
 
+    int eclClusterPulseShapeDiscrimination(const Particle* particle)
+    {
+      int result = 0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->hasTriggerClusterMatching();
+      }
+      return result;
+    }
+
     double eclClusterTrigger(const Particle* particle)
     {
       double result = -1.0;

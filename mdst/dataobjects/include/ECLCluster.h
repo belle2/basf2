@@ -34,6 +34,8 @@ namespace Belle2 {
       c_TriggerCluster   = 1 << 0,
       /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
       c_TriggerClusterMatching = 1 << 1,
+      /** bit 2: ECLCluster has pulse shape discrimination variables.*/
+      c_PulseShapeDiscrimination = 1 << 2,
     };
 
     /**
@@ -69,8 +71,8 @@ namespace Belle2 {
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.),
-      m_ClusterHadronIntensity(-999),
-      m_NumberofHadronDigits(-1) {}
+      m_ClusterHadronIntensity(0),
+      m_NumberofHadronDigits(0) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
@@ -227,7 +229,7 @@ namespace Belle2 {
     double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
     /** Return number of hadron digits in cluster*/
-    int getNumberofHadronDigits() const { return m_NumberofHadronDigits; }
+    uint8_t getNumberofHadronDigits() const { return m_NumberofHadronDigits; }
 
     /** Return second moment (shower shape variable). */
     double getSecondMoment() const { return m_secondMoment; }
@@ -300,6 +302,9 @@ namespace Belle2 {
 
     /** Check if ECLTRGCluster to ECLCluster matcher has run */
     bool hasTriggerClusterMatching() const {return hasStatus(c_TriggerClusterMatching);}
+
+    /** Check if ECLCluster had any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
+    bool hasPulseShapeDiscrimination() const {return hasStatus(c_PulseShapeDiscrimination);}
 
   private:
 
@@ -399,7 +404,7 @@ namespace Belle2 {
     Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
 
     /** Number of hadron digits in cluster */
-    int m_NumberofHadronDigits;  //[-1, 244., 8]
+    uint8_t m_NumberofHadronDigits;  //[0, 255., 8]
 
     /** Class definition */
     ClassDef(ECLCluster, 11);

@@ -66,6 +66,9 @@ namespace Belle2 {
     /** number of hits associated to this cluster */
     int* m_nHits;
 
+    /**  Status of pulse shape discrimination variables. 0 = no PSD  information (no waveforms), 1 = PSD cluster has PSD information */
+    int* m_ClusterPSD;
+
     /** 1/0 if charged track is/is not Matched to this cluster */
     int* m_trackM;
 

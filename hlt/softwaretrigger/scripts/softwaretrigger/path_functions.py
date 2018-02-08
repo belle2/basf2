@@ -273,6 +273,7 @@ def add_softwaretrigger_reconstruction(
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
+        # currently, dqm plots are only shown for event accepted by the HLT filters
         add_hlt_dqm(hlt_reconstruction_path, run_type)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':

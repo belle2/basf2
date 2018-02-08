@@ -146,9 +146,7 @@ def add_expressreco_processing(path, run_type="collision",
 
     if run_type == "collision":
         if do_reconstruction:
-            reconstruction.add_reconstruction(path,
-                                              skipGeometryAdding=True,
-                                              components=components)
+            reconstruction.add_reconstruction(path, components=components)
     elif run_type == "cosmics":
         # no filtering,
         # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks

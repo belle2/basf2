@@ -103,7 +103,7 @@ namespace TreeFitter {
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
     ParticleBase* rc = 0;
-    int pdgcode = particle->getPDGCode();
+    const int pdgcode = particle->getPDGCode();
 
     bool validfit  = false;
 
@@ -176,6 +176,7 @@ namespace TreeFitter {
           rc = true ;
           break ;
         default: // this should take care of the pi0
+          //FIXME check because tau
           //  rc = particle->isAResonance() || (pdgcode && pdgLifeTime(particle)<1.e-8) ;
           double ctau = pdgLifeTime(particle) / Belle2::Unit::um; //ctau in [um]
           //    B2DEBUG(80, "Particle code is " << pdgcode << " with a lifetime of " << TDatabasePDG::Instance()->GetParticle(
@@ -189,11 +190,10 @@ namespace TreeFitter {
   //FT: this was moved from InternalParticle::addToDaughterList
   void ParticleBase::collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex)
   {
-    // collect all particles emitted from vertex with position posindex
     if (mother() && mother()->posIndex() == posindex) {
-      //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
       particles.push_back(this);
     }
+
     for (auto daughter : m_daughters) {
       daughter->collectVertexDaughters(particles, posindex);
     }
@@ -202,28 +202,26 @@ namespace TreeFitter {
   ErrCode ParticleBase::initCovariance(FitParams* fitparams) const
   {
     ErrCode status;
-    // position
-    int posindex = posIndex();
+
+    const int posindex = posIndex();
     if (posindex >= 0) {
-      //JFK: the fits diverge if we init the off elements dont ask me ... 2017-09-30
       for (int i = 0; i < 3; ++i) {
         fitparams->getCovariance()(posindex + i, posindex + i) = 400;
       }
     }
 
     // momentum
-    int momindex = momIndex();
+    const int momindex = momIndex();
     if (momindex >= 0) {
-      //JFK: init Value in  GeV squared 2017-09-25
       const double initVal = 1;
-      int maxrow = hasEnergy() ? 4 : 3;
-      //JFK: same here: fit diverges if this has off elments 2017-09-30
+      const int maxrow = hasEnergy() ? 4 : 3;
+
       for (int i = 0; i < maxrow; ++i) {
         fitparams->getCovariance()(momindex + i, momindex + i) = initVal;
       }
     }
-    // JFK: tau is a length in our version of the code Thu 24 Aug 2017 04:30:17 AM CEST
-    int tauindex = tauIndex();
+
+    const int tauindex = tauIndex();
     if (tauindex >= 0) {
       double tau = pdgTau();
       double sigtau = tau > 0 ? 20 * tau : 999;
@@ -239,6 +237,7 @@ namespace TreeFitter {
       }
       fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
+
     return status;
   }
 
@@ -309,38 +308,22 @@ namespace TreeFitter {
 
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
-    //std::cout << "geo constr " << this->name() << " tau " << tau << " posindexmother " << posindexmother << " posindex " << posindex <<
-    //          " tauindex " <<
-    //          tauindex << " momindex " << momindex << std::endl;
     EigenTypes::ColVector momentumVec = fitparams.getStateVector().segment(momindex, 3);
-    double mom = momentumVec.norm();
     double posxmother = 0, posx = 0, momx = 0;
 
     // linear approximation is fine
-    //JFK: TODO move to block operations 2017-09-28
     for (int row = 0; row < 3; ++row) {
       posxmother = fitparams.getStateVector()(posindexmother + row);
       posx       = p_vec(row);
       momx       = fitparams.getStateVector()(momindex + row);
+
       p.getResiduals()(row) = posxmother - posx - tau * momx;  // FIXME TAU + or - ??
-      //p.getResiduals()(row) = posxmother - posx - tau * momx / mom;  // FIXME TAU
-      //std::cout << "ParticleBase Geo Mother x: " << posxmother << " daughter (posx + tau * momx) " <<
-      //          (posx + tau * momx) << " res " << p.getResiduals()(row) << " mother " << mother()->name() << std::endl;
+
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, momindex + row) = -1.*tau;
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex)       = -momx;
     }
-    //const double momPow3by2 = std::pow(mom, 1.5); // mom^3/2 -> d/dpx (momx/mom)
-    //p.getH()(0, momindex    ) = -1.0 * tau * p_vec(1) * p_vec(1) * p_vec(2) * p_vec(2) / momPow3by2; // FIXME TAU
-    //p.getH()(0, momindex + 1) = -1.0 * tau * p_vec(1) * p_vec(0) / momPow3by2; // FIXME TAU
-    //p.getH()(0, momindex + 2) = -1.0 * tau * p_vec(2) * p_vec(0) / momPow3by2; // FIXME TAU
-    //p.getH()(1, momindex    ) = -1.0 * tau * p_vec(0) * p_vec(1) / momPow3by2; // FIXME TAU
-    //p.getH()(1, momindex + 1) = -1.0 * tau * p_vec(0) * p_vec(0) * p_vec(2) * p_vec(2) / momPow3by2; // FIXME TAU
-    //p.getH()(1, momindex + 2) = -1.0 * tau * p_vec(2) * p_vec(1) / momPow3by2; // FIXME TAU
-    //p.getH()(2, momindex    ) = -1.0 * tau * p_vec(0) * p_vec(2)  / momPow3by2; // FIXME TAU
-    //p.getH()(2, momindex + 1) = -1.0 * tau * p_vec(1) * p_vec(2) / momPow3by2; // FIXME TAU
-    //p.getH()(2, momindex + 2) = -1.0 * tau * p_vec(1) * p_vec(1) * p_vec(0) * p_vec(0) / momPow3by2; // FIXME TAU
 
     return ErrCode::success;
   }
@@ -348,20 +331,22 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
                                               Projection& p) const
   {
-    double mass = pdgMass();
-    double mass2 = mass * mass;
-    int momindex = momIndex();
-    // initialize the value
-    double px = fitparams.getStateVector()(momindex);
-    double py = fitparams.getStateVector()(momindex + 1);
-    double pz = fitparams.getStateVector()(momindex + 2);
-    double E  = fitparams.getStateVector()(momindex + 3);
+    const double mass = pdgMass();
+    const double mass2 = mass * mass;
+    const int momindex = momIndex();
+
+    const double px = fitparams.getStateVector()(momindex);
+    const double py = fitparams.getStateVector()(momindex + 1);
+    const double pz = fitparams.getStateVector()(momindex + 2);
+    const double E  = fitparams.getStateVector()(momindex + 3);
+
     p.getResiduals()(0) =  E * E - px * px - py * py - pz * pz - mass2;
-    // calculate the projection matrix
+
     p.getH()(0, momindex) = -2.0 * px;
     p.getH()(0, momindex + 1) = -2.0 * py;
     p.getH()(0, momindex + 2) = -2.0 * pz;
     p.getH()(0, momindex + 3) =  2.0 * E;
+
     return ErrCode::success;
   }
 
@@ -384,33 +369,33 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::initTau(FitParams* fitparams) const
   {
-    int tauindex = tauIndex();
+    const int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
       const ParticleBase* amother = mother();
-      int momposindex = amother ? amother->posIndex() : -1;
-      int posindex = posIndex();
-      int momindex = momIndex();
+      const int momposindex = amother ? amother->posIndex() : -1;
+      const int posindex = posIndex();
+      const int momindex = momIndex();
+
       assert(momposindex >= 0); // check code logic: no mother -> no tau
-      //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
-      //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
+
       EigenTypes::ColVector dxVec = fitparams->getStateVector().segment(posindex, 3)
                                     - fitparams->getStateVector().segment(momposindex, 3);
 
       EigenTypes::ColVector pxVec = fitparams->getStateVector().segment(momindex, 3);
-      double momdX = dxVec.norm() ; //was px*dx before
-      double mom2 =  pxVec.transpose() * pxVec;
+      const double momdX = dxVec.norm() ; //was px*dx before
 
       // if tau should be a time devide by mom2 insertad of the sqrt
       double tau = std::abs(momdX); // / std::sqrt(mom2); //scalar product
 
-      // JFK: pdgTau returns nan because we init the mass with 0... Thu 24 Aug 2017 04:40:38 AM CEST
-      //      5 cm as an init value is a stupid but okish guess
       if (tau == 0) {
         tau = 0;// 5 / std::sqrt(mom2);//pdgTau();
       }
+
       if (std::isnan(tau)) {tau = 999;}
+
       fitparams->getStateVector()(tauindex) = tau;
     }
+
     return ErrCode::success;
   }
 } //end namespace TreeFitter

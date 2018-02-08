@@ -25,7 +25,8 @@ namespace TreeFitter {
                  divergingconstraint = 16,
                  slowdivergingfit = 32,
                  fastdivergingfit = 64,
-                 filtererror = 128
+                 filtererror = 128,
+                 photondimerror = 256
                 } ;
 
     ErrCode() : m_flag(success) {}

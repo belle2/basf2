@@ -27,6 +27,7 @@ namespace TreeFitter {
       if (flag & ErrCode::slowdivergingfit) os << "slowdivergingfit " ;
       if (flag & ErrCode::fastdivergingfit) os << "fastdivergingfit " ;
       if (flag & ErrCode::filtererror) os << "filtererror " ;
+      if (flag & ErrCode::photondimerror) os << "photondimerror" ;
     } else {
       os << "success " ;
     }

@@ -168,18 +168,20 @@ namespace TreeFitter {
     int i3(-1);
 
     // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec[0]) > std::abs(p_vec[1])) && (std::abs(p_vec[0]) > std::abs(p_vec[2]))) {
+    if ((std::abs(p_vec[0]) >= std::abs(p_vec[1])) && (std::abs(p_vec[0]) >= std::abs(p_vec[2]))) {
       i1 = 0; i2 = 1; i3 = 2;
-    } else if ((std::abs(p_vec[1]) > std::abs(p_vec[0])) && (std::abs(p_vec[1]) > std::abs(p_vec[2]))) {
+    } else if ((std::abs(p_vec[1]) >= std::abs(p_vec[0])) && (std::abs(p_vec[1]) >= std::abs(p_vec[2]))) {
       i1 = 1; i2 = 0; i3 = 2;
-    } else if ((std::abs(p_vec[2]) > std::abs(p_vec[1])) && (std::abs(p_vec[2]) > std::abs(p_vec[0]))) {
+    } else if ((std::abs(p_vec[2]) >= std::abs(p_vec[1])) && (std::abs(p_vec[2]) >= std::abs(p_vec[0]))) {
       i1 = 2; i2 = 1; i3 = 0;
     } else {
       // this should never happen
       B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
               << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
-      return ErrCode::inversionerror;
+      return ErrCode(ErrCode::photondimerror);
     }
+    if (0 == p_vec[i1]) {return ErrCode(ErrCode::photondimerror);}
+
 
     // p_vec[i1] must not be 0
     const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];

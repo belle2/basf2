@@ -28,6 +28,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string(""));
+  addParam("PrintData", m_PrintData, "Print data.", false);
   m_GeoDat = NULL;
 }
 
@@ -61,6 +62,8 @@ void EKLMUnpackerModule::event()
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
+  if (m_PrintData)
+    printf("  w1   w2   w3   w4 e la s p st\n");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2ERROR("RawKLM with index " << i << " has " <<
@@ -122,6 +125,11 @@ void EKLMUnpackerModule::event()
           }
           m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
                                                  &endcap, &layer, &sector);
+          if (m_PrintData) {
+            printf("%04x %04x %04x %04x %1d %2d %1d %1d %2d\n",
+                   bword1, bword2, bword3, bword4,
+                   endcap, layer, sector, plane, strip);
+          }
           eklmDigit = m_Digits.appendNew();
           eklmDigit->setCTime(ctime);
           eklmDigit->setTDC(tdc);

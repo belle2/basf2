@@ -73,6 +73,9 @@ namespace Belle2 {
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
 
+    /** Print data. */
+    bool m_PrintData;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 

@@ -10,6 +10,8 @@
 
 #include <ecl/modules/eclTrackingPerformance/ECLTrackingPerformanceModule.h>
 
+#include <ecl/dataobjects/ECLShower.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -63,6 +65,7 @@ void ECLTrackingPerformanceModule::initialize()
   StoreArray<RecoTrack>::required(m_recoTracksStoreArrayName);
   StoreArray<TrackFitResult>::required();
   StoreArray<ECLCluster>::required();
+  StoreArray<ECLShower>::required();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -183,6 +186,36 @@ void ECLTrackingPerformanceModule::event()
             }
           }
         }
+        double shower_energy, highest_track_related_shower_energy = 0;
+        const ECLShower* eclShower_WithHighestEnergy_track_related = nullptr;
+        for (auto& eclCluster : b2Track->getRelationsTo<ECLCluster>()) {
+          const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();
+          shower_energy = eclShower->getEnergy();
+          if (shower_energy > highest_track_related_shower_energy) {
+            highest_track_related_shower_energy = shower_energy;
+            eclShower_WithHighestEnergy_track_related = eclShower;
+          }
+        }
+        double highest_mcparticle_related_shower_energy = 0;
+        const ECLShower* eclShower_WithHighestEnergy_mcparticle_related = nullptr;
+        for (auto& eclShower : mcParticle.getRelationsWith<ECLShower>()) {
+          shower_energy = eclShower.getEnergy();
+          if (shower_energy > highest_mcparticle_related_shower_energy) {
+            highest_mcparticle_related_shower_energy = shower_energy;
+            eclShower_WithHighestEnergy_mcparticle_related = &eclShower;
+          }
+        }
+        if (eclShower_WithHighestEnergy_mcparticle_related != nullptr) {
+          m_mcparticle_shower_match = 1;
+        }
+        if (eclShower_WithHighestEnergy_track_related != nullptr) {
+          m_track_shower_match = 1;
+        }
+        // if (eclShower_WithHighestEnergy_track_related->getEnergy() / eclShower_WithHighestEnergy_mcparticle_related->getEnergy() > 0.5) {
+        //     && eclShower_WithHighestEnergy_track_related->getEnergy() / eclShower_WithHighestEnergy_mcparticle_related->getEnergy() < 2) {
+        // m_sameshowers = 1;
+        // }
+        // }
         ECLCluster* eclCluster = b2Track->getRelatedTo<ECLCluster>();
         if (eclCluster != nullptr) {
           m_matchedToECLCluster = 1;
@@ -280,6 +313,9 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("CorrectECLMatch", m_matchedToECLClusterWithHighestWeight);
   addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
+  addVariableToTree("ShowerMatch", m_sameshowers);
+  addVariableToTree("MCParticleShowerMatch", m_mcparticle_shower_match);
+  addVariableToTree("TrackShowerMatch", m_track_shower_match);
 
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
@@ -383,6 +419,10 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
 
   m_pValue = -999;
 
+  m_mcparticle_shower_match = 0;
+
+  m_track_shower_match = 0;
+
   m_matchedToECLCluster = 0;
 
   m_photonCluster = 0;
@@ -390,6 +430,8 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
   m_matchedToECLClusterWithHighestWeight = 0;
 
   m_hypothesisOfMatchedECLCluster = 0;
+
+  m_sameshowers = 0;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

@@ -86,6 +86,12 @@ namespace Belle2 {
     /**< total number of fitted tracks */
     double m_nFittedChargedStabletracks;
 
+    /**< boolean for match between MCParticle and ECL cluster */
+    int m_mcparticle_shower_match;
+
+    /**< boolean for match between track and ECL shower */
+    int m_track_shower_match;
+
     /**< boolean for match between track and ECL cluster */
     int m_matchedToECLCluster;
 
@@ -97,6 +103,9 @@ namespace Belle2 {
 
     /**< boolean whether matched to ECL cluster with highest weight */
     int m_matchedToECLClusterWithHighestWeight;
+
+    /**< boolean whether matched to ECL cluster with highest weight */
+    int m_sameshowers;
 
     /**
      * Sets all variables to the default value, here -999.

@@ -12,7 +12,7 @@ echo modify the variable BELLE2_GIT_ACCESS in the script to ssh
 BELLE2_GIT_ACCESS=http
 # BELLE2_GIT_ACCESS=ssh
 
-CENTRAL_RELEASE=build-2017-10-16
+CENTRAL_RELEASE=release-01-00-01
 
 ############################
 # ensure that the authentication in this step succeeds

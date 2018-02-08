@@ -13,7 +13,7 @@ echo modify the variable BELLE2_GIT_ACCESS in the script to ssh
 set BELLE2_GIT_ACCESS=http
 # set BELLE2_GIT_ACCESS ssh
 
-set CENTRAL_RELEASE=build-2017-10-16
+set CENTRAL_RELEASE=release-01-00-01
 
 ############################
 # ensure that the authentication in this step succeeds
@@ -44,5 +44,5 @@ if ( ! -d 'xsim.dir' ) then
     ln -s /home/belle2/tasheng/tsim/xsim.dir
 endif
 
-echo all done. Now please run 2D firmware simulation with
-echo basf2 trg/cdc/examples/firm2d.py
+echo all done. Now please run TSF firmware simulation with
+echo basf2 trg/cdc/examples/firmware_tsf.py

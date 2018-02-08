@@ -10,7 +10,7 @@
 
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/unpacking/PXDRawDataStructs.h>
-#include <pxd/unpacking/PXDUnpackerLookup.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 #include <pxd/modules/pxdUnpacking/PXDUnpackerNewModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
@@ -538,9 +538,9 @@ void PXDUnpackerNewModule::unpack_dhp(void* data, unsigned int frame_len, unsign
             // data has not been pre-processed by DHH, thus we have to do the mapping ourselves
             if ((dhe_ID & 0x21) == 0x00 || (dhe_ID & 0x21) == 0x21) {
               // if IFOB
-              PXDUnpackerLookup::map_rc_to_uv_IF_OB(v_cellID, u_cellID, dhp_dhp_id, dhe_ID);
+              PXDMappingLookup::map_rc_to_uv_IF_OB(v_cellID, u_cellID, dhp_dhp_id, dhe_ID);
             } else { // else OFIB
-              PXDUnpackerLookup::map_rc_to_uv_IB_OF(v_cellID, u_cellID, dhp_dhp_id, dhe_ID);
+              PXDMappingLookup::map_rc_to_uv_IB_OF(v_cellID, u_cellID, dhp_dhp_id, dhe_ID);
             }
           } else {
             u_cellID = dhp_col + 64 * dhp_dhp_id; // defaults for already mapped

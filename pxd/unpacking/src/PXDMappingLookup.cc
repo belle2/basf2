@@ -3,13 +3,14 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck                                            *
+ * Contributors: Bjoern Spruck, Peter Kodys                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/unpacking/PXDUnpackerLookup.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 #include <framework/logging/Logger.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <stdio.h>
 #include <vector>
@@ -18,8 +19,41 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 
+/** get ID of DCD for giving pixel, range: 1..4. */
+int PXDMappingLookup::getDCDID(const int u, const int v, const VxdID sensorID)
+{
+
+  //const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
+  //                                                              sensorID));
+  int ret = 0;
+  int iLayer = sensorID.getLayerNumber();
+  int iSensor = sensorID.getSensorNumber();
+  int chUMap;
+  chUMap = u;
+  int Direction = 1;
+  if (((iLayer == 1) && (iSensor == 1)) || ((iLayer == 2) && (iSensor == 2))) {
+    // inverted counting in U direction:
+    chUMap = 249 - u;
+    Direction = -1;
+  }
+  float fID;
+  fID = (float)chUMap / 62.5;
+  if ((chUMap == 62) || (chUMap == 187)) {
+    if ((v % 4) >= 2) fID = fID + Direction;
+  }
+  ret = (int)fID;
+  return ret + 1;
+} //getDCDID
+
+/** get ID of SWB for giving pixel, range: 1..6. */
+int PXDMappingLookup::getSWBID(const int v)
+{
+  return (int)(v / 128) + 1;
+}  //getSWBID
+
 /** Remaps of inner forward (IF) and outer backward (OB) modules of the PXD */
-void PXDUnpackerLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
+void PXDMappingLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, const unsigned int dhp_id,
+                                          const unsigned int dhe_ID)
 {
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
@@ -74,8 +108,8 @@ void PXDUnpackerLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int&
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
-                                           unsigned int dhe_ID)
+void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+                                          const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
   unsigned int row;
@@ -89,7 +123,8 @@ void PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int&
 }
 
 /** Remaps of inner backward (IB) and outer forward (OF) modules of the PXD */
-void PXDUnpackerLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)
+void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, const unsigned int dhp_id,
+                                          const unsigned int dhe_ID)
 {
   unsigned int DCD_channel = 0;
   unsigned int Drain = 0;
@@ -144,8 +179,8 @@ void PXDUnpackerLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int&
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
-                                           unsigned int dhe_ID)
+void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+                                          const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
   // slow way until we have tables
@@ -159,7 +194,7 @@ void PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int&
   u_cellID = 0;
 }
 
-void PXDUnpackerLookup::write_mapping_to_file(void)
+void PXDMappingLookup::write_mapping_to_file(void)
 {
   FILE* file = fopen("lut.csv", "wt+");
   if (file) {
@@ -237,13 +272,13 @@ void PXDUnpackerLookup::write_mapping_to_file(void)
   }
 }
 
-void PXDUnpackerLookup::write_inversemapping_to_file(void)
+void PXDMappingLookup::write_inversemapping_to_file(void)
 {
   B2FATAL("Code to be written");
 }
 
 
-void PXDUnpackerLookup::check(void)
+void PXDMappingLookup::check(void)
 {
   unsigned int dhe_ID[4] = {0x02, 0x03, 0x22, 0x23};// one of each kind, IB, OB, IF, OF
   for (int i = 0; i < 4; i++) {

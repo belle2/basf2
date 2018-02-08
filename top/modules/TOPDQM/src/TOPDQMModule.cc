@@ -177,13 +177,13 @@ namespace Belle2 {
       name = str(format("good_channel_hits_%1%") % (module));
       title = str(format("Number of good hits by channel for slot #%1%") % (module));
       int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
-      h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0.5, numPixels + 0.5);
+      h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->SetOption("LIVE");
       m_goodChannelHits.push_back(h1);
 
       name = str(format("bad_channel_hits_%1%") % (module));
       title = str(format("Number of bad hits by channel for slot #%1%") % (module));
-      h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0.5, numPixels + 0.5);
+      h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->SetOption("LIVE");
       m_badChannelHits.push_back(h1);
 
@@ -245,8 +245,8 @@ namespace Belle2 {
   void TOPDQMModule::event()
   {
 
-    int n_good[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int n_bad[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::vector<int> n_good(16, 0);
+    std::vector<int> n_bad(16, 0);
     for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
@@ -263,14 +263,14 @@ namespace Belle2 {
         m_goodHitsAsics[i]->Fill(asic_no, asic_ch);
         m_goodTdc[i]->Fill(digit.getRawTime());
         m_goodTiming[i]->Fill(digit.getTime());
-        m_goodChannelHits[i]->Fill(digit.getPixelID());
+        m_goodChannelHits[i]->Fill(digit.getChannel());
         n_good[i]++;
       } else { // other hits = background hits
         m_badHits->Fill(i + 1);
         m_badHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_badHitsAsics[i]->Fill(asic_no, asic_ch);
         m_badTdc[i]->Fill(digit.getRawTime());
-        m_badChannelHits[i]->Fill(digit.getPixelID());
+        m_badChannelHits[i]->Fill(digit.getChannel());
         n_bad[i]++;
       }
     }

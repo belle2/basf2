@@ -217,13 +217,17 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_CounterFTBErrors[i]->GetXaxis()->SetTitle("Error ID");
     m_CounterFTBErrors[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
-    // Counter of apvErrorOR (16) per FADC
+    // Counter of apvErrorOR (4) per FADC
     //----------------------------------------------------------------
     name = str(format("DQMER_SVD_FADC_%1%_CounterOfApvErrorOR") % i);
     title = str(format("DQM ER SVD FADC %1% Counter of ApvErrorOR") % i);
-    m_CounterApvErrorORErrors[i] = new TH1I(name.c_str(), title.c_str(), 16, 0, 16);
+    m_CounterApvErrorORErrors[i] = new TH1I(name.c_str(), title.c_str(), 4, 0, 4);
     m_CounterApvErrorORErrors[i]->GetXaxis()->SetTitle("Error ID");
     m_CounterApvErrorORErrors[i]->GetYaxis()->SetTitle("counts");
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(1, "LSB");
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(2, "FADC FIFO full OR");
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(3, "Frame error OR");
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(4, "MSB");
     //----------------------------------------------------------------
     // Counter of FTB Flags (32) per FADC
     //----------------------------------------------------------------

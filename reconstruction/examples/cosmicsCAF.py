@@ -29,7 +29,7 @@ from caf.framework import Calibration, CAF
 ROOT.gROOT.SetBatch(True)
 
 # Specify the input file(s)
-input_files = [os.path.abspath('/group/belle2/users/jbennett/GCR1/release-00-09-01/DB00000266/r03118/dedx.cosmic.3118.*.root')]
+input_files = [os.path.abspath('/group/belle2/users/jbennett/GCR1/test/r03118/dedx.cosmic.0001.3118.*.root')]
 
 # Modify the collector to apply other calibration constants
 momentum_col = register_module('CDCDedxElectronCollector')
@@ -94,7 +94,7 @@ momdb = 'calibration_results/MomentumCalibration/outputdb'
 cosdb = 'calibration_results/CosineCalibration/outputdb'
 wgdb = 'calibration_results/WireGainCalibration/outputdb'
 rgdb = 'calibration_results/RunGainCalibration/outputdb'
-localdb = 'localdb/database.txt'
+localdb = '/home/belle2/jbennett/CRDATA/release-00-09-01/DB00000266/r03118/calib/localdb/database.txt'
 
 momentum_cal.use_local_database(localdb)
 
@@ -118,20 +118,20 @@ other_cal.use_local_database(rgdb)
 
 # Add a pre-collector path to apply old calibration constants
 correct_for_mom = create_path()
-correct_for_mom.add_module('DedxCorrection', scaleCor=True, momentumCor=False,
+correct_for_mom.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=False,
                            momentumCorFromDB=False, cosineCor=True,
                            runGain=True, wireGain=True)
 momentum_cal.pre_collector_path = correct_for_mom
 
 correct_for_cos = create_path()
-correct_for_cos.add_module('DedxCorrection', scaleCor=True, momentumCor=True,
+correct_for_cos.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                            momentumCorFromDB=True, cosineCor=False,
                            runGain=True, wireGain=True)
 cosine_cal.pre_collector_path = correct_for_cos
 cosine_cal.depends_on(momentum_cal)
 
 correct_for_wire_gain = create_path()
-correct_for_wire_gain.add_module('DedxCorrection', scaleCor=True, momentumCor=True,
+correct_for_wire_gain.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                                  momentumCorFromDB=True, cosineCor=True,
                                  runGain=True, wireGain=False)
 wire_gain_cal.pre_collector_path = correct_for_wire_gain
@@ -139,7 +139,7 @@ wire_gain_cal.depends_on(momentum_cal)
 wire_gain_cal.depends_on(cosine_cal)
 
 correct_for_run_gain = create_path()
-correct_for_run_gain.add_module('DedxCorrection', scaleCor=True, momentumCor=True,
+correct_for_run_gain.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                                 momentumCorFromDB=True, cosineCor=True,
                                 runGain=False, wireGain=True)
 run_gain_cal.pre_collector_path = correct_for_run_gain
@@ -148,14 +148,14 @@ run_gain_cal.depends_on(cosine_cal)
 run_gain_cal.depends_on(wire_gain_cal)
 
 correct_for_others = create_path()
-correct_for_others.add_module('DedxCorrection', scaleCor=True, momentumCor=True,
+correct_for_others.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                               momentumCorFromDB=True, cosineCor=True,
                               runGain=True, wireGain=True)
 other_cal.pre_collector_path = correct_for_others
-run_gain_cal.depends_on(momentum_cal)
-run_gain_cal.depends_on(cosine_cal)
-run_gain_cal.depends_on(wire_gain_cal)
-run_gain_cal.depends_on(run_gain_cal)
+other_cal.depends_on(momentum_cal)
+other_cal.depends_on(cosine_cal)
+other_cal.depends_on(wire_gain_cal)
+other_cal.depends_on(run_gain_cal)
 
 
 # Create a CAF instance and add calibrations

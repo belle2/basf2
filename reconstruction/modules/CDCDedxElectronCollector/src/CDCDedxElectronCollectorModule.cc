@@ -124,7 +124,7 @@ void CDCDedxElectronCollectorModule::collect()
       B2WARNING("No related track...");
       continue;
     }
-    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;

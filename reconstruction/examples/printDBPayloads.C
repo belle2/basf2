@@ -172,7 +172,7 @@ void calib4_printOther( TString dir ){
 }
 
 
-void calib4_printPayloads(){
+void printDBPayloads(){
 
   TString dir("localdb");  
   //TString dir("calibration_results/CDCDedxCalibrations/outputdb");

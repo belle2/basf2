@@ -69,7 +69,7 @@ def create_hlt_path():
     return path
 
 
-def finalize_hlt_path(path):
+def finalize_hlt_path(path, show_progress_bar=False):
     """
     Add the required output modules for HLT
     """
@@ -94,8 +94,9 @@ def finalize_hlt_path(path):
     ##########
     # Other utilities
     ##########
-    progress = basf2.register_module('Progress')
-    path.add_module(progress)
+    if show_progress_bar:
+        progress = basf2.register_module('Progress')
+        path.add_module(progress)
 
     etime = basf2.register_module('ElapsedTime')
     path.add_module(etime)

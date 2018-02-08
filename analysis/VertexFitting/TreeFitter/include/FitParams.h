@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
+#include<iostream>
 
 namespace TreeFitter {
   class ParticleBase ;
@@ -95,7 +96,7 @@ namespace TreeFitter {
     int nConstraints() const { return m_nConstraints; }
 
     /** get numer of degrees of freedom */
-    int nDof() const { return nConstraints() - dim(); }// 6
+    int nDof() const { return std::abs(nConstraints() - dim()); }// FIXME why can this be negative?
 
     /** resize (enlarge!) the statevector */
     void resize(int newdim);
@@ -116,6 +117,7 @@ namespace TreeFitter {
     void resetChiSquare()
     {
       m_chiSquare = 0;
+      m_nConstraints = 0;
     }
 
     /** index map */

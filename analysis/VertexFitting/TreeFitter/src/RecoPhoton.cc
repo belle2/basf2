@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -31,9 +31,10 @@ namespace TreeFitter {
 
   RecoPhoton::RecoPhoton(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother),
+      m_dim(3),
       m_init(false),
       m_useEnergy(useEnergy(*particle)),
-      m_params(),//use params for dim if klongs come into the game
+      m_clusterPars(),//use params for dim if klongs come into the game
       m_covariance()
   {
     initParams() ;
@@ -46,18 +47,19 @@ namespace TreeFitter {
   ErrCode RecoPhoton::initParticleWithMother(FitParams* fitparams)
   {
     // calculate the direction
-    int posindexmother = mother()->posIndex();
+    const int posindexmother = mother()->posIndex();
 
     Eigen::Matrix<double, 1, 3> vertexToCluster = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
     for (unsigned int i = 0; i < 3; ++i) {
-      vertexToCluster(i) = m_params(i) - fitparams->getStateVector()(posindexmother + i);
+      vertexToCluster(i) = m_clusterPars(i) - fitparams->getStateVector()(posindexmother + i);
     }
 
-    double distanceToMother = vertexToCluster.norm();
+    const double distanceToMother = vertexToCluster.norm();
     // get the energy
-    double energy = m_useEnergy ? m_params(3) : particle()->getEnergy();
-    int momindex = momIndex();
+    const double energy =  m_clusterPars(3);
+    const int momindex = momIndex();
     for (unsigned int i = 0; i < 3; ++i) {
+      //px = E dx/|dx|
       fitparams->getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
     }
 
@@ -81,130 +83,76 @@ namespace TreeFitter {
         Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) { //   pdg != 111){
       rc = false ;
     }
-    //    B2DEBUG(80, "RecoPhoton::useEnergy = " << rc << " , pdg = " << pdg);
     return rc ;
   }
 
   ErrCode RecoPhoton::initCovariance(FitParams* fitparams) const
   {
-    int momindex = momIndex() ;
-    double varEnergy =  m_useEnergy ? m_covariance(3, 3) : 1;
-    const double factor = 1000;
+    const int momindex = momIndex() ;
+    const int posindex  = mother()->posIndex();
 
-    for (int row = 0; row < 4; ++row) {
-      fitparams->getCovariance()(momindex + row, momindex + row) = factor * varEnergy;
-    }
+    const double factorE = 1000 * m_covariance(3, 3);
+    const double factorX = 10000; // ~ 1m error on initial vertex
+
+    fitparams->getCovariance().block<4, 4>(momindex, momindex) =
+      Eigen::Matrix<double, 4, 4>::Identity(4, 4) * factorE;
+
+    fitparams->getCovariance().block<3, 3>(posindex, posindex) =
+      Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
+
     return ErrCode();
   }
 
   ErrCode RecoPhoton::initParams()
   {
-    const Belle2::ECLCluster* recoCalo = particle()->getECLCluster();
-    TVector3 centroid = recoCalo->getClusterPosition();
-    double energy = recoCalo->getEnergy();
+    const Belle2::ECLCluster* cluster = particle()->getECLCluster();
+    const TVector3 centroid = cluster->getClusterPosition();
+    const double energy = cluster->getEnergy();
     m_init = true;
-    // This returns the covariance matrix assuming the photons comes from the nominal IP
+    m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
     Belle2::ClusterUtils C;
-    TMatrixDSym cov_pE = C.GetCovarianceMatrix4x4FromCluster(
-                           recoCalo);//FT: error on xyz is extracted from error on p (sort of backwards but ok)
 
-    for (int row = 0; row < 4; ++row) {
-      for (int col = 0; col <= row; ++col) {
-        m_covariance(row, col) = cov_pE[row][col];
+    TMatrixDSym cov_EPhiTheta = cluster->getCovarianceMatrix3x3();
+
+    Eigen::Matrix<double, 2, 2> covPhiTheta = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
+
+    for (int row = 0; row < 2; ++row) { // we go thru all elements here instead of selfadjoint view later
+      for (int col = 0; col < 2; ++col) {
+        covPhiTheta(row, col) = cov_EPhiTheta[row + 1][col + 1];
       }
     }
-    m_params(0) = centroid.X();
-    m_params(1) = centroid.Y();
-    m_params(2) = centroid.Z();
-    if (m_useEnergy) {
-      m_params(3) = energy;
-    } else {
-      m_params(3) = 0; //JFK: does this make sense 2017-10-25
-    }
+
+    // the in going x-E correlations are 0 so we dont fill them
+    const double R      = cluster->getR();
+    const double theta  = cluster->getPhi();
+    const double phi    = cluster->getTheta();
+
+    const double st  = std::sin(theta);
+    const double ct  = std::cos(theta);
+    const double sp  = std::sin(phi);
+    const double cp  = std::cos(phi);
+
+    Eigen::Matrix<double, 2, 3> polarToCartesian = Eigen::Matrix<double, 2, 3>::Zero(2, 3);
+
+    // polarToCartesian({phi,theta} -> {x,y,z} )
+    polarToCartesian(0, 0) = -1. * R * st * sp;// dx/dphi
+    polarToCartesian(0, 1) = R * st * cp;      // dy/dphi
+    polarToCartesian(0, 2) = 0 ;               // dz/dphi
+
+    polarToCartesian(1, 0) = R * ct * cp;      // dx/dtheta
+    polarToCartesian(1, 1) = R * ct * sp;      // dy/dtheta
+    polarToCartesian(1, 2) = -1. * R * st ;    // dz/dtheta
+
+    m_covariance.block<3, 3>(0, 0) = polarToCartesian.transpose() * covPhiTheta * polarToCartesian;
+
+    m_covariance(3, 3) = cov_EPhiTheta[0][0];
+    m_clusterPars(0) = centroid.X();
+    m_clusterPars(1) = centroid.Y();
+    m_clusterPars(2) = centroid.Z();
+    m_clusterPars(3) = energy;
+
     return ErrCode::success;
   }
-
-
-  [[gnu::unused]]  ErrCode RecoPhoton::projectRecoConstraintOld(const FitParams& fitparams, Projection& p) const
-  {
-
-    ErrCode status ;
-    // calculate the total momentum and energy:
-    int momindex  = momIndex() ;
-    int posindex  = mother()->posIndex();
-    Eigen::Matrix<double, 1, 3> mom = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
-    Eigen::Matrix<double, 1, 3> dxVec = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
-
-    for (unsigned int i = 0; i < 3; ++i) {
-      mom(i) = fitparams.getStateVector()(momindex + i);
-      dxVec(i)      = m_params(i) - fitparams.getStateVector()(posindex + i);
-    }
-
-    double mom2 = mom * mom.transpose();
-    double energy = sqrt(mom2) ;
-
-    Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
-    P(0, 0) = mom(1) + mom(2);
-    P(0, 1) = -1.* mom(0);
-    P(0, 2) = -1.* mom(0);
-    P(1, 0) = -1.* mom(2);
-    P(1, 1) = -1.* mom(2);
-    P(1, 2) = mom(0) + mom(1);
-    P(2, 3) = 1;
-    // now get the residual. start in four dimensions
-    Eigen::Matrix<double, 4, 1> residual4 = Eigen::Matrix<double, 4, 1>::Zero(4, 1);
-    residual4.segment(0, 3) = dxVec.segment(0, 3);
-    residual4(3) = m_params(3) - energy;
-    // project out the 3D par
-
-    Eigen::Matrix<double, 3, 1> r = P * residual4; // //JFK: maybe use .segment(0,3) 2017-10-12
-    Eigen::Matrix<double, 3, 3> V = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
-    V = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
-
-    // calculate the parameter projection matrix
-    // first the 'position' part
-    // //JFK: we need H because of the dimensionality 2017-10-12
-    Eigen::Matrix<double, 3, 7> H = Eigen::Matrix<double, 3, 7>::Zero(3, 7); // = -1. * P;
-    // now the 'momentum' part
-    H.block<3, 3>(0, 0) = -1.0 * P.block<3, 3>(0, 0);
-
-    H(0, 3) = -1 * dxVec(1) - dxVec(2);
-    H(0, 4) = dxVec(0);
-    H(0, 5) = dxVec(0);
-    H(1, 3) = dxVec(2);
-    H(1, 4) = dxVec(2);
-    H(1, 5) = -1 * dxVec(0) - dxVec(1);
-    //H.block<1, 3>(2, 2) = mom.segment(0, 3) / energy;
-    for (int col = 0; col < 3; ++col) {
-      H(2, 3 + col) = -1 * mom(col) / energy ;
-    }
-    // done. copy everything back into the 'projection' object
-
-//    std::cout << "m_params(3) " << m_params(3) << " energy " << energy  << std::endl;
-//    std::cout << "P\n" << P  << std::endl;
-//    std::cout << "residual4\n" << residual4  << std::endl;
-//    std::cout << "r\n" << r  << std::endl;
-
-    p.getResiduals().segment(0, 3) = r.segment(0, 3); // //JFK: this was maxsize == dimm before. Why? 2017-10-12
-    //JFK: Eigen cant use blocks with variable size. for vectors it works 2017-09-26
-    // fill the error matrix
-    p.getV() = V.selfadjointView<Eigen::Lower>();
-    // fill the projection
-    //for (int row = 0; row < dimm; ++row) {
-    for (int row = 0; row < 3; ++row) {
-      for (int col = 0; col < 3; ++col) {
-        p.getH()(row, posindex + col) =  H(row, col);
-      }
-      for (int col = 0; col < 3; ++col) {
-        p.getH()(row, momindex + col) =  H(row, col + 3);
-      }
-    }
-
-    return ErrCode::success; //FT: temp fix
-  }
-
-
-
 
   ErrCode RecoPhoton::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
@@ -212,53 +160,84 @@ namespace TreeFitter {
     const int momindex  = momIndex() ;
     const int posindex  = mother()->posIndex();
 
-    const Eigen::Matrix<double, 1, 3> x_vec = fitparams.getStateVector().segment(posindex, 3);
+    const Eigen::Matrix<double, 1, 3> x_vertex = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
+    int i1(-1);// index of momentum par with highest momentum
+    int i2(-1);// this gives an assertion in Eigen if for some reason this will not be updated
+    int i3(-1);
+
+    // find highest momentum, eliminate dim with highest mom
+    if ((std::abs(p_vec[0]) > std::abs(p_vec[1])) && (std::abs(p_vec[0]) > std::abs(p_vec[2]))) {
+      i1 = 0; i2 = 1; i3 = 2;
+    } else if ((std::abs(p_vec[1]) > std::abs(p_vec[0])) && (std::abs(p_vec[1]) > std::abs(p_vec[2]))) {
+      i1 = 1; i2 = 0; i3 = 2;
+    } else if ((std::abs(p_vec[2]) > std::abs(p_vec[1])) && (std::abs(p_vec[2]) > std::abs(p_vec[0]))) {
+      i1 = 2; i2 = 1; i3 = 0;
+    } else {
+      // this should never happen
+      B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
+              << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
+      return ErrCode::inversionerror;
+    }
+
+    // p_vec[i1] must not be 0
+    const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];
     const double mom = p_vec.norm();
 
-    //Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
-    //const double Ec2 = m_params(3) * m_params(3);
+    // r'
+    Eigen::Matrix<double, 3, 1> residual3 = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
+    residual3(0) = m_clusterPars[i2] - x_vertex[i2] - p_vec[i2] * elim;
+    residual3(1) = m_clusterPars[i3] - x_vertex[i3] - p_vec[i3] * elim;
+    residual3(2) = m_clusterPars[3] - mom;
 
-    const Eigen::Matrix<double, 1, 3> vertexToCluster = x_vec - m_params.segment(0, 3);
-    const double delta = vertexToCluster.norm();
 
-    //const double EcDelta = m_params(3) * delta;
-    const double theta = delta / m_params(3);
+    //FIXME muss ich hier nach auch nach x,y,z ableiten???
+    // rotate covariance {px,py,pz}->{rx,ry,rE}
+    Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
+    P(0, i2) = -1; // dr0/di2c
+    P(0, i1) = - p_vec[i2] / p_vec[i1] ; // dr0 / di1c (if x eliminated)
+    P(0, i3) = 0; // dr0 / dxc (if x eliminated)
 
-    Eigen::Matrix<double, 4, 1> residual4 = Eigen::Matrix<double, 4, 1>::Zero(4, 1);
-    for (unsigned int row = 0 ; row < 3; row++) {
-      residual4(row) = m_params(row) - x_vec(row) - theta * p_vec(row);
-    }
-    residual4(3) = m_params(3) - mom;
+    P(1, i2) = 0; // dr1/dyc
+    P(1, i1) = - p_vec[i3] / p_vec[i1] ; // dr1 / dxc
+    P(1, i3) = -1 ; // dr1 / dxc
 
-    //P(0, 0) = 1;
-    //P(0, 3) =     p_vec(0) * EcDelta / Ec2;
+    P(2, i1) = -1.*p_vec[i1] / mom; // drE/dpx
+    P(2, i2) = -1.*p_vec[i2] / mom; // drE/dpy
+    P(2, i3) = -1.*p_vec[i3] / mom; // drE/dpz
+    P(2, 3) = 1; // dE/dEc
 
-    //P(1, 1) = 1;
-    //P(1, 3) =     p_vec(1) * EcDelta / Ec2;
+    p.getResiduals().segment(0, 3) = residual3;
 
-    //P(2, 2) = 1;
-    //P(2, 3) =     p_vec(2) * EcDelta / Ec2;
+    p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
 
-    //p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
-    p.getV() = m_covariance.selfadjointView<Eigen::Lower>();
-    //p.getResiduals().segment(0, 3) = residual4.segment(0, 3);
-    p.getResiduals().segment(0, 4) = residual4.segment(0, 4);
+    // dr'/dm  | m:={x,y,z,px,py,pz,E}
+    // x := x_vertex
+    p.getH()(0, posindex + i1) = P(0, i1);
+    p.getH()(0, posindex + i2) = -1.0;
+    p.getH()(0, posindex + i3) = 0;
 
-    if (dim() > 3) {
-      p.getH()(3, momindex)     =  p_vec(0) / mom;
-      p.getH()(3, momindex + 1) =  p_vec(1) / mom;
-      p.getH()(3, momindex + 2) =  p_vec(2) / mom;
-    }
+    p.getH()(1, posindex + i1) = P(1, i1);
+    p.getH()(1, posindex + i2) = 0;
+    p.getH()(1, posindex + i3) = -1.0;
 
-    for (unsigned int row = 0; row < 3; row++) {
-      p.getH()(row, posindex + row) = 1;
-      p.getH()(row, momindex + row) = theta;
-    }
+    p.getH()(0, momindex + i1) = 1.0 / (p_vec[i1] * p_vec[i1]);
+    p.getH()(0, momindex + i2) = -1. * elim;
+    p.getH()(0, momindex + i3) = 0;
+
+    p.getH()(1, momindex + i1) = 1.0 / (p_vec[i1] * p_vec[i1]);
+    p.getH()(1, momindex + i2) = 0;
+    p.getH()(1, momindex + i3) = -1. * elim;
+
+    p.getH()(2, momindex + i1) = P(2, i1);
+    p.getH()(2, momindex + i2) = P(2, i2);
+    p.getH()(2, momindex + i3) = P(2, i3);
+    p.getH()(2, momindex + 3) = 1;
 
     return ErrCode::success;
   }
 
 }
+
 

@@ -273,6 +273,28 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterErrorTheta(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getUncertaintyTheta();
+      }
+      return result;
+    }
+
+    double eclClusterErrorPhi(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getUncertaintyPhi();
+      }
+      return result;
+    }
+
     double eclClusterPhi(const Particle* particle)
     {
       double result = 0.0;
@@ -626,6 +648,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
+    REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi,
+                      "Returns ECL cluster's uncertainty on phi (from background level and energy dependent tabulation).");
+    REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta,
+                      "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
+
+
+
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
                       "Returns ECL cluster's uncorrected energy.");
     REGISTER_VARIABLE("clusterR", eclClusterR,

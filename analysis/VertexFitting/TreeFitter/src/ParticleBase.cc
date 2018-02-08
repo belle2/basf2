@@ -221,13 +221,6 @@ namespace TreeFitter {
       for (int i = 0; i < maxrow; ++i) {
         fitparams->getCovariance()(momindex + i, momindex + i) = initVal;
       }
-      //if (maxrow == 4) {
-      //  fitparams->getCovariance().block<4, 4>(momindex, momindex).triangularView<Eigen::Lower>() =
-      //    EigenTypes::MatrixXd::Constant(4, 4, initVal);
-      //} else if (maxrow == 3) {
-      //  fitparams->getCovariance().block<3, 3>(momindex, momindex).triangularView<Eigen::Lower>() =
-      //    EigenTypes::MatrixXd::Constant(3, 3, initVal);
-      //}
     }
     // JFK: tau is a length in our version of the code Thu 24 Aug 2017 04:30:17 AM CEST
     int tauindex = tauIndex();
@@ -237,7 +230,7 @@ namespace TreeFitter {
       const double maxdecaylength = 20; // [cm] (okay for Ks->pi0pi0)
       double bcP = particle()->getP();
       if (bcP > 0.0) {
-        sigtau = std::min(maxdecaylength / bcP, sigtau);
+        sigtau = std::min(maxdecaylength, sigtau); // FIXME TAU
       }
       if (tau > 0) {
         sigtau = 20 * tau;
@@ -268,15 +261,8 @@ namespace TreeFitter {
 
   const ParticleBase* ParticleBase::locate(Belle2::Particle* particle) const
   {
-    //    const ParticleBase* rc = 0;
-    //    if( particle() && ( particle()==aparticle || particle()->isCloneOf(*aparticle,true) ) ) rc = this ;
-
-    //FT: seems like isCloneOf searches down the decay tree to find the particle, which will then be cached in the ParticleMap
-    //    we don't have anything like that, so we have to do it explicitly.
-
-    const ParticleBase* rc = (m_particle == particle) ? this : 0; //if it corresponds to the stored pointer to the head, then it's easy
-    if (!rc) { //otherwise sift through the daughters
-      //FT:  LHCb iteration method, requires to define properly m_daughters in ParticleBase instead of InternalParticle, OR to do some hacks
+    const ParticleBase* rc = (m_particle == particle) ? this : 0;
+    if (!rc) {
       for (auto daughter : m_daughters) {
         rc = daughter->locate(particle);
         if (rc) {break;}
@@ -314,36 +300,48 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
   {
-    int posindexmother = mother()->posIndex();
-    int posindex = posIndex();
-    int tauindex = tauIndex();
-    int momindex = momIndex();
+    const int posindexmother = mother()->posIndex();
+    const int posindex = posIndex();
+    const int tauindex = tauIndex();
+    const int momindex = momIndex();
 
-    std::cout << "      -> " << this->name() << " tauindex " << tauindex  << std::endl;
-    std::cout << "         posindexmother " << posindexmother << " posindex " << posindex << " momindex " << momindex  << std::endl;
+    const double tau =  fitparams.getStateVector()(tauindex);
 
-    double tau =  fitparams.getStateVector()(tauindex);
+    const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
+    //std::cout << "geo constr " << this->name() << " tau " << tau << " posindexmother " << posindexmother << " posindex " << posindex <<
+    //          " tauindex " <<
+    //          tauindex << " momindex " << momindex << std::endl;
     EigenTypes::ColVector momentumVec = fitparams.getStateVector().segment(momindex, 3);
-    double p2 = momentumVec.transpose() * momentumVec;
-    double mom = std::sqrt(p2);
+    double mom = momentumVec.norm();
     double posxmother = 0, posx = 0, momx = 0;
 
     // linear approximation is fine
     //JFK: TODO move to block operations 2017-09-28
     for (int row = 0; row < 3; ++row) {
-
-      std::cout << "           working on  " << posindexmother + row << " posindex " << posindex + row << " momindex " << momindex + row
-                << std::endl;
       posxmother = fitparams.getStateVector()(posindexmother + row);
-      posx       = fitparams.getStateVector()(posindex + row);
+      posx       = p_vec(row);
       momx       = fitparams.getStateVector()(momindex + row);
-      p.getResiduals()(row) = posxmother - (posx + tau * momx);
-      p.getH()(row, posindexmother + row) =    1;
-      p.getH()(row, posindex + row) =        -1;
-      p.getH()(row, momindex + row) = tau; // JFK was just tau before
-      p.getH()(row, tauindex)       =      momx;
+      p.getResiduals()(row) = posxmother - posx - tau * momx;  // FIXME TAU + or - ??
+      //p.getResiduals()(row) = posxmother - posx - tau * momx / mom;  // FIXME TAU
+      //std::cout << "ParticleBase Geo Mother x: " << posxmother << " daughter (posx + tau * momx) " <<
+      //          (posx + tau * momx) << " res " << p.getResiduals()(row) << " mother " << mother()->name() << std::endl;
+      p.getH()(row, posindexmother + row) = 1;
+      p.getH()(row, momindex + row) = -1.*tau;
+      p.getH()(row, posindex + row) = -1;
+      p.getH()(row, tauindex)       = -momx;
     }
+    //const double momPow3by2 = std::pow(mom, 1.5); // mom^3/2 -> d/dpx (momx/mom)
+    //p.getH()(0, momindex    ) = -1.0 * tau * p_vec(1) * p_vec(1) * p_vec(2) * p_vec(2) / momPow3by2; // FIXME TAU
+    //p.getH()(0, momindex + 1) = -1.0 * tau * p_vec(1) * p_vec(0) / momPow3by2; // FIXME TAU
+    //p.getH()(0, momindex + 2) = -1.0 * tau * p_vec(2) * p_vec(0) / momPow3by2; // FIXME TAU
+    //p.getH()(1, momindex    ) = -1.0 * tau * p_vec(0) * p_vec(1) / momPow3by2; // FIXME TAU
+    //p.getH()(1, momindex + 1) = -1.0 * tau * p_vec(0) * p_vec(0) * p_vec(2) * p_vec(2) / momPow3by2; // FIXME TAU
+    //p.getH()(1, momindex + 2) = -1.0 * tau * p_vec(2) * p_vec(1) / momPow3by2; // FIXME TAU
+    //p.getH()(2, momindex    ) = -1.0 * tau * p_vec(0) * p_vec(2)  / momPow3by2; // FIXME TAU
+    //p.getH()(2, momindex + 1) = -1.0 * tau * p_vec(1) * p_vec(2) / momPow3by2; // FIXME TAU
+    //p.getH()(2, momindex + 2) = -1.0 * tau * p_vec(1) * p_vec(1) * p_vec(0) * p_vec(0) / momPow3by2; // FIXME TAU
+
     return ErrCode::success;
   }
 
@@ -395,22 +393,20 @@ namespace TreeFitter {
       assert(momposindex >= 0); // check code logic: no mother -> no tau
       //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
       //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
-
       EigenTypes::ColVector dxVec = fitparams->getStateVector().segment(posindex, 3)
                                     - fitparams->getStateVector().segment(momposindex, 3);
+
       EigenTypes::ColVector pxVec = fitparams->getStateVector().segment(momindex, 3);
-      double momdX = dxVec.transpose() * pxVec;
+      double momdX = dxVec.norm() ; //was px*dx before
       double mom2 =  pxVec.transpose() * pxVec;
 
-
-      // JFK: tau is a length now! Thu 24 Aug 2017 04:33:11 AM CEST
       // if tau should be a time devide by mom2 insertad of the sqrt
-      double tau = std::abs(momdX) / std::sqrt(mom2); //scalar product
+      double tau = std::abs(momdX); // / std::sqrt(mom2); //scalar product
 
       // JFK: pdgTau returns nan because we init the mass with 0... Thu 24 Aug 2017 04:40:38 AM CEST
       //      5 cm as an init value is a stupid but okish guess
       if (tau == 0) {
-        tau = 5 ;//pdgTau();
+        tau = 0;// 5 / std::sqrt(mom2);//pdgTau();
       }
       if (std::isnan(tau)) {tau = 999;}
       fitparams->getStateVector()(tauindex) = tau;

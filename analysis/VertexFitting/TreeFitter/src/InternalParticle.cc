@@ -178,7 +178,7 @@ namespace TreeFitter {
           // normal TrkPoca.
 
           //JFK: FIXME 2017-09-25
-
+          std::cout << "Internal particle l181 track + other daughter::Is this implementd?"  << std::endl;
           B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
         } else if (mother() && mother()->posIndex() >= 0) {
@@ -258,7 +258,6 @@ namespace TreeFitter {
   ErrCode InternalParticle::projectKineConstraint(const FitParams& fitparams,
                                                   Projection& p) const
   {
-
     // first add the mother
     int momindex = momIndex();
 
@@ -266,10 +265,10 @@ namespace TreeFitter {
     for (int imom = 0; imom < 4; ++imom) {
       p.getH()(imom, momindex + imom) = 1;
     }
+
     // now add the daughters
     const double posprecision = 1e-4; // 1mu
 
-    std::cout << "    -> kine mother " << this->name() << " maxrow  "  << std::endl;
     for (const auto daughter : m_daughters) {
       // just to be sure ...
       int dautauindex = 0, daumomindex = 0, maxrow = 0;
@@ -278,21 +277,15 @@ namespace TreeFitter {
       daumomindex = daughter->momIndex();
       mass = daughter->pdgMass();
       maxrow = daughter->hasEnergy() ? 4 : 3;
-
-      std::cout << "    -> kine daughter " << daughter->name() << " maxrow  " << maxrow << std::endl;
-      std::cout << "       dautauindex " << dautauindex << " daumomindex " << daumomindex << ""  << std::endl;
-
       e2 = mass * mass;
-      //e2 += fitparams.getStateVector().segment(daumomindex, maxrow).transpose() * fitparams.getStateVector().segment(daumomindex, maxrow);
-      //p.getResiduals().segment(0, maxrow) -= fitparams.getStateVector().segment(0, maxrow);
-      for (int imom = 0; imom < maxrow; ++imom) {
-        std::cout << "           mom taken from " << daumomindex + imom << std::endl;
 
+      for (int imom = 0; imom < maxrow; ++imom) {
         px = fitparams.getStateVector()(daumomindex + imom);
         e2 += px * px;
         p.getResiduals()(imom) += -px;
         p.getH()(imom, daumomindex + imom) = -1;
       }
+
       if (maxrow == 3) {
         // treat the energy for particles that are parameterized with p3
         energy = sqrt(e2);
@@ -301,10 +294,11 @@ namespace TreeFitter {
           px = fitparams.getStateVector()(daumomindex + jmom);
           p.getH()(3, daumomindex + jmom) = -px / energy;
         }
+
       } else if (dautauindex >= 0 && daughter->charge() != 0) {
         //JFK changed tau eventually we have to devide it by |p| here
         tau =  fitparams.getStateVector()(dautauindex);
-
+        std::cout << "InternalParticle::tau index stuff" << std::endl;
         lambda = bFieldOverC() * daughter->charge();
         px0 = fitparams.getStateVector()(daumomindex);
         py0 = fitparams.getStateVector()(daumomindex + 1);

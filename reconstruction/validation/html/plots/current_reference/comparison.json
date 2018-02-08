@@ -1,0 +1,320 @@
+{
+    "label": "current_reference",
+    "packages": [
+        {
+            "comparison_error": 3,
+            "comparison_warning": 4,
+            "fail_count": 0,
+            "name": "reconstruction",
+            "plotfiles": [
+                {
+                    "compared_revision": [
+                        "reference",
+                        "current"
+                    ],
+                    "comparison_error": 0,
+                    "comparison_warning": 0,
+                    "has_reference": true,
+                    "html_content": [],
+                    "ntuples": [],
+                    "package": "reconstruction",
+                    "plots": [
+                        {
+                            "check": "Should be as high as possible (esp. for low momenta), with almost no entries <0 ",
+                            "comparison_pvalue": null,
+                            "comparison_pvalue_error": null,
+                            "comparison_pvalue_warn": null,
+                            "comparison_result": "not_compared",
+                            "comparison_text": "Comparison failed: Comparison of 0_211_LLdiff (Type TH2F) with 0_211_LLdiff (Type TH2F) not supported.\nPlease contact Thomas.Hauth@kit.edu if you need this supported.",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "LL(pi) - LL(K) for true pions, over momentum (in VXD)",
+                            "height": 525,
+                            "is_expert": true,
+                            "pdf_filename": "dedx_LLdiff_pi_K_0_211_LLdiff.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LLdiff_pi_K_0_211_LLdiff.png",
+                            "title": "dedx_LLdiff_pi_K_0_211_LLdiff",
+                            "width": 700
+                        },
+                        {
+                            "check": "Should be as low as possible (esp. for low momenta), with almost no entries >0 ",
+                            "comparison_pvalue": null,
+                            "comparison_pvalue_error": null,
+                            "comparison_pvalue_warn": null,
+                            "comparison_result": "not_compared",
+                            "comparison_text": "Comparison failed: Comparison of 0_321_LLdiff (Type TH2F) with 0_321_LLdiff (Type TH2F) not supported.\nPlease contact Thomas.Hauth@kit.edu if you need this supported.",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "LL(pi) - LL(K) for true kaons, over momentum (in VXD)",
+                            "height": 525,
+                            "is_expert": true,
+                            "pdf_filename": "dedx_LLdiff_pi_K_0_321_LLdiff.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LLdiff_pi_K_0_321_LLdiff.png",
+                            "title": "dedx_LLdiff_pi_K_0_321_LLdiff",
+                            "width": 700
+                        },
+                        {
+                            "check": "Should be as high as possible (esp. for low momenta), with almost no entries <0 ",
+                            "comparison_pvalue": null,
+                            "comparison_pvalue_error": null,
+                            "comparison_pvalue_warn": null,
+                            "comparison_result": "not_compared",
+                            "comparison_text": "Comparison failed: Comparison of 1_211_LLdiff (Type TH2F) with 1_211_LLdiff (Type TH2F) not supported.\nPlease contact Thomas.Hauth@kit.edu if you need this supported.",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "LL(pi) - LL(K) for true pions, over momentum (in CDC)",
+                            "height": 525,
+                            "is_expert": true,
+                            "pdf_filename": "dedx_LLdiff_pi_K_1_211_LLdiff.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LLdiff_pi_K_1_211_LLdiff.png",
+                            "title": "dedx_LLdiff_pi_K_1_211_LLdiff",
+                            "width": 700
+                        },
+                        {
+                            "check": "Should be as low as possible (esp. for low momenta), with almost no entries >0 ",
+                            "comparison_pvalue": null,
+                            "comparison_pvalue_error": null,
+                            "comparison_pvalue_warn": null,
+                            "comparison_result": "not_compared",
+                            "comparison_text": "Comparison failed: Comparison of 1_321_LLdiff (Type TH2F) with 1_321_LLdiff (Type TH2F) not supported.\nPlease contact Thomas.Hauth@kit.edu if you need this supported.",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "LL(pi) - LL(K) for true kaons, over momentum (in CDC)",
+                            "height": 525,
+                            "is_expert": true,
+                            "pdf_filename": "dedx_LLdiff_pi_K_1_321_LLdiff.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LLdiff_pi_K_1_321_LLdiff.png",
+                            "title": "dedx_LLdiff_pi_K_1_321_LLdiff",
+                            "width": 700
+                        }
+                    ],
+                    "rootfile": "dedx_LLdiff_pi_K",
+                    "title": "dedx_LLdiff_pi_K"
+                },
+                {
+                    "compared_revision": [
+                        "reference",
+                        "current"
+                    ],
+                    "comparison_error": 3,
+                    "comparison_warning": 3,
+                    "has_reference": true,
+                    "html_content": [],
+                    "ntuples": [],
+                    "package": "reconstruction",
+                    "plots": [
+                        {
+                            "check": "Peak at 1",
+                            "comparison_pvalue": 3.554189019895008e-15,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "error",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 237.01918853460637 NDF = 90 Chi^2/NDF = 2.633546539273404)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "Unweighted output prob. for true deuterons",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_LRplots_1000010020_prob.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LRplots_1000010020_prob.png",
+                            "title": "dedx_LRplots_1000010020_prob",
+                            "width": 700
+                        },
+                        {
+                            "check": "Peak at 1",
+                            "comparison_pvalue": 0.002040585033996917,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "error",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 133.37827853540085 NDF = 90 Chi^2/NDF = 1.481980872615565)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "Unweighted output prob. for true electrons",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_LRplots_11_prob.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LRplots_11_prob.png",
+                            "title": "dedx_LRplots_11_prob",
+                            "width": 700
+                        },
+                        {
+                            "check": "Like pions, but too few entries for evaluation",
+                            "comparison_pvalue": 0.07833222595060267,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "warning",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 111.82499989289033 NDF = 92 Chi^2/NDF = 1.2154891292705472)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "Unweighted output prob. for true muons",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_LRplots_13_prob.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LRplots_13_prob.png",
+                            "title": "dedx_LRplots_13_prob",
+                            "width": 700
+                        },
+                        {
+                            "check": "Peak at 1, but also many at lower values",
+                            "comparison_pvalue": 0.17124433234211295,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "warning",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 104.76338313370148 NDF = 92 Chi^2/NDF = 1.1387324253663205)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "Unweighted output prob. for true pions",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_LRplots_211_prob.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LRplots_211_prob.png",
+                            "title": "dedx_LRplots_211_prob",
+                            "width": 700
+                        },
+                        {
+                            "check": "Peak at 1",
+                            "comparison_pvalue": 9.780968253196648e-07,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "error",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 168.7908855119125 NDF = 90 Chi^2/NDF = 1.8754542834656944)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "Unweighted output prob. for true protons",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_LRplots_2212_prob.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LRplots_2212_prob.png",
+                            "title": "dedx_LRplots_2212_prob",
+                            "width": 700
+                        },
+                        {
+                            "check": "Peak at 1",
+                            "comparison_pvalue": 0.030373340197108606,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "warning",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 116.78173781223057 NDF = 90 Chi^2/NDF = 1.2975748645803398)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "Unweighted output prob. for true kaons",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_LRplots_321_prob.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_LRplots_321_prob.png",
+                            "title": "dedx_LRplots_321_prob",
+                            "width": 700
+                        }
+                    ],
+                    "rootfile": "dedx_LRplots",
+                    "title": "dedx_LRplots"
+                },
+                {
+                    "compared_revision": [
+                        "reference",
+                        "current"
+                    ],
+                    "comparison_error": 0,
+                    "comparison_warning": 0,
+                    "has_reference": true,
+                    "html_content": [],
+                    "ntuples": [],
+                    "package": "reconstruction",
+                    "plots": [
+                        {
+                            "check": "Distinct bands for pions/kaons/protons below 1GeV, minimal ionisation for higher p. Some misreconstructed tracks at very low dE/dx values.",
+                            "comparison_pvalue": null,
+                            "comparison_pvalue_error": null,
+                            "comparison_pvalue_warn": null,
+                            "comparison_result": "not_compared",
+                            "comparison_text": "Comparison failed: Comparison of dedx_p_1 (Type TH2F) with dedx_p_1 (Type TH2F) not supported.\nPlease contact Thomas.Hauth@kit.edu if you need this supported.",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "dE/dx curve for SVD",
+                            "height": 525,
+                            "is_expert": true,
+                            "pdf_filename": "dedx_curves_dedx_p_1.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_curves_dedx_p_1.png",
+                            "title": "dedx_curves_dedx_p_1",
+                            "width": 700
+                        },
+                        {
+                            "check": "Distinct bands for pions/kaons/protons below 1GeV, relativistic rise visible . Some misreconstructed tracks at very low dE/dx values.",
+                            "comparison_pvalue": null,
+                            "comparison_pvalue_error": null,
+                            "comparison_pvalue_warn": null,
+                            "comparison_result": "not_compared",
+                            "comparison_text": "Comparison failed: Comparison of dedx_p_2 (Type TH2F) with dedx_p_2 (Type TH2F) not supported.\nPlease contact Thomas.Hauth@kit.edu if you need this supported.",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "dE/dx curve for CDC",
+                            "height": 525,
+                            "is_expert": true,
+                            "pdf_filename": "dedx_curves_dedx_p_2.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_curves_dedx_p_2.png",
+                            "title": "dedx_curves_dedx_p_2",
+                            "width": 700
+                        }
+                    ],
+                    "rootfile": "dedx_curves",
+                    "title": "dedx_curves"
+                },
+                {
+                    "compared_revision": [
+                        "reference",
+                        "current"
+                    ],
+                    "comparison_error": 0,
+                    "comparison_warning": 1,
+                    "has_reference": true,
+                    "html_content": [],
+                    "ntuples": [],
+                    "package": "reconstruction",
+                    "plots": [
+                        {
+                            "check": "Smooth distribution for values > 0, VXD measurements (< 0) at around the same level (in particular, should not be twice as high). Gap at -1, -2 indicates PXD is not being used (=default).",
+                            "comparison_pvalue": 0.9999999999996716,
+                            "comparison_pvalue_error": 0.01,
+                            "comparison_pvalue_warn": 1.0,
+                            "comparison_result": "warning",
+                            "comparison_text": "Performed Chi^2-Test between reference and current (Chi^2 = 10.653196410086622 NDF = 59 Chi^2/NDF = 0.18056265101841731)",
+                            "contact": "jvbennett@cmu.edu",
+                            "description": "layer ID for each dE/dx measurement (negative values for PXD/SVD)",
+                            "height": 525,
+                            "is_expert": false,
+                            "pdf_filename": "dedx_internals_layer_ID.pdf",
+                            "plot_path": "./plots/current_reference/reconstruction/",
+                            "png_filename": "dedx_internals_layer_ID.png",
+                            "title": "dedx_internals_layer_ID",
+                            "width": 700
+                        }
+                    ],
+                    "rootfile": "dedx_internals",
+                    "title": "dedx_internals"
+                }
+            ],
+            "scriptfiles": [],
+            "visible": true
+        }
+    ],
+    "revisions": [
+        {
+            "color": "#000000",
+            "creation_date": null,
+            "creation_timezone": null,
+            "git_hash": null,
+            "label": "reference",
+            "most_recent": false,
+            "packages": []
+        },
+        {
+            "color": "#ff0000",
+            "creation_date": null,
+            "creation_timezone": null,
+            "git_hash": null,
+            "label": "current",
+            "most_recent": false,
+            "packages": []
+        }
+    ]
+}

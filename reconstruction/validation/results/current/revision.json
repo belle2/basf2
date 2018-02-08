@@ -1,0 +1,171 @@
+{
+    "creation_date": "2017-11-29 05:07",
+    "creation_timezone": "UTC",
+    "git_hash": "8a6bb93fe5",
+    "label": "current",
+    "most_recent": false,
+    "packages": [
+        {
+            "fail_count": 0,
+            "name": "validation",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "analysis",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "arich",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "b2bii",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "background",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "bklm",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "cdc",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "decfiles",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "ecl",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "eklm",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "pxd",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 1,
+            "name": "reconstruction",
+            "plotfiles": [],
+            "scriptfiles": [
+                {
+                    "log_url": "reconstruction/dedx1_curves.C.log",
+                    "name": "dedx1_curves.C",
+                    "path": "/imports/home/jkrohn/basf2/release/reconstruction/validation/dedx1_curves.C",
+                    "return_code": 0,
+                    "status": "finished"
+                },
+                {
+                    "log_url": "reconstruction/dedx2_LR.C.log",
+                    "name": "dedx2_LR.C",
+                    "path": "/imports/home/jkrohn/basf2/release/reconstruction/validation/dedx2_LR.C",
+                    "return_code": 0,
+                    "status": "finished"
+                },
+                {
+                    "log_url": "reconstruction/dedx3_lldiff_pi_K.C.log",
+                    "name": "dedx3_lldiff_pi_K.C",
+                    "path": "/imports/home/jkrohn/basf2/release/reconstruction/validation/dedx3_lldiff_pi_K.C",
+                    "return_code": 0,
+                    "status": "finished"
+                },
+                {
+                    "log_url": "reconstruction/dedx4_internals.C.log",
+                    "name": "dedx4_internals.C",
+                    "path": "/imports/home/jkrohn/basf2/release/reconstruction/validation/dedx4_internals.C",
+                    "return_code": 0,
+                    "status": "finished"
+                },
+                {
+                    "log_url": "reconstruction/0_Klong_efficiencies.py.log",
+                    "name": "0_Klong_efficiencies.py",
+                    "path": "/imports/home/jkrohn/basf2/release/reconstruction/validation/0_Klong_efficiencies.py",
+                    "return_code": 1,
+                    "status": "failed"
+                },
+                {
+                    "log_url": "reconstruction/0_dedxPID_evtgen.py.log",
+                    "name": "0_dedxPID_evtgen.py",
+                    "path": "/imports/home/jkrohn/basf2/release/reconstruction/validation/0_dedxPID_evtgen.py",
+                    "return_code": 0,
+                    "status": "finished"
+                }
+            ],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "simulation",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "svd",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "top",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "tracking",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        },
+        {
+            "fail_count": 0,
+            "name": "vxd",
+            "plotfiles": [],
+            "scriptfiles": [],
+            "visible": true
+        }
+    ]
+}

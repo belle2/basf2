@@ -1,0 +1,282 @@
+[INFO] Steering file: /imports/home/jkrohn/basf2/release/reconstruction/validation/0_Klong_efficiencies.py
+[INFO] The random number seed is set to "#fa1afe1"
+[?1034h
+*************************************************************
+ Geant4 version Name: geant4-10-01-patch-02    (19-June-2015)
+                      Copyright : Geant4 Collaboration
+                      Reference : NIM A 506 (2003), 250-303
+                            WWW : http://cern.ch/geant4
+*************************************************************
+
+[INFO] Starting event processing, random seed is set to '#fa1afe1'
+[INFO] Mass of FWD_Shield layer 0 = 297.071.kg.
+[INFO] Mass of FWD_Shield layer 1 = 35.9605.kg.
+[INFO] Total mass of side FWD_Shield = 333.031 kg
+[INFO] Mass of BWD_Shield layer 0 = 492.284.kg.
+[INFO] Mass of BWD_Shield layer 1 = 36.0917.kg.
+[INFO] Total mass of side BWD_Shield = 528.376 kg
+[INFO] Total mass of PolePieceR = 48845.7 kg
+[INFO] Total mass of PolePieceL = 49453.1 kg
+[INFO] Created PXD DockBox with a mass of 4.53924kg
+[INFO] Created SVD DockBox with a mass of 4.51015kg
+[INFO] CDCSensitiveDetector: Threshold energy (MeV): 0
+[INFO] CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): 1
+[INFO] CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): 0
+[INFO] CDCSensitiveDetector: MinTrackLength (mm): 150
+[INFO] CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.
+[INFO] CDCGeometryPar: Sense wire z mode:1
+[INFO] CDCGeometryPar: Clock freq. for TDC= 1.01777 (GHz).
+[INFO] CDCGeometryPar: TDC bin width= 0.982536 (ns).
+[INFO] CDCGeometryPar: Load displacement params. (=1); not load (=0):1
+[INFO] CDCGeometryPar: Read displacement from DB
+[INFO] CDCGeometryPar: Load alignment params. (=1); not load (=0):1
+[INFO] CDCGeometryPar: Read alignment from DB
+[INFO] CDCGeometryPar: Load misalignment params. (=1); not load (=0):0
+[INFO] CDCGeometryPar: Read xt from DB
+[INFO] CDCGeometryPar: Read sigma from DB
+[INFO] CDCGeometryPar: Read prop-speed from DB
+[INFO] CDCGeometryPar: Read t0 from DB
+[INFO] CDCGeometryPar: Read badwire from DB
+[INFO] CDCGeometryPar: Read ch-map from DB
+[INFO] CDCGeometryPar: Read time-walk from DB
+[INFO] Geometry type: Full
+[INFO] BKLM::GeometryPar: DoBeamBackgroundStudy = 0
+[INFO] Geant4 default deltaChord = 0.25
+[INFO] DeltaChord after reset = 0.25
+[INFO] EnergyLossForExtrapolator::ComputeElectronDEDX for g4e_e-
+[INFO] EnergyLossForExtrapolator::ComputeElectronDEDX for g4e_e+
+[INFO] EnergyLossForExtrapolator::ComputeMuonDEDX for g4e_mu+
+[INFO] EnergyLossForExtrapolator::ComputeHadronDEDX for g4e_pi+
+[INFO] EnergyLossForExtrapolator::ComputeHadronDEDX for g4e_kaon+
+[INFO] EnergyLossForExtrapolator::ComputeHadronDEDX for g4e_proton
+[INFO] EnergyLossForExtrapolator::ComputeHadronDEDX for g4e_deuteron
+[INFO] EnergyLossForExtrapolator::ComputeTransportXS for g4e_e-
+[INFO] Perform Geant4 final initialization: Geometry optimization, PhysicsList calculations...
+[INFO] done, Geant4 ready
+[INFO] SVDDigitizer parameters (in default system units, *=cannot be set directly):
+[INFO]  DATASTORE COLLECTIONS:
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  Digits:             SVDDigits
+[INFO]  -->  SimHits:            SVDSimHits
+[INFO]  -->  TrueHits:           SVDTrueHits
+[INFO]  -->  MCSimHitRel:        MCParticlesToSVDSimHits
+[INFO]  -->  DigitMCRel:         
+[INFO]  -->  TrueSimRel:         SVDTrueHitsToSVDSimHits
+[INFO]  -->  DigitTrueRel:       
+[INFO]  PHYSICS: 
+[INFO]  -->  SegmentLength:      0.002
+[INFO]  -->  Charge int. range:  3
+[INFO]  NOISE: 
+[INFO]  -->  Add Poisson noise   true
+[INFO]  -->  Add Gaussian noise: true
+[INFO]  -->  Zero suppression cut2.5
+[INFO]  -->  Noise fraction*:    0.00620967
+[INFO]  TIMING: 
+[INFO]  -->  APV25 shaping time: 250
+[INFO]  -->  Sampling time:      31.44
+[INFO]  -->  Start of int. wind.:-31.44
+[INFO]  -->  Number of samples:  6
+[INFO]  -->  Random event times. false
+[INFO]  REPORTING: 
+[INFO]  -->  statisticsFilename: 
+[INFO]  -->  storeWaveforms:     false
+[INFO] PXDDigitizer Parameters (in system units, *=calculated +=set in xml):
+[INFO]  -->  ElectronicEffects:  true
+[INFO]  -->  ElectronicNoise:    150 e-
+[INFO]  --> +ChargeThreshold:    set in xml by sensor, nominal 4 ADU
+[INFO]  --> *NoiseFraction:      set in xml by sensor, nominal 1.0e-5
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  SimHits:            PXDSimHits
+[INFO]  -->  Digits:             pxd_unfiltered_digits
+[INFO]  -->  TrueHits:           PXDTrueHits
+[INFO]  -->  MCSimHitRel:        MCParticlesToPXDSimHits
+[INFO]  -->  DigitMCRel:         pxd_unfiltered_digitsToMCParticles
+[INFO]  -->  TrueSimRel:         PXDTrueHitsToPXDSimHits
+[INFO]  -->  DigitTrueRel:       pxd_unfiltered_digitsToPXDTrueHits
+[INFO]  -->  PoissonSmearing:    true
+[INFO]  --> +IntegrationWindow:  true, size defined in xml
+[INFO]  -->  SegmentLength:      0.0005 cm
+[INFO]  -->  ElectronGroupSize:  100 e-
+[INFO]  -->  ElectronStepTime:   1 ns
+[INFO]  -->  ElectronMaxSteps:   200
+[INFO]  -->  ADU unit:           216.667 e-/ADU
+[INFO]  -->  statisticsFilename: 
+[INFO] ECLDigitizer: Reading configuration data with background from: /imports/home/jkrohn/basf2/release/data/ecl/ECL-WF-BG.root
+[INFO] ECLDigitizer: 217 sets of wave form covariance matricies will be used.
+[INFO] ECLDigitizer: 217 parameter sets of fitting algorithm were read.
+[INFO] ECLDigitizer: 217 noise matricies were loaded.
+[INFO] ECLDigitizer: 217 fitting crystals groups were created.
+[INFO] ECLDigitizer: 2 sampled signal templates were created.
+[ERROR] BGOverlayExecutor: no BGOverlayInput module in the path  { module: BGOverlayExecutor }
+[INFO] No xml list of ignored pixels specified.
+[INFO]  1. COLLECTIONS:
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  Digits:             
+[INFO]  -->  RecoDigits:           __ROIsvdRecoDigits
+[INFO]  -->  TrueHits:           SVDTrueHits
+[INFO]  -->  DigitMCRel:         SVDShaperDigitsToMCParticles
+[INFO]  -->  RecoDigitMCRel:       __ROIsvdRecoDigitsToMCParticles
+[INFO]  -->  RecoDigitDigitRel:    __ROIsvdRecoDigitsToSVDShaperDigits
+[INFO]  -->  DigitTrueRel:       SVDShaperDigitsToSVDTrueHits
+[INFO]  -->  RecoDigitTrueRel:     __ROIsvdRecoDigitsToSVDTrueHits
+[INFO] SVDSimpleClusterizer Parameters (in default system unit, *=cannot be set directly):
+[INFO]  1. COLLECTIONS:
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  SVDRecoDigits:      __ROIsvdRecoDigits
+[INFO]  -->  SVDClusters:        __ROIsvdClusters
+[INFO]  -->  SVDTrueHits:        SVDTrueHits
+[INFO]  -->  DigitMCRel:         __ROIsvdRecoDigitsToMCParticles
+[INFO]  -->  ClusterMCRel:       __ROIsvdClustersToMCParticles
+[INFO]  -->  ClusterDigitRel:    __ROIsvdClustersTo__ROIsvdRecoDigits
+[INFO]  -->  DigitTrueRel:       __ROIsvdRecoDigitsToSVDTrueHits
+[INFO]  -->  ClusterTrueRel:     __ROIsvdClustersToSVDTrueHits
+[INFO]  2. CLUSTERING:
+[INFO]  -->  Neighbour cut:      3
+[INFO]  -->  Seed cut:           5
+[INFO]  -->  Size HeadTail:      3
+[INFO] SVDSpacePointCreatorModule(SVDSpacePoints)::initialize: names set for containers:
+
+svdClusters: __ROIsvdClusters
+spacePoints: SpacePoints__ROI
+[INFO] SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: SVDSectorMap_v000.root
+[INFO] SectorMapBootstrapModule: retrieving new SectorMap. New file name: /cvmfs/belle.cern.ch/conditions/dbstore_SVDSectorMap_v000.root_rev_4.root
+[INFO] SegmentNetworkProducerModule::initialize(): loading mapName: SVDOnlyDefault with nCompactSecIDs: 1549
+[INFO]  1. COLLECTIONS:
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  Digits:             
+[INFO]  -->  RecoDigits:           
+[INFO]  -->  TrueHits:           SVDTrueHits
+[INFO]  -->  DigitMCRel:         SVDShaperDigitsToMCParticles
+[INFO]  -->  RecoDigitMCRel:       SVDRecoDigitsToMCParticles
+[INFO]  -->  RecoDigitDigitRel:    SVDRecoDigitsToSVDShaperDigits
+[INFO]  -->  DigitTrueRel:       SVDShaperDigitsToSVDTrueHits
+[INFO]  -->  RecoDigitTrueRel:     SVDRecoDigitsToSVDTrueHits
+[INFO] SVDSimpleClusterizer Parameters (in default system unit, *=cannot be set directly):
+[INFO]  1. COLLECTIONS:
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  SVDRecoDigits:      SVDRecoDigits
+[INFO]  -->  SVDClusters:        SVDClusters
+[INFO]  -->  SVDTrueHits:        SVDTrueHits
+[INFO]  -->  DigitMCRel:         SVDRecoDigitsToMCParticles
+[INFO]  -->  ClusterMCRel:       SVDClustersToMCParticles
+[INFO]  -->  ClusterDigitRel:    SVDClustersToSVDRecoDigits
+[INFO]  -->  DigitTrueRel:       SVDRecoDigitsToSVDTrueHits
+[INFO]  -->  ClusterTrueRel:     SVDClustersToSVDTrueHits
+[INFO]  2. CLUSTERING:
+[INFO]  -->  Neighbour cut:      3
+[INFO]  -->  Seed cut:           5
+[INFO]  -->  Size HeadTail:      3
+[INFO] PXDClusterizer Parameters (in default system units, *=cannot be set directly):
+[INFO]  -->  ElectronicNoise:    0.7
+[INFO]  -->  NoiseSN:            3
+[INFO]  -->  SeedSN:             5
+[INFO]  -->  ClusterSN:          8
+[INFO]  -->  MCParticles:        MCParticles
+[INFO]  -->  Digits:             PXDDigits
+[INFO]  -->  Clusters:           PXDClusters
+[INFO]  -->  TrueHits:           PXDTrueHits
+[INFO]  -->  DigitMCRel:         PXDDigitsToMCParticles
+[INFO]  -->  ClusterMCRel:       PXDClustersToMCParticles
+[INFO]  -->  ClusterDigitRel:    PXDClustersToPXDDigits
+[INFO]  -->  DigitTrueRel:       PXDDigitsToPXDTrueHits
+[INFO]  -->  ClusterTrueRel:     PXDClustersToPXDTrueHits
+[INFO]  -->  NotUseClusterShape: 0
+[INFO] SVDSpacePointCreatorModule(SVDSpacePoints)::initialize: names set for containers:
+
+svdClusters: SVDClusters
+spacePoints: SpacePoints
+[INFO] SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: SVDSectorMap_v000.root
+[INFO] SectorMapBootstrapModule: retrieving new SectorMap. New file name: /cvmfs/belle.cern.ch/conditions/dbstore_SVDSectorMap_v000.root_rev_4.root
+[INFO] FiltersContainer: Replacing existing filter for setup name: SVDOnlyDefault
+[INFO] SegmentNetworkProducerModule::initialize(): loading mapName: SVDOnlyDefault with nCompactSecIDs: 1549
+[INFO] SpacePointCreatorModule(PXDSpacePoints)::initialize: names set for containers:
+pxdClusters: PXDClusters
+spacePoints: SpacePoints
+[INFO] ExtManager::Initialize(): Ext will run with FullSim and has initialized the extrapolator
+[INFO] Ext hypothesis for PDG code 11 and its antiparticle will be extrapolated
+[INFO] Ext hypothesis for PDG code 13 and its antiparticle will be extrapolated
+[INFO] Ext hypothesis for PDG code 211 and its antiparticle will be extrapolated
+[INFO] Ext hypothesis for PDG code 321 and its antiparticle will be extrapolated
+[INFO] Ext hypothesis for PDG code 2212 and its antiparticle will be extrapolated
+[INFO] Ext hypothesis for PDG code 1000010020 and its antiparticle will be extrapolated
+[INFO] Simulation::ExtCylSurfaceTarget created with radius 1700 zmin -1735 zmax 2675
+[INFO] ARICHReconstructorModule: track infromation is taken from mdst Tracks.
+[INFO] ECLGeometryPar::read() initialized with 224 crystals.
+[INFO] ECLNeighbours::ECLNeighbours: initialize N, n x n: 3 x 3
+ ... message repeated 1 times
+[INFO] ECLNeighbours::ECLNeighbours: initialize N, n x n: 3 x 3
+[INFO] ECLNeighbours::ECLNeighbours: initialize N, n x n: 3 x 3
+[INFO] ECLNeighbours::ECLNeighbours: initialize NC, n x n (minus corners): 5 x 5
+[INFO] ECLNeighbours::ECLNeighbours: initialize N, n x n: 3 x 3
+[INFO] ECLNeighbours::ECLNeighbours: initialize NC, n x n (minus corners): 5 x 5
+[INFO] ExtManager::Initialize(): Muid will run with FullSim; the extrapolator has already been initialized
+[INFO] Muid hypothesis for PDG code 13 and its antiparticle will be extrapolated
+[INFO] Simulation::ExtCylSurfaceTarget created with radius 3826.26 zmin -3151 zmax 4091
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:HLT (pi-:HLT)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : pt>0.2 and d0 < 2 and abs(z0) < 4
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:HLT (gamma:HLT)
+[INFO]    -> MDST source: ECLClusters
+[INFO]    -> With cuts  : E>0.1
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:calib (pi-:calib)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : abs(dz)<4.0 and dr<2.0 and chiProb>0.001 and cosTheta>-0.866 and cosTheta<0.956
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K+:calib (K-:calib)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : abs(dz)<4.0 and dr<2.0 and chiProb>0.001 and cosTheta>-0.866 and cosTheta<0.956
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: p+:calib (anti-p-:calib)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : abs(dz)<4.0 and dr<2.0 and chiProb>0.001 and cosTheta>-0.866 and cosTheta<0.956
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:calib (gamma:calib)
+[INFO]    -> MDST source: ECLClusters
+[INFO]    -> With cuts  : E>0.05
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing vertex fit on Lambda0:calib using kfitter
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing vertex fit on Xi-:calib using kfitter
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:dqm (pi-:dqm)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : pionID > 0.5 and chiProb > 0.001
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K-:dqm (K+:dqm)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : kaonID > 0.5 and chiProb > 0.001
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing vertex fit on D0:dqm using kfitter
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing vertex fit on D*+:dqm using kfitter
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing vertex fit on D+:dqm using kfitter
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:good (e-:good)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : electronID > 0.2 and d0 < 2 and abs(z0) < 4 
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing massvertex fit on J/psi:dqm_ee using kfitter
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: mu+:good (mu-:good)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : muonID > 0.2 and d0 < 2 and abs(z0) < 4 
+[INFO] ParticleVertexFitterModule : magnetic field = 1.48436
+[INFO] ParticleVertexFitter: Performing massvertex fit on J/psi:dqm_mumu using kfitter
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { function: void Belle2::EventProcessor::process(Belle2::PathPtr, long int) }
+[INFO] ================================================================================
+[INFO] Error summary: 1 errors and 0 warnings occurred.
+[ERROR] BGOverlayExecutor: no BGOverlayInput module in the path
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
+[INFO] ================================================================================
+
+WARNING - Attempt to delete the solid store while geometry closed !
+WARNING - Attempt to delete the logical volume store while geometry closed !
+WARNING - Attempt to delete the physical volume store while geometry closed !
+WARNING - Attempt to delete the region store while geometry closed !
+
+ TOP configured with           16  Q-bars.
+

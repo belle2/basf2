@@ -22,6 +22,8 @@ namespace TreeFitter {
 
   class KalmanCalculator {
   public:
+    /** constructor  */
+    KalmanCalculator() : m_chisq(1e+10) {}
 
     /** update statevector */
     void updateState(FitParams* fitparams);

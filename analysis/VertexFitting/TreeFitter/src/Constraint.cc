@@ -58,6 +58,9 @@ namespace TreeFitter {
 
   ErrCode Constraint::filter(FitParams* fitpar)
   {
+    //std::cout << "Filtering " << this->name() <<
+    //          " -------------------------------------------------------------------------------------------------------------------"  <<
+    //          std::endl;
     B2DEBUG(82, "----Constraint::filtering " << this->name());
     ErrCode status;
 
@@ -75,7 +78,6 @@ namespace TreeFitter {
 
       if (!status.failure()) {
 
-        std::cout << iter << " -> " << this->name()  << std::endl;
         status |= kalman.calculateGainMatrix(p.getResiduals(), p.getH(), fitpar, &p.getV());
 
         if (!status.failure()) {
@@ -94,6 +96,8 @@ namespace TreeFitter {
     }
     B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
             " NDF" << m_dim << " for " << this->name());
+    //std::cout <<  "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq
+    //          << " NDF" << m_dim << " for " << this->name() << std::endl;
 
     /* FIXME get the math in RecoPhoton right so that the reduced constraint can be projected
      * this is a hack that works but projection 3d instead of 4d photon would be better :  <15-12-17, jkrohn> */

@@ -39,17 +39,14 @@ namespace TreeFitter {
     /** project photon consztraint */
     ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const;
 
-    /** project photon consztraint */
-    ErrCode projectRecoConstraintOld(const FitParams& fitparams, Projection& p) const;
-
     /** sets the size of the corresponding residual projection */
     virtual int dimM() const { return dim(); }
 
     /** how should the energy be calculated ? from momentum or from E ?  */
-    virtual bool hasEnergy() const { return dim() > 3 ; }
+    virtual bool hasEnergy() const { return false; }
 
     /**set the size of the particle in the statevector */
-    virtual int dim() const { return 4; }
+    virtual int dim() const { return m_dim; }
 
     /** */
     virtual int type()     const { return kRecoPhoton ; }
@@ -64,16 +61,19 @@ namespace TreeFitter {
     static bool useEnergy(Belle2::Particle& cand) ;
 
   private:
+
+    /** dimension of residuals and 'width' of H */
+    const int m_dim;
     /** */
     bool m_init ;
 
     /** */
     bool m_useEnergy ;
 
-    /** constains params of this constraint */
-    Eigen::Matrix<double, 1, 4> m_params;
+    /** constains measured params (x_c, y_c, z_c, E_c) */
+    Eigen::Matrix<double, 1, 4> m_clusterPars;
 
-    /** constains covaraince of this constraint */
+    /** covariance (x_c,y_c,z_c,E_c) of measured pars */
     Eigen::Matrix<double, 4, 4> m_covariance;
   };
 

@@ -72,6 +72,16 @@ namespace Belle2 {
       return frame.getMomentum(part).E();
     }
 
+    double particleClusterEUncertainty(const Particle* part)
+    {
+      const ECLCluster* cluster = part->getECLCluster();
+      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
+      if (cluster) {
+        return std::sqrt(EPhiThetaCov[0][0]);
+      }
+      return std::nan("");
+    }
+
     double particlePx(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1116,6 +1126,24 @@ namespace Belle2 {
       return mcparticle->getMomentum().Mag();
     }
 
+    double particleMCMatchTheta(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Theta();
+    }
+
+    double particleMCMatchPhi(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Phi();
+    }
+
     double particleMCRecoilMass(const Particle* part)
     {
       StoreArray<MCParticle> mcparticles;
@@ -1433,12 +1461,12 @@ namespace Belle2 {
     }
 
 
-
-
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
+    REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
+                      "energy uncertainty as given by the underlying ECL cluster.");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
@@ -1574,6 +1602,13 @@ namespace Belle2 {
                       "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
                       "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,
+                      "The phi of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
+                      "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+
+
+
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
 

@@ -71,14 +71,11 @@ namespace TreeFitter {
       int ndiverging = 0;
       bool finished = false;
       double deltachisq = 1e10;
-      std::cout << "#########################################################################################"  << std::endl;
-      std::cout << "Starting to FIt fit pars are:\n" << m_fitparams->getStateVector()  << std::endl;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-
-
+        //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
+        //std::endl;
         EigenTypes::ColVector prevpar = m_fitparams->getStateVector();
 
-        std::cout << m_niter << " ------------------------------- filter" << std::endl;
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
@@ -86,7 +83,6 @@ namespace TreeFitter {
         double dChisqQuit = std::max(double(2 * nDof()), 2 * m_chiSquare);
 
         deltachisq = chisq - m_chiSquare;
-
 
         if (m_errCode.failure()) {
           finished = true ;
@@ -131,7 +127,9 @@ namespace TreeFitter {
     }
 
     m_chi2sum = m_decaychain->getChi2Sum();
+
     updateTree(*m_particle);
+
     return (m_status == VertexStatus::Success);
   }
 
@@ -181,20 +179,20 @@ namespace TreeFitter {
       posindex = pb->mother()->posIndex();
     }
     int momindex = pb->momIndex();
-    if (pb->hasEnergy()) {
+    if (pb->hasEnergy() || (pb->type() == ParticleBase::TFParticleType::kRecoPhoton)) {
+
       B2DEBUG(80, "       Fitter::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
-      //very important! Belle2 uses p,E,x! Change order here!
-      int parmap[7] ;
-      for (int i = 0; i < 4; ++i) {
-        parmap[i] = momindex + i;
-      }
-      for (int i = 0; i < 3; ++i) {
-        parmap[i + 4]   = posindex + i;
-      }
-      for (int row = 0; row < 7; ++row) {
+      // very important! Belle2 uses p,E,x! Change order here!
+      //FIXME fixme I changed this
+      for (int row = 0; row < 4; ++row) {
         for (int col = 0; col <= row; ++col) {
-          returncov(row, col) = cov(parmap[row], parmap[col]);
+          returncov(row, col) = cov(momindex + row, momindex + col);
+        }
+      }
+      for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col <= row; ++col) {
+          returncov(row + 4, col + 4) = cov(posindex + row, posindex + col);
         }
       }
 
@@ -202,45 +200,42 @@ namespace TreeFitter {
       B2DEBUG(80, "       Fitter::getCovFromPB for a particle with energy");
       // if not, use the pdttable mass
       EigenTypes::MatrixXd cov6 = EigenTypes::MatrixXd::Zero(6, 6);
-      int parmap[6];
-      for (int i = 0; i < 3; ++i) {
-        parmap[i] = momindex + i; //energy should be after this
-      }
-
-      for (int i = 0; i < 3; ++i) {
-        parmap[i + 3]   = posindex + i;
-      }
-
-      for (int row = 0; row < 6; ++row) {
+      for (int row = 0; row < 3; ++row) {
         for (int col = 0; col <= row; ++col) {
-          cov6(row, col) = cov(parmap[row], parmap[col]);
+          cov6(row, col) = cov(posindex + row, posindex + col);
+          cov6(row + 3, col + 3) = cov(momindex + row, momindex + col);
         }
       }
       // now fill the jacobian
       double mass = pb->pdgMass();
       EigenTypes::ColVector momVec = m_fitparams->getStateVector().segment(momindex, 3);
       double energy2 = momVec.transpose() * momVec;
-      //double energy2 = momVec.transpos() * momVec.transpose();
       energy2 += mass * mass;
       double energy = sqrt(energy2);
       EigenTypes::MatrixXd jacobian = EigenTypes::MatrixXd::Zero(7, 6);
       //JFK: there was an old comment on the part that set the diagonal se below. does this make sense? 2017-09-28
       // don't modify momentum
+
       for (int col = 0; col < 3; ++col) {
         jacobian(col, col) = 1; // don't modify momentum
-        jacobian(4, col) = m_fitparams->getStateVector()(momindex + col) / energy; //add energy row
-        jacobian(col + 4, col + 3) = 1; // slightly off diagonal position identity
+        jacobian(3, col) = m_fitparams->getStateVector()(momindex + col) / energy; //add energy row
+        jacobian(col + 4, col + 3) = 1; // position indeces
       }
       EigenTypes::MatrixXd cov7 = EigenTypes::MatrixXd::Zero(7, 7);
-
       cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
       //JFK: now put everything in the return type 2017-09-28
+
       for (int row = 0; row < 7; ++row) {
         for (int col = 0; col <= row; ++col) {
           returncov(row, col) = cov7(row, col);
         }
       }
-    }
+      //std::cout << "cov6 \n" << cov6  << std::endl;
+      //std::cout << "jacobian \n" << jacobian  << std::endl;
+      //std::cout << "return \n" << cov7  << std::endl;
+
+    } // else
+
   }
 
   bool Fitter::updateCand(Belle2::Particle& cand) const
@@ -257,8 +252,9 @@ namespace TreeFitter {
   }
 
   void Fitter::updateCand(const ParticleBase& pb,
-                          Belle2::Particle& cand) const //FT: this is very delicate, come back here in case of errors
+                          Belle2::Particle& cand) const
   {
+
     int posindex = pb.posIndex();
     bool hasPos = true;
     if (posindex < 0 && pb.mother()) {
@@ -277,12 +273,12 @@ namespace TreeFitter {
     p.SetPy(m_fitparams->getStateVector()(momindex + 1));
     p.SetPz(m_fitparams->getStateVector()(momindex + 2));
 
-    if (pb.hasEnergy()) { //FT: should be the same as posindex <0 (double check?)
+    if (pb.hasEnergy()) {
       p.SetE(m_fitparams->getStateVector()(momindex + 3));
       cand.set4Vector(p);
     } else {
-      double mass = cand.getMass();           //since when I feed a p4 in Particle what gets stored is actually the mass,
-      p.SetE(p.Vect()*p.Vect() + mass * mass); //I risk rounding errors for no benefit
+      double mass = cand.getPDGMass();
+      p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass)); //I risk rounding errors for no benefit
       cand.set4Vector(p);
     }
 

@@ -111,41 +111,40 @@ void PXDDAQDQMModule::beginRun()
 void PXDDAQDQMModule::event()
 {
   B2DEBUG(20, "Iterate PXD DAQ Status");
-  for (auto& evt : m_storeDAQEvtStats) {
-    PXDErrorFlags evt_emask = evt.getErrorMask();
-    for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-      PXDErrorFlags mask = (1ull << i);
-      if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
-    }
-    B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
-    for (auto& pkt : evt) {
-      B2DEBUG(20, "Iterate PXD DHC in Pkt " << pkt.getPktIndex());
-      for (auto& dhc : pkt) {
-        PXDErrorFlags dhc_emask = dhc.getErrorMask();
+  auto evt = *m_storeDAQEvtStats;
+  PXDErrorFlags evt_emask = evt.getErrorMask();
+  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
+    PXDErrorFlags mask = (1ull << i);
+    if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
+  }
+  B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
+  for (auto& pkt : evt) {
+    B2DEBUG(20, "Iterate PXD DHC in Pkt " << pkt.getPktIndex());
+    for (auto& dhc : pkt) {
+      PXDErrorFlags dhc_emask = dhc.getErrorMask();
+      for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
+        PXDErrorFlags mask = (1ull << i);
+        if ((dhc_emask & mask) == mask) hDAQErrorDHC->Fill(dhc.getDHCID(), i);
+      }
+      if (hDAQDHCReduction[dhc.getDHCID()]) {
+        float red = dhc.getRedCnt() ? float(dhc.getRawCnt()) / dhc.getRedCnt() : 0.;
+        if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
+        hDAQDHCReduction[dhc.getDHCID()]->Fill(red);
+      }
+      B2DEBUG(20, "Iterate PXD DHE in DHC " << dhc.getDHCID() << " , Err " << dhc_emask);
+      for (auto& dhe : dhc) {
+        PXDErrorFlags dhe_emask = dhe.getErrorMask();
+        B2DEBUG(20, "DHE " << dhe.getDHEID() << " , Err " << dhe_emask);
         for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
           PXDErrorFlags mask = (1ull << i);
-          if ((dhc_emask & mask) == mask) hDAQErrorDHC->Fill(dhc.getDHCID(), i);
+          if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
         }
-        if (hDAQDHCReduction[dhc.getDHCID()]) {
-          float red = dhc.getRedCnt() ? float(dhc.getRawCnt()) / dhc.getRedCnt() : 0.;
-          if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
-          hDAQDHCReduction[dhc.getDHCID()]->Fill(red);
-        }
-        B2DEBUG(20, "Iterate PXD DHE in DHC " << dhc.getDHCID() << " , Err " << dhc_emask);
-        for (auto& dhe : dhc) {
-          PXDErrorFlags dhe_emask = dhe.getErrorMask();
-          B2DEBUG(20, "DHE " << dhe.getDHEID() << " , Err " << dhe_emask);
-          for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-            PXDErrorFlags mask = (1ull << i);
-            if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
-          }
 
-          if (hDAQDHETriggerRowOffset[dhe.getSensorID()]) hDAQDHETriggerRowOffset[dhe.getSensorID()]->Fill(dhe.getStartRow());
-          if (hDAQDHEReduction[dhe.getSensorID()]) {
-            float red = dhe.getRedCnt() ? float(dhe.getRawCnt()) / dhe.getRedCnt() : 0.;
-            if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
-            hDAQDHEReduction[dhe.getSensorID()]->Fill(red);
-          }
+        if (hDAQDHETriggerRowOffset[dhe.getSensorID()]) hDAQDHETriggerRowOffset[dhe.getSensorID()]->Fill(dhe.getStartRow());
+        if (hDAQDHEReduction[dhe.getSensorID()]) {
+          float red = dhe.getRedCnt() ? float(dhe.getRawCnt()) / dhe.getRedCnt() : 0.;
+          if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
+          hDAQDHEReduction[dhe.getSensorID()]->Fill(red);
         }
       }
     }

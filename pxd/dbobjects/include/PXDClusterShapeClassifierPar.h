@@ -48,6 +48,7 @@ namespace Belle2 {
       auto offset_vector = m_offsets.at(shape_index);
       auto eta_index = getEtaIndex(shape_index, eta);
       if (eta_index >= offset_vector.size()) {
+        B2WARNING("Invalid eta for calibrated shape index " << shape_index);
         return false;
       }
       return true;
@@ -81,7 +82,7 @@ namespace Belle2 {
         if (eta <= etaPercentiles[i])
           return i;
       }
-      return etaPercentiles.size();
+      return etaPercentiles.size() - 1;
     }
 
     /** Return percentiles map  */
@@ -95,8 +96,6 @@ namespace Belle2 {
 
     /** Return shape likelyhood map  */
     const std::map<int, float>& getShapeLikelyhoodMap() const { return m_shape_likelyhoods; }
-
-
 
   private:
     /** Map of position offsets (corrections)  */

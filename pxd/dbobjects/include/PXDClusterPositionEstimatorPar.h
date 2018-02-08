@@ -80,8 +80,8 @@ namespace Belle2 {
       return m_shapeClassifiers.at(pixelkind)[key];
     }
 
-    /** Returns True if there are valid position corrections available */
-    bool hasOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
+    /** Returns True if there is a classifier available */
+    bool hasClassifier(int shape_index, double thetaU, double thetaV, int pixelkind) const
     {
       //Check pixelkind is valid
       if (m_gridmap.find(pixelkind) == m_gridmap.end()) {
@@ -97,8 +97,18 @@ namespace Belle2 {
       if ((uBin < 1) || (uBin > uBins) || (vBin < 1) || (vBin > vBins))
         return false;
 
-      // Check index is valid
-      const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(uBin, vBin, pixelkind);
+      return true;
+    }
+
+    /** Returns True if there are valid position corrections available */
+    bool hasOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
+    {
+      //Check if there is a classifier
+      if (not hasClassifier(shape_index, thetaU, thetaV, pixelkind)) {
+        return false;
+      }
+      const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
+      // Check if classifier has offset correction
       if (not classifier.hasOffset(shape_index, eta))
         return false;
 
@@ -110,6 +120,23 @@ namespace Belle2 {
     {
       const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
       return classifier.getOffset(shape_index, eta);
+    }
+
+    /** Returns shape likelyhood. Returns zero if shape not known, otherwise positive float*/
+    float getShapeLikelyhood(int shape_index, double thetaU, double thetaV, int pixelkind) const
+    {
+      // Return zero if there no classifier
+      if (not hasClassifier(shape_index, thetaU, thetaV, pixelkind)) {
+        return 0;
+      }
+      auto likelyhoodMap = getShapeClassifier(thetaU, thetaV, pixelkind).getShapeLikelyhoodMap();
+
+      // Return zero if no likelyhood was estimated
+      auto it = likelyhoodMap.find(shape_index);
+      if (it == likelyhoodMap.end())
+        return 0;
+
+      return it->second;
     }
 
   private:

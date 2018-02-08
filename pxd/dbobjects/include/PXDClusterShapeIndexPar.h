@@ -27,37 +27,36 @@ namespace Belle2 {
     /** Destructor */
     ~PXDClusterShapeIndexPar() {}
 
-    /** Add shape to index  */
-    void addShape(const std::string& shape, int index)
+    /** Add shape with name and index  */
+    void addShape(const std::string& name, int index)
     {
-      m_shapeIndex[index] = shape;
+      m_shapeIndexMap[index] = name;
     }
 
-    /** Returns shape index from shape string */
-    int getShapeIndex(const std::string& shape) const
+    /** Returns shape index from name. Returns -1 for invalid name. */
+    int getShapeIndex(const std::string& name) const
     {
-      for (auto it = m_shapeIndex.begin(); it != m_shapeIndex.end(); ++it)
-        if (it->second == shape)
+      for (auto it = m_shapeIndexMap.begin(); it != m_shapeIndexMap.end(); ++it)
+        if (it->second == name)
           return it->first;
       return -1;
     }
 
-    /** Returns shape name from index */
+    /** Returns shape name from index. Return 'None' for invalid index */
     const std::string& getShapeName(int index) const
     {
-      const std::string& name = m_shapeIndex.find(index)->second;
-      return name;
+      return m_shapeIndexMap.at(index);
     }
 
     /** Returns shape index from shape string */
     const std::map<int, std::string>&  getIndexMap() const
     {
-      return m_shapeIndex;
+      return m_shapeIndexMap;
     }
 
   private:
-
-    std::map<int, std::string> m_shapeIndex;
+    /**  Map of shape names and indexes */
+    std::map<int, std::string> m_shapeIndexMap;
 
     ClassDef(PXDClusterShapeIndexPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

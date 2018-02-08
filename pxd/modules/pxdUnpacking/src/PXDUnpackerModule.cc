@@ -566,8 +566,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F,
-                                                        dhp_cm/*, dhp_readout_frame_lo, dhe_first_readout_frame_id_lo*/
+                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F /*,
+                                                        dhp_cm, dhp_readout_frame_lo, dhe_first_readout_frame_id_lo*/
                                                        );
         }
       }

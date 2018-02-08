@@ -54,8 +54,6 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCount[eNumSensors][eNumSwitcher][eNumDCD];
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[eNumSensors][eNumSwitcher][eNumDCD];
-      /** Histogram raw pixel common mode */
-      TH1F* hrawPxdHitsCommonMode[eNumSensors][eNumSwitcher][eNumDCD];
 
       virtual void defineHisto();
 

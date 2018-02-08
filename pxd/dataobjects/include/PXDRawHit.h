@@ -106,7 +106,7 @@ namespace Belle2 {
     unsigned short m_frameNr;    /**< Number of the Frames */
     // ~PXDRawHit();
 
-    ClassDef(PXDRawHit, 4)
+    ClassDef(PXDRawHit, 5)
   };
 
 

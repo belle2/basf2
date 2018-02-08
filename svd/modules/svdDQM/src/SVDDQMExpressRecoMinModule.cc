@@ -224,10 +224,10 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_CounterApvErrorORErrors[i] = new TH1I(name.c_str(), title.c_str(), 4, 0, 4);
     m_CounterApvErrorORErrors[i]->GetXaxis()->SetTitle("Error ID");
     m_CounterApvErrorORErrors[i]->GetYaxis()->SetTitle("counts");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(1, "LSB");
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(1, "APV error OR");
     m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(2, "FADC FIFO full OR");
     m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(3, "Frame error OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(4, "MSB");
+    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(4, "Detection error OR");
     //----------------------------------------------------------------
     // Counter of FTB Flags (32) per FADC
     //----------------------------------------------------------------

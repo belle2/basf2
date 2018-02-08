@@ -218,4 +218,3 @@ namespace Belle2 {
 
 } // end of Belle2 namespace
 
-#endif

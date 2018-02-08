@@ -148,7 +148,7 @@ void PXDPackerModule::event()
 
   VxdID lastVxdId = -1; /// invalid ... force to set first itertor/index
   /// We assume the Digits are sorted by VxdID (P.K. says they are)
-  /// Thie saves some iterating lateron
+  /// This saves some iterating lateron
   for (auto it = m_storeDigits.begin() ; it != m_storeDigits.end(); it++) {
     VxdID currentVxdId;
     currentVxdId = it->getSensorID();
@@ -168,6 +168,7 @@ void PXDPackerModule::event()
                 dhe_id);
       }
 
+      if (startOfVxdID.count(currentVxdId) > 0) B2FATAL("PXD Digits are not sorted by VxdID!");
       startOfVxdID[currentVxdId] = std::distance(m_storeDigits.begin(), it);
       B2DEBUG(20, "Offset : " << startOfVxdID[currentVxdId]);
     }

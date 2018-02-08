@@ -9,13 +9,16 @@
  **************************************************************************/
 
 #include <simulation/modules/MaterialScan.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
 #include <boost/format.hpp>
 #include <algorithm>
 
 #include <TFile.h>
+#include <TH1D.h>
 #include <TH2D.h>
+#include <TRandom.h>
 
 #include <G4Event.hh>
 #include <G4EventManager.hh>
@@ -212,6 +215,127 @@ void MaterialScanPlanar::getRay(G4ThreeVector& origin, G4ThreeVector& direction)
   direction = m_dirW;
 }
 
+bool MaterialScanRay::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
+{
+  if (m_curRay > m_count) return false;
+
+  origin = m_origin;
+  direction = m_dir;
+  ++m_curRay;
+  if (m_curRay == 0) {
+    // First ray is just to check what the maximum flight length is
+    return true;
+  } else if (m_curRay == 1) {
+    // this is the second ray, save the maximum depth for histograms
+    m_maxDepth = m_maxDepth > 0 ? std::min(m_scanDepth, m_maxDepth) : m_scanDepth;
+    B2INFO("Set maximum depth to " << m_maxDepth);
+    // create summary histogram right now, not on demand, to make sure it is in the file
+    if (m_splitByMaterials) {
+      getHistogram("All_Materials_x0");
+      getHistogram("All_Materials_lambda");
+    } else {
+      getHistogram("All_Regions_x0");
+      getHistogram("All_Regions_lambda");
+    }
+  }
+  m_curDepth = 0;
+  if (m_opening > 0) {
+    // add small angle to the ray where we want the opening angle to be covered
+    // uniform by area so choose an angle uniform in cos(angle). We take half
+    // the opening angle because it can go in both sides
+    double theta = acos(gRandom->Uniform(cos(m_opening / 2.), 1));
+    double phi = gRandom->Uniform(0, 2 * M_PI);
+    auto orthogonal = direction.orthogonal();
+    orthogonal.rotate(phi, direction);
+    direction.rotate(theta, orthogonal);
+  }
+  B2DEBUG(10, "Create Ray " << m_curRay << " from " << origin << " direction " <<
+          direction << " [theta=" << (direction.theta() / M_PI * 180) << ", phi=" << (direction.phi() / M_PI * 180) << "]");
+  return true;
+}
+
+TH1D* MaterialScanRay::getHistogram(const std::string& name)
+{
+  TH1D*& hist = m_regions[name];
+  if (!hist) {
+    //Create new histogram
+    m_rootFile->cd(m_name.c_str());
+    int bins = std::ceil(m_maxDepth / m_sampleDepth);
+    hist = new TH1D(name.c_str(), (name + ";" + m_axisLabel).c_str(), bins, 0, m_maxDepth * Unit::mm);
+  }
+  return hist;
+}
+
+void MaterialScanRay::fillValue(const std::string& name, double value, double steplength)
+{
+  TH1D* h = getHistogram(name);
+  double x = m_curDepth;
+  //The steps are not aligned to the bin sizes so make sure we sub-sample the
+  //value and put it in the histogram in smaller steps. We choose 10 samples
+  //per bin here which should be good enough.
+  int samples = std::ceil(steplength / m_sampleDepth * 10);
+  const double dx = steplength / samples;
+  const double dv = value / samples / m_count / h->GetBinWidth(1);
+  for (int i = 0; i < samples; ++i) {
+    h->Fill(x * Unit::mm, dv);
+    x += dx;
+  }
+}
+
+void MaterialScanRay::UserSteppingAction(const G4Step* step)
+{
+  //Get information about radiation and interaction length
+  G4StepPoint* preStepPoint = step->GetPreStepPoint();
+  G4Region* region = preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetRegion();
+  G4Material* material = preStepPoint->GetMaterial();
+  const bool ignored = m_ignoredMaterials.count(material->GetName()) > 0;
+  double stlen = step->GetStepLength();
+  double x0 = stlen / (material->GetRadlen());
+  double lambda = stlen / (material->GetNuclearInterLength());
+  B2DEBUG(20, "Step in at " << preStepPoint->GetPosition() << " in volume '"
+          << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+          << " (" << region->GetName() << ")"
+          << " with length=" << stlen << " mm");
+  checkStep(step);
+
+  //check if the depth is limited
+  if (m_maxDepth > 0) {
+    if (m_curDepth + stlen > m_maxDepth) {
+      //Depth reached, kill track and add remaining part of the material budget
+      G4Track* track = step->GetTrack();
+      track->SetTrackStatus(fStopAndKill);
+      double remaining = m_maxDepth - m_curDepth;
+      x0 *= remaining / stlen;
+      lambda *= remaining / stlen;
+      stlen = remaining;
+    }
+  }
+
+  if (m_curRay > 0 && !ignored) {
+    //Fill x0 and lambda in a histogram for each region
+    string x0_total = "All_Regions_x0";
+    string lambda_total = "All_Regions_lambda";
+    string x0_name = region->GetName() + "_x0";
+    string lambda_name = region->GetName() + "_lambda";
+    //or for each Material
+    if (m_splitByMaterials) {
+      x0_total = "All_Materials_x0";
+      lambda_total = "All_Materials_lambda";
+      x0_name = material->GetName() + "_x0";
+      lambda_name = material->GetName() + "_lambda";
+    }
+    fillValue(x0_total, x0, stlen);
+    fillValue(lambda_total, lambda, stlen);
+    fillValue(x0_name, x0, stlen);
+    fillValue(lambda_name, lambda, stlen);
+  }
+  m_curDepth += stlen;
+  if (m_curRay == 0 && !ignored) {
+    // update max depth only for materials we do not ignore ...
+    m_scanDepth = m_curDepth;
+  }
+}
+
 MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0), m_doCosTheta(false)
 {
   //Set module properties
@@ -228,6 +352,7 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
   m_spherical.ignoredMaterials.push_back("Air");
   m_spherical.ignoredMaterials.push_back("G4_AIR");
   m_planar.ignoredMaterials = m_spherical.ignoredMaterials;
+  m_rayIgnoredMaterials = m_spherical.ignoredMaterials;
 
   addParam("Filename",            m_filename,
            "The filename where the material scan will be stored",
@@ -291,6 +416,27 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
   addParam("planar.splitByMaterials", m_planar.splitByMaterials,
            "If True, split output by material names instead of by regions", false);
 
+  addParam("ray", m_doRay, "Do a ray scan: Shoot from the given origin in a "
+           "given direction and record the material encountered along the way", false);
+  addParam("ray.origin", m_rayOrigin, "Origin for the ray", m_rayOrigin);
+  addParam("ray.theta", m_rayTheta, "Theta angle for the ray in degrees", m_rayTheta);
+  addParam("ray.phi", m_rayPhi, "Phi angle of the ray in degrees", m_rayPhi);
+  addParam("ray.direction", m_rayDirection, "Set the ray direction as vector "
+           "[x,y,z]. You cannot set this and theta/phi at the same time",
+           m_rayDirection);
+  addParam("ray.opening", m_rayOpening, "Opening angle for the ray in degrees. "
+           "If bigger than 0 then multiple rays (``ray.count``) will be shot "
+           "randomly inside the opening angle uniformly distributed in area "
+           "(cosine of the angle)", m_rayOpening);
+  addParam("ray.count", m_rayCount, "Count of rays if the opening angle is >0",
+           m_rayCount);
+  addParam("ray.sampleDepth", m_raySampleDepth, "Distance in which to sample the "
+           "material", m_raySampleDepth);
+  addParam("ray.maxDepth", m_rayMaxDepth, "Max distance for the ray before it's "
+           "stopped, 0 for no limit. The actual depth can be smaller if the "
+           "simulation volume ends earlier", m_rayMaxDepth);
+  addParam("ray.ignored", m_rayIgnoredMaterials, "Names of Materials which "
+           "should be ignored when doing the scan", m_rayIgnoredMaterials);
 }
 
 void MaterialScanModule::initialize()
@@ -318,6 +464,14 @@ void MaterialScanModule::initialize()
   //Convert plane definition to mm since Geant4 is of course using other units
   for (double& value : m_customPlane) value /= Unit::mm;
   for (double& value : m_sphericalOrigin) value /= Unit::mm;
+  for (double& value : m_rayOrigin) value /= Unit::mm;
+  if (m_rayDirection) {
+    if (getParam<double>("ray.theta").isSetInSteering() || getParam<double>("ray.phi").isSetInSteering()) {
+      B2ERROR("Cannot set ray.theta/ray.phi and ray.direction at the same time, please only set one");
+      return;
+    }
+    for (double& value : *m_rayDirection) value /= Unit::mm;
+  }
 }
 
 void MaterialScanModule::terminate()
@@ -364,6 +518,20 @@ void MaterialScanModule::beginRun()
       vDir = getAxis(m_planeName[1]);
     }
     scans.push_back(new MaterialScanPlanar(m_rootFile, origin, uDir, vDir, m_planar));
+  }
+
+  if (m_doRay) {
+    G4ThreeVector origin(m_sphericalOrigin[0], m_sphericalOrigin[1], m_sphericalOrigin[2]);
+    G4ThreeVector dir;
+    if (m_rayDirection) {
+      for (int i = 0; i < 3; ++i) dir[0] = (*m_rayDirection)[0];
+      dir = dir.unit();
+    } else {
+      dir.setRThetaPhi(1., m_rayTheta * Unit::deg, m_rayPhi * Unit::deg);
+    }
+    scans.push_back(new MaterialScanRay(m_rootFile, origin, dir, m_rayOpening * Unit::deg, m_rayCount,
+                                        m_raySampleDepth / Unit::mm, m_rayMaxDepth / Unit::mm,
+                                        m_raySplitByMaterials, m_rayIgnoredMaterials));
   }
 
   //Do each configured scan

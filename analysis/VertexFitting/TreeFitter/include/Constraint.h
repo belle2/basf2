@@ -60,7 +60,7 @@ namespace TreeFitter {
     /**get dimension of constraint */
     unsigned int dim() const { return m_dim; }
 
-
+    /** is this a linear constraint */
     bool isLinear() const { return m_maxNIter <= 1; }
 
     /**  get maximum number of iterations for non in contraint */

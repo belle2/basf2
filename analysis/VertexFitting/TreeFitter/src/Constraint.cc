@@ -94,7 +94,8 @@ namespace TreeFitter {
         }
       }
     }
-    B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
+    B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " <<
+            chisq <<
             " NDF" << m_dim << " for " << this->name());
     //std::cout <<  "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq
     //          << " NDF" << m_dim << " for " << this->name() << std::endl;

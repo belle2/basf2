@@ -77,7 +77,7 @@ namespace TreeFitter {
   bool RecoPhoton::useEnergy(Belle2::Particle& particle)
   {
     bool rc = true ;
-    int pdg = particle.getPDGCode();
+    const int pdg = particle.getPDGCode();
     if (pdg &&
         Belle2::Const::ParticleType(pdg) != Belle2::Const::photon && //   pdg != 22 &&
         Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) { //   pdg != 111){
@@ -92,7 +92,7 @@ namespace TreeFitter {
     const int posindex  = mother()->posIndex();
 
     const double factorE = 1000 * m_covariance(3, 3);
-    const double factorX = 10000; // ~ 1m error on initial vertex
+    const double factorX = 1000; // ~ 10cm error on initial vertex
 
     fitparams->getCovariance().block<4, 4>(momindex, momindex) =
       Eigen::Matrix<double, 4, 4>::Identity(4, 4) * factorE;
@@ -180,8 +180,8 @@ namespace TreeFitter {
               << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
       return ErrCode(ErrCode::photondimerror);
     }
-    if (0 == p_vec[i1]) {return ErrCode(ErrCode::photondimerror);}
 
+    if (0 == p_vec[i1]) {return ErrCode(ErrCode::photondimerror);}
 
     // p_vec[i1] must not be 0
     const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];
@@ -193,9 +193,7 @@ namespace TreeFitter {
     residual3(1) = m_clusterPars[i3] - x_vertex[i3] - p_vec[i3] * elim;
     residual3(2) = m_clusterPars[3] - mom;
 
-
-    //FIXME muss ich hier nach auch nach x,y,z ableiten???
-    // rotate covariance {px,py,pz}->{rx,ry,rE}
+    // dr'/dm | m:={xc,yc,zc,Ec} the measured quantities
     Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
     P(0, i2) = -1; // dr0/di2c
     P(0, i1) = - p_vec[i2] / p_vec[i1] ; // dr0 / di1c (if x eliminated)

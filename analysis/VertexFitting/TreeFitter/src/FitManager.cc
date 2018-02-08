@@ -20,7 +20,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
 
-#include <analysis/VertexFitting/TreeFitter/Fitter.h>
+#include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
@@ -35,7 +35,7 @@ namespace TreeFitter {
   extern int vtxverbose ;
   extern std::vector<int> massConstraintList ;
 
-  Fitter::Fitter(Belle2::Particle* particle, double prec, int ipDimension)
+  FitManager::FitManager(Belle2::Particle* particle, double prec, int ipDimension)
     : m_particle(particle), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(prec)
   {
@@ -46,13 +46,13 @@ namespace TreeFitter {
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
 
-  Fitter::~Fitter()
+  FitManager::~FitManager()
   {
     delete m_decaychain;
     delete m_fitparams;
   }
 
-  bool Fitter::fit()
+  bool FitManager::fit()
   {
     const int nitermax = 10;
     const int maxndiverging = 3;
@@ -88,7 +88,7 @@ namespace TreeFitter {
           finished = true ;
           m_status = VertexStatus::Failed;
         } else {
-          B2DEBUG(80, "Fitter: m_errCode.success()");
+          B2DEBUG(80, "FitManager: m_errCode.success()");
 
           if (m_niter > 0) {
             if (fabs(deltachisq) < dChisqConv) {
@@ -121,7 +121,7 @@ namespace TreeFitter {
       }
 
       if (!(m_fitparams->testCovariance())) {
-        B2WARNING("TreeFitter::Fitter: A covariance matrix diag element is < 0 (after performing the fit). Changing status to failed.");
+        B2WARNING("TreeFitManager::FitManager: A covariance matrix diag element is < 0 (after performing the fit). Changing status to failed.");
         m_status = VertexStatus::Failed;
       }
     }
@@ -133,46 +133,46 @@ namespace TreeFitter {
     return (m_status == VertexStatus::Success);
   }
 
-  const EigenTypes::MatrixXd& Fitter::getCovariance() const
+  const EigenTypes::MatrixXd& FitManager::getCovariance() const
   {
     return m_fitparams->getCovariance();
   }
 
-  const EigenTypes::ColVector& Fitter::getStateVector() const
+  const EigenTypes::ColVector& FitManager::getStateVector() const
   {
     return m_fitparams->getStateVector();
   }
 
-  int Fitter::nDof() const
+  int FitManager::nDof() const
   {
     return m_fitparams->nDof();
   }
 
-  int Fitter::posIndex(Belle2::Particle* particle) const
+  int FitManager::posIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->posIndex(particle);
   }
 
-  int Fitter::momIndex(Belle2::Particle* particle) const
+  int FitManager::momIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->momIndex(particle);
   }
 
-  int Fitter::tauIndex(Belle2::Particle* particle) const
+  int FitManager::tauIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->tauIndex(particle);
   }
 
-  double Fitter::globalChiSquare() const
+  double FitManager::globalChiSquare() const
   {
     return m_decaychain->chiSquare(m_fitparams);
   }
 
-  void Fitter::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
+  void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 
     EigenTypes::MatrixXd cov = m_fitparams->getCovariance().selfadjointView<Eigen::Lower>();
-    B2DEBUG(80, "       Fitter::getCovFromPB");
+    B2DEBUG(80, "       FitManager::getCovFromPB");
     int posindex = pb->posIndex();
     // hack: for tracks and photons, use the production vertex
     if (posindex < 0 && pb->mother()) {
@@ -181,7 +181,7 @@ namespace TreeFitter {
     int momindex = pb->momIndex();
     if (pb->hasEnergy() || (pb->type() == ParticleBase::TFParticleType::kRecoPhoton)) {
 
-      B2DEBUG(80, "       Fitter::getCovFromPB for a particle with energy");
+      B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
       // very important! Belle2 uses p,E,x! Change order here!
       //FIXME fixme I changed this
@@ -197,7 +197,7 @@ namespace TreeFitter {
       }
 
     } else {
-      B2DEBUG(80, "       Fitter::getCovFromPB for a particle with energy");
+      B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
       // if not, use the pdttable mass
       EigenTypes::MatrixXd cov6 = EigenTypes::MatrixXd::Zero(6, 6);
       for (int row = 0; row < 3; ++row) {
@@ -238,11 +238,11 @@ namespace TreeFitter {
 
   }
 
-  bool Fitter::updateCand(Belle2::Particle& cand) const
+  bool FitManager::updateCand(Belle2::Particle& cand) const
   {
     // assigns fitted parameters to a candidate
     const ParticleBase* pb = m_decaychain->locate(&cand);
-    B2DEBUG(80, " Fitter::updateCand(" << cand.getName() << ") is " << pb);
+    B2DEBUG(80, " FitManager::updateCand(" << cand.getName() << ") is " << pb);
     if (pb) {
       updateCand(*pb, cand);
     } else {
@@ -251,8 +251,8 @@ namespace TreeFitter {
     return pb != 0;
   }
 
-  void Fitter::updateCand(const ParticleBase& pb,
-                          Belle2::Particle& cand) const
+  void FitManager::updateCand(const ParticleBase& pb,
+                              Belle2::Particle& cand) const
   {
 
     int posindex = pb.posIndex();
@@ -324,7 +324,7 @@ namespace TreeFitter {
     }
   }
 
-  void Fitter::updateTree(Belle2::Particle& cand) const
+  void FitManager::updateTree(Belle2::Particle& cand) const
   {
     if (updateCand(cand)) { // if the mother can be updated, update the daughters
       int ndaughters = cand.getNDaughters();
@@ -336,7 +336,7 @@ namespace TreeFitter {
     }
   }
 
-  std::tuple<double, double> Fitter::getLifeTime(Belle2::Particle& cand) const
+  std::tuple<double, double> FitManager::getLifeTime(Belle2::Particle& cand) const
   {
     // returns the lifetime in the rest frame of the candidate
     std::tuple<double, double> rc;
@@ -352,13 +352,13 @@ namespace TreeFitter {
     return std::make_tuple(-999, -999);
   }
 
-  std::tuple<double, double> Fitter::getDecayLength(const ParticleBase* pb) const
+  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb) const
   {
     // returns the decaylength in the lab frame
     return getDecayLength(pb, m_fitparams);
   }
 
-  std::tuple<double, double> Fitter::getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const
+  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       int tauindex = pb->tauIndex();
@@ -369,7 +369,7 @@ namespace TreeFitter {
     return std::make_tuple(-999, -999);
   }
 
-  std::tuple<double, double> Fitter::getDecayLength(Belle2::Particle& cand) const
+  std::tuple<double, double> FitManager::getDecayLength(Belle2::Particle& cand) const
   {
     std::tuple<double, double> rc = std::make_tuple(999, -999);
     const ParticleBase* pb = m_decaychain->locate(&cand) ;

@@ -28,21 +28,21 @@ namespace TreeFitter {
   extern std::vector<int> massConstraintList;
 
   /** this class */
-  class Fitter {
+  class FitManager {
   public:
 
     /** status flag of the fit-itereation (the step in the newton method) */
     enum VertexStatus { Success = 0, NonConverged, BadInput, Failed, UnFitted };
 
     /** empty constructor  */
-    Fitter() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
+    FitManager() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(0.01) {} //Default constructor
 
     /** constructor  */
-    Fitter(Belle2::Particle* particle, double prec = 0.01, int ipDimension = 0);
+    FitManager(Belle2::Particle* particle, double prec = 0.01, int ipDimension = 0);
 
     /** destructor does stuff */
-    ~Fitter();
+    ~FitManager();
 
     /** main fit function that uses the kalman filter */
     bool fit();

@@ -38,30 +38,32 @@ from caf.state_machines import CalibrationMachine, MachineError, ConditionError,
 
 class CalibrationBase(ABC, Thread):
     """
-    :param name: Name of this calibration object
-    :type name: str
-    :param input_files: Input files to run this calibration over
-    :type input_files: list of strings, may contain 'globbable' wildcard expressions
+    Parameters:
+        name (str): Name of this calibration object. Should be unique if you are going to run it.
+        input_files (list[str]): Input files for this calibration. May contain wildcard expressions useable by `glob.glob`.
 
-    Abstract base class of Calibration types. The CAF implements the `Calibration` class which inherits from
+    Abstract base class of Calibration types. The CAF implements the :py:class:`.Calibration` class which inherits from
     this and runs the C++ CalibrationCollectorModule and CalibrationAlgorithm classes. But by inheriting from this
     class and providing the minimal necessary methods/attributes you could plug in your own Calibration types
     that doesn't depend on the C++ CAF at all and run everything in your own way.
 
-    THIS IS NOT RECOMMENDED!! But it's there if you really need it.
+    .. warning:: Writing your own class inheriting from :py:class:`.CalibrationBase` class is not recommended!
+                             But it's there if you really need it.
     """
-    #: The name of the successful completion state
+    #: The name of the successful completion state.
+    #: The :py:class:`.CAF` will use this as the state to decide when the Calibration is completed.
     end_state = "completed"
-    #: The name of the failure state
+    #: The name of the failure state.
+    #: The :py:class:`.CAF` will use this as the state to decide when the Calibration failed.
     fail_state = "failed"
 
     def __init__(self, name, input_files=None):
         """
         """
         super().__init__()
-        #: Name of calibration object. This must be unique when adding into the `CAF`.
+        #: Name of calibration object. This must be unique when adding into the py:class:`CAF`.
         self.name = name
-        #: List of calibration objects that will depend on this one.
+        #: List of calibration objects that depend on this one.
         self.future_dependencies = []
         #: List of calibration objects, where each one is a dependency of this one.
         self.dependencies = []
@@ -69,7 +71,8 @@ class CalibrationBase(ABC, Thread):
         #:
         #: >>> {absolute_file_path:iov}
         #:
-        #: Where iov is a `caf.utils.IoV` object. Will be filled during the `CAF.run` if empty
+        #: Where iov is a :py:class:`IoV <caf.utils.IoV>` object. Will be filled during `CAF.run()` if empty.
+        #: To improve performance you can fill this yourself before calling `CAF.run()`
         self.files_to_iovs = {}
         if input_files:
             #: Files used for collection procedure
@@ -77,7 +80,7 @@ class CalibrationBase(ABC, Thread):
         else:
             self.input_files = []
 
-        #: IoV which will be calibrated. This is set by the `CAF` itself when calling `CAF.run`
+        #: IoV which will be calibrated. This is set by the `CAF` itself when calling `CAF.run()`
         self.iov = None
         #: The directory where we'll store the local database payloads from this calibration
         self.output_database_dir = ""
@@ -143,10 +146,11 @@ class CalibrationBase(ABC, Thread):
 
 class Calibration(CalibrationBase):
     """
-    :param name: A string to name this calibration. It should be unique for use in the `CAF`
-    :param collector: Should be set to a CalibrationCollectorModule or a string with the module name.
-    :param algorithms: Should be set to a CalibrationAlgorithm or a list of them.
-    :param input_files: A string/list of strings. May contain wildcards useable by glob
+    Parameters:
+        name (str): Name of this calibration. It should be unique for use in the `CAF`
+        collector: Should be set to a CalibrationCollectorModule() or a string with the module name.
+        algorithms: Should be set to a CalibrationAlgorithm() or a `list` of them.
+        input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
 
     Every Calibration object must have a collector and at least one algorithm.
     You have the option to add in your collector/algorithm by argument here, or
@@ -257,14 +261,15 @@ class Calibration(CalibrationBase):
         if self.algorithms:
             #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
             #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
-            #: in `strategies`.
+            #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
 
         self._local_database_chain = []
         self.use_central_database(get_default_global_tags())
-        #: The `state_machines.CalibrationMachine` that we will run
+        #: The `caf.state_machines.CalibrationMachine` that we will run
         self.machine = CalibrationMachine(self)
-        #: The class that runs all the algorithms in this Calibration using their assigned `strategies.AlgorithmStrategy`
+        #: The class that runs all the algorithms in this Calibration using their assigned
+        #: :py:class:`caf.strategies.AlgorithmStrategy`
         self.algorithms_runner = runners.SeqAlgorithmsRunner
         #: The backend we'll use for our collector submission in this calibration. Will be set by the CAF if not here
         self.backend = None
@@ -307,14 +312,13 @@ class Calibration(CalibrationBase):
     @property
     def collector(self):
         """
-        Getter for the collector property.
+        Collector property, checks if already a module or need to create one from module name.
         """
         return self._collector
 
     @collector.setter
     def collector(self, collector):
         """
-        Setter for the collector property, checks if already a module or need to create one from string.
         """
         # check if collector is already a module or if we need to create one
         # from the name
@@ -331,7 +335,7 @@ class Calibration(CalibrationBase):
     @property
     def algorithms(self):
         """
-        Getter for the algorithms property.
+        Algorithms property, checks if single algorithm or list of algorithms passed in.
         """
         return self._algorithms
 
@@ -339,7 +343,6 @@ class Calibration(CalibrationBase):
     @method_dispatch
     def algorithms(self, value):
         """
-        Setter for the algorithms property, checks if single or list of algorithms passed in.
         """
         from ROOT.Belle2 import CalibrationAlgorithm
         if isinstance(value, CalibrationAlgorithm):
@@ -367,8 +370,7 @@ class Calibration(CalibrationBase):
     @property
     def pre_algorithms(self):
         """
-        Getter for the pre_algorithm attribute. Notice how we avoid the user needing to interact with the
-        `Algorithm` wrapper class.
+        Callback run prior to each algorithm iteration.
         """
         return [alg.pre_algorithm for alg in self.algorithms]
 
@@ -376,7 +378,6 @@ class Calibration(CalibrationBase):
     @method_dispatch
     def pre_algorithms(self, func):
         """
-        Setter for the pre_algorithms attribute.
         """
         if func:
             for alg in self.algorithms:
@@ -402,7 +403,7 @@ class Calibration(CalibrationBase):
     @property
     def strategies(self):
         """
-        Getter for the strategies attribute.
+        The `caf.strategies.AlgorithmStrategy` or `list` of them used when running the algorithm(s).
         """
         return [alg.strategy for alg in self.algorithms]
 
@@ -410,7 +411,6 @@ class Calibration(CalibrationBase):
     @method_dispatch
     def strategies(self, strategy):
         """
-        Setter for the strategies attribute.
         """
         if strategy:
             for alg in self.algorithms:
@@ -507,7 +507,7 @@ class Algorithm():
         #: The algorithm stratgey that will be used when running over the collected data
         self.strategy = strategies.SingleIOV
         #: Parameters that could be used in the execution of the algorithm strategy/runner to modify behaviour.
-        #: By default this is empty and not used by the `strategies.SingleIOV` class. But more complex strategies
+        #: By default this is empty and not used by the :py:class:`caf.strategies.SingleIOV` class. But more complex strategies
         #: or your own custom ones could use it to configure behaviour. Note that if you modify this inside a subprocess
         #: the modification won't persist outside, you would have to change it in the parent process
         self.params = {}
@@ -522,12 +522,13 @@ class Algorithm():
 
 class CAF():
     """
-    :param calibration_defaults: A dictionary of default options for calibrations run by this `CAF` instance e.g.
+    Parameters:
+      calibration_defaults (dict): A dictionary of default options for calibrations run by this `CAF` instance e.g.\
     >>> calibration_defaults={"max_iterations":2}
 
-    Each calibration can override these options by setting them for itself
+    Each `Calibration` run by the `CAF` can override these options by setting them for itself.
 
-    This class holds calibration objects and processes them. It defines the initial configuration/setup
+    This class holds `Calibration` objects and processes them. It defines the initial configuration/setup
     for the calibrations. But most of the real logic is done through the `caf.state_machines.CalibrationMachine`
 
     The `CAF` class essentially does some initial setup, holds the `CalibrationBase` instances and calls the
@@ -564,7 +565,7 @@ class CAF():
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
         #: Polling frequencywhile waiting for jobs to finish
         self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
-        #: The ordering and explicit future dependencies of calibrations. Will be filled during `CAF.run`
+        #: The ordering and explicit future dependencies of calibrations. Will be filled during `CAF.run()`
         self.order = None
         #: Private backend attribute
         self._backend = None
@@ -728,14 +729,13 @@ class CAF():
     @property
     def backend(self):
         """
-        Getter for the backend property.
+        The backend that runs the collector job. A property that checks that a Backend instance was passed in.
         """
         return self._backend
 
     @backend.setter
     def backend(self, backend):
         """
-        Setter for the backend property. Checks that a Backend instance was passed in.
         """
         if isinstance(backend, caf.backends.Backend):
             self._backend = backend

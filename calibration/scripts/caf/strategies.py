@@ -19,7 +19,7 @@ class AlgorithmStrategy(ABC):
     When defining a derived class you are free to use these attributes or to implement as much functionality as you want.
 
     If you define your derived class with an __init__ method, then you should first call the base class
-    `AlgorithmStrategy.__init__`  method via super() e.g.
+    `AlgorithmStrategy.__init__()`  method via super() e.g.
 
     >>> def __init__(self):
     >>>     super().__init__()

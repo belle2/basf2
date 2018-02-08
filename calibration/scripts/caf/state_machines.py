@@ -54,14 +54,13 @@ class State():
     @property
     def on_enter(self):
         """
-        Getter for on_enter attribute
+        Runs callbacks when a state is entered.
         """
         return self._on_enter
 
     @on_enter.setter
     def on_enter(self, callbacks):
         """
-        Setter for on_enter attribute
         """
         self._on_enter = []
         if callbacks:
@@ -70,14 +69,13 @@ class State():
     @property
     def on_exit(self):
         """
-        Getter for on_exit attribute
+        Runs callbacks when a state is exited.
         """
         return self._on_exit
 
     @on_exit.setter
     def on_exit(self, callbacks):
         """
-        Setter for on_exit attribute
         """
         self._on_exit = []
         if callbacks:
@@ -132,26 +130,29 @@ class State():
 
 class Machine():
     """
+    Parameters:
+      states (list[str]): A list of possible states of the machine.
+      initial_state (str):
+
     Base class for a final state machine wrapper.
     Implements the framwork that a more complex machine can inherit from.
 
-    * 'states' attribute is a list of possible states of the machine. (strings)
-
-    * 'transitions' attribute is a dictionary of trigger name keys, each value of
+    The `transitions` attribute is a dictionary of trigger name keys, each value of
     which is another dictionary of 'source' states, 'dest' states, and 'conditions'
-    methods. 'conditions' should be a list of callables or a single one.
-    A transition is valid if it goes from an allowed state to an allowed state.
+    methods. 'conditions' should be a list of callables or a single one. A transition is
+    valid if it goes from an allowed state to an allowed state.
     Conditions are optional but must be a callable that returns True or False based
     on some state of the machine. They cannot have input arguments currently.
 
-    * Every condition/before/after callback function MUST take **kwargs as the only
-    argument (except 'self' if it's a clas method). This is because it's basically
+    Every condition/before/after callback function MUST take ``**kwargs`` as the only
+    argument (except ``self`` if it's a class method). This is because it's basically
     impossible to determine which arguments to pass to which functions for a transition.
-    Therefore this machine just enforces that every function should simply take **kwargs
+    Therefore this machine just enforces that every function should simply take ``**kwargs``
     and use the dictionary of arguments (even if it doesn't need any arguments).
 
-    This also means that if you call a trigger with arguments e.g. machine.walk(speed=5)
-    you MUST use the keyword arguments rather than positional ones e.g. machine.walk(5)
+    This also means that if you call a trigger with arguments e.g. ``machine.walk(speed=5)``
+    you MUST use the keyword arguments rather than positional ones. So ``machine.walk(5)``
+    will *not* work.
     """
 
     def __init__(self, states=None, initial_state="default_initial"):
@@ -164,16 +165,16 @@ class Machine():
             for state in states:
                 self.add_state(state)
         if initial_state != "default_initial":
-            #: Initial state (property) for this machine
+            #: Initial state for this machine. Is actually a `property` decorator
             self.initial_state = initial_state
         else:
             self.add_state(initial_state)
-            #: Initial state (private) for this machine
+            #: Actual attribute holding initial state for this machine
             self._initial_state = State(initial_state)
 
-        #: Current state (private)
+        #: Actual attribute holding the Current state
         self._state = self.initial_state
-        #: Allowe transitions between states
+        #: Allowed transitions between states
         self.transitions = defaultdict(list)
 
     def add_state(self, state, enter=None, exit=None):
@@ -194,6 +195,7 @@ class Machine():
     @property
     def initial_state(self):
         """
+        The initial state of the machine. Needs a special property to prevent trying to run on_enter callbacks when set.
         """
         return self._initial_state
 
@@ -211,15 +213,15 @@ class Machine():
     @property
     def state(self):
         """
+                The current state of the machine. Actually a `property` decorator. It will call the exit method of the
+                current state and enter method of the new one. To get around the behaviour e.g. for setting initial states,
+                either use the `initial_state` property or directly set the _state attribute itself (at your own risk!).
         """
         return self._state
 
     @state.setter
     def state(self, state):
         """
-        Setter for a state. Will call the exit method of the current state and enter method of the
-        new one. to get around the behaviour e.g. for setting initial states, either use the initial_state
-        property or directly set the _state attribute itself (at your own risk!)
         """
         if isinstance(state, str):
             state_name = state

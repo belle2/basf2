@@ -23,7 +23,7 @@
 #include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <pxd/unpacking/PXDDCDSWBMapper.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 
@@ -38,6 +38,7 @@
 using namespace std;
 using boost::format;
 using namespace Belle2;
+using namespace Belle2::PXD;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -303,7 +304,6 @@ void PXDDQMExpressRecoMinModule::event()
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
 
-  PXD::PXDDCDSWBMapper mapper;
   // PXD basic histograms:
   // Fired strips
   vector< set<int> > Pixels(c_nPXDSensors); // sets to eliminate multiple samples per strip
@@ -316,10 +316,10 @@ void PXDDQMExpressRecoMinModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     Pixels.at(index).insert(digit2.getUniqueChannelID());
-    int iChip = mapper.getDCDID(digit2.getUCellID(), digit2.getVCellID(), sensorID);
+    int iChip = PXDMappingLookup::getDCDID(digit2.getUCellID(), digit2.getVCellID(), sensorID);
     int indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 1);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
-    iChip = mapper.getSWBID(digit2.getVCellID());
+    iChip = PXDMappingLookup::getSWBID(digit2.getVCellID());
     indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 0);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
 
@@ -342,10 +342,10 @@ void PXDDQMExpressRecoMinModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     counts.at(index).insert(cluster.GetUniqueID());
-    int iChip = mapper.getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
+    int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 1);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
-    iChip = mapper.getSWBID(SensorInfo.getVCellID(cluster.getV()));
+    iChip = PXDMappingLookup::getSWBID(SensorInfo.getVCellID(cluster.getV()));
     indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 0);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
     if (m_hitMapClCounts != NULL) m_hitMapClCounts->Fill(index);

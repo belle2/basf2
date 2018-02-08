@@ -14,8 +14,8 @@
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
 
-// #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
+
+#include <framework/datastore/StoreObjPtr.h>
 #include <TH2.h>
 #include <TH1.h>
 #include <string>

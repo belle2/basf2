@@ -131,8 +131,13 @@ if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS='-O3')
+    global_env.Append(LINKFLAGS='-flto')
+    # When using LTO, GCC-provided ar and ranlib wrappers must be used in order
+    # to preserve the GCC intermediate representation
+    global_env['AR'] = 'gcc-ar'
+    global_env['RANLIB'] = 'gcc-ranlib'
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

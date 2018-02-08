@@ -47,8 +47,8 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
-      /** Input array for DAQ Status. */ // TODO why array, can be object
-      StoreArray<PXDDAQStatus> m_storeDAQEvtStats;
+      /** Input array for DAQ Status. */
+      StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
       //the geometry
       VXD::GeoCache& m_vxdGeometry;

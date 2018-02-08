@@ -11,125 +11,17 @@
 </header>
 """
 
-import sys
 import math
-import numpy as np
 from basf2 import *
 from pxd import *
 import ROOT
 from ROOT import Belle2
 
+import utility
+
 # set_log_level(LogLevel.ERROR)
 # set some random seed
 set_random_seed(10346)
-# momenta to generate the plots for
-momenta = [3.0]
-# theta parameters
-theta_params = [90, 0.1]
-
-
-# FIXME: The following functions are helpers. Find a more reasonable implementation for them.
-import re
-
-
-def computeFeature(shape, thetaU, thetaV):
-    """Returns feature scalar """
-    feature = 0.0
-    entry, exit = get_entry_exit_index(shape, thetaU, thetaV)
-
-    if not entry == exit:
-        # Feature is the eta value from entry/exit signals
-        picked_signals = pick_signals(shape, indexset=[entry, exit])
-        feature = picked_signals[0] / (picked_signals[0] + picked_signals[1])
-    else:
-        # Single digit shape. Feature is the digit charge
-        picked_signals = pick_signals(shape, indexset=[entry])
-        feature = picked_signals[0]
-
-    return feature
-
-
-def get_entry_exit_index(shape, thetaU=1, thetaV=1):
-    "Get indices for entry and exit pixel of track depending on slopes into sensor"
-    vcells = get_vcells(shape)
-    size = vcells.shape[0]
-    vmax = np.max(vcells)
-
-    if thetaV >= 0:
-        if thetaU >= 0:
-            return 0, size - 1
-        else:
-            return get_indices(shape, 0)[-1], get_indices(shape, vmax)[0]
-    else:
-        if thetaU >= 0:
-            return get_indices(shape, vmax)[0], get_indices(shape, 0)[-1]
-        else:
-            return get_indices(shape, vmax)[-1], get_indices(shape, 0)[0]
-
-
-def get_short_digital_label(shape, thetaU, thetaV):
-    """Short (digital) label contains only entry&exit pixels hit by track"""
-    label = "S"
-    digits = re.split('D', shape)
-    entry, exit = get_entry_exit_index(shape, thetaU, thetaV)
-
-    # Add entry pixel
-    data = re.split('\.', digits[entry + 1])
-    label += "D" + data[0] + '.' + data[1]
-
-    if not entry == exit:
-        # Add exit pixel
-        data = re.split('\.', digits[exit + 1])
-        label += "D" + data[0] + '.' + data[1]
-
-    return label
-
-
-def get_size(shape):
-    """Number of digits in shape"""
-    return len(re.split('D', shape)) - 1
-
-
-def get_signals(shape):
-    """Get array of signals from shape"""
-    size = get_size(shape)
-    signals = np.zeros((size,), dtype=np.int)
-    digits = re.split('D', shape)
-    for i in range(size):
-        digit = digits[i + 1]
-        signals[i] = int(re.split('\.', digit)[2])
-    return signals
-
-
-def pick_signals(shape, indexset):
-    """Get array of picked signals from shape. Picked signals are given in indexset."""
-    dim = len(indexset)
-    signals = np.zeros((dim,), dtype=np.int)
-    digits = re.split('D', shape)
-    for i, index in enumerate(indexset):
-        digit = digits[index + 1]
-        signals[i] = int(re.split('\.', digit)[2])
-    return signals
-
-
-def get_vcells(shape):
-    """Get array of vcells from shape"""
-    size = get_size(shape)
-    vcells = np.zeros((size,), dtype=np.int)
-    digits = re.split('D', shape)
-    for i in range(size):
-        digit = digits[i + 1]
-        vcells[i] = int(re.split('\.', digit)[0])
-    return vcells
-
-
-def get_indices(shape, v):
-    """Get list of digit indices for vcell=v"""
-    indexlist = []
-    for i, vcell in enumerate(get_vcells(shape)):
-        if vcell == v:
-            indexlist.append(i)
-    return indexlist
 
 
 class PXDPositionEstimation(Module):
@@ -138,56 +30,73 @@ class PXDPositionEstimation(Module):
     """
 
     def __init__(self):
-        """Create a member to access cluster shape position estimator"""
+        """
+        Create a member to access cluster shape position estimator
+        """
         super().__init__()  # don't forget to call parent constructor
         self.position_estimator = Belle2.PyDBObj('PXDClusterPositionEstimatorPar')
         self.shape_indexer = Belle2.PyDBObj('PXDClusterShapeIndexPar')
         self.eventinfo = Belle2.PyStoreObj('EventMetaData')
 
-    def compute_shape(self, cluster):
-        """ Returns shape for pxd cluster"""
+    def initialize(self):
+        """
+        Create histograms with pulls and residuals
+        """
 
-        # get sorted list of digits caused by truehits
-        digits = cluster.getRelationsTo("PXDDigits")
+        # Counters to measure coverage of corrections
+        self.nclusters = 0
+        self.nfound_shapes = 0
+        self.nfound_offset = 0
 
-        # compute the shape string
-        minu = min([digit.getUCellID() for digit in digits])
-        minv = min([digit.getVCellID() for digit in digits])
-        shape = str(len(digits))
-        sensor_info = Belle2.VXD.GeoCache.get(cluster.getSensorID())
-        reject = False
-        kinds = set()
+        # Let's create a root file to store all profiles
+        #: Output file to store all plots
+        self.rfile = ROOT.TFile("PXDPositionEstimation.root", "RECREATE")
+        self.rfile.cd()
 
-        for i, digit in enumerate(digits):
-            charge = int(digit.getCharge())
-            shape += 'D' + str(digit.getVCellID() - minv) + '.' + str(digit.getUCellID() - minu) + '.' + str(charge)
-            kind = self.getPixelKind(sensor_info.getVPitch(sensor_info.getVCellPosition(digit.getVCellID())))
-            kinds.add(kind)
+        # Create histograms for momenta and incidence angles
+        self.hist_map_momentum = {}
+        self.hist_map_theta_u = {}
+        self.hist_map_theta_v = {}
+        self.hist_map_clustercharge = {}
 
-            # Cluster at sensor edge
-            if digit.getVCellID() <= 0 or digit.getVCellID() >= 767:
-                reject = True
-            # Cluster at sensor edge
-            if digit.getUCellID() <= 0 or digit.getUCellID() >= 249:
-                reject = True
+        for kind in range(5):
+            self.hist_map_momentum[kind] = ROOT.TH1F("hist_momentum_kind_{:d}".format(
+                kind), 'Particle momentum kind={:d}'.format(kind), 5000, 0.0, 10.0)
+            self.hist_map_theta_u[kind] = ROOT.TH1F("hist_theta_u_kind_{:d}".format(
+                kind), 'Particle angle thetaU kind={:d}'.format(kind), 180, -90, +90)
+            self.hist_map_theta_v[kind] = ROOT.TH1F("hist_theta_v_kind_{:d}".format(
+                kind), 'Particle angle thetaV kind={:d}'.format(kind), 180, -90, +90)
+            self.hist_map_clustercharge[kind] = ROOT.TH1F("hist_clustercharge_kind_{:d}".format(
+                kind), 'Cluster charge kind={:d}'.format(kind), 255, 0.0, 255.0)
 
-        # Check cluster has not digits with different pixel kind
-        if not len(kinds) == 1:
-            reject = True
+        # Create histogram for residuals
+        self.hist_map_residual_u = {}
+        self.hist_map_residual_v = {}
+        self.hist_map_residual_v_special = {}
+        self.hist_map_residual_pull_u = {}
+        self.hist_map_residual_pull_v = {}
 
-        return shape, minu, minv, reject, kinds.pop()
+        for kind in range(5):
+            for mode in range(3):
+                self.hist_map_residual_u[(kind, mode)] = ROOT.TH1F('hist_map_residual_u_kind_{:d}_mode_{:d}'.format(
+                    kind, mode), 'PXD residual U kind={:d} mode={:d}'.format(kind, mode), 400, -0.004, +0.004)
+                self.hist_map_residual_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_v_kind_{:d}_mode_{:d}'.format(
+                    kind, mode), 'PXD residual V kind={:d} mode={:d}'.format(kind, mode), 400, -0.004, +0.004)
+                self.hist_map_residual_pull_u[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_u_kind_{:d}_mode_{:d}'.format(
+                    kind, mode), 'PXD residual pull U kind={:d} mode={:d}'.format(kind, mode), 200, -5, +5)
+                self.hist_map_residual_pull_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_v_kind_{:d}_mode_{:d}'.format(
+                    kind, mode), 'PXD residual pull V kind={:d} mode={:d}'.format(kind, mode), 200, -5, +5)
 
-    def getPixelKind(self, VPitch):
-        if abs(VPitch - 0.0055) < 0.0001:
-            return 0
-        elif abs(VPitch - 0.0060) < 0.0001:
-            return 1
-        elif abs(VPitch - 0.0070) < 0.0001:
-            return 2
-        elif abs(VPitch - 0.0085) < 0.0001:
-            return 3
-        else:
-            return -1
+                self.binlimits = {}
+                self.binlimits[0] = (-90, -30)
+                self.binlimits[1] = (-30, +30)
+                self.binlimits[2] = (+30, +90)
+
+                for bin in range(3):
+                    name = 'hist_map_residual_v_kind_{:d}_mode_{:d}_special_{:d}'.format(kind, mode, bin)
+                    title = 'PXD residual V kind={:d} mode={:d} {:.0f}<thetaV<{:.0f}'.format(
+                        kind, mode, self.binlimits[bin][0], self.binlimits[bin][1])
+                    self.hist_map_residual_v_special[(kind, mode, bin)] = ROOT.TH1F(name, title, 400, -0.004, +0.004)
 
     def event(self):
         """Fill the residual and pull histograms"""
@@ -197,6 +106,7 @@ class PXDPositionEstimation(Module):
 
         for truehit in truehits:
             if isinstance(truehit, Belle2.PXDTrueHit):
+                sensor_info = Belle2.VXD.GeoCache.get(truehit.getSensorID())
                 clusters = truehit.getRelationsFrom("PXDClusters")
 
                 # now check if we find a cluster
@@ -206,64 +116,228 @@ class PXDPositionEstimation(Module):
                     if clusters.weight(j) < 100:
                         continue
 
-                    shape, minu, minv, reject, pixelkind = self.compute_shape(cls)
                     mom = truehit.getMomentum()
                     thetaV = math.atan(mom[1] / mom[2]) * 180 / math.pi
                     thetaU = math.atan(mom[0] / mom[2]) * 180 / math.pi
-                    print("Found truehit - cluster match on sensor " +
-                          str(truehit.getSensorID()) + " ({:d})".format(int(truehit.getSensorID())))
-                    print("    Matched truehit has angles thetaU/thetaV: {:.1f}/{:.1f} ".format(thetaU, thetaV))
-                    print("    Matched cluster has shape " + shape + " location at ui/vi: {:d}/{:d}".format(minu, minv))
+                    reject, pixelkind = utility.check_cluster(cls)
 
-                    eta = computeFeature(shape, thetaU, thetaV)
-                    dshape = get_short_digital_label(shape, thetaU, thetaV)
-                    shape_index = self.shape_indexer.getShapeIndex(dshape)
+                    eta = utility.computeEta(cls, thetaU, thetaV)
+                    shape_name = utility.get_short_shape_name(cls, thetaU, thetaV)
+                    shape_index = self.shape_indexer.getShapeIndex(shape_name)
 
-                    print("    shape {} -> index {}".format(shape, shape_index))
-                    print("    eta={:.5f}".format(eta))
+                    shiftU = sensor_info.getUCellPosition(cls.getUStart())
+                    shiftV = sensor_info.getVCellPosition(cls.getVStart())
 
-                    # FIXME: how to get the eta index
-                    if get_size(shape) == 1:
-                        print('skipping single pixel cluster')
-                        continue
+                    # print("Match truehit - cluster on sensor ({:d})".format(int(truehit.getSensorID())) )
 
-                    eta_index = 0
-                    if not reject and self.position_estimator.hasOffset(shape_index, eta_index, thetaU, thetaV, pixelkind):
-                        print("FOUND CORRECTION")
+                    # print("    Matched truehit has angles thetaU/thetaV: {:.1f}/{:.1f} ".format(thetaU, thetaV))
+                    # print("    Matched cluster shape {} -> index {}".format(shape_name, shape_index))
+                    # print("    Matched cluster eta={:.5f}".format(eta))
 
-                    #  # Now, we can safely querry the hit
-                    #  offsets, cov, prob = self.estimator.getHit(shape, thetaU, thetaV, pixelkind)
-                    #  print("    Matching likelyhood is {:.3f}".format(prob) )
-                    #
-                    #  #for pixelkind in self.position_estimator.getPixelkinds():
-                    #  bool hasOffset(int shape_index, int feature_index, double thetaU, double thetaV, int pixelkind)
+                    if not reject:
+
+                        self.nclusters += 1
+
+                        # Fill momentum and angles for pixelkind
+                        self.hist_map_momentum[pixelkind].Fill(mom.Mag())
+                        self.hist_map_theta_u[pixelkind].Fill(thetaU)
+                        self.hist_map_theta_v[pixelkind].Fill(thetaV)
+                        self.hist_map_clustercharge[pixelkind].Fill(cls.getCharge())
+
+                        # Fill pixelkind=4 for all PXD sensors
+                        self.hist_map_momentum[4].Fill(mom.Mag())
+                        self.hist_map_theta_u[4].Fill(thetaU)
+                        self.hist_map_theta_v[4].Fill(thetaV)
+                        self.hist_map_clustercharge[4].Fill(cls.getCharge())
+
+                        # Fill the histograms (mode=2)
+                        mode = 2
+                        pull_u = (truehit.getU() - cls.getU()) / cls.getUSigma()
+                        pull_v = (truehit.getV() - cls.getV()) / cls.getVSigma()
+
+                        self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - cls.getU())
+                        self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - cls.getV())
+                        self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
+                        self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+
+                        if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
+                            self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getU() - cls.getU())
+                        elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
+                            self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getU() - cls.getU())
+                        else:
+                            self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getU() - cls.getU())
+
+                        if self.position_estimator.getShapeLikelyhood(shape_index, thetaU, thetaV, pixelkind) > 0:
+                            self.nfound_shapes += 1
+
+                        if self.position_estimator.hasOffset(shape_index, eta, thetaU, thetaV, pixelkind):
+                            # Now, we can safely querry the correction
+                            self.nfound_offset += 1
+                            offset = self.position_estimator.getOffset(shape_index, eta, thetaU, thetaV, pixelkind)
+
+                            # Fill the histograms (mode=0)
+                            mode = 0
+                            pull_u = (truehit.getU() - shiftU - offset.getU()) / (math.sqrt(offset.getUSigma2()))
+                            pull_v = (truehit.getV() - shiftV - offset.getV()) / (math.sqrt(offset.getVSigma2()))
+
+                            self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
+                            self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
+                            self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
+                            self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+
+                            if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - shiftV - offset.getV())
+                            elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - shiftV - offset.getV())
+                            else:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - shiftV - offset.getV())
+
+                            # Fill the histograms (mode=1)
+                            mode = 1
+                            self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
+                            self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
+                            self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
+                            self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+
+                            if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - shiftV - offset.getV())
+                            elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - shiftV - offset.getV())
+                            else:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - shiftV - offset.getV())
+
+                        else:
+
+                            # Fill the histograms (mode=1)
+                            mode = 1
+                            pull_u = (truehit.getU() - cls.getU()) / cls.getUSigma()
+                            pull_v = (truehit.getV() - cls.getV()) / cls.getVSigma()
+
+                            self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - cls.getU())
+                            self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - cls.getV())
+                            self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
+                            self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+
+                            if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getU() - cls.getU())
+                            elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getU() - cls.getU())
+                            else:
+                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getU() - cls.getU())
+
+    def terminate(self):
+        """
+        Format and write all histograms and plot them
+        """
+
+        for kind in range(5):
+            self.hist_map_momentum[kind].SetLineWidth(2)
+            self.hist_map_momentum[kind].SetXTitle('momentum / GeV')
+            self.hist_map_momentum[kind].SetYTitle('number of particles')
+
+            self.hist_map_theta_u[kind].SetLineWidth(2)
+            self.hist_map_theta_u[kind].SetXTitle('thetaU / degree')
+            self.hist_map_theta_u[kind].SetYTitle('number of particles')
+
+            self.hist_map_theta_v[kind].SetLineWidth(2)
+            self.hist_map_theta_v[kind].SetXTitle('thetaV / degree')
+            self.hist_map_theta_v[kind].SetYTitle('number of particles')
+
+            self.hist_map_clustercharge[kind].SetLineWidth(2)
+            self.hist_map_clustercharge[kind].SetXTitle('cluster charge / ADU')
+            self.hist_map_clustercharge[kind].SetYTitle('number of particles')
+
+        for kind in range(5):
+            for mode in range(3):
+                self.hist_map_residual_pull_u[(kind, mode)].SetLineWidth(2)
+                self.hist_map_residual_pull_u[(kind, mode)].SetXTitle('pull u')
+                self.hist_map_residual_pull_u[(kind, mode)].SetYTitle('number of particles')
+
+                self.hist_map_residual_pull_v[(kind, mode)].SetLineWidth(2)
+                self.hist_map_residual_pull_v[(kind, mode)].SetXTitle('pull v')
+                self.hist_map_residual_pull_v[(kind, mode)].SetYTitle('number of particles')
+
+                self.hist_map_residual_u[(kind, mode)].SetLineWidth(2)
+                self.hist_map_residual_u[(kind, mode)].SetXTitle('residuals u / cm')
+                self.hist_map_residual_u[(kind, mode)].SetYTitle('number of particles')
+
+                self.hist_map_residual_v[(kind, mode)].SetLineWidth(2)
+                self.hist_map_residual_v[(kind, mode)].SetXTitle('residuals v / cm')
+                self.hist_map_residual_v[(kind, mode)].SetYTitle('number of particles')
+
+                for bin in range(3):
+                    self.hist_map_residual_v_special[(kind, mode, bin)].SetLineWidth(2)
+                    self.hist_map_residual_v_special[(kind, mode, bin)].SetXTitle('residuals v / cm')
+                    self.hist_map_residual_v_special[(kind, mode, bin)].SetYTitle('number of particles')
+
+        self.hcoverage = ROOT.TH1F("hist_coverage", 'Coverage of corrections', 2, 1, 2)
+        self.hcoverage.SetBinContent(1, 100.0 * float(self.nfound_offset / self.nclusters))
+        self.hcoverage.SetBinContent(2, 100.0 * float(self.nfound_shapes / self.nclusters))
+        self.hcoverage.SetLineWidth(2)
+        self.hcoverage.SetYTitle('coverage / %')
+        self.hcoverage.SetTitle('Coverage of cluster shape corrections')
+
+        print("Coverage of cluster shape corrections is {:.2f}% ".format(100.0 * float(self.nfound_offset / self.nclusters)))
+        print("Coverage of cluster shape likelyhoods is {:.2f}% ".format(100.0 * float(self.nfound_shapes / self.nclusters)))
+
+        self.rfile.Write()
+        self.rfile.Close()
 
 
-# Now let's create a path to simulate our events. We need a bit of statistics but
-# that's not too bad since we only simulate single muons
-main = create_path()
-main.add_module("EventInfoSetter", evtNumList=[10000])
-main.add_module("Gearbox")
-# we only need the pxd for this
-main.add_module("Geometry", components=['MagneticFieldConstant4LimitedRSVD',
-                                        'BeamPipe', 'PXD'])
-particlegun = main.add_module("ParticleGun")
-particlegun.param({
-    "nTracks": 1,
-    "pdgCodes": [13, -13],
-    # generate discrete momenta with equal weights
-    "momentumGeneration": 'discrete',
-    "momentumParams": momenta + [1] * len(momenta),
-    "thetaGeneration": 'normal',
-    "thetaParams": theta_params,
-})
-main.add_module("FullSim")
-add_pxd_simulation(main)
-add_pxd_reconstruction(main)
+if __name__ == "__main__":
 
-positionestimation = PXDPositionEstimation()
-main.add_module(positionestimation)
-main.add_module("Progress")
+    import argparse
+    import glob
+    import sys
 
-process(main)
-print(statistics)
+    parser = argparse.ArgumentParser(description="Test cluster shape corrections on generic BBbar events")
+    parser.add_argument(
+        '--bglocation',
+        dest='bglocation',
+        default='/home/benjamin/prerelease-01-00-00b-validation/samples',
+        type=str,
+        help='Location of bg overlay files')
+    parser.add_argument('--bkgOverlay', dest='bkgOverlay', action="store_true", help='Perform background overlay')
+    parser.add_argument('--nevents', dest='nevents', default=5000, type=int, help='Number of events')
+    args = parser.parse_args()
+
+    # Find background overlay files
+    bkgfiles = glob.glob(args.bglocation + '/*.root')
+    if len(bkgfiles) == 0:
+        print('No BG overlay files found')
+        sys.exit()
+
+    # Now let's create a path to simulate our events.
+    main = create_path()
+    main.add_module("EventInfoSetter", evtNumList=[args.nevents])
+    main.add_module("Gearbox")
+    # We only need the pxd for this
+    main.add_module("Geometry", components=['MagneticFieldConstant4LimitedRSVD', 'BeamPipe', 'PXD'])
+
+    # Generate BBbar events
+    main.add_module("EvtGenInput")
+
+    # Background overlay input
+    if bkgfiles:
+        if args.bkgOverlay:
+            bkginput = register_module('BGOverlayInput')
+            bkginput.param('inputFileNames', bkgfiles)
+            main.add_module(bkginput)
+
+    main.add_module("FullSim")
+    add_pxd_simulation(main)
+
+    # Background overlay executor - after digitizer
+    if bkgfiles:
+        if args.bkgOverlay:
+            main.add_module('BGOverlayExecutor', PXDDigitsName='')
+            main.add_module("PXDDigitSorter", digits='')
+
+    add_pxd_reconstruction(main)
+
+    positionestimation = PXDPositionEstimation()
+    main.add_module(positionestimation)
+    main.add_module("Progress")
+
+    process(main)
+    print(statistics)

@@ -54,6 +54,9 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
 
 def add_pxd_ckf(path, *args, **kwargs):
     """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
+    if "PXDSpacePointCreator" not in path:
+        path.add_module("PXDSpacePointCreator")
+
     condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
     phase2_path = basf2.create_path()
     _add_pxd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
@@ -80,10 +83,6 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
     :param only_use_tracks_with_svd: Include a cut on the input tracks to have SVD hits
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
-
-    if "PXDSpacePointCreator" not in path:
-        path.add_module("PXDSpacePointCreator")
-
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
     if direction == "forward":
@@ -149,6 +148,9 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
+    if "SVDSpacePointCreator" not in path:
+        path.add_module("SVDSpacePointCreator")
+
     condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
     phase2_path = basf2.create_path()
     _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
@@ -174,10 +176,6 @@ def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=F
     :param use_best_seeds: CKF parameter for useBestNInSeed
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
-
-    if "SVDSpacePointCreator" not in path:
-        path.add_module("SVDSpacePointCreator")
-
     if direction == "forward":
         reverse_seed = True
     else:

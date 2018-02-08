@@ -10,29 +10,27 @@
 
 #pragma once
 
-#include <reconstruction/dbobjects/CDCDedx2DCor.h>
+#include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include "TF1.h"
-#include "TH2F.h"
 
 namespace Belle2 {
   /**
    * A calibration algorithm for CDC dE/dx electron cos(theta) dependence
    *
    */
-  class CDCDedx2DCorrectionAlgorithm : public CalibrationAlgorithm {
+  class CDCDedxMomentumAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the algorithm.
      */
-    CDCDedx2DCorrectionAlgorithm();
+    CDCDedxMomentumAlgorithm();
 
     /**
      * Destructor
      */
-    virtual ~CDCDedx2DCorrectionAlgorithm() {}
+    virtual ~CDCDedxMomentumAlgorithm() {}
 
   protected:
 
@@ -42,14 +40,6 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
-
-    /** Save arithmetic and truncated mean for the 'dedx' values.
-     *
-     * @param dedx              input values
-     * @param removeLowest      lowest fraction of hits to remove (0.05)
-     * @param removeHighest     highest fraction of hits to remove (0.25)
-     */
-    double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
 
   };
 } // namespace Belle2

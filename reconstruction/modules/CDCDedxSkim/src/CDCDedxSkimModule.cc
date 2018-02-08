@@ -8,7 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "reconstruction/modules/DedxSkim/DedxSkimModule.h"
+#include "reconstruction/modules/CDCDedxSkim/CDCDedxSkimModule.h"
+
+#include "framework/datastore/StoreArray.h"
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -25,9 +27,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(DedxSkim)
+REG_MODULE(CDCDedxSkim)
 
-DedxSkimModule::DedxSkimModule() : Module()
+CDCDedxSkimModule::CDCDedxSkimModule() : Module()
 {
 
   setDescription("Apply clean up cuts for dE/dx purposes.");
@@ -50,16 +52,16 @@ DedxSkimModule::DedxSkimModule() : Module()
   m_trackID = 0;
 }
 
-DedxSkimModule::~DedxSkimModule() {}
+CDCDedxSkimModule::~CDCDedxSkimModule() {}
 
-void DedxSkimModule::initialize()
+void CDCDedxSkimModule::initialize()
 {
 
   // requred inputs
   m_tracks.isRequired();
 }
 
-void DedxSkimModule::event()
+void CDCDedxSkimModule::event()
 {
 
   m_eventID++;
@@ -116,6 +118,8 @@ void DedxSkimModule::event()
     // only using the electron hypothesis
     if (m_Bhabha == true || m_RadBhabha == true || m_TwoPhoton == true) {
 
+      if (!isGoodTrack(track, Const::electron)) break;
+
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::electron);
       TVector3 trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_e * mass_e);
@@ -129,6 +133,8 @@ void DedxSkimModule::event()
 
     // only using the muon hypothesis
     if (m_DiMuon == true || m_RadDiMuon == true) {
+
+      if (!isGoodTrack(track, Const::muon)) break;
 
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::muon);
       TVector3 trackMom = fitResult->getMomentum();
@@ -149,7 +155,7 @@ void DedxSkimModule::event()
   setReturnValue(pass);
 }
 
-bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable)
+bool CDCDedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable)
 {
 
   // check if the track fit failed
@@ -180,9 +186,9 @@ bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable&
   return true;
 }
 
-void DedxSkimModule::terminate()
+void CDCDedxSkimModule::terminate()
 {
 
-  B2INFO("DedxSkimModule exiting after processing " << m_trackID <<
+  B2INFO("CDCDedxSkimModule exiting after processing " << m_trackID <<
          " tracks in " << m_eventID + 1 << " events.");
 }

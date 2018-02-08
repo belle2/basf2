@@ -107,7 +107,7 @@ def add_hlt_processing(path, run_type="collision",
                        pruneDataStore=True,
                        additonal_store_arrays_to_keep=[],
                        components=DEFAULT_HLT_COMPONENTS,
-                       softwaretrigger_mode='hlt_filter'):
+                       softwaretrigger_mode='hlt_filter', **kwargs):
     """
     Add all modules for processing on HLT filter machines
     """
@@ -119,13 +119,10 @@ def add_hlt_processing(path, run_type="collision",
                                            components=components,
                                            softwaretrigger_mode=softwaretrigger_mode,
                                            run_type=run_type,
-                                           addDqmModules=True)
+                                           addDqmModules=True, **kwargs)
     elif run_type == "cosmics":
         # no filtering,
-        # todo: correct data taking period here, when SVD is in the components,
-        # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
-        # currently, not hlt triggering of cosmic events, but regular full reconstruction
-        reconstruction.add_cosmics_reconstruction(path, components=components)
+        reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
         add_hlt_dqm(path, run_type)
         if pruneDataStore:
             path.add_module(

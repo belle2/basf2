@@ -73,7 +73,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   var<named("track_is_fake")>() = trackIsFake;
   var<named("track_is_matched")>() = not trackIsFake;
   var<named("truth_matched_hits")>() = numberOfCorrectHits;
-  var<named("track_is_curler_clone_truth")>() = trackIsClone;
+  var<named("track_is_curler_clone")>() = trackIsClone;
   var<named("truth")>() = not trackIsClone;
   var<named("truth_first_nloops")>() = mcTrackLookUp.getFirstNLoops(ptrCDCTrack);
   var<named("truth_event_id")>() = m_eventMetaData->getEvent();

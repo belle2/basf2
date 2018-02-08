@@ -25,7 +25,7 @@ namespace Belle2 {
       "track_is_fake", // less than 80% purity in CDC
       "track_is_matched", // not fake
       "truth_matched_hits",
-      "track_is_curler_clone_truth", // track is clone
+      "track_is_curler_clone", // track is clone
       "truth", // CDC track is not clone
       "truth_first_nloops",
       "truth_event_id",

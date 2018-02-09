@@ -36,16 +36,18 @@ main.add_module(gearbox)
 
 class dbImporterModule(Module):
     def beginRun(self):
-        # call the importer class
+        # create the importer class
         dbImporter = SVDDatabaseImporter(0, 0, -1, -1)
-#        print("classdefined")
-        # import the noises
-#        dbImporter.importSVDNoiseCalibrationsFromXML("Hao_noise.xml")
+
+        # read the map from xml
+        dbImporter.importSVDChannelMapping("Hao_mapping.xml")
+
+        # read the noise from xml
+        dbImporter.importSVDNoiseCalibrationsFromXML("Hao_noise.xml")
+        # read the waveform calibrations from xml
         dbImporter.importSVDCalAmpCalibrationsFromXML("Hao_noise.xml")
 
-        print("importNoise_Done")
 
-        # dbImporter.importSVDChannelMapping("Hao_mapping.xml")
 '''
 # import the calibration constants from local runs
 dbImporter.importSVDPulseShapeCalibrations()

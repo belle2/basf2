@@ -66,6 +66,8 @@ namespace Belle2 {
       /**how many FADCs we have */
       unsigned short nFADCboards;
 
+      /** pointer to APVforFADCmap filled by mapping procedure */
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
       int n_basf2evt; //event number
       int m_nodeid; // Node ID

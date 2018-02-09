@@ -18,7 +18,7 @@ using namespace std;
 using boost::property_tree::ptree;
 
 
-SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUniqueName("")
+SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
 {
 
   // Create an empty property tree object
@@ -56,10 +56,6 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUn
   try {
     // traverse pt: let us navigate through the daughters of <SVD>
     for (ptree::value_type const& v : propertyTree.get_child("SVD")) {
-      if (v.first == "unique") {
-        m_MapUniqueName = v.second.get<string>("<xmlattr>.name");
-        B2INFO("Loading the offline -> online SVD map named " << m_MapUniqueName);
-      }
       // if the daughter is a <layer> then read it!
       if (v.first == "layer")
         ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);
@@ -232,8 +228,9 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
       unsigned char  chipN = tags.get<unsigned char>("<xmlattr>.n");
       unsigned char  FADCn = tags.get<unsigned char>("<xmlattr>.FADCn");
 
-      //getting FADC numbers for Packer's maps
+      //storing info on FADC numbers and related APV chips
       FADCnumbers.insert(FADCn);
+      APVforFADCmap.insert(std::pair<unsigned char, unsigned char>(FADCn, chipN));
 
       ChipID cid(FADCn, chipN);
 
@@ -280,7 +277,6 @@ void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
   for (auto ifadc = FADCnumbers.begin(); ifadc != FADCnumbers.end(); ++ifadc) {
     map2[it] = *ifadc;
     map1[*ifadc] = it++;
-    //std::cout << (unsigned short)(*ifadc) << ", ";
   }
 }
 

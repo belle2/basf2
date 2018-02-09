@@ -96,7 +96,15 @@ void SVDUnpackerModule::beginRun()
 {
   m_wrongFTBcrc = 0;
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  //number of FADC boards
+  nFADCboards = m_map->getFADCboardsNumber();
+
+  //passing APV<->FADC mapping from SVDOnlineToOfflineMap object
+  APVmap = &(m_map->APVforFADCmap);
+
 }
+
 
 #ifndef __clang__
 #pragma GCC diagnostic push
@@ -127,7 +135,20 @@ void SVDUnpackerModule::event()
     return;
   }
 
-  unsigned int nEntries_rawSVD = rawSVDList.getEntries();
+  bool nFADCmatch = true;
+  bool nAPVmatch = true;
+  unsigned short nAPVheaders = 999;
+
+  unsigned short nEntries_rawSVD = rawSVDList.getEntries();
+
+  if (nEntries_rawSVD != nFADCboards) {
+    B2WARNING(" On event number: " << m_eventMetaDataPtr->getEvent() << " --> number of RawSVD data objects (" << nEntries_rawSVD <<
+              ") do not match the number of FADC boards (" << nFADCboards << ")!");
+
+    nFADCmatch = false;
+  }
+
+
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
 
     unsigned int numEntries_rawSVD = rawSVDList[ i ]->GetNumEntries();
@@ -138,8 +159,6 @@ void SVDUnpackerModule::event()
       nWords[1] = rawSVDList[i]->Get2ndDetectorNwords(j);
       nWords[2] = rawSVDList[i]->Get3rdDetectorNwords(j);
       nWords[3] = rawSVDList[i]->Get4thDetectorNwords(j);
-
-      // i,j is only 0
 
       uint32_t* data32tab[4]; //vector of pointers
 
@@ -179,6 +198,10 @@ void SVDUnpackerModule::event()
             diagnosticVector.clear(); // new set of objects for the current FTB
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
+
+            nAPVheaders = 0; // start counting APV headers for this FADC
+            nAPVmatch = true; //assume correct # of APV headers
+
             data32_it++; // go to 2nd part of FTB header
             crc16vec.push_back(*data32_it);
 
@@ -250,6 +273,8 @@ void SVDUnpackerModule::event()
           }
 
           if (m_APVHeader.check == 2) { // APV header
+
+            nAPVheaders++;
             apv = m_APVHeader.APVnum;
 
             cmc1 = m_APVHeader.CMC1;
@@ -257,8 +282,8 @@ void SVDUnpackerModule::event()
             apvErrors = m_APVHeader.apvErr;
             pipAddr = m_APVHeader.pipelineAddr;
 
-            // temporary SVDDAQDiagnostic object (no info from trailers)
-            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError);
+            // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
+            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch);
             diagnosticVector.push_back(currentDAQDiagnostic);
           }
 
@@ -305,13 +330,24 @@ void SVDUnpackerModule::event()
 
           if (m_FADCTrailer.check == 14)  { // FADC trailer
 
+            //comparing number of APV chips and the number of APV headers, for the current FADC
+            unsigned short nAPVs = APVmap->count(fadc);
+
+            if (nAPVs != nAPVheaders) {
+              B2WARNING(" On event number: " << m_eventMetaDataPtr->getEvent() << " --> number of APV headers (" << nAPVheaders <<
+                        ") do not match the number of APVs (" << nAPVs << ") for FADC " << fadc << " !");
+              nAPVmatch = false;
+            }
+
             ftbFlags = m_FADCTrailer.FTBFlags;
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
             for (auto* finalDAQDiagnostic : diagnosticVector) {
+              // adding remaining info to Diagnostic object
               finalDAQDiagnostic->setFTBFlags(ftbFlags);
               finalDAQDiagnostic->setEmuPipelineAddress(emuPipAddr);
               finalDAQDiagnostic->setApvErrorOR(apvErrorsOR);
+              finalDAQDiagnostic->setAPVMatch(nAPVmatch);
             }
 
           }// FADC trailer
@@ -358,7 +394,7 @@ void SVDUnpackerModule::event()
 
 void SVDUnpackerModule::endRun()
 {
-  B2INFO("   m_wrongFTBcrc = " << m_wrongFTBcrc);
+// B2INFO("   m_wrongFTBcrc = " << m_wrongFTBcrc);
 }
 
 

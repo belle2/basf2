@@ -193,14 +193,14 @@ namespace Belle2 {
       }
 
       int moduleID = arichHits[i]->getModule();
-      if (moduleID > 143) {
+      if (moduleID > 420) {
         B2INFO("Invalid hapd number " << moduleID);
       } else {
         h_hapdHit->Fill(moduleID - 1);
       }
 
       int mergerID = arichMergerMap->getMergerID(moduleID);
-      if (mergerID) {
+      if (mergerID > 72) {
         B2INFO("Invalid MB number " << mergerID);
       } else {
         h_mergerHit->Fill(mergerID - 1);
@@ -219,6 +219,7 @@ namespace Belle2 {
 
       ARICHTrack* arichTrack = arichLikelihood.getRelated<ARICHTrack>();
 
+      //Momentum limits are applied
       if (arichTrack->getPhotons().size() == 0) continue;
       if (m_momUpLim + m_momDnLim != 0 && (arichTrack->getMomentum() < m_momDnLim || arichTrack->getMomentum() > m_momUpLim)) continue;
 

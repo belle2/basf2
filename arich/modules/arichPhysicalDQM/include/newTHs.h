@@ -25,15 +25,24 @@
 
 namespace Belle2 {
 
+  /**Make new 1D histgram with color settings
+   *@return TH1D histram
+   */
   TH1* newTH1(const char* name, const char* title,
               Int_t nbins, Double_t min, Double_t max,
               Int_t lcolor, Int_t /*fcolor*/);
 
+  /**Make new 2D histgram with color settings
+   *@return TH2D histram
+   */
   TH2* newTH2(const char* name, const char* title,
               Int_t xnbins, Double_t xmin, Double_t xmax,
               Int_t ynbins, Double_t ymin, Double_t ymax,
               Int_t lcolor, Int_t /*fcolor*/);
 
+  /**Make new 3D histgram with color settings
+   *@return TH3D histram
+   */
   TH3* newTH3(const char* name, const char* title,
               Int_t xnbins, Double_t xmin, Double_t xmax,
               Int_t ynbins, Double_t ymin, Double_t ymax,

@@ -13,8 +13,10 @@
 
 #include <framework/core/HistoModule.h>
 
+//Functions to make histograms
 #include <arich/modules/arichPhysicalDQM/newTHs.h>
 
+//ARICH dataobjects
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHPhoton.h>
@@ -84,36 +86,39 @@ namespace Belle2 {
 
 
   protected:
-    bool m_debug;
-    std::string m_outputFileName;
+    bool m_debug;/**<debug*/
+    std::string m_outputFileName;/**<Output .root file name*/
 
-    TFile* results = NULL;
+    TFile* results = NULL;/**<Output file*/
 
-    TH1* h_chStat = NULL;
-    TH1* h_aeroStat = NULL;
+    //Histograms to show status by 1/0
+    TH1* h_chStat = NULL;/**<Status of each channels*/
+    TH1* h_aeroStat = NULL;/**<Status of each aerogel tiles*/
 
-    TH1* h_chHit = NULL;
-    TH1* h_chipHit = NULL;
-    TH1* h_hapdHit = NULL;
-    TH1* h_mergerHit = NULL;
-    TH1* h_gelHit = NULL;
-    TH1* h_bits = NULL;
-    TH2* h_hits2D = NULL;
-    TH2* h_tracks2D = NULL;
-    TH2* h_gelHits2D[124] = {};
-    TH2* h_gelTracks2D[124] = {};
-    TH1* h_mergersHit[72] = {};
+    //Hitograms to show the data quality
+    TH1* h_chHit = NULL;/**<The number of hits in each channels*/
+    TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chips*/
+    TH1* h_hapdHit = NULL;/**<The number of hits in each HAPDs*/
+    TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
+    TH1* h_gelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
+    TH1* h_bits = NULL;/**<Timing bits*/
+    TH2* h_hits2D = NULL;/**<2D hit map of whale ARICH*/
+    TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
+    TH2* h_gelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
+    TH2* h_gelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/
+    //TH1* h_mergersHit[72] = {};/**<Extraction of h_chHit specified each Merger Board*/
 
-    TH1* h_hitsPerEvent = NULL;
-    TH1* h_theta = NULL;
-    TH1* h_hitsPerTrack = NULL;
+    TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
+    TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
+    TH1* h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/
 
-    TH1* h_secTheta[6] = {};
-    TH1* h_secHitsPerTrack[6] = {};
+    TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
+    TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
 
-    //monitoring parameters
-    double m_momUpLim = 0;
-    double m_momDnLim = 0;
+    //Monitoring parameters
+
+    double m_momUpLim = 0;/**<Upper momentum limit of tracks use (if set 0, no limit is applied)*/
+    double m_momDnLim = 0;/**<Lower momentum limit of tracks used (if set 0, no limit is applied)*/
 
   };
 

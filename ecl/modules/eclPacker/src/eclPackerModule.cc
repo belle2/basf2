@@ -254,7 +254,7 @@ void ECLPackerModule::event()
           int amp = m_eclDigits[i_digit]->getAmp();
           int tim = m_eclDigits[i_digit]->getTimeFit();
           unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
-          hit_data |= (tim & 0x1FFF) << 18;
+          hit_data |= (tim & 0xFFF) << 18;
           hit_data |= ((amp + 128) & 0x3FFFF);
           buff[iFINESSE].push_back(hit_data);
 

@@ -56,9 +56,9 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   double minFitLimit = 1e-25; /*< cut off for labeling a fit as poor */
   double minFitProbIter = 1e-8; /*< cut off for labeling a fit as poor if it also has many iterations */
   double constRatio = 0.5; /*< Novosibirsk normalization must be greater than constRatio x constant term */
-  double peakMin(0.6), peakMax(1.75); /*< range for peak of measured energy distribution */
+  double peakMin(0.5), peakMax(1.75); /*< range for peak of measured energy distribution */
   double peakTol = limitTol * (peakMax - peakMin); /*< fit is at limit if it is within peakTol of min or max */
-  double effSigMin(0.1), effSigMax(0.5); /*< range for effective sigma of measured energy distribution */
+  double effSigMin(0.08), effSigMax(0.5); /*< range for effective sigma of measured energy distribution */
   double effSigTol = limitTol * (effSigMax - effSigMin);
   double etaMin(-3.), etaMax(1.); /*< Novosibirsk tail parameter range */
   double etaNom(-0.41); /*< Nominal tail parameter */
@@ -186,7 +186,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /**..If we have not been asked to do fits, we can quit now */
   if (!performFits) {
-    B2RESULT("eclCosmicEAlgorithm has not been asked to perform fits; copying input histograms and quitting");
+    B2INFO("eclCosmicEAlgorithm has not been asked to perform fits; copying input histograms and quitting");
     histfile->Close();
     return c_NotEnoughData;
   }
@@ -201,7 +201,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
     bool SameLow = IntegralVsCrys[0]->GetBinContent(histbin) < minEntries;
     bool DifferentLow = IntegralVsCrys[1]->GetBinContent(histbin) < minEntries;
     if ((SameLow && DifferentLow) || (findExpValues && (SameLow || DifferentLow))) {
-      if (storeConst == 1) {B2RESULT("eclCosmicEAlgorithm: cellID " << histbin << " has insufficient statistics: " << IntegralVsCrys[0]->GetBinContent(histbin) << " and " << IntegralVsCrys[1]->GetBinContent(histbin) << ". Requirement is " << minEntries);}
+      if (storeConst == 1) {B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " has insufficient statistics: " << IntegralVsCrys[0]->GetBinContent(histbin) << " and " << IntegralVsCrys[1]->GetBinContent(histbin) << ". Requirement is " << minEntries);}
       sufficientData = false;
       break;
     }
@@ -450,7 +450,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
         //**..For failed fits, store the negative of the input expected energy */
         if (fitstatus < iterations) {
           if (histbin >= cellIDLo && histbin <= cellIDHi) {
-            B2RESULT("eclCosmicEAlgorithm: crystal " << crysID << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus);
+            B2INFO("eclCosmicEAlgorithm: crystal " << crysID << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus);
           }
           peakE = -1.;
           peakEUnc = 0.;
@@ -489,7 +489,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
           calibConstUnc[idir] = calibConst[idir] * fracPeakEUnc / peakE;
           weight[idir] = 1. / (calibConstUnc[idir] * calibConstUnc[idir]);
         }
-        if (fitstatus < iterations && histbin >= cellIDLo && histbin <= cellIDHi) { B2RESULT("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus); }
+        if (fitstatus < iterations && histbin >= cellIDLo && histbin <= cellIDHi) { B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus); }
       }
 
 
@@ -499,7 +499,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
 
       /**..If both fits failed, use the negative of the initial "same" calibration constant */
       if (StatusperCrys[0]->GetBinContent(histbin) < iterations && StatusperCrys[1]->GetBinContent(histbin) < iterations) {
-        if (histbin >= cellIDLo && histbin <= cellIDHi) {B2RESULT("eclCosmicEAlgorithm: no constant found for cellID = " << histbin << " status = " << StatusperCrys[0]->GetBinContent(histbin) << " and " << StatusperCrys[1]->GetBinContent(histbin));}
+        if (histbin >= cellIDLo && histbin <= cellIDHi) {B2INFO("eclCosmicEAlgorithm: no constant found for cellID = " << histbin << " status = " << StatusperCrys[0]->GetBinContent(histbin) << " and " << StatusperCrys[1]->GetBinContent(histbin));}
         averageConst = -1.*abs(AverageInitialCalib[0]->GetBinContent(histbin));
         averageConstUnc = 0.;
       } else {
@@ -531,7 +531,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
         ECLCrystalCalib* ExpectedE = new ECLCrystalCalib();
         ExpectedE->setCalibVector(tempE, tempUnc);
         saveCalibration(ExpectedE, DBname[idir]);
-        B2RESULT("eclCosmicEAlgorithm: successfully stored expected values for " << DBname[idir]);
+        B2INFO("eclCosmicEAlgorithm: successfully stored expected values for " << DBname[idir]);
       }
 
       /**..Store calibration constant for each crystal (nominally real data) */
@@ -546,7 +546,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
       ECLCrystalCalib* CosmicECalib = new ECLCrystalCalib();
       CosmicECalib->setCalibVector(tempCalib, tempCalibUnc);
       saveCalibration(CosmicECalib, "ECLCrystalEnergyCosmic");
-      B2RESULT("eclCosmicEAlgorithm: successfully stored calibration constants");
+      B2INFO("eclCosmicEAlgorithm: successfully stored calibration constants");
     }
   }
 
@@ -596,11 +596,11 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /**..Set the return code appropriately */
   if (storeConst == -1) {
-    B2RESULT("eclCosmicEAlgorithm performed fits but was not asked to store contants");
+    B2INFO("eclCosmicEAlgorithm performed fits but was not asked to store contants");
     return c_Failure;
   } else if (!DBsuccess) {
-    if (findExpValues) { B2RESULT("eclCosmicEAlgorithm: failed to store expected values"); }
-    else { B2RESULT("eclCosmicEAlgorithm: failed to store calibration constants"); }
+    if (findExpValues) { B2INFO("eclCosmicEAlgorithm: failed to store expected values"); }
+    else { B2INFO("eclCosmicEAlgorithm: failed to store calibration constants"); }
     return c_Failure;
   }
   return c_OK;

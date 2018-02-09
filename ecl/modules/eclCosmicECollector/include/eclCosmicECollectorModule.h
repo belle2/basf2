@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCOSMICECOLLECTORMODULE_H
-#define ECLCOSMICECOLLECTORMODULE_H
+#pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <ecl/geometry/ECLNeighbours.h>
@@ -46,7 +45,6 @@ namespace Belle2 {
     int iEvent = 0; /**< event counter */
 
     StoreArray<ECLDigit> eclDigitArray; /**< Required input array of eclDigits */
-
 
     /** Sets of three crystals that define a useful cosmic */
     std::vector<short int> CenterCrys; /**< crystal ID whose signal will be recorded */
@@ -88,4 +86,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* ECLCOSMICECOLLECTORMODULE_H */

@@ -59,16 +59,18 @@ add_unpackers(main, components='ECL')
 set_log_level(LogLevel.INFO)
 
 # CAF collector code
-eclCosmicE = register_module('eclCosmicECollector')
+eclCosmicE = register_module('eclCosmicECollector', logLevel=LogLevel.DEBUG, debugLevel=9)
 eclCosmicE.param('minCrysE', 0.01)
 eclCosmicE.param('mockupL1', False)
 eclCosmicE.param('trigThreshold', 0.1)
 main.add_module(eclCosmicE)
 
 # It is possible to force the job to use the specified global tag.
-# Default localdb is the subdirectory of current working directory.
+# Default localdb is the subdirectory of current working directory, but can be overwritten
 reset_database()
+use_database_chain()
 use_central_database("development")
+use_local_database("localdb/database.txt")
 
 process(main)
 

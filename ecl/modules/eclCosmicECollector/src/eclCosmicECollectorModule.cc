@@ -38,9 +38,9 @@ eclCosmicECollectorModule::eclCosmicECollectorModule() : CalibrationCollectorMod
   /** Set module properties */
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using cosmic rays");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("minCrysE", m_minCrysE, "Minimum energy for a crystal to be considered hit", 0.010);
+  addParam("minCrysE", m_minCrysE, "Minimum energy in GeV for a crystal to be considered hit", 0.010);
   addParam("mockupL1", m_mockupL1, "Calculate energy per trigger cell in lieu of trigger simulation", false);
-  addParam("trigThreshold", m_trigThreshold, "Minimum energy per trigger cell to mock up L1 trigger", 0.1);
+  addParam("trigThreshold", m_trigThreshold, "Minimum energy in GeV per trigger cell to mock up L1 trigger", 0.1);
 }
 
 
@@ -242,7 +242,7 @@ void eclCosmicECollectorModule::prepare()
       NeighbourA.push_back(nA);
       NeighbourB.push_back(nB);
     } else {
-      B2ERROR("No neighbour pair with the same thetaID for crysID = " << crysID);
+      B2FATAL("No neighbour pair with the same thetaID for crysID = " << crysID);
     }
 
     /** Now create pairs consisting of one next thetaID and one previous thetaID */
@@ -314,9 +314,8 @@ void eclCosmicECollectorModule::collect()
   if (m_ECLExpCosmicEDifferent.hasChanged()) {B2FATAL("eclCosmicECollector: ECLExpCosmicEDifferent has changed");}
   if (m_ElectronicsCalib.hasChanged()) {B2FATAL("eclCosmicECollector: ElectronicsCalib has changed");}
   if (m_CosmicECalib.hasChanged()) {
-    B2INFO("eclCosmicECollector: new values for ECLCosmicECalib");
+    B2DEBUG(9, "eclCosmicECollector: new values for ECLCosmicECalib");
     CosmicECalib = m_CosmicECalib->getCalibVector();
-    B2DEBUG(300, "DB constants for crysID=0: CosmicECalib = " << CosmicECalib[0]);
   }
 
   /**----------------------------------------------------------------------------------------*/

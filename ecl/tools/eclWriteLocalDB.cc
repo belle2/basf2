@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christopher Hearty   hearty@physics.ubc.ca               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>

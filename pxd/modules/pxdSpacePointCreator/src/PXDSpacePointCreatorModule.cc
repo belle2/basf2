@@ -45,7 +45,7 @@ PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
 void PXDSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
-  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
+  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   m_pxdClusters.isRequired(m_pxdClustersName);
 
 

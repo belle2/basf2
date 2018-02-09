@@ -90,10 +90,10 @@ namespace Belle2 {
       /** Register the object/array in the DataStore.
        *  This must be called in the initialization phase.
        *
-       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut.
+       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut | c_ErrorIfAlreadyRegistered.
        *  @return            True if the registration succeeded.
        */
-      bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut)
+      bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)
       {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(storeFlags);
       }
@@ -102,10 +102,11 @@ namespace Belle2 {
        *  This must be called in the initialization phase.
        *
        *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerInDataStore("myName") in initialize(), this object will continue refer to 'myName' in event().
-       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut.
+       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered.
        *  @return            True if the registration succeeded.
        */
-      bool registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut)
+      bool registerInDataStore(const std::string& name,
+                               DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)
       {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(name, storeFlags);
       }

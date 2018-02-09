@@ -164,7 +164,7 @@ void SpacePoint2TrueHitConnectorModule::initialize()
     for (unsigned int i = 0; i < m_nContainers; ++i) {
       std::string name = m_inputSpacePoints.at(i).first.getName() + m_PARAMoutputSuffix;
       m_outputSpacePoints.push_back(StoreArray<SpacePoint>(name));
-      m_outputSpacePoints.at(i).registerInDataStore(name, DataStore::c_DontWriteOut);
+      m_outputSpacePoints.at(i).registerInDataStore(name, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
       // register relations (detector dependent)
       if (m_inputSpacePoints.at(i).second == c_SVD) {

@@ -48,7 +48,7 @@ unsigned int CompareCurlerTracks::getNumberOfCorrectHits(const CDCTrack* ptrCDCT
   auto hitIsCorrect = [this, &mcTrackID](const CDCRecoHit3D & recoHit) {
     return m_CDCMCHitLookUp.getMCTrackId(recoHit.getWireHit().getHit()) == mcTrackID;
   };
-  return std::count_if(ptrCDCTrack->begin(), ptrCDCTrack->end(), hitIsCorrect);
+  return std::count_if(begin(*ptrCDCTrack), end(*ptrCDCTrack), hitIsCorrect);
 }
 
 /// Functor definition of comparison function for findNonCurlerCloneTrack

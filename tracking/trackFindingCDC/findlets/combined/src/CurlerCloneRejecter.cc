@@ -70,6 +70,6 @@ void CurlerCloneRejecter::apply(std::vector<CDCTrack>& tracks)
   if (m_param_deleteCurlerClones) {
     erase_remove_if(tracks, reject);
   } else {
-    std::for_each(tracks.begin(), tracks.end(), reject);
+    std::for_each(begin(tracks), end(tracks), reject);
   }
 }

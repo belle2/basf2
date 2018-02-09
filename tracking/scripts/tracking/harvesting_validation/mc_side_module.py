@@ -186,7 +186,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         hit_efficiency_crops = dict(
             hit_efficiency_in_all_found=hit_efficiency_in_all_found,
             unfound_hit_efficiency=unfound_hit_efficiency,
-            hit_efficiency_in_all_mached=hit_efficiency_in_all_matched,
+            hit_efficiency_in_all_matched=hit_efficiency_in_all_matched,
             hit_efficiency_in_all_fake=hit_efficiency_in_all_fake,
         )
         return hit_efficiency_crops

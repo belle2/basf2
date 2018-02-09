@@ -58,7 +58,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
     auto hitIsCorrect = [&hitLookUp, &trackMCMatch](const CDCRecoHit3D & recoHit) {
       return hitLookUp.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch;
     };
-    numberOfCorrectHits = std::count_if(ptrCDCTrack->begin(), ptrCDCTrack->end(), hitIsCorrect);
+    numberOfCorrectHits = std::count_if(begin(*ptrCDCTrack), end(*ptrCDCTrack), hitIsCorrect);
 
     const double purity = (double)numberOfCorrectHits / ptrCDCTrack->size();
     if (purity < 0.8) {

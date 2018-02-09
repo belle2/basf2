@@ -64,7 +64,7 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   defaultInList.push_back(std::string(""));
   addParam("TrueHitNames", m_PARAMtrueHitNames,
            "Container names of TrueHits. NOTE: need one name per 'DetectorType' (i.e. unique entries in 'DetectorType)!", defaultInList);
-  addParam("SpacePointNames", m_PARAMspacePointNames, "Container names of SpacePoints.", defaultInList);
+  addParam("SpacePointNames", m_PARAMspacePointNames, "Container names of SpacePoints.", {"SVDSpacePoints", "PXDSpacePoints"});
   addParam("DetectorTypes", m_PARAMdetectorTypes,
            "detector types to determine which entries in 'TrueHitNames' and 'SpacePointNames' belong to which detector type. Entries have to be 'SVD' or 'PXD'. NOTE: if more 'SpacePointNames' than 'DetectorTypes' get passed, the last entry in 'DetectorTypes' is assumed to be valid for all remaining 'SpacePointNames'!");
   addParam("ClusterNames", m_PARAMclusterNames,

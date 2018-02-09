@@ -28,7 +28,7 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 {
   InitializeCounters();
 
-  vector<string> spacePointArrayNames = {""};
+  vector<string> spacePointArrayNames = {"SVDSpacePoints", "PXDSpacePoints"};
 
   vector<double> ipCoords = {0, 0, 0};
 

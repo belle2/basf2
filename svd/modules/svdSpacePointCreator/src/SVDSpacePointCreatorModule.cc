@@ -34,7 +34,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
+           "SpacePoints collection name", string("SVDSpacePoints"));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,

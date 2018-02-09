@@ -45,7 +45,6 @@ packer.param('dhe_to_dhc', [
 # ])
 
 unpacker = register_module('PXDUnpacker')
-unpacker.param('HeaderEndianSwap', True)
 
 simpleoutput = register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')

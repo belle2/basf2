@@ -82,7 +82,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
 
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));
-  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(""));
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy,
            "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
   addParam("ThresholdTrials", m_thresholdTrials,
@@ -160,9 +159,8 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-  //Register the collections we want to use
-  StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
-  mcParticles.registerInDataStore();
+  //FullSim does not create a new collection.
+  //Instead the module will reuse and update the existing one.
 
   //Make sure these collections already exist
   StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
@@ -249,7 +247,8 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  EventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_mcParticleGraph);
+  //The output collection name will be always "MCParticles".
+  EventAction* eventAction = new EventAction("", m_mcParticleGraph);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.

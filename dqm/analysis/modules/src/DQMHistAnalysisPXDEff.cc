@@ -82,7 +82,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
       m_cEffModules[aPXDModule] = new TCanvas("c_Eff_" + buff);
     }
     m_hEffModules[aPXDModule] = new TH2D("HitEff_" + buff, histTitle,
-                                         m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                                         m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_hEffModules[aPXDModule]->SetStats(false);
     m_hEffModules[aPXDModule]->GetZaxis()->SetLimits(0, 1);
 
@@ -92,13 +92,13 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
   m_hEffMerge["IF"] = new TH2D("HitEff_IF", "Average Hit Efficiency of IF Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_hEffMerge["IB"] = new TH2D("HitEff_IB", "Average Hit Efficiency of IB Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_hEffMerge["OF"] = new TH2D("HitEff_OF", "Average Hit Efficiency of OF Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_hEffMerge["OB"] = new TH2D("HitEff_OB", "Average Hit Efficiency of OB Modules;Pixels in U;Pixels in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_cEffMerge["IF"] = new TCanvas("c_EffIF");
   m_cEffMerge["IB"] = new TCanvas("c_EffIB");
   m_cEffMerge["OF"] = new TCanvas("c_EffOF");

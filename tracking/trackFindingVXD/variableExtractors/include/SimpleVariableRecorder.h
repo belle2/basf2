@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #pragma once
+#include <functional>
+#include <string>
+#include <vector>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>

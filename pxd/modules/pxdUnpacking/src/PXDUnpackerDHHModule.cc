@@ -32,7 +32,6 @@ using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
 REG_MODULE(PXDUnpackerDHH)
 
-
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -226,12 +225,12 @@ void PXDUnpackerDHHModule::unpack_rawdhh(RawDHH& px, int inx)
     ll += 16;
 
     if (lo <= 0) {
-      B2ERROR("size of frame invalid: " << j << " size $" << std::hex << lo << " at byte offset " << std::hex << ll);
+      B2ERROR("size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       m_errorMask |= EPXDErrMask::c_FRAME_SIZE;
       return;
     }
     if (ll + lo > datafullsize) {
-      B2ERROR("frames exceed packet size: " << j  << " size " << lo << " at byte offset " << ll << " of datafullsize " <<
+      B2ERROR("frames exceed packet size: " << j  << " size " << lo << " at byte offset in dataptr " << ll << " of datafullsize " <<
               datafullsize << " of fullsize " << fullsize);
       m_errorMask |= EPXDErrMask::c_FRAME_SIZE;
       return;
@@ -479,7 +478,6 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
         if (!rowflag) {
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= EPXDErrMask::c_DHP_PIX_WO_ROW;
-//           dhp_pixel_error++;
           // dump_dhp(data, frame_len);// print out faulty dhp frame
           return;
         } else {
@@ -526,8 +524,7 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F/*, dhp_cm */
-                                                       );
+                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
         }
       }
     }

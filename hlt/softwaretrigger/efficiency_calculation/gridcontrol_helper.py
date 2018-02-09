@@ -4,7 +4,10 @@ import os
 import multiprocessing
 from shutil import copyfile, rmtree
 
-
+# GC_BELLE2_BACKGROUND_DIR is used, because it needs to set to
+# BELLE2_BACKGROUND_DIR in the steering file itself, because
+# BELLE2_BACKGROUND_DIR will be overwritten as soon as basf2
+# is sourced on batch nodes.
 DEFAULT_GRIDCONTROL_CONTENT = """
 [global]
 task = UserTask
@@ -19,7 +22,7 @@ BASF2_COMPILE_OPTION = {compile_option}
 BASF2_TOOLS_LOCATION = {tools_location}
 BASF2_RELEASE_LOCATION = {release_location}
 BASF2_STEERING_FILE = {steering_file}
-BELLE2_BACKGROUND_DIR = {background_dir}
+GC_BELLE2_BACKGROUND_DIR = {background_dir}
 [parameters]
 repeat = 1
 parameters = <pfs>

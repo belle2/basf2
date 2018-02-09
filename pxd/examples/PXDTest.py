@@ -65,10 +65,8 @@ output.param('outputFileName', 'PXDTestOutput.root')
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 PXDDIGI.param('statisticsFilename', 'PXDDiags.root')
-PXDDIGI.param('ADCFineMode', True)
 PXDDIGI.set_log_level(LogLevel.INFO)
 
-PXDCLUST.param('ADCFineMode', True)
 PXDCLUST.set_log_level(LogLevel.INFO)
 
 # ============================================================================

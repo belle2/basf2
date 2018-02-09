@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdUnpacking/PXDRawDataDefinitions.h>
+#include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDUnpackerDHHModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
@@ -1018,7 +1018,7 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm
+                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F/*, dhp_cm */
                                                        );
         }
       }

@@ -433,6 +433,7 @@ def TagV(
     confidenceLevel=0.,
     useFitAlgorithm='standard_PXD',
     askMCInfo=False,
+    reqPXDHits=0,
     path=analysis_main,
 ):
     """
@@ -444,6 +445,7 @@ def TagV(
     @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
     @param MCassociation: use standard MC association or the internal one
     @param useConstraint: choose constraint for the tag vertes fit
+    @param reqPXDHits: minimum N PXD hits for a track
     @param path      modules are added to this path
     """
 
@@ -454,6 +456,7 @@ def TagV(
     tvfit.param('MCAssociation', MCassociation)
     tvfit.param('useFitAlgorithm', useFitAlgorithm)
     tvfit.param('askMCInformation', askMCInfo)
+    tvfit.param('reqPXDHits', reqPXDHits)
     path.add_module(tvfit)
 
 

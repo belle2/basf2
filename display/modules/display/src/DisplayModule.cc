@@ -100,9 +100,6 @@ void DisplayModule::initialize()
   StoreArray<RecoHitInformation::UsedPXDHit> UsedPXDHits; UsedPXDHits.isOptional();
   StoreArray<RecoHitInformation::UsedSVDHit> UsedSVDHits; UsedSVDHits.isOptional();
   StoreArray<RecoHitInformation::UsedCDCHit> UsedCDCHits; UsedCDCHits.isOptional();
-  StoreArray<TrackCandidateTFInfo> TrackCandidateTFInfos; TrackCandidateTFInfos.isOptional();
-  StoreArray<CellTFInfo> CellTFInfos; CellTFInfos.isOptional();
-  StoreArray<SectorTFInfo> SectorTFInfos; SectorTFInfos.isOptional();
 
   m_display = new DisplayUI(m_automatic);
   if (hasCondition())
@@ -205,22 +202,6 @@ void DisplayModule::event()
     StoreArray<ROIid> testbeamROIs("ROIs");
     for (int i = 0 ; i < testbeamROIs.getEntries(); i++)
       m_visualizer->addROI(testbeamROIs[i]);
-
-    //special VXDTF objects
-    StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
-    for (auto& currentTC : tfcandTFInfo) {
-      m_visualizer->addTrackCandidateTFInfo(&currentTC);
-    }
-
-    StoreArray<CellTFInfo> cellTFInfo;
-    for (auto& currentCell : cellTFInfo) {
-      m_visualizer->addCellTFInfo(&currentCell);
-    }
-
-    StoreArray<SectorTFInfo> sectorTFInfo;
-    for (auto& currentSector : sectorTFInfo) {
-      m_visualizer->addSectorTFInfo(&currentSector);
-    }
   }
 
   if (m_showCDCHits || m_showTriggerObjects) {

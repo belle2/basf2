@@ -29,7 +29,8 @@ namespace eudaq {
     FileDeserializer(const std::string& fname, bool faileof = false, size_t buffersize = 65536);
     virtual bool HasData();
     template <typename T>
-    T peek() {
+    T peek()
+    {
       FillBuffer();
       BufferSerializer buf(m_start, m_stop);
       T result;

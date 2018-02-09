@@ -10,6 +10,8 @@ from effCalculation import EffModule
 
 
 class SummarizeL1TriggerResults(PickleHarvestingModule):
+    """Helper class to write out the L1 trigger results to a dataframe pickled to disk"""
+
     def __init__(self, root_file_name="save_results.pkl", store_object_name="TRGSummary"):
         """
         Create a new module to get the stored trigger decisions from the data store and save them to a root file.
@@ -49,6 +51,7 @@ class SummarizeL1TriggerResults(PickleHarvestingModule):
 
 
 def main():
+    """Open the given input file (coming from reconstruction) and write out the trigger results"""
     # Get all parameters for this calculation
     input_file = os.environ.get("input_file")
     output_file = os.environ.get("output_file")

@@ -133,11 +133,11 @@ void ECLPackerModule::event()
     tot_dsp_hits++;
   }
 
-  B2INFO("ECL Packer:: N Hits above threshold  = " << tot_dsp_hits << " nWaveforms = " << nEclWaveform);
+  B2DEBUG(100, "ECL Packer:: N Hits above threshold  = " << tot_dsp_hits << " nWaveforms = " << nEclWaveform);
 
   if (m_WaveformRareFactor != 0)
     if (m_EvtNum % m_WaveformRareFactor == 0) {
-      B2INFO("ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
+      B2DEBUG(100, "ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
       for (int i_wf = 0; i_wf < nEclWaveform; i_wf++) {
         int cid = m_eclDsps[i_wf]->getCellId();
         iCrate = m_eclMapper->getCrateID(cid);

@@ -72,7 +72,8 @@ void DQMHistAnalysisOutputFileModule::endRun()
   TFile f(m_filename.data(), "recreate");
   if (f.IsOpen()) {
     TDirectory* oldDir = gDirectory;
-    oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+    oldDir->mkdir(m_histogramDirectoryName.c_str());
+    oldDir->cd(m_histogramDirectoryName.c_str());
 
     if (m_saveCanvases) {
       // we could loop over histos ... but i think the second one is better
@@ -120,6 +121,10 @@ void DQMHistAnalysisOutputFileModule::endRun()
                   d = old = gDirectory;
                   TString myl = obj->GetName();
                   TString tok;
+// workaround for changes in histmanager/Input module ... TODO remove if not needed anymore
+//    std::string a=myl.Data();
+//    a.erase(std::remove(a.begin(), a.end(), ':'), a.end());
+//      myl=a.data();
                   Ssiz_t from = 0;
                   while (myl.Tokenize(tok, from, "/")) {
                     TString dummy;
@@ -129,10 +134,12 @@ void DQMHistAnalysisOutputFileModule::endRun()
                       auto e = d->GetDirectory(tok);
                       if (e) {
                         d = e;
+                        d->cd();
                       } else {
-                        d = d->mkdir(tok);
+                        d->mkdir(tok);
+                        d->cd(tok);
+                        d = gDirectory;
                       }
-                      d->cd();
                     } else {
                       break;
                     }

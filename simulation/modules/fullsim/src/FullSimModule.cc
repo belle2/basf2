@@ -104,14 +104,25 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
-  addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
-  addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
+  addParam("EnableVisualization", m_EnableVisualization, "If set to True, the Geant4 visualization support is enabled.", false);
+
+  addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True, optical photons are stored in MCParticles.", false);
   addParam("StoreAllSecondaries", m_storeSecondaries,
-           "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them",
+           "If set to True, all secondaries produced by Geant4 over a kinetic energy cut are stored in MCParticles. Otherwise do not store them.",
            false);
-  addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
+  addParam("SecondariesEnergyCut", m_secondariesEnergyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
+  addParam("StoreBremsstrahlungPhotons", m_storeBremsstrahlungPhotons,
+           "If set to True, store BremsstrahlungPhotons over a kinetic energy cut in MCParticles. Otherwise do not store them.", false);
+  addParam("BremsstrahlungPhotonsEnergyCut", m_bremsstrahlungPhotonsEnergyCut,
+           "[MeV] Kinetic energy cut for storing bremsstrahlung photons", 10.0);
+  addParam("StorePairConversions", m_storePairConversions,
+           "If set to True, store e+ or e- from pair conversions over a kinetic energy cut in MCParticles. Otherwise do not store them.",
+           false);
+  addParam("PairConversionsEnergyCut", m_pairConversionsEnergyCut,
+           "[MeV] Kinetic energy cut for storing e+ or e- from pair conversions", 10.0);
+
   addParam("magneticField", m_magneticFieldName,
-           "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
+           "Chooses the magnetic field stepper used by Geant4. Possible values are: default, nystrom, expliciteuler, simplerunge",
            string("default"));
   addParam("magneticCacheDistance", m_magneticCacheDistance,
            "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
@@ -179,6 +190,7 @@ void FullSimModule::initialize()
     physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
   }
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
+
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)
   G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
@@ -244,7 +256,12 @@ void FullSimModule::initialize()
   TrackingAction* trackingAction = new TrackingAction(m_mcParticleGraph);
   trackingAction->setIgnoreOpticalPhotons(!m_storeOpticalPhotons);
   trackingAction->setIgnoreSecondaries(!m_storeSecondaries);
-  trackingAction->setKineticEnergyCut(m_energyCut);
+  trackingAction->setSecondariesEnergyCut(m_secondariesEnergyCut);
+  trackingAction->setIgnoreBremsstrahlungPhotons(!m_storeBremsstrahlungPhotons);
+  trackingAction->setBremsstrahlungPhotonsEnergyCut(m_bremsstrahlungPhotonsEnergyCut);
+  trackingAction->setIgnorePairConversions(!m_storePairConversions);
+  trackingAction->setPairConversionsEnergyCut(m_pairConversionsEnergyCut);
+
   runManager.SetUserAction(trackingAction);
 
   //Add the stepping action which provides additional security checks

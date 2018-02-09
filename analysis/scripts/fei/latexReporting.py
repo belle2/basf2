@@ -30,6 +30,10 @@ import glob
 
 
 if __name__ == '__main__':
+    try:
+        output_file = sys.argv[1]
+    except IndexError:
+        raise AttributeError("You have to supply the output tex file.")
 
     particles, configuration = monitoring.load_config()
     monitoringParticle = []
@@ -220,4 +224,4 @@ if __name__ == '__main__':
                       vertex_pre_cut=p.after_vertex[channel.label].purity)
         o += table.finish()
 
-    o.save(sys.argv[1], compile=True)
+    o.save(output_file, compile=True)

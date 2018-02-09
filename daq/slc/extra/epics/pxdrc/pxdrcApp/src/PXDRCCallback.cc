@@ -18,6 +18,11 @@
 
 using namespace Belle2;
 
+const char* PXDRCCallback::pvPScur = "PXD:B:PSC-State:cur:S";
+const char* PXDRCCallback::pvPSreq = "PXD:B:PSC-State:req:S";
+const char* PXDRCCallback::pvRCcur = "PXD:RC:State:cur:S";
+const char* PXDRCCallback::pvRCreq = "PXD:RC:State:req:S";
+
 void printChidInfo(chid chid, const char* message);
 void connectionCallback(struct connection_handler_args args);
 void accessRightsCallback(struct access_rights_handler_args args);
@@ -34,11 +39,11 @@ PXDRCCallback::PXDRCCallback(const NSMNode& node)
 
 void PXDRCCallback::init(NSMCommunicator&) throw()
 {
-  int status = ca_create_channel("B2:PXD:RC:State:cur:S", NULL, NULL, 0, &m_RC_cur);
+  int status = ca_create_channel(pvRCcur, NULL, NULL, 0, &m_RC_cur);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel("B2:PXD:RC:State:req:S", NULL, NULL, 0, &m_RC_req);
+  status = ca_create_channel(pvRCreq, NULL, NULL, 0, &m_RC_req);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
@@ -47,8 +52,8 @@ void PXDRCCallback::init(NSMCommunicator&) throw()
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcconfig", true, false, "default"));
   add(new NSMVHandlerText("dbtable", true, false, "none"));
-  addPV("B2:PXD:RC:State:req:S");
-  addPV("B2:PXD:RC:State:cur:S");
+  addPV(pvRCreq);
+  addPV(pvRCcur);
 }
 
 int PXDRCCallback::putPV(chid cid, const char* val)
@@ -76,7 +81,8 @@ RCState PXDRCCallback::getRCRequest()
 
 void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  if (m_state_req == RCState::NOTREADY_S) {
+  if (m_state_req == RCState::NOTREADY_S || m_state_req == RCState::UNKNOWN) {
+    LogFile::info("set %s>>%s", "READY", pvRCreq);
     putPV(m_RC_req, "READY");
   } else if (m_state_req == RCState::READY_S) {
     setState(RCState::READY_S);
@@ -85,15 +91,17 @@ void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 
 void PXDRCCallback::abort() throw(RCHandlerException)
 {
-  if (m_state_req == RCState::NOTREADY_S) {
+  if (m_state_req == RCState::NOTREADY_S || m_state_req == RCState::UNKNOWN) {
     setState(RCState::NOTREADY_S);
   } else {
+    LogFile::info("set %s>>%s", "NOTREADY", pvRCreq);
     putPV(m_RC_req, "NOTREADY");
   }
 }
 
 void PXDRCCallback::start(int expno, int runno) throw(RCHandlerException)
 {
+  LogFile::info("set %s>>%s", "RUNNING", pvRCreq);
   putPV(m_RC_req, "RUNNING");
 }
 

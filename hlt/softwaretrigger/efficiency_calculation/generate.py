@@ -79,12 +79,16 @@ def add_generation(path, event_class):
 
 
 def main():
+    """Generate the given amount and type of events and store them to disk"""
     # Get all parameters for this calculation
     channel = os.environ.get("channel")
     output_file = os.environ.get("output_file")
     random_seed = os.environ.get("random_seed")
     n_events = int(os.environ.get("n_events"))
     phase = int(os.environ.get("phase"))
+
+    # reset the background folder, this get overwritten when basf2 is sourced
+    os.environ["BELLE2_BACKGROUND_DIR"] = os.environ["GC_BELLE2_BACKGROUND_DIR"]
 
     print("Parameters: ")
     print("channel:", channel)
@@ -106,19 +110,13 @@ def main():
 
     path.add_module("EventInfoSetter", evtNumList=[n_events], expList=expNumber)
 
-    if phase == 2:
-        path.add_module('Gearbox', fileName="geometry/Beast2_phase2.xml")
-    else:
-        path.add_module("Gearbox")
-    path.add_module("Geometry")
-
     add_generation(path, event_class=channel)
 
     # We do not want to have PXD data reduction in the simulation - as this is not performed in the real detector at
     # at this stage
     add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
 
-    add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True)
+    add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True, shortTracks=True)
 
     add_packers(path, components=DEFAULT_HLT_COMPONENTS)
 

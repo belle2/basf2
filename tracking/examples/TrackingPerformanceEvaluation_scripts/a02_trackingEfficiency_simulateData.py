@@ -32,14 +32,9 @@ roi = sys.argv[2]
 bkg = sys.argv[3]
 
 usePXDDataReduction = True
-use_vxdtf2 = False
 
 if (roi == 'noROI'):
     usePXDDataReduction = False
-
-if (roi == 'vxdtf2'):
-    use_vxdtf2 = True
-
 
 bkgFiles = None
 
@@ -57,10 +52,7 @@ if(usePXDDataReduction):
     print('simulating PXD Data Reduction')
 else:
     print('NOT simulating PXD Data Reduction')
-if(use_vxdtf2):
-    print('using vxdtf2')
-else:
-    print('NOT using vxdtf2')
+print('using vxdtf2')
 
 print(release)
 
@@ -82,7 +74,7 @@ root_input.param('inputFileName', input_filename)
 path.add_module(root_input)
 path.add_module(progress)
 
-add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction, use_vxdtf2)
+add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction)
 
 path.add_module(root_output)
 

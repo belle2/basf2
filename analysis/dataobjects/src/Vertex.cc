@@ -68,6 +68,38 @@ int Vertex::getNTracks()
   return m_NTracks;
 }
 
+float Vertex::getTagVl()
+{
+  return m_tagVl;
+}
+
+float Vertex::getTruthTagVl()
+{
+  return m_truthTagVl;
+}
+
+float Vertex::getTagVlErr()
+{
+  return m_tagVlErr;
+}
+
+float Vertex::getTagVol()
+{
+  return m_tagVol;
+}
+
+float Vertex::getTruthTagVol()
+{
+  return m_truthTagVol;
+}
+
+float Vertex::getTagVolErr()
+{
+  return m_tagVolErr;
+}
+
+
+
 void Vertex::setTagVertex(TVector3 TagVertex)
 {
   m_tagVertex = TagVertex;
@@ -117,6 +149,38 @@ void Vertex::setNTracks(int NTracks)
 {
   m_NTracks = NTracks;
 }
+
+void Vertex::setTagVl(float TagVl)
+{
+  m_tagVl = TagVl;
+}
+
+void Vertex::setTruthTagVl(float TruthTagVl)
+{
+  m_truthTagVl = TruthTagVl;
+}
+
+void Vertex::setTagVlErr(float TagVlErr)
+{
+  m_tagVlErr = TagVlErr;
+}
+
+void Vertex::setTagVol(float TagVol)
+{
+  m_tagVol = TagVol;
+}
+
+void Vertex::setTruthTagVol(float TruthTagVol)
+{
+  m_truthTagVol = TruthTagVol;
+}
+
+void Vertex::setTagVolErr(float TagVolErr)
+{
+  m_tagVolErr = TagVolErr;
+}
+
+
 
 void  Vertex::resetTagVertexErrorMatrix()
 {

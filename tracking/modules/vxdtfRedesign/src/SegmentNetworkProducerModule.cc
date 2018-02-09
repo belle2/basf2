@@ -91,6 +91,16 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
            bool(false));
 
+  addParam("maxNetworkSize",
+           m_PARAMmaxNetworkSize,
+           "Maximal size of the SegmentNetwork; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxNetworkSize);
+
+  addParam("maxHitNetworkSize",
+           m_PARAMmaxHitNetworkSize,
+           "Maximal size of the HitNetwork; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxHitNetworkSize);
+
   addParam("observerType",
            m_PARAMobserverType,
            "Use this option for debugging ONLY!"
@@ -464,6 +474,14 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
           } else {
             hitNetwork.addInnerToLastOuterNode(innerNodeID);
           }
+
+          if (hitNetwork.size() > m_PARAMmaxHitNetworkSize) {
+            B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize << "!"
+                    << " Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
+            hitNetwork.clear();
+            return;
+          }
+
         } // inner hit loop
       } // outer hit loop
     } // inner sector loop
@@ -572,6 +590,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         } else {
           segmentNetwork.addInnerToLastOuterNode(innerSegmentID);
         }
+
+        if (segments.size() > m_PARAMmaxNetworkSize) {
+          B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
+                  << ". Network size is " << segmentNetwork.size()
+                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_network.clear();
+          return;
+        }
+
       } // innerHit-loop
     } // centerHit-loop
   } // outerHit-loop

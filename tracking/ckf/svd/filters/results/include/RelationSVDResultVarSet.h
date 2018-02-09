@@ -14,33 +14,13 @@
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
-#include <tracking/ckf/svd/utilities/SVDAdvancer.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const relationSVDResultVarNames[] = {
-    "pt",
-    "theta",
-
-    "cdc_lowest_layer",
     "svd_highest_layer",
-
-    "number_of_hits",
-    "number_of_holes",
-
-    "last_hit_layer",
-    "first_hit_layer",
-
-    "distance_to_cdc_track",
-    "distance_to_cdc_track_xy",
-
     "number_of_hits_related_svd_track",
-
-    "chi2",
-    "chi2_vxd_max",
-    "chi2_vxd_min",
-    "chi2_cdc"
   };
 
   /// Vehicle class to transport the variable names
@@ -63,18 +43,8 @@ namespace Belle2 {
    * which knows the truth information if two tracks belong together or not.
    */
   class RelationSVDResultVarSet : public TrackFindingCDC::VarSet<RelationSVDResultVarNames> {
-    using Super = TrackFindingCDC::VarSet<RelationSVDResultVarNames>;
-
   public:
-    RelationSVDResultVarSet();
-
     /// Generate and assign the variables from the object.
     bool extract(const CKFToSVDResult* object) final;
-
-    /// Set the direction of the advancer
-    void initialize() override;
-  private:
-    /// Findlet for advancing
-    SVDAdvancer m_advancer;
   };
 }

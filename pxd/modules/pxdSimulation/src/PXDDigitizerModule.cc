@@ -41,8 +41,7 @@ REG_MODULE(PXDDigitizer)
 //-----------------------------------------------------------------
 
 PXDDigitizerModule::PXDDigitizerModule() :
-  Module(), m_rootFile(0), m_histSteps(0), m_histDiffusion(0), m_histLorentz_u(
-    0), m_histLorentz_v(0)
+  Module()
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
@@ -79,10 +78,6 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 
-
-  addParam("statisticsFilename", m_rootFilename,
-           "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
-           string(""));
 }
 
 void PXDDigitizerModule::initialize()
@@ -140,24 +135,6 @@ void PXDDigitizerModule::initialize()
   B2DEBUG(20, " -->  ElectronStepTime:   " << m_elStepTime << " ns");
   B2DEBUG(20, " -->  ElectronMaxSteps:   " << m_elMaxSteps);
   B2DEBUG(20, " -->  ADU unit:           " << m_eToADU << " e-/ADU");
-  B2DEBUG(20, " -->  statisticsFilename: " << m_rootFilename);
-
-  if (!m_rootFilename.empty()) {
-    m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
-    m_rootFile->cd();
-    m_histSteps = new TH1D("steps", "Diffusion steps;number of steps",
-                           m_elMaxSteps + 1, 0, m_elMaxSteps + 1);
-    m_histDiffusion = new TH2D("diffusion",
-                               "Diffusion distance;u [um];v [um];", 200, -100, 100, 200, -100,
-                               100);
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 200,
-                               -0.3, 0.3);
-    m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
-    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, v", 100,
-                               -0.1, 0.1);
-    m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
-  }
-
 }
 
 void PXDDigitizerModule::beginRun()
@@ -500,25 +477,4 @@ void PXDDigitizerModule::saveDigits()
   }
 }
 
-void PXDDigitizerModule::terminate()
-{
-  if (m_rootFile) {
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion steps;number of steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be mostly zero in about 40 steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion distance;u [um];v [um];."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, u."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, v."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_rootFile->Write();
-    m_rootFile->Close();
-  }
-}
+void PXDDigitizerModule::terminate() {}

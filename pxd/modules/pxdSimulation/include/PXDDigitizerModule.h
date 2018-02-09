@@ -193,20 +193,6 @@ namespace Belle2 {
       /** Current magnetic field */
       TVector3 m_currentBField;
 
-      /** Name of the ROOT filename to output statistics */
-      std::string m_rootFilename;
-      /** Pointer to the ROOT filename for statistics */
-      TFile* m_rootFile;
-      /** Histogram showing the number of random steps */
-      TH1D*  m_histSteps;
-      /** Histogram showing the diffusion cloud */
-      TH2D*  m_histDiffusion;
-      /** Histogram showing the Lorentz angles in u (r-phi). */
-      TH1D*  m_histLorentz_u;
-      /** Histogram showing the Lorentz angles in v (z). */
-      TH1D*  m_histLorentz_v;
-
-
     };//end class declaration
 
 

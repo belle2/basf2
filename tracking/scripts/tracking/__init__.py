@@ -387,7 +387,8 @@ def add_ckf_based_track_finding(path,
                             VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=reco_tracks)
 
 
-def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=True,
+def add_cdc_track_finding(path, reco_tracks="RecoTracks",
+                          with_ca=True, with_single_segment_tracks=True,
                           track_rejecter_on_ca=False,  # run fake rejecter also on full tracks from CA
                           with_curler_clone_rejection=True,
                           curler_clone_rejection_filter="truth",
@@ -438,6 +439,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=True,
                     trackFilterParameters={"cut": 0.1})
 
     if with_ca:
+        # Use CA to look for further tracks in combinations of remaining axial-stereo segment pairs
         path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
 
@@ -461,10 +463,16 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=True,
                         "Small",
                     ])
 
-    if with_ca:
+    if with_ca and with_single_segment_tracks:
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         MinimalHitsBySuperLayerId={0: 15})
+
+        if track_rejecter_on_ca:
+            path.add_module("TFCDC_TrackRejecter",
+                            inputTracks="CDCTrackVector",
+                            filter="mva",
+                            filterParameters={"cut": 0.1})
 
     if with_curler_clone_rejection:
         path.add_module("TFCDC_CurlerCloneRejecter",

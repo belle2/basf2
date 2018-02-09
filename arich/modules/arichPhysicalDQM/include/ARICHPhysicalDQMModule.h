@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj, Kindo Haruki                               *
+ * Contributors: Kindo Haruki                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHPYSICALDQMMODULE_H
-#define ARICHPYSICALDQMMODULE_H
+#ifndef ARICHPHYSICALDQMMODULE_H
+#define ARICHPHYSICALDQMMODULE_H
 
 #include <framework/core/HistoModule.h>
 
@@ -87,9 +87,6 @@ namespace Belle2 {
 
   protected:
     bool m_debug;/**<debug*/
-    std::string m_outputFileName;/**<Output .root file name*/
-
-    TFile* results = NULL;/**<Output file*/
 
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/
@@ -106,7 +103,6 @@ namespace Belle2 {
     TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
     TH2* h_gelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
     TH2* h_gelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/
-    //TH1* h_mergersHit[72] = {};/**<Extraction of h_chHit specified each Merger Board*/
 
     TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
     TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
@@ -117,8 +113,8 @@ namespace Belle2 {
 
     //Monitoring parameters
 
-    double m_momUpLim = 0;/**<Upper momentum limit of tracks use (if set 0, no limit is applied)*/
-    double m_momDnLim = 0;/**<Lower momentum limit of tracks used (if set 0, no limit is applied)*/
+    double m_momUpLim = 0;/**<Upper momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
+    double m_momDnLim = 0;/**<Lower momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
 
   };
 

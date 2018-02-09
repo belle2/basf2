@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj, Kindo Haruki                               *
+ * Contributors: Kindo Haruki                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -77,7 +77,6 @@ namespace Belle2 {
     // set module description (e.g. insert text)
     setDescription("Make summary of data quality.");
     setPropertyFlags(c_ParallelProcessingCertified);
-    addParam("OutputFileName", m_outputFileName, "Output file name", string("ARICHPhysicalDQMResult.root"));
     addParam("debug", m_debug, "debug mode", false);
     addParam("UpperMomentumLimit", m_momUpLim, "Upper momentum limit of tracks included in monitoring", 0.);
     addParam("LowerMomentumLimit", m_momDnLim, "Lower momentum limit of tracks included in monitoring", 0.);
@@ -89,13 +88,6 @@ namespace Belle2 {
 
   void ARICHPhysicalDQMModule::defineHisto()
   {
-
-    /*
-    TDirectory* oldDir = gDirectory;
-    TDirectory* dirARICHPhys = NULL;
-    dirARICHPhys = oldDir->mkdir("ARICHPhysDQM");
-    dirARICHPhys->cd();
-    */
     //Histograms for analysis and statistics
 
     h_chStat = newTH1("h_chStat", "Status of channels;# of channel;Status", 420 * 144, -0.5, 420 * 144 - 0.5, kRed, kRed);
@@ -128,9 +120,26 @@ namespace Belle2 {
                                 20, 0, 20, 20, 0, 20, kRed, kRed);
     }
 
-    for (int i = 0; i < 72; i++) {
-      h_mergersHit[i] = newTH1(Form("h_mergerHit_%d", i), Form("# of hits in merger No%d;# of channel;# of hits", i), 144 * 6, -0.5,
-                               144 * 6 - 0.5, kRed, kRed);
+    //Select "LIVE" monitoring histograms
+    h_chStat->SetOption("LIVE");
+    h_aeroStat->SetOption("LIVE");
+
+    h_chHit->SetOption("LIVE");
+    h_chipHit->SetOption("LIVE");
+    h_hapdHit->SetOption("LIVE");
+    h_mergerHit->SetOption("LIVE");
+    h_gelHit->SetOption("LIVE");
+    h_bits->SetOption("LIVE");
+    h_hits2D->SetOption("LIVE");
+    h_tracks2D->SetOption("LIVE");
+
+    h_hitsPerEvent->SetOption("LIVE");
+    h_theta->SetOption("LIVE");
+    h_hitsPerTrack->SetOption("LIVE");
+
+    for (int i = 0; i < 6; i++) {
+      h_secTheta[i]->SetOption("LIVE");
+      h_secHitsPerTrack[i]->SetOption("LIVE");
     }
   }
 
@@ -154,6 +163,32 @@ namespace Belle2 {
 
   void ARICHPhysicalDQMModule::beginRun()
   {
+
+    h_chStat->Reset();
+    h_aeroStat->Reset();
+
+    h_chHit->Reset();
+    h_chipHit->Reset();
+    h_hapdHit->Reset();
+    h_mergerHit->Reset();
+    h_gelHit->Reset();
+    h_bits->Reset();
+    h_hits2D->Reset();
+    h_tracks2D->Reset();
+    for (int i = 0; i < 124; i++) {
+      h_gelHits2D[i]->Reset();
+      h_gelTracks2D[i]->Reset();
+    }
+
+    h_hitsPerEvent->Reset();
+    h_theta->Reset();
+    h_hitsPerTrack->Reset();
+
+    for (int i = 0; i < 6; i++) {
+      h_secTheta[i] = {};
+      h_secHitsPerTrack[i] = {};
+    }
+
   }
 
   void ARICHPhysicalDQMModule::event()
@@ -209,11 +244,6 @@ namespace Belle2 {
       nHit++;
     }
     h_hitsPerEvent->Fill(nHit);
-    /*
-    for(int i=0;i<72;i++){
-      h_mergersHit[i]->Scale(0);
-      h_mergersHit[i]->Add(mergerClusterHitMap1D(h_chHit,i));
-    }*/
 
     for (const auto& arichLikelihood : arichLikelihoods) {
 
@@ -305,36 +335,6 @@ namespace Belle2 {
 
   void ARICHPhysicalDQMModule::terminate()
   {
-
-    results = new TFile(m_outputFileName.c_str(), "recreate");
-
-    //h_hits2D->Divide(h_tracks2D);
-
-    h_chHit->Write();
-    h_chipHit->Write();
-    h_hapdHit->Write();
-    h_mergerHit->Write();
-    h_gelHit->Write();
-    h_bits->Write();
-    h_hits2D->Write();
-    h_tracks2D->Write();
-    for (int i = 0; i < 124; i++) {
-      h_gelHits2D[i]->Write();
-      h_gelTracks2D[i]->Write();
-    }
-    //for(int i=0;i<72;i++){
-    //  h_mergersHit[i]->Write();
-    //}
-
-    h_hitsPerEvent->Write();
-    h_theta->Write();
-    h_hitsPerTrack->Write();
-    for (int i = 0; i < 6; i++) {
-      h_secTheta[i]->Write();
-      h_secHitsPerTrack[i]->Write();
-    }
-
-    results->Close();
   }
 }
 

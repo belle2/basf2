@@ -76,6 +76,9 @@ namespace Belle2 {
     /** Print data. */
     bool m_PrintData;
 
+    /** Check calibration-mode data. */
+    bool m_CheckCalibration;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 

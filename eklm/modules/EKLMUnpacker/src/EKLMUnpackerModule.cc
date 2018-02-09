@@ -29,6 +29,8 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string(""));
   addParam("PrintData", m_PrintData, "Print data.", false);
+  addParam("CheckCalibration", m_CheckCalibration,
+           "Check calibration-mode data.", false);
   m_GeoDat = NULL;
 }
 
@@ -58,7 +60,11 @@ void EKLMUnpackerModule::event()
    * detector buffer.
    */
   const int hitLength = 2;
+  int i1, i2;
   int endcap, layer, sector;
+  int laneNumber;
+  int nBlocks;
+  uint16_t dataWords[4];
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
@@ -90,12 +96,55 @@ void EKLMUnpackerModule::event()
           B2ERROR("Incorrect number of data words: " << numDetNwords);
           continue;
         }
+        if (m_CheckCalibration) {
+          std::map<int, int> blockLanes;
+          std::map<int, int>::iterator it;
+          uint16_t blockData[15];
+          if (numHits % 75 != 0) {
+            B2ERROR("The number of hits in the calibration mode (" <<
+                    numHits << ") is not a multiple of 75.");
+          } else {
+            nBlocks = numHits / 15;
+            for (i1 = 0; i1 < nBlocks; i1++) {
+              blockLanes.clear();
+              for (i2 = 0; i2 < 15; i2++) {
+                blockData[i2] = (buf_slot[(i1 * 15 + i2) * hitLength + 0]
+                                 >> 16) & 0xFFFF;
+                laneNumber = (blockData[i2] >> 8) & 0x1F;
+                it = blockLanes.find(laneNumber);
+                if (it == blockLanes.end())
+                  blockLanes.insert(std::pair<int, int>(laneNumber, 1));
+                else
+                  it->second++;
+              }
+              if (blockLanes.size() != 1) {
+                char buf[1024];
+                std::string errorMessage;
+                errorMessage = "Corrupted data block found. Lane numbers:\n";
+                for (it = blockLanes.begin(); it != blockLanes.end(); ++it) {
+                  errorMessage += (std::string("Lane ") +
+                                   std::to_string(it->first) + ": " +
+                                   std::to_string(it->second) + " time(s).\n");
+                }
+                errorMessage += "All first data words:\n";
+                for (i2 = 0; i2 < 15; i2++) {
+                  snprintf(buf, 1024, "%04x", blockData[i2]);
+                  errorMessage += buf;
+                  if (i2 < 15)
+                    errorMessage += " ";
+                }
+                errorMessage += "\n";
+                B2ERROR(errorMessage);
+              }
+            }
+          }
+        }
         for (int iHit = 0; iHit < numHits; iHit++) {
-          uint16_t bword2 =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
-          uint16_t bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
-          uint16_t bword4 =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          uint16_t bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
-          uint16_t strip = bword1 & 0x7F;
+          dataWords[0] = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
+          dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          dataWords[2] = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
+          dataWords[3] =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
+          uint16_t strip = dataWords[0] & 0x7F;
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from
@@ -104,17 +153,17 @@ void EKLMUnpackerModule::event()
           if (!m_GeoDat->checkStrip(strip, false)) {
             B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
           }
-          uint16_t plane = ((bword1 >> 7) & 1) + 1;
+          uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
           /*
            * The possible values of the plane number in the raw data are from
            * 1 to 2. The range is the same as in the detector geometry.
            * Consequently, a check of the plane number is useless: it is
            * always correct.
            */
-          lane.setLane((bword1 >> 8) & 0x1F);
-          uint16_t ctime  =   bword2 & 0xFFFF;
-          uint16_t tdc    =   bword3 & 0x7FF;
-          uint16_t charge =   bword4 & 0xFFF;
+          lane.setLane((dataWords[0] >> 8) & 0x1F);
+          uint16_t ctime = dataWords[1] & 0xFFFF;
+          uint16_t tdc = dataWords[2] & 0x7FF;
+          uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == NULL) {
             B2ERROR("Lane with copper = " << lane.getCopper() <<
@@ -127,7 +176,7 @@ void EKLMUnpackerModule::event()
                                                  &endcap, &layer, &sector);
           if (m_PrintData) {
             printf("%04x %04x %04x %04x %1d %2d %1d %1d %2d\n",
-                   bword1, bword2, bword3, bword4,
+                   dataWords[0], dataWords[1], dataWords[2], dataWords[3],
                    endcap, layer, sector, plane, strip);
           }
           eklmDigit = m_Digits.appendNew();

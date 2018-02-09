@@ -444,8 +444,8 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=True,
         if track_rejecter_on_ca:
             path.add_module("TFCDC_TrackRejecter",
                             inputTracks="CDCTrackVector2",
-                            trackFilter="mva",
-                            trackFilterParameters={"cut": 0.1})
+                            filter="mva",
+                            filterParameters={"cut": 0.1})
 
         # Overwrites the origin CDCTrackVector
         path.add_module("TFCDC_TrackCombiner",

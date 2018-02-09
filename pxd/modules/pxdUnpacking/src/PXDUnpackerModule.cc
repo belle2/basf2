@@ -1028,7 +1028,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
         if (len >= dhc.data_onsen_roi_frame->getMinSize()) {
           if ((len - dhc.data_onsen_roi_frame->getMinSize()) % 8 != 0) {
-            dump_roi(data, len - 4); // minus CRC
+            // dump_roi(data, len - 4); // dump ROI payload, minus CRC
+            /// TODO ... set ERROR flag!
           }
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;

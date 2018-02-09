@@ -88,6 +88,12 @@ namespace Belle2 {
 
   void ARICHPhysicalDQMModule::defineHisto()
   {
+
+    TDirectory* oldDir = gDirectory;
+    TDirectory* dirARICHDQM = NULL;
+    dirARICHDQM = oldDir->mkdir("ARICHDQM");
+    dirARICHDQM->cd();
+
     //Histograms for analysis and statistics
 
     h_chStat = newTH1("h_chStat", "Status of channels;# of channel;Status", 420 * 144, -0.5, 420 * 144 - 0.5, kRed, kRed);
@@ -141,6 +147,8 @@ namespace Belle2 {
       h_secTheta[i]->SetOption("LIVE");
       h_secHitsPerTrack[i]->SetOption("LIVE");
     }
+
+    oldDir->cd();
   }
 
   void ARICHPhysicalDQMModule::initialize()

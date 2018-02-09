@@ -479,7 +479,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->hasTriggerClusterMatching();
+        result = shower->hasPulseShapeDiscrimination();
       }
       return result;
     }
@@ -702,6 +702,8 @@ namespace Belle2 {
                       "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
+    REGISTER_VARIABLE("ClusterPulseShapeDiscrimination", eclClusterPulseShapeDiscrimination,
+                      "Status bit to indicate if cluster has waveforms for computing PSD variables.");
     REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
                       "Returns ECL cluster's hadron scintillation component intensity.");
     REGISTER_VARIABLE("ClusterNumverofHadronDigits", eclClusterNumberofHadronDigits,

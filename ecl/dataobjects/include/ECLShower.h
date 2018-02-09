@@ -36,11 +36,12 @@ namespace Belle2 {
       /** bit 1:  Hot crystal within nominal shower neighbour region.  */
       c_hasHotCrystal = 2 << 0,
 
-      /** bit 2:  Shower has pulse shape discrimination variables.  */
-      c_hasPulseShapeDiscrimination = 3 << 0,
-
       /** combined flag to test whether the shower is 'problematic' */
       c_hasProblematicCrystal = c_hasDeadCrystal | c_hasHotCrystal,
+
+      /** bit 3:  Shower has pulse shape discrimination variables.  */
+      c_hasPulseShapeDiscrimination = 4 << 0,
+
     };
 
     /** Default constructor for ROOT */

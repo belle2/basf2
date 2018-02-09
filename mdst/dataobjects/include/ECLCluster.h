@@ -34,8 +34,8 @@ namespace Belle2 {
       c_TriggerCluster   = 1 << 0,
       /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
       c_TriggerClusterMatching = 1 << 1,
-      /** bit 2: ECLCluster has pulse shape discrimination variables.*/
-      c_PulseShapeDiscrimination = 1 << 2,
+      /** bit 3: ECLCluster has pulse shape discrimination variables.*/
+      c_PulseShapeDiscrimination = 4 << 0,
     };
 
     /**

@@ -51,7 +51,7 @@ void SPTC2RTConverterModule::initialize()
 
   // Write out RecoTracks
   m_recoTracks = StoreArray<RecoTrack>(m_param_recoTracksStoreArrayName);
-  m_recoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  m_recoTracks.registerInDataStore();
   RecoTrack::registerRequiredRelations(m_recoTracks,
                                        "",
                                        m_param_svdHitsStoreArrayName,

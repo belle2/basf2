@@ -489,7 +489,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     // We see a second "header" with framenr+1 ...
     B2ERROR("DHP data: seems to be double header! skipping ... len " << frame_len);
     m_errorMask |= EPXDErrMask::c_DHP_DBL_HEADER;
-    dump_dhp(data, frame_len);
+    // dump_dhp(data, frame_len); print out guilty dhp packet
 //    B2ERROR("Mask $" << hex <<m_errorMask);
     return;
   }
@@ -518,8 +518,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
         if (!rowflag) {
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= EPXDErrMask::c_DHP_PIX_WO_ROW;
-//           dhp_pixel_error++;
-          dump_dhp(data, frame_len);
+          // dump_dhp(data, frame_len);// print out faulty dhp frame
           return;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
@@ -565,9 +564,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F /*,
-                                                        dhp_cm, dhp_readout_frame_lo, dhe_first_readout_frame_id_lo*/
-                                                       );
+                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
         }
       }
     }
@@ -1031,7 +1028,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
         if (len >= dhc.data_onsen_roi_frame->getMinSize()) {
           if ((len - dhc.data_onsen_roi_frame->getMinSize()) % 8 != 0) {
-            PXDUnpackerModule::dump_roi(data, len - 4); // minus CRC
+            dump_roi(data, len - 4); // minus CRC
           }
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;

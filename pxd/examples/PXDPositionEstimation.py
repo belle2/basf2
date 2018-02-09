@@ -134,7 +134,7 @@ class PXDPositionEstimation(Module):
                     # print("    Matched cluster shape {} -> index {}".format(shape_name, shape_index))
                     # print("    Matched cluster eta={:.5f}".format(eta))
 
-                    if not reject:
+                    if not reject and mom.Mag() > 0.02:
 
                         self.nclusters += 1
 

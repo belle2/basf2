@@ -29,7 +29,7 @@
 
 namespace Belle2 {
 
-  using NodeList = std::vector<std::pair<int, int> >;
+  using NodeList = std::vector<std::vector<int> >;
 
   static constexpr int mergerWidth = 256;
   static constexpr int nAllMergers = 146;
@@ -44,10 +44,10 @@ namespace Belle2 {
   struct SubTrigger {
     SubTrigger(std::string inName,
                unsigned inEventWidth, unsigned inOffset,
-               unsigned inHeaderSize, std::pair<int, int> inNodeID,
+               unsigned inHeaderSize, std::vector<int> inNodeID,
                int inDebugLevel = 0) :
       name(inName), eventWidth(inEventWidth), offset(inOffset),
-      headerSize(inHeaderSize), iNode(inNodeID.first), iFinesse(inNodeID.second),
+      headerSize(inHeaderSize), iNode(inNodeID.front()), iFinesse(inNodeID.back()),
       debugLevel(inDebugLevel) {};
 
     std::string name;

@@ -38,7 +38,7 @@ namespace Belle2 {
   struct Merger : SubTrigger {
     Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
            unsigned inEventWidth, unsigned inOffset,
-           unsigned inHeaderSize, std::pair<int, int> inNodeID,
+           unsigned inHeaderSize, std::vector<int> inNodeID,
            unsigned inNInnerMergers, int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset, inHeaderSize, inNodeID,
                  inDebugLevel),
@@ -108,7 +108,7 @@ namespace Belle2 {
     Tracker2D(StoreArray<TSFOutputBitStream>* inArrayPtr,
               StoreArray<T2DOutputBitStream>* outArrayPtr,
               std::string inName, unsigned inEventWidth, unsigned inOffset,
-              unsigned inHeaderSize, std::pair<int, int> inNodeID,
+              unsigned inHeaderSize, std::vector<int> inNodeID,
               unsigned inNumTS, int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset / 32, inHeaderSize, inNodeID,
                  inDebugLevel),

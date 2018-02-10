@@ -122,7 +122,7 @@ namespace Belle2 {
       /** Digitize one event */
       virtual void event();
       /** Terminate the module */
-      virtual void terminate();
+      //virtual void terminate();
 
     protected:
       /** Wether or not to apply noise */

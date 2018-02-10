@@ -1,28 +1,30 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef INTERNALPARTICLE_H
-#define INTERNALPARTICLE_H
+#pragma once
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <vector>
 
-//using namespace CLHEP;
-
 namespace TreeFitter {
 
+  /** another unneccessary layer of abstraction */
   class InternalParticle : public ParticleBase {
+
   public:
+
+    /** constructor */
     InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                      bool forceFitAll) ;
-    virtual ~InternalParticle() ;
+
+    /** destructor */
+    virtual ~InternalParticle() {};
 
     /** init covariance */
     virtual ErrCode initCovariance(FitParams*) const;
@@ -30,7 +32,7 @@ namespace TreeFitter {
     /** project kinematical constraint */
     ErrCode projectKineConstraint(const FitParams&, Projection&) const;
 
-    /** enforece conservation of momentum sum*/
+    /** enforce conservation of momentum sum*/
     virtual void forceP4Sum(FitParams&) const;
 
     /** init particle in case it has a mother */
@@ -42,38 +44,39 @@ namespace TreeFitter {
     /** find out which constraint it is and project */
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
 
-    /**  */
+    /** space reesrvered in fit params  */
     virtual int dim() const { return mother() ? 8 : 7 ; }
 
-    /**  */
+    /**  type */
     virtual int type() const { return kInternalParticle ; }
 
-    /**  */
+    /**   posintion index in fit params*/
     virtual int posIndex() const { return index()   ; }
-    /**  */
+
+    /** tau index in fit params  */
     virtual int tauIndex() const { return mother() ? index() + 3 : -1 ; }
-    /**  */
+
+    /** momentum index in fit params  */
     virtual int momIndex() const { return mother() ? index() + 4 : index() + 3 ; }
-    /**  */
+
+    /** has energy in fitparams  */
     virtual bool hasEnergy() const { return true ; }
-    /**  */
+
+    /** has postion index  */
     virtual bool hasPosition() const { return true ; }
-    /**  */
+
+    /** name  */
     virtual std::string parname(int index) const ;
 
-    /**  */
+    /** add to constraint list  */
     virtual void addToConstraintList(constraintlist& list, int depth) const ;
 
-    /**  */
+    /** set mass cosntraint flag */
     void setMassConstraint(bool b) { m_massconstraint = b ; }
 
-    /**  */
+    /** rotate in positive phi domain  */
     double phidomain(const double);
 
-    //should be moved back to helixutils
-    /**  */
-    double helixPoca(const CLHEP::HepVector&, const CLHEP::HepVector&,
-                     double&, double&, TVector3&, bool);
   protected:
 
     /** init momentum of *this and daughters */
@@ -81,15 +84,14 @@ namespace TreeFitter {
 
   private:
 
-    /**  */
+    /** has mass cosntraint */
     bool m_massconstraint ;
-    /**  */
+
+    /** has lifetime constraint  */
     bool m_lifetimeconstraint ;
-    /**  */
+
+    /** is conversion  */
     bool m_isconversion ;
   } ;
 
 }
-
-
-#endif //INTERNALPARTICLE_H

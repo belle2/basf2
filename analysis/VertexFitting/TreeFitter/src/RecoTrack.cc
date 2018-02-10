@@ -41,8 +41,6 @@ namespace TreeFitter {
     }
   }
 
-  RecoTrack::~RecoTrack() {}
-
   ErrCode RecoTrack::initParticleWithMother(FitParams* fitparams)
   {
 
@@ -124,19 +122,16 @@ namespace TreeFitter {
     positionAndMom.segment(0, 3) =  fitparams.getStateVector().segment(posindexmother, 3);
     positionAndMom.segment(3, 3) =  fitparams.getStateVector().segment(momindex, 3);
     Eigen::Matrix<double, 5, 6> jacobian = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
-#ifdef HELIX_TEST
-    //Test the Helix functions
-    HelixUtils::helixTest();
-#endif
+
     // translate into trackparameters
     Belle2::Helix helix;
 #ifndef NUMERICAL_JACOBIAN
     double flt;
     HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
-
 #else
     HelixUtils::getHelixAndJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
 #endif
+
     // get the measured track parameters at the poca to the mother
     if (!m_cached) {
       RecoTrack* nonconst =  const_cast<RecoTrack*>(this);

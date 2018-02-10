@@ -1,7 +1,7 @@
 /**************************************************************************
  *
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
@@ -9,9 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Creates photons and other neutrals from cluster objects. Currently only tested for photons.
-
-//#include <stdio.h>
 #include <framework/logging/Logger.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -27,26 +24,20 @@
 #include <framework/gearbox/Const.h>
 
 namespace TreeFitter {
-  extern int vtxverbose ;
 
   RecoPhoton::RecoPhoton(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother),
       m_dim(3),
       m_init(false),
       m_useEnergy(useEnergy(*particle)),
-      m_clusterPars(),//use params for dim if klongs come into the game
+      m_clusterPars(),
       m_covariance()
   {
     initParams() ;
   }
 
-  RecoPhoton::~RecoPhoton()
-  {
-  }
-
   ErrCode RecoPhoton::initParticleWithMother(FitParams* fitparams)
   {
-    // calculate the direction
     const int posindexmother = mother()->posIndex();
 
     Eigen::Matrix<double, 1, 3> vertexToCluster = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
@@ -55,9 +46,9 @@ namespace TreeFitter {
     }
 
     const double distanceToMother = vertexToCluster.norm();
-    // get the energy
     const double energy =  m_clusterPars(3);
     const int momindex = momIndex();
+
     for (unsigned int i = 0; i < 3; ++i) {
       //px = E dx/|dx|
       fitparams->getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
@@ -108,6 +99,7 @@ namespace TreeFitter {
     const Belle2::ECLCluster* cluster = particle()->getECLCluster();
     const TVector3 centroid = cluster->getClusterPosition();
     const double energy = cluster->getEnergy();
+
     m_init = true;
     m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
     Belle2::ClusterUtils C;
@@ -175,13 +167,12 @@ namespace TreeFitter {
     } else if ((std::abs(p_vec[2]) >= std::abs(p_vec[1])) && (std::abs(p_vec[2]) >= std::abs(p_vec[0]))) {
       i1 = 2; i2 = 1; i3 = 0;
     } else {
-      // this should never happen
       B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
               << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
       return ErrCode(ErrCode::photondimerror);
     }
 
-    if (0 == p_vec[i1]) {return ErrCode(ErrCode::photondimerror);}
+    if (0 == p_vec[i1]) { return ErrCode(ErrCode::photondimerror); }
 
     // p_vec[i1] must not be 0
     const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];

@@ -1,21 +1,18 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Creates reconstructed resonances. This is not actually used or tested yet in basf2, but is kept for future use. Be careful! It likely won't work out of the box as of release-00-08-00
 
-//#include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 namespace TreeFitter {
-  extern int vtxverbose ;
 
   RecoResonance::RecoResonance(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoComposite(particle, mother) {}
@@ -27,8 +24,8 @@ namespace TreeFitter {
 
   ErrCode RecoResonance::initMotherlessParticle(FitParams* fitparams)
   {
-    int posindex = posIndex();
-    int momindex = momIndex();
+    const int posindex = posIndex();
+    const int momindex = momIndex();
 
     //quick map for parameters
     int indexmap[7];
@@ -45,8 +42,6 @@ namespace TreeFitter {
     }
     return ErrCode::success;
   }
-
-  RecoResonance::~RecoResonance() {};
 
   ErrCode RecoResonance::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {
@@ -65,6 +60,4 @@ namespace TreeFitter {
   {
     return ParticleBase::parname(index + 4);
   }
-
-
 }

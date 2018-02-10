@@ -13,8 +13,6 @@
 
 #include <iostream>
 #include <TMath.h>
-#include <CLHEP/Matrix/Vector.h>
-#include <CLHEP/Matrix/Matrix.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -111,256 +109,6 @@ namespace TreeFitter {
 #endif
   }
 
-  void HelixUtils::helixFromVertex(const TVector3& position,
-                                   const TVector3& momentum,
-                                   int charge, double Bz,
-                                   Belle2::Helix& helix,
-                                   double& L,
-                                   CLHEP::HepMatrix& jacobian)
-  {
-
-#ifdef OLDHELIX
-
-    // first copy
-    double x  = position.X() ;
-    double y  = position.Y() ;
-    double z  = position.Z() ;
-    double px = momentum.X() ;
-    double py = momentum.Y() ;
-    double pz = momentum.Z() ;
-    helix = Belle2::Helix(position, momentum, charge, Bz);
-    L = helix.getArcLength2DAtXY(position.X(), position.Y());
-    const double alpha  =  helix.getAlpha(Bz);
-    const double a = 1 / alpha;
-    //    const double a  = Bz * Belle2::Unit::T * Belle2::Const::speedOfLight;
-
-    // omega
-    double aq    = a * charge ;
-    double pt2   = px * px + py * py ;
-    double pt    = sqrt(pt2) ;
-    double omega = aq / pt ;
-    cout << "calculated omega = " << omega << endl;
-    cout << "helix omega = " << helix.getOmega() << endl;
-    //    double omega = helix.getOmega();
-
-    // now tandip
-    double tandip = pz / pt ;
-    cout << "calculated tanlambda = " << tandip << endl;
-    cout << "helix tanlambda = " << helix.getTanLambda() << endl;
-    //double tandip = helix.getTanLambda();
-
-    // now phi0
-    double phi     = atan2(py, px);
-    double px0 = px + aq * y ;
-    double py0 = py - aq * x ;
-    double phi0    = atan2(py0, px0) ;
-    cout << "calculated phi0 = " << phi0 << endl;
-    cout << "helix phi0 = " << helix.getPhi0() << endl;
-    //    double phi0    = helix.getPhi0();
-
-    // now d0
-    double pt02 = px0 * px0 + py0 * py0 ;
-    double pt0 = sqrt(pt02) ;
-    double d0 = - (pt0 - pt) / aq ;//FT changed sign temporarily
-    cout << "calculated d0 = " << d0 << endl;
-    cout << "helix d0 = " << helix.getD0() << endl;
-    //    double d0 = helix.getD0();
-
-    // now z0
-    double deltaphi = phi - phi0 ;
-    if (deltaphi >  TMath::Pi()) deltaphi -= TMath::TwoPi() ;
-    else if (deltaphi < -TMath::Pi()) deltaphi += TMath::TwoPi() ;
-    double l  = deltaphi / omega ;
-    double z0 = z - tandip * l ;
-    cout << "calculated z0 = " << z0 << endl;
-    cout << "helix z0 = " << helix.getZ0() << endl;
-    //    double z0 = helix.getZ0();
-
-    // now L
-    double p2 = pt2 + pz * pz ;
-    double p  = sqrt(p2) ;
-    cout << "calculated arclength = " << l* p / pt << endl;
-    cout << "helix arclenght = " << L << endl;
-    //    L = l * p / pt ;
-
-    // all derivatives.
-    double dptdpx    = px / pt ;
-    double dptdpy    = py / pt ;
-    double domegadpt = -omega / pt ;
-    double dpt0dpx   = px0 / pt0 ;
-    double dpt0dpy   = py0 / pt0 ;
-    double dpt0dx    = -aq * dpt0dpy ;
-    double dpt0dy    = aq * dpt0dpx ;
-    double dpdpx     = px / p ;
-    double dpdpy     = py / p ;
-
-    double domegadpx = domegadpt * dptdpx ;
-    double domegadpy = domegadpt * dptdpy ;
-
-    double dphidpx = -py / pt2 ;
-    double dphidpy = px / pt2 ;
-
-    double dphi0dpx = -py0 / pt02 ;
-    double dphi0dpy = px0 / pt02 ;
-    double dphi0dx  = -aq * dphi0dpy ;
-    double dphi0dy  = aq * dphi0dpx ;
-
-    double dd0dpx = - (dpt0dpx - dptdpx) / aq ; //FT also changed sign to all derivatives
-    double dd0dpy = - (dpt0dpy - dptdpy) / aq ;
-    double dd0dx  = - dpt0dx / aq ;
-    double dd0dy  = - dpt0dy / aq ;
-
-    double dldx  = -dphi0dx / omega ;
-    double dldy  = -dphi0dy / omega ;
-    double dldpx = (dphidpx - dphi0dpx - l * domegadpx) / omega ;
-    double dldpy = (dphidpy - dphi0dpy - l * domegadpy) / omega ;
-
-    double dLdx  = dldx * L / l ;
-    double dLdy  = dldy * L / l ;
-    double dLdpx = L * (dldpx / l + dpdpx / p - dptdpx / pt) ;
-    double dLdpy = L * (dldpy / l + dpdpy / p - dptdpy / pt) ;
-    //double dLdpx = L*(dldpx/l - px*pz*pz/(p2*pt2)) ;
-    //double dLdpy = L*(dldpy/l - py*pz*pz/(p2*pt2)) ;
-    double dLdpz = l * pz / (pt * p) ;
-
-    double dtandipdpx = -dptdpx * tandip / pt ;
-    double dtandipdpy = -dptdpy * tandip / pt ;
-    double dtandipdpz = 1 / pt ;
-
-    double dz0dx  = -tandip * dldx ;
-    double dz0dy  = -tandip * dldy ;
-    double dz0dz  = 1;
-    double dz0dpx = -tandip * dldpx - l * dtandipdpx ;
-    double dz0dpy = -tandip * dldpy - l * dtandipdpy ;
-    double dz0dpz = -l * dtandipdpz ;
-
-    //now copy everything back
-    //    helix = Belle2::Helix(d0,phi0,omega,z0,tandip);
-    //   helix = Belle2::Helix(position, momentum,charge,Bz);
-    // the row is helixpar, the column the vertexpar
-    /*
-    cout << "D0: " << d0 << " (BaBar) :" << helix.getD0() << " (Belle)" << endl;
-    cout << "Phi0: " << phi0 << " (BaBar) :" << helix.getPhi0() << " (Belle)" << endl;
-    cout << "Omega: " << omega << " (BaBar) :" << helix.getOmega() << " (Belle)" << endl;
-    cout << "Z0: " << z0 << " (BaBar) :" << helix.getZ0() << " (Belle)" << endl;
-    cout << "TanLambda: " << tandip << " (BaBar) :" << helix.getTanLambda() << " (Belle)" << endl;
-    */
-    if (jacobian.num_col() != 6 || jacobian.num_row() != 5)
-      jacobian = CLHEP::HepMatrix(5, 6) ;
-
-    if (jacobian.num_col() == 6 && jacobian.num_row() == 5) {
-      for (int row = 0; row < 5; ++row)
-        for (int col = 0; col < 6; ++col)
-          jacobian[row][col] = 0 ;
-
-      jacobian[iOmega][iX] = 0 ;
-      jacobian[iOmega][iY] = 0 ;
-      jacobian[iOmega][iZ] = 0 ;
-      jacobian[iOmega][iPx] = domegadpx ;
-      jacobian[iOmega][iPy] = domegadpy ;
-      jacobian[iOmega][iPz] = 0 ;
-
-      jacobian[iPhi0][iX]  = dphi0dx ;
-      jacobian[iPhi0][iY]  = dphi0dy ;
-      jacobian[iPhi0][iZ]  = 0 ;
-      jacobian[iPhi0][iPx] = dphi0dpx ;
-      jacobian[iPhi0][iPy] = dphi0dpy ;
-      jacobian[iPhi0][iPz] = 0 ;
-
-      jacobian[iD0][iX]  = dd0dx ;
-      jacobian[iD0][iY]  = dd0dy ;
-      jacobian[iD0][iZ]  = 0 ;
-      jacobian[iD0][iPx] = dd0dpx ;
-      jacobian[iD0][iPy] = dd0dpy ;
-      jacobian[iD0][iPz] = 0 ;
-
-      jacobian[iTanLambda][iX] = 0 ;
-      jacobian[iTanLambda][iY] = 0 ;
-      jacobian[iTanLambda][iZ] = 0 ;
-      jacobian[iTanLambda][iPx] = dtandipdpx ;
-      jacobian[iTanLambda][iPy] = dtandipdpy ;
-      jacobian[iTanLambda][iPz] = dtandipdpz ;
-
-      jacobian[iZ0][iX]  = dz0dx ;
-      jacobian[iZ0][iY]  = dz0dy ;
-      jacobian[iZ0][iZ]  = dz0dz ;
-      jacobian[iZ0][iPx] = dz0dpx ;
-      jacobian[iZ0][iPy] = dz0dpy ;
-      jacobian[iZ0][iPz] = dz0dpz ;
-      /*
-      jacobian[iArcLength2D][iX]  = dLdx ;
-      jacobian[iArcLength2D][iY]  = dLdy ;
-      jacobian[iArcLength2D][iZ]  = 0 ;
-      jacobian[iArcLength2D][iPx] = dLdpx ;
-      jacobian[iArcLength2D][iPy] = dLdpy ;
-      jacobian[iArcLength2D][iPz] = dLdpz ;
-      */
-    }
-#else
-    helix = Belle2::Helix(position, momentum, charge, Bz);
-    L = helix.getArcLength2DAtXY(position.X(), position.Y());
-    const double alpha =  helix.getAlpha(Bz);
-
-    //Copied from Belle2::UncertainHelix
-    // COMPLETELY WRONG SINCE IT ASSUMES IT'S IN THE PERIGEE,
-    // ONLY A PLACEHOLDER FOR NOW
-    // 1. Rotate to a system where phi0 = 0
-    TMatrixD jacobianRot(6, 6);
-    jacobianRot.Zero();
-
-    const double px = momentum.X();
-    const double py = momentum.Y();
-    const double pt = hypot(px, py);
-    const double cosPhi0 = px / pt;
-    const double sinPhi0 = py / pt;
-
-    // Passive rotation matrix by phi0:
-    jacobianRot(iX, iX) = cosPhi0;
-    jacobianRot(iX, iY) = sinPhi0;
-    jacobianRot(iY, iX) = -sinPhi0;
-    jacobianRot(iY, iY) = cosPhi0;
-    jacobianRot(iZ, iZ) = 1.0;
-
-    jacobianRot(iPx, iPx) = cosPhi0;
-    jacobianRot(iPx, iPy) = sinPhi0;
-    jacobianRot(iPy, iPx) = -sinPhi0;
-    jacobianRot(iPy, iPy) = cosPhi0;
-    jacobianRot(iPz, iPz) = 1.0;
-
-    // 2. Translate to perigee parameters on the position
-    const double pz = momentum.Z();
-    const double invPt = 1 / pt;
-    const double invPtSquared = invPt * invPt;
-    TMatrixD jacobianToHelixParameters(5, 6);
-    jacobianToHelixParameters.Zero();
-    jacobianToHelixParameters(iD0, iY) = -1;
-    jacobianToHelixParameters(iPhi0, iX) = charge * invPt / alpha;
-    jacobianToHelixParameters(iPhi0, iPy) = invPt;
-    jacobianToHelixParameters(iOmega, iPx) = -charge * invPtSquared / alpha;
-    jacobianToHelixParameters(iTanLambda, iPx) = - pz * invPtSquared;
-    jacobianToHelixParameters(iTanLambda, iPz) = invPt;
-    jacobianToHelixParameters(iZ0, iX) = - pz * invPt;
-    jacobianToHelixParameters(iZ0, iZ) = 1;
-
-    //then jacobian = jacobianToHelix*jacobianRot
-    TMatrixD jacobianTmp(5, 6);
-    jacobianTmp = jacobianToHelixParameters * jacobianRot;
-
-    //    cout << "The Jacobian is:" << endl;
-    //    jacobianTmp.Print();
-
-    // trivial cast from TMatrix to HepMatrix
-    // the row is helixpar, the column the vertexpar
-    if (jacobian.num_col() != 6 || jacobian.num_row() != 5)
-      jacobian = CLHEP::HepMatrix(5, 6) ;
-    if (jacobian.num_col() == 6 && jacobian.num_row() == 5) {
-      for (int row = 0; row < 5; ++row)
-        for (int col = 0; col < 6; ++col)
-          jacobian[row][col] = jacobianTmp(row, col);
-    }
-#endif
-  }
-
   std::string HelixUtils::helixParName(int i)
   {
     std::string rc ;
@@ -389,12 +137,6 @@ namespace TreeFitter {
     return rc ;
   }
 
-  void HelixUtils::printHelixPar(const CLHEP::HepVector& helixpar)
-  {
-    for (int i = 0; i < 6; ++i)
-      cout << helixParName(i + 1).c_str() << helixpar[i] << endl ;
-  }
-
   void HelixUtils::printVertexPar(const TVector3& position, const TVector3& momentum, int charge)
   {
     for (int i = 0; i < 3; ++i)
@@ -404,7 +146,6 @@ namespace TreeFitter {
     cout << "charge:    " << charge << endl ;
   }
 
-  //JFK: FIXME JUMP 2017-10-11
   //Calculate Jacobian numerically. Precision is questionable, but you don't have to get the derivative calculation right... good for cross checks
   void HelixUtils::getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                           int charge, double Bz,
@@ -453,47 +194,6 @@ namespace TreeFitter {
 
 
 
-
-  //Calculate Jacobian numerically. Precision is questionable, but you don't have to get the derivative calculation right... good for cross checks
-  void HelixUtils::helixFromVertexNumerical(const TVector3& position,
-                                            const TVector3& momentum,
-                                            int charge, double Bz,
-                                            Belle2::Helix& helix,
-                                            double& L,
-                                            CLHEP::HepMatrix& jacobian)
-  {
-    // first call with dummy jacobian
-    CLHEP::HepMatrix dummy ;
-    HelixUtils::helixFromVertex(position, momentum, charge, Bz, helix, L, dummy) ;
-
-    // numeric calculation of the jacobian
-    TVector3 postmp;
-    TVector3 momtmp;
-    Belle2::Helix helixtmp;
-    double Ltmp;
-    CLHEP::HepMatrix jacobiantmp(5, 6) ;
-
-    //double delta = 0.001*abs(vertexpar[jin]) ;
-    //if(delta < 1e-8) delta = 1e-8 ;
-    double delta = 1e-5 ;// this is quite a random choice.
-    for (int jin = 0; jin < 6; ++jin) {
-      for (int i = 0; i < 3; ++i) {
-        postmp[i] = position[i];
-        momtmp[i] = momentum[i];
-      }
-      if (jin < 3) postmp[jin] += delta;
-      else momtmp[jin - 3] += delta;
-      //
-      HelixUtils::helixFromVertex(postmp, momtmp, charge, Bz, helixtmp, Ltmp, jacobiantmp) ;
-      jacobian[iD0][jin] = (helixtmp.getD0() - helix.getD0()) / delta ;
-      jacobian[iPhi0][jin] = (helixtmp.getPhi0() - helix.getPhi0()) / delta ;
-      jacobian[iOmega][jin] = (helixtmp.getOmega() - helix.getOmega()) / delta ;
-      jacobian[iZ0][jin] = (helixtmp.getZ0() - helix.getZ0()) / delta ;
-      jacobian[iTanLambda][jin] = (helixtmp.getTanLambda() - helix.getTanLambda()) / delta ;
-      //      jacobian[iArcLength2D][jin] = (Ltmp - L) / delta ;
-    }
-    //    cout << "Numerical Jacobian: " << endl << jacobian << endl;
-  }
 
   inline double sqr(double x) { return x * x ; }
 
@@ -670,65 +370,65 @@ namespace TreeFitter {
     return sqrt(sqr(x - point.x()) + sqr(y - point.y()) + sqr(z - point.z())) ;
   }
 
-  void HelixUtils::helixTest()
-  {
-    const double pi = 3.1415927 ;
-    CLHEP::HepVector helixpar(6) ;
-
-    helixpar[HelixUtils::iD0]          = 2 ;
-    helixpar[HelixUtils::iPhi0]        = +pi - 0.1;
-    helixpar[HelixUtils::iOmega]       = 0.05 ;
-    helixpar[HelixUtils::iZ0]          = 0.5 ;
-    helixpar[HelixUtils::iTanLambda]   = -7 ;
-    helixpar[HelixUtils::iArcLength2D] = 10 ;
-
-    cout << "This goes in: " << endl ;
-    HelixUtils::printHelixPar(helixpar) ;
-
-    TVector3 position;
-    TVector3 momentum;
-    int charge ;
-    double Bz = 1.5;
-    HelixUtils::vertexFromHelix(Belle2::Helix(helixpar[HelixUtils::iD0],
-                                              helixpar[HelixUtils::iPhi0],
-                                              helixpar[HelixUtils::iOmega],
-                                              helixpar[HelixUtils::iZ0],
-                                              helixpar[HelixUtils::iTanLambda]),
-                                helixpar[HelixUtils::iArcLength2D], Bz,
-                                position, momentum, charge);
-
-    cout << "This convertes to: " << endl ;
-    HelixUtils::printVertexPar(position, momentum, charge) ;
-
-    Belle2::Helix helixback;
-    double Lback;
-    CLHEP::HepMatrix jacobian(5, 6) ;
-    HelixUtils::helixFromVertex(position, momentum, charge, Bz, helixback, Lback, jacobian);
-
-    cout << "We get back: " << endl ;
-    CLHEP::HepVector helixparback(6);
-    helixparback[HelixUtils::iD0]          = helixback.getD0();
-    helixparback[HelixUtils::iPhi0]        = helixback.getPhi0();
-    helixparback[HelixUtils::iOmega]       = helixback.getOmega();
-    helixparback[HelixUtils::iZ0]          = helixback.getZ0();
-    helixparback[HelixUtils::iTanLambda]   = helixback.getTanLambda();
-    helixparback[HelixUtils::iArcLength2D] = Lback;
-    HelixUtils::printHelixPar(helixparback) ;
-    cout << "Analytic Jacobian: " << endl << jacobian << endl;
-    // numeric check of the jacobian
-    CLHEP::HepMatrix jacobiannum(6, 6) ;
-    HelixUtils::helixFromVertexNumerical(position, momentum, charge, Bz, helixback, Lback, jacobiannum) ;
-    //
-    for (int iex = 0; iex < 5; ++iex) {
-      for (int jin = 0; jin < 6; ++jin) {
-        double anaderiv = jacobian[iex][jin] ;
-        double numderiv = jacobiannum[iex][jin] ;
-        cout << "d" << HelixUtils::helixParName(iex + 1)
-             << "/d" << HelixUtils::vertexParName(jin + 1)
-             << " =  " << numderiv << " (num), " << anaderiv << " (anal)" << endl ;
-      }
-    }
-  }
+//  void HelixUtils::helixTest()
+//  {
+//    const double pi = 3.1415927 ;
+//    CLHEP::HepVector helixpar(6) ;
+//
+//    helixpar[HelixUtils::iD0]          = 2 ;
+//    helixpar[HelixUtils::iPhi0]        = +pi - 0.1;
+//    helixpar[HelixUtils::iOmega]       = 0.05 ;
+//    helixpar[HelixUtils::iZ0]          = 0.5 ;
+//    helixpar[HelixUtils::iTanLambda]   = -7 ;
+//    helixpar[HelixUtils::iArcLength2D] = 10 ;
+//
+//    cout << "This goes in: " << endl ;
+//    HelixUtils::printHelixPar(helixpar) ;
+//
+//    TVector3 position;
+//    TVector3 momentum;
+//    int charge ;
+//    double Bz = 1.5;
+//    HelixUtils::vertexFromHelix(Belle2::Helix(helixpar[HelixUtils::iD0],
+//                                              helixpar[HelixUtils::iPhi0],
+//                                              helixpar[HelixUtils::iOmega],
+//                                              helixpar[HelixUtils::iZ0],
+//                                              helixpar[HelixUtils::iTanLambda]),
+//                                helixpar[HelixUtils::iArcLength2D], Bz,
+//                                position, momentum, charge);
+//
+//    cout << "This convertes to: " << endl ;
+//    HelixUtils::printVertexPar(position, momentum, charge) ;
+//
+//    Belle2::Helix helixback;
+//    double Lback;
+//    CLHEP::HepMatrix jacobian(5, 6) ;
+//    HelixUtils::helixFromVertex(position, momentum, charge, Bz, helixback, Lback, jacobian);
+//
+//    cout << "We get back: " << endl ;
+//    CLHEP::HepVector helixparback(6);
+//    helixparback[HelixUtils::iD0]          = helixback.getD0();
+//    helixparback[HelixUtils::iPhi0]        = helixback.getPhi0();
+//    helixparback[HelixUtils::iOmega]       = helixback.getOmega();
+//    helixparback[HelixUtils::iZ0]          = helixback.getZ0();
+//    helixparback[HelixUtils::iTanLambda]   = helixback.getTanLambda();
+//    helixparback[HelixUtils::iArcLength2D] = Lback;
+//    HelixUtils::printHelixPar(helixparback) ;
+//    cout << "Analytic Jacobian: " << endl << jacobian << endl;
+//    // numeric check of the jacobian
+//    CLHEP::HepMatrix jacobiannum(6, 6) ;
+//    HelixUtils::helixFromVertexNumerical(position, momentum, charge, Bz, helixback, Lback, jacobiannum) ;
+//    //
+//    for (int iex = 0; iex < 5; ++iex) {
+//      for (int jin = 0; jin < 6; ++jin) {
+//        double anaderiv = jacobian[iex][jin] ;
+//        double numderiv = jacobiannum[iex][jin] ;
+//        cout << "d" << HelixUtils::helixParName(iex + 1)
+//             << "/d" << HelixUtils::vertexParName(jin + 1)
+//             << " =  " << numderiv << " (num), " << anaderiv << " (anal)" << endl ;
+//      }
+//    }
+//  }
 
 
 }

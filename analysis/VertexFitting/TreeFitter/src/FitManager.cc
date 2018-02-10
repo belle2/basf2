@@ -35,9 +35,16 @@ namespace TreeFitter {
   extern int vtxverbose ;
   extern std::vector<int> massConstraintList ;
 
-  FitManager::FitManager(Belle2::Particle* particle, double prec, int ipDimension)
-    : m_particle(particle), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
-      m_chiSquare(-1), m_niter(-1), m_prec(prec)
+  FitManager::FitManager(Belle2::Particle* particle,
+                         double prec,
+                         int ipDimension) :
+    m_particle(particle),
+    m_decaychain(0),
+    m_fitparams(0),
+    m_status(VertexStatus::UnFitted),
+    m_chiSquare(-1),
+    m_niter(-1),
+    m_prec(prec)
   {
     // build the tree,
     m_decaychain = new DecayChain(particle, false, ipDimension);
@@ -121,7 +128,6 @@ namespace TreeFitter {
       }
 
       if (!(m_fitparams->testCovariance())) {
-        B2WARNING("TreeFitManager::FitManager: A covariance matrix diag element is < 0 (after performing the fit). Changing status to failed.");
         m_status = VertexStatus::Failed;
       }
     }
@@ -242,7 +248,6 @@ namespace TreeFitter {
   {
     // assigns fitted parameters to a candidate
     const ParticleBase* pb = m_decaychain->locate(&cand);
-    B2DEBUG(80, " FitManager::updateCand(" << cand.getName() << ") is " << pb);
     if (pb) {
       updateCand(*pb, cand);
     } else {
@@ -361,9 +366,9 @@ namespace TreeFitter {
   std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
-      int tauindex = pb->tauIndex();
-      double len   = fitparams->getStateVector()(tauindex);
-      double lenErr = fitparams->getCovariance()(tauindex, tauindex);
+      const int tauindex = pb->tauIndex();
+      const double len   = fitparams->getStateVector()(tauindex);
+      const double lenErr = fitparams->getCovariance()(tauindex, tauindex);
       return std::make_tuple(len, lenErr);
     }
     return std::make_tuple(-999, -999);
@@ -371,7 +376,7 @@ namespace TreeFitter {
 
   std::tuple<double, double> FitManager::getDecayLength(Belle2::Particle& cand) const
   {
-    std::tuple<double, double> rc = std::make_tuple(999, -999);
+    std::tuple<double, double> rc = std::make_tuple(-999, -999);
     const ParticleBase* pb = m_decaychain->locate(&cand) ;
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
       rc = getDecayLength(pb);

@@ -1,26 +1,18 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef RECOTRACK_H
-#define RECOTRACK_H
+#pragma once
 
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
-
-#include <CLHEP/Matrix/Vector.h>
-#include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Matrix/Matrix.h>
-
-//using namespace CLHEP;
 
 namespace TreeFitter {
 
@@ -32,7 +24,7 @@ namespace TreeFitter {
     RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
 
     /**    */
-    virtual ~RecoTrack() ;
+    virtual ~RecoTrack() {};
 
     /**   init with mother particle (replacing initPar2)  */
     virtual ErrCode initParticleWithMother(FitParams* fitparams);
@@ -94,4 +86,3 @@ namespace TreeFitter {
     Eigen::Matrix<double, 5, 5>m_covariance;
   };
 }
-#endif //RECOTRACK_H

@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Creates an internal particle, carefully initialising it. Base class for RecoComposite and RecoResonance.
-//Many of the constraints that could be applied here (mass, lifetime, etc.) are missing because there's no way (yet)
-//to flag a particle for them. This requires development.
 
 #include <iomanip>
 #include <algorithm>
@@ -49,11 +46,6 @@ namespace TreeFitter {
     }
     return rc;
   }
-
-  InternalParticle::~InternalParticle()
-  {
-  };
-
 
   InternalParticle::InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                                      bool forceFitAll)

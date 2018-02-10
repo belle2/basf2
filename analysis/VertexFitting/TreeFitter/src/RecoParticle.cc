@@ -1,30 +1,21 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-//Creates a particle object from a charged or neutral final state. Base class for RecoTrack and RecoPhoton. This doesn't do much by itself; most of the functionality is in those individual classes.
-
-//#include <stdio.h>
-//#include <analysis/dataobjects/Particle.h>
-#include <framework/logging/Logger.h>
 
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
 namespace TreeFitter {
-  extern int vtxverbose ;
 
   RecoParticle::RecoParticle(Belle2::Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother) {}
-
-  RecoParticle::~RecoParticle() {}
 
   ErrCode RecoParticle::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
@@ -33,7 +24,7 @@ namespace TreeFitter {
 
   std::string RecoParticle::parname(int index) const
   {
-    return ParticleBase::parname(index + 4) ;
+    return ParticleBase::parname(index + 4);
   }
 
   ErrCode RecoParticle::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
@@ -42,18 +33,18 @@ namespace TreeFitter {
     switch (type) {
       case Constraint::track:
       case Constraint::photon:
-        status |= projectRecoConstraint(fitparams, p) ;
+        status |= projectRecoConstraint(fitparams, p);
         break ;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);
     }
-    return status ;
+    return status;
   }
 
   double RecoParticle::chiSquare(const FitParams* fitparams) const
   {
     Projection p(fitparams->dim(), dimM());
     projectRecoConstraint(*fitparams, p);
-    return p.chiSquare();
+    return p.getChiSquare();
   }
 }

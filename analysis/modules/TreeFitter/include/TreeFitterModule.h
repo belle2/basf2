@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef TREEFITTERMODUEL_H
-#define TREEFITTERMODUEL_H
+#pragma once
 #include <framework/core/Module.h>
 
 
@@ -70,4 +69,3 @@ namespace Belle2 {
 
   };
 }
-#endif

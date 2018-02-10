@@ -10,7 +10,7 @@ from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
-                                mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
+                                mcTrackFinding=False, trigger_mode="all", trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False):
     """
@@ -33,6 +33,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         If true, prune them.
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -65,7 +66,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
         if fit_tracks:
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                            trackFitHypotheses=additionalTrackFitHypotheses,
+                                            trackFitHypotheses=trackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
 
@@ -206,7 +207,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # will be used for electrons which gives a better result as GenFit's current electron
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
-                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
+                    pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks)
 

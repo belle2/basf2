@@ -34,7 +34,6 @@ TreeFitterModule::TreeFitterModule() : Module()
            "Confidence level to accept fitted decay tree. -1.0 for failed fits. Candidates with < confidenceLevel will be removed from the particle list! ",
            0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
-  addParam("verbose", m_verbose, "BaBar verbosity (to be phased out in the future)", 5);
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
   addParam("ipConstraintDimension", m_ipConstraintDimension,
            "Type::Int. Use the x-y-z-beamspot or x-y-beamtube constraint. Zero means no cosntraint which is the default. The Beamspot will be treated as the mother of the particlelist you feed.",
@@ -94,7 +93,6 @@ void TreeFitterModule::terminate()
 bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(new TreeFitter::FitManager(head, m_precision, m_ipConstraintDimension));
-  TreeFitter->setVerbose(m_verbose);
   TreeFitter->setMassConstraintList(m_massConstraintList);
   bool rc = TreeFitter->fit();
   return rc;

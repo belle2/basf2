@@ -1,19 +1,12 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-//Main implementation of the fitter.
-
-//#include <iomanip>
-//#include <stdio.h>
-//#include <sstream>
-
 #include <TMath.h>
 #include <TVector.h>
 
@@ -25,14 +18,11 @@
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
-#include <CLHEP/Matrix/Vector.h>
-#include <CLHEP/Vector/LorentzVector.h>
 
 using std::vector;
 
 namespace TreeFitter {
 
-  extern int vtxverbose ;
   extern std::vector<int> massConstraintList ;
 
   FitManager::FitManager(Belle2::Particle* particle,
@@ -46,10 +36,9 @@ namespace TreeFitter {
     m_niter(-1),
     m_prec(prec)
   {
-    // build the tree,
-    m_decaychain = new DecayChain(particle, false, ipDimension);
+    //JFK FIXME maybe theres a smarter way
+    m_decaychain =  new DecayChain(particle, false, ipDimension);
 
-    // allocate the fit parameters
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
 
@@ -64,12 +53,13 @@ namespace TreeFitter {
     const int nitermax = 10;
     const int maxndiverging = 3;
     const double dChisqConv = m_prec;
-    // initialize
     m_chiSquare = -1;
     m_errCode.reset();
+
     if (m_status == VertexStatus::UnFitted) {
       m_errCode = m_decaychain->initialize(m_fitparams);
     }
+
     if (m_errCode.failure()) {
       // the input tracks are too far apart
       m_status = VertexStatus::BadInput;
@@ -86,7 +76,7 @@ namespace TreeFitter {
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
-        double chisq = m_fitparams->chiSquare();//   m_fitparams->nDof();
+        double chisq = m_fitparams->chiSquare();
         double dChisqQuit = std::max(double(2 * nDof()), 2 * m_chiSquare);
 
         deltachisq = chisq - m_chiSquare;
@@ -190,12 +180,12 @@ namespace TreeFitter {
       B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
       // very important! Belle2 uses p,E,x! Change order here!
-      //FIXME fixme I changed this
       for (int row = 0; row < 4; ++row) {
         for (int col = 0; col <= row; ++col) {
           returncov(row, col) = cov(momindex + row, momindex + col);
         }
       }
+
       for (int row = 0; row < 3; ++row) {
         for (int col = 0; col <= row; ++col) {
           returncov(row + 4, col + 4) = cov(posindex + row, posindex + col);
@@ -205,20 +195,27 @@ namespace TreeFitter {
     } else {
       B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
       // if not, use the pdttable mass
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov6 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(6, 6);
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov6 =
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(6, 6);
+
       for (int row = 0; row < 3; ++row) {
         for (int col = 0; col <= row; ++col) {
           cov6(row, col) = cov(posindex + row, posindex + col);
           cov6(row + 3, col + 3) = cov(momindex + row, momindex + col);
         }
       }
+
       // now fill the jacobian
       double mass = pb->pdgMass();
-      Eigen::Matrix<double, Eigen::Dynamic, 1> momVec = m_fitparams->getStateVector().segment(momindex, 3);
+      Eigen::Matrix<double, Eigen::Dynamic, 1> momVec =
+        m_fitparams->getStateVector().segment(momindex, 3);
+
       double energy2 = momVec.transpose() * momVec;
       energy2 += mass * mass;
       double energy = sqrt(energy2);
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> jacobian = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 6);
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> jacobian =
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 6);
+
       //JFK: there was an old comment on the part that set the diagonal se below. does this make sense? 2017-09-28
       // don't modify momentum
 
@@ -227,18 +224,16 @@ namespace TreeFitter {
         jacobian(3, col) = m_fitparams->getStateVector()(momindex + col) / energy; //add energy row
         jacobian(col + 4, col + 3) = 1; // position indeces
       }
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov7 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 7);
+
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov7 =
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 7);
       cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
-      //JFK: now put everything in the return type 2017-09-28
 
       for (int row = 0; row < 7; ++row) {
         for (int col = 0; col <= row; ++col) {
           returncov(row, col) = cov7(row, col);
         }
       }
-      //std::cout << "cov6 \n" << cov6  << std::endl;
-      //std::cout << "jacobian \n" << jacobian  << std::endl;
-      //std::cout << "return \n" << cov7  << std::endl;
 
     } // else
 
@@ -259,7 +254,6 @@ namespace TreeFitter {
   void FitManager::updateCand(const ParticleBase& pb,
                               Belle2::Particle& cand) const
   {
-
     int posindex = pb.posIndex();
     bool hasPos = true;
     if (posindex < 0 && pb.mother()) {
@@ -267,11 +261,10 @@ namespace TreeFitter {
       hasPos = false;
     }
 
-    int momindex = pb.momIndex();
-    TVector3 pos; //FT: this is not optimal
-    pos[0] = m_fitparams->getStateVector()(posindex);
-    pos[1] = m_fitparams->getStateVector()(posindex + 1);
-    pos[2] = m_fitparams->getStateVector()(posindex + 2);
+    const int momindex = pb.momIndex();
+    const TVector3 pos(m_fitparams->getStateVector()(posindex),
+                       m_fitparams->getStateVector()(posindex + 1),
+                       m_fitparams->getStateVector()(posindex + 2));
 
     TLorentzVector p;
     p.SetPx(m_fitparams->getStateVector()(momindex));
@@ -282,8 +275,8 @@ namespace TreeFitter {
       p.SetE(m_fitparams->getStateVector()(momindex + 3));
       cand.set4Vector(p);
     } else {
-      double mass = cand.getPDGMass();
-      p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass)); //I risk rounding errors for no benefit
+      const double mass = cand.getPDGMass();
+      p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass));
       cand.set4Vector(p);
     }
 
@@ -321,18 +314,17 @@ namespace TreeFitter {
     if (hasPos) {  //if not final state
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
-        double NDFs = nDof();
-        double fitparchi2 = m_fitparams->chiSquare();
+        const double NDFs = nDof();
+        const double fitparchi2 = m_fitparams->chiSquare();
         cand.setPValue(TMath::Prob(fitparchi2, NDFs));   //FT: (to do) p-values of fit must be verified
       }
-
     }
   }
 
   void FitManager::updateTree(Belle2::Particle& cand) const
   {
     if (updateCand(cand)) { // if the mother can be updated, update the daughters
-      int ndaughters = cand.getNDaughters();
+      const int ndaughters = cand.getNDaughters();
       Belle2::Particle* daughter;
       for (int i = 0; i < ndaughters; i++) {
         daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
@@ -347,11 +339,11 @@ namespace TreeFitter {
     std::tuple<double, double> rc;
     const ParticleBase* pb = m_decaychain->locate(&cand);
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
-      int tauindex = pb->tauIndex();
-      double tau    = m_fitparams->getStateVector()(tauindex);
-      double taucov = m_fitparams->getCovariance()(tauindex, tauindex);
-      double mass   = pb->pdgMass();
-      double convfac = mass / Belle2::Const::speedOfLight;
+      const int tauindex = pb->tauIndex();
+      const double tau    = m_fitparams->getStateVector()(tauindex);
+      const double taucov = m_fitparams->getCovariance()(tauindex, tauindex);
+      const double mass   = pb->pdgMass();
+      const double convfac = mass / Belle2::Const::speedOfLight;
       return std::make_tuple(convfac * tau, convfac * convfac * taucov);
     }
     return std::make_tuple(-999, -999);
@@ -384,6 +376,4 @@ namespace TreeFitter {
     return rc;
   }
 
-
 }//end module namespace
-

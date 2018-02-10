@@ -28,6 +28,7 @@ namespace TreeFitter {
 
     /**  empty constructor  */
     DecayChain() : m_dim(0), m_headOfChain(0), m_cand(0), m_isOwner(true) {} //Default constructor (actually never used)
+
     /**  constructor   */
     DecayChain(Belle2::Particle* bc, bool forceFitAll = false, const int ipDimension = 0);
 

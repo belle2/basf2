@@ -1,14 +1,13 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * right(C) 2013 - Belle II Collaboration                             *
+ * right(C) 2018 - Belle II Collaboration                                 *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef FITTER_H
-#define FITTER_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <vector>
@@ -21,9 +20,6 @@ namespace TreeFitter {
   class FitParams;
   class ParticleBase;
 
-  /**FIXME remove */
-  extern int vtxverbose;
-
   /** list of pdg codes to mass constrain */
   extern std::vector<int> massConstraintList;
 
@@ -34,7 +30,7 @@ namespace TreeFitter {
     /** status flag of the fit-itereation (the step in the newton method) */
     enum VertexStatus { Success = 0, NonConverged, BadInput, Failed, UnFitted };
 
-    /** empty constructor  */
+    /** constructor  */
     FitManager() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(0.01) {} //Default constructor
 
@@ -125,10 +121,6 @@ namespace TreeFitter {
     /** chi2 sum of all cosntraints  */
     double m_chi2sum;
 
-    /** set the debug verbosity //JFK: FIXME remove debug stuff 2017-11-08   */
-    static void setVerbose(int i) { vtxverbose = i; }
-
-
   private:
     /** head of the tree  */
     Belle2::Particle* m_particle;
@@ -139,10 +131,10 @@ namespace TreeFitter {
     /**  the statevector */
     FitParams* m_fitparams;
 
-    /** status of the current iteration (in the newton algorith) */
+    /** status of the current iteration */
     int m_status;
 
-    /** chi2 of the current newton iteration */
+    /** chi2 of the current iteration */
     double m_chiSquare;
 
     /** iteration index */
@@ -156,4 +148,3 @@ namespace TreeFitter {
 
   };
 }
-#endif

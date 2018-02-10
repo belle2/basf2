@@ -41,10 +41,10 @@ namespace TreeFitter {
     const Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() const { return m_globalState; }
 
     /** get a reference to an element of the state vector todo replace by setter? */
-    double& getRefToElementOfStateVec(int row) { return m_globalState(row, 0); } //vector defined as column vector
+    double& getRefToElementOfStateVec(int row) { return m_globalState(row, 0); }
 
     /** get a const reference to an element of the state vector todo replace by setter? */
-    const double& getRefToElementOfStateVec(int row) const { return m_globalState(row, 0); } //vector defined as column vector this is even more weird
+    const double& getRefToElementOfStateVec(int row) const { return m_globalState(row, 0); }
 
     /** get an covaraince diagonal element   */
     double getCovDiaElement(int counter) { return m_globalCovariance(counter, counter); }
@@ -131,8 +131,7 @@ namespace TreeFitter {
 
   private:
 
-    /** vector holding all parameters of this fit
-     * */
+    /** vector holding all parameters of this fit */
     Eigen::Matrix<double, Eigen::Dynamic, 1> m_globalState;
 
     /** covariance of the global state */

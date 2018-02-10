@@ -12,7 +12,7 @@
 //Main module implementation
 
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
-#include <analysis/VertexFitting/TreeFitter/Fitter.h>
+#include <analysis/VertexFitting/TreeFitter/FitManager.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
@@ -93,7 +93,7 @@ void TreeFitterModule::terminate()
 
 bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
-  std::unique_ptr<TreeFitter::Fitter> TreeFitter(new TreeFitter::Fitter(head, m_precision, m_ipConstraintDimension));
+  std::unique_ptr<TreeFitter::FitManager> TreeFitter(new TreeFitter::FitManager(head, m_precision, m_ipConstraintDimension));
   TreeFitter->setVerbose(m_verbose);
   TreeFitter->setMassConstraintList(m_massConstraintList);
   bool rc = TreeFitter->fit();

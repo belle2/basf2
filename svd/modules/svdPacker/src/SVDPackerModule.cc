@@ -167,7 +167,7 @@ void SVDPackerModule::event()
     // fill DataInfo
     for (unsigned short j = 0; j < 6; j++) {
       dataInfo.data[j] = samples[j];
-      B2INFO("sample " << j << ": " << samples[j] << endl);
+      B2DEBUG(10, "sample " << j << ": " << samples[j] << endl);
     }
     dataInfo.channel =  apvChannel;
 

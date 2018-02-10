@@ -3,40 +3,64 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Kindo Haruki                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Module manager
-#include <framework/core/HistoModule.h>
-
 // Own include
 #include <arich/modules/arichDQM/ARICHDQMModule.h>
+#include <arich/modules/arichDQM/newTHs.h>
+#include <arich/modules/arichDQM/hitMapMaker.h>
+
+// ARICH
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHCopperMapping.h>
+#include <arich/dbobjects/ARICHGeoDetectorPlane.h>
+#include <arich/dbobjects/ARICHGeoAerogelPlane.h>
+#include <framework/database/DBObjPtr.h>
+
+#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dataobjects/ARICHSimHit.h>
+#include <arich/dataobjects/ARICHDigit.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
+#include <arich/dataobjects/ARICHTrack.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
+#include <arich/dataobjects/ARICHPhoton.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
 // Dataobject classes
-#include <arich/dataobjects/ARICHDigit.h>
-#include <arich/dataobjects/ARICHHit.h>
-#include <TH1F.h>
-#include <TH2Poly.h>
-#include <TFile.h>
 #include <framework/database/DBObjPtr.h>
-// print bitset
-#include <bitset>
+
+// Raw data object class
+#include <rawdata/dataobjects/RawARICH.h>
+
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TH3F.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TMath.h>
+#include <THStack.h>
+#include <TVector3.h>
+#include <TFile.h>
+#include <TImage.h>
+#include <TPad.h>
+
+#include <sstream>
+#include <fstream>
+#include <math.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -46,21 +70,16 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHDQM)
-
-  //-----------------------------------------------------------------
-  //                 Implementation
-  //-----------------------------------------------------------------
+  REG_MODULE(ARICHDQM);
 
   ARICHDQMModule::ARICHDQMModule() : HistoModule()
   {
     // set module description (e.g. insert text)
-    setDescription("ARICH DQM histogrammer");
+    setDescription("Make summary of data quality.");
     setPropertyFlags(c_ParallelProcessingCertified);
-
-    addParam("histogramDirectoryName", m_histogramDirectoryName,
-             "histogram directory in ROOT file", string("ARICH"));
-
+    addParam("debug", m_debug, "debug mode", false);
+    addParam("UpperMomentumLimit", m_momUpLim, "Upper momentum limit of tracks included in monitoring", 0.);
+    addParam("LowerMomentumLimit", m_momDnLim, "Lower momentum limit of tracks included in monitoring", 0.);
   }
 
   ARICHDQMModule::~ARICHDQMModule()
@@ -69,68 +88,254 @@ namespace Belle2 {
 
   void ARICHDQMModule::defineHisto()
   {
-    // Create a separate histogram directory and cd into it.
+
     TDirectory* oldDir = gDirectory;
-    oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+    TDirectory* dirARICHDQM = NULL;
+    dirARICHDQM = oldDir->mkdir("ARICHDQM");
+    dirARICHDQM->cd();
 
-    m_hBits = new TH1F("hBits", "comulative hit bitmap", 4, -0.5, 3.5);
-    m_hHits = new TH1F("hHits", "# of hits/event", 864, -0.5, 863.5);
-    m_hHitsHapd = new TH2F("hHitsChn", "# of hits/channel/(1000 events);module ID; asic ch #", 420, 0.5, 420.5, 144, -0.5, 143.5);
-    m_hHitsHapd->SetOption("colz");
-    m_hHitsMerger = new TH1F("hHitsMerg", "# of hits/merger/(1000 events);merger ID #", 72, 0.5, 72.5);
-    m_hHitsCopper = new TH1F("hHitsCopp", "# of hits/copper/(1000 events);copper ID #", 18, 0.5, 18.5);
+    //Histograms for analysis and statistics
 
+    h_chStat = newTH1("h_chStat", "Status of channels;# of channel;Status", 420 * 144, -0.5, 420 * 144 - 0.5, kRed, kRed);
+    h_aeroStat = newTH1("h_aeroStat", "Status of aerogels;# of aerogel tile;Status", 160, -0.5, 160 - 0.5, kRed, kRed);
+
+    h_chHit = newTH1("h_chHit", "# of hits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5, kRed, kRed);
+    h_chipHit = newTH1("h_chipHit", "# of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5, kRed, kRed);
+    h_hapdHit = newTH1("h_hapdHit", "# of hits in each channel;HAPD serial;Hits", 420, -0.5, 420 - 0.5, kRed, kRed);
+    h_mergerHit = newTH1("h_mergerHit", "# of hits in each merger board;MB serial;Hits", 72, -0.5, 72 - 0.5, kRed, kRed);
+    h_gelHit = newTH1("h_gelHit", "# of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5, kRed, kRed);
+    h_bits = newTH1("h_bits", "# of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5, kRed, kRed);
+    h_hits2D = newTH2("h_hits2D", "Distribution of hits on its track position", 460, -115, 115, 460, -115, 115, kRed, kRed);
+    h_tracks2D = newTH2("h_tracks2D", "Distribution track positions", 460, -115, 115, 460, -115, 115, kRed, kRed);
+
+    h_hitsPerEvent = newTH1("h_hitsPerEvent", "# of hit per event;# of hits;Events", 150, 0, 150, kRed, kRed);
+    h_theta = newTH1("h_theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6, kRed, kRed);
+    h_hitsPerTrack = newTH1("h_hitsPerTrack", "# of hit per track;# of hits;Tracks", 40, 0, 40, kRed, kRed);
+
+    for (int i = 0; i < 6; i++) {
+      h_secTheta[i] = newTH1(Form("h_thetaSec%d", i), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i), 60, 0,
+                             M_PI / 6, kRed, kRed);
+      h_secHitsPerTrack[i] = newTH1(Form("h_hitsPerTrackSec%d", i), Form("# of hit per track in sector %d;# of hits;Tracks", i), 40, 0,
+                                    40, kRed, kRed);
+    }
+
+    for (int i = 0; i < 124; i++) {
+      h_gelHits2D[i] = newTH2(Form("h_gelHits2d_%d", i), Form("Distribution of hits per track on aerogel tile coodinate No.%d", i), 20, 0,
+                              20, 20, 0, 20, kRed, kRed);
+      h_gelTracks2D[i] = newTH2(Form("h_gelTracks2d_%d", i), Form("Distribution of hits per track on aerogel tile coodinate No.%d", i),
+                                20, 0, 20, 20, 0, 20, kRed, kRed);
+    }
+
+    //Select "LIVE" monitoring histograms
+    h_chStat->SetOption("LIVE");
+    h_aeroStat->SetOption("LIVE");
+
+    h_chHit->SetOption("LIVE");
+    h_chipHit->SetOption("LIVE");
+    h_hapdHit->SetOption("LIVE");
+    h_mergerHit->SetOption("LIVE");
+    h_gelHit->SetOption("LIVE");
+    h_bits->SetOption("LIVE");
+    h_hits2D->SetOption("LIVE");
+    h_tracks2D->SetOption("LIVE");
+
+    h_hitsPerEvent->SetOption("LIVE");
+    h_theta->SetOption("LIVE");
+    h_hitsPerTrack->SetOption("LIVE");
+
+    for (int i = 0; i < 6; i++) {
+      h_secTheta[i]->SetOption("LIVE");
+      h_secHitsPerTrack[i]->SetOption("LIVE");
+    }
+
+    oldDir->cd();
   }
 
   void ARICHDQMModule::initialize()
   {
-    // Register histograms (calls back defineHisto)
-    REG_HISTOGRAM;
-
-    StoreArray<ARICHDigit> digits;
-    digits.isRequired();
-
-    StoreArray<ARICHHit> hits;
-    hits.isRequired();
-
+    REG_HISTOGRAM
+    StoreArray<MCParticle> MCParticles;
+    MCParticles.isOptional();
+    StoreArray<Track> tracks;
+    tracks.isRequired();
+    StoreArray<ARICHHit> arichHits;
+    arichHits.isRequired();
+    StoreArray<ARICHDigit> arichDigits;
+    arichDigits.isRequired();
+    StoreArray<ARICHTrack> arichTracks;
+    arichTracks.isRequired();
+    StoreArray<ARICHAeroHit> arichAeroHits;
+    arichAeroHits.isRequired();    StoreArray<ARICHLikelihood> likelihoods;
+    likelihoods.isRequired();
   }
-
 
   void ARICHDQMModule::beginRun()
   {
+
+    h_chStat->Reset();
+    h_aeroStat->Reset();
+
+    h_chHit->Reset();
+    h_chipHit->Reset();
+    h_hapdHit->Reset();
+    h_mergerHit->Reset();
+    h_gelHit->Reset();
+    h_bits->Reset();
+    h_hits2D->Reset();
+    h_tracks2D->Reset();
+    for (int i = 0; i < 124; i++) {
+      h_gelHits2D[i]->Reset();
+      h_gelTracks2D[i]->Reset();
+    }
+
+    h_hitsPerEvent->Reset();
+    h_theta->Reset();
+    h_hitsPerTrack->Reset();
+
+    for (int i = 0; i < 6; i++) {
+      h_secTheta[i] = {};
+      h_secHitsPerTrack[i] = {};
+    }
+
   }
 
   void ARICHDQMModule::event()
   {
+    StoreArray<MCParticle> MCParticles;
+    StoreArray<Track> tracks;
+    StoreArray<ARICHDigit> arichDigits;
+    StoreArray<ARICHHit> arichHits;
+    StoreArray<ARICHTrack> arichTracks;
+    StoreArray<ARICHAeroHit> arichAeroHits;
+    StoreArray<ARICHLikelihood> arichLikelihoods;
+    DBObjPtr<ARICHGeometryConfig> arichGeoConfig;
+    const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
+    const ARICHGeoAerogelPlane& arichGeoAero = arichGeoConfig->getAerogelPlane();
+    DBObjPtr<ARICHChannelMapping> arichChannelMap;
+    DBObjPtr<ARICHMergerMapping> arichMergerMap;
 
-    DBObjPtr<ARICHGeometryConfig> m_geoPar;
-    DBObjPtr<ARICHChannelMapping> chMap;
-    DBObjPtr<ARICHMergerMapping> mrgMap;
-    DBObjPtr<ARICHCopperMapping> cprMap;
+    if (arichHits.getEntries() == 0) return;
 
-    StoreArray<ARICHDigit> digits;
-    StoreArray<ARICHHit> hits;
-
-    for (const auto& digit : digits) {
-
+    for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
       for (int i = 0; i < 8; i++) {
-        if (bits & (1 << i)) m_hBits->Fill(i);
-        //std::cout <<  std::bitset<8>(bits) << std::endl;
+        if (bits & (1 << i)) h_bits->Fill(i);
       }
-      int asicCh = digit.getChannelID();
-      int modID = digit.getModuleID();
-      m_hHitsHapd->Fill(modID, asicCh);
-      unsigned mrgID = mrgMap->getMergerID(modID);
-      unsigned cprID = cprMap->getCopperID(mrgID);
-      m_hHitsMerger->Fill(mrgID);
-      m_hHitsCopper->Fill(cprID);
     }
 
-    m_hHits->Fill(digits.getEntries());
+    int nHit = 0;
+    for (int i = 0; i < arichHits.getEntries(); i++) {
+      h_chHit->Fill((arichHits[i]->getModule() - 1) * 144 + (arichHits[i]->getChannel() - 1));
+
+      int x = 12 , y = 12;
+      arichChannelMap->getXYFromAsic(arichHits[i]->getChannel(), x, y);
+      if (x >= 12 || y >= 12) {
+        B2INFO("Invalid channel position (x,y)=(" << x << "," << y << ").");
+      } else {
+        h_chipHit->Fill((arichHits[i]->getModule() - 1) * 4 + (x + 2 * y));
+      }
+
+      int moduleID = arichHits[i]->getModule();
+      if (moduleID > 420) {
+        B2INFO("Invalid hapd number " << moduleID);
+      } else {
+        h_hapdHit->Fill(moduleID - 1);
+      }
+
+      int mergerID = arichMergerMap->getMergerID(moduleID);
+      if (mergerID > 72) {
+        B2INFO("Invalid MB number " << mergerID);
+      } else {
+        h_mergerHit->Fill(mergerID - 1);
+      }
+
+      nHit++;
+    }
+    h_hitsPerEvent->Fill(nHit);
+
+    for (const auto& arichLikelihood : arichLikelihoods) {
+
+      ARICHTrack* arichTrack = arichLikelihood.getRelated<ARICHTrack>();
+
+      //Momentum limits are applied
+      if (arichTrack->getPhotons().size() == 0) continue;
+      if (m_momUpLim + m_momDnLim != 0 && (arichTrack->getMomentum() < m_momDnLim || arichTrack->getMomentum() > m_momUpLim)) continue;
+
+      TVector3 recPos = arichTrack->getPosition();
+      int sector = 0;
+      double dPhi = recPos.Phi();
+      while (dPhi > M_PI / 3 && sector < 6) {
+        dPhi -= M_PI / 3;
+        sector++;
+      }
+      double trR = recPos.XYvector().Mod();
+      double trPhi = recPos.Phi() + M_PI;
+
+      int iRing = 0;
+      int iAzimuth = 0;
+      while (arichGeoAero.getRingRadius(iRing + 1) < trR && iRing < 4) {
+        iRing++;
+      }
+      if (iRing == 0) continue;
+      while (arichGeoAero.getRingDPhi(iRing) * (iAzimuth + 1) < trPhi) {
+        iAzimuth++;
+      }
+
+      h_tracks2D->Fill(recPos.X(), recPos.Y());
+
+      std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
+      int nPhoton = 0;
+      for (int i = 0; i < (int)photons.size(); i++) {
+        auto& photon(photons[i]);
+        h_theta->Fill(photon.getThetaCer());
+        h_secTheta[sector]->Fill(photon.getThetaCer());
+        nPhoton++;
+      }
+
+      h_hitsPerTrack->Fill(nPhoton);
+      h_secHitsPerTrack[sector]->Fill(nPhoton);
+
+      h_hits2D->Fill(recPos.X(), recPos.Y(), nPhoton);
+
+      switch (iRing) {
+        case 1:
+          h_gelHits2D[iAzimuth]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                      (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
+                                      nPhoton);
+          h_gelTracks2D[iAzimuth]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                        (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20));
+          h_gelHit->Fill(iAzimuth, nPhoton);
+          break;
+        case 2:
+          h_gelHits2D[iAzimuth + 22]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                           (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
+                                           nPhoton);
+          h_gelTracks2D[iAzimuth + 22]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                             (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20));
+          h_gelHit->Fill(iAzimuth + 22, nPhoton);
+          break;
+        case 3:
+          h_gelHits2D[iAzimuth + 50]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                           (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
+                                           nPhoton);
+          h_gelTracks2D[iAzimuth + 50]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                             (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20));
+          h_gelHit->Fill(iAzimuth + 50, nPhoton);
+          break;
+        case 4:
+          h_gelHits2D[iAzimuth + 84]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                           (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
+                                           nPhoton);
+          h_gelTracks2D[iAzimuth + 84]->Fill((trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                                             (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20));
+          h_gelHit->Fill(iAzimuth + 84, nPhoton);
+          break;
+        default:
+          break;
+      }
+    }
 
   }
-
 
   void ARICHDQMModule::endRun()
   {
@@ -139,7 +344,6 @@ namespace Belle2 {
   void ARICHDQMModule::terminate()
   {
   }
+}
 
-
-} // end Belle2 namespace
 

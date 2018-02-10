@@ -9,8 +9,9 @@ path = create_hlt_path()
 
 # no reconstruction or software trigger added at all
 # just add dqm
-add_hlt_dqm(path, run_type="cosmics")
 
+# currently, not all DQM modules can be executed without the reconstruction module in the path
+# add_hlt_dqm(path, run_type="cosmics")
 
 finalize_hlt_path(path)
 basf2.print_path(path)

@@ -78,11 +78,11 @@ namespace Belle2 {
     unsigned int getEtaIndex(int shape_index, float eta) const
     {
       auto etaPercentiles = m_percentiles.at(shape_index);
-      for (std::size_t i = 0; i != etaPercentiles.size(); ++i) {
-        if (eta <= etaPercentiles[i])
+      for (int i = etaPercentiles.size() - 1; i >= 0; --i) {
+        if (eta >= etaPercentiles[i])
           return i;
       }
-      return etaPercentiles.size() - 1;
+      return 0;
     }
 
     /** Return percentiles map  */

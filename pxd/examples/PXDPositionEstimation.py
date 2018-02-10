@@ -13,7 +13,6 @@
 
 import math
 from basf2 import *
-from pxd import *
 import ROOT
 from ROOT import Belle2
 
@@ -121,22 +120,21 @@ class PXDPositionEstimation(Module):
                     thetaU = math.atan(mom[0] / mom[2]) * 180 / math.pi
                     reject, pixelkind = utility.check_cluster(cls)
 
-                    eta = utility.computeEta(cls, thetaU, thetaV)
-                    shape_name = utility.get_short_shape_name(cls, thetaU, thetaV)
-                    shape_index = self.shape_indexer.getShapeIndex(shape_name)
-
-                    shiftU = sensor_info.getUCellPosition(cls.getUStart())
-                    shiftV = sensor_info.getVCellPosition(cls.getVStart())
-
-                    # print("Match truehit - cluster on sensor ({:d})".format(int(truehit.getSensorID())) )
-
-                    # print("    Matched truehit has angles thetaU/thetaV: {:.1f}/{:.1f} ".format(thetaU, thetaV))
-                    # print("    Matched cluster shape {} -> index {}".format(shape_name, shape_index))
-                    # print("    Matched cluster eta={:.5f}".format(eta))
+                    # Only look at primary particles
+                    for mcp in truehit.getRelationsFrom("MCParticles"):
+                        if not mcp.hasStatus(1):
+                            reject = True
 
                     if not reject and mom.Mag() > 0.02:
 
                         self.nclusters += 1
+
+                        eta = utility.computeEta(cls, thetaU, thetaV)
+                        shape_name = utility.get_short_shape_name(cls, thetaU, thetaV)
+                        shape_index = self.shape_indexer.getShapeIndex(shape_name)
+
+                        shiftU = sensor_info.getUCellPosition(cls.getUStart())
+                        shiftV = sensor_info.getVCellPosition(cls.getVStart())
 
                         # Fill momentum and angles for pixelkind
                         self.hist_map_momentum[pixelkind].Fill(mom.Mag())
@@ -161,11 +159,11 @@ class PXDPositionEstimation(Module):
                         self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
 
                         if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
-                            self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getU() - cls.getU())
+                            self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - cls.getV())
                         elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
-                            self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getU() - cls.getU())
+                            self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - cls.getV())
                         else:
-                            self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getU() - cls.getU())
+                            self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - cls.getV())
 
                         if self.position_estimator.getShapeLikelyhood(shape_index, thetaU, thetaV, pixelkind) > 0:
                             self.nfound_shapes += 1
@@ -219,11 +217,11 @@ class PXDPositionEstimation(Module):
                             self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
 
                             if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getU() - cls.getU())
+                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - cls.getV())
                             elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getU() - cls.getU())
+                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - cls.getV())
                             else:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getU() - cls.getU())
+                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - cls.getV())
 
     def terminate(self):
         """
@@ -312,7 +310,8 @@ if __name__ == "__main__":
     main.add_module("EventInfoSetter", evtNumList=[args.nevents])
     main.add_module("Gearbox")
     # We only need the pxd for this
-    main.add_module("Geometry", components=['MagneticFieldConstant4LimitedRSVD', 'BeamPipe', 'PXD'])
+    main.add_module("Geometry", components=['MagneticField', 'BeamPipe', 'PXD'], useDB=False)
+    # main.add_module("Geometry",useDB=False)
 
     # Generate BBbar events
     main.add_module("EvtGenInput")
@@ -325,7 +324,7 @@ if __name__ == "__main__":
             main.add_module(bkginput)
 
     main.add_module("FullSim")
-    add_pxd_simulation(main)
+    main.add_module("PXDDigitizer")
 
     # Background overlay executor - after digitizer
     if bkgfiles:
@@ -333,7 +332,7 @@ if __name__ == "__main__":
             main.add_module('BGOverlayExecutor', PXDDigitsName='')
             main.add_module("PXDDigitSorter", digits='')
 
-    add_pxd_reconstruction(main)
+    main.add_module("PXDClusterizer")
 
     positionestimation = PXDPositionEstimation()
     main.add_module(positionestimation)

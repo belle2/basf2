@@ -81,7 +81,7 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
         //std::endl;
-        EigenTypes::ColVector prevpar = m_fitparams->getStateVector();
+        Eigen::Matrix<double, Eigen::Dynamic, 1> prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
@@ -139,12 +139,12 @@ namespace TreeFitter {
     return (m_status == VertexStatus::Success);
   }
 
-  const EigenTypes::MatrixXd& FitManager::getCovariance() const
+  const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& FitManager::getCovariance() const
   {
     return m_fitparams->getCovariance();
   }
 
-  const EigenTypes::ColVector& FitManager::getStateVector() const
+  const Eigen::Matrix<double, Eigen::Dynamic, 1>& FitManager::getStateVector() const
   {
     return m_fitparams->getStateVector();
   }
@@ -177,7 +177,7 @@ namespace TreeFitter {
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 
-    EigenTypes::MatrixXd cov = m_fitparams->getCovariance().selfadjointView<Eigen::Lower>();
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov = m_fitparams->getCovariance().selfadjointView<Eigen::Lower>();
     B2DEBUG(80, "       FitManager::getCovFromPB");
     int posindex = pb->posIndex();
     // hack: for tracks and photons, use the production vertex
@@ -205,7 +205,7 @@ namespace TreeFitter {
     } else {
       B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
       // if not, use the pdttable mass
-      EigenTypes::MatrixXd cov6 = EigenTypes::MatrixXd::Zero(6, 6);
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov6 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(6, 6);
       for (int row = 0; row < 3; ++row) {
         for (int col = 0; col <= row; ++col) {
           cov6(row, col) = cov(posindex + row, posindex + col);
@@ -214,11 +214,11 @@ namespace TreeFitter {
       }
       // now fill the jacobian
       double mass = pb->pdgMass();
-      EigenTypes::ColVector momVec = m_fitparams->getStateVector().segment(momindex, 3);
+      Eigen::Matrix<double, Eigen::Dynamic, 1> momVec = m_fitparams->getStateVector().segment(momindex, 3);
       double energy2 = momVec.transpose() * momVec;
       energy2 += mass * mass;
       double energy = sqrt(energy2);
-      EigenTypes::MatrixXd jacobian = EigenTypes::MatrixXd::Zero(7, 6);
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> jacobian = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 6);
       //JFK: there was an old comment on the part that set the diagonal se below. does this make sense? 2017-09-28
       // don't modify momentum
 
@@ -227,7 +227,7 @@ namespace TreeFitter {
         jacobian(3, col) = m_fitparams->getStateVector()(momindex + col) / energy; //add energy row
         jacobian(col + 4, col + 3) = 1; // position indeces
       }
-      EigenTypes::MatrixXd cov7 = EigenTypes::MatrixXd::Zero(7, 7);
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov7 = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 7);
       cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
       //JFK: now put everything in the return type 2017-09-28
 

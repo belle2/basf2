@@ -1,16 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Creates and initialises charged particles using helix parameters. Defines the projection of reconstruction (helix) constraints to the fit.
 
-//#include <stdio.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
@@ -20,11 +18,8 @@
 #include <TMath.h>
 
 #define NUMERICAL_JACOBIAN
-//#define HELIX_TEST
 
 namespace TreeFitter {
-
-  extern int vtxverbose;
 
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother), m_bfield(0), m_trackfit(0), m_cached(false),
@@ -50,7 +45,7 @@ namespace TreeFitter {
       const_cast<RecoTrack*>(this)->updFltToMother(*fitparams);
     }
     TVector3 recoP = m_trackfit->getHelix().getMomentumAtArcLength2D(m_flt, m_bfield);
-    int momindex = momIndex();
+    const int momindex = momIndex();
     fitparams->getStateVector()(momindex) = recoP.X();
     fitparams->getStateVector()(momindex + 1) = recoP.Y();
     fitparams->getStateVector()(momindex + 2) = recoP.Z();
@@ -67,7 +62,7 @@ namespace TreeFitter {
   {
     // we only need a rough estimate of the covariance
     TMatrixFSym p4Err = particle()->getMomentumErrorMatrix();
-    int momindex = momIndex();
+    const int momindex = momIndex();
 
     for (int row = 0; row < 3; ++row) {
       //std::cout << "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]  << std::endl;
@@ -80,7 +75,7 @@ namespace TreeFitter {
 
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
   {
-    int posindexmother = mother()->posIndex();
+    const int posindexmother = mother()->posIndex();
     //FT: is this correct? Might need to make it 3D
     m_flt = m_trackfit->getHelix().getArcLength2DAtXY(
               fitparams.getStateVector()(posindexmother),
@@ -115,8 +110,8 @@ namespace TreeFitter {
   {
     B2DEBUG(85, "----------           RecoTrack::projectRecoConstraintCopy\n");
     ErrCode status;
-    int posindexmother = mother()->posIndex();
-    int momindex = momIndex();
+    const int posindexmother = mother()->posIndex();
+    const int momindex = momIndex();
 
     Eigen::Matrix<double, 1, 6> positionAndMom = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
     positionAndMom.segment(0, 3) =  fitparams.getStateVector().segment(posindexmother, 3);
@@ -146,9 +141,10 @@ namespace TreeFitter {
     helixpars(4) = helix.getTanLambda();
 
     // fill the residual and cov matrix
-    p.getResiduals().segment(0, 5) = helixpars - m_params;//.segment(0, 5);
+    p.getResiduals().segment(0, 5) = helixpars - m_params;
     p.getResiduals()(1) = HelixUtils::phidomain(p.getResiduals()(1));
-    EigenTypes::MatrixXd writtenCov = m_covariance.block<5, 5>(0, 0);
+
+    Eigen::Matrix<double, 5, 5> writtenCov = m_covariance.block<5, 5>(0, 0);
 
     p.getV().triangularView<Eigen::Lower>() =  writtenCov.triangularView<Eigen::Lower>();
     for (int row = 0; row < 5; ++row) {

@@ -49,7 +49,7 @@ namespace TreeFitter {
     const TVector3 mom = particle()->getMomentum();
     const double energy = particle()->getEnergy();
     const int size = dimMeas();
-    m_params = EigenTypes::ColVector::Zero(size, 1);
+    m_params = Eigen::Matrix<double, 7, 1>::Zero(size, 1);
     m_params(0) = pos.X();
     m_params(1) = pos.Y();
     m_params(2) = pos.Z();
@@ -61,7 +61,7 @@ namespace TreeFitter {
       m_params(6) = energy;
     }
 
-    m_covariance = EigenTypes::MatrixXd::Zero(size, size);
+    m_covariance = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(size, size);
     const TMatrixFSym cov7in = getBasf2Particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
 
     for (int row = 0; row < size - 3; ++row) { //first the p,E block

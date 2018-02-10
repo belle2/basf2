@@ -9,7 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Handles the conversion of parameters between (x[3],p[3]) phase space and (helix[5], flight time) track representation
 
 #include <iostream>
 #include <TMath.h>

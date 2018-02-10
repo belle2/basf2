@@ -55,7 +55,14 @@ namespace TreeFitter {
 
 
   ParticleBase::ParticleBase(const std::string& name)
-    : m_particle(NULL), m_mother(NULL), m_index(0), m_pdgMass(0), m_pdgWidth(0), m_pdgLifeTime(0), m_charge(0), m_name(name) {}
+    : m_particle(NULL),
+      m_mother(NULL),
+      m_index(0),
+      m_pdgMass(0),
+      m_pdgWidth(0),
+      m_pdgLifeTime(0),
+      m_charge(0),
+      m_name(name) {}
 
 
   ParticleBase::~ParticleBase()
@@ -308,7 +315,6 @@ namespace TreeFitter {
 
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
-    EigenTypes::ColVector momentumVec = fitparams.getStateVector().segment(momindex, 3);
     double posxmother = 0, posx = 0, momx = 0;
 
     // linear approximation is fine
@@ -374,14 +380,14 @@ namespace TreeFitter {
       const ParticleBase* amother = mother();
       const int momposindex = amother ? amother->posIndex() : -1;
       const int posindex = posIndex();
-      const int momindex = momIndex();
+      //const int momindex = momIndex();
 
       assert(momposindex >= 0); // check code logic: no mother -> no tau
 
-      EigenTypes::ColVector dxVec = fitparams->getStateVector().segment(posindex, 3)
-                                    - fitparams->getStateVector().segment(momposindex, 3);
+      Eigen::Matrix<double, 3, 1> dxVec = fitparams->getStateVector().segment(posindex, 3)
+                                          - fitparams->getStateVector().segment(momposindex, 3);
 
-      EigenTypes::ColVector pxVec = fitparams->getStateVector().segment(momindex, 3);
+      //Eigen::Matrix<double, 3, 1> pxVec = fitparams->getStateVector().segment(momindex, 3);
       const double momdX = dxVec.norm() ; //was px*dx before
 
       // if tau should be a time devide by mom2 insertad of the sqrt

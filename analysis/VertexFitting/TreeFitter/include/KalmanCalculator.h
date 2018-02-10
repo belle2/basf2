@@ -35,8 +35,12 @@ namespace TreeFitter {
     double getChiSquare() { return m_chisq;}
 
     /** init the kalman machenery */
-    ErrCode calculateGainMatrix(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
-                                const FitParams* fitparams, const EigenTypes::MatrixXd* V = 0, double weight = 1);
+    ErrCode calculateGainMatrix(const Eigen::Matrix<double, Eigen::Dynamic, 1>& residuals,
+                                const Eigen::Matrix<double,
+                                Eigen::Dynamic, Eigen::Dynamic>& G,
+                                const FitParams* fitparams,
+                                const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>* V = 0,
+                                double weight = 1);
 
     /**  get chi2 */
     double chisq() const { return m_chisq ; }
@@ -53,17 +57,17 @@ namespace TreeFitter {
     double m_chisq;
 
     /** vecotr holding the residuals */
-    EigenTypes::ColVector m_res;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> m_res;
     /** G former H (derivative of constraints chi2) */
-    EigenTypes::MatrixXd m_G;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_G;
     /** R residual covariance */
-    EigenTypes::MatrixXd m_R;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_R;
     /** R inverse */
-    EigenTypes::MatrixXd m_Rinverse;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_Rinverse;
     /** K kalman gain matrix */
-    EigenTypes::MatrixXd m_K;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_K;
     /** C times G^t  */
-    EigenTypes::MatrixXd m_CGt;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_CGt;
 
   };
 }

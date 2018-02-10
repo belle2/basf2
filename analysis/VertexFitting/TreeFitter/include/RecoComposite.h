@@ -78,10 +78,10 @@ namespace TreeFitter {
   protected:
 
     /** column vector to store the measurement */
-    EigenTypes::ColVector m_params;
+    Eigen::Matrix<double, 7, 1> m_params;
 
     /** only lower triangle filled! */
-    EigenTypes::MatrixXd  m_covariance;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>  m_covariance;
 
     /** flag  */
     bool m_hasEnergy;

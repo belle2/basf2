@@ -57,7 +57,7 @@ namespace TreeFitter {
     void updateTree(Belle2::Particle& particle) const;
 
     /** get covariance matrix */
-    const EigenTypes::MatrixXd& getCovariance() const;
+    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() const;
 
     /** extract cov from particle base */
     void getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const;
@@ -75,7 +75,7 @@ namespace TreeFitter {
     std::tuple<double, double> getDecayLength(Belle2::Particle& cand) const;
 
     /** get Statevector */
-    const EigenTypes::ColVector& getStateVector() const;;
+    const Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() const;;
 
     /** getter for the index of the vertex position in the state vector */
     int posIndex(Belle2::Particle* particle) const;

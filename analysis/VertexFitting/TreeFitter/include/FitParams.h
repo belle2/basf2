@@ -14,7 +14,9 @@
 #include<iostream>
 
 namespace TreeFitter {
+
   class ParticleBase;
+
   /** Class to store and manage fitparams (statevector) */
   class FitParams {
 
@@ -85,7 +87,7 @@ namespace TreeFitter {
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
 
     /** get dimension od statevector */
-    int dim() const { return m_dim; } //JFK: this is deprecated 2017-09-21
+    int dim() const { return m_dim; }
 
     /** get chi2 of statevector*/
     double chiSquare() const { return m_chiSquare; }
@@ -111,6 +113,7 @@ namespace TreeFitter {
       m_chiSquare += chisq;
       m_nConstraints += nconstraints;
     }
+
     /** reset chi2 */
     void resetChiSquare()
     {
@@ -146,5 +149,5 @@ namespace TreeFitter {
 
     /** vector with the number of constraints per parameter */
     std::vector<int> m_nConstraintsVec;
-  } ;
+  };
 }

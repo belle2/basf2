@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef HELIXUTILS_H
-#define HELIXUTILS_H
+#pragma once
 
 #include <string>
 
@@ -30,20 +28,20 @@ namespace TreeFitter {
     enum HelixCoor  {iD0 = 0, iPhi0, iOmega, iZ0, iTanLambda, iArcLength2D} ;
 
     /** get helix from a vertex */
-    static void helixFromVertex(const EigenTypes::ColVector& position,
-                                const EigenTypes::ColVector& momentum,
+    static void helixFromVertex(const Eigen::Matrix<double, 3, 1>& position,
+                                const Eigen::Matrix<double, 3, 1>& momentum,
                                 int charge, double Bz,
                                 Belle2::Helix& helix,
                                 double& L,
-                                EigenTypes::MatrixXd& jacobian);
+                                Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& jacobian);
 
     /** get helix from a vertex */
-    static void helixFromVertexNumerical(const EigenTypes::ColVector& position,
-                                         const EigenTypes::ColVector& momentum,
+    static void helixFromVertexNumerical(const Eigen::Matrix<double, 3, 1>& position,
+                                         const Eigen::Matrix<double, 3, 1>& momentum,
                                          int charge, double Bz,
                                          Belle2::Helix& helix,
                                          double& flt,
-                                         EigenTypes::MatrixXd& jacobian);
+                                         Eigen::Matrix<double, 5, 6>& jacobian);
 
     /**  */
     static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
@@ -93,7 +91,3 @@ namespace TreeFitter {
   } ;
 
 }
-
-
-#endif //HELIXUTILS_H
-

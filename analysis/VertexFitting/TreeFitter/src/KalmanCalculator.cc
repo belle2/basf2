@@ -18,30 +18,31 @@ namespace TreeFitter {
 
   extern int vtxverbose;
 
-  ErrCode KalmanCalculator::calculateGainMatrix(const EigenTypes::ColVector& residuals, const EigenTypes::MatrixXd& G,
-                                                const FitParams* fitparams, const EigenTypes::MatrixXd* V, double weight)
+  ErrCode KalmanCalculator::calculateGainMatrix(const Eigen::Matrix<double, Eigen::Dynamic, 1>& residuals,
+                                                const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& G,
+                                                const FitParams* fitparams, const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>* V, double weight)
   {
     B2DEBUG(83, "------ KalmanCalculator::init                                    ");
     m_constrDim = residuals.size(); //TODO move to constrcutor?
     m_stateDim  = fitparams->getDimensionOfState();
     m_res = residuals; //TODO move to constructor?
     m_G = G;
-    m_R = EigenTypes::MatrixXd::Zero(m_constrDim, m_constrDim);
-    EigenTypes::MatrixXd C =
-      EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
+    m_R = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(m_constrDim, m_constrDim);
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> C =
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
     C  = fitparams->getCovariance().triangularView<Eigen::Lower>();
-    EigenTypes::MatrixXd Rtemp =
-      EigenTypes::MatrixXd::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Rtemp =
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
     Rtemp = G * m_CGt;
     if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
-      const EigenTypes::MatrixXd weightedV  = weight * (*V).selfadjointView<Eigen::Lower>();
+      const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> weightedV  = weight * (*V).selfadjointView<Eigen::Lower>();
       m_R = Rtemp + weightedV;
     } else {
       m_R = Rtemp.triangularView<Eigen::Lower>();
     }
 
-    EigenTypes::MatrixXd RInvtemp;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> RInvtemp;
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
     if (!m_Rinverse.allFinite()) {
@@ -67,17 +68,17 @@ namespace TreeFitter {
 
     //std::cout << "Photon pos cov(s) BEFORE\n" << fitparams->getCovariance().block<3, 3>(13, 13) << std::endl;
 
-    EigenTypes::MatrixXd fitCov  = fitparams->getCovariance().triangularView<Eigen::Lower>();
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> fitCov  = fitparams->getCovariance().triangularView<Eigen::Lower>();
     //std::cout << "Rinv\n" << m_Rinverse  << std::endl;
     //std::cout << "m_G\n" << m_G  << std::endl;
     //std::cout << "fitCov\n" << fitCov  << std::endl;
-    EigenTypes::MatrixXd GRinvGt = m_G.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_G;
-    EigenTypes::MatrixXd deltaCov  = fitCov.selfadjointView<Eigen::Lower>() * GRinvGt *
-                                     fitCov.selfadjointView<Eigen::Lower>();
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> GRinvGt = m_G.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_G;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> deltaCov  = fitCov.selfadjointView<Eigen::Lower>() * GRinvGt *
+        fitCov.selfadjointView<Eigen::Lower>();
     //std::cout << "delta cov00\n" << deltaCov.block<3, 3>(13, 13) << std::endl;
     //std::cout << "delta cov44\n" << deltaCov.block<4,4>(4,4)<<std::endl;
     //JFK: somehow you cant substract triangles from each other but since its just elment wise we dont care too much 2017-09-28
-    EigenTypes::MatrixXd delta = fitCov - deltaCov;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> delta = fitCov - deltaCov;
     //std::cout << "new cov00\n" <<delta.block<4,4>(0,0) << std::endl;
     //std::cout << "new cov44\n" <<delta.block<4,4>(4,4) << std::endl;
     fitparams->getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();

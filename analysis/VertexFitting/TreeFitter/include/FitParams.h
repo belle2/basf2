@@ -1,22 +1,20 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef FITPARAMS_H
-#define FITPARAMS_H
+#pragma once
 
 #include <vector>
 #include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
 #include<iostream>
 
 namespace TreeFitter {
-  class ParticleBase ;
+  class ParticleBase;
   /** Class to store and manage fitparams (statevector) */
   class FitParams {
 
@@ -26,19 +24,19 @@ namespace TreeFitter {
     FitParams(int dim);
 
     /** Destructor */
-    ~FitParams();
+    ~FitParams() {};
 
     /** getter for the states covariance */
-    EigenTypes::MatrixXd& getCovariance() { return m_globalCovariance; }
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() { return m_globalCovariance; }
 
     /** const getter for the states covariance */
-    const EigenTypes::MatrixXd& getCovariance() const { return m_globalCovariance; }
+    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() const { return m_globalCovariance; }
 
     /** getter for the fit parameters/statevector */
-    EigenTypes::ColVector& getStateVector() {return m_globalState;}
+    Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() {return m_globalState;}
 
     /** const getter for the fit parameters/statevector */
-    const EigenTypes::ColVector& getStateVector() const { return m_globalState; }
+    const Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() const { return m_globalState; }
 
     /** get a reference to an element of the state vector todo replace by setter? */
     double& getRefToElementOfStateVec(int row) { return m_globalState(row, 0); } //vector defined as column vector
@@ -50,10 +48,10 @@ namespace TreeFitter {
     double getCovDiaElement(int counter) { return m_globalCovariance(counter, counter); }
 
     /** get a sub block from the covaraince matrix */
-    EigenTypes::MatrixXd getMaskInCovariance(const std::vector<int>& indexVec) const;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> getMaskInCovariance(const std::vector<int>& indexVec) const;
 
     /** get a sub block from the state vector */
-    EigenTypes::ColVector getMaskInStateVec(const std::vector<int>& indexVec) const;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> getMaskInStateVec(const std::vector<int>& indexVec) const;
 
     /** reset the staevector */
     void resetStateVector();
@@ -132,10 +130,10 @@ namespace TreeFitter {
 
     /** vector holding all parameters of this fit
      * */
-    EigenTypes::ColVector m_globalState;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> m_globalState;
 
     /** covariance of the global state */
-    EigenTypes::MatrixXd m_globalCovariance;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_globalCovariance;
 
     /** dimension of statevector */
     int m_dim;
@@ -150,5 +148,3 @@ namespace TreeFitter {
     std::vector<int> m_nConstraintsVec;
   } ;
 }
-
-#endif //FITPARAMS_H

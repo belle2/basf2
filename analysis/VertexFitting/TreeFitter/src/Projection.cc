@@ -22,12 +22,11 @@ namespace TreeFitter {
     m_dimProj(dimP),
     m_offset(0) {}
 
-
   void Projection::resetProjection()
   {
-    m_residual = EigenTypes::ColVector::Zero(m_dimCov);
-    m_H = EigenTypes::MatrixXd::Zero(m_dimCov, m_dimProj);
-    m_V = EigenTypes::MatrixXd::Zero(m_dimCov, m_dimCov);
+    m_residual = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(m_dimCov);
+    m_H = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(m_dimCov, m_dimProj);
+    m_V = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(m_dimCov, m_dimCov);
     m_offset = 0;
   }
 
@@ -37,4 +36,4 @@ namespace TreeFitter {
     return m_residual.transpose() * VSym.inverse() * m_residual;
   }
 
-} //END namespace treefitter
+}

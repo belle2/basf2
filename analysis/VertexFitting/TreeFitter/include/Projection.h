@@ -9,15 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
-
 #include <Eigen/Dense>
 
 namespace TreeFitter {
 
   /** class to store the projected residuals and the corresponding jacobian as well as the covariance matrix in the system of residuals */
   class Projection {
+
   public:
+
     /** constructor */
     Projection(int dimP, int dimC);
 
@@ -25,25 +25,25 @@ namespace TreeFitter {
     virtual ~Projection() {};
 
     /** get projection matrix */
-    EigenTypes::MatrixXd& getH() {return m_H;}
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getH() {return m_H;}
 
     /** get projection matrix */
-    const EigenTypes::MatrixXd getH() const {return m_H;}
+    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> getH() const {return m_H;}
 
     /** get residuals */
-    EigenTypes::ColVector& getResiduals() {return m_residual;}
+    Eigen::Matrix<double, Eigen::Dynamic, 1>& getResiduals() {return m_residual;}
 
     /** get residuals */
-    const EigenTypes::ColVector getResiduals() const {return m_residual;}
+    const Eigen::Matrix<double, Eigen::Dynamic, 1> getResiduals() const {return m_residual;}
 
     /** ge element in residuals */
     double getElementInResiduals(int row) { return m_residual(m_offset + row, 1); }
 
     /** get residuals cov matrix */
-    EigenTypes::MatrixXd& getV() {return m_V;}
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getV() {return m_V;}
 
     /** get residuals cov matrix */
-    const EigenTypes::MatrixXd& getV() const {return m_V;}
+    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getV() const {return m_V;}
 
     /** reset projection */
     void resetProjection();
@@ -61,6 +61,7 @@ namespace TreeFitter {
     unsigned int offset() const { return m_offset; }
 
   private:
+
     /** jacobian of the constraint, converts x,p,E<->system of residuals */
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_H;
 
@@ -68,7 +69,7 @@ namespace TreeFitter {
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_V;
 
     /** residuals of constraint */
-    EigenTypes::ColVector m_residual;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> m_residual;
 
     /** dimension of the covariance */
     int m_dimCov;
@@ -78,5 +79,5 @@ namespace TreeFitter {
 
     /** offset for constraint index. used when there's more then one constraint projected */
     unsigned int m_offset;
-  } ;
+  };
 }

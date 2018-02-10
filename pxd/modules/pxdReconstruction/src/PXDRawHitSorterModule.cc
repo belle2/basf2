@@ -44,12 +44,12 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("mergeDuplicates", m_mergeDuplicates,
            "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
-  addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", -1000.0);
-  addParam("assignID", m_assignID, "Assign VxdID to RAwHits that don't have it", true);
+  addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
-  addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
+  // TODO we should not need this
+  //addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
   addParam("ignoredPixelsListName", m_ignoredPixelsListName, "Name of the xml with ignored pixels list", string(""));
 
 }
@@ -61,8 +61,9 @@ void PXDRawHitSorterModule::initialize()
   m_pxdRawHit.isRequired(m_storeRawHitsName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   storeDigits.registerInDataStore();
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  storeFrames.registerInDataStore();
+  // TODO we should not need this
+  //StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+  //storeFrames.registerInDataStore();
 
   m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(m_ignoredPixelsListName));
 }
@@ -71,7 +72,8 @@ void PXDRawHitSorterModule::event()
 {
   StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+  // TODO we should not need this
+  //StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   // if no input, nothing to do
   if (!storeRawHits || !storeRawHits.getEntries()) return;
@@ -80,7 +82,8 @@ void PXDRawHitSorterModule::event()
 
   //Mapping of Pixel information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Pixel>> sensors;
-  std::map<VxdID, std::set<unsigned short>> startRows;
+  // TODO: this variable should be removed before merging into master
+  //std::map<VxdID, std::set<unsigned short>> startRows;
 
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = storeRawHits.getEntries();
@@ -92,20 +95,15 @@ void PXDRawHitSorterModule::event()
     // If malformed object, drop it.
     VxdID sensorID = rawhit->getSensorID();
     if (!geo.validSensorID(sensorID)) {
-      if (m_assignID) {
-        sensorID.setLayerNumber(2);
-        sensorID.setLadderNumber(1);
-        sensorID.setSensorNumber(2);
-      } else {
-        B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
-        continue;
-      }
+      B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
+      continue;
     }
     if (m_trimOutOfRange && !goodHit(rawhit))
       continue;
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
-    Pixel px(rawhit, rawhit->getStartRow());
+    // TODO: Pixel should not store start row
+    Pixel px(rawhit, 0 /*rawhit->getStartRow()*/);
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
       frameCounter = 1;
@@ -120,7 +118,8 @@ void PXDRawHitSorterModule::event()
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       if (m_ignoredPixelsListName == "" || m_ignoredPixelsList->pixelOK(sensorID, PXDIgnoredPixelsMap::map_pixel(px.getU(), px.getV()))) {
         sensors[sensorID].insert(px);
-        startRows[sensorID].insert(rawhit->getStartRow());
+        // TODO we should not need this
+        //startRows[sensorID].insert(rawhit->getStartRow());
       }
     }
   }
@@ -147,8 +146,9 @@ void PXDRawHitSorterModule::event()
       }
       lastpx = &px;
     }
-    for (unsigned short startRow : startRows[sensorID])
-      storeFrames.appendNew(sensorID, startRow);
+    // TODO we should not need this
+    //for (unsigned short startRow : startRows[sensorID])
+    //  storeFrames.appendNew(sensorID, startRow);
 
   }
 }

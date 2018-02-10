@@ -14,7 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDFrame.h>
+// TODO we should not need this
+//#include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <string>
 
@@ -55,16 +56,15 @@ namespace Belle2 {
       std::string m_storeRawHitsName;
       /** Name of the collection to use for the PXDDigits */
       std::string m_storeDigitsName;
+      // TODO we should not need this
       /** Name of the collection to use for the PXDFrames */
-      std::string m_storeFramesName;
+      //std::string m_storeFramesName;
       /** Mode: if true, merge duplicate pixels, otherwise only keep the first. */
       bool m_mergeDuplicates;
       /** Mode: if true, merge frames, otherwise keep separate frames */
       bool m_mergeFrames;
-      /** Minimum charge for which a digit is created. */
-      double m_0cut;
-      /** Assign VXDID to data that don't have it. */
-      bool m_assignID;
+      /** Minimum charge for a digit to carry */
+      int m_0cut;
       /** Discard out-of-range hits. */
       bool m_trimOutOfRange;
       /** Name of the ignored pixels list xml */

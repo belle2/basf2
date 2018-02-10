@@ -1014,11 +1014,12 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
                    << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
             B2DEBUG(20, "dhe_ID " << dhe_ID);
             B2DEBUG(20, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
+            // TODO Someone (->Björn) should put toffset into PXDDAQStatus
             B2DEBUG(20, "toffset " << toffset);
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F/*, dhp_cm */
+                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F/*, dhp_cm */
                                                        );
         }
       }

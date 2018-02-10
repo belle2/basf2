@@ -50,7 +50,8 @@ ROISenderModule::~ROISenderModule()
 void
 ROISenderModule::initialize()
 {
-  StoreObjPtr<ROIpayload>::required(m_ROIpayloadName);
+  StoreObjPtr<ROIpayload> roiPayloads;
+  roiPayloads.isRequired(m_ROIpayloadName);
 
   m_messageQueueNameCstring =  m_messageQueueName.c_str();
 

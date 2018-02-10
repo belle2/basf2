@@ -47,9 +47,10 @@ DQMHistComparitorModule::~DQMHistComparitorModule() { }
 TH1* DQMHistComparitorModule::GetHisto(TString histoname)
 {
   TH1* hh1;
+  gROOT->cd();
   hh1 = findHist(histoname.Data());
   if (hh1 == NULL) {
-    B2INFO("Histo " << histoname << " not in memfile");
+    B2DEBUG(20, "findHisto failed " << histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
 
 
@@ -67,10 +68,10 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
         if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
           auto e = d->GetDirectory(tok);
           if (e) {
-            B2INFO("Cd Dir " << tok);
+            B2DEBUG(20, "Cd Dir " << tok << " from " << d->GetPath());
             d = e;
           } else {
-            B2INFO("cd failed " << tok);
+            B2DEBUG(20, "cd failed " << tok << " from " << d->GetPath());
           }
         } else {
           break;
@@ -103,7 +104,7 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
     }
 
     if (hh1 == NULL) {
-      B2INFO("Histo " << histoname << " not in memfile or ref file");
+      B2DEBUG(20, "Histo " << histoname << " not in memfile or ref file");
       // the following code sux ... is there no root function for that?
 
       TDirectory* d = gROOT;
@@ -128,17 +129,17 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
       TObject* obj = d->FindObject(tok);
       if (obj != NULL) {
         if (obj->IsA()->InheritsFrom("TH1")) {
-          B2INFO("Histo " << histoname << " found in mem");
+          B2DEBUG(20, "Histo " << histoname << " found in mem");
           hh1 = (TH1*)obj;
         }
       } else {
-        B2INFO("Histo " << histoname << " NOT found in mem");
+        B2DEBUG(20, "Histo " << histoname << " NOT found in mem");
       }
     }
   }
 
   if (hh1 == NULL) {
-    B2INFO("Histo " << histoname << " not found");
+    B2DEBUG(20, "Histo " << histoname << " not found");
   }
 
   return hh1;
@@ -164,12 +165,8 @@ void DQMHistComparitorModule::initialize()
       continue;
     }
 
-    TH1* hist1, *hist2;
-
-    hist1 = GetHisto(it.at(0));
-    if (!hist1) continue;
-    hist2 = GetHisto(it.at(1));
-    if (!hist2) continue;
+    // Do not check for histogram existance here, as it might not be
+    // in memfile when analysis task is started
     TString a = it.at(2).c_str();
 
     auto n = new CMPNODE;
@@ -210,13 +207,18 @@ void DQMHistComparitorModule::event()
 
     TH1* hist1, *hist2;
 
+    B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
     hist1 = GetHisto(it->histo1);
-    if (!hist1) continue;
+    if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
     hist2 = GetHisto(it->histo2);
+    if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
+    // Dont compare if any of hists is missing ... TODO We should clean CANVAS, raise some error if we cannot compare
+    if (!hist1) continue;
     if (!hist2) continue;
 
+    B2DEBUG(20, "Compare " << it->histo1 << " with ref " << it->histo2);
     // if compare normalized ... does not work!
-//     hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
+    // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
 
     double data = 0.0;
     data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized

@@ -3,20 +3,20 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef ERRCODE_H
-#define ERRCODE_H
+#pragma once
 
 #include <iostream>
 
 namespace TreeFitter {
 
+  /** abstract errorocode be aware that the default is succes */
   class ErrCode {
   public:
+    /** some enums to store errors */
     enum Status {success = 0,
                  pocafailure = 1,
                  baddistance = 2,
@@ -29,36 +29,45 @@ namespace TreeFitter {
                  photondimerror = 256
                 } ;
 
+    /** default constructor */
     ErrCode() : m_flag(success) {}
 
-    // cppcheck-suppress noExplicitConstructor
+    /** simple cosntructor */
     ErrCode(Status flag) : m_flag(flag) {}
 
+    /** operator */
     const ErrCode& operator|=(const ErrCode& rhs)
     {
       m_flag |= rhs.m_flag ; return *this ;
     }
 
+    /** operator */
     bool operator==(const ErrCode& rhs) const
     {
       return m_flag == rhs.m_flag ;
     }
 
+    /** operator */
     bool operator==(const ErrCode::Status& rhs) const
     {
       return *this == ErrCode(rhs) ;
     }
 
+    /** reset the errorcode to default (success!) */
     void reset() { m_flag = success ; }
+
+    /** returns true if errorcode is error */
     bool failure() const { return m_flag != success ; }
 
+    /** get errorcode */
     unsigned int flag() const { return m_flag ; }
   private:
+
+    /** storing the errorcode */
     unsigned int m_flag ;
+
+    /** operator */
+    std::ostream& operator<<(std::ostream& os, const ErrCode& code) ;
+
   } ;
-
-  std::ostream& operator<<(std::ostream& os, const ErrCode& code) ;
-
 }
-
-#endif //ERRCODE_H

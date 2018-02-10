@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Define error codes to use in the fitter.
 
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 using std::ostream;

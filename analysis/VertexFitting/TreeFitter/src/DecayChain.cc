@@ -19,7 +19,6 @@
 
 
 namespace TreeFitter {
-  extern int vtxverbose;
 
   DecayChain::DecayChain(Belle2::Particle* particle, bool forceFitAll, const int ipDimension)
     : m_dim(0), m_headOfChain(0), m_isOwner(true)

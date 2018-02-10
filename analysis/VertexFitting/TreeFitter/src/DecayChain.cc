@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Build decaytree structure allowing to index particles and handle the filtering of constraints across the tree
 
 #include <algorithm>
 #include <framework/logging/Logger.h>
@@ -26,16 +25,14 @@ namespace TreeFitter {
     : m_dim(0), m_headOfChain(0), m_isOwner(true)
   {
     if (ipDimension > 1) {
-      B2DEBUG(30, "--DecayChain::constructor with beam contr");
       m_headOfChain = ParticleBase::createInteractionPoint(particle, forceFitAll, ipDimension);
     } else {
       //use the B,D or whatever as head
-      B2DEBUG(30, "--DecayChain::constructor without beam contr");
       m_headOfChain = ParticleBase::createParticle(particle, 0, forceFitAll);
     }
     m_headOfChain->updateIndex(m_dim);
 
-    m_cand   = locate(particle);
+    m_cand = locate(particle);
     initConstraintList();
   }
 
@@ -56,8 +53,7 @@ namespace TreeFitter {
 
   ErrCode DecayChain::initialize(FitParams* par)
   {
-    B2DEBUG(81, "--DecayChain::initialize: head:" << m_headOfChain->name());
-    ErrCode status; //seems like I should initialise it now if I want to use bitwise OR (|=) later
+    ErrCode status;
     par->resetStateVector();
     status |= m_headOfChain->initMotherlessParticle(par);
     par->resetCovariance();
@@ -67,11 +63,9 @@ namespace TreeFitter {
 
   ErrCode DecayChain::filter(FitParams& par, bool firstpass)
   {
-    B2DEBUG(81, "--Filtering DecayChain ");
     ErrCode status;
     par.resetCovariance();
     if (firstpass || !par.testCovariance()) {
-      B2DEBUG(81, "--Filtering DecayChain: Init Covariance");
       status |= m_headOfChain->initCovariance(&par);
     }
 
@@ -79,7 +73,6 @@ namespace TreeFitter {
     par.resetChiSquare();
     for (auto constraint : m_constraintlist) {
 
-      B2DEBUG(81, "--Filtering DecayChain: Current Constraint:" << constraint.name());
       status |= constraint.filter(&par);
 
       m_chi2SumConstraints += constraint.getChi2();
@@ -92,13 +85,11 @@ namespace TreeFitter {
     return m_headOfChain->chiSquare(par);
   }
 
-  const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const   //FT: This needs investigation
+  const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const
   {
+    //FIXME this can be done easier
     const ParticleBase* rc(0);
-    B2DEBUG(81, "--DecayChain::locate: Trying to locate " << particle->getName() << " in a " << m_particleMap.size() << " sized map.");
     const auto mapRow = m_particleMap.find(particle) ;
-
-    //auto isNullPB = [](const ParticleBase * pb) {return (pb) ? pb->name() : "NULL"; }; //JFK: lambda I use for debugging 2017-11-15
 
     if (mapRow == m_particleMap.end()) {
       //JFK: take head of chain and recursively find particle in it 2017-11-15
@@ -116,41 +107,37 @@ namespace TreeFitter {
 
   int DecayChain::index(Belle2::Particle* particle) const
   {
-    int rc = -1 ;
     const ParticleBase* base = locate(particle);
     if (base) {
-      rc = base->index();
+      return base->index();
     }
-    return rc;
+    return -1;
   }
 
   int DecayChain::posIndex(Belle2::Particle* particle) const
   {
-    int rc = -1;
     const ParticleBase* base = locate(particle);
     if (base) {
-      rc = base->posIndex();
+      return base->posIndex();
     }
-    return rc;
+    return -1;
   }
 
   int DecayChain::momIndex(Belle2::Particle* particle) const
   {
-    int rc = -1;
     const ParticleBase* base = locate(particle);
     if (base) {
-      rc = base->momIndex();
+      return base->momIndex();
     }
-    return rc;
+    return -1;
   }
 
   int DecayChain::tauIndex(Belle2::Particle* particle) const
   {
-    int rc = -1;
     const ParticleBase* base = locate(particle);
     if (base) {
-      rc = base->tauIndex();
+      return base->tauIndex();
     }
-    return rc;
+    return -1;
   }
 }

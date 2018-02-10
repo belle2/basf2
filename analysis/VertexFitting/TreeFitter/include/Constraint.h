@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef CONSTRAINT_H
-#define CONSTRAINT_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -20,6 +18,7 @@ namespace TreeFitter {
   class Projection ;
   class FitParams ;
 
+  /** class to manage the order of contraints and their filtering */
   class Constraint {
   public:
     /**
@@ -85,7 +84,6 @@ namespace TreeFitter {
     /** filter this constraint */
     virtual ErrCode filter(FitParams* fitpar);
 
-
     /** get name of constraint  */
     std::string name() const;
 
@@ -96,6 +94,7 @@ namespace TreeFitter {
 
     /** get diension of cosntraint */
     double getNDF() const {return m_ndf;}
+
     /** get chi2 of last kalman iteration for this constraint */
     double getChi2() const {return m_chi2;}
 
@@ -120,7 +119,9 @@ namespace TreeFitter {
     /** ndf */
     double m_ndf;
 
+    /** chi2 coming from the constraint */
     double m_chi2;
+
     /**  */
     int m_depth;
 
@@ -138,5 +139,3 @@ namespace TreeFitter {
   };
 
 }
-
-#endif //CONSTRAINT_H

@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef DECAYCHAIN_H
-#define DECAYCHAIN_H
+#pragma once
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/MergedConstraint.h>
@@ -75,10 +73,8 @@ namespace TreeFitter {
     int tauIndex(Belle2::Particle* bc) const ;
 
     /**    */
-    void setOwner(bool b) { m_isOwner = b ;}
-
-    /**    */
     int momIndex() const ;
+
     /**  */
     double getChi2Sum() const {return m_chi2SumConstraints; }
 
@@ -88,13 +84,13 @@ namespace TreeFitter {
   private:
 
     /** chi2 sum for the constraints has to be devided by the number of constraints in the getter */
-    double m_chi2SumConstraints;
+    mutable double m_chi2SumConstraints;
 
     /**    */
-    int m_dim ;
+    mutable int m_dim ;
 
     /**    */
-    ParticleBase* m_headOfChain ;     // head of decay tree
+    mutable ParticleBase* m_headOfChain ;     // head of decay tree
 
     /**    */
     const ParticleBase* m_cand ; // fit candidate (not same to mother in case of bs/be constraint)
@@ -115,12 +111,8 @@ namespace TreeFitter {
     ParticleMap m_particleMap ;
 
     /**    */
-    bool m_isOwner ;
+    const bool m_isOwner ;
 
   };
 
 }
-
-
-
-#endif //DECAYCHAIN_H

@@ -8,17 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <iomanip>
-#include <framework/logging/Logger.h>
-
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
 namespace TreeFitter {
-
-  extern int vtxverbose ;
 
   bool Constraint::operator<(const Constraint& rhs) const
   {
@@ -58,10 +53,6 @@ namespace TreeFitter {
 
   ErrCode Constraint::filter(FitParams* fitpar)
   {
-    //std::cout << "Filtering " << this->name() <<
-    //          " -------------------------------------------------------------------------------------------------------------------"  <<
-    //          std::endl;
-    B2DEBUG(82, "----Constraint::filtering " << this->name());
     ErrCode status;
 
     Projection p(fitpar->getDimensionOfState(), m_dim);
@@ -72,7 +63,6 @@ namespace TreeFitter {
     bool finished(false) ;
     while (!finished && !status.failure()) {
 
-      B2DEBUG(82, "---- Constraint::filter iteration # " << iter << " current chi2 = " << chisq);
       p.resetProjection();
       status |= project(*fitpar, p);
 
@@ -94,19 +84,13 @@ namespace TreeFitter {
         }
       }
     }
-    B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " <<
-            chisq <<
-            " NDF" << m_dim << " for " << this->name());
+
     //std::cout <<  "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq
     //          << " NDF" << m_dim << " for " << this->name() << std::endl;
 
-    /* FIXME get the math in RecoPhoton right so that the reduced constraint can be projected
-     * this is a hack that works but projection 3d instead of 4d photon would be better :  <15-12-17, jkrohn> */
-    const unsigned int NDF = (this->type() == photon)
-                             && (this->dim() == 4) ?  kalman.getConstraintDim() - 1 : kalman.getConstraintDim();
+    const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
 
-    //fitpar->addChiSquare(kalman.getChiSquare(), kalman.getConstraintDim());
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
     return status;

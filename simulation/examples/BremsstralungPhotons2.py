@@ -8,6 +8,7 @@ This script saves Bremsstrahlung photons in MCParticles.
   <contact>dorisykim@ssu.ac.kr</contact>
   <description>
       Saves 100 generic BBbar events with EvtGen + Bremsstrahlungi photons created by Geant4 in MCParticles.
+      The corresponding secondaryPhysicsProcess ID is 3, which is defined as fBremsstrahlung in G4EmProcessSubType.h.
       The detector simulation mixed with background, trigger simulation, and standard reconstruction are done.
   </description>
 </header>
@@ -34,7 +35,7 @@ main.add_module('EvtGenInput')
 add_simulation(main, bkgfiles=get_background_files())
 
 # saving Bremsstrahlung photons with kinetic energy > 10.0 MeV.
-set_modules_parameters(main, "FullSim", StoreBremsstrahlungPhotons=True, BremsstrahlungPhotonsEnergyCut=10.0)
+set_module_parameters(main, "FullSim", StoreBremsstrahlungPhotons=True, BremsstrahlungPhotonsEnergyCut=10.0)
 
 # trigger simulation
 add_tsim(main)

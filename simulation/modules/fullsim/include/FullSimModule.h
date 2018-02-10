@@ -94,7 +94,6 @@ namespace Belle2 {
   protected:
 
     std::string m_mcParticleInputColName;  /**< The parameter variable for the name of the input MCParticle collection. */
-    std::string m_mcParticleOutputColName; /**< The parameter variable for the name of the output MCParticle collection. */
     double m_thresholdImportantEnergy;     /**< A particle which got 'stuck' and has less than this energy will be killed after m_thresholdTrials trials. */
     int m_thresholdTrials;                 /**< Geant4 will try m_thresholdTrials times to move a particle which got 'stuck' and has an energy less than m_thresholdImportantEnergy. */
     int m_runEventVerbosity;               /**< Geant4 run/event verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */

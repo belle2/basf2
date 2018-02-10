@@ -8,10 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedx1DCleanupAlgorithm.h>
-#include <TF1.h>
+#include <algorithm>
+#include <iostream>
+
+#include <TCanvas.h>
 #include <TH1F.h>
+#include <TLine.h>
 #include <TTree.h>
+
+#include <reconstruction/calibration/CDCDedx1DCleanupAlgorithm.h>
 
 using namespace Belle2;
 
@@ -39,51 +44,70 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
   if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
-  std::vector<double>* dedx = 0, *enta = 0;
-  TBranch* bdedx = 0, *benta = 0;
+  std::vector<double>* dedxhit = 0, *enta = 0;
 
-  ttree->SetBranchAddress("dedxhit", &dedx, &bdedx);
-  ttree->SetBranchAddress("enta", &enta, &benta);
+  ttree->SetBranchAddress("enta", &enta);
+  ttree->SetBranchAddress("dedxhit", &dedxhit);
 
   // make histograms to store dE/dx values in bins of entrance angle
   const int nbins = 20;
   double binsize = 2.0 / nbins;
-  TH1F dedxenta[nbins];
-  for (unsigned int i = 0; i < nbins; ++i) {
-    dedxenta[i] = TH1F(TString::Format("dedxenta%d", i), "dE/dx in bins of cosine", 100, 0, 2);
-  }
-
-  // fill histograms
+  std::vector<std::vector<double>> entadedx(nbins, std::vector<double>());
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
-    for (unsigned int j = 0; j < dedx->size(); ++j) {
+    for (unsigned int j = 0; j < enta->size(); ++j) {
       double myenta = enta->at(j);
 
       // assume rotational symmetry
       if (myenta < -3.1416 / 2.0) myenta += 3.1416 / 2.0;
-      if (myenta > 3.1416 / 2.0) myenta -= 3.1416 / 2.0;
+      else if (myenta > 3.1416 / 2.0) myenta -= 3.1416 / 2.0;
+      if (abs(myenta) > 3.1416 / 2) continue;
 
-      int bin = std::floor(sin(myenta) / binsize);
+      int bin = std::floor((sin(myenta) + 1) / binsize);
       if (bin < 0 || bin >= nbins) continue;
-      dedxenta[bin].Fill(dedx->at(j));
+      entadedx[bin].push_back(dedxhit->at(j));
     }
   }
+
+  // Print the histograms for quality control
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
+  ctmp->Divide(3, 3);
+  std::stringstream psname; psname << "dedx_1dcor.ps[";
+  ctmp->Print(psname.str().c_str());
+  psname.str(""); psname << "dedx_1dcor.ps";
+
+  TH1F* base = new TH1F("base", "", 250, 0, 5);
+  TLine* tl = new TLine();
 
   // fit histograms to get gains in bins of entrance angle
   std::vector<double> onedcor;
-  for (unsigned int i = 0; i < nbins; ++i) {
-    if (dedxenta[i].Integral() < 50)
-      onedcor.push_back(1.0); // FIXME! --> should return not enough data
-    else {
-      int status = dedxenta[i].Fit("gaus");
-      if (status != 0) {
-        onedcor.push_back(1.0); // FIXME! --> should return not enough data
-      } else {
-        float mean = dedxenta[i].GetFunction("gaus")->GetParameter(1);
-        onedcor.push_back(mean);
-      }
+  for (unsigned int i = 0; i < entadedx.size(); ++i) {
+    ctmp->cd(i % 9 + 1); // each canvas is 9x9
+    for (unsigned int j = 0; j < entadedx[i].size(); ++j) {
+      base->Fill(entadedx[i][j]);
     }
+    base->DrawCopy("hist");
+
+    double mean = 1.0;
+    if (entadedx[i].size() < 10) {
+      onedcor.push_back(mean); // <-- FIX ME, should return not enough data
+    } else {
+      mean = calculateMean(entadedx[i], 0.05, 0.25);
+      onedcor.push_back(mean);
+    }
+
+    tl->SetX1(mean); tl->SetX2(mean);
+    tl->SetY1(0); tl->SetY2(base->GetMaximum());
+    tl->Draw("same");
+
+    base->Reset();
+    if ((i + 1) % 9 == 0 || i + 1 == entadedx.size())
+      ctmp->Print(psname.str().c_str());
   }
+
+  psname.str(""); psname << "dedx_1dcor.ps]";
+  ctmp->Print(psname.str().c_str());
+  delete ctmp;
 
   std::vector<std::vector<double>> onedcors;
   onedcors.push_back(onedcor);
@@ -94,4 +118,38 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
   saveCalibration(gain, "CDCDedx1DCleanup");
 
   return c_OK;
+}
+
+double CDCDedx1DCleanupAlgorithm::calculateMean(const std::vector<double>& dedx,
+                                                double removeLowest, double removeHighest) const
+{
+  // Calculate the truncated average by skipping the lowest & highest
+  // events in the array of dE/dx values
+  std::vector<double> sortedDedx = dedx;
+  std::sort(sortedDedx.begin(), sortedDedx.end());
+
+  double truncatedMean = 0.0;
+  double mean = 0.0;
+  double sumOfSquares = 0.0;
+  int numValuesTrunc = 0;
+  const int numDedx = sortedDedx.size();
+
+  // add a factor of 0.5 here to make sure we are rounding appropriately...
+  const int lowEdgeTrunc = int(numDedx * removeLowest + 0.5);
+  const int highEdgeTrunc = int(numDedx * (1 - removeHighest) + 0.5);
+  for (int i = 0; i < numDedx; i++) {
+    mean += sortedDedx[i];
+    if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
+      truncatedMean += sortedDedx[i];
+      sumOfSquares += sortedDedx[i] * sortedDedx[i];
+      numValuesTrunc++;
+    }
+  }
+
+  if (numDedx != 0) mean /= numDedx;
+
+  if (numValuesTrunc != 0) truncatedMean /= numValuesTrunc;
+  else truncatedMean = mean;
+
+  return truncatedMean;
 }

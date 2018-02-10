@@ -52,7 +52,7 @@ add_tracking_reconstruction(
     main,
     components=["SVD"],
     mcTrackFinding=MCTracking,
-    additionalTrackFitHypotheses=[211],
+    trackFitHypotheses=[211],
     skipHitPreparerAdding=True)
 
 

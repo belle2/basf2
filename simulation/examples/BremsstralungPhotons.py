@@ -8,6 +8,7 @@ This script saves bremsstrahlung photons in MCParticles.
   <contact>dorisykim@ssu.ac.kr</contact>
   <description>
       Saves 100 EvtGen events + secondary bremsstrahlung photons created by Geant4 in MCParticles.
+      The corresponding secondaryPhysicsProcess ID is 3, which is defined as fBremsstrahlung in G4EmProcessSubType.h.
   </description>
 </header>
 """

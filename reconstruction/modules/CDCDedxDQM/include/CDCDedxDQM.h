@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TF1.h"
 
 namespace Belle2 {
@@ -53,12 +54,10 @@ namespace Belle2 {
 
   private:
 
-    /** Store array: CDCDedxTrack */
-    StoreArray<CDCDedxTrack> m_cdcDedxTracks;
+    StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TH1F* m_h_dedx = nullptr; /**< Histogram for dE/dx truncated means */
-    TH1F* m_h_dedxmean = nullptr; /**< Histogram for average dE/dx mean */
-    TH1F* m_h_dedxsigma = nullptr; /**< Histogram for dE/dx resolution */
+    TH1F* m_h_dedxmeans = nullptr; /**< Histogram for dE/dx electron means */
+    TH2F* m_h_dedxbands = nullptr; /**< Histogram for dE/dx band plot */
 
   };
 } // Belle2 namespace

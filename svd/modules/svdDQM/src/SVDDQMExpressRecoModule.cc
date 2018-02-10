@@ -341,7 +341,7 @@ void SVDDQMExpressRecoModule::initialize()
   m_storeSVDClustersName = storeSVDClusters.getName();
 
   storeSVDClusters.registerInDataStore();
-  storeSVDShaperDigits.isRequired();
+  storeSVDShaperDigits.isOptional();
 
   //Store names to speed up creation later
   m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();

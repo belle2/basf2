@@ -9,8 +9,8 @@
  **************************************************************************/
 
 // Own include
-#include <arich/modules/arichPhysicalDQM/newTHs.h>
-#include <arich/modules/arichPhysicalDQM/hitMapMaker.h>
+#include <arich/modules/arichDQM/newTHs.h>
+#include <arich/modules/arichDQM/hitMapMaker.h>
 
 // ARICH
 #include <arich/dbobjects/ARICHGeometryConfig.h>

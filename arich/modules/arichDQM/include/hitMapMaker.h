@@ -13,7 +13,7 @@
 
 #include <framework/core/HistoModule.h>
 
-#include <arich/modules/arichPhysicalDQM/newTHs.h>
+#include <arich/modules/arichDQM/newTHs.h>
 
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHTrack.h>

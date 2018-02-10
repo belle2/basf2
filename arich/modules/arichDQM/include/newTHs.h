@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BELLE2_NEWTHS_h
-#define BELLE2_NEWTHS_h
+#ifndef ARICH_NEWTHS_h
+#define ARICH_NEWTHS_h
 
 #include <TCanvas.h>
 #include <TH1F.h>

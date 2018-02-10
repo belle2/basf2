@@ -76,6 +76,8 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
   moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
 
+  moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
+
   moduleParamList->getParameter<bool>("useAssignedHits").setDefaultValue(false);
 }
 

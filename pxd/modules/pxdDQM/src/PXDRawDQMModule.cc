@@ -156,7 +156,9 @@ void PXDRawDQMModule::event()
                                                    100 + it.getRow() + 850 * (layer + layer + sensor - 3));
     if (hrawPxdChargeMap[dhh_id]) hrawPxdChargeMap[dhh_id]->Fill(it.getColumn(), it.getRow(), it.getCharge());
     if (hrawPxdHitsCharge[dhh_id]) hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
-    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - it.getStartRow());
+    // TODO: read start row from DAQStatus StoreObjPtr ...
+    unsigned int startRow = 0;
+    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - startRow);
   }
 
   if (hrawPxdAdcMapAll) {

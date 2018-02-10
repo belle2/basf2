@@ -477,4 +477,4 @@ void PXDDigitizerModule::saveDigits()
   }
 }
 
-//void PXDDigitizerModule::terminate() {}
+

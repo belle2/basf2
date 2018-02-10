@@ -116,13 +116,11 @@ namespace Belle2 {
       void saveDigits();
 
       /** Initialize the module and check the parameters */
-      virtual void initialize();
+      void initialize() override final;
       /** Initialize the list of existing PXD Sensors */
-      virtual void beginRun();
+      void beginRun() override final;
       /** Digitize one event */
-      virtual void event();
-      /** Terminate the module */
-      //virtual void terminate();
+      void event() override final;
 
     protected:
       /** Wether or not to apply noise */

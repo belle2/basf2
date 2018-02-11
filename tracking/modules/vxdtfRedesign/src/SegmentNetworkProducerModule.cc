@@ -28,7 +28,7 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 {
   InitializeCounters();
 
-  vector<string> spacePointArrayNames = {""};
+  vector<string> spacePointArrayNames = {"SVDSpacePoints", "PXDSpacePoints"};
 
   vector<double> ipCoords = {0, 0, 0};
 
@@ -145,7 +145,7 @@ SegmentNetworkProducerModule::initialize()
     m_spacePoints.back().isRequired();
   }
 
-  m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut);
+  m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   // TODO catch cases when m_network already existed in DataStore!
 
@@ -174,8 +174,8 @@ SegmentNetworkProducerModule::initialize()
   // for this observer the results will be dumped into the datastore
   if (m_PARAMobserverType == SegmentNetworkProducerModule::c_ObserverCheckFilters) {
     // needs a StoreArray to store the data
-    StoreArray<ObserverInfo> observerInfoArray("observerInfos", DataStore::c_Event);
-    observerInfoArray.registerInDataStore();
+    StoreArray<ObserverInfo> observerInfoArray("observerInfos");
+    observerInfoArray.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
     VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
     bool isinitialized = initializeObservers(aFilter.observe(ObserverCheckFilters()) , observerInfoArray);

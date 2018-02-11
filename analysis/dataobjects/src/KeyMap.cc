@@ -10,8 +10,8 @@
 
 #include <analysis/dataobjects/KeyMap.h>
 #include <framework/logging/Logger.h>
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
+//#include <analysis/VariableManager/Manager.h>
+//#include <analysis/VariableManager/Utility.h>
 
 using namespace Belle2;
 
@@ -26,6 +26,7 @@ int KeyMap::numberOfDimensions()
   } else {
     B2ERROR("Key map is incorrectly intialized: dimension can't be defined.");
   }
+  return -1;
 }
 
 void KeyMap::dimensionsCheck(int ndim)
@@ -65,8 +66,8 @@ bool KeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var
         return true;
       }
     }
-    return false;
   }
+  return false;
 }
 
 bool KeyMap::isKey(double key)
@@ -268,6 +269,8 @@ double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits 
 // Get kinematic key for the particle's momentum
 double KeyMap::getKey(const Particle* p)
 {
+  return -110;
+  /*
   int nDim = numberOfDimensions();
   switch (nDim) {
     case 1: {
@@ -276,6 +279,7 @@ double KeyMap::getKey(const Particle* p)
       const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
       if (!var1) {
         B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
+        return -1;
       } else {
         var1_val = var1->function(p);
       }
@@ -296,11 +300,13 @@ double KeyMap::getKey(const Particle* p)
       const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(variables[1]);
       if (!var1) {
         B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
+        return -1;
       } else {
         var1_val = var1->function(p);
       }
       if (!var2) {
         B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
+        return -1;
       } else {
         var2_val = var2->function(p);
       }
@@ -327,16 +333,19 @@ double KeyMap::getKey(const Particle* p)
       const Variable::Manager::Var* var3 = Variable::Manager::Instance().getVariable(variables[2]);
       if (!var1) {
         B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
+        return -1;
       } else {
         var1_val = var1->function(p);
       }
       if (!var2) {
         B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
+        return -1;
       } else {
         var2_val = var2->function(p);
       }
       if (!var3) {
         B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
+        return -1;
       } else {
         var3_val = var3->function(p);
       }
@@ -361,6 +370,7 @@ double KeyMap::getKey(const Particle* p)
       B2ERROR("Error in finding of the key due to dimensionality of the table");
   }
   return -1;
+  */
 }
 
 
@@ -380,6 +390,7 @@ std::string KeyMap::getVar1()
     default:
       B2ERROR("Error in gtting variable name due to dimensionality of the table");
   }
+  return std::string("Error");
 }
 
 std::string KeyMap::getVar2()
@@ -398,6 +409,7 @@ std::string KeyMap::getVar2()
     default:
       B2ERROR("Error in gtting variable name due to dimensionality of the table");
   }
+  return std::string("Error");
 }
 
 std::string KeyMap::getVar3()
@@ -416,7 +428,7 @@ std::string KeyMap::getVar3()
     default:
       B2ERROR("Error in gtting variable name due to dimensionality of the table");
   }
-
+  return std::string("Error");
 }
 
 void KeyMap::setVar1(std::string name)
@@ -527,6 +539,7 @@ double KeyMap::addKey(NDBin bin, double key_ID)
       break;
     default:
       B2ERROR("Error in adding key due to dimensionality of the table");
+      return -1;
   }
 }
 
@@ -546,5 +559,6 @@ double KeyMap::addKey(NDBin bin)
       break;
     default:
       B2ERROR("Error in adding key due to dimensionality of the table");
+      return -1;
   }
 }

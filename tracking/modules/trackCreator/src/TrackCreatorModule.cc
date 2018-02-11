@@ -70,7 +70,7 @@ void TrackCreatorModule::initialize()
   StoreArray<Track> tracks(m_trackColName);
   const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
   StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
-  const bool trackFitResultsRegistered = trackFitResults.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  const bool trackFitResultsRegistered = trackFitResults.registerInDataStore();
 
   B2ASSERT(tracksRegistered and trackFitResultsRegistered, "Could not register output store arrays.");
 

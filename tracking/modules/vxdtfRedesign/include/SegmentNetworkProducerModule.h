@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at)     *
+ * Contributors: Jakob Lettenbichler, Felix Metzner                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -75,54 +75,24 @@ namespace Belle2 {
     };
 
 
-    /**
-     * Constructor of the module.
-     */
+    /// Constructor of the module.
     SegmentNetworkProducerModule();
 
 
-    /** Initializes the Module.
-     */
+    /// Modul initialization: performing checks on input parameter and registration of network container in data store.
     void initialize() override;
 
-
-
-
-    /**
-     * Prints a header for each new run.
-     */
+    /// Begin Run which load the filters from the provided SectorMap and checks if this was successful.
     void beginRun() override
     {
-      InitializeCounters();
-
-      if (m_PARAMVirtualIPCoordinates.size() != 3
-          or m_PARAMVirtualIPErrors.size() != 3)
-        B2FATAL("SegmentNetworkProducerModule:initialize: parameters for virtualIP are wrong - check basf2 -m!");
-
-      m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
-                                          m_PARAMVirtualIPCoordinates.at(2));
-      m_virtualIPErrors = B2Vector3D(m_PARAMVirtualIPErrors.at(0), m_PARAMVirtualIPErrors.at(1), m_PARAMVirtualIPErrors.at(2));
+      m_vxdtfFilters = m_filtersContainer.getFilters(m_PARAMsecMapName);
+      if (m_vxdtfFilters == nullptr) B2FATAL("Requested secMapName '" << m_PARAMsecMapName
+                                               << "' does not exist! Can not continue...");
     }
 
 
     /** builds the SegmentNetwork and the TrackNodeNetwork  */
     void event() override;
-
-
-    /** Prints a footer for each run which ended. */
-    void endRun() override;
-
-    /** clean up: */
-    void terminate() override
-    {
-      // delete the root file if it has been created
-      if (m_tfile) {
-        m_tfile->Write();
-        m_tfile->Close();
-        delete m_tfile;
-      }
-    }
-
 
 
     /** initialize variables to avoid nondeterministic behavior */
@@ -178,18 +148,15 @@ namespace Belle2 {
     bool buildTrackNodeNetwork();
 
 
-    /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment >
+    /** Use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment >
     @param ObserverType : type  of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
     */
     template < class ObserverType >
     void buildSegmentNetwork();
 
 
-
   protected:
-
-// module parameters
-
+    // module parameters
     /** The output: a StoreObjPtr of DirectedNodeNetworkContainer:
      * - will contain a DirectedNodeNetwork< ActiveSector> (if parameter 'CreateNeworks' is [1;3])
      * - will contain a DirectedNodeNetwork< SpacePoint > (if parameter 'CreateNeworks' is  [2;3])
@@ -199,7 +166,7 @@ namespace Belle2 {
     int m_PARAMCreateNeworks;
 
     /** contains names for storeArray with spacePoints in it */
-    std::vector<std::string> m_PARAMSpacePointsArrayNames;
+    std::vector<std::string> m_PARAMSpacePointsArrayNames = {"SVDSpacePoints", "PXDSpacePoints"};
 
     /** defines the unique name given to the output of this module - WARNING two instances of this module with the same name set in this parameter will abort the run! */
     std::string m_PARAMNetworkOutputName;
@@ -208,10 +175,10 @@ namespace Belle2 {
     bool m_PARAMAddVirtualIP;
 
     /**  expects X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
-    std::vector<double> m_PARAMVirtualIPCoordinates;
+    std::vector<double> m_PARAMVirtualIPCoordinates = {0, 0, 0};
 
     /** expects errors for X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
-    std::vector<double> m_PARAMVirtualIPErrors;
+    std::vector<double> m_PARAMVirtualIPErrors = {0.2, 0.2, 1.};
 
     /** the name of the SectorMap used for this instance. */
     std::string m_PARAMsecMapName;

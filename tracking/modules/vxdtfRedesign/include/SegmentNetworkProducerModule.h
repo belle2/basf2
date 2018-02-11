@@ -27,7 +27,6 @@
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
-
 //root
 #include <TFile.h>
 
@@ -191,12 +190,7 @@ namespace Belle2 {
     */
     unsigned short m_PARAMmaxHitNetworkSize = 3000;
 
-    /** integer switch to decide which observer to use: see enum eObserverTypes
-      NOTE: that observing filters make the code slow! So only use for debugging purposes
-    */
-    int m_PARAMobserverType;
-
-// member variables
+    /// member variables
 
     /** pointer to a root file needed to store the filter-variable responses if filter are observed */
     TFile* m_tfile = nullptr;

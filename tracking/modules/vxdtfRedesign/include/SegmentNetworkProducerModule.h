@@ -50,11 +50,8 @@ namespace Belle2 {
   class SegmentNetworkProducerModule : public Module {
 
   public:
-    /** to improve readability of the code, here the definition of the static sector type. */
+    /// Definition of the static sector type.
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
-
-    /** enum to handle the currently implemented observer types */
-    enum eObserverTypes { c_VoidObserver = 0, c_ObserverCheckMCPurity = 1, c_ObserverCheckFilters = 2 };
 
     /** simple struct for collecting raw data for a single sector */
     struct RawSectorData {
@@ -156,19 +153,11 @@ namespace Belle2 {
 
 
   protected:
-    // module parameters
-    /** The output: a StoreObjPtr of DirectedNodeNetworkContainer:
-     * - will contain a DirectedNodeNetwork< ActiveSector> (if parameter 'CreateNeworks' is [1;3])
-     * - will contain a DirectedNodeNetwork< SpacePoint > (if parameter 'CreateNeworks' is  [2;3])
-     * - will contain a DirectedNodeNetwork< Segment > (if parameter 'CreateNeworks' is [3])
-     * - if 'CreateNeworks' is <1 or > 3 it will abort the run.
-     */
-    int m_PARAMCreateNeworks;
-
-    /** contains names for storeArray with spacePoints in it */
+    /// module parameters
+    /// Vector with SpacePoint storeArray names.
     std::vector<std::string> m_PARAMSpacePointsArrayNames = {"SVDSpacePoints", "PXDSpacePoints"};
 
-    /** defines the unique name given to the output of this module - WARNING two instances of this module with the same name set in this parameter will abort the run! */
+    /// Name for network container data store object created by this module.
     std::string m_PARAMNetworkOutputName;
 
     /** if true, to the given SpacePoints a virtual interaction point at given coordinates with parameter 'virtualIPCoorindates' will be added */
@@ -181,16 +170,16 @@ namespace Belle2 {
     std::vector<double> m_PARAMVirtualIPErrors = {0.2, 0.2, 1.};
 
     /** the name of the SectorMap used for this instance. */
-    std::string m_PARAMsecMapName;
+    std::string m_PARAMsecMapName = "testMap";
 
     /** If true for each event and each network created a file with a graph is created. */
-    bool m_PARAMprintNetworks;
+    bool m_PARAMprintNetworks = false;
 
     /** If true a file containing Mathematica code to generate a graph of the segment network is created. */
-    bool m_PARAMprintToMathematica;
+    bool m_PARAMprintToMathematica = false;
 
     /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
-    bool m_PARAMallFiltersOff;
+    bool m_PARAMallFiltersOff = false;
 
     /** Maximal size of SegmentNetwork; if exceeded, filling of the SegmentNetwork will be stopped, the
     *   SegmentNetwork will be cleared and the respective event will be skipped.

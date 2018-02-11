@@ -30,12 +30,6 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
   setDescription("The segment network producer module. \n This module takes a given sectorMap and storeArrays of spacePoints and creates a segmentNetwork (if activated).\nThe output: a StoreObjPtr of DirectedNodeNetworkContainer:\n - will contain a DirectedNodeNetwork< ActiveSector> (if parameter 'createNeworks' is [1;3])\n - will contain a DirectedNodeNetwork< SpacePoint > (if parameter 'createNeworks' is  [2;3])\n - will contain a DirectedNodeNetwork< Segment > (if parameter 'createNeworks' is [3])");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-
-  addParam("CreateNeworks",
-           m_PARAMCreateNeworks,
-           "The output: a StoreObjPtr of DirectedNodeNetworkContainer:\n - will contain a DirectedNodeNetwork<ActiveSector> (if parameter 'createNeworks' is [1;3])\n - will contain a DirectedNodeNetwork<SpacePoint> (if parameter 'createNeworks' is  [2;3])\n - will contain a DirectedNodeNetwork<Segment> (if parameter 'createNeworks' is [3])",
-           int(3));
-
   addParam("SpacePointsArrayNames",
            m_PARAMSpacePointsArrayNames,
            "contains names for storeArrays with spacePoints in it (add at least one)",
@@ -63,20 +57,23 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 
   addParam("sectorMapName",
            m_PARAMsecMapName,
-           "the name of the SectorMap used for this instance.", string("testMap"));
+           "the name of the SectorMap used for this instance.",
+           m_PARAMsecMapName);
 
   addParam("printNetworks",
            m_PARAMprintNetworks,
-           "If true for each event and each network created a file with a graph is created.", bool(false));
+           "If true for each event and each network created a file with a graph is created.",
+           m_PARAMprintNetworks);
 
   addParam("printNetworkToMathematica",
            m_PARAMprintToMathematica,
-           "If true a file containing Mathematica code to generate a graph of the segment network is created.", bool(false));
+           "If true a file containing Mathematica code to generate a graph of the segment network is created.",
+           m_PARAMprintToMathematica);
 
   addParam("allFiltersOff",
            m_PARAMallFiltersOff,
            "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
-           bool(false));
+           m_PARAMallFiltersOff);
 
   addParam("maxNetworkSize",
            m_PARAMmaxNetworkSize,
@@ -87,16 +84,6 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMmaxHitNetworkSize,
            "Maximal size of the HitNetwork; if exceeded, the event execution will be skipped.",
            m_PARAMmaxHitNetworkSize);
-
-  addParam("observerType",
-           m_PARAMobserverType,
-           "Use this option for debugging ONLY!"
-           "0 -> No observer (VoidObserver) This is the default!; "
-           "1 -> ObserverCheckMCPurity : observes filter, values are written to a root file;"
-           "2 -> ObserverCheckFilters : observes filter, values are stored to the datastore (WARNING creates lots of data)"
-           "NOTE: that observing filters (using another option than 0 VoidObserver) makes the code slow!"
-           "So only use for debugging purposes.",
-           int(SegmentNetworkProducerModule::c_VoidObserver));
 }
 
 
@@ -126,10 +113,6 @@ void SegmentNetworkProducerModule::initialize()
                                              true);
   }
 
-  if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
-    B2FATAL("Parameter 'createNeworks' is set to invalid value " << m_PARAMCreateNeworks << "! Must be between 1 and 3!");
-  }
-
   for (std::string& anArrayName : m_PARAMSpacePointsArrayNames) {
     m_spacePoints.push_back(StoreArray<SpacePoint>(anArrayName));
     m_spacePoints.back().isRequired();
@@ -153,11 +136,7 @@ void SegmentNetworkProducerModule::event()
   vector<RawSectorData> collectedData = matchSpacePointToSectors();
   buildActiveSectorNetwork(collectedData);
 
-  if (m_PARAMCreateNeworks < 2) {
-    return;
-  }
-
-  if (not buildTrackNodeNetwork<VoidObserver>() or m_PARAMCreateNeworks < 3) {
+  if (not buildTrackNodeNetwork<VoidObserver>()) {
     return;
   }
 

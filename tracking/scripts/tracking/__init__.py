@@ -921,12 +921,9 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     nameSegNet = 'SegmentNetwork' + suffix
     segNetProducer = register_module('SegmentNetworkProducer')
-    segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
-    segNetProducer.param('printNetworks', False)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
-    segNetProducer.param('observerType', 0)
     path.add_module(segNetProducer)
 
     #################

@@ -47,8 +47,10 @@ namespace Belle2 {
 
   private:
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 22 */
+    /** cut for accepting to hitmap histogram, using strips only, default = 22 ADU */
     float m_CutSVDCharge = 22.0;
+    /** cut for accepting clusters to hitmap histogram, default = 12 ke- */
+    float m_CutSVDClusterCharge = 12000;
 
     /** No of FADCs, for Phase2: 5,
      *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
@@ -90,10 +92,14 @@ namespace Belle2 {
     TH1F** m_clusterChargeU;
     /** v charge of clusters */
     TH1F** m_clusterChargeV;
-    /** u charge of clusters for all sensors */
-    TH1F* m_clusterChargeUAll;
-    /** v charge of clusters for all sensors */
-    TH1F* m_clusterChargeVAll;
+    /** u charge of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeU3;
+    /** v charge of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeV3;
+    /** u charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeU456;
+    /** v charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeV456;
     /** u charge of strips */
     TH1F** m_stripSignalU;
     /** v charge of strips */

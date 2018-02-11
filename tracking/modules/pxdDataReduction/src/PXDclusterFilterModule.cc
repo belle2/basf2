@@ -46,7 +46,8 @@ PXDclusterFilterModule::~PXDclusterFilterModule()
 void PXDclusterFilterModule::initialize()
 {
 
-  StoreArray<ROIid>::required(m_ROIidsName);
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIidsName);
 
   // We have to change it once the hardware type clusters are well defined
   StoreArray<PXDCluster> PXDClusters(m_PXDClustersName);   /**< The PXDClusters to be filtered */

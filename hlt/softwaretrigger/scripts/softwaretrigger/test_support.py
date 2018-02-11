@@ -23,6 +23,7 @@ class CheckForSoftwareTriggerResult(basf2.Module):
         be checked for a filled SoftwareTriggerResult object
         """
         super().__init__()
+        #: Copy of the has_softwaretriggerresult input variable.
         self.has_softwaretriggerresult = has_softwaretriggerresult
 
     def event(self):

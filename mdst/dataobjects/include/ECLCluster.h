@@ -29,17 +29,17 @@ namespace Belle2 {
 
     /** The hypothis ID for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
     enum Hypothesis {
-      /** CR is split into a muon and n photons*/
+      /** CR is split into a muon and n photons (T1) */
       c_muonNPhotons = 1,
-      /** CR is reconstructed as a charged hadron*/
+      /** CR is reconstructed as a charged hadron (T2) */
       c_chargedHadron = 2,
-      /** CR is split into an electron and n photons*/
+      /** CR is split into an electron and n photons (T3) */
       c_electronNPhotons = 3,
-      /** CR is split into n photons*/
+      /** CR is split into n photons (N1) */
       c_nPhotons = 5,
-      /** CR is reconstructed as a neutral hadron*/
+      /** CR is reconstructed as a neutral hadron (N2) */
       c_neutralHadron = 6,
-      /** CR is reconstructed as merged pi0*/
+      /** CR is reconstructed as merged pi0 (N3) */
       c_mergedPi0 = 7
     };
 
@@ -58,7 +58,7 @@ namespace Belle2 {
       m_isTrack(false),
       m_status(0),
       m_connectedRegionId(0),
-      m_hypothesisId(5), // set to 5 (all photons) for b2bii
+      m_hypothesisId(c_nPhotons), // set to c_nPhotons for b2bii
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
       m_covmat_10(0.),

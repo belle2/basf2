@@ -13,17 +13,21 @@
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/dataobjects/UncertainHelix.h>
-#include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
-
+#include <Eigen/Core>
 namespace TreeFitter {
 
-  /**  */
+  /**  utility for helix<->x,p conversions
+   * FIXME this is still a mess
+   * FIXME we still use the numerical jacobian I think
+   * FIXME FIX THIS
+   * */
   class HelixUtils {
 
   public:
 
     /**  */
     enum VertexCoor {iX = 0, iY, iZ, iPx, iPy, iPz} ;
+
     /**  */
     enum HelixCoor  {iD0 = 0, iPhi0, iOmega, iZ0, iTanLambda, iArcLength2D} ;
 

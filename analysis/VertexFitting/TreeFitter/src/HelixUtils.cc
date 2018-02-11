@@ -27,7 +27,6 @@ using std::endl;
 
 namespace TreeFitter {
 
-  extern int vtxverbose ;
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
                                    double L, double Bz,

@@ -10,8 +10,8 @@
 #pragma once
 
 #include <vector>
-#include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
-#include<iostream>
+#include <iostream>
+#include <Eigen/Core>
 
 namespace TreeFitter {
 
@@ -32,7 +32,10 @@ namespace TreeFitter {
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() { return m_globalCovariance; }
 
     /** const getter for the states covariance */
-    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() const { return m_globalCovariance; }
+    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() const
+    {
+      return m_globalCovariance;
+    }
 
     /** getter for the fit parameters/statevector */
     Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() {return m_globalState;}

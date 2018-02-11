@@ -45,7 +45,6 @@ namespace TreeFitter {
   void DecayChain::initConstraintList()
   {
     m_constraintlist.clear();
-
     m_headOfChain->addToConstraintList(m_constraintlist, 0);
     std::sort(m_constraintlist.begin(), m_constraintlist.end());
   }

@@ -8,22 +8,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef PARTICLEBASE_H
-#define PARTICLEBASE_H
+#pragma once
 
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <Eigen/Core>
 
-
-#include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
 #include <analysis/dataobjects/Particle.h>
 
 namespace TreeFitter {
 
   class FitParams;
 
+  /** base class for all particles */
   class ParticleBase {
 
   public:
@@ -231,6 +229,3 @@ namespace TreeFitter {
 
   }; // end class ParticleBase
 } // end namespace TreeFitter
-
-#endif //PARTICLEBASE_H
-

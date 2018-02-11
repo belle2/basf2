@@ -85,10 +85,12 @@ namespace TreeFitter {
     Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
 
     /** vertex position of the IP */
-    EigenTypes::ColVector m_ipPosVec;
+    Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor, 3, 1> m_ipPosVec;
 
-    /** covariance of the IP  */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_ipCovariance;
+    /** covariance of the IP
+     * dont know size but I know the max size
+     * */
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor, 3, 3> m_ipCovariance;
 
   };
 }

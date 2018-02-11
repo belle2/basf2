@@ -7,21 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef MERGEDCONSTRAINT_H
-#define MERGEDCONSTRAINT_H
-
-//#include <vector>
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 
 namespace TreeFitter {
+  /**  */
   class MergedConstraint : public Constraint {
   public:
+    /**  */
     typedef std::vector<Constraint*> constraintlist ;
 
+    /**  */
     MergedConstraint() : Constraint(Constraint::merged) {}
+    /**  */
     virtual ~MergedConstraint() {}
-
+    /**  */
     MergedConstraint(const constraintlist& list) :
       Constraint(Constraint::merged), m_list(list)
     {
@@ -31,8 +32,12 @@ namespace TreeFitter {
       setDim(d) ;
     }
 
+
+
+    /**  */
     virtual ErrCode project(const FitParams& fitpar, Projection& p) const ;
 
+    /**  */
     void push_back(Constraint* c)
     {
       m_list.push_back(c) ;
@@ -42,9 +47,8 @@ namespace TreeFitter {
 
 
   private:
+    /**  */
     constraintlist m_list ;
   } ;
 
 }
-
-#endif //MERGEDCONSTRAINT_H

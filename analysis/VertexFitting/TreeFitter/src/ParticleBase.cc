@@ -11,7 +11,6 @@
 //Creates a particle. Base class for all other particle classes.
 
 #include <TDatabasePDG.h>
-#include <TMath.h>
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
@@ -24,7 +23,6 @@
 #include <analysis/VertexFitting/TreeFitter/InteractionPoint.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
-#include <framework/gearbox/Const.h>
 
 namespace TreeFitter {
 

@@ -9,11 +9,11 @@
  **************************************************************************/
 #pragma once
 
+
 #include <analysis/dataobjects/Particle.h>
 #include <vector>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-#include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
-
+#include <Eigen/Core>
 
 namespace TreeFitter {
   class DecayChain;

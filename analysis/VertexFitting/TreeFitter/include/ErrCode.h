@@ -66,8 +66,5 @@ namespace TreeFitter {
     /** storing the errorcode */
     unsigned int m_flag ;
 
-    /** operator */
-    std::ostream& operator<<(std::ostream& os, const ErrCode& code) ;
-
   } ;
 }

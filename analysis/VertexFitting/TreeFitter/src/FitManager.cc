@@ -19,8 +19,6 @@
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
 
-using std::vector;
-
 namespace TreeFitter {
 
   extern std::vector<int> massConstraintList ;
@@ -50,6 +48,7 @@ namespace TreeFitter {
 
   bool FitManager::fit()
   {
+
     const int nitermax = 10;
     const int maxndiverging = 3;
     const double dChisqConv = m_prec;
@@ -70,7 +69,7 @@ namespace TreeFitter {
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
-        //std::endl;
+        //          std::endl;
         Eigen::Matrix<double, Eigen::Dynamic, 1> prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);

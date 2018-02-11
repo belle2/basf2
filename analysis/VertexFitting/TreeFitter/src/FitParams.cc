@@ -12,9 +12,8 @@
 
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-#include <analysis/VertexFitting/TreeFitter/EigenTypes.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 namespace TreeFitter {
 
@@ -47,8 +46,6 @@ namespace TreeFitter {
     bool okay = true;
     for (int row = 0; row < m_dim && okay; ++row) {
       okay = (m_globalCovariance(row, row) > 0);
-      B2DEBUG(80, "Covariance dia element is smaller than 0!");
-      B2DEBUG(80, "Fitpar global cov\n" << m_globalCovariance);
     }
     return okay;
   }
@@ -69,8 +66,7 @@ namespace TreeFitter {
 
   [[gnu::unused]] Eigen::Matrix<double, Eigen::Dynamic, 1> FitParams::getMaskInStateVec(const std::vector<int>& indexVec) const
   {
-
-    int nrow = indexVec.size();
+    const int nrow = indexVec.size();
     Eigen::Matrix<double, Eigen::Dynamic, 1> returnVec =  Eigen::Matrix<double, Eigen::Dynamic, 1>(nrow, 1);
     for (int row = 0; row < nrow; ++row) {
       returnVec(row) = m_globalState(indexVec[row]);

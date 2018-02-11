@@ -22,8 +22,8 @@ namespace TreeFitter {
                                      int dimension) :
     ParticleBase("InteractionPoint"),
     m_constraintDimension(dimension),
-    m_ipPosVec(3),
-    m_ipCovariance(3, 3)
+    m_ipPosVec(dimension),
+    m_ipCovariance(dimension, dimension)
   {
     addDaughter(daughter, forceFitAll);
     initBeamSpot();
@@ -71,7 +71,7 @@ namespace TreeFitter {
         m_ipCovariance(1, 1) = covVertex(1 , 1);
         m_ipCovariance(1, 0) = covVertex(1 , 0);
       } else {
-        B2FATAL("The IP constraint has to have a dimension of either 0, 2 or 3.");
+        B2FATAL("The IP constraint has to have a dimension of either 0, 2 or 3. You specified: " << m_constraintDimension);
       }
     }
     return ErrCode::success;

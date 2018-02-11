@@ -54,9 +54,8 @@ namespace TreeFitter {
   ErrCode Constraint::filter(FitParams* fitpar)
   {
     ErrCode status;
-
     Projection p(fitpar->getDimensionOfState(), m_dim);
-    KalmanCalculator kalman;
+    KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
 
     double chisq(0);
     int iter(0);
@@ -68,7 +67,13 @@ namespace TreeFitter {
 
       if (!status.failure()) {
 
-        status |= kalman.calculateGainMatrix(p.getResiduals(), p.getH(), fitpar, &p.getV());
+        status |= kalman.calculateGainMatrix(
+                    p.getResiduals(),
+                    p.getH(),
+                    fitpar,
+                    &p.getV(),
+                    1 // weight
+                  );
 
         if (!status.failure()) {
 

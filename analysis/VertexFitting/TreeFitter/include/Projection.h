@@ -25,25 +25,25 @@ namespace TreeFitter {
     virtual ~Projection() {};
 
     /** get projection matrix */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getH() {return m_H;}
+    Eigen::Matrix < double, -1, -1, 0, 5, 100 > & getH() {return m_H;}
 
     /** get projection matrix */
-    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> getH() const {return m_H;}
+    const Eigen::Matrix < double, -1, -1, 0, 5, 100 > getH() const {return m_H;}
 
     /** get residuals */
-    Eigen::Matrix<double, Eigen::Dynamic, 1>& getResiduals() {return m_residual;}
+    Eigen::Matrix < double, -1, 1, 0, 5, 1 > & getResiduals() {return m_residual;}
 
     /** get residuals */
-    const Eigen::Matrix<double, Eigen::Dynamic, 1> getResiduals() const {return m_residual;}
+    const Eigen::Matrix < double, -1, 1, 0, 5, 1 > getResiduals() const {return m_residual;}
 
     /** ge element in residuals */
     double getElementInResiduals(int row) { return m_residual(m_offset + row, 1); }
 
     /** get residuals cov matrix */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getV() {return m_V;}
+    Eigen::Matrix < double, -1, -1, 0, 5, 5 > & getV() {return m_V;}
 
     /** get residuals cov matrix */
-    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getV() const {return m_V;}
+    const Eigen::Matrix < double, -1, -1, 0, 5, 5 > & getV() const {return m_V;}
 
     /** reset projection */
     void resetProjection();
@@ -63,13 +63,13 @@ namespace TreeFitter {
   private:
 
     /** jacobian of the constraint, converts x,p,E<->system of residuals */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_H;
+    Eigen::Matrix < double, -1, -1, 0, 5, 100 > m_H;
 
     /** covariance matrix of this constraint (r') */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_V;
+    Eigen::Matrix < double, -1, -1, 0, 5, 5 > m_V;
 
     /** residuals of constraint */
-    Eigen::Matrix<double, Eigen::Dynamic, 1> m_residual;
+    Eigen::Matrix < double, -1, 1, 0, 5, 1 > m_residual;
 
     /** dimension of the covariance */
     int m_dimCov;

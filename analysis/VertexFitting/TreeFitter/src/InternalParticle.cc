@@ -8,10 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <iomanip>
-#include <algorithm>
-#include <boost/foreach.hpp>
 #include <analysis/dataobjects/Particle.h>
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
@@ -20,7 +16,6 @@
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
 
-#include <TMath.h>
 
 using std::vector;
 
@@ -93,7 +88,7 @@ namespace TreeFitter {
     assert(hasPosition());
 
     // Start with origin
-    fitparams->getStateVector().segment(posindex, 3) = EigenTypes::ColVector::Zero(3);
+    fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
 
     // Step 1: pre-initialization of all daughters
     for (auto daughter : m_daughters) {
@@ -219,7 +214,7 @@ namespace TreeFitter {
   {
     int momindex = momIndex();
     // reset
-    fitparams->getStateVector().segment(momindex, 4) = EigenTypes::ColVector::Zero(4);
+    fitparams->getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
     // now add daughter momenta
     int daumomindex = 0, maxrow = 0;
     double e2 = 0, mass = 0;

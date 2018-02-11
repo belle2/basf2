@@ -172,7 +172,7 @@ namespace Belle2 {
     std::string m_PARAMNetworkOutputName;
 
     /** if true, to the given SpacePoints a virtual interaction point at given coordinates with parameter 'virtualIPCoorindates' will be added */
-    bool m_PARAMAddVirtualIP;
+    bool m_PARAMAddVirtualIP = false;
 
     /**  expects X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
     std::vector<double> m_PARAMVirtualIPCoordinates = {0, 0, 0};

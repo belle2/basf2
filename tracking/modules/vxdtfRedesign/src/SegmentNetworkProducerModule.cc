@@ -49,7 +49,7 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
   addParam("addVirtualIP",
            m_PARAMAddVirtualIP,
            "if true, to the given SpacePoints a virtual interaction point at given coordinates with parameter 'virtualIPCoorindates' will be added",
-           bool(true));
+           m_PARAMAddVirtualIP);
 
   addParam("virtualIPCoorindates",
            m_PARAMVirtualIPCoordinates,

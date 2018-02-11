@@ -28,7 +28,7 @@ namespace Belle2 {
     void event() override;
 
     /// Merge cosmic tracks.
-    void MergingTracks(StoreArray<RecoTrack>, StoreArray<RecoTrack>);
+    void MergingTracks(RecoTrack*, RecoTrack*, StoreArray<RecoTrack>);
 
   private:
     /// StoreArray name from which to read the reco tracks.

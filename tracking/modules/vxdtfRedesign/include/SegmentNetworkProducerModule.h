@@ -169,11 +169,13 @@ namespace Belle2 {
     void buildActiveSectorNetwork(std::vector< RawSectorData >& collectedData);
 
 
-    /** old name: segFinder. use SpacePoints stored in ActiveSectors to build SpacePoints which will stored and linked in a DirectedNodeNetwork< TrackNode >
-      @param ObserverType: type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
-    */
+    /** Evaluate TrackNodes in the ActiveSectors and link them if they fulfill the filter criteria of the SectorMap.
+     *  The linked TrackNodes are stored in the DirectedNodeNetwork<TrackNode>.
+     *  The boolean return value will be false, if the network cration is aborted prematurely.
+     *  @param ObserverType: type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
+     */
     template < class ObserverType >
-    void buildTrackNodeNetwork();
+    bool buildTrackNodeNetwork();
 
 
     /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment >

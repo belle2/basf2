@@ -207,22 +207,15 @@ void SegmentNetworkProducerModule::event()
 
   buildActiveSectorNetwork(collectedData);
 
-  if (m_PARAMCreateNeworks < 2) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating activeSectorNetwork"); return; }
+  if (m_PARAMCreateNeworks < 2) {
+    return;
+  }
 
+  if (not buildTrackNodeNetwork<VoidObserver>() or m_PARAMCreateNeworks < 3) {
+    return;
+  }
 
-  // use VoidObserver to deactivate observation of filters
-  if (m_PARAMobserverType == c_ObserverCheckMCPurity) buildTrackNodeNetwork<ObserverCheckMCPurity>();
-  else if (m_PARAMobserverType == c_ObserverCheckFilters) buildTrackNodeNetwork<ObserverCheckFilters>();
-  else buildTrackNodeNetwork<VoidObserver>(); // apply-two-hit-filters
-
-  if (m_PARAMCreateNeworks < 3) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating trackNodeNetwork"); return; }
-
-  // use VoidObserver to deactivate observation, currently we dont observe the three hits so all VoidObserver
-  if (m_PARAMobserverType == c_ObserverCheckMCPurity) buildSegmentNetwork<VoidObserver>();
-  else if (m_PARAMobserverType == c_ObserverCheckFilters) buildSegmentNetwork<VoidObserver>();
-  else buildSegmentNetwork<VoidObserver>(); // apply-three-hit-filters
-
-  // TODO debug output with counters!
+  buildSegmentNetwork<VoidObserver>();
 }
 
 
@@ -411,9 +404,8 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 }
 
 
-/** old name: segFinder. use SpacePoints stored in ActiveSectors to store and link them in a DirectedNodeNetwork< SpacePoint > */
 template < class ObserverType >
-void SegmentNetworkProducerModule::buildTrackNodeNetwork()
+bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
 {
   DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, VoidMetaInfo>& activeSectorNetwork =
     m_network->accessActiveSectorNetwork();
@@ -422,9 +414,13 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
-    if (outerSector->getInnerNodes().empty()) continue; // go to next sector
+    if (outerSector->getInnerNodes().empty()) {
+      continue;
+    }
     const vector<TrackNode*>& outerHits = outerSector->getEntry().getHits();
-    if (outerHits.empty()) continue;
+    if (outerHits.empty()) {
+      continue;
+    }
 
     // get the point to the static sector
     const StaticSectorType* outerStaticSector = outerSector->getEntry().getAttachedStaticSector();
@@ -437,17 +433,19 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
     // loop over inner sectors to get their hits(->innerHits) and check their compatibility
     for (auto* innerSector : outerSector->getInnerNodes()) {
       const vector<TrackNode*>& innerHits = innerSector->getEntry().getHits();
-      if (innerHits.empty()) continue;
-
+      if (innerHits.empty()) {
+        continue;
+      }
 
       //retrieve the filter, a null pointer is returned if there is no filter
       const auto* filter2sp = outerStaticSector->getFilter2sp(innerSector->getEntry().getFullSecID());
-      if (filter2sp == NULL) continue;
+      if (filter2sp == NULL) {
+        continue;
+      }
 
       for (TrackNode* outerHit : outerHits) {
         // skip double-adding of nodes into the network after first time found -> speeding up the code:
         bool wasAnythingFoundSoFar = false;
-
 
         std::int32_t outerNodeID = outerHit->getID();
         hitNetwork.addNode(outerNodeID, *outerHit);
@@ -459,9 +457,11 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
           if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
-          if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
+          if (accepted == false) {
+            nRejected++;
+            continue;
+          }
           nAccepted++;
-
 
           std::int32_t innerNodeID = innerHit->getID();
           hitNetwork.addNode(innerNodeID, *innerHit);
@@ -476,27 +476,25 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
 
           if (hitNetwork.size() > m_PARAMmaxHitNetworkSize) {
-            B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize << "!"
-                    << " Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
-            hitNetwork.clear();
-            return;
+            B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize
+                    << "! Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
+            return false;
           }
 
-        } // inner hit loop
-      } // outer hit loop
-    } // inner sector loop
-  } // outer sector loop
-  B2DEBUG(1, "SegmentNetworkProducerModule::buildTrackNodeNetwork() (ev " << m_eventCounter << "): nAccepted/nRejected: " << nAccepted
-          << "/" << nRejected <<
-          ", size of nLinked/hitNetwork: " << nLinked << "/" << hitNetwork.size());
+        }
+      }
+    }
+  }
   m_nTrackNodesAccepted += nAccepted;
   m_nTrackNodesRejected += nRejected;
   m_nTrackNodeLinksCreated += nLinked;
 
-  if (!m_PARAMprintNetworks) return;
+  if (!m_PARAMprintNetworks) return true;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
   DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
+
+  return true;
 }
 
 

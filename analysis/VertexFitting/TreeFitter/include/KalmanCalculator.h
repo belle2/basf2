@@ -95,7 +95,7 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, 5 > m_K;
 
     /** C times G^t  */
-    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > m_CGt;
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, 5 > m_CGt;
 
   };
 }

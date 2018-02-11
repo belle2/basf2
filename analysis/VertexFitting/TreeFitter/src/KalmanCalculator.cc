@@ -27,7 +27,7 @@ namespace TreeFitter {
     m_R(sizeRes, sizeRes),
     m_Rinverse(sizeRes, sizeRes),
     m_K(sizeState, sizeRes),
-    m_CGt(sizeRes, sizeState)
+    m_CGt(sizeState, sizeRes)
   {
     m_R = Eigen::Matrix < double, -1, -1, 0, 5, 5 >::Zero(m_constrDim, m_constrDim);
   }

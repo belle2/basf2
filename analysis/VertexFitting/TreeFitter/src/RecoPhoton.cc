@@ -79,7 +79,7 @@ namespace TreeFitter {
 
   ErrCode RecoPhoton::initCovariance(FitParams* fitparams) const
   {
-    const int momindex = momIndex() ;
+    const int momindex = momIndex();
     const int posindex  = mother()->posIndex();
 
     const double factorE = 1000 * m_covariance(3, 3);

@@ -35,7 +35,7 @@ namespace TreeFitter {
 
   ErrCode KalmanCalculator::calculateGainMatrix(
     const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
-    const Eigen::Matrix < double, -1, -1, 0, 5, 100 > & G,
+    const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
     const FitParams* fitparams,
     const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V,
     double weight)
@@ -43,8 +43,8 @@ namespace TreeFitter {
     m_res = residuals;
     m_G = G;
 
-    Eigen::Matrix < double, -1, -1, 0, 100, 100 > C =
-      Eigen::Matrix < double, -1, -1, 0 , 100, 100 >
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C =
+      Eigen::Matrix < double, -1, -1, 0 , MAX_MATRIX_SIZE, MAX_MATRIX_SIZE >
       ::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
 
 
@@ -86,17 +86,17 @@ namespace TreeFitter {
   void KalmanCalculator::updateCovariance(FitParams* fitparams)
   {
 
-    Eigen::Matrix < double, -1, -1, 0, 100, 100 > fitCov  =
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > fitCov  =
       fitparams->getCovariance().triangularView<Eigen::Lower>();
 
-    Eigen::Matrix < double, -1, -1, 0, 100, 100 > GRinvGt =
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > GRinvGt =
       m_G.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_G;
 
     //fitcov is sym so no transpose needed (not that it would have runtime cost)
-    Eigen::Matrix < double, -1, -1, 0, 100, 100 > deltaCov  =
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > deltaCov  =
       fitCov.selfadjointView<Eigen::Lower>() * GRinvGt * fitCov.selfadjointView<Eigen::Lower>();
 
-    Eigen::Matrix < double, -1, -1, 0, 100, 100 > delta =
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > delta =
       fitCov - deltaCov;
 
     fitparams->getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();

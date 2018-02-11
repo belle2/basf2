@@ -28,54 +28,6 @@ namespace Belle2 {
     class  StoreWrappedObjPtr : public StoreObjPtr<StoreWrapper<T> > {
 
     public:
-
-#if 0 //use of static StoreObjPtr members is discouraged.
-      /** Register an object, that should not be written to the output by default, in the data store.
-       *
-       *  This must be called in the initialization phase.
-       *
-       *  @param name        Name under which the object is stored.
-       *  @param durability  Specifies lifetime of object in question.
-       *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-       *  @return            True if the registration succeeded.
-       */
-      static bool registerTransient(const std::string& name = "",
-                                    DataStore::EDurability durability = DataStore::c_Event,
-                                    bool errorIfExisting = false)
-      {
-        return StoreObjPtr<StoreWrapper<T> >::registerTransient(name, durability, errorIfExisting);
-      }
-
-      /** Check whether an object was registered before.
-       *
-       *  It will cause an error if the object does not exist.
-       *  This must be called in the initialization phase.
-       *
-       *  @param name        Name under which the object is stored.
-       *  @param durability  Specifies lifetime of object in question.
-       *  @return            True if the object exists.
-       */
-      static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-      {
-        return StoreObjPtr<StoreWrapper<T> >::required(name, durability);
-      }
-
-      /** Tell the data store about an optional input.
-       *
-       *  Mainly useful for creating diagrams of module inputs and outputs.
-       *  This must be called in the initialization phase.
-       *
-       *  @param name        Name under which the object is stored.
-       *  @param durability  Specifies lifetime of object in question.
-       *  @return            True if the object exists.
-       */
-      static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-      {
-        return StoreObjPtr<StoreWrapper<T> >::optional(name, durability);
-      }
-#endif
-
-    public:
       /** Constructor to access an object in the DataStore.
        *
        *  @param name       Name under which the object is stored in the DataStore.

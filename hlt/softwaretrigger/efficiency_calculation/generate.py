@@ -17,7 +17,7 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 
 
-def add_generation(path, event_class):
+def add_generation(path, event_class, phase):
     """
     Add the different generators to the path (can be changed by the event_class input parameter).
     :param path: The path to add the generator to.
@@ -72,6 +72,8 @@ def add_generation(path, event_class):
         generators.add_phokhara_generator(path, finalstate="pi+pi-")
     elif event_class == "pipipi":
         generators.add_phokhara_generator(path, finalstate="pi+pi-pi0")
+    elif event_class == "cosmics":
+        generators.add_cosmics_generator(path, accept_box=1, data_taking_period="phase{}".format(phase))
 
     # Fail for everything else
     else:
@@ -110,7 +112,7 @@ def main():
 
     path.add_module("EventInfoSetter", evtNumList=[n_events], expList=expNumber)
 
-    add_generation(path, event_class=channel)
+    add_generation(path, event_class=channel, phase=phase)
 
     # We do not want to have PXD data reduction in the simulation - as this is not performed in the real detector at
     # at this stage

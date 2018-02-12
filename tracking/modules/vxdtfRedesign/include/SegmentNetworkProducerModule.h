@@ -10,6 +10,14 @@
 
 #pragma once
 
+// stl
+#include <string>
+#include <vector>
+#include <utility>
+
+//root
+#include <TFile.h>
+
 // fw
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -27,24 +35,15 @@
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
-//root
-#include <TFile.h>
-
-// stl
-#include <string>
-#include <vector>
-#include <utility>      // std::pair, std::move
-
 
 namespace Belle2 {
 
-  /** The segment network producer module.
+  /** The Segment Network Producer Module.
    *
-   * This module takes a given sectorMap and storeArrays of spacePoints and creates a segmentNetwork (if activated).
-   * The output: a StoreObjPtr of DirectedNodeNetworkContainer:
-   * - will contain a DirectedNodeNetwork< ActiveSector> (if parameter 'createNeworks' is [1;3])
-   * - will contain a DirectedNodeNetwork< SpacePoint > (if parameter 'createNeworks' is  [2;3])
-   * - will contain a DirectedNodeNetwork< Segment > (if parameter 'createNeworks' is [3])
+   * This module takes a provided sectorMap and StoreArrays of spacePoints and creates an activeSectorNetwork,
+   * a TrackNodeNetwork and a segmentNetwork by evaluating the given set of SpacePoints using the filters stored
+   * in the sectorMap to reduce the possible combinations.
+   * The output of the module is a StoreObjPtr to a DirectedNodeNetworkContainer which contains the three networks.
    */
   class SegmentNetworkProducerModule : public Module {
 
@@ -109,30 +108,24 @@ namespace Belle2 {
 
 
     /** for each SpacePoint given, find according sector and store them in a fast and intermediate way* */
-    std::vector< RawSectorData > matchSpacePointToSectors();
+    std::vector<RawSectorData> matchSpacePointToSectors();
 
 
     /** returns a NULL-ptr if no sector found, returns pointer to the static sector if found */
     const StaticSectorType* findSectorForSpacePoint(const SpacePoint& aSP)
     {
       if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {
-        B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() <<
-                " has no valid FullSecID: " << aSP);
         return nullptr;
       }
 
       FullSecID spSecID = m_vxdtfFilters->getFullID(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV());
       const StaticSectorType* secPointer =  m_vxdtfFilters->getStaticSector(spSecID);
-      B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() <<
-              " got valid FullSecID of " << spSecID.getFullSecString() <<
-              " with pointer-adress (if this is a nullptr, vxdtffilters does not have anything stored): " << secPointer);
-
       return secPointer;
     }
 
 
-    /** build a DirectedNodeNetwork< ActiveSector >, where all ActiveSectors are stored which have SpacePoints* and compatible inner- or outer neighbours */
-    void buildActiveSectorNetwork(std::vector< RawSectorData >& collectedData);
+    /** build a DirectedNodeNetwork<ActiveSector>, where all ActiveSectors are stored which have SpacePoints* and compatible inner- or outer neighbours */
+    void buildActiveSectorNetwork(std::vector<RawSectorData>& collectedData);
 
 
     /** Evaluate TrackNodes in the ActiveSectors and link them if they fulfill the filter criteria of the SectorMap.
@@ -140,14 +133,14 @@ namespace Belle2 {
      *  The boolean return value will be false, if the network cration is aborted prematurely.
      *  @param ObserverType: type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
      */
-    template < class ObserverType >
+    template <class ObserverType>
     bool buildTrackNodeNetwork();
 
 
-    /** Use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment >
+    /** Use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork<Segment>
     @param ObserverType : type  of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
     */
-    template < class ObserverType >
+    template <class ObserverType>
     void buildSegmentNetwork();
 
 
@@ -210,7 +203,7 @@ namespace Belle2 {
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */
-    std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;
+    std::vector<StoreArray<Belle2::SpacePoint>> m_spacePoints;
 
     // output containers
     /** access to the DirectedNodeNetwork, which will be produced by this module */

@@ -41,7 +41,7 @@ def simulate_run(run_numbers, exp_numbers):
     weird_path.add_module(PrinterModule("Strange condition"))
 
     # Condition for phase2
-    phase_2_conditional(path, path_when_in_iov=phase2_path)
+    phase_2_conditional(path, phase2_path=phase2_path)
 
     # Condition for phase3
     make_conditional_at(path, iov_list=[(0, 0, 0, -1)], path_when_in_iov=phase3_path, path_when_not_in_iov=no_phase3_path)

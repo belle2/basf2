@@ -117,7 +117,7 @@ namespace Belle2 {
     int getNRays() const override { return m_params.nU * m_params.nV; }
 
     /** Record the material budget for each step of the particles */
-    void UserSteppingAction(const G4Step* step);
+    void UserSteppingAction(const G4Step* step) override;
   protected:
     /** Get the origin and direction for the next scan particle.
      * To be overridden by descendents

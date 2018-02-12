@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -16,12 +16,11 @@
 namespace Belle2 {
 
   /**
-   * r.m.s. of noise for all 512 channels of 16 modules.
-   *
-   * The noise for masked channels is undefined.
-   * It is the caller's responsibility to check for masked channels
+   * Class to store relative quantum efficiency of channels w.r.t initial one measured in PMT QA
+   * QE is expected to decrease during the experiment due to aging induced by acuumulated charge
+   * Default is set to 1.0
    */
-  class TOPCalChannelNoise: public TObject {
+  class TOPCalChannelRQE: public TObject {
   public:
 
     /**
@@ -35,18 +34,16 @@ namespace Belle2 {
 
     /**
      * Default constructor.
-     * Noises are set to 0 by default.
      */
-    TOPCalChannelNoise() {}
+    TOPCalChannelRQE() {}
 
     /**
-     * Sets the noise r.m.s for a single channel and switches status to calibrated.
-     * If data for a given channel not available set noise to 0 (or just skip the call)
+     * Sets the relative QE for a single channel and switches status to calibrated
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @param rmsNoise r.m.s. of noise [ADC counts]
+     * @param relQE relative quantum efficiency w.r.t initial one (absolute value, not in %)
      */
-    void setNoise(int moduleID, unsigned channel, double rmsNoise)
+    void setRQE(int moduleID, unsigned channel, double relQE)
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -57,7 +54,7 @@ namespace Belle2 {
         B2ERROR("Invalid channel number, constant not set (" << ClassName() << ")");
         return;
       }
-      m_rmsNoise[module][channel] = rmsNoise;
+      m_relQE[module][channel] = relQE;
       m_status[module][channel] = c_Calibrated;
     }
 
@@ -81,12 +78,12 @@ namespace Belle2 {
     }
 
     /**
-     * Returns the noise r.m.s of a single channel (0 or negative: data not available)
+     * Returns the relative QE for a single channel
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @return r.m.s. of noise [ADC counts]
+     * @return relative quantum efficieny (absolute value, not in %)
      */
-    double getNoise(int moduleID, unsigned channel) const
+    double getRQE(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -97,7 +94,7 @@ namespace Belle2 {
         B2WARNING("Invalid channel number, returning 0 (" << ClassName() << ")");
         return 0;
       }
-      return m_rmsNoise[module][channel];
+      return m_relQE[module][channel];
     }
 
     /**
@@ -152,13 +149,12 @@ namespace Belle2 {
       c_numChannels = 512 /**< number of channels per module */
     };
 
-    float m_rmsNoise[c_numModules][c_numChannels] = {{0}};    /**< noise [ADC counts] */
+    float m_relQE[c_numModules][c_numChannels] = {{1.0}};    /**< relative quantum efficiency */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
 
-    ClassDef(TOPCalChannelNoise, 2); /**< ClassDef */
+    ClassDef(TOPCalChannelRQE, 1); /**< ClassDef */
 
   };
 
 } // end namespace Belle2
-
 

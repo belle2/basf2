@@ -1,4 +1,5 @@
 import basf2
+from iov_conditional import phase_2_conditional, make_conditional_at
 
 
 class PrinterModule(basf2.Module):
@@ -31,24 +32,25 @@ def simulate_run(run_numbers, exp_numbers):
     phase3_path = basf2.create_path()
     phase3_path.add_module(PrinterModule("Phase 3 is here"))
 
+    # No Phase 3 path
+    no_phase3_path = basf2.create_path()
+    no_phase3_path.add_module(PrinterModule("Phase 3 is not here"))
+
     # Weird path
     weird_path = basf2.create_path()
     weird_path.add_module(PrinterModule("Strange condition"))
 
     # Condition for phase2
-    condition = path.add_module("IoVDependentCondition", iovList=[(1002, 0, 1002, -1), (1, 0, 4, -1)])
-    condition.if_true(phase2_path, basf2.AfterConditionPath.END)
+    phase_2_conditional(path, path_when_in_iov=phase2_path)
 
     # Condition for phase3
-    condition = path.add_module("IoVDependentCondition", iovList=[(0, 0, 0, -1)])
-    condition.if_true(phase3_path, basf2.AfterConditionPath.END)
+    make_conditional_at(path, iov_list=[(0, 0, 0, -1)], path_when_in_iov=phase3_path, path_when_not_in_iov=no_phase3_path)
 
     # Some weird condition
-    condition = path.add_module("IoVDependentCondition", iovList=[(42, 42, 47, 47)])
-    condition.if_true(weird_path, basf2.AfterConditionPath.END)
+    make_conditional_at(path, iov_list=[(42, 42, 47, 47)], path_when_in_iov=weird_path)
 
-    # None at all
-    path.add_module(PrinterModule("No condition met"))
+    # Finished path
+    path.add_module(PrinterModule("Finish"))
 
     basf2.process(path)
 

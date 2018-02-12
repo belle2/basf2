@@ -41,5 +41,7 @@ def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=N
         condition_module.if_false(path_when_not_in_iov, basf2.AfterConditionPath.CONTINUE)
 
 
-#: Handy shortcut for phase 2 conditions
-phase_2_conditional = partial(make_conditional_at, iov_list=PHASE2_CONDITIONS)
+def phase_2_conditional(path, phase2_path, phase3_path):
+    """Handy shortcut for phase 2 conditions"""
+    make_conditional_at(path=path, iov_list=PHASE2_CONDITIONS,
+                        path_when_in_iov=phase2_path, path_when_not_in_iov=phase3_path)

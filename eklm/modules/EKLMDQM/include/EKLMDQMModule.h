@@ -88,6 +88,9 @@ namespace Belle2 {
     /** Hit time. */
     TH1F* m_Time;
 
+    /** Strip number within a layer. */
+    TH1F** m_StripLayer;
+
   };
 
 }

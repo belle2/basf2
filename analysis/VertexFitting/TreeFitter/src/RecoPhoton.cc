@@ -151,6 +151,23 @@ namespace TreeFitter {
     ErrCode status ;
     const int momindex  = momIndex() ;
     const int posindex  = mother()->posIndex();
+    /**
+     * m : decay vertex mother
+     * p : momentum photon
+     * c : postion cluster
+     * so:
+     * m + p = c
+     * thus (tau converts p to the correct units):
+     * 0 = c - m - tau * p
+     * we have 3 geometric equations and eliminate tau using the dimension with the highest momentum
+     * (because we have to devide but that momentum)
+     * only downside is we have to figure out which dimensions this is
+     * the 4th equation is the nergy which we keep as:
+     * 0 = E - |p|
+     * just to be sure, essentially this is always zero because p is build from E
+     * */
+
+
 
     const Eigen::Matrix<double, 1, 3> x_vertex = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
@@ -204,7 +221,7 @@ namespace TreeFitter {
     p.getV() = P * m_covariance.selfadjointView<Eigen::Lower>() * P.transpose();
 
     // dr'/dm  | m:={x,y,z,px,py,pz,E}
-    // x := x_vertex
+    // x := x_vertex (decay vertex of mother)
     p.getH()(0, posindex + i1) = P(0, i1);
     p.getH()(0, posindex + i2) = -1.0;
     p.getH()(0, posindex + i3) = 0;

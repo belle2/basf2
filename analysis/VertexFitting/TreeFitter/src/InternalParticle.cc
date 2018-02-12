@@ -260,6 +260,7 @@ namespace TreeFitter {
       // just to be sure ...
       int dautauindex = 0, daumomindex = 0, maxrow = 0;
       double mass = 0, e2 = 0, px = 0, py = 0, energy = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
+
       dautauindex = daughter->tauIndex();
       daumomindex = daughter->momIndex();
       mass = daughter->pdgMass();

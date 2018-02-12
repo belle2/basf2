@@ -321,12 +321,30 @@ namespace TreeFitter {
       posx       = p_vec(row);
       momx       = fitparams.getStateVector()(momindex + row);
 
-      p.getResiduals()(row) = posxmother - posx - tau * momx;  // FIXME TAU + or - ??
-
-      p.getH()(row, posindexmother + row) = 1;
+      /**
+       * x is the decay vertex of the particle
+       * m the decay vertex of the mother
+       * p the momentum vector of the particle
+       * so in vectors:
+       *  m + p = x
+       * thus (tau converts p into units of length):
+       *  0 = x - m - tau * p
+       * */
+      p.getResiduals()(row) = posx - posxmother - tau * momx ;
+      p.getH()(row, posindexmother + row) = -1;
       p.getH()(row, momindex + row) = -1.*tau;
-      p.getH()(row, posindex + row) = -1;
+      p.getH()(row, posindex + row) = 1;
       p.getH()(row, tauindex)       = -momx;
+
+
+
+      //p.getResiduals()(row) = posxmother - posx + tau * momx;  // FIXME TAU + or - ??
+
+      //p.getH()(row, posindexmother + row) = 1;
+      //p.getH()(row, momindex + row) = 1.*tau;
+      //p.getH()(row, posindex + row) = -1;
+      //p.getH()(row, tauindex)       = momx;
+
     }
 
     return ErrCode::success;
@@ -344,12 +362,21 @@ namespace TreeFitter {
     const double pz = fitparams.getStateVector()(momindex + 2);
     const double E  = fitparams.getStateVector()(momindex + 3);
 
-    p.getResiduals()(0) =  E * E - px * px - py * py - pz * pz - mass2;
+    p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
 
-    p.getH()(0, momindex) = -2.0 * px;
-    p.getH()(0, momindex + 1) = -2.0 * py;
-    p.getH()(0, momindex + 2) = -2.0 * pz;
-    p.getH()(0, momindex + 3) =  2.0 * E;
+    p.getH()(0, momindex)     = 2.0 * px;
+    p.getH()(0, momindex + 1) = 2.0 * py;
+    p.getH()(0, momindex + 2) = 2.0 * pz;
+    p.getH()(0, momindex + 3) = -2.0 * E;
+
+
+
+    //p.getResiduals()(0) =  E * E - px * px - py * py - pz * pz - mass2;
+
+    //p.getH()(0, momindex) = -2.0 * px;
+    //p.getH()(0, momindex + 1) = -2.0 * py;
+    //p.getH()(0, momindex + 2) = -2.0 * pz;
+    //p.getH()(0, momindex + 3) =  2.0 * E;
 
     return ErrCode::success;
   }
@@ -385,14 +412,13 @@ namespace TreeFitter {
       Eigen::Matrix<double, 3, 1> dxVec = fitparams->getStateVector().segment(posindex, 3)
                                           - fitparams->getStateVector().segment(momposindex, 3);
 
-      //Eigen::Matrix<double, 3, 1> pxVec = fitparams->getStateVector().segment(momindex, 3);
       const double momdX = dxVec.norm() ; //was px*dx before
 
       // if tau should be a time devide by mom2 insertad of the sqrt
       double tau = std::abs(momdX); // / std::sqrt(mom2); //scalar product
 
       if (tau == 0) {
-        tau = 0;// 5 / std::sqrt(mom2);//pdgTau();
+        tau = 5;// 5 / std::sqrt(mom2);//pdgTau();
       }
 
       if (std::isnan(tau)) {tau = 999;}

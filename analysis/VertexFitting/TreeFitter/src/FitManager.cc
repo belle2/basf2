@@ -1,4 +1,5 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
@@ -11,7 +12,10 @@
 #include <TVector.h>
 
 #include <analysis/dataobjects/Particle.h>
+
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
@@ -68,8 +72,8 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
-        //          std::endl;
+        std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
+                  std::endl;
         Eigen::Matrix<double, Eigen::Dynamic, 1> prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);
@@ -194,8 +198,8 @@ namespace TreeFitter {
     } else {
       B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
       // if not, use the pdttable mass
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov6 =
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(6, 6);
+      Eigen::Matrix<double, 6, 6> cov6 =
+        Eigen::Matrix<double, 6, 6>::Zero(6, 6);
 
       for (int row = 0; row < 3; ++row) {
         for (int col = 0; col <= row; ++col) {
@@ -206,14 +210,15 @@ namespace TreeFitter {
 
       // now fill the jacobian
       double mass = pb->pdgMass();
-      Eigen::Matrix<double, Eigen::Dynamic, 1> momVec =
+      Eigen::Matrix<double, 3, 1> momVec =
         m_fitparams->getStateVector().segment(momindex, 3);
 
       double energy2 = momVec.transpose() * momVec;
       energy2 += mass * mass;
       double energy = sqrt(energy2);
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> jacobian =
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 6);
+
+      Eigen::Matrix<double, 7, 6> jacobian =
+        Eigen::Matrix<double, 7, 6>::Zero(7, 6);
 
       //JFK: there was an old comment on the part that set the diagonal se below. does this make sense? 2017-09-28
       // don't modify momentum
@@ -224,8 +229,8 @@ namespace TreeFitter {
         jacobian(col + 4, col + 3) = 1; // position indeces
       }
 
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov7 =
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(7, 7);
+      Eigen::Matrix<double, 7, 7> cov7 =
+        Eigen::Matrix<double, 7, 7>::Zero(7, 7);
       cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
 
       for (int row = 0; row < 7; ++row) {
@@ -341,9 +346,15 @@ namespace TreeFitter {
       const int tauindex = pb->tauIndex();
       const double tau    = m_fitparams->getStateVector()(tauindex);
       const double taucov = m_fitparams->getCovariance()(tauindex, tauindex);
+
+      // convert tau in units of momentum into units of time
       const double mass   = pb->pdgMass();
-      const double convfac = mass / Belle2::Const::speedOfLight;
+      //tau: [meter/GeV]
+      //  c: [cm/ns]
+      //  m: GeV
+      const double convfac = mass / Belle2::Const::speedOfLight ;
       return std::make_tuple(convfac * tau, convfac * convfac * taucov);
+      //return std::make_tuple(tau, taucov);
     }
     return std::make_tuple(-999, -999);
   }

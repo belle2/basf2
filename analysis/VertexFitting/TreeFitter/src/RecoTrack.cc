@@ -39,7 +39,6 @@ namespace TreeFitter {
   ErrCode RecoTrack::initParticleWithMother(FitParams* fitparams)
   {
 
-    B2DEBUG(85, "---------- RecoTrack::initParticleWithMother                                   ");
     //initPar2
     if (m_flt == 0) {
       const_cast<RecoTrack*>(this)->updFltToMother(*fitparams);
@@ -49,7 +48,6 @@ namespace TreeFitter {
     fitparams->getStateVector()(momindex) = recoP.X();
     fitparams->getStateVector()(momindex + 1) = recoP.Y();
     fitparams->getStateVector()(momindex + 2) = recoP.Z();
-    B2DEBUG(85, "---------- RecoTrack::initParticleWithMother momentum set to:\n" << fitparams->getStateVector().segment(momindex, 3));
     return ErrCode::success;
   }
 
@@ -68,7 +66,6 @@ namespace TreeFitter {
       //std::cout << "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]  << std::endl;
       fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
-    B2DEBUG(85, "----------     RecoTrack::initCovariance to:\n" << fitparams->getCovariance());
 
     return ErrCode();
   }
@@ -87,28 +84,26 @@ namespace TreeFitter {
   ErrCode RecoTrack::updateParams(double flt)
   {
     m_flt = flt;
-    std::vector<float> tau = m_trackfit->getTau();
+    std::vector<float> trackParameter = m_trackfit->getTau();
     //JFK: FIXME this is castable but I dont get how Eigen::VectorXf::map works 2017-09-26
-    for (unsigned int i = 0; i < tau.size(); ++i) {
-      m_params(i) = tau[i];
+    for (unsigned int i = 0; i < trackParameter.size(); ++i) {
+      m_params(i) = trackParameter[i];
     }
-    B2DEBUG(85, "----------       RecoTrack::updateParams this is the measurement:\n" << m_params);
     // FIX ME: bring z0 in the correct domain ...
     TMatrixDSym cov = m_trackfit->getCovariance5();
+    //FIXME is this symmetric?
     for (int row = 0; row < 5; ++row) {
       for (int col = 0; col <= row; ++col) {
         m_covariance(row, col) = cov[row][col];
       }
     }
 
-    B2DEBUG(85, "----------       RecoTrack::updateParams this is the measurement COVARIANCE:\n" << m_covariance);
     m_cached = true;
     return ErrCode::success;
   }
 
   ErrCode  RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
-    B2DEBUG(85, "----------           RecoTrack::projectRecoConstraintCopy\n");
     ErrCode status;
     const int posindexmother = mother()->posIndex();
     const int momindex = momIndex();
@@ -141,7 +136,8 @@ namespace TreeFitter {
     helixpars(4) = helix.getTanLambda();
 
     // fill the residual and cov matrix
-    p.getResiduals().segment(0, 5) = helixpars - m_params;
+    //p.getResiduals().segment(0, 5) = helixpars - m_params;
+    p.getResiduals().segment(0, 5) = m_params - helixpars;
     p.getResiduals()(1) = HelixUtils::phidomain(p.getResiduals()(1));
 
     Eigen::Matrix<double, 5, 5> writtenCov = m_covariance.block<5, 5>(0, 0);

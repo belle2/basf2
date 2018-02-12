@@ -57,6 +57,8 @@ namespace TreeFitter {
     Projection p(fitpar->getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
 
+    //std::cout << "Filtering: " << this->name() << std::endl;
+
     double chisq(0);
     int iter(0);
     bool finished(false) ;

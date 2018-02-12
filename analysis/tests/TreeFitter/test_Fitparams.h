@@ -1,5 +1,5 @@
 #include "analysis/VertexFitting/TreeFitter/FitParams.h"
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 #include <gtest/gtest.h>
 

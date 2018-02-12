@@ -122,7 +122,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m   \\                           /                                                \033[0m");
   B2INFO("\033[40;97m    \\       \033[0m\033[32;40mTREEFITTER\033[0m\033[40;97m        /                                                 \033[0m");
   B2INFO("\033[40;97m     \\_______________________/                                                  \033[0m");
-  B2INFO("\033[40;97m      (_)                   (_)                                                 \033[0m");
+  B2INFO("\033[40;97m      (_)                 (_)                                                   \033[0m");
   B2INFO("\033[40;97m                                                                                \033[0m");
   B2INFO("\033[1;35m============= TREEFIT STATISTICS ===============================================\033[0m");
   B2INFO("\033[1;39mCandidates before fit: " << m_nCandidatesBeforeFit << "\033[0m");

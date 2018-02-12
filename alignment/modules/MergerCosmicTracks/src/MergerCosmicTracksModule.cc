@@ -315,12 +315,12 @@ void MergerCosmicTracksModule::event()
       if (trackFirst.size() != 0 && trackSecond.size() != 0) {
         RelationVector<ECLShower> eclShowerFirst = trackFirst[0]->getRelationsTo<ECLShower>();
         RelationVector<ECLShower> eclShowerSecond = trackSecond[0]->getRelationsTo<ECLShower>();
-        if (eclShowerFirst.size() != 0 && eclShowerFirst.size() != 0) {
+        if (eclShowerFirst.size() != 0 && eclShowerSecond.size() != 0) {
           if (eclConnectedRegionStoreArray.getEntries() >= 2) {
             MergingTracks(recoTrackStoreArray[0], recoTrackStoreArray[1], mergedRecoTracks);
             mergedTracks = true;
           }
-        } else if (eclShowerFirst.size() != 0 || eclShowerFirst.size() != 0) {
+        } else if (eclShowerFirst.size() != 0 || eclShowerSecond.size() != 0) {
           if (eclConnectedRegionStoreArray.getEntries() == 2 || eclConnectedRegionStoreArray.getEntries() == 1) {
             MergingTracks(recoTrackStoreArray[0], recoTrackStoreArray[1], mergedRecoTracks);
             mergedTracks = true;

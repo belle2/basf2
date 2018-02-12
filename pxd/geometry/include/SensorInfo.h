@@ -169,6 +169,12 @@ namespace Belle2 {
        * @return pixel kind ID in range 0..7, 0-3 for Layer=1, 4-7 for Layer=2
        */
       int getPixelKind(const VxdID sensorID, double v) const;
+      /** Return pixel kind ID
+       * @param sensorID the sensor identification
+       * @param vID Local vcell ID
+       * @return pixel kind ID in range 0..3, 0-1 for Layer=1, 2-3 for Layer=2
+       */
+      int getPixelKindNew(const VxdID& sensorID, int vID) const;
 
     protected:
       /** Calculate Lorentz shift factor.

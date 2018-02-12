@@ -97,6 +97,8 @@ namespace Belle2 {
     /** Methods that actually interface to Genfit.  */
     /* This method allows to provide hit position dependent on track direction. */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    /* This method allows to provide hit position dependent on track direction. New method using the PXDClusterPositionEstimator */
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane2(const genfit::StateOnPlane& state) const;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }

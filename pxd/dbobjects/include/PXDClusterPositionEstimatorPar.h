@@ -81,7 +81,7 @@ namespace Belle2 {
     }
 
     /** Returns True if there is a classifier available */
-    bool hasClassifier(int shape_index, double thetaU, double thetaV, int pixelkind) const
+    bool hasClassifier(double thetaU, double thetaV, int pixelkind) const
     {
       //Check pixelkind is valid
       if (m_gridmap.find(pixelkind) == m_gridmap.end()) {
@@ -104,7 +104,7 @@ namespace Belle2 {
     bool hasOffset(int shape_index, float eta, double thetaU, double thetaV, int pixelkind) const
     {
       //Check if there is a classifier
-      if (not hasClassifier(shape_index, thetaU, thetaV, pixelkind)) {
+      if (not hasClassifier(thetaU, thetaV, pixelkind)) {
         return false;
       }
       const PXDClusterShapeClassifierPar& classifier = getShapeClassifier(thetaU, thetaV, pixelkind);
@@ -126,7 +126,7 @@ namespace Belle2 {
     float getShapeLikelyhood(int shape_index, double thetaU, double thetaV, int pixelkind) const
     {
       // Return zero if there no classifier
-      if (not hasClassifier(shape_index, thetaU, thetaV, pixelkind)) {
+      if (not hasClassifier(thetaU, thetaV, pixelkind)) {
         return 0;
       }
       auto likelyhoodMap = getShapeClassifier(thetaU, thetaV, pixelkind).getShapeLikelyhoodMap();

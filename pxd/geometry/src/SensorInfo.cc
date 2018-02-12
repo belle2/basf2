@@ -73,6 +73,16 @@ int SensorInfo::getPixelKind(const VxdID sensorID, double v) const
   return i_pixelKind;
 }
 
+int SensorInfo::getPixelKindNew(const VxdID& sensorID, int vID) const
+{
+  const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+  double v = Info.getVCellPosition(vID);
+  int i_pixelKind = Info.getVPitchID(v);
+  if (Info.getID().getLayerNumber() == 2) i_pixelKind += 2;
+  return i_pixelKind;
+}
+
+
 const TVector3 SensorInfo::getLorentzShift(double u, double v) const
 {
   // Constants for the 5-point Gauss quadrature formula

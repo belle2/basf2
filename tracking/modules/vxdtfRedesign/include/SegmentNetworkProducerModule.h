@@ -51,21 +51,21 @@ namespace Belle2 {
     /// Definition of the static sector type.
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
-    /** simple struct for collecting raw data for a single sector */
+    /// Simple struct for collecting raw data for a single sector
     struct RawSectorData {
-      /** secID of rawSector */
+      /// secID of rawSector
       FullSecID secID;
 
-      /** needed for creating ActiveSectorNetwork: if yes, the sector was already added to the network */
+      /// Whether the sector was already added to the network
       bool wasCreated;
 
-      /** stores a sector if one is found, NULL else */
+      /// Stores a sector if one is found, NULL else
       ActiveSector<StaticSectorType, TrackNode>* sector;
 
-      /** stores a static sector */
+      /// Stores a static sector
       const StaticSectorType* staticSector;
 
-      /** collects the hits found on this sector */
+      /// collects the hits found on this sector
       std::vector<Belle2::TrackNode*> hits;
     };
 
@@ -86,11 +86,16 @@ namespace Belle2 {
     }
 
 
-    /** builds the SegmentNetwork and the TrackNodeNetwork  */
+    /** Event function
+     *  - Creation of TrackNodes form SpacePoints
+     *  - Filling the activeSectorNetwork with all sectors with hits in the current event
+     *  - Filling the trackNodeNetwork by building combinations of 2 TrackNodes (= 2 SpacePoints)
+     *  - Filling the segmentNetwork by building combinations of segments (= 3 SpacePoints)
+     */
     void event() override;
 
 
-    /** initialize variables to avoid nondeterministic behavior */
+    /// Initialize counters.
     void InitializeCounters()
     {
       m_nSpacePointsTotal = 0;
@@ -107,11 +112,11 @@ namespace Belle2 {
     }
 
 
-    /** for each SpacePoint given, find according sector and store them in a fast and intermediate way* */
+    /// Create TrackNodes from SpacePoints and collect fullSecIDs of 'active' sectors with SpacePoints for the event.
     std::vector<RawSectorData> matchSpacePointToSectors();
 
 
-    /** returns a NULL-ptr if no sector found, returns pointer to the static sector if found */
+    /// Returns pointer to static sector of a provided SpacePoint; returns NULL-ptr if no sector could be found.
     const StaticSectorType* findSectorForSpacePoint(const SpacePoint& aSP)
     {
       if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {
@@ -124,7 +129,8 @@ namespace Belle2 {
     }
 
 
-    /** build a DirectedNodeNetwork<ActiveSector>, where all ActiveSectors are stored which have SpacePoints* and compatible inner- or outer neighbours */
+    /** Builds a DirectedNodeNetwork<ActiveSector>, containing ActiveSectors which have SpacePoints
+     *  and compatible inner- or outer neighbours */
     void buildActiveSectorNetwork(std::vector<RawSectorData>& collectedData);
 
 
@@ -145,32 +151,32 @@ namespace Belle2 {
 
 
   protected:
-    /// module parameters
+    /** Module Parameters */
     /// Vector with SpacePoint storeArray names.
     std::vector<std::string> m_PARAMSpacePointsArrayNames = {"SVDSpacePoints", "PXDSpacePoints"};
 
     /// Name for network container data store object created by this module.
     std::string m_PARAMNetworkOutputName;
 
-    /** if true, to the given SpacePoints a virtual interaction point at given coordinates with parameter 'virtualIPCoorindates' will be added */
+    /// Boolean to set whether to add an additional SpacePoint as a virtual interaction point.
     bool m_PARAMAddVirtualIP = false;
 
-    /**  expects X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
+    /// Coordinates for virtual interaction point SpacePoint.
     std::vector<double> m_PARAMVirtualIPCoordinates = {0, 0, 0};
 
-    /** expects errors for X, Y, and Z coordinates for virtual IP in global coordinates (only lists with 3 coordinates are allowed!). Only used if addVirtualIP == true. */
+    /// Errors on coordinates for virtual interaction point SpacePoint.
     std::vector<double> m_PARAMVirtualIPErrors = {0.2, 0.2, 1.};
 
-    /** the name of the SectorMap used for this instance. */
+    /// Name of SectorMap used for this instance.
     std::string m_PARAMsecMapName = "testMap";
 
-    /** If true for each event and each network created a file with a graph is created. */
+    /// If true for each event and each network a file with a graph of the network is created.
     bool m_PARAMprintNetworks = false;
 
     /** If true a file containing Mathematica code to generate a graph of the segment network is created. */
     bool m_PARAMprintToMathematica = false;
 
-    /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
+    /// If true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.
     bool m_PARAMallFiltersOff = false;
 
     /** Maximal size of SegmentNetwork; if exceeded, filling of the SegmentNetwork will be stopped, the
@@ -183,120 +189,88 @@ namespace Belle2 {
     */
     unsigned short m_PARAMmaxHitNetworkSize = 3000;
 
-    /// member variables
 
-    /** pointer to a root file needed to store the filter-variable responses if filter are observed */
-    TFile* m_tfile = nullptr;
-
-    /** vector containing global coordinates for virtual IP, is set using module parameters. */
+    /** Member Variables */
+    /// Vector for coordinates of virtual IP.
     B2Vector3D m_virtualIPCoordinates;
 
-    /** vector containing global errors for virtual IP, is set using module parameters. */
+    /// Vector for errors on coordinates of virtual IP.
     B2Vector3D m_virtualIPErrors;
 
-    // input containers
-    /** reference to the container which contains all the sector to filter maps and with it the VXDTFFilters. */
+    /// Reference to container which contains all the sector to filter maps and with it the VXDTFFilters.
     FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
-    /** pointer to the current filter, contains all sectorCombinations and Filters including cuts. */
-    // WARNING: the pointer will change if the DB object is updated!
+    /// Pointer to the current filters, contains all sectorCombinations and Filters including cuts.
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
-    /** contains storeArrays with SpacePoints in it */
+    /// Contains all SPacePoint storeArrays to be evaluated.
     std::vector<StoreArray<Belle2::SpacePoint>> m_spacePoints;
 
-    // output containers
-    /** access to the DirectedNodeNetwork, which will be produced by this module */
+    /// Access to the DirectedNodeNetwork, which will be produced by this module
     StoreObjPtr<DirectedNodeNetworkContainer> m_network;
 
 
-// counters
-
-    /** knows current event number */
+    /** Counters */
+    /// Current event number.
     unsigned int m_eventCounter = 0;
 
     // spacePoint-matching:
-
-    /** counts number of spacePoints accepted by secMap (spacepoint-to-sector-matching only). */
+    /// Counts number of spacePoints accepted by secMap (spacepoint-to-sector-matching only).
     unsigned int m_nSPsFound = 0;
-
-    /** counts number of spacePoints rejected by secMap (spacepoint-to-sector-matching only). */
+    /// Counts number of spacePoints rejected by secMap (spacepoint-to-sector-matching only).
     unsigned int m_nSPsLost = 0;
-
-    /** counts total number of Sectors with SpacePoints attached to them found (double entries between several events are ignored.) - spacepoint-matching only */
+    /// Counts total number of Sectors with SpacePoints attached to them found (no double counting).
     unsigned int m_nRawSectorsFound = 0;
 
     // buildActiveSectorNetwork:
-
-    /** counts accepted number of Sectors with SpacePoints attached to them found (double entries between several events are ignored.) - activeSector-creation only - this is one step after spacePointMatching. */
+    /// Counts accepted number of Sectors with SpacePoints attached to them found (no double counting).
     unsigned int m_nGoodSectorsFound = 0;
-
-    /** number of sectorCombinations which were successfully linked. */
+    /// Number of sectorCombinations which were successfully linked.
     unsigned int m_nSectorsLinked = 0;
-
-    /** counts number of times a sector had an inner sector without hits (does not mean that this sector had no other inner sectors with hits). */
+    /// Counts number of times a sector had an inner sector without hits (other inner sectors with hits still possible).
     unsigned int m_nBadSectorInnerNotActive = 0;
-
-    /** counts number of times a sector had inner sectors bot none of them had any spacePoints. */
+    /// Counts number of times a sector had inner sectors but none of them had any spacePoints.
     unsigned int m_nBadSectorNoInnerActive = 0;
-
-    /** counts number of times a sector had spacePoints but no inner sectors was attached at all. */
+    /// Counts number of times a sector had spacePoints but no inner sectors was attached at all.
     unsigned int m_nBadSectorNoInnerExisting = 0;
 
     // buildTrackNodeNetwork:
-    /** counts number of times a trackNode was accepted (same trackNode can be accepted/rejected more than once -> combinations relevant). */
+    /// Counts number of times a trackNode was accepted (same trackNode can be accepted/rejected more than once).
     unsigned int m_nTrackNodesAccepted = 0;
-
-    /** counts number of times a trackNode was rejected (same trackNode can be accepted/rejected more than once -> combinations relevant). */
+    /// Counts number of times a trackNode was rejected (same trackNode can be accepted/rejected more than once).
     unsigned int m_nTrackNodesRejected = 0;
-
-    /** counts number of times a link between tracknodes was created (unique per combination and map). */
+    /// Counts number of times a link between tracknodes was created (unique per combination and map).
     unsigned int m_nTrackNodeLinksCreated = 0;
 
     // buildSegmentNetwork:
-    /** counts number of times a Segment was accepted (same Segment can be accepted/rejected more than once -> combinations relevant). */
+    /// Counts number of times a Segment was accepted (same Segment can be accepted/rejected more than once).
     unsigned int m_nSegmentsAccepted = 0;
-
-    /** counts number of times a Segment was rejected (same Segment can be accepted/rejected more than once -> combinations relevant). */
+    /// Counts number of times a Segment was rejected (same Segment can be accepted/rejected more than once).
     unsigned int m_nSegmentsRejected = 0;
-
-    /** counts number of times a link between tracknodes was created (unique per combination and map). */
+    /// Counts number of times a link between tracknodes was created (unique per combination and map).
     unsigned int m_nSegmentsLinksCreated = 0;
-
-    /** counts number of Sectors which could be woven into the network */
+    /// Counts number of Sectors which could be woven into the network
     unsigned int m_nSectorsAsNodes;
-
-    /** counts number of links between Sectors which could be woven into the network - outerDirection */
+    /// Counts number of links between Sectors which could be woven into the network - outerDirection
     unsigned int m_nOuterSectorLinks;
-
-    /** counts number of links between Sectors which could be woven into the network - innerDirection */
+    /// Counts number of links between Sectors which could be woven into the network - innerDirection
     unsigned int m_nInnerSectorLinks;
-
-    /** counts total number of SpacePoints occurred */
+    /// Counts total number of SpacePoints occurred
     unsigned int m_nSpacePointsTotal;
-
-    /** counts number of SpacePoints which had sectors sectors */
+    /// Counts number of SpacePoints which had sectors sectors
     unsigned int m_nSpacePointsInSectors;
-
-    /** counts number of SpacePoints which could be woven into the network */
+    /// Counts number of SpacePoints which could be woven into the network
     unsigned int m_nSpacePointsAsNodes;
-
-    /** counts number of links between SpacePoints which could be woven into the network - outerDirection */
+    /// Counts number of links between SpacePoints which could be woven into the network - outerDirection
     unsigned int m_nOuterSpacePointLinks;
-
-    /** counts number of links between SpacePoints which could be woven into the network - innerDirection */
+    /// Counts number of links between SpacePoints which could be woven into the network - innerDirection
     unsigned int m_nInnerSpacePointLinks;
-
-    /** counts number of Segments which could be woven into the network */
+    /// Counts number of Segments which could be woven into the network
     unsigned int m_nSegmentsAsNodes;
-
-    /** counts number of links between Segments which could be woven into the network - outerDirection */
+    /// Counts number of links between Segments which could be woven into the network - outerDirection
     unsigned int m_nOuterSegmentLinks;
-
-    /** counts number of links between Segments which could be woven into the network - innerDirection */
+    /// Counts number of links between Segments which could be woven into the network - innerDirection
     unsigned int m_nInnerSegmentLinks;
-
-  private:
   };
 }
 

@@ -137,6 +137,7 @@ void SegmentNetworkProducerModule::event()
   }
 
   vector<RawSectorData> collectedData = matchSpacePointToSectors();
+
   buildActiveSectorNetwork(collectedData);
 
   if (not buildTrackNodeNetwork<VoidObserver>()) {
@@ -163,7 +164,7 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
       const StaticSectorType* sectorFound = findSectorForSpacePoint(aSP);
 
       if (sectorFound == nullptr) {
-        B2WARNING("matchSpacePointToSectors: SP in sensor " << aSP.getVxdID() << " no sector found, SpacePoint discarded!");
+        B2WARNING("SpacePoint in sensor " << aSP.getVxdID() << " no sector found, SpacePoint discarded!");
         nSPsLost++;
         continue;
       }

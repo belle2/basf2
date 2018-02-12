@@ -24,6 +24,15 @@ namespace Belle2 {
   public:
 
     /**
+     * Calibration status values
+     */
+    enum EStatus {
+      c_Default = 0,    /**< uncalibrated default value */
+      c_Calibrated = 1, /**< good calibrated value */
+      c_Unusable = 2    /**< bad calibrated value */
+    };
+
+    /**
      * time axis size (time axis for 4 ASIC windows)
      */
     enum {c_WindowSize = TOPASICPedestals::c_WindowSize,
@@ -34,12 +43,10 @@ namespace Belle2 {
      * Default constructor
      */
     TOPSampleTimes()
-    {
-      for (unsigned i = 0; i <= c_TimeAxisSize; i++) m_timeAxis[i] = 0;
-    }
+    {}
 
     /**
-     * Useful constructor
+     * Useful constructor, sets equidistant time base (uncalibrated)
      * @param scrodID scrod ID
      * @param channel hardware channel number
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
@@ -58,17 +65,28 @@ namespace Belle2 {
     }
 
     /**
-     * Sets equidistant time axis.
+     * Sets equidistant time axis (uncalibrated).
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
     void setTimeAxis(double syncTimeBase);
 
     /**
-     * Sets time axis from calibration data.
+     * Sets time axis from calibration data and switches status to calibrated
      * @param sampleTimes vector of 256 elements of sample times
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
     void setTimeAxis(const std::vector<double>& sampleTimes, double syncTimeBase);
+
+    /**
+     * Sets uncertainty on time base calibration incl. systematics
+     * @param error estimated uncertainty of time axis points
+     */
+    void setTimeError(double error) {m_timeError = error;}
+
+    /**
+     * Switches calibration status to unusable to flag badly calibrated constant
+     */
+    void setUnusable() {m_calibrated = c_Unusable;}
 
     /**
      * Returns scrod ID
@@ -93,6 +111,12 @@ namespace Belle2 {
      * @return vector of sample times
      */
     std::vector<double> getTimeAxis() const;
+
+    /**
+     * Returns uncertainty on time base calibration incl. systematics
+     * @return uncertainty of time axis points
+     */
+    double getTimeError() const {return m_timeError;}
 
     /**
      * Returns time in respect to sample 0 of window 0
@@ -156,20 +180,32 @@ namespace Belle2 {
     double getSample(int window, double time) const;
 
     /**
-     * Is time axis calibrated or equidistant
-     * @return true, if calibrated
+     * Returns calibration status
+     * @return true, if good calibrated
      */
-    bool isCalibrated() const {return m_calibrated;}
+    bool isCalibrated() const {return m_calibrated == c_Calibrated;}
 
+    /**
+     * Returns calibration status
+     * @return true, if default (= equidistant, not calibrated)
+     */
+    bool isDefault() const {return m_calibrated == c_Default;}
+
+    /**
+     * Returns calibration status
+     * @return true, if bad calibrated
+     */
+    bool isUnusable() const {return m_calibrated == c_Unusable;}
 
   private:
 
     unsigned short m_scrodID = 0;          /**< scrod ID */
     unsigned short m_channel = 0;          /**< hardware channel number within SCROD */
-    float m_timeAxis[c_TimeAxisSize + 1];  /**< time axis + right border point */
-    bool m_calibrated = false;             /**< flag: calibrated or equidistant */
+    float m_timeAxis[c_TimeAxisSize + 1] = {0};  /**< time axis + right border point */
+    float m_timeError = 0;                 /**< uncertainty of time axis points incl. systematics */
+    EStatus m_calibrated = c_Default;      /**< calibration status */
 
-    ClassDef(TOPSampleTimes, 1); /**< ClassDef */
+    ClassDef(TOPSampleTimes, 2); /**< ClassDef */
 
   };
 

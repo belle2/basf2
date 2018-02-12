@@ -21,7 +21,7 @@ namespace Belle2 {
     double timeBin = DTime / c_TimeAxisSize;
     for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin * i;
     m_timeAxis[c_TimeAxisSize] = DTime;
-    m_calibrated = false;
+    m_calibrated = c_Default;
   }
 
 
@@ -36,7 +36,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = sampleTimes[i];
     double DTime = 2 * syncTimeBase;
     m_timeAxis[c_TimeAxisSize] = DTime;
-    m_calibrated = true;
+    m_calibrated = c_Calibrated;
   }
 
 

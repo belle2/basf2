@@ -304,35 +304,7 @@ namespace Belle2 {
       * @param flag Histogram of flags.
       * @return Indication of succes of realizing of condition, 1: OK.
       */
-    int SetFlag2(int Type, int bin, const double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist) const;
-    /** Function return flag histogram filled based on condition from TH1F source.
-        * Flag values:
-        * -3: nonexisting Type
-        * -2: histogram is missing or masked
-        * -1: less than 100 samles, skip comparition
-        *  0: good much with reference
-        *  1: warning level = diff > 6 * sigma and < error level
-        *  2: error level = diff > 10 * sigma
-        * @param Type Set type of condition for flag calculation.
-        * 1: use counts, mean and RMS.
-        * 2: use counts only.
-        * 3: use mean only.
-        * 4: use RMS only.
-        * 5: use counts and mean.
-        * 9: use bin content only.
-        * 10: use Chi2 condition and pars[0] and pars[1].
-        * 100: nothing do just fill flags as OK.
-        * @param bin bin which is fill in flag histogram.
-        * @param pars array of parameters need for condition.
-        * @param ratio Ratio of acquired events to reference events.
-        * @param hist Histogram of sources.
-        * @param refhist Reference histogram.
-        * @param flag Histogram of flags.
-        * @return Indication of succes of realizing of condition, 1: OK.
-        */
-    // int SetFlag(const int Type, const int bin, double* pars, const double ratio, std::string name_hist, std::string name_refhist, TH1I* flaghist) const;
-    //TH1* findHistLocal(TString& a);
-    // TH1* GetHisto(TString histoname) const;
+    int SetFlag(int Type, int bin, const double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist) const;
 
     /** Function for filling of TH1F histogram to database.
       * @param HistoBD Histogram for DB.

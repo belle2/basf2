@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <dqm/utilities/DQMCommonUtils.h>
-#include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/RelationArray.h>
 
 #include <framework/database/DBImportObjPtr.h>
@@ -20,308 +19,7 @@ using namespace std;
 using namespace Belle2;
 
 
-int DQMCommonUtils::getPXDSensorIndex(const int Layer, const int Ladder, const int Sensor)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          return tempcounter;
-        }
-        tempcounter++;
-      }
-    }
-  }
-  return tempcounter;
-}
-
-
-void DQMCommonUtils::getIDsFromPXDIndex(const int Index, int& Layer, int& Ladder, int& Sensor)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if (tempcounter == Index) {
-          Layer = layer.getLayerNumber();
-          Ladder = ladder.getLadderNumber();
-          Sensor = sensor.getSensorNumber();
-          return;
-        }
-        tempcounter++;
-      }
-    }
-  }
-}
-
-
-int DQMCommonUtils::getPXDChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip,
-                                    const int IsU) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          int iChip = Chip - 1;
-          if (!IsU)
-            iChip += (int)c_nPXDChipsU;
-          return tempcounter + iChip;
-        }
-        tempcounter = tempcounter + (c_nPXDChipsU + c_nPXDChipsV);
-      }
-    }
-  }
-  return tempcounter;
-}
-
-
-void DQMCommonUtils::getIDsFromPXDChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
-                                            int& IsU) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        Layer = layer.getLayerNumber();
-        Ladder = ladder.getLadderNumber();
-        Sensor = sensor.getSensorNumber();
-        int Chips = c_nPXDChipsU + c_nPXDChipsV;
-        for (int iChip = 0; iChip < Chips; iChip++) {
-          if (tempcounter + iChip == Index) {
-            Layer = layer.getLayerNumber();
-            Ladder = ladder.getLadderNumber();
-            Sensor = sensor.getSensorNumber();
-            Chip = iChip + 1;
-            IsU = 1;
-            if (iChip >= c_nPXDChipsU) {
-              Chip = iChip + 1 - c_nPXDChipsU;
-              IsU = 0;
-            }
-            return;
-          }
-        }
-        tempcounter = tempcounter + (c_nPXDChipsU + c_nPXDChipsV);
-      }
-    }
-  }
-}
-
-
-int DQMCommonUtils::getSVDSensorIndex(const int Layer, const int Ladder, const int Sensor)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  int tempend = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() <= geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          tempend = 1;
-        }
-        if (tempend == 1) break;
-        tempcounter++;
-      }
-      if (tempend == 1) break;
-    }
-    if (tempend == 1) break;
-  }
-  return tempcounter;
-}
-
-
-void DQMCommonUtils::getIDsFromSVDIndex(const int Index, int& Layer, int& Ladder, int& Sensor)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  int tempend = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() <= geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if (tempcounter == Index) {
-          Layer = layer.getLayerNumber();
-          Ladder = ladder.getLadderNumber();
-          Sensor = sensor.getSensorNumber();
-          tempend = 1;
-        }
-        if (tempend == 1) break;
-        tempcounter++;
-      }
-      if (tempend == 1) break;
-    }
-    if (tempend == 1) break;
-  }
-}
-
-
-int DQMCommonUtils::getSVDChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip,
-                                    const int IsU) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-//  int Chip =
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() <= geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          int iChip = Chip;
-          if (Layer == 3)
-            if (!IsU)
-              iChip += c_nSVDChipsL3;
-          if (Layer > 3)
-            if (!IsU)
-              iChip += c_nSVDChipsLu;
-          return tempcounter + iChip;
-        }
-        if (Layer == 3)
-          tempcounter = tempcounter + (2 * c_nSVDChipsL3);
-        if (Layer > 3)
-          tempcounter = tempcounter + (c_nSVDChipsLu + c_nSVDChipsLv);
-      }
-    }
-  }
-  return tempcounter;
-}
-
-
-void DQMCommonUtils::getIDsFromSVDChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
-                                            int& IsU) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() <= geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size()) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        Layer = layer.getLayerNumber();
-        Ladder = ladder.getLadderNumber();
-        Sensor = sensor.getSensorNumber();
-        int Chips = 0;
-        if (layer.getLayerNumber() == 3)
-          Chips = 2 * c_nSVDChipsL3;
-        if (layer.getLayerNumber() > 3)
-          Chips = c_nSVDChipsLu + c_nSVDChipsLv;
-        for (int iChip = 0; iChip < Chips; iChip++) {
-          if (tempcounter + iChip == Index) {
-            Layer = layer.getLayerNumber();
-            Ladder = ladder.getLadderNumber();
-            Sensor = sensor.getSensorNumber();
-            Chip = iChip;
-            IsU = 1;
-            if (Layer == 3) {
-              if (iChip >= c_nSVDChipsL3) {
-                Chip = iChip - c_nSVDChipsL3;
-                IsU = 0;
-              }
-            }
-            if (Layer > 3) {
-              if (iChip >= c_nSVDChipsLu) {
-                Chip = iChip - c_nSVDChipsLu;
-                IsU = 0;
-              }
-            }
-            return;
-          }
-        }
-        if (Layer == 3)
-          tempcounter = tempcounter + (2 * c_nSVDChipsL3);
-        if (Layer > 3)
-          tempcounter = tempcounter + (c_nSVDChipsLu + c_nSVDChipsLv);
-      }
-    }
-  }
-}
-
-
-int DQMCommonUtils::getVXDLayerIndex(const int Layer)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (Layer == layer.getLayerNumber()) {
-      return tempcounter;
-    }
-    tempcounter++;
-  }
-  return tempcounter;
-}
-
-
-void DQMCommonUtils::getLayerIDsFromVXDLayerIndex(const int Index, int& Layer)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (tempcounter == Index) {
-      Layer = layer.getLayerNumber();
-      return;
-    }
-    tempcounter++;
-  }
-}
-
-
-int DQMCommonUtils::getVXDSensorIndex(const int Layer, const int Ladder, const int Sensor)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          return tempcounter;
-        }
-        tempcounter++;
-      }
-    }
-  }
-  return tempcounter;
-}
-
-
-void DQMCommonUtils::getIDsFromVXDIndex(const int Index, int& Layer, int& Ladder, int& Sensor)
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if (tempcounter == Index) {
-          Layer = layer.getLayerNumber();
-          Ladder = ladder.getLadderNumber();
-          Sensor = sensor.getSensorNumber();
-          return;
-        }
-        tempcounter++;
-      }
-    }
-  }
-}
-
-
-int DQMCommonUtils::SetFlag(const int Type, const int bin, double* pars, const double ratio, TH1F* hist, TH1F* refhist,
+int DQMCommonUtils::SetFlag(int Type, int bin, const double* pars, double ratio, TH1F* hist, TH1F* refhist,
                             TH1I* flaghist) const
 {
   int iret = 0;
@@ -445,7 +143,7 @@ int DQMCommonUtils::SetFlag(const int Type, const int bin, double* pars, const d
 }
 
 
-int DQMCommonUtils::SetFlag2(const int Type, const int bin, double* pars, const double ratio, TH1I* hist, TH1I* refhist,
+int DQMCommonUtils::SetFlag2(int Type, int bin, const double* pars, double ratio, TH1I* hist, TH1I* refhist,
                              TH1I* flaghist) const
 {
 //  TH1F* histF = new TH1F("histF", "histF", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
@@ -740,17 +438,17 @@ void DQMCommonUtils::CreateDBHisto(TH1I* HistoDB) const
 }
 
 
-void DQMCommonUtils::CreateDBHistoGroup(TH1F** HistoDB, const int Number) const
+void DQMCommonUtils::CreateDBHistoGroup(TH1F** HistoDB, int number) const
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
   DBImportObjPtr<TVectorD> DBHisto(Name.Data());
-  DBHisto.construct(Number * HistoDB[0]->GetNbinsX() + 3);
-  double* Content = new double[Number * HistoDB[0]->GetNbinsX() + 3];
+  DBHisto.construct(number * HistoDB[0]->GetNbinsX() + 3);
+  double* Content = new double[number * HistoDB[0]->GetNbinsX() + 3];
   Content[0] = HistoDB[0]->GetNbinsX();
   Content[1] = HistoDB[0]->GetXaxis()->GetXmin();
   Content[2] = HistoDB[0]->GetXaxis()->GetXmax();
-  for (int j = 0; j < Number; j++) {
+  for (int j = 0; j < number; j++) {
     for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
       Content[j * HistoDB[j]->GetNbinsX() + i + 3] = HistoDB[j]->GetBinContent(i + 1);
     }
@@ -761,17 +459,17 @@ void DQMCommonUtils::CreateDBHistoGroup(TH1F** HistoDB, const int Number) const
 }
 
 
-void DQMCommonUtils::CreateDBHistoGroup(TH1I** HistoDB, const int Number) const
+void DQMCommonUtils::CreateDBHistoGroup(TH1I** HistoDB, int number) const
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
   DBImportObjPtr<TVectorD> DBHisto(Name.Data());
-  DBHisto.construct(Number * HistoDB[0]->GetNbinsX() + 3);
-  double* Content = new double[Number * HistoDB[0]->GetNbinsX() + 3];
+  DBHisto.construct(number * HistoDB[0]->GetNbinsX() + 3);
+  double* Content = new double[number * HistoDB[0]->GetNbinsX() + 3];
   Content[0] = HistoDB[0]->GetNbinsX();
   Content[1] = HistoDB[0]->GetXaxis()->GetXmin();
   Content[2] = HistoDB[0]->GetXaxis()->GetXmax();
-  for (int j = 0; j < Number; j++) {
+  for (int j = 0; j < number; j++) {
     for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
       Content[j * HistoDB[j]->GetNbinsX() + i + 3] = HistoDB[j]->GetBinContent(i + 1);
     }
@@ -828,7 +526,7 @@ int DQMCommonUtils::LoadDBHisto(TH1I* HistoDB) const
 }
 
 
-int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, const int Number) const
+int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, int number) const
 {
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
   DBObjPtr<TVectorD> DBHisto(Name.Data());
@@ -838,7 +536,7 @@ int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, const int Number) const
     if (HistoDB[0]->GetNbinsX() != (int)DBHisto->GetMatrixArray()[0]) ret = 0;
     if (HistoDB[0]->GetXaxis()->GetXmin() != DBHisto->GetMatrixArray()[1]) ret = 0;
     if (HistoDB[0]->GetXaxis()->GetXmax() != DBHisto->GetMatrixArray()[2]) ret = 0;
-    for (int j = 0; j < Number; j++) {
+    for (int j = 0; j < number; j++) {
       for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
         HistoDB[j]->SetBinContent(i + 1, DBHisto->GetMatrixArray()[j * HistoDB[j]->GetNbinsX() + i + 3]);
       }
@@ -851,7 +549,7 @@ int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, const int Number) const
 }
 
 
-int DQMCommonUtils::LoadDBHistoGroup(TH1I** HistoDB, const int Number) const
+int DQMCommonUtils::LoadDBHistoGroup(TH1I** HistoDB, int number) const
 {
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
   DBObjPtr<TVectorD> DBHisto(Name.Data());
@@ -861,7 +559,7 @@ int DQMCommonUtils::LoadDBHistoGroup(TH1I** HistoDB, const int Number) const
     if (HistoDB[0]->GetNbinsX() != (int)DBHisto->GetMatrixArray()[0]) ret = 0;
     if (HistoDB[0]->GetXaxis()->GetXmin() != DBHisto->GetMatrixArray()[1]) ret = 0;
     if (HistoDB[0]->GetXaxis()->GetXmax() != DBHisto->GetMatrixArray()[2]) ret = 0;
-    for (int j = 0; j < Number; j++) {
+    for (int j = 0; j < number; j++) {
       for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
         HistoDB[j]->SetBinContent(i + 1, DBHisto->GetMatrixArray()[j * HistoDB[j]->GetNbinsX() + i + 3]);
       }

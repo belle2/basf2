@@ -15,12 +15,14 @@ from basf2 import *
 import sys
 import glob
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors
+from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors, TSpectrum, TCanvas
+import ROOT
 import pylab
 import numpy
+import time
 
 
-class TOPTBCResolution(Module):
+class TOPLaserHistogrammerModule(Module):
 
     ''' Module to study resolution and performance of the top laser calibration.'''
 
@@ -49,6 +51,8 @@ class TOPTBCResolution(Module):
 
     #: ignores the hits wthout calibration
     m_ignoreNotCalibrated = True
+    #: ignores the hits wthout calibration
+    m_runOnData = True
 
     #: maximum width to accept a TOPDigit
     m_maxWidth = 3.
@@ -59,7 +63,9 @@ class TOPTBCResolution(Module):
     #: minimum amplitude to accept a TOPDigit
     m_minAmp = 250.
     #: root file with the MC distribition of the laser light, to get the light path corrections
-    m_mcCorrection = 'mct0.root'
+    m_mcCorrectionsFile = 't0MC.root'
+    #: positions of the first and second peak
+    m_MCPeaks = [[]]
 
     def setOutputName(self, outputname):
         ''' Sets the output file name '''
@@ -86,10 +92,33 @@ class TOPTBCResolution(Module):
         #: output name
         self.m_minAmp = minAmp
 
+    def setMCCorrectionsFile(self, MCfile):
+        ''' Sets the file containing the MC correction'''
+        #: output name
+        self.m_mcCorrectionsFile = MCfile
+
     def ignoreNotCalibrated(self, ignoreNotCal):
         ''' Sets the flag to ingore the hits without calibration '''
         #: output name
         self.m_ignoreNotCalibrated = ignoreNotCal
+
+    def beginRun(self):
+        self.m_MCPeaks = [[-1. for second in range(2)] for first in range(512)]    # default
+        tfileIn = TFile(self.m_mcCorrectionsFile)
+        histoMC = tfileIn.Get('LaserTimingVSChannelOneSlot')
+        for kCh in range(512):
+            timeProjection = histoMC.ProjectionY('projection', kCh + 1, kCh + 1)
+            timeProjection.GetXaxis().SetRangeUser(0., 1.)
+            spectrum = TSpectrum()
+            numPeaks = spectrum.Search(timeProjection, 2., 'nobackground', 0.1)
+            peaks = spectrum.GetPositionX()
+            print(str(numPeaks))
+            if numPeaks is not 0:
+                print('channel ' + str(kCh) + ' ' + str(peaks[0]) + ' ' +
+                      str(self.m_MCPeaks[kCh][0]) + ' ' + str(self.m_MCPeaks[kCh][1]))
+            for iPeak in range(numPeaks):
+                if iPeak < 2:
+                    self.m_MCPeaks[kCh][iPeak] = peaks[iPeak]
 
     def event(self):
         ''' Event processor: fill histograms '''
@@ -111,20 +140,13 @@ class TOPTBCResolution(Module):
 
     def terminate(self):
         ''' Write histograms to file, fills and fits the resolution plots'''
-
         tfile = TFile(self.outname, 'recreate')
-
         self.h_LaserTimingVSChannel.Write()
         self.h_LaserTimingVSChannelOneSlot.Write()
-
-#        for k in range(0,512*16):
-#            timeProjection = self.h_LaserTimingVSChannel.projectionY('projection', k, k)
-
         tfile.Close()
 
 
 argvs = sys.argv
-
 print('usage: basf2', argvs[0], 'runNumber outfileName')
 
 dbaddress = argvs[1]        # path to the calibration DB  (absolute path  or 'none')
@@ -200,19 +222,19 @@ if datatype != 'root':
         print("Using TBC")
         converter.param('useSampleTimeCalibration', True)
     converter.param('useChannelT0Calibration', True)
-    converter.param('useModuleT0Calibration', False)
+    converter.param('useModuleT0Calibration', True)
     converter.param('useCommonT0Calibration', False)
     converter.param('calibrationChannel', -1)  # do not specify the calpulse channel
     converter.param('lookBackWindows', 29)  # in number of windows
     main.add_module(converter)
 
 # resolution plotter
-resolutionModule = TOPTBCResolution()
+resolutionModule = TOPLaserHistogrammerModule()
 resolutionModule.setOutputName(outfile)
-resolutionModule.setMinWidth(0.1)  # calpluse candidate selection
-resolutionModule.setMaxWidth(999)  # calpluse candidate selection
-resolutionModule.setMinAmp(100)  # calpluse candidate selection
-resolutionModule.setMaxAmp(999)  # calpluse candidate selection
+resolutionModule.setMinWidth(0.1)  # good TOPDigit selection
+resolutionModule.setMaxWidth(999)  # good TOPDigit selection
+resolutionModule.setMinAmp(100)  # good TOPDigit selection
+resolutionModule.setMaxAmp(999)  # good TOPDigit selection
 if dbaddress == 'none':
     resolutionModule.ignoreNotCalibrated(True)
 else:

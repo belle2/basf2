@@ -8,14 +8,15 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/NtupleTools/NtupleThrustAndCoTool.h>
+#include <analysis/NtupleTools/NtupleEventShapeTool.h>
 #include <TBranch.h>
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/EventVariables.h>
 
 using namespace Belle2;
 using namespace std;
 
-void NtupleThrustAndCoTool::setupTree()
+void NtupleEventShapeTool::setupTree()
 {
   m_tree->Branch("ThrustValue", &m_fThrustValue, "ThrustValue/F");
   m_tree->Branch("ThrustVector", &m_fThrustVector[0], "ThrustVector[3]/F");
@@ -24,32 +25,35 @@ void NtupleThrustAndCoTool::setupTree()
   int nDecayProducts = strNames.size();
   B2INFO("nDecayProducts = " << nDecayProducts);
 
-  m_fCosThrust = new float[nDecayProducts];
+  m_fCosToThrust = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_CosThrust").c_str(),  &m_fCosThrust[iProduct],
-                   (strNames[iProduct] + "_CosThrust/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_CosToThrust").c_str(),  &m_fCosToThrust[iProduct],
+                   (strNames[iProduct] + "_CosToThrust/F").c_str());
   }
 }
 
-void NtupleThrustAndCoTool::deallocateMemory()
+void NtupleEventShapeTool::deallocateMemory()
 {
   m_fThrustValue = 0;
   for (int i = 0; i < 3; i++) {m_fThrustVector[i] = -100;}
-  delete [] m_fCosThrust;
+  delete [] m_fThrustValue;
+  delete [] m_fCosToThrust;
 }
 
-void NtupleThrustAndCoTool::eval(const Particle* particle)
+void NtupleEventShapeTool::eval(const Particle* particle)
 {
   if (!particle) {
-    B2ERROR("NtupleThrustAndCoTool::eval - no Particle found!");
+    B2ERROR("NtupleEventShapeTool::eval - no Particle found!");
     return;
   }
+
+  m_fThrustValue = EventVariable::thrustOfEvent;
+//  for (int i = 0; i < 3; i++) {m_fThrustVector[i] = EventVariable:: };
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    B2INFO("Here we will give values to the variables");
-//     m_fPIDk[iProduct] = Variable::kaonID(selparticles[iProduct]);
+    m_fCosToThrust[iProduct] = Variable::cosToEvtThrust(selparticles[iProduct]);
   }
 }

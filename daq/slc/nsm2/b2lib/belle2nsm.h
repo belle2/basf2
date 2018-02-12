@@ -2,7 +2,7 @@
 #ifndef __belle2nsm_h__
 #define __belle2nsm_h__
 
-#include "nsm2.h"
+#include <nsm2/nsm2.h>
 
 #if defined(__cplusplus)
 extern "C" {
@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 int b2nsm_addincpath(const char* path);
+const char* b2nsm_nodename(int nodeid);
 int b2nsm_nodeid(const char* nodename);
 int b2nsm_nodepid(const char* nodename);
 int b2nsm_loghook(NSMmsg* msg, NSMcontext* nsmc);

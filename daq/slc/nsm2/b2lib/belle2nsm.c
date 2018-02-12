@@ -17,9 +17,10 @@
    20140902 1935 memset fix
    20140921 1940 flushmem
    20160420 1946 debugflag separately from corelib
+   20180121 1957 b2nsm_nodename is added
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.47";
+const char *belle2nsm_version = "belle2nsm 1.9.57";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,8 +30,8 @@ const char *belle2nsm_version = "belle2nsm 1.9.47";
 #include <time.h>
 #include <sys/time.h>
 
-#include "nsm2.h"
-#include "nsmlib2.h"
+#include <nsm2/nsm2.h>
+#include <nsm2/nsmlib2.h>
 #include "belle2nsm.h"
 
 /* checkpoint of signal handler to be studied with gdb
@@ -76,6 +77,12 @@ int
 b2nsm_addincpath(const char *path)
 {
   return nsmlib_addincpath(path);
+}
+/* -- b2nsm_nodename ---------------------------------------------------- */
+const char *
+b2nsm_nodename(int nodeid)
+{
+  return nsmlib_nodename(nsm, nodeid);
 }
 /* -- b2nsm_nodeid ------------------------------------------------------ */
 int
@@ -433,9 +440,10 @@ b2nsm_flushmem(const void *ptr, int siz)
 int
 b2nsm_wait(float timeout)
 {
-  int wait_msec = (int)(timeout * 1000);
+  /* int wait_msec = (int)(timeout * 1000); */
+  int wait_usec = (int)(timeout * 1000);
   char buf[NSM_TCPMSGSIZ]; /* should not be static */
-  NSMcontext *nsmc = nsmlib_selectc(0, wait_msec); /* usesig = 0 */
+  NSMcontext *nsmc = nsmlib_selectc(0, wait_usec); /* usesig = 0 */
   NSMcontext *nsmsav;
 
   if (! nsmc) return 0;

@@ -7,8 +7,6 @@ FILES = \
  b2lib/Makefile \
  b2lib/belle2nsm.c \
  b2lib/belle2nsm.h \
- b2lib/client_data.h \
- b2lib/main.c \
  corelib/Makefile \
  corelib/nsm2.h \
  corelib/nsmhash.c \
@@ -48,6 +46,15 @@ all:
 	(cd example ; make clean all ||\
 	              make -f Makefile.no-readline clean all )
 
+install: all
+	(cd daemon  ; make install)
+	(cd corelib ; make install)
+	(cd b2lib   ; make install)
+	(cd nsmget  ; make install)
+	(cd example ; make install ||\
+	              make -f Makefile.no-readline clean all )
+
+
 clean:
 	(cd daemon  ; make clean)
 	(cd corelib ; make clean)
@@ -68,8 +75,7 @@ daemon/nsm2.h: $(FILES)
 	@echo
 	@false
 
-package: tgz daemon/nsm2.h
-	@-mkdir tgz 2> /dev/null || true
+package: daemon/nsm2.h
 	@grep 'VERSION' daemon/nsm2.h
 	@grep 'define.*VERSION' daemon/nsmd2.cc
 	@grep 'nsmlib2_version' corelib/nsmlib2.c
@@ -78,12 +84,7 @@ package: tgz daemon/nsm2.h
 	@-rm -rf nsm2-$(VER)
 	@mkdir nsm2-$(VER)
 	@tar cf - daemon/nsm2.h $(FILES) | (cd nsm2-$(VER) ; tar xf -)
-	@tar cf - nsm2-$(VER) | gzip -9 > tgz/nsm2-$(VER).tgz
+	@tar cf - nsm2-$(VER) | gzip -9 > nsm2-$(VER).tgz
 	@-rm -rf nsm2-$(VER)
-	@echo tgz/nsm2-$(VER).tgz is created
-
-install: ${BELLE2_EXTERNALS_DIR}/src/nsm2/daemon/Makefile
-
-${BELLE2_EXTERNALS_DIR}/src/nsm2/daemon/Makefile: daemon/Makefile
-	@sh ${BELLE2_LOCAL_DIR}/daq/slc/extra/nsm2/export.sh
+	@echo nsm2-$(VER).tgz is created
 

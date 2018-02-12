@@ -182,12 +182,12 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   //----------------------------------------------------------------
   // Charge of clusters for all sensors
   //----------------------------------------------------------------
-  string name = str(format("DQMER_SVD_ClusterChargeAll"));
+  string name = str(format("DQMER_SVD_ClusterChargeUAll"));
   string title = str(format("DQM ER SVD Cluster charge in U for all sensors"));
   m_clusterChargeUAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
   m_clusterChargeUAll->GetXaxis()->SetTitle("charge of u clusters [ke-]");
   m_clusterChargeUAll->GetYaxis()->SetTitle("count");
-  name = str(format("DQMER_SVD_ClusterChargeAll"));
+  name = str(format("DQMER_SVD_ClusterChargeVAll"));
   title = str(format("DQM ER SVD Cluster charge in V for all sensors"));
   m_clusterChargeVAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
   m_clusterChargeVAll->GetXaxis()->SetTitle("charge of v clusters [ke-]");

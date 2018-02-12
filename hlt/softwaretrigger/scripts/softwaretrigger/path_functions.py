@@ -69,7 +69,7 @@ def create_hlt_path():
     return path
 
 
-def finalize_hlt_path(path, show_progress_bar=False):
+def finalize_hlt_path(path, show_progress_bar=False, use_local_storage=False):
     """
     Add the required output modules for HLT
     """
@@ -78,13 +78,16 @@ def finalize_hlt_path(path, show_progress_bar=False):
     ##########
     # Output to RingBuffer
     # todo: needs to changed to Ring Buffer output for testing
-    # output = basf2.register_module("Ds2Rbuf")
-    # output.param("RingBufferName", argvs[2])
 
-    # Output to SeqRoot
-    output = basf2.register_module("SeqRootOutput")
-    output.param('outputFileName', 'HLTout.sroot')
-    # output file name should be specified with -o option
+    if not use_local_storage:
+        output = basf2.register_module("Ds2Rbuf")
+        output.param("RingBufferName", sys.argvs[2])
+
+    else:
+        # Output to SeqRoot
+        output = basf2.register_module("SeqRootOutput")
+        output.param('outputFileName', 'HLTout.sroot')
+        # output file name should be specified with -o option
 
     # Specification of output objects
     output.param("saveObjs", ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)

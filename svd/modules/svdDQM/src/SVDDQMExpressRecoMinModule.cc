@@ -182,8 +182,19 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   //----------------------------------------------------------------
   // Charge of clusters for all sensors
   //----------------------------------------------------------------
-  string name = str(format("DQMER_SVD_ClusterChargeU3"));
-  string title = str(format("DQM ER SVD Cluster charge in U for layer 3 sensors"));
+  string name = str(format("DQMER_SVD_ClusterChargeAll"));
+  string title = str(format("DQM ER SVD Cluster charge in U for all sensors"));
+  m_clusterChargeUAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeUAll->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+  m_clusterChargeUAll->GetYaxis()->SetTitle("count");
+  name = str(format("DQMER_SVD_ClusterChargeAll"));
+  title = str(format("DQM ER SVD Cluster charge in V for all sensors"));
+  m_clusterChargeVAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeVAll->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+  m_clusterChargeVAll->GetYaxis()->SetTitle("count");
+
+  name = str(format("DQMER_SVD_ClusterChargeU3"));
+  title = str(format("DQM ER SVD Cluster charge in U for layer 3 sensors"));
   m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
   m_clusterChargeU3->GetXaxis()->SetTitle("charge of u clusters [ke-]");
   m_clusterChargeU3->GetYaxis()->SetTitle("count");
@@ -411,6 +422,8 @@ void SVDDQMExpressRecoMinModule::beginRun()
     if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Reset();
     if (m_CounterFTBFlags[i] != NULL) m_CounterFTBFlags[i]->Reset();
   }
+  if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Reset();
+  if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Reset();
   if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Reset();
   if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Reset();
   if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Reset();
@@ -538,6 +551,7 @@ void SVDDQMExpressRecoMinModule::event()
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (iLayer == 3) if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (iLayer != 3) if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
@@ -550,6 +564,7 @@ void SVDDQMExpressRecoMinModule::event()
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (iLayer == 3) if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (iLayer != 3) if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
@@ -571,7 +586,6 @@ int SVDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
-//  int Chip =
   for (VxdID layer : geo.getLayers()) {
     if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
     for (VxdID ladder : geo.getLadders(layer)) {
@@ -580,17 +594,17 @@ int SVDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
             (Ladder == ladder.getLadderNumber()) &&
             (Sensor == sensor.getSensorNumber())) {
           int iChip = Chip;
-          if (Layer == 3)
-            if (!IsU)
-              iChip += c_nSVDChipsL3;
-          if (Layer > 3)
-            if (!IsU)
-              iChip += c_nSVDChipsLu;
+          if ((Layer == 3) && (IsU == 0)) {
+            iChip += c_nSVDChipsL3;
+          }
+          if ((Layer > 3) && (IsU == 0)) {
+            iChip += c_nSVDChipsLu;
+          }
           return tempcounter + iChip;
         }
-        if (Layer == 3)
+        if (layer.getLayerNumber() == 3)
           tempcounter = tempcounter + (2 * c_nSVDChipsL3);
-        if (Layer > 3)
+        else
           tempcounter = tempcounter + (c_nSVDChipsLu + c_nSVDChipsLv);
       }
     }
@@ -608,16 +622,13 @@ void SVDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
         Layer = layer.getLayerNumber();
-        Ladder = ladder.getLadderNumber();
-        Sensor = sensor.getSensorNumber();
         int Chips = 0;
-        if (layer.getLayerNumber() == 3)
+        if (Layer == 3)
           Chips = 2 * c_nSVDChipsL3;
-        if (layer.getLayerNumber() > 3)
+        if (Layer > 3)
           Chips = c_nSVDChipsLu + c_nSVDChipsLv;
         for (int iChip = 0; iChip < Chips; iChip++) {
           if (tempcounter + iChip == Index) {
-            Layer = layer.getLayerNumber();
             Ladder = ladder.getLadderNumber();
             Sensor = sensor.getSensorNumber();
             Chip = iChip;

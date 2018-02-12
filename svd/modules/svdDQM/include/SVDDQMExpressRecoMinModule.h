@@ -92,6 +92,10 @@ namespace Belle2 {
     TH1F** m_clusterChargeU;
     /** v charge of clusters */
     TH1F** m_clusterChargeV;
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll;
     /** u charge of clusters for layer 3 sensors */
     TH1F* m_clusterChargeU3;
     /** v charge of clusters for layer 3  sensors */

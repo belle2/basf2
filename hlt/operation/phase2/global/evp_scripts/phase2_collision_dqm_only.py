@@ -7,8 +7,7 @@ setup_basf2_and_db()
 path = create_hlt_path()
 
 # no reconstruction or software trigger added at all
-# currently, not all DQM modules can be executed without the reconstruction module in the path
-# add_hlt_dqm(path, run_type="collisions")
+add_hlt_dqm(path, run_type="collisions")
 
 finalize_hlt_path(path)
 basf2.print_path(path)

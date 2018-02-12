@@ -157,16 +157,17 @@ namespace Belle2 {
     StoreArray<MCParticle> MCParticles;
     MCParticles.isOptional();
     StoreArray<Track> tracks;
-    tracks.isRequired();
+    tracks.isOptional();
     StoreArray<ARICHHit> arichHits;
-    arichHits.isRequired();
+    arichHits.isOptional();
     StoreArray<ARICHDigit> arichDigits;
     arichDigits.isRequired();
     StoreArray<ARICHTrack> arichTracks;
-    arichTracks.isRequired();
+    arichTracks.isOptional();
     StoreArray<ARICHAeroHit> arichAeroHits;
-    arichAeroHits.isRequired();    StoreArray<ARICHLikelihood> likelihoods;
-    likelihoods.isRequired();
+    arichAeroHits.isOptional();
+    StoreArray<ARICHLikelihood> likelihoods;
+    likelihoods.isOptional();
   }
 
   void ARICHDQMModule::beginRun()

@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/modules/vxdtfRedesign/SegmentNetworkProducerModule.h>
-
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 
@@ -482,7 +481,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
                   << ". Network size is " << segmentNetwork.size()
                   << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
-          m_network.clear();
+          m_network->clear();
           return;
         }
       }

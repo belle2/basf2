@@ -9,11 +9,14 @@
  **************************************************************************/
 #pragma once
 
+// stl:
+#include <vector>
+
+// fw:
 #include <framework/datastore/RelationsObject.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
-
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h> // needed for the correct typedef of the StaticSector
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
@@ -21,10 +24,6 @@
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/VoidMetaInfo.h>
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
-
-
-// C++-std:
-#include <vector>
 
 
 namespace Belle2 {
@@ -123,27 +122,10 @@ namespace Belle2 {
 
     /** Clear directed node network container
      * Called to clear the directed node network container if the segment network size grows to large.
-     * This is necessary to
-     * a) prevent to following modules from processing events with a only partly filled network;
-     * b) shrink the member vectors again to an acceptable size.
+     * This is necessary to prevent to following modules from processing events with a only partly filled network.
      */
     void clear()
     {
-      // shrinking is not performed, as the number of active sectors is constant
-      m_activeSectors.clear();
-
-      int size = m_trackNodes.size();
-      m_trackNodes.resize(size / 5);
-      m_trackNodes.shrink_to_fit();
-      m_trackNodes.clear();
-
-      size = m_segments.size();
-      m_segments.resize(size / 10);
-      m_segments.shrink_to_fit();
-      m_segments.clear();
-
-      // Clearing the segmentNetwork is important as the following modules will process the event
-      // if it still contains entries.
       m_SegmentNetwork.clear();
     }
 

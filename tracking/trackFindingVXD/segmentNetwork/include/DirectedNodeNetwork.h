@@ -9,15 +9,14 @@
  **************************************************************************/
 #pragma once
 
-// in fw:
-#include <framework/logging/Logger.h>
-
-#include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
-
 // stl:
 #include <vector>
 #include <unordered_map>
 
+// fw:
+#include <framework/logging/Logger.h>
+
+#include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 
 
 namespace Belle2 {
@@ -177,35 +176,22 @@ namespace Belle2 {
 
     /** Clear directed node network
      * Called to clear the directed node network if its size grows to large.
-     * This is necessary to
-     * a) prevent to following modules from processing events with only partly filled networks;
-     * b) shrink the member vectors again to an acceptable size.
+     * This is necessary to prevent to following modules from processing events with only partly filled networks.
      */
     void clear()
     {
-      int size = m_nodes.size();
-      m_nodes.resize(size / 10);
-      m_nodes.shrink_to_fit();
+      for (auto* node : m_nodes) { delete node; }
       m_nodes.clear();
-
-      size = m_innerEnds.size();
-      m_innerEnds.resize(size / 10);
-      m_innerEnds.shrink_to_fit();
-      m_innerEnds.clear();
-
-      size = m_outerEnds.size();
-      m_outerEnds.resize(size / 10);
-      m_outerEnds.shrink_to_fit();
-      m_outerEnds.clear();
 
       // Clearing the unordered_map is important as the following modules will process the event
       // if it still contains entries.
+      for (auto nodePointer : m_nodeMap) {
+        delete nodePointer.second;
+      }
       m_nodeMap.clear();
     }
 
-/// getters:
-
-
+    /// getters:
     /** returns all nodes which have no outer nodes (but inner ones) and therefore are outer ends of the network */
     std::vector<Node*> getOuterEnds()
     {

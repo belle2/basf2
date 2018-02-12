@@ -20,23 +20,24 @@ def main():
     roi_filter = bool(os.environ.get("roi_filter"))
     hlt_mode = os.environ.get("hlt_mode")
 
+    input_file_list = input_file_list.split("#")
+
     print("input_file_list:", input_file_list)
     print("phase:", phase)
-
-    log_file = output_file.replace(".root", ".log")
 
     # Now start the real basf2 calculation
     path = basf2.create_path()
     path.add_module("RootInput", inputFileNames=input_file_list)
 
-    if hlt_mode == "colission_filter":
+    if hlt_mode == "collision_filter":
         add_hlt_processing(path, run_type="collision", softwaretrigger_mode="hlt_filter")
+    elif hlt_mode == "collision_monitor":
+        add_hlt_processing(path, run_type="collision", softwaretrigger_mode="monitor")
     elif hlt_mode == "cosmics_monitor":
         add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitor", data_taking_period="phase{}".format(phase))
     else:
         basf2.B2FATAL("hlt_mode {} not supported".format(hlt_mode))
 
-    basf2.log_to_file(log_file)
     basf2.print_path(path)
     basf2.process(path)
 

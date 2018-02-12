@@ -335,18 +335,6 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_clusterTimeV[i]->GetYaxis()->SetTitle("count");
   }
 
-  for (int i = 0; i < c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
-    TString AxisTicks = Form("%i_%i_%i", iLayer, iLadder, iSensor);
-    m_hitMapCountsU->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapClCountsU->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-    m_hitMapClCountsV->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
-  }
-
   for (int i = 0; i < c_nSVDChips; i++) {
     int iLayer = 0;
     int iLadder = 0;
@@ -580,7 +568,7 @@ int SVDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
       }
     }
   }
-  return tempcounter;
+  return -1;  // in case this is out of range.
 }
 
 void SVDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
@@ -646,7 +634,7 @@ int SVDDQMExpressRecoMinModule::getSensorIndex(const int Layer, const int Ladder
       }
     }
   }
-  return tempcounter;
+  return -1;  // in case this is out of range.
 }
 
 void SVDDQMExpressRecoMinModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const

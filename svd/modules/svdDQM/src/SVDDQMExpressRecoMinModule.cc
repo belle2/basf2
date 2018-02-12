@@ -160,10 +160,12 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_clustersU = new TH1F*[c_nSVDSensors];
   m_clustersV = new TH1F*[c_nSVDSensors];
 
+  /*
   m_CounterAPVErrors = new TH1I*[c_nFADC];
   m_CounterFTBErrors = new TH1I*[c_nFADC];
   m_CounterApvErrorORErrors = new TH1I*[c_nFADC];
   m_CounterFTBFlags = new TH1I*[c_nFADC];
+  */
 
   m_clusterChargeU = new TH1F*[c_nSVDSensors];
   m_clusterChargeV = new TH1F*[c_nSVDSensors];
@@ -207,6 +209,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_clusterTimeVAll->GetXaxis()->SetTitle("time of v clusters [ns]");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
 
+  /*
   for (int i = 0; i < c_nFADC; i++) {
     //----------------------------------------------------------------
     // Counter of APV errors (16) per FADC
@@ -246,6 +249,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
     m_CounterFTBFlags[i]->GetXaxis()->SetTitle("Flag");
     m_CounterFTBFlags[i]->GetYaxis()->SetTitle("counts");
   }
+  */
 
   for (int i = 0; i < c_nSVDSensors; i++) {
     int iLayer = 0;
@@ -365,7 +369,7 @@ void SVDDQMExpressRecoMinModule::initialize()
   m_storeSVDClustersName = storeSVDClusters.getName();
 
   m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
-  storeSVDClusters.registerInDataStore();
+  storeSVDClusters.isOptional();
   storeSVDShaperDigits.isOptional();
 
   //Store names to speed up creation later
@@ -383,12 +387,14 @@ void SVDDQMExpressRecoMinModule::beginRun()
 
   if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Reset();
   if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Reset();
-  for (int i = 0; i < c_nFADC; i++) {
+
+  /*  for (int i = 0; i < c_nFADC; i++) {
     if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Reset();
     if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Reset();
     if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Reset();
     if (m_CounterFTBFlags[i] != NULL) m_CounterFTBFlags[i]->Reset();
   }
+  */
   if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Reset();
   if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Reset();
   if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Reset();
@@ -427,7 +433,7 @@ void SVDDQMExpressRecoMinModule::event()
 
   // SVD basic histograms:
   // DAQ Diagnostic
-
+  /*
   // if object exist and is mapped on expected size:
   if (storeDAQDiagnostics.getEntries() == c_nFADC) {
     int i = 0;
@@ -446,6 +452,7 @@ void SVDDQMExpressRecoMinModule::event()
       i++;
     }
   }
+  */
 
   // Fired strips
   vector< set<int> > uStrips(c_nSVDSensors); // sets to eliminate multiple samples per strip

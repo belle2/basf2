@@ -93,10 +93,7 @@ def run_reconstruction(channels, storage_location, local_execution, phase, roi_f
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
-_
-
-
-def run_hlt_processing(channels, storage_location, local_execution, phase, roi_filter, jobs=4, max_input_files=10):
+def run_hlt_processing(channels, storage_location, local_execution, phase, roi_filter, hlt_mode, jobs=4, max_input_files=10):
     """
     Helper function to call gridcontrol on the reconstruct.py steering file with
     the correct arguments. Will run one job per generated file.
@@ -109,13 +106,16 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
         generated_path = os.path.join(channel_path, "generated")
 
         for input_file in glob(os.path.join(generated_path, "*.root")):
-            input_file_list.append(input_file_list)
+            input_file_list.append(input_file)
 
     for i in range(jobs):
-        this_random = random.shuffle(input_file_list)
+        # clone list
+        this_random = input_file_list[:]
+        # shuffle in place
+        random.shuffle(this_random)
         this_random = this_random[:max_input_files]
 
-        parameter = {"input_file_list": this_random, "phase": phase, "roi_filter": roi_filter}
+        parameter = {"input_file_list": "#".join(this_random), "phase": phase, "roi_filter": roi_filter, "hlt_mode": hlt_mode}
         parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(
@@ -193,7 +193,7 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--hlt-stresstest", help="Run hlt stresstest",
                         action="store_true", default=False)
-    parser.add_argument("--hlt-mode", help="hlt mode", type=string)
+    parser.add_argument("--hlt-mode", help="hlt mode", type=str)
     parser.add_argument("--always-generate", help="Always generate events, even if the out files already exist",
                         action="store_true", default=False)
     parser.add_argument("--phase", help="Select the phase of the Belle II Detector. Can be 2 or 3 (default)",
@@ -232,7 +232,8 @@ if __name__ == "__main__":
         run_hlt_processing(channels=channels_to_study, storage_location=abs_storage_location,
                            local_execution=args.local,
                            phase=args.phase,
-                           roi_filter=not args.no_roi_filter)
+                           roi_filter=not args.no_roi_filter,
+                           hlt_mode=args.hlt_mode)
     else:
         # Reconstruct each channel
         run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,

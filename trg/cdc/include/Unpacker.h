@@ -309,8 +309,8 @@ namespace Belle2 {
               if (ts[3] > 0) {
                 unsigned iTS = TSIDInSL(ts[0], iAx, iTracker);
                 CDCTriggerSegmentHit* hit =
-                  tsHits->appendNew(CDCHit(),
-                                    globalSegmentID(iTS, 2 * iAx),
+                  tsHits->appendNew(2 * iAx, // super layer
+                                    iTS, // TS number in super layer
                                     ts[3], // priority position
                                     ts[2], // L/R
                                     ts[1], // priority time

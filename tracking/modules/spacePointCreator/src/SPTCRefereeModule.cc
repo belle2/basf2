@@ -91,13 +91,13 @@ void SPTCRefereeModule::initialize()
   // register new StoreArray
   if (m_PARAMstoreNewArray) {
     StoreArray<SpacePointTrackCand> newStoreArray(m_PARAMnewArrayName);
-    newStoreArray.registerInDataStore(m_PARAMnewArrayName, DataStore::c_DontWriteOut);
+    newStoreArray.registerInDataStore(m_PARAMnewArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
     newStoreArray.registerRelationTo(inputSpacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
   } else {
     m_curlingArrayName = m_PARAMsptcName + m_PARAMcurlingSuffix;
     B2DEBUG(100, "StoreArray name of the curling parts: " << m_curlingArrayName);
     StoreArray<SpacePointTrackCand> newStoreArray(m_curlingArrayName);
-    newStoreArray.registerInDataStore(m_curlingArrayName, DataStore::c_DontWriteOut);
+    newStoreArray.registerInDataStore(m_curlingArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
     newStoreArray.registerRelationTo(inputSpacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 

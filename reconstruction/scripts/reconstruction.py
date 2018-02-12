@@ -25,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True,
+                       trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
@@ -50,8 +50,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
-    :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
+    :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
@@ -64,7 +64,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 mcTrackFinding=False,
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
-                                additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                trackFitHypotheses=trackFitHypotheses,
                                 use_second_cdc_hits=use_second_cdc_hits)
 
     # Statistics summary

@@ -3,33 +3,41 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Kindo Haruki                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef ARICHDQMMODULE_H
+#define ARICHDQMMODULE_H
 
-// I copied 6 lines below from PXDDQMModule.h - is it realy needed?
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 
-#include <framework/core/Module.h>
-#include <string>
+//Functions to make histograms
+#include <arich/modules/arichDQM/newTHs.h>
+
+//ARICH dataobjects
+#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dataobjects/ARICHTrack.h>
+#include <arich/dataobjects/ARICHPhoton.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
+
+#include <TCanvas.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TH2Poly.h>
-#include <TCanvas.h>
-#include <arich/utility/ARICHChannelHist.h>
+#include <TH3F.h>
+#include <TVector2.h>
+#include <TText.h>
+#include <TFile.h>
+
+#include <vector>
+#include <string>
+#include <map>
 
 namespace Belle2 {
 
   /**
-   * Simple DQM module for occuppancy plots etc.
+   * Make summary of data quality from reconstruction
    */
   class ARICHDQMModule : public HistoModule {
 
@@ -46,17 +54,12 @@ namespace Belle2 {
     virtual ~ARICHDQMModule();
 
     /**
-     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-     * to be placed in this function.
-     */
-    virtual void defineHisto();
-
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
     virtual void initialize();
+
+    virtual void defineHisto();
 
     /**
      * Called when entering a new run.
@@ -81,14 +84,40 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-  private:
-    std::string m_histogramDirectoryName; /**< histogram directory in ROOT file */
-    TH1F* m_hHits = 0; /**< histogram for number of hits / event  */
-    TH1F* m_hBits = 0; /**< histogram for acumulative hit bitmap distribution (4-bits / hit) */
-    TH2F* m_hHitsHapd = 0; /**< accumulated hits per channel */
-    TH1F* m_hHitsMerger = 0; /**< accumulated hits per merger board */
-    TH1F* m_hHitsCopper = 0; /**< accumulated hits per copper board */
+
+  protected:
+    bool m_debug;/**<debug*/
+
+    //Histograms to show status by 1/0
+    TH1* h_chStat = NULL;/**<Status of each channels*/
+    TH1* h_aeroStat = NULL;/**<Status of each aerogel tiles*/
+
+    //Hitograms to show the data quality
+    TH1* h_chHit = NULL;/**<The number of hits in each channels*/
+    TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chips*/
+    TH1* h_hapdHit = NULL;/**<The number of hits in each HAPDs*/
+    TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
+    TH1* h_gelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
+    TH1* h_bits = NULL;/**<Timing bits*/
+    TH2* h_hits2D = NULL;/**<2D hit map of whale ARICH*/
+    TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
+    TH2* h_gelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
+    TH2* h_gelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/
+
+    TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
+    TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
+    TH1* h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/
+
+    TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
+    TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
+
+    //Monitoring parameters
+
+    double m_momUpLim = 0;/**<Upper momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
+    double m_momDnLim = 0;/**<Lower momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
+
   };
 
 } // Belle2 namespace
 
+#endif

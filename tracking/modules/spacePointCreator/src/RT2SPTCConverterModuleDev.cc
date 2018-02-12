@@ -39,8 +39,10 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   // required for conversion
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
 
-  addParam("SVDandPXDSPName", m_SVDAndPXDSPName, "Name of the collection for SVD and PXD SpacePoints. Note: that "
-           "both PXD and SVD SpacePoints should be contained in that collection.", std::string(""));
+  addParam("SVDSpacePointStoreArrayName", m_svdSpacePointsStoreArrayName, "Name of the collection for SVD.",
+           boost::make_optional<std::string>("SVDSpacePoints"));
+  addParam("PXDSpacePointStoreArrayName", m_pxdSpacePointsStoreArrayName, "Name of the collection for PXD.",
+           boost::make_optional<std::string>("PXDSpacePoints"));
 
   // optional input
   addParam("SVDSingleClusterSP", m_SVDSingleClusterSPName, "SVD single Cluster SpacePoints collection name.", std::string(""));
@@ -86,7 +88,14 @@ void RT2SPTCConverterModule::initialize()
 
   // check if all required StoreArrays are here
   StoreArray<SVDCluster> SVDClusters; SVDClusters.isRequired(m_SVDClusterName);
-  StoreArray<SpacePoint> SpacePoints; SpacePoints.isRequired(m_SVDAndPXDSPName);
+  if (m_pxdSpacePointsStoreArrayName) {
+    StoreArray<SpacePoint> spacePoints;
+    spacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
+  }
+  if (m_svdSpacePointsStoreArrayName) {
+    StoreArray<SpacePoint> spacePoints;
+    spacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
+  }
 
 
   StoreArray<RecoTrack> recoTracks(m_RecoTracksName);
@@ -264,7 +273,15 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
     }
 
     // NOTE: double cluster SVD SP and PXD SP should be stored in the same StoreArray!
-    const SpacePoint* relatedSpacePoint = relatedTrueHit->getRelatedFrom<SpacePoint>(m_SVDAndPXDSPName);
+    const SpacePoint* relatedSpacePoint = [this, hitInfo, relatedTrueHit]() -> const SpacePoint* {
+      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
+        return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
+      }
+      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
+        return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
+      }
+      return nullptr;
+    }();
 
     // special case for the SVD cluster as there is the option for single cluster SP
     if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
@@ -308,17 +325,19 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
 
     std::vector<const SpacePoint*> spacePointCandidates; /**< For all SpacePoints in this vector a TrackNode will be created */
 
-    // simple case PXD : there is a one to one relation between cluster and SpacePoint
-    if (hitInfos[iHit]->getTrackingDetector() == RecoHitInformation::c_PXD) {
-      PXDCluster* pxdCluster = hitInfos.at(iHit)->getRelated<PXDCluster>();
-      SpacePoint* relatedPXDSP = NULL;
-      if (pxdCluster) relatedPXDSP = pxdCluster->getRelated<SpacePoint>();
-      // if found a spacepoint one is already done!
-      if (relatedPXDSP) {
-        finalSpacePoints.push_back(relatedPXDSP);
-        continue;
-      }
-    } // end PXD case
+    if (m_pxdSpacePointsStoreArrayName) {
+      // simple case PXD : there is a one to one relation between cluster and SpacePoint
+      if (hitInfos[iHit]->getTrackingDetector() == RecoHitInformation::c_PXD) {
+        PXDCluster* pxdCluster = hitInfos.at(iHit)->getRelated<PXDCluster>();
+        SpacePoint* relatedPXDSP = NULL;
+        if (pxdCluster) relatedPXDSP = pxdCluster->getRelated<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
+        // if found a spacepoint one is already done!
+        if (relatedPXDSP) {
+          finalSpacePoints.push_back(relatedPXDSP);
+          continue;
+        }
+      } // end PXD case
+    }
 
     // At this point it has to be a SVD cluster, for SVD one has to combine u and v clusters
     SVDCluster* clusterA = hitInfos.at(iHit)->getRelated<SVDCluster>();
@@ -331,32 +350,35 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       else break;
     }
 
-    RelationVector<SpacePoint> relatedSpacePointsA = clusterA->getRelationsFrom<SpacePoint>(m_SVDAndPXDSPName);
+    if (m_svdSpacePointsStoreArrayName) {
+      RelationVector<SpacePoint> relatedSpacePointsA = clusterA->getRelationsFrom<SpacePoint>(
+                                                         *m_svdSpacePointsStoreArrayName);
 
-    SVDCluster* clusterB = NULL;
-    if (iHit + 1 < hitInfos.size()) clusterB = hitInfos.at(iHit + 1)->getRelated<SVDCluster>();
+      SVDCluster* clusterB = NULL;
+      if (iHit + 1 < hitInfos.size()) clusterB = hitInfos.at(iHit + 1)->getRelated<SVDCluster>();
 
-    B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Number of SpacePoints related to first cluster: " <<
-            relatedSpacePointsA.size());
+      B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Number of SpacePoints related to first cluster: " <<
+              relatedSpacePointsA.size());
 
-    // Try to verify SpacePoint by using next cluster to build a U/V pair.
-    if (clusterA && clusterB && (clusterA->isUCluster() != clusterB->isUCluster())) {
-      auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(m_SVDAndPXDSPName);
+      // Try to verify SpacePoint by using next cluster to build a U/V pair.
+      if (clusterA && clusterB && (clusterA->isUCluster() != clusterB->isUCluster())) {
+        auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
 
-      // determine intersecting SpacePoints.
-      for (const auto& spacePoint : relatedSpacePointsA) {
-        for (const auto& spacePointCompare : relatedSpacePointsB) {
-          if (spacePoint == spacePointCompare) {
-            spacePointCandidates.push_back(&spacePoint);
-            break;
+        // determine intersecting SpacePoints.
+        for (const auto& spacePoint : relatedSpacePointsA) {
+          for (const auto& spacePointCompare : relatedSpacePointsB) {
+            if (spacePoint == spacePointCompare) {
+              spacePointCandidates.push_back(&spacePoint);
+              break;
+            }
           }
         }
-      }
-      B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Number of intersections with next cluster: " <<
-              spacePointCandidates.size());
-      // Intersection should resolve to the single SpacePoint that was used to create the recoTrack.
-      if (spacePointCandidates.size() == 1) ++iHit; /**< Cluster information already used. Don't use it again. */
-    } // end first case
+        B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Number of intersections with next cluster: " <<
+                spacePointCandidates.size());
+        // Intersection should resolve to the single SpacePoint that was used to create the recoTrack.
+        if (spacePointCandidates.size() == 1) ++iHit; /**< Cluster information already used. Don't use it again. */
+      } // end first case
+    }
 
     // Look up if it is part of single cluster SP collection. If no dedicated collection is given the default collection will be tried again!
     if (clusterA && spacePointCandidates.size() != 1 && m_useSingleClusterSP) {

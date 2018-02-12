@@ -67,6 +67,8 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");
   moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("all");
 
+  moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
+
   moduleParamList->getParameter<bool>("endEarly").setDefaultValue(false);
 }
 

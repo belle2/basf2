@@ -193,27 +193,6 @@ void SVDDQMExpressRecoMinModule::defineHisto()
   m_clusterChargeVAll->GetXaxis()->SetTitle("charge of v clusters [ke-]");
   m_clusterChargeVAll->GetYaxis()->SetTitle("count");
 
-  name = str(format("DQMER_SVD_ClusterChargeU3"));
-  title = str(format("DQM ER SVD Cluster charge in U for layer 3 sensors"));
-  m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-  m_clusterChargeU3->GetXaxis()->SetTitle("charge of u clusters [ke-]");
-  m_clusterChargeU3->GetYaxis()->SetTitle("count");
-  name = str(format("DQMER_SVD_ClusterChargeV3"));
-  title = str(format("DQM ER SVD Cluster charge in V for layer 3 sensors"));
-  m_clusterChargeV3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-  m_clusterChargeV3->GetXaxis()->SetTitle("charge of v clusters [ke-]");
-  m_clusterChargeV3->GetYaxis()->SetTitle("count");
-
-  name = str(format("DQMER_SVD_ClusterChargeU456"));
-  title = str(format("DQM ER SVD Cluster charge in U for layers 4,5,6 sensors"));
-  m_clusterChargeU456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-  m_clusterChargeU456->GetXaxis()->SetTitle("charge of u clusters [ke-]");
-  m_clusterChargeU456->GetYaxis()->SetTitle("count");
-  name = str(format("DQMER_SVD_ClusterChargeV456"));
-  title = str(format("DQM ER SVD Cluster charge in V for layers 4,5,6 sensors"));
-  m_clusterChargeV456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-  m_clusterChargeV456->GetXaxis()->SetTitle("charge of v clusters [ke-]");
-  m_clusterChargeV456->GetYaxis()->SetTitle("count");
   //----------------------------------------------------------------
   // Cluster time distribution for all sensors
   //----------------------------------------------------------------
@@ -424,10 +403,6 @@ void SVDDQMExpressRecoMinModule::beginRun()
   }
   if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Reset();
   if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Reset();
-  if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Reset();
-  if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Reset();
-  if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Reset();
-  if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Reset();
   if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Reset();
   if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Reset();
   for (int i = 0; i < c_nSVDSensors; i++) {
@@ -552,8 +527,6 @@ void SVDDQMExpressRecoMinModule::event()
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (iLayer == 3) if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (iLayer != 3) if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
       if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Fill(cluster.getClsTime());
@@ -565,8 +538,6 @@ void SVDDQMExpressRecoMinModule::event()
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (iLayer == 3) if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (iLayer != 3) if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
       if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
       if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Fill(cluster.getClsTime());

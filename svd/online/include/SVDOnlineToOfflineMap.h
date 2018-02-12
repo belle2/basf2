@@ -19,6 +19,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
 #include <unordered_set>
+#include <string>
 
 namespace Belle2 {
   /** This class implements the methods to map raw SVD hits to BASF2 SVD hits.
@@ -232,6 +233,9 @@ namespace Belle2 {
      *  nSensor in ladder nLadder in layer nLayer
      */
     void ReadSensorSide(int nLayer, int nLadder, int nSensor, bool isU, boost::property_tree::ptree const& xml_side);
+
+    /** Human readable unique name of this map*/
+    std::string m_MapUniqueName;
 
     /** m_sensors[ChipID(FADC,APV25)] gives the SensorInfo for the given APV25 on
      * the given FADC (Unpacker)

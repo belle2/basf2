@@ -18,7 +18,7 @@ using namespace std;
 using boost::property_tree::ptree;
 
 
-SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
+SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUniqueName("")
 {
 
   // Create an empty property tree object
@@ -56,6 +56,10 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
   try {
     // traverse pt: let us navigate through the daughters of <SVD>
     for (ptree::value_type const& v : propertyTree.get_child("SVD")) {
+      if (v.first == "unique") {
+        m_MapUniqueName = v.second.get<string>("<xmlattr>.name");
+        B2INFO("Loading the offline -> online SVD map named " << m_MapUniqueName);
+      }
       // if the daughter is a <layer> then read it!
       if (v.first == "layer")
         ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);

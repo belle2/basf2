@@ -133,12 +133,10 @@ void SVDPackerModule::event()
 
 
   unsigned int nEntries_SVDShaperDigits = svdShaperDigits.getEntries();
-  //data_words.clear();
 
   // DataInfo contains info on 6 samples and strip number
   vector<DataInfo> (*fadc_apv_matrix)[48] = new
   vector<DataInfo>[nFADCboards][48]; // for all layers, nFADCboards FADCs and at most 48 APV25 for each
-
 
   for (unsigned int i = 0; i < nEntries_SVDShaperDigits; i++) {
 
@@ -169,7 +167,6 @@ void SVDPackerModule::event()
       dataInfo.data[j] = samples[j];
     }
     dataInfo.channel =  apvChannel;
-
 
     //fill fadc_apv_matrix[fadc][apv] with DataInfo object
     fadc_apv_matrix[fadcIter->second][apv].push_back(dataInfo);
@@ -378,5 +375,4 @@ void SVDPackerModule::binPrintout(unsigned int nwords)
   }
 
 }
-
 

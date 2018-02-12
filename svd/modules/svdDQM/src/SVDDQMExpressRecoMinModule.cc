@@ -366,7 +366,7 @@ void SVDDQMExpressRecoMinModule::initialize()
 
   m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
   storeSVDClusters.registerInDataStore();
-  storeSVDShaperDigits.isRequired();
+  storeSVDShaperDigits.isOptional();
 
   //Store names to speed up creation later
   m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();

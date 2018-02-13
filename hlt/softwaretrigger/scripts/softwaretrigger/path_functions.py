@@ -1,5 +1,6 @@
 import sys
 import basf2
+import argparse
 from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
@@ -26,6 +27,18 @@ def setup_basf2_and_db():
     Setupl local database usage for HLT
     """
 
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('input_buffer_name', type=str,
+                        help='Input Ring Buffer namess')
+    parser.add_argument('output_buffer_name', type=str,
+                        help='Output Ring Buffer name')
+    parser.add_argument('histo_port', type=int,
+                        help='Port of the HistoManager to connect to')
+    parser.add_argument('number_processes', type=int, default=0,
+                        help='Number of parallel processes to use')
+
+    args = parser.parse_args()
+
     basf2.set_log_level(basf2.LogLevel.ERROR)
     ##########
     # Local DB specification
@@ -33,13 +46,12 @@ def setup_basf2_and_db():
     basf2.reset_database()
     basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
 
-    if len(sys.argv) > 4:
-        basf2.set_nprocesses(int(sys.argv[4]))
-    else:
-        basf2.B2WARNING("Cannot set number of processes as no command line argument is provided.")
+    basf2.set_nprocesses(args.number_processes)
+
+    return args
 
 
-def create_hlt_path():
+def create_hlt_path(args):
     """
     Create and return a path used for HLT and ExpressReco running
     """
@@ -52,7 +64,7 @@ def create_hlt_path():
     ##########
     # Input from ringbuffer (for raw data)
     input = basf2.register_module('Raw2Ds')
-    input.param("RingBufferName", sys.argv[1])
+    input.param("RingBufferName", args.input_buffer_name)
 
     path.add_module(input)
 
@@ -61,15 +73,14 @@ def create_hlt_path():
     ##########
     # HistoManager for real HLT
     histoman = basf2.register_module('DqmHistoManager')
-    histoman.param("Port", int(sys.argv[3]))
-    histoman.param("Port", 9991)
+    histoman.param("Port", args.histo_port)
     histoman.param("DumpInterval", 1000)
     path.add_module(histoman)
 
     return path
 
 
-def finalize_hlt_path(path, show_progress_bar=False, use_local_storage=False):
+def finalize_hlt_path(path, args, show_progress_bar=False, use_local_storage=False):
     """
     Add the required output modules for HLT
     """
@@ -81,7 +92,7 @@ def finalize_hlt_path(path, show_progress_bar=False, use_local_storage=False):
 
     if not use_local_storage:
         output = basf2.register_module("Ds2Rbuf")
-        output.param("RingBufferName", sys.argvs[2])
+        output.param("RingBufferName", args.output_buffer_name)
 
     else:
         # Output to SeqRoot

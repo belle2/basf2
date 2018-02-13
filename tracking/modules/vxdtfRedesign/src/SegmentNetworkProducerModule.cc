@@ -280,8 +280,10 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
     }
   }
 
-  std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
-  DNN::printNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>(activeSectorNetwork, fileName);
+  if (m_PARAMprintNetworks) {
+    std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
+    DNN::printNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>(activeSectorNetwork, fileName);
+  }
 }
 
 
@@ -370,12 +372,10 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
   m_nTrackNodesRejected += nRejected;
   m_nTrackNodeLinksCreated += nLinked;
 
-  if (!m_PARAMprintNetworks) {
-    return true;
+  if (m_PARAMprintNetworks) {
+    std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
+    DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
   }
-
-  std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
-  DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
 
   return true;
 }
@@ -491,11 +491,9 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   m_nSegmentsRejected += nRejected;
   m_nSegmentsLinksCreated += nLinked;
 
-  if (!m_PARAMprintNetworks) {
-    return;
+  if (m_PARAMprintNetworks) {
+    std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);
+    DNN::printNetwork<Segment<Belle2::TrackNode>, CACell>(segmentNetwork, fileName);
+    DNN::printCANetwork<Segment<Belle2::TrackNode>>(segmentNetwork, "CA" + fileName);
   }
-
-  std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);
-  DNN::printNetwork<Segment<Belle2::TrackNode>, CACell>(segmentNetwork, fileName);
-  DNN::printCANetwork<Segment<Belle2::TrackNode>>(segmentNetwork, "CA" + fileName);
 }

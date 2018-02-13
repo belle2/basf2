@@ -6,7 +6,7 @@ import generators
 import shutil
 from simulation import add_simulation
 
-from softwaretrigger.path_functions import get_store_only_rawdata_path, DEFAULT_HLT_COMPONENTS
+from softwaretrigger.path_functions import get_store_only_rawdata_path, DEFAULT_HLT_COMPONENTS, DEFAULT_EXPRESSRECO_COMPONENTS
 from rawdata import add_packers
 
 import ROOT
@@ -38,7 +38,7 @@ class CheckForSoftwareTriggerResult(basf2.Module):
                     basf2.B2FATAL("SoftwareTriggerResult exists but has no entries")
 
 
-def create_test_path(runtype="collision", with_pxd=False):
+def create_test_path(runtype="collision", location="hlt", expNum=0):
     """
     Create the first half of the path to test HLT/ExpressReco scripts
     """
@@ -46,8 +46,9 @@ def create_test_path(runtype="collision", with_pxd=False):
 
     tempfolder = tempfile.mkdtemp()
     path = basf2.create_path()
+
     # specify number of events to be generated
-    path.add_module('EventInfoSetter', evtNumList=[1])
+    path.add_module('EventInfoSetter', evtNumList=[1], expList=[expNum])
     path.add_module("HistoManager", histoFileName=os.path.join(tempfolder, "hlt_steering_file_test.root"))
 
     if runtype == "collision":
@@ -55,13 +56,17 @@ def create_test_path(runtype="collision", with_pxd=False):
     elif runtype == "cosmics":
         generators.add_cosmics_generator(path)
 
-    components = DEFAULT_HLT_COMPONENTS
     additonal_store_arrays_to_keep = []
-    if with_pxd:
-        components.append("PXD")
-        additonal_store_arrays_to_keep.append("RawPXDs")
+    add_simulation(path, usePXDDataReduction=False)
 
-    add_simulation(path, usePXDDataReduction=False, components=components)
+    if location == "hlt":
+        components = DEFAULT_HLT_COMPONENTS
+    elif location == "expressreco":
+        additonal_store_arrays_to_keep.append("RawPXDs")
+        components = DEFAULT_EXPRESSRECO_COMPONENTS
+    else:
+        basf2.B2FATAL("Location {} for test is not supported".format(location))
+
     add_packers(path, components=components)
 
     # remove everything but HLT input raw objects
@@ -81,4 +86,5 @@ def finalize_test_path(path, tempfolder, has_softwaretriggerresult=True):
 
     basf2.print_path(path)
     basf2.process(path)
+    print(basf2.statistics)
     shutil.rmtree(tempfolder)

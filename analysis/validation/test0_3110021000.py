@@ -110,9 +110,6 @@ main.add_module(phokhara)
 # add_simulation(main, bkgfiles=bg)
 add_simulation(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # Reconstruction
 add_reconstruction(main)
 

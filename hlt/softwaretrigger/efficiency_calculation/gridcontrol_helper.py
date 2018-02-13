@@ -4,7 +4,10 @@ import os
 import multiprocessing
 from shutil import copyfile, rmtree
 
-
+# GC_BELLE2_BACKGROUND_DIR is used, because it needs to set to
+# BELLE2_BACKGROUND_DIR in the steering file itself, because
+# BELLE2_BACKGROUND_DIR will be overwritten as soon as basf2
+# is sourced on batch nodes.
 DEFAULT_GRIDCONTROL_CONTENT = """
 [global]
 task = UserTask
@@ -19,6 +22,7 @@ BASF2_COMPILE_OPTION = {compile_option}
 BASF2_TOOLS_LOCATION = {tools_location}
 BASF2_RELEASE_LOCATION = {release_location}
 BASF2_STEERING_FILE = {steering_file}
+GC_BELLE2_BACKGROUND_DIR = {background_dir}
 [parameters]
 repeat = 1
 parameters = <pfs>
@@ -37,6 +41,7 @@ def write_gridcontrol_file(steering_file, parameters, local_execution):
     release_location = os.getenv("BELLE2_LOCAL_DIR")
     tools_location = os.getenv("BELLE2_TOOLS")
     compile_option = os.getenv("BELLE2_OPTION")
+    background_dir = os.getenv("BELLE2_BACKGROUND_DIR")
 
     basename = os.path.splitext(steering_file)[0]
     working_folder = basename + "/"
@@ -86,6 +91,7 @@ def write_gridcontrol_file(steering_file, parameters, local_execution):
             parameter_file=parameter_file,
             steering_file_abs_path=steering_file_abs_path,
             jobs_in_flight=jobs_in_flight,
+            background_dir=background_dir,
             backend=backend
         ))
 

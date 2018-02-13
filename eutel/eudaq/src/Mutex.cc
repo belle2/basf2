@@ -6,7 +6,8 @@ namespace eudaq {
 
   class Mutex::Impl {
   public:
-    Impl() {
+    Impl()
+    {
       if (pthread_mutexattr_init(&m_attr)) {
         EUDAQ_THROW("Unable to create mutex attributes");
       }
@@ -15,7 +16,8 @@ namespace eudaq {
         EUDAQ_THROW("Unable to create mutex");
       }
     }
-    ~Impl() {
+    ~Impl()
+    {
       if (pthread_mutex_destroy(&m_mutex)) {
         // error
       }

@@ -1,25 +1,176 @@
+import sys
 import basf2
 from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
-
+import ROOT
 import softwaretrigger.hltdqm as hltdqm
 
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
     add_calibration_software_trigger, add_calcROIs_software_trigger
 
+from daqdqm.collisiondqm import add_collision_dqm
+from daqdqm.cosmicdqm import add_cosmic_dqm
+
+from rawdata import add_unpackers
+
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
+
+
+def setup_basf2_and_db():
+    """
+    Setupl local database usage for HLT
+    """
+
+    basf2.set_log_level(basf2.LogLevel.ERROR)
+    ##########
+    # Local DB specification
+    ##########
+    basf2.reset_database()
+    basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
+
+    if len(sys.argv) > 4:
+        basf2.set_nprocesses(int(sys.argv[4]))
+    else:
+        basf2.B2WARNING("Cannot set number of processes as no command line argument is provided.")
+
+
+def create_hlt_path():
+    """
+    Create and return a path used for HLT and ExpressReco running
+    """
+    path = basf2.create_path()
+    # todo: insert crash handling path
+    # crashsafe_path = basf2.create_path()
+
+    ##########
+    # Input
+    ##########
+    # Input from ringbuffer (for raw data)
+    input = basf2.register_module('Raw2Ds')
+    input.param("RingBufferName", sys.argv[1])
+
+    path.add_module(input)
+
+    ##########
+    # Histogram Handling
+    ##########
+    # HistoManager for real HLT
+    histoman = basf2.register_module('DqmHistoManager')
+    histoman.param("Port", int(sys.argv[3]))
+    histoman.param("Port", 9991)
+    histoman.param("DumpInterval", 1000)
+    path.add_module(histoman)
+
+    return path
+
+
+def finalize_hlt_path(path, show_progress_bar=False, use_local_storage=False):
+    """
+    Add the required output modules for HLT
+    """
+    ##########
+    # Output
+    ##########
+    # Output to RingBuffer
+    # todo: needs to changed to Ring Buffer output for testing
+
+    if not use_local_storage:
+        output = basf2.register_module("Ds2Rbuf")
+        output.param("RingBufferName", sys.argvs[2])
+
+    else:
+        # Output to SeqRoot
+        output = basf2.register_module("SeqRootOutput")
+        output.param('outputFileName', 'HLTout.sroot')
+        # output file name should be specified with -o option
+
+    # Specification of output objects
+    output.param("saveObjs", ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)
+
+    path.add_module(output)
+
+    ##########
+    # Other utilities
+    ##########
+    if show_progress_bar:
+        progress = basf2.register_module('Progress')
+        path.add_module(progress)
+
+    etime = basf2.register_module('ElapsedTime')
+    path.add_module(etime)
+
+
+def add_hlt_processing(path, run_type="collision",
+                       with_bfield=True,
+                       pruneDataStore=True,
+                       additonal_store_arrays_to_keep=[],
+                       components=DEFAULT_HLT_COMPONENTS,
+                       softwaretrigger_mode='hlt_filter', **kwargs):
+    """
+    Add all modules for processing on HLT filter machines
+    """
+    add_unpackers(path, components=components)
+
+    if run_type == "collision":
+        # todo: forward the the mag field and run_type mode into this method call
+        add_softwaretrigger_reconstruction(path,
+                                           components=components,
+                                           softwaretrigger_mode=softwaretrigger_mode,
+                                           run_type=run_type,
+                                           addDqmModules=True, **kwargs)
+    elif run_type == "cosmics":
+        # no filtering,
+        reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
+        add_hlt_dqm(path, run_type)
+        if pruneDataStore:
+            path.add_module(
+                "PruneDataStore",
+                matchEntries=ALWAYS_SAVE_REGEX +
+                RAW_SAVE_STORE_ARRAYS +
+                additonal_store_arrays_to_keep)
+
+    else:
+        basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+
+
+def add_expressreco_processing(path, run_type="collision",
+                               with_bfield=True,
+                               components=DEFAULT_EXPRESSRECO_COMPONENTS,
+                               do_reconstruction=True):
+    """
+    Add all modules for processing on the ExpressReco machines
+    """
+    add_unpackers(path, components=components)
+
+    if run_type == "collision":
+        if do_reconstruction:
+            reconstruction.add_reconstruction(path, components=components)
+    elif run_type == "cosmics":
+        # no filtering,
+        # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
+        if do_reconstruction:
+            reconstruction.add_cosmics_reconstruction(path, components=components)
+    else:
+        basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+
+    add_expressreco_dqm(path, run_type)
 
 
 def add_softwaretrigger_reconstruction(
         path,
         store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
-        additionalTrackFitHypotheses=[],
+        trackFitHypotheses=[211],
         softwaretrigger_mode='hlt_filter',
+        addDqmModules=False,
+        run_type="collision",
+        additonal_store_arrays_to_keep=[],
+        pruneDataStore=True,
         calcROIs=True):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
@@ -59,10 +210,18 @@ def add_softwaretrigger_reconstruction(
                                  fast_reco_filter: enable reconstruction, fast_reco filter is on, hlt filter is off
                                  hlt_filter: default mode, enable all software activities
                                              including reconstruction, fast_reco and hlt filters.
+    :param additonal_store_arrays_to_keep: StoreArray names which will kept together with the Raw objects after
+                                           the HLT processing is complete. The content of the StoreArray will only
+                                           be kept if the event is not filtered or the monitoring mode is used.
+    :param pruneDataStore: If this is false, none of the reconstruction content will be removed from the datestore
+                           after the reconstruction and software trigger is complete. Default is true.
     """
     # In the following, we will need some paths:
     # (1) A "store-metadata" path (deleting everything except the trigger tags and some metadata)
-    store_only_metadata_path = get_store_only_metadata_path()
+    if pruneDataStore:
+        store_only_metadata_path = get_store_only_metadata_path()
+    else:
+        store_only_metadata_path = basf2.create_path()
     # (3) A path doing the fast reco reconstruction
     fast_reco_reconstruction_path = basf2.create_path()
     # (4) A path doing the hlt reconstruction
@@ -83,7 +242,7 @@ def add_softwaretrigger_reconstruction(
     # Add fast reco reconstruction
     if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:
         reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True,
-                                          components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+                                          components=components, trackFitHypotheses=trackFitHypotheses)
         # Add fast reco cuts
         fast_reco_cut_module = add_fast_reco_software_trigger(fast_reco_reconstruction_path, store_array_debug_prescale)
         if softwaretrigger_mode in ['fast_reco_filter', 'hlt_filter']:
@@ -98,7 +257,7 @@ def add_softwaretrigger_reconstruction(
 
         # Add hlt reconstruction
         reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
-                                          components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+                                          components=components, trackFitHypotheses=trackFitHypotheses)
 
         hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
@@ -106,7 +265,8 @@ def add_softwaretrigger_reconstruction(
         add_calcROIs_software_trigger(calibration_and_store_only_rawdata_path, calcROIs=calcROIs)
         # Fill the calibration_and_store_only_rawdata_path path
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
-        calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
+        if pruneDataStore:
+            calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
         if softwaretrigger_mode == 'hlt_filter':
             # There are two possibilities for the output of this module
             # (1) the event is rejected -> only store the metadata
@@ -116,14 +276,47 @@ def add_softwaretrigger_reconstruction(
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
+        # currently, dqm plots are only shown for event accepted by the HLT filters
+        add_hlt_dqm(hlt_reconstruction_path, run_type)
+
     elif softwaretrigger_mode == 'softwaretrigger_off':
-        fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+        # make sure to still add the DQM modules, they can give at least some FW runtime info
+        # and some unpacked hit information
+        add_hlt_dqm(path, run_type)
+        if pruneDataStore:
+            fast_reco_reconstruction_path.add_module(
+                "PruneDataStore",
+                matchEntries=ALWAYS_SAVE_REGEX +
+                RAW_SAVE_STORE_ARRAYS +
+                additonal_store_arrays_to_keep)
 
     path.add_path(fast_reco_reconstruction_path)
 
 
-def add_softwaretrigger_dqm(path):
-    hltdqm.standard_hltdqm(path)
+def add_online_dqm(path, run_type, dqm_environment):
+    """
+    Add DQM plots for a specific run type and dqm environment
+    """
+    if run_type == "collision":
+        add_collision_dqm(path, dqm_environment=dqm_environment)
+    elif run_type == "cosmics":
+        add_cosmic_dqm(path, dqm_environment=dqm_environment)
+    else:
+        basf2.B2FATAL("Run type {} not supported.".format(run_type))
+
+
+def add_hlt_dqm(path, run_type):
+    """
+    Add all the DQM modules for HLT to the path
+    """
+    add_online_dqm(path, run_type, "hlt")
+
+
+def add_expressreco_dqm(path, run_type):
+    """
+    Add all the DQM modules for ExpressReco to the path
+    """
+    add_online_dqm(path, run_type, "expressreco")
 
 
 def get_store_only_metadata_path():
@@ -142,7 +335,7 @@ def get_store_only_metadata_path():
     return store_metadata_path
 
 
-def get_store_only_rawdata_path():
+def get_store_only_rawdata_path(additonal_store_arrays_to_keep=[]):
     """
     Helper function to create a path which deletes (prunes) everything from the data store except
     raw objects from the detector and things that are really needed, e.g. the event meta data and the results of the
@@ -153,8 +346,11 @@ def get_store_only_rawdata_path():
     :return: The created path.
     """
     store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
-        .set_name("KeepRawData")
+    store_rawdata_path.add_module(
+        "PruneDataStore",
+        matchEntries=ALWAYS_SAVE_REGEX +
+        RAW_SAVE_STORE_ARRAYS +
+        additonal_store_arrays_to_keep) .set_name("KeepRawData")
 
     return store_rawdata_path
 

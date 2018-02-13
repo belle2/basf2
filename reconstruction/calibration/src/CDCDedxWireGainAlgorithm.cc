@@ -11,6 +11,10 @@
 #include <algorithm>
 #include <iostream>
 
+#include <TH1F.h>
+#include <TLine.h>
+#include <TCanvas.h>
+
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
 
 using namespace Belle2;
@@ -54,25 +58,63 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
   }
 
+  // Print the histograms for quality control
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
+  ctmp->Divide(3, 3);
+  std::stringstream psname; psname << "dedx_wiregains.ps[";
+  ctmp->Print(psname.str().c_str());
+  psname.str(""); psname << "dedx_wiregains.ps";
+
+  TH1F* base = new TH1F("base", "", 250, 0, 5);
+  TLine* tl = new TLine();
+  unsigned int outermin = 8 * 160;
+  double outeravg = 0; int nouterwires = 0;
+
   std::vector<double> means;
-  for (unsigned int i = 0; i < 14336; ++i) {
-    if (wirededx[i].size() < 50) {
-      means.push_back(1.0); // <-- FIX ME, should return not enough data
-    } else {
-      double mean = calculateMean(wirededx[i], 0.05, 0.25);
-      means.push_back(mean);
+  for (unsigned int i = 0; i < wirededx.size(); ++i) {
+    ctmp->cd(i % 9 + 1); // each canvas is 9x9
+    for (unsigned int j = 0; j < wirededx[i].size(); ++j) {
+      base->Fill(wirededx[i][j]);
     }
+    base->DrawCopy("hist");
+
+    double mean = 1.0;
+    if (wirededx[i].size() < 10) {
+      means.push_back(mean); // <-- FIX ME, should return not enough data
+    } else {
+      mean = calculateMean(wirededx[i], 0.05, 0.25);
+      means.push_back(mean);
+      if (i >= outermin) {
+        outeravg += mean;
+        nouterwires++;
+      }
+    }
+
+    tl->SetX1(mean); tl->SetX2(mean);
+    tl->SetY1(0); tl->SetY2(base->GetMaximum());
+    tl->Draw("same");
+
+    base->Reset();
+    if ((i + 1) % 9 == 0)
+      ctmp->Print(psname.str().c_str());
+  }
+
+  psname.str(""); psname << "dedx_wiregains.ps]";
+  ctmp->Print(psname.str().c_str());
+  delete ctmp;
+  delete base;
+  delete tl;
+
+  // Normalize the outer layers to 1
+  outeravg /= nouterwires;
+  for (unsigned int i = 0; i < 14336; ++i) {
+    means[i] /= outeravg;
   }
 
   B2INFO("dE/dx Calibration done for " << means.size() << " CDC wires");
 
   CDCDedxWireGain* gains = new CDCDedxWireGain(means);
   saveCalibration(gains, "CDCDedxWireGain");
-
-  // Iterate
-  //  B2INFO("mean: " << mean);
-  //  if (mean - 42. >= 1.)
-  //    return c_Iterate;
 
   return c_OK;
 }

@@ -65,8 +65,10 @@ def get_metadata(name="output.root"):
 def merge_files(*args, output="output.root", filter_modified=False):
     """run the merging tool on all passed files
 
-    :param output: name of the output file
-    :param filter_modified: if True omit warnings that the release is modified and consistency cannot be checked
+    Parameters:
+      output: name of the output file
+      filter_modified: if True omit warnings that the release is modified and
+          consistency cannot be checked
     """
     process = subprocess.run(["merge_basf2_files", "-q", output] + list(args), stdout=subprocess.PIPE)
     # do we want to filter the modified release warning?

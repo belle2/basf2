@@ -658,7 +658,8 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Phi();
     }
 
-    double cosToThrustOfEvent(const Particle* part){
+    double cosToThrustOfEvent(const Particle* part)
+    {
       StoreObjPtr<ThrustOfEvent> thrust;
       if (!thrust) {
         B2ERROR("Cannot find thrust of event information.");
@@ -1137,118 +1138,6 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
-    // TDCPV related ---------------------------------------------------------
-    double particleMCTagBFlavor(const Particle* particle)
-    {
-      double result = 1000.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
-    }
-
-    double particleTagVx(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().X();
-
-      return result;
-    }
-
-    double particleTagVy(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Y();
-
-      return result;
-    }
-
-    double particleTagVz(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaTErr(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaTErr();
-
-      return result;
-    }
-
-    double particleMCDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaZ(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = particle->getZ() - vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaB(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert) {
-        PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
-        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-        double c = Const::speedOfLight / 1000.; // cm ps-1
-        result = vert->getDeltaT() * bg * c;
-      }
-      return result;
-    }
 
 // Recoil Kinematics related ---------------------------------------------
 
@@ -1596,18 +1485,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
-
-    VARIABLE_GROUP("TDCPV");
-    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
-    REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,

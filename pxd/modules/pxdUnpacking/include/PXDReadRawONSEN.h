@@ -7,9 +7,7 @@
 // Date : 15 - Apr - 2014
 //-
 
-#ifndef PXDREADRAWONSEN_H
-#define PXDREADRAWONSEN_H
-
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
@@ -32,9 +30,9 @@ namespace Belle2 {
 
     /*! A class definition of an input module for Sequential ROOT I/O */
 
-#define MAXEVTSIZE (4*1024*1024)
 
     class PXDReadRawONSENModule : public Module {
+      enum {MAXEVTSIZE = 4 * 1024 * 1024};
 
       // Public functions
     public:
@@ -87,4 +85,3 @@ namespace Belle2 {
   } // end namespace PXD
 } // end namespace Belle2
 
-#endif // PXDEADdRAWONSEN_H

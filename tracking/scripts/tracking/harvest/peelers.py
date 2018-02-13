@@ -193,6 +193,31 @@ def peel_store_array_info(item, key="{part_name}"):
 
 
 @format_crop_keys
+def peel_quality_indicators(reco_track, key="{part_name}"):
+    nan = float("nan")
+
+    svd_qi = nan
+    space_point_track_cand = reco_track.getRelated('SPTrackCands')
+
+    if not space_point_track_cand:
+        svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+        if svd_cdc_track_cand:
+            svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+            if svd_track_cand:
+                space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
+
+    if space_point_track_cand:
+        svd_qi = space_point_track_cand.getQualityIndex()
+
+    crops = dict(
+        quality_indicator=reco_track.getQualityIndicator(),
+        svd_quality_indicator=svd_qi,
+    )
+
+    return crops
+
+
+@format_crop_keys
 def peel_fit_status(reco_track, key="{part_name}"):
     nan = float("nan")
 

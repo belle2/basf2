@@ -109,8 +109,8 @@ void BackgroundInfo::merge(const Mergeable* other)
   if (!canBeMerged(otherObj)) throw BackgroundInfoNotMergeable();
 
   for (const auto& otherBg : otherObj->getBackgrounds()) {
-    for (unsigned i = 0; i < m_backgrounds.size(); i++) {
-      auto& bg = m_backgrounds[i];
+    bool added{false};
+    for (auto& bg : m_backgrounds) {
       if (otherBg.tag != bg.tag) continue;
       if (otherBg.fileType != bg.fileType) continue;
       if (otherBg.fileNames == bg.fileNames) {
@@ -119,10 +119,11 @@ void BackgroundInfo::merge(const Mergeable* other)
           throw BackgroundInfoNotMergeable();
         }
         bg.reused += otherBg.reused;
-      } else {
-        m_backgrounds.push_back(otherBg);
+        added = true;
+        break;
       }
     }
+    if (!added) m_backgrounds.push_back(otherBg);
   }
 
 }

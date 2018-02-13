@@ -2,11 +2,15 @@ import basf2
 
 
 class PrinterModule(basf2.Module):
+    """Print the given string on each event"""
     def __init__(self, print_string):
+        """Remember the given string to print later"""
         super().__init__()
+        #: The string we want to print each event
         self._print_string = print_string
 
     def event(self):
+        """And now would be a good time for printing ..."""
         print(self._print_string)
 
 

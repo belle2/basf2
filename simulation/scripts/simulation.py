@@ -37,7 +37,7 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components, use_vxdtf2=True,
+def add_PXDDataReduction(path, components,
                          pxd_unfiltered_digits='pxd_unfiltered_digits',
                          doCleanup=True):
 
@@ -48,7 +48,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
     # SVD tracking
     svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2, svd_cluster='__ROIsvdClusters')
+    add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters')
 
     add_roiFinder(path, svd_reco_tracks)
 
@@ -108,7 +108,6 @@ def add_simulation(
         bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
-        use_vxdtf2=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False):
     """
@@ -214,7 +213,7 @@ def add_simulation(
 
     # PXD data reduction - after background overlay executor
     if (components is None or 'PXD' in components) and usePXDDataReduction:
-        add_PXDDataReduction(path, components, use_vxdtf2, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
+        add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

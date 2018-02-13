@@ -1,18 +1,21 @@
-/* Nanae Taniguchi 2015.05.21 */
+/* Nanae Taniguchi 2017.07.12 */
+/* Nanae Taniguchi 2018.02.06 */
 
 #ifndef CDCDQM7MODULE_H
 #define CDCDQM7MODULE_H
 
-#include <framework/core/HistoModule.h>        // <- Substitution of HistoModule.h
+#include <framework/core/HistoModule.h>
+
 #include <vector>
 #include "TH1F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 
 namespace Belle2 {
-
-  /**
+  /*
    * The module for Data Quality Monitor.
    */
-  class cdcDQM7Module : public HistoModule {  // <- derived from HistoModule class
+  class cdcDQM7Module : public HistoModule {
 
   public:
 
@@ -33,10 +36,16 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-    TH1F* h_tdc;         /**< histogram tdc */
-    TH1F* h_adc;         /**< histogram fadc sum */
-    TH1F* h_layer;       /**< histogram ilayer hits */
-    TH1F* h_nhits;       /**< histogram cell hit in first ilayer */
+    TH1D* h_nhits_L[56];     /* histogram hit in layer */
+    TH1D* h_tdc_L[56];       /* histogram tdc */
+    TH1D* h_adc_L[56];       /* histogram adc */
+
+    TH1D* h_tdc_sL[9];       /* tdc each super layer */
+    TH1D* h_adc_sL[9];       /* adc each super layer */
+
+    TH1D* h_fast_tdc;        /* fastest TDC in each event */
+
+    TH2D* bmap_2; /* board status map 2D */
 
   };
 }

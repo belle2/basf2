@@ -21,7 +21,7 @@ from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from concurrent.futures import ThreadPoolExecutor
 
 
-def download_payload(destination, db, payloadinfo):
+def check_payload(destination, payloadinfo):
     """
     Download a single payload and return a list of all iovs. If the functions
     returns None there was an error downloading.
@@ -40,6 +40,11 @@ def download_payload(destination, db, payloadinfo):
     for iov in payloadinfo["payloadIovs"]:
         iovlist.append([module, revision, iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]])
 
+    return (local_file, remote_file, checksum, iovlist)
+
+
+def download_file(db, local_file, remote_file, checksum, iovlist):
+    """Actually download the file"""
     # check if existing
     if os.path.exists(local_file):
         if calculate_checksum(local_file) == checksum:
@@ -146,17 +151,21 @@ def command_download(args, db=None):
             B2ERROR(str(e))
             continue
 
-        download_list = []
+        download_list = {}
         for payload in req.json():
             name = payload["payloadId"]["basf2Module"]["name"]
             if payloadfilter.check(name):
-                download_list.append(payload)
+                local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload)
+                if local_file in download_list:
+                    download_list[local_file][-1] += iovlist
+                else:
+                    download_list[local_file] = [local_file, remote_file, checksum, iovlist]
 
-        # parse the payload list and do the downloading
+        # do the downloading
         full_iovlist = []
         failed = 0
         with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
-            for iovlist in pool.map(lambda x: download_payload(args.destination, db, x), download_list):
+            for iovlist in pool.map(lambda x: download_file(db, *x), download_list.values()):
                 if iovlist is None:
                     failed += 1
                     continue

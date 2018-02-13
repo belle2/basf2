@@ -40,6 +40,8 @@
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
 #include <iostream>
 #include <fstream>
 

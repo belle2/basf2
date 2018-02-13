@@ -114,7 +114,7 @@ particlegun.param('nTracks', 10)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 
@@ -130,7 +130,7 @@ main.add_module(progress)
 nodeid = 0
 Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
-Packer.param('svdDigitListName', 'SVDDigits')
+Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 
 # optionally produce 3-sample data for specific FADCs

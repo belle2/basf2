@@ -22,6 +22,10 @@ def build_library(name, dirs, alias_name, libs = []):
 build_library("libnsm2_corelib.so", ['corelib'], "nsm2_corelib")
 build_library("libnsm2_b2lib.so", ['b2lib'], "nsm2_b2lib", libs=["nsm2_corelib"])
 
+# build nsmd2, one file needs special CPPFLAGS, therefor a listing of files here and no Glob
+source_files = ['./daemon/nsmd2.cc','./daemon/nsmhash.c', env.Object('./daemon/nsminfo2.cc', CPPFLAGS='-DNSMD2INFO')]
+env.Program(target = os.path.join(env['BINDIR'], "nsmd2" ), source = [source_files])
+
 # stop scons from further exploring the nsm2 folder
 env['CONTINUE'] = False
 

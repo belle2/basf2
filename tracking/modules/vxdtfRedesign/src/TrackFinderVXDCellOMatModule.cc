@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-
 #include <framework/geometry/BFieldManager.h>
 
 #include <tracking/modules/vxdtfRedesign/TrackFinderVXDCellOMatModule.h>
@@ -26,7 +25,9 @@ REG_MODULE(TrackFinderVXDCellOMat)
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 {
   //Set module properties
-  setDescription("The TrackFinderVXD Cell-O-Mat module. \n It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands using a Cellular Automaton algorithm implementation.");
+  setDescription("The TrackFinderVXD Cell-O-Mat module."
+                 "\n It uses the output produced by the SegmentNetworkProducerModule to create"
+                 "SpacePointTrackCands using a Cellular Automaton algorithm implementation.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
@@ -116,14 +117,13 @@ void TrackFinderVXDCellOMatModule::event()
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) {
-    B2DEBUG(1, "TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!");
+    B2WARNING("In Event: " << m_eventCounter << " no seed could be found -> no TCs created!");
     return;
   }
 
   /// mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
-    B2DEBUG(10, "Number of families in the network: " << nFamilies);
     if (nFamilies > m_PARAMmaxFamilies)  {
       B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
       return;
@@ -132,12 +132,17 @@ void TrackFinderVXDCellOMatModule::event()
   }
 
   /// collect all Paths starting from a Seed:
-  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
+  m_collectedPaths.clear();
+  if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMstoreSubsets)) {
+    B2ERROR("VXDCellOMat got signal to abort the event.");
+    return;
+  }
+
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  for (auto& aPath : collectedPaths) {
-    SpacePointTrackCand sptc = convertNetworkPath(aPath.get());
+  for (auto& aPath : m_collectedPaths) {
+    SpacePointTrackCand sptc = convertNetworkPath(aPath);
 
     if (m_PARAMselectBestPerFamily) {
       m_sptcSelector->testNewSPTC(sptc);
@@ -155,15 +160,5 @@ void TrackFinderVXDCellOMatModule::event()
       std::vector<const SpacePoint*> path = cand.getHits();
       m_sptcCreator.createSPTC(m_TCs, path, cand.getFamily());
     }
-    B2DEBUG(10, "Created " << bestPaths.size() << " TCs...");
   }
-
-  B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
-          ": CA needed " << nRounds <<
-          " for network with " << segmentNetwork.size() <<
-          " nodes, which resulted in " << nSeeds <<
-          ". Among these the pathCollector found " << m_pathCollector.nTrees <<
-          " and " << collectedPaths.size() <<
-          " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
-          " times.");
 }

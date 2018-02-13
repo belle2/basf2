@@ -37,10 +37,12 @@
 
 namespace Belle2 {
   /** The TrackFinderVXDCellOMatModule is a low momentum Si-only trackfinder.
-   *
    * It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands using a Cellular Automaton algorithm implementation.
    */
   class TrackFinderVXDCellOMatModule final : public Module {
+  private:
+    using NodeType = Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>;
+    using Path = std::vector<NodeType*>;
 
   public:
 
@@ -68,6 +70,9 @@ namespace Belle2 {
 
     /** the name of the SectorMap used for this instance. */
     std::string m_PARAMsecMapName;
+
+    /** Path collection obtained from evaluation of the provided segment network. */
+    std::vector<Path> m_collectedPaths;
 
     /** If true for each event and each network created a file with a graph is created. */
     bool m_PARAMprintNetworks;
@@ -127,7 +132,5 @@ namespace Belle2 {
 
     /** Event number counter. */
     unsigned int m_eventCounter = 0;
-
-  private:
   };
-} // Belle2 namespace
+}

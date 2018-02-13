@@ -36,6 +36,9 @@ def setup_basf2_and_db():
                         help='Port of the HistoManager to connect to')
     parser.add_argument('number_processes', type=int, default=0,
                         help='Number of parallel processes to use')
+    parser.add_argument('--local-db-path', type=str,
+                        help="set path to the local database.txt to use for the ConditionDB",
+                        default="hlt/examples/LocalDB/database.txt")
 
     args = parser.parse_args()
 
@@ -44,7 +47,7 @@ def setup_basf2_and_db():
     # Local DB specification
     ##########
     basf2.reset_database()
-    basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
+    basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
 
     basf2.set_nprocesses(args.number_processes)
 

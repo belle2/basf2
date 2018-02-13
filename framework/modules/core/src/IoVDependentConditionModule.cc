@@ -22,8 +22,7 @@ IoVDependentConditionModule::IoVDependentConditionModule() : Module()
                  "there is no upper limit on the run number.");
   setPropertyFlags(Module::EModulePropFlags::c_ParallelProcessingCertified);
 
-  addParam("iovList", m_iovList, "The list of IoV to test in the format [(min exp, min run, max exp, max run), ...].",
-           m_iovList);
+  addParam("iovList", m_iovList, "The list of IoV to test in the format [(min exp, min run, max exp, max run), ...].");
 }
 
 void IoVDependentConditionModule::initialize()

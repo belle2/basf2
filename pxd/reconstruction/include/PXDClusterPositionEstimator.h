@@ -21,14 +21,15 @@ namespace Belle2 {
 
   namespace PXD {
     /**
-    * Singleton class that estimates cluster positions. It also provides the likelyhood
-    * that a given cluster was created by a charged track.
+    * Singleton class that estimates cluster positions taking into account estimated track
+    * incidence angles into the sensor. The class provides an interface to get the likelyhood
+    * that a given cluster was created by a charged track with given incidence angles.
     */
     class PXDClusterPositionEstimator {
 
     public:
 
-      /** Read cluster shape correction data from DataBase */
+      /** Read cluster position corrections from DataBase */
       void initialize()
       {
         DBObjPtr<PXDClusterPositionEstimatorPar> dbObjPositionEstimator;
@@ -73,7 +74,7 @@ namespace Belle2 {
       PXDCluster& correctCluster(PXDCluster& cluster, double tu, double tv) const;
 
       /** Return cluster shape likelyhood. */
-      float getShapeLikelyhood(PXDCluster& cluster, double tu, double tv) const;
+      float getShapeLikelyhood(const PXDCluster& cluster, double tu, double tv) const;
 
       /** Main (and only) way to access the PXDClusterPositionEstimator. */
       static PXDClusterPositionEstimator& getInstance();

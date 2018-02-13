@@ -58,7 +58,7 @@ Belle2::PXDCluster& Belle2::PXD::PXDClusterPositionEstimator::correctCluster(Bel
   return cluster;
 }
 
-float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(Belle2::PXDCluster& cluster, double tu, double tv) const
+float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(const Belle2::PXDCluster& cluster, double tu, double tv) const
 {
   double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
   double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
@@ -73,7 +73,7 @@ float Belle2::PXD::PXDClusterPositionEstimator::computeEta(const Belle2::PXDClus
   auto headDigit = getHeadDigit(cluster, thetaU, thetaV);
   auto tailDigit = getTailDigit(cluster, thetaU, thetaV);
   float eta = 0;
-  if (headDigit.getVCellID() != tailDigit.getVCellID() or headDigit.getUCellID() != tailDigit.getVCellID())
+  if (headDigit.getVCellID() != tailDigit.getVCellID() or headDigit.getUCellID() != tailDigit.getUCellID())
     eta = (float)tailDigit.getCharge() / ((float)tailDigit.getCharge() + (float)headDigit.getCharge());
   else
     eta = (float) tailDigit.getCharge();
@@ -116,25 +116,24 @@ const Belle2::PXDDigit& Belle2::PXD::PXDClusterPositionEstimator::getTailDigit(c
 const Belle2::PXDDigit& Belle2::PXD::PXDClusterPositionEstimator::getLastDigitWithVOffset(const Belle2::PXDCluster& cluster,
     int vOffset) const
 {
-  B2INFO("inside getLastDigit");
   auto vMax = cluster.getVSize() - 1;
   auto vMin = cluster.getVStart();
-
   if (vOffset > vMax)
     B2FATAL("Request digit from cluster with invalid offset.");
 
-  B2INFO("vOffset " << vOffset << " for cluster size " << cluster.getSize() << "  and charge " << cluster.getCharge());
   int index = 0;
-  for (auto digit : cluster.getRelationsTo<Belle2::PXDDigit>()) {
+  for (auto digit : cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")) {
     int v = digit.getVCellID() - vMin;
-    B2INFO("index " << index << " current v " << v);
-    if (vOffset < v)
-      B2INFO("match at " << index - 1);
-    return *cluster.getRelationsTo<Belle2::PXDDigit>()[index - 1];
+    if (vOffset < v) {
+      if (index < 1)
+        B2FATAL("Accesing invalid digit index. Digits in cluster are  " << getFullName(cluster));
+      return *cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")[index - 1];
+    }
     index++;
   }
-  B2INFO("match at last " << index);
-  return *cluster.getRelationsTo<PXDDigit>()[index];
+  if (index < 1)
+    B2FATAL("Accesing invalid digit index. Digits in cluster are  " << getFullName(cluster));
+  return *cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")[index - 1];
 }
 
 const Belle2::PXDDigit& Belle2::PXD::PXDClusterPositionEstimator::getFirstDigitWithVOffset(const Belle2::PXDCluster& cluster,
@@ -146,14 +145,14 @@ const Belle2::PXDDigit& Belle2::PXD::PXDClusterPositionEstimator::getFirstDigitW
   if (vOffset > vMax)
     B2FATAL("Request digit from cluster with invalid offset.");
 
-  for (const Belle2::PXDDigit& digit : cluster.getRelationsTo<PXDDigit>()) {
+  for (const Belle2::PXDDigit& digit : cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")) {
     int v = digit.getVCellID() - vMin;
     if (vOffset == v) {
       return digit;
     }
   }
   // There is no reason to ever get here
-  return *cluster.getRelationsTo<PXDDigit>().begin();
+  return *cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")[0];
 }
 
 const std::string Belle2::PXD::PXDClusterPositionEstimator::getShortName(const Belle2::PXDCluster& cluster, float thetaU,
@@ -167,7 +166,7 @@ const std::string Belle2::PXD::PXDClusterPositionEstimator::getShortName(const B
 
   name += "D" + std::to_string(tailDigit.getVCellID() - vMin) + '.' + std::to_string(tailDigit.getUCellID() - uMin);
 
-  if (headDigit.getVCellID() != tailDigit.getVCellID() or headDigit.getUCellID() != tailDigit.getVCellID())
+  if (headDigit.getVCellID() != tailDigit.getVCellID() or headDigit.getUCellID() != tailDigit.getUCellID())
     name += "D" + std::to_string(headDigit.getVCellID() - vMin) + '.' + std::to_string(headDigit.getUCellID() - uMin);
 
   return name;
@@ -194,7 +193,7 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const Belle2::PXDCl
   Belle2::VxdID sensorID = cluster.getSensorID();
   const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
 
-  for (const Belle2::PXDDigit& digit : cluster.getRelationsTo<PXDDigit>()) {
+  for (const Belle2::PXDDigit& digit : cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")) {
     int pixelkind = Info.getPixelKindNew(sensorID, digit.getVCellID());
     pixelkinds.insert(pixelkind);
 

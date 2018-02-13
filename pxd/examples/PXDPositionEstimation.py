@@ -17,6 +17,7 @@ import ROOT
 from ROOT import Belle2
 
 import utility
+import copy
 
 # set_log_level(LogLevel.ERROR)
 # set some random seed
@@ -33,9 +34,9 @@ class PXDPositionEstimation(Module):
         Create a member to access cluster shape position estimator
         """
         super().__init__()  # don't forget to call parent constructor
+        # TODO: fully replace this by PXDPositionEstimator singleton class
         self.position_estimator = Belle2.PyDBObj('PXDClusterPositionEstimatorPar')
         self.shape_indexer = Belle2.PyDBObj('PXDClusterShapeIndexPar')
-        self.eventinfo = Belle2.PyStoreObj('EventMetaData')
 
     def initialize(self):
         """
@@ -165,7 +166,8 @@ class PXDPositionEstimation(Module):
                         else:
                             self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - cls.getV())
 
-                        if self.position_estimator.getShapeLikelyhood(shape_index, thetaU, thetaV, pixelkind) > 0:
+                        shape_likelyhood = self.position_estimator.getShapeLikelyhood(shape_index, thetaU, thetaV, pixelkind)
+                        if shape_likelyhood > 0:
                             self.nfound_shapes += 1
 
                         if self.position_estimator.hasOffset(shape_index, eta, thetaU, thetaV, pixelkind):
@@ -177,6 +179,24 @@ class PXDPositionEstimation(Module):
                             mode = 0
                             pull_u = (truehit.getU() - shiftU - offset.getU()) / (math.sqrt(offset.getUSigma2()))
                             pull_v = (truehit.getV() - shiftV - offset.getV()) / (math.sqrt(offset.getVSigma2()))
+
+                            # ########################################
+                            # FIXME: this is for testing the PXDClusterPositionEstimator singleton
+                            # correctedCluster = copy.deepcopy(cls)
+                            tv = math.atan(mom[1] / mom[2])
+                            tu = math.atan(mom[0] / mom[2])
+                            a = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
+                            # cls = a.correctCluster(cls, tu, tv)
+                            # print('BENNI position estimator initialized')
+                            new_position_estimator = a.getPositionEstimatorParameters()
+                            new_shape_indexer = a.getShapeIndexParameters()
+                            new_shape_index = new_shape_indexer.getShapeIndex(shape_name)
+                            # print('  BENNI: new_index={}    old_index={}'.format(new_shape_index, shape_index))
+                            # new_likelyhood = a.getShapeLikelyhood(cls, tu, tv)
+                            # print('  BENNI: new_likelyhood={:f}    old_likelyhood={:f}'.format(new_likelyhood, shape_likelyhood))
+                            new_name = a.getShortName(cls, thetaU, thetaV)
+                            # print('  BENNI: new_name={}   old_name={}'.format(new_name, shape_name))
+                            # END TESTING ############################
 
                             self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
                             self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
@@ -332,6 +352,7 @@ if __name__ == "__main__":
             main.add_module('BGOverlayExecutor', PXDDigitsName='')
             main.add_module("PXDDigitSorter", digits='')
 
+    main.add_module("ActivatePXDCalibration")
     main.add_module("PXDClusterizer")
 
     positionestimation = PXDPositionEstimation()

@@ -3,8 +3,9 @@
 
 ##############################################################################
 #
-# This is an example steering file to run the PXD part of Belle2 simulation.
-# to test the real data processing part.
+# This is an example steering file to create an output file 'PXDRawHit.root'
+# containing branches PXDDigits and RawPXD. Use this file to test unpacking
+# and DQM modules in examples/unpacking.
 #
 ##############################################################################
 
@@ -29,13 +30,8 @@ geometry = register_module('Geometry')
 simulation = register_module('FullSim')
 # PXD digitization module
 PXDDIGI = register_module('PXDDigitizer')
-# Convert digits to PXDRawHits
-rawhitmaker = register_module('PXDRawHitProducer')
-# ... and back
-rawhitsorter = register_module('PXDRawHitSorter')
-rawhitsorter.param('mergeFrames', False)
-# PXD clusterizer
-PXDCLUST = register_module('PXDClusterizer')
+# Convert digits to raw pxd data
+PXDPACKER = register_module('PXDPacker')
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -52,16 +48,30 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # ============================================================================
-
 # Set the number of events to be processed (10 events)
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
+# ============================================================================
 # Set output filename
-output.param('outputFileName', 'PXDTestOutput.root')
+output.param('outputFileName', 'PXDRawHit.root')
 
+# ============================================================================
+# [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
+# -1 is disable port
+PXDPACKER.param('dhe_to_dhc', [
+    [0, 2, 4, 34, 36, 38],
+    [1, 6, 8, 40, 42, 44],
+    [2, 10, 12, 46, 48, 50],
+    [3, 14, 16, 52, 54, 56],
+    [4, 3, 5, 35, 37, 39],
+    [5, 7, 9, 41, 43, 45],
+    [6, 11, 13, 47, 49, 51],
+    [7, 15, 17, 53, 55, 57],
+])
+
+# ============================================================================
 # Select subdetectors to be built
-# geometry.param('Components', ['PXD','SVD'])
-geometry.param('components', ['PXD'])
+geometry.param('components', ['MagneticField', 'PXD'])
 
 # ============================================================================
 # Do the simulation
@@ -74,10 +84,7 @@ main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDIGI)
-main.add_module(rawhitmaker)
-main.add_module(rawhitsorter)
-main.add_module(PXDCLUST)
-
+main.add_module(PXDPACKER)
 main.add_module(output)
 
 # Process events

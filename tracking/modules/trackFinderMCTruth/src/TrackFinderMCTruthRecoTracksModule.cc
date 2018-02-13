@@ -201,7 +201,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
 
     //output store arrays have to be registered in initialize()
     StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-    recoTracks.registerInDataStore();
+    recoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
     recoTracks.registerRelationTo(mcparticles);
 

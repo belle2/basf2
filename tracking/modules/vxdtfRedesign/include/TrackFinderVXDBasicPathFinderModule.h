@@ -60,12 +60,6 @@ namespace Belle2 {
   protected:
 
     /// module parameters
-    /** SpacePoint collection name */
-    std::string m_spacePointsName;
-
-    /** the storeArray for svdClusters as member, is faster than recreating link for each event */
-    StoreArray<SpacePoint> m_spacePoints;
-
     /** name for StoreArray<SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;
 

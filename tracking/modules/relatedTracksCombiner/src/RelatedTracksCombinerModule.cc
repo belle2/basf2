@@ -38,7 +38,7 @@ void RelatedTracksCombinerModule::initialize()
   m_vxdRecoTracks.isRequired(m_vxdRecoTracksStoreArrayName);
   m_cdcRecoTracks.isRequired(m_cdcRecoTracksStoreArrayName);
 
-  m_recoTracks.registerInDataStore(m_recoTracksStoreArrayName);
+  m_recoTracks.registerInDataStore(m_recoTracksStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
   RecoTrack::registerRequiredRelations(m_recoTracks);
 
   m_recoTracks.registerRelationTo(m_vxdRecoTracks);

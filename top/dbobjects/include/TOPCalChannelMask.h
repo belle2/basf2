@@ -51,6 +51,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status not set");
         return;
       }
       m_status[module][channel] = status;
@@ -65,6 +66,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status 'active' not set");
         return;
       }
       m_status[module][channel] = c_Active;
@@ -79,6 +81,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status 'dead' not set");
         return;
       }
       m_status[module][channel] = c_Dead;
@@ -93,6 +96,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status 'noisy' not set");
         return;
       }
       m_status[module][channel] = c_Noisy;
@@ -108,7 +112,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
-        B2ERROR("Returning dead channel value");
+        B2WARNING("Returning dead channel value");
         return c_Dead;
       }
       return m_status[module][channel];
@@ -124,7 +128,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
-        B2ERROR("Returning false");
+        B2WARNING("Returning false");
         return false;
       }
       return (m_status[module][channel] == c_Active);
@@ -137,15 +141,15 @@ namespace Belle2 {
     bool check(const int module, const unsigned channel) const
     {
       if (module >= c_numModules) {
-        B2ERROR("Module number greater than " << c_numModules);
+        B2ERROR("Invalid module number (" << ClassName() << ")");
         return false;
       }
       if (module < 0) {
-        B2ERROR("Module number has gone negative");
+        B2ERROR("Invalid module number (" << ClassName() << ")");
         return false;
       }
       if (channel >= c_numChannels) {
-        B2ERROR("Channel number greater than " << c_numChannels);
+        B2ERROR("Invalid module number (" << ClassName() << ")");
         return false;
       }
       return true;

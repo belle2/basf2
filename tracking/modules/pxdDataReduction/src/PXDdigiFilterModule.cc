@@ -48,7 +48,8 @@ PXDdigiFilterModule::~PXDdigiFilterModule()
 void PXDdigiFilterModule::initialize()
 {
 
-  StoreArray<ROIid>::required(m_ROIidsName);
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIidsName);
 
   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
   PXDDigits.isRequired();

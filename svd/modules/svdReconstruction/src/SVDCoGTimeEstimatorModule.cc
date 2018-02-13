@@ -51,7 +51,7 @@ void SVDCoGTimeEstimatorModule::initialize()
   m_storeShaper.isRequired(m_storeShaperDigitsName);
 
   //Initialize the new RecoDigit
-  m_storeReco.registerInDataStore(m_storeRecoDigitsName);
+  m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
 
   RelationArray relRecoDigitShaperDigits(m_storeReco, m_storeShaper);
   relRecoDigitShaperDigits.registerInDataStore();

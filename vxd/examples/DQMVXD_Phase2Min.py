@@ -16,6 +16,7 @@ from reconstruction import add_reconstruction
 from L1trigger import add_tsim
 import glob
 
+from reconstruction import add_cosmics_reconstruction
 from daqdqm.commondqm import add_common_dqm
 
 # background (collision) files
@@ -44,6 +45,8 @@ main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_event
 
 # generate BBbar events
 main.add_module('EvtGenInput')
+# generate cosmics events
+# main.add_module('Cosmics')
 
 # detector simulation
 add_simulation(main, bkgfiles=bg)
@@ -53,6 +56,8 @@ add_tsim(main)
 
 # reconstruction - set pruneTracks=False to store RecoHits for TrackDQM
 add_reconstruction(main, pruneTracks=False)
+# reconstruction fo cosmics - set pruneTracks=False to store RecoHits for TrackDQM
+# add_cosmics_reconstruction(main, pruneTracks=False, data_taking_period = 'phase2')
 
 # histomanager: use DqmHistoManager for in-line monitoring, or HistoManager for offline training
 # main.add_module('DqmHistoManager', Port=7777)

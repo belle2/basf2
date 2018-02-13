@@ -10,9 +10,9 @@ from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
-                                mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
-                                reco_tracks="RecoTracks", prune_temporary_tracks=True,
-                                fit_tracks=True, use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                mcTrackFinding=False, trigger_mode="all", trackFitHypotheses=None,
+                                reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
+                                use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_vxdtf2_QE_MVA=True):
     """
     This function adds the standard reconstruction modules for tracking
@@ -34,6 +34,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         If true, prune them.
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -66,7 +67,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
         if fit_tracks:
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                            trackFitHypotheses=additionalTrackFitHypotheses,
+                                            trackFitHypotheses=trackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
 
@@ -207,7 +208,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # will be used for electrons which gives a better result as GenFit's current electron
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
-                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
+                    pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks)
 
@@ -889,7 +890,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.set_name(pxdSPCreatorName)
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-            spCreatorPXD.param('SpacePoints', nameSPs)
+            spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
             path.add_module(spCreatorPXD)
 
     # check for the name instead of the type as the HLT also need those module under (should have different names)
@@ -900,7 +901,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         spCreatorSVD.set_name(svdSPCreatorName)
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', nameSPs)
+        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
         path.add_module(spCreatorSVD)
 
@@ -918,11 +919,15 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # SegmentNet
     ##################
 
+    spacePointArrayNames = ["SVD" + nameSPs]
+    if use_pxd:
+        spacePointArrayNames += ["PXD" + nameSPs]
+
     nameSegNet = 'SegmentNetwork' + suffix
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', nameSegNet)
-    segNetProducer.param('SpacePointsArrayNames', [nameSPs])
+    segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
     segNetProducer.param('addVirtualIP', False)
@@ -940,7 +945,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     trackFinder = register_module(track_finder_module)
     trackFinder.param('NetworkName', nameSegNet)
     trackFinder.param('SpacePointTrackCandArrayName', nameSPTCs)
-    trackFinder.param('SpacePoints', nameSPs)
     trackFinder.param('printNetworks', False)
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)

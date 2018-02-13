@@ -389,7 +389,7 @@ def add_ckf_based_track_finding(path,
 
 def add_cdc_track_finding(path, reco_tracks="RecoTracks",
                           with_ca=True, with_single_segment_tracks=True,
-                          track_rejecter_on_ca=False,  # run fake rejecter also on full tracks from CA
+                          track_rejecter_after_ca=False,  # run fake rejecter also on full tracks from CA
                           with_curler_clone_rejection=True,
                           curler_clone_rejection_filter="truth",
                           clone_rejection_filter_parameters={
@@ -443,12 +443,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks",
         path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
 
-        if track_rejecter_on_ca:
-            path.add_module("TFCDC_TrackRejecter",
-                            inputTracks="CDCTrackVector2",
-                            filter="mva",
-                            filterParameters={"cut": 0.1})
-
         # Overwrites the origin CDCTrackVector
         path.add_module("TFCDC_TrackCombiner",
                         inputTracks="CDCTrackVector",
@@ -468,7 +462,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks",
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         MinimalHitsBySuperLayerId={0: 15})
 
-        if track_rejecter_on_ca:
+        if track_rejecter_after_ca:
             path.add_module("TFCDC_TrackRejecter",
                             inputTracks="CDCTrackVector",
                             filter="mva",

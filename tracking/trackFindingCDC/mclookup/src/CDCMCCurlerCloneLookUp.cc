@@ -82,7 +82,7 @@ CDCTrack* CDCMCCurlerCloneLookUp::findNonCurlerCloneTrack(std::vector<CDCTrack*>
 
   const CompareCurlerTracks compareCurlerTracks(cdcMCTrackLookUp, cdcMCHitLookUp);
   CDCTrack* ptrNonCurlerCloneTrack =
-    *(std::min_element(matchedTrackPtrs.begin(), matchedTrackPtrs.end(), compareCurlerTracks));
+    *(std::min_element(begin(matchedTrackPtrs), end(matchedTrackPtrs), compareCurlerTracks));
 
   return ptrNonCurlerCloneTrack;
 }

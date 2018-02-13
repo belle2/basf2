@@ -3,11 +3,9 @@
 """
 Already prepared and prefilled conditional module for the different experiment phases
 """
-from functools import partial
-
 import basf2
 
-PHASE2_CONDITIONS = [(1, 0, 4, -1), (1002, 0, 1002, -1)]
+PHASE2_IOVS = [(1, 0, 4, -1), (1002, 0, 1002, -1)]
 
 
 def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=None):
@@ -43,5 +41,5 @@ def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=N
 
 def phase_2_conditional(path, phase2_path, phase3_path=None):
     """Handy shortcut for phase 2 conditions"""
-    make_conditional_at(path=path, iov_list=PHASE2_CONDITIONS,
+    make_conditional_at(path=path, iov_list=PHASE2_IOVS,
                         path_when_in_iov=phase2_path, path_when_not_in_iov=phase3_path)

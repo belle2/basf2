@@ -101,7 +101,7 @@ namespace Belle2 {
           longesPathIndex = index;
         }
         out << "\n" << "path " << index << ": length " << aPath.size() << ", entries:\n";
-        for (auto* entry : *aPath) {
+        for (auto* entry : aPath) {
           out << entry->getEntry() << "| ";
         }
         index++;
@@ -117,7 +117,7 @@ namespace Belle2 {
     Path clone(Path& aPath) const
     {
       Path newPath = Path();
-      for (auto* entry : Path) {
+      for (auto* entry : aPath) {
         newPath.push_back(entry);
       }
       return newPath;

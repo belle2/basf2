@@ -15,27 +15,32 @@ using namespace Belle2;
 
 void LookupTable::addEntry(WeightInfo entryValue, NDBin bin)
 {
+  B2INFO("Adding entry to lookup table");
   double id = m_LookupTable.first.addKey(bin);
   m_LookupTable.second.insert(std::pair<double, WeightInfo>(id, entryValue));
 }
 
 void LookupTable::addEntry(WeightInfo entryValue, NDBin bin, double key_ID)
 {
+  B2INFO("Adding entry to lookup table with specific key_ID: " << key_ID);
   double id = m_LookupTable.first.addKey(bin, key_ID);
   m_LookupTable.second.insert(std::pair<double, WeightInfo>(id, entryValue));
 }
 
 void LookupTable::defineOutOfRangeWeight(WeightInfo entryValue)
 {
+  B2INFO("Definition of out-of-range weights");
   m_LookupTable.second.insert(std::pair<double, WeightInfo>(-1, entryValue));
 }
 
 
 WeightInfo LookupTable::getFirst()
 {
+  B2INFO("Getting first entry of the lookup table");
   return m_LookupTable.second.begin()->second;
 }
 
+/*
 // Getting Lookup info for given particle in given event
 WeightInfo LookupTable::getInfo(const Particle* p)
 {
@@ -49,4 +54,25 @@ WeightInfo LookupTable::getInfo(const Particle* p)
   }
   return m_LookupTable.second.find(entryKey)->second;
 }
+*/
 
+void LookupTable::printLookupTable()
+{
+  B2INFO("Printing the table");
+  for (auto entry : m_LookupTable.second) {
+    double key_ID = entry.first;
+    B2INFO("Preparing to print info for key " << key_ID);
+    NDBin bin = m_LookupTable.first.getNDBin(key_ID);
+    B2INFO("N-dim bin object for key " << key_ID << " is retrieved");
+    WeightInfo info = entry.second;
+    B2INFO("Weight info for key " << key_ID << " is retrieved");
+    B2INFO("----- Bin start -----\n");
+    for (auto bin1d : bin) {
+      B2INFO(bin1d.first << ": [" << bin1d.second.first << "; " << bin1d.second.second << "]\n");
+    }
+    for (auto line : info) {
+      B2INFO(line.first << ": " << line.second << "\n");
+    }
+    B2INFO("----- Bin stop ------\n");
+  }
+}

@@ -60,6 +60,16 @@ namespace Belle2 {
     KeyMap() {};
 
     /**
+    * Binlimits for unused dimensions
+    */
+    BinLimits unusedBin();
+
+    /**
+    * Check if bin in unused bin
+    */
+    bool isUnusedBin(BinLimits bin);
+
+    /**
      * Adding predefined ID to the table.
      * @param bin contains bin ranges and names of te variables
      * @param key_ID predefined bin ID
@@ -171,6 +181,13 @@ namespace Belle2 {
     bool isKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax);
 
     /**
+     * Return bin info for given bin
+     * @param bin key
+     * @return bin info
+     */
+    NDBin getNDBin(double key_ID);
+
+    /**
      * Check if a certain ID is in the table
      * @param key subjected ID
      */
@@ -216,12 +233,12 @@ namespace Belle2 {
      */
     std::vector<std::string> addNames(NDBin bin);
 
-    /**
-     * Get key ID for given particle. If particle is out of range, -1 is returned.
-     * @param particle
-     * @return key ID
-     */
-    double getKey(const Particle* p);
+    ///**
+    // * Get key ID for given particle. If particle is out of range, -1 is returned.
+    // * @param particle
+    // * @return key ID
+    // */
+    //double getKey(const Particle* p);
 
     /**
     * Check if key table is of expected dimensions.
@@ -236,6 +253,26 @@ namespace Belle2 {
     * @return number of dimensions of the key table.
     */
     int numberOfDimensions();
+
+    /**
+    * Return true if keymap is empty.
+    */
+    bool isNewKeymap();
+
+    /**
+    * Return true if keymap axes are unnamed.
+    */
+    bool isUnnamed();
+
+    /**
+    * Get vector of names from N-dim bin
+    */
+    std::vector<std::string> getBinNameVector(NDBin bin);
+
+    /**
+    * Get vector of names keymap
+    */
+    std::vector<std::string> getNames();
 
   };
 

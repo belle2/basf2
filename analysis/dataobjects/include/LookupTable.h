@@ -64,7 +64,7 @@ namespace Belle2 {
     * @param p particle
     * @return lookup information (map: key - lookup parameter; value - value of the parameter )
     */
-    WeightInfo getInfo(const Particle* p);
+    //WeightInfo getInfo(const Particle* p);
 
     /**
     * Dummy function returning sample of lookup line

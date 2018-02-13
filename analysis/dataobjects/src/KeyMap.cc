@@ -15,22 +15,65 @@
 
 using namespace Belle2;
 
+BinLimits KeyMap::unusedBin()
+{
+  return std::pair<double, double>(-999, 999);
+}
+
+bool KeyMap::isUnusedBin(BinLimits bin)
+{
+  BinLimits unused_bin = this->unusedBin();
+  if ((bin.first == unused_bin.first) and (bin.second == unused_bin.second)) {
+    return true;
+  }
+  return false;
+}
+
+bool KeyMap::isNewKeymap()
+{
+  B2INFO("Checking if keymap is new");
+  if (m_3DkeyTable.second.empty()) {
+    return true;
+  }
+  return false;
+}
+
+bool KeyMap::isUnnamed()
+{
+  B2INFO("Checking if keymap is unnamed");
+  if (m_3DkeyTable.first.empty()) {
+    return true;
+  }
+  return false;
+}
+
 int KeyMap::numberOfDimensions()
 {
-  if ((not m_1DkeyTable.second.empty()) and (m_2DkeyTable.second.empty()) and (m_3DkeyTable.second.empty())) {
+  B2INFO("Checking number of dimensions of the keymap.");
+  bool dim1_is_unused = this->isUnusedBin(m_3DkeyTable.second.begin()->first);
+  bool dim2_is_unused = this->isUnusedBin(m_3DkeyTable.second.begin()->second.begin()->first);
+  bool dim3_is_unused = this->isUnusedBin(m_3DkeyTable.second.begin()->second.begin()->second.begin()->first);
+  if ((not dim1_is_unused) and (dim2_is_unused) and (dim3_is_unused)) {
+    B2INFO("The keymap is 1-D");
     return 1;
-  } else if ((m_1DkeyTable.second.empty()) and (not m_2DkeyTable.second.empty()) and (m_3DkeyTable.second.empty())) {
+  } else if ((not dim1_is_unused) and (not dim2_is_unused) and (dim3_is_unused)) {
+    B2INFO("The keymap is 2-D");
     return 2;
-  } else if ((m_1DkeyTable.second.empty()) and (m_2DkeyTable.second.empty()) and (not m_3DkeyTable.second.empty())) {
+  } else if ((not dim1_is_unused) and (not dim2_is_unused) and (not dim3_is_unused)) {
+    B2INFO("The keymap is 3-D");
     return 3;
   } else {
-    B2ERROR("Key map is incorrectly intialized: dimension can't be defined.");
+    B2ERROR("The keymap is incorrectly intialized: dimension can't be defined.");
   }
   return -1;
 }
 
 void KeyMap::dimensionsCheck(int ndim)
 {
+  B2INFO("Check if number of dimesions of keymap is " << ndim);
+  if (this->isNewKeymap()) {
+    return;
+  }
   if (ndim != this->numberOfDimensions()) {
     B2ERROR("You checked if " << this->numberOfDimensions() << "D table is " << ndim << "D.");
   }
@@ -38,27 +81,23 @@ void KeyMap::dimensionsCheck(int ndim)
 
 bool KeyMap::isKey(BinLimits var1_minimax)
 {
-  this->dimensionsCheck(1);
-  if (m_1DkeyTable.second.find(var1_minimax) != m_1DkeyTable.second.end()) {
-    return true;
-  }
-  return false;
+  B2INFO("Check if 1D bin exists in the keymap");
+  return this->isKey(var1_minimax, this->unusedBin());
 }
 
 bool KeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minimax)
 {
-  this->dimensionsCheck(2);
-  if (m_2DkeyTable.second.find(var1_minimax) != m_2DkeyTable.second.end()) {
-    if (m_2DkeyTable.second.find(var1_minimax)->second.find(var2_minimax) != m_2DkeyTable.second.find(var1_minimax)->second.end()) {
-      return true;
-    }
-  }
-  return false;
+  B2INFO("Check if 2D bin exists in the keymap");
+  return this->isKey(var1_minimax, var2_minimax, this->unusedBin());
 }
 
 bool KeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax)
 {
-  this->dimensionsCheck(3);
+  if (this->isNewKeymap()) {
+    B2INFO("Keymap is new, key is not defined");
+    return false;
+  }
+  B2INFO("Check if 3D bin exists in the keymap");
   if (m_3DkeyTable.second.find(var1_minimax) != m_3DkeyTable.second.end()) {
     if (m_3DkeyTable.second.find(var1_minimax)->second.find(var2_minimax) != m_3DkeyTable.second.find(var1_minimax)->second.end()) {
       if (m_3DkeyTable.second.find(var1_minimax)->second.find(var2_minimax)->second.find(var3_minimax) != m_3DkeyTable.second.find(
@@ -72,67 +111,40 @@ bool KeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var
 
 bool KeyMap::isKey(double key)
 {
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      for (auto var1_minimax : m_1DkeyTable.second) {
-        if (key ==  var1_minimax.second) {
+  B2INFO("Check if key " << key << " is defined for the map");
+  if (this->isNewKeymap()) {
+    B2INFO("Keymap is new, key is not defined");
+    return false;
+  }
+  for (auto var1_minimax : m_3DkeyTable.second) {
+    for (auto var2_minimax : var1_minimax.second) {
+      for (auto var3_minimax : var2_minimax.second) {
+        if (key ==  var3_minimax.second) {
+          B2INFO("Keymap is not new, the key " << key << " is found");
           return true;
         }
       }
-      return false;
-      break;
-    case 2:
-      for (auto var1_minimax : m_2DkeyTable.second) {
-        for (auto var2_minimax : var1_minimax.second) {
-          if (key ==  var2_minimax.second) {
-            return true;
-          }
-        }
-      }
-      return false;
-      break;
-    case 3:
-      for (auto var1_minimax : m_3DkeyTable.second) {
-        for (auto var2_minimax : var1_minimax.second) {
-          for (auto var3_minimax : var2_minimax.second) {
-            if (key ==  var3_minimax.second) {
-              return true;
-            }
-          }
-        }
-      }
-      return false;
-      break;
-    default:
-      B2ERROR("Error in finding of the key due to dumensionality of the table");
-      return false;
+    }
   }
+  B2INFO("Keymap is not new, the key " << key << " is not found");
+  return false;
 }
 
 double KeyMap::getKey(BinLimits var1_minimax)
 {
-  this->dimensionsCheck(1);
-  if (not this->isKey(var1_minimax)) {
-    B2ERROR("Trying to get unexisting kinematic key: \n var1 in [" << var1_minimax.first << "; " << var1_minimax.second <<
-            "].");
-  }
-  return m_1DkeyTable.second.find(var1_minimax)->second;
+  B2INFO("Getting key for 1D bin");
+  return this->getKey(var1_minimax, this->unusedBin());
 }
 
 double KeyMap::getKey(BinLimits var1_minimax, BinLimits var2_minimax)
 {
-  this->dimensionsCheck(2);
-  if (not this->isKey(var1_minimax, var2_minimax)) {
-    B2ERROR("Trying to get unexisting kinematic key: \n var1 in [" << var1_minimax.first << "; " << var1_minimax.second <<
-            "], \n var2 in [" << var2_minimax.first << "; " << var2_minimax.second << "].");
-  }
-  return m_2DkeyTable.second.find(var1_minimax)->second.find(var2_minimax)->second;
+  B2INFO("Getting key for 2D bin");
+  return this->getKey(var1_minimax, var2_minimax, this->unusedBin());
 }
 
 double KeyMap::getKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax)
 {
-  this->dimensionsCheck(3);
+  B2INFO("Getting key for 3D bin");
   if (not this->isKey(var1_minimax, var2_minimax, var3_minimax)) {
     B2ERROR("Trying to get unexisting kinematic key: \n var1 in [" << var1_minimax.first << "; " << var1_minimax.second <<
             "], \n var2 in [" << var2_minimax.first << "; " << var2_minimax.second <<
@@ -141,36 +153,93 @@ double KeyMap::getKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits 
   return m_3DkeyTable.second.find(var1_minimax)->second.find(var2_minimax)->second.find(var3_minimax)->second;
 }
 
+std::vector<std::string> KeyMap::getNames()
+{
+  B2INFO("Retreiving axis names");
+  int nDim = numberOfDimensions();
+  std::vector<std::string> names = m_3DkeyTable.first;
+  for (auto name : names) {
+    B2INFO("Axis name found: " << name);
+  }
+  return names;
+}
+
+NDBin KeyMap::getNDBin(double key_ID)
+{
+  B2INFO("Getting N-dim bin for the given key");
+  if (not this->isKey(key_ID)) {
+    B2ERROR("Trying to get unexisting key" << key_ID);
+  }
+  int nDim = numberOfDimensions();
+  NDBin bin;
+  BinLimits limitx_x;
+  BinLimits limitx_y;
+  BinLimits limitx_z;
+  std::string name_x;
+  std::string name_y;
+  std::string name_z;
+  std::vector<std::string> names = this->getNames();
+  for (auto var1_minimax : m_3DkeyTable.second) {
+    for (auto var2_minimax : var1_minimax.second) {
+      for (auto var3_minimax : var2_minimax.second) {
+        if (key_ID ==  var3_minimax.second) {
+          limitx_x = var1_minimax.first;
+          limitx_y = var2_minimax.first;
+          limitx_z = var3_minimax.first;
+        }
+      }
+    }
+  }
+  switch (nDim) {
+    case 1:
+      B2INFO("Getting name of the first axis variable");
+      name_x = names[0];
+      bin.insert(std::pair<std::string, BinLimits>(name_x, limitx_x));
+      return bin;
+      break;
+    case 2:
+      B2INFO("Getting name of the first axis variable");
+      name_x = names[0];
+      B2INFO("Getting name of the second axis variable");
+      name_y = names[1];
+      bin.insert(std::pair<std::string, BinLimits>(name_x, limitx_x));
+      bin.insert(std::pair<std::string, BinLimits>(name_y, limitx_y));
+      return bin;
+      break;
+    case 3:
+      B2INFO("Getting name of the first axis variable");
+      name_x = names[0];
+      B2INFO("Getting name of the second axis variable");
+      name_y = names[1];
+      B2INFO("Getting name of the third axis variable");
+      name_z = names[2];
+      bin.insert(std::pair<std::string, BinLimits>(name_x, limitx_x));
+      bin.insert(std::pair<std::string, BinLimits>(name_y, limitx_y));
+      bin.insert(std::pair<std::string, BinLimits>(name_z, limitx_z));
+      return bin;
+      break;
+    default:
+      B2ERROR("Error in finding of the key due to dumensionality of the table");
+  }
+  return bin;
+}
+
 // Add new kinematic key
 double KeyMap::addKey(BinLimits var1_minimax)
 {
-  this->dimensionsCheck(1);
-  if (this->isKey(var1_minimax)) {
-    return this->getKey(var1_minimax);
-  }
-  double bin_number = m_1DkeyTable.second.size();
-  while (this->isKey(bin_number)) {
-    bin_number += 1;
-  }
-  return this->addKey(var1_minimax, bin_number);
+  B2INFO("Adding 1D bin to the keymap");
+  return this->addKey(var1_minimax, this->unusedBin());
 }
 
 double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax)
 {
-  this->dimensionsCheck(2);
-  if (this->isKey(var1_minimax, var2_minimax)) {
-    return this->getKey(var1_minimax, var2_minimax);
-  }
-  double bin_number = m_2DkeyTable.second.size();
-  while (this->isKey(bin_number)) {
-    bin_number += 1;
-  }
-  return this->addKey(var1_minimax, var2_minimax, bin_number);
+  B2INFO("Adding 2D bin to the keymap");
+  return this->addKey(var1_minimax, var2_minimax, this->unusedBin());
 }
 
 double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax)
 {
-  this->dimensionsCheck(3);
+  B2INFO("Adding 3D bin to the keymap");
   if (this->isKey(var1_minimax, var2_minimax, var3_minimax)) {
     return this->getKey(var1_minimax, var2_minimax, var3_minimax);
   }
@@ -184,61 +253,27 @@ double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits 
 // Add entry to kinematic key table
 double KeyMap::addKey(BinLimits var1_minimax, double key_ID)
 {
-  this->dimensionsCheck(1);
-  if (this->isKey(var1_minimax)) {
-    double found_key = this->getKey(var1_minimax);
-    if (found_key == key_ID) {
-      return key_ID;
-    } else {
-      B2WARNING("Trying to assign existing limits to the new kinematic key # " << key_ID << ": \n var1 in [" << var1_minimax.first << "; "
-                << var1_minimax.second <<
-                "]\n. Ignoring the attempt.");
-      return found_key;
-    }
-  }
-
-
-  m_1DkeyTable.second.insert(std::make_pair(var1_minimax, key_ID));
-
-  return key_ID;
+  B2INFO("Adding 1D bin to the keymap with specific key " << key_ID);
+  return this->addKey(var1_minimax, this->unusedBin(), key_ID);
 }
 
 double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax,
                       double key_ID)
 {
-  this->dimensionsCheck(2);
-  if (this->isKey(var1_minimax, var2_minimax)) {
-    double found_key = this->getKey(var1_minimax, var2_minimax);
-    if (found_key == key_ID) {
-      return key_ID;
-    } else {
-      B2WARNING("Trying to assign existing limits to the new kinematic key # " << key_ID << ": \n var1 in [" << var1_minimax.first << "; "
-                << var1_minimax.second <<
-                "], \n var2 in [" << var2_minimax.first << "; " << var2_minimax.second << "].\n. Ignoring the attempt.");
-      return found_key;
-    }
-  }
-
-  if (m_2DkeyTable.second.find(var1_minimax) != m_2DkeyTable.second.end()) {
-    m_2DkeyTable.second.find(var1_minimax)->second.insert(std::make_pair(var2_minimax, key_ID));
-  } else {
-    Nameless1DMap var2_key_map;
-    var2_key_map[var2_minimax] = key_ID;
-    m_2DkeyTable.second[var1_minimax] = var2_key_map;
-  }
-  return key_ID;
+  B2INFO("Adding 2D bin to the keymap with specific key " << key_ID);
+  return this->addKey(var1_minimax, var2_minimax, this->unusedBin(), key_ID);
 }
 
 double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax,
                       double key_ID)
 {
-  this->dimensionsCheck(3);
+  B2INFO("Adding 3D bin to the keymap with specific key " << key_ID);
   if (this->isKey(var1_minimax, var2_minimax, var3_minimax)) {
     double found_key = this->getKey(var1_minimax, var2_minimax, var3_minimax);
     if (found_key == key_ID) {
       return key_ID;
     } else {
-      B2WARNING("Trying to assign existing limits to the new kinematic key # " << key_ID << ": \n var1 in [" << var1_minimax.first << "; "
+      B2WARNING("Trying to assign existing limits to the new key # " << key_ID << ": \n var1 in [" << var1_minimax.first << "; "
                 << var1_minimax.second <<
                 "], \n var2 in [" << var2_minimax.first << "; " << var2_minimax.second << "], \n var3 in ["
                 << var3_minimax.first << "; " << var3_minimax.second << "].\n. Ignoring the attempt.");
@@ -265,12 +300,10 @@ double KeyMap::addKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits 
 }
 
 
-
+/*
 // Get kinematic key for the particle's momentum
 double KeyMap::getKey(const Particle* p)
 {
-  return -110;
-  /*
   int nDim = numberOfDimensions();
   switch (nDim) {
     case 1: {
@@ -370,195 +403,184 @@ double KeyMap::getKey(const Particle* p)
       B2ERROR("Error in finding of the key due to dimensionality of the table");
   }
   return -1;
-  */
 }
-
+*/
 
 std::string KeyMap::getVar1()
 {
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      return m_1DkeyTable.first[0];
-      break;
-    case 2:
-      return m_2DkeyTable.first[0];
-      break;
-    case 3:
-      return m_3DkeyTable.first[0];
-      break;
-    default:
-      B2ERROR("Error in gtting variable name due to dimensionality of the table");
+  B2INFO("Getting name of the  first axis");
+  if (this->isUnnamed()) {
+    B2ERROR("Trying to get unexisting axis names");
   }
-  return std::string("Error");
+  return m_3DkeyTable.first[0];
 }
 
 std::string KeyMap::getVar2()
 {
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      B2ERROR("Trying to get name of the second variable from 1D table.");
-      break;
-    case 2:
-      return m_2DkeyTable.first[1];
-      break;
-    case 3:
-      return m_3DkeyTable.first[1];
-      break;
-    default:
-      B2ERROR("Error in gtting variable name due to dimensionality of the table");
+  B2INFO("Getting name of the second axis");
+  if (this->isUnnamed()) {
+    B2ERROR("Trying to get unexisting axis names");
   }
-  return std::string("Error");
+  int nDim = numberOfDimensions();
+  if (nDim == 1) {
+    B2ERROR("Trying to get name of the second variable from 1D table.");
+  }
+  return m_3DkeyTable.first[1];
 }
 
 std::string KeyMap::getVar3()
 {
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      B2ERROR("Trying to get name of the third variable from 1D table.");
-      break;
-    case 2:
-      B2ERROR("Trying to get name of the third variable from 2D table.");
-      break;
-    case 3:
-      return m_3DkeyTable.first[2];
-      break;
-    default:
-      B2ERROR("Error in gtting variable name due to dimensionality of the table");
+  B2INFO("Getting name of the third axis");
+  if (this->isUnnamed()) {
+    B2ERROR("Trying to get unexisting axis names");
   }
-  return std::string("Error");
+  int nDim = numberOfDimensions();
+  if (nDim < 3) {
+    B2ERROR("Trying to get name of the third variable from 1D or 2D table.");
+  }
+  return m_3DkeyTable.first[2];
 }
 
-void KeyMap::setVar1(std::string name)
-{
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      m_1DkeyTable.first[0] = name;
-      break;
-    case 2:
-      m_2DkeyTable.first[0] = name;
-      break;
-    case 3:
-      m_3DkeyTable.first[0] = name;
-      break;
-    default:
-      B2ERROR("Error in setting variable name due to dimensionality of the table");
-  }
-}
+//void KeyMap::setVar1(std::string name)
+//{
+//  B2INFO("Setting name of the  first axis");
+//  int nDim = numberOfDimensions();
+//  switch (nDim) {
+//    case 1:
+//      m_1DkeyTable.first[0] = name;
+//      break;
+//    case 2:
+//      m_2DkeyTable.first[0] = name;
+//      break;
+//    case 3:
+//      m_3DkeyTable.first[0] = name;
+//      break;
+//    default:
+//      B2ERROR("Error in setting variable name due to dimensionality of the table");
+//  }
+//}
+//
+//void KeyMap::setVar2(std::string name)
+//{
+//  B2INFO("Setting name of the  second axis");
+//  int nDim = numberOfDimensions();
+//  switch (nDim) {
+//    case 1:
+//      B2ERROR("Trying to set name of the second variable for 1D table.");
+//      break;
+//    case 2:
+//      m_2DkeyTable.first[1] = name;
+//      break;
+//    case 3:
+//      m_3DkeyTable.first[1] = name;
+//      break;
+//    default:
+//      B2ERROR("Error in setting variable name due to dimensionality of the table");
+//  }
+//}
+//
+//void KeyMap::setVar3(std::string name)
+//{
+//  B2INFO("Setting name of the  third axis");
+//  int nDim = numberOfDimensions();
+//  switch (nDim) {
+//    case 1:
+//      B2ERROR("Trying to set name of the third variable for 1D table.");
+//      break;
+//    case 2:
+//      B2ERROR("Trying to set name of the third variable for 2D table.");
+//      break;
+//    case 3:
+//      m_3DkeyTable.first[2] = name;
+//      break;
+//    default:
+//      B2ERROR("Error in setting variable name due to dimensionality of the table");
+//  }
+//}
 
-void KeyMap::setVar2(std::string name)
+std::vector<std::string> KeyMap::getBinNameVector(NDBin bin)
 {
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      B2ERROR("Trying to set name of the second variable for 1D table.");
-      break;
-    case 2:
-      m_2DkeyTable.first[1] = name;
-      break;
-    case 3:
-      m_3DkeyTable.first[1] = name;
-      break;
-    default:
-      B2ERROR("Error in setting variable name due to dimensionality of the table");
+  B2INFO("Getting vector of axis names from N-dim bin");
+  std::vector<std::string> names;
+  for (auto const& name : bin) {
+    names.push_back(name.first);
+    B2INFO("Name found: " << name.first);
   }
-}
-
-void KeyMap::setVar3(std::string name)
-{
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1:
-      B2ERROR("Trying to set name of the third variable for 1D table.");
-      break;
-    case 2:
-      B2ERROR("Trying to set name of the third variable for 2D table.");
-      break;
-    case 3:
-      m_3DkeyTable.first[2] = name;
-      break;
-    default:
-      B2ERROR("Error in setting variable name due to dimensionality of the table");
-  }
+  /** Sorting names to avoid confusion */
+  std::sort(names.begin(), names.end());
+  return names;
 }
 
 std::vector<std::string> KeyMap::addNames(NDBin bin)
 {
-  std::vector<std::string> names;
-  for (auto const& name : bin) {
-    names.push_back(name.first);
+  B2INFO("Setting axis names of the keymap from N-dim bin");
+  std::vector<std::string> new_names = this->getBinNameVector(bin);
+
+  if (this->isUnnamed()) {
+    m_3DkeyTable.first = new_names;
+    return this->getNames();
   }
-  /** Sorting names to avoid confusion */
-  std::sort(names.begin(), names.end());
-  int nDim = names.size();
-  if (this->getVar1().empty()) {
-    this->setVar1(names[0]);
-  } else {
-    if (this->getVar1() != names[0]) {
-      B2ERROR("Attempt of change of the first variable name");
-    }
-  }
-  if (nDim > 1) {
-    if (this->getVar2().empty()) {
-      this->setVar2(names[1]);
-    } else {
-      if (this->getVar2() != names[1]) {
-        B2ERROR("Attempt of change of the second variable name");
-      }
+
+  std::vector<std::string> existing_names = this->getNames();
+
+  for (auto name : new_names) {
+    if (std::find(existing_names.begin(), existing_names.end(), name) == existing_names.end()) {
+      B2ERROR("Trying to add new axis name to the already-defined table");
     }
   }
 
-  if (nDim > 2) {
-    if (this->getVar3().empty()) {
-      this->setVar3(names[2]);
-    } else {
-      if (this->getVar3() != names[2]) {
-        B2ERROR("Attempt of change of the third variable name");
-      }
+  for (auto name : existing_names) {
+    if (std::find(new_names.begin(), new_names.end(), name) == new_names.end()) {
+      B2ERROR("Trying to add bin with missing axis name. Dimensionality problem?");
     }
   }
-  return names;
+  return existing_names;
 }
 
 double KeyMap::addKey(NDBin bin, double key_ID)
 {
-  std::vector<std::string>  names = this->addNames(bin);
+  B2INFO("Adding entry to keymap for N-dim bin object with specific key ID " << key_ID);
+  std::vector<std::string> names = this->getBinNameVector(bin);
   int nDim = names.size();
+  double added_key_ID;
   switch (nDim) {
     case 1:
-      return this->addKey(bin[names[0]], key_ID);
+      added_key_ID = this->addKey(bin[names[0]], key_ID);
       break;
     case 2:
-      return this->addKey(bin[names[0]], bin[names[1]], key_ID);
+      added_key_ID = this->addKey(bin[names[0]], bin[names[1]], key_ID);
       break;
     case 3:
-      return this->addKey(bin[names[0]], bin[names[1]], bin[names[2]], key_ID);
+      added_key_ID = this->addKey(bin[names[0]], bin[names[1]], bin[names[2]], key_ID);
       break;
     default:
       B2ERROR("Error in adding key due to dimensionality of the table");
       return -1;
   }
+  this->addNames(bin);
+  return added_key_ID;
 }
 
 double KeyMap::addKey(NDBin bin)
 {
-  std::vector<std::string> names = this->addNames(bin);
+  B2INFO("Adding entry to keymap for N-dim bin object");
+  std::vector<std::string> names = this->getBinNameVector(bin);
   int nDim = names.size();
+  double added_key_ID;
   switch (nDim) {
     case 1:
-      return this->addKey(bin[names[0]]);
+      added_key_ID = this->addKey(bin[names[0]]);
       break;
     case 2:
-      return this->addKey(bin[names[0]], bin[names[1]]);
+      added_key_ID = this->addKey(bin[names[0]], bin[names[1]]);
       break;
     case 3:
-      return this->addKey(bin[names[0]], bin[names[1]], bin[names[2]]);
+      added_key_ID = this->addKey(bin[names[0]], bin[names[1]], bin[names[2]]);
       break;
     default:
       B2ERROR("Error in adding key due to dimensionality of the table");
       return -1;
   }
+  this->addNames(bin);
+  return added_key_ID;
 }

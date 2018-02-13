@@ -29,7 +29,7 @@ namespace Belle2 {
 
   private:
     float m_fThrustVector[3];      /**< The thrust vector. */
-    float* m_fThrustValue;         /**< The thrust value of the event */
+    float m_fThrustValue;         /**< The thrust value of the event */
     float* m_fCosToThrust;           /**< Cosine of the angle between the thrust axis and the particle's momentum */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

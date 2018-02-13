@@ -8,10 +8,15 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
+// framework - DataStore
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+
 #include <analysis/NtupleTools/NtupleEventShapeTool.h>
-#include <TBranch.h>
 #include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/EventVariables.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
+
+#include <TBranch.h>
 
 using namespace Belle2;
 using namespace std;
@@ -35,9 +40,8 @@ void NtupleEventShapeTool::setupTree()
 
 void NtupleEventShapeTool::deallocateMemory()
 {
-  m_fThrustValue = 0;
   for (int i = 0; i < 3; i++) {m_fThrustVector[i] = -100;}
-  delete [] m_fThrustValue;
+  //delete [] m_fThrustValue;
   delete [] m_fCosToThrust;
 }
 
@@ -48,12 +52,18 @@ void NtupleEventShapeTool::eval(const Particle* particle)
     return;
   }
 
-  m_fThrustValue = EventVariable::thrustOfEvent;
+  StoreObjPtr<ThrustOfEvent> thrust;
+  if (thrust) {
+    m_fThrustValue = thrust->getThrust();
+  } else {
+    m_fThrustValue = -1;
+  }
+
 //  for (int i = 0; i < 3; i++) {m_fThrustVector[i] = EventVariable:: };
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_fCosToThrust[iProduct] = Variable::cosToEvtThrust(selparticles[iProduct]);
+    m_fCosToThrust[iProduct] = Variable::cosToThrustOfEvent(selparticles[iProduct]);
   }
 }

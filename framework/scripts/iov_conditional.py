@@ -28,12 +28,12 @@ def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=N
     will branch the path for all events with experiment number 0 to the modules in exp_0_path and into
     not_exp_0_path in all other cases.
 
-
-    :param path: Branch the execution of the given path.
-    :param iov_list: Under which IoV conditions should the `path_when_in_iov` be executed. It should be a list in the form
-        [(min exp, min run, max exp, max run), ...]
-    :param path_when_in_iov: Which branch to execute, if one of the IoV conditions is met.
-    :param path_when_not_in_iov: If given, execute this path in all cases, none IoV condition is met.
+    Parameters:
+        path: Branch the execution of the given path.
+        iov_list: Under which IoV conditions should the `path_when_in_iov` be executed. It should be a list in the form
+                  [(min exp, min run, max exp, max run), ...]
+        path_when_in_iov: Which branch to execute, if one of the IoV conditions is met.
+        path_when_not_in_iov: If given, execute this path in all cases, none IoV condition is met.
     """
     condition_module = path.add_module("IoVDependentCondition", iovList=iov_list)
     condition_module.if_true(path_when_in_iov, basf2.AfterConditionPath.CONTINUE)

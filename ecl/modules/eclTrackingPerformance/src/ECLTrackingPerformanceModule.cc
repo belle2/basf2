@@ -175,60 +175,38 @@ void ECLTrackingPerformanceModule::event()
             }
           }
         }
-        double shower_energy, highest_track_related_shower_energy = 0;
-        const ECLShower* eclShower_WithHighestEnergy_track_related = nullptr;
+        double shower_energy = 0., highest_track_related_shower_energy = 0.;
+        const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
         for (auto& eclCluster : b2Track->getRelationsTo<ECLCluster>()) {
+          if (eclCluster.getHypothesisId() != 5) continue;
           const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();
           shower_energy = eclShower->getEnergy();
           if (shower_energy > highest_track_related_shower_energy) {
             highest_track_related_shower_energy = shower_energy;
-            eclShower_WithHighestEnergy_track_related = eclShower;
+            eclCluster_WithHighestEnergy_track_related = &eclCluster;
           }
         }
-        double highest_mcparticle_related_shower_energy = 0;
-        const ECLShower* eclShower_WithHighestEnergy_mcparticle_related = nullptr;
-        for (auto& eclShower : mcParticle.getRelationsWith<ECLShower>()) {
-          shower_energy = eclShower.getEnergy();
-          if (shower_energy > highest_mcparticle_related_shower_energy) {
-            highest_mcparticle_related_shower_energy = shower_energy;
-            eclShower_WithHighestEnergy_mcparticle_related = &eclShower;
-          }
-        }
-        if (eclShower_WithHighestEnergy_mcparticle_related != nullptr) {
-          m_mcparticle_shower_match = 1;
-        }
-        if (eclShower_WithHighestEnergy_track_related != nullptr) {
-          m_track_shower_match = 1;
-        }
-        // if (eclShower_WithHighestEnergy_track_related->getEnergy() / eclShower_WithHighestEnergy_mcparticle_related->getEnergy() > 0.5) {
-        //     && eclShower_WithHighestEnergy_track_related->getEnergy() / eclShower_WithHighestEnergy_mcparticle_related->getEnergy() < 2) {
-        // m_sameshowers = 1;
-        // }
-        // }
-        ECLCluster* eclCluster = b2Track->getRelatedTo<ECLCluster>();
-        if (eclCluster != nullptr) {
+        if (eclCluster_WithHighestEnergy_track_related != nullptr) {
           m_matchedToECLCluster = 1;
-          m_hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
-          // find highest rated ECLCluster
-          const ECLCluster* eclClusterWithHighestWeight = nullptr;
-          maximumWeight = -2;
-          const auto& relatedECLClusters = mcParticle.getRelationsWith<ECLCluster>();
-          for (unsigned int index = 0; index < relatedECLClusters.size(); ++index) {
-            const ECLCluster* relatedECLCluster = relatedECLClusters.object(index);
-            const double weight = relatedECLClusters.weight(index);
-            if (weight > maximumWeight) {
-              eclClusterWithHighestWeight = relatedECLCluster;
-              maximumWeight = weight;
-            }
+          m_hypothesisOfMatchedECLCluster = eclCluster_WithHighestEnergy_track_related->getHypothesisId();
+        }
+        maximumWeight = -2.;
+        const ECLCluster* eclCluster_matchedBestToMCParticle = nullptr;
+        const auto& relatedECLClusters = mcParticle.getRelationsFrom<ECLCluster>();
+        for (unsigned int index = 0; index < relatedECLClusters.size(); ++index) {
+          const ECLCluster* relatedECLCluster = relatedECLClusters.object(index);
+          if (relatedECLCluster->getHypothesisId() != 5) continue;
+          const double weight = relatedECLClusters.weight(index);
+          if (weight > maximumWeight) {
+            eclCluster_matchedBestToMCParticle = relatedECLCluster;
+            maximumWeight = weight;
           }
-          if (eclClusterWithHighestWeight == eclCluster) {
-            m_matchedToECLClusterWithHighestWeight = 1;
-          }
-          for (const MCParticle& eclClusterMCParticle : eclCluster->getRelationsTo<MCParticle>()) {
-            if (eclClusterMCParticle.getPDG() == 22) {
-              m_photonCluster = 1;
-              break;
-            }
+        }
+        if (eclCluster_matchedBestToMCParticle != nullptr) {
+          m_mcparticle_cluster_match = 1;
+          m_mcparticle_cluster_energy = maximumWeight;
+          if (eclCluster_WithHighestEnergy_track_related == eclCluster_matchedBestToMCParticle) {
+            m_sameclusters = 1;
           }
         }
       }
@@ -299,12 +277,11 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("pValue", m_pValue);
 
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
-  addVariableToTree("CorrectECLMatch", m_matchedToECLClusterWithHighestWeight);
   addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
-  addVariableToTree("ShowerMatch", m_sameshowers);
-  addVariableToTree("MCParticleShowerMatch", m_mcparticle_shower_match);
-  addVariableToTree("TrackShowerMatch", m_track_shower_match);
+  addVariableToTree("ShowerMatch", m_sameclusters);
+  addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match);
+  addVariableToTree("ClusterEnergy", m_mcparticle_cluster_energy);
 
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
@@ -408,19 +385,17 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
 
   m_pValue = -999;
 
-  m_mcparticle_shower_match = 0;
-
-  m_track_shower_match = 0;
+  m_mcparticle_cluster_match = 0;
 
   m_matchedToECLCluster = 0;
 
   m_photonCluster = 0;
 
-  m_matchedToECLClusterWithHighestWeight = 0;
-
   m_hypothesisOfMatchedECLCluster = 0;
 
-  m_sameshowers = 0;
+  m_sameclusters = 0;
+
+  m_mcparticle_cluster_energy = 0.0;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

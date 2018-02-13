@@ -86,4 +86,5 @@ def finalize_test_path(path, tempfolder, has_softwaretriggerresult=True):
 
     basf2.print_path(path)
     basf2.process(path)
+    print(basf2.statistics)
     shutil.rmtree(tempfolder)

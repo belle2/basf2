@@ -38,8 +38,7 @@ ECLMatchingPerformanceModule::ECLMatchingPerformanceModule() :
 
 void ECLMatchingPerformanceModule::initialize()
 {
-  // MCParticles and Tracks needed for this module
-  m_mcParticles.isRequired();
+  // Required modules
   m_recoTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
@@ -90,12 +89,6 @@ void ECLMatchingPerformanceModule::event()
       if (eclCluster != nullptr) {
         m_matchedToECLCluster = 1;
         m_hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
-        for (const MCParticle& eclClusterMCParticle : eclCluster->getRelationsTo<MCParticle>()) {
-          if (eclClusterMCParticle.getPDG() == 22) {
-            m_photonCluster = 1;
-            break;
-          }
-        }
       }
       for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
         ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
@@ -145,7 +138,6 @@ void ECLMatchingPerformanceModule::setupTree()
   addVariableToTree("pValue", m_pValue);
 
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
-  addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
 
   addVariableToTree("MinDistance", m_distance);
@@ -172,8 +164,6 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
   m_pValue = -999;
 
   m_matchedToECLCluster = 0;
-
-  m_photonCluster = 0;
 
   m_hypothesisOfMatchedECLCluster = 0;
 

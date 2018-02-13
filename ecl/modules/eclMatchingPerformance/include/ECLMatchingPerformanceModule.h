@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -58,7 +57,6 @@ namespace Belle2 {
 
     StoreArray<ECLCluster> m_eclClusters;
     StoreArray<ExtHit> m_extHits;
-    StoreArray<MCParticle> m_mcParticles;
     StoreArray<RecoTrack> m_recoTracks;
     StoreArray<Track> m_tracks;
     StoreArray<TrackFitResult> m_trackFitResults;
@@ -86,9 +84,6 @@ namespace Belle2 {
 
     /**< hypothesis of matched ECL cluster */
     int m_hypothesisOfMatchedECLCluster;
-
-    /**< boolean for photon being related to matched ECL cluster */
-    int m_photonCluster;
 
     /**< minimal distance between track and ECLCluster */
     double m_distance;

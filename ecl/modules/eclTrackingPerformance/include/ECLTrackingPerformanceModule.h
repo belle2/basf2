@@ -1,16 +1,22 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Michael Ziegler                                          *
+ * Contributors: Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #ifndef ECLTRACKINGPERFORMANCEMODULE_H_
 #define ECLTRACKINGPERFORMANCEMODULE_H_
 
+#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
 
 // forward declarations
@@ -22,8 +28,8 @@ namespace Belle2 {
   class Track;
   class TrackFitResult;
   class RecoTrack;
-  class ExtHit;
   class ECLCluster;
+  class ECLShower;
 
   template< class T >
   class StoreArray;
@@ -52,6 +58,14 @@ namespace Belle2 {
     std::string m_outputFileName; /**< name of output root file */
     std::string m_recoTracksStoreArrayName; /**< genfit::Track collection name */
     std::vector< int > m_signalDaughterPDGs; /**< PDG codes of the B daughters of the interesting decay channel */
+
+    // Required input
+    StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
+    StoreArray<ECLShower> m_eclShowers; /** Required input array of ECLShowers */
+    StoreArray<MCParticle> m_mcParticles; /** Required input array of MCParticles */
+    StoreArray<RecoTrack> m_recoTracks; /** Required input array of RecoTracks */
+    StoreArray<Track> m_tracks; /** Required input array of Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /** Required input array of TrackFitResults */
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */

@@ -16,13 +16,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
 #include <root/TFile.h>
 #include <root/TTree.h>
 
@@ -46,12 +39,12 @@ ECLMatchingPerformanceModule::ECLMatchingPerformanceModule() :
 void ECLMatchingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
-  StoreArray<MCParticle>::required();
-  StoreArray<RecoTrack>::required();
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
-  StoreArray<ECLCluster>::required();
-  StoreArray<ExtHit>::required();
+  m_mcParticles.isRequired();
+  m_recoTracks.isRequired();
+  m_tracks.isRequired();
+  m_trackFitResults.isRequired();
+  m_eclClusters.isRequired();
+  m_extHits.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -71,9 +64,7 @@ void ECLMatchingPerformanceModule::event()
 
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
-  StoreArray<Track> tracks;
-
-  for (const Track& track : tracks) {
+  for (const Track& track : m_tracks) {
     setVariablesToDefaultValue();
     const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
     if (recoTrack) {

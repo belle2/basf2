@@ -9,10 +9,7 @@
  **************************************************************************/
 
 #include <ecl/modules/eclClusterProperties/ECLClusterPropertiesModule.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <tracking/dataobjects/ExtHit.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -41,10 +38,11 @@ ECLClusterPropertiesModule::~ECLClusterPropertiesModule()
 
 void ECLClusterPropertiesModule::initialize()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<ECLCluster>::required();
-  StoreArray<ECLCalDigit>::required();
+  m_tracks.isRequired();
+  m_eclShowers.isRequired();
+  m_eclClusters.isRequired();
+  m_eclCalDigits.isRequired();
+  m_extHits.isRequired();
 }
 
 void ECLClusterPropertiesModule::beginRun()
@@ -53,12 +51,9 @@ void ECLClusterPropertiesModule::beginRun()
 
 void ECLClusterPropertiesModule::event()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLShower> eclRecShowers;
-
-  for (auto& shower : eclRecShowers) {
+  for (auto& shower : m_eclShowers) {
     // compute the distance from shower COG and the closest extrapolated track
-    double dist = computeTrkMinDistance(shower, tracks);
+    double dist = computeTrkMinDistance(shower, m_tracks);
     shower.setMinTrkDistance(dist);
     ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
     if (cluster != nullptr) {

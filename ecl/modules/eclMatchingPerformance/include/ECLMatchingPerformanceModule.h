@@ -11,6 +11,12 @@
 #define ECLMATCHINGPERFORMANCEMODULE_H_
 
 #include <framework/core/Module.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
 
 // forward declarations
@@ -49,6 +55,13 @@ namespace Belle2 {
 
   private:
     std::string m_outputFileName; /**< name of output root file */
+
+    StoreArray<ECLCluster> m_eclClusters;
+    StoreArray<ExtHit> m_extHits;
+    StoreArray<MCParticle> m_mcParticles;
+    StoreArray<RecoTrack> m_recoTracks;
+    StoreArray<Track> m_tracks;
+    StoreArray<TrackFitResult> m_trackFitResults;
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */

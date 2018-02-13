@@ -1,16 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Michael Ziegler                                          *
+ * Contributor: Frank Meier                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <ecl/modules/eclTrackingPerformance/ECLTrackingPerformanceModule.h>
-
-#include <ecl/dataobjects/ECLShower.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -18,14 +16,8 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -60,12 +52,12 @@ ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
 void ECLTrackingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
-  StoreArray<MCParticle>::required();
-  StoreArray<Track>::required();
-  StoreArray<RecoTrack>::required(m_recoTracksStoreArrayName);
-  StoreArray<TrackFitResult>::required();
-  StoreArray<ECLCluster>::required();
-  StoreArray<ECLShower>::required();
+  m_mcParticles.isRequired();
+  m_tracks.isRequired();
+  m_recoTracks.isRequired();
+  m_trackFitResults.isRequired();
+  m_eclClusters.isRequired();
+  m_eclShowers.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -85,14 +77,11 @@ void ECLTrackingPerformanceModule::event()
 
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  StoreArray<MCParticle> mcParticles;
-
   m_nGeneratedChargedStableMcParticles = 0;
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
-  for (const MCParticle& mcParticle : mcParticles) {
+  for (const MCParticle& mcParticle : m_mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
       setVariablesToDefaultValue();

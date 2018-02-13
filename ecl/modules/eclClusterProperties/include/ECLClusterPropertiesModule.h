@@ -11,10 +11,13 @@
 #ifndef ECLCLUSTERPROPERTIESMODULE_H
 #define ECLCLUSTERPROPERTIESMODULE_H
 
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 namespace Belle2 {
   /**
@@ -58,6 +61,13 @@ namespace Belle2 {
 
     /** Compute depth. */
     void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
+
+    // Required input
+    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
+    StoreArray<Track> m_tracks; /** Required input array of Tracks */
+    StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
+    StoreArray<ECLShower> m_eclShowers; /** Required input array of ECLShowers */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /** Required input array of ECLCalDigits */
 
   };
 }

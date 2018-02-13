@@ -34,11 +34,11 @@ namespace Belle2 {
   public:
     SPTCRefereeModule(); /**< Constructor */
 
-    virtual void initialize(); /**< initialize: check StoreArrays, initialize counters, ... */
+    void initialize() override; /**< initialize: check StoreArrays, initialize counters, ... */
 
-    virtual void event(); /**< event: check SpacePointTrackCands */
+    void event() override; /**< event: check SpacePointTrackCands */
 
-    virtual void terminate(); /**< terminate: print some summary information */
+    void terminate() override; /**< terminate: print some summary information */
 
   protected:
 

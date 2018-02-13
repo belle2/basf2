@@ -63,7 +63,7 @@ namespace Belle2 {
     }
     bool handleSetText(const std::string& val)
     {
-      m_fee.setRunMode(m_hslb, val);
+      m_fee.setRunMode(m_callback, m_hslb, val);
       return NSMVHandlerText::handleSetText(val);
     }
 
@@ -79,7 +79,7 @@ namespace Belle2 {
 
 using namespace Belle2;
 
-SVDFTBFEE::SVDFTBFEE()
+SVDFTBFEE::SVDFTBFEE() : FEE("svdftb")
 {
 }
 
@@ -125,7 +125,7 @@ void SVDFTBFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 
 }
 
-void SVDFTBFEE::setRunMode(HSLB& hslb, const std::string& mode)
+void SVDFTBFEE::setRunMode(RCCallback& callback, HSLB& hslb, const std::string& mode)
 {
   LogFile::info(mode);
   if (mode == "fadc") {
@@ -175,6 +175,13 @@ void SVDFTBFEE::setRunMode(HSLB& hslb, const std::string& mode)
     hslb.writefee8(ADD_CFR,  0x81);
     hslb.writefee8(ADD_MBMR, 0x00);
   }
+  std::string vname = StringUtil::form("svdftb[%d].", hslb.get_finid());
+  callback.set(vname + "runmode", (int)hslb.readfee8(RUN_MODE));
+  callback.set(vname + "cfr", (int)hslb.readfee8(ADD_CFR));
+  callback.set(vname + "mbmr", (int)hslb.readfee8(ADD_MBMR));
+  LogFile::debug("runmode : 0x%x", (int)hslb.readfee8(RUN_MODE));
+  LogFile::debug("cfr     : 0x%x", (int)hslb.readfee8(ADD_CFR));
+  LogFile::debug("mbmr    : 0x%x", (int)hslb.readfee8(ADD_MBMR));
 }
 
 std::string SVDFTBFEE::getRunMode(HSLB& hslb)
@@ -204,7 +211,7 @@ void SVDFTBFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   std::string vname = StringUtil::form("svdftb[%d].", hslb.get_finid());
   std::string mode;
   callback.get(vname + ".runmode_s", mode);
-  setRunMode(hslb, mode);
+  setRunMode(callback, hslb, mode);
 }
 
 void SVDFTBFEE::monitor(RCCallback& callback, HSLB& hslb)
@@ -215,6 +222,9 @@ void SVDFTBFEE::monitor(RCCallback& callback, HSLB& hslb)
   for (int i = 0; i < 8; i++) {
     callback.set(vname + StringUtil::form("status[%d]", i), (status >> i) & 0x1);
   }
+  callback.set(vname + "runmode", (int)hslb.readfee8(RUN_MODE));
+  callback.set(vname + "cfr", (int)hslb.readfee8(ADD_CFR));
+  callback.set(vname + "mbmr", (int)hslb.readfee8(ADD_MBMR));
 }
 
 bool SVDFTBFEE::NSMVHandlerInitRand::handleSetInt(int val)

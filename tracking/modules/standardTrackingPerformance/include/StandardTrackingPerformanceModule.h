@@ -38,13 +38,13 @@ namespace Belle2 {
     StandardTrackingPerformanceModule();
 
     /** Register the needed StoreArrays and open th output TFile. */
-    void initialize();
+    void initialize() override;
 
     /** Fill the tree with the event data.  */
-    void event();
+    void event() override;
 
     /** Write the tree into the opened root file. */
-    void terminate();
+    void terminate() override;
 
   private:
     std::string m_outputFileName; /**< name of output root file */

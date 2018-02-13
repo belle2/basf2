@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
   std::vector<std::string> datafiles;
   std::string treename = "variables";
   std::string outputfile;
+  bool copy_target = true;
 
   po::options_description description("Options");
   description.add_options()
@@ -31,7 +32,8 @@ int main(int argc, char* argv[])
   ("datafiles", po::value<std::vector<std::string>>(&datafiles)->multitoken()->required(),
    "ROOT files containing the dataset")
   ("treename", po::value<std::string>(&treename), "Name of tree in ROOT datafile")
-  ("outputfile", po::value<std::string>(&outputfile)->required(), "ROOT file containing the results");
+  ("outputfile", po::value<std::string>(&outputfile)->required(), "ROOT file containing the results")
+  ("copy_target", po::value<bool>(&copy_target), "defines if the target variable should be copied");
 
   po::variables_map vm;
 
@@ -49,7 +51,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::expert(filenames, datafiles, treename, outputfile);
+  Belle2::MVA::expert(filenames, datafiles, treename, outputfile, 0, 0, 0, copy_target);
   return 0;
 
 }

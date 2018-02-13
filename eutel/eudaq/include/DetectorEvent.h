@@ -32,7 +32,8 @@ namespace eudaq {
     counted_ptr<Event> GetEventPtr(size_t i) { return m_events[i]; }
     const RawDataEvent& GetRawSubEvent(const std::string& subtype, int n = 0) const;
     template <typename T>
-    const T* GetSubEvent(int n = 0) const {
+    const T* GetSubEvent(int n = 0) const
+    {
       for (size_t i = 0; i < NumEvents(); i++) {
         const T* sev = dynamic_cast<const T*>(GetEvent(i));
         if (sev) {

@@ -12,13 +12,15 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
-#include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
+#include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
 #include <tracking/ckf/pxd/findlets/PXDStateRejecter.h>
 #include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
+#include <tracking/ckf/general/findlets/ResultStorer.dcl.h>
 
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
@@ -74,14 +76,16 @@ namespace Belle2 {
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
     unsigned int m_param_minimalHitRequirement = 1;
+    /// Cut away tracks without SVD hits or not
+    bool m_param_onlyUseTracksWithSVD = true;
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
-    CKFDataHandler<CKFToPXDResult> m_dataHandler;
+    TrackLoader m_dataHandler;
     /// Findlet for loading the space points
     SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks
-    StateCreator<RecoTrack, CKFToPXDState> m_stateCreatorFromTracks;
+    StateCreatorWithReversal<CKFToPXDState> m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToPXDState> m_stateCreatorFromHits;
     /// Findlet for creating relations between states
@@ -92,6 +96,8 @@ namespace Belle2 {
     OverlapResolver<ChooseablePXDResultFilter> m_overlapResolver;
     /// Findlet for tagging the used space points
     SpacePointTagger<CKFToPXDResult, PXDCluster> m_spacePointTagger;
+    /// Findlet for storing the results
+    ResultStorer<CKFToPXDResult> m_resultStorer;
 
     // Object pools
     /// Pointers to the Reco tracks as a vector

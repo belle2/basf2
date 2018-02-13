@@ -33,25 +33,11 @@ namespace Belle2 {
     ROIPayloadAssemblerModule();
 
     /**
-     * Destructor of the module.
-     */
-    virtual ~ROIPayloadAssemblerModule();
-
-    /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
-
-    virtual void event();
-
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
+    void event() override;
 
   protected:
 

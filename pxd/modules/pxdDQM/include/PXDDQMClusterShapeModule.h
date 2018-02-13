@@ -10,16 +10,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMClusterShapeMODULE_H_
-#define PXDDQMClusterShapeMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
-
 #include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
 #include <pxd/reconstruction/HitCorrector.h>
@@ -52,18 +45,19 @@ namespace Belle2 {
       /* Destructor */
       virtual ~PXDDQMClusterShapeModule();
 
+    private:
       /** Module functions */
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
+      void initialize() override final;
+      void beginRun() override final;
+      void event() override final;
+      void endRun() override final;
+      void terminate() override final;
 
       /**
       * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
       * to be placed in this function.
       */
-      virtual void defineHisto();
+      void defineHisto() override final;
 
     private:
       /** PXDTrueHits StoreArray name */
@@ -184,5 +178,4 @@ namespace Belle2 {
 
 }  // end namespace Belle2
 
-#endif  // PXDDQMClusterShapeMODULE_H_
 

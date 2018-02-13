@@ -26,8 +26,10 @@
 #include <framework/database/DBArray.h>
 
 // ECL
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 
 // ROOT
 #include <TMath.h>
@@ -37,7 +39,6 @@
 #include <fstream>      // std::ifstream
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -96,8 +97,8 @@ void ECLShowerCorrectorModule::event()
   // Loop over all ECLShowers.
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct N1 showers! N2 showers keep the raw energy! (TF)
-    if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
+    // Only correct EM showers! Other showers keep the raw energy!
+    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();
@@ -127,7 +128,7 @@ void ECLShowerCorrectorModule::event()
       eclShower.setEnergy(correctedEnergy);
       eclShower.setEnergyHighestCrystal(correctedEnergyHighest);
 
-    } // end correction N1 only
+    } // end correction
   } // end loop over all shower
 
 }

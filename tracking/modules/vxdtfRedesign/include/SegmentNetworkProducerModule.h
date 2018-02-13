@@ -83,7 +83,7 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
 
 
@@ -91,7 +91,7 @@ namespace Belle2 {
     /**
      * Prints a header for each new run.
      */
-    virtual void beginRun()
+    void beginRun() override
     {
       InitializeCounters();
 
@@ -106,14 +106,14 @@ namespace Belle2 {
 
 
     /** builds the SegmentNetwork and the TrackNodeNetwork  */
-    virtual void event();
+    void event() override;
 
 
     /** Prints a footer for each run which ended. */
-    virtual void endRun();
+    void endRun() override;
 
     /** clean up: */
-    void terminate()
+    void terminate() override
     {
       // delete the root file if it has been created
       if (m_tfile) {
@@ -222,6 +222,16 @@ namespace Belle2 {
 
     /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
     bool m_PARAMallFiltersOff;
+
+    /** Maximal size of SegmentNetwork; if exceeded, filling of the SegmentNetwork will be stopped, the
+    *   SegmentNetwork will be cleared and the respective event will be skipped.
+    */
+    unsigned short m_PARAMmaxNetworkSize = 50000;
+
+    /** Maximal size of hit network; if exceeded, filling of the HitNetwork will be stopped, the
+    *  HitsNetwork will be cleared and the respective event will be skipped.
+    */
+    unsigned short m_PARAMmaxHitNetworkSize = 3000;
 
     /** integer switch to decide which observer to use: see enum eObserverTypes
       NOTE: that observing filters make the code slow! So only use for debugging purposes

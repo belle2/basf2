@@ -51,7 +51,7 @@ SVDPackerModule::SVDPackerModule() : Module(),
 
 
   // Parameter definitions
-  addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
+  addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVD Shaper Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
@@ -74,9 +74,8 @@ void SVDPackerModule::initialize()
 {
 
   m_rawSVD.registerInDataStore(m_rawSVDListName);
-  m_svdDigit.isRequired(m_svdDigitListName);
+  m_svdShaperDigit.isRequired(m_svdShaperDigitListName);
   m_eventMetaDataPtr.isRequired();
-  prepFADClist();
 
 }
 
@@ -84,6 +83,13 @@ void SVDPackerModule::initialize()
 void SVDPackerModule::beginRun()
 {
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  //number of FADC boards
+  nFADCboards = m_map->getFADCboardsNumber();
+
+  // filling FADCnumberMap and FADCnumberMapRev
+  m_map->prepFADCmaps(FADCnumberMap, FADCnumberMapRev);
+
 }
 
 
@@ -95,7 +101,7 @@ void SVDPackerModule::event()
 {
 
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+  StoreArray<SVDShaperDigit> svdShaperDigits(m_svdShaperDigitListName);
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData.");
@@ -125,73 +131,70 @@ void SVDPackerModule::event()
   rawcprpacker_info.b2l_ctime = 0x7654321;
 
 
-  unsigned int nEntries_SVDDigits = svdDigits.getEntries();
-  //B2INFO("nEntries_SVDDigits = "  << nEntries_SVDDigits);
-
-
+  unsigned int nEntries_SVDShaperDigits = svdShaperDigits.getEntries();
   data_words.clear();
 
 
   // DataInfo contains info on 6 samples and strip number
-  vector<DataInfo> fadc_apv_matrix[48][48]; // for all layers, 48 FADCs and at most 48 APV25 for each
+  vector<DataInfo> (*fadc_apv_matrix)[48] = new
+  vector<DataInfo>[nFADCboards][48]; // for all layers, nFADCboards FADCs and at most 48 APV25 for each
 
 
-  for (unsigned int i = 0; i < nEntries_SVDDigits; i++) {
+  for (unsigned int i = 0; i < nEntries_SVDShaperDigits; i++) {
 
-    const SVDDigit* hit = svdDigits[i];
+    const SVDShaperDigit* hit = svdShaperDigits[i];
 
     short int cellID = hit->getCellID();
-    //float cellPOS = hit->getCellPosition();
     VxdID sensID = hit->getSensorID();
     bool isU = hit->isUStrip();
-    short idx = hit->getIndex();
 
     int sensor = sensID.getSensorNumber();
     int ladder = sensID.getLadderNumber();
     int layer = sensID.getLayerNumber();
 
+    // find FADC/APV for given DSSD sensor
+    const SVDOnlineToOfflineMap::ChipInfo& CHIP_info = m_map->getChipInfo(layer, ladder, sensor, isU, cellID);
+    unsigned short fadc = CHIP_info.fadc;
+    unsigned short apv = CHIP_info.apv;
+    unsigned short apvChannel = CHIP_info.apvChannel;
 
-    if (idx == 0) { // fill fadc_apv_matrix
+    // return 0-47 for given FADC number
+    auto fadcIter = FADCnumberMap.find(fadc);
 
-      // find FADC/APV for given DSSD sensor
-      const SVDOnlineToOfflineMap::ChipInfo& CHIP_info = m_map->getChipInfo(layer, ladder, sensor, isU, cellID);
-      unsigned short fadc = CHIP_info.fadc;
-      unsigned short apv = CHIP_info.apv;
-      unsigned short apvChannel = CHIP_info.apvChannel;
+    //getting charge samples from SVDShaperDigit object
+    SVDShaperDigit::APVFloatSamples samples = hit->getSamples();
 
-      // return 0-47 for given FADC number
-      auto fadcIter = fadcNumbers.find(fadc);
-
-
-      // fill DataInfo
-      for (unsigned short j = 0; j < 6; j++)
-        dataInfo.data[j] = svdDigits[i + j]->getCharge();
-      dataInfo.channel =  apvChannel;
-
-      //fill fadc_apv_matrix[fadc][apv] with DataInfo object
-      fadc_apv_matrix[fadcIter->second][apv].push_back(dataInfo);
+    // fill DataInfo
+    for (unsigned short j = 0; j < 6; j++) {
+      dataInfo.data[j] = samples[j];
+      B2DEBUG(10, "sample " << j << ": " << samples[j] << endl);
+    }
+    dataInfo.channel =  apvChannel;
 
 
-    } // endif i%6==0
-  } // end of the loop that fills fadc_apv_matrix !!!!
+    //fill fadc_apv_matrix[fadc][apv] with DataInfo object
+    fadc_apv_matrix[fadcIter->second][apv].push_back(dataInfo);
+
+  }// end of the loop that fills fadc_apv_matrix !!!!
 
 
 
 
-//new RawSVD entry
+
+  //new RawSVD entry
   RawSVD* raw_svd = rawSVDList.appendNew();
 
   // for each buffer in RawSVD object we store 12 FTBs/FADCs (48 in total)
   unsigned int j_buf[3]; // table of values indicating where new buffer begins
   bool sim3sample;
 
-  for (unsigned int iFADC = 0; iFADC < 48; iFADC++) {
+  for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
 
     iCRC = 0;
     sim3sample = false;
 
     // if m_simulate3sampleData==true, 3-sample data will be simulated for FADCs: 168,144,48,24
-    if (m_simulate3sampleData and iFADCnumber[iFADC] % 24 == 0) sim3sample = true;
+    if (m_simulate3sampleData and FADCnumberMapRev[iFADC] % 24 == 0) sim3sample = true;
 
     // here goes FTB header
     data32 = 0xffaa0000;
@@ -215,7 +218,7 @@ void SVDPackerModule::event()
     m_MainHeader.trgType = 0xf;
     m_MainHeader.trgTiming = 0;
     m_MainHeader.onebit = 0;
-    m_MainHeader.FADCnum = iFADCnumber[iFADC]; // write original FADC number
+    m_MainHeader.FADCnum = FADCnumberMapRev[iFADC]; // write original FADC number
     m_MainHeader.evtType = 0;
 
     m_MainHeader.DAQMode = 2;
@@ -351,6 +354,8 @@ void SVDPackerModule::event()
   delete [] buf3;
   delete [] buf4;
 
+  delete [] fadc_apv_matrix;
+
   n_basf2evt++;
 
 } // end event function
@@ -366,20 +371,8 @@ void SVDPackerModule::terminate()
 
 void SVDPackerModule::endRun()
 {
-
 }
 
-
-// mapping FADC numbers as 0-47
-void SVDPackerModule::prepFADClist()
-{
-  unsigned short it = 0;
-  while (it < 48) {
-    fadcNumbers[iFADCnumber[it]] = it;
-    it++;
-  }
-
-}
 
 
 // function for printing 32-bit frames in binary mode

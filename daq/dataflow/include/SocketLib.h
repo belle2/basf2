@@ -60,6 +60,8 @@ namespace Belle2 {
     SocketRecv(u_short port);
     ~SocketRecv();
 
+    int reconnect(int ntry);
+
     int examine();
     int accept();
     int close();
@@ -79,6 +81,9 @@ namespace Belle2 {
 
   private:
     SocketIO m_io;
+    struct hostent* m_hp;
+    struct sockaddr_in m_sa;
+    int m_port;
     int m_sock;
     int m_sender;
     int m_errno;
@@ -90,6 +95,8 @@ namespace Belle2 {
   public:
     SocketSend(const char* node, u_short prt);
     ~SocketSend();
+
+    int reconnect(int ntry);
 
     int put(char* data, int len);
     int put_wordbuf(int* data, int len);
@@ -107,6 +114,8 @@ namespace Belle2 {
 
   private:
     SocketIO m_io;
+    struct hostent* m_hp;
+    struct sockaddr_in m_sa;
     int m_sock;
     int m_port;
     char m_node[128];

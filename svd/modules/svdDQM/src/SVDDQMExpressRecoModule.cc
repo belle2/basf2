@@ -19,7 +19,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
@@ -33,7 +33,6 @@
 #include "TF1.h"
 
 #include <framework/database/DBImportObjPtr.h>
-// #include <framework/database/DBImportArray.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -55,7 +54,7 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
   setDescription("SVD DQM module for Express Reco"
-                 "Recommended Number of events for monito is 40 kEvents or more to fill all histograms "
+                 "Recommended Number of events for monitor is 40 kEvents or more to fill all histograms "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
@@ -144,6 +143,50 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_clusterTimeU = new TH1F*[c_nSVDSensors];
   m_clusterTimeV = new TH1F*[c_nSVDSensors];
 
+  int ChargeBins = 80;
+  float ChargeMax = 80;
+  // int TimeBins = 50;
+  // float TimeMin = -100;
+  // float TimeMax = 100;
+  //----------------------------------------------------------------
+  // Charge of clusters for all sensors
+  //----------------------------------------------------------------
+  string name = str(format("DQMER_SVD_ClusterChargeUAll"));
+  string title = str(format("DQM ER SVD Cluster charge in U for all sensors"));
+  m_clusterChargeUAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeUAll->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+  m_clusterChargeUAll->GetYaxis()->SetTitle("count");
+  name = str(format("DQMER_SVD_ClusterChargeVAll"));
+  title = str(format("DQM ER SVD Cluster charge in V for all sensors"));
+  m_clusterChargeVAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeVAll->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+  m_clusterChargeVAll->GetYaxis()->SetTitle("count");
+
+  name = str(format("DQMER_SVD_ClusterChargeU3"));
+  title = str(format("DQM ER SVD Cluster charge in U for layer 3 sensors"));
+  m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeU3->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+  m_clusterChargeU3->GetYaxis()->SetTitle("count");
+  name = str(format("DQMER_SVD_ClusterChargeV3"));
+  title = str(format("DQM ER SVD Cluster charge in V for layer 3 sensors"));
+  m_clusterChargeV3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeV3->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+  m_clusterChargeV3->GetYaxis()->SetTitle("count");
+
+  name = str(format("DQMER_SVD_ClusterChargeU456"));
+  title = str(format("DQM ER SVD Cluster charge in U for layers 4,5,6 sensors"));
+  m_clusterChargeU456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeU456->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+  m_clusterChargeU456->GetYaxis()->SetTitle("count");
+  name = str(format("DQMER_SVD_ClusterChargeV456"));
+  title = str(format("DQM ER SVD Cluster charge in V for layers 4,5,6 sensors"));
+  m_clusterChargeV456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeV456->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+  m_clusterChargeV456->GetYaxis()->SetTitle("count");
+  //----------------------------------------------------------------
+  // Cluster time distribution for all sensors
+  //----------------------------------------------------------------
+
   for (int i = 0; i < c_nSVDSensors; i++) {
     DirSVDBasic->cd();
     int iLayer = 0;
@@ -156,8 +199,8 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of fired strips per frame
     //----------------------------------------------------------------
-    string name = str(format("DQMER_SVD_%1%_FiredU") % sensorDescr);
-    string title = str(format("DQM ER SVD Sensor %1% Fired strips in U") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_FiredU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Fired strips in U") % sensorDescr);
     m_firedU[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
     m_firedU[i]->GetXaxis()->SetTitle("# of fired u strips");
     m_firedU[i]->GetYaxis()->SetTitle("count");
@@ -184,13 +227,13 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQMER_SVD_%1%_ClusterChargeU") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Cluster charge in U") % sensorDescr);
-    m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
-    m_clusterChargeU[i]->GetXaxis()->SetTitle("charge of u clusters [ADU]");
+    m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 300000);
+    m_clusterChargeU[i]->GetXaxis()->SetTitle("charge of u clusters [el]");
     m_clusterChargeU[i]->GetYaxis()->SetTitle("count");
     name = str(format("DQMER_SVD_%1%_ClusterChargeV") % sensorDescr);
     title = str(format("DQM ER SVD Sensor %1% Cluster charge in V") % sensorDescr);
-    m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
-    m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [ADU]");
+    m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 300000);
+    m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [el]");
     m_clusterChargeV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Charge of strips
@@ -337,14 +380,15 @@ void SVDDQMExpressRecoModule::initialize()
   REG_HISTOGRAM
 
   //Register collections
-  StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
+  StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
   m_storeSVDClustersName = storeSVDClusters.getName();
-  m_relSVDClusterDigitName = relSVDClusterDigits.getName();
+
+  storeSVDClusters.registerInDataStore();
+  storeSVDShaperDigits.isRequired();
 
   //Store names to speed up creation later
-  m_storeSVDDigitsName = storeSVDDigits.getName();
+  m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();
 
 }
 
@@ -367,6 +411,13 @@ void SVDDQMExpressRecoModule::beginRun()
   if (m_fClusterSizeVFlag != NULL) m_fClusterSizeVFlag->Reset();
   if (m_fClusterTimeUFlag != NULL) m_fClusterTimeUFlag->Reset();
   if (m_fClusterTimeVFlag != NULL) m_fClusterTimeVFlag->Reset();
+
+  if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Reset();
+  if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Reset();
+  if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Reset();
+  if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Reset();
+  if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Reset();
+  if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Reset();
 
   if (m_hitMapCountsU != NULL) m_hitMapCountsU->Reset();
   if (m_hitMapCountsV != NULL) m_hitMapCountsV->Reset();
@@ -392,20 +443,20 @@ void SVDDQMExpressRecoModule::beginRun()
 
 void SVDDQMExpressRecoModule::event()
 {
-  const StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
+
+  const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-  const RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits, m_relSVDClusterDigitName);
 
   m_NoOfEvents++;
-
-  // If there are no digits, leave
-  if (!storeSVDDigits || !storeSVDDigits.getEntries()) return;
+  if (!storeSVDShaperDigits || !storeSVDShaperDigits.getEntries()) {
+    return;
+  }
 
   // SVD basic histograms:
   // Fired strips
   vector< set<int> > uStrips(c_nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > vStrips(c_nSVDSensors);
-  for (const SVDDigit& digitIn : storeSVDDigits) {
+  for (const SVDShaperDigit& digitIn : storeSVDShaperDigits) {
     int iLayer = digitIn.getSensorID().getLayerNumber();
     if ((iLayer < c_firstSVDLayer) || (iLayer > c_lastSVDLayer)) continue;
     int iLadder = digitIn.getSensorID().getLadderNumber();
@@ -415,14 +466,22 @@ void SVDDQMExpressRecoModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (digitIn.isUStrip()) {
       uStrips.at(index).insert(digitIn.getCellID());
-      if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(digitIn.getCharge());
-      if ((m_hitMapCountsU != NULL) && (digitIn.getCharge() > m_CutSVDCharge))
-        m_hitMapCountsU->Fill(index);
+      // 6-to-1 relation weights are equal to digit signals, modulo rounding error
+      SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
+      for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
+        if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(samples[i]);
+        if ((m_hitMapCountsU != NULL) && (samples[i] > m_CutSVDCharge))
+          m_hitMapCountsU->Fill(index);
+      }
     } else {
       vStrips.at(index).insert(digitIn.getCellID());
-      if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(digitIn.getCharge());
-      if ((m_hitMapCountsV != NULL) && (digitIn.getCharge() > m_CutSVDCharge))
-        m_hitMapCountsV->Fill(index);
+      // 6-to-1 relation weights are equal to digit signals, modulo rounding error
+      SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
+      for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
+        if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(samples[i]);
+        if ((m_hitMapCountsV != NULL) && (samples[i] > m_CutSVDCharge))
+          m_hitMapCountsV->Fill(index);
+      }
     }
   }
   for (int i = 0; i < c_nSVDSensors; i++) {
@@ -445,12 +504,18 @@ void SVDDQMExpressRecoModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (cluster.isUCluster()) {
       countsU.at(index).insert(SensorInfo.getUCellID(cluster.getPosition()));
+      if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (iLayer == 3) if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (iLayer != 3) if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge());
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
+      if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (iLayer == 3) if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (iLayer != 3) if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge());
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());

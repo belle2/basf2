@@ -131,7 +131,7 @@ void CDCCosmicAnalysisModule::event()
   evtT0 = 0;
   if (m_EventT0Extraction) {
     // event with is fail to extract t0 will be exclude from analysis
-    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
       evtT0 =  m_eventTimeStoreObject->getEventT0();
     } else {
       store = false;

@@ -11,7 +11,7 @@
 #include <tracking/ckf/svd/findlets/CKFToSVDFindlet.h>
 
 #include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
-#include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
@@ -20,11 +20,12 @@
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
+#include <tracking/ckf/general/findlets/ResultStorer.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
@@ -43,6 +44,7 @@ CKFToSVDFindlet::CKFToSVDFindlet()
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_overlapResolver);
   addProcessingSignalListener(&m_spacePointTagger);
+  addProcessingSignalListener(&m_resultStorer);
 }
 
 void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -57,10 +59,26 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
   m_spacePointTagger.exposeParameters(moduleParamList, prefix);
+  m_resultStorer.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
+
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva_with_direction_check");
+  moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
+  moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");
+  moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("mva");
+
+  moduleParamList->getParameter<std::string>("filter").setDefaultValue("mva");
+
+  moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+
+  moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
+
+  moduleParamList->getParameter<bool>("useAssignedHits").setDefaultValue(false);
 }
 
 void CKFToSVDFindlet::beginEvent()
@@ -104,6 +122,6 @@ void CKFToSVDFindlet::apply()
 
   B2DEBUG(50, "Having found " << m_filteredResults.size() << " results");
 
-  m_dataHandler.store(m_filteredResults);
+  m_resultStorer.apply(m_filteredResults);
   m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);
 }

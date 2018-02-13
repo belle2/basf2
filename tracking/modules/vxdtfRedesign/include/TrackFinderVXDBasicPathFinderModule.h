@@ -48,24 +48,18 @@ namespace Belle2 {
     TrackFinderVXDBasicPathFinderModule();
 
     /** initialize */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** beginRun */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** event */
-    virtual void event() override;
+    void event() override;
 
 
   protected:
 
     /// module parameters
-    /** SpacePoint collection name */
-    std::string m_spacePointsName;
-
-    /** the storeArray for svdClusters as member, is faster than recreating link for each event */
-    StoreArray<SpacePoint> m_spacePoints;
-
     /** name for StoreArray<SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;
 
@@ -95,9 +89,6 @@ namespace Belle2 {
 
     /** Maximal number of families in event; if exceeded, the execution of the trackfinder will be stopped. */
     unsigned short m_PARAMmaxFamilies = 10000;
-
-    /** Maximal size of segment network; if exceeded, the execution of the trackfinder will be stopped. */
-    unsigned short m_PARAMmaxNetworkSize = 50000;
 
     /// member variables
     /** CA algorithm */

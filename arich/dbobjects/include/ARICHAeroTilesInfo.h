@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Manca Mrvar                                              *
@@ -62,8 +62,7 @@ namespace Belle2 {
 
   private:
 
-    std::map<std::vector<int>, std::vector<float>>
-                                                m_aeroPos2optical; /**< map of aerogel tile slot (1-124) to aerogel optical properties */
+    std::map<std::vector<int>, std::vector<float>> m_aeroPos2optical; /**< map of tile slot (1-124) to optical properties */
 
     ClassDef(ARICHAeroTilesInfo, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

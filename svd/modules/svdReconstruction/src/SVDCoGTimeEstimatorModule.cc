@@ -51,7 +51,7 @@ void SVDCoGTimeEstimatorModule::initialize()
   m_storeShaper.isRequired(m_storeShaperDigitsName);
 
   //Initialize the new RecoDigit
-  m_storeReco.registerInDataStore(m_storeRecoDigitsName);
+  m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
 
   RelationArray relRecoDigitShaperDigits(m_storeReco, m_storeShaper);
   relRecoDigitShaperDigits.registerInDataStore();
@@ -226,10 +226,9 @@ int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
     return 3;
   else if (modality == 0)
     return 1;
-  else {
-    return -1;
-    B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
-  }
+
+  B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
+  return -1;
 }
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)

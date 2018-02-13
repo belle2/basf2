@@ -14,7 +14,7 @@ namespace Belle2 {
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
-    virtual void boot(const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void recover(const DBObject& obj) throw(RCHandlerException);
 

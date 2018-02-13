@@ -14,9 +14,11 @@ import os
 import sys
 import glob
 import subprocess
+import interactive
 from fnmatch import fnmatch
 
 use_local_database("localDB_run400_toImport/database_run400_toImport.txt", "localDB_run400_toImport")
+# use_central_database("GT_gen_prod_004.11_Master-20171213-230000")
 
 # use_local_database("test/database.txt", "test")
 
@@ -31,22 +33,20 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
-# process single event
-process(main)
 
-print("processato!")
+class dbImporterModule(Module):
+    def beginRun(self):
+        # call the importer class
+        dbImporter = SVDDatabaseImporter(0, 0, -1, -1)
+#        print("classdefined")
+        # import the noises
+#        dbImporter.importSVDNoiseCalibrationsFromXML("Hao_noise.xml")
+        dbImporter.importSVDCalAmpCalibrationsFromXML("Hao_noise.xml")
 
-# call the importer class
-dbImporter = SVDDatabaseImporter()
+        print("importNoise_Done")
 
-print("classdefined")
-
+        # dbImporter.importSVDChannelMapping("Hao_mapping.xml")
 '''
-# import the noises
-dbImporter.importSVDNoiseCalibrations()
-
-print("importNoise_Done")
-
 # import the calibration constants from local runs
 dbImporter.importSVDPulseShapeCalibrations()
 
@@ -62,6 +62,12 @@ print("importTimeShiftCorrection_Done")
 dbImporter.importSVDLocalRunBadStrips()
 
 print("importBadStrips_Done")
-'''
+
 dbImporter.importSVDChannelMapping()
+'''
+
+main.add_module(dbImporterModule())
+# process single event
+process(main)
+
 print("IMPORT COMPLETED!!!")

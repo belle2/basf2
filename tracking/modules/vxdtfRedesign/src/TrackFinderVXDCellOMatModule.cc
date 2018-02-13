@@ -40,9 +40,6 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
 
-  addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
-
   addParam("printNetworks",
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
@@ -77,20 +74,13 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
            m_PARAMmaxFamilies);
 
-  addParam("maxNetworkSize",
-           m_PARAMmaxNetworkSize,
-           "Maximal size of the segment network; if exceeded, the event execution will be skipped.",
-           m_PARAMmaxNetworkSize);
-
 }
 
 
 void TrackFinderVXDCellOMatModule::initialize()
 {
-  m_spacePoints.isRequired(m_spacePointsName);
-
   m_network.isRequired(m_PARAMNetworkName);
-  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
@@ -113,12 +103,6 @@ void TrackFinderVXDCellOMatModule::event()
   m_eventCounter++;
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
-
-  if (segmentNetwork.size() > m_PARAMmaxNetworkSize) {
-    B2ERROR("Size of network provided by the SegmentNetworkProducer exceeds the limit of " << m_PARAMmaxNetworkSize
-            << ". Network size is " << segmentNetwork.size() << ".");
-    return;
-  }
 
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);

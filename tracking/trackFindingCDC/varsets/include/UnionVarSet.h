@@ -104,7 +104,7 @@ namespace Belle2 {
       }
 
       /// Return the number of currently contained variable sets
-      size_t size()
+      size_t size() const
       {
         return m_varSets.size();
       }

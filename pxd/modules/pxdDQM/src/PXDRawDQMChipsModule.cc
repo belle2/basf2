@@ -46,8 +46,8 @@ void PXDRawDQMChipsModule::defineHisto()
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {
-    auto dir = oldDir->mkdir(m_histogramDirectoryName.c_str());
-    if (dir) dir->cd();
+    oldDir->mkdir(m_histogramDirectoryName.c_str());
+    oldDir->cd(m_histogramDirectoryName.c_str());
   }
 
 
@@ -69,9 +69,6 @@ void PXDRawDQMChipsModule::defineHisto()
                                                8192);
           hrawPxdHitsCharge[i][j][k] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
                                                 ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
-          hrawPxdHitsCommonMode[i][j][k] = new TH1F(("hrawPxdHitsCommonMode" + s2).c_str(),
-                                                    ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(),
-                                                    256, 0, 256);
         }
       }
     } else {
@@ -79,7 +76,6 @@ void PXDRawDQMChipsModule::defineHisto()
         for (auto k = 0; k < eNumDCD; k++) {
           hrawPxdHitsCount[i][j][k] =  NULL;
           hrawPxdHitsCharge[i][j][k] =  NULL;
-          hrawPxdHitsCommonMode[i][j][k] = NULL;
         }
       }
     }
@@ -103,7 +99,6 @@ void PXDRawDQMChipsModule::beginRun()
       for (auto k = 0; k < eNumDCD; k++) {
         if (hrawPxdHitsCount[i][j][k]) hrawPxdHitsCount[i][j][k]->Reset();
         if (hrawPxdHitsCharge[i][j][k]) hrawPxdHitsCharge[i][j][k]->Reset();
-        if (hrawPxdHitsCommonMode[i][j][k]) hrawPxdHitsCommonMode[i][j][k]->Reset();
       }
     }
   }
@@ -133,7 +128,6 @@ void PXDRawDQMChipsModule::event()
     // TODO check switcher 0-6? DCD 0-4?
     nhits[dhh_id][switcher][dcd]++;
     if (hrawPxdHitsCharge[dhh_id][switcher][dcd]) hrawPxdHitsCharge[dhh_id][switcher][dcd]->Fill(it.getCharge());
-    if (hrawPxdHitsCommonMode[dhh_id][switcher][dcd]) hrawPxdHitsCommonMode[dhh_id][switcher][dcd]->Fill(it.getCommonMode());
   }
   for (auto i = 0; i < eNumSensors; i++) {
     for (auto j = 0; j < eNumSwitcher; j++) {

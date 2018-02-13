@@ -14,6 +14,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <top/dataobjects/TOPSimHit.h>
+#include <top/dataobjects/TOPSimCalPulse.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
@@ -103,13 +104,15 @@ namespace Belle2 {
     int m_hysteresis = 0; /**< pulse height threshold hysteresis [ADC counts] */
     int m_thresholdCount = 0; /**< minimal number of samples above threshold */
     bool m_useWaveforms = false; /**< if true, use full waveform digitization */
-    bool m_useDatabase = false;  /**< if true, use sample times from database */
+    bool m_useDatabase = false;  /**< if true, use calibration constants from database */
+    bool m_useSampleTimeCalibration = false;   /**< if true, use time base calibration */
     bool m_simulateTTS = true; /**< if true, add TTS to simulated hits */
     bool m_allChannels = false; /**< if true, always make waveforms for all channels */
     unsigned m_storageDepth = 0;           /**< ASIC analog storage depth */
 
     // datastore objects
     StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */
+    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< collection of simuated cal pulses */
     StoreArray<MCParticle> m_mcParticles;   /**< collection of MC particles */
     StoreArray<TOPRawWaveform> m_waveforms; /**< collection of waveforms */
     StoreArray<TOPRawDigit> m_rawDigits;    /**< collection of raw digits */

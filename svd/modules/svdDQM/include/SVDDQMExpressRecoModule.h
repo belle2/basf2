@@ -61,12 +61,10 @@ namespace Belle2 {
     /** cut for accepting to hitmap histogram, using strips only, default = 22 */
     float m_CutSVDCharge = 22.0;
 
-    /** SVDDigits StoreArray name */
-    std::string m_storeSVDDigitsName;
+    /** SVDShaperDigits StoreArray name */
+    std::string m_storeSVDShaperDigitsName;
     /** SVDClusters StoreArray name */
     std::string m_storeSVDClustersName;
-    /** SVDClustersToSVDDigits RelationArray name */
-    std::string m_relSVDClusterDigitName;
 
     /** Basic Directory in output file */
     TDirectory* m_oldDir;
@@ -115,6 +113,19 @@ namespace Belle2 {
     TH1I* m_fClusterTimeUFlag;
     /** Flags of v time */
     TH1I* m_fClusterTimeVFlag;
+
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll;
+    /** u charge of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeU3;
+    /** v charge of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeV3;
+    /** u charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeU456;
+    /** v charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeV456;
 
     /** Hitmaps u of Digits */
     TH1I* m_hitMapCountsU;

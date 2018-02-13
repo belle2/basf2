@@ -32,21 +32,25 @@ namespace eudaq {
 
     template <typename T>
     void SetPixel(unsigned index, unsigned x, unsigned y,
-                  T pix, bool pivot = false, unsigned frame = 0) {
+                  T pix, bool pivot = false, unsigned frame = 0)
+    {
       SetPixelHelper(index, x, y, (double)pix, pivot, frame);
     }
     template <typename T>
     void SetPixel(unsigned index, unsigned x, unsigned y,
-                  T pix, unsigned frame) {
+                  T pix, unsigned frame)
+    {
       SetPixelHelper(index, x, y, (double)pix, false, frame);
     }
     template <typename T>
     void PushPixel(unsigned x, unsigned y, T pix,
-                   bool pivot = false, unsigned frame = 0) {
+                   bool pivot = false, unsigned frame = 0)
+    {
       PushPixelHelper(x, y, (double)pix, pivot, frame);
     }
     template <typename T>
-    void PushPixel(unsigned x, unsigned y, T pix, unsigned frame) {
+    void PushPixel(unsigned x, unsigned y, T pix, unsigned frame)
+    {
       PushPixelHelper(x, y, (double)pix, false, frame);
     }
 

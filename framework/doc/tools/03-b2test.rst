@@ -7,6 +7,8 @@ These tools are used to run the continous integration tests. We have unittests a
     single: tools; b2test-units
     single: testing; b2test-units
 
+.. _b2test-units:
+
 ``b2test-units``: Run unittests
 -------------------------------
 
@@ -28,11 +30,14 @@ without arguments. Here we just document the most useful arguments, please use
     single: tools; b2test-scripts
     single: testing; b2test-scripts
 
+.. _b2test-scripts:
+
 ``b2test-scripts``: Run framework tests
 ---------------------------------------
+
 .. argparse::
     :filename: framework/tools/b2test-scripts
     :func: get_argument_parser
-    :prog: test_basf2
+    :prog: b2test-scripts
     :nodefaultconst:
     :nogroupsections:

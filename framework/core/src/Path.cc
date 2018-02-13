@@ -18,6 +18,7 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/SubEventModule.h>
 #include <framework/core/SwitchDataStoreModule.h>
+#include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
 using namespace boost::python;
@@ -199,7 +200,7 @@ void Path::exposePythonAPI()
 .. seealso:: :func:`basf2.process`)")
   .def("__str__", &Path::getPathString)
   .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2.py
-  .def("add_path", &Path::addPath, R"(Insert another path at the end of this one.
+  .def("add_path", &Path::addPath, args("path"), R"(Insert another path at the end of this one.
 For example,
 
     >>> path.add_module('A')

@@ -8,11 +8,15 @@ import glob
 
 numEvents = 2000
 
-bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
-# bkgFiles = None #if no background
+bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
+bkgFiles = None  # uncomment to remove  background
 simulateJitter = False
+
 ROIfinding = False
 Phase2 = False
+MCTracking = True
+# set this string to identify the output rootfiles
+tag = "_Y4S_noJitter_noBKG_noROI_MCTF.root"
 
 main = create_path()
 
@@ -24,7 +28,7 @@ if Phase2:
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', expList)
-eventinfosetter.param('runList', [1])
+eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [numEvents])
 main.add_module(eventinfosetter)
 main.add_module('EventInfoPrinter')
@@ -43,16 +47,16 @@ add_simulation(
 
 add_svd_reconstruction(main)
 
+
 add_tracking_reconstruction(
     main,
     components=["SVD"],
-    use_vxdtf2=True,
-    mcTrackFinding=True,
-    additionalTrackFitHypotheses=[211],
+    mcTrackFinding=MCTracking,
+    trackFitHypotheses=[211],
     skipHitPreparerAdding=True)
 
 
-tag = "_Y4S_noJitter_noBKG_noROI_MCTF.root"
+tag = "_Y4S_jitter10ns_wBKG_noROI_MCTF.root"
 clseval = register_module('SVDClusterEvaluation')
 clseval.param('outputFileName', "ClusterEvaluation" + str(tag))
 main.add_module(clseval)

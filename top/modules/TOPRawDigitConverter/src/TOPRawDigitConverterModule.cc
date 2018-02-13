@@ -207,10 +207,13 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
 
-      // get raw time and correct it for possible window discontinuity
+      // get raw times and correct them for possible window discontinuity
 
-      double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
-      rawTime = rawDigit.correctTime(rawTime, m_storageDepth);
+      double rawTimeLeading = rawDigit.getCFDLeadingTime(); // time in [samples]
+      rawTimeLeading = rawDigit.correctTime(rawTimeLeading, m_storageDepth);
+
+      double rawTimeFalling = rawDigit.getCFDFallingTime(); // time in [samples]
+      rawTimeFalling = rawDigit.correctTime(rawTimeFalling, m_storageDepth);
 
       // get first window and correct it according to look back windows (if given)
 
@@ -223,7 +226,8 @@ namespace Belle2 {
         window -= nwin;
         if (window < 0) window += m_storageDepth;
         if (window >= (int) m_storageDepth) window -= m_storageDepth;
-        rawTime += nwin * TOPRawDigit::c_WindowSize;
+        rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
+        rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
       }
 
       // convert raw time to time using equidistant or calibrated time base
@@ -240,21 +244,17 @@ namespace Belle2 {
           continue;
         }
       }
-      double time = sampleTimes->getTime(window, rawTime); // time in [ns]
-
-      // determine pulse width
-
-      double width = sampleTimes->getDeltaTime(window,
-                                               rawDigit.getCFDFallingTime(),
-                                               rawDigit.getCFDLeadingTime()); // in [ns]
+      double time = sampleTimes->getTime(window, rawTimeLeading); // time in [ns]
+      double width = sampleTimes->getDeltaTime(window, rawTimeFalling, rawTimeLeading);
 
       // determine time uncertainty
 
       double timeError = geo->getNominalTDC().getTimeJitter();
       if (m_pedestalRMS > 0) {
         double rawErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
-        auto sampleRise = rawDigit.getSampleRise();
-        timeError = rawErr * sampleTimes->getTimeBin(window, sampleRise); // [ns]
+        int sample = static_cast<int>(rawTimeLeading);
+        if (rawTimeLeading < 0) sample--;
+        timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
       }
 
       // apply T0 calibration
@@ -298,7 +298,7 @@ namespace Belle2 {
 
       // append new TOPDigit and set it
 
-      auto* digit = m_digits.appendNew(moduleID, pixelID, rawTime);
+      auto* digit = m_digits.appendNew(moduleID, pixelID, rawTimeLeading);
       digit->setTime(time);
       digit->setTimeError(timeError);
       digit->setPulseHeight(rawDigit.getValuePeak());

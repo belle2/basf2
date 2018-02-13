@@ -21,9 +21,9 @@ def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=N
 
     Example:
 
-        make_conditional_at(path, iov_list=[(0, 0, 0, -1)],
-                            path_when_in_iov=exp_0_path,
-                            path_when_not_in_iov=not_exp_0_path)
+    >>> make_conditional_at(path, iov_list=[(0, 0, 0, -1)],
+    ...                     path_when_in_iov=exp_0_path,
+    ...                     path_when_not_in_iov=not_exp_0_path)
 
     will branch the path for all events with experiment number 0 to the modules in exp_0_path and into
     not_exp_0_path in all other cases.

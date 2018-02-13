@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 ########################################################
-# 100 generic BBbar events using EvtGen
 #
-# Example steering file
+# Generate 100 generic BBbar events using EvtGen
+#
+# Contributor(s): Torben Ferber (torben.ferber@desy.de)
+#
 ########################################################
 
 from basf2 import *
@@ -21,7 +23,6 @@ add_evtgen_generator(path=main, finalstate='mixed')
 
 # run
 main.add_module("Progress")
-main.add_module("Gearbox")
 main.add_module("RootOutput", outputFileName="evtgen_upsilon4s.root")
 main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
 

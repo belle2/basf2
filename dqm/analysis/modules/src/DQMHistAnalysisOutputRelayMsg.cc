@@ -62,12 +62,28 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
 
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = 0;
+
+  bool first_try = true;
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       TCanvas* c = (TCanvas*) obj;
       mess.Reset();
       mess.WriteObject(c);     // write object in message buffer
-      m_sock->Send(mess);
+      if (m_sock->Send(mess) < 0) {
+        if (!first_try) {
+          break;//Only try to reconnect once per event
+        } else {
+          first_try = false;
+        }
+        //The plain TSocket can't reconnect, so delete and create a new one
+        delete m_sock;
+        m_sock = new TSocket(m_hostname.c_str(), m_port);
+        //Try to send the failed message again
+        if (m_sock->Send(mess) < 0) {
+          //If failed a second time stop for this event
+          break;
+        }
+      }
     }
   }
 }

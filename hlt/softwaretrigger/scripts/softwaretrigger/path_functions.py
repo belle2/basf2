@@ -27,9 +27,9 @@ def setup_basf2_and_db():
     Setupl local database usage for HLT
     """
 
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='basf2 for online')
     parser.add_argument('input_buffer_name', type=str,
-                        help='Input Ring Buffer namess')
+                        help='Input Ring Buffer names')
     parser.add_argument('output_buffer_name', type=str,
                         help='Output Ring Buffer name')
     parser.add_argument('histo_port', type=int,

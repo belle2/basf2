@@ -94,8 +94,7 @@ namespace Belle2 {
 
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
-/// getters
-
+    /// getters
     /** returns reference to the ActiveSectorNetwork stored in this container, intended for read and write access */
     DirectedNodeNetwork<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo >&
     accessActiveSectorNetwork() { return m_ActiveSectorNetwork; }
@@ -144,5 +143,4 @@ namespace Belle2 {
     // last member changed: added metaInfo for DirectedNodeNetwork
     ClassDef(DirectedNodeNetworkContainer, 10)
   };
-
-} //Belle2 namespace
+}

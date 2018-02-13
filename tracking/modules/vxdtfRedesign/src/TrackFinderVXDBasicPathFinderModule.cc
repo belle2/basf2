@@ -113,7 +113,10 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
-  if (nRounds < 0) { B2ERROR("Basic Path Finder failed, skipping event!"); return; }
+  if (nRounds < 0) {
+    B2ERROR("Basic Path Finder failed, skipping event!");
+    return;
+  }
 
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = 0;

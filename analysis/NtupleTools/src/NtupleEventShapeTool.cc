@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Ami Rostomyan                                            *
+* Contributors: Ami Rostomyan, Michel H. Villanueva                      *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -17,6 +17,7 @@
 #include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <TBranch.h>
+#include <TVector3.h>
 
 using namespace Belle2;
 using namespace std;
@@ -40,8 +41,6 @@ void NtupleEventShapeTool::setupTree()
 
 void NtupleEventShapeTool::deallocateMemory()
 {
-  for (int i = 0; i < 3; i++) {m_fThrustVector[i] = -100;}
-  //delete [] m_fThrustValue;
   delete [] m_fCosToThrust;
 }
 
@@ -55,11 +54,17 @@ void NtupleEventShapeTool::eval(const Particle* particle)
   StoreObjPtr<ThrustOfEvent> thrust;
   if (thrust) {
     m_fThrustValue = thrust->getThrust();
+    TVector3 thr = thrust->getThrustAxis();
+    for (int i = 0; i < 3; i++) {
+      m_fThrustVector[i] = thr(i);
+    }
   } else {
+    B2WARNING("NtupleEventShapeTool::Thrust of event not found.");
     m_fThrustValue = -1;
+    for (int i = 0; i < 3; i++) {
+      m_fThrustVector[i] = -1;
+    }
   }
-
-//  for (int i = 0; i < 3; i++) {m_fThrustVector[i] = EventVariable:: };
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();

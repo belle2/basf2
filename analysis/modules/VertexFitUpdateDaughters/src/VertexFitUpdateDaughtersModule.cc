@@ -168,7 +168,7 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
     for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
       if (tracksVertex[itrack] != mother) {
         rsf.addTrack(tracksVertex[itrack]);
-        B2DEBUG(1, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
+        B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
       }
       if (tracksVertex[itrack] == mother) B2WARNING("VertexFitUpdateDaughtersModule: Selected Mother not used in the fit");
     }
@@ -211,7 +211,7 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
     // One track fit cannot be kinematic
     analysis::RaveVertexFitter rsg;
     rsg.addTrack(tracksVertex[0]);
-    B2DEBUG(1, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
+    B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
     if (tracksVertex[0] == mother) B2FATAL("VertexFitUpdateDaughtersModule: Selected Mother not used in sigle track fit");
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);

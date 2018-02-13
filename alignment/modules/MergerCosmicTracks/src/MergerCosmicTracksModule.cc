@@ -225,7 +225,7 @@ void MergerCosmicTracksModule::event()
   // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
   float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
 
-  bool mergedTracks = false;
+  // bool mergedTracks = false;
 
   if (recoTrackStoreArray.getEntries() == 1) {
     if (eclConnectedRegionStoreArray.getEntries() == 2 || eclConnectedRegionStoreArray.getEntries() == 1) {
@@ -301,7 +301,7 @@ void MergerCosmicTracksModule::event()
                 mergedRecoTrack->addEKLMHit(recoTrackStoreArray[0]->getSortedEKLMHitList()[i], sortingNumber);
               }
             }
-            mergedTracks = true;
+            // mergedTracks = true;
           }
         }
       }
@@ -318,12 +318,12 @@ void MergerCosmicTracksModule::event()
         if (eclShowerFirst.size() != 0 && eclShowerSecond.size() != 0) {
           if (eclConnectedRegionStoreArray.getEntries() >= 2) {
             MergingTracks(recoTrackStoreArray[0], recoTrackStoreArray[1], mergedRecoTracks);
-            mergedTracks = true;
+            // mergedTracks = true;
           }
         } else if (eclShowerFirst.size() != 0 || eclShowerSecond.size() != 0) {
           if (eclConnectedRegionStoreArray.getEntries() == 2 || eclConnectedRegionStoreArray.getEntries() == 1) {
             MergingTracks(recoTrackStoreArray[0], recoTrackStoreArray[1], mergedRecoTracks);
-            mergedTracks = true;
+            // mergedTracks = true;
           }
         }
       }
@@ -343,7 +343,7 @@ void MergerCosmicTracksModule::event()
               if (eclShowerFirst.size() != 0 && eclShowerSecond.size() != 0) {
                 if (eclShowerFirst[0]->getRelationsWith<Track>().size() == 1 && eclShowerSecond[0]->getRelationsWith<Track>().size() == 1) {
                   MergingTracks(recoTrackStoreArray[i], recoTrackStoreArray[j], mergedRecoTracks);
-                  mergedTracks = true;
+                  // mergedTracks = true;
                 }
               }
             }
@@ -353,16 +353,16 @@ void MergerCosmicTracksModule::event()
     }
   }
 
-  if (mergedTracks == false) {
+  /* if (mergedTracks == false) {
     int numberOfTrackWithECLShowers = 0;
     for (int i = 0; i < trackStoreArray.getEntries(); i++) {
       RelationVector<ECLShower> eclShower = trackStoreArray[i]->getRelationsTo<ECLShower>();
       if (eclShower.size() != 0) {
-        std::cout << "\nNumber of showers on the track: " << eclShower.size() << " and number of tracks in ECL shower: " <<
+        // std::cout << "\nNumber of showers on the track: " << eclShower.size() << " and number of tracks in ECL shower: " <<
                   eclShower[0]->getRelationsWith<Track>().size() << "\n";
         if (eclShower[0]->getRelationsWith<Track>().size() == 1) {numberOfTrackWithECLShowers++;}
       }
     }
-    std::cout << "\nNumber of tracks with ECL showers: " << numberOfTrackWithECLShowers << "\n";
-  }
+    // std::cout << "\nNumber of tracks with ECL showers: " << numberOfTrackWithECLShowers << "\n";
+    }*/
 }

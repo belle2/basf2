@@ -61,7 +61,7 @@ namespace Belle2 {
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.) {}
 
-    /** Set m_isTrack true if the cluster matches with at least one track. */
+    /** Set m_isTrack true if the cluster matches with cluster. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
 
     /** Set status. */

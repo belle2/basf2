@@ -100,7 +100,6 @@ void PXDUnpackerModule::initialize()
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
 
-  // test_mapping();// write out the mapping table which is used for comparison ...
 }
 
 void PXDUnpackerModule::terminate()
@@ -490,7 +489,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     // We see a second "header" with framenr+1 ...
     B2ERROR("DHP data: seems to be double header! skipping ... len " << frame_len);
     m_errorMask |= EPXDErrMask::c_DHP_DBL_HEADER;
-    dump_dhp(data, frame_len);
+    // dump_dhp(data, frame_len); print out guilty dhp packet
 //    B2ERROR("Mask $" << hex <<m_errorMask);
     return;
   }
@@ -519,8 +518,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
         if (!rowflag) {
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= EPXDErrMask::c_DHP_PIX_WO_ROW;
-//           dhp_pixel_error++;
-          dump_dhp(data, frame_len);
+          // dump_dhp(data, frame_len);// print out faulty dhp frame
           return;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
@@ -548,7 +546,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             // We use it here for simulation purpose
           }
           if (u_cellID >= 250) {
-            B2WARNING("DHP COL Overflow (unconnected drain lines) " << u_cellID);
+            B2WARNING("DHP COL Overflow (unconnected drain lines) " << u_cellID << ", ref " << dhe_reformat << ", dhpcol " << dhp_col << ", id "
+                      << dhp_dhp_id);
             m_errorMask |= EPXDErrMask::c_COL_OVERFLOW;
           }
           dhp_adc = dhp_pix[i] & 0xFF;
@@ -557,18 +556,16 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
                     << " CM $" << hex << dhp_cm);
 
           /*if (verbose) {
-            B2INFO("raw    |   " << hex << d[i]);
-            B2INFO("row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
+            B2DEBUG(20, "raw    |   " << hex << d[i]);
+            B2DEBUG(20, "row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
                    << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-            B2INFO("dhe_ID " << dhe_ID);
-            B2INFO("start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-            B2INFO("toffset " << toffset);
+            B2DEBUG(20, "dhe_ID " << dhe_ID);
+            B2DEBUG(20, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
+            B2DEBUG(20, "toffset " << toffset);
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F /*,
-                                                        dhp_cm, dhp_readout_frame_lo, dhe_first_readout_frame_id_lo*/
-                                                       );
+                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
         }
       }
     }
@@ -579,9 +576,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             <<
             " (DHP) DHP ID $" << hex << dhp_dhp_id);
     /*for (int i = 0; i < raw_nr_words ; i++) {
-      B2INFO("RAW      |   " << hex << p_pix[i]);
+      B2DEBUG(20, "RAW      |   " << hex << p_pix[i]);
       printf("raw %08X  |  ", p_pix[i]);
-      B2INFO("row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
+      B2DEBUG(20, "row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
              << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
             );
     }*/
@@ -1032,7 +1029,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
         if (len >= dhc.data_onsen_roi_frame->getMinSize()) {
           if ((len - dhc.data_onsen_roi_frame->getMinSize()) % 8 != 0) {
-            PXDUnpackerModule::dump_roi(data, len - 4); // minus CRC
+            // dump_roi(data, len - 4); // dump ROI payload, minus CRC
+            /// TODO ... set ERROR flag!
           }
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;

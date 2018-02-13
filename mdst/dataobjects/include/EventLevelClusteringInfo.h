@@ -58,43 +58,43 @@ namespace Belle2 {
       m_nECLCalDigitsOutOfTimeBWD = nECLCalDigitsOutOfTimeBWD;
     }
 
-    /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters, FWD. */
+    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters, FWD. */
     uint8_t getNECLShowersRejectedFWD() const
     {
       return m_nECLShowersRejectedFWD;
     }
 
-    /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters, Barrel. */
+    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters, Barrel. */
     uint8_t getNECLShowersRejectedBarrel() const
     {
       return m_nECLShowersRejectedBarrel;
     }
 
-    /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters, BWD. */
+    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters, BWD. */
     uint8_t getNECLShowersRejectedBWD() const
     {
       return m_nECLShowersRejectedBWD;
     }
 
-    /** Getter for the number of N1 ECLShowers that are not stored as ECLClusters. */
+    /** Getter for the number of photon ECLShowers that are not stored as ECLClusters. */
     uint8_t getNECLShowersRejected() const
     {
       return m_nECLShowersRejectedFWD + m_nECLShowersRejectedBarrel + m_nECLShowersRejectedBWD;
     }
 
-    /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, FWD. */
+    /** Setter for the number of photon ECLShowers that are not stored as ECLClusters, FWD. */
     void setNECLShowersRejectedFWD(uint8_t const nECLShowersRejectedFWD)
     {
       m_nECLShowersRejectedFWD = nECLShowersRejectedFWD;
     }
 
-    /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, Barrel. */
+    /** Setter for the number of photon ECLShowers that are not stored as ECLClusters, Barrel. */
     void setNECLShowersRejectedBarrel(uint8_t const nECLShowersRejectedBarrel)
     {
       m_nECLShowersRejectedBarrel = nECLShowersRejectedBarrel;
     }
 
-    /** Setter for the number of N1 ECLShowers that are not stored as ECLClusters, BWD. */
+    /** Setter for the number of photon ECLShowers that are not stored as ECLClusters, BWD. */
     void setNECLShowersRejectedBWD(uint8_t const nECLShowersRejectedBWD)
     {
       m_nECLShowersRejectedBWD = nECLShowersRejectedBWD;
@@ -110,13 +110,13 @@ namespace Belle2 {
     /** Number of out of time, energetic ECLCalDigits, BWD. */
     uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
 
-    /** Number of N1 showers that are rejected before storing to mdst (max. 255), FWD. */
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), FWD. */
     uint8_t m_nECLShowersRejectedFWD {0};
 
-    /** Number of N1 showers that are rejected before storing to mdst (max. 255), Barrel. */
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), Barrel. */
     uint8_t m_nECLShowersRejectedBarrel {0};
 
-    /** Number of N1 showers that are rejected before storing to mdst (max. 255), BWD. */
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
     uint8_t m_nECLShowersRejectedBWD {0};
 
     ClassDef(EventLevelClusteringInfo, 1); /**< ROOT. */

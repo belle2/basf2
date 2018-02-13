@@ -40,7 +40,7 @@ void CosmicsTrackMergerFindlet::initialize()
 {
   m_inputTracks.isRequired(m_param_inputRecoTracks);
 
-  m_outputTracks.registerInDataStore(m_param_outputRecoTracks);
+  m_outputTracks.registerInDataStore(m_param_outputRecoTracks, DataStore::c_ErrorIfAlreadyRegistered);
   RecoTrack::registerRequiredRelations(m_outputTracks);
 
   Super::initialize();

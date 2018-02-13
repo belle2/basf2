@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -16,12 +16,9 @@
 namespace Belle2 {
 
   /**
-   * r.m.s. of noise for all 512 channels of 16 modules.
-   *
-   * The noise for masked channels is undefined.
-   * It is the caller's responsibility to check for masked channels
+   * Class to store integrated charge per channel
    */
-  class TOPCalChannelNoise: public TObject {
+  class TOPCalIntegratedCharge: public TObject {
   public:
 
     /**
@@ -35,18 +32,16 @@ namespace Belle2 {
 
     /**
      * Default constructor.
-     * Noises are set to 0 by default.
      */
-    TOPCalChannelNoise() {}
+    TOPCalIntegratedCharge() {}
 
     /**
-     * Sets the noise r.m.s for a single channel and switches status to calibrated.
-     * If data for a given channel not available set noise to 0 (or just skip the call)
+     * Sets the integrated charge for a single channel and switches status to calibrated
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @param rmsNoise r.m.s. of noise [ADC counts]
+     * @param charge integrated charge in Coulombs per cm^2
      */
-    void setNoise(int moduleID, unsigned channel, double rmsNoise)
+    void setCharge(int moduleID, unsigned channel, double charge)
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -57,7 +52,7 @@ namespace Belle2 {
         B2ERROR("Invalid channel number, constant not set (" << ClassName() << ")");
         return;
       }
-      m_rmsNoise[module][channel] = rmsNoise;
+      m_charge[module][channel] = charge;
       m_status[module][channel] = c_Calibrated;
     }
 
@@ -81,12 +76,12 @@ namespace Belle2 {
     }
 
     /**
-     * Returns the noise r.m.s of a single channel (0 or negative: data not available)
+     * Returns the integrated charge of a single channel
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @return r.m.s. of noise [ADC counts]
+     * @return integrated charge [C/cm^2]
      */
-    double getNoise(int moduleID, unsigned channel) const
+    double getCharge(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -97,7 +92,7 @@ namespace Belle2 {
         B2WARNING("Invalid channel number, returning 0 (" << ClassName() << ")");
         return 0;
       }
-      return m_rmsNoise[module][channel];
+      return m_charge[module][channel];
     }
 
     /**
@@ -152,13 +147,12 @@ namespace Belle2 {
       c_numChannels = 512 /**< number of channels per module */
     };
 
-    float m_rmsNoise[c_numModules][c_numChannels] = {{0}};    /**< noise [ADC counts] */
+    float m_charge[c_numModules][c_numChannels] = {{0}};    /**< integrated charge [C/cm^2] */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
 
-    ClassDef(TOPCalChannelNoise, 2); /**< ClassDef */
+    ClassDef(TOPCalIntegratedCharge, 1); /**< ClassDef */
 
   };
 
 } // end namespace Belle2
-
 

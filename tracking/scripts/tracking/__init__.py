@@ -886,7 +886,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.set_name(pxdSPCreatorName)
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-            spCreatorPXD.param('SpacePoints', nameSPs)
+            spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
             path.add_module(spCreatorPXD)
 
     # check for the name instead of the type as the HLT also need those module under (should have different names)
@@ -897,7 +897,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         spCreatorSVD.set_name(svdSPCreatorName)
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', nameSPs)
+        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
         path.add_module(spCreatorSVD)
 
@@ -915,11 +915,15 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # SegmentNet
     ##################
 
+    spacePointArrayNames = ["SVD" + nameSPs]
+    if use_pxd:
+        spacePointArrayNames += ["PXD" + nameSPs]
+
     nameSegNet = 'SegmentNetwork' + suffix
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', nameSegNet)
-    segNetProducer.param('SpacePointsArrayNames', [nameSPs])
+    segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
     segNetProducer.param('addVirtualIP', False)
@@ -937,7 +941,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     trackFinder = register_module(track_finder_module)
     trackFinder.param('NetworkName', nameSegNet)
     trackFinder.param('SpacePointTrackCandArrayName', nameSPTCs)
-    trackFinder.param('SpacePoints', nameSPs)
     trackFinder.param('printNetworks', False)
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)

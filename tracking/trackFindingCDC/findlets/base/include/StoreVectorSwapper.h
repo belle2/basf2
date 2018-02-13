@@ -91,7 +91,7 @@ namespace Belle2 {
         Super::initialize();
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
-          storeVector.registerInDataStore(DataStore::c_DontWriteOut);
+          storeVector.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
         }
       }
 

@@ -105,7 +105,6 @@ namespace Belle2 {
       /** Unpack one event (several frames) stored in RawPXD object
        * @param px RawPXD data object
        * @param inx Index of RawPXD packet
-       * @param daqevtstat Daq Status Object
        */
       void unpack_rawpxd(RawPXD& px, int inx);
 
@@ -149,12 +148,6 @@ namespace Belle2 {
        */
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
-      /**
-       * @param length length of cluster data
-       * @param data pointer to cluster data
-       * @param vxd_id vertex Detector ID
-       */
-
       /** Error Mask set per packet / frame*/
       PXDError::PXDErrorFlags m_errorMask;
       /** Error Mask set per packet / DHE */
@@ -185,7 +178,7 @@ namespace Belle2 {
       /** helper function to "count" nr of set bits within lower 5 bits.
         * It does not need the class object, thus static.
         */
-      int static nr5bits(int i);
+      static int nr5bits(int i);
 
       /** dump to a file, helper function for debugging.
         */

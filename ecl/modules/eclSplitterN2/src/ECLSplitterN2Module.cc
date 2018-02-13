@@ -20,6 +20,9 @@
 // ECL
 #include <ecl/utility/Position.h>
 
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
 // OTHER
 #include <string>
 #include <utility>      // std::pair
@@ -46,7 +49,7 @@ ECLSplitterN2Module::ECLSplitterN2Module() : Module(), m_eclCalDigits(eclCalDigi
   m_eclEventInformation(eclEventInformationName())
 {
   // Set description.
-  setDescription("ECLSplitterN2Module: Baseline reconstruction splitter code for the neutral hadron hypothesis (N2).");
+  setDescription("ECLSplitterN2Module: Baseline reconstruction splitter code for the neutral hadron hypothesis.");
 
   // Set module parameters.
   addParam("positionMethod", m_positionMethod, "Position determination method.", std::string("lilo"));
@@ -159,7 +162,7 @@ void ECLSplitterN2Module::event()
     aECLShower->setNumberOfCrystals(weightSum);
 
     aECLShower->setShowerId(iShower);
-    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N2);
+    aECLShower->setHypothesisId(Belle2::ECLCluster::c_neutralHadron);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     B2DEBUG(175, "N2 shower " << iShower);

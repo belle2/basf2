@@ -51,7 +51,7 @@ namespace Belle2 {
     /**
      * Termination action.
      */
-    virtual void terminate();
+    void terminate() override;
 
   protected:
 

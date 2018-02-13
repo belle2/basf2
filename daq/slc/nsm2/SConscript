@@ -17,8 +17,6 @@ def build_library(name, dirs, alias_name, libs = []):
                              for source_file in Glob(os.path.join(src_dir, dir, '*.c'))])
         env.Alias(alias_name, includes)
     lib = env.SharedLibrary(os.path.join(env['LIBDIR'], name), [source_files], LIBS=libs)
-    print ("source {}".format([source_files]))
-    print ("to {}".format(os.path.join(env['LIBDIR'], name)))
     env.Alias(alias_name, lib)
 
 build_library("libnsm2_corelib.so", ['corelib'], "nsm2_corelib")

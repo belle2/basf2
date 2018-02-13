@@ -34,21 +34,47 @@ namespace Belle2 {
 
   {
     setDescription("Creates test lookup table");
-    addParam("tableIDNotSpec", m_tableIDNotSpec, "Bin:weight info map without specific bin-numbering scheme");
-    addParam("tableIDSpec", m_tableIDSpec, "Bin:weight info map with specific bin-numbering scheme");
+    listOfNoIdEntries empty_noid_list;
+    addParam("tableIDNotSpec", m_tableIDNotSpec, "Bin:weight info map without specific bin-numbering scheme", empty_noid_list);
+    listOfSpecificIDEntries empty_specificid_list;
+    addParam("tableIDSpec", m_tableIDSpec, "Bin:weight info map with specific bin-numbering scheme", empty_specificid_list);
     addParam("outOfRangeWeight", m_outOfRangeWeight, "Weight info for out-of-range partiles");
+  }
+
+  NDBin LookUpCreatorModule::NDBinTupleToNDBin(NDBinTuple bin_tuple)
+  {
+    NDBin binning;
+    for (auto bin_1d : bin_tuple) {
+      std::string axis_name = bin_1d.first;
+      double min_val = std::get<0>(bin_1d.second);
+      double max_val = std::get<1>(bin_1d.second);
+      BinLimits lims = std::pair<double, double>(min_val, max_val);
+      binning.insert(std::pair<std::string, BinLimits>(axis_name, lims));
+    }
+    return binning;
   }
 
   void LookUpCreatorModule::initialize()
   {
     LookupTable table = LookupTable();
+
+    if (!m_outOfRangeWeight.empty()) {
+      table.defineOutOfRangeWeight(m_outOfRangeWeight);
+    }
+
     if (!m_tableIDNotSpec.empty() and m_tableIDSpec.empty()) {
       for (auto entry : m_tableIDNotSpec) {
-        table.addEntry(entry.first, entry.second);
+        WeightInfo info = std::get<0>(entry);
+        NDBin bin = NDBinTupleToNDBin(std::get<1>(entry));
+        table.addEntry(info, bin);
       }
     } else if (!m_tableIDSpec.empty() and m_tableIDNotSpec.empty()) {
       for (auto entry : m_tableIDSpec) {
-        table.addEntry(entry.first.first, entry.first.second, entry.second);
+        noIdEntry noid = std::get<0>(entry);
+        double bin_id = std::get<1>(entry);
+        WeightInfo info = std::get<0>(noid);
+        NDBin bin = NDBinTupleToNDBin(std::get<1>(noid));
+        table.addEntry(info, bin, bin_id);
       }
     } else {
       B2ERROR("Please define one table: with OR without specific bin IDs");

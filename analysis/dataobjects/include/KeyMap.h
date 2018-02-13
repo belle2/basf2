@@ -15,19 +15,31 @@
 
 namespace Belle2 {
 
+  // Just pair of numners - min and max values of bin border
   typedef std::pair<double, double> BinLimits;
-  typedef std::map<BinLimits, double> Nameless1DMap;
-  typedef std::pair< std::vector<std::string>, Nameless1DMap> Named1DMap;
-  typedef std::map<BinLimits, Nameless1DMap> Nameless2DMap;
-  typedef std::pair< std::vector<std::string>, Nameless2DMap> Named2DMap;
-  typedef std::map<BinLimits, Nameless2DMap> Nameless3DMap;
-  typedef std::pair< std::vector<std::string>, Nameless3DMap> Named3DMap;
 
-  /**
-  * Here, string is the name of the variable, BinLimits are self-explaintrory
-  * This structure can be used for 1D, 2D and 3D bins
-  */
+  // N-dim bin: pairs of bin limits with name of the axis variable.
   typedef std::map<std::string, BinLimits> NDBin;
+
+  // Map of bin limits with bin ID
+  typedef std::map<BinLimits, double> Nameless1DMap;
+
+  // Vector of axis names paired with 1D map.
+  // Vector is left for consistency:
+  // It doesn't have any sense for 1D, but have sense for 2D and 3D
+  typedef std::pair< std::vector<std::string>, Nameless1DMap> Named1DMap;
+
+  // Map of 2D bins with bin ID
+  typedef std::map<BinLimits, Nameless1DMap> Nameless2DMap;
+
+  // Vector of axis names paired with 2D map.
+  typedef std::pair< std::vector<std::string>, Nameless2DMap> Named2DMap;
+
+  // Map of 3D bins with bin ID
+  typedef std::map<BinLimits, Nameless2DMap> Nameless3DMap;
+
+  // Vector of axis names paired with 3D map.
+  typedef std::pair< std::vector<std::string>, Nameless3DMap> Named3DMap;
 
   /**
    * Class for handling lookup tables

@@ -18,15 +18,24 @@
 
 namespace Belle2 {
 
+  // Just pair of numners - min and max values of bin border
+  typedef std::tuple<double, double> BinLimitsTuple;
+
+  // N-dim bin: pairs of bin limits with name of the axis variable.
+  typedef std::map<std::string, BinLimitsTuple> NDBinTuple;
+  typedef std::tuple<WeightInfo, NDBinTuple> noIdEntry;
+  typedef std::tuple<noIdEntry, double> specificIDEntry;
+  typedef std::vector<noIdEntry> listOfNoIdEntries;
+  typedef std::vector<specificIDEntry> listOfSpecificIDEntries;
+
   /**
    * prints particle list to screen
    */
   class LookUpCreatorModule : public Module {
 
-    std::map<WeightInfo, NDBin> m_tableIDNotSpec;
-    std::map<std::pair<WeightInfo, NDBin>, double> m_tableIDSpec;
+    listOfNoIdEntries m_tableIDNotSpec;
+    listOfSpecificIDEntries m_tableIDSpec;
     WeightInfo m_outOfRangeWeight;
-
 
   public:
 
@@ -34,6 +43,8 @@ namespace Belle2 {
      * Constructor
      */
     LookUpCreatorModule();
+
+    NDBin NDBinTupleToNDBin(NDBinTuple bin_tuple);
 
     /**
      * Initialize the Module.

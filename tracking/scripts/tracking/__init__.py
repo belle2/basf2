@@ -13,8 +13,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True,
                                 fit_tracks=True, use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                use_vxdtf2_QE_MVA=True, do_MVA_training=False,
-                                MVA_weight_file='/local/scratch/ssd/sracs/FullMVA-Tests/FullMVA.FastBDT.weights.xml'):
+                                use_vxdtf2_QE_MVA=True):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -69,9 +68,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                             trackFitHypotheses=additionalTrackFitHypotheses,
                                             reco_tracks=reco_tracks)
-
-            add_track_mva_quality_estimation(path, do_training=do_MVA_training,
-                                             weight_file=MVA_weight_file)
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
@@ -1086,7 +1082,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
 def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_reco_tracks="SVDCDCRecoTracks",
                                      cdc_reco_tracks="CDCRecoTracks", svd_reco_tracks="SVDRecoTracks",
                                      pxd_reco_tracks="PXDRecoTracks",
-                                     weight_file='tracking/data/trackQE_weight_files',
+                                     weight_file='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
                                      do_training=False):
     if(not do_training):
         trackQualityEstimatorMVA = register_module('TrackQualityEstimatorMVA', recoTracksStoreArrayName=reco_tracks,

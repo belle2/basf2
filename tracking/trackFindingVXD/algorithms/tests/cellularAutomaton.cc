@@ -3,11 +3,13 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at)     *
+ * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <array>
+#include <iostream>
 #include <gtest/gtest.h>
 
 #include <framework/logging/Logger.h>
@@ -15,11 +17,8 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
-
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
-
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
-
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/CALogger.h>
@@ -27,34 +26,27 @@
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
 
-#include <array>
-#include <iostream>
-
 
 using namespace std;
 using namespace Belle2;
 
 /**
- *
  * These tests cover the functionality of the classes:
  * DirectedNode, DirectedNodeNetwork. TODO
- *
  */
 namespace CellularAutomatonTests {
 
 
-  /** Test class demonstrating the behavior of The Cellular Automaton and the PathCollectorRecursive
-   * */
+  /// Test class demonstrating the behavior of The Cellular Automaton and the PathCollectorRecursive
   class CellularAutomatonTest : public ::testing::Test {
   protected:
 
   };
 
 
-
-
-  /** Test without external mockup. Fills a DirectedNodeNetwork< int, CACell> to be able to apply a CA, find seeds and collect the Paths using PathCollectorRecursive:
-   */
+  /** Test without external mockup. Fills a DirectedNodeNetwork< int, CACell> to be able to apply a CA,
+  * find seeds and collect the Paths using PathCollectorRecursive:
+  */
   TEST(CellularAutomatonTest, TestCAAndPathCollectorRecursiveUsingDirectedNodeNetworkInt)
   {
     // just some input for testing (same as in DirectedNodeNetwork-tests):
@@ -150,17 +142,20 @@ namespace CellularAutomatonTests {
     /// PathCollector:
     PathCollectorType pathCollector;
 
-    std::vector< PathCollectorType::PathPtr> paths = pathCollector.findPaths(intNetwork);
+    std::vector< PathCollectorType::Path> paths;
+    pathCollector.findPaths(intNetwork, paths);
 
     std::string out = PathCollectorType::printPaths(paths);
     B2INFO(out);
 
-    // changed from 10 to 13 after changing seedThreshold from 2 to 1 in  tracking/trackFindingVXD/algorithms/include/CAValidator.h
-    EXPECT_EQ(13,
-              paths.size());  // there could be more paths than seeds: why? ->the pathCollectorRecursive based on the CA also adds alternative paths with the same length.
+    // there could be more paths than seeds: why?
+    // -> the pathCollectorRecursive based on the CA also adds alternative paths with the same length.
+    EXPECT_EQ(13, paths.size());
     unsigned int longestPath = 0;
-    for (PathCollectorType::PathPtr& aPath : paths) {
-      if (longestPath < aPath->size()) { longestPath = aPath->size(); }
+    for (auto& aPath : paths) {
+      if (longestPath < aPath.size()) {
+        longestPath = aPath.size();
+      }
     }
 
     EXPECT_EQ(7, longestPath);  // TODO: fix
@@ -168,11 +163,11 @@ namespace CellularAutomatonTests {
               1); // CA starts counting with 1, not with 0, the length of the paths is the number of Cells stored in it.
 
     // also collect subpaths
-    paths = pathCollector.findPaths(intNetwork, true);
+    paths.clear();
+    pathCollector.findPaths(intNetwork, paths, true);
     EXPECT_EQ(44, paths.size()); // Out of the 13 paths one gets 31 subpaths -> 44 in total
   }
-
-} // end namespace
+}
 
 
 

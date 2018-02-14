@@ -41,7 +41,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module(ecldqm)
     # TOP
     if components is None or 'TOP' in components:
-        topdqm = register_module('TOPDataQualityOnline')
+        topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
     # BKLM
     if components is None or 'BKLM' in components:
@@ -55,3 +55,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'TRG' in components:
         trgecldqm = register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+    # TrackDQM, needs at least one VXD components to be present or will crash otherwise
+    if components is None or 'SVD' in components or 'PXD' in components:
+        trackDqm = register_module('TrackDQM')
+        path.add_module(trackDqm)

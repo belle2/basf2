@@ -40,9 +40,6 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
 
-  addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
-
   addParam("printNetworks",
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
@@ -82,10 +79,8 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 
 void TrackFinderVXDCellOMatModule::initialize()
 {
-  m_spacePoints.isRequired(m_spacePointsName);
-
   m_network.isRequired(m_PARAMNetworkName);
-  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);

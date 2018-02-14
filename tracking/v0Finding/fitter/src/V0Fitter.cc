@@ -29,7 +29,7 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
 
   if (m_validation) {
     B2DEBUG(300, "Register DataStore for validation.");
-    m_validationV0s.registerInDataStore(v0ValidationVerticesName);
+    m_validationV0s.registerInDataStore(v0ValidationVerticesName, DataStore::c_ErrorIfAlreadyRegistered);
   }
 
   B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),

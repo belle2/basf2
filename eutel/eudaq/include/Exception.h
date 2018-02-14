@@ -26,7 +26,8 @@ namespace eudaq {
   class Exception : public std::exception {
   public:
     Exception(const std::string& msg);
-    const char* what() const throw() {
+    const char* what() const throw()
+    {
       if (m_text.length() == 0) make_text();
       return m_text.c_str();
     }
@@ -34,7 +35,8 @@ namespace eudaq {
     const Exception& SetLocation(const std::string& file = "",
                                  unsigned line = 0,
                                  const std::string& func = "") const;
-    virtual ~Exception() throw() {
+    virtual ~Exception() throw()
+    {
     }
   protected:
     std::string m_msg;

@@ -1,4 +1,5 @@
 import basf2
+from iov_conditional import phase_2_conditional
 
 
 def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
@@ -49,18 +50,20 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
 
                     filter=result_filter,
                     filterParameters=result_filter_parameters
-                    )
+                    ).set_name(f"CDCToSVDSeedCKF_{direction}")
 
 
 def add_pxd_ckf(path, *args, **kwargs):
     """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
+    if "PXDSpacePointCreator" not in path:
+        path.add_module("PXDSpacePointCreator")
+
     phase2_path = basf2.create_path()
     _add_pxd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
     phase3_path = basf2.create_path()
     _add_pxd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
-    condition.if_true(phase2_path, basf2.AfterConditionPath.CONTINUE)
-    condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
+
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
 
 
 def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,
@@ -80,10 +83,6 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
     :param only_use_tracks_with_svd: Include a cut on the input tracks to have SVD hits
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
-
-    if "PXDSpacePointCreator" not in path:
-        path.add_module("PXDSpacePointCreator")
-
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
     if direction == "forward":
@@ -144,18 +143,20 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
                     onlyUseTracksWithSVD=only_use_tracks_with_svd,
 
                     reverseSeed=reverse_seed,
-                    **module_parameters)
+                    **module_parameters).set_name(f"ToPXDCKF_{direction}")
 
 
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
+    if "SVDSpacePointCreator" not in path:
+        path.add_module("SVDSpacePointCreator")
+
     phase2_path = basf2.create_path()
     _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
     phase3_path = basf2.create_path()
     _add_svd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
-    condition.if_true(phase2_path, basf2.AfterConditionPath.CONTINUE)
-    condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
+
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
 
 
 def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_truth=False,
@@ -174,10 +175,6 @@ def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=F
     :param use_best_seeds: CKF parameter for useBestNInSeed
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
-
-    if "SVDSpacePointCreator" not in path:
-        path.add_module("SVDSpacePointCreator")
-
     if direction == "forward":
         reverse_seed = True
     else:
@@ -229,4 +226,4 @@ def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=F
                     writeOutDirection=direction,
                     relationCheckForDirection=direction,
 
-                    **module_parameters)
+                    **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")

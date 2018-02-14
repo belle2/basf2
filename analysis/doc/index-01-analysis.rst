@@ -69,6 +69,10 @@ variables
 
    .. autodata:: variables.variables
 
+Decay String
+===============
+.. toctree:: DecayString
+
 Event based analysis
 ====================
 .. toctree:: event-based

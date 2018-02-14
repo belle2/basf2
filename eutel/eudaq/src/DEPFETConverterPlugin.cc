@@ -77,7 +77,8 @@ namespace eudaq {
   class DEPFETConverterBase {
   public:
 
-    depfet::DEPFETADCValues ConvertDEPFETEvent(const std::vector<unsigned char>& data, unsigned id) const {
+    depfet::DEPFETADCValues ConvertDEPFETEvent(const std::vector<unsigned char>& data, unsigned id) const
+    {
 
 
       //---------------------------------------------------------------------------------------------
@@ -333,13 +334,16 @@ namespace eudaq {
                 mappedCol = (current_col ^ 0x3C) + 64 * mydhpid;  //mappedDrain>>2;
                 //mappedRowOffset=3-mappedDrain%4;
                 mappedRow = current_row; //(current_row>>2)*4+mappedRowOffset;
-                if (debug) printf("Translating coordinates DHPRow %4d%%4 = %d, DHPCol %3d -> DCDChannel %3d -> Drain %3d, Col %d, row %4d, Offset %d\n", current_row, rowOffset, current_col, DCDChannel, mappedDrain, mappedCol, mappedRow, mappedRowOffset);
+                if (debug)
+                  printf("Translating coordinates DHPRow %4d%%4 = %d, DHPCol %3d -> DCDChannel %3d -> Drain %3d, Col %d, row %4d, Offset %d\n",
+                         current_row, rowOffset, current_col, DCDChannel, mappedDrain, mappedCol, mappedRow, mappedRowOffset);
                 if ((mappedRow < 480) && (mappedCol < 128)) {
                   m_event.at(0).push_back(mappedRow);
                   m_event.at(1).push_back(mappedCol);
                   m_event.at(2).push_back(current_val);
                   m_event.at(3).push_back(current_CM);
-                } else printf("Warning: col/val: [%d|%d], in row  %d, out of range. Max Row=%d, max col=%d\n", mappedCol, current_val, mappedRow, 480, 128);
+                } else printf("Warning: col/val: [%d|%d], in row  %d, out of range. Max Row=%d, max col=%d\n", mappedCol, current_val, mappedRow,
+                                480, 128);
               }
 
             } //-- end dhp reading frame (hits)
@@ -355,21 +359,24 @@ namespace eudaq {
     }
 
   protected:
-    static size_t NumPlanes(const Event& event) {
+    static size_t NumPlanes(const Event& event)
+    {
       if (const RawDataEvent* ev = dynamic_cast<const RawDataEvent*>(&event)) {
         return ev->NumBlocks();
       }
       return 0;
     }
 
-    static std::vector<unsigned char> GetPlane(const Event& event, size_t i) {
+    static std::vector<unsigned char> GetPlane(const Event& event, size_t i)
+    {
       if (const RawDataEvent* ev = dynamic_cast<const RawDataEvent*>(&event)) {
         return ev->GetBlock(i);
       }
       return std::vector<unsigned char>();
     }
 
-    static size_t GetID(const Event& event, size_t i) {
+    static size_t GetID(const Event& event, size_t i)
+    {
       if (const RawDataEvent* ev = dynamic_cast<const RawDataEvent*>(&event)) {
         return ev->GetID(i);
       }
@@ -386,7 +393,8 @@ namespace eudaq {
 
     virtual bool GetStandardSubEvent(StandardEvent&, const eudaq::Event&) const;
 
-    virtual unsigned GetTriggerID(Event const& ev) const {
+    virtual unsigned GetTriggerID(Event const& ev) const
+    {
       const RawDataEvent& rawev = dynamic_cast<const RawDataEvent&>(ev);
       if (rawev.NumBlocks() < 1) return (unsigned) - 1;
       return getlittleendian<unsigned>(&rawev.GetBlock(0)[4]);

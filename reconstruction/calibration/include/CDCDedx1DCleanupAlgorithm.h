@@ -41,5 +41,13 @@ namespace Belle2 {
 
   private:
 
+    /** Save arithmetic and truncated mean for the 'dedx' values.
+     *
+     * @param dedx              input values
+     * @param removeLowest      lowest fraction of hits to remove (0.05)
+     * @param removeHighest     highest fraction of hits to remove (0.25)
+     */
+    double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
+
   };
 } // namespace Belle2

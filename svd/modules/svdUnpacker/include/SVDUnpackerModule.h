@@ -71,8 +71,13 @@ namespace Belle2 {
 
 
 
-
     private:
+
+      /**how many FADCs we have */
+      unsigned short nFADCboards;
+
+      /** pointer to APVforFADCmap filled by mapping procedure */
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
       std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //unsigned short m_runType;

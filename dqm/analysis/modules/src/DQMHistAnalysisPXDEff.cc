@@ -25,7 +25,7 @@ REG_MODULE(DQMHistAnalysisPXDEff)
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
+DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
   //Parameter definition
 
@@ -44,33 +44,36 @@ DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule() { }
 
 void DQMHistAnalysisPXDEffModule::initialize()
 {
-  //collect the list of all PXD Modules in the geometry here
-  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
-    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
-    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
-    m_PXDModules.push_back(aVxdID);
+  //As there is no access to the geometry now, instead build all possible PXD id's and remove the ones not existing later
+  for (int layer = 1; layer <= 2; layer++) {
+    for (int ladder = 1; ladder <= 12; ladder++) {
+      if (layer == 1 && ladder >= 9) {
+        continue;//layer 1 only has 8 ladders
+      }
+      for (int sensor = 1; sensor <= 2; sensor++) {
+        m_PXDModules.push_back(VxdID(layer, ladder, sensor));
 
-    if (aVxdID.getLayerNumber() == 1) {
-      m_PXDLayer1.push_back(aVxdID);
-    } else if (aVxdID.getLayerNumber() == 2) {
-      m_PXDLayer2.push_back(aVxdID);
-    } else {
-      B2ERROR("Layer number " << aVxdID.getLayerNumber() << " given for a PXD Module!");
-      continue;
+        if (layer == 1) {
+          m_PXDLayer1.push_back(VxdID(layer, ladder, sensor));
+        } else if (layer == 2) {
+          m_PXDLayer2.push_back(VxdID(layer, ladder, sensor));
+        }
+      }
     }
-
-
   }
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
+  const int nu = 250;//The number of pixels per module should never change
+  const int nv = 768;
 
-  //Have been promised that all modules have the same number of pixels, so just take from the first one
-  VXD::SensorInfoBase cellGetInfo = m_vxdGeometry.getSensorInfo(m_PXDModules[0]);
-  int nu = cellGetInfo.getUCells();
-  int nv = cellGetInfo.getVCells();
+  if (m_PXDModules.size() == 0) {
+    //This could as well be a B2FATAL, the module won't do anything useful if this happens
+    B2ERROR("No PXDModules found! Can't really do anything useful now...");
+    // set some default size to nu, nv?
+  }
 
+  //Because without geometry there is no way to know which modules even exist at this point, create all for now and then maybe leave some unused
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
@@ -79,7 +82,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
       m_cEffModules[aPXDModule] = new TCanvas("c_Eff_" + buff);
     }
     m_hEffModules[aPXDModule] = new TH2D("HitEff_" + buff, histTitle,
-                                         m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                                         m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_hEffModules[aPXDModule]->SetStats(false);
     m_hEffModules[aPXDModule]->GetZaxis()->SetLimits(0, 1);
 
@@ -89,13 +92,13 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
   m_hEffMerge["IF"] = new TH2D("HitEff_IF", "Average Hit Efficiency of IF Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_hEffMerge["IB"] = new TH2D("HitEff_IB", "Average Hit Efficiency of IB Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_hEffMerge["OF"] = new TH2D("HitEff_OF", "Average Hit Efficiency of OF Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_hEffMerge["OB"] = new TH2D("HitEff_OB", "Average Hit Efficiency of OB Modules;Pixels in U;Pixels in V",
-                               m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   m_cEffMerge["IF"] = new TCanvas("c_EffIF");
   m_cEffMerge["IB"] = new TCanvas("c_EffIB");
   m_cEffMerge["OF"] = new TCanvas("c_EffOF");
@@ -107,7 +110,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_hEffMerge["OB"]->SetStats(false);
 
 
-  //One bin for each module in the geometry, one histogram for each layer
+  //One bin for each module, one histogram for each layer
   m_cEffAll1 = new TCanvas("c_EffAll1");
   m_cEffAll2 = new TCanvas("c_EffAll2");
 
@@ -126,7 +129,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
     m_hEffAll1->GetXaxis()->SetBinLabel(i, ModuleName);
   }
   for (unsigned int i = 1; i <= m_PXDLayer2.size(); i++) {
-    TString ModuleName = (std::string)m_PXDModules[i - 1];
+    TString ModuleName = (std::string)m_PXDLayer2[i - 1];
     m_hEffAll2->GetXaxis()->SetBinLabel(i, ModuleName);
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
@@ -151,6 +154,47 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   }
 }
 
+TH1* DQMHistAnalysisPXDEffModule::GetHisto(TString histoname)
+{
+  TH1* hh1;
+  gROOT->cd();
+  // look in memfile
+  hh1 = findHist(histoname.Data());
+  if (hh1) return hh1; // found in memfile
+
+  B2INFO("Histo " << histoname << " not in memfile");
+  // the following code sux ... is there no root function for that?
+  TDirectory* d = gROOT;
+
+  TString myl = histoname;
+  TString tok;
+  Ssiz_t from = 0;
+  while (myl.Tokenize(tok, from, "/")) {
+    TString dummy;
+    Ssiz_t f;
+    f = from;
+    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
+      auto e = d->GetDirectory(tok);
+      if (e) {
+        B2INFO("Cd Dir " << tok);
+        d = e;
+      }
+      d->cd();
+    } else {
+      break;
+    }
+  }
+  TObject* obj = d->FindObject(tok);
+  if (obj != NULL) {
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      B2INFO("Histo " << histoname << " found in mem");
+      return (TH1*)obj;
+    }
+  } else {
+    B2INFO("Histo " << histoname << " NOT found in mem");
+  }
+  return NULL;
+}
 
 void DQMHistAnalysisPXDEffModule::event()
 {
@@ -172,26 +216,20 @@ void DQMHistAnalysisPXDEffModule::event()
     //Summing up events is done in the module creating these
     m_hEffModules[aPXDModule]->Reset();
 
+    //Will always try to get all modules, even ones not in the current geometry
     TH2D* Hits, *Matches;
-    Hits = (TH2D*)findHist(m_histogramDirectoryName, std::string("track_hits_" + buff));
-    Matches = (TH2D*)findHist(m_histogramDirectoryName, std::string("matched_cluster_" + buff));
+    TString locationHits = "track_hits_" + buff;
+    if (m_histogramDirectoryName != "") {
+      locationHits = m_histogramDirectoryName + "/" + locationHits;
+    }
+    Hits = (TH2D*)GetHisto(locationHits);
+    TString locationMatches = "matched_cluster_" + buff;
+    if (m_histogramDirectoryName != "") {
+      locationMatches = m_histogramDirectoryName + "/" + locationMatches;
+    }
+    Matches = (TH2D*)GetHisto(locationMatches);
 
     //Finding only one of them should only happen in very strange situations...
-    if (Hits == nullptr) {
-      TString locationHits = "track_hits_" + buff;
-      if (m_histogramDirectoryName != "") {
-        locationHits = m_histogramDirectoryName + "/" + locationHits;
-      }
-      Hits = (TH2D*)findHistLocal(locationHits);
-    }
-    if (Matches == nullptr)    {
-      TString locationMatches = "matched_cluster_" + buff;
-      if (m_histogramDirectoryName != "") {
-        locationMatches = m_histogramDirectoryName + "/" + locationMatches;
-      }
-      Matches = (TH2D*)findHistLocal(locationMatches);
-    }
-
     if (Hits == nullptr || Matches == nullptr) {
       B2ERROR("Missing histogram for sensor " << aPXDModule);
       mapHits[aPXDModule] = nullptr;
@@ -223,7 +261,6 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
     }
-
     if (m_cEffModules[aPXDModule]) {
       m_cEffModules[aPXDModule]->cd();
       m_hEffModules[aPXDModule]->Draw("colz");
@@ -295,41 +332,5 @@ void DQMHistAnalysisPXDEffModule::endRun()
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
-}
-
-TH1* DQMHistAnalysisPXDEffModule::findHistLocal(TString& a)
-{
-  B2INFO("Histo " << a << " not in memfile");
-  // the following code sux ... is there no root function for that?
-  TDirectory* d = gROOT;
-
-  TString myl = a;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        B2INFO("Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histo " << a << " found in mem");
-      return (TH1*)obj;
-    }
-  } else {
-    B2INFO("Histo " << a << " NOT found in mem");
-  }
-  return NULL;
 }
 

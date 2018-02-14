@@ -17,7 +17,10 @@ namespace Belle2 {
   struct DecayStringParticle;
 
   /** Represents a particle in the DecayDescriptor.
-  It is used for mother and daughter particles. */
+  It is used for mother and daughter particles.
+
+  User documentation is located at analysis/doc/DecayDescriptor.rst
+  Please modify in accordingly to introduced changes.*/
   class DecayDescriptorParticle {
   private:
     /** evt.pdl name of the particle. */
@@ -36,13 +39,15 @@ namespace Belle2 {
     /** initialise member variables from std::string member variables contained in a DecayStringParticle struct. */
     bool init(const DecayStringParticle& p);
     /** evt.pdl name of the particle. */
-    std::string getName() const {
+    std::string getName() const
+    {
       return m_strName;
     }
     /** returns the full name of the particle
      *  full_name = name:label
      */
-    std::string getFullName() const {
+    std::string getFullName() const
+    {
       if (m_strLabel.empty())
         return m_strName;
       else
@@ -51,15 +56,18 @@ namespace Belle2 {
     /** Return the name from getName() without + - * or anti- */
     std::string getNameSimple() const;
     /** Is the particle selected in the decay string? */
-    bool isSelected() const {
+    bool isSelected() const
+    {
       return m_isSelected;
     }
     /** The label of this particle, "default" returned, when no label set. */
-    std::string getLabel() const {
+    std::string getLabel() const
+    {
       return m_strLabel;
     }
     /** Return PDG code.*/
-    int getPDGCode() const {
+    int getPDGCode() const
+    {
       return m_iPDGCode;
     }
   };

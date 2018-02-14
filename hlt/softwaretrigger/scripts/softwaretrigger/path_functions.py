@@ -89,14 +89,6 @@ def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
     else:
         histoman = basf2.register_module('HistoManager')
         histoman.param('histoFileName', dqmfile)
-
-    ##########
-    # Histogram Handling
-    ##########
-    # HistoManager for real HLT
-    histoman = basf2.register_module('DqmHistoManager')
-    histoman.param("Port", )
-    histoman.param("DumpInterval", 1000)
     path.add_module(histoman)
 
     return path

@@ -63,4 +63,4 @@ Event based variables
 Here is a list of event based variables on which you can make a cut using the above.
 
 .. b2-variables::
-   :regex-filter: ^[Eventbased].*
+   :regex-filter: ^\[Eventbased\].*

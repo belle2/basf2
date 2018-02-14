@@ -23,6 +23,7 @@ from glob import glob
 import os
 import argparse
 import time
+import random
 
 from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficiencies
 from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
@@ -92,6 +93,47 @@ def run_reconstruction(channels, storage_location, local_execution, phase, roi_f
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
+def run_hlt_processing(channels, storage_location, local_execution, phase, roi_filter, hlt_mode, jobs=4, max_input_files=10):
+    """
+    Helper function to call gridcontrol on the reconstruct.py steering file with
+    the correct arguments. Will run one job per generated file.
+    """
+    parameters = []
+    input_file_list = []
+    output_storage_location = os.path.join(storage_location, "hlt_processing")
+
+    if not os.path.exists(output_storage_location):
+        os.makedirs(output_storage_location)
+
+    for channel in channels:
+        channel_path = os.path.join(storage_location, channel)
+        generated_path = os.path.join(channel_path, "generated")
+
+        for input_file in glob(os.path.join(generated_path, "*.root")):
+            input_file_list.append(input_file)
+
+    for number in range(jobs):
+        # clone list
+        this_random = input_file_list[:]
+        # shuffle in place
+        random.shuffle(this_random)
+        this_random = this_random[:max_input_files]
+
+        # stores the memory consumption over events
+        mem_statistics_file = os.path.join(output_storage_location, f"{number}_memory.root")
+
+        parameter = {"input_file_list": "#".join(this_random), "phase": phase, "roi_filter": roi_filter,
+                     "hlt_mode": hlt_mode,
+                     "mem_statistics_file": mem_statistics_file}
+        parameters.append(parameter)
+
+    gridcontrol_file = write_gridcontrol_file(
+        steering_file="hlt_processing.py",
+        parameters=parameters,
+        local_execution=local_execution)
+    call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
+
+
 def calculate_efficiencies(channels, storage_location, local_execution):
     """
     Helper function to call gridcontrol on the analyse.py steering file with
@@ -127,7 +169,9 @@ def calculate_efficiencies(channels, storage_location, local_execution):
 
 if __name__ == "__main__":
     channels_to_study = [
-        "background_only",
+        # background only not working atm. because
+        # FullSim complains that the MCParticle StoreArray is not registered
+        # "background_only",
 
         "ee",
         "eemumu",
@@ -158,14 +202,21 @@ if __name__ == "__main__":
                         type=int, default=5)
     parser.add_argument("--local", help="Execute on the local system and not via batch processing",
                         action="store_true", default=False)
+    parser.add_argument("--hlt-stresstest", help="Run hlt stresstest and not efficiency calculation",
+                        action="store_true", default=False)
+    parser.add_argument("--hlt-mode", help="hlt mode", type=str, default="collision_filter")
     parser.add_argument("--always-generate", help="Always generate events, even if the out files already exist",
                         action="store_true", default=False)
     parser.add_argument("--phase", help="Select the phase of the Belle II Detector. Can be 2 or 3 (default)",
                         type=int, default=3)
+    parser.add_argument("--cosmics", action="store_true", help="for cosmics events")
     parser.add_argument("--no-roi-filter", help="Don't apply the Region-Of-Interest filter for the PXD hits",
                         action="store_true", default=False)
 
     args = parser.parse_args()
+
+    if args.cosmics:
+        channels_to_study = ["cosmics"]
 
     if args.phase == 2:
         print("\n!!!!\n You selected to run with Phase 2 configuration.")
@@ -188,12 +239,19 @@ if __name__ == "__main__":
                     skip_if_files_exist=not args.always_generate,
                     phase=args.phase)
 
-    # Reconstruct each channel
-    run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,
-                       local_execution=args.local,
-                       phase=args.phase,
-                       roi_filter=not args.no_roi_filter)
+    if args.hlt_stresstest:
+        run_hlt_processing(channels=channels_to_study, storage_location=abs_storage_location,
+                           local_execution=args.local,
+                           phase=args.phase,
+                           roi_filter=not args.no_roi_filter,
+                           hlt_mode=args.hlt_mode)
+    else:
+        # Reconstruct each channel
+        run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,
+                           local_execution=args.local,
+                           phase=args.phase,
+                           roi_filter=not args.no_roi_filter)
 
-    # Calculate file size and efficiencies for each channel
-    calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
-                           local_execution=args.local)
+        # Calculate file size and efficiencies for each channel
+        calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
+                               local_execution=args.local)

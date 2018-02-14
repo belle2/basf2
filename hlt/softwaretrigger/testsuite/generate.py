@@ -17,7 +17,7 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 
 
-def add_generation(path, event_class):
+def add_generation(path, event_class, phase):
     """
     Add the different generators to the path (can be changed by the event_class input parameter).
     :param path: The path to add the generator to.
@@ -72,6 +72,27 @@ def add_generation(path, event_class):
         generators.add_phokhara_generator(path, finalstate="pi+pi-")
     elif event_class == "pipipi":
         generators.add_phokhara_generator(path, finalstate="pi+pi-pi0")
+    elif event_class == "cosmics":
+        # add the special Gearbox configuration for Cosmics, which is not
+        # done by add_cosmics_generator yet
+        if 'Gearbox' not in path:
+            global_box_size = [100, 100, 100]
+            override = [("/Global/length", str(global_box_size[0]), "m"),
+                        ("/Global/width", str(global_box_size[1]), "m"),
+                        ("/Global/height", str(global_box_size[2]), "m")]
+
+            path.add_module('Gearbox', override=override)
+
+        # detector geometry
+        if 'Geometry' not in path:
+            geometry = path.add_module('Geometry')
+
+        generators.add_cosmics_generator(path,
+                                         # this always needs to be normal, as phase3 is
+                                         # not supported by generator script yet
+                                         # data_taking_period="phase{}".format(phase),
+                                         data_taking_period="normal",
+                                         keep_box=[2, 2, 2], accept_box=[1, 1, 1])
 
     # Fail for everything else
     else:
@@ -110,7 +131,7 @@ def main():
 
     path.add_module("EventInfoSetter", evtNumList=[n_events], expList=expNumber)
 
-    add_generation(path, event_class=channel)
+    add_generation(path, event_class=channel, phase=phase)
 
     # We do not want to have PXD data reduction in the simulation - as this is not performed in the real detector at
     # at this stage

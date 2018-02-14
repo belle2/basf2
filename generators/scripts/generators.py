@@ -152,8 +152,8 @@ def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenpartic
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: global decay file, should be fine as is
-    decay_file = os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC')
+    #: global decay file
+    decay_file = get_default_decayfile()
 
     if finalstate == 'uubar':
         pass

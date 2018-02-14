@@ -54,6 +54,15 @@ def create_test_path(runtype="collision", location="hlt", expNum=0):
     if runtype == "collision":
         generators.add_continuum_generator(path, finalstate="uubar")
     elif runtype == "cosmics":
+        # add gearbox and geometry here, otherwise the Gearbox will be added with some custom xml geometry
+        global_box_size = [100, 100, 100]
+        override = [("/Global/length", str(global_box_size[0]), "m"),
+                    ("/Global/width", str(global_box_size[1]), "m"),
+                    ("/Global/height", str(global_box_size[2]), "m")]
+
+        path.add_module('Gearbox', override=override)
+        path.add_module("Geometry")
+
         generators.add_cosmics_generator(path)
 
     additonal_store_arrays_to_keep = []

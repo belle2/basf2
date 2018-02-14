@@ -77,8 +77,19 @@ int SensorInfo::getPixelKindNew(const VxdID& sensorID, int vID) const
 {
   const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
   double v = Info.getVCellPosition(vID);
-  int i_pixelKind = Info.getVPitchID(v);
-  if (Info.getID().getLayerNumber() == 2) i_pixelKind += 2;
+  double vPitch = Info.getVPitch(v);
+  int  i_pixelKind = 0;
+
+  if (std::fabs(vPitch - 0.0055) < 0.0001)
+    i_pixelKind = 0;
+  else if (std::fabs(vPitch - 0.0060) < 0.0001)
+    i_pixelKind = 1;
+  else if (std::fabs(vPitch - 0.0070) < 0.0001)
+    i_pixelKind = 2;
+  else if (std::fabs(vPitch - 0.0085) < 0.0001)
+    i_pixelKind = 3;
+  else
+    B2FATAL("Unexpected pixel vPitch.");
   return i_pixelKind;
 }
 

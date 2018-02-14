@@ -172,7 +172,7 @@ namespace Belle2 {
       /** Return pixel kind ID
        * @param sensorID the sensor identification
        * @param vID Local vcell ID
-       * @return pixel kind ID in range 0..3, 0-1 for Layer=1, 2-3 for Layer=2
+       * @return pixel kind ID in range 0, 1, 2, 3 for z55, z60, z70, z85 pixels
        */
       int getPixelKindNew(const VxdID& sensorID, int vID) const;
 

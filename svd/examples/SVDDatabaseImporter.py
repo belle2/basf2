@@ -19,13 +19,13 @@ import argparse
 from fnmatch import fnmatch
 
 parser = argparse.ArgumentParser(description="SVD Database Importer")
-parser.add_argument('--experiment', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
+parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
-parser.add_argument('--calib_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
+parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 
 
-if(len(sys.argv) != 7 and len(sys.argv) != 9):
+if(len(sys.argv) != 7):
     print('')
     print('ERROR: wrong number of arguments passed, check below the correct usage of this script.')
     print('')
@@ -87,7 +87,7 @@ class dbImporterModule(Module):
         if args.mapp is not None:
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
-            print("Channel Mapping Imported")
+            # print("Channel Mapping Imported")
 
 
 main.add_module(dbImporterModule())

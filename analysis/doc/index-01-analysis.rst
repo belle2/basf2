@@ -69,6 +69,9 @@ variables
 
    .. autodata:: variables.variables
 
+Decay String
+===============
+.. toctree:: DecayString
 
 Advanced Tools
 ===============

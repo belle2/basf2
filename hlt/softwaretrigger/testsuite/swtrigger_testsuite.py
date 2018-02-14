@@ -165,7 +165,9 @@ def calculate_efficiencies(channels, storage_location, local_execution):
 
 if __name__ == "__main__":
     channels_to_study = [
-        "background_only",
+        # background only not working atm. because
+        # FullSim complains that the MCParticle StoreArray is not registered
+        # "background_only",
 
         "ee",
         "eemumu",

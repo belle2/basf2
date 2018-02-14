@@ -16,13 +16,13 @@ from daqdqm.cosmicdqm import add_cosmic_dqm
 
 from rawdata import add_unpackers
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 
-def setup_basf2_and_db():
+def setup_basf2_and_db(dbfile=None):
     """
     Setupl local database usage for HLT
     """
@@ -47,14 +47,17 @@ def setup_basf2_and_db():
     # Local DB specification
     ##########
     basf2.reset_database()
-    basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
+    if dbfile is None:
+        basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
+    else:
+        basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(dbfile))
 
     basf2.set_nprocesses(args.number_processes)
 
     return args
 
 
-def create_hlt_path(args):
+def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
     """
     Create and return a path used for HLT and ExpressReco running
     """
@@ -65,42 +68,55 @@ def create_hlt_path(args):
     ##########
     # Input
     ##########
-    # Input from ringbuffer (for raw data)
-    input = basf2.register_module('Raw2Ds')
-    input.param("RingBufferName", args.input_buffer_name)
-
+    if inputfile == 'DAQ':
+        # Input from ringbuffer (for raw data)
+        input = basf2.register_module('Raw2Ds')
+        input.param("RingBufferName", args.input_buffer_name)
+    else:
+        # Input from SeqRootInput
+        input = basf2.register_module('SeqRootInput')
+        input.param('inputFileName', inputfile)
     path.add_module(input)
+
+    ##########
+    # Histogram Handling
+    ##########
+    if dqmfile == 'DAQ':
+        # HistoManager for real HLT
+        histoman = basf2.register_module('DqmHistoManager')
+        histoman.param("Port", args.histo_port)
+        histoman.param("DumpInterval", 1000)
+    else:
+        histoman = basf2.register_module('HistoManager')
+        histoman.param('histoFileName', dqmfile)
 
     ##########
     # Histogram Handling
     ##########
     # HistoManager for real HLT
     histoman = basf2.register_module('DqmHistoManager')
-    histoman.param("Port", args.histo_port)
+    histoman.param("Port", )
     histoman.param("DumpInterval", 1000)
     path.add_module(histoman)
 
     return path
 
 
-def finalize_hlt_path(path, args, show_progress_bar=False, use_local_storage=False):
+def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='DAQ'):
     """
     Add the required output modules for HLT
     """
     ##########
     # Output
     ##########
-    # Output to RingBuffer
-    # todo: needs to changed to Ring Buffer output for testing
-
-    if not use_local_storage:
+    if outputfile == 'DAQ':
+        # Output to RingBuffer
         output = basf2.register_module("Ds2Rbuf")
-        output.param("RingBufferName", args.output_buffer_name)
-
+        output.param("RingBufferName", sys.argvs[2])
     else:
         # Output to SeqRoot
         output = basf2.register_module("SeqRootOutput")
-        output.param('outputFileName', 'HLTout.sroot')
+        output.param('outputFileName', outputfile)
         # output file name should be specified with -o option
 
     # Specification of output objects

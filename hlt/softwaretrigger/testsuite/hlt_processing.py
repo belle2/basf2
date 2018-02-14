@@ -10,6 +10,7 @@ from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, a
 
 from rawdata import add_unpackers, add_packers
 from simulation import add_roiFinder
+from validation import statistics_plots, event_timing_plot
 
 
 def main():
@@ -17,8 +18,10 @@ def main():
     # Get all parameters for this calculation
     input_file_list = os.environ.get("input_file_list")
     phase = int(os.environ.get("phase"))
-    roi_filter = bool(os.environ.get("roi_filter"))
     hlt_mode = os.environ.get("hlt_mode")
+    mem_statistics_file = os.environ.get("mem_statistics_file")
+    vmem_mem_statistics_file = mem_statistics_file.replace(".root", "_vmem.root")
+    rss_mem_statistics_file = mem_statistics_file.replace(".root", "_rss.root")
 
     input_file_list = input_file_list.split("#")
 
@@ -32,14 +35,27 @@ def main():
     if hlt_mode == "collision_filter":
         add_hlt_processing(path, run_type="collision", softwaretrigger_mode="hlt_filter")
     elif hlt_mode == "collision_monitor":
-        add_hlt_processing(path, run_type="collision", softwaretrigger_mode="monitor")
+        add_hlt_processing(path, run_type="collision", softwaretrigger_mode="monitoring")
     elif hlt_mode == "cosmics_monitor":
-        add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitor", data_taking_period="phase{}".format(phase))
+        add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitoring", data_taking_period="phase{}".format(phase))
     else:
         basf2.B2FATAL("hlt_mode {} not supported".format(hlt_mode))
 
+    # memory profile
+    path.add_module('Profile', outputFileName=vmem_mem_statistics_file, rssOutputFileName=rss_mem_statistics_file)
+
     basf2.print_path(path)
     basf2.process(path)
+
+    # Print call statistics
+    print(statistics)
+
+    # statistics_plots('EvtGenSimRec_statistics.root', contact='Thomas.Hauth@kit.edu',
+    #                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events',
+    #                 prefix='EvtGenSimRec')
+    # event_timing_plot('../EvtGenSimRec.root', 'EvtGenSimRec_statistics.root', contact='tkuhr',
+    #                  jobDesc='a standard simulation and reconstruction job with generic EvtGen events',
+    #                  prefix='EvtGenSimRec')
 
 
 if __name__ == "__main__":

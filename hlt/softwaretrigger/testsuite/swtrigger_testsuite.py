@@ -248,6 +248,6 @@ if __name__ == "__main__":
                            phase=args.phase,
                            roi_filter=not args.no_roi_filter)
 
-    # Calculate file size and efficiencies for each channel
-    calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
-                           local_execution=args.local)
+        # Calculate file size and efficiencies for each channel
+        calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
+                               local_execution=args.local)

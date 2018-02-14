@@ -49,7 +49,7 @@ BestCandidateSelectionModule::~BestCandidateSelectionModule()
 
 void BestCandidateSelectionModule::initialize()
 {
-  StoreArray<Particle>::required();
+  StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_inputListName);
 
   m_variable = Variable::Manager::Instance().getVariable(m_variableName);

@@ -64,10 +64,13 @@ namespace Belle2 {
       bool m_ignoreMetaFlags;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-      //* Fix EventMeta - HLT Trigger Offset for DESY TB 2016, only for error reporting, no data is modified */
-      int m_DESY16_FixTrigOffset;
-      //* Fix Row Offset for DESY TB 2016 */
-      int m_DESY16_FixRowOffset;
+      /** Check for susp. Padding/CRC, default off because of many false positive */
+      bool m_checkPaddingCRC;
+      /** Force Mapping even if DHH bit is not requesting it */
+      bool m_forceMapping;
+      /** Force No Mapping even if DHH bit is requesting it */
+      bool m_forceNoMapping;
+
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 

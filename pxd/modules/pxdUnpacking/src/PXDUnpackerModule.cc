@@ -64,10 +64,10 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreMetaFlags", m_ignoreMetaFlags, "Ignore wrong Meta event flags", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
-  addParam("DESY16FixTrigOffset", m_DESY16_FixTrigOffset,
-           "Fix trigger offset (only trigger number, not data) between Meta Event and HLT", 0);
-  addParam("DESY16FixRowOffset", m_DESY16_FixRowOffset, "Fix row offset by shifting row by value (one gates is 4 pixel rows)", 0);
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)0);
+  addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
+  addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
+  addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
 //              EPXDErrFlag::c_FIX_SIZE | EPXDErrFlag::c_DHE_CRC | EPXDErrFlag::c_DHC_UNKNOWN | /*EPXDErrFlag::c_MERGER_CRC |*/
@@ -135,9 +135,6 @@ void PXDUnpackerModule::event()
   m_errorMaskEvent = 0;
 
   m_meta_event_nr = evtPtr->getEvent();
-  if (m_DESY16_FixTrigOffset != 0) {
-    m_meta_event_nr += m_DESY16_FixTrigOffset;
-  }
   m_meta_run_nr = evtPtr->getRun();
   m_meta_subrun_nr = evtPtr->getSubrun();
   m_meta_experiment = evtPtr->getExperiment();
@@ -531,7 +528,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           }
           // we cannot do col overflow check before mapping :-(
 
-          if (dhe_reformat == 0) {
+          if ((dhe_reformat == 0 && !m_forceNoMapping) || m_forceMapping) {
             u_cellID = dhp_col;// defaults for no mapping
             // data has not been pre-processed by DHH, thus we have to do the mapping ourselves
             if ((dhe_ID & 0x21) == 0x00 || (dhe_ID & 0x21) == 0x21) {
@@ -726,7 +723,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       }
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
-      m_errorMask |= dhc.check_padding();// isUnfiltered_event
+      if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
 
       unpack_dhp(data, len - 4,

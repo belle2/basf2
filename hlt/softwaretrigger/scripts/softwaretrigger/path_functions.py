@@ -163,22 +163,22 @@ def add_hlt_processing(path, run_type="collision",
 def add_expressreco_processing(path, run_type="collision",
                                with_bfield=True,
                                components=DEFAULT_EXPRESSRECO_COMPONENTS,
-                               do_reconstruction=True):
+                               do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
     """
+    if not do_reconstruction:
+        add_geometry_if_not_present(path)
+
     add_unpackers(path, components=components)
 
-    if run_type == "collision":
-        if do_reconstruction:
+    if do_reconstruction:
+        if run_type == "collision":
             reconstruction.add_reconstruction(path, components=components)
-    elif run_type == "cosmics":
-        # no filtering,
-        # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
-        if do_reconstruction:
-            reconstruction.add_cosmics_reconstruction(path, components=components)
-    else:
-        basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+        elif run_type == "cosmics":
+            reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
+        else:
+            basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
     add_expressreco_dqm(path, run_type)
 
@@ -327,18 +327,34 @@ def add_online_dqm(path, run_type, dqm_environment):
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
 
-def add_hlt_dqm(path, run_type):
+def add_hlt_dqm(path, run_type, standalone=False):
     """
     Add all the DQM modules for HLT to the path
     """
+    if standalone:
+        add_geometry_if_not_present(path)
+
     add_online_dqm(path, run_type, "hlt")
 
 
-def add_expressreco_dqm(path, run_type):
+def add_expressreco_dqm(path, run_type, standalone=False):
     """
     Add all the DQM modules for ExpressReco to the path
     """
+    if standalone:
+        add_geometry_if_not_present(path)
+
     add_online_dqm(path, run_type, "expressreco")
+
+
+def add_geometry_if_not_present(path):
+    # geometry parameter database
+    if 'Gearbox' not in path:
+        path.add_module('Gearbox')
+
+    # detector geometry
+    if 'Geometry' not in path:
+        path.add_module('Geometry', useDB=True)
 
 
 def get_store_only_metadata_path():

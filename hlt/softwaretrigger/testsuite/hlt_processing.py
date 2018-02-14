@@ -9,7 +9,6 @@ from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, a
     RAW_SAVE_STORE_ARRAYS
 
 from rawdata import add_unpackers, add_packers
-from simulation import add_roiFinder
 from validation import statistics_plots, event_timing_plot
 
 

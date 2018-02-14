@@ -148,7 +148,7 @@ def add_hlt_processing(path, run_type="collision",
     elif run_type == "cosmics":
         # no filtering,
         reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
-        add_hlt_dqm(path, run_type)
+        add_hlt_dqm(path, run_type, components=components)
         if pruneDataStore:
             path.add_module(
                 "PruneDataStore",
@@ -180,7 +180,7 @@ def add_expressreco_processing(path, run_type="collision",
         else:
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
-    add_expressreco_dqm(path, run_type)
+    add_expressreco_dqm(path, run_type, components=components)
 
 
 def add_softwaretrigger_reconstruction(
@@ -299,12 +299,12 @@ def add_softwaretrigger_reconstruction(
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
         # currently, dqm plots are only shown for event accepted by the HLT filters
-        add_hlt_dqm(hlt_reconstruction_path, run_type)
+        add_hlt_dqm(hlt_reconstruction_path, run_type, components=components)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
         # make sure to still add the DQM modules, they can give at least some FW runtime info
         # and some unpacked hit information
-        add_hlt_dqm(path, run_type)
+        add_hlt_dqm(path, run_type, components=components)
         if pruneDataStore:
             fast_reco_reconstruction_path.add_module(
                 "PruneDataStore",
@@ -315,36 +315,36 @@ def add_softwaretrigger_reconstruction(
     path.add_path(fast_reco_reconstruction_path)
 
 
-def add_online_dqm(path, run_type, dqm_environment):
+def add_online_dqm(path, run_type, dqm_environment, components=None):
     """
     Add DQM plots for a specific run type and dqm environment
     """
     if run_type == "collision":
-        add_collision_dqm(path, dqm_environment=dqm_environment)
+        add_collision_dqm(path, components=components, dqm_environment=dqm_environment)
     elif run_type == "cosmics":
-        add_cosmic_dqm(path, dqm_environment=dqm_environment)
+        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
 
-def add_hlt_dqm(path, run_type, standalone=False):
+def add_hlt_dqm(path, run_type, standalone=False, components=None):
     """
     Add all the DQM modules for HLT to the path
     """
     if standalone:
         add_geometry_if_not_present(path)
 
-    add_online_dqm(path, run_type, "hlt")
+    add_online_dqm(path, run_type, "hlt", components)
 
 
-def add_expressreco_dqm(path, run_type, standalone=False):
+def add_expressreco_dqm(path, run_type, standalone=False, components=None):
     """
     Add all the DQM modules for ExpressReco to the path
     """
     if standalone:
         add_geometry_if_not_present(path)
 
-    add_online_dqm(path, run_type, "expressreco")
+    add_online_dqm(path, run_type, "expressreco", components)
 
 
 def add_geometry_if_not_present(path):

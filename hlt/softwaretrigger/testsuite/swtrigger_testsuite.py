@@ -100,6 +100,10 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
     """
     parameters = []
     input_file_list = []
+    output_storage_location = os.path.join(storage_location, "hlt_processing")
+
+    if not os.path.exists(output_storage_location):
+        os.makedirs(output_storage_location)
 
     for channel in channels:
         channel_path = os.path.join(storage_location, channel)
@@ -116,7 +120,7 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
         this_random = this_random[:max_input_files]
 
         # stores the memory consumption over events
-        mem_statistics_file = os.path.join(generated_path, f"{number}_memory.root")
+        mem_statistics_file = os.path.join(output_storage_location, f"{number}_memory.root")
 
         parameter = {"input_file_list": "#".join(this_random), "phase": phase, "roi_filter": roi_filter,
                      "hlt_mode": hlt_mode,

@@ -8,7 +8,7 @@ args = setup_basf2_and_db()
 path = create_hlt_path(args)
 
 # no reconstruction or software trigger added at all
-add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitor", data_taking_period="phase2")
+add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitoring", data_taking_period="phase2")
 
 finalize_hlt_path(path, args)
 basf2.print_path(path)

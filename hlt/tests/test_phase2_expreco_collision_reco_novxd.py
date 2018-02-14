@@ -3,7 +3,7 @@
 from softwaretrigger.path_functions import add_expressreco_processing, DEFAULT_EXPRESSRECO_COMPONENTS
 from softwaretrigger.test_support import create_test_path, finalize_test_path
 
-path, tempfolder = create_test_path(runtype="collision")
+path, tempfolder = create_test_path(runtype="collision", expNum=1002)
 
 reco_components = DEFAULT_EXPRESSRECO_COMPONENTS
 reco_components.remove("PXD")

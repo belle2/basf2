@@ -73,6 +73,7 @@ def add_generation(path, event_class, phase):
     elif event_class == "pipipi":
         generators.add_phokhara_generator(path, finalstate="pi+pi-pi0")
     elif event_class == "cosmics":
+        # todo: be careful, this adds an old geometry from 2017
         generators.add_cosmics_generator(path, accept_box=1, data_taking_period="phase{}".format(phase))
 
     # Fail for everything else

@@ -163,7 +163,7 @@ def add_hlt_processing(path, run_type="collision",
 def add_expressreco_processing(path, run_type="collision",
                                with_bfield=True,
                                components=DEFAULT_EXPRESSRECO_COMPONENTS,
-                               do_reconstruction=True):
+                               do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
     """
@@ -176,7 +176,7 @@ def add_expressreco_processing(path, run_type="collision",
         # no filtering,
         # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
         if do_reconstruction:
-            reconstruction.add_cosmics_reconstruction(path, components=components)
+            reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
     else:
         basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 

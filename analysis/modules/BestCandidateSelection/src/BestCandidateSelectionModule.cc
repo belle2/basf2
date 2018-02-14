@@ -36,6 +36,7 @@ BestCandidateSelectionModule::BestCandidateSelectionModule():
   addParam("particleList", m_inputListName, "Name of the ParticleList to reduce to the best candidates");
   addParam("variable", m_variableName, "Variable which defines the candidate ranking (see selectLowest for ordering)");
   addParam("selectLowest", m_selectLowest, "Candidate with lower value are better (default: higher is better))", false);
+  addParam("allowMultiRank", m_allowMultiRank, "Candidates with identical values get identical rank", false);
   addParam("numBest", m_numBest, "Keep this many of the best candidates (0: keep all)", 0);
   addParam("outputVariable", m_outputVariableName,
            "Name for created variable, which contains the rank for the particle. If not provided, the standard name '${variable}_rank' is used.");
@@ -48,7 +49,7 @@ BestCandidateSelectionModule::~BestCandidateSelectionModule()
 
 void BestCandidateSelectionModule::initialize()
 {
-  StoreArray<Particle>().isRequired();
+  StoreArray<Particle>::required();
   m_inputList.isRequired(m_inputListName);
 
   m_variable = Variable::Manager::Instance().getVariable(m_variableName);
@@ -92,11 +93,25 @@ void BestCandidateSelectionModule::event()
   //remove everything but best candidates
   m_inputList->clear();
   int rank = 1;
+  double previous_val;
+  bool first_candidate = true;
   for (const auto& candidate : valueToIndex) {
+    if (first_candidate) {
+      first_candidate = false;
+      previous_val = candidate.first;
+    }
     Particle* p = particles[candidate.second];
     p->addExtraInfo(extraInfoName, rank);
     m_inputList->addParticle(p);
-    rank++;
+    if (m_allowMultiRank) {
+      if (candidate.first != previous_val) {
+        rank++;
+      }
+    } else {
+      rank++;
+    }
+
+    previous_val = candidate.first;
 
     if (m_numBest != 0 and rank > m_numBest)
       break;

@@ -451,12 +451,14 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   if (printflag)
     B2DEBUG(20, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
 
+  /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
-    B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 " << dhe_first_readout_frame_id_lo << " != " << (dhp_readout_frame_lo & 0x3F));
+    B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 " << dhe_first_readout_frame_id_lo << " != " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
     m_errorMask |= EPXDErrMask::c_DHP_DHE_FRAME_DIFFER;
   }
-  /*
-  if (last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
+  */
+  /* // TODO removed because data format error is not to be fixed soon
+    if (last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
     if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) > m_maxDHPFrameDiff) {
       B2ERROR("Two DHP Frames per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[dhp_dhp_id] << ", " <<
               dhp_readout_frame_lo);
@@ -474,7 +476,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     }
   }
 
-  /*
+  /* // TODO removed because the data is not ordered as expected in current firmware
   for (auto j = 0; j < 4; j++) {
     if (last_dhp_readout_frame_lo[j] != -1) {
       if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > m_maxDHPFrameDiff) {

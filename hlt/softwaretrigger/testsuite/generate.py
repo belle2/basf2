@@ -73,8 +73,20 @@ def add_generation(path, event_class, phase):
     elif event_class == "pipipi":
         generators.add_phokhara_generator(path, finalstate="pi+pi-pi0")
     elif event_class == "cosmics":
-        # todo: be careful, this adds an old geometry from 2017
-        generators.add_cosmics_generator(path, accept_box=1, data_taking_period="phase{}".format(phase))
+        # add the special Gearbox configuration for Cosmics, which is not
+        # done by add_cosmics_generator yet
+        if 'Gearbox' not in path:
+            override = [("/Global/length", str(global_box_size[0]), "m"),
+                        ("/Global/width", str(global_box_size[1]), "m"),
+                        ("/Global/height", str(global_box_size[2]), "m")]
+
+            path.add_module('Gearbox', override=override)
+
+        # detector geometry
+        if 'Geometry' not in path:
+            geometry = path.add_module('Geometry')
+
+        generators.add_cosmics_generator(path, data_taking_period="phase{}".format(phase))
 
     # Fail for everything else
     else:

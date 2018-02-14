@@ -59,6 +59,3 @@ void IoVDependentConditionModule::event()
 {
   setReturnValue(m_conditionIsMet);
 }
-
-// Use template class here to make the compiler add another specification.
-template class Belle2::ModuleParam<std::vector<std::tuple<int, int, int, int>>>;

@@ -112,7 +112,7 @@ def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='DAQ'):
     if outputfile == 'DAQ':
         # Output to RingBuffer
         output = basf2.register_module("Ds2Rbuf")
-        output.param("RingBufferName", sys.argvs[2])
+        output.param("RingBufferName", args.output_buffer_name)
     else:
         # Output to SeqRoot
         output = basf2.register_module("SeqRootOutput")

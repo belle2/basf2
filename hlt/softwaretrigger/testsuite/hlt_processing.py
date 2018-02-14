@@ -20,8 +20,10 @@ def main():
     phase = int(os.environ.get("phase"))
     hlt_mode = os.environ.get("hlt_mode")
     mem_statistics_file = os.environ.get("mem_statistics_file")
-    vmem_mem_statistics_file = mem_statistics_file.replace(".root", "_vmem.root")
-    rss_mem_statistics_file = mem_statistics_file.replace(".root", "_rss.root")
+    vmem_mem_statistics_file = mem_statistics_file.replace("_memory.root", "_vmem.root")
+    rss_mem_statistics_file = mem_statistics_file.replace("_memory.root", "_rss.root")
+    dqm_histogram_file = mem_statistics_file.replace("_memory.root", "_dqm.root")
+    rss_mem_statistics_file = mem_statistics_file.replace("_memory.root", "_rss.root")
 
     input_file_list = input_file_list.split("#")
 
@@ -31,6 +33,8 @@ def main():
     # Now start the real basf2 calculation
     path = basf2.create_path()
     path.add_module("RootInput", inputFileNames=input_file_list)
+
+    path.add_module("HistoManager", histoFileName=dqm_histogram_file)
 
     if hlt_mode == "collision_filter":
         add_hlt_processing(path, run_type="collision", softwaretrigger_mode="hlt_filter")
@@ -48,7 +52,7 @@ def main():
     basf2.process(path)
 
     # Print call statistics
-    print(statistics)
+    print(basf2.statistics)
 
     # statistics_plots('EvtGenSimRec_statistics.root', contact='Thomas.Hauth@kit.edu',
     #                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events',

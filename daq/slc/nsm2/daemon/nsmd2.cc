@@ -49,8 +49,11 @@
 //  20171002  1950 ackdaemon fix to avoid connection to multiple D
 //  20171002  1951 destroyconn to non M/D allowed, avoid duplicate free M/D
 //  20171002  1952 shortbufp/longbufp/bsizbuf to be modified when ncon changes
+//  20180111  1953 debug orphan node
+//  20180118  1954 conid fix for master's client, suppress WARN(no conid)
+//  20180124  1958 logfp fix for -b, smarter recv message
 
-#define NSM_DAEMON_VERSION   1952
+#define NSM_DAEMON_VERSION   1958
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -254,7 +257,7 @@ static NSMcmdtbl_t nsmd_cmdtbl[] = {
   { NSMCMD_PONG,        0, "PONG",        nsmd_do_pong },
   { NSMCMD_READY,       0, "READY",       nsmd_do_ready },
   { NSMCMD_NOP,         0, "NOP",         nsmd_do_nop },
-  { NSMCMD_NEWREQ,      0, "NEWREQ",      nsmd_do_newreq },
+  { NSMCMD_NEWREQ,      1, "NEWREQ",      nsmd_do_newreq },
   { NSMCMD_DELREQ,      0, "DELREQ",      nsmd_do_delreq },
   // udp-broadcast
   { NSMCMD_NEWDAEMON,   0, "NEWDAEMON",   nsmd_do_newdaemon },
@@ -2088,6 +2091,7 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
       memset(&dmsg, 0, sizeof(dmsg));
       dmsg.req = NSMCMD_DELCLIENT;
       dmsg.src = con.nid;
+      dmsg.dest = -1;
       nsmd_do_delclient(con, dmsg);
     } else if (sys.ready <= 0) {
       LOG("nsmd is not ready yet");
@@ -3011,7 +3015,7 @@ void
 nsmd_do_newreq(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
-  DBG("do_newreq");
+  // DBG("do_newreq");
 
   // dmsg should have at most one pars
   if (dmsg.npar != 0 && dmsg.npar != 1 || dmsg.len <= 1)
@@ -3208,7 +3212,10 @@ nsmd_do_newclient(NSMcon& con, NSMdmsg& dmsg)
 
     // reuse dmsg packet
     dmsg.pars[0] = nodeid;
-    if (ConIsLocal(con) && nodeid >= 0) con.nid = nodeid;
+    if (ConIsLocal(con) && nodeid >= 0) {
+      con.nid = nodeid;
+      sys.conid[nodeid] = &con - sys.con;
+    }
     DBG("do_newclient immaster nodeid=%d", nodeid);
     nsmd_tcpsend(con, dmsg);
     return;
@@ -3262,7 +3269,9 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
   DBG("do_delclient");
 
   // free distribution list
-  if (dmsg.src != (uint16_t) - 1 && ConIsLocal(con)) {
+  if (dmsg.src != (uint16_t) - 1 &&
+      dmsg.dest == (uint16_t) - 1 &&
+      ConIsLocal(con)) {
     nsmd_delete_dis(dmsg.src);
   }
 
@@ -3292,13 +3301,29 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
     return;
   }
 
+  // 1953 debug code
+  if (dmsg.src != (uint16_t) - 1 && dmsg.dest != (uint16_t) - 1) {
+    // send delclient to dest, not to src
+    uint16_t tmp = dmsg.src;
+    dmsg.src  = dmsg.dest;
+    dmsg.dest = tmp;
+  }
+
   // for an NSM client
   if (dmsg.src != (uint16_t) - 1) {
     if (dmsg.src == NSMSYS_MAX_NOD) return;
     if (dmsg.src >  NSMSYS_MAX_NOD) ASRT("do_delclient dmsg.src=%d", dmsg.src);
     NSMnod& nod = sys.nod[dmsg.src];
-    if (nod.ipaddr != ADDR_IP(con.sockad))
-      ASRT("do_delclient bad ip=%s", ADDR_STR(con.sockad));
+
+    /* 1953 debug -- this condition may need to be differently handled */
+    if (nod.ipaddr == 0) {
+      LOG("do_delclient: nod is already removed");
+      return;
+    }
+    if (nod.ipaddr != ADDR_IP(con.sockad)) {
+      LOG("do_delclient bad ip=%s", ADDR_STR(con.sockad));
+      return;
+    }
 
     /*
       IP address check was there in nsm1
@@ -4194,13 +4219,13 @@ nsmd_sendreq(NSMdmsg& dmsg)
     strcpy(databuf, "(null)");
   }
 
-  DBG("command: req = %04x len = %d npar = %d datap = %s con = %d",
-      dmsg.req, dmsg.len, dmsg.npar, databuf, conid);
-
   if (conid != 0) {
+    DBG("command: req = %04x len = %d npar = %d datap = %s con = %d",
+        dmsg.req, dmsg.len, dmsg.npar, databuf, conid);
     nsmd_tcpsend(sys.con[conid], dmsg);
   } else {
-    WARN("no conid?");
+    DBG("ignored: req = %04x len = %d npar = %d datap = %s",
+        dmsg.req, dmsg.len, dmsg.npar, databuf);
   }
   return;
 }
@@ -4537,15 +4562,32 @@ void
 nsmd_command(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
+  int conid = CON_ID(con);
+  char pars[256];
+
+  switch (dmsg.npar) {
+    case 0: strcpy(pars, "[]"); break;
+    case 1: sprintf(pars, "[%d]", dmsg.pars[0]); break;
+    case 2: sprintf(pars, "[%d,%d]", dmsg.pars[0], dmsg.pars[1]); break;
+    default: sprintf(pars, "[%d,%d,..(%d)]",
+                       dmsg.pars[0], dmsg.pars[1], dmsg.npar);
+  }
 
   // finding nsmd request
   if (dmsg.req >= NSMCMD_FIRST && dmsg.req <= NSMCMD_LAST) {
     NSMcmdtbl_t& cmd = nsmd_cmdtbl[dmsg.req - NSMCMD_FIRST];
     if (cmd.req != dmsg.req) ASRT("command: table broken req(%d)", dmsg.req);
-    if (cmd.printable && dmsg.datap) {
-      LOG("recv %s(%d)<=%s  len=%d npar=%d data=%s",
-          cmd.name, dmsg.seq,
-          ADDR_STR(con.sockad), dmsg.len, dmsg.npar, dmsg.datap);
+    if (cmd.printable && dmsg.datap && dmsg.len < 256) {
+      char buf[300];
+      int i;
+      for (i = 0; i < 255 && isprint(dmsg.datap[i]); i++) buf[i] = dmsg.datap[i];
+      buf[i] = 0;
+      if (dmsg.len != strlen(buf) + 1) {
+        sprintf(buf + strlen(buf), " len=%d", dmsg.len);
+      }
+      LOG("recv %s(%d,%d)<=%s(%d,%d) p=%s %s",
+          cmd.name, dmsg.dest, dmsg.seq,
+          ADDR_STR(con.sockad), dmsg.src, conid, pars, buf);
     } else {
       int dispflag = 1;
       if ((cmd.req == NSMCMD_USRCPYMEM ||
@@ -4555,8 +4597,12 @@ nsmd_command(NSMcon& con, NSMdmsg& dmsg)
            cmd.req == NSMCMD_PONG) && !DBGBIT(7)) dispflag = 0;
 
       if (dispflag) {
-        LOG("recv %s(%d)<=%s  len=%d npar=%d",
-            cmd.name, dmsg.seq, ADDR_STR(con.sockad), dmsg.len, dmsg.npar);
+        if (dmsg.len) {
+          sprintf(pars + strlen(pars), " len=%d", dmsg.len);
+        }
+        LOG("recv %s(%d,%d)<=%s(%d,%d) p=%s",
+            cmd.name, dmsg.dest, dmsg.seq,
+            ADDR_STR(con.sockad), dmsg.src, conid, pars);
       }
     }
     cmd.func(con, dmsg);
@@ -4799,6 +4845,7 @@ nsmd_tcpaccept()
 // - Allocated long buffer is fixed to the message, and will not be reused
 //   in tcprecv, and will be freed elsewhere.
 // ----------------------------------------------------------------------
+int xignore_recvlen0 = 0;
 void
 nsmd_tcprecv(NSMcon& con)
 {
@@ -4876,6 +4923,7 @@ nsmd_tcprecv(NSMcon& con)
     } else {
       LOG("tcprecv connection closed while reading %d bytes", recvsiz);
     }
+    if (xignore_recvlen0) return;
     goto disconnect_return;
   }
 
@@ -5057,6 +5105,8 @@ nsmd_loop()
 {
   int busy = 0;
   uint64_t tinfo_in10ms = time10ms() + 30 * 100; /* 30s after the start */
+  fd_set fdset_skip;
+  FD_ZERO(&fdset_skip);
 
   while (1) {
 
@@ -5076,18 +5126,27 @@ nsmd_loop()
     int nfd = nsmd_select(fdset, 1); // 10msec
     if (nfd > 0) {
       NSMcon& conlast = sys.con[sys.ncon];
+      int action = 0;
       for (int conid = 0; nfd > 0 && conid < sys.ncon; conid++) {
         int sock = sys.con[conid].sock;
         if (sock < 0 || ! FD_ISSET(sock, &fdset)) continue;
+        if (FD_ISSET(sock, &fdset_skip)) continue;
         nfd--;
         if (conid == NSMCON_UDP) {
           nsmd_udprecv();
+          FD_SET(sock, &fdset_skip);
+          action++;
         } else if (conid == NSMCON_TCP) {
           nsmd_tcpaccept();
+          FD_SET(sock, &fdset_skip);
+          action++;
         } else {
           nsmd_tcprecv(sys.con[conid]);
+          FD_SET(sock, &fdset_skip);
+          action++;
         }
       }
+      if (! action) FD_ZERO(&fdset_skip);
       busy = 1;
     }
 
@@ -5202,8 +5261,8 @@ main(int argc, char** argv)
     }
 
     switch (opt) {
-      case 'b': nofork = 0; nsmd_logfp = 0; break;
-      case 'f': nofork = 1; nsmd_logfp = 0; break;
+      case 'b': nofork = 0; nsmd_logfp = stdout; break; // default
+      case 'f': nofork = 1; nsmd_logfp = 0;      break;
       case 'o': nofork = 1; nsmd_logfp = stdout; break;
       case 'd': debug  = nsmd_atoi(ap, 255); break;
       case 'm': prio   = nsmd_atoi(ap, 10); break;

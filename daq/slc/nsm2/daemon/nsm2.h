@@ -11,7 +11,7 @@ extern "C" {
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1944 /* protocol version */
-#define NSM_PACKAGE_VERSION  1952 /* package  version */
+#define NSM_PACKAGE_VERSION  1958 /* package  version */
 
 /*
   20120723 1900 file created
@@ -65,6 +65,12 @@ extern "C" {
   20170102 1950 nsmd2 ackdaemon more fix
   20171002 1951 nsmd2 destroyconn/ackdaemon fix
   20171002 1952 nsmd2 recv buffer to global
+  20180111 1953 debug orphan node
+  20180118 1954 nsmlib fix on select timeout, conid fix, message cleanup
+  20180118 1955 put more priority to less frequent messages
+  20180120 1956 b2nsm_wait to accept usec precision time
+  20180121 1957 b2nsm_nodename added
+  20180124 1958 smarter nsmd2 debug messages
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

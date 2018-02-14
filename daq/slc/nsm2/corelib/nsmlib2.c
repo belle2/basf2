@@ -22,9 +22,11 @@
    20140903 1937 nsmparse fix (see nsmparse.c)
    20140917 1939 skip revision check for -1
    20140921 1940 flushmem
+   20180118 1954 nsmlib_send timeout problem fix
+   20180120 1956 nsmlib_selectu for usec, nsmlib_select as static
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.40";
+const char *nsmlib2_version   = "nsmlib2 1.9.56";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -640,7 +642,7 @@ nsmlib_initshm(NSMcontext *nsmc, int shmkey, int port)
   return 0;
 }
 /* -- nsmlib_select -------------------------------------------------- */
-int
+static int /* for internal use only */
 nsmlib_select(int fdr, int fdw, unsigned int msec)
 {
   struct timeval tv;
@@ -660,7 +662,7 @@ nsmlib_select(int fdr, int fdw, unsigned int msec)
   }
   return ret;
 }
-/* -- nsmlib_selectc ------------------------------------------------- */
+/* -- nsmlib_selectu ------------------------------------------------- */
 /*
   usesig = 1 when called from signal handler
              then nsmc->usesig=1 is taken
@@ -669,6 +671,11 @@ nsmlib_select(int fdr, int fdw, unsigned int msec)
  */
 NSMcontext *
 nsmlib_selectc(int usesig, unsigned int msec)
+{
+  return nsmlib_selectu(usesig, msec, 0);
+}
+NSMcontext *
+nsmlib_selectu(int usesig, unsigned int msec, unsigned int usec)
 {
   fd_set fdset;
   struct timeval tv;
@@ -686,7 +693,7 @@ nsmlib_selectc(int usesig, unsigned int msec)
   if (highest == -1) return 0;
   
   tv.tv_sec  = msec / 1000;
-  tv.tv_usec = (msec % 1000) * 1000;
+  tv.tv_usec = (msec % 1000) * 1000 + usec;
   while (1) {
     ret = select(highest, &fdset, 0, 0, &tv);
     if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
@@ -1151,6 +1158,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   char *datap  = buf + sizeof(NSMtcphead);
   const char *writep;
   int writelen;
+  int writtenlen = 0;
   int err = 0;
   int i;
   int oldsig;
@@ -1189,19 +1197,27 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
 
   DBS(nsmc,1104);
   DBG("writep = %x", writep);
+  nsmc->errc = 0;
 
   while (writelen > 0) {
     int ret = nsmlib_select(0, nsmc->sock, 1000); /* 1 sec */
     if (ret <  0) { err = NSMESELECT;  goto nsmlib_send_error; }
-    if (ret == 0) { err = NSMETIMEOUT; goto nsmlib_send_error; }
+    /* socket is not shutdown if nothing was sent and just timed out */
+    if (ret == 0 && writtenlen == 0) return NSMETIMEOUT;
+    /* wait forever if timed out after something was already written */
+    if (ret == 0) {
+      nsmc->errc++;
+      continue;
+    }
 
     ret = write(nsmc->sock, writep, writelen);
     if (ret < 0 && (errno == EINTR || errno == EAGAIN)) continue;
     if (ret <  0) { err = NSMEWRITE;  goto nsmlib_send_error; }
     if (ret == 0) { err = NSMECLOSED; goto nsmlib_send_error; }
 
-    writelen -= ret;
-    writep   += ret;
+    writtenlen += ret;
+    writelen   -= ret;
+    writep     += ret;
   }
 
   if (msgp->len > NSM_TCPTHRESHOLD) {
@@ -1212,20 +1228,27 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   while (writelen > 0) {
     int ret = nsmlib_select(0, nsmc->sock, 1000); /* 1 sec */
     if (ret <  0) { err = NSMESELECT;  goto nsmlib_send_error; }
-    if (ret == 0) { err = NSMETIMEOUT; goto nsmlib_send_error; }
+    /* wait forever if timed out after something was already written */
+    if (ret == 0) {
+      nsmc->errc++;
+      continue;
+    }
 
     ret = write(nsmc->sock, writep, writelen);
     if (ret < 0 && (errno == EINTR || errno == EAGAIN)) continue;
     if (ret <  0) { err = NSMEWRITE;  goto nsmlib_send_error; }
     if (ret == 0) { err = NSMECLOSED; goto nsmlib_send_error; }
 
-    writelen -= ret;
-    writep   += ret;
+    writtenlen += ret;
+    writelen   -= ret;
+    writep     += ret;
   }
   DBS(nsmc,1106);
   return 0;
   
  nsmlib_send_error:
+  /* errno of select/write will be overwritten by that of shutdown */
+  nsmc->errc = errno;
   DBS(nsmc,1199);
   shutdown(nsmc->sock, 2);
   nsmc->sock = -1;

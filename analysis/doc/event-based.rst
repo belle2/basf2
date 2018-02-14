@@ -3,7 +3,7 @@
 Event based analysis
 ====================
 
-.. important::
+.. note::
         The analysis software framework is designed to work with particles. In the default candidate-wise paradigm the analyst takes lists of particles, builds up candidates, loads analysis modules, and saves information (i.e. using the NtupleMaker) for each candidate. If you are new, it is probably best to start with this approach.
 
 In some situations, it is useful to make cuts on, and write out event-wise information.
@@ -53,7 +53,7 @@ Here is a simple example:
     applyEventCuts('R2EventLevel < 0.3')
 
 This builds the list of all pions but only processes events where the event-level R2 passes the cut. 
-See `B2A307 <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A307-BasicEventWiseNtupleSelection.py>`_ for a full example.
+See :download:`B2A307 </analysis/examples/tutorials/B2A307-BasicEventWiseNtupleSelection.py>` for a full example.
 
 .. autofunction:: modularAnalysis.applyEventCuts
 

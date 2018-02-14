@@ -132,22 +132,27 @@ def add_hlt_processing(path, run_type="collision",
                        pruneDataStore=True,
                        additonal_store_arrays_to_keep=[],
                        components=DEFAULT_HLT_COMPONENTS,
+                       reco_components=None,
                        softwaretrigger_mode='hlt_filter', **kwargs):
     """
     Add all modules for processing on HLT filter machines
     """
     add_unpackers(path, components=components)
 
+    # if not set, just assume to reuse the normal compontents list
+    if reco_components is None:
+        reco_components = components
+
     if run_type == "collision":
         # todo: forward the the mag field and run_type mode into this method call
         add_softwaretrigger_reconstruction(path,
-                                           components=components,
+                                           components=reco_components,
                                            softwaretrigger_mode=softwaretrigger_mode,
                                            run_type=run_type,
                                            addDqmModules=True, **kwargs)
     elif run_type == "cosmics":
         # no filtering,
-        reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
+        reconstruction.add_cosmics_reconstruction(path, components=reco_components, **kwargs)
         add_hlt_dqm(path, run_type, components=components)
         if pruneDataStore:
             path.add_module(
@@ -163,6 +168,7 @@ def add_hlt_processing(path, run_type="collision",
 def add_expressreco_processing(path, run_type="collision",
                                with_bfield=True,
                                components=DEFAULT_EXPRESSRECO_COMPONENTS,
+                               reco_components=None,
                                do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -172,11 +178,15 @@ def add_expressreco_processing(path, run_type="collision",
 
     add_unpackers(path, components=components)
 
+    # if not set, just assume to reuse the normal compontents list
+    if reco_components is None:
+        reco_components = components
+
     if do_reconstruction:
         if run_type == "collision":
-            reconstruction.add_reconstruction(path, components=components)
+            reconstruction.add_reconstruction(path, components=reco_components)
         elif run_type == "cosmics":
-            reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
+            reconstruction.add_cosmics_reconstruction(path, components=reco_components, **kwargs)
         else:
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 

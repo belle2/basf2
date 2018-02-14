@@ -36,6 +36,8 @@
 #include <top/dbobjects/TOPCalChannelT0.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
+#include <top/dbobjects/TOPCalChannelPulseHeight.h>
+#include <top/dbobjects/TOPCalChannelThresholdEff.h>
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPPmtInstallation.h>
@@ -57,7 +59,6 @@ using namespace std;
 namespace Belle2 {
 
   using namespace TOP;
-
 
   void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
   {
@@ -761,6 +762,66 @@ namespace Belle2 {
 
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     Database::Instance().storeData("TOPPmtTTSHistos", &pmtTtsHistos, iov);
+
+    B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
+
+    return;
+  }
+
+  void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName)
+  {
+    // declare db objects to be imported
+    DBImportArray<TOPCalChannelPulseHeight> calChannelPulseHeight;
+    DBImportArray<TOPCalChannelThresholdEff> calChannelThresholdEff;
+    calChannelPulseHeight.consruct();
+    calChannelThresholdEff.consruct();
+
+    TFile* f = new TFile(fileName.c_str());
+    TTree* tr = (TTree*)f->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
+
+    short slotId;
+    short pixelId;
+    float p1;
+    float p2;
+    float x0;
+    float threshold;
+    float efficiency;
+    float chisquare;
+    float ndf;
+    short fitStatus;
+    tr->SetBranchAddress("slotId", &slotId);
+    tr->SetBranchAddress("pixelId", &pixelId);
+    tr->SetBranchAddress("p1", &p1);
+    tr->SetBranchAddress("p2", &p2);
+    tr->SetBranchAddress("x0", &x0);
+    tr->SetBranchAddress("threshold", &threshold);
+    tr->SetBranchAddress("efficiency", &efficiency);
+    tr->SetBranchAddress("chisquare", &chisquare);
+    tr->SetBranchAddress("ndf", &ndf);
+    tr->SetBranchAddress("fitStatus", &fitStatus);
+
+    long nEntries = tr->GetEntries();
+    for (long iEntry = 0 ; iEntry < nEntries ; iEntry++) {
+      tr->GetEntry(iEntry);
+      int iBS = ((pixelId - 1) % 64) / 16;
+      int iCarrier = (pixelId - 1) / 128;
+      int iAsic = 1 - ((pixelId - 1) % 128) / 64 + 2 * (((pixelId - 1) / 8) % 2);
+      int iAsicCh = (pixelId - 1) % 8;
+      if (iAsic % 2 == 0) iASicCh = 8 - iAsicCh;
+      int iChannel = 128 * iBS + 32 * iCarrier + 8 * iAsic + iASicCh;
+
+      calChannelPulseHeight.setParameters(slotId, iChannel, x0, p1, p2);
+      calChannelThresholdEff.setThreEff(slotId, iChannel, efficiency);
+
+      if (chisquare / ndf > 10.) {
+        calChannelPulseHeight.setUnusable(slotId, iChannel);
+        calChannelThresholdEff.setUnusable(slotId, iChannel);
+      }
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    calChannelPulseHeight.import(iov);
+    calChannelThresholdEff.import(iov);
 
     B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
 

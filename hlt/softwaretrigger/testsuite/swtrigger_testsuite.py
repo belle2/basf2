@@ -209,7 +209,7 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--phase", help="Select the phase of the Belle II Detector. Can be 2 or 3 (default)",
                         type=int, default=3)
-    parser.add_argument("--cosmics", help="for cosmics events")
+    parser.add_argument("--cosmics", action="store_true", help="for cosmics events")
     parser.add_argument("--no-roi-filter", help="Don't apply the Region-Of-Interest filter for the PXD hits",
                         action="store_true", default=False)
 

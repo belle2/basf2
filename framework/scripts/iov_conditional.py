@@ -28,7 +28,7 @@ def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=N
 
     Parameters:
         path: Branch the execution of the given path.
-        iov_list: Under which IoV conditions should the `path_when_in_iov` be executed. It should be a list in the form
+        iov_list: Under which IoV conditions should the ``path_when_in_iov`` be executed. It should be a list in the form
                   [(min exp, min run, max exp, max run), ...]
         path_when_in_iov: Which branch to execute, if one of the IoV conditions is met.
         path_when_not_in_iov: If given, execute this path in all cases, none IoV condition is met.
@@ -40,6 +40,13 @@ def make_conditional_at(path, iov_list, path_when_in_iov, path_when_not_in_iov=N
 
 
 def phase_2_conditional(path, phase2_path, phase3_path=None):
-    """Handy shortcut for phase 2 conditions"""
+    """
+    Handy shortcut for phase 2 conditions
+
+    Parameters:
+        path: Branch the execution of the given path.
+        phase2_path: Call this path only when in phase 2.
+        phase3_path: When given, call this path only when in phase 3.
+    """
     make_conditional_at(path=path, iov_list=PHASE2_IOVS,
                         path_when_in_iov=phase2_path, path_when_not_in_iov=phase3_path)

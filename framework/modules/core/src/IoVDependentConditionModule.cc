@@ -22,7 +22,8 @@ IoVDependentConditionModule::IoVDependentConditionModule() : Module()
                  "there is no upper limit on the run number.");
   setPropertyFlags(Module::EModulePropFlags::c_ParallelProcessingCertified);
 
-  addParam("iovList", m_iovList, "The list of IoV to test in the format [(min exp, min run, max exp, max run), ...].");
+  addParam("iovList", m_iovList, "The list of IoV to test in the format [(min exp, min run, max exp, max run), ...]."
+           "If multiple IoVs are given, their union will be checked against the event's IoV.");
 }
 
 void IoVDependentConditionModule::initialize()

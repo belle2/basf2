@@ -328,31 +328,34 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
       for (ptree::value_type const& fadcChild : backEndLayoutChild.second.get_child("")) {
         if (fadcChild.first == "adc") {
           int ADCid = fadcChild.second.get<int>("<xmlattr>.id") ;
-          cout << "  ADC id    = " << ADCid << "\n";
+          B2DEBUG(1, "  ADC id    = " << ADCid);
 
           int layerId = fadcChild.second.get<int>("<xmlattr>.layer_id");
-          cout << "  layer_id  = " << layerId << "\n";
+          B2DEBUG(1, "  layer_id  = " << layerId);
 
           int ladderId = fadcChild.second.get<int>("<xmlattr>.ladder_id") ;
-          cout << "  ladder_id = " << ladderId << "\n";
+          B2DEBUG(1, "  ladder_id = " << ladderId);
 
           int hybridId = fadcChild.second.get<int>("<xmlattr>.hybrid_id");
-          cout << "  hybrid_id = " << hybridId  << "\n";
+          B2DEBUG(1, "  hybrid_id = " << hybridId);
 
-          cout << "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25") << "\n";
+          B2DEBUG(1, "  delay25   = " <<
+                  fadcChild.second.get<int>("<xmlattr>.delay25"));
 
-          int apv25ADCid = 0;
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
+              int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
               string valuesString = apvChild.second.get<string>(xmlTag) ;
-              cout << xmlTag << " APV25ID" << apv25ADCid << " " << valuesString << "\n~~~~~~~~\n";
+              B2DEBUG(10, xmlTag << " APV25ID" << apv25ADCid << " "
+                      << valuesString << "\n~~~~~~~~\n");
 
               stringstream ssn;
               ssn << valuesString;
               double value;
               for (int apvChannel  = 0 ; apvChannel < 128; apvChannel ++) {
                 ssn >> value;
-                const SVDOnlineToOfflineMap::SensorInfo& info = map->getSensorInfo(FADCid, ADCid * 6 + apv25ADCid);
+                const SVDOnlineToOfflineMap::SensorInfo& info =
+                  map->getSensorInfo(FADCid, ADCid * 6 + apv25ADCid);
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
@@ -362,20 +365,23 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
                 int ladder = info.m_sensorID.getLadderNumber();
                 int sensor = info.m_sensorID.getSensorNumber();
                 if (apvChannel % 127 == 0)
-                  cout << layer << "_"  << ladder << "_" << sensor << "_" << side << "_" << strip << "( " << apvChannel <<
-                       ") " << value << "\n";
-                if (errorTollerant || layer != layerId || ladder != ladderId   // ||
+                  B2DEBUG(100, layer << "_"  << ladder << "_" <<
+                          sensor << "_" << side << "_" << strip << "( " <<
+                          apvChannel << ") " << value);
+                if (errorTollerant || layer != layerId || ladder != ladderId
+                    // ||
                     // test on the sensor != f( hybrid) anr apv perhaps
                    )
-                  B2ERROR("Inconsistency among maps: xml files tels \n" <<
-                          "layer " << layerId << " ladder " << ladderId << " hybridID " << hybridId << "\n" <<
-                          "while the BASF2 map tels \n" <<
-                          "layer " << layer << " ladder " << ladder << " sensor " << sensor << "\n");
+                  B2ERROR("Inconsistency among maps: xml files tells \n" <<
+                          "layer " << layerId << " ladder " << ladderId <<
+                          " hybridID " << hybridId << "\n" <<
+                          "while the BASF2 map tells \n" <<
+                          "layer " << layer << " ladder " << ladder <<
+                          " sensor " << sensor << "\n");
 
 
                 payload->set(layer, ladder, sensor, side , strip, value);
               }
-              apv25ADCid ++;
             }
           }
         }
@@ -431,22 +437,22 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
       for (ptree::value_type const& fadcChild : backEndLayoutChild.second.get_child("")) {
         if (fadcChild.first == "adc") {
           int ADCid = fadcChild.second.get<int>("<xmlattr>.id") ;
-          cout << "  ADC id    = " << ADCid << "\n";
+          B2DEBUG(1, "  ADC id    = " << ADCid);
 
           int layerId = fadcChild.second.get<int>("<xmlattr>.layer_id");
-          cout << "  layer_id  = " << layerId << "\n";
+          B2DEBUG(1, "  layer_id  = " << layerId);
 
           int ladderId = fadcChild.second.get<int>("<xmlattr>.ladder_id") ;
-          cout << "  ladder_id = " << ladderId << "\n";
+          B2DEBUG(1, "  ladder_id = " << ladderId);
 
           int hybridId = fadcChild.second.get<int>("<xmlattr>.hybrid_id");
-          cout << "  hybrid_id = " << hybridId  << "\n";
+          B2DEBUG(1, "  hybrid_id = " << hybridId);
 
-          cout << "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25") << "\n";
+          B2DEBUG(1, "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25"));
 
-          int apv25ADCid = 0;
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
+              int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
               string ampString = apvChild.second.get<string>("cal_peaks") ;
               string widthString = apvChild.second.get<string>("cal_width") ;
               string peakTimeString = apvChild.second.get<string>("cal_peak_time") ;
@@ -492,7 +498,6 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
                 pulseShapes->set(layer, ladder, sensor, side , strip, stripCalAmp);
 
               }
-              apv25ADCid ++;
             }
           }
         }

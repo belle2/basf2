@@ -850,7 +850,7 @@ def reconstructDecay(
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
     reconstructed as well (meaning that the charge conjugated mother list is created as well).
 
-    @param decayString DecayString specifying what kind of the decay should be reconstructed
+    @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise

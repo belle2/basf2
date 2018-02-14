@@ -57,7 +57,8 @@ void KLMFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   if (obj.hasObject("window")) {
     DBObject o_window(obj("window"));
     LogFile::debug("Write window values...");
-    hslb.writefee32(0x30, o_window.getInt("val0"));
+    hslb.writefee32(0x30, o_window.getInt("val0")); //rpc window start
+    hslb.writefee32(0x34, o_window.getInt("val0")); //write the window start to daq stream
     hslb.writefee32(0x31, o_window.getInt("val1"));
     hslb.writefee32(0x32, o_window.getInt("val2"));
     hslb.writefee32(0x33, o_window.getInt("val3"));

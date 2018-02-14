@@ -68,6 +68,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
   addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
   addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);
+  addParam("MaxDHPFrameDiff", m_maxDHPFrameDiff, "Maximum DHP Frame Nr Difference w/o reporting error", 2u);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
 //              EPXDErrFlag::c_FIX_SIZE | EPXDErrFlag::c_DHE_CRC | EPXDErrFlag::c_DHC_UNKNOWN | /*EPXDErrFlag::c_MERGER_CRC |*/
@@ -89,10 +90,12 @@ void PXDUnpackerModule::initialize()
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
-  B2INFO("Ignore(missing)DATCON: " << m_ignoreDATCON);
+  B2INFO("Ignore (missing) DATCON: " << m_ignoreDATCON);
   B2INFO("Ignore (some) missing Meta flags: " << m_ignoreMetaFlags);
-
-  ignore_datcon_flag = m_ignoreDATCON;
+  B2INFO("ForceMapping: " << m_forceMapping);
+  B2INFO("ForceNoMapping: " << m_forceNoMapping);
+  B2INFO("CheckPaddingCRC: " << m_checkPaddingCRC);
+  B2INFO("MaxDHPFrameDiff: " << m_maxDHPFrameDiff);
 
   m_sendunfiltered = 0;
   m_sendrois = 0;
@@ -448,17 +451,19 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   if (printflag)
     B2DEBUG(20, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
 
-  if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > 1) {
+  if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
     B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 " << dhe_first_readout_frame_id_lo << " != " << (dhp_readout_frame_lo & 0x3F));
     m_errorMask |= EPXDErrMask::c_DHP_DHE_FRAME_DIFFER;
   }
+  /*
   if (last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
-    if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) != 1) {
+    if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) > m_maxDHPFrameDiff) {
       B2ERROR("Two DHP Frames per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[dhp_dhp_id] << ", " <<
               dhp_readout_frame_lo);
       m_errorMask |= EPXDErrMask::c_DHP_NOT_CONT;
     }
   }
+  */
 
   if (daqpktstat.dhc_size() > 0) {
     if (daqpktstat.dhc_back().dhe_size() > 0) {
@@ -469,9 +474,10 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     }
   }
 
+  /*
   for (auto j = 0; j < 4; j++) {
     if (last_dhp_readout_frame_lo[j] != -1) {
-      if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > 1) {
+      if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > m_maxDHPFrameDiff) {
         B2ERROR("Two DHP Frames (different DHP) per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[j] <<
                 ", " <<
                 dhp_readout_frame_lo);
@@ -480,6 +486,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
       }
     }
   }
+  */
   last_dhp_readout_frame_lo[dhp_dhp_id] = dhp_readout_frame_lo;
 
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
@@ -1075,7 +1082,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 //       B2ERROR("TRG TAG HLT: $" << hex << dhc.data_onsen_trigger_frame->get_trig_tag1() << " DATCON $" <<  dhc.data_onsen_trigger_frame->get_trig_tag2() << " META " << m_meta_time);
 
       if (verbose) dhc.data_onsen_trigger_frame->print();
-      m_errorMask |= dhc.data_onsen_trigger_frame->check_error(ignore_datcon_flag);
+      m_errorMask |= dhc.data_onsen_trigger_frame->check_error(m_ignoreDATCON);
       m_errorMask |= dhc.check_crc();
       if (Frame_Number != 0) {
         B2ERROR("ONSEN TRG Frame must be the first one.");

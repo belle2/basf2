@@ -70,6 +70,8 @@ namespace Belle2 {
       bool m_forceMapping;
       /** Force No Mapping even if DHH bit is requesting it */
       bool m_forceNoMapping;
+      /** Maximum DHP frame difference until error is reported */
+      unsigned int m_maxDHPFrameDiff;
 
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
@@ -163,8 +165,6 @@ namespace Belle2 {
       PXDError::PXDErrorFlags m_errorMaskEvent;
       /** give verbose unpacking information -> TODO will be a parameter in next release */
       bool verbose = true;
-      /** ignore missing datcon (dont show error) */
-      bool ignore_datcon_flag = true;
 
       /** counter for not accepted events... should not happen TODO discussion ongoing with DAQ group */
       unsigned int m_notaccepted{0};

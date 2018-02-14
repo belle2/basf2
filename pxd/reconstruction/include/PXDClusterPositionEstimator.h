@@ -13,9 +13,12 @@
 #include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
+#include <pxd/dbobjects/PXDClusterOffsetPar.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <framework/database/DBObjPtr.h>
+#include <set>
+#include <pxd/reconstruction/Pixel.h>
 
 namespace Belle2 {
 
@@ -59,19 +62,8 @@ namespace Belle2 {
       /** Return shape index parameters from Database */
       const PXDClusterShapeIndexPar& getShapeIndexParameters() const {return  m_shapeIndexPar;}
 
-      /** Return position-corrected cluster.
-      * Create a temporary cluster to avoid accumulating corrections
-      * Like this:
-      * PXDCluster correctedCluster(*this->getCluster()); // "this" = PXDRecoHit
-      * correctedCluster =
-      *   PXD::PXDClusterPositionEstimator::getInstance().correctCluster(correctedCluster, tu, tv);
-      * correctedCluster is a local object and dies with its scope.
-      * @param cluster pointer to the cluster to be corrected
-      * @param tu Track direction in u-coordinate
-      * @param tv Track direction in v-coordinate
-      * @return Corrected cluster
-      */
-      PXDCluster& correctCluster(PXDCluster& cluster, double tu, double tv) const;
+      /** Return cluster offset */
+      PXDClusterOffsetPar getClusterOffset(const PXDCluster& cluster, double tu, double tv) const;
 
       /** Return cluster shape likelyhood. */
       float getShapeLikelyhood(const PXDCluster& cluster, double tu, double tv) const;
@@ -79,42 +71,32 @@ namespace Belle2 {
       /** Main (and only) way to access the PXDClusterPositionEstimator. */
       static PXDClusterPositionEstimator& getInstance();
 
-      /** Return the normed charge ratio between head and tail digit of cluster. */
-      float computeEta(const PXDCluster& cluster, double thetaU, double thetaV) const;
+      /** Return the normed charge ratio between head and tail pixels. */
+      float computeEta(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /** Return a name for the cluster shape constructed from the relative positions of head and tail digit. */
-      const std::string getShortName(const PXDCluster& cluster, float thetaU, float thetaV) const;
+      /** Return a name for the pixel set */
+      const std::string getShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
+                                     double thetaV) const;
 
-      /** Return a name for the cluster shape constructed from the relative positions of all digits. */
-      const std::string getFullName(const PXDCluster& cluster) const;
-
-      /** Return type of corrector function */
-      typedef std::function<PXDCluster&(PXDCluster&, double, double)> corrector_function_type;
-
-      /** Return corrector function for this corrector */
-      corrector_function_type getCorrectorFunction()
-      {
-        return ([this](PXDCluster & cluster, double tu, double tv)  -> PXDCluster& {
-          return correctCluster(cluster, tu, tv);
-        });
-      }
-
-    private:
+      /** Return a name for the pixel set. */
+      const std::string getFullName(const std::set<Pixel>& pixels, int uStart, int vStart) const;
 
       /** Return type of cluster needed to find cluster position correction. */
       int getClusterkind(const PXDCluster& cluster) const;
 
-      /* Return reference to the head digit in the cluster. */
-      const PXDDigit& getHeadDigit(const PXDCluster& cluster, float thetaU, float thetaV) const;
+    private:
 
-      /* Return reference to the tail digit in the cluster. */
-      const PXDDigit& getTailDigit(const PXDCluster& cluster, float thetaU, float thetaV) const;
+      /* Return reference to the head pixel in pixel set. */
+      const Pixel& getHeadPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /* Return reference to the last digit in cluster with given vOffset from vStart. */
-      const PXDDigit& getLastDigitWithVOffset(const PXDCluster& cluster, int vOffset) const;
+      /* Return reference to the tail pixel in pixel set. */
+      const Pixel& getTailPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /* Return reference to the first digit in cluster with given vOffset from vStart. */
-      const PXDDigit& getFirstDigitWithVOffset(const PXDCluster& cluster, int vOffset) const;
+      /* Return reference to the last pixel in pixel set with given vOffset from vStart. */
+      const Pixel& getLastPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset) const;
+
+      /* Return reference to the first pixel in pixel set with given vOffset from vStart. */
+      const Pixel& getFirstPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset) const;
 
       /** Singleton class, hidden constructor */
       PXDClusterPositionEstimator() {};

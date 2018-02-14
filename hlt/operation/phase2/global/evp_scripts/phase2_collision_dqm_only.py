@@ -7,7 +7,7 @@ args = setup_basf2_and_db()
 path = create_hlt_path(args)
 
 # no reconstruction or software trigger added at all
-add_hlt_dqm(path, run_type="collisions")
+add_hlt_dqm(path, run_type="collisions", standalone=True)
 
 finalize_hlt_path(path, args)
 basf2.print_path(path)

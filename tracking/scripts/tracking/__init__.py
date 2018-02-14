@@ -584,7 +584,7 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
 
     if add_both_directions:
         add_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
-                    direction="forwards", use_mc_truth=use_mc_truth, **kwargs)
+                    direction="forward", use_mc_truth=use_mc_truth, **kwargs)
 
     path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=input_reco_tracks,
                     VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)

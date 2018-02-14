@@ -101,6 +101,10 @@ void VXDDQMExpressRecoMinModule::defineHisto()
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   c_nVXDLayers = geo.getLayers().size();
+  if (c_nVXDLayers == 0) {
+    B2FATAL("Missing geometry for VXD, check steering file.");
+    return;
+  }
   c_firstVXDLayer = 1;  // counting start from 1...
   c_lastVXDLayer = c_nVXDLayers;
   c_nPXDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size();

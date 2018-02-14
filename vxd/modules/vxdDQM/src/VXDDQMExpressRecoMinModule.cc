@@ -105,7 +105,7 @@ void VXDDQMExpressRecoMinModule::defineHisto()
     B2FATAL("Missing geometry for VXD, check steering file.");
     return;
   }
-  c_firstVXDLayer = 1;  // counting start from 1...
+  c_firstVXDLayer = geo.getLayers().begin()->getLayerNumber();  // counting start from 1...
   c_lastVXDLayer = c_nVXDLayers;
   c_nPXDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size();
   c_firstPXDLayer = c_firstVXDLayer;

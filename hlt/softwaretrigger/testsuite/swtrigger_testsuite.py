@@ -108,14 +108,19 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
         for input_file in glob(os.path.join(generated_path, "*.root")):
             input_file_list.append(input_file)
 
-    for i in range(jobs):
+    for number in range(jobs):
         # clone list
         this_random = input_file_list[:]
         # shuffle in place
         random.shuffle(this_random)
         this_random = this_random[:max_input_files]
 
-        parameter = {"input_file_list": "#".join(this_random), "phase": phase, "roi_filter": roi_filter, "hlt_mode": hlt_mode}
+        # stores the memory consumption over events
+        mem_statistics_file = os.path.join(generated_path, f"{number}_memory.root")
+
+        parameter = {"input_file_list": "#".join(this_random), "phase": phase, "roi_filter": roi_filter,
+                     "hlt_mode": hlt_mode,
+                     "mem_statistics_file": mem_statistics_file}
         parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_file(
@@ -191,9 +196,9 @@ if __name__ == "__main__":
                         type=int, default=5)
     parser.add_argument("--local", help="Execute on the local system and not via batch processing",
                         action="store_true", default=False)
-    parser.add_argument("--hlt-stresstest", help="Run hlt stresstest",
+    parser.add_argument("--hlt-stresstest", help="Run hlt stresstest and not efficiency calculation",
                         action="store_true", default=False)
-    parser.add_argument("--hlt-mode", help="hlt mode", type=str)
+    parser.add_argument("--hlt-mode", help="hlt mode", type=str, default="collision_filter")
     parser.add_argument("--always-generate", help="Always generate events, even if the out files already exist",
                         action="store_true", default=False)
     parser.add_argument("--phase", help="Select the phase of the Belle II Detector. Can be 2 or 3 (default)",

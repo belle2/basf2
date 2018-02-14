@@ -265,11 +265,10 @@ def add_softwaretrigger_reconstruction(
     # If softwaretrigger_mode is not any of the trigger mode, force the mode
     # to the default mode 'hlt_filter', and print out a warning
     if softwaretrigger_mode not in ['softwaretrigger_off', 'monitoring', 'fast_reco_filter', 'hlt_filter']:
-        basf2.B2WARNING("The trigger mode " + softwaretrigger_mode +
-                        " is not a standard software trigger" +
-                        "mode [softwaretrigger_off, monitoring, fast_reco_filter, hlt_filter]" +
-                        "the default mode hlt_filter is forced to be applied")
-        softwaretrigger_mode = 'hlt_filter'
+        basf2.B2FATAL("The trigger mode " + softwaretrigger_mode +
+                      " is not a supported software trigger" +
+                      "mode [softwaretrigger_off, monitoring, fast_reco_filter, hlt_filter]" +
+                      "the default is mode hlt_filter")
 
     # Add fast reco reconstruction
     if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:

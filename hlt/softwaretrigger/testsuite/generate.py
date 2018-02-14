@@ -76,6 +76,7 @@ def add_generation(path, event_class, phase):
         # add the special Gearbox configuration for Cosmics, which is not
         # done by add_cosmics_generator yet
         if 'Gearbox' not in path:
+            global_box_size = [100, 100, 100]
             override = [("/Global/length", str(global_box_size[0]), "m"),
                         ("/Global/width", str(global_box_size[1]), "m"),
                         ("/Global/height", str(global_box_size[2]), "m")]
@@ -86,7 +87,12 @@ def add_generation(path, event_class, phase):
         if 'Geometry' not in path:
             geometry = path.add_module('Geometry')
 
-        generators.add_cosmics_generator(path, data_taking_period="phase{}".format(phase))
+        generators.add_cosmics_generator(path,
+                                         # this always needs to be normal, as phase3 is
+                                         # not supported by generator script yet
+                                         # data_taking_period="phase{}".format(phase),
+                                         data_taking_period="normal",
+                                         keep_box=[2, 2, 2], accept_box=[1, 1, 1])
 
     # Fail for everything else
     else:

@@ -129,7 +129,8 @@ def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenpartic
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
-    :param emptypathname branch to reject events where PYTHIA failed to fragment
+    :param userdecfile: EvtGen decfile used for particle decays
+    :param useevtgenparticledata: Experimental feature to use a consistent set of particle properties between EvtGen and PYTIA
     """
 
     #: kkmc input file, one for each qqbar mode

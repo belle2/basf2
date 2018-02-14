@@ -1,5 +1,6 @@
 import sys
 import basf2
+import argparse
 from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
@@ -15,31 +16,48 @@ from daqdqm.cosmicdqm import add_cosmic_dqm
 
 from rawdata import add_unpackers
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 
-def setup_basf2_and_db():
+def setup_basf2_and_db(dbfile=None):
     """
     Setupl local database usage for HLT
     """
+
+    parser = argparse.ArgumentParser(description='basf2 for online')
+    parser.add_argument('input_buffer_name', type=str,
+                        help='Input Ring Buffer names')
+    parser.add_argument('output_buffer_name', type=str,
+                        help='Output Ring Buffer name')
+    parser.add_argument('histo_port', type=int,
+                        help='Port of the HistoManager to connect to')
+    parser.add_argument('number_processes', type=int, default=0,
+                        help='Number of parallel processes to use')
+    parser.add_argument('--local-db-path', type=str,
+                        help="set path to the local database.txt to use for the ConditionDB",
+                        default="hlt/examples/LocalDB/database.txt")
+
+    args = parser.parse_args()
 
     basf2.set_log_level(basf2.LogLevel.ERROR)
     ##########
     # Local DB specification
     ##########
     basf2.reset_database()
-    basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
-
-    if len(sys.argv) > 4:
-        basf2.set_nprocesses(int(sys.argv[4]))
+    if dbfile is None:
+        basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
     else:
-        basf2.B2WARNING("Cannot set number of processes as no command line argument is provided.")
+        basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(dbfile))
+
+    basf2.set_nprocesses(args.number_processes)
+
+    return args
 
 
-def create_hlt_path():
+def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
     """
     Create and return a path used for HLT and ExpressReco running
     """
@@ -50,43 +68,47 @@ def create_hlt_path():
     ##########
     # Input
     ##########
-    # Input from ringbuffer (for raw data)
-    input = basf2.register_module('Raw2Ds')
-    input.param("RingBufferName", sys.argv[1])
-
+    if inputfile == 'DAQ':
+        # Input from ringbuffer (for raw data)
+        input = basf2.register_module('Raw2Ds')
+        input.param("RingBufferName", args.input_buffer_name)
+    else:
+        # Input from SeqRootInput
+        input = basf2.register_module('SeqRootInput')
+        input.param('inputFileName', inputfile)
     path.add_module(input)
 
     ##########
     # Histogram Handling
     ##########
-    # HistoManager for real HLT
-    histoman = basf2.register_module('DqmHistoManager')
-    histoman.param("Port", int(sys.argv[3]))
-    histoman.param("Port", 9991)
-    histoman.param("DumpInterval", 1000)
+    if dqmfile == 'DAQ':
+        # HistoManager for real HLT
+        histoman = basf2.register_module('DqmHistoManager')
+        histoman.param("Port", args.histo_port)
+        histoman.param("DumpInterval", 1000)
+    else:
+        histoman = basf2.register_module('HistoManager')
+        histoman.param('histoFileName', dqmfile)
     path.add_module(histoman)
 
     return path
 
 
-def finalize_hlt_path(path, show_progress_bar=False, use_local_storage=False):
+def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='DAQ'):
     """
     Add the required output modules for HLT
     """
     ##########
     # Output
     ##########
-    # Output to RingBuffer
-    # todo: needs to changed to Ring Buffer output for testing
-
-    if not use_local_storage:
+    if outputfile == 'DAQ':
+        # Output to RingBuffer
         output = basf2.register_module("Ds2Rbuf")
-        output.param("RingBufferName", sys.argvs[2])
-
+        output.param("RingBufferName", args.output_buffer_name)
     else:
         # Output to SeqRoot
         output = basf2.register_module("SeqRootOutput")
-        output.param('outputFileName', 'HLTout.sroot')
+        output.param('outputFileName', outputfile)
         # output file name should be specified with -o option
 
     # Specification of output objects
@@ -110,23 +132,28 @@ def add_hlt_processing(path, run_type="collision",
                        pruneDataStore=True,
                        additonal_store_arrays_to_keep=[],
                        components=DEFAULT_HLT_COMPONENTS,
+                       reco_components=None,
                        softwaretrigger_mode='hlt_filter', **kwargs):
     """
     Add all modules for processing on HLT filter machines
     """
     add_unpackers(path, components=components)
 
+    # if not set, just assume to reuse the normal compontents list
+    if reco_components is None:
+        reco_components = components
+
     if run_type == "collision":
         # todo: forward the the mag field and run_type mode into this method call
         add_softwaretrigger_reconstruction(path,
-                                           components=components,
+                                           components=reco_components,
                                            softwaretrigger_mode=softwaretrigger_mode,
                                            run_type=run_type,
                                            addDqmModules=True, **kwargs)
     elif run_type == "cosmics":
         # no filtering,
-        reconstruction.add_cosmics_reconstruction(path, components=components, **kwargs)
-        add_hlt_dqm(path, run_type)
+        reconstruction.add_cosmics_reconstruction(path, components=reco_components, **kwargs)
+        add_hlt_dqm(path, run_type, components=components)
         if pruneDataStore:
             path.add_module(
                 "PruneDataStore",
@@ -141,24 +168,29 @@ def add_hlt_processing(path, run_type="collision",
 def add_expressreco_processing(path, run_type="collision",
                                with_bfield=True,
                                components=DEFAULT_EXPRESSRECO_COMPONENTS,
-                               do_reconstruction=True):
+                               reco_components=None,
+                               do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
     """
+    if not do_reconstruction:
+        add_geometry_if_not_present(path)
+
     add_unpackers(path, components=components)
 
-    if run_type == "collision":
-        if do_reconstruction:
-            reconstruction.add_reconstruction(path, components=components)
-    elif run_type == "cosmics":
-        # no filtering,
-        # the Phase II cosmic reconstruction will be used which combines SVD & CDC tracks
-        if do_reconstruction:
-            reconstruction.add_cosmics_reconstruction(path, components=components)
-    else:
-        basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+    # if not set, just assume to reuse the normal compontents list
+    if reco_components is None:
+        reco_components = components
 
-    add_expressreco_dqm(path, run_type)
+    if do_reconstruction:
+        if run_type == "collision":
+            reconstruction.add_reconstruction(path, components=reco_components)
+        elif run_type == "cosmics":
+            reconstruction.add_cosmics_reconstruction(path, components=reco_components, **kwargs)
+        else:
+            basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+
+    add_expressreco_dqm(path, run_type, components=components)
 
 
 def add_softwaretrigger_reconstruction(
@@ -277,12 +309,12 @@ def add_softwaretrigger_reconstruction(
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
         # currently, dqm plots are only shown for event accepted by the HLT filters
-        add_hlt_dqm(hlt_reconstruction_path, run_type)
+        add_hlt_dqm(hlt_reconstruction_path, run_type, components=components)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
         # make sure to still add the DQM modules, they can give at least some FW runtime info
         # and some unpacked hit information
-        add_hlt_dqm(path, run_type)
+        add_hlt_dqm(path, run_type, components=components)
         if pruneDataStore:
             fast_reco_reconstruction_path.add_module(
                 "PruneDataStore",
@@ -293,30 +325,46 @@ def add_softwaretrigger_reconstruction(
     path.add_path(fast_reco_reconstruction_path)
 
 
-def add_online_dqm(path, run_type, dqm_environment):
+def add_online_dqm(path, run_type, dqm_environment, components=None):
     """
     Add DQM plots for a specific run type and dqm environment
     """
     if run_type == "collision":
-        add_collision_dqm(path, dqm_environment=dqm_environment)
+        add_collision_dqm(path, components=components, dqm_environment=dqm_environment)
     elif run_type == "cosmics":
-        add_cosmic_dqm(path, dqm_environment=dqm_environment)
+        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
 
-def add_hlt_dqm(path, run_type):
+def add_hlt_dqm(path, run_type, standalone=False, components=None):
     """
     Add all the DQM modules for HLT to the path
     """
-    add_online_dqm(path, run_type, "hlt")
+    if standalone:
+        add_geometry_if_not_present(path)
+
+    add_online_dqm(path, run_type, "hlt", components)
 
 
-def add_expressreco_dqm(path, run_type):
+def add_expressreco_dqm(path, run_type, standalone=False, components=None):
     """
     Add all the DQM modules for ExpressReco to the path
     """
-    add_online_dqm(path, run_type, "expressreco")
+    if standalone:
+        add_geometry_if_not_present(path)
+
+    add_online_dqm(path, run_type, "expressreco", components)
+
+
+def add_geometry_if_not_present(path):
+    # geometry parameter database
+    if 'Gearbox' not in path:
+        path.add_module('Gearbox')
+
+    # detector geometry
+    if 'Geometry' not in path:
+        path.add_module('Geometry', useDB=True)
 
 
 def get_store_only_metadata_path():

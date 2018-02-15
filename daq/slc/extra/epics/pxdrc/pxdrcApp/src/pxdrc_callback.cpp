@@ -96,7 +96,7 @@ void eventCallback(struct event_handler_args eha)
 	} else if (val == "ABORTING") {
 	  g_callback->setState(RCState::ABORTING_RS);
 	} else if (val == "UNLOADING") {
-	  g_callback->setState(RCState::ABORTING_RS);
+	  g_callback->setState(RCState::ABORTING_RS); // There is no unloading state yet
 	} else if (val == "STARTING") {
 	  g_callback->setState(RCState::STARTING_TS);
 	} else if (val == "STOPPING") {

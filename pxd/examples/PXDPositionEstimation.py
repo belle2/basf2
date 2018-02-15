@@ -16,31 +16,18 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-import utility
-import copy
-
-# set_log_level(LogLevel.ERROR)
 # set some random seed
 set_random_seed(10346)
 
 
 class PXDPositionEstimation(Module):
     """
-    Histogram the difference between the estimated cluster position and the position of the related truehit.
+    Histogram the difference position residuals and pulls between clusters and truehits.
     """
-
-    def __init__(self):
-        """
-        Create a member to access cluster shape position estimator
-        """
-        super().__init__()  # don't forget to call parent constructor
-        # TODO: fully replace this by PXDPositionEstimator singleton class
-        self.position_estimator = Belle2.PyDBObj('PXDClusterPositionEstimatorPar')
-        self.shape_indexer = Belle2.PyDBObj('PXDClusterShapeIndexPar')
 
     def initialize(self):
         """
-        Create histograms with pulls and residuals
+        Create histograms for pulls and residuals
         """
 
         # Counters to measure coverage of corrections
@@ -59,6 +46,7 @@ class PXDPositionEstimation(Module):
         self.hist_map_theta_v = {}
         self.hist_map_clustercharge = {}
 
+        # Loop over clusterkinds (=4 means 'all' kinds)
         for kind in range(5):
             self.hist_map_momentum[kind] = ROOT.TH1F("hist_momentum_kind_{:d}".format(
                 kind), 'Particle momentum kind={:d}'.format(kind), 5000, 0.0, 10.0)
@@ -117,33 +105,34 @@ class PXDPositionEstimation(Module):
                         continue
 
                     mom = truehit.getMomentum()
-                    thetaV = math.atan(mom[1] / mom[2]) * 180 / math.pi
-                    thetaU = math.atan(mom[0] / mom[2]) * 180 / math.pi
-                    reject, pixelkind = utility.check_cluster(cls)
+                    tu = mom[0] / mom[2]
+                    tv = mom[1] / mom[2]
+                    thetaU = math.atan(tu) * 180 / math.pi
+                    thetaV = math.atan(tv) * 180 / math.pi
 
                     # Only look at primary particles
                     for mcp in truehit.getRelationsFrom("MCParticles"):
                         if not mcp.hasStatus(1):
                             reject = True
 
-                    if not reject and mom.Mag() > 0.02:
+                    # Get instance of position estimator
+                    PositionEstimator = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
+                    clusterkind = PositionEstimator.getClusterkind(cls)
+
+                    # Clusterkinds 0,1,2,3 refer to all cases which can currently
+                    # be corrected. Cases where a cluster pixel touches a sensor
+                    # edge or contains pixel with varying vPitch are excluded here.
+                    if clusterkind <= 3 and mom.Mag() > 0.02:
 
                         self.nclusters += 1
 
-                        eta = utility.computeEta(cls, thetaU, thetaV)
-                        shape_name = utility.get_short_shape_name(cls, thetaU, thetaV)
-                        shape_index = self.shape_indexer.getShapeIndex(shape_name)
+                        # Fill momentum and angles for clusterkind
+                        self.hist_map_momentum[clusterkind].Fill(mom.Mag())
+                        self.hist_map_theta_u[clusterkind].Fill(thetaU)
+                        self.hist_map_theta_v[clusterkind].Fill(thetaV)
+                        self.hist_map_clustercharge[clusterkind].Fill(cls.getCharge())
 
-                        shiftU = sensor_info.getUCellPosition(cls.getUStart())
-                        shiftV = sensor_info.getVCellPosition(cls.getVStart())
-
-                        # Fill momentum and angles for pixelkind
-                        self.hist_map_momentum[pixelkind].Fill(mom.Mag())
-                        self.hist_map_theta_u[pixelkind].Fill(thetaU)
-                        self.hist_map_theta_v[pixelkind].Fill(thetaV)
-                        self.hist_map_clustercharge[pixelkind].Fill(cls.getCharge())
-
-                        # Fill pixelkind=4 for all PXD sensors
+                        # Fill clusterkind=4 for all PXD sensors
                         self.hist_map_momentum[4].Fill(mom.Mag())
                         self.hist_map_theta_u[4].Fill(thetaU)
                         self.hist_map_theta_v[4].Fill(thetaV)
@@ -154,75 +143,68 @@ class PXDPositionEstimation(Module):
                         pull_u = (truehit.getU() - cls.getU()) / cls.getUSigma()
                         pull_v = (truehit.getV() - cls.getV()) / cls.getVSigma()
 
-                        self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - cls.getU())
-                        self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - cls.getV())
-                        self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
-                        self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+                        self.hist_map_residual_u[(clusterkind, mode)].Fill(truehit.getU() - cls.getU())
+                        self.hist_map_residual_v[(clusterkind, mode)].Fill(truehit.getV() - cls.getV())
+                        self.hist_map_residual_pull_u[(clusterkind, mode)].Fill(pull_u)
+                        self.hist_map_residual_pull_v[(clusterkind, mode)].Fill(pull_v)
 
                         if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
-                            self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - cls.getV())
+                            self.hist_map_residual_v_special[(clusterkind, mode, 0)].Fill(truehit.getV() - cls.getV())
                         elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
-                            self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - cls.getV())
+                            self.hist_map_residual_v_special[(clusterkind, mode, 1)].Fill(truehit.getV() - cls.getV())
                         else:
-                            self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - cls.getV())
+                            self.hist_map_residual_v_special[(clusterkind, mode, 2)].Fill(truehit.getV() - cls.getV())
 
-                        shape_likelyhood = self.position_estimator.getShapeLikelyhood(shape_index, thetaU, thetaV, pixelkind)
+                        shape_likelyhood = PositionEstimator.getShapeLikelyhood(cls, tu, tv)
                         if shape_likelyhood > 0:
                             self.nfound_shapes += 1
 
-                        if self.position_estimator.hasOffset(shape_index, eta, thetaU, thetaV, pixelkind):
+                        offset = PositionEstimator.getClusterOffset(cls, tu, tv)
+                        if offset:
                             # Now, we can safely querry the correction
                             self.nfound_offset += 1
-                            offset = self.position_estimator.getOffset(shape_index, eta, thetaU, thetaV, pixelkind)
+
+                            # We need to explicitely add a shift to the offsets
+                            # This is not needed when working with PXDRecoHits
+                            shiftU = sensor_info.getUCellPosition(cls.getUStart())
+                            shiftV = sensor_info.getVCellPosition(cls.getVStart())
 
                             # Fill the histograms (mode=0)
                             mode = 0
                             pull_u = (truehit.getU() - shiftU - offset.getU()) / (math.sqrt(offset.getUSigma2()))
                             pull_v = (truehit.getV() - shiftV - offset.getV()) / (math.sqrt(offset.getVSigma2()))
 
-                            # ########################################
-                            # FIXME: this is for testing the PXDClusterPositionEstimator singleton
-                            # correctedCluster = copy.deepcopy(cls)
-                            tv = math.atan(mom[1] / mom[2])
-                            tu = math.atan(mom[0] / mom[2])
-                            a = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
-                            # cls = a.correctCluster(cls, tu, tv)
-                            # print('BENNI position estimator initialized')
-                            new_position_estimator = a.getPositionEstimatorParameters()
-                            new_shape_indexer = a.getShapeIndexParameters()
-                            new_shape_index = new_shape_indexer.getShapeIndex(shape_name)
-                            # print('  BENNI: new_index={}    old_index={}'.format(new_shape_index, shape_index))
-                            # new_likelyhood = a.getShapeLikelyhood(cls, tu, tv)
-                            # print('  BENNI: new_likelyhood={:f}    old_likelyhood={:f}'.format(new_likelyhood, shape_likelyhood))
-                            new_name = a.getShortName(cls, thetaU, thetaV)
-                            # print('  BENNI: new_name={}   old_name={}'.format(new_name, shape_name))
-                            # END TESTING ############################
-
-                            self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
-                            self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
-                            self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
-                            self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+                            self.hist_map_residual_u[(clusterkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
+                            self.hist_map_residual_v[(clusterkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
+                            self.hist_map_residual_pull_u[(clusterkind, mode)].Fill(pull_u)
+                            self.hist_map_residual_pull_v[(clusterkind, mode)].Fill(pull_v)
 
                             if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - shiftV - offset.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 0)].Fill(
+                                    truehit.getV() - shiftV - offset.getV())
                             elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - shiftV - offset.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 1)].Fill(
+                                    truehit.getV() - shiftV - offset.getV())
                             else:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - shiftV - offset.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 2)].Fill(
+                                    truehit.getV() - shiftV - offset.getV())
 
                             # Fill the histograms (mode=1)
                             mode = 1
-                            self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
-                            self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
-                            self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
-                            self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+                            self.hist_map_residual_u[(clusterkind, mode)].Fill(truehit.getU() - shiftU - offset.getU())
+                            self.hist_map_residual_v[(clusterkind, mode)].Fill(truehit.getV() - shiftV - offset.getV())
+                            self.hist_map_residual_pull_u[(clusterkind, mode)].Fill(pull_u)
+                            self.hist_map_residual_pull_v[(clusterkind, mode)].Fill(pull_v)
 
                             if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - shiftV - offset.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 0)].Fill(
+                                    truehit.getV() - shiftV - offset.getV())
                             elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - shiftV - offset.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 1)].Fill(
+                                    truehit.getV() - shiftV - offset.getV())
                             else:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - shiftV - offset.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 2)].Fill(
+                                    truehit.getV() - shiftV - offset.getV())
 
                         else:
 
@@ -231,17 +213,17 @@ class PXDPositionEstimation(Module):
                             pull_u = (truehit.getU() - cls.getU()) / cls.getUSigma()
                             pull_v = (truehit.getV() - cls.getV()) / cls.getVSigma()
 
-                            self.hist_map_residual_u[(pixelkind, mode)].Fill(truehit.getU() - cls.getU())
-                            self.hist_map_residual_v[(pixelkind, mode)].Fill(truehit.getV() - cls.getV())
-                            self.hist_map_residual_pull_u[(pixelkind, mode)].Fill(pull_u)
-                            self.hist_map_residual_pull_v[(pixelkind, mode)].Fill(pull_v)
+                            self.hist_map_residual_u[(clusterkind, mode)].Fill(truehit.getU() - cls.getU())
+                            self.hist_map_residual_v[(clusterkind, mode)].Fill(truehit.getV() - cls.getV())
+                            self.hist_map_residual_pull_u[(clusterkind, mode)].Fill(pull_u)
+                            self.hist_map_residual_pull_v[(clusterkind, mode)].Fill(pull_v)
 
                             if thetaV >= self.binlimits[0][0] and thetaV < self.binlimits[0][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 0)].Fill(truehit.getV() - cls.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 0)].Fill(truehit.getV() - cls.getV())
                             elif thetaV >= self.binlimits[1][0] and thetaV < self.binlimits[1][1]:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 1)].Fill(truehit.getV() - cls.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 1)].Fill(truehit.getV() - cls.getV())
                             else:
-                                self.hist_map_residual_v_special[(pixelkind, mode, 2)].Fill(truehit.getV() - cls.getV())
+                                self.hist_map_residual_v_special[(clusterkind, mode, 2)].Fill(truehit.getV() - cls.getV())
 
     def terminate(self):
         """

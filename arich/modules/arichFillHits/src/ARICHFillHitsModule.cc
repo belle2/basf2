@@ -78,7 +78,8 @@ namespace Belle2 {
       int modID = digit.getModuleID();
       int xCh, yCh;
       if (not m_chnMap->getXYFromAsic(asicCh, xCh, yCh)) {
-        B2ERROR("Invalid ARICH hit!");
+        B2ERROR("Invalid ARICH hit! This hit will be ignored.");
+        continue;
       }
 
       TVector2 hitpos = m_geoPar->getChannelPosition(modID, xCh, yCh);

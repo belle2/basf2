@@ -10,6 +10,8 @@
 #ifndef ECLMATCHINGPERFORMANCEMODULE_H_
 #define ECLMATCHINGPERFORMANCEMODULE_H_
 
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/geometry/ECLNeighbours.h>
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -55,11 +57,14 @@ namespace Belle2 {
   private:
     std::string m_outputFileName; /**< name of output root file */
 
+    StoreArray<ECLCalDigit> m_eclCalDigits;
     StoreArray<ECLCluster> m_eclClusters;
     StoreArray<ExtHit> m_extHits;
     StoreArray<RecoTrack> m_recoTracks;
     StoreArray<Track> m_tracks;
     StoreArray<TrackFitResult> m_trackFitResults;
+
+    ECL::ECLNeighbours* m_eclNeighbours;
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
@@ -76,6 +81,9 @@ namespace Belle2 {
     /**< Event number */
     int m_iEvent;
 
+    /**< Track Multiplicity */
+    int m_trackMultiplicity;
+
     /**< pValue of track fit */
     double m_pValue;
 
@@ -87,6 +95,24 @@ namespace Belle2 {
 
     /**< minimal distance between track and ECLCluster */
     double m_distance;
+
+    /**< length of track in ECL */
+    double m_trackLength;
+
+    /**< energy loss of track in ECL */
+    double m_deposited_energy;
+
+    /**< minimal distance between track at center of ECL and ECLCalDigit with at least 10 MeV */
+    double m_innerdistance;
+
+    /**< boolean for match between track and ECLCalDigit */
+    int m_matchedToECLCalDigit;
+
+    /**< number of times track enters ECL */
+    int m_enter;
+
+    /**< number of times track leaves ECL */
+    int m_exit;
 
     /**
      * Sets all variables to the default value, here -999.

@@ -10,6 +10,7 @@
 
 #include <ecl/modules/eclMatchingPerformance/ECLMatchingPerformanceModule.h>
 
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -44,6 +45,9 @@ void ECLMatchingPerformanceModule::initialize()
   m_trackFitResults.isRequired();
   m_eclClusters.isRequired();
   m_extHits.isRequired();
+  m_eclCalDigits.isRequired();
+
+  m_eclNeighbours = new ECL::ECLNeighbours("N", 1);
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -60,6 +64,11 @@ void ECLMatchingPerformanceModule::event()
   m_iEvent = eventMetaData->getEvent();
   m_iRun = eventMetaData->getRun();
   m_iExperiment = eventMetaData->getExperiment();
+  m_trackMultiplicity = m_tracks.getEntries();
+
+  double distance;
+  TVector3 pos_enter, pos_exit, pos_center;
+  ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
 
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
@@ -90,17 +99,64 @@ void ECLMatchingPerformanceModule::event()
         m_matchedToECLCluster = 1;
         m_hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
       }
+      bool found_first_enter = false;
+      std::set<int> uniqueECLCalDigits;
       for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
+        int copyid =  extHit.getCopyID();
+        if (copyid == -1) continue;
+        if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
         ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
         if (eclClusterNear) {
-          double distance = (eclClusterNear->getClusterPosition() - extHit.getPosition()).Mag();
+          distance = (eclClusterNear->getClusterPosition() - extHit.getPosition()).Mag();
           if (m_distance < 0 || distance < m_distance) {
             m_distance = distance;
           }
         }
+        const int cell = copyid + 1;
+        if (extHit.getStatus() == EXT_ENTER) {
+          m_enter++;
+          bool inserted = (uniqueECLCalDigits.insert(cell)).second;
+          if (!inserted) {
+            for (const auto& eclCalDigit : m_eclCalDigits) {
+              if (eclCalDigit.getCellId() == cell) {
+                m_deposited_energy += eclCalDigit.getEnergy();
+                break;
+              }
+            }
+          }
+          //Find ECLCalDigit in cell ID of ExtHit or one of its neighbours
+          auto& vec_of_neighbouring_cells = m_eclNeighbours->getNeighbours(cell);
+          for (const auto neighbouringcell : vec_of_neighbouring_cells) {
+            const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+            [&](const ECLCalDigit & d) { return d.getCellId() == neighbouringcell; }
+                                       );
+            //Found ECLCalDigit close to ExtHit
+            if (idigit != m_eclCalDigits.end()) {
+              m_matchedToECLCalDigit = 1;
+              break;
+            }
+          }
+          if (!found_first_enter) {
+            pos_enter = extHit.getPosition();
+            found_first_enter = true;
+          }
+        } else if (extHit.getStatus() == EXT_EXIT) {
+          m_exit++;
+          pos_exit = extHit.getPosition();
+        }
       }
-      m_dataTree->Fill(); // write data to tree
+      m_trackLength = (pos_enter - pos_exit).Mag();
+      for (const auto& eclCalDigit : m_eclCalDigits) {
+        if (eclCalDigit.getEnergy() < 0.01) continue;
+        int cellid = eclCalDigit.getCellId();
+        TVector3 cvec = geometry->GetCrystalVec(cellid - 1);
+        distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
+        if (m_innerdistance < 0 || distance < m_innerdistance) {
+          m_innerdistance = distance;
+        }
+      }
     }
+    m_dataTree->Fill(); // write data to tree
   }
 }
 
@@ -118,6 +174,7 @@ void ECLMatchingPerformanceModule::setupTree()
   addVariableToTree("expNo", m_iExperiment);
   addVariableToTree("runNo", m_iRun);
   addVariableToTree("evtNo", m_iEvent);
+  addVariableToTree("nTracks", m_trackMultiplicity);
 
   addVariableToTree("cosTheta", m_trackProperties.cosTheta);
 
@@ -141,6 +198,16 @@ void ECLMatchingPerformanceModule::setupTree()
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
 
   addVariableToTree("MinDistance", m_distance);
+
+  addVariableToTree("TrackECalDigitMatch", m_matchedToECLCalDigit);
+
+  addVariableToTree("nECLEnter", m_enter);
+  addVariableToTree("nECLExit", m_exit);
+
+  addVariableToTree("DepositedEnergy", m_deposited_energy);
+  addVariableToTree("TrackLengthInECL", m_trackLength);
+
+  addVariableToTree("DistanceTo10MeV", m_innerdistance);
 }
 
 void ECLMatchingPerformanceModule::writeData()
@@ -168,6 +235,16 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
   m_hypothesisOfMatchedECLCluster = 0;
 
   m_distance = -999;
+
+  m_matchedToECLCalDigit = 0;
+
+  m_enter = 0;
+  m_exit = 0;
+
+  m_deposited_energy = 0;
+  m_trackLength = 0;
+
+  m_innerdistance = -999;
 }
 
 void ECLMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

@@ -154,19 +154,19 @@ namespace Belle2 {
      * @param (unused) Layer of the sensor
      * @return number of u-side chips
      */
-    unsigned short getNumberOfPXDUSideChips(unsigned short) const
+    unsigned short getNumberOfPXDUSideChips(unsigned short = 0) const
     { return c_nPXDChipsU; }
     /** Get number of v-side PXD chips
      * @param (unused) Layer of the sensor
      * @return number of v-side chips
      */
-    unsigned short getNumberOfPXDVSideChips(unsigned short) const
+    unsigned short getNumberOfPXDVSideChips(unsigned short = 0) const
     { return c_nPXDChipsV; }
     /** Get number of u-side SVD chips
      * @param (unused) Layer of the sensor
      * @return number of u-side chips
      */
-    unsigned short getNumberOfSVDUSideChips(unsigned short) const
+    unsigned short getNumberOfSVDUSideChips(unsigned short = 0) const
     { return c_nSVDChipsLu; }
     /** Get number of v-side SVD chips
      * @param layer Layer of the sensor

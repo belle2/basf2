@@ -104,9 +104,18 @@ class CheckNumbering(basf2.Module):
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
             basf2.B2ERROR('Sensor index neighbourhood test failure: \n' +
-                          'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n' +
-                          'Index: {3}.'.format(init_sensorID, next_expected_sensorID,
-                                               next_sensorID, init_sensor_index + 1))
+                          'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n Index: {3}.'.format(
+                              init_sensorID, next_expected_sensorID,
+                              next_sensorID, init_sensor_index + 1
+                          ))
+
+        # 1c. Sensor counting
+        num_sensors_expected = 212
+        if (self.DCU.getNumberOfSensors() != num_sensors_expected):
+            basf2.B2ERROR('Number of sensors mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              num_sensors_expected, self.DCU.getNumberOfSensors()
+                          ))
         #
         # 2. PXD sensor indexing
         #
@@ -131,6 +140,13 @@ class CheckNumbering(basf2.Module):
                 'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n ' +
                 'Index: {3}.'.format(init_sensorID, next_expected_sensorID,
                                      next_sensorID, init_sensor_index + 1))
+        # 2c. Sensor counting
+        num_sensors_expected = 40
+        if (self.DCU.getNumberOfPXDSensors() != num_sensors_expected):
+            basf2.B2ERROR('Number of PXD sensors mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              num_sensors_expected, self.DCU.getNumberOfPXDSensors()
+                          ))
         #
         # 3. SVD sensor indexing
         #
@@ -155,6 +171,13 @@ class CheckNumbering(basf2.Module):
                 'Initial id: {0} \n Expected id: {1} \n Actaul id: {2} \n ' +
                 'Index: {3}.'.format(init_sensorID, next_expected_sensorID,
                                      next_sensorID, init_sensor_index + 1))
+        # 3c. Sensor counting
+        num_sensors_expected = 172
+        if (self.DCU.getNumberOfSVDSensors() != num_sensors_expected):
+            basf2.B2ERROR('Number of SVD sensors mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              num_sensors_expected, self.DCU.getNumberOfSVDSensors()
+                          ))
         #
         # 4. Layer indexing
         #
@@ -177,6 +200,149 @@ class CheckNumbering(basf2.Module):
                     next_layer,
                     init_layer_index +
                     1))
+        #
+        # 5. PXD chip indexing
+        #
+        # 5a. Chip-on-sensor counts
+        if self.DCU.getNumberOfPXDUSideChips() != 4:
+            basf2.B2ERROR('PXD u-side chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              4, self.DCU.getNumberOfPXDUSideChips())
+                          )
+        if self.DCU.getNumberOfPXDVSideChips() != 6:
+            basf2.B2ERROR('PXD v-side chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              6, self.DCU.getNumberOfPXDVSideChips())
+                          )
+        if self.DCU.getNumberOfSVDUSideChips() != 6:
+            basf2.B2ERROR('SVD u-side chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              6, self.DCU.getNumberOfSVDUSideChips())
+                          )
+        if self.DCU.getNumberOfSVDVSideChips(3) != 6:
+            basf2.B2ERROR('SVD v-side chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              6, self.DCU.getNumberOfSVDVSideChips(3))
+                          )
+        if self.DCU.getNumberOfSVDVSideChips(4) != 4:
+            basf2.B2ERROR('SVD v-side chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              4, self.DCU.getNumberOfSVDVSideChips(4))
+                          )
+        # 5b. PXD chip indexing - loop
+        init_layer = 1
+        init_ladder = 2
+        init_sensor = 1
+        init_uSide = True
+        init_chipNo = 3
+        index_with_vxdid = self.DCU.getPXDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
+        index_with_llss = self.DCU.getPXDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
+        if index_with_vxdid != index_with_llss:
+            basf2.B2ERROR('Mismatch between VxdID-based and layer-ladder-sensor based index:\n' +
+                          'VxdID-based: {0}\nlayer-ladder-sensor: {1}'.format(
+                              index_with_vxdid, index_with_llss)
+                          )
+        returned_chipID = self.DCU.getChipIDFromPXDIndex(index_with_vxdid)
+        returned_layer = returned_chipID.getLayerNumber()
+        returned_ladder = returned_chipID.getLadderNumber()
+        returned_sensor = returned_chipID.getSensorNumber()
+        returned_uSide = self.DCU.isPXDSideU(returned_chipID)
+        returned_chipNo = self.DCU.getPXDChipNumber(returned_chipID)
+        match = (init_layer == returned_layer) and \
+            (init_ladder == returned_ladder) and \
+            (init_sensor == returned_sensor) and \
+            (init_uSide == returned_uSide) and \
+            (init_chipNo == returned_chipNo)
+        if not match:
+            basf2.B2ERROR('Mismatch in PXD chip indexing:\n' +
+                          'Initial: {0} {1} {2} {3} {4}\n'.format(
+                              init_layer, init_ladder, init_sensor, init_uSide, init_chipNo) +
+                          'Final: {0} {1} {2} {3} {4}.'.format(
+                              returned_layer, returned_ladder, returned_sensor, returned_uSide, returned_chipNo)
+                          )
+        # 5c. PXD chip indexing - neighbourhood
+        # We are expecting same sensor, v-side, chip 0
+        expected_layer = init_layer
+        expected_ladder = init_ladder
+        expected_sensor = init_sensor
+        expected_uSide = False
+        expected_chipNo = 0
+        neighbour_chipID = self.DCU.getChipIDFromPXDIndex(index_with_vxdid + 1)
+        neighbour_layer = neighbour_chipID.getLayerNumber()
+        neighbour_ladder = neighbour_chipID.getLadderNumber()
+        neighbour_sensor = neighbour_chipID.getSensorNumber()
+        neighbour_uSide = self.DCU.isPXDSideU(neighbour_chipID)
+        neighbour_chipNo = self.DCU.getPXDChipNumber(neighbour_chipID)
+        match = (expected_layer == neighbour_layer) and \
+            (expected_ladder == neighbour_ladder) and \
+            (expected_sensor == neighbour_sensor) and \
+            (expected_uSide == neighbour_uSide) and \
+            (expected_chipNo == neighbour_chipNo)
+        if not match:
+            basf2.B2ERROR('Mismatch in PXD chip index neighbourship:\n' +
+                          'Expected: {0} {1} {2} {3} {4}\n'.format(
+                              expected_layer, expected_ladder, expected_sensor, expected_uSide, expected_chipNo) +
+                          'Obtained: {0} {1} {2} {3} {4}.'.format(
+                              neighbour_layer, neighbour_ladder, neighbour_sensor, neighbour_uSide, neighbour_chipNo)
+                          )
+
+        # 5d. SVD chip indexing - loop
+        init_layer = 3
+        init_ladder = 2
+        init_sensor = 1
+        init_uSide = True
+        init_chipNo = 5
+        index_with_vxdid = self.DCU.getSVDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
+        index_with_llss = self.DCU.getSVDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
+        if index_with_vxdid != index_with_llss:
+            basf2.B2ERROR('Mismatch between VxdID-based and layer-ladder-sensor based index:\n' +
+                          'VxdID-based: {0}\nlayer-ladder-sensor: {1}'.format(
+                              index_with_vxdid, index_with_llss)
+                          )
+        returned_chipID = self.DCU.getChipIDFromSVDIndex(index_with_vxdid)
+        returned_layer = returned_chipID.getLayerNumber()
+        returned_ladder = returned_chipID.getLadderNumber()
+        returned_sensor = returned_chipID.getSensorNumber()
+        returned_uSide = self.DCU.isSVDSideU(returned_chipID)
+        returned_chipNo = self.DCU.getSVDChipNumber(returned_chipID)
+        match = (init_layer == returned_layer) and \
+            (init_ladder == returned_ladder) and \
+            (init_sensor == returned_sensor) and \
+            (init_uSide == returned_uSide) and \
+            (init_chipNo == returned_chipNo)
+        if not match:
+            basf2.B2ERROR('Mismatch in SVD chip indexing:\n' +
+                          'Initial: {0} {1} {2} {3} {4}\n'.format(
+                              init_layer, init_ladder, init_sensor, init_uSide, init_chipNo) +
+                          'Final: {0} {1} {2} {3} {4}.'.format(
+                              returned_layer, returned_ladder, returned_sensor, returned_uSide, returned_chipNo)
+                          )
+        # 5e. SVD chip indexing - neighbourhood
+        # We are expecting same sensor, v-side, chip 0
+        expected_layer = init_layer
+        expected_ladder = init_ladder
+        expected_sensor = init_sensor
+        expected_uSide = False
+        expected_chipNo = 0
+        neighbour_chipID = self.DCU.getChipIDFromSVDIndex(index_with_vxdid + 1)
+        neighbour_layer = neighbour_chipID.getLayerNumber()
+        neighbour_ladder = neighbour_chipID.getLadderNumber()
+        neighbour_sensor = neighbour_chipID.getSensorNumber()
+        neighbour_uSide = self.DCU.isSVDSideU(neighbour_chipID)
+        neighbour_chipNo = self.DCU.getSVDChipNumber(neighbour_chipID)
+        match = (expected_layer == neighbour_layer) and \
+            (expected_ladder == neighbour_ladder) and \
+            (expected_sensor == neighbour_sensor) and \
+            (expected_uSide == neighbour_uSide) and \
+            (expected_chipNo == neighbour_chipNo)
+        if not match:
+            basf2.B2ERROR('Mismatch in SVD chip index neighbourship:\n' +
+                          'Expected: {0} {1} {2} {3} {4}\n'.format(
+                              expected_layer, expected_ladder, expected_sensor, expected_uSide, expected_chipNo) +
+                          'Obtained: {0} {1} {2} {3} {4}.'.format(
+                              neighbour_layer, neighbour_ladder, neighbour_sensor, neighbour_uSide, neighbour_chipNo)
+                          )
+            # END OF TESTS
 
 
 if __name__ == "__main__":

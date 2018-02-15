@@ -882,7 +882,7 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
-def reconstructMissingKLDecay(
+def reconstructMissingKlongDecayExpert(
     decayString,
     cut,
     dmID=0,
@@ -903,8 +903,8 @@ def reconstructMissingKLDecay(
     @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     """
 
-    pcalc = register_module('KLMomentumCalculator')
-    pcalc.set_name('KLMomentumCalculator_' + decayString)
+    pcalc = register_module('KlongMomentumCalculatorExpert')
+    pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
     pcalc.param('cut', cut)
     pcalc.param('decayMode', dmID)
@@ -912,8 +912,8 @@ def reconstructMissingKLDecay(
     pcalc.param('recoList', recoList)
     analysis_main.add_module(pcalc)
 
-    rmake = register_module('KLDecayReconstructor')
-    rmake.set_name('KLDecayReconstrucotr_' + decayString)
+    rmake = register_module('KlongDecayReconstructorExpert')
+    rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
     rmake.param('decayString', decayString)
     rmake.param('cut', cut)
     rmake.param('decayMode', dmID)

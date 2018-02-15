@@ -77,7 +77,7 @@ namespace Belle2 {
 
     /** Get uv covariance
      */
-    float getUVCovariance() { return m_uvCovariance; }
+    float getUVCovariance() const { return m_uvCovariance; }
 
   private:
 
@@ -93,6 +93,6 @@ namespace Belle2 {
     float m_uvCovariance;
 
 
-    ClassDef(PXDClusterOffsetPar, 1);    /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDClusterOffsetPar, 2);    /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

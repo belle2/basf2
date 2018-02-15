@@ -21,7 +21,7 @@ modularAnalysis
       your own path.
 
 vertex
-===============
+======
 .. automodule:: vertex
    :members:
    :undoc-members:
@@ -72,6 +72,10 @@ variables
 Decay String
 ===============
 .. toctree:: DecayString
+
+Event based analysis
+====================
+.. toctree:: event-based
 
 Advanced Tools
 ===============

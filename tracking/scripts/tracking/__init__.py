@@ -1086,7 +1086,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
 def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_reco_tracks="SVDCDCRecoTracks",
                                      cdc_reco_tracks="CDCRecoTracks", svd_reco_tracks="SVDRecoTracks",
                                      pxd_reco_tracks="PXDRecoTracks",
-                                     weight_file='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
+                                     file='tracking/data/TrackQE_weight_files/FullTrackQE-Default.xml',
                                      do_training=False):
     if(not do_training):
         trackQualityEstimatorMVA = register_module('TrackQualityEstimatorMVA', recoTracksStoreArrayName=reco_tracks,
@@ -1094,7 +1094,7 @@ def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_rec
                                                    CDCRecoTracksStoreArrayName=cdc_reco_tracks,
                                                    SVDRecoTracksStoreArrayName=svd_reco_tracks,
                                                    PXDRecoTracksStoreArrayName=pxd_reco_tracks)
-        trackQualityEstimatorMVA.param('WeightFileIdentifier', weight_file)
+        trackQualityEstimatorMVA.param('WeightFileIdentifier', file)
         path.add_module(trackQualityEstimatorMVA)
     else:
         trackQETrainingDataCollector = register_module('TrackQETrainingDataCollector', recoTracksStoreArrayName=reco_tracks,
@@ -1102,5 +1102,5 @@ def add_track_mva_quality_estimation(path, reco_tracks="RecoTracks", svd_cdc_rec
                                                        CDCRecoTracksStoreArrayName=cdc_reco_tracks,
                                                        SVDRecoTracksStoreArrayName=svd_reco_tracks,
                                                        PXDRecoTracksStoreArrayName=pxd_reco_tracks)
-        trackQETrainingDataCollector.param('TrainingDataOutputName', 'FullRecoTrack-MVA-Training.root')
+        trackQETrainingDataCollector.param('TrainingDataOutputName', file)
         path.add_module(trackQETrainingDataCollector)

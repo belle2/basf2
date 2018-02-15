@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##############################################################################
 #
+# This script dumps out a valid DHC-DHE mapping table for simulation.
+# As we do not have an idea what the real mapping will be, take as an
+# workaround, until we have the table in data base.
+#
+##############################################################################
+
 
 from sys import *
 

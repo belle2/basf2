@@ -117,6 +117,9 @@ namespace Belle2 {
 
     protected:
 
+      /** cluster is not good if something goes wrong */
+      bool m_stopCreationCluster;
+
       /** VxdID of the cluster */
       VxdID m_vxdID;
 

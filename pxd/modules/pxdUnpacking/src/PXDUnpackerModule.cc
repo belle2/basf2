@@ -546,7 +546,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             // We use it here for simulation purpose
           }
           if (u_cellID >= 250) {
-            B2WARNING("DHP COL Overflow (unconnected drain lines) " << u_cellID);
+            B2WARNING("DHP COL Overflow (unconnected drain lines) " << u_cellID << ", ref " << dhe_reformat << ", dhpcol " << dhp_col << ", id "
+                      << dhp_dhp_id);
             m_errorMask |= EPXDErrMask::c_COL_OVERFLOW;
           }
           dhp_adc = dhp_pix[i] & 0xFF;

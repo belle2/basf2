@@ -88,7 +88,7 @@ namespace Belle2 {
         c_DHE_WIE = 1ull << 39,
         //
         c_ROW_OVERFLOW = 1ull << 40,
-        c_DHP_NOT_CONT = 1ull << 40,
+        c_DHP_NOT_CONT = 1ull << 41,
         c_DHP_DHP_FRAME_DIFFER = 1ull << 42,
         c_DHP_DHE_FRAME_DIFFER = 1ull << 43,
         //

@@ -1,5 +1,4 @@
-#ifndef _Belle2_PXDRCCallback_h
-#define _Belle2_PXDRCCallback_h
+#pragma once
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
@@ -57,10 +56,7 @@ namespace Belle2 {
     chid m_RC_req;
     chid m_RC_cur;
     RCState m_state_req;
-    RCState m_state_cur;
 
   };
 
 }
-
-#endif

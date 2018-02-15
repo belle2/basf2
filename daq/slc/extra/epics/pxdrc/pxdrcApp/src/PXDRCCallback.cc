@@ -73,8 +73,7 @@ RCState PXDRCCallback::getRCRequest()
 
 void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  if (m_state_req == RCState::NOTREADY_S || m_state_req == RCState::UNKNOWN) {
-    LogFile::info("set %s>>%s", "READY", pvRCreq);
+  if (m_state_req == RCState::NOTREADY_S) {
     putPV(m_RC_req, "READY");
   } else if (m_state_req == RCState::READY_S) {
     setState(RCState::READY_S);
@@ -83,17 +82,15 @@ void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 
 void PXDRCCallback::abort() throw(RCHandlerException)
 {
-  if (m_state_req == RCState::NOTREADY_S || m_state_req == RCState::UNKNOWN) {
+  if (m_state_req == RCState::NOTREADY_S) {
     setState(RCState::NOTREADY_S);
   } else {
-    LogFile::info("set %s>>%s", "NOTREADY", pvRCreq);
     putPV(m_RC_req, "NOTREADY");
   }
 }
 
 void PXDRCCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  LogFile::info("set %s>>%s", "RUNNING", pvRCreq);
   putPV(m_RC_req, "RUNNING");
 }
 

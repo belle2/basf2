@@ -114,6 +114,19 @@ namespace Belle2 {
     /** Flags of v time */
     TH1I* m_fClusterTimeVFlag;
 
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll;
+    /** u charge of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeU3;
+    /** v charge of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeV3;
+    /** u charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeU456;
+    /** v charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeV456;
+
     /** Hitmaps u of Digits */
     TH1I* m_hitMapCountsU;
     /** Hitmaps v of Digits */

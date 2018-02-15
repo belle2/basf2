@@ -32,6 +32,7 @@ namespace Belle2 {
   struct var_pvt {
     NSMVar var;
     IOSCANPVT* pvt;
+    bool updated;
   };
   typedef std::map<std::string, var_pvt> NSMVarPVTList;
 

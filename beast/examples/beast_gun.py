@@ -73,6 +73,9 @@ main.add_module(fullsim)
 
 # Add additional modules, like digitization and analysis
 # for example He3Digitizer
+# dataobjects created in these modules are also put into the datastore
+# and finally saved into the output root file (he3 digits in this case)
+#
 # he3digi = register_module('He3Digitizer')
 # main.add_module(he3digi)
 

@@ -49,6 +49,7 @@
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <map>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -771,10 +772,10 @@ namespace Belle2 {
   void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName)
   {
     // declare db objects to be imported
-    DBImportArray<TOPCalChannelPulseHeight> calChannelPulseHeight;
-    DBImportArray<TOPCalChannelThresholdEff> calChannelThresholdEff;
-    calChannelPulseHeight.consruct();
-    calChannelThresholdEff.consruct();
+    DBImportObjPtr<TOPCalChannelPulseHeight> calChannelPulseHeight;
+    DBImportObjPtr<TOPCalChannelThresholdEff> calChannelThresholdEff;
+    calChannelPulseHeight.construct();
+    calChannelThresholdEff.construct();
 
     TFile* f = new TFile(fileName.c_str());
     TTree* tr = (TTree*)f->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
@@ -787,35 +788,44 @@ namespace Belle2 {
     float threshold;
     float efficiency;
     float chisquare;
-    float ndf;
-    short fitStatus;
+    int ndf;
     tr->SetBranchAddress("slotId", &slotId);
     tr->SetBranchAddress("pixelId", &pixelId);
-    tr->SetBranchAddress("p1", &p1);
-    tr->SetBranchAddress("p2", &p2);
-    tr->SetBranchAddress("x0", &x0);
+    tr->SetBranchAddress("p1ForGain", &p1);
+    tr->SetBranchAddress("p2ForGain", &p2);
+    tr->SetBranchAddress("x0ForGain", &x0);
     tr->SetBranchAddress("threshold", &threshold);
     tr->SetBranchAddress("efficiency", &efficiency);
-    tr->SetBranchAddress("chisquare", &chisquare);
-    tr->SetBranchAddress("ndf", &ndf);
-    tr->SetBranchAddress("fitStatus", &fitStatus);
+    tr->SetBranchAddress("chisquareForGain", &chisquare);
+    tr->SetBranchAddress("ndfForGain", &ndf);
 
     long nEntries = tr->GetEntries();
+    std::map<short, float> reducedChisqMap;
     for (long iEntry = 0 ; iEntry < nEntries ; iEntry++) {
       tr->GetEntry(iEntry);
       int iBS = ((pixelId - 1) % 64) / 16;
       int iCarrier = (pixelId - 1) / 128;
       int iAsic = 1 - ((pixelId - 1) % 128) / 64 + 2 * (((pixelId - 1) / 8) % 2);
       int iAsicCh = (pixelId - 1) % 8;
-      if (iAsic % 2 == 0) iASicCh = 8 - iAsicCh;
-      int iChannel = 128 * iBS + 32 * iCarrier + 8 * iAsic + iASicCh;
+      if (iAsic % 2 == 0) iAsicCh = 8 - iAsicCh;
+      int iChannel = 128 * iBS + 32 * iCarrier + 8 * iAsic + iAsicCh;
+      short globalChannelNumber = slotId * 1000 + iChannel;
+      float redChisq = chisquare / ndf;
 
-      calChannelPulseHeight.setParameters(slotId, iChannel, x0, p1, p2);
-      calChannelThresholdEff.setThreEff(slotId, iChannel, efficiency);
+      if (reducedChisqMap.count(globalChannelNumber) == 0
+          || reducedChisqMap[globalChannelNumber] > redChisq) {
+        reducedChisqMap[globalChannelNumber] = redChisq;
+        calChannelPulseHeight->setParameters(slotId, iChannel, x0, p1, p2);
+        calChannelThresholdEff->setThrEff(slotId, iChannel, efficiency);
+      }
+    }
 
-      if (chisquare / ndf > 10.) {
-        calChannelPulseHeight.setUnusable(slotId, iChannel);
-        calChannelThresholdEff.setUnusable(slotId, iChannel);
+    for (auto chi2 : reducedChisqMap) {
+      if (chi2.second > 10.) {
+        slotId = chi2.first / 1000;
+        int iChannel = chi2.first % 1000;
+        calChannelPulseHeight->setUnusable(slotId, iChannel);
+        calChannelThresholdEff->setUnusable(slotId, iChannel);
       }
     }
 
@@ -823,7 +833,8 @@ namespace Belle2 {
     calChannelPulseHeight.import(iov);
     calChannelThresholdEff.import(iov);
 
-    B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
+    B2RESULT("Imported channel-by-channel gain and efficiency data from fitting of pulse height distribution for "
+             << reducedChisqMap.size() << " channels from " << fileName << " file.");
 
     return;
   }

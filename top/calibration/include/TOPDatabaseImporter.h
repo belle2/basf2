@@ -123,7 +123,7 @@ namespace Belle2 {
 
     /**
      * Import fit results of pulse height disribution for channel gain and threshold efficiency
-     * @param fileName : name of the text file containing relevant data
+     * @param fileName : name of the root file containing relevant data, which is obtained from TOPGainEfficiencyMonitor
      */
     void importPmtPulseHeightFitResult(std::string fileName);
 

@@ -40,4 +40,4 @@ process(main)
 dbImporter = TOPDatabaseImporter()
 
 # import constants
-dbImporter.importPmtPulseHeightFitResult("")
+dbImporter.importPmtPulseHeightFitResult("/group/belle2/users/okuto/gain_summary_bfield_newHV.root")

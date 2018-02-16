@@ -60,8 +60,8 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("PXDRawPedestalsName", m_PXDRawPedestalsName, "The name of the StoreArray of generated PXDRawPedestals", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
-  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
-  addParam("IgnoreMetaFlags", m_ignoreMetaFlags, "Ignore wrong Meta event flags", false);
+  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", true);
+  addParam("IgnoreMetaFlags", m_ignoreMetaFlags, "Ignore wrong Meta event flags", true);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)0);
@@ -89,13 +89,13 @@ void PXDUnpackerModule::initialize()
   m_storeRawCluster.registerInDataStore(m_RawClusterName);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
-  B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
-  B2INFO("Ignore (missing) DATCON: " << m_ignoreDATCON);
-  B2INFO("Ignore (some) missing Meta flags: " << m_ignoreMetaFlags);
-  B2INFO("ForceMapping: " << m_forceMapping);
-  B2INFO("ForceNoMapping: " << m_forceNoMapping);
-  B2INFO("CheckPaddingCRC: " << m_checkPaddingCRC);
-  B2INFO("MaxDHPFrameDiff: " << m_maxDHPFrameDiff);
+  B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);
+  B2DEBUG(1, "Ignore (missing) DATCON: " << m_ignoreDATCON);
+  B2DEBUG(1, "Ignore (some) missing Meta flags: " << m_ignoreMetaFlags);
+  B2DEBUG(1, "ForceMapping: " << m_forceMapping);
+  B2DEBUG(1, "ForceNoMapping: " << m_forceNoMapping);
+  B2DEBUG(1, "CheckPaddingCRC: " << m_checkPaddingCRC);
+  B2DEBUG(1, "MaxDHPFrameDiff: " << m_maxDHPFrameDiff);
 
   m_sendunfiltered = 0;
   m_sendrois = 0;

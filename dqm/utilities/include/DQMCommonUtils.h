@@ -149,24 +149,32 @@ namespace Belle2 {
     /*********************************************************************
      * Chip-related parameters
      *********************************************************************/
+    /** Get total number of chips in PXD
+     * @return total number of chips in PXD
+     */
+    size_t getTotalPXDChips() const { return m_listOfPXDChips.size(); }
 
     /** Get number of u-side PXD chips
      * @param (unused) Layer of the sensor
      * @return number of u-side chips
      */
-    unsigned short getNumberOfPXDUSideChips(unsigned short) const
+    unsigned short getNumberOfPXDUSideChips(unsigned short = 0) const
     { return c_nPXDChipsU; }
     /** Get number of v-side PXD chips
      * @param (unused) Layer of the sensor
      * @return number of v-side chips
      */
-    unsigned short getNumberOfPXDVSideChips(unsigned short) const
+    unsigned short getNumberOfPXDVSideChips(unsigned short = 0) const
     { return c_nPXDChipsV; }
+    /** Get total number of chips in SVD
+     * @return total number of chips in SVD
+     */
+    size_t getTotalSVDChips() const { return m_listOfSVDChips.size(); }
     /** Get number of u-side SVD chips
      * @param (unused) Layer of the sensor
      * @return number of u-side chips
      */
-    unsigned short getNumberOfSVDUSideChips(unsigned short) const
+    unsigned short getNumberOfSVDUSideChips(unsigned short = 0) const
     { return c_nSVDChipsLu; }
     /** Get number of v-side SVD chips
      * @param layer Layer of the sensor
@@ -242,6 +250,7 @@ namespace Belle2 {
      * PXD chip indexing
      *********************************************************************/
     /** Return PXD chip index in the list of PXD chips.
+      * 1-based chip numbering.
       * @param sensorID VxdID of the sensor
       * @param isU true for u side of the sensor (DCD)
       * @param chip Chip position on sensor - DCDs or Switchers
@@ -250,7 +259,7 @@ namespace Belle2 {
     int getPXDChipIndex(VxdID sensorID, bool isU, int chip) const
     {
       VxdID chipID(sensorID);
-      chip = isU ? chip : chip + c_nPXDChipsU;
+      chip = isU ? chip - 1 : chip - 1 + c_nPXDChipsU;
       chipID.setSegmentNumber(static_cast<unsigned short>(chip));
       return std::distance(
                m_listOfPXDChips.begin(),
@@ -261,7 +270,7 @@ namespace Belle2 {
       * @param ladder ladder position of sensor
       * @param sensor sensor position of sensor
       * @param isU true for u side of the sensor (DCD)
-      * @param chip Chip position on sensor - DCDs or Switchers
+      * @param chip Chip number on sensor (DCD or switcher, 1-based)
       * @return Index of sensor in plots.
       */
     int getPXDChipIndex(int layer, int ladder, int sensor, bool isU, int chip) const
@@ -269,7 +278,7 @@ namespace Belle2 {
       return getPXDChipIndex(VxdID(layer, ladder, sensor), isU, chip);
     }
 
-    /** Return position of a chip on a PXD sensor for index in the list. .
+    /** Return chipID (VxdID with side and chipNo) for index in the list. .
       * @param pxdChipIndex Index in the list of PXD sensors.
       * @return chipID: VxdID with chip number/side encoded in segment part.
       */
@@ -287,14 +296,14 @@ namespace Belle2 {
       return (chipID.getSegmentNumber() < c_nPXDChipsU);
     }
 
-    /** Decode sensor number from a PXD ChipID.
+    /** Decode (1-based) chip  number from a PXD ChipID.
      * @param chipID VxdID with chip number encoded in Segment part.
      * @return Chip number on the respective sensor side.
      */
     unsigned short getPXDChipNumber(VxdID chipID) const
     {
       unsigned short chipNo = chipID.getSegmentNumber();
-      return (chipNo < c_nPXDChipsU ? chipNo : (chipNo - c_nPXDChipsU));
+      return (chipNo < c_nPXDChipsU ? chipNo + 1 : (chipNo + 1 - c_nPXDChipsU));
     }
 
     /*********************************************************************
@@ -321,7 +330,7 @@ namespace Belle2 {
       return getSVDSensorIndex(VxdID(layer, ladder, sensor));
     }
 
-    /** Function return VxdID for SVD index of sensor in plots.
+    /** Return VxdID for SVD index of sensor in plots.
       * Uses SVD sensor count, without PXD.
       * @param svdIndex Index of the SVD sensor.
       */
@@ -337,16 +346,16 @@ namespace Belle2 {
     /** Return SVD chip index in the list of SVD chips.
       * @param sensorID VxdID of the sensor
       * @param isU true for u side of the sensor
-      * @param chip Chip position on sensor
+      * @param chip Chip position on sensor (1-based)
       * @return Index of sensor in plots.
       */
     int getSVDChipIndex(VxdID sensorID, bool isU, int chip) const
     {
       VxdID chipID(sensorID);
       if (sensorID.getLayerNumber() == 3)
-        chip = isU ? chip : chip + c_nSVDChipsL3;
+        chip = isU ? chip - 1 : chip - 1 + c_nSVDChipsL3;
       else
-        chip = isU ? chip : chip + c_nSVDChipsLu;
+        chip = isU ? chip - 1 : chip - 1 + c_nSVDChipsLu;
       chipID.setSegmentNumber(static_cast<unsigned short>(chip));
       return std::distance(
                m_listOfSVDChips.begin(),
@@ -357,7 +366,7 @@ namespace Belle2 {
       * @param ladder ladder position of sensor
       * @param sensor sensor position of sensor
       * @param isU true for u side of the sensor
-      * @param chip Chip position on sensor
+      * @param chip Chip position on sensor (1-based)
       * @return Index of sensor in plots.
       */
     int getSVDChipIndex(int layer, int ladder, int sensor, bool isU, int chip) const
@@ -365,7 +374,7 @@ namespace Belle2 {
       return getSVDChipIndex(VxdID(layer, ladder, sensor), isU, chip);
     }
 
-    /** Return position of a chip on a SVD sensor for index in the list. .
+    /** Return chipID (VxdID with side and chipNo) for index in the list. .
       * @param svdChipIndex Index in the list of SVD sensors.
       * @return chipID: VxdID with chip number/side encoded in segment part.
       */
@@ -383,7 +392,7 @@ namespace Belle2 {
       return (chipID.getLayerNumber() == 3 ? chipID.getSegmentNumber() < c_nSVDChipsL3 : chipID.getSegmentNumber() < c_nSVDChipsLu);
     }
 
-    /** Decode sensor number from a SVD ChipID.
+    /** Decode (1-based) chip number from a SVD ChipID.
      * @param chipID VxdID with chip number encoded in Segment part.
      * @return Chip number on the respective sensor side.
      */
@@ -392,14 +401,14 @@ namespace Belle2 {
       unsigned short chipNo = chipID.getSegmentNumber();
       if (chipID.getLayerNumber() == 3) {
         if (chipNo < c_nSVDChipsL3)
-          return chipNo;
+          return chipNo + 1;
         else
-          return (chipNo - c_nSVDChipsL3);
+          return (chipNo + 1 - c_nSVDChipsL3);
       } else {
         if (chipNo < c_nSVDChipsLu)
-          return chipNo;
+          return chipNo + 1;
         else
-          return (chipNo - c_nSVDChipsLu);
+          return (chipNo + 1 - c_nSVDChipsLu);
       }
     }
 

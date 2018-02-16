@@ -42,6 +42,9 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
 
   addParam("NameTag", m_PARAMNameTag, "A name tag that will be attached to the name of the output file. If left empty (\"\") a "
            "random number will be attached!", std::string(""));
+
+  addParam("checkForFit", m_checkForFit, "If true it check that there exists a related RecoTrack and that RecoTrack was fitted.",
+           bool(true));
 }
 
 /**

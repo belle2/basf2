@@ -35,6 +35,14 @@ parser.add_argument(
     default=False,
     help='enable the selection of training sample based on track parameters')
 
+parser.add_argument(
+    '--disable_checkFit',
+    dest='checkFit',
+    action='store_const',
+    const=False,
+    default=True,
+    help="By default only RecoTracks with valid fit are taken by training. Usiing this option will disable that. ")
+
 arguments = parser.parse_args()
 use_noKick = arguments.use_NoKick
 
@@ -47,6 +55,7 @@ use_noKick = arguments.use_NoKick
 set_log_level(LogLevel.ERROR)
 log_to_file('logVXDTF2Preparation.log', append=False)
 # if false PXD hits will be ignored in the trainings data collection
+# Currently we dont do PXD tracking with vxdtf2 (as of 15.02.2018)
 usePXD = False
 
 # ---------------------------------------------------------------------------------------
@@ -115,6 +124,7 @@ if usePXD:
 else:
     nameTag += '_SVDOnly'
 
+#
 SecMapTrainerBase = register_module('VXDTFTrainingDataCollector')
 SecMapTrainerBase.param('NameTag', nameTag)
 SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')

@@ -16,6 +16,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <dqm/utilities/DQMCommonUtils.h>
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
@@ -24,20 +25,21 @@
 namespace Belle2 {
 
   /** PXD DQM Module */
-  class PXDDQMExpressRecoMinModule : public HistoModule {  // <- derived from HistoModule class
+  class PXDDQMClustersModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
-    PXDDQMExpressRecoMinModule();
+    PXDDQMClustersModule();
     /* Destructor */
-    virtual ~PXDDQMExpressRecoMinModule();
+    virtual ~PXDDQMClustersModule();
 
   private:
     /** Module functions */
     void initialize() override final;
     void beginRun() override final;
     void event() override final;
+    void endRun() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -46,6 +48,9 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /** Connection to DQMCommonUtils folder of functions for DQM */
+    DQMCommonUtils* m_utils = nullptr;
 
     /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
     float m_CutPXDCharge = 0.0;
@@ -90,60 +95,60 @@ namespace Belle2 {
     /** Cluster size */
     TH1F** m_clusterSizeUV;
 
-    /** Number of PXD chips per sensor in u (DCD) (=4) on Belle II */
-    int c_nPXDChipsU = 4;
-    /** Number of PXD chips per sensor in v (Switchers) (=6) on Belle II */
-    int c_nPXDChipsV = 6;
-    /** Number of PXD chips per sensor on Belle II */
-    int c_nPXDChips;
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** Number of PXD sensors on Belle II */
-    int c_nPXDSensors;
+    /** Hitmaps pixels for u */
+    TH1F** m_hitMapU;
+    /** Hitmaps pixels for v */
+    TH1F** m_hitMapV;
+    /** Hitmaps pixels */
+    TH2F** m_hitMap;
+    /** Hitmaps clusters for u */
+    TH1F** m_hitMapUCl;
+    /** Hitmaps clusters for v */
+    TH1F** m_hitMapVCl;
+    /** Hitmaps clusters */
+    TH2F** m_hitMapCl;
+    /** Seed */
+    TH1F** m_seed;
 
-    /** Function return index of chip in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @param Chip Chip position on sensor - DCDs or Switchers
-       * @param IsU Info if Chip is on u direction (DCD)
-       * @return Index of sensor in plots.
-       */
-    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip, const int IsU) const;
-    /** Function return position indexes of chipID in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       * @param Chip return Chip position on sensor - DCDs or Switchers
-       * @param IsU return info if Chip is on u direction (DCD)
-       */
-    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip, int& IsU) const;
+    /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
+    std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
+    /** Number of events */
+    int m_NoOfEvents;
+    /** Number of events in reference histogram */
+    int m_NoOfEventsRef;
 
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       */
-    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
+    /** Using local files instead of DataBase for reference histogram, default=0 */
+    int m_NotUseDB = 0;
+    /** Create and fill reference histograms in DataBase, default=0 */
+    int m_CreateDB = 0;
+
+    /** Basic Directory in output file */
+    TDirectory* m_oldDir;
+
+    /** Flags of Hitmaps of Digits */
+    TH1I* m_fHitMapCountsFlag;
+    /** Flags of Hitmaps of Clusters*/
+    TH1I* m_fHitMapClCountsFlag;
+    /** Flags of Fired Digits */
+    TH1I* m_fFiredFlag;
+    /** Flags of Clusters per event */
+    TH1I* m_fClustersFlag;
+    /** Flags of Start row distribution */
+    TH1I* m_fStartRowFlag;
+    /** Flags of Cluster seed charge by distance from the start row */
+    TH1I* m_fChargStartRowFlag;
+    /** Flags of counter for Cluster seed charge by distance from the start row */
+    TH1I* m_fStartRowCountFlag;
+    /** Flags of Charge of clusters */
+    TH1I* m_fClusterChargeFlag;
+    /** Flags of Charge of pixels */
+    TH1I* m_fPixelSignalFlag;
+    /** Flags of u cluster size */
+    TH1I* m_fClusterSizeUFlag;
+    /** Flags of v cluster size */
+    TH1I* m_fClusterSizeVFlag;
+    /** Flags of Cluster size */
+    TH1I* m_fClusterSizeUVFlag;
 
   };
 

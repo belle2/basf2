@@ -21,7 +21,9 @@ class CheckNumbering(basf2.Module):
         """ Initialize the DQMCommonUtils class here. It builds
         its lookup arrrays, so we want to do it only once."""
 
-        self.DCU = Belle2.DQMCommonUtils()
+        self.gTools = Belle2.VXD.GeoCache.getInstance().getGeoTools()
+        if not self.gTools:
+            basf2.B2FATAL("GeoTools not available!")
 
     def event(self):
         """ We test sensor and chip numbering by going from ID to
@@ -30,14 +32,14 @@ class CheckNumbering(basf2.Module):
         # 0. General parameters
         #
         # 0a. Layer counts
-        if (self.DCU.getNumberOfLayers() != 6):
-            basf2.B2ERROR('Layer count failure: \n {0} layers reported, 6 actually.'.format(self.DCU.getNumberOfLayers()))
-        if (self.DCU.getNumberOfPXDLayers() != 2):
-            basf2.B2ERROR('PXD layer count failure: \n {0} layers reported, 2 actually.'.format(self.DCU.getNumberOfPXDLayers()))
-        if (self.DCU.getNumberOfSVDLayers() != 4):
-            basf2.B2ERROR('SVD layer count failure: \n {0} layers reported, 4 actually.'.format(self.DCU.getNumberOfSVDLayers()))
+        if (self.gTools.getNumberOfLayers() != 6):
+            basf2.B2ERROR('Layer count failure: \n {0} layers reported, 6 actually.'.format(self.gTools.getNumberOfLayers()))
+        if (self.gTools.getNumberOfPXDLayers() != 2):
+            basf2.B2ERROR('PXD layer count failure: \n {0} layers reported, 2 actually.'.format(self.gTools.getNumberOfPXDLayers()))
+        if (self.gTools.getNumberOfSVDLayers() != 4):
+            basf2.B2ERROR('SVD layer count failure: \n {0} layers reported, 4 actually.'.format(self.gTools.getNumberOfSVDLayers()))
         # 0b. Layer numbers
-        layers = self.DCU.getLayers()
+        layers = self.gTools.getLayers()
         expected_layers = [1, 2, 3, 4, 5, 6]
         match = True
         for l1, l2 in zip(layers, expected_layers):
@@ -49,7 +51,7 @@ class CheckNumbering(basf2.Module):
             l2_string = ' '.join([str(x) for x in expected_layers])
             basf2.B2ERROR('Layer numbers do not match, expected {0}, got {1}!'.format(l2_string, l1_string))
 
-        layers = self.DCU.getPXDLayers()
+        layers = self.gTools.getPXDLayers()
         expected_layers = [1, 2]
         match = True
         for l1, l2 in zip(layers, expected_layers):
@@ -61,7 +63,7 @@ class CheckNumbering(basf2.Module):
             l2_string = ' '.join([str(x) for x in expected_layers])
             basf2.B2ERROR('PXD layer numbers do not match, expected {0}, got {1}!'.format(l2_string, l1_string))
 
-        layers = self.DCU.getSVDLayers()
+        layers = self.gTools.getSVDLayers()
         expected_layers = [3, 4, 5, 6]
         match = True
         for l1, l2 in zip(layers, expected_layers):
@@ -74,32 +76,32 @@ class CheckNumbering(basf2.Module):
             basf2.B2ERROR('SVD layer numbers do not match, expected {0}, got {1}!'.format(l2_string, l1_string))
 
         # 0c. Layer ranges
-        if (self.DCU.getFirstLayer() != 1):
-            basf2.B2ERROR('First layer number is 1, reported {0}.'.format(self.DCU.getFirstLayer()))
-        if (self.DCU.getLastLayer() != 6):
-            basf2.B2ERROR('Last layer number is 6, reported {0}.'.format(self.DCU.getLastLayer()))
-        if (self.DCU.getFirstPXDLayer() != 1):
-            basf2.B2ERROR('First PXD layer number is 1, reported {0}.'.format(self.DCU.getFirstPXDLayer()))
-        if (self.DCU.getLastPXDLayer() != 2):
-            basf2.B2ERROR('Last PXD layer number is 2, reported {0}.'.format(self.DCU.getLastPXDLayer()))
-        if (self.DCU.getFirstSVDLayer() != 3):
-            basf2.B2ERROR('First SVD layer number is 3, reported {0}.'.format(self.DCU.getFirstSVDLayer()))
-        if (self.DCU.getLastSVDLayer() != 6):
-            basf2.B2ERROR('Last SVD layer number is 6, reported {0}.'.format(self.DCU.getLastSVDLayer()))
+        if (self.gTools.getFirstLayer() != 1):
+            basf2.B2ERROR('First layer number is 1, reported {0}.'.format(self.gTools.getFirstLayer()))
+        if (self.gTools.getLastLayer() != 6):
+            basf2.B2ERROR('Last layer number is 6, reported {0}.'.format(self.gTools.getLastLayer()))
+        if (self.gTools.getFirstPXDLayer() != 1):
+            basf2.B2ERROR('First PXD layer number is 1, reported {0}.'.format(self.gTools.getFirstPXDLayer()))
+        if (self.gTools.getLastPXDLayer() != 2):
+            basf2.B2ERROR('Last PXD layer number is 2, reported {0}.'.format(self.gTools.getLastPXDLayer()))
+        if (self.gTools.getFirstSVDLayer() != 3):
+            basf2.B2ERROR('First SVD layer number is 3, reported {0}.'.format(self.gTools.getFirstSVDLayer()))
+        if (self.gTools.getLastSVDLayer() != 6):
+            basf2.B2ERROR('Last SVD layer number is 6, reported {0}.'.format(self.gTools.getLastSVDLayer()))
         # 0d. Sensor numbers
         #
         # 1. General sensor indexing
         #
         # 1a. Basic loop
         init_sensorID = Belle2.VxdID(3, 1, 1)
-        init_sensor_index = self.DCU.getSensorIndex(init_sensorID)
-        ret_sensorID = self.DCU.getSensorIDFromIndex(init_sensor_index)
+        init_sensor_index = self.gTools.getSensorIndex(init_sensorID)
+        ret_sensorID = self.gTools.getSensorIDFromIndex(init_sensor_index)
         if init_sensorID.getID() != ret_sensorID.getID():
             basf2.B2ERROR(
                 "Sensor index failure: \n Initial id: {0} \n VXD index: {1} \n Retrieved id: {2}.".format(
                     init_sensorID, init_sensor_index, ret_sensorID))
         # 1b. Neighbourhood test
-        next_sensorID = self.DCU.getSensorIDFromIndex(init_sensor_index + 1)
+        next_sensorID = self.gTools.getSensorIDFromIndex(init_sensor_index + 1)
         next_expected_sensorID = Belle2.VxdID(init_sensorID)
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
@@ -111,27 +113,27 @@ class CheckNumbering(basf2.Module):
 
         # 1c. Sensor counting
         num_sensors_expected = 212
-        if (self.DCU.getNumberOfSensors() != num_sensors_expected):
+        if (self.gTools.getNumberOfSensors() != num_sensors_expected):
             basf2.B2ERROR('Number of sensors mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              num_sensors_expected, self.DCU.getNumberOfSensors()
+                              num_sensors_expected, self.gTools.getNumberOfSensors()
                           ))
         #
         # 2. PXD sensor indexing
         #
         # 2a. Basic loop
         init_sensorID = Belle2.VxdID(1, 2, 1)
-        init_sensor_index = self.DCU.getPXDSensorIndex(
+        init_sensor_index = self.gTools.getPXDSensorIndex(
             init_sensorID.getLayerNumber(),
             init_sensorID.getLadderNumber(),
             init_sensorID.getSensorNumber())
-        ret_sensorID = self.DCU.getSensorIDFromPXDIndex(init_sensor_index)
+        ret_sensorID = self.gTools.getSensorIDFromPXDIndex(init_sensor_index)
         if init_sensorID.getID() != ret_sensorID.getID():
             basf2.B2ERROR(
                 "PXD sensor index failure: \n Initial id: {0} \n VXD index: {1} \n Retrieved id: {2}.".format(
                     init_sensorID, init_sensor_index, ret_sensorID))
         # 2b. Neighbourhood test
-        next_sensorID = self.DCU.getSensorIDFromPXDIndex(init_sensor_index + 1)
+        next_sensorID = self.gTools.getSensorIDFromPXDIndex(init_sensor_index + 1)
         next_expected_sensorID = Belle2.VxdID(init_sensorID)
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
@@ -142,27 +144,27 @@ class CheckNumbering(basf2.Module):
                                      next_sensorID, init_sensor_index + 1))
         # 2c. Sensor counting
         num_sensors_expected = 40
-        if (self.DCU.getNumberOfPXDSensors() != num_sensors_expected):
+        if (self.gTools.getNumberOfPXDSensors() != num_sensors_expected):
             basf2.B2ERROR('Number of PXD sensors mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              num_sensors_expected, self.DCU.getNumberOfPXDSensors()
+                              num_sensors_expected, self.gTools.getNumberOfPXDSensors()
                           ))
         #
         # 3. SVD sensor indexing
         #
         # 2a. Basic loop
         init_sensorID = Belle2.VxdID(4, 2, 1)
-        init_sensor_index = self.DCU.getSVDSensorIndex(
+        init_sensor_index = self.gTools.getSVDSensorIndex(
             init_sensorID.getLayerNumber(),
             init_sensorID.getLadderNumber(),
             init_sensorID.getSensorNumber())
-        ret_sensorID = self.DCU.getSensorIDFromSVDIndex(init_sensor_index)
+        ret_sensorID = self.gTools.getSensorIDFromSVDIndex(init_sensor_index)
         if init_sensorID.getID() != ret_sensorID.getID():
             basf2.B2ERROR(
                 "SVD sensor index failure: \n Initial id: {0} \n VXD index: {1} \n Retrieved id: {2}.".format(
                     init_sensorID, init_sensor_index, ret_sensorID))
         # 2b. Neighbourhood test
-        next_sensorID = self.DCU.getSensorIDFromSVDIndex(init_sensor_index + 1)
+        next_sensorID = self.gTools.getSensorIDFromSVDIndex(init_sensor_index + 1)
         next_expected_sensorID = Belle2.VxdID(init_sensorID)
         next_expected_sensorID.setSensorNumber(init_sensorID.getSensorNumber() + 1)
         if next_expected_sensorID.getID() != next_sensorID.getID():
@@ -173,24 +175,24 @@ class CheckNumbering(basf2.Module):
                                      next_sensorID, init_sensor_index + 1))
         # 3c. Sensor counting
         num_sensors_expected = 172
-        if (self.DCU.getNumberOfSVDSensors() != num_sensors_expected):
+        if (self.gTools.getNumberOfSVDSensors() != num_sensors_expected):
             basf2.B2ERROR('Number of SVD sensors mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              num_sensors_expected, self.DCU.getNumberOfSVDSensors()
+                              num_sensors_expected, self.gTools.getNumberOfSVDSensors()
                           ))
         #
         # 4. Layer indexing
         #
         # 4a. Basic loop
         init_layer = 4
-        init_layer_index = self.DCU.getLayerIndex(init_layer)
-        ret_layer = self.DCU.getLayerNumberFromLayerIndex(init_layer_index)
+        init_layer_index = self.gTools.getLayerIndex(init_layer)
+        ret_layer = self.gTools.getLayerNumberFromLayerIndex(init_layer_index)
         if init_layer != ret_layer:
             basf2.B2ERROR(
                 "Layer index failure: \n Initial: {0} \n Index: {1} \n Retrieved: {2}.".format(
                     init_layer, init_layer_index, ret_layer))
         # 2b. Neighbourhood test
-        next_layer = self.DCU.getLayerNumberFromLayerIndex(init_layer_index + 1)
+        next_layer = self.gTools.getLayerNumberFromLayerIndex(init_layer_index + 1)
         next_expected_layer = init_layer + 1
         if next_layer != next_expected_layer:
             basf2.B2ERROR(
@@ -204,40 +206,40 @@ class CheckNumbering(basf2.Module):
         # 5. PXD chip indexing
         #
         # 5a. Chip-on-sensor counts
-        if self.DCU.getTotalPXDChips() != 2120:
+        if self.gTools.getTotalPXDChips() != 2120:
             basf2.B2ERROR('PXD chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              2120, self.DCU.getTotalPXDChips())
+                              2120, self.gTools.getTotalPXDChips())
                           )
-        if self.DCU.getNumberOfPXDUSideChips() != 4:
+        if self.gTools.getNumberOfPXDUSideChips() != 4:
             basf2.B2ERROR('PXD u-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              4, self.DCU.getNumberOfPXDUSideChips())
+                              4, self.gTools.getNumberOfPXDUSideChips())
                           )
-        if self.DCU.getNumberOfPXDVSideChips() != 6:
+        if self.gTools.getNumberOfPXDVSideChips() != 6:
             basf2.B2ERROR('PXD v-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              6, self.DCU.getNumberOfPXDVSideChips())
+                              6, self.gTools.getNumberOfPXDVSideChips())
                           )
-        if self.DCU.getTotalSVDChips() != 2148:
+        if self.gTools.getTotalSVDChips() != 2148:
             basf2.B2ERROR('SVD chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              2148, self.DCU.getTotalSVDChips())
+                              2148, self.gTools.getTotalSVDChips())
                           )
-        if self.DCU.getNumberOfSVDUSideChips() != 6:
+        if self.gTools.getNumberOfSVDUSideChips() != 6:
             basf2.B2ERROR('SVD u-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              6, self.DCU.getNumberOfSVDUSideChips())
+                              6, self.gTools.getNumberOfSVDUSideChips())
                           )
-        if self.DCU.getNumberOfSVDVSideChips(3) != 6:
+        if self.gTools.getNumberOfSVDVSideChips(3) != 6:
             basf2.B2ERROR('SVD v-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              6, self.DCU.getNumberOfSVDVSideChips(3))
+                              6, self.gTools.getNumberOfSVDVSideChips(3))
                           )
-        if self.DCU.getNumberOfSVDVSideChips(4) != 4:
+        if self.gTools.getNumberOfSVDVSideChips(4) != 4:
             basf2.B2ERROR('SVD v-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
-                              4, self.DCU.getNumberOfSVDVSideChips(4))
+                              4, self.gTools.getNumberOfSVDVSideChips(4))
                           )
         # 5b. PXD chip indexing - loop
         init_layer = 1
@@ -245,19 +247,19 @@ class CheckNumbering(basf2.Module):
         init_sensor = 1
         init_uSide = True
         init_chipNo = 4
-        index_with_vxdid = self.DCU.getPXDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
-        index_with_llss = self.DCU.getPXDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
+        index_with_vxdid = self.gTools.getPXDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
+        index_with_llss = self.gTools.getPXDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
         if index_with_vxdid != index_with_llss:
             basf2.B2ERROR('Mismatch between VxdID-based and layer-ladder-sensor based index:\n' +
                           'VxdID-based: {0}\nlayer-ladder-sensor: {1}'.format(
                               index_with_vxdid, index_with_llss)
                           )
-        returned_chipID = self.DCU.getChipIDFromPXDIndex(index_with_vxdid)
+        returned_chipID = self.gTools.getChipIDFromPXDIndex(index_with_vxdid)
         returned_layer = returned_chipID.getLayerNumber()
         returned_ladder = returned_chipID.getLadderNumber()
         returned_sensor = returned_chipID.getSensorNumber()
-        returned_uSide = self.DCU.isPXDSideU(returned_chipID)
-        returned_chipNo = self.DCU.getPXDChipNumber(returned_chipID)
+        returned_uSide = self.gTools.isPXDSideU(returned_chipID)
+        returned_chipNo = self.gTools.getPXDChipNumber(returned_chipID)
         match = (init_layer == returned_layer) and \
             (init_ladder == returned_ladder) and \
             (init_sensor == returned_sensor) and \
@@ -277,12 +279,12 @@ class CheckNumbering(basf2.Module):
         expected_sensor = init_sensor
         expected_uSide = False
         expected_chipNo = 1
-        neighbour_chipID = self.DCU.getChipIDFromPXDIndex(index_with_vxdid + 1)
+        neighbour_chipID = self.gTools.getChipIDFromPXDIndex(index_with_vxdid + 1)
         neighbour_layer = neighbour_chipID.getLayerNumber()
         neighbour_ladder = neighbour_chipID.getLadderNumber()
         neighbour_sensor = neighbour_chipID.getSensorNumber()
-        neighbour_uSide = self.DCU.isPXDSideU(neighbour_chipID)
-        neighbour_chipNo = self.DCU.getPXDChipNumber(neighbour_chipID)
+        neighbour_uSide = self.gTools.isPXDSideU(neighbour_chipID)
+        neighbour_chipNo = self.gTools.getPXDChipNumber(neighbour_chipID)
         match = (expected_layer == neighbour_layer) and \
             (expected_ladder == neighbour_ladder) and \
             (expected_sensor == neighbour_sensor) and \
@@ -302,19 +304,19 @@ class CheckNumbering(basf2.Module):
         init_sensor = 1
         init_uSide = True
         init_chipNo = 6
-        index_with_vxdid = self.DCU.getSVDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
-        index_with_llss = self.DCU.getSVDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
+        index_with_vxdid = self.gTools.getSVDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
+        index_with_llss = self.gTools.getSVDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
         if index_with_vxdid != index_with_llss:
             basf2.B2ERROR('Mismatch between VxdID-based and layer-ladder-sensor based index:\n' +
                           'VxdID-based: {0}\nlayer-ladder-sensor: {1}'.format(
                               index_with_vxdid, index_with_llss)
                           )
-        returned_chipID = self.DCU.getChipIDFromSVDIndex(index_with_vxdid)
+        returned_chipID = self.gTools.getChipIDFromSVDIndex(index_with_vxdid)
         returned_layer = returned_chipID.getLayerNumber()
         returned_ladder = returned_chipID.getLadderNumber()
         returned_sensor = returned_chipID.getSensorNumber()
-        returned_uSide = self.DCU.isSVDSideU(returned_chipID)
-        returned_chipNo = self.DCU.getSVDChipNumber(returned_chipID)
+        returned_uSide = self.gTools.isSVDSideU(returned_chipID)
+        returned_chipNo = self.gTools.getSVDChipNumber(returned_chipID)
         match = (init_layer == returned_layer) and \
             (init_ladder == returned_ladder) and \
             (init_sensor == returned_sensor) and \
@@ -334,12 +336,12 @@ class CheckNumbering(basf2.Module):
         expected_sensor = init_sensor
         expected_uSide = False
         expected_chipNo = 1
-        neighbour_chipID = self.DCU.getChipIDFromSVDIndex(index_with_vxdid + 1)
+        neighbour_chipID = self.gTools.getChipIDFromSVDIndex(index_with_vxdid + 1)
         neighbour_layer = neighbour_chipID.getLayerNumber()
         neighbour_ladder = neighbour_chipID.getLadderNumber()
         neighbour_sensor = neighbour_chipID.getSensorNumber()
-        neighbour_uSide = self.DCU.isSVDSideU(neighbour_chipID)
-        neighbour_chipNo = self.DCU.getSVDChipNumber(neighbour_chipID)
+        neighbour_uSide = self.gTools.isSVDSideU(neighbour_chipID)
+        neighbour_chipNo = self.gTools.getSVDChipNumber(neighbour_chipID)
         match = (expected_layer == neighbour_layer) and \
             (expected_ladder == neighbour_ladder) and \
             (expected_sensor == neighbour_sensor) and \

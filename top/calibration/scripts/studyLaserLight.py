@@ -6,7 +6,8 @@
 #
 # Contributors: Umberto Tamponi (tamponi@to.infn.it)
 #
-# usage: basf2 studyLaserResolution.py dbaddress (path|none) type (local|pocket) output_name.root path_to_sroot run1 run2 ... runN
+# usage: basf2 studyLaserResolution.py dbaddress (path|none) type (local|pocket|root)
+#                                      output_name.root path_to_sroot run1 run2 ... runN
 #        The run number accepts wildcards
 # ------------------------------------------------------------------------
 
@@ -126,11 +127,11 @@ class TOPLaserHistogrammerModule(Module):
         digits = Belle2.PyStoreArray('TOPDigits')
 
         for digit in digits:
-            if(not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()):
+            if((not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()) or digit.getHitQuality() != 1):
                 continue
-
-            if (digit.getHitQuality() == 1 and digit.getPulseHeight() > self.m_minAmp and digit.getPulseHeight() <
-                    self.m_maxAmp and digit.getPulseWidth() > self.m_minWidth and digit.getPulseWidth() < self.m_maxWidth):
+            if(digit.getPulseHeight() > self.m_minAmp or digit.getPulseHeight() < self.m_maxAmp):
+                continue
+            if (and digit.getPulseWidth() > self.m_minWidth and digit.getPulseWidth() < self.m_maxWidth):
                 slotID = digit.getModuleID()
                 hwchan = digit.getChannel()
                 self.h_LaserTimingVSChannel.Fill(512 * (slotID - 1) + hwchan, digit.getTime())
@@ -149,17 +150,19 @@ class TOPLaserHistogrammerModule(Module):
 argvs = sys.argv
 print('usage: basf2', argvs[0], 'runNumber outfileName')
 
-dbaddress = argvs[1]        # path to the calibration DB  (absolute path  or 'none')
-datatype = argvs[2]         # data type  ('pocket' or 'local')
-outfile = argvs[3]          # output name
-folder = argvs[4]           # folder containing the sroot files
-runnumbers = sys.argv[5:]   # run numbers
+lookBack = argvs[1]         # lookbackWindows setting
+dbaddress = argvs[2]        # path to the calibration DB  (absolute path  or 'none')
+datatype = argvs[3]         # data type  ('pocket' or 'local' or 'root', if root files have to be analyzed)
+outfile = argvs[4]          # output name
+folder = argvs[5]           # folder containing the sroot files
+runnumbers = sys.argv[6:]   # run numbers
 
 files = []
 for runnumber in runnumbers:
     if datatype == 'root':
         files += [f for f in glob.glob(str(folder) + '/*' + str(runnumber) + '*.root')]
     else:
+        #        print('running on sroot files in folder ' + glob.glob(str(folder))
         files += [f for f in glob.glob(str(folder) + '/*' + str(runnumber) + '*.sroot')]
 for fname in files:
     print("file: " + fname)
@@ -218,14 +221,16 @@ if datatype != 'root':
     if dbaddress == 'none':
         print("Not using TBC")
         converter.param('useSampleTimeCalibration', False)
+        converter.param('useChannelT0Calibration', False)
+        converter.param('useModuleT0Calibration', False)
     else:
         print("Using TBC")
         converter.param('useSampleTimeCalibration', True)
-    converter.param('useChannelT0Calibration', True)
-    converter.param('useModuleT0Calibration', True)
+        converter.param('useChannelT0Calibration', True)
+        converter.param('useModuleT0Calibration', True)
     converter.param('useCommonT0Calibration', False)
     converter.param('calibrationChannel', -1)  # do not specify the calpulse channel
-    converter.param('lookBackWindows', 29)  # in number of windows
+    converter.param('lookBackWindows', int(lookBack))  # in number of windows
     main.add_module(converter)
 
 # resolution plotter

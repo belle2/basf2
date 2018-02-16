@@ -97,6 +97,12 @@ namespace Belle2 {
     /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
     std::vector<std::string> m_hideObjects;
 
+    /** Path to custom file with geometry extract */
+    std::string m_customGeometryExtractPath;
+
+    /** Path to custom file with geometry extract with corrected placement of TOP bars */
+    std::string m_customGeometryExtractPathTop;
+
     /** pointer to actual display */
     DisplayUI* m_display;
 

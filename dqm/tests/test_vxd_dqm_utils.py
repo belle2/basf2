@@ -234,7 +234,7 @@ class CheckNumbering(basf2.Module):
         init_ladder = 2
         init_sensor = 1
         init_uSide = True
-        init_chipNo = 3
+        init_chipNo = 4
         index_with_vxdid = self.DCU.getPXDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
         index_with_llss = self.DCU.getPXDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
         if index_with_vxdid != index_with_llss:
@@ -266,7 +266,7 @@ class CheckNumbering(basf2.Module):
         expected_ladder = init_ladder
         expected_sensor = init_sensor
         expected_uSide = False
-        expected_chipNo = 0
+        expected_chipNo = 1
         neighbour_chipID = self.DCU.getChipIDFromPXDIndex(index_with_vxdid + 1)
         neighbour_layer = neighbour_chipID.getLayerNumber()
         neighbour_ladder = neighbour_chipID.getLadderNumber()
@@ -291,7 +291,7 @@ class CheckNumbering(basf2.Module):
         init_ladder = 2
         init_sensor = 1
         init_uSide = True
-        init_chipNo = 5
+        init_chipNo = 6
         index_with_vxdid = self.DCU.getSVDChipIndex(Belle2.VxdID(init_layer, init_ladder, init_sensor), init_uSide, init_chipNo)
         index_with_llss = self.DCU.getSVDChipIndex(init_layer, init_ladder, init_sensor, init_uSide, init_chipNo)
         if index_with_vxdid != index_with_llss:
@@ -323,7 +323,7 @@ class CheckNumbering(basf2.Module):
         expected_ladder = init_ladder
         expected_sensor = init_sensor
         expected_uSide = False
-        expected_chipNo = 0
+        expected_chipNo = 1
         neighbour_chipID = self.DCU.getChipIDFromSVDIndex(index_with_vxdid + 1)
         neighbour_layer = neighbour_chipID.getLayerNumber()
         neighbour_ladder = neighbour_chipID.getLadderNumber()

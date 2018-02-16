@@ -279,7 +279,7 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.logging.log_level = logLevel
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
-    recoTrackCandConverter.param('SVDandPXDSPName', SPscollection)
+    recoTrackCandConverter.param('SVDSpacePointStoreArrayName', SPscollection)
     recoTrackCandConverter.param('useTrueHits', True)
     recoTrackCandConverter.param('ignorePXDHits', not usePXD)  # if True PXD hits will be ignored
     recoTrackCandConverter.param('useSingleClusterSP', False)

@@ -24,7 +24,6 @@ namespace Belle2 {
 
   namespace Monopoles {
 
-    class G4MonopoleFieldMessenger;
     class G4MonopoleEquation;
 
     class G4MonopoleFieldSetup {
@@ -39,8 +38,8 @@ namespace Belle2 {
     private:
 
       G4MonopoleFieldSetup();
-
-      G4FieldManager*         GetGlobalFieldManager() ;   // static
+      G4MonopoleFieldSetup(const G4MonopoleFieldSetup& copy);//hide copy constructor
+      G4MonopoleFieldSetup& operator=(const G4MonopoleFieldSetup& copy);//hide assign operator
 
       G4FieldManager*         fFieldManager ;
       G4ChordFinder*          fMonopoleChordFinder ;

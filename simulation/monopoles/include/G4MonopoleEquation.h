@@ -22,7 +22,7 @@ namespace Belle2 {
     class G4MonopoleEquation : public G4EquationOfMotion {
     public:  // with description
 
-      G4MonopoleEquation(G4ElectroMagneticField* emField);
+      explicit G4MonopoleEquation(G4ElectroMagneticField* emField);
 
       ~G4MonopoleEquation();
 

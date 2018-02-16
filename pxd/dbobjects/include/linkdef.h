@@ -8,4 +8,7 @@
 #pragma link C++ class Belle2::PXDSensorInfoPar+;
 #pragma link C++ class Belle2::PXDGeometryPar+;
 
+
+#pragma link C++ class Belle2::PXDMaskedPixelPar.h+;
+
 #endif

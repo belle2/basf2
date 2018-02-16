@@ -204,6 +204,11 @@ class CheckNumbering(basf2.Module):
         # 5. PXD chip indexing
         #
         # 5a. Chip-on-sensor counts
+        if self.DCU.getTotalPXDChips() != 2120:
+            basf2.B2ERROR('PXD chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              2120, self.DCU.getTotalPXDChips())
+                          )
         if self.DCU.getNumberOfPXDUSideChips() != 4:
             basf2.B2ERROR('PXD u-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
@@ -213,6 +218,11 @@ class CheckNumbering(basf2.Module):
             basf2.B2ERROR('PXD v-side chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
                               6, self.DCU.getNumberOfPXDVSideChips())
+                          )
+        if self.DCU.getTotalSVDChips() != 2148:
+            basf2.B2ERROR('SVD chip count mismatch: \n' +
+                          'Expected: {0}, got {1}.'.format(
+                              2148, self.DCU.getTotalSVDChips())
                           )
         if self.DCU.getNumberOfSVDUSideChips() != 6:
             basf2.B2ERROR('SVD u-side chip count mismatch: \n' +

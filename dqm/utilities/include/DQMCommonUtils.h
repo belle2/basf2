@@ -149,6 +149,10 @@ namespace Belle2 {
     /*********************************************************************
      * Chip-related parameters
      *********************************************************************/
+    /** Get total number of chips in PXD
+     * @return total number of chips in PXD
+     */
+    size_t getTotalPXDChips() const { return m_listOfPXDChips.size(); }
 
     /** Get number of u-side PXD chips
      * @param (unused) Layer of the sensor
@@ -162,6 +166,10 @@ namespace Belle2 {
      */
     unsigned short getNumberOfPXDVSideChips(unsigned short = 0) const
     { return c_nPXDChipsV; }
+    /** Get total number of chips in SVD
+     * @return total number of chips in SVD
+     */
+    size_t getTotalSVDChips() const { return m_listOfSVDChips.size(); }
     /** Get number of u-side SVD chips
      * @param (unused) Layer of the sensor
      * @return number of u-side chips

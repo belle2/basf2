@@ -2,6 +2,11 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
+ *   This module computes shower variables using pulse shape              *
+ *   information from offline two component fits.  Using pulse            *
+ *   shape discrimination, these shower variables can be used             *
+ *   for particle id.                                                     *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:  Savino Longo (longos@uvic.ca)                           *
  *                                                                        *

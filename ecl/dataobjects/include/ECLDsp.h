@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                               *
+ * Contributors: Poyuan Chen                                              *
+ *               Savino Longo                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,10 +15,11 @@
 #include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
 
-  /*! Class to store ECL simulated rawdata of Dsp array for fit
-   *  before digitization fit (output of ECLDsp)
-   * relation to ECLHit
-   * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+  /*! Class to store ECL ShaperDSP waveform ADC data.
+   *
+   * For MC filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+   * For data filled in ecl/modules/eclUnpacker/src/eclUnpackerModule.cc
+   *
    */
 
   class ECLDsp : public RelationsObject {

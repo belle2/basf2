@@ -2,6 +2,11 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
+ * This module is used to compute the two component (photon+hadron)       *
+ * fit to ecl waveforms stored offline.  Hadron component energy          *
+ * measured from fit is used to perform pulse shape discrimination        *
+ * for particle id.                                                       *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Savino Longo (longos@uvic.ca)                            *
  *                                                                        *

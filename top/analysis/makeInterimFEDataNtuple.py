@@ -102,11 +102,16 @@ print("# of lookback windows : " + str(lookbackWindows))
 print()
 print("start process...")
 
+
+# data base
+reset_database()
+path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/localDB"
+use_local_database(path_to_db + '/localDB.txt', path_to_db)
+
 # Create path
 main = create_path()
 
 roinput = register_module('SeqRootInput')
-# roinput = register_module('RootInput')
 roinput.param('inputFileName', inputFile)
 main.add_module(roinput)
 
@@ -142,28 +147,32 @@ if not isOfflineFEDisabled:
 
 # Convert to TOPDigits
 converter = register_module('TOPRawDigitConverter')
-converter.param('useSampleTimeCalibration', False)
-converter.param('useChannelT0Calibration', False)
-converter.param('useModuleT0Calibration', False)
+converter.param('useSampleTimeCalibration', True)
+converter.param('useChannelT0Calibration', True)
+converter.param('useModuleT0Calibration', True)
 converter.param('useCommonT0Calibration', False)
 converter.param('lookBackWindows', lookbackWindows)
-converter.param('storageDepth', 508)  # run dependent, check run list on confluence page
+converter.param('storageDepth', 508)
 converter.param('calibrationChannel', calCh)  # if set, cal pulses will be flagged
 converter.param('calpulseHeightMin', 450)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
 converter.param('calpulseWidthMin', 2.0)  # in [ns]
-converter.param('calpulseWidthMax', 6.0)  # in [ns]
+converter.param('calpulseWidthMax', 7.0)  # in [ns]
 main.add_module(converter)
 
 ntuple = register_module('TOPInterimFENtuple')
 ntuple.param('saveWaveform', (args.saveWaveform))
 ntuple.param('useDoublePulse', (not isOfflineFEDisabled))
 ntuple.param('calibrationChannel', calCh)
-# ntuple.param('averageSamplingRate', 2.71394)
-ntuple.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
-ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
-ntuple.param('nominalDeltaT', 21.85)  # in [ns]
-ntuple.param('nominalDeltaTRange', 2)  # in [ns]
+# ntuple.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
+# ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
+ntuple.param('minHeightFirstCalPulse', 300)  # in [ADC counts]
+ntuple.param('minHeightSecondCalPulse', 300)  # in [ADC counts]
+ntuple.param('nominalDeltaT', 21.88)  # in [ns]
+ntuple.param('nominalDeltaTRange', 5)  # in [ns]
+ntuple.param('globalRefSlotNum', 1)
+ntuple.param('globalRefAsicNum', 0)
+ntuple.param('timePerWin', 23.581939)  # in [ns]
 main.add_module(ntuple)
 
 # Print progress
@@ -178,4 +187,3 @@ print(statistics)
 
 if not args.skipPlot:
     plotInterimFEDataNtupleSummary(outputRoot, 2, isOfflineFEDisabled)
-    # plotInterimFEDataNtupleAdvanced(outputRoot)

@@ -791,32 +791,45 @@ namespace Belle2 {
     int ndf;
     tr->SetBranchAddress("slotId", &slotId);
     tr->SetBranchAddress("pixelId", &pixelId);
-    tr->SetBranchAddress("p1ForGain", &p1);
-    tr->SetBranchAddress("p2ForGain", &p2);
-    tr->SetBranchAddress("x0ForGain", &x0);
-    tr->SetBranchAddress("threshold", &threshold);
-    tr->SetBranchAddress("efficiency", &efficiency);
-    tr->SetBranchAddress("chisquareForGain", &chisquare);
-    tr->SetBranchAddress("ndfForGain", &ndf);
+    tr->SetBranchAddress("p1UseIntegral", &p1);
+    tr->SetBranchAddress("p2UseIntegral", &p2);
+    tr->SetBranchAddress("x0UseIntegral", &x0);
+    tr->SetBranchAddress("thresholdForIntegral", &threshold);
+    tr->SetBranchAddress("efficiencyUseIntegral", &efficiency);
+    tr->SetBranchAddress("chisquareUseIntegral", &chisquare);
+    tr->SetBranchAddress("ndfUseIntegral", &ndf);
+
+    const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+    if (!channelMapper.isValid()) {
+      B2ERROR("No valid channel mapper found");
+      return;
+    }
 
     long nEntries = tr->GetEntries();
     std::map<short, float> reducedChisqMap;
+    bool isFirst = true;
     for (long iEntry = 0 ; iEntry < nEntries ; iEntry++) {
       tr->GetEntry(iEntry);
-      int iBS = ((pixelId - 1) % 64) / 16;
-      int iCarrier = (pixelId - 1) / 128;
-      int iAsic = 1 - ((pixelId - 1) % 128) / 64 + 2 * (((pixelId - 1) / 8) % 2);
-      int iAsicCh = (pixelId - 1) % 8;
-      if (iAsic % 2 == 0) iAsicCh = 8 - iAsicCh;
-      int iChannel = 128 * iBS + 32 * iCarrier + 8 * iAsic + iAsicCh;
-      short globalChannelNumber = slotId * 1000 + iChannel;
+
+      if (!channelMapper.isPixelIDValid(pixelId)) {
+        B2ERROR("invalid pixelID" << pixelId);
+        continue;
+      }
+      auto channel = channelMapper.getChannel(pixelId);
+      short globalChannelNumber = slotId * 1000 + channel;
       float redChisq = chisquare / ndf;
 
       if (reducedChisqMap.count(globalChannelNumber) == 0
           || reducedChisqMap[globalChannelNumber] > redChisq) {
         reducedChisqMap[globalChannelNumber] = redChisq;
-        calChannelPulseHeight->setParameters(slotId, iChannel, x0, p1, p2);
-        calChannelThresholdEff->setThrEff(slotId, iChannel, efficiency);
+        calChannelPulseHeight->setParameters(slotId, channel, x0, p1, p2);
+        calChannelThresholdEff->setThrEff(slotId, channel, efficiency);
+        if (isFirst) {
+          calChannelThresholdEff->setOfflineThreshold(threshold);
+          isFirst = false;
+        } else if (TMath::Abs(threshold - calChannelThresholdEff->getOfflineThreshold()) > 0.01)
+          B2ERROR("different threshold values are found : " << threshold << ", default = "
+                  << calChannelThresholdEff->getOfflineThreshold());
       }
     }
 

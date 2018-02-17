@@ -3,7 +3,8 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Umberto Tamponi (tamponi@to.infn.it), Marko Staric       *
+ * Contributors: Umberto Tamponi (tamponi@to.infn.it), Marko Staric,      *
+ *               Maeda Yosuke                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -80,6 +81,17 @@ namespace Belle2 {
     }
 
     /**
+     * Sets threshold value used for efficiency evaluation
+     * (efficiency definition : ratio of integral of fit function over a range [threshold, +inf] to integral over the full range [0, +inf])
+     * @param threshold threshold value (in a unit of ADC count, common for all channels)
+     */
+    void setOfflineThreshold(float offlineThreshold)
+    {
+      m_offlineThreshold = offlineThreshold;
+    }
+
+
+    /**
      * Returns the threshold efficiency of a single channel
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
@@ -141,6 +153,15 @@ namespace Belle2 {
       return m_status[module][channel] == c_Unusable;
     }
 
+    /**
+     * Returns the threshold value used for efficiency evaluation
+     * @return offlineThreshold, common for all channels
+     */
+    float getOfflineThreshold() const
+    {
+      return m_offlineThreshold;
+    }
+
   private:
 
     /**
@@ -153,8 +174,9 @@ namespace Belle2 {
 
     float m_ThrEff[c_numModules][c_numChannels] = {{0}};    /**< threshold efficiency value. 0 by default. */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
+    float m_offlineThreshold = 0; /**< threshold value used for efficiency evaluation, common for all channels */
 
-    ClassDef(TOPCalChannelThresholdEff, 2); /**< ClassDef */
+    ClassDef(TOPCalChannelThresholdEff, 3); /**< ClassDef */
 
   };
 

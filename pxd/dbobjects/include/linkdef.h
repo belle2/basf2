@@ -9,7 +9,7 @@
 #pragma link C++ class Belle2::PXDGeometryPar+;
 
 
-#pragma link C++ class Belle2::PXDMaskedPixelPar.h+;
+#pragma link C++ class Belle2::PXDMaskedPixelPar+;
 #pragma link C++ class Belle2::PXDClusterOffsetPar+;
 #pragma link C++ class Belle2::PXDClusterShapeClassifierPar+;
 #pragma link C++ class Belle2::PXDClusterPositionEstimatorPar+;

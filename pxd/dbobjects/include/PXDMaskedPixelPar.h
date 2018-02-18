@@ -10,12 +10,7 @@
 #pragma once
 
 #include <TObject.h>
-#include <vxd/dataobjects/VxdID.h>
-//#include <framework/logging/Logger.h>
-
-#include <map>
 #include <unordered_map>
-#include <set>
 #include <unordered_set>
 
 
@@ -30,25 +25,51 @@ namespace Belle2 {
     typedef std::unordered_set< unsigned int> MaskedSinglePixelsSet;
 
     /** Default constructor */
-    PXDMaskedPixelPar() : m_MapSingles(0) {}
+    PXDMaskedPixelPar() : m_MapSingles() {}
     /** Destructor */
     ~PXDMaskedPixelPar() {}
 
     /** Mask single pixel
      *
-     * @param id VxdID of the required sensor
-     * @param uid uCell of single pixel to mask
-     * @param vid vCell of single pixel to mask
+     * @param sensorID unique ID of the sensor
+     * @param pixID unique ID of single pixel to mask
      */
-    void maskSinglePixel(VxdID id, unsigned int uid, unsigned int vid);
+    void maskSinglePixel(unsigned short sensorID, unsigned int pixID)
+    {
+      auto mapIterSingles = m_MapSingles.find(sensorID);
+      if (mapIterSingles != m_MapSingles.end()) {
+        // Already some masked single pixels on sensor
+        auto singles = mapIterSingles->second;
+        // Only add pixel, if it is not already in
+        if (singles.find(pixID) == singles.end())
+          singles.insert(pixID);
+      } else {
+        // Create an empty set of masked single pixels
+        PXDMaskedPixelPar::MaskedSinglePixelsSet singles;
+        // pixID will be used to generate hash in unordered_set for quick access
+        singles.insert(pixID);
+        m_MapSingles[sensorID] = singles;
+      }
+    }
 
     /** Check whether a pixel on a given sensor is OK or not.
-     * @param id VxdID of the sensor
-     * @param uid uCell of single pixel to mask
-     * @param vid vCell of single pixel to mask
-     * @return true if pixel or the id is not found in the list, otherwise false.
+     * @param sensorID unique ID of the sensor
+     * @param pixID unique ID of single pixel to mask
+     * @return true if pixel is not masked, otherwise false.
      */
-    bool pixelOK(VxdID id, unsigned int uid, unsigned int vid) const;
+    bool pixelOK(unsigned short sensorID, unsigned int pixID) const
+    {
+      auto mapIterSingles = m_MapSingles.find(sensorID);
+      if (mapIterSingles != m_MapSingles.end()) {
+        // Found some masked single pixels on sensor
+        auto singles = mapIterSingles->second;
+        // Look if this is a single masked pixel
+        if (singles.find(pixID) != singles.end())
+          return false;
+      }
+      // Pixel not found in the mask => pixel OK
+      return true;
+    }
 
     /** Return unordered_map with all masked single pixels in PXD. */
     const std::unordered_map<unsigned short, MaskedSinglePixelsSet>& getMaskedPixelMap() const {return m_MapSingles;}

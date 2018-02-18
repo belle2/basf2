@@ -24,7 +24,7 @@ using namespace std;
 
 Belle2::PXD::PXDClusterPositionEstimator& Belle2::PXD::PXDClusterPositionEstimator::getInstance()
 {
-  static std::unique_ptr<PXDClusterPositionEstimator> instance(new Belle2::PXD::PXDClusterPositionEstimator());
+  static std::unique_ptr<Belle2::PXD::PXDClusterPositionEstimator> instance(new Belle2::PXD::PXDClusterPositionEstimator());
   return *instance;
 }
 
@@ -202,7 +202,7 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const Belle2::PXDCl
   bool vEdge = false;
 
   Belle2::VxdID sensorID = cluster.getSensorID();
-  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
 
   for (const Belle2::PXDDigit& digit : cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")) {
     int pixelkind = Info.getPixelKindNew(sensorID, digit.getVCellID());

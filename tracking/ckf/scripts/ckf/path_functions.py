@@ -58,8 +58,6 @@ def add_pxd_ckf(path, *args, **kwargs):
     if "PXDSpacePointCreator" not in path:
         path.add_module("PXDSpacePointCreator")
 
-    # condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1, maximalExpNumber=1002)
     phase2_path = basf2.create_path()
     _add_pxd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
     phase3_path = basf2.create_path()
@@ -151,10 +149,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
     if "SVDSpacePointCreator" not in path:
-        path.add_module("SVDSpacePointCreator", MinClusterTime=-999)
-
-    # condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1, maximalExpNumber=1002)
+        path.add_module("SVDSpacePointCreator")
 
     phase2_path = basf2.create_path()
     _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)

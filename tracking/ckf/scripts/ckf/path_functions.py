@@ -1,4 +1,5 @@
 import basf2
+from iov_conditional import phase_2_conditional
 
 
 def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
@@ -63,8 +64,8 @@ def add_pxd_ckf(path, *args, **kwargs):
     _add_pxd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
     phase3_path = basf2.create_path()
     _add_pxd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
-    condition.if_true(phase2_path, basf2.AfterConditionPath.CONTINUE)
-    condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
+
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
 
 
 def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,
@@ -154,12 +155,13 @@ def add_svd_ckf(path, *args, **kwargs):
 
     # condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
     condition = path.add_module("IoVDependentCondition", minimalExpNumber=1, maximalExpNumber=1002)
+
     phase2_path = basf2.create_path()
     _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
     phase3_path = basf2.create_path()
     _add_svd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
-    condition.if_true(phase2_path, basf2.AfterConditionPath.CONTINUE)
-    condition.if_false(phase3_path, basf2.AfterConditionPath.CONTINUE)
+
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
 
 
 def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=False, use_mc_truth=False,

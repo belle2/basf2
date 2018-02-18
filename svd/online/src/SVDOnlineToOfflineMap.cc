@@ -232,8 +232,9 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
       unsigned char  chipN = tags.get<unsigned char>("<xmlattr>.n");
       unsigned char  FADCn = tags.get<unsigned char>("<xmlattr>.FADCn");
 
-      //getting FADC numbers for Packer's maps
+      //storing info on FADC numbers and related APV chips
       FADCnumbers.insert(FADCn);
+      APVforFADCmap.insert(std::pair<unsigned char, unsigned char>(FADCn, chipN));
 
       ChipID cid(FADCn, chipN);
 
@@ -280,7 +281,6 @@ void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
   for (auto ifadc = FADCnumbers.begin(); ifadc != FADCnumbers.end(); ++ifadc) {
     map2[it] = *ifadc;
     map1[*ifadc] = it++;
-    //std::cout << (unsigned short)(*ifadc) << ", ";
   }
 }
 

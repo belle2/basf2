@@ -51,8 +51,6 @@ PairGenModule::PairGenModule() : Module()
 
 void PairGenModule::initialize()
 {
-  //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
   m_initialParticleGeneration.initialize();
 }
 

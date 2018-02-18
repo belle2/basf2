@@ -48,7 +48,7 @@ void PXDDAQDQMModule::defineHisto()
   oldDir->cd(m_histogramDirectoryName.c_str());
 
   hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
-  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 6, 0, 6, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
 
   // histograms might get unreadable, but, if necessary, you can zoom in anyways.
@@ -81,7 +81,7 @@ void PXDDAQDQMModule::defineHisto()
     hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff, 200, 0,
                                         40);// If max changed, check overflow copy below
   }
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 16; i++) {
     //cppcheck-suppress zerodiv
     hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
                                    ("Data Reduction DHC " + str(format(" %d") % i)).c_str(), 200, 0, 40);// If max changed, check overflow copy below

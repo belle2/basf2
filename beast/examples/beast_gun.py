@@ -25,6 +25,14 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [200])
 main.add_module(eventinfosetter)
 
+# Uncomment if you include your study/analysis module into the path
+# Study modules (in your detector folder) are HistoModules, they produce histograms,
+# and HistoManager module takes care to store them in the output root file
+#
+# histo = register_module('HistoManager')
+# histo.param('histoFileName', 'histograms.root')  # File to save histograms
+# main.add_module(histo)
+
 # Gearbox - reads parameters from the xml files
 gearbox = register_module('Gearbox')
 gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
@@ -71,13 +79,18 @@ fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)
 
-# Add additional modules, like digitization and analysis
+# Add additional modules, like digitization and study/analysis
 # for example He3Digitizer
 # dataobjects created in these modules are also put into the datastore
 # and finally saved into the output root file (he3 digits in this case)
 #
 # he3digi = register_module('He3Digitizer')
 # main.add_module(he3digi)
+#
+# if you add study/analysis module uncomment also HistoManager lines
+#
+# he3study = register_module('He3tubeStudy')
+# main.add_module(he3study)
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -88,7 +101,7 @@ main.add_module(progress)
 # display.param('fullGeometry', True)
 # main.add_module(display)
 
-# store output hits into root file
+# store output hits into root file (these is collection of hits, not histograms)
 # by default all content of datastore is stored
 output = register_module('RootOutput')
 output.param('outputFileName', "beast_test.root")

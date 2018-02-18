@@ -60,14 +60,15 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("PXDRawPedestalsName", m_PXDRawPedestalsName, "The name of the StoreArray of generated PXDRawPedestals", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
-  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
-  addParam("IgnoreMetaFlags", m_ignoreMetaFlags, "Ignore wrong Meta event flags", false);
+  addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", true);
+  addParam("IgnoreMetaFlags", m_ignoreMetaFlags, "Ignore wrong Meta event flags", true);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
-  addParam("DESY16FixTrigOffset", m_DESY16_FixTrigOffset,
-           "Fix trigger offset (only trigger number, not data) between Meta Event and HLT", 0);
-  addParam("DESY16FixRowOffset", m_DESY16_FixRowOffset, "Fix row offset by shifting row by value (one gates is 4 pixel rows)", 0);
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", (uint64_t)0);
+  addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
+  addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
+  addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);
+  addParam("MaxDHPFrameDiff", m_maxDHPFrameDiff, "Maximum DHP Frame Nr Difference w/o reporting error", 2u);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
 //              EPXDErrFlag::c_FIX_SIZE | EPXDErrFlag::c_DHE_CRC | EPXDErrFlag::c_DHC_UNKNOWN | /*EPXDErrFlag::c_MERGER_CRC |*/
@@ -88,11 +89,13 @@ void PXDUnpackerModule::initialize()
   m_storeRawCluster.registerInDataStore(m_RawClusterName);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
-  B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
-  B2INFO("Ignore(missing)DATCON: " << m_ignoreDATCON);
-  B2INFO("Ignore (some) missing Meta flags: " << m_ignoreMetaFlags);
-
-  ignore_datcon_flag = m_ignoreDATCON;
+  B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);
+  B2DEBUG(1, "Ignore (missing) DATCON: " << m_ignoreDATCON);
+  B2DEBUG(1, "Ignore (some) missing Meta flags: " << m_ignoreMetaFlags);
+  B2DEBUG(1, "ForceMapping: " << m_forceMapping);
+  B2DEBUG(1, "ForceNoMapping: " << m_forceNoMapping);
+  B2DEBUG(1, "CheckPaddingCRC: " << m_checkPaddingCRC);
+  B2DEBUG(1, "MaxDHPFrameDiff: " << m_maxDHPFrameDiff);
 
   m_sendunfiltered = 0;
   m_sendrois = 0;
@@ -135,9 +138,6 @@ void PXDUnpackerModule::event()
   m_errorMaskEvent = 0;
 
   m_meta_event_nr = evtPtr->getEvent();
-  if (m_DESY16_FixTrigOffset != 0) {
-    m_meta_event_nr += m_DESY16_FixTrigOffset;
-  }
   m_meta_run_nr = evtPtr->getRun();
   m_meta_subrun_nr = evtPtr->getSubrun();
   m_meta_experiment = evtPtr->getExperiment();
@@ -451,17 +451,21 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   if (printflag)
     B2DEBUG(20, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
 
-  if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > 1) {
-    B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 " << dhe_first_readout_frame_id_lo << " != " << (dhp_readout_frame_lo & 0x3F));
+  /* // TODO removed because data format error is not to be fixed soon
+  if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
+    B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 " << dhe_first_readout_frame_id_lo << " != " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
     m_errorMask |= EPXDErrMask::c_DHP_DHE_FRAME_DIFFER;
   }
-  if (last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
-    if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) != 1) {
+  */
+  /* // TODO removed because data format error is not to be fixed soon
+    if (last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
+    if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) > m_maxDHPFrameDiff) {
       B2ERROR("Two DHP Frames per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[dhp_dhp_id] << ", " <<
               dhp_readout_frame_lo);
       m_errorMask |= EPXDErrMask::c_DHP_NOT_CONT;
     }
   }
+  */
 
   if (daqpktstat.dhc_size() > 0) {
     if (daqpktstat.dhc_back().dhe_size() > 0) {
@@ -472,9 +476,10 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     }
   }
 
+  /* // TODO removed because the data is not ordered as expected in current firmware
   for (auto j = 0; j < 4; j++) {
     if (last_dhp_readout_frame_lo[j] != -1) {
-      if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > 1) {
+      if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > m_maxDHPFrameDiff) {
         B2ERROR("Two DHP Frames (different DHP) per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[j] <<
                 ", " <<
                 dhp_readout_frame_lo);
@@ -483,6 +488,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
       }
     }
   }
+  */
   last_dhp_readout_frame_lo[dhp_dhp_id] = dhp_readout_frame_lo;
 
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
@@ -531,7 +537,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           }
           // we cannot do col overflow check before mapping :-(
 
-          if (dhe_reformat == 0) {
+          if ((dhe_reformat == 0 && !m_forceNoMapping) || m_forceMapping) {
             u_cellID = dhp_col;// defaults for no mapping
             // data has not been pre-processed by DHH, thus we have to do the mapping ourselves
             if ((dhe_ID & 0x21) == 0x00 || (dhe_ID & 0x21) == 0x21) {
@@ -726,7 +732,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       }
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
-      m_errorMask |= dhc.check_padding();// isUnfiltered_event
+      if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
 
       unpack_dhp(data, len - 4,
@@ -1078,7 +1084,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 //       B2ERROR("TRG TAG HLT: $" << hex << dhc.data_onsen_trigger_frame->get_trig_tag1() << " DATCON $" <<  dhc.data_onsen_trigger_frame->get_trig_tag2() << " META " << m_meta_time);
 
       if (verbose) dhc.data_onsen_trigger_frame->print();
-      m_errorMask |= dhc.data_onsen_trigger_frame->check_error(ignore_datcon_flag);
+      m_errorMask |= dhc.data_onsen_trigger_frame->check_error(m_ignoreDATCON);
       m_errorMask |= dhc.check_crc();
       if (Frame_Number != 0) {
         B2ERROR("ONSEN TRG Frame must be the first one.");

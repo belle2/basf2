@@ -34,7 +34,7 @@ namespace Belle2 {
     /// StoreArray name from which to read the reco tracks.
     std::string m_param_recoTracksStoreArrayName = "";
     /// StoreArray name where the merged reco track is written.
-    std::string m_param_mergedRecoTracksStoreArrayName = "__MergedRecoTracks";
+    std::string m_param_mergedRecoTracksStoreArrayName = "CosmicRecoTracks";
     /// Flag to using magnetic field during reconstruction.
     bool m_usingMagneticField = true;
     /// Number of CDC hit per track required for cosmic track

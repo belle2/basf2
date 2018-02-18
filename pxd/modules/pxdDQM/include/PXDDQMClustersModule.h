@@ -16,7 +16,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-#include <dqm/utilities/DQMCommonUtils.h>
+#include <vxd/geometry/GeoTools.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
@@ -39,7 +40,6 @@ namespace Belle2 {
     void initialize() override final;
     void beginRun() override final;
     void event() override final;
-    void endRun() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -48,9 +48,6 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
-
-    /** Connection to DQMCommonUtils folder of functions for DQM */
-    DQMCommonUtils* m_utils = nullptr;
 
     /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
     float m_CutPXDCharge = 0.0;
@@ -109,46 +106,6 @@ namespace Belle2 {
     TH2F** m_hitMapCl;
     /** Seed */
     TH1F** m_seed;
-
-    /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
-    std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
-    /** Number of events */
-    int m_NoOfEvents;
-    /** Number of events in reference histogram */
-    int m_NoOfEventsRef;
-
-    /** Using local files instead of DataBase for reference histogram, default=0 */
-    int m_NotUseDB = 0;
-    /** Create and fill reference histograms in DataBase, default=0 */
-    int m_CreateDB = 0;
-
-    /** Basic Directory in output file */
-    TDirectory* m_oldDir;
-
-    /** Flags of Hitmaps of Digits */
-    TH1I* m_fHitMapCountsFlag;
-    /** Flags of Hitmaps of Clusters*/
-    TH1I* m_fHitMapClCountsFlag;
-    /** Flags of Fired Digits */
-    TH1I* m_fFiredFlag;
-    /** Flags of Clusters per event */
-    TH1I* m_fClustersFlag;
-    /** Flags of Start row distribution */
-    TH1I* m_fStartRowFlag;
-    /** Flags of Cluster seed charge by distance from the start row */
-    TH1I* m_fChargStartRowFlag;
-    /** Flags of counter for Cluster seed charge by distance from the start row */
-    TH1I* m_fStartRowCountFlag;
-    /** Flags of Charge of clusters */
-    TH1I* m_fClusterChargeFlag;
-    /** Flags of Charge of pixels */
-    TH1I* m_fPixelSignalFlag;
-    /** Flags of u cluster size */
-    TH1I* m_fClusterSizeUFlag;
-    /** Flags of v cluster size */
-    TH1I* m_fClusterSizeVFlag;
-    /** Flags of Cluster size */
-    TH1I* m_fClusterSizeUVFlag;
 
   };
 

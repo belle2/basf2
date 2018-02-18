@@ -149,7 +149,7 @@ if not isOfflineFEDisabled:
 converter = register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', True)
 converter.param('useChannelT0Calibration', True)
-converter.param('useModuleT0Calibration', True)
+converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('lookBackWindows', lookbackWindows)
 converter.param('storageDepth', 508)

@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'top_dataobjects', 'top',
+env['LIBS'] = ['framework', 'top_dataobjects', 'top', 'rawdata_dataobjects',
 	       '$ROOT_LIBS']
 
 Return('env')

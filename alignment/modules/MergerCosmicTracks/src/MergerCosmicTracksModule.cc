@@ -37,6 +37,8 @@ MergerCosmicTracksModule::MergerCosmicTracksModule() : Module()
            "Flag to using magnetic field during reconstruction.",
            m_usingMagneticField);
   addParam("minimumNumHitCut", m_minimumNumHitCut, "Number of CDC hit per track required for cosmic track", m_minimumNumHitCut);
+  addParam("minimumClusterSize", m_minimumClusterSize, "Minimal cluster size for used PXD clusters for cosmic track",
+           m_minimumClusterSize);
 }
 
 void MergerCosmicTracksModule::initialize()
@@ -124,7 +126,7 @@ void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrac
   if (upperTrack->hasPXDHits()) {
     int PXDHits = upperTrack->getNumberOfPXDHits();
     for (int i = 0; i < PXDHits; i++) {
-      if (upperTrack->getSortedPXDHitList()[i]->getSize() > 1) {mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);}
+      if (upperTrack->getSortedPXDHitList()[i]->getSize() > m_minimumClusterSize) {mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);}
       // B2INFO("Cluster size of included PXD hit: " << upperTrack->getSortedPXDHitList()[i]->getSize());
       sortingNumber++;
     }
@@ -134,7 +136,7 @@ void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrac
   if (lowerTrack->hasPXDHits()) {
     int PXDHits = lowerTrack->getNumberOfPXDHits();
     for (int i = 0; i < PXDHits; i++) {
-      if (lowerTrack->getSortedPXDHitList()[i]->getSize() > 1) {mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);}
+      if (lowerTrack->getSortedPXDHitList()[i]->getSize() > m_minimumClusterSize) {mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);}
       // B2INFO("Cluster size of included PXD hit: " << lowerTrack->getSortedPXDHitList()[i]->getSize());
       sortingNumber++;
     }

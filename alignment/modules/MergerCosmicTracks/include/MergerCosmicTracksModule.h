@@ -39,6 +39,8 @@ namespace Belle2 {
     bool m_usingMagneticField = true;
     /// Number of CDC hit per track required for cosmic track
     unsigned int m_minimumNumHitCut = 40;
+    /// Minimal PXD cluster size for used PXD hits in cosmic track
+    unsigned int m_minimumClusterSize = 1;
     /// Magnitude of cosmic tracks if magnetic field is not used.
     double m_magnitudeOfMomentumWithoutMagneticField;
   };

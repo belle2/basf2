@@ -13,7 +13,7 @@ from ROOT import Belle2
 class EventSelectorVXD(Module):
 
     """
-    Python module to select cosmic events
+    Python module to select simulated cosmic events
     (which pass VXD volume).
     """
 
@@ -29,14 +29,10 @@ class EventSelectorVXD(Module):
 
         return True
 
-        return True
-
     def event(self):
         """ Return True if event is fine, False otherwise """
-
         SVDSimHitArray = Belle2.PyStoreArray('SVDSimHits')
         PXDSimHitArray = Belle2.PyStoreArray('PXDSimHits')
-
         if self.isOK(SVDSimHitArray):
             someOK = True
         elif self.isOK(PXDSimHitArray):

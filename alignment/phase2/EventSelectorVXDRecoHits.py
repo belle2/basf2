@@ -13,7 +13,7 @@ from ROOT import Belle2
 class EventSelectorVXDRecoHits(Module):
 
     """
-    Python module to select cosmic events
+    Python module to select reconstructed cosmic events
     (which pass VXD volume).
     """
 
@@ -26,8 +26,6 @@ class EventSelectorVXDRecoHits(Module):
         nRecoHit = RecoHit.getEntries()
         if nRecoHit == 0:
             return False
-
-        return True
 
         return True
 

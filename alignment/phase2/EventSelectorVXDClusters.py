@@ -13,7 +13,7 @@ from ROOT import Belle2
 class EventSelectorVXDClusters(Module):
 
     """
-    Python module to select cosmic events
+    Python module to search PXD of SVD clusters
     (which pass VXD volume).
     """
 
@@ -21,10 +21,10 @@ class EventSelectorVXDClusters(Module):
         """ init """
         super(EventSelectorVXDClusters, self).__init__()
 
-    def isOK(self, RecoHit):
+    def isOK(self, Clusters):
         """ Events with empty VXD (SVD or PXD) SimHits are removed."""
-        nRecoHit = RecoHit.getEntries()
-        if nRecoHit == 0:
+        nClusters = Clusters.getEntries()
+        if nClusters == 0:
             return False
 
         return True
@@ -34,19 +34,23 @@ class EventSelectorVXDClusters(Module):
     def event(self):
         """ Return True if event is fine, False otherwise """
 
-        SVDRecoHitArray = Belle2.PyStoreArray('SVDClusters')
-        PXDRecoHitArray = Belle2.PyStoreArray('PXDClusters')
+        someOK = False
 
-        if self.isOK(SVDRecoHitArray):
+        SVDClusters = Belle2.PyStoreArray('SVDClusters')
+        nSVDClusters = SVDClusters.getEntries()
+        if nSVDClusters != 0:
             someOK = True
-        elif self.isOK(PXDRecoHitArray):
-            someOK = True
-        else:
-            someOK = False
+
+        PXDClusters = Belle2.PyStoreArray('PXDClusters')
+        nPXDClusters = PXDClusters.getEntries()
+        if nPXDClusters != 0:
+            for pxdCluster in PXDClusters:
+                if pxdCluster.getSize() > 1:
+                    someOK = True
 
         if someOK:
             EventMetaData = Belle2.PyStoreObj('EventMetaData')
             event = EventMetaData.getEvent()
-            print('Event', event, 'has PXD or SVD RecoHits. It will be stored')
+            print('Event', event, 'has PXD or SVD Clusters. It will be stored')
 
         super(EventSelectorVXDClusters, self).return_value(someOK)

@@ -41,7 +41,7 @@ namespace Belle2 {
                     c_Timestamp = 0x80 /**< Time at which the message was emitted. */
                   };
 
-    static const int c_DefaultDebugLevel = 9;  /**< Default debug level. */
+    static const int c_DefaultDebugLevel = 10;  /**< Default debug level. */
 
     /**
      * The LogConfig constructor.

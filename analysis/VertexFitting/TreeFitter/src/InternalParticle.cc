@@ -166,7 +166,7 @@ namespace TreeFitter {
           // normal TrkPoca.
 
           //JFK: FIXME 2017-09-25
-          std::cout << "Internal particle l181 track + other daughter::Is this implementd?"  << std::endl;
+          //std::cout << "Internal particle l181 track + other daughter::Is this implementd?"  << std::endl;
           B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
         } else if (mother() && mother()->posIndex() >= 0) {
@@ -287,7 +287,6 @@ namespace TreeFitter {
       } else if (dautauindex >= 0 && daughter->charge() != 0) {
         //JFK changed tau eventually we have to devide it by |p| here
         tau =  fitparams.getStateVector()(dautauindex);
-        std::cout << "InternalParticle::tau index stuff" << std::endl;
         lambda = bFieldOverC() * daughter->charge();
         px0 = fitparams.getStateVector()(daumomindex);
         py0 = fitparams.getStateVector()(daumomindex + 1);

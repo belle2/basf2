@@ -310,7 +310,6 @@ namespace TreeFitter {
     const int momindex = momIndex();
 
     const double tau =  fitparams.getStateVector()(tauindex);
-
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
 
     double posxmother = 0, posx = 0, momx = 0;
@@ -330,18 +329,18 @@ namespace TreeFitter {
        * thus (tau converts p into units of length):
        *  0 = x - m - tau * p
        * */
-      //p.getResiduals()(row) = posxmother + tau * momx - posx ;
-      //p.getH()(row, posindexmother + row) = 1;
-      //p.getH()(row, momindex + row) = tau;
-      //p.getH()(row, posindex + row) = -1.;
-      //p.getH()(row, tauindex)       = momx;
-
-      p.getResiduals()(row) = posxmother - posx + tau * momx;  // FIXME TAU + or - ??
-
+      p.getResiduals()(row) = posxmother + tau * momx - posx ;
       p.getH()(row, posindexmother + row) = 1;
-      p.getH()(row, momindex + row) = 1.*tau;
-      p.getH()(row, posindex + row) = -1;
+      p.getH()(row, momindex + row) = tau;
+      p.getH()(row, posindex + row) = -1.;
       p.getH()(row, tauindex)       = momx;
+
+      //p.getResiduals()(row) = posxmother - posx + tau * momx;  // FIXME TAU + or - ??
+
+      //p.getH()(row, posindexmother + row) = 1;
+      //p.getH()(row, momindex + row) = 1.*tau;
+      //p.getH()(row, posindex + row) = -1;
+      //p.getH()(row, tauindex)       = momx;
 
     }
 

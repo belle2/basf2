@@ -10,7 +10,7 @@
 
 // Own include
 
-#include <analysis/VariableManager/KlIdVariables.h>
+#include <analysis/VariableManager/KlongIDVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
@@ -21,7 +21,6 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -36,7 +35,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double particleKLMKlId(const Particle* particle)
+    double particleKLMKlongID(const Particle* particle)
     {
       double result = -999;
       const KlId* klid = particle->getKLMCluster()->getRelatedTo<KlId>();
@@ -133,50 +132,21 @@ namespace Belle2 {
       return cluster->getLayers();
     }
 
-    float particleKLMgetPhi(const Particle* particle)
-    {
-      const KLMCluster* cluster = particle->getKLMCluster();
-      if (!cluster) {return -999;}
-      return cluster->getMomentum().Phi();
-    }
 
-    float particleKLMgetTheta(const Particle* particle)
-    {
-      const KLMCluster* cluster = particle->getKLMCluster();
-      if (!cluster) {return -999;}
-      return cluster->getMomentum().Theta();
-    }
-
-    float particleKLMgetMCMomentum(const Particle* particle)
-    {
-      const KLMCluster* cluster = particle->getKLMCluster();
-      if (!cluster) {return -999;}
-      const auto mcParticle = cluster->getRelatedTo<MCParticle>();
-      if (!mcParticle) {return -999;}
-      return mcParticle->getMomentum().Mag();
-    }
-
-
-
-
-    VARIABLE_GROUP("K_L0-ID");
-    REGISTER_VARIABLE("KlId_KLM"          , particleKLMKlId              , "KlId from KLMcluster classifier.");
-    REGISTER_VARIABLE("KL_Phi"          , particleKLMgetPhi              , "Phi of underlying KLMCLuster.");
-    REGISTER_VARIABLE("KL_Theta"          , particleKLMgetTheta              , "Theta of underlying KLMCLuster.");
-    REGISTER_VARIABLE("KL_MCMomentum"          , particleKLMgetMCMomentum              ,
-                      "Momentum of MC particle of underlying KLMCLuster.");
-    REGISTER_VARIABLE("KL_BelleTrackFlag" , particleKLMBelleTrackFlag    ,
+    VARIABLE_GROUP("klong-ID");
+    REGISTER_VARIABLE("klongID_KLM"          , particleKLMKlongID              , "KlongID from KLMcluster classifier.");
+    REGISTER_VARIABLE("klong_BelleTrackFlag" , particleKLMBelleTrackFlag    ,
                       "Does the corresponding Cluster carry a Belle style Track Flag.");
-    REGISTER_VARIABLE("KL_BelleECLFlag"   , particleKLMBelleECLFlag      ,
+    REGISTER_VARIABLE("klong_BelleECLFlag"   , particleKLMBelleECLFlag      ,
                       "Does the corresponding Cluster carry a Belle style ECL Flag.");
-    REGISTER_VARIABLE("KL_isForwardEKLM"  , particleKLMisForwardEKLM     , "Is the corresponding KLM cluster from Forward EKLM.");
-    REGISTER_VARIABLE("KL_isBackwardEKLM" , particleKLMisBackwardEKLM    , "Is the corresponding KLM cluster from Backward EKLM.");
-    REGISTER_VARIABLE("KL_isBKLM"         , particleKLMisBKLM            , "Is the corresponding KLM cluster from BKLM.");
-    REGISTER_VARIABLE("KL_Nlayers"        , particleKLMgetNLayers        , "Number of Layers in the cluster.");
-    REGISTER_VARIABLE("KL_InnermostLayer" , particleKLMgetInnermostLayer , "Number of the first hit layer");
-    REGISTER_VARIABLE("KL_Time"           , particleKLMgetTime           ,
+    REGISTER_VARIABLE("klong_isForwardEKLM"  , particleKLMisForwardEKLM     , "Is the corresponding KLM cluster from Forward EKLM.");
+    REGISTER_VARIABLE("klong_isBackwardEKLM" , particleKLMisBackwardEKLM    , "Is the corresponding KLM cluster from Backward EKLM.");
+    REGISTER_VARIABLE("klong_isBKLM"         , particleKLMisBKLM            , "Is the corresponding KLM cluster from BKLM.");
+    REGISTER_VARIABLE("klong_Nlayers"        , particleKLMgetNLayers        , "Number of Layers in the cluster.");
+    REGISTER_VARIABLE("klong_InnermostLayer" , particleKLMgetInnermostLayer , "Number of the first hit layer");
+    REGISTER_VARIABLE("klong_Time"           , particleKLMgetTime           ,
                       "Timing of Corresponding KLMcluster (corrected for muon? time of flight)");
-    REGISTER_VARIABLE("KL_Energy"         , particleKLMgetEnergy         ,
+    REGISTER_VARIABLE("klong_Energy"         , particleKLMgetEnergy         ,
                       "Energy of corresponding KLMcluster (0.215GeV times n_hitCells)");
 
   }

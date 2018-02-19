@@ -9,7 +9,7 @@
 **************************************************************************/
 
 // Own include
-#include <analysis/modules/KLDecayReconstructor/KLMomentumCalculatorModule.h>
+#include <analysis/modules/KlongDecayReconstructor/KlongMomentumCalculatorExpertModule.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -32,13 +32,13 @@ namespace Belle2 {
 //                 Register module
 //-----------------------------------------------------------------
 
-  REG_MODULE(KLMomentumCalculator)
+  REG_MODULE(KlongMomentumCalculatorExpert)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-  KLMomentumCalculatorModule::KLMomentumCalculatorModule() :
+  KlongMomentumCalculatorExpertModule::KlongMomentumCalculatorExpertModule() :
     Module()
 
   {
@@ -61,7 +61,7 @@ namespace Belle2 {
 
   }
 
-  void KLMomentumCalculatorModule::initialize()
+  void KlongMomentumCalculatorExpertModule::initialize()
   {
     // clear everything, initialize private members
     m_pdgCode = 0;
@@ -112,7 +112,7 @@ namespace Belle2 {
 
   }
 
-  void KLMomentumCalculatorModule::event()
+  void KlongMomentumCalculatorExpertModule::event()
   {
     StoreArray<Particle> particles;
 
@@ -204,6 +204,8 @@ namespace Belle2 {
 
       if (is_physical) {
         TLorentzVector mom = pDaughters + missDaughters;
+        mom.SetE(std::sqrt(m_b * m_b + mom.Vect().Mag2()));
+        particle.set4Vector(mom);
         if (isnan(mom.Vect().Mag()))
           is_physical = 0;
       }

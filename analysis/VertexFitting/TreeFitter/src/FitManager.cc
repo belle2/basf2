@@ -210,9 +210,6 @@ namespace TreeFitter {
       Eigen::Matrix<double, 7, 6> jacobian =
         Eigen::Matrix<double, 7, 6>::Zero(7, 6);
 
-      //JFK: there was an old comment on the part that set the diagonal se below. does this make sense? 2017-09-28
-      // don't modify momentum
-
       for (int col = 0; col < 3; ++col) {
         jacobian(col, col) = 1; // don't modify momentum
         jacobian(3, col) = m_fitparams->getStateVector()(momindex + col) / energy; //add energy row

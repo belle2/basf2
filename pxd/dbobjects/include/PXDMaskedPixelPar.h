@@ -39,7 +39,7 @@ namespace Belle2 {
       auto mapIterSingles = m_MapSingles.find(sensorID);
       if (mapIterSingles != m_MapSingles.end()) {
         // Already some masked single pixels on sensor
-        auto singles = mapIterSingles->second;
+        auto& singles = mapIterSingles->second;
         // Only add pixel, if it is not already in
         if (singles.find(pixID) == singles.end())
           singles.insert(pixID);

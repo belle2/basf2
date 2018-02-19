@@ -29,15 +29,16 @@ namespace Belle2 {
       void initialize()
       {
         DBObjPtr<PXDMaskedPixelPar> dbObj;
-        if (!dbObj) {
-          // Check that we found the object and if not report the problem
-          B2WARNING("No PXDMaskedPixel payload found.");
+        if (dbObj) {
+          // Store payload
+          m_maskedPixelPar = *dbObj;
+          // Remember that payloads are initialized now
+          m_isInitialized = true;
+        } else {
+          // Check that we found the objects and if not report the problem
+          // Keep low profile because there is always a fallback
+          B2WARNING("Cannot initialize PXDPixelMasker: The payload PXDMaskedPixelPar is missing.");
         }
-        // Store payload
-        m_maskedPixelPar = *dbObj;
-
-        // Remember that payloads are initialized now
-        m_isInitialized = true;
       }
 
       /** Get initialization status. */

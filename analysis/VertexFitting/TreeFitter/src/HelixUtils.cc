@@ -154,6 +154,7 @@ namespace TreeFitter {
     TVector3 position(positionAndMom(0),
                       positionAndMom(1),
                       positionAndMom(2));
+
     TVector3 momentum(positionAndMom(3),
                       positionAndMom(4),
                       positionAndMom(5));
@@ -163,7 +164,7 @@ namespace TreeFitter {
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
 
-    double delta = 1e-5 ;// this is quite a random choice.
+    double delta = 1e-5;// this is quite a random choice.
 
     TVector3 postmp;
     TVector3 momtmp;
@@ -178,6 +179,7 @@ namespace TreeFitter {
       } else {
         momtmp[jin - 3] += delta;
       }
+
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
       jacobian(iPhi0, jin)      = (helixPlusDelta.getPhi0()      - helix.getPhi0())      / delta ;
@@ -188,6 +190,42 @@ namespace TreeFitter {
       //      jacobian[iArcLength2D][jin] = (LPlusDelta - L) / delta ;
     }
     //    cout << "Numerical Jacobian: " << endl << jacobian << endl;
+  }
+
+  void HelixUtils::getJacobianFromVertexNumerical(
+    Eigen::Matrix<double, 1, 6>& positionAndMom,
+    int charge, double Bz,
+    Belle2::Helix& helix,
+    Eigen::Matrix<double, 5, 6>& jacobian,
+    double delta
+  )
+  {
+    // numeric calculation of the jacobian
+    Belle2::Helix helixPlusDelta;
+
+    TVector3 postmp;
+    TVector3 momtmp;
+
+    for (int jin = 0; jin < 6; ++jin) {
+      for (int i = 0; i < 3; ++i) {
+        postmp[i] = positionAndMom(i);
+        momtmp[i] = positionAndMom(i + 3);
+      }
+
+      if (jin < 3) {
+        postmp[jin] += delta;
+      } else {
+        momtmp[jin - 3] += delta;
+      }
+
+      helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
+      jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
+      jacobian(iPhi0, jin)      = (helixPlusDelta.getPhi0()      - helix.getPhi0())      / delta ;
+      jacobian(iOmega, jin)     = (helixPlusDelta.getOmega()     - helix.getOmega())     / delta ;
+      jacobian(iZ0, jin)        = (helixPlusDelta.getZ0()        - helix.getZ0())        / delta ;
+      jacobian(iTanLambda, jin) = (helixPlusDelta.getTanLambda() - helix.getTanLambda()) / delta ;
+    }
+
   }
 
 

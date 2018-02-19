@@ -46,6 +46,14 @@ namespace TreeFitter {
                                                        Eigen::Matrix<double, 5, 6>& jacobian);
 
     /**  */
+    static void getJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+                                               int charge, double Bz,
+                                               Belle2::Helix& helix,
+                                               Eigen::Matrix<double, 5, 6>& jacobian,
+                                               double delta = 1e-5
+                                              );
+
+    /**  */
     static void helixFromVertex(Eigen::Matrix<double, 1, 6>& positionAndMomentum ,
                                 int charge, double Bz,
                                 Belle2::Helix& helix,

@@ -21,9 +21,14 @@
 
 namespace TreeFitter {
 
-  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother)
-    : RecoParticle(particle, mother), m_bfield(0), m_trackfit(0), m_cached(false),
-      m_flt(0), m_params(5), m_covariance(5, 5)
+  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
+    RecoParticle(particle, mother),
+    m_bfield(0),
+    m_trackfit(0),
+    m_cached(false),
+    m_flt(0),
+    m_params(5),
+    m_covariance(5, 5)
   {
     //FT: FIX ME: This initialises the BField at the IP. This might not be a correct assumption, but is the easiest and fastest for now. Check the impact of using the field at the perigee, or perhaps at the decay vertex as appropriate, especially for significantly displaced vertices.
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
@@ -102,32 +107,45 @@ namespace TreeFitter {
     return ErrCode::success;
   }
 
-  ErrCode  RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
+  ErrCode RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
     ErrCode status;
     const int posindexmother = mother()->posIndex();
     const int momindex = momIndex();
 
     Eigen::Matrix<double, 1, 6> positionAndMom = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
-    positionAndMom.segment(0, 3) =  fitparams.getStateVector().segment(posindexmother, 3);
-    positionAndMom.segment(3, 3) =  fitparams.getStateVector().segment(momindex, 3);
+    positionAndMom.segment(0, 3) = fitparams.getStateVector().segment(posindexmother, 3);
+    positionAndMom.segment(3, 3) = fitparams.getStateVector().segment(momindex, 3);
     Eigen::Matrix<double, 5, 6> jacobian = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
 
-    // translate into trackparameters
-    Belle2::Helix helix;
+    Belle2::Helix helix = Belle2::Helix(
+                            TVector3(
+                              positionAndMom(0),
+                              positionAndMom(1),
+                              positionAndMom(2)),
+                            TVector3(
+                              positionAndMom(3),
+                              positionAndMom(4),
+                              positionAndMom(5)),
+                            charge(),
+                            m_bfield
+                          );
+
 #ifndef NUMERICAL_JACOBIAN
     double flt;
     HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
 #else
-    HelixUtils::getHelixAndJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
+    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
+    //HelixUtils::getHelixAndJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
 #endif
 
     // get the measured track parameters at the poca to the mother
     if (!m_cached) {
       RecoTrack* nonconst =  const_cast<RecoTrack*>(this);
-      if (m_flt == 0) {nonconst->updFltToMother(fitparams);}
+      if (m_flt == 0) { nonconst->updFltToMother(fitparams); }
       nonconst->updateParams(m_flt);
     }
+
     Eigen::Matrix<double, 1, 5> helixpars(5);
     helixpars(0) = helix.getD0();
     helixpars(1) = helix.getPhi0();
@@ -136,21 +154,24 @@ namespace TreeFitter {
     helixpars(4) = helix.getTanLambda();
 
     // fill the residual and cov matrix
-    //p.getResiduals().segment(0, 5) = helixpars - m_params;
+    // p.getResiduals().segment(0, 5) = helixpars - m_params; //this works
     p.getResiduals().segment(0, 5) = m_params - helixpars;
+
     p.getResiduals()(1) = HelixUtils::phidomain(p.getResiduals()(1));
 
     Eigen::Matrix<double, 5, 5> writtenCov = m_covariance.block<5, 5>(0, 0);
 
     p.getV().triangularView<Eigen::Lower>() =  writtenCov.triangularView<Eigen::Lower>();
+
+    //dr/dx
     for (int row = 0; row < 5; ++row) {
       // the position
       for (int col = 0; col < 3; ++col) {
-        p.getH()(row, posindexmother + col) = jacobian(row, col);
+        p.getH()(row, posindexmother + col) = -1.0 * jacobian(row, col);
       }
       // the momentum
       for (int col = 0; col < 3; ++col) {
-        p.getH()(row, momindex + col) = jacobian(row , col + 3);
+        p.getH()(row, momindex + col) = -1.0 * jacobian(row , col + 3);
       }
     }
     return status;

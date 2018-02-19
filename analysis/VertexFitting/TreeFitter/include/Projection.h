@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
+
 #include <Eigen/Dense>
 
 namespace TreeFitter {
@@ -25,10 +27,10 @@ namespace TreeFitter {
     virtual ~Projection() {};
 
     /** get projection matrix */
-    Eigen::Matrix < double, -1, -1, 0, 5, 100 > & getH() {return m_H;}
+    Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & getH() {return m_H;}
 
     /** get projection matrix */
-    const Eigen::Matrix < double, -1, -1, 0, 5, 100 > getH() const {return m_H;}
+    const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > getH() const {return m_H;}
 
     /** get residuals */
     Eigen::Matrix < double, -1, 1, 0, 5, 1 > & getResiduals() {return m_residual;}
@@ -48,9 +50,6 @@ namespace TreeFitter {
     /** reset projection */
     void resetProjection();
 
-    /** get chi2 for this residual */
-    double getChiSquare();
-
     /**  get offset (for mergedcosntraints)*/
     unsigned int getOffset() { return m_offset; }
 
@@ -63,7 +62,7 @@ namespace TreeFitter {
   private:
 
     /** jacobian of the constraint, converts x,p,E<->system of residuals */
-    Eigen::Matrix < double, -1, -1, 0, 5, 100 > m_H;
+    Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > m_H;
 
     /** covariance matrix of this constraint (r') */
     Eigen::Matrix < double, -1, -1, 0, 5, 5 > m_V;

@@ -72,8 +72,8 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
-                  std::endl;
+        //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
+        //          std::endl;
         Eigen::Matrix<double, Eigen::Dynamic, 1> prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);

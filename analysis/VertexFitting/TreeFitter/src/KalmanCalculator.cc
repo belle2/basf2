@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 // I dont know anything about this and you did not see this.
-#pragma GCC diagnostic ignored "-Wstack-usage="
+//#pragma GCC diagnostic ignored "-Wstack-usage="
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
@@ -46,7 +46,6 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C =
       Eigen::Matrix < double, -1, -1, 0 , MAX_MATRIX_SIZE, MAX_MATRIX_SIZE >
       ::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
-
 
     Eigen::Matrix < double, -1, -1, 0, 5, 5 > Rtemp =
       Eigen::Matrix < double, -1, -1, 0, 5, 5 >

@@ -65,9 +65,6 @@ namespace TreeFitter {
     /** return true FIXME */
     virtual bool hasPosition() const { return true ; }
 
-    /** get chi2 */
-    virtual double chiSquare(const FitParams* fitparams) const ;
-
     /** add this to list */
     virtual void addToConstraintList(constraintlist& alist, int depth) const
     {
@@ -81,7 +78,7 @@ namespace TreeFitter {
     Eigen::Matrix<double, 7, 1> m_params;
 
     /** only lower triangle filled! */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>  m_covariance;
+    Eigen::Matrix < double, -1, -1, 0, 7, 7 >  m_covariance;
 
     /** flag  */
     bool m_hasEnergy;

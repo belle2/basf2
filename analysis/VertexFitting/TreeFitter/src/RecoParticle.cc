@@ -41,10 +41,4 @@ namespace TreeFitter {
     return status;
   }
 
-  double RecoParticle::chiSquare(const FitParams* fitparams) const
-  {
-    Projection p(fitparams->dim(), dimM());
-    projectRecoConstraint(*fitparams, p);
-    return p.getChiSquare();
-  }
 }

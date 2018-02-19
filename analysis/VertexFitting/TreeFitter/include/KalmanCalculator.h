@@ -1,4 +1,5 @@
 /**************************************************************************
+
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
@@ -8,16 +9,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-// there's 2 limits here EIGEN_STACK_ALLOCATION_LIMIT (128kb)
-// and what we accept as reasonable stack usage (the parameter below)
-// to give you a feeling: 100x100 results in the cov upddate function beeing
-// 300kb big. 120x120 already exceeds the Eigen limit (for a single matrix),
-// if that is needed we have to set EIGEN_STACK_ALLOCATION_LIMIT
-// BEFORE we include Eigen (as a flag in scons) JFK
-#define MAX_MATRIX_SIZE 100
+
+#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+
 // inverse() needs this, in the other classes we get away with just Eigen/Core
 #include <Eigen/Dense>
 
@@ -82,7 +79,7 @@ namespace TreeFitter {
     /** vector holding the residuals */
     Eigen::Matrix < double, -1, 1, 0, 5, 1 > m_res;
 
-    /** G former H, transforms residuals<->x,p */
+    /** G former H, transforms covraince of {residuals}<->{x,p,E} */
     Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > m_G;
 
     /** R residual covariance */

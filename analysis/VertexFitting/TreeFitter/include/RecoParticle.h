@@ -48,9 +48,6 @@ namespace TreeFitter {
     /** abstract abstract projection */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
 
-    /** get chi2 */
-    virtual double chiSquare(const FitParams* fitparams) const;
-
   };
 
 }

@@ -132,16 +132,6 @@ namespace TreeFitter {
     return (m_status == VertexStatus::Success);
   }
 
-  const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& FitManager::getCovariance() const
-  {
-    return m_fitparams->getCovariance();
-  }
-
-  const Eigen::Matrix<double, Eigen::Dynamic, 1>& FitManager::getStateVector() const
-  {
-    return m_fitparams->getStateVector();
-  }
-
   int FitManager::nDof() const
   {
     return m_fitparams->nDof();

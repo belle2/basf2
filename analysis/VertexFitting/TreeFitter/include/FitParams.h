@@ -9,9 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
-#include <iostream>
+#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 #include <Eigen/Core>
+
+#include <vector>
 
 namespace TreeFitter {
 
@@ -29,19 +30,25 @@ namespace TreeFitter {
     ~FitParams() {};
 
     /** getter for the states covariance */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() { return m_globalCovariance; }
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance()
+    {
+      return m_globalCovariance;
+    }
 
     /** const getter for the states covariance */
-    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& getCovariance() const
+    const Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance() const
     {
       return m_globalCovariance;
     }
 
     /** getter for the fit parameters/statevector */
-    Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() {return m_globalState;}
+    Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > & getStateVector() {return m_globalState;}
 
     /** const getter for the fit parameters/statevector */
-    const Eigen::Matrix<double, Eigen::Dynamic, 1>& getStateVector() const { return m_globalState; }
+    const Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > & getStateVector() const
+    {
+      return m_globalState;
+    }
 
     /** get a reference to an element of the state vector todo replace by setter? */
     double& getRefToElementOfStateVec(int row) { return m_globalState(row, 0); }
@@ -51,12 +58,6 @@ namespace TreeFitter {
 
     /** get an covaraince diagonal element   */
     double getCovDiaElement(int counter) { return m_globalCovariance(counter, counter); }
-
-    /** get a sub block from the covaraince matrix */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> getMaskInCovariance(const std::vector<int>& indexVec) const;
-
-    /** get a sub block from the state vector */
-    Eigen::Matrix<double, Eigen::Dynamic, 1> getMaskInStateVec(const std::vector<int>& indexVec) const;
 
     /** reset the staevector */
     void resetStateVector();
@@ -129,16 +130,16 @@ namespace TreeFitter {
 
   protected:
 
-    /** constructor for ROOT?? FIXME do we need this? */
+    /** constructor  */
     FitParams() {}
 
   private:
 
     /** vector holding all parameters of this fit */
-    Eigen::Matrix<double, Eigen::Dynamic, 1> m_globalState;
+    Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > m_globalState;
 
     /** covariance of the global state */
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_globalCovariance;
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > m_globalCovariance;
 
     /** dimension of statevector */
     int m_dim;

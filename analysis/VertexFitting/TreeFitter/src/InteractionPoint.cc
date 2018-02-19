@@ -95,11 +95,15 @@ namespace TreeFitter {
     const int posindex = posIndex();
 
     p.getResiduals().segment(0, m_constraintDimension) =
-      fitparams.getStateVector().segment(posindex, m_constraintDimension) -
-      m_ipPosVec.segment(0, m_constraintDimension);
+      m_ipPosVec.segment(0, m_constraintDimension) -
+      fitparams.getStateVector().segment(posindex, m_constraintDimension);
+
+    //p.getResiduals().segment(0, m_constraintDimension) =
+    //  fitparams.getStateVector().segment(posindex, m_constraintDimension) -
+    //  m_ipPosVec.segment(0, m_constraintDimension);
 
     for (int row = 0; row < m_constraintDimension; ++row) {
-      p.getH()(row, posindex + row) = 1;
+      p.getH()(row, posindex + row) = -1;
 
       for (int col = 0; col <= row; ++col) {
         p.getV()(row, col) = m_ipCovariance(row, col);

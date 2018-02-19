@@ -135,7 +135,7 @@ namespace TreeFitter {
     double flt;
     HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
 #else
-    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
+    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-8);
     //HelixUtils::getHelixAndJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
 #endif
 

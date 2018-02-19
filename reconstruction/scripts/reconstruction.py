@@ -208,7 +208,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_ecl_modules(path, components)
 
     if trigger_mode in ["hlt", "all"]:
-        # add_ecl_track_matcher_module(path, components)
+        add_ecl_track_matcher_module(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -220,7 +220,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
         add_muid_module(path, components)
         add_pid_module(path, components)
-        add_ecl_track_cluster_modules(path, components)
+        # add_ecl_track_cluster_modules(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed

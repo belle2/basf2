@@ -1038,9 +1038,9 @@ def reconstructRecoilDaughter(
 def rankByHighest(
     particleList,
     variable,
-    allowMultiRank=False,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
     path=analysis_main,
 ):
     """
@@ -1053,8 +1053,8 @@ def rankByHighest(
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
-    @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param path             modules are added to this path
     """
 
@@ -1062,18 +1062,18 @@ def rankByHighest(
     bcs.set_name('BestCandidateSelection_' + particleList + '_' + variable)
     bcs.param('particleList', particleList)
     bcs.param('variable', variable)
-    bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('numBest', numBest)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('allowMultiRank', allowMultiRank)
     path.add_module(bcs)
 
 
 def rankByLowest(
     particleList,
     variable,
-    allowMultiRank=False,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
     path=analysis_main,
 ):
     """
@@ -1085,9 +1085,9 @@ def rankByLowest(
 
     @param particleList     The input ParticleList
     @param variable         Variable to order Particles by.
-    @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param path             modules are added to this path
     """
 
@@ -1095,9 +1095,9 @@ def rankByLowest(
     bcs.set_name('BestCandidateSelection_' + particleList + '_' + variable)
     bcs.param('particleList', particleList)
     bcs.param('variable', variable)
-    bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('numBest', numBest)
     bcs.param('selectLowest', True)
+    bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
     path.add_module(bcs)
 

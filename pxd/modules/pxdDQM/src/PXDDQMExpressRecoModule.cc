@@ -23,9 +23,9 @@
 #include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <pxd/unpacking/PXDMappingLookup.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoTools.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <boost/format.hpp>
 
@@ -75,6 +75,15 @@ PXDDQMExpressRecoModule::~PXDDQMExpressRecoModule()
 
 void PXDDQMExpressRecoModule::defineHisto()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfLayers() == 0) {
+    B2FATAL("Missing geometry for VXD, check steering file.");
+  }
+  if (gTools->getNumberOfPXDLayers() == 0) {
+    B2WARNING("Missing geometry for PXD, PXD-DQM is skiped.");
+    return;
+  }
+
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {
@@ -83,54 +92,34 @@ void PXDDQMExpressRecoModule::defineHisto()
   }
 
   // basic constants presets:
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  c_nVXDLayers = geo.getLayers().size();
-  if (c_nVXDLayers == 0) {
-    B2FATAL("Missing geometry for VXD, check steering file.");
-    return;
-  }
-  c_firstVXDLayer = 1;  // counting start from 1...
-  c_lastVXDLayer = c_nVXDLayers;
-  c_nPXDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size();
-  c_firstPXDLayer = c_firstVXDLayer;
-  c_lastPXDLayer = c_nPXDLayers;
-
-  c_nPXDSensors = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() <= c_lastPXDLayer) {  // PXD
-        c_nPXDSensors += geo.getLadders(layer).size() * geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
-  c_nPXDChips = c_nPXDSensors * (c_nPXDChipsU + c_nPXDChipsV);
+  int nPXDSensors = gTools->getNumberOfPXDSensors();
+  int nPXDChips = gTools->getTotalPXDChips();
 
   // Create basic histograms:
   m_hitMapCounts = new TH1I("DQMER_PXD_PixelHitmapCounts", "DQM ER PXD Integrated number of fired pixels per sensor",
-                            c_nPXDSensors, 0, c_nPXDSensors);
+                            nPXDSensors, 0, nPXDSensors);
   m_hitMapCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCounts->GetYaxis()->SetTitle("counts");
   m_hitMapClCounts = new TH1I("DQMER_PXD_ClusterHitmapCounts", "DQM ER PXD Integrated number of clusters per sensor",
-                              c_nPXDSensors, 0, c_nPXDSensors);
+                              nPXDSensors, 0, nPXDSensors);
   m_hitMapClCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCounts->GetYaxis()->SetTitle("counts");
   // basic counters per chip:
   m_hitMapCountsChip = new TH1I("DQMER_PXD_PixelHitmapCountsChip", "DQM ER PXD Integrated number of fired pixels per chip",
-                                c_nPXDChips, 0, c_nPXDChips);
+                                nPXDChips, 0, nPXDChips);
   m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
   m_hitMapClCountsChip = new TH1I("DQMER_PXD_ClusterHitmapCountsChip", "DQM ER PXD Integrated number of clusters per chip",
-                                  c_nPXDChips, 0, c_nPXDChips);
+                                  nPXDChips, 0, nPXDChips);
   m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
-  for (int i = 0; i < c_nPXDChips; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    int iChip = 0;
-    int IsU = 0;
-    getIDsFromChipIndex(i, iLayer, iLadder, iSensor, iChip, IsU);
+  for (int i = 0; i < nPXDChips; i++) {
+    VxdID id = gTools->getChipIDFromPXDIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
+    int iChip = gTools->getPXDChipNumber(id);
+    int IsU = gTools->isPXDSideU(id);
     TString AxisTicks = Form("%i_%i_%i_u%iDCD", iLayer, iLadder, iSensor, iChip);
     if (!IsU)
       AxisTicks = Form("%i_%i_%i_v%iSWB", iLayer, iLadder, iSensor, iChip);
@@ -138,31 +127,31 @@ void PXDDQMExpressRecoModule::defineHisto()
     m_hitMapClCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
-  for (int i = 0; i < c_nPXDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nPXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromPXDIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     TString AxisTicks = Form("%i_%i_%i", iLayer, iLadder, iSensor);
     m_hitMapCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
     m_hitMapClCounts->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
-  m_fired = new TH1F*[c_nPXDSensors];
-  m_clusters = new TH1F*[c_nPXDSensors];
-  m_startRow = new TH1F*[c_nPXDSensors];
-  m_chargStartRow = new TH1F*[c_nPXDSensors];
-  m_startRowCount = new TH1F*[c_nPXDSensors];
-  m_clusterCharge = new TH1F*[c_nPXDSensors];
-  m_pixelSignal = new TH1F*[c_nPXDSensors];
-  m_clusterSizeU = new TH1F*[c_nPXDSensors];
-  m_clusterSizeV = new TH1F*[c_nPXDSensors];
-  m_clusterSizeUV = new TH1F*[c_nPXDSensors];
-  for (int i = 0; i < c_nPXDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  m_fired = new TH1F*[nPXDSensors];
+  m_clusters = new TH1F*[nPXDSensors];
+  m_startRow = new TH1F*[nPXDSensors];
+  m_chargStartRow = new TH1F*[nPXDSensors];
+  m_startRowCount = new TH1F*[nPXDSensors];
+  m_clusterCharge = new TH1F*[nPXDSensors];
+  m_pixelSignal = new TH1F*[nPXDSensors];
+  m_clusterSizeU = new TH1F*[nPXDSensors];
+  m_clusterSizeV = new TH1F*[nPXDSensors];
+  m_clusterSizeUV = new TH1F*[nPXDSensors];
+  for (int i = 0; i < nPXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromPXDIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
@@ -259,30 +248,34 @@ void PXDDQMExpressRecoModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
-  //Register collections
-  StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
-  StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
-  RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
-  m_storePXDClustersName = storePXDClusters.getName();
-  m_relPXDClusterDigitName = relPXDClusterDigits.getName();
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfPXDLayers() != 0) {
+    //Register collections
+    StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
+    StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
+    RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
+    m_storePXDClustersName = storePXDClusters.getName();
+    m_relPXDClusterDigitName = relPXDClusterDigits.getName();
 
-  //Store names to speed up creation later
-  m_storePXDDigitsName = storePXDDigits.getName();
+    //Store names to speed up creation later
+    m_storePXDDigitsName = storePXDDigits.getName();
 
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  m_storeFramesName = storeFrames.getName();
-
+    StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+    m_storeFramesName = storeFrames.getName();
+  }
 }
 
 void PXDDQMExpressRecoModule::beginRun()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfPXDLayers() == 0) return;
 
   if (m_hitMapCounts != NULL) m_hitMapCounts->Reset();
   if (m_hitMapClCounts != NULL) m_hitMapClCounts->Reset();
   if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Reset();
   if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Reset();
 
-  for (int i = 0; i < c_nPXDSensors; i++) {
+  for (int i = 0; i < gTools->getNumberOfPXDSensors(); i++) {
     if (m_fired[i] != NULL) m_fired[i]->Reset();
     if (m_clusters[i] != NULL) m_clusters[i]->Reset();
     if (m_startRow[i] != NULL) m_startRow[i]->Reset();
@@ -300,6 +293,9 @@ void PXDDQMExpressRecoModule::beginRun()
 
 void PXDDQMExpressRecoModule::event()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfPXDLayers() == 0) return;
+
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
@@ -308,49 +304,53 @@ void PXDDQMExpressRecoModule::event()
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
 
+  int firstPXDLayer = gTools->getFirstPXDLayer();
+  int lastPXDLayer = gTools->getLastPXDLayer();
+  int nPXDSensors = gTools->getNumberOfPXDSensors();
+
   // PXD basic histograms:
   // Fired strips
-  vector< set<int> > Pixels(c_nPXDSensors); // sets to eliminate multiple samples per strip
-  for (const PXDDigit& digit2 : storePXDDigits) {
-    int iLayer = digit2.getSensorID().getLayerNumber();
-    if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-    int iLadder = digit2.getSensorID().getLadderNumber();
-    int iSensor = digit2.getSensorID().getSensorNumber();
-    int index = getSensorIndex(iLayer, iLadder, iSensor);
+  vector< set<int> > Pixels(nPXDSensors); // sets to eliminate multiple samples per strip
+  for (const PXDDigit& digit : storePXDDigits) {
+    int iLayer = digit.getSensorID().getLayerNumber();
+    if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
+    int iLadder = digit.getSensorID().getLadderNumber();
+    int iSensor = digit.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
+    int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    Pixels.at(index).insert(digit2.getUniqueChannelID());
-    int iChip = PXDMappingLookup::getDCDID(digit2.getUCellID(), digit2.getVCellID(), sensorID);
-    int indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 1);
+    Pixels.at(index).insert(digit.getUniqueChannelID());
+    int iChip = PXDMappingLookup::getDCDID(digit.getUCellID(), digit.getVCellID(), sensorID);
+    int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
-    iChip = PXDMappingLookup::getSWBID(digit2.getVCellID());
-    indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 0);
+    iChip = PXDMappingLookup::getSWBID(digit.getVCellID());
+    indexChip = gTools->getPXDChipIndex(sensorID, kFALSE, iChip);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
 
-    if (m_pixelSignal[index] != NULL) m_pixelSignal[index]->Fill(digit2.getCharge());
-    if ((m_hitMapCounts != NULL) && (digit2.getCharge() > m_CutPXDCharge))
+    if (m_pixelSignal[index] != NULL) m_pixelSignal[index]->Fill(digit.getCharge());
+    if ((m_hitMapCounts != NULL) && (digit.getCharge() > m_CutPXDCharge))
       m_hitMapCounts->Fill(index);
   }
-  for (int i = 0; i < c_nPXDSensors; i++) {
+  for (int i = 0; i < nPXDSensors; i++) {
     if ((m_fired[i] != NULL) && (Pixels[i].size() > 0)) m_fired[i]->Fill(Pixels[i].size());
   }
 
-  vector< set<int> > counts(c_nPXDSensors);
+  vector< set<int> > counts(nPXDSensors);
   // Hitmaps, Charge, Seed, Size, ...
   for (const PXDCluster& cluster : storePXDClusters) {
     int iLayer = cluster.getSensorID().getLayerNumber();
-    if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
+    if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
     int iLadder = cluster.getSensorID().getLadderNumber();
     int iSensor = cluster.getSensorID().getSensorNumber();
-    int index = getSensorIndex(iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
+    int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     counts.at(index).insert(cluster.GetUniqueID());
     int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
-    int indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 1);
+    int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
     iChip = PXDMappingLookup::getSWBID(SensorInfo.getVCellID(cluster.getV()));
-    indexChip = getChipIndex(iLayer, iLadder, iSensor, iChip, 0);
+    indexChip = gTools->getPXDChipIndex(sensorID, kFALSE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
     if (m_hitMapClCounts != NULL) m_hitMapClCounts->Fill(index);
     if (m_clusterCharge[index] != NULL) m_clusterCharge[index]->Fill(cluster.getCharge());
@@ -358,134 +358,8 @@ void PXDDQMExpressRecoModule::event()
     if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getVSize());
     if (m_clusterSizeUV[index] != NULL) m_clusterSizeUV[index]->Fill(cluster.getSize());
   }
-  for (int i = 0; i < c_nPXDSensors; i++) {
+  for (int i = 0; i < nPXDSensors; i++) {
     if ((m_clusters[i] != NULL) && (counts[i].size() > 0))
       m_clusters[i]->Fill(counts[i].size());
-  }
-  if (storeFrames && storeFrames.getEntries()) {
-    // Start rows
-    for (const PXDFrame& frame : storeFrames) {
-      int iLayer = frame.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-      int iLadder = frame.getSensorID().getLadderNumber();
-      int iSensor = frame.getSensorID().getSensorNumber();
-      int index = getSensorIndex(iLayer, iLadder, iSensor);
-      if (m_startRow[index] != NULL) m_startRow[index]->Fill(frame.getStartRow());
-    }
-    // Cluster seed charge by start row
-    std::map<VxdID, unsigned short> startRows;
-    for (auto frame : storeFrames)
-      startRows.insert(std::make_pair(frame.getSensorID(), frame.getStartRow()));
-    for (auto cluster : storePXDClusters) {
-      int iLayer = cluster.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-      int iLadder = cluster.getSensorID().getLadderNumber();
-      int iSensor = cluster.getSensorID().getSensorNumber();
-      int index = getSensorIndex(iLayer, iLadder, iSensor);
-      VxdID sensorID(iLayer, iLadder, iSensor);
-      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-
-      float fDistance = SensorInfo.getVCellID(cluster.getV()) - startRows[cluster.getSensorID()];
-      if (fDistance < 0) fDistance += SensorInfo.getVCells();
-      if (m_chargStartRow[index] != NULL) m_chargStartRow[index]->Fill(fDistance, cluster.getSeedCharge());
-      if (m_startRowCount[index] != NULL) m_startRowCount[index]->Fill(fDistance);
-    }
-  }
-}
-
-int PXDDQMExpressRecoModule::getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip,
-                                          const int IsU) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          int iChip = Chip - 1;
-          if (!IsU)
-            iChip += c_nPXDChipsU;
-          return tempcounter + iChip;
-        }
-        tempcounter = tempcounter + (c_nPXDChipsU + c_nPXDChipsV);
-      }
-    }
-  }
-  return tempcounter;
-}
-
-void PXDDQMExpressRecoModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
-                                                  int& IsU) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        Layer = layer.getLayerNumber();
-        Ladder = ladder.getLadderNumber();
-        Sensor = sensor.getSensorNumber();
-        int Chips = c_nPXDChipsU + c_nPXDChipsV;
-        for (int iChip = 0; iChip < Chips; iChip++) {
-          if (tempcounter + iChip == Index) {
-            Layer = layer.getLayerNumber();
-            Ladder = ladder.getLadderNumber();
-            Sensor = sensor.getSensorNumber();
-            Chip = iChip + 1;
-            IsU = 1;
-            if (iChip >= c_nPXDChipsU) {
-              Chip = iChip + 1 - c_nPXDChipsU;
-              IsU = 0;
-            }
-            return;
-          }
-        }
-        tempcounter = tempcounter + (c_nPXDChipsU + c_nPXDChipsV);
-      }
-    }
-  }
-}
-
-int PXDDQMExpressRecoModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          return tempcounter;
-        }
-        tempcounter++;
-      }
-    }
-  }
-  return tempcounter;
-}
-
-void PXDDQMExpressRecoModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (layer.getLayerNumber() > c_lastPXDLayer) continue;  // need PXD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if (tempcounter == Index) {
-          Layer = layer.getLayerNumber();
-          Ladder = ladder.getLadderNumber();
-          Sensor = sensor.getSensorNumber();
-          return;
-        }
-        tempcounter++;
-      }
-    }
   }
 }

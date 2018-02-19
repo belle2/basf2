@@ -79,7 +79,7 @@ void PXDDQMClustersModule::defineHisto()
   if (gTools->getNumberOfLayers() == 0) {
     B2FATAL("Missing geometry for VXD, check steering file.");
   }
-  if (gTools->getNumberOfPXDLayers() != 0) {
+  if (gTools->getNumberOfPXDLayers() == 0) {
     B2WARNING("Missing geometry for PXD, PXD-DQM is skiped.");
     return;
   }
@@ -433,7 +433,7 @@ void PXDDQMClustersModule::event()
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
     iChip = PXDMappingLookup::getSWBID(SensorInfo.getVCellID(cluster.getV()));
-    indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
+    indexChip = gTools->getPXDChipIndex(sensorID, kFALSE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
     if (m_hitMapClCounts != NULL) m_hitMapClCounts->Fill(index);
     if (m_clusterCharge[index] != NULL) m_clusterCharge[index]->Fill(cluster.getCharge());

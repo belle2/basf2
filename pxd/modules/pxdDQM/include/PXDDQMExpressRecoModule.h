@@ -90,61 +90,6 @@ namespace Belle2 {
     /** Cluster size */
     TH1F** m_clusterSizeUV;
 
-    /** Number of PXD chips per sensor in u (DCD) (=4) on Belle II */
-    int c_nPXDChipsU = 4;
-    /** Number of PXD chips per sensor in v (Switchers) (=6) on Belle II */
-    int c_nPXDChipsV = 6;
-    /** Number of PXD chips per sensor on Belle II */
-    int c_nPXDChips;
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** Number of PXD sensors on Belle II */
-    int c_nPXDSensors;
-
-    /** Function return index of chip in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @param Chip Chip position on sensor - DCDs or Switchers
-       * @param IsU Info if Chip is on u direction (DCD)
-       * @return Index of sensor in plots.
-       */
-    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip, const int IsU) const;
-    /** Function return position indexes of chipID in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       * @param Chip return Chip position on sensor - DCDs or Switchers
-       * @param IsU return info if Chip is on u direction (DCD)
-       */
-    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip, int& IsU) const;
-
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       */
-    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
-
   };
 
 }

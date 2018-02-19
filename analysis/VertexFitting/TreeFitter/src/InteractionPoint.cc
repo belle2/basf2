@@ -98,10 +98,6 @@ namespace TreeFitter {
       m_ipPosVec.segment(0, m_constraintDimension) -
       fitparams.getStateVector().segment(posindex, m_constraintDimension);
 
-    //p.getResiduals().segment(0, m_constraintDimension) =
-    //  fitparams.getStateVector().segment(posindex, m_constraintDimension) -
-    //  m_ipPosVec.segment(0, m_constraintDimension);
-
     for (int row = 0; row < m_constraintDimension; ++row) {
       p.getH()(row, posindex + row) = -1;
 

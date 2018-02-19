@@ -135,7 +135,7 @@ namespace TreeFitter {
     double flt;
     HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
 #else
-    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-8);
+    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-5);
     //HelixUtils::getHelixAndJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
 #endif
 
@@ -153,8 +153,6 @@ namespace TreeFitter {
     helixpars(3) = helix.getZ0();
     helixpars(4) = helix.getTanLambda();
 
-    // fill the residual and cov matrix
-    // p.getResiduals().segment(0, 5) = helixpars - m_params; //this works
     p.getResiduals().segment(0, 5) = m_params - helixpars;
 
     p.getResiduals()(1) = HelixUtils::phidomain(p.getResiduals()(1));

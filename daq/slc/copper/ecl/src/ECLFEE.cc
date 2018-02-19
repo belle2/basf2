@@ -20,8 +20,6 @@ using namespace Belle2;
 // TODO: Add custom operations before AND after routine operations.
 // TODO: Optimize writeToShaper via intelligent masking
 
-// TODO: Support for RELAY_G (reg 0x31) and run type register (0x221)
-
 ECLFEE::ECLFEE() : FEE("ecl")
 {
 }
@@ -84,7 +82,16 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   hslb.writefee8(0x20, obj.getInt("shaper_mask_low"));
   hslb.writefee8(0x21, obj.getInt("shaper_mask_high"));
 
-  hslb.writefee8(0x38, obj.getInt("relay_g"));
+  // Generator relay.
+  // Register to control two generator relays.
+  //  - 0 - relays off, 1 - first relay on, 2 - second relay on, 3 - both relays on
+  //  One relay decreases the signal by a factor of 8.
+  hslb.writefee8(0x31, obj.getInt("relay_g"));
+  // Waveform saving mode
+  // 0x00 -- normal run, don't save waveforms
+  // 0x20 -- save waveforms using ttd_trg_rare_factor
+  hslb.writefee32(0x80, obj.getInt("calib_mode_num"));
+  callback.log(LogFile::INFO, "write fee-32 %x << %x", 0x80, obj.getInt("calib_mode_num"));
 
   callback.log(LogFile::INFO, "write fee-8 %x << %x", 0x38, obj.getInt("ttd_trg_rare_factor"));
   hslb.writefee8(0x38, obj.getInt("ttd_trg_rare_factor"));
@@ -131,6 +138,20 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     unsigned int val = o_reg30.getInt("val");
     hslb.writefee8(0x30, val);
     callback.log(LogFile::INFO, "write fee-8 %x >> %x", 0x30, val);
+  }
+
+  if (obj.hasObject("col_data_after")) {
+    const DBObjectList o_sh_datas(obj.getObjects("col_data_after"));
+    for (size_t i = 0; i < o_sh_datas.size(); i++) {
+      const DBObject& o_sh_data(o_sh_datas[i]);
+      unsigned int sh_num    = o_sh_data.getInt("mask"); // 0xFFF format
+      unsigned int reg_num   = o_sh_data.getInt("addr");
+      unsigned int reg_wdata = o_sh_data.getInt("data");
+      // Print description for custom register into log
+      callback.log(LogFile::INFO, "ecl[%d]: %s", hslb.get_finid(),
+                   o_sh_data.getText("desc"));
+      rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
+    }
   }
 }
 

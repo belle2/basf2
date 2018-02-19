@@ -47,7 +47,9 @@ void ECLMatchingPerformanceModule::initialize()
   m_extHits.isRequired();
   m_eclCalDigits.isRequired();
 
-  m_eclNeighbours = new ECL::ECLNeighbours("N", 1);
+  m_eclNeighbours1x1 = new ECL::ECLNeighbours("N", 0);
+  m_eclNeighbours3x3 = new ECL::ECLNeighbours("N", 1);
+  m_eclNeighbours5x5 = new ECL::ECLNeighbours("N", 2);
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -93,6 +95,8 @@ void ECLMatchingPerformanceModule::event()
       m_trackProperties.z = fitResult->getPosition().Z();
 
       m_pValue = fitResult->getPValue();
+      m_charge = (int)fitResult->getChargeSign();
+      m_d0 = fitResult->getD0();
 
       ECLCluster* eclCluster = track.getRelatedTo<ECLCluster>();
       if (eclCluster != nullptr) {
@@ -101,6 +105,7 @@ void ECLMatchingPerformanceModule::event()
       }
       bool found_first_enter = false;
       std::set<int> uniqueECLCalDigits;
+      bool inserted;
       for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
         int copyid =  extHit.getCopyID();
         if (copyid == -1) continue;
@@ -115,8 +120,8 @@ void ECLMatchingPerformanceModule::event()
         const int cell = copyid + 1;
         if (extHit.getStatus() == EXT_ENTER) {
           m_enter++;
-          bool inserted = (uniqueECLCalDigits.insert(cell)).second;
-          if (!inserted) {
+          inserted = (uniqueECLCalDigits.insert(cell)).second;
+          if (inserted) {
             for (const auto& eclCalDigit : m_eclCalDigits) {
               if (eclCalDigit.getCellId() == cell) {
                 m_deposited_energy += eclCalDigit.getEnergy();
@@ -124,22 +129,14 @@ void ECLMatchingPerformanceModule::event()
               }
             }
           }
-          //Find ECLCalDigit in cell ID of ExtHit or one of its neighbours
-          auto& vec_of_neighbouring_cells = m_eclNeighbours->getNeighbours(cell);
-          for (const auto neighbouringcell : vec_of_neighbouring_cells) {
-            const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
-            [&](const ECLCalDigit & d) { return d.getCellId() == neighbouringcell; }
-                                       );
-            //Found ECLCalDigit close to ExtHit
-            if (idigit != m_eclCalDigits.end()) {
-              m_matchedToECLCalDigit = 1;
-              break;
-            }
-          }
           if (!found_first_enter) {
             pos_enter = extHit.getPosition();
             found_first_enter = true;
           }
+          //Find ECLCalDigit in cell ID of ExtHit or one of its neighbours
+          findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours1x1, m_matchedTo1x1Neighbours, cell);
+          findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours3x3, m_matchedTo3x3Neighbours, cell);
+          findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours5x5, m_matchedTo5x5Neighbours, cell);
         } else if (extHit.getStatus() == EXT_EXIT) {
           m_exit++;
           pos_exit = extHit.getPosition();
@@ -149,11 +146,11 @@ void ECLMatchingPerformanceModule::event()
       for (const auto& eclCalDigit : m_eclCalDigits) {
         if (eclCalDigit.getEnergy() < 0.01) continue;
         int cellid = eclCalDigit.getCellId();
-        TVector3 cvec = geometry->GetCrystalVec(cellid - 1);
-        distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
-        if (m_innerdistance < 0 || distance < m_innerdistance) {
-          m_innerdistance = distance;
-        }
+        // TVector3 cvec = geometry->GetCrystalPos(cellid - 1);
+        // distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
+        // if (m_innerdistance < 0 || distance < m_innerdistance) {
+        //   m_innerdistance = distance;
+        // }
       }
     }
     m_dataTree->Fill(); // write data to tree
@@ -194,12 +191,18 @@ void ECLMatchingPerformanceModule::setupTree()
 
   addVariableToTree("pValue", m_pValue);
 
+  addVariableToTree("charge", m_charge);
+
+  addVariableToTree("d0", m_d0);
+
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
 
   addVariableToTree("MinDistance", m_distance);
 
-  addVariableToTree("TrackECalDigitMatch", m_matchedToECLCalDigit);
+  addVariableToTree("TrackToOneByOneNeighboursMatch", m_matchedTo1x1Neighbours);
+  addVariableToTree("TrackToThreeByThreeNeighboursMatch", m_matchedTo3x3Neighbours);
+  addVariableToTree("TrackToFiveByFiveNeighboursMatch", m_matchedTo5x5Neighbours);
 
   addVariableToTree("nECLEnter", m_enter);
   addVariableToTree("nECLExit", m_exit);
@@ -230,13 +233,19 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
 
   m_pValue = -999;
 
+  m_charge = 0;
+
+  m_d0 = -999;
+
   m_matchedToECLCluster = 0;
 
   m_hypothesisOfMatchedECLCluster = 0;
 
   m_distance = -999;
 
-  m_matchedToECLCalDigit = 0;
+  m_matchedTo1x1Neighbours = 0;
+  m_matchedTo3x3Neighbours = 0;
+  m_matchedTo5x5Neighbours = 0;
 
   m_enter = 0;
   m_exit = 0;
@@ -259,4 +268,20 @@ void ECLMatchingPerformanceModule::addVariableToTree(const std::string& varName,
   std::stringstream leaf;
   leaf << varName << "/I";
   m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
+}
+
+void ECLMatchingPerformanceModule::findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours,
+    int& matchedToNeighbours, const int& cell)
+{
+  auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
+  for (const auto& neighbouringcell : vec_of_neighbouring_cells) {
+    const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+    [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > 0.002); }
+                               );
+    //Found ECLCalDigit close to ExtHit
+    if (idigit != m_eclCalDigits.end()) {
+      matchedToNeighbours = 1;
+      break;
+    }
+  }
 }

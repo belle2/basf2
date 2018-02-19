@@ -64,7 +64,9 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;
     StoreArray<TrackFitResult> m_trackFitResults;
 
-    ECL::ECLNeighbours* m_eclNeighbours;
+    ECL::ECLNeighbours* m_eclNeighbours1x1;
+    ECL::ECLNeighbours* m_eclNeighbours3x3;
+    ECL::ECLNeighbours* m_eclNeighbours5x5;
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
@@ -87,6 +89,12 @@ namespace Belle2 {
     /**< pValue of track fit */
     double m_pValue;
 
+    /**< charge */
+    int m_charge;
+
+    /**< signed distance of the track to the IP in the r-phi plane */
+    double m_d0;
+
     /**< boolean for match between track and ECL cluster */
     int m_matchedToECLCluster;
 
@@ -105,8 +113,14 @@ namespace Belle2 {
     /**< minimal distance between track at center of ECL and ECLCalDigit with at least 10 MeV */
     double m_innerdistance;
 
-    /**< boolean for match between track and ECLCalDigit */
-    int m_matchedToECLCalDigit;
+    /**< boolean for match between track and ECLCalDigit cell */
+    int m_matchedTo1x1Neighbours;
+
+    /**< boolean for match between track and one of 9 ECLCalDigit neighbouring cells */
+    int m_matchedTo3x3Neighbours;
+
+    /**< boolean for match between track and one of 25 ECLCalDigit neighbouring cells */
+    int m_matchedTo5x5Neighbours;
 
     /**< number of times track enters ECL */
     int m_enter;
@@ -130,6 +144,9 @@ namespace Belle2 {
 
     /** add a variable with int format */
     void addVariableToTree(const std::string& varName, int& varReference);
+
+    /** find a match between crystals in which energy was deposited and the cell or its neighbors that a track entered  */
+    void findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours, int& matchedToNeighbours, const int& cell);
   };
 
 

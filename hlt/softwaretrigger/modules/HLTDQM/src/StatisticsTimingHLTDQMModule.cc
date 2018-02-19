@@ -156,8 +156,6 @@ void StatisticsTimingHLTDQMModule::initialize()
     "ARICHFillHits",
     "ARICHReconstructor",
     "ECLTrackShowerMatch",
-    "ECLTrackClusterMatching",
-    "ECLClusterProperties",
     "ECLElectronId",
     "MCMatcherECLClusters",
     "EKLMReconstructor",

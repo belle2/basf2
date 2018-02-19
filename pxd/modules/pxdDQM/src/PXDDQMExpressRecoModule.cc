@@ -53,7 +53,7 @@ REG_MODULE(PXDDQMExpressReco)
 PXDDQMExpressRecoModule::PXDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
-  setDescription("PXD DQM module for Express RecoMin "
+  setDescription("PXD DQM module for Express Reco "
                  "Recommended Number of events for monito is 40 kEvents or more to fill all histograms "
                 );
 

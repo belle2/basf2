@@ -24,10 +24,8 @@
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
-
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBObjPtr.h>
+#include <vxd/geometry/GeoTools.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <boost/format.hpp>
 

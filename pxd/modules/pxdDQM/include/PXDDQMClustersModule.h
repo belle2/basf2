@@ -16,8 +16,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/GeoTools.h>
-#include <pxd/unpacking/PXDMappingLookup.h>
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"

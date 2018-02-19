@@ -118,6 +118,25 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   callback.log(LogFile::INFO, "Loading shaper parameters: relays");
   writeRelays(callback, hslb, obj);
 
+  if (obj.hasObject("col_data")) {
+    const DBObjectList o_col_datas(obj.getObjects("col_data"));
+    for (size_t i = 0; i < o_col_datas.size(); i++) {
+      const DBObject& o_col_data(o_col_datas[i]);
+      unsigned int reg_num   = o_col_data.getInt("addr");
+      unsigned int reg_wdata = o_col_data.getInt("data");
+      std::string type       = o_col_data.getText("type");
+      // Print description for custom register into log
+      callback.log(LogFile::INFO, "ecl[%d]: write%s reg0x%x val0x%x (%s)",
+                   hslb.get_finid(), type, reg_num, reg_wdata,
+                   o_col_data.getText("desc"));
+      if (type == "fee8") {
+        hslb.writefee8(reg_num, reg_wdata);
+      } else if (type == "fee32") {
+        hslb.writefee32(reg_num, reg_wdata);
+      }
+    }
+  }
+
   if (obj.hasObject("sh_data_after")) {
     const DBObjectList o_sh_datas(obj.getObjects("sh_data_after"));
     for (size_t i = 0; i < o_sh_datas.size(); i++) {
@@ -126,7 +145,8 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
       unsigned int reg_num   = o_sh_data.getInt("addr");
       unsigned int reg_wdata = o_sh_data.getInt("data");
       // Print description for custom register into log
-      callback.log(LogFile::INFO, "ecl[%d]: %s", hslb.get_finid(),
+      callback.log(LogFile::INFO, "ecl[%d]: write shaper reg0x%x val0x%x (%s)",
+                   hslb.get_finid(), reg_num, reg_wdata,
                    o_sh_data.getText("desc"));
       rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
     }
@@ -138,20 +158,6 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     unsigned int val = o_reg30.getInt("val");
     hslb.writefee8(0x30, val);
     callback.log(LogFile::INFO, "write fee-8 %x >> %x", 0x30, val);
-  }
-
-  if (obj.hasObject("col_data_after")) {
-    const DBObjectList o_sh_datas(obj.getObjects("col_data_after"));
-    for (size_t i = 0; i < o_sh_datas.size(); i++) {
-      const DBObject& o_sh_data(o_sh_datas[i]);
-      unsigned int sh_num    = o_sh_data.getInt("mask"); // 0xFFF format
-      unsigned int reg_num   = o_sh_data.getInt("addr");
-      unsigned int reg_wdata = o_sh_data.getInt("data");
-      // Print description for custom register into log
-      callback.log(LogFile::INFO, "ecl[%d]: %s", hslb.get_finid(),
-                   o_sh_data.getText("desc"));
-      rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
-    }
   }
 }
 

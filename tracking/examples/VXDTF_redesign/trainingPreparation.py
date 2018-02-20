@@ -81,21 +81,22 @@ setup_Geometry(path)
 # put PXD and SVD SpacePoints into the same StoreArray
 if usePXD:
     spCreatorPXD = register_module('PXDSpacePointCreator')
-    spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-    spCreatorPXD.param('SpacePoints', 'SpacePoints')
+    spCreatorPXD.param('NameOfInstance', 'PXDSpacePointCreator')
+    spCreatorPXD.param('SpacePoints', 'PXDSpacePoints')
     path.add_module(spCreatorPXD)
 
 spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-spCreatorSVD.param('SpacePoints', 'SpacePoints')
+spCreatorSVD.param('NameOfInstance', 'SVDSpacePointCreator')
+spCreatorSVD.param('SpacePoints', 'SVDSpacePoints')
 path.add_module(spCreatorSVD)
 
 
 # Converts GenFit track candidates and checks them, with respect to the SecMap settings
 # Produces SpacePoint TrackCand which is used in VXDTFTrainingDataCollector.
 setup_RTCtoSPTCConverters(path=path,
-                          SPscollection='SpacePoints',
+                          SVDSPscollection='SVDSpacePoints',
+                          PXDSPscollection='PXDSpacePoints',
                           RTCinput='MCRecoTracks',
                           sptcOutput='checkedSPTCs',
                           usePXD=usePXD,

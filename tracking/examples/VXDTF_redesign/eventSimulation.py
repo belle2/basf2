@@ -150,7 +150,7 @@ main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks",
 # track fitting
 daffitter = register_module("DAFRecoFitter")
 daffitter.param('recoTracksStoreArrayName', "MCRecoTracks")
-daffitter.logging.log_level = LogLevel.DEBUG
+# daffitter.logging.log_level = LogLevel.DEBUG
 main.add_module(daffitter)
 
 

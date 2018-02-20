@@ -214,7 +214,8 @@ def setup_VXDTF2(path=None,
 
 def setup_RTCtoSPTCConverters(
         path=0,
-        SPscollection='SpacePoints',
+        SVDSPscollection='SVDSpacePoints',
+        PXDSPscollection='PXDSpacePoints',
         RTCinput='mcTracks',
         sptcOutput='checkedSPTCs',
         usePXD=True,
@@ -241,6 +242,7 @@ def setup_RTCtoSPTCConverters(
     @param useNoKick enable the training sample selection based on track parameters (and produce a TFile of its effect)
     """
     print("setup RTCtoSPTCConverters...")
+
     spacePointNames = []
     detectorTypes = []
     trueHitNames = []
@@ -248,11 +250,11 @@ def setup_RTCtoSPTCConverters(
     if usePXD:
         detectorTypes.append('PXD')
         # PXD SpacePoints and SVD SpacePoints are assumed to be in the same StoreArray
-        spacePointNames.append(SPscollection)
+        spacePointNames.append(PXDSPscollection)
         trueHitNames.append('')
         clusterNames.append('')
     # PXD SpacePoints and SVD SpacePoints are assumed to be in the same StoreArray
-    spacePointNames.append(SPscollection)
+    spacePointNames.append(SVDSPscollection)
     detectorTypes.append('SVD')
     trueHitNames.append('')
     clusterNames.append('')
@@ -279,7 +281,10 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.logging.log_level = logLevel
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
-    recoTrackCandConverter.param('SVDandPXDSPName', SPscollection)
+    recoTrackCandConverter.param('SVDSpacePointStoreArrayName', SVDSPscollection)
+    recoTrackCandConverter.param('PXDSpacePointStoreArrayName', None)
+    if usePXD:
+        recoTrackCandConverter.param('PXDSpacePointStoreArrayName', PXDSPscollection)
     recoTrackCandConverter.param('useTrueHits', True)
     recoTrackCandConverter.param('ignorePXDHits', not usePXD)  # if True PXD hits will be ignored
     recoTrackCandConverter.param('useSingleClusterSP', False)

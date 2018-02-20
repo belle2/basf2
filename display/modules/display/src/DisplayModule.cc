@@ -68,7 +68,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideVolumes", m_hideVolumes,
            "List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden.", {});
   addParam("deleteVolumes", m_deleteVolumes,
-           "List of volumes to be deleted. The volume and all its daughters will be deleted completely. Regular expression should work as well.", {});
+           "List of volumes to be deleted. The volume and all its daughters will be deleted completely. Uses Regular Expressions (RE)! If the expression starts with '#', only daughters are removed (# is removed for RE)", {});
 
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.

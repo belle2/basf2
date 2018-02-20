@@ -12,7 +12,7 @@
 # It is needed for R-Phi and R-Z projection (empty for full geometry).
 # It is faster to display and manipulate (zoom, rotation) than full geometry
 #
-# This script will open Display (by default, read below) where one can:
+# This script will open Display, where one can:
 # 1) Remove volumes to have reasonably-sized extract
 #    - Go to Eve panel -> Scenes -> Geometry scene
 #    - Select volumes to be removed completely from the extract by right-clicking
@@ -39,7 +39,7 @@ main = create_path()
 main.add_module('EventInfoSetter')
 # main.add_module('RootInput')
 
-# You can specifi different geometry here, e.g. for Phase2, do:
+# You can specify different geometry here, e.g. for Phase2, do:
 # main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
 main.add_module('Gearbox')
 
@@ -58,18 +58,21 @@ display.param('fullGeometry', True)
 # NOTE: Volume names in the Eve panel have usually a suffix ('_1' etc. which you have to omit here)
 #       For example 'BKLM.EnvelopeLogical' is named 'BKLM.EnvelopeLogical_1' but here you need to specify
 #       them without the suffix (their visualisation is changed directly in geometry in memory - which
-#       has no effect to e.g. simulation, it is only for visualisation - so many have the same name)
-#       For example 'PXD.Switcher_refl' will hide all 'PXD.Switcher_refl_#' you can see in the Eve panel.
-display.param('hideVolumes', ['BKLM.EnvelopeLogical',
-                              'Endcap_1',
-                              'Endcap_2',
-                              'logicalCDC',
-                              'CarbonTube',
-                              'PXD.Switcher_refl'])
+#       has no effect to e.g. simulation - but many volumes have the same name)
+#       For example 'PXD.Switcher_refl' will hide all 'PXD.Switcher_refl_#' you could see in the Eve panel.
+display.param('hideVolumes', ['logicalCDC',
+                              'ARICH.masterVolume'])
 
 # List of volumes to be deleted. This time the suffix is needed.
 # NOTE: These are REGULAR EXPRESSIONS from ROOT, see:
 #       https://root.cern.ch/root/html534/TPRegexp.html
+#
+# NOTE: If the expression starts with '#', only children of this
+#       element are deleted (sometimes useful), the leading '#'
+#       is removed before making regular expression.
+# WARNING: For some reason one can still expand this in the Eve panel, which
+#          will cause the children elements to re-appear (strange, why?!) -
+#          so do not click (expand) it if you do not want it in the extract
 #
 # Some usefull examples:
 #
@@ -92,20 +95,52 @@ display.param('hideVolumes', ['BKLM.EnvelopeLogical',
 #
 # A B2INFO message is issued for every volume deleted. Please check the output is what you expect.
 #
-# Follows a default list used to create Phase 3 extract:
-display.param('deleteVolumes', ['BKLM\\.EnvelopeLogical',
-                                '^Endcap_1.*',
-                                '^Endcap_2.*',
-                                '^logicalCDC_0$',
-                                'PXD\\.Switcher.*',
-                                'PXD\\.Balcony.*',
-                                'PXD\\.Cap.*',
-                                'PXD\\.ReadoutChips.*'])
+# Follows a default list used to create Phase 3(2) extract:
+# NOTE: One can do much more efficiently with regular expressions...
+#       I keep this list if someone would like to re-enable some parts without
+#       all the work of going through the geometry scene.
+display.param('deleteVolumes', [
+    # 'BKLM\\.EnvelopeLogical',
+    # '^Endcap_1.*',
+    # '^Endcap_2.*',
+
+    # --- BKLM ---------------------------------------------------
+    '#BKLM\\.F',       # Note the leading # (only delete children)
+    '#BKLM\\.B',       # Note the leading # (only delete children)
+    # --- EKLM ---------------------------------------------------
+    '#^Layer_.*',      # Note the leading # (only delete children)
+    '#^ShieldLayer.*',  # Note the leading # (only delete children)
+    # --- CDC ----------------------------------------------------
+    '#^logicalCDC_0$',  # delete children + hide this (see above)
+    # --- ARICH --------------------------------------------------
+    '#ARICH.*',        # delete children + hide this (see above)
+    # --- PXD ----------------------------------------------------
+    'PXD\\.Switcher.*',
+    'PXD\\.Balcony.*',
+    'PXD\\.Cap.*',
+    'PXD\\.ReadoutChips.*',
+    'PXD\\.Reinforcement.*',
+    'PXD\\.ThinningLayer.*',
+    'PXD\\.Border.*',
+    'CarbonTube.*',
+    '^backward_.*',
+    '^forward_.*',
+    # --- SVD ----------------------------------------------------
+    'SVD\\. Forward.*',
+    'SVD\\. Backward.*',
+    'SVD\\. Outer',
+    'SVD\\.Kapton.*',
+    'SVD\\.Layer.*',
+    'SVD\\.Barrel.*',
+    'SVD\\.Origami.*',
+    'SVD\\.Slanted.*',
+    'SVD\\.APV.*'
+])
 
 # To use custom extract afterwards in Display, you need to set
 # fullGeometry=False (default) and change the path to the extract used (in your own display script):
 #
-# display.param('customGeometryExtractPath', 'path/to/extract/geometry_extract.root')
+# display.param('customGeometryExtractPath', 'geometry_extract.root')
 
 main.add_module(display)
 

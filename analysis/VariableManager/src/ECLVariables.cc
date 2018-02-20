@@ -26,9 +26,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 
-//ECL
-#include <ecl/dataobjects/ECLShower.h>
-
 //ROOT
 #include <TVector3.h>
 

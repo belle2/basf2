@@ -67,6 +67,11 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("customGeometryExtractPath", m_customGeometryExtractPath, "Path to custom file with geometry extract.", std::string(""));
   addParam("customGeometryExtractPathTop", m_customGeometryExtractPathTop,
            "Path to custom file with geometry extract with corrected placement of TOP bars.", std::string(""));
+  addParam("hideVolumes", m_hideVolumes,
+           "List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden.", {});
+  addParam("deleteVolumes", m_deleteVolumes,
+           "List of volumes to be deleted. The volume and all its daughters will be deleted completely. Regular expression should work as well.", {});
+
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
   if ((!gApplication) || (gApplication->TestBit(TApplication::kDefaultApplication))) {
@@ -132,7 +137,9 @@ void DisplayModule::initialize()
   }
 
   if (!m_customGeometryExtractPath.empty()) EveGeometry::setCustomExtractPath(m_customGeometryExtractPath);
-  if (!m_customGeometryExtractPathTop.empty()) EveGeometry::setCustomExtractPathTop(m_customGeometryExtractPathTop);
+
+  EveGeometry::setHideVolumes(m_hideVolumes);
+  EveGeometry::setDeleteVolumes(m_deleteVolumes);
 
   EveGeometry::addGeometry(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
   m_visualizer = new EVEVisualization();

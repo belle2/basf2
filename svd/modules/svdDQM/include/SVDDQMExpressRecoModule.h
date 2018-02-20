@@ -23,14 +23,14 @@
 namespace Belle2 {
 
   /** SVD DQM Module */
-  class SVDDQMExpressRecoMinModule : public HistoModule {  // <- derived from HistoModule class
+  class SVDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
-    SVDDQMExpressRecoMinModule();
+    SVDDQMExpressRecoModule();
     /* Destructor */
-    virtual ~SVDDQMExpressRecoMinModule();
+    virtual ~SVDDQMExpressRecoModule();
 
     /** Module function initialize */
     void initialize() override final;

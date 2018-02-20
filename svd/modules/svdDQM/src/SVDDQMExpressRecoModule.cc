@@ -10,7 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "svd/modules/svdDQM/SVDDQMExpressRecoMinModule.h"
+#include "svd/modules/svdDQM/SVDDQMExpressRecoModule.h"
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -34,14 +34,14 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMExpressRecoMin)
+REG_MODULE(SVDDQMExpressReco)
 
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDQMExpressRecoMinModule::SVDDQMExpressRecoMinModule() : HistoModule()
+SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
   setDescription("SVD DQM module for Express Reco"
@@ -59,7 +59,7 @@ SVDDQMExpressRecoMinModule::SVDDQMExpressRecoMinModule() : HistoModule()
 }
 
 
-SVDDQMExpressRecoMinModule::~SVDDQMExpressRecoMinModule()
+SVDDQMExpressRecoModule::~SVDDQMExpressRecoModule()
 {
 }
 
@@ -67,7 +67,7 @@ SVDDQMExpressRecoMinModule::~SVDDQMExpressRecoMinModule()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void SVDDQMExpressRecoMinModule::defineHisto()
+void SVDDQMExpressRecoModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -361,7 +361,7 @@ void SVDDQMExpressRecoMinModule::defineHisto()
 }
 
 
-void SVDDQMExpressRecoMinModule::initialize()
+void SVDDQMExpressRecoModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -381,7 +381,7 @@ void SVDDQMExpressRecoMinModule::initialize()
 
 }
 
-void SVDDQMExpressRecoMinModule::beginRun()
+void SVDDQMExpressRecoModule::beginRun()
 {
   // Just to make sure, reset all the histograms.
   if (m_hitMapCountsU != NULL) m_hitMapCountsU->Reset();
@@ -420,7 +420,7 @@ void SVDDQMExpressRecoMinModule::beginRun()
 }
 
 
-void SVDDQMExpressRecoMinModule::event()
+void SVDDQMExpressRecoModule::event()
 {
 
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
@@ -551,8 +551,8 @@ void SVDDQMExpressRecoMinModule::event()
 }
 
 
-int SVDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip,
-                                             const int IsU) const
+int SVDDQMExpressRecoModule::getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip,
+                                          const int IsU) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -582,8 +582,8 @@ int SVDDQMExpressRecoMinModule::getChipIndex(const int Layer, const int Ladder, 
   return -1;  // in case this is out of range.
 }
 
-void SVDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
-                                                     int& IsU) const
+void SVDDQMExpressRecoModule::getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip,
+                                                  int& IsU) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -628,7 +628,7 @@ void SVDDQMExpressRecoMinModule::getIDsFromChipIndex(const int Index, int& Layer
 }
 
 
-int SVDDQMExpressRecoMinModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
+int SVDDQMExpressRecoModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -648,7 +648,7 @@ int SVDDQMExpressRecoMinModule::getSensorIndex(const int Layer, const int Ladder
   return -1;  // in case this is out of range.
 }
 
-void SVDDQMExpressRecoMinModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
+void SVDDQMExpressRecoModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;

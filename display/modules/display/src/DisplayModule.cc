@@ -65,8 +65,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideObjects", m_hideObjects,
            "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
   addParam("customGeometryExtractPath", m_customGeometryExtractPath, "Path to custom file with geometry extract.", std::string(""));
-  addParam("customGeometryExtractPathTop", m_customGeometryExtractPathTop,
-           "Path to custom file with geometry extract with corrected placement of TOP bars.", std::string(""));
   addParam("hideVolumes", m_hideVolumes,
            "List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden.", {});
   addParam("deleteVolumes", m_deleteVolumes,

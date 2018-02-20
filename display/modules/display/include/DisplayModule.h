@@ -100,9 +100,6 @@ namespace Belle2 {
     /** Path to custom file with geometry extract */
     std::string m_customGeometryExtractPath;
 
-    /** Path to custom file with geometry extract with corrected placement of TOP bars */
-    std::string m_customGeometryExtractPathTop;
-
     /** List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden. */
     std::vector<std::string> m_hideVolumes;
 

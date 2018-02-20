@@ -24,7 +24,6 @@ namespace {
   static std::vector<std::string> s_hideVolumes = {};
   static std::vector<std::string> s_deleteVolumes = {};
   static std::string s_eveGeometryExtractPath = "/data/display/geometry_extract.root";
-  static std::string s_eveGeometryExtractPathTop = "/data/display/geometry_extract_top.root";
 }
 
 void EveGeometry::addGeometry(EType visMode)

@@ -21,6 +21,8 @@ using namespace Belle2::TangoPalette;
 namespace {
   static TEveGeoTopNode* s_eveTopNode = nullptr;
   static TEveGeoShape* s_simplifiedShape = nullptr;
+  static std::vector<std::string> s_hideVolumes = {};
+  static std::vector<std::string> s_deleteVolumes = {};
   static std::string s_eveGeometryExtractPath = "/data/display/geometry_extract.root";
   static std::string s_eveGeometryExtractPathTop = "/data/display/geometry_extract_top.root";
 }
@@ -53,15 +55,20 @@ void EveGeometry::addGeometry(EType visMode)
     setVolumeColor("Endcap_1", getTColorID("Chameleon", 1));
     setVolumeColor("Endcap_2", getTColorID("Chameleon", 1));
 
+    for (auto& volume : s_hideVolumes)
+      disableVolume(volume.c_str(), false);
+
     TGeoNode* top_node = gGeoManager->GetTopNode();
     assert(top_node != NULL);
     s_eveTopNode = new TEveGeoTopNode(gGeoManager, top_node);
     s_eveTopNode->IncDenyDestroy();
     s_eveTopNode->SetVisLevel(2);
+
     gEve->AddGlobalElement(s_eveTopNode);
 
     //expand geometry in eve list (otherwise one needs three clicks to see that it has children)
     s_eveTopNode->ExpandIntoListTreesRecursively();
+
   }
   B2DEBUG(100, "Loading geometry projections...");
 
@@ -75,29 +82,60 @@ void EveGeometry::addGeometry(EType visMode)
   delete f;
 
   //TOP was rotated, let's remove the wrong shapes from the extract
-  std::list<TEveElement*> top_bars;
-  TPRegexp re("Support.*");
-  s_simplifiedShape->FindChildren(top_bars, re);
-  B2ASSERT("No TOP bars found?", !top_bars.empty());
-  for (TEveElement* el : top_bars) {
-    el->Destroy();
-  }
-  //and add fixed ones instead
-  const std::string extractPathTop = FileSystem::findFile(s_eveGeometryExtractPathTop);
-  f = TFile::Open(extractPathTop.c_str(), "READ");
-  TEveGeoShapeExtract* gsetop = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
-  TEveGeoShape* top_extract = TEveGeoShape::ImportShapeExtract(gsetop, 0);
-  top_extract->SetRnrSelf(false);
-  s_simplifiedShape->AddElement(top_extract);
-  delete f;
+  //   std::list<TEveElement*> top_bars;
+  //   TPRegexp re("Support.*");
+  //   s_simplifiedShape->FindChildren(top_bars, re);
+  //   B2ASSERT("No TOP bars found?", !top_bars.empty());
+  //   for (TEveElement* el : top_bars) {
+  //     el->Destroy();
+  //   }
+  //   //and add fixed ones instead
+  //   const std::string extractPathTop = FileSystem::findFile(s_eveGeometryExtractPathTop);
+  //   f = TFile::Open(extractPathTop.c_str(), "READ");
+  //   TEveGeoShapeExtract* gsetop = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
+  //   TEveGeoShape* top_extract = TEveGeoShape::ImportShapeExtract(gsetop, 0);
+  //   top_extract->SetRnrSelf(false);
+  //   s_simplifiedShape->AddElement(top_extract);
+  //   delete f;
 
   //I want to show full geo in unprojected view,
   //but I still need to add the extract to the geometry scene...
   gEve->AddGlobalElement(s_simplifiedShape);
 
   setVisualisationMode(visMode);
+
+  // Allow deletion only for full geometry and only descent 2 levels
+  // (Scanning all geometry is slow and no-one will ever use it)
+  if (s_eveTopNode && !s_deleteVolumes.empty()) {
+    for (auto& volumeRegExp : s_deleteVolumes) {
+      TPRegexp re(volumeRegExp.c_str());
+
+      // First look for volumes to delete in all children of top volume
+      std::list<TEveElement*> allChildren;
+      TPRegexp reAll(".*");
+      s_eveTopNode->FindChildren(allChildren, reAll);
+      for (TEveElement* child : allChildren) {
+        std::list<TEveElement*> volumes;
+        child->FindChildren(volumes, re);
+        for (TEveElement* el : volumes) {
+          B2INFO("Match with regular expression '" << volumeRegExp << "' ... removing volume : " << el->GetElementName());
+          el->Destroy();
+        }
+      }
+
+      // Now delete all matching children of top volume
+      std::list<TEveElement*> volumes;
+      s_eveTopNode->FindChildren(volumes, re);
+      for (TEveElement* el : volumes) {
+        B2INFO("Match with regular expression '" << volumeRegExp << "' ... removing volume : " << el->GetElementName());
+        el->Destroy();
+      }
+    }
+  }
+
   B2DEBUG(100, "Done.");
 }
+
 void EveGeometry::setVisualisationMode(EType visMode)
 {
   bool fullgeo = (visMode == c_Full);
@@ -182,7 +220,12 @@ void EveGeometry::setCustomExtractPath(const std::string& extractPath)
   s_eveGeometryExtractPath = extractPath;
 }
 
-void EveGeometry::setCustomExtractPathTop(const std::string& extractPathTop)
+void EveGeometry::setHideVolumes(const std::vector<std::string>& volumes)
 {
-  s_eveGeometryExtractPathTop = extractPathTop;
+  s_hideVolumes = volumes;
+}
+
+void EveGeometry::setDeleteVolumes(const std::vector<std::string>& volumes)
+{
+  s_deleteVolumes = volumes;
 }

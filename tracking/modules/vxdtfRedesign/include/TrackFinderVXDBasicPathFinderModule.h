@@ -30,7 +30,6 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/trackFindingVXD/algorithms/CALogger.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerBase.h>
 
@@ -42,6 +41,7 @@ namespace Belle2 {
   class TrackFinderVXDBasicPathFinderModule final : public Module {
   private:
     using NodeType = Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>;
+    using NodeNetworkType = Belle2::DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>;
     using Path = std::vector<NodeType*>;
 
   public:
@@ -97,27 +97,17 @@ namespace Belle2 {
 
     /// member variables
     /** CA algorithm */
-    CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
-    m_cellularAutomaton;
+    CellularAutomaton<NodeNetworkType, Belle2::CAValidator<Belle2::CACell>> m_cellularAutomaton;
 
     /** Algorithm for finding paths of segments. */
-    PathCollectorRecursive <
-    Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
-           Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
-           std::vector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>*>,
-           Belle2::NodeCompatibilityCheckerBase<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>>
-           > m_pathCollector;
+    PathCollectorRecursive<NodeNetworkType, NodeType, Path, Belle2::NodeCompatibilityCheckerBase<NodeType>> m_pathCollector;
 
     /** Tool for creating SPTCs, which fills storeArray directly. */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
     /** Class to evaluate connected nodes, in this case for the directed node network, and assigns a family to each
      *  cluster of connected nodes. */
-    NodeFamilyDefiner <
-    Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
-           Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
-           std::vector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>*>
-           > m_familyDefiner;
+    NodeFamilyDefiner<NodeNetworkType, NodeType, Path> m_familyDefiner;
 
     /// input containers
     /** Access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates. */

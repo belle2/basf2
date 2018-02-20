@@ -21,7 +21,6 @@
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
-#include <tracking/trackFindingVXD/algorithms/CALogger.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
@@ -124,7 +123,7 @@ namespace CellularAutomatonTests {
 
 
     /// CA:
-    CellularAutomaton<DirectedNodeNetwork<int, CACell>, CAValidator<CACell>, CALogger> cellularAutomaton;
+    CellularAutomaton<DirectedNodeNetwork<int, CACell>, CAValidator<CACell>> cellularAutomaton;
 
     int nRounds = cellularAutomaton.apply(intNetwork);
     unsigned int nSeeds = cellularAutomaton.findSeeds(intNetwork);

@@ -82,7 +82,6 @@ namespace Belle2 {
           B2ERROR("Number of collected paths to large. Aborting Event!");
           return false;
         }
-
       }
       paths = allNodePaths;
       return true;
@@ -193,7 +192,7 @@ namespace Belle2 {
 
   protected:
     /// protected Data members:
-    /// Stores mini-Class for checking compatibility of two nodes passed.
+    /** Stores mini-Class for checking compatibility of two nodes passed. */
     NodeCompatibilityCheckerType m_compatibilityChecker;
   };
 }

@@ -88,7 +88,41 @@ class CheckNumbering(basf2.Module):
             basf2.B2ERROR('First SVD layer number is 3, reported {0}.'.format(self.gTools.getFirstSVDLayer()))
         if (self.gTools.getLastSVDLayer() != 6):
             basf2.B2ERROR('Last SVD layer number is 6, reported {0}.'.format(self.gTools.getLastSVDLayer()))
-        # 0d. Sensor numbers
+        # 0d. Sensor indexing range
+        # PXD
+        # First PXD sensor should be (first PXD layer)/1/1,
+        idOfFirstPXDSensor = self.gTools.getSensorIDFromPXDIndex(0)
+        layer = idOfFirstPXDSensor.getLayerNumber()
+        ladder = idOfFirstPXDSensor.getLadderNumber()
+        sensor = idOfFirstPXDSensor.getSensorNumber()
+        if layer != self.gTools.getFirstPXDLayer() or ladder != 1 or sensor != 1:
+            basf2.B2ERROR('Mismatch in first PXD sensor placement:\n' +
+                          'Expected {0}/{1}/{2}\nGot: {3|/{4}/{5}'.format(
+                              layer, ladder, sensor,
+                              self.gTools.getFirstPXDLayer(), 1, 1))
+        idOfLastPXDSensor = self.gTools.getSensorIDFromPXDIndex(self.gTools.getNumberOfPXDSensors() - 1)
+        layer = idOfLastPXDSensor.getLayerNumber()
+        if layer != self.gTools.getLastPXDLayer():
+            basf2.B2ERROR('Mismatch in last PXD sensor placement:\n' +
+                          'Expected layer {0} got layer {1|'.format(
+                              layer, self.gTools.getLastPXDLayer()))
+        # SVD
+        # First SVD sensor should be (first PXD layer)/1/1,
+        idOfFirstSVDSensor = self.gTools.getSensorIDFromSVDIndex(0)
+        layer = idOfFirstSVDSensor.getLayerNumber()
+        ladder = idOfFirstSVDSensor.getLadderNumber()
+        sensor = idOfFirstSVDSensor.getSensorNumber()
+        if layer != self.gTools.getFirstSVDLayer() or ladder != 1 or sensor != 1:
+            basf2.B2ERROR('Mismatch in first SVD sensor placement:\n' +
+                          'Expected {0}/{1}/{2}\nGot: {3}/{4}/{5}'.format(
+                              layer, ladder, sensor,
+                              self.gTools.getFirstSVDLayer(), 1, 1))
+        idOfLastSVDSensor = self.gTools.getSensorIDFromSVDIndex(self.gTools.getNumberOfSVDSensors() - 1)
+        layer = idOfLastSVDSensor.getLayerNumber()
+        if layer != self.gTools.getLastSVDLayer():
+            basf2.B2ERROR('Mismatch in last SVD sensor placement:\n' +
+                          'Expected layer {0} got layer {1}'.format(
+                              layer, self.gTools.getLastSVDLayer()))
         #
         # 1. General sensor indexing
         #

@@ -10,6 +10,7 @@
 
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainer.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/modules/vxdtfRedesign/VXDTFTrainingDataCollectorModule.h>
 
@@ -103,6 +104,24 @@ void VXDTFTrainingDataCollectorModule::event()
 
   for (unsigned iTC = 0; iTC < nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
+
+    // check if SP track cand has a related RecoTrack and if that recotrack was fitted
+    // I dont care which one, any is fine so I use the "ALL" statement
+    // TODO: consider to move the whole check into dataCollector.storeTC as there are already other checks done
+    if (m_checkForFit) {
+      RelationVector<RecoTrack> relatedRecoTracks = currentTC->getRelationsTo<RecoTrack>("ALL");
+      if (relatedRecoTracks.size() < 1) {
+        B2DEBUG(1, "No related RecoTrack found. Will not use that track candidate for training");
+        continue;
+      }
+
+      // assume that there is only one!
+      if (not relatedRecoTracks[0]->wasFitSuccessful()) {
+        B2DEBUG(1, "Found track was not fitted! Will not use this track candidate for training.");
+        continue;
+      }
+    }
+
     for (auto& dataCollector : m_secMapTrainers)
       dataCollector.storeTC(*currentTC, iTC);
   }

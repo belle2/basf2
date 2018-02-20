@@ -144,7 +144,7 @@ namespace Belle2 {
     /**if # of APV headers match # of APVs for given FADC */
     bool m_apvMatch;
 
-    ClassDef(SVDDAQDiagnostic, 1)
+    ClassDef(SVDDAQDiagnostic, 2)
   }; // class SVDDAQDiagnostic
 } // namespace Belle2
 

@@ -1041,6 +1041,7 @@ def rankByHighest(
     numBest=0,
     outputVariable='',
     allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1055,6 +1056,7 @@ def rankByHighest(
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
     @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1065,6 +1067,7 @@ def rankByHighest(
     bcs.param('numBest', numBest)
     bcs.param('outputVariable', outputVariable)
     bcs.param('allowMultiRank', allowMultiRank)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1074,6 +1077,7 @@ def rankByLowest(
     numBest=0,
     outputVariable='',
     allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1088,6 +1092,7 @@ def rankByLowest(
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
     @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1099,6 +1104,7 @@ def rankByLowest(
     bcs.param('selectLowest', True)
     bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 

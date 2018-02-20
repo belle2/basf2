@@ -38,6 +38,7 @@ BestCandidateSelectionModule::BestCandidateSelectionModule():
   addParam("selectLowest", m_selectLowest, "Candidate with lower value are better (default: higher is better))", false);
   addParam("allowMultiRank", m_allowMultiRank, "Candidates with identical values get identical rank", false);
   addParam("numBest", m_numBest, "Keep this many of the best candidates (0: keep all)", 0);
+  addParam("cut", m_cutParameter, "Only candidates passing the cut will be ranked. The others will have rank -1.", std::string(""));
   addParam("outputVariable", m_outputVariableName,
            "Name for created variable, which contains the rank for the particle. If not provided, the standard name '${variable}_rank' is used.");
 
@@ -59,6 +60,7 @@ void BestCandidateSelectionModule::initialize()
   if (m_numBest < 0) {
     B2ERROR("value of numBest must be >= 0!");
   }
+  m_cut = Variable::Cut::compile(m_cutParameter);
 }
 
 void BestCandidateSelectionModule::event()
@@ -96,11 +98,17 @@ void BestCandidateSelectionModule::event()
   double previous_val;
   bool first_candidate = true;
   for (const auto& candidate : valueToIndex) {
+    Particle* p = particles[candidate.second];
+    if (!m_cut->check(p)) {
+      p->addExtraInfo(extraInfoName, -1);
+      m_inputList->addParticle(p);
+      continue;
+    }
     if (first_candidate) {
       first_candidate = false;
       previous_val = candidate.first;
     }
-    Particle* p = particles[candidate.second];
+
     p->addExtraInfo(extraInfoName, rank);
     m_inputList->addParticle(p);
     if (m_allowMultiRank) {

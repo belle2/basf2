@@ -780,15 +780,15 @@ namespace Belle2 {
     TFile* f = new TFile(fileName.c_str());
     TTree* tr = (TTree*)f->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
 
-    short slotId;
-    short pixelId;
-    float p1;
-    float p2;
-    float x0;
-    float threshold;
-    float efficiency;
-    float chisquare;
-    int ndf;
+    short slotId = 0;
+    short pixelId = 0;
+    float p1 = -1;
+    float p2 = -1;
+    float x0 = -1;
+    float threshold = -1;
+    float efficiency = -1;
+    float chisquare = -1;
+    int ndf = 0;
     tr->SetBranchAddress("slotId", &slotId);
     tr->SetBranchAddress("pixelId", &pixelId);
     tr->SetBranchAddress("p1UseIntegral", &p1);
@@ -807,9 +807,10 @@ namespace Belle2 {
 
     long nEntries = tr->GetEntries();
     std::map<short, float> reducedChisqMap;
-    bool isFirst = true;
     for (long iEntry = 0 ; iEntry < nEntries ; iEntry++) {
       tr->GetEntry(iEntry);
+
+      if (efficiency < 0) continue;
 
       if (!channelMapper.isPixelIDValid(pixelId)) {
         B2ERROR("invalid pixelID" << pixelId);
@@ -819,17 +820,13 @@ namespace Belle2 {
       short globalChannelNumber = slotId * 1000 + channel;
       float redChisq = chisquare / ndf;
 
+      //in case entries for the same channel appears multiple time, use data with smaller reduced chisquare
+      //(This can happen when distribution is fit manually and results are appended for channels with fit failure)
       if (reducedChisqMap.count(globalChannelNumber) == 0
           || reducedChisqMap[globalChannelNumber] > redChisq) {
         reducedChisqMap[globalChannelNumber] = redChisq;
         calChannelPulseHeight->setParameters(slotId, channel, x0, p1, p2);
-        calChannelThresholdEff->setThrEff(slotId, channel, efficiency);
-        if (isFirst) {
-          calChannelThresholdEff->setOfflineThreshold(threshold);
-          isFirst = false;
-        } else if (TMath::Abs(threshold - calChannelThresholdEff->getOfflineThreshold()) > 0.01)
-          B2ERROR("different threshold values are found : " << threshold << ", default = "
-                  << calChannelThresholdEff->getOfflineThreshold());
+        calChannelThresholdEff->setThrEff(slotId, channel, efficiency, (short)threshold);
       }
     }
 

@@ -41,12 +41,14 @@ namespace Belle2 {
     TOPCalChannelThresholdEff() {}
 
     /**
-     * Sets the threshold efficiency for a single channel and switches status to calibrated
+     * Sets the threshold efficiency and correspolding threshold for a single channel and switches status to calibrated
+     * (efficiency definition : ratio of integral of fit function over a range [threshold, +inf] to integral over the full range [0, +inf])
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      * @param ThrEff channel threshold efficiency
+     * @param offlineThreshold threshold ADC counts used in efficiency evaluation
      */
-    void setThrEff(int moduleID, unsigned channel, float ThrEff)
+    void setThrEff(int moduleID, unsigned channel, float ThrEff, short offlineThreshold)
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -58,6 +60,7 @@ namespace Belle2 {
         return;
       }
       m_ThrEff[module][channel] = ThrEff;
+      m_offlineThreshold[module][channel] = offlineThreshold;
       m_status[module][channel] = c_Calibrated;
     }
 
@@ -79,17 +82,6 @@ namespace Belle2 {
       }
       m_status[module][channel] = c_Unusable;
     }
-
-    /**
-     * Sets threshold value used for efficiency evaluation
-     * (efficiency definition : ratio of integral of fit function over a range [threshold, +inf] to integral over the full range [0, +inf])
-     * @param threshold threshold value (in a unit of ADC count, common for all channels)
-     */
-    void setOfflineThreshold(float offlineThreshold)
-    {
-      m_offlineThreshold = offlineThreshold;
-    }
-
 
     /**
      * Returns the threshold efficiency of a single channel
@@ -155,11 +147,16 @@ namespace Belle2 {
 
     /**
      * Returns the threshold value used for efficiency evaluation
-     * @return offlineThreshold, common for all channels
+     * @param moduleID module ID (1-based)
+     * @param channel hardware channel number (0-based)
+     * @return offlineThreshold
      */
-    float getOfflineThreshold() const
+    float getOfflineThreshold(int moduleID, unsigned channel) const
     {
-      return m_offlineThreshold;
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) return false;
+      if (channel >= c_numChannels) return false;
+      return m_offlineThreshold[module][channel];
     }
 
   private:
@@ -174,7 +171,7 @@ namespace Belle2 {
 
     float m_ThrEff[c_numModules][c_numChannels] = {{0}};    /**< threshold efficiency value. 0 by default. */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
-    float m_offlineThreshold = 0; /**< threshold value used for efficiency evaluation, common for all channels */
+    short m_offlineThreshold[c_numModules][c_numChannels] = {{0}}; /**< threshold value used for efficiency evaluation */
 
     ClassDef(TOPCalChannelThresholdEff, 3); /**< ClassDef */
 

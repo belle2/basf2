@@ -124,19 +124,36 @@ void ECLMatchingPerformanceModule::event()
           if (inserted) {
             for (const auto& eclCalDigit : m_eclCalDigits) {
               if (eclCalDigit.getCellId() == cell) {
-                m_deposited_energy += eclCalDigit.getEnergy();
+                if (eclCalDigit.getEnergy() > 0.002) {
+                  m_deposited_energy += eclCalDigit.getEnergy();
+                }
                 break;
               }
             }
           }
           if (!found_first_enter) {
             pos_enter = extHit.getPosition();
+            m_enteringcellid = cell;
+            m_enteringcelltheta = (geometry->GetCrystalPos(cell - 1)).Theta();
             found_first_enter = true;
           }
           //Find ECLCalDigit in cell ID of ExtHit or one of its neighbours
-          findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours1x1, m_matchedTo1x1Neighbours, cell);
-          findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours3x3, m_matchedTo3x3Neighbours, cell);
-          findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours5x5, m_matchedTo5x5Neighbours, cell);
+          if (m_matchedTo1x1Neighbours == 0) {
+            findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours1x1, m_matchedTo1x1Neighbours, cell);
+          }
+          if (m_matchedTo1x1Neighbours == 1) {
+            m_matchedTo3x3Neighbours = 1;
+            m_matchedTo5x5Neighbours = 1;
+          }
+          if (m_matchedTo3x3Neighbours == 0) {
+            findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours3x3, m_matchedTo3x3Neighbours, cell);
+          }
+          if (m_matchedTo3x3Neighbours == 1) {
+            m_matchedTo5x5Neighbours = 1;
+          }
+          if (m_matchedTo5x5Neighbours == 0) {
+            findECLCalDigitMatchInNeighbouringCell(m_eclNeighbours5x5, m_matchedTo5x5Neighbours, cell);
+          }
         } else if (extHit.getStatus() == EXT_EXIT) {
           m_exit++;
           pos_exit = extHit.getPosition();
@@ -146,11 +163,11 @@ void ECLMatchingPerformanceModule::event()
       for (const auto& eclCalDigit : m_eclCalDigits) {
         if (eclCalDigit.getEnergy() < 0.01) continue;
         int cellid = eclCalDigit.getCellId();
-        // TVector3 cvec = geometry->GetCrystalPos(cellid - 1);
-        // distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
-        // if (m_innerdistance < 0 || distance < m_innerdistance) {
-        //   m_innerdistance = distance;
-        // }
+        TVector3 cvec = geometry->GetCrystalPos(cellid - 1);
+        distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
+        if (m_innerdistance < 0 || distance < m_innerdistance) {
+          m_innerdistance = distance;
+        }
       }
     }
     m_dataTree->Fill(); // write data to tree
@@ -207,6 +224,9 @@ void ECLMatchingPerformanceModule::setupTree()
   addVariableToTree("nECLEnter", m_enter);
   addVariableToTree("nECLExit", m_exit);
 
+  addVariableToTree("CellID", m_enteringcellid);
+  addVariableToTree("CrystalTheta", m_enteringcelltheta);
+
   addVariableToTree("DepositedEnergy", m_deposited_energy);
   addVariableToTree("TrackLengthInECL", m_trackLength);
 
@@ -254,6 +274,9 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
   m_trackLength = 0;
 
   m_innerdistance = -999;
+
+  m_enteringcellid = -1;
+  m_enteringcelltheta = -999;
 }
 
 void ECLMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

@@ -128,6 +128,12 @@ namespace Belle2 {
     /**< number of times track leaves ECL */
     int m_exit;
 
+    /**< cell id of first crystal that is entered by track */
+    int m_enteringcellid;
+
+    /**< theta of first crystal that is entered by track */
+    double m_enteringcelltheta;
+
     /**
      * Sets all variables to the default value, here -999.
      * */

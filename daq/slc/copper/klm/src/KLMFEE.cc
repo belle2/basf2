@@ -63,6 +63,7 @@ void KLMFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     hslb.writefee32(0x32, o_window.getInt("val2"));
     hslb.writefee32(0x33, o_window.getInt("val3"));
   }
+  sleep(30);
 }
 
 extern "C" {

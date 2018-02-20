@@ -24,7 +24,7 @@ REG_MODULE(TrackFinderVXDCellOMat)
 
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 {
-  //Set module properties
+  ///Set module properties
   setDescription("The TrackFinderVXD Cell-O-Mat module."
                  "\n It uses the output produced by the SegmentNetworkProducerModule to create"
                  "SpacePointTrackCands using a Cellular Automaton algorithm implementation.");
@@ -107,7 +107,10 @@ void TrackFinderVXDCellOMatModule::event()
 
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
-  if (nRounds < 0) { B2ERROR("CA failed, skipping event!"); return; }
+  if (nRounds < 0) {
+    B2ERROR("CA failed, skipping event!");
+    return;
+  }
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_PARAMNetworkName + "_CA_Ev" + std::to_string(m_eventCounter);
@@ -138,6 +141,7 @@ void TrackFinderVXDCellOMatModule::event()
     return;
   }
 
+  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :collectedPaths:" << m_collectedPaths.size());
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.

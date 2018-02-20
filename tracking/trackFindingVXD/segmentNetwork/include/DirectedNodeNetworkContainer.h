@@ -102,6 +102,7 @@ namespace Belle2 {
 
     /** returns reference to the actual ActiveSectors stored in this container, intended for read and write access */
     std::vector<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>* >& accessActiveSectors() { return m_activeSectors; }
+    int sizeActiveSectors() { return m_activeSectors.size(); }
 
 
     /** returns reference to the HitNetwork stored in this container, intended for read and write access */
@@ -114,10 +115,12 @@ namespace Belle2 {
 
     /** returns reference to the actual segments stored in this container, intended for read and write access */
     std::vector<Belle2::Segment<Belle2::TrackNode>* >& accessSegments() { return m_segments; }
+    int sizeSegments() { return m_segments.size(); }
 
 
     /** returns reference to the actual trackNodes stored in this container, intended for read and write access */
     std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
+    int sizeTrackNodes() { return m_trackNodes.size(); }
 
     /** Clear directed node network container
      * Called to clear the directed node network container if the segment network size grows to large.

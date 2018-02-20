@@ -215,6 +215,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
     m_network->accessActiveSectorNetwork();
   // activeSectors are to be stored separately:
   vector<ActiveSector<StaticSectorType, TrackNode>* >& activeSectors = m_network->accessActiveSectors();
+  int nLinked = 0;
 
   // loop over all raw sectors found so far:
   for (RawSectorData& outerSectorData : collectedData) {
@@ -269,6 +270,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
 
         if (activeSectorNetwork.linkNodes(outerEntryID, innerEntryID)) {
           wasAnythingFoundSoFar = true;
+          nLinked++;
         }
       } else {
         activeSectorNetwork.addInnerToLastOuterNode(innerEntryID);
@@ -279,6 +281,8 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
       delete outerSector;
     }
   }
+
+  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :activSectorConections:" << nLinked);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
@@ -360,6 +364,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
 
           if (hitNetwork.size() > m_PARAMmaxHitNetworkSize) {
+            //if (nLinked > 10000) {
             B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize
                     << "! Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
             return false;
@@ -371,6 +376,8 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
   m_nTrackNodesAccepted += nAccepted;
   m_nTrackNodesRejected += nRejected;
   m_nTrackNodeLinksCreated += nLinked;
+
+  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :trackNodeConnections:" << nLinked);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
@@ -467,6 +474,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           segments.push_back(outerSegment);
           segmentNetwork.addNode(outerSegmentID, *outerSegment);
         }
+
         // store combination of hits in network:
         if (!wasAnythingFoundSoFar) {
           if (segmentNetwork.linkNodes(outerSegmentID, innerSegmentID)) {
@@ -487,9 +495,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
       }
     }
   }
-  m_nSegmentsAccepted += nAccepted;
-  m_nSegmentsRejected += nRejected;
-  m_nSegmentsLinksCreated += nLinked;
+  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :segmentConections:" << nLinked);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);

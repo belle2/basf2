@@ -103,36 +103,47 @@ void EveGeometry::addGeometry(EType visMode)
 
   setVisualisationMode(visMode);
 
-  // Allow deletion only for full geometry and only descent 2 levels
-  // (Scanning all geometry is slow and no-one will ever use it)
-  if (s_eveTopNode && !s_deleteVolumes.empty()) {
+  // Allow deletion only for full geometry
+  if (s_eveTopNode) {
     for (auto& volumeRegExp : s_deleteVolumes) {
-      TPRegexp re(volumeRegExp.c_str());
-
-      // First look for volumes to delete in all children of top volume
-      std::list<TEveElement*> allChildren;
-      TPRegexp reAll(".*");
-      s_eveTopNode->FindChildren(allChildren, reAll);
-      for (TEveElement* child : allChildren) {
-        std::list<TEveElement*> volumes;
-        child->FindChildren(volumes, re);
-        for (TEveElement* el : volumes) {
-          B2INFO("Match with regular expression '" << volumeRegExp << "' ... removing volume : " << el->GetElementName());
-          el->Destroy();
-        }
-      }
-
-      // Now delete all matching children of top volume
-      std::list<TEveElement*> volumes;
-      s_eveTopNode->FindChildren(volumes, re);
-      for (TEveElement* el : volumes) {
-        B2INFO("Match with regular expression '" << volumeRegExp << "' ... removing volume : " << el->GetElementName());
-        el->Destroy();
-      }
+      removeChildrenByRegExp(s_eveTopNode, volumeRegExp);
     }
   }
 
   B2DEBUG(100, "Done.");
+}
+
+void EveGeometry::removeChildrenByRegExp(TEveElement* parent, const std::string& pattern)
+{
+  TPRegexp reAll(".*");
+  bool onlyChildren = false;
+  std::string regexp = pattern;
+
+  // For patterns with leading '#', do delete only
+  // children elements (and remove the '#' for regexp)
+  if (pattern.substr(0, 1) == std::string("#")) {
+    regexp = pattern.substr(1);
+    onlyChildren = true;
+  }
+
+  TPRegexp reMatch(regexp.c_str());
+
+  std::list<TEveElement*> children;
+  parent->FindChildren(children, reAll);
+
+  for (TEveElement* child : children) {
+    if (reMatch.MatchB(child->GetElementName())) {
+      if (onlyChildren) {
+        B2INFO("Removing children of " << child->GetElementName());
+        child->DestroyElements();
+      } else {
+        B2INFO("Removing " << child->GetElementName());
+        child->Destroy();
+      }
+    } else {
+      removeChildrenByRegExp(child, pattern);
+    }
+  }
 }
 
 void EveGeometry::setVisualisationMode(EType visMode)

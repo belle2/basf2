@@ -19,7 +19,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # PXD (not useful on HLT)
     if dqm_environment == "expressreco":
         if components is None or 'PXD' in components:
-            pxddqm = register_module('PXDDQMExpressRecoMin')
+            pxddqm = register_module('PXDDQMExpressReco')
             path.add_module(pxddqm)
     # SVD
     if dqm_environment == "expressreco":

@@ -5,24 +5,19 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Prepared for Phase 2 and Belle II geometry                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDDQMMODULE_H_
-#define SVDDQMMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vector>
+#include "TH1I.h"
 #include "TH1F.h"
 #include "TH2F.h"
 
@@ -39,51 +34,53 @@ namespace Belle2 {
     virtual ~SVDDQMModule();
 
     /** Module function initialize */
-    virtual void initialize();
+    void initialize() override final;
     /** Module function beginRun */
-    virtual void beginRun();
+    void beginRun() override final;
     /** Module function event */
-    virtual void event();
-    /** Module function endRun */
-    virtual void endRun();
-    /** Module function terminate */
-    virtual void terminate();
-    /** Module functions */
+    void event() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    void defineHisto() override final;
 
   private:
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 22 */
+    /** cut for accepting to hitmap histogram, using strips only, default = 22 ADU */
     float m_CutSVDCharge = 22.0;
-    /** flag <0,1> for using strips only, no clusters will be required, default = 0 */
-    int m_UseStrips = 0;
-    /** flag <0,1> for creation of more plots for experts mostly, default = 1 */
-    int m_SaveOtherHistos = 1;
+    /** cut for accepting clusters to hitmap histogram, default = 12 ke- */
+    float m_CutSVDClusterCharge = 12000;
 
-    /** SVDDigits StoreArray name */
-    std::string m_storeSVDDigitsName;
+    /** No of FADCs, for Phase2: 5,
+     *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
+     *  keep universal code for Phase 2 and 3
+    */
+    // int c_nFADC = 5;
+
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
+
+    /** SVDShaperDigits StoreArray name */
+    std::string m_storeSVDShaperDigitsName;
     /** SVDClusters StoreArray name */
     std::string m_storeSVDClustersName;
-    /** SVDClustersToSVDDigits RelationArray name */
-    std::string m_relSVDClusterDigitName;
+    /** SVD diagnostics module name */
+    std::string m_svdDAQDiagnosticsListName;
 
-    /** Hitmaps strips for u */
-    TH2F** m_hitMapU;
-    /** Hitmaps strips for v */
-    TH2F** m_hitMapV;
-    /** Hitmaps clusters for u */
-    TH1F** m_hitMapUCl;
-    /** Hitmaps clusters for v */
-    TH1F** m_hitMapVCl;
-    /** u seed */
-    TH1F** m_seedU;
-    /** v seed */
-    TH1F** m_seedV;
+    /** Hitmaps u of Digits */
+    TH1I* m_hitMapCountsU;
+    /** Hitmaps v of Digits */
+    TH1I* m_hitMapCountsV;
+    /** Hitmaps u of Clusters*/
+    TH1I* m_hitMapClCountsU;
+    /** Hitmaps v of Clusters*/
+    TH1I* m_hitMapClCountsV;
+    /** Hitmaps of digits on chips */
+    TH1I* m_hitMapCountsChip;
+    /** Hitmaps of clusters on chips */
+    TH1I* m_hitMapClCountsChip;
     /** Fired u strips per event */
     TH1F** m_firedU;
     /** Fired v strips per event */
@@ -93,59 +90,61 @@ namespace Belle2 {
     /** v clusters per event */
     TH1F** m_clustersV;
     /** u charge of clusters */
-    TH1F** m_chargeU;
+    TH1F** m_clusterChargeU;
     /** v charge of clusters */
-    TH1F** m_chargeV;
+    TH1F** m_clusterChargeV;
+    /** u charge of clusters for all sensors */
+    TH1F* m_clusterChargeUAll;
+    /** v charge of clusters for all sensors */
+    TH1F* m_clusterChargeVAll;
     /** u charge of strips */
-    TH1F** m_chargeUSt;
+    TH1F** m_stripSignalU;
     /** v charge of strips */
-    TH1F** m_chargeVSt;
+    TH1F** m_stripSignalV;
     /** u size */
-    TH1F** m_sizeU;
+    TH1F** m_clusterSizeU;
     /** v size */
-    TH1F** m_sizeV;
+    TH1F** m_clusterSizeV;
     /** u time */
-    TH1F** m_timeU;
+    TH1F** m_clusterTimeU;
     /** v time */
-    TH1F** m_timeV;
+    TH1F** m_clusterTimeV;
+    /** u time of clusters for all sensors */
+    TH1F* m_clusterTimeUAll;
+    /** v time of clusters for all sensors */
+    TH1F* m_clusterTimeVAll;
 
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
-    /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
-    /** Number of SVD sensors on Belle II */
-    int c_nSVDSensors;
+    /** Hitmaps pixels for u */
+    TH1F** m_hitMapU;
+    /** Hitmaps pixels for v */
+    TH1F** m_hitMapV;
+    /** Hitmaps pixels */
+    TH2F** m_hitMap;
+    /** Hitmaps clusters for u */
+    TH1F** m_hitMapUCl;
+    /** Hitmaps clusters for v */
+    TH1F** m_hitMapVCl;
+    /** Hitmaps clusters */
+    TH2F** m_hitMapCl;
 
-    /** Function return index of sensor in plots.
-      * @param Layer Layer position of sensor
-      * @param Ladder Ladder position of sensor
-      * @param Sensor Sensor position of sensor
-      * @return Index of sensor in plots.
-      */
-    int getSensorIndex(int Layer, int Ladder, int Sensor);
-    /** Function return ID of sensor layer, ladder and sensor in plots.
-      * @param Index Index of sensor in plots.
-      * @param Layer return Layer position of sensor
-      * @param Ladder return Ladder position of sensor
-      * @param Sensor return Sensor position of sensor
-      */
-    void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
+    /** Counter of APV errors (16) */
+    TH1I** m_CounterAPVErrors;
+    /** Counter of FTB errors (256) */
+    TH1I** m_CounterFTBErrors;
+    /** Counter of apvErrorOR (16) */
+    TH1I** m_CounterApvErrorORErrors;
+    /** Counter of FTB Flags (32) */
+    TH1I** m_CounterFTBFlags;
+
+    /** u charge of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeU3;
+    /** v charge of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeV3;
+    /** u charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeU456;
+    /** v charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeV456;
 
   };
 
 }
-#endif

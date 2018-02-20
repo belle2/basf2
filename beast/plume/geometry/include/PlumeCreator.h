@@ -29,7 +29,6 @@ class G4Region;
 class G4VSolid;
 class G4UnionSolid;
 class G4SubtractionSolid;
-class G4AssemblyVolume;
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the PLUME detector */
@@ -46,10 +45,6 @@ namespace Belle2 {
     protected:
       /**  SensitiveDetector PLUME */
       SensitiveDetector* m_sensitive;
-      G4AssemblyVolume* buildSupport1();
-      G4AssemblyVolume* buildSupport2();
-      G4AssemblyVolume* buildSupport3();
-      G4AssemblyVolume* buildSupport4();
     };
 
   }

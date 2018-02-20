@@ -103,9 +103,6 @@ namespace Belle2 {
     float getphiAngle()         const { return m_phiLoc; }
     /** global time */
     float getglobalTime()       const { return m_globalTime; }
-    /** event number */
-    int geteventnumber() const {return m_evtNum;}
-    void seteventnumber(const int evtn) {m_evtNum = (unsigned)evtn;}
 
 
   private:
@@ -156,10 +153,9 @@ namespace Belle2 {
     float m_phiLoc;
     /** global time */
     float m_globalTime;
-    /** event number */
-    unsigned m_evtNum;
 
-    ClassDef(PlumeSimHit, 2)
+
+    ClassDef(PlumeSimHit, 1)
   };
 
 } // end namespace Belle2

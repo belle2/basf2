@@ -43,26 +43,6 @@
       <GlueThickness unit="um">10.0</GlueThickness>
       <KaptonThickness unit="um">100.0</KaptonThickness>
       <AluminiumThickness unit="um">20.0</AluminiumThickness>
-      <Foam>
-	<length unit="mm">171.18</length>
-	<width unit="mm">15</width>
-	<thickness unit="mm">2</thickness>
-	<zPosition>-22</zPosition>
-      </Foam>
-      <Flex>
-	<length unit="mm">205.18</length>
-	<width unit="mm">18</width>
-	<zPosition>5</zPosition>
-      </Flex>
-      <AlBat>
-	<length unit="mm">49</length>
-	<width unit="mm">18</width>
-	<thickness unit="mm">2</thickness>
-	<zPosition>83.1</zPosition>
-      </AlBat>
-      <SensorXShift unit="mm">10</SensorXShift>
-      <FullLength unit="mm">215.2</FullLength>
-      <FullWidth unit="mm">18</FullWidth>
     </Active>
 
 
@@ -92,27 +72,7 @@
       <DistanceFromFoamCenter unit="um">1000.0</DistanceFromFoamCenter>
       <GlueThickness unit="um">10.0</GlueThickness>
       <KaptonThickness unit="um">100.0</KaptonThickness>
-      <AluminiumThickness unit="um">20.0</AluminiumThickness>      
-      <Foam>
-	<length unit="mm">171.18</length>
-	<width unit="mm">15</width>
-	<thickness unit="mm">2</thickness>
-	<zPosition>-22</zPosition>
-      </Foam>
-      <Flex>
-	<length unit="mm">205.18</length>
-	<width unit="mm">18</width>
-	<zPosition>5</zPosition>
-      </Flex>
-      <AlBat>
-	<length unit="mm">49</length>
-	<width unit="mm">18</width>
-	<thickness unit="mm">2</thickness>
-	<zPosition>83.1</zPosition>
-      </AlBat>
-      <SensorXShift unit="mm">10</SensorXShift>
-      <FullLength unit="mm">215.2</FullLength>
-      <FullWidth unit="mm">18</FullWidth>
+      <AluminiumThickness unit="um">20.0</AluminiumThickness>
     </Active>
 
   </Content>

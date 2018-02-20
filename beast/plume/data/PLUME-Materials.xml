@@ -60,24 +60,4 @@
       <Material fraction="0.11">Al</Material> 
     </Components>
   </Material>
-
-  <Material name="Plume_peek">
-    <density unit="g/cm3">1.31</density>
-    <Components>
-      <Material fraction="0.76">C</Material>
-      <Material fraction="0.08">H</Material>
-      <Material fraction="0.16">O</Material>
-    </Components>
-  </Material>
-  
-
-  <Material name="Plume-CarbonTubes">
-    <state>Solid</state>
-    <density unit="g/cm3">1.5</density>
-    <Components>
-      <Element>C</Element>
-    </Components>
-  </Material>
-  
-
 </Materials>

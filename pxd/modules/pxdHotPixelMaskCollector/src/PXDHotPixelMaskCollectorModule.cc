@@ -40,20 +40,25 @@ void PXDHotPixelMaskCollectorModule::prepare() // Do your initialise() stuff her
   auto hhitmap = new TH1I("hhitmap",
                           "Pixel hits from PXDDigits histogram, distribution parameters found by PXDHotPixelMaskCollectorModule", 250 * 768, 0, 250 * 768);
 
+  auto hnevents = new TH1I("hnevents",
+                           "Number of events used for masking, distribution parameters found by PXDHotPixelMaskCollectorModule", 1, 0, 1);
+
   // Data object registration ----------------------------------------------
-  registerObject<TH1I>("hitmap_cal", hhitmap); // Does the registerInDatastore for you
+  registerObject<TH1I>("hitmap", hhitmap); // Does the registerInDatastore for you
+  registerObject<TH1I>("nevents", hnevents);
 
 }
 
 void PXDHotPixelMaskCollectorModule::collect() // Do your event() stuff here
 {
-
-  //VxdID filterID(m_filterSensorName);
-
   // Data object access and filling ----------------------------------------
-  TH1I* collector_data = getObjectPtr<TH1I>("hitmap_cal");
+  TH1I* collector_nevents = getObjectPtr<TH1I>("nevents");
+  collector_nevents->Fill(0);
+
+  TH1I* collector_hitmap = getObjectPtr<TH1I>("hitmap");
+
   for (auto& digit :  m_pxdDigits) {
     unsigned int pixelID = digit.getUCellID() * 768 + digit.getVCellID();
-    collector_data->Fill(pixelID, 1);
+    collector_hitmap->Fill(pixelID, 1);
   }
 }

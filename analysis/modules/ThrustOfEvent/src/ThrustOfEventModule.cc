@@ -89,14 +89,19 @@ void ThrustOfEventModule::terminate()
 TVector3 ThrustOfEventModule::getThrustOfEvent(vector<string> particleLists)
 {
   int nParticleLists = particleLists.size();
+  B2DEBUG(10, "ThrustOfEventModule: Getting Thrust of Event");
   PCmsLabTransform T;
   vector<TVector3> forthrust;
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
     string ParticleListName = particleLists[i_pl];
+    B2DEBUG(10, "ParticleList " << ParticleListName);
     StoreObjPtr<ParticleList> plist(ParticleListName);
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
+      B2DEBUG(19, "    Mdst source " << part->getMdstSource());
+      if (part->getTrack())
+        B2DEBUG(19, "    Track index: " << part->getTrack()->getArrayIndex());
       TVector3 p = part->getMomentum();
       TLorentzVector p_lab = part->get4Vector();
       TLorentzVector p_cms = T.rotateLabToCms() * p_lab;

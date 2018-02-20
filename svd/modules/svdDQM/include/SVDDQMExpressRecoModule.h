@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  /** SVD DQM Module */
+  /** SVD DQM Module for Express Reco */
   class SVDDQMExpressRecoModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
@@ -56,7 +56,7 @@ namespace Belle2 {
      *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
      *  keep universal code for Phase 2 and 3
     */
-    int c_nFADC = 5;
+    // int c_nFADC = 5;
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
@@ -121,69 +121,6 @@ namespace Belle2 {
     TH1I** m_CounterApvErrorORErrors;
     /** Counter of FTB Flags (32) */
     TH1I** m_CounterFTBFlags;
-
-    /** Number of SVD chips per sensor in u,v in layer 3 (=6) on Belle II */
-    int c_nSVDChipsL3 = 6;
-    /** Number of SVD chips per sensor in u in layers 4,5,6 (=6) on Belle II */
-    int c_nSVDChipsLu = 6;
-    /** Number of SVD chips per sensor in v in layers 4,5,6 (=4) on Belle II */
-    int c_nSVDChipsLv = 4;
-    /** Number of SVD strips per chip on Belle II */
-    int c_nSVDChannelsPerChip = 128;
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
-    /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
-    /** Number of SVD sensors on Belle II */
-    int c_nSVDSensors;
-    /** Number of SVD chips on Belle II */
-    int c_nSVDChips;
-
-    /** Function return index of chip in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @param Chip Chip position on sensor
-       * @return Index of sensor in plots.
-       */
-    int getChipIndex(const int Layer, const int Ladder, const int Sensor, const int Chip, const int IsU) const;
-    /** Function return position indexes of chipID in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       * @param Chip return Chip position on sensor
-       */
-    void getIDsFromChipIndex(const int Index, int& Layer, int& Ladder, int& Sensor, int& Chip, int& IsU) const;
-
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return position indexes of sensorID in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor
-       * @param Ladder return Ladder position of sensor
-       * @param Sensor return Sensor position of sensor
-       */
-    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
 
   };
 

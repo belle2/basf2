@@ -24,7 +24,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # SVD
     if dqm_environment == "expressreco":
         if components is None or 'SVD' in components:
-            svddqm = register_module('SVDDQMExpressRecoMin')
+            svddqm = register_module('SVDDQMExpressReco')
             path.add_module(svddqm)
     # VXD (PXD/SVD common)
     if dqm_environment == "expressreco":

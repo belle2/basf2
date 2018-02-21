@@ -63,9 +63,13 @@ void DQMHistAnalysisInputModule::event()
   TKey* key = NULL;
   while ((key = (TKey*)next())) {
     TH1* h = (TH1*)key->ReadObj();
+    if (h == NULL) continue; // would be strange, but better check
+    // Remove ":" from folder name, workaround!
+    TString a = h->GetName();
+    a.ReplaceAll(":", "");
+    h->SetName(a);
     hs.push_back(h);
     if (m_autocanvas) {
-      TString a = h->GetName();
       StringList s = StringUtil::split(a.Data(), '/');
 
       bool give_canvas = false;
@@ -73,12 +77,15 @@ void DQMHistAnalysisInputModule::event()
         give_canvas = true;
       } else {
         for (auto& wanted_folder : m_acfolders) {
+          B2DEBUG(1, "==" << wanted_folder << "==" << s[0] << "==");
           if (wanted_folder == s[0]) {
             give_canvas = true;
+            break;
           }
         }
       }
       if (give_canvas) {
+        B2DEBUG(1, "Auto Hist->Canvas for " << a);
         a.ReplaceAll("/", "_");
         std::string name = a.Data();
         if (m_cs.find(name) == m_cs.end()) {

@@ -314,8 +314,7 @@ def setup_RTCtoSPTCConverters(
     sptcReferee.param('kickSpacePoint', True)
     sptcReferee.param('checkSameSensor', True)
     sptcReferee.param('useMCInfo', True)
-
-    sptcReferee.logging.log_level = LogLevel.DEBUG
+    # sptcReferee.logging.log_level = LogLevel.DEBUG
 
     if path is 0:
         return [sp2thConnector, recoTrackCandConverter, sptcReferee]

@@ -141,6 +141,9 @@ void RT2SPTCConverterModule::event()
 
   for (auto& recoTrack : m_recoTracks) {
 
+    // if corresponding flag is set only use fitted tracks
+    if (m_convertFittedOnly and not recoTrack.wasFitSuccessful()) continue;
+
     if (m_noKickCutsFile.size() != 0) {
       bool passCut = m_trackSel->trackSelector(recoTrack);
       if (!passCut) {

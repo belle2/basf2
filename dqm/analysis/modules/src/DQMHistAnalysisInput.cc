@@ -30,6 +30,8 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
   addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
+  addParam("AutoCanvasFolders", m_acfolders, "List of folders for which to automatically create canvases, empty for all",
+           std::vector<std::string>());
   B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
 }
 
@@ -65,28 +67,41 @@ void DQMHistAnalysisInputModule::event()
     if (m_autocanvas) {
       TString a = h->GetName();
       StringList s = StringUtil::split(a.Data(), '/');
-      a.ReplaceAll("/", "_");
-      std::string name = a.Data();
-      if (m_cs.find(name) == m_cs.end()) {
-        if (s.size() > 1) {
-          std::string dirname = s[0];
-          std::string hname = s[1];
-          TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-        } else {
-          std::string hname = a.Data();
-          TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
-          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+
+      bool give_canvas = false;
+      if (m_acfolders.size() == 0) { //If none specified, canvases for all histograms
+        give_canvas = true;
+      } else {
+        for (auto& wanted_folder : m_acfolders) {
+          if (wanted_folder == s[0]) {
+            give_canvas = true;
+          }
         }
       }
-      TCanvas* c = m_cs[name];
-      c->cd();
-      if (h->GetDimension() == 1) {
-        h->Draw("hist");
-      } else if (h->GetDimension() == 2) {
-        h->Draw("colz");
+      if (give_canvas) {
+        a.ReplaceAll("/", "_");
+        std::string name = a.Data();
+        if (m_cs.find(name) == m_cs.end()) {
+          if (s.size() > 1) {
+            std::string dirname = s[0];
+            std::string hname = s[1];
+            TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+            m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+          } else {
+            std::string hname = a.Data();
+            TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
+            m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+          }
+        }
+        TCanvas* c = m_cs[name];
+        c->cd();
+        if (h->GetDimension() == 1) {
+          h->Draw("hist");
+        } else if (h->GetDimension() == 2) {
+          h->Draw("colz");
+        }
+        c->Update();
       }
-      c->Update();
     }
   }
   resetHist();

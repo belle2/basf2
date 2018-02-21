@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#ifndef SVDHOTSTRIPSFILTER_H
-#define SVDHOTSTRIPSFILTER_H
+#ifndef SVDZSEMULATOR_H
+#define SVDZSEMULATOR_H
 
 
 #include <framework/core/Module.h>
@@ -24,8 +24,8 @@
 
 namespace Belle2 {
 
-  /** This module filters out the hot strips from the SVDShaperDigit StoreArray.
-   * The strip is filtered out if only one sample is above a SN threshold.
+  /** This module filters out strips that do not pass a ZS cut from the SVDShaperDigit StoreArray.
+   * The strip is filtered out if less than nSamples are above a SN threshold.
    */
 
   class SVDZeroSuppressionEmulatorModule : public Module {
@@ -43,9 +43,9 @@ namespace Belle2 {
     virtual void event() override;
 
 
-    int m_nSample; /**< maximum number of samples above threshold to mark the strip as hot*/
+    int m_nSample; /**< minimum number of samples required to be above threshold*/
     float m_cutSN; /**< SN ratio threshold*/
-    bool m_createOutside; /**<if true a StoreArray of Hot Strips is created*/
+    bool m_createOutside; /**<if true a StoreArray of Strips zero-suppressed is created*/
 
   private:
 
@@ -55,7 +55,7 @@ namespace Belle2 {
     SelectSubset< SVDShaperDigit > m_selectorIN; /**< selector of the subset of the SVDShaperDigit passing ZS*/
     SelectSubset< SVDShaperDigit > m_selectorOUT; /**< selector of the subset of the SVDShaperDigit not passing ZS*/
 
-    bool passesZS(const SVDShaperDigit*);  /**< returns true if the strip is hot*/
+    bool passesZS(const SVDShaperDigit*);  /**< returns true if the strip passes the ZS cut*/
 
     //calibration objects
     SVDNoiseCalibrations m_NoiseCal;

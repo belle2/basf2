@@ -230,10 +230,10 @@ namespace Belle2 {
     }
 
     /**
-     * mark the strip as hot
-     * @param max numner of samples above threshold
-     * @param SN threshold
-     * @return true if the strip is hot, false otherwise
+     * does the strip pass the ZS cut?
+     * @param nSamples min number of samples above threshold
+     * @param cutMinSignal SN threshold
+     * @return true if the strip have st least nSamples above threshold, false otherwise
      */
     bool passesZS(int nSamples, float cutMinSignal) const
     {

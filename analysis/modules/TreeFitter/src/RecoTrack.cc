@@ -353,7 +353,7 @@ namespace TreeFitter {
       }
       // the momentum
       for (int col = 0; col < 3; ++col) {
-//        B2DEBUG( "WRITING INTO H mom" << jacobian(row, col + 3));
+//        B2DEBUG(19, "WRITING INTO H mom" << jacobian(row, col + 3));
         p.getH()(row, momindex + col) = jacobian(row + 1, col + 4);
       }
     }

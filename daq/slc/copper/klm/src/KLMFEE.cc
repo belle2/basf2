@@ -86,26 +86,26 @@ void KLMFEE::monitor(RCCallback& callback, HSLB& hslb)
   //rpc look back window coarse start
   callback.wait(5);
   int wins = hslb.readfee32(0X30);
-  int win_start = wins & 0xffff;
-  callback.set(vname + ".coarse_start", win_start);
+  //int win_start = wins & 0xffff;
+  callback.set(vname + ".coarse_start", wins);
 
   //rpc look back window coarse stop
   callback.wait(5);
   int winstop = hslb.readfee32(0X31);
-  int win_stop = winstop & 0xffff;
-  callback.set(vname + ".coarse_stop", win_stop);
+  //int win_stop = winstop & 0xffff;
+  callback.set(vname + ".coarse_stop", winstop);
 
   //rpc look back window fine start
   callback.wait(5);
   int fwins = hslb.readfee32(0X32);
-  int fwin_start = fwins & 0xffff;
-  callback.set(vname + ".fine_start", fwin_start);
+  //int fwin_start = fwins & 0xffff;
+  callback.set(vname + ".fine_start", fwins);
 
   //rpc look back window fine stop
   callback.wait(5);
   int fwinstop = hslb.readfee32(0X33);
-  int fwin_stop = fwinstop & 0xffff;
-  callback.set(vname + ".fine_stop", fwin_stop);
+  //int fwin_stop = fwinstop & 0xffff;
+  callback.set(vname + ".fine_stop", fwinstop);
 
 }
 

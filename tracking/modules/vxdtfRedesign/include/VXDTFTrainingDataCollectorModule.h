@@ -80,8 +80,6 @@ namespace Belle2 {
     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > >
     m_secMapTrainers;
 
-    /** if true it check that there exists a related RecoTrack and that this was fitted*/
-    bool m_checkForFit = true;
 
   private:
   };

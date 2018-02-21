@@ -82,6 +82,8 @@ namespace Belle2 {
       c_singleClustersSPs = 1024, /**< bit 10: SPTC contains single Cluster SpacePoints. */
       c_isActive =  2048,         /**< bit 11: SPTC is active (i.e. if false, some module rejected it for further use. */
       c_isReserved = 4096,        /**< bit 12: SPTC is reserved (i.e. should not be altered and should be treated with high priority). */
+      c_hasFittedRecoTrack = 1 << 13,  /**< bit 13: SPTC is related to a RecoTrack which has a successful fit.
+        NOTE: this check is performed on the original SPTC, if the current one is a copy of that the relation may be lost*/
       c_initialState = 0 + c_isActive, /**< This is the initialState, which will always be set in the beginning and at reset. */
     };
 

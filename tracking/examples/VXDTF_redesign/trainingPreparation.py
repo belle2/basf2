@@ -62,6 +62,7 @@ usePXD = False
 # Create paths
 path = create_path()
 
+
 # Input Module
 rootInputM = register_module('RootInput')
 path.add_module(rootInputM)
@@ -69,6 +70,9 @@ path.add_module(rootInputM)
 # Event Info Module
 eventinfoprinter = register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
+
+path.add_module("PrintCollections", printForEvent=1)
+
 
 # puts the geometry and gearbox in the path
 setup_Geometry(path)
@@ -129,11 +133,13 @@ else:
 SecMapTrainerBase = register_module('VXDTFTrainingDataCollector')
 SecMapTrainerBase.param('NameTag', nameTag)
 SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')
-SecMapTrainerBase.logging.log_level = LogLevel.DEBUG
+# SecMapTrainerBase.logging.log_level = LogLevel.DEBUG
 path.add_module(SecMapTrainerBase)
 
 # this can take quite long so it is good to know if it is still running
 path.add_module('Progress')
+
+path.add_module("PrintCollections", printForEvent=1)
 
 process(path)
 

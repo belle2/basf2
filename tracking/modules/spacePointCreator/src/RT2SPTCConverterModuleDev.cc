@@ -79,6 +79,12 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   initializeCounters();
 }
 
+/** destructor */
+RT2SPTCConverterModule::~RT2SPTCConverterModule()
+{
+  if (m_trackSel) delete m_trackSel;
+}
+
 // ------------------------------ INITIALIZE ---------------------------------------
 void RT2SPTCConverterModule::initialize()
 {

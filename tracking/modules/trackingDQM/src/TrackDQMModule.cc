@@ -79,6 +79,7 @@ void TrackDQMModule::defineHisto()
   if (gTools->getNumberOfLayers() == 0) {
     B2WARNING("Missing geometry for VXD.");
   }
+  printf("---> kuk 0a\n");
 
   // basic constants presets:
   int nVXDLayers = gTools->getNumberOfLayers();
@@ -262,6 +263,7 @@ void TrackDQMModule::defineHisto()
   m_Tracks->GetXaxis()->SetTitle("# tracks");
   m_Tracks->GetYaxis()->SetTitle("counts");
 
+  printf("---> kuk 1a\n");
   if (gTools->getNumberOfLayers() == 0) {
     B2WARNING("Missing geometry for VXD, VXD-DQM related are skiped.");
     return;
@@ -271,11 +273,11 @@ void TrackDQMModule::defineHisto()
   m_TRClusterCorrelationsPhi = (TH2F**) new TH2F*[nVXDLayers - 1];
   m_TRClusterCorrelationsTheta = (TH2F**) new TH2F*[nVXDLayers - 1];
   m_UBResidualsSensor = (TH2F**) new TH2F*[nVXDSensors];
-  m_UBResidualsSensorU = (TH1F**) new TH2F*[nVXDSensors];
-  m_UBResidualsSensorV = (TH1F**) new TH2F*[nVXDSensors];
+  m_UBResidualsSensorU = (TH1F**) new TH1F*[nVXDSensors];
+  m_UBResidualsSensorV = (TH1F**) new TH1F*[nVXDSensors];
 
   for (VxdID layer : geo.getLayers()) {
-    int i = layer.getLayerNumber();
+    int i = layer.getLayerNumber() - gTools->getFirstLayer();
     /** Track related clusters - hitmap in IP angle range */
     name = str(format("TRClusterHitmapLayer%1%") % i);
     title = str(format("Cluster Hitmap for layer %1%") % i);
@@ -287,6 +289,7 @@ void TrackDQMModule::defineHisto()
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber();
     if (i == gTools->getLastLayer()) continue;
+    i -= gTools->getFirstLayer();
     /** Track related clusters - neighbor corelations in Phi */
     name = str(format("CorrelationsPhiLayers_%1%_%2%") % i % (i + 1));
     title = str(format("Correlations in Phi for Layers %1% %2%") % i % (i + 1));
@@ -307,6 +310,7 @@ void TrackDQMModule::defineHisto()
     m_TRClusterCorrelationsTheta[i]->GetZaxis()->SetTitle("counts");
   }
 
+  printf("---> kuk 2a\n");
   DirTracksAlignment->cd();
   for (int i = 0; i < nVXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromIndex(i);
@@ -340,6 +344,7 @@ void TrackDQMModule::defineHisto()
   }
 
   oldDir->cd();
+  printf("---> kuk 3a\n");
 
 }
 
@@ -347,6 +352,7 @@ void TrackDQMModule::beginRun()
 {
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  printf("---> kuk 0c\n");
 
   if (m_MomPhi != NULL) m_MomPhi->Reset();
   if (m_MomTheta != NULL) m_MomTheta->Reset();
@@ -377,30 +383,36 @@ void TrackDQMModule::beginRun()
 
   if (gTools->getNumberOfLayers() == 0) return;
 
+  printf("---> kuk 1c\n");
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber() - gTools->getFirstLayer();
+    printf("---> kuk 1c1 %i\n", i);
     if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
   }
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber();
     if (i == gTools->getLastLayer()) continue;
     i -= gTools->getFirstLayer();
+    printf("---> kuk 1c2 %i\n", i);
     if (m_TRClusterCorrelationsPhi[i] != NULL) m_TRClusterCorrelationsPhi[i]->Reset();
     if (m_TRClusterCorrelationsTheta[i] != NULL) m_TRClusterCorrelationsTheta[i]->Reset();
   }
   for (int i = 0; i < gTools->getNumberOfSensors(); i++) {
+    printf("---> kuk 1c3 %i\n", i);
     if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
     if (m_UBResidualsSensorU[i] != NULL) m_UBResidualsSensorU[i]->Reset();
     if (m_UBResidualsSensorV[i] != NULL) m_UBResidualsSensorV[i]->Reset();
   }
+  printf("---> kuk 2c\n");
 }
 
 
 void TrackDQMModule::event()
 {
+  printf("---> kuk 0\n");
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   try {
-
+    printf("---> kuk 1\n");
     int iTrack = 0;
     int iTrackVXD = 0;
     int iTrackCDC = 0;
@@ -408,6 +420,7 @@ void TrackDQMModule::event()
 
     StoreArray<Track> tracks;
     for (const Track& track : tracks) {  // over tracks
+      printf("---> kuk 2\n");
       RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
       RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
       int nPXD = (int)pxdClustersTrack.size();
@@ -453,6 +466,7 @@ void TrackDQMModule::event()
       m_MomTheta->Fill(Theta);
       m_MomCosTheta->Fill(cos(Theta - 90.0));
 
+      printf("---> kuk 3\n");
       float Chi2NDF = 0;
       float NDF = 0;
       float pValue = 0;

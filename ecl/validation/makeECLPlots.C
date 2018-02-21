@@ -38,7 +38,6 @@ void makeECLPlots()
   
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
-  // results/current -> ../
   if (TFile::Open("../ECLBkgOutput.root") != NULL) {
     TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
     TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
@@ -122,7 +121,7 @@ void ECLMuon(TTree* muon_tree)
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFake->Write(); 
 
-  TH1F* hMuonsFakeTheta = new TH1F("hMuonsFakeTheta","#theta distribution for fake (non-bkg) neutral clusters", 25,-3.2,3.2);
+  TH1F* hMuonsFakeTheta = new TH1F("hMuonsFakeTheta","#theta distribution for fake (non-bkg) neutral clusters", 25, 0, 3.2);
 
   muon_tree->Draw("eclClusterTheta>>hMuonsFakeTheta","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
   hMuonsFakeTheta->GetXaxis()->SetTitle("#theta (rad)");
@@ -131,7 +130,7 @@ void ECLMuon(TTree* muon_tree)
   hMuonsFakeTheta->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFakeTheta->Write(); 
 
-  TH1F* hMuonsFakePhi = new TH1F("hMuonsFakePhi","#phi distribution for fake (non-bkg) neutral clusters", 25,-3.2,3.2);
+  TH1F* hMuonsFakePhi = new TH1F("hMuonsFakePhi","#phi distribution for fake (non-bkg) neutral clusters", 25, -3.6, 3.6);
 
   muon_tree->Draw("eclClusterPhi>>hMuonsFakePhi","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
   hMuonsFakePhi->GetXaxis()->SetTitle("#phi (rad)");
@@ -1124,11 +1123,11 @@ void ECLBkg(TTree* bkg_tree)
   bkg_tree->Draw("eclClusterEnergy>>bkgClusterE","eclClusterEnergy>0&&eclClusterHypothesisId==5");
   bkgClusterE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for bkg clusters")); 
-  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 0."));
+  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 20. (threshold value)"));
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterE->Write();
 
-  TH1F* bkgClusterTheta = new TH1F("bkgClusterTheta", "Cluster theta, bkg only", 50, 3.2, -3.2);
+  TH1F* bkgClusterTheta = new TH1F("bkgClusterTheta", "Cluster theta, bkg only", 50, 0, 3.2);
   bkg_tree->Draw("eclClusterTheta>>bkgClusterTheta","eclClusterEnergy>0&&eclClusterHypothesisId==5");
   bkgClusterTheta->GetXaxis()->SetTitle("#theta (rad)");
   bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster theta for bkg clusters")); 
@@ -1136,10 +1135,10 @@ void ECLBkg(TTree* bkg_tree)
   bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterTheta->Write();
 
-  TH1F* bkgClusterPhi = new TH1F("bkgClusterPhi", "Cluster phi, bkg only", 50, 3.2, -3.2);
+  TH1F* bkgClusterPhi = new TH1F("bkgClusterPhi", "Cluster phi, bkg only", 50, -3.6, 3.6);
   bkg_tree->Draw("eclClusterPhi>>bkgClusterPhi","eclClusterEnergy>0&&eclClusterHypothesisId==5");
   bkgClusterPhi->GetXaxis()->SetTitle("#phi (rad)");
-  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster theta for bkg clusters")); 
+  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster phi for bkg clusters")); 
   bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape."));
   bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterPhi->Write();
@@ -1161,7 +1160,7 @@ void ECLBkg(TTree* bkg_tree)
 
   bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for bkg")); 
-  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2014)"));
+  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 55 (Feb 2018)"));
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   bkgClusterMultip->Write();
  

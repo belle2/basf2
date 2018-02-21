@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEKLIDTOOL_H
-#define NTUPLEKLIDTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -19,12 +18,12 @@
 
 namespace Belle2 {
 
-  /** NtupleTool to write the KlId variables to a flat ntuple. */
-  class NtupleKlIdTool : public NtupleFlatTool {
+  /** NtupleTool to write the KlongID variables to a flat ntuple. */
+  class NtupleKlongIDTool : public NtupleFlatTool {
   private:
 
     /** the Kl pid */
-    float* m_KlId     ;
+    float* m_klongID     ;
     /** is Forward EKLM. */
     float* m_isFEKLM  ;
     /** is Backweard EKLM. */
@@ -51,11 +50,9 @@ namespace Belle2 {
     void setupTree();
   public:
     /** Constuctor. */
-    NtupleKlIdTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtupleKlongIDTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };
 
 } // namepspace Belle2
-
-#endif // NTUPLEPIDTOOL_H

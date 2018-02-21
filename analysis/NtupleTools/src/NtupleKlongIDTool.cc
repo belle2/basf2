@@ -8,20 +8,20 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/NtupleTools/NtupleKlIdTool.h>
+#include <analysis/NtupleTools/NtupleKlongIDTool.h>
 #include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/KlIdVariables.h>
+#include <analysis/VariableManager/KlongIDVariables.h>
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>
 
 using namespace Belle2;
 using namespace std;
 
-void NtupleKlIdTool::setupTree()
+void NtupleKlongIDTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
-  m_KlId      = new float[nDecayProducts];
+  m_klongID      = new float[nDecayProducts];
   m_isFEKLM   = new float[nDecayProducts];
   m_isBEKLM   = new float[nDecayProducts];
   m_isBKLM    = new float[nDecayProducts];
@@ -33,7 +33,8 @@ void NtupleKlIdTool::setupTree()
   m_Energy    = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_KlId").c_str()      , &m_KlId[iProduct]      , (strNames[iProduct] + "_KlId/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_klongID").c_str()      , &m_klongID[iProduct]      ,
+                   (strNames[iProduct] + "_klongID/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_isFEKLM").c_str()   , &m_isFEKLM[iProduct]   , (strNames[iProduct] + "_isFEKLM/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_isBEKLM").c_str()   , &m_isBEKLM[iProduct]   , (strNames[iProduct] + "_isBEKLM/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_isBKLM").c_str()    , &m_isBKLM[iProduct]    , (strNames[iProduct] + "_isBKLM/F").c_str());
@@ -48,17 +49,17 @@ void NtupleKlIdTool::setupTree()
   }
 }
 
-void NtupleKlIdTool::eval(const Particle* particle)
+void NtupleKlongIDTool::eval(const Particle* particle)
 {
   if (!particle) {
-    B2ERROR("NtupleKlIdTool::eval - no Particle found!");
+    B2ERROR("NtupleKlongIDTool::eval - no Particle found!");
     return;
   }
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_KlId[iProduct]      = Variable::particleKLMKlId(selparticles[iProduct]);
+    m_klongID[iProduct]      = Variable::particleKLMKlongID(selparticles[iProduct]);
     m_isFEKLM[iProduct]   = Variable::particleKLMisForwardEKLM(selparticles[iProduct]);
     m_isBEKLM[iProduct]   = Variable::particleKLMisBackwardEKLM(selparticles[iProduct]);
     m_isBKLM[iProduct]    = Variable::particleKLMisBKLM(selparticles[iProduct]);

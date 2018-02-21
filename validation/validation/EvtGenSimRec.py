@@ -45,7 +45,7 @@ add_reconstruction(main)
 main.add_module('Profile')
 
 # output
-main.add_module('RootOutput', additionalBranchNames=['SpacePoints'], outputFileName='../EvtGenSimRec.root')
+main.add_module('RootOutput', additionalBranchNames=['SpacePoints', 'SVDSpacePoints'], outputFileName='../EvtGenSimRec.root')
 
 process(main)
 

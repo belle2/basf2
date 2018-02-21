@@ -156,6 +156,7 @@ namespace Belle2 {
     uint8_t m_apvNo;
 
     ClassDef(SVDDAQDiagnostic, 3)
+
   }; // class SVDDAQDiagnostic
 } // namespace Belle2
 

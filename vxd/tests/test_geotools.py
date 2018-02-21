@@ -88,7 +88,41 @@ class CheckNumbering(basf2.Module):
             basf2.B2ERROR('First SVD layer number is 3, reported {0}.'.format(self.gTools.getFirstSVDLayer()))
         if (self.gTools.getLastSVDLayer() != 6):
             basf2.B2ERROR('Last SVD layer number is 6, reported {0}.'.format(self.gTools.getLastSVDLayer()))
-        # 0d. Sensor numbers
+        # 0d. Sensor indexing range
+        # PXD
+        # First PXD sensor should be (first PXD layer)/1/1,
+        idOfFirstPXDSensor = self.gTools.getSensorIDFromPXDIndex(0)
+        layer = idOfFirstPXDSensor.getLayerNumber()
+        ladder = idOfFirstPXDSensor.getLadderNumber()
+        sensor = idOfFirstPXDSensor.getSensorNumber()
+        if layer != self.gTools.getFirstPXDLayer() or ladder != 1 or sensor != 1:
+            basf2.B2ERROR('Mismatch in first PXD sensor placement:\n' +
+                          'Expected {0}/{1}/{2}\nGot: {3|/{4}/{5}'.format(
+                              layer, ladder, sensor,
+                              self.gTools.getFirstPXDLayer(), 1, 1))
+        idOfLastPXDSensor = self.gTools.getSensorIDFromPXDIndex(self.gTools.getNumberOfPXDSensors() - 1)
+        layer = idOfLastPXDSensor.getLayerNumber()
+        if layer != self.gTools.getLastPXDLayer():
+            basf2.B2ERROR('Mismatch in last PXD sensor placement:\n' +
+                          'Expected layer {0} got layer {1|'.format(
+                              layer, self.gTools.getLastPXDLayer()))
+        # SVD
+        # First SVD sensor should be (first PXD layer)/1/1,
+        idOfFirstSVDSensor = self.gTools.getSensorIDFromSVDIndex(0)
+        layer = idOfFirstSVDSensor.getLayerNumber()
+        ladder = idOfFirstSVDSensor.getLadderNumber()
+        sensor = idOfFirstSVDSensor.getSensorNumber()
+        if layer != self.gTools.getFirstSVDLayer() or ladder != 1 or sensor != 1:
+            basf2.B2ERROR('Mismatch in first SVD sensor placement:\n' +
+                          'Expected {0}/{1}/{2}\nGot: {3}/{4}/{5}'.format(
+                              layer, ladder, sensor,
+                              self.gTools.getFirstSVDLayer(), 1, 1))
+        idOfLastSVDSensor = self.gTools.getSensorIDFromSVDIndex(self.gTools.getNumberOfSVDSensors() - 1)
+        layer = idOfLastSVDSensor.getLayerNumber()
+        if layer != self.gTools.getLastSVDLayer():
+            basf2.B2ERROR('Mismatch in last SVD sensor placement:\n' +
+                          'Expected layer {0} got layer {1}'.format(
+                              layer, self.gTools.getLastSVDLayer()))
         #
         # 1. General sensor indexing
         #
@@ -206,7 +240,7 @@ class CheckNumbering(basf2.Module):
         # 5. PXD chip indexing
         #
         # 5a. Chip-on-sensor counts
-        if self.gTools.getTotalPXDChips() != 2120:
+        if self.gTools.getTotalPXDChips() != 400:
             basf2.B2ERROR('PXD chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
                               2120, self.gTools.getTotalPXDChips())
@@ -221,7 +255,7 @@ class CheckNumbering(basf2.Module):
                           'Expected: {0}, got {1}.'.format(
                               6, self.gTools.getNumberOfPXDVSideChips())
                           )
-        if self.gTools.getTotalSVDChips() != 2148:
+        if self.gTools.getTotalSVDChips() != 1748:
             basf2.B2ERROR('SVD chip count mismatch: \n' +
                           'Expected: {0}, got {1}.'.format(
                               2148, self.gTools.getTotalSVDChips())
@@ -354,6 +388,101 @@ class CheckNumbering(basf2.Module):
                           'Obtained: {0} {1} {2} {3} {4}.'.format(
                               neighbour_layer, neighbour_ladder, neighbour_sensor, neighbour_uSide, neighbour_chipNo)
                           )
+        # 5f. Test of PXD chip assignment
+        # We want to see that the first and last chips have correct placement.
+        indexOfFirstPXDChip = 0
+        # First chip must be on first PXD layer, 1st ladder, 1st sensor, u-sie,
+        # chip 0.
+        idOfFirstPXDChip = self.gTools.getChipIDFromPXDIndex(indexOfFirstPXDChip)
+        firstChipLayer = idOfFirstPXDChip.getLayerNumber()
+        firstChipLadder = idOfFirstPXDChip.getLadderNumber()
+        firstChipSensor = idOfFirstPXDChip.getSensorNumber()
+        firstChipUSide = self.gTools.isPXDSideU(idOfFirstPXDChip)
+        firstChipNo = self.gTools.getPXDChipNumber(idOfFirstPXDChip)
+        if (firstChipLayer != self.gTools.getFirstPXDLayer() or
+                firstChipLadder != 1 or
+                firstChipSensor != 1 or
+                not firstChipUSide or
+                firstChipNo != 1):
+            basf2.B2ERROR(
+                'Wrong 1st PXD chip assignment:\nExpected {0}/{1}/{2} side {3} chip {4},\nGot {5}/{6}/{7} side {8} chip {9}'.format(
+                    self.gTools.getFirstPXDLayer(),
+                    1,
+                    1,
+                    'u',
+                    1,
+                    firstChipLayer,
+                    firstChipLadder,
+                    firstChipSensor,
+                    'u' if firstChipUSide else 'v',
+                    firstChipNo))
+        indexOfLastPXDChip = self.gTools.getTotalPXDChips() - 1
+        # Last chip must be on last PXD layer, v-sie, chip 6.
+        idOfLastPXDChip = self.gTools.getChipIDFromPXDIndex(indexOfLastPXDChip)
+        lastChipLayer = idOfLastPXDChip.getLayerNumber()
+        lastChipUSide = self.gTools.isPXDSideU(idOfLastPXDChip)
+        lastChipNo = self.gTools.getPXDChipNumber(idOfLastPXDChip)
+        expectedLastChipNo = self.gTools.getNumberOfPXDVSideChips(self.gTools.getLastPXDLayer())
+        if (lastChipLayer != self.gTools.getLastPXDLayer() or
+                lastChipUSide or
+                lastChipNo != expectedLastChipNo):
+            basf2.B2ERROR(
+                'Wrong last PXD chip assignment:\n' +
+                'Expected layer {0} side {1} chip {2},\nGot layer {3} side {4} chip {5}'.format(
+                    self.gTools.getLastPXDLayer(),
+                    'v',
+                    expectedLastChipNo,
+                    lastChipLayer,
+                    'u' if lastChipUSide else 'v',
+                    lastChipNo))
+        # 5g. Test of SVD chip assignment
+        # We want to see that the first and last chips have correct placement.
+        indexOfFirstSVDChip = 0
+        # First chip must be on first SVD layer, 1st ladder, 1st sensor, u-sie,
+        # chip 0.
+        idOfFirstSVDChip = self.gTools.getChipIDFromSVDIndex(indexOfFirstSVDChip)
+        firstChipLayer = idOfFirstSVDChip.getLayerNumber()
+        firstChipLadder = idOfFirstSVDChip.getLadderNumber()
+        firstChipSensor = idOfFirstSVDChip.getSensorNumber()
+        firstChipUSide = self.gTools.isSVDSideU(idOfFirstSVDChip)
+        firstChipNo = self.gTools.getSVDChipNumber(idOfFirstSVDChip)
+        if (firstChipLayer != self.gTools.getFirstSVDLayer() or
+                firstChipLadder != 1 or
+                firstChipSensor != 1 or
+                not firstChipUSide or
+                firstChipNo != 1):
+            basf2.B2ERROR(
+                'Wrong 1st SVD chip assignment:\nExpected {0}/{1}/{2} side {3} chip {4},\nGot {5}/{6}/{7} side {8} chip {9}'.format(
+                    self.gTools.getFirstSVDLayer(),
+                    1,
+                    1,
+                    'u',
+                    1,
+                    firstChipLayer,
+                    firstChipLadder,
+                    firstChipSensor,
+                    'u' if firstChipUSide else 'v',
+                    firstChipNo))
+        indexOfLastSVDChip = self.gTools.getTotalSVDChips() - 1
+        # Last chip must be on last SVD layer, v-sie, chip 6.
+        idOfLastSVDChip = self.gTools.getChipIDFromSVDIndex(indexOfLastSVDChip)
+        lastChipLayer = idOfLastSVDChip.getLayerNumber()
+        lastChipUSide = self.gTools.isSVDSideU(idOfLastSVDChip)
+        lastChipNo = self.gTools.getSVDChipNumber(idOfLastSVDChip)
+        expectedLastChipNo = self.gTools.getNumberOfSVDVSideChips(self.gTools.getLastSVDLayer())
+        if (lastChipLayer != self.gTools.getLastSVDLayer() or
+                lastChipUSide or
+                lastChipNo != expectedLastChipNo):
+            basf2.B2ERROR(
+                'Wrong last SVD chip assignment:\n' +
+                'Expected layer {0} side {1} chip {2},\nGot layer {3} side {4} chip {5}'.format(
+                    self.gTools.getLastSVDLayer(),
+                    'v',
+                    expectedLastChipNo,
+                    lastChipLayer,
+                    'u' if lastChipUSide else 'v',
+                    lastChipNo))
+
             # END OF TESTS
 
 
@@ -368,7 +497,7 @@ if __name__ == "__main__":
         check_numbering.add_module('Gearbox')
         check_numbering.add_module('Geometry', components=['MagneticField', 'PXD', 'SVD'])
         check_numbering.add_module(CheckNumbering())
-        with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(check_numbering)
+        # with b2test_utils.show_only_errors():
+        b2test_utils.safe_process(check_numbering)
 
         basf2.B2INFO('Test complete.')

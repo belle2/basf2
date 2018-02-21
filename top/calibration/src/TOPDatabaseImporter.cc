@@ -829,16 +829,9 @@ namespace Belle2 {
         calChannelThresholdEff->setThrEff(slotId, channel, efficiency, (short)threshold);
 
         if (redChisq > 10.) {
-          calChannelPulseHeight->setUnusable(slotId, iChannel);
-          calChannelThresholdEff->setUnusable(slotId, iChannel);
+          calChannelPulseHeight->setUnusable(slotId, channel);
+          calChannelThresholdEff->setUnusable(slotId, channel);
         }
-      }
-    }
-
-    for (auto chi2 : reducedChisqMap) {
-      if (chi2.second > 10.) {
-        slotId = chi2.first / 1000;
-        int iChannel = chi2.first % 1000;
       }
     }
 

@@ -47,10 +47,14 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   //Set module properties
   setDescription("SVD DQM module for Express Reco"
                  "Recommended Number of events for monitor is 40 kEvents or more to fill all histograms "
+                 "Container for histograms for off-line analysis with any granulation base on request "
+                 "Call all histograms set ShowAllHistos=1 ."
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 
+  addParam("ShowAllHistos", m_ShowAllHistos,
+           "Flag to show all histot in DQM, default = 0 ", m_ShowAllHistos);
   addParam("CutSVDCharge", m_CutSVDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 22 ADU ", m_CutSVDCharge);
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
@@ -329,6 +333,86 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_hitMapClCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
+  //----------------------------------------------------------------
+  // Additional histograms for out of ExpressReco
+  //----------------------------------------------------------------
+
+  if (m_ShowAllHistos == 1) {
+    TDirectory* dirShowAll = NULL;
+    dirShowAll = oldDir->mkdir("SVDDQMAll");
+    dirShowAll->cd();
+
+    name = str(format("DQMER_SVD_ClusterChargeU3"));
+    title = str(format("DQM ER SVD Cluster charge in U for layer 3 sensors"));
+    m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+    m_clusterChargeU3->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+    m_clusterChargeU3->GetYaxis()->SetTitle("count");
+    name = str(format("DQMER_SVD_ClusterChargeV3"));
+    title = str(format("DQM ER SVD Cluster charge in V for layer 3 sensors"));
+    m_clusterChargeV3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+    m_clusterChargeV3->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+    m_clusterChargeV3->GetYaxis()->SetTitle("count");
+
+    name = str(format("DQMER_SVD_ClusterChargeU456"));
+    title = str(format("DQM ER SVD Cluster charge in U for layers 4,5,6 sensors"));
+    m_clusterChargeU456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+    m_clusterChargeU456->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+    m_clusterChargeU456->GetYaxis()->SetTitle("count");
+    name = str(format("DQMER_SVD_ClusterChargeV456"));
+    title = str(format("DQM ER SVD Cluster charge in V for layers 4,5,6 sensors"));
+    m_clusterChargeV456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+    m_clusterChargeV456->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+    m_clusterChargeV456->GetYaxis()->SetTitle("count");
+
+    m_hitMapU = new TH2F*[nSVDSensors];
+    m_hitMapV = new TH2F*[nSVDSensors];
+    m_hitMapUCl = new TH1F*[nSVDSensors];
+    m_hitMapVCl = new TH1F*[nSVDSensors];
+    for (int i = 0; i < nSVDSensors; i++) {
+      VxdID id = gTools->getSensorIDFromSVDIndex(i);
+      int iLayer = id.getLayerNumber();
+      int iLadder = id.getLadderNumber();
+      int iSensor = id.getSensorNumber();
+      VxdID sensorID(iLayer, iLadder, iSensor);
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+      //----------------------------------------------------------------
+      // Hitmaps: Number of strips by coordinate
+      //----------------------------------------------------------------
+      name = str(format("SVD_%1%_StripHitmapU") % sensorDescr);
+      title = str(format("SVD Sensor %1% Strip Hitmap in U") % sensorDescr);
+      int nStrips = SensorInfo.getUCells();
+      m_hitMapU[i] = new TH2F(name.c_str(), title.c_str(), nStrips, 0, nStrips, SVDShaperDigit::c_nAPVSamples, 0,
+                              SVDShaperDigit::c_nAPVSamples);
+      m_hitMapU[i]->GetXaxis()->SetTitle("u position [pitch units]");
+      m_hitMapU[i]->GetYaxis()->SetTitle("timebin [time units]");
+      m_hitMapU[i]->GetZaxis()->SetTitle("hits");
+      name = str(format("SVD_%1%_StripHitmapV") % sensorDescr);
+      title = str(format("SVD Sensor %1% Strip Hitmap in V") % sensorDescr);
+      nStrips = SensorInfo.getVCells();
+      m_hitMapV[i] = new TH2F(name.c_str(), title.c_str(), nStrips, 0, nStrips, SVDShaperDigit::c_nAPVSamples, 0,
+                              SVDShaperDigit::c_nAPVSamples);
+      m_hitMapV[i]->GetXaxis()->SetTitle("v position [pitch units]");
+      m_hitMapV[i]->GetYaxis()->SetTitle("timebin [time units]");
+      m_hitMapV[i]->GetZaxis()->SetTitle("hits");
+      //----------------------------------------------------------------
+      // Hitmaps: Number of clusters by coordinate
+      //----------------------------------------------------------------
+      name = str(format("SVD_%1%_HitmapClstU") % sensorDescr);
+      title = str(format("SVD Sensor %1% Hitmap Clusters in U") % sensorDescr);
+      nStrips = SensorInfo.getUCells();
+      m_hitMapUCl[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
+      m_hitMapUCl[i]->GetXaxis()->SetTitle("u position [pitch units]");
+      m_hitMapUCl[i]->GetYaxis()->SetTitle("hits");
+      name = str(format("SVD_%1%_HitmapClstV") % sensorDescr);
+      title = str(format("SVD Sensor %1% Hitmap Clusters in V") % sensorDescr);
+      nStrips = SensorInfo.getVCells();
+      m_hitMapVCl[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
+      m_hitMapVCl[i]->GetXaxis()->SetTitle("v position [pitch units]");
+      m_hitMapVCl[i]->GetYaxis()->SetTitle("hits");
+    }
+  }
+
   oldDir->cd();
 }
 
@@ -394,8 +478,19 @@ void SVDDQMExpressRecoModule::beginRun()
     if (m_clusterTimeU[i] != NULL) m_clusterTimeU[i]->Reset();
     if (m_clusterTimeV[i] != NULL) m_clusterTimeV[i]->Reset();
   }
+  if (m_ShowAllHistos == 1) {
+    if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Reset();
+    if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Reset();
+    if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Reset();
+    if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Reset();
+    for (int i = 0; i < gTools->getNumberOfSVDSensors(); i++) {
+      if (m_hitMapU[i] != NULL) m_hitMapU[i]->Reset();
+      if (m_hitMapV[i] != NULL) m_hitMapV[i]->Reset();
+      if (m_hitMapUCl[i] != NULL) m_hitMapUCl[i]->Reset();
+      if (m_hitMapVCl[i] != NULL) m_hitMapVCl[i]->Reset();
+    }
+  }
 }
-
 
 void SVDDQMExpressRecoModule::event()
 {
@@ -463,6 +558,9 @@ void SVDDQMExpressRecoModule::event()
         if (samples[i] > m_CutSVDCharge) {
           if (m_hitMapCountsU != NULL) m_hitMapCountsU->Fill(index);
           if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+          if (m_ShowAllHistos == 1) {
+            if (m_hitMapU[index] != NULL) m_hitMapU[index]->Fill(digitIn.getCellID(), i);
+          }
         }
       }
     } else {
@@ -476,6 +574,9 @@ void SVDDQMExpressRecoModule::event()
         if (samples[i] > m_CutSVDCharge) {
           if (m_hitMapCountsV != NULL) m_hitMapCountsV->Fill(index);
           if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+          if (m_ShowAllHistos == 1) {
+            if (m_hitMapV[index] != NULL) m_hitMapV[index]->Fill(digitIn.getCellID(), i);
+          }
         }
       }
     }
@@ -510,6 +611,11 @@ void SVDDQMExpressRecoModule::event()
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
       if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
       if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Fill(cluster.getClsTime());
+      if (m_ShowAllHistos == 1) {
+        if (iLayer == 3) if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (iLayer != 3) if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (m_hitMapUCl[index] != NULL) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
+      }
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE,
@@ -521,6 +627,11 @@ void SVDDQMExpressRecoModule::event()
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
       if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
       if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Fill(cluster.getClsTime());
+      if (m_ShowAllHistos == 1) {
+        if (iLayer == 3) if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (iLayer != 3) if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (m_hitMapVCl[index] != NULL) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
+      }
     }
   }
   for (int i = 0; i < nSVDSensors; i++) {

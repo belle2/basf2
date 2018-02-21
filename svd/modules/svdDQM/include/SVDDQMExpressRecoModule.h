@@ -19,6 +19,7 @@
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
+#include "TH2F.h"
 
 namespace Belle2 {
 
@@ -46,6 +47,9 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /** Flag to show all histot in DQM, default = 0 */
+    int m_ShowAllHistos = 0;
 
     /** cut for accepting to hitmap histogram, using strips only, default = 22 ADU */
     float m_CutSVDCharge = 22.0;
@@ -121,6 +125,29 @@ namespace Belle2 {
     TH1I** m_CounterApvErrorORErrors;
     /** Counter of FTB Flags (32) */
     TH1I** m_CounterFTBFlags;
+
+    //----------------------------------------------------------------
+    // Additional histograms for out of ExpressReco
+    //----------------------------------------------------------------
+
+    /** Hitmaps pixels for u */
+    TH2F** m_hitMapU;
+    /** Hitmaps pixels for v */
+    TH2F** m_hitMapV;
+    /** Hitmaps clusters for u */
+    TH1F** m_hitMapUCl;
+    /** Hitmaps clusters for v */
+    TH1F** m_hitMapVCl;
+
+    /** u charge of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeU3;
+    /** v charge of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeV3;
+    /** u charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeU456;
+    /** v charge of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeV456;
+
 
   };
 

@@ -51,7 +51,7 @@ SVDDQMModule::SVDDQMModule() : HistoModule()
   //Set module properties
   setDescription("SVD DQM module"
                  "Recommended Number of events for monitor is 40 kEvents or more to fill all histograms. "
-                 "Conteiner for histograms for off-line analysis with any granulation base on request. "
+                 "Container for histograms for off-line analysis with any granulation base on request. "
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing

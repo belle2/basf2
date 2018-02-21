@@ -59,6 +59,6 @@ void PXDHotPixelMaskCollectorModule::collect() // Do your event() stuff here
 
   for (auto& digit :  m_pxdDigits) {
     unsigned int pixelID = digit.getUCellID() * 768 + digit.getVCellID();
-    collector_hitmap->Fill(pixelID, 1);
+    collector_hitmap->Fill(pixelID);
   }
 }

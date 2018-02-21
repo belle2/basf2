@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDDigit.h>
+// FIXME: will be removed soon
 #include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <string>
 #include <algorithm>
@@ -66,6 +67,8 @@ namespace Belle2 {
       bool m_mergeDuplicates;
       /** if true, check digit data and discard malformed digits.*/
       bool m_trimDigits;
+
+      // FIXME: Getting ignored pixels as xml is deprecated and will be removed soon
       /** Name of the ignored pixels list xml */
       std::string m_ignoredPixelsListName;
       /** Ignored pixels list manager class */

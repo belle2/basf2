@@ -18,7 +18,6 @@
 
 #include "TH1I.h"
 
-
 using namespace std;
 using namespace Belle2;
 
@@ -50,14 +49,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   //Loop over all bins (=pixels) in hitmap
   for (auto bin = 1; bin <= hist_hitmap->GetXaxis()->GetNbins(); bin++) {
     float nhits = (float) hist_hitmap->GetBinContent(bin);
+    unsigned int pixelID = bin - 1;
+
     if (nhits > minHits) {
       if (nhits / nevents > maxOccupancy) {
         // This pixel is hot, we have to mask it
-        B2INFO("Masking hot pixel with pixelID=" << bin << " having occupancy of " << nhits / nevents << ">" << maxOccupancy);
-        maskedPixelsPar->maskSinglePixel(VxdID("1.1.1"), bin);
-        maskedPixelsPar->maskSinglePixel(VxdID("1.1.2"), bin);
-        maskedPixelsPar->maskSinglePixel(VxdID("2.1.1"), bin);
-        maskedPixelsPar->maskSinglePixel(VxdID("2.1.2"), bin);
+        maskedPixelsPar->maskSinglePixel(VxdID("1.1.1").getID(), pixelID);
+        maskedPixelsPar->maskSinglePixel(VxdID("1.1.2").getID(), pixelID);
+        maskedPixelsPar->maskSinglePixel(VxdID("2.1.1").getID(), pixelID);
+        maskedPixelsPar->maskSinglePixel(VxdID("2.1.2").getID(), pixelID);
       }
     }
   }

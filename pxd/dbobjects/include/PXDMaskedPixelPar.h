@@ -62,7 +62,7 @@ namespace Belle2 {
       auto mapIterSingles = m_MapSingles.find(sensorID);
       if (mapIterSingles != m_MapSingles.end()) {
         // Found some masked single pixels on sensor
-        auto singles = mapIterSingles->second;
+        auto& singles = mapIterSingles->second;
         // Look if this is a single masked pixel
         if (singles.find(pixID) != singles.end())
           return false;

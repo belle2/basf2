@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/PXDDigitSorterModule.h>
-#include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -18,6 +17,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/reconstruction/Pixel.h>
+// IDEA do the pixel masking here
+#include <pxd/reconstruction/PXDPixelMasker.h>
 #include <functional>
 
 using namespace std;
@@ -46,6 +47,7 @@ PXDDigitSorterModule::PXDDigitSorterModule() : Module()
   addParam("trimDigits", m_trimDigits, "If true, pixel data will be checked to detect malformed pixels. Such pixels will be scarded.",
            true);
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
+  // FIXME Deprecated, will be removed soon
   addParam("ignoredPixelsListName", m_ignoredPixelsListName, "Name of the xml with ignored pixels list", string(""));
   addParam("truehits", m_storeTrueHitsName, "PXDTrueHit collection name", string(""));
   addParam("particles", m_storeMCParticlesName, "MCParticle collection name", string(""));
@@ -100,6 +102,22 @@ void PXDDigitSorterModule::event()
     const PXDDigit* const storeDigit = storeDigits[i];
     Pixel px(storeDigit, i);
     VxdID sensorID = storeDigit->getSensorID();
+
+    // FIXME: new code
+    if (PXDPixelMasker::getInstance().pixelOK(storeDigit->getSensorID(), storeDigit->getUCellID(), storeDigit->getVCellID())) {
+      // Trim digits
+      if (!m_trimDigits || goodDigit(storeDigit)) {
+        sensors[sensorID].insert(px);
+      } else {
+        B2INFO("Encountered a malformed digit in PXDDigit sorter: " << endl
+               << "VxdID: " << sensorID.getLayerNumber() << "/"
+               << sensorID.getLadderNumber() << "/"
+               << sensorID.getSensorNumber() << " u = " << storeDigit->getUCellID() << "v = " << storeDigit->getVCellID()
+               << " DISCARDED.");
+      }
+    }
+
+    /* // Deprecated code
     if (m_ignoredPixelsListName == ""
         || m_ignoredPixelsList->pixelOK(storeDigit->getSensorID(), PXDIgnoredPixelsMap::map_pixel(storeDigit->getUCellID(),
                                         storeDigit->getVCellID()))) {
@@ -114,6 +132,7 @@ void PXDDigitSorterModule::event()
                << " DISCARDED.");
       }
     }
+    */
   }
 
   // Now we loop over sensors and reorder the digits list

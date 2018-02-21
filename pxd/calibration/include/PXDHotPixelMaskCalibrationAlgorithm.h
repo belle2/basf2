@@ -37,6 +37,8 @@ namespace Belle2 {
 
     /// Run algo on data
     virtual EResult calibrate();
+
+
   };
 } // namespace Belle2
 

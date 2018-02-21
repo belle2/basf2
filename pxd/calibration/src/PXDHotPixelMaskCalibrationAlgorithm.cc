@@ -8,13 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <pxd/calibration/PXDHotPixelMaskCalibrationAlgorithm.h>
+#include <pxd/dbobjects/PXDMaskedPixelPar.h>
+
 
 #include "TH1I.h"
-#include "TFitResultPtr.h"
-#include "TFitResult.h"
-#include "TNtuple.h"
-#include "TBranch.h"
+
 
 using namespace std;
 using namespace Belle2;
@@ -32,6 +35,9 @@ PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): Cali
 
 CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 {
+
+  PXDMaskedPixelPar* maskedPixelsPar = new PXDMaskedPixelPar();
+
   auto hist_nevents = getObjectPtr<TH1I>("nevents");
   auto nevents = hist_nevents->GetEntries();
   if (nevents < minEvents) {
@@ -46,13 +52,20 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     float nhits = (float) hist_hitmap->GetBinContent(bin);
     if (nhits > minHits) {
       if (nhits / nevents > maxOccupancy) {
-        // This pixel is hot, we mask it
-        B2INFO("Masking pixel " << bin << " having occupancy of " << nhits / nevents);
+        // This pixel is hot, we have to mask it
+        B2INFO("Masking hot pixel with pixelID=" << bin << " having occupancy of " << nhits / nevents << ">" << maxOccupancy);
+        maskedPixelsPar->maskSinglePixel(VxdID("1.1.1"), bin);
+        maskedPixelsPar->maskSinglePixel(VxdID("1.1.2"), bin);
+        maskedPixelsPar->maskSinglePixel(VxdID("2.1.1"), bin);
+        maskedPixelsPar->maskSinglePixel(VxdID("2.1.2"), bin);
       }
     }
   }
 
-  //saveCalibration(fittedvalues, getPrefix());
+  // Save the TNtuple to database. Note that this will set the database object name to the same as the collector but you
+  // are free to change it.
+  saveCalibration(maskedPixelsPar, "PXDMaskedPixelPar");
+
   if (getIteration() < 1) {
     B2INFO("Calibration called for iteration");
     return c_Iterate;

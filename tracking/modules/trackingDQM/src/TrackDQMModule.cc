@@ -262,7 +262,7 @@ void TrackDQMModule::defineHisto()
   m_Tracks->GetXaxis()->SetTitle("# tracks");
   m_Tracks->GetYaxis()->SetTitle("counts");
 
-  if (gTools->getNumberOfPXDLayers() == 0) {
+  if (gTools->getNumberOfLayers() == 0) {
     B2WARNING("Missing geometry for VXD, VXD-DQM related are skiped.");
     return;
   }
@@ -375,7 +375,7 @@ void TrackDQMModule::beginRun()
   if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Reset();
   if (m_Tracks != NULL) m_Tracks->Reset();
 
-  if (gTools->getNumberOfPXDLayers() == 0) return;
+  if (gTools->getNumberOfLayers() == 0) return;
 
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber() - gTools->getFirstLayer();

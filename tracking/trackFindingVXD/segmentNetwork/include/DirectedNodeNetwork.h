@@ -103,7 +103,7 @@ namespace Belle2 {
     {
       if (m_nodeMap.count(nodeID) == 0) {
         m_nodeMap.emplace(nodeID, new Node(newEntry));
-        m_isFinalized = true;
+        m_isFinalized = false;
         return true;
       }
       return false;

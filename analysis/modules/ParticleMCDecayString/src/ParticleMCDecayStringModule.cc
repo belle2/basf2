@@ -305,10 +305,8 @@ namespace Belle2 {
 
     unsigned int nParticles(decayStrings.size() - 1);
     if (nParticles > m_identifiers.size()) {
-      B2WARNING("ParticleMCDecayStringModule: not enough identifiers have been specified to use the concise string format:"
-                << std::endl << "Number of particles in your decay mode = " << nParticles << std::endl
-                << "Available identifiers: " << m_identifiers << std::endl
-                << "Standard format will be used instead.");
+      B2WARNING("ParticleMCDecayStringModule: not enough identifiers have been specified to use the concise string format:\nNumber of particles in your decay mode = "
+                << nParticles << "\nAvailable identifiers: " << m_identifiers  << "\nStandard format will be used instead.");
       return;
     }
 

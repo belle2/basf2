@@ -356,16 +356,17 @@ namespace TreeFitter {
 
   void ParticleBase::print(const FitParams* fitpar) const
   {
-    std::cout << std::setw(5) << "[" << type() << "]" << std::setw(15) << std::flush << name().c_str()
-              << " val" << std::setw(15) << "err" << std::endl ;
-    std::cout << std::setprecision(5) ;
+    std::ostringstream stream;
+    stream << std::setw(5) << "[" << type() << "]" << std::setw(15) << std::flush << name().c_str()
+           << " val" << std::setw(15) << "err\n" ;
+    stream << std::setprecision(5) ;
     for (int i = 0; i < dim(); ++i) {
       int theindex = index() + i ;
-      std::cout << std::setw(2) << theindex << " "
-                << std::setw(20) << parname(i).c_str()
-                << std::setw(15) << fitpar->par()(theindex + 1)
-                << std::setw(15) << sqrt(fitpar->cov()(theindex + 1, theindex + 1))
-                << std::setw(15) << fitpar->cov()(theindex + 1, theindex + 1) << std::endl ;
+      stream << std::setw(2) << theindex << " "
+             << std::setw(20) << parname(i).c_str()
+             << std::setw(15) << fitpar->par()(theindex + 1)
+             << std::setw(15) << sqrt(fitpar->cov()(theindex + 1, theindex + 1))
+             << std::setw(15) << fitpar->cov()(theindex + 1, theindex + 1) << "\n";
     }
     if (hasEnergy()) {
       int momindex = momIndex() ;
@@ -383,10 +384,12 @@ namespace TreeFitter {
       G(3) = -pz / mass ;
       G(4) =   E / mass ;
       double massvar = cov.similarity(G) ;
-      std::cout << std::setw(2) << std::setw(20) << "mass: "
-                << std::setw(15) << mass
-                << std::setw(15) << sqrt(massvar) << std::endl ;
+      stream << std::setw(2) << std::setw(20) << "mass: "
+             << std::setw(15) << mass
+             << std::setw(15) << sqrt(massvar) << "\n";
     }
+
+    B2DEBUG(19, stream.str());
 
     //FT: also print daughters
     for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end() ; ++it) {
@@ -496,10 +499,10 @@ namespace TreeFitter {
                 p.H(2, momindex + 2) += -tau + sinlt / lambda;
 
                 if (vtxverbose >= 2)
-                  std::cout << "Using helix for position of particle: " << name().c_str() << " "
+                  B2DEBUG(19, "Using helix for position of particle: " << name().c_str() << " "
                             << lambda << " " << lambda* tau
                             << "  delta-x,y: " << -tau* px0 + (py - py0) / lambda << "  "
-                            << -tau* py0 - (px - px0) / lambda << std::endl ;
+                            << -tau* py0 - (px - px0) / lambda << );
               }
             }*/
     return ErrCode::success;

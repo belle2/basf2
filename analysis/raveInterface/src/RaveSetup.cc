@@ -24,7 +24,6 @@
 #include <string>
 using std::string;
 #include <iostream>
-using std::cout; using std::cerr; using std::endl;
 
 
 using namespace Belle2;
@@ -94,15 +93,15 @@ void RaveSetup::Print()
 {
   if (getRawInstance() not_eq NULL) {
     if (getRawInstance()->m_useBeamSpot == false) {
-      cout << "use beam spot is false" << endl;
+      B2DEBUG(19, "use beam spot is false");
     } else {
-      cout << "use beam spot is true and beam spot position and covariance matrix are:" << endl;
+      B2DEBUG(19, "use beam spot is true and beam spot position and covariance matrix are:");
       getRawInstance()->m_beamSpot.Print();
       getRawInstance()->m_beamSpotCov.Print();
     }
-    cout << "the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory << endl;
-//    cout << "the pointer to GFRaveVertexFactory is " << getRawInstance()->m_GFRaveVertexFactory << endl;
+    B2DEBUG(19, "the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory);
+//    B2DEBUG(19, "the pointer to GFRaveVertexFactory is " << getRawInstance()->m_GFRaveVertexFactory );
   } else {
-    cout << "RaveSetup::initialize was not called. There is nothing to Print." << endl;
+    B2DEBUG(19, "RaveSetup::initialize was not called. There is nothing to Print.");
   }
 }

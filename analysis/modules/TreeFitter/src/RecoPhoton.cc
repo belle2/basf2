@@ -149,12 +149,14 @@ namespace TreeFitter {
     m_m(3) = centroid.Z() ;
     if (m_useEnergy) m_m(4) = energy ;
     if (vtxverbose >= 3) {
-      std::cout << "Neutral particle: " << particle()->getPDGCode() << std::endl
-                << "Measurement is: (" << m_m(1) << "," << m_m(2) << "," << m_m(3);
-      if (m_useEnergy) std::cout << "," << m_m(4);
-      std::cout << ")" << std::endl
-                << "energy is: " << energy << std::flush
-                << "cov matrix is: " << m_matrixV << std::flush ;
+      std::ostringstream stream;
+      stream << "Neutral particle: " << particle()->getPDGCode() << "\n"
+             << "Measurement is: (" << m_m(1) << "," << m_m(2) << "," << m_m(3);
+      if (m_useEnergy) stream << "," << m_m(4);
+      stream << ")\n"
+             << "energy is: " << energy
+             << "cov matrix is: " << m_matrixV;
+      B2DEBUG(19, stream.str());
     }
     return ErrCode() ;
   }
@@ -350,9 +352,9 @@ namespace TreeFitter {
         p.getH()(row, momindex + col) =  H(row, col + 3);
       }
     }
-    //std::cout << "reco photon r\n" << r  << std::endl;
-//    std::cout << "reco photon P\n" << P  << std::endl;
-//    std::cout << "reco photon H\n" << H  << std::endl;
+    //B2DEBUG(19, "reco photon r\n" << r  );
+//    B2DEBUG(19, "reco photon P\n" << P  );
+//    B2DEBUG(19, "reco photon H\n" << H  );
 
     return ErrCode::success; //FT: temp fix
   }

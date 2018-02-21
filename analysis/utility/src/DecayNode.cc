@@ -34,8 +34,8 @@ namespace Belle2 {
       output << "    ";
     }
 
-    output << std::to_string(pdg);
-    output << std::endl;
+    output << std::to_string(pdg) << "\n";
+
 
     for (const auto& d : daughters) {
       output << d.print_node(indent + 1);

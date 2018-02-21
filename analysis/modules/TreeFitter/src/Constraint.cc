@@ -62,10 +62,10 @@ namespace TreeFitter {
     B2DEBUG(82, "----Constraint::filtering " << this->name());
     ErrCode status;
     if (m_type <= Constraint::unknown || m_type >= Constraint::ntypes) {
-      std::cout << "VtkConstraint: unknown constraint: " << m_type << std::endl;
+      B2DEBUG(19, "VtkConstraint: unknown constraint: " << m_type);
       status |= ErrCode::badsetup;
     } else if (m_type != merged && !m_node) {
-      std::cout << "VtkConstraint: filter constraint without a node" << std::endl;
+      B2DEBUG(19, "VtkConstraint: filter constraint without a node");
       status |= ErrCode::badsetup;
     } else {
 

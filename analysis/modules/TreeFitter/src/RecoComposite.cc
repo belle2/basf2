@@ -15,9 +15,9 @@
 #include <analysis/modules/TreeFitter/RecoComposite.h>
 #include <analysis/modules/TreeFitter/FitParams.h>
 
+#include <framework/logging/Logger.h>
+
 #include <TMatrixFSym.h>
-//using std::cout;
-//using std::endl;
 
 namespace TreeFitter {
   extern int vtxverbose ;
@@ -94,8 +94,7 @@ namespace TreeFitter {
     //FT: the above has to be optimized later into a single loop; doesn't matter right now since we don't use it.
     m_matrixV = cov7out.sub(1, dimM()) ; // so either 7 or 6, depending on mass constraint
     if (vtxverbose >= 4) {
-      std::cout << "cov matrix of external candidate: " << name().c_str()
-                << " " << dimM() << " " << m_matrixV << std::endl ;
+      B2DEBUG(19, "cov matrix of external candidate: " << name()  << " " << dimM() << " " << m_matrixV);
     }
   }
   void RecoComposite::updateParams()//FT had to split up all calls to "btafitparams"

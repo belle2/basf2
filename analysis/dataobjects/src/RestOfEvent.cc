@@ -378,9 +378,9 @@ void RestOfEvent::printIndices(std::set<int> indices) const
   if (indices.empty())
     return;
 
-  std::cout << "     -> ";
+  std::string printout =  "     -> ";
   for (const int index : indices) {
-    std::cout << index << ", ";
+    printout += std::to_string(index) +  ", ";
   }
-  std::cout << std::endl;
+  B2DEBUG(19, printout);
 }

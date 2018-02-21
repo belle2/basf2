@@ -118,7 +118,7 @@ namespace Belle2 {
   {
     StoreArray<Track> tracks;
 
-    std::cout << std::endl << "           Track (ID, PDG, Mask): ";
+    std::string printout = "\n           Track (ID, PDG, Mask): ";
     for (const auto& it : trackMask) {
       const Track* track = tracks[it.first];
       const MCParticle* mcp = track->getRelated<MCParticle>();
@@ -127,16 +127,16 @@ namespace Belle2 {
         mcPDG = mcp->getPDG();
       else
         mcPDG = -1;
-      std::cout << "(" << it.first << ", " << mcPDG << ", " << it.second << ")   ";
+      printout += "(" + std::to_string(it.first) + ", " + std::to_string(mcPDG) + ", " + std::to_string(it.second) + ")   ";
     }
-    std::cout << std::endl << std::endl;
+    B2DEBUG(19, printout);
   }
 
   void RestOfEventPrinterModule::printECLClusterMask(std::map<unsigned int, bool> eclClusterMask) const
   {
     StoreArray<ECLCluster> eclClusters;
 
-    std::cout << std::endl << "           ECLCluster (ID, PDG, Mask): ";
+    std::string printout = "\n           ECLCluster (ID, PDG, Mask): ";
     for (const auto& it : eclClusterMask) {
       const ECLCluster* cluster = eclClusters[it.first];
       const MCParticle* mcp = cluster->getRelated<MCParticle>();
@@ -145,9 +145,9 @@ namespace Belle2 {
         mcPDG = mcp->getPDG();
       else
         mcPDG = -1;
-      std::cout << "(" << it.first << ", " << mcPDG << ", " << it.second << ")   ";
+      printout += "(" + std::to_string(it.first) + ", " + std::to_string(mcPDG) + ", " + std::to_string(it.second) + ")   ";
     }
-    std::cout << std::endl << std::endl;
+    B2DEBUG(19, printout);
   }
 
 } // end Belle2 namespace

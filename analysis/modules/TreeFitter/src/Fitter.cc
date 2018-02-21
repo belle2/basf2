@@ -453,7 +453,7 @@ namespace TreeFitter {
                           Belle2::Particle& cand) const //FT: this is very delicate, come back here in case of errors
   {
     B2DEBUG(80, "Updating the candidate " << cand.getName());
-    //std::cout<< "Updating the candidate " << cand.getName()<<std::endl;
+    //B2DEBUG(19, "Updating the candidate " << cand.getName());
     //    assert( pb->particle()->getPDGCode() == cand.getPDGCode() ) ; //sanity check
     int posindex = pb.posIndex();
     bool hasPos = true;
@@ -555,14 +555,14 @@ namespace TreeFitter {
         //double decchi2 = m_decaychain->getChainsChi2(m_fitparams);
         double fitparchi2 = m_fitparams->chiSquare();
 
-        // std::cout << "____________________________________________ "  << std::endl;
-        // std::cout << "  -- FINAL chi2 newton    :    " << chi2byndf << " with ndf = " << NDFs << std::endl;
-        // std::cout << "  -- Chains chi2/ndf      :    " << decchi2 / NDFs   << std::endl;
-        // std::cout << "  -- Fitpars chi2/ndf     :    " << fitparchi2 / NDFs   << std::endl;
-        // std::cout << "  -- FINAL p VALUE decaychain: " << TMath::Prob(decchi2   , NDFs)  << std::endl;
-        // std::cout << "  -- FINAL p VALUE fitpars   : " << TMath::Prob(fitparchi2   , NDFs)  << std::endl;
+        // B2DEBUG(19, "____________________________________________ "  );
+        // B2DEBUG(19, "  -- FINAL chi2 newton    :    " << chi2byndf << " with ndf = " << NDFs );
+        // B2DEBUG(19, "  -- Chains chi2/ndf      :    " << decchi2 / NDFs   );
+        // B2DEBUG(19, "  -- Fitpars chi2/ndf     :    " << fitparchi2 / NDFs   );
+        // B2DEBUG(19, "  -- FINAL p VALUE decaychain: " << TMath::Prob(decchi2   , NDFs)  );
+        // B2DEBUG(19, "  -- FINAL p VALUE fitpars   : " << TMath::Prob(fitparchi2   , NDFs)  );
         //cand.setPValue(TMath::Prob(chiSquare() , nDof()));   //FT: (to do) p-values of fit must be verified
-        //std::cout << "____________________________________________ "  << std::endl;
+        //B2DEBUG(19, "____________________________________________ "  );
         //cand.setPValue(fitparchi2);   //FT: (to do) p-values of fit must be
         B2DEBUG(80, "Fitter::setting PVal: " << TMath::Prob(fitparchi2, NDFs) << " Chi2: " << fitparchi2 << " NDF: " << NDFs);
         cand.setPValue(TMath::Prob(fitparchi2, NDFs));   //FT: (to do) p-values of fit must be verified
@@ -663,12 +663,12 @@ namespace TreeFitter {
         //double decchi2 = m_decaychain->getChainsChi2(m_fitparams);
         double fitparchi2 = m_fitparams->chiSquare();
 
-        // std::cout << "____________________________________________ "  << std::endl;
-        // std::cout << "  -- FINAL chi2 newton    :    " << chi2byndf << " with ndf = " << NDFs << std::endl;
-        // std::cout << "  -- Chains chi2/ndf      :    " << decchi2 / NDFs   << std::endl;
-        // std::cout << "  -- FINAL p VALUE decaychain: " << TMath::Prob(decchi2   , NDFs)  << std::endl;
+        // B2DEBUG(19, "____________________________________________ "  );
+        // B2DEBUG(19, "  -- FINAL chi2 newton    :    " << chi2byndf << " with ndf = " << NDFs );
+        // B2DEBUG(19, "  -- Chains chi2/ndf      :    " << decchi2 / NDFs   );
+        // B2DEBUG(19, "  -- FINAL p VALUE decaychain: " << TMath::Prob(decchi2   , NDFs)  );
         //cand.setPValue(TMath::Prob(chiSquare() , nDof()));   //FT: (to do) p-values of fit must be verified
-        //std::cout << "____________________________________________ "  << std::endl;
+        //B2DEBUG(19, "____________________________________________ "  );
         //cand.setPValue(fitparchi2);   //FT: (to do) p-values of fit must be verified
         //
         B2DEBUG(80, "   Fitter::setting PVal: " << TMath::Prob(fitparchi2,
@@ -769,8 +769,7 @@ namespace TreeFitter {
   {
     // returns the decaylength in the lab frame
     TVector2 rc;
-//    std::cout << pb->tauIndex() << " tau index " << pb->name() << " momindex " << pb->momIndex() << " posindex  " << pb->posIndex() <<
-//              std::endl;
+//    B2DEBUG(19, pb->tauIndex() << " tau index " << pb->name() << " momindex " << pb->momIndex() << " posindex  " << pb->posIndex() );
     if (pb->tauIndex() >= 0 && pb->mother()) {
       // one can calculate the error in many ways. I managed to make
       // them all agree, with a few outliers. this one seems to be
@@ -817,8 +816,8 @@ namespace TreeFitter {
 
 
       rc.SetX(len);
-      //std::cout << "calculated decay length of " << len << " +- " << std::sqrt(fitparams->cov(indexvec).similarity(
-      //            jacobian)) << std::endl;
+      //B2DEBUG(19, "calculated decay length of " << len << " +- " << std::sqrt(fitparams->cov(indexvec).similarity(
+      //            jacobian)) );
       rc.SetY(fitparams->cov(indexvec).similarity(jacobian));
       //rc.SetY(fitparams->cov(indexvec));
     }

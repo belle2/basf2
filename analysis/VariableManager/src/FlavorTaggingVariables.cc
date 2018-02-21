@@ -891,9 +891,7 @@ namespace Belle2 {
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
             B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
-            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
-            << endl <<
-            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda.\nThe possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -953,9 +951,7 @@ namespace Belle2 {
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
             B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
-            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
-            << endl <<
-            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda.\nThe possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 

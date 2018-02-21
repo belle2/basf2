@@ -110,9 +110,9 @@ namespace Belle2 {
       /** Print all attributes of this object to terminal*/
       void Print() const
       {
-        std::cout << "useBeamSpot: " << m_useBeamSpot << std::endl;
-        std::cout << "number of rave::Tracks: " << m_raveTracks.size() << std::endl;
-        std::cout << "number of fitted  rave::Vertices: " << m_raveVertices.size() << std::endl;
+        B2DEBUG(19, "useBeamSpot: " << m_useBeamSpot);
+        B2DEBUG(19, "number of rave::Tracks: " << m_raveTracks.size());
+        B2DEBUG(19, "number of fitted  rave::Vertices: " << m_raveVertices.size());
 
       }
       /** return the number of tracks that where added via addTrack or addMother*/

@@ -160,7 +160,7 @@ namespace TreeFitter {
   ErrCode InternalParticle::initPar1(FitParams* fitparams)
   {
 
-    //std::cout << "Initilizing :" << this->name()  << std::endl;
+    //B2DEBUG(19, "Initilizing :" << this->name()  );
 
     // This is the most complicated part of the vertexer: an
     // initialization that always works.
@@ -176,9 +176,9 @@ namespace TreeFitter {
     // D0->pi0Ks, because the D0 is initialized before there is a B
     // vertex.
     if (vtxverbose >= 3)
-      std::cout << "InternalParticle::initPar: "
-                << particle()->getName() << " " << m_daughters.size() << " "
-                << hasPosition() << " " << posIndex() << std::endl ;
+      B2DEBUG(19, "InternalParticle::initPar: "
+              << particle()->getName() << " " << m_daughters.size() << " "
+              << hasPosition() << " " << posIndex());
     ErrCode status ;
     int posindex = posIndex();
 
@@ -207,7 +207,7 @@ namespace TreeFitter {
       if (vtx.Mag()) { //if it's not zero
         // we found an existing valid vertex. that's fine as well ...
         if (vtxverbose >= 2) {
-          std::cout << "using existing vertex: " << std::endl ;
+          B2DEBUG(19, "using existing vertex: ");
           vtx.Print();
         }
 
@@ -283,7 +283,7 @@ namespace TreeFitter {
             linetrajectories.reserve(  vtxdaughters.size() ) ;
             for(ParticleBase::Iter it = vtxdaughters.begin() ;
           it != vtxdaughters.end() ; ++it) {
-              //std::cout << (*it)->bc()->pdtEntry()->name() << std::endl ;
+              //B2DEBUG(19, (*it)->bc()->pdtEntry()->name() );
               int dauposindex = (*it)->posIndex() ;
               int daumomindex = (*it)->momIndex() ;
               HepPoint point(fitparams->par()(dauposindex+1),
@@ -328,11 +328,11 @@ namespace TreeFitter {
         } else {
           // something is wrong!
           //    BtaPrintTree treeprinter ;
-          std::cout << "There are not sufficient geometric constraints to fit "
-                    << "this decay tree. Perhaps you should add a beam constraint. "
-                    << " This happend for a " << this->name() << " candidate." <<
-                    //      << bc()->constraint(BtaConstraint::Beam)
-                    std::endl ;
+          B2DEBUG(19, "There are not sufficient geometric constraints to fit "
+                  << "this decay tree. Perhaps you should add a beam constraint. "
+                  << " This happend for a " << this->name() << " candidate."
+                  //      << bc()->constraint(BtaConstraint::Beam)
+                 );
           //    << treeprinter.print(*bc()) << endmsg ;
           status |= ErrCode::badsetup;
         }
@@ -345,11 +345,11 @@ namespace TreeFitter {
     // step 4: initialize the momentum by adding up the daughter 4-vectors
     initMom(fitparams);
     if (vtxverbose >= 3)
-      std::cout << "End of initpar: "
-                << particle()->getName() << " ("
-                << fitparams->par()(posindex + 1) << ","
-                << fitparams->par()(posindex + 2) << ","
-                << fitparams->par()(posindex + 3) << ")" << std::endl ;
+      B2DEBUG(19, "End of initpar: "
+              << particle()->getName() << " ("
+              << fitparams->par()(posindex + 1) << ","
+              << fitparams->par()(posindex + 2) << ","
+              << fitparams->par()(posindex + 3) << ")");
 
     return status;
   }
@@ -545,7 +545,7 @@ namespace TreeFitter {
            fitparams->getStateVector().segment(daumomindex, maxrow);
       fitparams->getStateVector().segment(momindex, maxrow) += fitparams->getStateVector().segment(daumomindex, maxrow);
       //:w
-      //std::cout << "InternalParticle::initMomentum\n " << fitparams->getStateVector().segment(momindex, maxrow) << std::endl;
+      //B2DEBUG(19, "InternalParticle::initMomentum\n " << fitparams->getStateVector().segment(momindex, maxrow) );
       if (maxrow == 3) {
         mass = (*it)->pdgMass();
         fitparams->getStateVector()(momindex + 3) += sqrt(e2 + mass * mass);
@@ -647,7 +647,7 @@ namespace TreeFitter {
   ErrCode InternalParticle::projectKineConstraintCopy(const FitParams& fitparams,
                                                       Projection& p) const
   {
-    // std::cout << "KINE______________________________________________ "   << std::endl;
+    // B2DEBUG(19, "KINE______________________________________________ "   );
 
     // first add the mother
     int momindex = momIndex();
@@ -656,7 +656,7 @@ namespace TreeFitter {
     for (int imom = 0; imom < 4; ++imom) {
       p.getH()(imom, momindex + imom) = 1;
     }
-//    std::cout << "init E" << p.getResiduals()(3)  << std::endl;
+//    B2DEBUG(19, "init E" << p.getResiduals()(3)  );
     // now add the daughters
     const double posprecision = 1e-4; // 1mu
     int dautauindex = 0, daumomindex = 0, maxrow = 0;
@@ -667,22 +667,22 @@ namespace TreeFitter {
       mass = (*it)->pdgMass();
       maxrow = (*it)->hasEnergy() ? 4 : 3;
       e2 = mass * mass;
-      //    std::cout << "e2 = mass * mass " << e2 << " " << (*it)->name()  << std::endl;
+      //    B2DEBUG(19, "e2 = mass * mass " << e2 << " " << (*it)->name()  );
       //e2 += fitparams.getStateVector().segment(daumomindex, maxrow).transpose() * fitparams.getStateVector().segment(daumomindex, maxrow);
       //p.getResiduals().segment(0, maxrow) -= fitparams.getStateVector().segment(0, maxrow);
       for (int imom = 0; imom < maxrow; ++imom) {
         px = fitparams.getStateVector()(daumomindex + imom);
         e2 += px * px;
-        //    std::cout << "e2 += px " << e2  << " daumomindex " << daumomindex   << std::endl;
+        //    B2DEBUG(19, "e2 += px " << e2  << " daumomindex " << daumomindex   );
         p.getResiduals()(imom) += -px;
         p.getH()(imom, daumomindex + imom) = -1;
       }
       if (maxrow == 3) {
         // treat the energy for particles that are parameterized with p3
         energy = sqrt(e2);
-        //  std::cout << "before substracting E " << p.getResiduals()(3)  << std::endl;
+        //  B2DEBUG(19, "before substracting E " << p.getResiduals()(3)  );
         p.getResiduals()(3) += -energy;
-        //  std::cout << "after substracting E " << p.getResiduals()(3) << " energy  " << energy  << std::endl;
+        //  B2DEBUG(19, "after substracting E " << p.getResiduals()(3) << " energy  " << energy  );
         for (int jmom = 0; jmom < 3; ++jmom) {
           px = fitparams.getStateVector()(daumomindex + jmom);
           p.getH()(3, daumomindex + jmom) = -px / energy;
@@ -710,13 +710,13 @@ namespace TreeFitter {
           p.getH()(1, dautauindex) -= lambda * px;
         }
       }
-      // std::cout << "daughter " << (*it)->name() << " energy " << p.getResiduals()(3)  << std::endl;
-      // std::cout << "daughter " << (*it)->name() << " H\n" << p.getH()  << std::endl;
+      // B2DEBUG(19, "daughter " << (*it)->name() << " energy " << p.getResiduals()(3)  );
+      // B2DEBUG(19, "daughter " << (*it)->name() << " H\n" << p.getH()  );
 
     }
 
-//   std::cout << "final energy" << p.getResiduals()(3)  << std::endl;
-    //std::cout << " H\n" << p.getH()  << std::endl;
+//   B2DEBUG(19, "final energy" << p.getResiduals()(3)  );
+    //B2DEBUG(19, " H\n" << p.getH()  );
 
 
 

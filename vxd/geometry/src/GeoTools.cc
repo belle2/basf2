@@ -55,6 +55,9 @@ void GeoTools::createListOfPXDChips()
   std::vector<unsigned short> sensorChips(c_nPXDChipsU + c_nPXDChipsV);
   std::iota(sensorChips.begin(), sensorChips.end(), 0);
   for (auto sensorID : m_listOfSensors) {
+    if (sensorID.getLayerNumber() < getFirstPXDLayer() ||
+        sensorID.getLayerNumber() > getLastPXDLayer())
+      continue;
     std::vector<VxdID> sensorIDs;
     std::transform(
       sensorChips.begin(), sensorChips.end(),
@@ -75,6 +78,9 @@ void GeoTools::createListOfSVDChips()
   std::vector<unsigned short> sensorChipsL3(2 * c_nSVDChipsL3);
   std::iota(sensorChipsL3.begin(), sensorChipsL3.end(), 0);
   for (auto sensorID : m_listOfSensors) {
+    if (sensorID.getLayerNumber() < getFirstSVDLayer() ||
+        sensorID.getLayerNumber() > getLastSVDLayer())
+      continue;
     std::vector<VxdID> sensorIDs;
     std::vector<unsigned short>& sensorChips =
       sensorID.getLayerNumber() == 3 ? sensorChipsL3 : sensorChipsL456;

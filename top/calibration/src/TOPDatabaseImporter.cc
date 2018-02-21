@@ -823,7 +823,7 @@ namespace Belle2 {
       //in case entries for the same channel appears multiple time, use data with smaller reduced chisquare
       //(This can happen when distribution is fit manually and results are appended for channels with fit failure)
       if (reducedChisqMap.count(globalChannelNumber) == 0
-          || reducedChisqMap[globalChannelNumber] > redChisq) {
+          or reducedChisqMap[globalChannelNumber] > redChisq) {
         reducedChisqMap[globalChannelNumber] = redChisq;
         calChannelPulseHeight->setParameters(slotId, channel, x0, p1, p2);
         calChannelThresholdEff->setThrEff(slotId, channel, efficiency, (short)threshold);

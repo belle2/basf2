@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace Variable {
 
     /** particle Klid. -999 if error */
-    double particleKLMKlId(const Particle* particle);
+    double particleKLMKlongID(const Particle* particle);
 
     /**get Belle stle track flag */
     int particleKLMBelleTrackFlag(const Particle* particle);

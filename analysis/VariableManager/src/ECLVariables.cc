@@ -26,9 +26,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 
-//ECL
-#include <ecl/dataobjects/ECLShower.h>
-
 //ROOT
 #include <TVector3.h>
 
@@ -40,9 +37,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getDetectorRegion();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getDetectorRegion();
 
       return result;
     }
@@ -51,9 +48,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getMinTrkDistance();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getMinTrkDistance();
 
       return result;
     }
@@ -62,9 +59,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getConnectedRegionId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getConnectedRegionId();
 
       return result;
     }
@@ -73,9 +70,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getDeltaL();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getDeltaL();
 
       return result;
     }
@@ -200,9 +197,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getUncertaintyEnergy();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getUncertaintyEnergy();
       }
       return result;
     }
@@ -211,9 +208,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergyRaw();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getEnergyRaw();
       }
       return result;
     }
@@ -222,9 +219,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergy();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getEnergy();
       }
       return result;
     }
@@ -233,9 +230,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergyHighestCrystal();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getEnergyHighestCrystal();
       }
       return result;
     }
@@ -244,9 +241,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getTime();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getTime();
       }
       return result;
     }
@@ -255,9 +252,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getDeltaTime99();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getDeltaTime99();
       }
       return result;
     }
@@ -266,9 +263,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getTheta();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getTheta();
       }
       return result;
     }
@@ -277,9 +274,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getPhi();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getPhi();
       }
       return result;
     }
@@ -288,9 +285,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getR();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getR();
       }
       return result;
     }
@@ -299,9 +296,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getE1oE9();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getE1oE9();
       }
       return result;
     }
@@ -310,9 +307,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getE9oE21();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getE9oE21();
       }
       return result;
     }
@@ -321,9 +318,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getAbsZernike40();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getAbsZernike40();
       }
       return result;
     }
@@ -332,9 +329,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getAbsZernike51();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getAbsZernike51();
       }
       return result;
     }
@@ -343,9 +340,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getZernikeMVA();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getZernikeMVA();
       }
       return result;
     }
@@ -354,9 +351,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getSecondMoment();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getSecondMoment();
       }
       return result;
     }
@@ -365,9 +362,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getLAT();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getLAT();
       }
       return result;
     }
@@ -376,9 +373,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        //result = shower->getMergedPi0();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        //result = cluster->getMergedPi0();
       }
       return result;
     }
@@ -387,9 +384,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getNumberOfCrystals();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getNumberOfCrystals();
       }
       return result;
     }
@@ -398,9 +395,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        const Track* track = shower->getRelated<Track>();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        const Track* track = cluster->getRelated<Track>();
 
         if (track)
           result = 1.0;
@@ -413,9 +410,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getConnectedRegionId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getConnectedRegionId();
       }
       return result;
     }
@@ -424,9 +421,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getUniqueId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getUniqueId();
       }
       return result;
     }
@@ -435,9 +432,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getClusterId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getClusterId();
       }
       return result;
     }
@@ -446,9 +443,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getHypothesisId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getHypothesisId();
       }
       return result;
     }
@@ -457,12 +454,12 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        const bool matcher = shower->hasTriggerClusterMatching();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        const bool matcher = cluster->hasTriggerClusterMatching();
 
         if (matcher) {
-          result = shower->isTriggerCluster();
+          result = cluster->isTriggerCluster();
         } else {
           B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
         }

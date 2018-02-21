@@ -229,6 +229,44 @@ namespace Belle2 {
         return getCellID() < x.getCellID();
     }
 
+    /**
+     * mark the strip as hot
+     * @param max numner of samples above threshold
+     * @param SN threshold
+     * @return true if the strip is hot, false otherwise
+     */
+    bool passesZS(int nSamples, float cutMinSignal) const
+    {
+      int nOKSamples = 0;
+      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++)
+        if (samples_vec[k] > cutMinSignal)
+          nOKSamples++;
+
+      if (nOKSamples >= nSamples)
+        return true;
+
+      return false;
+    }
+
+
+    /** returns the number of samples, 6, 3 or 1 */
+    int getNSamples() const
+    {
+
+      SVDModeByte thisMode(m_mode);
+      int modality = (int)thisMode.getDAQMode();
+
+      if (modality == 2)
+        return 6;
+      else if (modality == 1)
+        return 3;
+      else if (modality == 0)
+        return 1;
+
+      return -1;
+    }
+
   private:
 
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/

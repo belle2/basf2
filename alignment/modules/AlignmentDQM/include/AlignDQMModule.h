@@ -44,7 +44,6 @@ namespace Belle2 {
     void beginRun() override final;
     void event() override final;
     void endRun() override final;
-    void terminate() override final;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -167,62 +166,6 @@ namespace Belle2 {
     TH1F* m_TracksVXDCDC;
     /** Number of all finding tracks */
     TH1F* m_Tracks;
-
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
-    /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
-    /** Maximum No of PXD ladders on layer */
-    unsigned int c_MaxLaddersInPXDLayer;
-    /** Maximum No of SVD ladders on layer */
-    unsigned int c_MaxLaddersInSVDLayer;
-    /** Maximum No of PXD sensors on layer */
-    unsigned int c_MaxSensorsInPXDLayer;
-    /** Maximum No of SVD sensors on layer */
-    unsigned int c_MaxSensorsInSVDLayer;
-    /** No of PXD sensors */
-    int c_nPXDSensors;
-    /** No of SVD sensors */
-    int c_nSVDSensors;
-
-    /** Function return index of layer in plots.
-       * @param Layer Layer position.
-       * @return Index of layer in plots.
-       */
-    int getLayerIndex(const int Layer) const;
-    /** Function return index of layer in plots.
-       * @param Index Index of layer in plots.
-       * @param Layer return layer position.
-       */
-    void getLayerIDsFromLayerIndex(const int Index, int& Layer) const;
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor.
-       * @param Ladder Ladder position of sensor.
-       * @param Sensor Sensor position of sensor.
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor.
-       * @param Ladder return Ladder position of sensor.
-       * @param Sensor return Sensor position of sensor.
-       */
-    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
 
   };  //end class declaration
 

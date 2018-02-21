@@ -59,13 +59,11 @@ main.add_module('HistoManager', histoFileName='Histos_DQMAlign_Phase2.root')
 # main.add_module('HistoManager', histoFileName='Histos_DQMTracks_BelleII.root')
 
 pxddqmExpReco = register_module('PXDDQMExpressReco')
-svddqmExpRecoMin = register_module('SVDDQMExpressRecoMin')
 svddqmExpReco = register_module('SVDDQMExpressReco')
-vxddqmExpRecoMin = register_module('VXDDQMExpressRecoMin')
 vxddqmExpReco = register_module('VXDDQMExpressReco')
 main.add_module(pxddqmExpReco)
-main.add_module(svddqmExpRecoMin)
-main.add_module(vxddqmExpRecoMin)
+main.add_module(svddqmExpReco)
+main.add_module(vxddqmExpReco)
 # # The following should do the same as above
 # add_common_dqm(main,['PXD', 'SVD'])
 

@@ -68,6 +68,8 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
   addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
   addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);
+  addParam("IgnoreDHPMask", m_ignoreDHPMask, "Ignore active DHP mask in DHE (Ghost frame issue)", true);
+  addParam("IgnoreDHELength", m_ignoreDHELength, "Ignore Length in DHE (GHOST frame issue)", true);
   addParam("MaxDHPFrameDiff", m_maxDHPFrameDiff, "Maximum DHP Frame Nr Difference w/o reporting error", 2u);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
@@ -453,7 +455,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
-    B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 " << dhe_first_readout_frame_id_lo << " != " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
+    B2ERROR("DHP Frame Nr differ from DHE Frame Nr by >1 DHE " << dhe_first_readout_frame_id_lo << " != DHP " << (dhp_readout_frame_lo & 0x3F) << " delta "<< ((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) );
     m_errorMask |= EPXDErrMask::c_DHP_DHE_FRAME_DIFFER;
   }
   */
@@ -985,8 +987,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       }
       m_errorMask |= dhc.check_crc();
       if (found_mask_active_dhp != mask_active_dhp) {
-        B2WARNING("DHE_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp <<
-                  " mask of found dhp/ghost frames");
+        if (!m_ignoreDHPMask) B2WARNING("DHE_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp <<
+                                          " mask of found dhp/ghost frames");
         m_errorMask |= EPXDErrMask::c_DHP_ACTIVE;
       }
       countedDHEEndFrames++;
@@ -999,7 +1001,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         w = dhc.data_dhe_end_frame->get_words() * 2;
         if (countedBytesInDHE >= 0) {
           if (countedBytesInDHE != w) {
-            B2ERROR("Error: WIE $" << hex << countedBytesInDHE << " != DHE END $" << hex << w);
+            if (!m_ignoreDHELength) B2ERROR("Error: WIE $" << hex << countedBytesInDHE << " != DHE END $" << hex << w);
             m_errorMask |= EPXDErrMask::c_DHE_WIE;
           } else {
             if (verbose)

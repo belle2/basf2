@@ -37,7 +37,6 @@
 
 
 namespace Belle2 {
-
   /** The Segment Network Producer Module.
    *
    * This module takes a provided sectorMap and StoreArrays of spacePoints and creates an activeSectorNetwork,
@@ -69,10 +68,8 @@ namespace Belle2 {
       std::vector<Belle2::TrackNode*> hits;
     };
 
-
     /// Constructor of the module.
     SegmentNetworkProducerModule();
-
 
     /// Modul initialization: performing checks on input parameter and registration of network container in data store.
     void initialize() override;
@@ -81,10 +78,10 @@ namespace Belle2 {
     void beginRun() override
     {
       m_vxdtfFilters = m_filtersContainer.getFilters(m_PARAMsecMapName);
-      if (m_vxdtfFilters == nullptr) B2FATAL("Requested secMapName '" << m_PARAMsecMapName
-                                               << "' does not exist! Can not continue...");
+      if (m_vxdtfFilters == nullptr) {
+        B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
+      }
     }
-
 
     /** Event function
      *  - Creation of TrackNodes form SpacePoints

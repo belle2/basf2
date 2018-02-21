@@ -98,8 +98,9 @@ void SegmentNetworkProducerModule::initialize()
   // Get pointer to current filters to check if they exist. They must be reloaded for every run,
   // as the pointer will change if the DB object changes (see SectorMapBootStrapModule).
   auto filters = m_filtersContainer.getFilters(m_PARAMsecMapName);
-  if (filters == nullptr) B2FATAL("Requested secMapName '" << m_PARAMsecMapName
-                                    << "' does not exist! Can not continue...");
+  if (filters == nullptr) {
+    B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
+  }
 
   m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0),
                                       m_PARAMVirtualIPCoordinates.at(1),

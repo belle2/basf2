@@ -240,6 +240,20 @@ namespace Belle2 {
       return false;
     }
 
+    bool passesZS(int nSamples, float cutMinSignal) const
+    {
+      int nOKSamples = 0;
+      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++)
+        if (samples_vec[k] > cutMinSignal)
+          nOKSamples++;
+
+      if (nOKSamples >= nSamples)
+        return true;
+
+      return false;
+    }
+
 
     /** returns the number of samples, 6, 3 or 1 */
     int getNSamples() const

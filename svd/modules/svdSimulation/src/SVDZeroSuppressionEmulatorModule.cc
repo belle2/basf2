@@ -24,19 +24,19 @@ REG_MODULE(SVDZeroSuppressionEmulator)
 
 SVDZeroSuppressionEmulatorModule::SVDZeroSuppressionEmulatorModule() : Module()
 {
-  setDescription("Filters out SVDShaperDigit with only one sample above a certain threshold, by default set at SN > 3.");
+  setDescription("Filters out SVDShaperDigit with less than 1 (default) sample is below a certain threshold, by default set at SN = 3.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("ShaperDigitsIN", m_SVDShaperDigitsIN,
-           "Kept ShaperDigits collection name, kept", string(""));
+           "Kept ShaperDigits collection name", string(""));
   addParam("ShaperDigitsOUT", m_SVDShaperDigitsOUT,
            "ShaperDigits collection name", string(""));
   addParam("SNthreshold", m_cutSN,
-           "minimum SN to not be filtered out", float(3));
+           "minimum SN to be kept", float(3));
   addParam("numberOfSamples", m_nSample,
-           "number of samples below threshold to filter out strip ", int(1));
+           "number of samples above threshold to be kept ", int(1));
   addParam("createOUTStripsList", m_createOutside,
            "create the StoreArray of outside strips", bool(false));
 
@@ -69,10 +69,10 @@ void SVDZeroSuppressionEmulatorModule::event()
   // If no digits, nothing to do
   if (!m_storeShaper || !m_storeShaper.getEntries()) return;
 
-  m_selectorIN.select([&](const SVDShaperDigit * shaper) { return ! this->passesZS(shaper) ;});
+  m_selectorIN.select([&](const SVDShaperDigit * shaper) { return this->passesZS(shaper) ;});
 
   if (m_createOutside)
-    m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return this->passesZS(shaper) ;});
+    m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return ! this->passesZS(shaper) ;});
 
   B2DEBUG(10, "     shaper digits = " << m_storeShaper.getEntries() <<
           ", shaper digits IN = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()));

@@ -149,13 +149,19 @@ namespace Belle2 {
      * Returns the threshold value used for efficiency evaluation
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @return offlineThreshold
+     * @return offlineThreshold (in a unit of ADC counts)
      */
-    float getOfflineThreshold(int moduleID, unsigned channel) const
+    short getOfflineThreshold(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return false;
-      if (channel >= c_numChannels) return false;
+      if (module >= c_numModules) {
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Invalid channel number, returning 0 (" << ClassName() << ")");
+        return 0;
+      }
       return m_offlineThreshold[module][channel];
     }
 

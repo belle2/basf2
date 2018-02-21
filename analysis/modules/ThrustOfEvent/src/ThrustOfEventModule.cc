@@ -59,8 +59,6 @@ void ThrustOfEventModule::initialize()
   thrustOfEvt.registerInDataStore();
 
   unsigned nParticleLists = m_particleLists.size();
-  for (unsigned i = 0; i < nParticleLists; ++i) {
-  }
   B2INFO("Number of ParticleLists to calculate Thrust: " << nParticleLists << " ");
 }
 

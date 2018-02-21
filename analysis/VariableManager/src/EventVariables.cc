@@ -320,8 +320,8 @@ namespace Belle2 {
     {
       StoreObjPtr<ThrustOfEvent> thrust;
       if (!thrust) {
-        B2WARNING("Cannot find thrust information.");
-        return -1.0;
+        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+        return std::numeric_limits<float>::quiet_NaN();
       }
       double th = thrust->getThrust();
       return th;

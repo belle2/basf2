@@ -59,10 +59,10 @@ void NtupleEventShapeTool::eval(const Particle* particle)
       m_fThrustVector[i] = thr(i);
     }
   } else {
-    B2WARNING("NtupleEventShapeTool::Thrust of event not found.");
-    m_fThrustValue = -1;
+    B2WARNING("Thrust of event not found, did you forget to run ThrustOfEventModule?");
+    m_fThrustValue = std::numeric_limits<float>::quiet_NaN();
     for (int i = 0; i < 3; i++) {
-      m_fThrustVector[i] = -1;
+      m_fThrustVector[i] = std::numeric_limits<float>::quiet_NaN();
     }
   }
 

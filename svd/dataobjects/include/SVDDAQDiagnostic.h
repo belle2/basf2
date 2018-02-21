@@ -12,13 +12,13 @@
 #define SVDDAQDIAGNOSTICS_H
 
 #include <cstdint>
-#include <framework/dataobjects/DigitBase.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /**
    * Class to store SVD DAQ diagnostic information
    */
-  class SVDDAQDiagnostic : public TObject {
+  class SVDDAQDiagnostic : public RelationsObject {
   public:
     enum {
       /** Number of bits available to represent a trigger type */
@@ -61,7 +61,7 @@ namespace Belle2 {
      * @param ftbError Errors field as in the FTB header
      */
     SVDDAQDiagnostic(uint8_t triggerNumber, uint8_t triggerType, uint8_t pipelineAddress, uint8_t cmc1, uint8_t cmc2, uint8_t apvError,
-                     uint8_t ftbError, bool fadcMatch)
+                     uint8_t ftbError, bool fadcMatch, uint8_t fadcNo = uint8_t(0), uint8_t apvNo = uint8_t(0))
 
     {
       m_triggerNumber = triggerNumber;
@@ -77,10 +77,12 @@ namespace Belle2 {
       m_emuPipelineAddress = 0;
       m_apvErrorOR = 0;
       m_apvMatch = 0;
+      m_fadcNo = fadcNo;
+      m_apvNo = apvNo;
     }
 
     /** Default constructor */
-    SVDDAQDiagnostic(): SVDDAQDiagnostic(0, 0, 0, 0, 0, 0, 0, false) {}
+    SVDDAQDiagnostic(): SVDDAQDiagnostic(0, 0, 0, 0, 0, 0, 0, false, 0, 0) {}
 
     /** Get the trigger number */
     uint16_t getTriggerNumber() const { return static_cast<uint16_t>(m_triggerNumber); }
@@ -106,6 +108,11 @@ namespace Belle2 {
     bool getAPVMatch() const {return m_apvMatch; }
     /** Get the FADCmatch code */
     bool getFADCMatch() const {return m_fadcMatch; }
+    /** Get FADC number */
+    unsigned short getFADCNumber() const { return m_fadcNo; }
+    /** Get APV number */
+    unsigned short getAPVNumber() const { return m_apvNo; }
+
 
     /** functions for setting values unpacked from FADC trailer
      * - FTB Flags Field
@@ -143,8 +150,12 @@ namespace Belle2 {
     bool m_fadcMatch;
     /**if # of APV headers match # of APVs for given FADC */
     bool m_apvMatch;
+    /**FADC # */
+    uint8_t m_fadcNo;
+    /**APV # */
+    uint8_t m_apvNo;
 
-    ClassDef(SVDDAQDiagnostic, 1)
+    ClassDef(SVDDAQDiagnostic, 3)
   }; // class SVDDAQDiagnostic
 } // namespace Belle2
 

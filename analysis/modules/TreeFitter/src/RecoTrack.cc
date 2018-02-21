@@ -97,7 +97,7 @@ namespace TreeFitter {
     int momindex = momIndex();
 
     for (int row = 0; row < 3; ++row) {
-      //B2DEBUG(19, "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]  );
+      //B2DEBUG(19, "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]);
       fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
     B2DEBUG(85, "----------     RecoTrack::initCovariance to:\n" << fitparams->getCovariance());
@@ -238,15 +238,15 @@ namespace TreeFitter {
     helixpars[HelixUtils::iTanLambda] = helix.getTanLambda();
 
     if (vtxverbose >= 5) {
-      B2DEBUG(19, "vertex position = ");
-      position.Print(); B2DEBUG(19, "");
-      B2DEBUG(19, "vertex momentum = ");
-      momentum.Print(); B2DEBUG(19, "") ;
-      B2DEBUG(19, "helix = " << helixpars.T());
-      B2DEBUG(19, "flt   = " << flt);
-      B2DEBUG(19, "m   = " << m_m.T());
-      B2DEBUG(19, "sig = " << symdiag(m_matrixV).T());
-      B2DEBUG(19, "V matrix = " << m_matrixV);
+      std::cout << "vertex position = ";
+      position.Print(); std::cout << std::endl ;
+      std::cout << "vertex momentum = ";
+      momentum.Print(); std::cout << std::endl ;
+      std::cout << "helix = " << helixpars.T() << std::endl ;
+      std::cout << "flt   = " << flt << std::endl ;
+      std::cout << "m   = " << m_m.T() << std::endl ;
+      std::cout << "sig = " << symdiag(m_matrixV).T() << std::endl ;
+      std::cout << "V matrix = " << m_matrixV << std::endl ;
     }
 
     // fill the residual and cov matrix
@@ -258,12 +258,14 @@ namespace TreeFitter {
     }
 
     // bring phi-residual in the correct domain ([-pi,pi])
-    if (vtxverbose >= 8)     B2DEBUG(19, "bring phi-residual in the correct domain ([-pi,pi]): " << p.r(2));
+    std::ostringstream stream;
+    if (vtxverbose >= 8)  stream  << "bring phi-residual in the correct domain ([-pi,pi]): " << p.r(2);
     p.r(2) = HelixUtils::phidomain(p.r(2));
     if (vtxverbose >= 8) {
-      B2DEBUG(19, " -> " << p.r(2));
-      B2DEBUG(19, "And now the Jacobian:");
-      B2DEBUG(19, jacobian);
+      stream << " -> " << p.r(2) << std::endl;
+      stream << "And now the Jacobian:" << std::endl;
+      stream << jacobian << std::endl;
+      B2DEBUG(19, stream.str());
     }
     // FIX ME: bring z0 residual in the correct domain --> this needs some thinking
 
@@ -282,7 +284,7 @@ namespace TreeFitter {
     }
 
     if (vtxverbose >= 8) {
-      B2DEBUG(19, "And now the H matrix:");
+      B2DEBUG(19, "And now the H matrix:\n");
       B2DEBUG(19, p.H());
     }
     return status;
@@ -346,17 +348,17 @@ namespace TreeFitter {
     for (int row = 0; row < 5; ++row) {
       // the position
       for (int col = 0; col < 3; ++col) {
-//        B2DEBUG(19, "WRITING INTO H pos" << jacobian(row, col)  );
+//        B2DEBUG(19, "WRITING INTO H pos" << jacobian(row, col) );
         p.getH()(row, posindexmother + col) = jacobian(row + 1, col + 1);
       }
       // the momentum
       for (int col = 0; col < 3; ++col) {
-//        B2DEBUG(19, "WRITING INTO H mom" << jacobian(row, col + 3)  );
+//        B2DEBUG( "WRITING INTO H mom" << jacobian(row, col + 3));
         p.getH()(row, momindex + col) = jacobian(row + 1, col + 4);
       }
     }
-    //B2DEBUG(19, "projected track residuals \n" << p.getResiduals().transpose() );
-    //B2DEBUG(19, "projected track p.getH()\n" << p.getH() );
+    //B2DEBUG(19, "projected track residuals \n" << p.getResiduals().transpose())
+    //B2DEBUG(19, "projected track p.getH()\n" << p.getH());
     return status;
   }
   ErrCode  RecoTrack::projectRecoConstraintCopy(const FitParams& fitparams, Projection& p) const

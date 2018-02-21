@@ -3,82 +3,31 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler, Felix Metzner                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-// stl:
 #include <vector>
 #include <unordered_map>
 
-// fw:
 #include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 
 
 namespace Belle2 {
-
   template<typename EntryType, typename MetaInfoType>
   class DirectedNodeNetwork {
-  public:
-    /** typedef for more readable Node-Type */
-    typedef DirectedNode<EntryType, MetaInfoType> Node;
-    typedef std::int64_t NodeID; // NodeID should be some unique integer
-
   protected:
-
-    /** ************************* DATA MEMBERS ************************* */
-
-    /** carries all nodes */
-    std::unordered_map<NodeID, Node*> m_nodeMap;
-
-    /** temporal storage for last outer node added, used for speed-up */
-    NodeID m_lastOuterNodeID;
-
-
-    /** temporal storage for last inner node added, used for speed-up */
-    NodeID m_lastInnerNodeID;
-
-    /** keeps track of the state of the network to fill the vectors m_nodes, m_outerEnds, m_innerEnds only if required */
-    bool m_isFinalized;
-
-    /** After the network is finalized this vector will also carry all nodes to be able to keep the old interface.
-     * This shouldn't affect the performance drastically in comparison to directly accessing the nodeMap.
-     */
-    std::vector<Node*> m_nodes;
-
-    /** keeps track of current outerEnds (nodes which have no outerNodes) - entries are the NodeIDs of the nodes which currently form an outermost node */
-    std::vector<Node*> m_outerEnds;
-
-
-    /** keeps track of current innerEnds (nodes which have no innerNodes) - entries are the NodeIds of the nodes which currently form an innermost node */
-    std::vector<Node*> m_innerEnds;
-
-
-    /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
-
-
-    /** links nodes with each other. returns true if everything went well, returns false, if not  */
-    static bool createLink(Node& outerNode, Node& innerNode)
-    {
-      // not successful if one of them was already added to the other one:
-      if (std::find(outerNode.getInnerNodes().begin(), outerNode.getInnerNodes().end(), &innerNode) != outerNode.getInnerNodes().end()) { return false; }
-      if (std::find(innerNode.getOuterNodes().begin(), innerNode.getOuterNodes().end(), &outerNode) != innerNode.getOuterNodes().end()) { return false; }
-
-      outerNode.addInnerNode(innerNode);
-      innerNode.addOuterNode(outerNode);
-      return true;
-    }
+    using Node = DirectedNode<EntryType, MetaInfoType>;
+    /// NodeID should be some unique integer
+    using NodeID = std::int64_t;
 
   public:
-
-
     /** ************************* CONSTRUCTOR/DESTRUCTOR ************************* */
-
-
+    /** Constructor */
     DirectedNodeNetwork() :
       m_lastOuterNodeID(),
       m_lastInnerNodeID(),
@@ -87,7 +36,9 @@ namespace Belle2 {
       m_nodeMap.reserve(50000);
     }
 
-    /** destructor taking care of cleaning up the pointer-mess - WARNING only needed when using classic pointers for the nodes! */
+
+    /** destructor taking care of cleaning up the pointer-mess
+     *  WARNING only needed when using classic pointers for the nodes! */
     ~DirectedNodeNetwork()
     {
       for (auto nodePointer : m_nodeMap) {
@@ -98,7 +49,8 @@ namespace Belle2 {
 
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
-
+    /** Adding new node to nodeMap, if the nodeID is not already present in the nodeMap.
+     *  Returns true if new node was added. */
     bool addNode(NodeID nodeID, EntryType& newEntry)
     {
       if (m_nodeMap.count(nodeID) == 0) {
@@ -178,6 +130,14 @@ namespace Belle2 {
       return createLink(*(m_nodeMap[outerNodeID]), *(m_nodeMap[innerNodeID]));
     }
 
+
+    /** Check if a given entry is already in the network */
+    bool isNodeInNetwork(const NodeID nodeID) const
+    {
+      return m_nodeMap.count(nodeID);
+    }
+
+
     /** Clear directed node network
      * Called to clear the directed node network if its size grows to large.
      * This is necessary to prevent to following modules from processing events with only partly filled networks.
@@ -194,6 +154,7 @@ namespace Belle2 {
       }
       m_nodeMap.clear();
     }
+
 
     /// getters:
     /** returns all nodes which have no outer nodes (but inner ones) and therefore are outer ends of the network */
@@ -212,14 +173,15 @@ namespace Belle2 {
     }
 
 
-    /** returns pointer to the node carrying the entry which is equal to given parameter. If no fitting entry was found, nullptr is returned. */
+    /** Returns pointer to the node carrying the entry which is equal to given parameter.
+     *  If no fitting entry was found, nullptr is returned. */
     Node* getNode(NodeID toBeFound)
     {
       if (m_nodeMap.count(toBeFound)) return m_nodeMap.at(toBeFound);
       else return nullptr;
     }
 
-    /** returns all nodes of the network */
+    /** Returns all nodes of the network */
     std::vector<Node* >& getNodes()
     {
       if (!m_isFinalized) finalize();
@@ -227,7 +189,7 @@ namespace Belle2 {
     }
 
 
-    /** returns iterator for container: begin */
+    /** Returns iterator for container: begin */
     typename std::vector<Node* >::iterator begin()
     {
       if (!m_isFinalized) finalize();
@@ -235,7 +197,7 @@ namespace Belle2 {
     }
 
 
-    /** returns iterator for container: end */
+    /** Returns iterator for container: end */
     typename std::vector<Node* >::iterator end()
     {
       if (!m_isFinalized) finalize();
@@ -243,17 +205,29 @@ namespace Belle2 {
     }
 
 
-    /** returns number of nodes to be found in the network */
+    /** Returns number of nodes to be found in the network */
     unsigned int size() const { return m_nodeMap.size(); }
 
 
-    /** check if a given entry is already in the network */
-    bool isNodeInNetwork(const NodeID nodeID) const
-    {
-      return m_nodeMap.count(nodeID);
-    }
   protected:
+    /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
+    /** links nodes with each other. returns true if everything went well, returns false, if not  */
+    static bool createLink(Node& outerNode, Node& innerNode)
+    {
+      // not successful if one of them was already added to the other one:
+      if (std::find(outerNode.getInnerNodes().begin(), outerNode.getInnerNodes().end(), &innerNode) != outerNode.getInnerNodes().end()) {
+        return false;
+      }
+      if (std::find(innerNode.getOuterNodes().begin(), innerNode.getOuterNodes().end(), &outerNode) != innerNode.getOuterNodes().end()) {
+        return false;
+      }
 
+      outerNode.addInnerNode(innerNode);
+      innerNode.addOuterNode(outerNode);
+      return true;
+    }
+
+    /** Finalizing the NodeNetwork */
     void finalize()
     {
       if (m_isFinalized) return;
@@ -268,5 +242,31 @@ namespace Belle2 {
       }
       m_isFinalized = true;
     }
+
+    /** ************************* DATA MEMBERS ************************* */
+    /** carries all nodes */
+    std::unordered_map<NodeID, Node*> m_nodeMap;
+
+    /** temporal storage for last outer node added, used for speed-up */
+    NodeID m_lastOuterNodeID;
+
+    /** temporal storage for last inner node added, used for speed-up */
+    NodeID m_lastInnerNodeID;
+
+    /** keeps track of the state of the network to fill the vectors m_nodes, m_outerEnds, m_innerEnds only if required */
+    bool m_isFinalized;
+
+    /** After the network is finalized this vector will also carry all nodes to be able to keep the old interface.
+     * This shouldn't affect the performance drastically in comparison to directly accessing the nodeMap.
+     */
+    std::vector<Node*> m_nodes;
+
+    /** keeps track of current outerEnds (nodes which have no outerNodes)
+     *  entries are the NodeIDs of the nodes which currently form an outermost node */
+    std::vector<Node*> m_outerEnds;
+
+    /** keeps track of current innerEnds (nodes which have no innerNodes)
+     *  entries are the NodeIds of the nodes which currently form an innermost node */
+    std::vector<Node*> m_innerEnds;
   };
 }

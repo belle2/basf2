@@ -24,33 +24,58 @@ namespace Belle2 {
 
   namespace Monopoles {
 
-    class G4MonopoleFieldMessenger;
+    /**
+     * Monopole field setup singleton class, that takes care of switching between conventional
+     * particle transportation and monopole transportation.
+     */
     class G4MonopoleEquation;
 
     class G4MonopoleFieldSetup {
     public:
 
+      /**
+       * Switches chord finder between
+       * 1 - basf2 FullSim chord finder
+       * 2 - monopole chord finder
+       * Since monopoles use different equation of motion
+       *
+       * @param val Which chord finder to switch to.
+       */
       void SwitchChordFinder(G4int val);
 
-      static G4MonopoleFieldSetup* GetMonopoleFieldSetup();
+      static G4MonopoleFieldSetup* GetMonopoleFieldSetup(); /**< Returns G4MonopoleFieldSetup instance*/
 
+      /**
+       * Destructor.
+       */
       ~G4MonopoleFieldSetup() ;
 
     private:
 
+      /**
+       * Constructor.
+       */
       G4MonopoleFieldSetup();
+      /**
+       * Copy constructor should be hidden.
+       * @param copy Copy reference.
+       */
+      G4MonopoleFieldSetup(const G4MonopoleFieldSetup& copy);
+      /**
+       * Assignment operator should be hidden.
+       * @param copy Assign reference.
+       */
+      G4MonopoleFieldSetup& operator=(const G4MonopoleFieldSetup& copy);
 
-      G4FieldManager*         GetGlobalFieldManager() ;   // static
+      G4FieldManager*         fFieldManager ; /**< Field manager that holds current chord finder*/
+      G4ChordFinder*          fMonopoleChordFinder ; /**< Chord finder for monopoles*/
+      G4ChordFinder*          fbasf2ChordFinder ; /**< Chord finder taken from FullSim of basf2*/
+      G4MonopoleEquation*     fMonopoleEquation ; /**< Monopole equation of motion*/
+      G4MagneticField*        fMagneticField ; /**< Magnetic field of basf2*/
+      G4MagIntegratorStepper* fMonopoleStepper ; /**< Stepper for monopoles*/
+      G4double                fMinStep ; /**< Minimal step. 1mm is taken as default*/
 
-      G4FieldManager*         fFieldManager ;
-      G4ChordFinder*          fMonopoleChordFinder ;
-      G4ChordFinder*          fbasf2ChordFinder ; //We should not forget the setup that was before switching to monopole physics
-      G4MonopoleEquation*     fMonopoleEquation ;
-      G4MagneticField*        fMagneticField ;
-      G4MagIntegratorStepper* fMonopoleStepper ;
-      G4double                fMinStep ;
-
-      static G4MonopoleFieldSetup*  fMonopoleFieldSetup;
+      static G4MonopoleFieldSetup*  fMonopoleFieldSetup; /**< The instance of this class*/
 
     };
 

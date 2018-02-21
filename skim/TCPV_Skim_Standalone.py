@@ -41,7 +41,7 @@ stdPhotons('loose')
 loadStdKS()
 loadStdDiLeptons(True)
 loadStdLightMesons()
-
+cutAndCopyList('gamma:E15', 'gamma:loose', '1.5<E<3.5')
 # TCPV Skim
 from TCPV_List import *
 tcpvList = TCPVList()

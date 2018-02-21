@@ -189,7 +189,7 @@ namespace Belle2 {
     {
       unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
       if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
-        /// TODO many false positives, we should remove that check after we KNOW tht it has been fixed in DHH Firmware
+        /// TODO many false positives, we should remove that check after we KNOW that it has been fixed in DHH Firmware
         B2WARNING("Suspicious Padding $" << std::hex << crc);
         return PXDError::EPXDErrMask::c_SUSP_PADDING;
       }

@@ -19,6 +19,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
+#include <rawdata/dataobjects/RawTOP.h>
 
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -53,15 +54,19 @@ namespace Belle2 {
     //           (float)2.71394);
     addParam("minHeightFirstCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the first cal. pulse",
              (float)600.);
-    addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the second cal. pulse",
+    addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold2, "pulse height threshold for the second cal. pulse",
              (float)450.);
     addParam("nominalDeltaT", m_calibrationPulseInterval, "nominal DeltaT (time interval of the double calibration pulses) [ns]",
              (float)21.85);
     addParam("nominalDeltaTRange", m_calibrationPulseIntervalRange,
              "acceptable DeltaT shift from the noinal value before calibration [ns]",
              (float)2.);
+    addParam("globalRefSlotNum", m_globalRefSlotNum,
+             "slot number where a global reference asic exists. slot01-asic0 (pixelId=1-8) is default.", 1);
+    addParam("globalRefAsicNum", m_globalRefAsicNum,
+             "asic number defined as int((pixelId-1)/8) of a global reference asic", 0);
 
-    //addParam("TimePerWin", m_TimePerWin, "time interval of a single window (=64 samples) [ns]", (Float_t)23.581939);
+    addParam("timePerWin", m_timePerWin, "time interval of a single window (=64 samples) [ns]", (float)23.581939);
   }
 
   TOPInterimFENtupleModule::~TOPInterimFENtupleModule() {}
@@ -70,6 +75,8 @@ namespace Belle2 {
   {
     REG_HISTOGRAM;
 
+    StoreArray<RawTOP> rawTOPs;
+    rawTOPs.isRequired();
     StoreArray<TOPRawDigit> rawDigits;
     rawDigits.isRequired();
     StoreArray<TOPDigit> digits;
@@ -85,11 +92,20 @@ namespace Belle2 {
 
     m_tree = new TTree("tree", "TTree for generator output");
 
+    std::ostringstream nModuleStr;
+    nModuleStr << "[" << c_NModule << "]";
+
     m_tree->Branch("nHit", &m_nHit, "nHit/I");
+    m_tree->Branch("eventNumCopper", m_eventNumCopper,
+                   std::string(std::string("eventNumCopper") + nModuleStr.str() + "/i").c_str());
+    m_tree->Branch("ttuTime", m_ttuTime,
+                   std::string(std::string("ttuTime") + nModuleStr.str() + "/i").c_str());
+    m_tree->Branch("ttcTime", m_ttcTime,
+                   std::string(std::string("ttcTime") + nModuleStr.str() + "/i").c_str());
     m_tree->Branch("slotNum", m_slotNum, "slotNum[nHit]/S");
     m_tree->Branch("pixelId", m_pixelId, "pixelId[nHit]/S");
     m_tree->Branch("isCalCh", m_isCalCh, "isCalCh[nHit]/O");
-    m_tree->Branch("eventNum", m_eventNum, "eventNum[nHit]/i");
+    m_tree->Branch("eventNum", &m_eventNum, "eventNum/i");
     m_tree->Branch("winNum", m_winNum, "winNum[nHit]/S");
     m_tree->Branch("trigWinNum", m_trigWinNum, "trigWinNum[nHit]/S");
     m_tree->Branch("windowsInOrder", m_windowsInOrder, "windowsInOrder[nHit]/O");
@@ -97,6 +113,7 @@ namespace Belle2 {
     m_tree->Branch("time", m_time, "time[nHit]/F");
     m_tree->Branch("rawTime", m_rawTime, "rawTime[nHit]/F");
     m_tree->Branch("refTime", m_refTime, "refTime[nHit]/F");
+    m_tree->Branch("globalRefTime", &m_globalRefTime, "globalRefTime/F");
     m_tree->Branch("sample", m_sample, "sample[nHit]/s");
     m_tree->Branch("height", m_height, "height[nHit]/F");
     m_tree->Branch("integral", m_integral, "integral[nHit]/F");
@@ -132,12 +149,31 @@ namespace Belle2 {
     m_errorFlag = 0;
 
     StoreObjPtr<EventMetaData> EventMetaDataPtr;
+    StoreArray<RawTOP> rawTOPs;
     StoreArray<TOPDigit> digits;
+
+    for (int iSlot = 0 ; iSlot < c_NModule ; iSlot++) {
+      m_eventNumCopper[iSlot] = -1;
+      m_ttuTime[iSlot] = -1;
+      m_ttcTime[iSlot] = -1;
+    }
+    int iSlotTTC = 0;
+    for (auto& rawTOP : rawTOPs) {
+      if (iSlotTTC >= c_NModule) {
+        B2WARNING("too many TTC information");
+        break;
+      }
+      m_eventNumCopper[iSlotTTC] = rawTOP.GetEveNo(0);
+      m_ttuTime[iSlotTTC] = rawTOP.GetTTUtime(0);
+      m_ttcTime[iSlotTTC] = rawTOP.GetTTCtime(0);
+      iSlotTTC++;
+    }
 
     std::map<short, short> nHitOfflineFEMap;
     //std::map<short, int> windowNumListMap;
     static std::set<short> noisyChannelBlackListSet;
     UInt_t EventNum = EventMetaDataPtr->getEvent();
+    m_eventNum = EventNum;
     m_eventErrorFlag = EventMetaDataPtr->getErrorFlag();
     for (const auto& digit : digits) {
 
@@ -150,13 +186,12 @@ namespace Belle2 {
       m_slotNum[m_nHit] = digit.getModuleID();
       m_pixelId[m_nHit] = (short)digit.getPixelID();
       m_isCalCh[m_nHit] = (digit.getASICChannel() == m_calibrationChannel);
-      m_eventNum[m_nHit] = EventNum;
       m_winNum[m_nHit] = (short)digit.getFirstWindow();
       m_hitQuality[m_nHit] = (unsigned char)digit.getHitQuality();
       m_isReallyJunk[m_nHit] = false;
       m_windowsInOrder[m_nHit] = true;
       m_rawTime[m_nHit] = digit.getRawTime();
-      m_time[m_nHit] = digit.getTime();
+      m_time[m_nHit] = digit.getTime() + m_winNum[m_nHit] * m_timePerWin;
       m_sample[m_nHit] = TMath::FloorNint(m_rawTime[m_nHit] + m_winNum[m_nHit] * c_NSamplePerWindow) % c_NSampleTBC;
       m_height[m_nHit] = digit.getPulseHeight();
       m_integral[m_nHit] = digit.getIntegral();
@@ -275,7 +310,8 @@ namespace Belle2 {
 
   void TOPInterimFENtupleModule::getReferenceTiming()
   {
-
+    static short globalRefAsic = m_globalRefAsicNum + 100 * m_globalRefSlotNum;
+    m_globalRefTime = -99999;
     std::map<short, short> iRefHitMap;
     for (int iHit = 0 ; iHit < m_nHit ; iHit++) {
       if (!m_isCalCh[iHit]) continue;
@@ -309,6 +345,17 @@ namespace Belle2 {
               m_hitQuality[kHit] += 200;
             }
             nCands++;
+          }
+          //in case jHit and kHit are not in time order (added at 28th Nov)
+          else if (timediff < 0 &&  m_height[kHit] > m_calibrationPulseThreshold1
+                   && m_height[jHit] > m_calibrationPulseThreshold2
+                   && TMath::Abs(timediff + m_calibrationPulseInterval) < m_calibrationPulseIntervalRange) {
+            if (nCands == 0) {
+              iRefHitMap[reducedPixelId] = kHit;
+              m_hitQuality[kHit] += 100;
+              m_hitQuality[jHit] += 200;
+            }
+            nCands++;
           }//satisfy selection criteria for calibration signal
         }
       }//iVec (finish selecting a calibration signal candidate)
@@ -321,6 +368,7 @@ namespace Belle2 {
       if (iRefHitMap.count(reducedPixelId) > 0) {
         int iRef = iRefHitMap[reducedPixelId];
         m_refTime[iHit] = m_time[iRef];
+        if (reducedPixelId == globalRefAsic) m_globalRefTime = m_time[iRef];
         if (!m_isReallyJunk[iHit] && m_hitQuality[iRef] >= 100) {
           m_hitQuality[iHit] += 10;
         }

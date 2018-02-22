@@ -9,7 +9,7 @@
 **************************************************************************/
 
 // Own include
-#include <analysis/modules/KLDecayReconstructor/KLDecayReconstructorModule.h>
+#include <analysis/modules/KlongDecayReconstructor/KlongDecayReconstructorExpertModule.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -32,13 +32,13 @@ namespace Belle2 {
 //                 Register module
 //-----------------------------------------------------------------
 
-  REG_MODULE(KLDecayReconstructor)
+  REG_MODULE(KlongDecayReconstructorExpert)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-  KLDecayReconstructorModule::KLDecayReconstructorModule() :
+  KlongDecayReconstructorExpertModule::KlongDecayReconstructorExpertModule() :
     Module()
 
   {
@@ -57,12 +57,12 @@ namespace Belle2 {
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
     addParam("recoList", m_recoList,
-             "Suffix attached to the original K_L input list to identify the output list of the FindKLMomentum module; this is the input for this module, if not defined it is set to '_reco' \n",
+             "Suffix attached to the original K_L input list to identify the output list of the FindKlongMomentum module; this is the input for this module, if not defined it is set to '_reco' \n",
              std::string("_reco"));
 
   }
 
-  void KLDecayReconstructorModule::initialize()
+  void KlongDecayReconstructorExpertModule::initialize()
   {
     // clear everything, initialize private members
     m_pdgCode = 0;
@@ -122,7 +122,7 @@ namespace Belle2 {
 
   }
 
-  void KLDecayReconstructorModule::event()
+  void KlongDecayReconstructorExpertModule::event()
   {
     StoreArray<Particle> particles;
 

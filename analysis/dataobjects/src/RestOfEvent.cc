@@ -37,9 +37,9 @@ void RestOfEvent::addTracks(std::vector<int>& indices)
   addIndices(indices, m_trackIndices);
 }
 
-void RestOfEvent::addECLCluster(const ECLCluster* shower)
+void RestOfEvent::addECLCluster(const ECLCluster* cluster)
 {
-  m_eclClusterIndices.insert(shower->getArrayIndex());
+  m_eclClusterIndices.insert(cluster->getArrayIndex());
 }
 
 void RestOfEvent::addECLClusters(std::vector<int>& indices)
@@ -126,7 +126,7 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
   StoreArray<ECLCluster> allECLClusters;
 
   if (allECLClusters.getEntries() < getNECLClusters(maskName))
-    B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL showers in the RestOfEvent > number of all showers in StoreArray<ECLCluster>!");
+    B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL clusters in the RestOfEvent > number of all clusters in StoreArray<ECLCluster>!");
 
   int i = 0;
   std::map<unsigned int, bool> eclClusterMask = RestOfEvent::getECLClusterMask(maskName);

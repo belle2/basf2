@@ -539,21 +539,18 @@ G4VParticleChange* G4MonopoleTransportation::PostStepDoIt(const G4Track& track,
   }         // endif ( fGeometryLimitedStep )
 
   const G4VPhysicalVolume* pNewVol = retCurrentTouchable->GetVolume() ;
-  const G4Material* pNewMaterial   = 0 ;
-  const G4VSensitiveDetector* pNewSensitiveDetector   = 0 ;
+  G4Material* pNewMaterial   = nullptr ;
+  G4VSensitiveDetector* pNewSensitiveDetector   = nullptr ;
 
   if (pNewVol != 0) {
     pNewMaterial = pNewVol->GetLogicalVolume()->GetMaterial();
     pNewSensitiveDetector = pNewVol->GetLogicalVolume()->GetSensitiveDetector();
   }
 
-  // ( <const_cast> pNewMaterial ) ;
-  // ( <const_cast> pNewSensitiveDetector) ;
-
   fParticleChange.SetMaterialInTouchable(
-    (G4Material*) pNewMaterial) ;
+    pNewMaterial) ;
   fParticleChange.SetSensitiveDetectorInTouchable(
-    (G4VSensitiveDetector*) pNewSensitiveDetector) ;
+    pNewSensitiveDetector) ;
 
   const G4MaterialCutsCouple* pNewMaterialCutsCouple = 0;
   if (pNewVol != 0) {

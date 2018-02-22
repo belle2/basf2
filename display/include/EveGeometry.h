@@ -39,6 +39,12 @@ namespace Belle2 {
      * just crashes. This is all quite horrible, really.
      */
     void saveExtract();
+
+    /** Set custom path to the geometry extract (to change originally hard-coded value) */
+    void setCustomExtractPath(const std::string& extractPath);
+
+    /** Set custom path to the geometry extract with corrected TOP bars (to change originally hard-coded value) */
+    void setCustomExtractPathTop(const std::string& extractPathTop);
   }
 }
 

@@ -34,7 +34,7 @@ TF1* FitPulse(TGraph* gin, int ShapeFlag, double* pulseInputPara)
   //ShapeFlag = 1 for diode
   //
   double highRange = 10;
-  TF1* ShpFloat = new TF1(Form("Shp_%d", ShapeFlag), WaveFuncTwoComp, 0, highRange, 26);
+  TF1* ShpFloat = new TF1(Form("Shp_%d", ShapeFlag), Belle2::ECL::WaveFuncTwoComponent, 0, highRange, 26);
   ShpFloat->FixParameter(0, 0);
   ShpFloat->FixParameter(1, 0);
   ShpFloat->FixParameter(2, 1);

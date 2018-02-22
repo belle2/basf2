@@ -39,9 +39,9 @@ namespace Belle2 {
       m_TimeResolution = 0; /**< Calibrated Time Resolution */
       m_Energy         = 0; /**< Calibrated Energy */
       m_Status         = 0; /**< Calibration Status */
-      m_TwoCompTotalEnergy = 0; /**< Offline Two Component Total Energy*/
-      m_TwoCompHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
-      m_TwoCompChi2 = 0; /**< Offline Two Component chi2*/
+      m_TwoComponentTotalEnergy = 0; /**< Offline Two Component Total Energy*/
+      m_TwoComponentHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
+      m_TwoComponentChi2 = 0; /**< Offline Two Component chi2*/
     }
 
     /*! Set  Cell ID
@@ -54,15 +54,15 @@ namespace Belle2 {
 
     /*! Set two component total energy
      */
-    void setTwoCompTotalEnergy(double Energy) { m_TwoCompTotalEnergy = Energy; }
+    void setTwoComponentTotalEnergy(double Energy) { m_TwoComponentTotalEnergy = Energy; }
 
     /*! Set two component hadron energy
      */
-    void setTwoCompHadronEnergy(double Energy) { m_TwoCompHadronEnergy = Energy; }
+    void setTwoComponentHadronEnergy(double Energy) { m_TwoComponentHadronEnergy = Energy; }
 
     /*! Set two component chi2
      */
-    void setTwoCompChi2(double chi) { m_TwoCompChi2 = chi; }
+    void setTwoComponentChi2(double chi) { m_TwoComponentChi2 = chi; }
 
     /*! Set Calibrated Time
      */
@@ -97,17 +97,17 @@ namespace Belle2 {
     /*! Get Two Component calibrated Total Energy
      * @return Two Component calibrated Total Energy
      */
-    double getTwoCompTotalEnergy() const { return m_TwoCompTotalEnergy; }
+    double getTwoComponentTotalEnergy() const { return m_TwoComponentTotalEnergy; }
 
     /*! Get Two Component calibrated hadron component Energy
      * @return Two Component calibrated hadron component Energy
      */
-    double getTwoCompHadronEnergy() const { return m_TwoCompHadronEnergy; }
+    double getTwoComponentHadronEnergy() const { return m_TwoComponentHadronEnergy; }
 
     /*! Get two componnent chi2
      * @return two componnent chi2
      */
-    double getTwoCompChi2() const { return m_TwoCompChi2; }
+    double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
 
     /*! Get Calibrated Time
@@ -157,9 +157,9 @@ namespace Belle2 {
     double m_TimeResolution;   /**< Calibrated Time resolution*/
     double m_Energy; /**< Calibrated Energy */
     unsigned short int m_Status;   /**< Calibration and Fit Status */
-    double m_TwoCompTotalEnergy;  /**< Calibrated Two Component Total Energy */
-    double m_TwoCompHadronEnergy; /**< Calibrated Hadron Component Energy */
-    double m_TwoCompChi2; /**< Two Component chi2*/
+    double m_TwoComponentTotalEnergy;  /**< Calibrated Two Component Total Energy */
+    double m_TwoComponentHadronEnergy; /**< Calibrated Hadron Component Energy */
+    double m_TwoComponentChi2; /**< Two Component chi2*/
 
     // 1: first version (TF)
     // 2: added m_TimeResolution (TF)

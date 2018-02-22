@@ -231,7 +231,7 @@ namespace Belle2 {
     /**
      * return 1 if cluster has pulse shape discrimination variables computed
      */
-    int eclClusterPulseShapeDiscrimination(const Particle* particle);
+    int eclClusterHasPulseShapeDiscrimination(const Particle* particle);
 
     /**
      * return 1.0 if cluster matched to a trigger cluster

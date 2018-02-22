@@ -261,23 +261,23 @@ void ECLDigitCalibratorModule::event()
 
     //Calibrating offline fit results
     ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
-    aECLCalDigit->setTwoCompChi2(-1);
-    aECLCalDigit->setTwoCompTotalEnergy(-1);
-    aECLCalDigit->setTwoCompHadronEnergy(-1);
+    aECLCalDigit->setTwoComponentChi2(-1);
+    aECLCalDigit->setTwoComponentTotalEnergy(-1);
+    aECLCalDigit->setTwoComponentHadronEnergy(-1);
     if (aECLDsp) {
       //require ECLDigit to have offline waveform
-      if (aECLDsp->getTwoCompChi2() > 0) {
+      if (aECLDsp->getTwoComponentChi2() > 0) {
         //require offline waveform to have offline fit result
         //
-        double calibratedTwoCompTotalEnergy = aECLDsp->getTwoCompTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                              v_calibrationCrystalEnergy[cellid - 1];
-        double calibratedTwoCompHadronEnergy = aECLDsp->getTwoCompHadronAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                               v_calibrationCrystalEnergy[cellid - 1];
-        double TwoCompChi2 = aECLDsp->getTwoCompChi2();
+        double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                   v_calibrationCrystalEnergy[cellid - 1];
+        double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                    v_calibrationCrystalEnergy[cellid - 1];
+        double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
         //
-        aECLCalDigit->setTwoCompTotalEnergy(calibratedTwoCompTotalEnergy);
-        aECLCalDigit->setTwoCompHadronEnergy(calibratedTwoCompHadronEnergy);
-        aECLCalDigit->setTwoCompChi2(TwoCompChi2);
+        aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
+        aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
+        aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
         //
       }
     }

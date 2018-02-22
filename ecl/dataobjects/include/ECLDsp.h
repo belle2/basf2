@@ -28,12 +28,12 @@ namespace Belle2 {
     ECLDsp() : m_DspAVector(31, 0)
     {
       m_CellId = 0;    /**< cell id */
-      m_TwoCompTotalAmp = -1;  /**< Offline two component total amplitude */
-      m_TwoCompHadronAmp = -1; /**< Offline two component hadron amplitude */
-      m_TwoCompChi2 = -1;  /**< Offline two component chi2*/
-      m_TwoCompTime = 1;  /**< Offline two component time */
-      m_TwoCompBaseline = 1;  /**< Offline two component baseline */
-      m_DataMCFlag = false;  /**< Data = true MC = false */
+      m_TwoComponentTotalAmp = -1;  /**< Offline two component total amplitude */
+      m_TwoComponentHadronAmp = -1; /**< Offline two component hadron amplitude */
+      m_TwoComponentChi2 = -1;  /**< Offline two component chi2*/
+      m_TwoComponentTime = 1;  /**< Offline two component time */
+      m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
+      m_isData = false;  /**< Data = true MC = false */
     }
 
     /** Constructor for data*/
@@ -41,7 +41,7 @@ namespace Belle2 {
     {
       m_CellId     = CellId;
       m_DspAVector.assign(ADCData, ADCData + NADCPoints);
-      m_DataMCFlag = flag;
+      m_isData = flag;
     }
 
     /** Constructor for data*/
@@ -49,7 +49,7 @@ namespace Belle2 {
     {
       m_CellId     = CellId;
       m_DspAVector = ADCData;
-      m_DataMCFlag = flag;
+      m_isData = flag;
     }
 
     /*! Set Cell ID
@@ -58,7 +58,7 @@ namespace Belle2 {
 
     /*! Set Data or MC flag. MC = false. Data = true
      */
-    void setDataMCFlag(bool flag) { m_DataMCFlag = flag; }
+    void setisData(bool flag) { m_isData = flag; }
 
     /*! Set Dsp array
      */
@@ -76,23 +76,23 @@ namespace Belle2 {
 
     /*! Set two comp total amp
      */
-    void setTwoCompTotalAmp(double input) {  m_TwoCompTotalAmp = input; }
+    void setTwoComponentTotalAmp(double input) {  m_TwoComponentTotalAmp = input; }
 
     /*! Set two comp hadron amp
      */
-    void setTwoCompHadronAmp(double input) { m_TwoCompHadronAmp = input; }
+    void setTwoComponentHadronAmp(double input) { m_TwoComponentHadronAmp = input; }
 
     /*! Set two comp chi2
      */
-    void setTwoCompChi2(double input) {      m_TwoCompChi2 = input; }
+    void setTwoComponentChi2(double input) {      m_TwoComponentChi2 = input; }
 
     /*! Set two comp time
      */
-    void setTwoCompTime(double input) {      m_TwoCompTime = input; }
+    void setTwoComponentTime(double input) {      m_TwoComponentTime = input; }
 
     /*! Set two comp baseline
      */
-    void setTwoCompBaseline(double input) {  m_TwoCompBaseline = input; }
+    void setTwoComponentBaseline(double input) {  m_TwoComponentBaseline = input; }
 
     /*! Get Cell ID
      * @return cell ID
@@ -102,7 +102,7 @@ namespace Belle2 {
     /*! Get Data or MC flag
      * @return Data or MC flag. MC=false Data=true;
      */
-    bool getDataMCFlag() const { return m_DataMCFlag; }
+    bool getisData() const { return m_isData; }
 
     /*! Get Dsp Array
      * @return Dsp Array 0~31
@@ -117,27 +117,27 @@ namespace Belle2 {
     /*! get two comp total amp
      * @return two comp total amp
      */
-    double getTwoCompTotalAmp() const { return m_TwoCompTotalAmp; }
+    double getTwoComponentTotalAmp() const { return m_TwoComponentTotalAmp; }
 
     /*! get two comp hadron amp
      * @return two comp hadron amp
      */
-    double getTwoCompHadronAmp() const { return m_TwoCompHadronAmp; }
+    double getTwoComponentHadronAmp() const { return m_TwoComponentHadronAmp; }
 
     /*! get two comp chi2
      * @return two comp chi2
      */
-    double getTwoCompChi2() const { return m_TwoCompChi2; }
+    double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
     /*! get two comp time
      * @return two comp time
      */
-    double getTwoCompTime() const { return m_TwoCompTime; }
+    double getTwoComponentTime() const { return m_TwoComponentTime; }
 
     /*! get two comp baseline
      * @return two comp baseline
      */
-    double getTwoCompBaseline() const { return m_TwoCompBaseline; }
+    double getTwoComponentBaseline() const { return m_TwoComponentBaseline; }
 
 
     /*! Get Dsp Array
@@ -159,12 +159,12 @@ namespace Belle2 {
   private:
 
     int m_CellId;      /**< Cell ID */
-    bool m_DataMCFlag;      /**< Data = true, MC = false*/
-    double m_TwoCompTotalAmp; /**< Two comp total amp */
-    double m_TwoCompHadronAmp;   /**< Two comp hadron amp */
-    double m_TwoCompChi2; /**< Two comp chi2 */
-    double m_TwoCompTime; /**< Two comp time*/
-    double m_TwoCompBaseline; /**< Two comp baseline*/
+    bool m_isData;      /**< Data = true, MC = false*/
+    double m_TwoComponentTotalAmp; /**< Two comp total amp */
+    double m_TwoComponentHadronAmp;   /**< Two comp hadron amp */
+    double m_TwoComponentChi2; /**< Two comp chi2 */
+    double m_TwoComponentTime; /**< Two comp time*/
+    double m_TwoComponentBaseline; /**< Two comp baseline*/
     std::vector <int> m_DspAVector; /**< Dsp array vith variable length for calibration, tests, etc.  */
 
     /*2 dspa array with variable length*/

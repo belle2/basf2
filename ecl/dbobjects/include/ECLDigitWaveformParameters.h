@@ -11,8 +11,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITWAVEFORMPARAMETERS
-#define ECLDIGITWAVEFORMPARAMETERS
+#pragma once
+
 #include <TObject.h>
 #include <vector>
 #include <framework/logging/Logger.h>
@@ -66,4 +66,3 @@ namespace Belle2 {
     ClassDef(ECLDigitWaveformParameters, 1); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

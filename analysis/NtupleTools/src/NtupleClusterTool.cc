@@ -101,7 +101,7 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_e1e9[iProduct]    = Variable::eclClusterE1E9(selparticles[iProduct]);
     m_e9e21[iProduct]   = Variable::eclClusterE9E21(selparticles[iProduct]);
     m_nHits[iProduct]   = int(Variable::eclClusterNHits(selparticles[iProduct]));
-    m_ClusterPSD[iProduct]   = int(Variable::eclClusterPulseShapeDiscrimination(selparticles[iProduct]));
+    m_ClusterPSD[iProduct]   = int(Variable::eclClusterHasPulseShapeDiscrimination(selparticles[iProduct]));
     m_trackM[iProduct]  = int(Variable::eclClusterTrackMatched(selparticles[iProduct]));
 
     m_uncorrE[iProduct]  = Variable::eclClusterUncorrectedE(selparticles[iProduct]);

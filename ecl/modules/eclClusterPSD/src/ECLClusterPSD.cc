@@ -68,45 +68,45 @@ void ECLClusterPSDModule::initialize()
 void ECLClusterPSDModule::beginRun()
 {
 }
-//
+
 void ECLClusterPSDModule::event()
 {
   StoreArray<ECLShower> eclshowers;
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
-  //
-  for (unsigned int ishowers = 0; ishowers < (unsigned int)eclshowers.getEntries() ; ishowers++) {
-    //
-    auto relatedDigits = eclshowers[ishowers]->getRelationsTo<ECLCalDigit>();
-    //
-    double Cluster2CTotalEnergy = 0;
-    double Clust2CHadronEnergy = 0;
-    int NumberofHadronDigits = 0;
+
+  for (auto& shower : eclshowers) {
+
+    auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
+
+    double cluster2CTotalEnergy = 0;
+    double cluster2CHadronEnergy = 0;
+    int numberofHadronDigits = 0;
     int nWaveforminCluster = 0;
-    //
+
     for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
       const auto caldigit = relatedDigits.object(iRel);
-      double Digit2CChi2 = caldigit->getTwoCompChi2();
-      //
-      if (Digit2CChi2 < 0)  continue; //onl digits with waveforms
-      //
-      if (Digit2CChi2 < m_Chi2Threshold) { //must be a good fit
-        //
-        double Digit2CTotalEnergy = caldigit->getTwoCompTotalEnergy();
-        double Digit2CHadronComponentEnergy = caldigit->getTwoCompHadronEnergy();
-        Cluster2CTotalEnergy += Digit2CTotalEnergy;
-        Clust2CHadronEnergy += Digit2CHadronComponentEnergy;
-        if (Digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  NumberofHadronDigits++;
+      const double digit2CChi2 = caldigit->getTwoComponentChi2();
+
+      if (digit2CChi2 < 0)  continue; //only digits with waveforms
+
+      if (digit2CChi2 < m_Chi2Threshold) { //must be a good fit
+
+        const double digit2CTotalEnergy = caldigit->getTwoComponentTotalEnergy();
+        const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
+        cluster2CTotalEnergy += digit2CTotalEnergy;
+        cluster2CHadronEnergy += digit2CHadronComponentEnergy;
+        if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits++;
         nWaveforminCluster++;
       }
     }
-    //
+
     if (nWaveforminCluster > 0) {
-      if (Cluster2CTotalEnergy != 0) eclshowers[ishowers]->setShowerHadronIntensity(Clust2CHadronEnergy / Cluster2CTotalEnergy);
-      eclshowers[ishowers]->setNumberofHadronDigits(NumberofHadronDigits);
-      eclshowers[ishowers]->addStatus(ECLShower::c_hasPulseShapeDiscrimination);
+      if (cluster2CTotalEnergy != 0) shower.setShowerHadronIntensity(cluster2CHadronEnergy / cluster2CTotalEnergy);
+      shower.setNumberofHadronDigits(numberofHadronDigits);
+      shower.addStatus(ECLShower::c_hasPulseShapeDiscrimination);
     } else {
-      eclshowers[ishowers]->setShowerHadronIntensity(0);
-      eclshowers[ishowers]->setNumberofHadronDigits(0);
+      shower.setShowerHadronIntensity(0);
+      shower.setNumberofHadronDigits(0);
     }
   }
 }

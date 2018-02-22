@@ -62,31 +62,31 @@ ECLWaveformFitModule::ECLWaveformFitModule()
 ECLWaveformFitModule::~ECLWaveformFitModule()
 {
 }
-//
+
 // initialize
 void ECLWaveformFitModule::initialize()
 {
   // ECL dataobjects
   StoreArray<ECLDsp> eclDsps(eclDspArrayName());
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
-  //
+
   eclDsps.registerInDataStore(eclDspArrayName());
   eclDigits.registerInDataStore(eclDigitArrayName());
-  //
+
   StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
   eclEventInformationPtr.registerInDataStore(eclEventInformationName());
-  //
+
 }
-//
+
 // begin run
 void ECLWaveformFitModule::beginRun()
 {
-  //
+
   DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
   m_ADCtoEnergy.resize(8736);
   if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
-  //
+
   DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
   m_PhotonTemplates.resize(8736);
   m_SecondComponentTemplates.resize(8736);
@@ -102,42 +102,41 @@ void ECLWaveformFitModule::beginRun()
     }
   }
 }
-//
+
 std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
                                                       std::vector<double> PhotonPars11,
                                                       std::vector<double> HadronPars11,
                                                       int ComponentNumber)
 {
-  //
+
   //InitialAmp: = Starting Fit Amp
   //PhotonPars11: 11 Photon Template Pars
   //HadronPars11: 11 Hadron Template Pars
-  //ComponentNumber: If 1 use only photon template, else use both components
-  //
+
   const double convertToADCTime = 0.5;
-  //
+
   std::vector<double> WaveformAmp;
   std::vector<double> WaveformTime;
   std::vector<double> WaveformTimeError;
   std::vector<double> WaveformAmpError;
-  //
+
   for (int k = 0; k < EclConfiguration::m_nsmp; k++) {
     WaveformAmp.push_back((double)(m_CurrentPulseArray31[k]));
     WaveformAmpError.push_back(10);
     WaveformTime.push_back(k * convertToADCTime);
     WaveformTimeError.push_back(0.1);
   }
-  //
+
   TGraphErrors* WaveformGraph = new TGraphErrors(WaveformTime.size(),
                                                  &WaveformTime[0],
                                                  &WaveformAmp[0],
                                                  &WaveformTimeError[0],
                                                  &WaveformAmpError[0]);
-  //
+
   int LowFitLimit = 12 * convertToADCTime;
   int HighFitLimit = 32 * convertToADCTime;
-  //
-  TF1* FitROOTHadron = new TF1("FitROOTHadron", WaveFuncTwoComp, LowFitLimit, HighFitLimit, 26);
+
+  TF1* FitROOTHadron = new TF1("FitROOTHadron", WaveFuncTwoComponent, LowFitLimit, HighFitLimit, 26);
   FitROOTHadron->SetNpx(1000);
   FitROOTHadron->SetParameter(0, 8.);
   FitROOTHadron->SetParameter(1, WaveformAmp[1]);
@@ -154,43 +153,44 @@ std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
     FitROOTHadron->FixParameter(3, 0);
   }
   WaveformGraph->Fit("FitROOTHadron", "Q N 0 R W", "", LowFitLimit, HighFitLimit);
-  //
-  double OfflineFitChiSquareTwoComp = 0;
+
+  double OfflineFitChiSquareTwoComponent = 0;
   for (int k = 12; k < 31;
-       k++)  OfflineFitChiSquareTwoComp += (pow((WaveformAmp[k] - FitROOTHadron->Eval(WaveformTime[k])), 2) / (pow(WaveformAmpError[k],
-                                              2)));
-  //
+       k++)  OfflineFitChiSquareTwoComponent += (pow((WaveformAmp[k] - FitROOTHadron->Eval(WaveformTime[k])),
+                                                       2) / (pow(WaveformAmpError[k],
+                                                             2)));
+
   std::vector<double> tempResult(5);
   tempResult[0] = FitROOTHadron->GetParameter(2) + FitROOTHadron->GetParameter(3); //Total Amp
   tempResult[1] = FitROOTHadron->GetParameter(3); //Hadron Amp
-  tempResult[2] = OfflineFitChiSquareTwoComp; //Chi2
+  tempResult[2] = OfflineFitChiSquareTwoComponent; //Chi2
   tempResult[3] = FitROOTHadron->GetParameter(0); //Time
   tempResult[4] = FitROOTHadron->GetParameter(1); //Basline
-  //
+
   WaveformGraph->Delete();
   FitROOTHadron->Delete();
-  //
+
   return tempResult;
 }
-//
+
 void ECLWaveformFitModule::event()
 {
-//
+
   StoreArray<ECLDsp> eclDsps(eclDspArrayName());
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
-  //
+
   for (auto& aECLDsp : eclDsps) {
-    //
-    aECLDsp.setTwoCompTotalAmp(-1);
-    aECLDsp.setTwoCompHadronAmp(-1);
-    aECLDsp.setTwoCompChi2(-1);
-    aECLDsp.setTwoCompTime(-1);
-    aECLDsp.setTwoCompBaseline(-1);
-    //
-    if (aECLDsp.getDataMCFlag() == false)  continue; //Currently for data only
-    //
+
+    aECLDsp.setTwoComponentTotalAmp(-1);
+    aECLDsp.setTwoComponentHadronAmp(-1);
+    aECLDsp.setTwoComponentChi2(-1);
+    aECLDsp.setTwoComponentTime(-1);
+    aECLDsp.setTwoComponentBaseline(-1);
+
+    if (aECLDsp.getisData() == false)  continue; //Currently for data only
+
     int CurrentCellID = aECLDsp.getCellId();
-    //
+
     //setting relation of eclDSP to aECLDigit
     bool RelationSet = false;
     double OnlineAmp = 0;
@@ -202,17 +202,17 @@ void ECLWaveformFitModule::event()
         break;
       }
     }
-    //
+
     if (RelationSet == false) {
       B2WARNING("Could not set relation to eclDigit. ECLDsp CellID:" << CurrentCellID);
       continue;
     }
-    //
+
     const double OnlineEnergy = OnlineAmp *= m_ADCtoEnergy[CurrentCellID - 1];
     if (OnlineEnergy < m_EnergyThreshold)  continue;
-    //
+
     if (aECLDsp.getNADCPoints() > 0) {
-      //
+
       //Filling array with ADC values.
       //TriggerCheck used to skip saved waveforms with no pulses (noise)
       double TriggerCheck = 0;
@@ -224,17 +224,17 @@ void ECLWaveformFitModule::event()
         }
       }
       if (TriggerCheck < 100) continue;
-      //
+
       //Fit using ROOT::Fit with Photon + Hadron or Diode Templates
       std::vector<double> theROOTFit;
       theROOTFit = FitWithROOT(OnlineAmp, m_PhotonTemplates[CurrentCellID - 1], m_SecondComponentTemplates[CurrentCellID - 1], 2);
-      //
-      aECLDsp.setTwoCompTotalAmp(theROOTFit[0]);
-      aECLDsp.setTwoCompHadronAmp(theROOTFit[1]);
-      aECLDsp.setTwoCompChi2(theROOTFit[2]);
-      aECLDsp.setTwoCompTime(theROOTFit[3]);
-      aECLDsp.setTwoCompBaseline(theROOTFit[4]);
-      //
+
+      aECLDsp.setTwoComponentTotalAmp(theROOTFit[0]);
+      aECLDsp.setTwoComponentHadronAmp(theROOTFit[1]);
+      aECLDsp.setTwoComponentChi2(theROOTFit[2]);
+      aECLDsp.setTwoComponentTime(theROOTFit[3]);
+      aECLDsp.setTwoComponentBaseline(theROOTFit[4]);
+
     }
   }
 }

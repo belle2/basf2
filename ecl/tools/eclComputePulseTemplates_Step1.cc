@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
   //
   for (Long64_t jentry = LowIDLimit; jentry < HighIDLimit; jentry++) {
     chain->GetEntry(jentry);
-    TF1 PhotonShapeFunc = TF1(Form("photonShape_%lld", jentry), WaveFuncTwoComp, 0, 20, 26);;
+    TF1 PhotonShapeFunc = TF1(Form("photonShape_%lld", jentry), Belle2::ECL::WaveFuncTwoComponent, 0, 20, 26);;
     PhotonShapeFunc.SetNpx(1000);
     std::cout << PhotonWaveformPar[0] << std::endl;
     PhotonShapeFunc.SetParameter(0, 0);

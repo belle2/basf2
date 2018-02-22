@@ -20,50 +20,48 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace ECL {
 
-    class ECLClusterPSDModule: public Module {
+  class ECLClusterPSDModule: public Module {
 
-    public:
+  public:
 
-      /** Constructor.
-       */
-      ECLClusterPSDModule();
+    /** Constructor.
+     */
+    ECLClusterPSDModule();
 
-      /** Destructor.
-       */
-      ~ECLClusterPSDModule();
+    /** Destructor.
+     */
+    ~ECLClusterPSDModule();
 
-      /** Initialize variables. */
-      virtual void initialize();
+    /** Initialize variables. */
+    virtual void initialize();
 
-      /** begin run.*/
-      virtual void beginRun();
+    /** begin run.*/
+    virtual void beginRun();
 
-      /** event per event.
-       */
-      virtual void event();
+    /** event per event.
+     */
+    virtual void event();
 
-      /** end run. */
-      virtual void endRun();
+    /** end run. */
+    virtual void endRun();
 
-      /** terminate.*/
-      virtual void terminate();
+    /** terminate.*/
+    virtual void terminate();
 
-      virtual const char* eclCalDigitArrayName() const
-      { return "ECLCalDigits" ; }
+    virtual const char* eclCalDigitArrayName() const
+    { return "ECLCalDigits" ; }
 
-      /** Name of the ECLEventInformation.*/
-      virtual const char* eclEventInformationName() const
-      { return "ECLEventInformation" ; }
+    /** Name of the ECLEventInformation.*/
+    virtual const char* eclEventInformationName() const
+    { return "ECLEventInformation" ; }
 
-    protected:
+  protected:
 
-    private:
-      double m_Chi2Threshold;   /** Two component fit chi square threshold .*/
-      double m_CrystalHadronEnergyThreshold; /** hadron component energy threshold to classify as hadron.*/
-    };
-  } // end ECL namespace
+  private:
+    double m_Chi2Threshold;   /** Two component fit chi square threshold .*/
+    double m_CrystalHadronEnergyThreshold; /** hadron component energy threshold to classify as hadron.*/
+  };
 } // end Belle2 namespace
 
 #endif

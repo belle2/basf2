@@ -17,6 +17,7 @@ backend = {backend}
 [jobs]
 wall time = 1:00
 in flight = {jobs_in_flight}
+memory = 2100
 [constants]
 BASF2_COMPILE_OPTION = {compile_option}
 BASF2_TOOLS_LOCATION = {tools_location}
@@ -30,17 +31,63 @@ pfs type = csv
 pfs source = {parameter_file}
 [UserTask]
 executable = .basf2_wrapper.sh
-memory = 2100
 input files = {steering_file_abs_path}
 [wms]
 queue = s
 """
 
+TEST_PROCESSING_GRIDCONTROL_CONTENT = """
+[global]
+task = UserTask
+workdir create = True
+workdir space = 0
+backend = {backend}
+[jobs]
+wall time = 1:00
+in flight = {jobs_in_flight}
+max retry = 0
+memory = 2100
+[constants]
+BASF2_COMPILE_OPTION = {compile_option}
+BASF2_TOOLS_LOCATION = {tools_location}
+BASF2_RELEASE_LOCATION = {release_location}
+BASF2_STEERING_FILE = {steering_file}
+BASF2_LOCAL_DB_PATH = {local_db_path}
+[UserTask]
+executable = .basf2_wrapper_hlt.sh
+files per job = 1 ; Number of files to process per job
+dataset provider = file
+; use wildcard to pickup all input files
+dataset = :scan:{dataset_folder}
+source recurse = True
+filename filter = *.root
+[wms]
+queue = s
+"""
 
-def write_gridcontrol_file(steering_file, parameters, local_execution):
-    release_location = os.getenv("BELLE2_LOCAL_DIR")
-    tools_location = os.getenv("BELLE2_TOOLS")
-    compile_option = os.getenv("BELLE2_OPTION")
+
+def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder, local_db_path, local_execution,
+                               jobs_in_flight=100):
+    if os.path.exists(working_folder):
+        rmtree(working_folder)
+
+    os.mkdir(working_folder)
+
+    # this steering file is part of the release, so we don't need to copy it as input
+    hlt_steering_file = os.path.abspath(hlt_steering_file)
+    gridcontrol_file = os.path.join(working_folder, "hlt_raw_processing.conf")
+
+    specific_gc_settings = {"dataset_folder": dataset_folder,
+                            "steering_file": hlt_steering_file,
+                            "local_db_path": local_db_path}
+    return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
+                                  gridcontrol_filename=gridcontrol_file,
+                                  specific_gc_settings=specific_gc_settings,
+                                  jobs_in_flight=jobs_in_flight,
+                                  gc_template=TEST_PROCESSING_GRIDCONTROL_CONTENT)
+
+
+def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
     background_dir = os.getenv("BELLE2_BACKGROUND_DIR")
 
     basename = os.path.splitext(steering_file)[0]
@@ -74,28 +121,44 @@ def write_gridcontrol_file(steering_file, parameters, local_execution):
 
     steering_file_abs_path = os.path.abspath(steering_file)
 
+    specific_gc_settings = {"background_dir": background_dir,
+                            "parameter_file": parameter_file,
+                            "steering_file": steering_file,
+                            "steering_file_abs_path": steering_file_abs_path}
+    return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
+                                  gridcontrol_filename=gridcontrol_file,
+                                  specific_gc_settings=specific_gc_settings)
+
+
+def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder, specific_gc_settings,
+                           gc_template=DEFAULT_GRIDCONTROL_CONTENT,
+                           jobs_in_flight=100):
+    release_location = os.getenv("BELLE2_LOCAL_DIR")
+    tools_location = os.getenv("BELLE2_TOOLS")
+    compile_option = os.getenv("BELLE2_OPTION")
+
     if local_execution:
         # only run as much jobs as physical CPU (account for hyperthreading multiplier here)
         jobs_in_flight = int(multiprocessing.cpu_count() / 2)
         backend = "host"
     else:
-        jobs_in_flight = 50000
+        jobs_in_flight = jobs_in_flight
         backend = "lsf"
 
-    with open(gridcontrol_file, "w") as f:
-        f.write(DEFAULT_GRIDCONTROL_CONTENT.format(
-            compile_option=compile_option,
-            tools_location=tools_location,
-            release_location=release_location,
-            steering_file=steering_file,
-            parameter_file=parameter_file,
-            steering_file_abs_path=steering_file_abs_path,
-            jobs_in_flight=jobs_in_flight,
-            background_dir=background_dir,
-            backend=backend
-        ))
+    common_gc_settings = {
+        "compile_option": compile_option,
+        "tools_location": tools_location,
+        "release_location": release_location,
+        "jobs_in_flight": jobs_in_flight,
+        "backend": backend}
 
-    return gridcontrol_file
+    # merged dictionaries
+    final_gc_settings = {**common_gc_settings, **specific_gc_settings}
+
+    with open(gridcontrol_filename, "w") as f:
+        f.write(gc_template.format(**final_gc_settings))
+
+    return gridcontrol_filename
 
 
 def call_gridcontrol(gridcontrol_file, retries):

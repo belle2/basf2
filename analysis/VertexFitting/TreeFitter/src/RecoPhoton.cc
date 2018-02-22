@@ -162,12 +162,10 @@ namespace TreeFitter {
      * we have 3 geometric equations and eliminate tau using the dimension with the highest momentum
      * (because we have to devide but that momentum)
      * only downside is we have to figure out which dimensions this is
-     * the 4th equation is the nergy which we keep as:
+     * the 4th equation is the energy which we keep as:
      * 0 = E - |p|
      * just to be sure, essentially this is always zero because p is build from E
      * */
-
-
 
     const Eigen::Matrix<double, 1, 3> x_vertex = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
@@ -203,18 +201,27 @@ namespace TreeFitter {
 
     // dr'/dm | m:={xc,yc,zc,Ec} the measured quantities
     Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
-    P(0, i2) = -1; // dr0/di2c
-    P(0, i1) = - p_vec[i2] / p_vec[i1] ; // dr0 / di1c (if x eliminated)
-    P(0, i3) = 0; // dr0 / dxc (if x eliminated)
+    //P(0, i2) = -1; // dr0/di2c
+    //P(0, i1) = - p_vec[i2] / p_vec[i1] ; // dr0 / di1c (if x eliminated)
+    //P(0, i3) = 0; // dr0 / dxc (if x eliminated)
 
-    P(1, i2) = 0; // dr1/dyc
-    P(1, i1) = - p_vec[i3] / p_vec[i1] ; // dr1 / dxc
-    P(1, i3) = -1 ; // dr1 / dxc
+    //P(1, i2) = 0; // dr1/dyc
+    //P(1, i1) = - p_vec[i3] / p_vec[i1] ; // dr1 / dxc
+    //P(1, i3) = -1 ; // dr1 / dxc
 
-    P(2, i1) = -1.*p_vec[i1] / mom; // drE/dpx
-    P(2, i2) = -1.*p_vec[i2] / mom; // drE/dpy
-    P(2, i3) = -1.*p_vec[i3] / mom; // drE/dpz
+    //P(2, i1) = -1. * p_vec[i1] / mom; // drE/dpx
+    //P(2, i2) = -1. * p_vec[i2] / mom; // drE/dpy
+    //P(2, i3) = -1. * p_vec[i3] / mom; // drE/dpz
+    //P(2, 3) = 1; // dE/dEc
+
+    // deriving by the cluster pars
+    P(0, i2) = 1;
+    P(0, i1) = - p_vec[i2] / p_vec[i1];
+
+    P(1, i3) = 1;
+    P(1, i1) = - p_vec[i3] / p_vec[i1];
     P(2, 3) = 1; // dE/dEc
+
 
     p.getResiduals().segment(0, 3) = residual3;
 

@@ -52,6 +52,9 @@ def setup_basf2_and_db(dbfile=None):
     parser.add_argument('--central-db-tag', type=str,
                         help="Use the central db with a specific tag",
                         default=None)
+    parser.add_argument('--no-output',
+                        help="Don't write any output files",
+                        action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -144,28 +147,29 @@ def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='HLT'):
     ##########
     # Output
     ##########
-    if outputfile == 'HLT' and not args.root_output_file:
-        # Output to RingBuffer
-        output = basf2.register_module("Ds2Rbuf")
-        output.param("RingBufferName", args.output_buffer_name)
-    elif outputfile == 'EXPRESSRECO' and not args.root_output_file:
-        output = basf2.register_module("Ds2Sample")
-    else:
-        # Output to SeqRoot
-        output = basf2.register_module("SeqRootOutput")
-
-        if args.root_output_file:
-            output.param('outputFileName', args.root_output_file)
+    if not args.no_output:
+        if outputfile == 'HLT' and not args.root_output_file:
+            # Output to RingBuffer
+            output = basf2.register_module("Ds2Rbuf")
+            output.param("RingBufferName", args.output_buffer_name)
+        elif outputfile == 'EXPRESSRECO' and not args.root_output_file:
+            output = basf2.register_module("Ds2Sample")
         else:
-            output.param('outputFileName', outputfile)
+            # Output to SeqRoot
+            output = basf2.register_module("SeqRootOutput")
 
-        # output file name should be specified with -o option
+            if args.root_output_file:
+                output.param('outputFileName', args.root_output_file)
+            else:
+                output.param('outputFileName', outputfile)
 
-    # Specification of output objects
-    if outputfile != 'EXPRESSRECO':
-        output.param("saveObjs", ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)
+            # output file name should be specified with -o option
 
-    path.add_module(output)
+        # Specification of output objects
+        if outputfile != 'EXPRESSRECO':
+            output.param("saveObjs", ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)
+
+        path.add_module(output)
 
     ##########
     # Other utilities

@@ -73,10 +73,12 @@ class ProgressBarViewer(IPythonWidget):
         #: The starting percentage (obviously 0)
         self.last_percentage = 0
 
+        #: Widget of the progress bar itself
         self.progress_bar = FloatProgress(value=0, min=0, max=1,
                                           layout=Layout(width="100%", height="40px"))
+        #: Label for the progress bar, shows progress in percent or status
         self.progress_label = Label()
-        # box widget containing progress bar and status label
+        #: Box widget that will be displayed, contains progress bar and status label
         self.progress_box = VBox([self.progress_bar, self.progress_label])
 
         display(self.progress_box)

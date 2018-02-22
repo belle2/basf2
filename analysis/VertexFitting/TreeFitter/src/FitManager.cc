@@ -17,6 +17,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 
+#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
+
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
@@ -74,7 +76,7 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
         //          std::endl;
-        Eigen::Matrix<double, Eigen::Dynamic, 1> prevpar = m_fitparams->getStateVector();
+        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);

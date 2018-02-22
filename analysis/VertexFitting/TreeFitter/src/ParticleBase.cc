@@ -317,6 +317,8 @@ namespace TreeFitter {
 
     const double tau = fitparams.getStateVector()(tauindex);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
+    const Eigen::Matrix<double, 1, 3> x_vec = fitparams.getStateVector().segment(posindex, 3);
+    const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
     //const double mom = p_vec.norm();
 
@@ -324,9 +326,9 @@ namespace TreeFitter {
 
     // linear approximation is fine
     for (int row = 0; row < 3; ++row) {
-      posxmother = fitparams.getStateVector()(posindexmother + row);
-      posx       = p_vec(row);
-      momx       = fitparams.getStateVector()(momindex + row);
+      posxmother = x_m(row);
+      posx       = x_vec(row);
+      momx       = p_vec(row);
       //momx       = fitparams.getStateVector()(momindex + row) / mom;
 
       /**

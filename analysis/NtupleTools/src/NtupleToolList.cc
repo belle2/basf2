@@ -51,8 +51,7 @@
 #include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleKlIdTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
-#include <analysis/NtupleTools/NtupleAngularTool.h> //added (2018.2.14)
-#include <analysis/NtupleTools/NtupleXpTool.h> //added (2018.2.20)
+#include <analysis/NtupleTools/NtupleXpTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -140,7 +139,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
   else if (strToolName == "KlId") return new NtupleKlIdTool(tree, d);
   else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
-  else if (strToolName == "Angular") return new NtupleAngularTool(tree, d);
   else if (strToolName == "Xp") return new NtupleXpTool(tree, d);
   B2ERROR("NtupleTool \"" << strToolName << "\" is not available: no tool with that name could be found!");
   return NULL;

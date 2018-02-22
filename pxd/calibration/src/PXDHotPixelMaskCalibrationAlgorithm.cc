@@ -54,7 +54,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
         string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
         auto hpxdhitmap =  getObjectPtr<TH1I>(name.c_str());
 
-        // Check there was data for sensor collected
+        // Check if there was data collected for this sensor
         if (hpxdhitmap == nullptr) continue;
 
         // Mask all hot pixel for this sensor

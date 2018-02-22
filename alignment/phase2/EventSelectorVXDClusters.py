@@ -21,16 +21,6 @@ class EventSelectorVXDClusters(Module):
         """ init """
         super(EventSelectorVXDClusters, self).__init__()
 
-    def isOK(self, Clusters):
-        """ Events with empty VXD (SVD or PXD) SimHits are removed."""
-        nClusters = Clusters.getEntries()
-        if nClusters == 0:
-            return False
-
-        return True
-
-        return True
-
     def event(self):
         """ Return True if event is fine, False otherwise """
 
@@ -44,9 +34,7 @@ class EventSelectorVXDClusters(Module):
         PXDClusters = Belle2.PyStoreArray('PXDClusters')
         nPXDClusters = PXDClusters.getEntries()
         if nPXDClusters != 0:
-            for pxdCluster in PXDClusters:
-                if pxdCluster.getSize() > 1:
-                    someOK = True
+            someOK = True
 
         if someOK:
             EventMetaData = Belle2.PyStoreObj('EventMetaData')

@@ -320,8 +320,6 @@ namespace TreeFitter {
     const Eigen::Matrix<double, 1, 3> x_vec = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
-    //const double mom = p_vec.norm();
-
     double posxmother = 0, posx = 0, momx = 0;
 
     // linear approximation is fine
@@ -341,33 +339,12 @@ namespace TreeFitter {
        *  0 = x - m - tau * p
        * */
 
-      //p.getResiduals()(row) = -1.0 * posxmother - tau * momx + posx ;
-      //p.getH()(row, posindexmother + row) = -1;
-      //p.getH()(row, momindex + row) = -tau;
-      //p.getH()(row, posindex + row) = 1.;
-      //p.getH()(row, tauindex)       = -1.0 * momx;
-
       p.getResiduals()(row) = posxmother + tau * momx - posx ;
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, momindex + row) = tau;
       p.getH()(row, posindex + row) = -1.;
       p.getH()(row, tauindex)       = momx;
     }
-
-    //const double px = p_vec(0);
-    //const double py = p_vec(1);
-    //const double pz = p_vec(2);
-    //const double p2 = p_vec * p_vec.transpose();
-
-    //p.getH()(0, momindex + 0)  = tau / mom * (1 - px *  px / p2);
-    //p.getH()(0, momindex + 1)  = tau / mom * (0 - px *  py / p2);
-    //p.getH()(0, momindex + 2)  = tau / mom * (0 - px *  pz / p2);
-    //p.getH()(1, momindex + 0)  = tau / mom * (0 - py *  px / p2);
-    //p.getH()(1, momindex + 1)  = tau / mom * (1 - py *  py / p2);
-    //p.getH()(1, momindex + 2)  = tau / mom * (0 - py *  pz / p2);
-    //p.getH()(2, momindex + 0)  = tau / mom * (0 - pz *  px / p2);
-    //p.getH()(2, momindex + 1)  = tau / mom * (0 - pz *  py / p2);
-    //p.getH()(2, momindex + 2)  = tau / mom * (1 - pz *  pz / p2);
 
     return ErrCode::success;
   }

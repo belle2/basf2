@@ -76,6 +76,7 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
         //          std::endl;
+
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);

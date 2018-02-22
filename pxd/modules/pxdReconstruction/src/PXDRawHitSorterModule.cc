@@ -17,7 +17,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <pxd/reconstruction/Pixel.h>
-// IDEA do the pixel masking here
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <set>
@@ -52,9 +51,6 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
   addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
-  // FIXME will be removed soon
-  addParam("ignoredPixelsListName", m_ignoredPixelsListName, "Name of the xml with ignored pixels list", string(""));
-
 }
 
 
@@ -66,8 +62,6 @@ void PXDRawHitSorterModule::initialize()
   storeDigits.registerInDataStore();
   StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   storeFrames.registerInDataStore();
-  // FIXME: will be removed soon
-  m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(m_ignoredPixelsListName));
 }
 
 void PXDRawHitSorterModule::event()
@@ -121,10 +115,7 @@ void PXDRawHitSorterModule::event()
     sensorID.setSegmentNumber(frameCounter); // should be 0 anyway...
     // We need some protection against crap data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
-
-      // FIXME
       if (PXDPixelMasker::getInstance().pixelOK(sensorID, px.getU(), px.getV())) {
-        //if (m_ignoredPixelsListName == "" || m_ignoredPixelsList->pixelOK(sensorID, PXDIgnoredPixelsMap::map_pixel(px.getU(), px.getV()))) {
         sensors[sensorID].insert(px);
         startRows[sensorID].insert(rawhit->getStartRow());
       }

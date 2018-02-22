@@ -15,8 +15,6 @@
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDFrame.h>
-// FIXME: deprecated code, will be removed soon
-#include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <string>
 
 namespace Belle2 {
@@ -68,11 +66,6 @@ namespace Belle2 {
       bool m_assignID;
       /** Discard out-of-range hits. */
       bool m_trimOutOfRange;
-      // FIXME: deprecated code, will be removed soon
-      /** Name of the ignored pixels list xml */
-      std::string m_ignoredPixelsListName;
-      /** Ignored pixels list manager class */
-      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList;
     };//end class declaration
 
 

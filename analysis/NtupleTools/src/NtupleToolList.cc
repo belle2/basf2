@@ -23,7 +23,6 @@
 #include <analysis/NtupleTools/NtupleMCVertexTool.h>
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
-#include <analysis/NtupleTools/NtupleROEGammasTool.h>
 #include <analysis/NtupleTools/NtupleRecoilKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 #include <analysis/NtupleTools/NtupleTagVertexTool.h>
@@ -112,7 +111,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);
   else if (strToolName == "CustomFloats") return new NtupleCustomFloatsTool(tree, d, strOption);
   else if (strToolName == "ROEMultiplicities") return new NtupleROEMultiplicitiesTool(tree, d);
-  else if (strToolName == "ROEGammas") return new NtupleROEGammasTool(tree, d);
   else if (strToolName == "RecoilKinematics") return new NtupleRecoilKinematicsTool(tree, d);
   else if (strToolName == "ExtraEnergy") return new NtupleExtraEnergyTool(tree, d);
   else if (strToolName == "TagVertex") return new NtupleTagVertexTool(tree, d);

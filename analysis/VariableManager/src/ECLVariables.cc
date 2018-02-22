@@ -125,22 +125,6 @@ namespace Belle2 {
       return minDistHelix;
     }
 
-    bool isGoodGamma(int region, double energy, bool calibrated)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      if (!calibrated) {
-        goodGammaRegion1 = region == 1 && energy > 0.140;
-        goodGammaRegion2 = region == 2 && energy > 0.130;
-        goodGammaRegion3 = region == 3 && energy > 0.200;
-      } else {
-        goodGammaRegion1 = region == 1 && energy > 0.100;
-        goodGammaRegion2 = region == 2 && energy > 0.090;
-        goodGammaRegion3 = region == 3 && energy > 0.160;
-      }
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
     bool isGoodBelleGamma(int region, double energy)
     {
       bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
@@ -151,46 +135,12 @@ namespace Belle2 {
       return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
-    bool isGoodSkimGamma(int region, double energy)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      goodGammaRegion1 = region == 1 && energy > 0.030;
-      goodGammaRegion2 = region == 2 && energy > 0.020;
-      goodGammaRegion3 = region == 3 && energy > 0.040;
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    double goodGammaUncalibrated(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodGamma(region, energy, false);
-    }
-
-    double goodGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodGamma(region, energy, true);
-    }
-
     double goodBelleGamma(const Particle* particle)
     {
       double energy = particle->getEnergy();
       int region = eclClusterDetectionRegion(particle);
 
       return (double) isGoodBelleGamma(region, energy);
-    }
-
-    double goodSkimGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodSkimGamma(region, energy);
     }
 
     double eclClusterErrorE(const Particle* particle)
@@ -612,14 +562,8 @@ namespace Belle2 {
                       "Therefore, keep in mind that this variable might be removed in the future!");
     REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
                       "Returns distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
-    REGISTER_VARIABLE("goodGamma", goodGamma,
-                      "Returns 1.0 if photon candidate passes simple region dependent energy selection (100/90/160 MeV).");
-    REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
-                      "Returns 1.0 if photon candidate passes simple region dependent raw energy selection (140/130/200 MeV).");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
-                      "Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
-    REGISTER_VARIABLE("goodSkimGamma", goodSkimGamma,
-                      "Returns 1.0 if photon candidate passes simple region dependent energy selection (30/20/40 MeV).");
+                      "[Legacy] Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
     REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");

@@ -516,6 +516,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // if flag is set discard all auxiliary hits:
+          if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
+
           const PXDCluster* pxdCluster = relatedClusters.object(i);
           const RelationVector<PXDTrueHit>& relatedTrueHits = pxdCluster->getRelationsTo<PXDTrueHit>();
 
@@ -577,6 +580,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           if (not std::isnan(m_useNLoops) and not isWithinNLoops<SVDCluster, SVDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
+
+          // if flag is set discard all auxiliary hits:
+          if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
           const SVDCluster* svdCluster = relatedClusters.object(i);
           const RelationVector<SVDTrueHit>& relatedTrueHits = svdCluster->getRelationsTo<SVDTrueHit>();
@@ -675,6 +681,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
+
+          // if flag is set discard all auxiliary hits:
+          if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
           int superLayerId = cdcHit->getISuperLayer();
 
@@ -839,9 +848,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
         const int hitID = std::get<1>(hitInformation);
         const auto hitOriginMCFinderType = std::get<2>(hitInformation);
 
-        // if flag is set discard all auxiliary hits:
-        if (m_discardAuxiliaryHits and hitOriginMCFinderType == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit)
-          continue;
 
         if (detectorInformation == Const::CDC) {
           const CDCHit* cdcHit = cdcHits[hitID];
@@ -869,8 +875,13 @@ void TrackFinderMCTruthRecoTracksModule::event()
           newRecoTrack->addSVDHit(svdCluster, hitCounter, hitOriginMCFinderType);
         }
         ++hitCounter;
-      }
-    }
+      } // end loop over hits
+
+      B2DEBUG(20, "New RecoTrack: #PXDHits: " << newRecoTrack->getPXDHitList().size() <<
+              " #SVDHits: " << newRecoTrack->getSVDHitList().size() <<
+              " #CDCHits: " << newRecoTrack->getCDCHitList().size());
+
+    } // end loop over vector
   }//end loop over MCParticles
 }
 
@@ -879,15 +890,25 @@ void TrackFinderMCTruthRecoTracksModule::event()
 template< class THit, class TSimHit>
 bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* aHit, double nLoops)
 {
-  const TSimHit* aSimHit = aHit->template getRelated<TSimHit>();
-  if (not aSimHit) return false;
-  const MCParticle* mcParticle = aSimHit->template getRelated<MCParticle>();
-  if (not mcParticle) return false;
+  // for SVD there are cases with more than one simhit attached
+  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsTo<TSimHit>();
+
+  // take the first best simhit with mcParticle attached
+  const MCParticle* mcParticle = nullptr;
+  const TSimHit* aSimHit = nullptr;
+  for (const auto& thisSimHit : relatedSimHits) {
+    mcParticle = thisSimHit.template getRelated<MCParticle>();
+    aSimHit = &thisSimHit;
+    if (mcParticle) break;
+  }
+  if (not mcParticle or not aSimHit) {
+    return false;
+  }
 
   // subtract the production time here in order for this classification to also work
   // for particles produced at times t' > t0
   const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
-  // has been this: (but flighttime seems to be identical to global time)
+  // has been this for CDC: (but flighttime seems to be identical to global time!?)
   // const double tof = cdcSimHit->getFlightTime() - mcParticle->getProductionTime();
   const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
   const float absMom3D = mcParticle->getMomentum().Mag();

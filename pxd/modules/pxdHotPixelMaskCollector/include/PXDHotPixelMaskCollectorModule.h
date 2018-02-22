@@ -17,9 +17,9 @@
 
 namespace Belle2 {
   /**
-   * Calibration Collector Module for PXD hot pixel masking
+   * Calibration Collector Module for PXD hot pixel masking from PXDDigits
    *
-   *    *
+   *
    */
   class PXDHotPixelMaskCollectorModule : public CalibrationCollectorModule {
 
@@ -29,13 +29,18 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     PXDHotPixelMaskCollectorModule();
-    void prepare();
-    void collect();
+    void prepare() override final;
+    void collect() override final;
 
   private:
-    /** Name of the collection to use for the PXDDigits */
-    std::string m_filterSensorName;
+    /**< Required input for PXDigits  */
+    StoreArray<PXDDigit> m_pxdDigit;
 
-    StoreArray<PXDDigit> m_pxdDigits;
+    /** Name of the collection to use for PXDDigits */
+    std::string m_storeDigitsName;
+
+    /** Minimum charge (ADU) for detecting a hit. */
+    int m_0cut;
+
   };
 }

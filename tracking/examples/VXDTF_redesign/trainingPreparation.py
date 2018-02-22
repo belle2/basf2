@@ -105,7 +105,8 @@ setup_RTCtoSPTCConverters(path=path,
                           sptcOutput='checkedSPTCs',
                           usePXD=usePXD,
                           logLevel=LogLevel.ERROR,
-                          useNoKick=use_noKick)
+                          useNoKick=use_noKick
+                          useOnlyFittedTracks=True)
 
 
 # SecMap BootStrap

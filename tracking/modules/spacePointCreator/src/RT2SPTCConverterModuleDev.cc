@@ -76,6 +76,9 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
 
   addParam("ignorePXDHits", m_ignorePXDHits, "If true no PXD hits will be used when creating the SpacePointTrackCand", bool(false));
 
+  addParam("convertFittedOnly", m_convertFittedOnly, "If true only RecoTracks with successful fit will be converted to "
+           "SpacePointTrackCands", m_convertFittedOnly);
+
   initializeCounters();
 }
 

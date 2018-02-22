@@ -221,7 +221,8 @@ def setup_RTCtoSPTCConverters(
         usePXD=True,
         logLevel=LogLevel.INFO,
         debugVal=1,
-        useNoKick=False):
+        useNoKick=False,
+        useOnlyFittedTracks=False):
     """This function adds the modules needed to convert Reco-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
@@ -240,6 +241,8 @@ def setup_RTCtoSPTCConverters(
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
 
     @param useNoKick enable the training sample selection based on track parameters (and produce a TFile of its effect)
+
+    @param useOnlyFittedTracks: if True only fitted RecoTracks will be transformed to SpacePointTrackCands
     """
     print("setup RTCtoSPTCConverters...")
 
@@ -290,6 +293,7 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
+    recoTrackCandConverter.param('convertFittedOnly', useOnlyFittedTracks)
 
     if os.environ.get('USE_BEAST2_GEOMETRY'):
         NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCutsPhase2.root")

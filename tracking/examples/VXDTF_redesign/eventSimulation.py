@@ -136,15 +136,18 @@ mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
 mctrackfinder.param('UseCDCHits', False)
 mctrackfinder.param('UseSVDHits', True)
 # Always use PXD hits! For SVD only, these will be filtered later when converting to SPTrackCand
-# 15.02.2018: deactivated PXD again as we dont do pxd track finding anymore
+# 15.02.2018: deactivated PXD again as we dont do pxd track finding anymore and to not bias the fit
 mctrackfinder.param('UsePXDHits', False)
 mctrackfinder.param('Smearing', False)
 mctrackfinder.param('MinimalNDF', 6)
 mctrackfinder.param('WhichParticles', ['primary'])
 mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
+# set up the track finder to only use the first half loop of the track and discard all other hits
+mctrackfinder.param('UseNLoops', 0.5)
+mctrackfinder.param('discardAuxiliaryHits', True)
 main.add_module(mctrackfinder)
 
-# include a track fit into
+# include a track fit into the chain
 # Correct time seed: Do I need it for SVD only tracks ????
 main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks", useFittedInformation=False)
 # track fitting

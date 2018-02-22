@@ -258,7 +258,7 @@ namespace TreeFitter {
     const double posprecision = 1e-4; // 1mu
 
     for (const auto daughter : m_daughters) {
-      // just to be sure ...
+
       int dautauindex = 0, daumomindex = 0, maxrow = 0;
       double mass = 0, e2 = 0, px = 0, py = 0, energy = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
 
@@ -279,25 +279,31 @@ namespace TreeFitter {
         // treat the energy for particles that are parameterized with p3
         energy = sqrt(e2);
         p.getResiduals()(3) += -energy;
+
         for (int jmom = 0; jmom < 3; ++jmom) {
           px = fitparams.getStateVector()(daumomindex + jmom);
           p.getH()(3, daumomindex + jmom) = -px / energy;
         }
 
-      } else if (dautauindex >= 0 && daughter->charge() != 0) {
-        //JFK changed tau eventually we have to devide it by |p| here
+        /** FIXME temporarily switched off */
+      } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
+
         tau =  fitparams.getStateVector()(dautauindex);
         lambda = bFieldOverC() * daughter->charge();
+
         px0 = fitparams.getStateVector()(daumomindex);
         py0 = fitparams.getStateVector()(daumomindex + 1);
         pt0 = sqrt(px0 * px0 + py0 * py0);
+
         if (fabs(pt0 * lambda * tau * tau) > posprecision) {
           sinlt = sin(lambda * tau);
           coslt = cos(lambda * tau);
           px = px0 * coslt - py0 * sinlt;
           py = py0 * coslt + px0 * sinlt;
+
           p.getResiduals()(0) += px0 - px;
           p.getResiduals()(1) += py0 - py;
+
           p.getH()(0, daumomindex) += 1 - coslt  ;
           p.getH()(0, daumomindex + 1) += sinlt      ;
           p.getH()(0, dautauindex) += lambda * py;

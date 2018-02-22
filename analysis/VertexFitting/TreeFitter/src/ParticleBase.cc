@@ -26,11 +26,17 @@
 
 namespace TreeFitter {
 
-  int vtxverbose = 0;
   std::vector<int> massConstraintList;//FT: this is not the best place to place this, but that's where the other extern goes.
 
-  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother)
-    : m_particle(particle), m_mother(mother), m_index(0), m_pdgMass(0), m_pdgWidth(0), m_pdgLifeTime(0), m_charge(0), m_name("Unknown")
+  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
+    m_particle(particle),
+    m_mother(mother),
+    m_index(0),
+    m_pdgMass(0),
+    m_pdgWidth(0),
+    m_pdgLifeTime(0),
+    m_charge(0),
+    m_name("Unknown")
   {
     if (particle) {
       const int pdgcode = particle->getPDGCode();
@@ -52,15 +58,15 @@ namespace TreeFitter {
   }
 
 
-  ParticleBase::ParticleBase(const std::string& name)
-    : m_particle(NULL),
-      m_mother(NULL),
-      m_index(0),
-      m_pdgMass(0),
-      m_pdgWidth(0),
-      m_pdgLifeTime(0),
-      m_charge(0),
-      m_name(name) {}
+  ParticleBase::ParticleBase(const std::string& name) :
+    m_particle(NULL),
+    m_mother(NULL),
+    m_index(0),
+    m_pdgMass(0),
+    m_pdgWidth(0),
+    m_pdgLifeTime(0),
+    m_charge(0),
+    m_name(name) {}
 
 
   ParticleBase::~ParticleBase()
@@ -309,8 +315,10 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
     const int momindex = momIndex();
 
-    const double tau =  fitparams.getStateVector()(tauindex);
+    const double tau = fitparams.getStateVector()(tauindex);
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
+
+    //const double mom = p_vec.norm();
 
     double posxmother = 0, posx = 0, momx = 0;
 
@@ -319,6 +327,7 @@ namespace TreeFitter {
       posxmother = fitparams.getStateVector()(posindexmother + row);
       posx       = p_vec(row);
       momx       = fitparams.getStateVector()(momindex + row);
+      //momx       = fitparams.getStateVector()(momindex + row) / mom;
 
       /**
        * x is the decay vertex of the particle
@@ -329,20 +338,34 @@ namespace TreeFitter {
        * thus (tau converts p into units of length):
        *  0 = x - m - tau * p
        * */
+
+      //p.getResiduals()(row) = -1.0 * posxmother - tau * momx + posx ;
+      //p.getH()(row, posindexmother + row) = -1;
+      //p.getH()(row, momindex + row) = -tau;
+      //p.getH()(row, posindex + row) = 1.;
+      //p.getH()(row, tauindex)       = -1.0 * momx;
+
       p.getResiduals()(row) = posxmother + tau * momx - posx ;
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, momindex + row) = tau;
       p.getH()(row, posindex + row) = -1.;
       p.getH()(row, tauindex)       = momx;
-
-      //p.getResiduals()(row) = posxmother - posx + tau * momx;  // FIXME TAU + or - ??
-
-      //p.getH()(row, posindexmother + row) = 1;
-      //p.getH()(row, momindex + row) = 1.*tau;
-      //p.getH()(row, posindex + row) = -1;
-      //p.getH()(row, tauindex)       = momx;
-
     }
+
+    //const double px = p_vec(0);
+    //const double py = p_vec(1);
+    //const double pz = p_vec(2);
+    //const double p2 = p_vec * p_vec.transpose();
+
+    //p.getH()(0, momindex + 0)  = tau / mom * (1 - px *  px / p2);
+    //p.getH()(0, momindex + 1)  = tau / mom * (0 - px *  py / p2);
+    //p.getH()(0, momindex + 2)  = tau / mom * (0 - px *  pz / p2);
+    //p.getH()(1, momindex + 0)  = tau / mom * (0 - py *  px / p2);
+    //p.getH()(1, momindex + 1)  = tau / mom * (1 - py *  py / p2);
+    //p.getH()(1, momindex + 2)  = tau / mom * (0 - py *  pz / p2);
+    //p.getH()(2, momindex + 0)  = tau / mom * (0 - pz *  px / p2);
+    //p.getH()(2, momindex + 1)  = tau / mom * (0 - pz *  py / p2);
+    //p.getH()(2, momindex + 2)  = tau / mom * (1 - pz *  pz / p2);
 
     return ErrCode::success;
   }
@@ -366,15 +389,12 @@ namespace TreeFitter {
     p.getH()(0, momindex + 2) = 2.0 * pz;
     p.getH()(0, momindex + 3) = -2.0 * E;
 
-
-
     //p.getResiduals()(0) =  E * E - px * px - py * py - pz * pz - mass2;
 
     //p.getH()(0, momindex) = -2.0 * px;
     //p.getH()(0, momindex + 1) = -2.0 * py;
     //p.getH()(0, momindex + 2) = -2.0 * pz;
     //p.getH()(0, momindex + 3) =  2.0 * E;
-
     return ErrCode::success;
   }
 
@@ -418,7 +438,7 @@ namespace TreeFitter {
         tau = 5;// 5 / std::sqrt(mom2);//pdgTau();
       }
 
-      if (std::isnan(tau)) {tau = 999;}
+      if (std::isnan(tau)) {tau = -999;}
 
       fitparams->getStateVector()(tauindex) = tau;
     }

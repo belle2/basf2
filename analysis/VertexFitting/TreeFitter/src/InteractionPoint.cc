@@ -74,6 +74,12 @@ namespace TreeFitter {
         B2FATAL("The IP constraint has to have a dimension of either 0, 2 or 3. You specified: " << m_constraintDimension);
       }
     }
+
+    // std::cout << "Beam Spot uncertainty : x "
+    //   << std::sqrt(m_ipCovariance(0, 0)) << " y: "
+    //   << std::sqrt(m_ipCovariance(1, 1)) << " z: "
+    //   << std::sqrt(m_ipCovariance(2, 2)) << std::endl;
+
     return ErrCode::success;
   }
 

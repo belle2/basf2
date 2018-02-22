@@ -27,7 +27,6 @@ namespace TreeFitter {
      *  which they are applied.
     */
     enum Type { unknown = 0,
-                beamspot,
                 beamenergy,
                 lifetime,
                 resonance,
@@ -38,6 +37,7 @@ namespace TreeFitter {
                 kinematic,
                 massEnergy,
                 geometric,
+                beamspot,
                 mass,
                 merged,
                 ntypes

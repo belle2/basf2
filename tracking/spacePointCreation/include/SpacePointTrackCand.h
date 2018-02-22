@@ -418,6 +418,6 @@ namespace Belle2 {
     double m_qualityIndex = 0.5;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
-    ClassDef(SpacePointTrackCand, 9)
+    ClassDef(SpacePointTrackCand, 10)
   };
 }

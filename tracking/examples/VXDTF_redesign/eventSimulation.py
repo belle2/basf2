@@ -147,14 +147,17 @@ mctrackfinder.param('UseNLoops', 0.5)
 mctrackfinder.param('discardAuxiliaryHits', True)
 main.add_module(mctrackfinder)
 
-# include a track fit into the chain
-# Correct time seed: Do I need it for SVD only tracks ????
+# include a track fit into the chain (sequence taken from
+# Correct time seed: Do I need it for VXD only tracks ????
 main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks", useFittedInformation=False)
 # track fitting
 daffitter = register_module("DAFRecoFitter")
 daffitter.param('recoTracksStoreArrayName', "MCRecoTracks")
 # daffitter.logging.log_level = LogLevel.DEBUG
 main.add_module(daffitter)
+# also used in the tracking sequence (multi hypothesis)
+# may be overkill
+main.add_module('TrackCreator', recoTrackColName="MCRecoTracks", pdgCodes=[211, 321, 2212])
 
 
 # build the name of the output file

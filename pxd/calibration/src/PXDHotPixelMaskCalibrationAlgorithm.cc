@@ -8,14 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//#include <framework/database/DBObjPtr.h>
-//#include <framework/database/DBImportObjPtr.h>
-//#include <framework/database/IntervalOfValidity.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/calibration/PXDHotPixelMaskCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <boost/format.hpp>
 #include "TH1I.h"
 
@@ -47,29 +43,30 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 
   PXDMaskedPixelPar* maskedPixelsPar = new PXDMaskedPixelPar();
 
-  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
-
-  if (gTools->getNumberOfPXDLayers() == 0) {
-    B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
-  }
-
   // Mask all hot pixels for PXD
-  int nPXDSensors = gTools->getNumberOfPXDSensors();
-  for (int i = 0; i < nPXDSensors; i++) {
-    // Get hitmap for PXD sensor
-    string name = str(format("PXD_%1%_PixelHitmap") % i);
-    auto hpxdhitmap =  getObjectPtr<TH1I>(name.c_str());
+  for (int iLayer = 1; iLayer <= 2; iLayer++) {
+    int nLadder = 8;
+    if (iLayer == 2) nLadder = 12;
+    for (int iLadder = 1; iLadder <= nLadder; iLadder++) {
+      for (int iSensor = 1; iSensor <= 2; iSensor++) {
+        // Get hitmap for PXD sensor
+        VxdID id(iLayer, iLadder, iSensor);
+        string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
+        auto hpxdhitmap =  getObjectPtr<TH1I>(name.c_str());
 
+        // Check there was data for sensor collected
+        if (hpxdhitmap == nullptr) continue;
 
-    // Mask all hot pixel for this sensor
-    VxdID id = gTools->getSensorIDFromPXDIndex(i);
-    for (auto bin = 1; bin <= hpxdhitmap->GetXaxis()->GetNbins(); bin++) {
-      float nhits = (float) hpxdhitmap->GetBinContent(bin);
+        // Mask all hot pixel for this sensor
+        for (auto bin = 1; bin <= hpxdhitmap->GetXaxis()->GetNbins(); bin++) {
+          float nhits = (float) hpxdhitmap->GetBinContent(bin);
 
-      if (nhits > minHits) {
-        if (nhits / nevents > maxOccupancy) {
-          // This pixel is hot, we have to mask it
-          maskedPixelsPar->maskSinglePixel(id.getID(), bin - 1);
+          if (nhits > minHits) {
+            if (nhits / nevents > maxOccupancy) {
+              // This pixel is hot, we have to mask it
+              maskedPixelsPar->maskSinglePixel(id.getID(), bin - 1);
+            }
+          }
         }
       }
     }

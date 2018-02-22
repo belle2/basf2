@@ -58,19 +58,17 @@ void PXDRawHotPixelMaskCollectorModule::prepare() // Do your initialise() stuff 
   registerObject<TH1I>("nevents", hnevents);
 
   int nPXDSensors = gTools->getNumberOfPXDSensors();
-
   for (int i = 0; i < nPXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromPXDIndex(i);
     int iLayer = id.getLayerNumber();
     int iLadder = id.getLadderNumber();
     int iSensor = id.getSensorNumber();
-    VxdID sensorID(iLayer, iLadder, iSensor);
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
     //----------------------------------------------------------------
     // Hitmaps: Number of hits per sensor and pixel
     //----------------------------------------------------------------
-    string name = str(format("PXD_%1%_PixelHitmap") % i);
+    string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
     string title = str(format("PXD Sensor %1% Pixel Hitmap from PXDRawHotPixelMaskCollector") % sensorDescr);
 
     // Data object creation --------------------------------------------------
@@ -88,7 +86,6 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
   if (!m_pxdRawHit || !m_pxdRawHit.getEntries()) return;
 
   auto& geo = VXD::GeoCache::getInstance();
-  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
 
   // Data object access and filling ----------------------------------------
   TH1I* collector_nevents = getObjectPtr<TH1I>("nevents");
@@ -110,9 +107,7 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
 
     // Increment counter for hit pixel
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
-      int index = gTools->getPXDSensorIndex(sensorID);
-      string name = str(format("PXD_%1%_PixelHitmap") % index);
-
+      string name = str(format("PXD_%1%_PixelHitmap") % sensorID.getID());
       TH1I* collector_hitmap = getObjectPtr<TH1I>(name.c_str());
       collector_hitmap->Fill(rawhit.getColumn() * 768 + rawhit.getRow());
     }

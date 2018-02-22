@@ -26,7 +26,7 @@ import time
 import random
 
 from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficiencies
-from gridcontrol_helper import write_gridcontrol_file, call_gridcontrol
+from gridcontrol_helper import write_gridcontrol_swtrigger, call_gridcontrol
 
 
 def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase):
@@ -57,7 +57,10 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
 
             parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(steering_file="generate.py", parameters=parameters, local_execution=local_execution)
+    gridcontrol_file = write_gridcontrol_swtrigger(
+        steering_file="generate.py",
+        parameters=parameters,
+        local_execution=local_execution)
 
     if skip_if_files_exist and all_output_files_exist:
         return
@@ -86,7 +89,7 @@ def run_reconstruction(channels, storage_location, local_execution, phase, roi_f
 
             parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(
+    gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file="reconstruct.py",
         parameters=parameters,
         local_execution=local_execution)
@@ -127,7 +130,7 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
                      "mem_statistics_file": mem_statistics_file}
         parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(
+    gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file="hlt_processing.py",
         parameters=parameters,
         local_execution=local_execution)
@@ -159,7 +162,10 @@ def calculate_efficiencies(channels, storage_location, local_execution):
 
             parameters.append(parameter)
 
-    gridcontrol_file = write_gridcontrol_file(steering_file="analyse.py", parameters=parameters, local_execution=local_execution)
+    gridcontrol_file = write_gridcontrol_swtrigger(
+        steering_file="analyse.py",
+        parameters=parameters,
+        local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
     extract_efficiencies(channels=channels, storage_location=storage_location)

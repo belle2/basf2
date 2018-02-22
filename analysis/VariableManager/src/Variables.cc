@@ -28,6 +28,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -655,6 +656,19 @@ namespace Belle2 {
       TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
 
       return (beam - part->get4Vector()).Vect().Phi();
+    }
+
+    double cosToThrustOfEvent(const Particle* part)
+    {
+      StoreObjPtr<ThrustOfEvent> thrust;
+      if (!thrust) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      PCmsLabTransform T;
+      TVector3 th = thrust->getThrustAxis();
+      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      return std::cos(th.Angle(particleMomentum));
     }
 
 // released energy --------------------------------------------------
@@ -1399,6 +1413,9 @@ namespace Belle2 {
                       "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
     REGISTER_VARIABLE("missingMomentumPhi", missingMomentumPhi,
                       "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
+                      "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
+
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");

@@ -54,11 +54,11 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 
   addParam("ShowAllHistos", m_ShowAllHistos,
-           "Flag to show all histot in DQM, default = 0 ", m_ShowAllHistos);
+           "Flag to show all histos in DQM, default = 0 ", m_ShowAllHistos);
   addParam("CutSVDCharge", m_CutSVDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 22 ADU ", m_CutSVDCharge);
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
-           "cut for accepting clusters to hitmap histogram, default = 12 ke- ", m_CutSVDClusterCharge);
+           "cut for accepting clusters to hitmap histogram, default = 5 ke- ", m_CutSVDClusterCharge);
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDExpReco"));
 }

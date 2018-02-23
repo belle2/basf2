@@ -153,14 +153,15 @@ namespace TreeFitter {
           TVector3 v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
           // FIXME @francesco here was a minus sign I removed
-          fitparams->getStateVector()(posindex)     = -v.x();
-          fitparams->getStateVector()(posindex + 1) = -v.y();
-          fitparams->getStateVector()(posindex + 2) = -v.z();
+          fitparams->getStateVector()(posindex)     = v.x();
+          fitparams->getStateVector()(posindex + 1) = v.y();
+          fitparams->getStateVector()(posindex + 2) = v.z();
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
 
-        } else if (trkdaughters.size() + vtxdaughters.size() >= 2)  {
+          /** FIXME temporarily disabled */
+        } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
           // that's unfortunate: no enough charged tracks from this
           // vertex. need all daughters. create trajectories and use
           // normal TrkPoca.
@@ -168,9 +169,6 @@ namespace TreeFitter {
           //JFK: FIXME 2017-09-25
           //std::cout << "Internal particle l181 track + other daughter::Is this implementd?"  << std::endl;
           B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
-
-          // FIXME Does this work yet?
-          B2WARNING("This might not work yet");
 
         } else if (mother() && mother()->posIndex() >= 0) {
           // let's hope the mother was initialized
@@ -289,7 +287,8 @@ namespace TreeFitter {
         }
 
         /** FIXME temporarily switched off */
-      } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
+        //} else if (false && dautauindex >= 0 && daughter->charge() != 0) {
+      } else if (dautauindex >= 0 && daughter->charge() != 0) {
 
         tau =  fitparams.getStateVector()(dautauindex);
         lambda = bFieldOverC() * daughter->charge();

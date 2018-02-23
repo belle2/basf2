@@ -25,13 +25,13 @@
 
 namespace TreeFitter {
 
-  RecoPhoton::RecoPhoton(Belle2::Particle* particle, const ParticleBase* mother)
-    : RecoParticle(particle, mother),
-      m_dim(3),
-      m_init(false),
-      m_useEnergy(useEnergy(*particle)),
-      m_clusterPars(),
-      m_covariance()
+  RecoPhoton::RecoPhoton(Belle2::Particle* particle, const ParticleBase* mother) :
+    RecoParticle(particle, mother),
+    m_dim(3),
+    m_init(false),
+    m_useEnergy(useEnergy(*particle)),
+    m_clusterPars(),
+    m_covariance()
   {
     initParams() ;
   }
@@ -229,11 +229,11 @@ namespace TreeFitter {
 
     // dr'/dm  | m:={x,y,z,px,py,pz,E}
     // x := x_vertex (decay vertex of mother)
-    p.getH()(0, posindex + i1) = P(0, i1);
+    p.getH()(0, posindex + i1) =  p_vec[i2] / p_vec[i1]; //sign?
     p.getH()(0, posindex + i2) = -1.0;
     p.getH()(0, posindex + i3) = 0;
 
-    p.getH()(1, posindex + i1) = P(1, i1);
+    p.getH()(1, posindex + i1) =  p_vec[i3] / p_vec[i1]; //sign?
     p.getH()(1, posindex + i2) = 0;
     p.getH()(1, posindex + i3) = -1.0;
 
@@ -245,9 +245,9 @@ namespace TreeFitter {
     p.getH()(1, momindex + i2) = 0;
     p.getH()(1, momindex + i3) = -1. * elim;
 
-    p.getH()(2, momindex + i1) = P(2, i1);
-    p.getH()(2, momindex + i2) = P(2, i2);
-    p.getH()(2, momindex + i3) = P(2, i3);
+    p.getH()(2, momindex + i1) = -1. * p_vec[i1] / mom;
+    p.getH()(2, momindex + i2) = -1. * p_vec[i2] / mom;
+    p.getH()(2, momindex + i3) = -1. * p_vec[i3] / mom;
     p.getH()(2, momindex + 3) = 1;
 
     return ErrCode::success;

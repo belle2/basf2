@@ -355,7 +355,6 @@ namespace TreeFitter {
     const double mass = pdgMass();
     const double mass2 = mass * mass;
     const int momindex = momIndex();
-
     const double px = fitparams.getStateVector()(momindex);
     const double py = fitparams.getStateVector()(momindex + 1);
     const double pz = fitparams.getStateVector()(momindex + 2);

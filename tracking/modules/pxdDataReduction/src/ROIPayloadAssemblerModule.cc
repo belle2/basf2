@@ -86,9 +86,11 @@ void ROIPayloadAssemblerModule::event()
 
   if (!mAcceptAll) {
     StoreObjPtr<SoftwareTriggerResult> result;
+    if (!result.isValid()) {
+      B2FATAL("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+    }
     accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
   }
-
 
   map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;
 

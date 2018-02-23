@@ -25,6 +25,8 @@ def main():
                         action="store_true", default=False)
     parser.add_argument("--ignore-db-failure", help="Ignore if the DB download was not successful (expert option)",
                         action="store_true", default=False)
+    parser.add_argument("--use-gdb", help="Use the gbb debugger when calling basf2",
+                        action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -48,7 +50,8 @@ def main():
                                                               hlt_steering_file=hlt_steering_file,
                                                               dataset_folder=args.raw_folder_location,
                                                               local_db_path=os.path.join(abs_db_target, "database.txt"),
-                                                              local_execution=args.local)
+                                                              local_execution=args.local,
+                                                              use_gdb=args.use_gdb)
 
     # download DB
     try:

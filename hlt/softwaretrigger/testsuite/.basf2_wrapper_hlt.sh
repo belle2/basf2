@@ -19,5 +19,12 @@ setoption ${BASF2_COMPILE_OPTION}
 # back to the jobs scratch folder
 cd ${GC_SCRATCH}
 echo "Starting steering file..."
-basf2 ${BASF2_STEERING_FILE} -- --input-file ${FILE_NAMES} --no-output --histo-output-file dqm_out.root --root-output-file output.root --local-db-path ${BASF2_LOCAL_DB_PATH} input_buffer output_buffer 2222 0
+basf2_command="basf2 ${BASF2_STEERING_FILE} -- --input-file ${FILE_NAMES} --no-output --histo-output-file dqm_out.root --root-output-file output.root --local-db-path ${BASF2_LOCAL_DB_PATH} input_buffer output_buffer 2222 0"
 
+if [ -z "${BASF2_USE_GDB}" ]; then
+	eval_command=$basf2_command
+else
+	eval_command="gdb -return-child-result -batch -ex 'run' -ex 'backtrace' --args ${basf2_command}"
+fi
+echo "Executing: ${eval_command}"
+eval $eval_command

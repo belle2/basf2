@@ -53,6 +53,7 @@ BASF2_TOOLS_LOCATION = {tools_location}
 BASF2_RELEASE_LOCATION = {release_location}
 BASF2_STEERING_FILE = {steering_file}
 BASF2_LOCAL_DB_PATH = {local_db_path}
+{use_gdb}
 [UserTask]
 executable = .basf2_wrapper_hlt.sh
 files per job = 1 ; Number of files to process per job
@@ -67,7 +68,7 @@ queue = s
 
 
 def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder, local_db_path, local_execution,
-                               jobs_in_flight=100):
+                               jobs_in_flight=100, use_gdb=False):
     if os.path.exists(working_folder):
         rmtree(working_folder)
 
@@ -77,8 +78,12 @@ def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder
     hlt_steering_file = os.path.abspath(hlt_steering_file)
     gridcontrol_file = os.path.join(working_folder, "hlt_raw_processing.conf")
 
+    # rewrite the use_gdb flag to be used as env variable
+    use_gdb = "BASF2_USE_GDB = 1" if use_gdb else ""
+
     specific_gc_settings = {"dataset_folder": dataset_folder,
                             "steering_file": hlt_steering_file,
+                            "use_gdb": use_gdb,
                             "local_db_path": local_db_path}
     return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
                                   gridcontrol_filename=gridcontrol_file,

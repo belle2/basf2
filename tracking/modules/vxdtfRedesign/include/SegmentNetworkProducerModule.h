@@ -10,22 +10,18 @@
 
 #pragma once
 
-// stl
 #include <string>
 #include <vector>
 #include <utility>
 
-//root
 #include <TFile.h>
 
-// fw
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
 
-// tracking
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
@@ -176,19 +172,16 @@ namespace Belle2 {
     /// If true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.
     bool m_PARAMallFiltersOff = false;
 
-    /** Maximal size of SegmentNetwork; if exceeded, filling of the SegmentNetwork will be stopped, the
-    *   SegmentNetwork will be cleared and the respective event will be skipped.
-    */
+    /// Maximal size of SegmentNetwork; if exceeded, filling of SegmentNetwork will be stopped and the event skipped.
     unsigned short m_PARAMmaxNetworkSize = 40000;
 
+    /// Maximal number of Segment connections; if exceeded, filling of SegmentNetwork will be stopped and the event skipped.
     unsigned short m_PARAMmaxSegmentConnections = 30000;
 
-
-    /** Maximal size of hit network; if exceeded, filling of the HitNetwork will be stopped, the
-    *  HitsNetwork will be cleared and the respective event will be skipped.
-    */
+    /// Maximal size of hit network; if exceeded, filling of HitNetwork will be stopped and the event skipped.
     unsigned short m_PARAMmaxHitNetworkSize = 3000;
 
+    /// Maximal number of hit connections; if exceeded, filling of HitNetwork will be stopped and the event skipped.
     unsigned short m_PARAMmaxTrackNodeConnections = 8000;
 
 

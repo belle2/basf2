@@ -85,18 +85,29 @@ namespace Belle2 {
     std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
 
 
-    int sizeSegments() { return m_segments.size(); }
+    /** Returns number of activeSectors found. */
     int sizeActiveSectors() { return m_activeSectors.size(); }
+    /** Returns number of trackNodes found. */
     int sizeTrackNodes() { return m_trackNodes.size(); }
+    /** Returns number of segments found. */
+    int sizeSegments() { return m_segments.size(); }
 
-    int get_trackNodeConnections() { return m_trackNodeConnections; }
+    /** Returns number of activeSectors connections made. */
     int get_activeSectorConnections() { return m_activeSectorConnections; }
+    /** Returns number of trackNodes connections made. */
+    int get_trackNodeConnections() { return m_trackNodeConnections; }
+    /** Returns number of segments connections made. */
     int get_segmentConnections() { return m_segmentConnections; }
+    /** Returns number of paths found. */
     int get_collectedPaths() { return m_collectedPaths; }
 
-    void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
+    /** Sets number of activeSectors connections made. */
     void set_activeSectorConnections(int in) { m_activeSectorConnections = in; }
+    /** Sets number of trackNodes connections made. */
+    void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
+    /** Sets number of segments connections made. */
     void set_segmentConnections(int in) { m_segmentConnections = in; }
+    /** Sets number of paths found. */
     void set_collectedPaths(int in) { m_collectedPaths = in; }
 
     /** Clear directed node network container
@@ -125,9 +136,13 @@ namespace Belle2 {
     ClassDef(DirectedNodeNetworkContainer, 10)
 
   protected:
-    int m_trackNodeConnections = 0;
+    /** Number of activeSectors connections made. */
     int m_activeSectorConnections = 0;
+    /** Number of trackNodes connections made. */
+    int m_trackNodeConnections = 0;
+    /** Number of segments connections made. */
     int m_segmentConnections = 0;
+    /** Number of paths found. */
     int m_collectedPaths = 0;
 
     /** ************************* DATA MEMBERS ************************* */

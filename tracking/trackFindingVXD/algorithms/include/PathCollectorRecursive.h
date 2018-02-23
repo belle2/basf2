@@ -47,7 +47,7 @@ namespace Belle2 {
     using Path = std::vector<NodeType*>;
 
 
-    /* Main functionality of this class
+    /** Main functionality of this class
      * Evaluates provided network and creates all allowed paths.
      * All found paths are filled into the provided vector 'paths'.
      * If storeSubsets is turned on, also the sub-paths are saved to vector 'paths'.

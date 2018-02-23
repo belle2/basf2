@@ -10,12 +10,10 @@
 
 #pragma once
 
-// fw
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 
-// tracking
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
@@ -36,7 +34,8 @@
 
 namespace Belle2 {
   /** The TrackFinderVXDBasicPathFinder is a low momentum Si-only trackfinder.
-   * It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands by simply storing all possible paths stored in the SegmentNetwork.
+   * It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands
+   * by simply storing all possible paths stored in the SegmentNetwork.
    */
   class TrackFinderVXDBasicPathFinderModule final : public Module {
   private:
@@ -95,6 +94,7 @@ namespace Belle2 {
     /** Maximal number of families in event; if exceeded, the execution of the trackfinder will be stopped. */
     unsigned short m_PARAMmaxFamilies = 10000;
 
+    /** Maximal number of paths per event; if exceeded, the execution of the trackfinder will be stopped. */
     unsigned int m_PARAMmaxPaths = 300000;
 
     /// member variables

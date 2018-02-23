@@ -55,8 +55,13 @@ namespace Belle2 {
     /** No of FADCs, for Phase2: 5,
      *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
      *  keep universal code for Phase 2 and 3
+     *  NB: Some private fields have not yet been used and clang warnings
+     *  for them have been disabled.
     */
-    int c_nFADC = 5;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-private-field"
+    const int c_nFADC = 5;
+#pragma clang diagnostic pop
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
@@ -113,6 +118,8 @@ namespace Belle2 {
     /** v time of clusters for all sensors */
     TH1F* m_clusterTimeVAll;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-private-field"
     /** Counter of APV errors (16) */
     TH1I** m_CounterAPVErrors;
     /** Counter of FTB errors (256) */
@@ -121,6 +128,7 @@ namespace Belle2 {
     TH1I** m_CounterApvErrorORErrors;
     /** Counter of FTB Flags (32) */
     TH1I** m_CounterFTBFlags;
+#pragma clang diagnostic pop
 
     /** Number of SVD chips per sensor in u,v in layer 3 (=6) on Belle II */
     int c_nSVDChipsL3 = 6;

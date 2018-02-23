@@ -66,6 +66,12 @@ void ROIPayloadAssemblerModule::initialize()
   StoreObjPtr<ROIpayload> roiPayloads;
   roiPayloads.registerInDataStore(m_ROIpayloadName);
 
+  // in case we don't accept all events, we have to look
+  // up the trigger decision
+  if (!mAcceptAll) {
+    StoreObjPtr<SoftwareTriggerResult> result;
+    result.isRequired();
+  }
 }
 
 

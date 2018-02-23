@@ -110,12 +110,20 @@ def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
         input.param("RingBufferName", args.input_buffer_name)
     else:
         # Input from SeqRootInput
-        input = basf2.register_module('SeqRootInput')
+        input_file_name = None
 
         if args.input_file:
-            input.param('inputFileName', args.input_file)
+            input_file_name = args.input_file
         else:
-            input.param('inputFileName', inputfile)
+            input_file_name = inputfile
+
+        # automatic detection if root or sroot input module
+        # is needed
+        if input_file_name.endswith(".sroot"):
+            input = basf2.register_module('SeqRootInput')
+        else:
+            input = basf2.register_module('RootInput')
+        input.param('inputFileName', input_file_name)
 
     path.add_module(input)
 

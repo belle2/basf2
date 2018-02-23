@@ -2034,3 +2034,46 @@ def writePi0EtaVeto(
     variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_main):
+    """
+    Calculates the Thrust of the event using ParticleLists provided. If no ParticleList is
+    provided, default ParticleLists are used(all track and all hits in ECL without associated track).
+
+    The Thrust value is stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
+    and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
+    particle and the Thrust of the event in the CM system, are also created.
+
+    @param inputListNames   list of ParticleLists used to calculate the Thrust. If the list is empty,
+                            default ParticleLists pi+:thrust and gamma:thrust are filled.
+    @param default_cleanup  if True, apply default clean up cuts to default
+                            ParticleLists pi+:thrust and gamma:thrust.
+    @param path             modules are added to this path
+    """
+    if not inputListNames:
+        B2INFO("Creating particle lists pi+:thrust and gamma:thrust to get the Thrust of Event.")
+        fillParticleList('pi+:thrust', '')
+        fillParticleList('gamma:thrust', '')
+        particleLists = ['pi+:thrust', 'gamma:thrust']
+
+        if default_cleanup:
+            B2INFO("Using default cleanup in Thrust of Event module.")
+            trackCuts = 'pt > 0.1'
+            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+            trackCuts += ' and -3.0 < dz < 3.0'
+            trackCuts += ' and -0.5 < dr < 0.5'
+            applyCuts('pi+:thrust', trackCuts)
+
+            gammaCuts = 'E > 0.05'
+            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            applyCuts('gamma:thrust', gammaCuts)
+        else:
+            B2INFO("No cleanup in Thrust of Event module.")
+    else:
+        particleLists = inputListNames
+
+    thrustModule = register_module('ThrustOfEvent')
+    thrustModule.set_name('ThrustOfEvent_')
+    thrustModule.param('particleLists', particleLists)
+    path.add_module(thrustModule)

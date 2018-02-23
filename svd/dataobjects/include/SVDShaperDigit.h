@@ -221,6 +221,27 @@ namespace Belle2 {
     }
 
     /**
+     * does the strip pass the ZS cut?
+     * @param nSamples min number of samples above threshold
+     * @param cutMinSignal SN threshold
+     * @return true if the strip have st least nSamples above threshold, false otherwise
+     */
+    bool passesZS(int nSamples, float cutMinSignal) const
+    {
+      int nOKSamples = 0;
+      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++)
+        if (samples_vec[k] > cutMinSignal)
+          nOKSamples++;
+
+      if (nOKSamples >= nSamples)
+        return true;
+
+      return false;
+    }
+
+
+    /*
      * mark the strip as hot
      * @param max numner of samples above threshold
      * @param SN threshold

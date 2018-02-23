@@ -118,117 +118,63 @@ namespace Belle2 {
           head.print();
         }
 
-        switch (head.type) {
-          case 1:
-            unpackSuppressedData(buffer, bufferSize, ibyte, head);
-            break;
-          case 2:
-            unpackUnsuppressedData(buffer, bufferSize, ibyte, head);
-            break;
-          default:
-            B2ERROR("ARICHUnpacker: unknown data format type = " << head.type);
+        while (ibyte < head.length) {
+
+          // new feb
+          ARICHRawHeader febHead;
+          readHeader(buffer, ibyte, febHead);
+          if (m_debug) febHead.print();
+
+          if (/*febHead.type != head.type ||*/ febHead.version != head.version || febHead.mergerID != head.mergerID
+                                               || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in FEB header " << (unsigned)febHead.FEBSlot <<
+                                                     " not consistent with data in merger header " << (unsigned)head.mergerID);
+
+          // feb header shift
+          ibyte += ARICHFEB_HEADER_SIZE;
+          int dataLen = febHead.length - ARICHFEB_HEADER_SIZE;
+
+          febHead.FEBSlot += 1; /// temporary! FEB Slots on merger should be 1-6 (now 0-5). Remove when firmware is updated!
+
+          unsigned mergID = m_mergerMap->getMergerIDfromSN((unsigned)head.mergerID);
+          unsigned moduleID = m_mergerMap->getModuleID(mergID, (unsigned)febHead.FEBSlot);
+
+          if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger 2 module mapping for mergerID " << (unsigned)head.mergerID << " FEB slot: " << (unsigned)febHead.FEBSlot); break;}
+
+          // read data
+          if (m_debug) std::cout << "Hit channels: " << std::endl;
+          if (febHead.type == 1) {
+            for (int i = 0; i < dataLen / 2; i++) {
+              int shift = (3 - ibyte % 4) * 8;
+              uint8_t asicCh = buffer[ibyte / 4] >> shift;
+              ibyte++;
+              shift = (3 - ibyte % 4) * 8;
+              uint8_t hitBitSet = buffer[ibyte / 4] >> shift;
+              if (m_debug && hitBitSet) std::cout << "ch: " << (unsigned)asicCh << " " <<  std::bitset<8>(hitBitSet) << std::endl;
+              // store digit
+              digits.appendNew(moduleID, (unsigned)asicCh, hitBitSet);
+              ibyte++;
+            }
+          } else if (febHead.type == 2) {
+            unsigned asicCh = 143;
+            for (int i = 0; i < dataLen; i++) {
+              int shift = (3 - ibyte % 4) * 8;
+              uint8_t hitBitSet = buffer[ibyte / 4] >> shift;
+              // store digit if hit
+              if (hitBitSet & m_bitMask) {
+                digits.appendNew(moduleID, asicCh, hitBitSet);
+              }
+              asicCh--;
+              ibyte++;
+            }
+          } else B2ERROR("ARICHUnpackerModule: Unknown data type " << febHead.type);
+
         }
+
+        if (ceil(ibyte / 4.) != (unsigned)bufferSize)
+          B2WARNING("ARICHUnpackerModule: data buffer size mismatch (from copper vs data header: " <<  bufferSize << " vs. " <<  ceil(
+                      ibyte / 4.));
       }
     }
-
-  }
-
-  void ARICHUnpackerModule::unpackUnsuppressedData(const int* buffer, int bufferSize, unsigned& ibyte, ARICHRawHeader& head)
-  {
-
-    StoreArray<ARICHDigit> digits(m_outputDigitsName);
-
-    while (ibyte < head.length) {
-
-      // new feb
-      ARICHRawHeader febHead;
-      readHeader(buffer, ibyte, febHead);
-      if (febHead.type != head.type || febHead.version != head.version || febHead.mergerID != head.mergerID
-          || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in FEB header " << (unsigned)febHead.FEBSlot <<
-                                                        " not consistent with data in merger header " << (unsigned)head.mergerID);
-      // feb header shift
-      ibyte += ARICHFEB_HEADER_SIZE;
-      int dataLen = febHead.length - ARICHFEB_HEADER_SIZE;
-
-      // get module ID from mapper
-
-      febHead.FEBSlot += 1; /// temporary! FEB Slots on merger should be 1-6 (now 0-5). Remove when firmware is updated!
-
-      if (m_debug) {
-        std::cout << std::endl << "FEB header" << std::endl;
-        febHead.print();
-      }
-      unsigned moduleID = m_mergerMap->getModuleID((unsigned)head.mergerID, (unsigned)febHead.FEBSlot);
-
-
-      if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger 2 module mapping for mergerID " << (unsigned)head.mergerID << " FEB slot: " << (unsigned)febHead.FEBSlot); break;}
-      if (m_debug) std::cout << "Hit channels: " << std::endl;
-      // read data
-      unsigned asicCh = 143;
-      for (int i = 0; i < dataLen; i++) {
-        int shift = (3 - ibyte % 4) * 8;
-        uint8_t hitBitSet = buffer[ibyte / 4] >> shift;
-        // store digit if hit
-        if (hitBitSet & m_bitMask) {
-          digits.appendNew(moduleID, asicCh, hitBitSet);
-          if (m_debug && hitBitSet) std::cout << "ch: " << asicCh << " " <<  std::bitset<8>(hitBitSet) << std::endl;
-        }
-        asicCh--;
-        ibyte++;
-      }
-
-    }
-
-    if (ceil(ibyte / 4.) != (unsigned)bufferSize)
-      B2WARNING("ARICHUnpackerModule: data buffer size mismatch (from copper vs data header: " <<  bufferSize << " vs. " <<  ceil(
-                  ibyte / 4.));
-
-  }
-
-  void ARICHUnpackerModule::unpackSuppressedData(const int* buffer, int bufferSize, unsigned& ibyte, ARICHRawHeader& head)
-  {
-
-    StoreArray<ARICHDigit> digits(m_outputDigitsName);
-
-    while (ibyte < head.length) {
-      // new feb
-      ARICHRawHeader febHead;
-      readHeader(buffer, ibyte, febHead);
-      if (m_debug) febHead.print();
-
-      if (febHead.type != head.type || febHead.version != head.version || febHead.mergerID != head.mergerID
-          || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in FEB header " << (unsigned)febHead.FEBSlot <<
-                                                        " not consistent with data in merger header " << (unsigned)head.mergerID);
-
-      // feb header shift
-      ibyte += ARICHFEB_HEADER_SIZE;
-      int dataLen = febHead.length - ARICHFEB_HEADER_SIZE;
-
-      febHead.FEBSlot += 1; /// temporary! FEB Slots on merger should be 1-6 (now 0-5). Remove when firmware is updated!
-
-      unsigned moduleID = m_mergerMap->getModuleID((unsigned)head.mergerID, (unsigned)febHead.FEBSlot);
-
-      if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger 2 module mapping for mergerID " << (unsigned)head.mergerID << " FEB slot: " << (unsigned)febHead.FEBSlot); break;}
-
-      // read data
-
-      for (int i = 0; i < dataLen / 2; i++) {
-        int shift = (3 - ibyte % 4) * 8;
-        uint8_t asicCh = buffer[ibyte / 4] >> shift;
-        ibyte++;
-        shift = (3 - ibyte % 4) * 8;
-        uint8_t hitBitSet = buffer[ibyte / 4] >> shift;
-
-        // store digit
-        digits.appendNew(moduleID, (unsigned)asicCh, hitBitSet);
-        ibyte++;
-      }
-
-    }
-
-    if (ceil(ibyte / 4.) != (unsigned)bufferSize)
-      B2WARNING("ARICHUnpackerModule: data buffer size mismatch (from copper vs data header): " <<
-                (unsigned)bufferSize << " vs. " << ceil(ibyte / 4.));
 
   }
 

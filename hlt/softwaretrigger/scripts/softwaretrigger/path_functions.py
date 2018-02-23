@@ -22,6 +22,7 @@ ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpay
 
 # list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_REGEX = RAW_SAVE_STORE_ARRAYS + ["EventMetaData"]
+EXPRESSRECO_INPUT_REGEX = RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX
 
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
@@ -273,6 +274,7 @@ def add_expressreco_processing(path, run_type="collision",
                                reco_components=None,
                                make_crashsafe=True,
                                clean_wrapped_path=False,
+                               prune_input=True,
                                do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -281,6 +283,14 @@ def add_expressreco_processing(path, run_type="collision",
     wrapped_path = path
     if make_crashsafe:
         wrapped_path = basf2.create_path()
+
+    # ensure that only DataStore content is present that we expect in
+    # in the ExpressReco configuration. If tracks are present in the
+    # input file, this can be a problem and lead to crashes
+    if prune_input:
+        wrapped_path.add_module(
+            "PruneDataStore",
+            matchEntries=EXPRESSRECO_INPUT_REGEX)
 
     if not do_reconstruction:
         add_geometry_if_not_present(wrapped_path)

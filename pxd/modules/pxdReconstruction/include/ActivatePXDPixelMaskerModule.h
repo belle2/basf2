@@ -12,22 +12,22 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <pxd/reconstruction/PXDClusterPositionEstimator.h>
+
 
 namespace Belle2 {
   namespace PXD {
 
-    /** The ActivatePXDCalibration module.
+    /** The ActivatePXDPixelMasker module.
      *
-     * This module is responsible reading the calibration constants for local PXD
-     * reconstruction from the Database.
+     * This module is responsible reading the calibration constants for PXD
+     * pixel masking from the Database.
      */
-    class ActivatePXDCalibrationModule : public Module {
+    class ActivatePXDPixelMaskerModule : public Module {
 
     public:
 
       /** Constructor */
-      ActivatePXDCalibrationModule();
+      ActivatePXDPixelMaskerModule();
 
       /** Initialize the module */
       void initialize() override final;

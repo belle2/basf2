@@ -34,11 +34,7 @@ namespace TreeFitter {
 
     fitparams->getStateVector().segment(posindex, 3) = m_params.segment(0, 3);
 
-    if (7 == dimMeas()) {
-      fitparams->getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
-    } else {
-      fitparams->getStateVector().segment(momindex, 3) = m_params.segment(3, 3);
-    }
+    fitparams->getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
 
     return ErrCode::success ;
   }
@@ -48,8 +44,8 @@ namespace TreeFitter {
     const TVector3 pos = particle()->getVertex();
     const TVector3 mom = particle()->getMomentum();
     const double energy = particle()->getEnergy();
-    const int size = dimMeas();
-    m_params = Eigen::Matrix<double, 7, 1>::Zero(size, 1);
+
+    m_params = Eigen::Matrix<double, 7, 1>::Zero(7, 1);
     m_params(0) = pos.X();
     m_params(1) = pos.Y();
     m_params(2) = pos.Z();
@@ -57,14 +53,12 @@ namespace TreeFitter {
     m_params(4) = mom.Y();
     m_params(5) = mom.Z();
 
-    if (7 == size) {
-      m_params(6) = energy;
-    }
+    m_params(6) = energy;
 
-    m_covariance = Eigen::Matrix < double, -1, -1, 0, 7, 7 >::Zero(size, size);
+    m_covariance = Eigen::Matrix < double, -1, -1, 0, 7, 7 >::Zero(7, 7);
     const TMatrixFSym cov7in = getBasf2Particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
 
-    for (int row = 0; row < size - 3; ++row) { //first the p,E block
+    for (int row = 0; row < 4; ++row) { //first the p,E block
       for (int col = 0; col <= row; ++col) {
         m_covariance(3 + row, 3 + col) = cov7in[row][col];
       }
@@ -81,23 +75,19 @@ namespace TreeFitter {
   {
     const int posindex = posIndex() ;
     const int momindex = momIndex() ;
-    const int size = dimMeas();
 
-    p.getResiduals().segment(0, 3) = fitparams.getStateVector().segment(posindex, 3) - m_params.segment(0, 3);
+    p.getResiduals().segment(0, 3) = m_params.segment(0, 3) - fitparams.getStateVector().segment(posindex, 3);
 
-    if (size == 7) {
-      p.getResiduals().segment(3, 4) = fitparams.getStateVector().segment(momindex, 4) - m_params.segment(3, 4);
-    } else if (size == 6) {
-      p.getResiduals().segment(3, 3) = fitparams.getStateVector().segment(momindex, 3) - m_params.segment(3, 3);
-    }
+    p.getResiduals().segment(3, 4) = m_params.segment(3, 4) - fitparams.getStateVector().segment(momindex, 4);
 
     for (int row = 0; row < 3; ++row) {
-      p.getH()(row,  posindex + row) = 1;
+      p.getH()(row,  posindex + row) = -1;
     }
 
-    for (int row = 0; row < size - 3; ++row) {
-      p.getH()(3 + row,  momindex + row) = 1;
+    for (int row = 0; row < 4; ++row) {
+      p.getH()(3 + row,  momindex + row) = -1;
     }
+
     p.getV().triangularView<Eigen::Lower>() = m_covariance.triangularView<Eigen::Lower>();
 
     return ErrCode::success ;

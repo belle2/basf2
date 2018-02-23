@@ -65,6 +65,8 @@ namespace Belle2 {
       {
         m_cosmic = b;
       }
+
+      void saveHisto();
     protected:
       /// Run algo on data
       virtual EResult calibrate();

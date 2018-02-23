@@ -702,7 +702,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                     trackFilter="mva",
                     trackFilterParameters={"cut": 0.1})
 
+    output_tracks = "CDCTrackVector"
+
     if with_ca:
+        output_tracks = "CombinedCDCTrackVector"
         path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
 
@@ -710,10 +713,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
         path.add_module("TFCDC_TrackCombiner",
                         inputTracks="CDCTrackVector",
                         secondaryInputTracks="CDCTrackVector2",
-                        tracks="CDCTrackVector")
+                        tracks=output_tracks)
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",
+                    inputTracks=output_tracks,
                     corrections=[
                         "LayerBreak",
                         "OneSuperlayer",
@@ -723,10 +727,12 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     if with_ca:
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
+                        inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
+                    inputTracks=output_tracks,
                     RecoTracksStoreArrayName=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)

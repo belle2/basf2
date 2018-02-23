@@ -75,9 +75,6 @@ namespace Belle2 {
      * @param bufferSize buffer size
      */
 
-    void unpackSuppressedData(const int* buffer, int bufferSize, unsigned& ibyte,
-                              ARICHRawHeader& head); /**< unpacks suppressed data (only hit channels writen)*/
-    void unpackUnsuppressedData(const int* buffer, int bufferSize, unsigned& ibyte, ARICHRawHeader& head);
     void printBits(const int* buffer, int bufferSize);
     void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head);
 

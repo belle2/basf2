@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     info.reportReady();
     for (size_t i = 0; i < server_socket.size(); i++) {
       fprintf(stderr, "wait for connection[%d] to %s:%d\n", (int)i,
-              server_socket[i].getIP(), server_socket[i].getPort());
+              server_socket[i].getIP().c_str(), server_socket[i].getPort());
       socket[i] = server_socket[i].accept();
       fprintf(stderr, "[INFO] Connected [%d] from %s:%d...\n", (int)i,
               socket[i].getIP().c_str(), socket[i].getPort());

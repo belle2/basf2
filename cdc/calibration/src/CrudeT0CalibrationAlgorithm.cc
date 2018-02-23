@@ -170,6 +170,7 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
 
   B2INFO("Write constants");
   write();
+  saveHisto();
   return c_OK;
 }
 
@@ -185,4 +186,45 @@ void CrudeT0CalibrationAlgorithm::write()
     }
   }
   saveCalibration(tz, "CDCTimeZeros");
+}
+
+void CrudeT0CalibrationAlgorithm::saveHisto()
+{
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  TFile* fhist = new TFile("histCruteT0.root", "recreate");
+  fhist->cd();
+  TDirectory* top = gDirectory;
+  TDirectory* Direct[56];
+  for (int il = 0; il < 56; ++il) {
+    top->cd();
+    Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
+    Direct[il]->cd();
+    for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
+      if (m_flag[il][w] == 1) {
+        m_hTDC[il][w]->Write();
+      }
+    }
+  }
+  top->cd();
+  TDirectory* board = gDirectory->mkdir("board");
+  board->cd();
+  for (int ib = 0; ib < 300; ++ib) {
+    if (m_hTDCBoard[ib]) {
+      m_hTDCBoard[ib]->Write();
+    }
+  }
+  top->cd();
+  m_hT0All->Write();
+
+  /*
+  if (b.size() > 20) {
+    TGraphErrors* gr = new TGraphErrors(b.size(), &b.at(0), &sb.at(0), &db.at(0), &dsb.at(0));
+    gr->SetName("reso");
+    gr->Write();
+    TGraphErrors* grT0b = new TGraphErrors(b.size(), &b.at(0), &t0b.at(0), &db.at(0), &dt0b.at(0));
+    grT0b->SetName("T0Board");
+    grT0b->Write();
+  }
+  */
+  fhist->Close();
 }

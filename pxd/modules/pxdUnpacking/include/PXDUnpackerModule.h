@@ -66,6 +66,10 @@ namespace Belle2 {
       bool m_doNotStore;
       /** Check for susp. Padding/CRC, default off because of many false positive */
       bool m_checkPaddingCRC;
+      /** Ignore Phase2 FW erro */
+      bool m_ignoreDHPMask;
+      /** Ignore Phase2 FW error */
+      bool m_ignoreDHELength;
       /** Force Mapping even if DHH bit is not requesting it */
       bool m_forceMapping;
       /** Force No Mapping even if DHH bit is requesting it */
@@ -181,7 +185,7 @@ namespace Belle2 {
       /** helper function to "count" nr of set bits within lower 5 bits.
         * It does not need the class object, thus static.
         */
-      static int nr5bits(int i);
+      int static nr5bits(int i);
 
       /** dump to a file, helper function for debugging.
         */

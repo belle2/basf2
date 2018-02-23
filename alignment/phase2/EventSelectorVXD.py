@@ -31,12 +31,16 @@ class EventSelectorVXD(Module):
 
     def event(self):
         """ Return True if event is fine, False otherwise """
+
         SVDSimHitArray = Belle2.PyStoreArray('SVDSimHits')
         PXDSimHitArray = Belle2.PyStoreArray('PXDSimHits')
+
         if self.isOK(SVDSimHitArray):
             someOK = True
+
         elif self.isOK(PXDSimHitArray):
             someOK = True
+
         else:
             someOK = False
 

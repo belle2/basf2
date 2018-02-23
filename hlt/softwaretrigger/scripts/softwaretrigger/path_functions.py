@@ -219,9 +219,10 @@ def add_hlt_processing(path, run_type="collision",
     # ensure that only DataStore content is present that we expect in
     # in the HLT configuration. If ROIpayloads or tracks are present in the
     # input file, this can be a problem and lead to crashes
-    wrapped_path.add_module(
-        "PruneDataStore",
-        matchEntries=HLT_INPUT_REGEX)
+    if prune_input:
+        wrapped_path.add_module(
+            "PruneDataStore",
+            matchEntries=HLT_INPUT_REGEX)
 
     # todo: currently, the add_unpackers script will add the geometry with
     # all components. This is actually important, as also the PXD geomtery is

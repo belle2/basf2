@@ -142,7 +142,7 @@ namespace CellularAutomatonTests {
     PathCollectorType pathCollector;
 
     std::vector< PathCollectorType::Path> paths;
-    pathCollector.findPaths(intNetwork, paths);
+    pathCollector.findPaths(intNetwork, paths, 100000000);
 
     std::string out = PathCollectorType::printPaths(paths);
     B2INFO(out);
@@ -163,11 +163,13 @@ namespace CellularAutomatonTests {
 
     // also collect subpaths
     paths.clear();
-    pathCollector.findPaths(intNetwork, paths, true);
+    bool test = pathCollector.findPaths(intNetwork, paths, 50, true);
     EXPECT_EQ(44, paths.size()); // Out of the 13 paths one gets 31 subpaths -> 44 in total
+    EXPECT_EQ(true, test); // Should return true, as 44 paths do not exceed the given limit of 50
+
+    // Checking if limit works
+    paths.clear();
+    test = pathCollector.findPaths(intNetwork, paths, 10);
+    EXPECT_EQ(false, test); // Should return false, as 13 paths exceed the given limit of 10
   }
 }
-
-
-
-

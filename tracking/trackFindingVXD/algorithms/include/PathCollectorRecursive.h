@@ -53,7 +53,7 @@ namespace Belle2 {
      * If storeSubsets is turned on, also the sub-paths are saved to vector 'paths'.
      * If a defined limit on the number of possible paths is exceeded, the search is aborted, and false is returned.
      */
-    bool findPaths(ContainerType& aNetwork, std::vector<Path>& paths, bool storeSubsets = false)
+    bool findPaths(ContainerType& aNetwork, std::vector<Path>& paths, unsigned int pathLimit, bool storeSubsets = false)
     {
       m_storeSubsets = storeSubsets;
 
@@ -77,8 +77,7 @@ namespace Belle2 {
         findPathsRecursive(allNodePaths, newPath, innerNeighbours);
         storeAcceptedPath(newPath, allNodePaths);
 
-        //TODO: Set limit via parameter and test various ways to improve limit
-        if (allNodePaths.size() > 200000) {
+        if (allNodePaths.size() > pathLimit) {
           B2ERROR("Number of collected paths to large. Aborting Event!");
           return false;
         }

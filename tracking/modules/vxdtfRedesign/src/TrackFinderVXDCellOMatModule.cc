@@ -75,6 +75,10 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
            m_PARAMmaxFamilies);
 
+  addParam("maxPaths",
+           m_PARAMmaxPaths,
+           "Maximal number of paths per an event; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxPaths);
 }
 
 
@@ -136,12 +140,13 @@ void TrackFinderVXDCellOMatModule::event()
 
   /// collect all Paths starting from a Seed:
   m_collectedPaths.clear();
-  if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMstoreSubsets)) {
+  if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
     B2ERROR("VXDCellOMat got signal to abort the event.");
+    m_network->set_collectedPaths(m_collectedPaths.size());
     return;
   }
 
-  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :collectedPaths:" << m_collectedPaths.size());
+  m_network->set_collectedPaths(m_collectedPaths.size());
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.

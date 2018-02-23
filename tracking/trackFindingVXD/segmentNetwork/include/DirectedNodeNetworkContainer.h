@@ -72,31 +72,32 @@ namespace Belle2 {
     /** Returns reference to the actual ActiveSectors stored in this container, intended for read and write access */
     std::vector<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>* >& accessActiveSectors() { return m_activeSectors; }
 
-
-    int sizeActiveSectors() { return m_activeSectors.size(); }
-
-
     /** Returns reference to the HitNetwork stored in this container, intended for read and write access */
     DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>& accessHitNetwork() { return m_HitNetwork; }
-
 
     /** Returns reference to the SegmentNetwork stored in this container, intended for read and write access */
     DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >& accessSegmentNetwork() { return m_SegmentNetwork; }
 
-
     /** Returns reference to the actual segments stored in this container, intended for read and write access */
     std::vector<Belle2::Segment<Belle2::TrackNode>* >& accessSegments() { return m_segments; }
-
-
-    int sizeSegments() { return m_segments.size(); }
-
 
     /** Returns reference to the actual trackNodes stored in this container, intended for read and write access */
     std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
 
 
+    int sizeSegments() { return m_segments.size(); }
+    int sizeActiveSectors() { return m_activeSectors.size(); }
     int sizeTrackNodes() { return m_trackNodes.size(); }
 
+    int get_trackNodeConnections() { return m_trackNodeConnections; }
+    int get_activeSectorConnections() { return m_activeSectorConnections; }
+    int get_segmentConnections() { return m_segmentConnections; }
+    int get_collectedPaths() { return m_collectedPaths; }
+
+    void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
+    void set_activeSectorConnections(int in) { m_activeSectorConnections = in; }
+    void set_segmentConnections(int in) { m_segmentConnections = in; }
+    void set_collectedPaths(int in) { m_collectedPaths = in; }
 
     /** Clear directed node network container
      * Called to clear the directed node network container if the segment network size grows to large.
@@ -107,14 +108,12 @@ namespace Belle2 {
       m_SegmentNetwork.clear();
     }
 
-
     /** Passes parameters for creating a virtual interaction point */
     void setVirtualInteractionPoint(B2Vector3D& pos, B2Vector3D& posError)
     {
       m_VIPSpacePoint = new SpacePoint(pos, posError, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
       m_VirtualInteractionPoint = new Belle2::TrackNode(m_VIPSpacePoint);
     }
-
 
     /** Returns reference to the Virtual interactionPoint stored here */
     Belle2::TrackNode* getVirtualInteractionPoint() { return m_VirtualInteractionPoint; }
@@ -126,6 +125,11 @@ namespace Belle2 {
     ClassDef(DirectedNodeNetworkContainer, 10)
 
   protected:
+    int m_trackNodeConnections = 0;
+    int m_activeSectorConnections = 0;
+    int m_segmentConnections = 0;
+    int m_collectedPaths = 0;
+
     /** ************************* DATA MEMBERS ************************* */
     /** Stores the full network of activeSectors, which contain hits in that event and have compatible Sectors with hits too*/
     DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;//!

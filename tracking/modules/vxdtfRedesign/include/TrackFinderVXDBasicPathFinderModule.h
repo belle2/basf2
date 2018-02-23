@@ -95,6 +95,8 @@ namespace Belle2 {
     /** Maximal number of families in event; if exceeded, the execution of the trackfinder will be stopped. */
     unsigned short m_PARAMmaxFamilies = 10000;
 
+    unsigned int m_PARAMmaxPaths = 300000;
+
     /// member variables
     /** CA algorithm */
     CellularAutomaton<NodeNetworkType, Belle2::CAValidator<Belle2::CACell>> m_cellularAutomaton;

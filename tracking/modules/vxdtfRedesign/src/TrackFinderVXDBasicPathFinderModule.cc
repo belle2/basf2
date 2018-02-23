@@ -76,6 +76,10 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
            m_PARAMmaxFamilies);
 
+  addParam("maxPaths",
+           m_PARAMmaxPaths,
+           "Maximal number of paths per an event; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxPaths);
 }
 
 
@@ -150,7 +154,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
   }
   /// collect all Paths starting from a Seed:
   m_collectedPaths.clear();
-  if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMstoreSubsets)) {
+  if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
     B2ERROR("VXDBasicPathFinder got signal to abort the event.");
     return;
   }

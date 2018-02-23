@@ -82,12 +82,21 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "Maximal size of the SegmentNetwork; if exceeded, the event execution will be skipped.",
            m_PARAMmaxNetworkSize);
 
+  addParam("maxConnections",
+           m_PARAMmaxSegmentConnections ,
+           "Maximal number of Segment connections; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxSegmentConnections);
+
   addParam("maxHitNetworkSize",
            m_PARAMmaxHitNetworkSize,
            "Maximal size of the HitNetwork; if exceeded, the event execution will be skipped.",
            m_PARAMmaxHitNetworkSize);
-}
 
+  addParam("maxHitConnections",
+           m_PARAMmaxTrackNodeConnections,
+           "Maximal number of Hit connections; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxTrackNodeConnections);
+}
 
 void SegmentNetworkProducerModule::initialize()
 {
@@ -137,6 +146,12 @@ void SegmentNetworkProducerModule::event()
   }
 
   vector<RawSectorData> collectedData = matchSpacePointToSectors();
+
+  m_network->set_trackNodeConnections(0);
+  m_network->set_activeSectorConnections(0);
+  m_network->set_segmentConnections(0);
+  m_network->set_collectedPaths(0);
+
 
   buildActiveSectorNetwork(collectedData);
 
@@ -283,7 +298,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
     }
   }
 
-  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :activSectorConections:" << nLinked);
+  m_network->set_activeSectorConnections(nLinked);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
@@ -364,10 +379,16 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
             hitNetwork.addInnerToLastOuterNode(innerNodeID);
           }
 
+          if (nLinked > m_PARAMmaxTrackNodeConnections) {
+            B2ERROR("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
+                    << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            m_network->set_trackNodeConnections(nLinked);
+            return false;
+          }
           if (hitNetwork.size() > m_PARAMmaxHitNetworkSize) {
-            //if (nLinked > 10000) {
             B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize
                     << "! Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
+            m_network->set_trackNodeConnections(nLinked);
             return false;
           }
         }
@@ -378,7 +399,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
   m_nTrackNodesRejected += nRejected;
   m_nTrackNodeLinksCreated += nLinked;
 
-  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :trackNodeConnections:" << nLinked);
+  m_network->set_trackNodeConnections(nLinked);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
@@ -486,17 +507,25 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           segmentNetwork.addInnerToLastOuterNode(innerSegmentID);
         }
 
+        if (nLinked > m_PARAMmaxSegmentConnections) {
+          B2ERROR("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
+                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_network->set_segmentConnections(nLinked);
+          m_network->clear();
+          return;
+        }
         if (segments.size() > m_PARAMmaxNetworkSize) {
           B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
                   << ". Network size is " << segmentNetwork.size()
                   << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_network->set_segmentConnections(nLinked);
           m_network->clear();
           return;
         }
       }
     }
   }
-  B2WARNING(">>>> :event:" << m_eventCounter << ": >> :segmentConections:" << nLinked);
+  m_network->set_segmentConnections(nLinked);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);

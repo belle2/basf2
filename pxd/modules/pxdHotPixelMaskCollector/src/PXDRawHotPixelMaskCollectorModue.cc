@@ -49,21 +49,37 @@ void PXDRawHotPixelMaskCollectorModule::prepare() // Do your initialise() stuff 
     B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
   }
 
-  //----------------------------------------------------------------------------------------
-  // Nevents: Count number of events which are accumulated (later for normalization of hits)
-  //----------------------------------------------------------------------------------------
-  auto hnevents = new TH1I("hnevents",
-                           "Number of events used for masking, distribution parameters found by PXDRawHotPixelMaskCollectorModule", 1, 0, 1);
+  //-------------------------------------------------------------------------------------------------
+  // PXDHits: Histogram the number of PXDRawHits per event (assuming Belle 2 PXD with < 2% occupancy)
+  //-------------------------------------------------------------------------------------------------
+  auto hPXDHits = new TH1I("hPXDHits",
+                           "Number of hits in PXD per events used for masking, distribution parameters found by PXDRawHotPixelMaskCollectorModule", 200000, 0,
+                           200000);
+  hPXDHits->GetXaxis()->SetTitle("Number of hits");
+  hPXDHits->GetYaxis()->SetTitle("Events");
+  registerObject<TH1I>("PXDHits", hPXDHits);
 
-  registerObject<TH1I>("nevents", hnevents);
-
+  //--------------------------------------------------------
+  // PXDHitCounts: Count the number of PXDRawHits per sensor
+  //--------------------------------------------------------
   int nPXDSensors = gTools->getNumberOfPXDSensors();
+  auto hPXDHitCounts = new TH1I("hPXDHitCounts",
+                                "Number of hits in PXD sensors for masking, distribution parameters found by PXDRawHotPixelMaskCollectorModule", nPXDSensors, 0,
+                                nPXDSensors);
+
+  hPXDHitCounts->GetXaxis()->SetTitle("SensorID");
+  hPXDHitCounts->GetYaxis()->SetTitle("Number of hits");
   for (int i = 0; i < nPXDSensors; i++) {
     VxdID id = gTools->getSensorIDFromPXDIndex(i);
-    int iLayer = id.getLayerNumber();
-    int iLadder = id.getLadderNumber();
-    int iSensor = id.getSensorNumber();
-    string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+    string sensorDescr = id;
+    hPXDHitCounts->GetXaxis()->SetBinLabel(i + 1, str(format("%1%") % sensorDescr).c_str());
+  }
+  registerObject<TH1I>("PXDHitCounts", hPXDHitCounts);
+
+  // Fill PXDHitMap with empty histos for all sensors
+  for (int i = 0; i < nPXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromPXDIndex(i);
+    string sensorDescr = id;
 
     //----------------------------------------------------------------
     // Hitmaps: Number of hits per sensor and pixel
@@ -72,27 +88,29 @@ void PXDRawHotPixelMaskCollectorModule::prepare() // Do your initialise() stuff 
     string title = str(format("PXD Sensor %1% Pixel Hitmap from PXDRawHotPixelMaskCollector") % sensorDescr);
 
     // Data object creation --------------------------------------------------
-    auto hpxdhitmap = new TH1I(name.c_str(), title.c_str(), 250 * 768, 0, 250 * 768);
-
-    // Data object registration ----------------------------------------------
-    // FIXME: is there a smarter way to register vector of histograms???
-    registerObject<TH1I>(name.c_str(), hpxdhitmap); // Does the registerInDatastore for you
+    auto hsensorhitmap = new TH1I(name.c_str(), title.c_str(), 250 * 768, 0, 250 * 768);
+    registerObject<TH1I>(name.c_str(), hsensorhitmap);
   }
 }
 
 void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
 {
-  // if no input, nothing to do
-  if (!m_pxdRawHit || !m_pxdRawHit.getEntries()) return;
+  // Histogram pxd hits per event
+  TH1I* collector_hits = getObjectPtr<TH1I>("PXDHits");
+
+  // Even if there is no input StoreArray, we still want to fill zero hits
+  if (!m_pxdRawHit)
+    collector_hits->Fill(0);
+  else
+    collector_hits->Fill(m_pxdRawHit.getEntries());
 
   auto& geo = VXD::GeoCache::getInstance();
+  auto gTools = geo.getGeoTools();
 
-  // Data object access and filling ----------------------------------------
-  TH1I* collector_nevents = getObjectPtr<TH1I>("nevents");
-  collector_nevents->Fill(0);
+  // Count hits per sensor
+  TH1I* collector_pxdhitcounts = getObjectPtr<TH1I>("PXDHitCounts");
 
   for (auto& rawhit :  m_pxdRawHit) {
-
     VxdID sensorID = rawhit.getSensorID();
     if (!geo.validSensorID(sensorID)) {
       B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
@@ -108,8 +126,9 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
     // Increment counter for hit pixel
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       string name = str(format("PXD_%1%_PixelHitmap") % sensorID.getID());
-      TH1I* collector_hitmap = getObjectPtr<TH1I>(name.c_str());
-      collector_hitmap->Fill(rawhit.getColumn() * 768 + rawhit.getRow());
+      TH1I* collector_sensorhitmap = getObjectPtr<TH1I>(name.c_str());
+      collector_sensorhitmap->Fill(rawhit.getColumn() * 768 + rawhit.getRow());
+      collector_pxdhitcounts->Fill(gTools->getPXDSensorIndex(sensorID));
     }
   }
 }

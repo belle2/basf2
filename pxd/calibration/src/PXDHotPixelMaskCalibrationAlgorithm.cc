@@ -13,6 +13,7 @@
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 
 #include <boost/format.hpp>
+#include <string>
 #include "TH1I.h"
 
 using namespace std;
@@ -34,8 +35,8 @@ PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): Cali
 CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 {
 
-  auto hist_nevents = getObjectPtr<TH1I>("nevents");
-  auto nevents = hist_nevents->GetEntries();
+  auto collector_pxdhits = getObjectPtr<TH1I>("PXDHits");
+  auto nevents = collector_pxdhits->GetEntries();
   if (nevents < minEvents) {
     B2INFO("Not Enough Data");
     return c_NotEnoughData;
@@ -43,30 +44,27 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 
   PXDMaskedPixelPar* maskedPixelsPar = new PXDMaskedPixelPar();
 
-  // Mask all hot pixels for PXD
-  for (int iLayer = 1; iLayer <= 2; iLayer++) {
-    int nLadder = 8;
-    if (iLayer == 2) nLadder = 12;
-    for (int iLadder = 1; iLadder <= nLadder; iLadder++) {
-      for (int iSensor = 1; iSensor <= 2; iSensor++) {
-        // Get hitmap for PXD sensor
-        VxdID id(iLayer, iLadder, iSensor);
-        string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
-        auto hpxdhitmap =  getObjectPtr<TH1I>(name.c_str());
+  // Loop over all sensor from collector
+  auto collector_pxdhitcounts = getObjectPtr<TH1I>("PXDHitCounts");
+  for (auto sensBin = 1; sensBin <= collector_pxdhitcounts->GetXaxis()->GetNbins(); sensBin++) {
+    // The bin label is assumed to be a string representation of VxdID
+    string sensorDescr =  collector_pxdhitcounts->GetXaxis()->GetBinLabel(sensBin);
+    VxdID id(sensorDescr);
 
-        // Check if there was data collected for this sensor
-        if (hpxdhitmap == nullptr) continue;
+    // Get hitmap from collector
+    string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
+    auto collector_pxdhitmap =  getObjectPtr<TH1I>(name.c_str());
 
-        // Mask all hot pixel for this sensor
-        for (auto bin = 1; bin <= hpxdhitmap->GetXaxis()->GetNbins(); bin++) {
-          float nhits = (float) hpxdhitmap->GetBinContent(bin);
+    // Check if there was data collected for this sensor
+    if (collector_pxdhitmap == nullptr) continue;
 
-          if (nhits > minHits) {
-            if (nhits / nevents > maxOccupancy) {
-              // This pixel is hot, we have to mask it
-              maskedPixelsPar->maskSinglePixel(id.getID(), bin - 1);
-            }
-          }
+    // Mask all hot pixel for this sensor
+    for (auto bin = 1; bin <= collector_pxdhitmap->GetXaxis()->GetNbins(); bin++) {
+      float nhits = (float) collector_pxdhitmap->GetBinContent(bin);
+      if (nhits > minHits) {
+        if (nhits / nevents > maxOccupancy) {
+          // This pixel is hot, we have to mask it
+          maskedPixelsPar->maskSinglePixel(id.getID(), bin - 1);
         }
       }
     }

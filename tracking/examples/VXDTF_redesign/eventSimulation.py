@@ -147,7 +147,7 @@ mctrackfinder.param('UseNLoops', 0.5)
 mctrackfinder.param('discardAuxiliaryHits', True)
 main.add_module(mctrackfinder)
 
-# include a track fit into the chain (sequence taken from
+# include a track fit into the chain (sequence adopted from the tracking scripts)
 # Correct time seed: Do I need it for VXD only tracks ????
 main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks", useFittedInformation=False)
 # track fitting

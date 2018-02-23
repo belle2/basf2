@@ -908,8 +908,6 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
   // subtract the production time here in order for this classification to also work
   // for particles produced at times t' > t0
   const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
-  // has been this for CDC: (but flighttime seems to be identical to global time!?)
-  // const double tof = cdcSimHit->getFlightTime() - mcParticle->getProductionTime();
   const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
   const float absMom3D = mcParticle->getMomentum().Mag();
 

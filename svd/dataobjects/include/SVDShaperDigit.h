@@ -281,12 +281,13 @@ namespace Belle2 {
 
   private:
 
-    VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU; /**< True if U, false if V. */
-    short m_cellID; /**< Strip coordinate in pitch units. */
+    VxdID::baseType m_sensorID = 0; /**< Compressed sensor identifier.*/
+    bool m_isU = false; /**< True if U, false if V. */
+    short m_cellID = 0; /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples; /**< 6 APV signals from the strip. */
-    int8_t m_FADCTime; /**< digit time estimate from the FADC, in ns */
-    SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
+    int8_t m_FADCTime = 0; /**< digit time estimate from the FADC, in ns */
+    SVDModeByte::baseType m_mode = SVDModeByte::c_DefaultID;
+    /**< Mode byte, trigger FADCTime + DAQ mode */
 
     ClassDef(SVDShaperDigit, 2)
 

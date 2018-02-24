@@ -49,7 +49,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
-  addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
+  //addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
 }
 
 

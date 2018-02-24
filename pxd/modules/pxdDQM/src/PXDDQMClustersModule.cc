@@ -20,7 +20,6 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
@@ -331,9 +330,6 @@ void PXDDQMClustersModule::initialize()
 
     //Store names to speed up creation later
     m_storePXDDigitsName = storePXDDigits.getName();
-
-    StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-    m_storeFramesName = storeFrames.getName();
   }
 }
 
@@ -379,7 +375,6 @@ void PXDDQMClustersModule::event()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
@@ -455,6 +450,10 @@ void PXDDQMClustersModule::event()
     if ((m_clusters[i] != NULL) && (counts[i].size() > 0))
       m_clusters[i]->Fill(counts[i].size());
   }
+
+  /*
+  // FIXME: If this stuff here is really needed, the startrow information has to
+  // from from PXDDAQStatus dataobject.
   if (storeFrames && storeFrames.getEntries()) {
     // Start rows
     for (const PXDFrame& frame : storeFrames) {
@@ -484,4 +483,5 @@ void PXDDQMClustersModule::event()
       if (m_startRowCount[index] != NULL) m_startRowCount[index]->Fill(fDistance);
     }
   }
+  */
 }

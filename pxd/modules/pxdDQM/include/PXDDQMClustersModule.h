@@ -58,8 +58,7 @@ namespace Belle2 {
     std::string m_storePXDClustersName;
     /** PXDClustersToPXDDigits RelationArray name */
     std::string m_relPXDClusterDigitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
+
 
     /** Hitmaps of Digits */
     TH1I* m_hitMapCounts;

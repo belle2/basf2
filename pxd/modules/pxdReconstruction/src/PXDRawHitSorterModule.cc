@@ -49,7 +49,6 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
-  //addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
 }
 
 
@@ -59,17 +58,12 @@ void PXDRawHitSorterModule::initialize()
   m_pxdRawHit.isRequired(m_storeRawHitsName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
   storeDigits.registerInDataStore();
-  // TODO we should not need this
-  //StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  //storeFrames.registerInDataStore();
 }
 
 void PXDRawHitSorterModule::event()
 {
   StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  // TODO we should not need this
-  //StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   // if no input, nothing to do
   if (!storeRawHits || !storeRawHits.getEntries()) return;
@@ -78,13 +72,12 @@ void PXDRawHitSorterModule::event()
 
   //Mapping of Pixel information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Pixel>> sensors;
-  // TODO: this variable should be removed before merging into master
-  //std::map<VxdID, std::set<unsigned short>> startRows;
 
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = storeRawHits.getEntries();
   unsigned short currentFrameNumber(0);
   VxdID currentSensorID(0);
+  // TODO: It seems there is no need for the frameCounter any more ... should remove it as well.
   unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
     const PXDRawHit* const rawhit = storeRawHits[i];
@@ -98,8 +91,9 @@ void PXDRawHitSorterModule::event()
       continue;
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
-    // TODO: Pixel should not store start row
-    Pixel px(rawhit, 0 /*rawhit->getStartRow()*/);
+    // FIXME: The index of the temporary Pixel object seems not needed here.
+    // Set this index always to zero
+    Pixel px(rawhit, 0);
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
       frameCounter = 1;
@@ -109,13 +103,11 @@ void PXDRawHitSorterModule::event()
       currentFrameNumber = rawhit->getFrameNr();
     }
     if (m_mergeFrames) frameCounter = 0;
-    sensorID.setSegmentNumber(frameCounter); // should be 0 anyway...
+
     // We need some protection against crap data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       if (PXDPixelMasker::getInstance().pixelOK(sensorID, px.getU(), px.getV())) {
         sensors[sensorID].insert(px);
-        // TODO we should not need this
-        //startRows[sensorID].insert(rawhit->getStartRow());
       }
     }
   }
@@ -142,9 +134,5 @@ void PXDRawHitSorterModule::event()
       }
       lastpx = &px;
     }
-    // TODO we should not need this
-    //for (unsigned short startRow : startRows[sensorID])
-    //  storeFrames.appendNew(sensorID, startRow);
-
   }
 }

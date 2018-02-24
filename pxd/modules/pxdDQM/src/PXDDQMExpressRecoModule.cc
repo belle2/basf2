@@ -20,7 +20,6 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
@@ -259,9 +258,6 @@ void PXDDQMExpressRecoModule::initialize()
 
     //Store names to speed up creation later
     m_storePXDDigitsName = storePXDDigits.getName();
-
-    StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-    m_storeFramesName = storeFrames.getName();
   }
 }
 
@@ -299,7 +295,6 @@ void PXDDQMExpressRecoModule::event()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;

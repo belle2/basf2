@@ -107,6 +107,7 @@ void PXDRawDQMModule::initialize()
   m_storeRawHits.isRequired(m_storeRawHitsName);
   m_storeRawPedestals.isRequired(m_storeRawPedestalsName);
   m_storeRawAdcs.isRequired(m_storeRawAdcsName);
+  m_storeDAQEvtStats.isRequired();
 }
 
 void PXDRawDQMModule::beginRun()
@@ -137,16 +138,29 @@ void PXDRawDQMModule::event()
   if (hrawPxdHitsCount) hrawPxdHitsCount->Fill(m_storeRawHits.getEntries());
 
   for (auto& it : m_storeRawHits) {
-    int dhh_id;
-    // calculate DHH id from Vxd Id
-    unsigned int layer, ladder, sensor;//, segment;
-    VxdID currentVxdId;
-    currentVxdId = it.getSensorID();
-    layer = currentVxdId.getLayerNumber();/// 1 ... 2
-    ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
-    sensor = currentVxdId.getSensorNumber();/// 1 ... 2
-    // segment = currentVxdId.getSegmentNumber();// Frame nr? ... ignore
-    dhh_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
+
+    VxdID currentVxdId = it.getSensorID();
+    auto layer = currentVxdId.getLayerNumber();/// 1 ... 2
+    auto ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
+    auto sensor = currentVxdId.getSensorNumber();/// 1 ... 2
+
+    // Get startrow and DheID from DAQEvtStats
+    int dhh_id = -1;
+    unsigned int startRow = -1;
+
+    // FIXME: i guess this can be done more elegantly ...
+    auto evt = *m_storeDAQEvtStats;
+    for (auto& pkt : evt) {
+      for (auto& dhc : pkt) {
+        for (auto& dhe : dhc) {
+          if (dhe.getSensorID() == currentVxdId) {
+            dhh_id = dhe.getDHEID();
+            startRow = dhe.getStartRow();
+          }
+        }
+      }
+    }
+
     if (dhh_id <= 0 || dhh_id >= 64) {
       B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
       continue;
@@ -156,8 +170,6 @@ void PXDRawDQMModule::event()
                                                    100 + it.getRow() + 850 * (layer + layer + sensor - 3));
     if (hrawPxdChargeMap[dhh_id]) hrawPxdChargeMap[dhh_id]->Fill(it.getColumn(), it.getRow(), it.getCharge());
     if (hrawPxdHitsCharge[dhh_id]) hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
-    // TODO: read start row from DAQStatus StoreObjPtr ...
-    unsigned int startRow = 0;
     if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - startRow);
   }
 

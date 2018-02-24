@@ -118,13 +118,13 @@ namespace Belle2 {
     TH1F* m_clusterTimeVAll;
 
     /** Counter of APV errors (16) */
-    TH1I** m_CounterAPVErrors;
+    // --for future-- TH1I** m_CounterAPVErrors;
     /** Counter of FTB errors (256) */
-    TH1I** m_CounterFTBErrors;
+    // --for future-- TH1I** m_CounterFTBErrors;
     /** Counter of apvErrorOR (16) */
-    TH1I** m_CounterApvErrorORErrors;
+    // --for future-- TH1I** m_CounterApvErrorORErrors;
     /** Counter of FTB Flags (32) */
-    TH1I** m_CounterFTBFlags;
+    // --for future-- TH1I** m_CounterFTBFlags;
 
     //----------------------------------------------------------------
     // Additional histograms for out of ExpressReco

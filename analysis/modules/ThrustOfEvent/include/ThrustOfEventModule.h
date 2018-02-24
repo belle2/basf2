@@ -24,7 +24,6 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ContinuumSuppression/Thrust.h>

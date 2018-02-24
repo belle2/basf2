@@ -146,7 +146,7 @@ void PXDRawDQMModule::event()
 
     // Get startrow and DheID from DAQEvtStats
     int dhh_id = -1;
-    unsigned int startRow = -1;
+    unsigned int startRow = 0;
 
     // FIXME: i guess this can be done more elegantly ...
     auto evt = *m_storeDAQEvtStats;

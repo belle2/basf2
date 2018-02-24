@@ -10,8 +10,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <genfit/MeasurementOnPlane.h>
 #include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
+
+#include <genfit/MeasurementOnPlane.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
@@ -23,8 +24,7 @@
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/geometry/SensorInfo.h>
 
-
-#include <framework/database/DBObjPtr.h>
+#include <vxd/geometry/GeoTools.h>
 
 #include <TDirectory.h>
 #include <TVectorD.h>
@@ -76,61 +76,16 @@ void AlignDQMModule::initialize()
 
 void AlignDQMModule::defineHisto()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfLayers() == 0) {
+    B2WARNING("Missing geometry for VXD.");
+  }
 
   // basic constants presets:
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  c_nVXDLayers = geo.getLayers().size();
-  c_firstVXDLayer = 1;  // counting start from 1...
-  c_lastVXDLayer = c_nVXDLayers;
-  c_nPXDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size();
-  c_firstPXDLayer = c_firstVXDLayer;
-  c_lastPXDLayer = c_nPXDLayers;
-  c_nSVDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::SVD).size();
-  c_firstSVDLayer = c_nPXDLayers + c_firstPXDLayer;
-  c_lastSVDLayer = c_firstSVDLayer + c_nSVDLayers;
-
-  c_MaxLaddersInPXDLayer = 0;
-  c_MaxLaddersInSVDLayer = 0;
-  c_MaxSensorsInPXDLayer = 0;
-  c_MaxSensorsInSVDLayer = 0;
-
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() <= c_lastPXDLayer) {  // PXD
-        if (c_MaxLaddersInPXDLayer < geo.getLadders(layer).size())
-          c_MaxLaddersInPXDLayer = geo.getLadders(layer).size();
-        if (c_MaxSensorsInPXDLayer < geo.getSensors(ladder).size())
-          c_MaxSensorsInPXDLayer = geo.getSensors(ladder).size();
-      } else { // SVD
-        if (c_MaxLaddersInSVDLayer < geo.getLadders(layer).size())
-          c_MaxLaddersInSVDLayer = geo.getLadders(layer).size();
-        if (c_MaxSensorsInSVDLayer < geo.getSensors(ladder).size())
-          c_MaxSensorsInSVDLayer = geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
-
-  c_nPXDSensors = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() <= c_lastPXDLayer) {  // PXD
-        c_nPXDSensors += geo.getLadders(layer).size() * geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
-
-  c_nSVDSensors = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() > c_lastPXDLayer) {  // SVD
-        c_nSVDSensors += geo.getLadders(layer).size() * geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
+  int nVXDLayers = gTools->getNumberOfLayers();
+  int nVXDSensors = gTools->getNumberOfSensors();
   float ResidualRange = 400;  // in um
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -139,7 +94,9 @@ void AlignDQMModule::defineHisto()
   TDirectory* DirAlignSensors = NULL;
   DirAlignSensors = oldDir->mkdir("AlignmentDQMSensors");
   TDirectory* DirAlignSensResids = NULL;
-  DirAlignSensResids = DirAlignSensors->mkdir("Residuals");
+  DirAlignSensResids = DirAlignSensors->mkdir("Residuals2D");
+  TDirectory* DirAlignSensResids1D = NULL;
+  DirAlignSensResids1D = DirAlignSensors->mkdir("Residuals1D");
 
   TDirectory* DirAlignSensResMeanUPosUV = NULL;
   DirAlignSensResMeanUPosUV = DirAlignSensors->mkdir("ResidMeanUPositUV");
@@ -268,41 +225,51 @@ void AlignDQMModule::defineHisto()
   m_UBResidualsSVDV->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDV->GetYaxis()->SetTitle("counts");
 
-  m_TRClusterHitmap = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_TRClusterCorrelationsPhi = (TH2F**) new TH2F*[c_nVXDLayers - 1];
-  m_TRClusterCorrelationsTheta = (TH2F**) new TH2F*[c_nVXDLayers - 1];
-  m_UBResidualsSensor = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_UBResidualsSensorU = (TH1F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_UBResidualsSensorV = (TH1F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-
-  for (int i = 0; i < c_nVXDLayers; i++) {
-    /** Track related clusters - hitmap in IP angle range */
-    name = str(format("Alig_TRClusterHitmapLayer%1%") % (i + 1));
-    title = str(format("Cluster Hitmap for layer %1%") % (i + 1));
-    m_TRClusterHitmap[i] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 180, 0.0, 180.0);
-    m_TRClusterHitmap[i]->GetXaxis()->SetTitle("Phi angle [deg]");
-    m_TRClusterHitmap[i]->GetYaxis()->SetTitle("Theta angle [deg]");
-    m_TRClusterHitmap[i]->GetZaxis()->SetTitle("counts");
+  if (gTools->getNumberOfLayers() == 0) {
+    B2WARNING("Missing geometry for VXD, VXD-DQM related are skiped.");
+    return;
   }
-  for (int i = 0; i < c_nVXDLayers - 1; i++) {
+
+  m_TRClusterHitmap = (TH2F**) new TH2F*[nVXDLayers];
+  m_TRClusterCorrelationsPhi = (TH2F**) new TH2F*[nVXDLayers - 1];
+  m_TRClusterCorrelationsTheta = (TH2F**) new TH2F*[nVXDLayers - 1];
+  m_UBResidualsSensor = (TH2F**) new TH2F*[nVXDSensors];
+  m_UBResidualsSensorU = (TH1F**) new TH2F*[nVXDSensors];
+  m_UBResidualsSensorV = (TH1F**) new TH2F*[nVXDSensors];
+
+  for (VxdID layer : geo.getLayers()) {
+    int i = layer.getLayerNumber();
+    int index = gTools->getLayerIndex(layer.getLayerNumber());
+    /** Track related clusters - hitmap in IP angle range */
+    name = str(format("Alig_TRClusterHitmapLayer%1%") % i);
+    title = str(format("Cluster Hitmap for layer %1%") % i);
+    m_TRClusterHitmap[index] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 180, 0.0, 180.0);
+    m_TRClusterHitmap[index]->GetXaxis()->SetTitle("Phi angle [deg]");
+    m_TRClusterHitmap[index]->GetYaxis()->SetTitle("Theta angle [deg]");
+    m_TRClusterHitmap[index]->GetZaxis()->SetTitle("counts");
+  }
+  for (VxdID layer : geo.getLayers()) {
+    int i = layer.getLayerNumber();
+    if (i == gTools->getLastLayer()) continue;
+    int index = gTools->getLayerIndex(layer.getLayerNumber());
     /** Track related clusters - neighbor corelations in Phi */
-    name = str(format("Alig_CorrelationsPhiLayers_%1%_%2%") % (i + 1) % (i + 2));
-    title = str(format("Correlations in Phi for Layers %1% %2%") % (i + 1) % (i + 2));
-    m_TRClusterCorrelationsPhi[i] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 360, -180.0, 180.0);
+    name = str(format("Alig_CorrelationsPhiLayers_%1%_%2%") % i % (i + 1));
+    title = str(format("Correlations in Phi for Layers %1% %2%") % i % (i + 1));
+    m_TRClusterCorrelationsPhi[index] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 360, -180.0, 180.0);
+    title = str(format("angle layer %1% [deg]") % i);
+    m_TRClusterCorrelationsPhi[index]->GetXaxis()->SetTitle(title.c_str());
     title = str(format("angle layer %1% [deg]") % (i + 1));
-    m_TRClusterCorrelationsPhi[i]->GetXaxis()->SetTitle(title.c_str());
-    title = str(format("angle layer %1% [deg]") % (i + 2));
-    m_TRClusterCorrelationsPhi[i]->GetYaxis()->SetTitle(title.c_str());
-    m_TRClusterCorrelationsPhi[i]->GetZaxis()->SetTitle("counts");
+    m_TRClusterCorrelationsPhi[index]->GetYaxis()->SetTitle(title.c_str());
+    m_TRClusterCorrelationsPhi[index]->GetZaxis()->SetTitle("counts");
     /** Track related clusters - neighbor corelations in Theta */
-    name = str(format("Alig_CorrelationsThetaLayers_%1%_%2%") % (i + 1) % (i + 2));
-    title = str(format("Correlations in Theta for Layers %1% %2%") % (i + 1) % (i + 2));
-    m_TRClusterCorrelationsTheta[i] = new TH2F(name.c_str(), title.c_str(), 180, 0.0, 180.0, 180, 0.0, 180.0);
+    name = str(format("Alig_CorrelationsThetaLayers_%1%_%2%") % i % (i + 1));
+    title = str(format("Correlations in Theta for Layers %1% %2%") % i % (i + 1));
+    m_TRClusterCorrelationsTheta[index] = new TH2F(name.c_str(), title.c_str(), 180, 0.0, 180.0, 180, 0.0, 180.0);
+    title = str(format("angle layer %1% [deg]") % i);
+    m_TRClusterCorrelationsTheta[index]->GetXaxis()->SetTitle(title.c_str());
     title = str(format("angle layer %1% [deg]") % (i + 1));
-    m_TRClusterCorrelationsTheta[i]->GetXaxis()->SetTitle(title.c_str());
-    title = str(format("angle layer %1% [deg]") % (i + 2));
-    m_TRClusterCorrelationsTheta[i]->GetYaxis()->SetTitle(title.c_str());
-    m_TRClusterCorrelationsTheta[i]->GetZaxis()->SetTitle("counts");
+    m_TRClusterCorrelationsTheta[index]->GetYaxis()->SetTitle(title.c_str());
+    m_TRClusterCorrelationsTheta[index]->GetZaxis()->SetTitle("counts");
   }
 
   m_MomX = NULL;
@@ -394,11 +361,28 @@ void AlignDQMModule::defineHisto()
   m_Tracks->GetYaxis()->SetTitle("counts");
 
   DirAlignSensResids->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
+    /** Unbiased residuals for PXD u vs v per sensor*/
+    string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+    name = str(format("Alig_UBResiduals_%1%") % sensorDescr);
+    sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
+    title = str(format("PXD Unbiased residuals for sensor %1%") % sensorDescr);
+    m_UBResidualsSensor[i] = new TH2F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange, 200, -ResidualRange,
+                                      ResidualRange);
+    m_UBResidualsSensor[i]->GetXaxis()->SetTitle("residual U [#mum]");
+    m_UBResidualsSensor[i]->GetYaxis()->SetTitle("residual V [#mum]");
+    m_UBResidualsSensor[i]->GetZaxis()->SetTitle("counts");
+  }
+  DirAlignSensResids1D->cd();
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     /** Unbiased residuals for PXD u vs v per sensor*/
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("Alig_UBResidualsU_%1%") % sensorDescr);
@@ -414,38 +398,29 @@ void AlignDQMModule::defineHisto()
     m_UBResidualsSensorV[i] = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
     m_UBResidualsSensorV[i]->GetXaxis()->SetTitle("residual [#mum]");
     m_UBResidualsSensorV[i]->GetYaxis()->SetTitle("counts");
-    sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-    name = str(format("Alig_UBResiduals_%1%") % sensorDescr);
-    sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
-    title = str(format("PXD Unbiased residuals for sensor %1%") % sensorDescr);
-    m_UBResidualsSensor[i] = new TH2F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange, 200, -ResidualRange,
-                                      ResidualRange);
-    m_UBResidualsSensor[i]->GetXaxis()->SetTitle("residual U [#mum]");
-    m_UBResidualsSensor[i]->GetYaxis()->SetTitle("residual V [#mum]");
-    m_UBResidualsSensor[i]->GetZaxis()->SetTitle("counts");
   }
 
-  m_ResMeanPosUVSensCounts = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResMeanUPosUVSens = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResMeanVPosUVSens = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResUPosUSens = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResUPosVSens = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResVPosUSens = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResVPosVSens = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResMeanUPosUSens = (TH1F**) new TH1F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResMeanUPosVSens = (TH1F**) new TH1F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResMeanVPosUSens = (TH1F**) new TH1F*[c_nPXDSensors + c_nSVDSensors];
-  m_ResMeanVPosVSens = (TH1F**) new TH1F*[c_nPXDSensors + c_nSVDSensors];
+  m_ResMeanPosUVSensCounts = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResMeanUPosUVSens = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResMeanVPosUVSens = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResUPosUSens = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResUPosVSens = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResVPosUSens = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResVPosVSens = (TH2F**) new TH2F*[nVXDSensors];
+  m_ResMeanUPosUSens = (TH1F**) new TH1F*[nVXDSensors];
+  m_ResMeanUPosVSens = (TH1F**) new TH1F*[nVXDSensors];
+  m_ResMeanVPosUSens = (TH1F**) new TH1F*[nVXDSensors];
+  m_ResMeanVPosVSens = (TH1F**) new TH1F*[nVXDSensors];
 
   int iSizeBins = 20;
   float fSizeMin = -50;  // in mm
   float fSizeMax = -fSizeMin;
   DirAlignSensResMeanUPosUV->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanUPosUVSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -455,11 +430,11 @@ void AlignDQMModule::defineHisto()
     m_ResMeanUPosUVSens[i]->GetYaxis()->SetTitle("position V [mm]");
     m_ResMeanUPosUVSens[i]->GetZaxis()->SetTitle("residual U [#mum]");
   }
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanPosUVCountsSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -471,11 +446,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResMeanVPosUV->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanVPosUVSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -487,11 +462,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResMeanUPosU->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanUPosUSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -502,11 +477,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResMeanVPosU->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanVPosUSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -517,11 +492,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResMeanUPosV->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanUPosVSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -532,11 +507,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResMeanVPosV->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResMeanVPosVSens_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -547,11 +522,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResUPosU->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResUPosUSensor_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -563,11 +538,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResVPosU->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResVPosUSensor_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -579,11 +554,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResUPosV->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResUPosVSensor_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -595,11 +570,11 @@ void AlignDQMModule::defineHisto()
   }
 
   DirAlignSensResVPosV->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("ResVPosVSensor_%1%") % sensorDescr);
     sensorDescr = str(format("Layer %1% Ladder %2% Sensor %3%") % iLayer % iLadder % iSensor);
@@ -610,17 +585,17 @@ void AlignDQMModule::defineHisto()
     m_ResVPosVSens[i]->GetZaxis()->SetTitle("counts");
   }
 
-  m_ResMeanPhiThetaLayerCounts = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResMeanUPhiThetaLayer = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResMeanVPhiThetaLayer = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResUPhiLayer = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResVPhiLayer = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResUThetaLayer = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResVThetaLayer = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_ResMeanUPhiLayer = (TH1F**) new TH1F*[c_nVXDLayers];
-  m_ResMeanVPhiLayer = (TH1F**) new TH1F*[c_nVXDLayers];
-  m_ResMeanUThetaLayer = (TH1F**) new TH1F*[c_nVXDLayers];
-  m_ResMeanVThetaLayer = (TH1F**) new TH1F*[c_nVXDLayers];
+  m_ResMeanPhiThetaLayerCounts = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResMeanUPhiThetaLayer = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResMeanVPhiThetaLayer = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResUPhiLayer = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResVPhiLayer = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResUThetaLayer = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResVThetaLayer = (TH2F**) new TH2F*[nVXDLayers];
+  m_ResMeanUPhiLayer = (TH1F**) new TH1F*[nVXDLayers];
+  m_ResMeanVPhiLayer = (TH1F**) new TH1F*[nVXDLayers];
+  m_ResMeanUThetaLayer = (TH1F**) new TH1F*[nVXDLayers];
+  m_ResMeanVThetaLayer = (TH1F**) new TH1F*[nVXDLayers];
 
   int iPhiGran = 90;
   int iThetGran = iPhiGran / 2;
@@ -629,7 +604,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResMeanUPosUV->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResMeanUPhiThetaLayer_%1%") % iLayer);
     title = str(format("Residuals Mean U in Phi Theta, Layer %1%") % iLayer);
     m_ResMeanUPhiThetaLayer[iLay] = new TH2F(name.c_str(), title.c_str(), iPhiGran, -180, 180, iThetGran, 0, 180);
@@ -639,7 +614,7 @@ void AlignDQMModule::defineHisto()
   }
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResCounterPhiThetaLayer_%1%") % iLayer);
     title = str(format("Residuals counter in Phi Theta, Layer %1%") % iLayer);
     m_ResMeanPhiThetaLayerCounts[iLay] = new TH2F(name.c_str(), title.c_str(), iPhiGran, -180, 180, iThetGran, 0, 180);
@@ -651,7 +626,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResMeanVPosUV->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResMeanVPhiThetaLayer_%1%") % iLayer);
     title = str(format("Residuals Mean V in Phi Theta, Layer %1%") % iLayer);
     m_ResMeanVPhiThetaLayer[iLay] = new TH2F(name.c_str(), title.c_str(), iPhiGran, -180, 180, iThetGran, 0, 180);
@@ -663,7 +638,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResMeanUPosU->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResMeanUPhiLayer_%1%") % iLayer);
     title = str(format("Residuals Mean U in Phi, Layer %1%") % iLayer);
     m_ResMeanUPhiLayer[iLay] = new TH1F(name.c_str(), title.c_str(), iPhiGran, -180, 180);
@@ -674,7 +649,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResMeanVPosU->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResMeanVPhiLayer_%1%") % iLayer);
     title = str(format("Residuals Mean V in Phi, Layer %1%") % iLayer);
     m_ResMeanVPhiLayer[iLay] = new TH1F(name.c_str(), title.c_str(), iPhiGran, -180, 180);
@@ -685,7 +660,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResMeanUPosV->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResMeanUThetaLayer_%1%") % iLayer);
     title = str(format("Residuals Mean U in Theta, Layer %1%") % iLayer);
     m_ResMeanUThetaLayer[iLay] = new TH1F(name.c_str(), title.c_str(), iThetGran, 0, 180);
@@ -696,7 +671,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResMeanVPosV->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResMeanVThetaLayer_%1%") % iLayer);
     title = str(format("Residuals Mean V in Theta, Layer %1%") % iLayer);
     m_ResMeanVThetaLayer[iLay] = new TH1F(name.c_str(), title.c_str(), iThetGran, 0, 180);
@@ -707,7 +682,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResUPosU->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResUPhiLayer_%1%") % iLayer);
     title = str(format("Residuals U in Phi, Layer %1%") % iLayer);
     m_ResUPhiLayer[iLay] = new TH2F(name.c_str(), title.c_str(), iPhiGran, -180, 180, iYResGran, -ResidualRange, ResidualRange);
@@ -719,7 +694,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResVPosU->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResVPhiLayer_%1%") % iLayer);
     title = str(format("Residuals V in Phi, Layer %1%") % iLayer);
     m_ResVPhiLayer[iLay] = new TH2F(name.c_str(), title.c_str(), iPhiGran, -180, 180, iYResGran, -ResidualRange, ResidualRange);
@@ -731,7 +706,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResUPosV->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResUThetaLayer_%1%") % iLayer);
     title = str(format("Residuals U in Theta, Layer %1%") % iLayer);
     m_ResUThetaLayer[iLay] = new TH2F(name.c_str(), title.c_str(), iThetGran, 0, 180, iYResGran, -ResidualRange, ResidualRange);
@@ -743,7 +718,7 @@ void AlignDQMModule::defineHisto()
   DirAlignLayerResVPosV->cd();
   for (VxdID layer : geo.getLayers()) {
     int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     name = str(format("ResVThetaLayer_%1%") % iLayer);
     title = str(format("Residuals V in Theta, Layer %1%") % iLayer);
     m_ResVThetaLayer[iLay] = new TH2F(name.c_str(), title.c_str(), iThetGran, 0, 180, iYResGran, -ResidualRange, ResidualRange);
@@ -758,6 +733,9 @@ void AlignDQMModule::defineHisto()
 
 void AlignDQMModule::beginRun()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   if (m_MomPhi != NULL) m_MomPhi->Reset();
   if (m_MomTheta != NULL) m_MomTheta->Reset();
   if (m_MomCosTheta != NULL) m_MomCosTheta->Reset();
@@ -772,14 +750,18 @@ void AlignDQMModule::beginRun()
   if (m_UBResidualsPXDV != NULL) m_UBResidualsPXDV->Reset();
   if (m_UBResidualsSVDV != NULL) m_UBResidualsSVDV->Reset();
 
-  for (int i = 0; i < c_nVXDLayers; i++) {
+  for (VxdID layer : geo.getLayers()) {
+    int i = gTools->getLayerIndex(layer.getLayerNumber());
     if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
   }
-  for (int i = 0; i < c_nVXDLayers - 1; i++) {
+  for (VxdID layer : geo.getLayers()) {
+    int i = layer.getLayerNumber();
+    if (i == gTools->getLastLayer()) continue;
+    i = gTools->getLayerIndex(i);
     if (m_TRClusterCorrelationsPhi[i] != NULL) m_TRClusterCorrelationsPhi[i]->Reset();
     if (m_TRClusterCorrelationsTheta[i] != NULL) m_TRClusterCorrelationsTheta[i]->Reset();
   }
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
+  for (int i = 0; i < gTools->getNumberOfSensors(); i++) {
     if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
     if (m_UBResidualsSensorU[i] != NULL) m_UBResidualsSensorU[i]->Reset();
     if (m_UBResidualsSensorV[i] != NULL) m_UBResidualsSensorV[i]->Reset();
@@ -801,6 +783,7 @@ void AlignDQMModule::beginRun()
 
 void AlignDQMModule::event()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   int iTrack = 0;
   int iTrackVXD = 0;
   int iTrackCDC = 0;
@@ -919,8 +902,9 @@ void AlignDQMModule::event()
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
             if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
-              m_TRClusterCorrelationsPhi[getLayerIndex(iLayerPrev)]->Fill(fPosSPUPrev, fPosSPU);
-              m_TRClusterCorrelationsTheta[getLayerIndex(iLayerPrev)]->Fill(fPosSPVPrev, fPosSPV);
+              int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
+              m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
+              m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
               iHitPrew = iHit;
             }
             iLayerPrev = iLayer;
@@ -931,11 +915,12 @@ void AlignDQMModule::event()
             m_UBResidualsPXDV->Fill(ResidVPlaneRHUnBias);
 
 
-            int index = getSensorIndex(iLayer, sensorID.getLadderNumber(), sensorID.getSensorNumber());
+            int index = gTools->getSensorIndex(sensorID);
+            int indexLayer = gTools->getLayerIndex(sensorID.getLayerNumber());
             m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
             m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
             m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
-            m_TRClusterHitmap[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
+            m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
 
             posU *= Unit::convertValueToUnit(1.0, "mm");
             posV *= Unit::convertValueToUnit(1.0, "mm");
@@ -948,13 +933,13 @@ void AlignDQMModule::event()
             m_ResVPosUSens[index]->Fill(posU, ResidVPlaneRHUnBias);
             m_ResVPosVSens[index]->Fill(posV, ResidVPlaneRHUnBias);
 
-            m_ResMeanPhiThetaLayerCounts[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
-            m_ResMeanUPhiThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
-            m_ResMeanVPhiThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
-            m_ResUPhiLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, ResidUPlaneRHUnBias);
-            m_ResVPhiLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, ResidVPlaneRHUnBias);
-            m_ResUThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPV, ResidUPlaneRHUnBias);
-            m_ResVThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPV, ResidVPlaneRHUnBias);
+            m_ResMeanPhiThetaLayerCounts[indexLayer]->Fill(fPosSPU, fPosSPV);
+            m_ResMeanUPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
+            m_ResMeanVPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
+            m_ResUPhiLayer[indexLayer]->Fill(fPosSPU, ResidUPlaneRHUnBias);
+            m_ResVPhiLayer[indexLayer]->Fill(fPosSPU, ResidVPlaneRHUnBias);
+            m_ResUThetaLayer[indexLayer]->Fill(fPosSPV, ResidUPlaneRHUnBias);
+            m_ResVThetaLayer[indexLayer]->Fill(fPosSPV, ResidVPlaneRHUnBias);
 
           }
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
@@ -981,8 +966,9 @@ void AlignDQMModule::event()
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate
                 if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
-                  m_TRClusterCorrelationsPhi[getLayerIndex(iLayerPrev)]->Fill(fPosSPUPrev, fPosSPU);
-                  m_TRClusterCorrelationsTheta[getLayerIndex(iLayerPrev)]->Fill(fPosSPVPrev, fPosSPV);
+                  int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
+                  m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
+                  m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
                   iHitPrew = iHit;
                 }
                 iLayerPrev = iLayer;
@@ -991,11 +977,12 @@ void AlignDQMModule::event()
                 m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
                 m_UBResidualsSVDU->Fill(ResidUPlaneRHUnBias);
                 m_UBResidualsSVDV->Fill(ResidVPlaneRHUnBias);
-                int index = getSensorIndex(iLayer, sensorID.getLadderNumber(), sensorID.getSensorNumber());
+                int index = gTools->getSensorIndex(sensorID);
+                int indexLayer = gTools->getLayerIndex(sensorID.getLayerNumber());
                 m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
                 m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
                 m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
-                m_TRClusterHitmap[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
+                m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
 
                 posU *= Unit::convertValueToUnit(1.0, "mm");
                 posV *= Unit::convertValueToUnit(1.0, "mm");
@@ -1008,13 +995,13 @@ void AlignDQMModule::event()
                 m_ResVPosUSens[index]->Fill(posU, ResidVPlaneRHUnBias);
                 m_ResVPosVSens[index]->Fill(posV, ResidVPlaneRHUnBias);
 
-                m_ResMeanPhiThetaLayerCounts[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
-                m_ResMeanUPhiThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
-                m_ResMeanVPhiThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
-                m_ResUPhiLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, ResidUPlaneRHUnBias);
-                m_ResVPhiLayer[getLayerIndex(iLayer)]->Fill(fPosSPU, ResidVPlaneRHUnBias);
-                m_ResUThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPV, ResidUPlaneRHUnBias);
-                m_ResVThetaLayer[getLayerIndex(iLayer)]->Fill(fPosSPV, ResidVPlaneRHUnBias);
+                m_ResMeanPhiThetaLayerCounts[indexLayer]->Fill(fPosSPU, fPosSPV);
+                m_ResMeanUPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
+                m_ResMeanVPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
+                m_ResUPhiLayer[indexLayer]->Fill(fPosSPU, ResidUPlaneRHUnBias);
+                m_ResVPhiLayer[indexLayer]->Fill(fPosSPU, ResidVPlaneRHUnBias);
+                m_ResUThetaLayer[indexLayer]->Fill(fPosSPV, ResidUPlaneRHUnBias);
+                m_ResVThetaLayer[indexLayer]->Fill(fPosSPV, ResidVPlaneRHUnBias);
 
               }
               if (sensorIDPrew != sensorID) { // other sensor, reset
@@ -1053,10 +1040,10 @@ void AlignDQMModule::event()
 
 void AlignDQMModule::endRun()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (VxdID layer : geo.getLayers()) {
-    int iLayer = layer.getLayerNumber();
-    int iLay = getLayerIndex(iLayer);
+    int iLay = gTools->getLayerIndex(layer.getLayerNumber());
     m_ResMeanUPhiThetaLayer[iLay]->Divide(m_ResMeanPhiThetaLayerCounts[iLay]);
     m_ResMeanVPhiThetaLayer[iLay]->Divide(m_ResMeanPhiThetaLayerCounts[iLay]);
     for (int i = 0; i < m_ResUPhiLayer[iLay]->GetNbinsX(); i++) {
@@ -1106,7 +1093,7 @@ void AlignDQMModule::endRun()
     }
   }
 
-  for (int iSen = 0; iSen < c_nPXDSensors + c_nSVDSensors; iSen++) {
+  for (int iSen = 0; iSen < gTools->getNumberOfSensors(); iSen++) {
     m_ResMeanUPosUVSens[iSen]->Divide(m_ResMeanPosUVSensCounts[iSen]);
     m_ResMeanVPosUVSens[iSen]->Divide(m_ResMeanPosUVSensCounts[iSen]);
     for (int i = 0; i < m_ResUPosUSens[iSen]->GetNbinsX(); i++) {
@@ -1157,76 +1144,3 @@ void AlignDQMModule::endRun()
   }
 
 }
-
-
-void AlignDQMModule::terminate()
-{
-}
-
-
-int AlignDQMModule::getLayerIndex(const int Layer) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (Layer == layer.getLayerNumber()) {
-      return tempcounter;
-    }
-    tempcounter++;
-  }
-  return tempcounter;
-}
-
-void AlignDQMModule::getLayerIDsFromLayerIndex(const int Index, int& Layer) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (tempcounter == Index) {
-      Layer = layer.getLayerNumber();
-      return;
-    }
-    tempcounter++;
-  }
-}
-
-int AlignDQMModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    // if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          return tempcounter;
-        }
-        tempcounter++;
-      }
-    }
-  }
-  return tempcounter;
-}
-
-void AlignDQMModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    // if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if (tempcounter == Index) {
-          Layer = layer.getLayerNumber();
-          Ladder = ladder.getLadderNumber();
-          Sensor = sensor.getSensorNumber();
-          return;
-        }
-        tempcounter++;
-      }
-    }
-  }
-}
-

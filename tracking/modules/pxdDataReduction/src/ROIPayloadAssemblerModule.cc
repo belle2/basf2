@@ -54,23 +54,18 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("NoRejectFlag", mNoRejectFlag, "Never reject, just send no ROI", true);
 }
 
-ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
-{
-}
-
-
 void ROIPayloadAssemblerModule::initialize()
 {
 
-  StoreArray<ROIid>::required(m_ROIListName);
-  StoreObjPtr<EventMetaData>::required();
-  StoreObjPtr<ROIpayload>::registerPersistent(m_ROIpayloadName);
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIListName);
 
-}
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData.isRequired();
 
+  StoreObjPtr<ROIpayload> roiPayloads;
+  roiPayloads.registerInDataStore(m_ROIpayloadName);
 
-void ROIPayloadAssemblerModule::beginRun()
-{
 }
 
 
@@ -180,14 +175,4 @@ void ROIPayloadAssemblerModule::event()
   payload->setCRC();
 
   B2DEBUG(1, " number of ROIs in payload = " << addROI);
-}
-
-
-void ROIPayloadAssemblerModule::endRun()
-{
-}
-
-
-void ROIPayloadAssemblerModule::terminate()
-{
 }

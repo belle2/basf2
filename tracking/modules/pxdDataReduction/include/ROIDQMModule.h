@@ -100,7 +100,7 @@ namespace Belle2 {
     TH2F* h_HitRow_CellU; /**< pxdRawHit ROW vs CellID U*/
     TH2F* h_HitCol_CellV; /**< pxdRawHit ROW vs CellID U*/
 
-    virtual void defineHisto(); /**< define histograms*/
+    void defineHisto() override; /**< define histograms*/
 
   };//end class declaration
 

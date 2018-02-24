@@ -64,10 +64,19 @@ namespace Belle2 {
       bool m_ignoreMetaFlags;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-      //* Fix EventMeta - HLT Trigger Offset for DESY TB 2016, only for error reporting, no data is modified */
-      int m_DESY16_FixTrigOffset;
-      //* Fix Row Offset for DESY TB 2016 */
-      int m_DESY16_FixRowOffset;
+      /** Check for susp. Padding/CRC, default off because of many false positive */
+      bool m_checkPaddingCRC;
+      /** Ignore Phase2 FW erro */
+      bool m_ignoreDHPMask;
+      /** Ignore Phase2 FW error */
+      bool m_ignoreDHELength;
+      /** Force Mapping even if DHH bit is not requesting it */
+      bool m_forceMapping;
+      /** Force No Mapping even if DHH bit is requesting it */
+      bool m_forceNoMapping;
+      /** Maximum DHP frame difference until error is reported */
+      unsigned int m_maxDHPFrameDiff;
+
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 
@@ -105,7 +114,6 @@ namespace Belle2 {
       /** Unpack one event (several frames) stored in RawPXD object
        * @param px RawPXD data object
        * @param inx Index of RawPXD packet
-       * @param daqevtstat Daq Status Object
        */
       void unpack_rawpxd(RawPXD& px, int inx);
 
@@ -149,12 +157,6 @@ namespace Belle2 {
        */
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
-      /**
-       * @param length length of cluster data
-       * @param data pointer to cluster data
-       * @param vxd_id vertex Detector ID
-       */
-
       /** Error Mask set per packet / frame*/
       PXDError::PXDErrorFlags m_errorMask;
       /** Error Mask set per packet / DHE */
@@ -167,8 +169,6 @@ namespace Belle2 {
       PXDError::PXDErrorFlags m_errorMaskEvent;
       /** give verbose unpacking information -> TODO will be a parameter in next release */
       bool verbose = true;
-      /** ignore missing datcon (dont show error) */
-      bool ignore_datcon_flag = true;
 
       /** counter for not accepted events... should not happen TODO discussion ongoing with DAQ group */
       unsigned int m_notaccepted{0};

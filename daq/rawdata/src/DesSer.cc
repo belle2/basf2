@@ -7,6 +7,8 @@
 //-
 #include <daq/rawdata/DesSer.h>
 
+#include <sys/uio.h>
+
 //#define DEBUG
 using namespace std;
 using namespace Belle2;

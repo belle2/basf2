@@ -250,11 +250,17 @@ PXDROIFinderAnalysisModule::~PXDROIFinderAnalysisModule()
 void PXDROIFinderAnalysisModule::initialize()
 {
 
-  StoreArray<RecoTrack>::required(m_recoTrackListName);
-  StoreArray<ROIid>::required(m_ROIListName);
-  StoreArray<PXDIntercept>::required(m_PXDInterceptListName);
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_recoTrackListName);
 
-  StoreArray<MCParticle>::required();
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIListName);
+
+  StoreArray<PXDIntercept> pxdIntercepts;
+  pxdIntercepts.isRequired(m_PXDInterceptListName);
+
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired();
 
   n_rois           = 0;
   n_intercepts     = 0;

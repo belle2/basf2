@@ -36,7 +36,7 @@ void FittedTracksStorerModule::initialize()
   inputRecoTracks.isRequired();
 
   StoreArray<RecoTrack> outputRecoTracks(m_param_outputRecoTracksStoreArrayName);
-  outputRecoTracks.registerInDataStore();
+  outputRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   RecoTrack::registerRequiredRelations(outputRecoTracks);
 

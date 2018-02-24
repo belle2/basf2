@@ -1269,8 +1269,8 @@ recordtype(ai) {
 		pp(TRUE)
 		interest(2)
 	}
-	field(ROFF,DBF_ULONG) {
-		prompt("Raw Offset")
+	field(ROFF,DBF_LONG) {
+		prompt("Raw Offset, obsolete")
 		pp(TRUE)
 		interest(2)
 	}
@@ -1635,8 +1635,8 @@ recordtype(ao) {
 		size(16)
 		interest(1)
 	}
-	field(ROFF,DBF_ULONG) {
-		prompt("Raw Offset")
+	field(ROFF,DBF_LONG) {
+		prompt("Raw Offset, obsolete")
 		pp(TRUE)
 		interest(2)
 	}
@@ -3585,254 +3585,149 @@ recordtype(aSub) {
 	field(NEVA,DBF_ULONG) {
 		prompt("Num. elements in VALA")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVB,DBF_ULONG) {
 		prompt("Num. elements in VALB")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVC,DBF_ULONG) {
 		prompt("Num. elements in VALC")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVD,DBF_ULONG) {
 		prompt("Num. elements in VALD")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVE,DBF_ULONG) {
 		prompt("Num. elements in VALE")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVF,DBF_ULONG) {
 		prompt("Num. elements in VALF")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVG,DBF_ULONG) {
 		prompt("Num. elements in VALG")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVH,DBF_ULONG) {
 		prompt("Num. elements in VAlH")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVI,DBF_ULONG) {
 		prompt("Num. elements in VALI")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVJ,DBF_ULONG) {
 		prompt("Num. elements in VALJ")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVK,DBF_ULONG) {
 		prompt("Num. elements in VALK")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVL,DBF_ULONG) {
 		prompt("Num. elements in VALL")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVM,DBF_ULONG) {
 		prompt("Num. elements in VALM")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVN,DBF_ULONG) {
 		prompt("Num. elements in VALN")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVO,DBF_ULONG) {
 		prompt("Num. elements in VALO")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVP,DBF_ULONG) {
 		prompt("Num. elements in VALP")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVQ,DBF_ULONG) {
 		prompt("Num. elements in VALQ")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVR,DBF_ULONG) {
 		prompt("Num. elements in VALR")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVS,DBF_ULONG) {
 		prompt("Num. elements in VALS")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVT,DBF_ULONG) {
 		prompt("Num. elements in VALT")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
 	}
 	field(NEVU,DBF_ULONG) {
 		prompt("Num. elements in VALU")
 		initial("1")
+		promptgroup(GUI_WAVE)
 		special(SPC_NOMOD)
 		interest(3)
-	}
-	field(ONVA,DBF_ULONG) {
-		prompt("Num. elements in OVLA")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVB,DBF_ULONG) {
-		prompt("Num. elements in OVLB")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVC,DBF_ULONG) {
-		prompt("Num. elements in OVLC")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVD,DBF_ULONG) {
-		prompt("Num. elements in OVLD")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVE,DBF_ULONG) {
-		prompt("Num. elements in OVLE")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVF,DBF_ULONG) {
-		prompt("Num. elements in OVLF")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVG,DBF_ULONG) {
-		prompt("Num. elements in OVLG")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVH,DBF_ULONG) {
-		prompt("Num. elements in VAlH")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVI,DBF_ULONG) {
-		prompt("Num. elements in OVLI")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVJ,DBF_ULONG) {
-		prompt("Num. elements in OVLJ")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVK,DBF_ULONG) {
-		prompt("Num. elements in OVLK")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVL,DBF_ULONG) {
-		prompt("Num. elements in OVLL")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVM,DBF_ULONG) {
-		prompt("Num. elements in OVLM")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVN,DBF_ULONG) {
-		prompt("Num. elements in OVLN")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVO,DBF_ULONG) {
-		prompt("Num. elements in OVLO")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVP,DBF_ULONG) {
-		prompt("Num. elements in OVLP")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVQ,DBF_ULONG) {
-		prompt("Num. elements in OVLQ")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVR,DBF_ULONG) {
-		prompt("Num. elements in OVLR")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVS,DBF_ULONG) {
-		prompt("Num. elements in OVLS")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVT,DBF_ULONG) {
-		prompt("Num. elements in OVLT")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
-	}
-	field(ONVU,DBF_ULONG) {
-		prompt("Num. elements in OVLU")
-		initial("1")
-		special(SPC_NOMOD)
-		interest(4)
 	}
 }
 recordtype(bi) {
@@ -4097,28 +3992,28 @@ recordtype(bi) {
 	}
 	field(OSV,DBF_MENU) {
 		prompt("One Error Severity")
-		promptgroup(GUI_ALARMS)
+		promptgroup(GUI_BITS1)
 		menu(menuAlarmSevr)
 		pp(TRUE)
 		interest(1)
 	}
 	field(COSV,DBF_MENU) {
 		prompt("Change of State Svr")
-		promptgroup(GUI_ALARMS)
+		promptgroup(GUI_BITS2)
 		menu(menuAlarmSevr)
 		pp(TRUE)
 		interest(1)
 	}
 	field(ZNAM,DBF_STRING) {
 		prompt("Zero Name")
-		promptgroup(GUI_DISPLAY)
+		promptgroup(GUI_CALC)
 		size(26)
 		pp(TRUE)
 		interest(1)
 	}
 	field(ONAM,DBF_STRING) {
 		prompt("One Name")
-		promptgroup(GUI_DISPLAY)
+		promptgroup(GUI_CLOCK)
 		size(26)
 		pp(TRUE)
 		interest(1)
@@ -13607,4 +13502,3 @@ registrar(asSub)
 variable(asCaDebug,int)
 variable(dbRecordsOnceOnly,int)
 variable(dbBptNotMonotonic,int)
-variable(dbTemplateMaxVars,int)

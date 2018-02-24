@@ -201,13 +201,13 @@ void ECLDQMModule::initialize()
   ECLDigits.isRequired();
 
   StoreArray<ECLCalDigit> ECLCalDigits;
-  ECLCalDigits.isRequired();
+  ECLCalDigits.isOptional();
 
   StoreArray<ECLTrig> ECLTrigs;
-  ECLTrigs.isRequired();
+  ECLTrigs.isOptional();
 
   StoreArray<ECLDsp> ECLDsps;
-  ECLDsps.isRequired();
+  ECLDsps.isOptional();
 
 
 }
@@ -251,8 +251,6 @@ void ECLDQMModule::event()
   int NHitsEvent = ECLCalDigits.getEntries();
   int trigtag1 = 0;
   int flagtag = 1;
-
-  if (ECLDigits.getEntries() != NHitsEvent) B2ERROR("ECLDigit and ECLCalDigit objects have different number of entries!!!");
 
   for (auto& aECLDigit : ECLDigits) {
 

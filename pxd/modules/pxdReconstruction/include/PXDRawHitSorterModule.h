@@ -14,9 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
-// TODO we should not need this
-//#include <pxd/dataobjects/PXDFrame.h>
-#include <pxd/online/PXDIgnoredPixelsMap.h>
+#include <pxd/dataobjects/PXDFrame.h>
 #include <string>
 
 namespace Belle2 {
@@ -67,10 +65,6 @@ namespace Belle2 {
       int m_0cut;
       /** Discard out-of-range hits. */
       bool m_trimOutOfRange;
-      /** Name of the ignored pixels list xml */
-      std::string m_ignoredPixelsListName;
-      /** Ignored pixels list manager class */
-      std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList;
     };//end class declaration
 
 

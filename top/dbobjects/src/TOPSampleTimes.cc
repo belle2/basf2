@@ -21,7 +21,7 @@ namespace Belle2 {
     double timeBin = DTime / c_TimeAxisSize;
     for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin * i;
     m_timeAxis[c_TimeAxisSize] = DTime;
-    m_calibrated = false;
+    m_calibrated = c_Default;
   }
 
 
@@ -36,7 +36,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = sampleTimes[i];
     double DTime = 2 * syncTimeBase;
     m_timeAxis[c_TimeAxisSize] = DTime;
-    m_calibrated = true;
+    m_calibrated = c_Calibrated;
   }
 
 
@@ -74,7 +74,7 @@ namespace Belle2 {
 
   double TOPSampleTimes::getSample(int window, double time) const
   {
-    time += getFullTime(window, 0);
+    time += window * getTimeRange() / 4.0;
     int n = int(time / getTimeRange());
     if (time < 0) n--;
 

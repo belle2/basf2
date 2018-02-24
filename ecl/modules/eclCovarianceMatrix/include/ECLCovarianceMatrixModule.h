@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * This module calculates the covariance matrix for a N1 showers.         *
+ * This module calculates the covariance matrix for n photon showers.     *
  * The matrix depends on the shower region (FWD, Bartel, BWD)             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *

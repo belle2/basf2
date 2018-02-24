@@ -26,7 +26,7 @@ G4Monopole::G4Monopole(const G4String& name,
                        G4double  eCharge,
                        G4int     encoding)
   : G4ParticleDefinition(name, mass, 0.0 * MeV, eplus * eCharge,
-                         0, 0, 0,
+                         1, 0, 0,
                          0, 0, 0,
                          "fermion", 0, 0, encoding,
                          true, -1.0, 0)

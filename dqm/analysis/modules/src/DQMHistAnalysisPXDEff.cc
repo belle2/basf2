@@ -12,6 +12,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDEff.h>
 #include <TROOT.h>
 #include <TClass.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
@@ -44,36 +45,45 @@ DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule() { }
 
 void DQMHistAnalysisPXDEffModule::initialize()
 {
-  //As there is no access to the geometry now, instead build all possible PXD id's and remove the ones not existing later
-  for (int layer = 1; layer <= 2; layer++) {
-    for (int ladder = 1; ladder <= 12; ladder++) {
-      if (layer == 1 && ladder >= 9) {
-        continue;//layer 1 only has 8 ladders
-      }
-      for (int sensor = 1; sensor <= 2; sensor++) {
-        m_PXDModules.push_back(VxdID(layer, ladder, sensor));
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-        if (layer == 1) {
-          m_PXDLayer1.push_back(VxdID(layer, ladder, sensor));
-        } else if (layer == 2) {
-          m_PXDLayer2.push_back(VxdID(layer, ladder, sensor));
-        }
-      }
+  //collect the list of all PXD Modules in the geometry here
+  std::vector<VxdID> sensors = geo.getListOfSensors();
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
+    // B2DEBUG(20,"VXD " << aVxdID);
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+    m_PXDModules.push_back(aVxdID);
+
+    if (aVxdID.getLayerNumber() == 1) {
+      m_PXDLayer1.push_back(aVxdID);
+    } else if (aVxdID.getLayerNumber() == 2) {
+      m_PXDLayer2.push_back(aVxdID);
+    } else {
+      B2ERROR("Layer number " << aVxdID.getLayerNumber() << " given for a PXD Module!");
+      continue;
     }
+
+
   }
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  const int nu = 250;//The number of pixels per module should never change
-  const int nv = 768;
 
+
+  int nu = 1;//If this does not get overwritten, the histograms will anyway never contain anything useful
+  int nv = 1;
+  //Have been promised that all modules have the same number of pixels, so just take from the first one
   if (m_PXDModules.size() == 0) {
     //This could as well be a B2FATAL, the module won't do anything useful if this happens
     B2ERROR("No PXDModules found! Can't really do anything useful now...");
     // set some default size to nu, nv?
+  } else {
+    VXD::SensorInfoBase cellGetInfo = geo.getSensorInfo(m_PXDModules[0]);
+    nu = cellGetInfo.getUCells();
+    nv = cellGetInfo.getVCells();
   }
 
-  //Because without geometry there is no way to know which modules even exist at this point, create all for now and then maybe leave some unused
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
@@ -110,7 +120,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_hEffMerge["OB"]->SetStats(false);
 
 
-  //One bin for each module, one histogram for each layer
+  //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll1 = new TCanvas("c_EffAll1");
   m_cEffAll2 = new TCanvas("c_EffAll2");
 
@@ -216,7 +226,6 @@ void DQMHistAnalysisPXDEffModule::event()
     //Summing up events is done in the module creating these
     m_hEffModules[aPXDModule]->Reset();
 
-    //Will always try to get all modules, even ones not in the current geometry
     TH2D* Hits, *Matches;
     TString locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
@@ -261,6 +270,7 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
     }
+
     if (m_cEffModules[aPXDModule]) {
       m_cEffModules[aPXDModule]->cd();
       m_hEffModules[aPXDModule]->Draw("colz");

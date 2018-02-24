@@ -34,7 +34,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(), m_dheID(0), m_startRow(0), m_frameNr(0),
+    PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(0), m_dheID(0), m_startRow(0), m_frameNr(0),
       m_rawCount(0), m_redCount(0) {}
 
     /** constructor setting the error mask, dheid, raw and reduced data counters, ...
@@ -46,7 +46,8 @@ namespace Belle2 {
      */
     PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short sr,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
-      m_startRow(sr), m_frameNr(fn), m_rawCount(0), m_redCount(0) {}
+      m_startRow(sr), m_frameNr(fn), m_rawCount(0), m_redCount(0)
+    {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -81,7 +82,7 @@ namespace Belle2 {
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
 
     /** Set VxdID and DHE ID of sensor */
-    void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
+    void setDHEID(VxdID id, int dheid) { m_sensorID = id.getID(); m_dheID = dheid;};
     /** Get DHE ID of sensor*/
     unsigned short getDHEID(void) const { return  m_dheID;};
     /** Get VxdID of sensor */
@@ -145,7 +146,7 @@ namespace Belle2 {
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
     bool m_usable; /**< data is useable.*/
 
-    VxdID m_sensorID;/**< Sensor ID.*/
+    unsigned short m_sensorID;/**< Sensor ID.*/
     unsigned short m_dheID;/**< DHE ID as delivered by DAQ.*/
     unsigned short m_startRow; /**< Startrow from DHE header */
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
@@ -158,7 +159,7 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
-    ClassDef(PXDDAQDHEStatus, 1);
+    ClassDef(PXDDAQDHEStatus, 2);
 
   }; // class PXDDAQDHEStatus
 

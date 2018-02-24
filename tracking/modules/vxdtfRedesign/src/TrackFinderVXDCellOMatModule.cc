@@ -85,7 +85,7 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 void TrackFinderVXDCellOMatModule::initialize()
 {
   m_network.isRequired(m_PARAMNetworkName);
-  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);

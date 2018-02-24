@@ -130,7 +130,7 @@ void SegmentNetworkProducerModule::initialize()
     m_spacePoints.back().isRequired();
   }
 
-  m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut);
 }
 
 

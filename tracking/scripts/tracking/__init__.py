@@ -820,14 +820,42 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     RecoTracksStoreArrayName=reco_tracks)
 
 
-def add_vxd_track_finding_vxdtf2(path, *args, **kwargs):
+def add_vxd_track_finding_vxdtf2(path, *args, svd_clusters="", components=None, suffix="", **kwargs):
     """Function for calling _add_vxdtf2_implementation for phase2 or 3 differently"""
+
+    nameSPs = 'SpacePoints' + suffix
+
+    pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
+    if pxdSPCreatorName not in [e.name() for e in path.modules()]:
+        if is_pxd_used(components):
+            spCreatorPXD = register_module('PXDSpacePointCreator')
+            spCreatorPXD.set_name(pxdSPCreatorName)
+            spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
+            spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
+            path.add_module(spCreatorPXD)
+
+    # check for the name instead of the type as the HLT also need those module under (should have different names)
+    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
+    if svdSPCreatorName not in [e.name() for e in path.modules()]:
+        # always use svd!
+        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD.set_name(svdSPCreatorName)
+        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
+        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
+        spCreatorSVD.param('SVDClusters', svd_clusters)
+        path.add_module(spCreatorSVD)
 
     condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
     phase2_path = create_path()
-    _add_vxdtf2_implementation(phase2_path, *args, phase2=True, **kwargs)
+    _add_vxdtf2_implementation(phase2_path,
+                               *args,
+                               svd_clusters=svd_clusters, components=components, suffix=suffix, phase2=True, **kwargs)
     phase3_path = create_path()
-    _add_vxdtf2_implementation(phase3_path, *args, phase2=False, **kwargs)
+    _add_vxdtf2_implementation(phase3_path,
+                               *args,
+                               svd_clusters=svd_clusters, components=components, suffix=suffix, phase2=False, **kwargs)
+
     condition.if_true(phase2_path, AfterConditionPath.CONTINUE)
     condition.if_false(phase3_path, AfterConditionPath.CONTINUE)
 
@@ -904,27 +932,6 @@ def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks=
     #################
 
     nameSPs = 'SpacePoints' + suffix
-
-    pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
-    if pxdSPCreatorName not in [e.name() for e in path.modules()]:
-        if use_pxd:
-            spCreatorPXD = register_module('PXDSpacePointCreator')
-            spCreatorPXD.set_name(pxdSPCreatorName)
-            spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-            spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
-            path.add_module(spCreatorPXD)
-
-    # check for the name instead of the type as the HLT also need those module under (should have different names)
-    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
-    if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        # always use svd!
-        spCreatorSVD = register_module('SVDSpacePointCreator')
-        spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
-        spCreatorSVD.param('SVDClusters', svd_clusters)
-        path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')

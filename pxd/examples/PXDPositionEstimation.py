@@ -334,7 +334,7 @@ if __name__ == "__main__":
             main.add_module('BGOverlayExecutor', PXDDigitsName='')
             main.add_module("PXDDigitSorter", digits='')
 
-    main.add_module("ActivatePXDCalibration")
+    main.add_module("ActivatePXDClusterPositionEstimator")
     main.add_module("PXDClusterizer")
 
     positionestimation = PXDPositionEstimation()

@@ -17,8 +17,13 @@ from daqdqm.cosmicdqm import add_cosmic_dqm
 
 from rawdata import add_unpackers
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "ROIs"]
-ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpayload"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs"]
+ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpayload", "ROIs"]
+
+# list of DataStore names that are present when data enters the HLT.
+HLT_INPUT_REGEX = RAW_SAVE_STORE_ARRAYS + ["EventMetaData"]
+EXPRESSRECO_INPUT_REGEX = RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX
+
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
@@ -201,6 +206,7 @@ def add_hlt_processing(path, run_type="collision",
                        roi_take_fullframe=True,
                        make_crashsafe=True,
                        clean_wrapped_path=False,
+                       prune_input=True,
                        softwaretrigger_mode='hlt_filter', **kwargs):
     """
     Add all modules for processing on HLT filter machines
@@ -210,6 +216,19 @@ def add_hlt_processing(path, run_type="collision",
     if make_crashsafe:
         wrapped_path = basf2.create_path()
 
+    # ensure that only DataStore content is present that we expect in
+    # in the HLT configuration. If ROIpayloads or tracks are present in the
+    # input file, this can be a problem and lead to crashes
+    if prune_input:
+        wrapped_path.add_module(
+            "PruneDataStore",
+            matchEntries=HLT_INPUT_REGEX)
+
+    # todo: currently, the add_unpackers script will add the geometry with
+    # all components. This is actually important, as also the PXD geomtery is
+    # needed on the HLT (but not in DEFAULT_HLT_COMPONENTS) because the
+    # RoiPayloadAssembler might look things up in the PXD Geometry
+    # This needs to be properly solved in some future refactoring of this file
     add_unpackers(wrapped_path, components=components)
 
     # if not set, just assume to reuse the normal compontents list
@@ -256,6 +275,7 @@ def add_expressreco_processing(path, run_type="collision",
                                reco_components=None,
                                make_crashsafe=True,
                                clean_wrapped_path=False,
+                               prune_input=True,
                                do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
@@ -264,6 +284,14 @@ def add_expressreco_processing(path, run_type="collision",
     wrapped_path = path
     if make_crashsafe:
         wrapped_path = basf2.create_path()
+
+    # ensure that only DataStore content is present that we expect in
+    # in the ExpressReco configuration. If tracks are present in the
+    # input file, this can be a problem and lead to crashes
+    if prune_input:
+        wrapped_path.add_module(
+            "PruneDataStore",
+            matchEntries=EXPRESSRECO_INPUT_REGEX)
 
     if not do_reconstruction:
         add_geometry_if_not_present(wrapped_path)

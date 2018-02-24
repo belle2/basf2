@@ -60,7 +60,7 @@ main.add_module('HistoManager', histoFileName='Histos_DQMTracks_Phase2.root')
 pxddqmExpReco = register_module('PXDDQMExpressReco')
 svddqmExpReco = register_module('SVDDQMExpressReco')
 vxddqmExpReco = register_module('VXDDQMExpressReco')
-# main.add_module(pxddqmExpReco)
+
 main.add_module(pxddqmExpReco)
 main.add_module(svddqmExpReco)
 main.add_module(vxddqmExpReco)

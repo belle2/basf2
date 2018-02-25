@@ -82,7 +82,7 @@ namespace Belle2 {
     void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
 
     /** Set VxdID and DHE ID of sensor */
-    void setDHEID(VxdID id, int dheid) { m_sensorID = id.getID(); m_dheID = dheid;};
+    void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
     /** Get DHE ID of sensor*/
     unsigned short getDHEID(void) const { return  m_dheID;};
     /** Get VxdID of sensor */

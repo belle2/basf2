@@ -12,7 +12,8 @@
 #include "TH2D.h"
 
 namespace Belle2 {
-  /*
+
+  /**
    * The module for Data Quality Monitor.
    */
   class cdcDQM7Module : public HistoModule {
@@ -36,16 +37,16 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-    TH1D* h_nhits_L[56];     /* histogram hit in layer */
-    TH1D* h_tdc_L[56];       /* histogram tdc */
-    TH1D* h_adc_L[56];       /* histogram adc */
+    TH1D* h_nhits_L[56];     /**<  histogram hit in layer */
+    TH1D* h_tdc_L[56];       /**<  histogram tdc */
+    TH1D* h_adc_L[56];       /**<  histogram adc */
 
-    TH1D* h_tdc_sL[9];       /* tdc each super layer */
-    TH1D* h_adc_sL[9];       /* adc each super layer */
+    TH1D* h_tdc_sL[9];       /**<  tdc each super layer */
+    TH1D* h_adc_sL[9];       /**<  adc each super layer */
 
-    TH1D* h_fast_tdc;        /* fastest TDC in each event */
+    TH1D* h_fast_tdc;        /**<  fastest TDC in each event */
 
-    TH2D* bmap_2; /* board status map 2D */
+    TH2D* bmap_2; /**<  board status map 2D */
 
   };
 }

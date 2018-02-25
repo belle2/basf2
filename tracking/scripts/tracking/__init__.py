@@ -820,53 +820,13 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     RecoTracksStoreArrayName=reco_tracks)
 
 
-def add_vxd_track_finding_vxdtf2(path, *args, svd_clusters="", components=None, suffix="", **kwargs):
-    """Function for calling _add_vxdtf2_implementation for phase2 or 3 differently"""
-
-    nameSPs = 'SpacePoints' + suffix
-
-    pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
-    if pxdSPCreatorName not in [e.name() for e in path.modules()]:
-        if is_pxd_used(components):
-            spCreatorPXD = register_module('PXDSpacePointCreator')
-            spCreatorPXD.set_name(pxdSPCreatorName)
-            spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-            spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
-            path.add_module(spCreatorPXD)
-
-    # check for the name instead of the type as the HLT also need those module under (should have different names)
-    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
-    if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        # always use svd!
-        spCreatorSVD = register_module('SVDSpacePointCreator')
-        spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
-        spCreatorSVD.param('SVDClusters', svd_clusters)
-        path.add_module(spCreatorSVD)
-
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
-    phase2_path = create_path()
-    _add_vxdtf2_implementation(phase2_path,
-                               *args,
-                               svd_clusters=svd_clusters, components=components, suffix=suffix, phase2=True, **kwargs)
-    phase3_path = create_path()
-    _add_vxdtf2_implementation(phase3_path,
-                               *args,
-                               svd_clusters=svd_clusters, components=components, suffix=suffix, phase2=False, **kwargs)
-
-    condition.if_true(phase2_path, AfterConditionPath.CONTINUE)
-    condition.if_false(phase3_path, AfterConditionPath.CONTINUE)
-
-
-def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                               useTwoStepSelection=True, PXDminSVDSPs=3, use_quality_estimator_mva=True,
-                               QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
-                               sectormap_file=None, custom_setup_name=None,
-                               filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
-                               quality_estimator='tripletFit', use_quality_index_cutter=False,
-                               track_finder_module='TrackFinderVXDCellOMat'):
+def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
+                                 useTwoStepSelection=True, PXDminSVDSPs=3, use_quality_estimator_mva=True,
+                                 QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
+                                 sectormap_file=None, custom_setup_name=None,
+                                 filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
+                                 quality_estimator='tripletFit', use_quality_index_cutter=False,
+                                 track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -875,7 +835,6 @@ def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks=
     Use the GenfitTrackCandidatesCreator Module to convert back.
 
     :param path: basf2 path
-    :param phase2: Whether to use the setup for phase2 or not. Default is False.
     :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means
@@ -914,24 +873,33 @@ def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks=
         db_sec_map_file = "SVDSectorMap_v000.root"
         use_pxd = False
 
-    maxNetworkSize = 40000
-    maxConnections = 30000
-    maxHitNetworkSize = 3000
-    maxHitConnections = 8000
-    maxPaths = 300000
-    if phase2:
-        maxNetworkSize = 10000
-        maxConnections = 6000
-        maxHitNetworkSize = 1000
-        maxHitConnections = 2000
-        maxPaths = 40000
-
     #################
     # VXDTF2 Step 0
     # Preparation
     #################
 
     nameSPs = 'SpacePoints' + suffix
+
+    pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
+    if pxdSPCreatorName not in [e.name() for e in path.modules()]:
+        if use_pxd:
+            spCreatorPXD = register_module('PXDSpacePointCreator')
+            spCreatorPXD.set_name(pxdSPCreatorName)
+            spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
+            spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
+            path.add_module(spCreatorPXD)
+
+    # check for the name instead of the type as the HLT also need those module under (should have different names)
+    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
+    if svdSPCreatorName not in [e.name() for e in path.modules()]:
+        # always use svd!
+        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD.set_name(svdSPCreatorName)
+        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
+        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
+        spCreatorSVD.param('SVDClusters', svd_clusters)
+        path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
@@ -956,10 +924,6 @@ def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks=
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
-    segNetProducer.param('maxNetworkSize', maxNetworkSize)
-    segNetProducer.param('maxConnections', maxConnections)
-    segNetProducer.param('maxHitNetworkSize', maxHitNetworkSize)
-    segNetProducer.param('maxHitConnections', maxHitConnections)
     path.add_module(segNetProducer)
 
     #################
@@ -977,7 +941,6 @@ def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks=
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
-    trackFinder.param('maxPaths', maxPaths)
     trackFinder.param('strictSeeding', TFstrictSeeding)
     trackFinder.param('storeSubsets', TFstoreSubsets)
     path.add_module(trackFinder)

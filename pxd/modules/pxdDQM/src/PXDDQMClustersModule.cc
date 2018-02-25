@@ -169,7 +169,7 @@ void PXDDQMClustersModule::defineHisto()
     string title = str(format("DQM PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = NULL;
     m_fired[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-    m_fired[i]->GetXaxis()->SetTitle("# of fired u pixels");
+    m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Number of clusters per frame
@@ -178,7 +178,7 @@ void PXDDQMClustersModule::defineHisto()
     title = str(format("DQM PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = NULL;
     m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-    m_clusters[i]->GetXaxis()->SetTitle("# of u clusters");
+    m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Start row distribution

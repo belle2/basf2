@@ -138,9 +138,10 @@ void PXDDQMExpressRecoModule::defineHisto()
 
   m_fired = new TH1F*[nPXDSensors];
   m_clusters = new TH1F*[nPXDSensors];
-  m_startRow = new TH1F*[nPXDSensors];
-  m_chargStartRow = new TH1F*[nPXDSensors];
-  m_startRowCount = new TH1F*[nPXDSensors];
+  // FIXME: startrow histos are for experts not shifters
+  //m_startRow = new TH1F*[nPXDSensors];
+  //m_chargStartRow = new TH1F*[nPXDSensors];
+  //m_startRowCount = new TH1F*[nPXDSensors];
   m_clusterCharge = new TH1F*[nPXDSensors];
   m_pixelSignal = new TH1F*[nPXDSensors];
   m_clusterSizeU = new TH1F*[nPXDSensors];
@@ -161,7 +162,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     string title = str(format("DQM ER PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = NULL;
     m_fired[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-    m_fired[i]->GetXaxis()->SetTitle("# of fired u pixels");
+    m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Number of clusters per frame
@@ -170,32 +171,33 @@ void PXDDQMExpressRecoModule::defineHisto()
     title = str(format("DQM ER PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = NULL;
     m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-    m_clusters[i]->GetXaxis()->SetTitle("# of u clusters");
+    m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Start row distribution
+    // FIXME: expert level, remove here at some point
     //----------------------------------------------------------------
-    name = str(format("DQMER_PXD_%1%_StartRow") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Start row distribution") % sensorDescr);
+    //name = str(format("DQMER_PXD_%1%_StartRow") % sensorDescr);
+    //title = str(format("DQM ER PXD Sensor %1% Start row distribution") % sensorDescr);
 
-    int nPixels;/** Number of pixels on PXD v direction */
-    nPixels = SensorInfo.getVCells();
-    m_startRow[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
-    m_startRow[i]->GetXaxis()->SetTitle("start row [pitch units]");
-    m_startRow[i]->GetYaxis()->SetTitle("count");
+    //int nPixels;/** Number of pixels on PXD v direction */
+    //nPixels = SensorInfo.getVCells();
+    //m_startRow[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
+    //m_startRow[i]->GetXaxis()->SetTitle("start row [pitch units]");
+    //m_startRow[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
-    name = str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
-    m_chargStartRow[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
-    m_chargStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_chargStartRow[i]->GetYaxis()->SetTitle("average seed [ADU]");
-    name = str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr);
-    title = str(format("DQM ER PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
-    m_startRowCount[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
-    m_startRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
-    m_startRowCount[i]->GetYaxis()->SetTitle("count");
+    //name = str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr);
+    //title = str(format("DQM ER PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
+    //m_chargStartRow[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
+    //m_chargStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
+    //m_chargStartRow[i]->GetYaxis()->SetTitle("average seed [ADU]");
+    //name = str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr);
+    //title = str(format("DQM ER PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
+    //m_startRowCount[i] = new TH1F(name.c_str(), title.c_str(), nPixels / 4, 0.0, nPixels);
+    //m_startRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
+    //m_startRowCount[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Cluster Charge
     //----------------------------------------------------------------
@@ -274,9 +276,10 @@ void PXDDQMExpressRecoModule::beginRun()
   for (int i = 0; i < gTools->getNumberOfPXDSensors(); i++) {
     if (m_fired[i] != NULL) m_fired[i]->Reset();
     if (m_clusters[i] != NULL) m_clusters[i]->Reset();
-    if (m_startRow[i] != NULL) m_startRow[i]->Reset();
-    if (m_chargStartRow[i] != NULL) m_chargStartRow[i]->Reset();
-    if (m_startRowCount[i] != NULL) m_startRowCount[i]->Reset();
+    // FIXME: startrow is for expert only, not shifter
+    //if (m_startRow[i] != NULL) m_startRow[i]->Reset();
+    //if (m_chargStartRow[i] != NULL) m_chargStartRow[i]->Reset();
+    //if (m_startRowCount[i] != NULL) m_startRowCount[i]->Reset();
     if (m_clusterCharge[i] != NULL) m_clusterCharge[i]->Reset();
     if (m_pixelSignal[i] != NULL) m_pixelSignal[i]->Reset();
     if (m_clusterSizeU[i] != NULL) m_clusterSizeU[i]->Reset();

@@ -101,7 +101,9 @@ namespace Belle2 {
 
     h_chHit = newTH1("h_chHit", "# of hits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5, kRed, kRed);
     h_chipHit = newTH1("h_chipHit", "# of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5, kRed, kRed);
-    h_hapdHit = newTH1("h_hapdHit", "# of hits in each channel;HAPD serial;Hits", 420, -0.5, 420 - 0.5, kRed, kRed);
+    h_hapdHit = newTH1("h_hapdHit", "# of hits in each channel;HAPD serial;Hits", 420, 0.5, 421 - 0.5, kRed, kRed);
+    h_hapdHitPerEvent = newTH2("h_hapdHitPerEvent", "# of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5, 420 + 0.5, 144,
+                               -0.5, 143.5, kRed, kRed);
     h_mergerHit = newTH1("h_mergerHit", "# of hits in each merger board;MB serial;Hits", 72, -0.5, 72 - 0.5, kRed, kRed);
     h_gelHit = newTH1("h_gelHit", "# of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5, kRed, kRed);
     h_bits = newTH1("h_bits", "# of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5, kRed, kRed);
@@ -223,24 +225,24 @@ namespace Belle2 {
         if (bits & (1 << i)) h_bits->Fill(i);
       }
     }
-
+    std::vector<int> hpd(420, 0);
     int nHit = 0;
     for (int i = 0; i < arichHits.getEntries(); i++) {
-      h_chHit->Fill((arichHits[i]->getModule() - 1) * 144 + (arichHits[i]->getChannel() - 1));
-
+      int moduleID = arichHits[i]->getModule();
+      h_chHit->Fill((moduleID - 1) * 144 + arichHits[i]->getChannel());
+      hpd[moduleID - 1]++;
       int x = 12 , y = 12;
       arichChannelMap->getXYFromAsic(arichHits[i]->getChannel(), x, y);
       if (x >= 12 || y >= 12) {
         B2INFO("Invalid channel position (x,y)=(" << x << "," << y << ").");
       } else {
-        h_chipHit->Fill((arichHits[i]->getModule() - 1) * 4 + (x + 2 * y));
+        h_chipHit->Fill((moduleID - 1) * 4 + (x + 2 * y));
       }
 
-      int moduleID = arichHits[i]->getModule();
       if (moduleID > 420) {
         B2INFO("Invalid hapd number " << moduleID);
       } else {
-        h_hapdHit->Fill(moduleID - 1);
+        h_hapdHit->Fill(moduleID);
       }
 
       int mergerID = arichMergerMap->getMergerID(moduleID);
@@ -252,7 +254,10 @@ namespace Belle2 {
 
       nHit++;
     }
+
     h_hitsPerEvent->Fill(nHit);
+    int mmid = 1;
+    for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
     for (const auto& arichLikelihood : arichLikelihoods) {
 

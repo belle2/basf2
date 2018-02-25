@@ -34,9 +34,9 @@ input_module.param('inputFileName', options.filename)
 main.add_module(input_module)
 
 # Histogram manager module
-# histo = register_module('HistoManager')
-# histo.param('histoFileName', "histograms.root")  # File to save histograms
-# main.add_module(histo)
+histo = register_module('HistoManager')
+histo.param('histoFileName', "histograms.root")  # File to save histograms
+main.add_module(histo)
 
 
 # build geometry if display option
@@ -58,8 +58,8 @@ arichHits = register_module('ARICHFillHits')
 main.add_module(arichHits)
 
 # create simple DQM histograms
-# arichHists = register_module('ARICHDQM')
-# main.add_module(arichHists)
+arichHists = register_module('ARICHDQM')
+main.add_module(arichHists)
 
 # uncomment to store dataobjects
 output = register_module('RootOutput')
@@ -85,3 +85,8 @@ process(main)
 
 # print stats
 print(statistics)
+
+# plot DQM histograms
+if not int(options.display):
+    com = 'root -l histograms.root ' + home + '/arich/utility/scripts/plotDQM.C'
+    os.system(com)

@@ -319,6 +319,8 @@ void PXDDQMClustersModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
+  m_storeDAQEvtStats.isRequired();
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() != 0) {
     //Register collections
@@ -451,37 +453,31 @@ void PXDDQMClustersModule::event()
       m_clusters[i]->Fill(counts[i].size());
   }
 
-  /*
-  // FIXME: If this stuff here is really needed, the startrow information has to
-  // from from PXDDAQStatus dataobject.
-  if (storeFrames && storeFrames.getEntries()) {
-    // Start rows
-    for (const PXDFrame& frame : storeFrames) {
-      int iLayer = frame.getSensorID().getLayerNumber();
-      if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
-      int iLadder = frame.getSensorID().getLadderNumber();
-      int iSensor = frame.getSensorID().getSensorNumber();
-      int index = gTools->getPXDSensorIndex(iLayer, iLadder, iSensor);
-      if (m_startRow[index] != NULL) m_startRow[index]->Fill(frame.getStartRow());
-    }
-    // Cluster seed charge by start row
-    std::map<VxdID, unsigned short> startRows;
-    for (auto frame : storeFrames)
-      startRows.insert(std::make_pair(frame.getSensorID(), frame.getStartRow()));
-    for (auto cluster : storePXDClusters) {
-      int iLayer = cluster.getSensorID().getLayerNumber();
-      if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
-      int iLadder = cluster.getSensorID().getLadderNumber();
-      int iSensor = cluster.getSensorID().getSensorNumber();
-      int index = gTools->getPXDSensorIndex(iLayer, iLadder, iSensor);
-      VxdID sensorID(iLayer, iLadder, iSensor);
-      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  // Start rows
+  std::map<VxdID, unsigned short> startRows;
+  for (int index = 0; index < nPXDSensors; index++) {
+    VxdID id = gTools->getSensorIDFromPXDIndex(index);
 
-      float fDistance = SensorInfo.getVCellID(cluster.getV()) - startRows[cluster.getSensorID()];
-      if (fDistance < 0) fDistance += SensorInfo.getVCells();
-      if (m_chargStartRow[index] != NULL) m_chargStartRow[index]->Fill(fDistance, cluster.getSeedCharge());
-      if (m_startRowCount[index] != NULL) m_startRowCount[index]->Fill(fDistance);
+    const PXDDAQDHEStatus* dhe = (*m_storeDAQEvtStats).findDHE(id);
+    if (dhe == nullptr) {
+      B2ERROR("No DHE found for SensorId: " << id);
+      continue;
     }
+    auto startRow = dhe->getStartRow();
+    if (m_startRow[index] != NULL) m_startRow[index]->Fill(startRow);
+    startRows.insert(std::make_pair(id, startRow));
   }
-  */
+
+  // Cluster seed charge by start row
+  for (auto& cluster : storePXDClusters) {
+    VxdID sensorID = cluster.getSensorID();
+    int index = gTools->getPXDSensorIndex(sensorID);
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+
+    float fDistance = SensorInfo.getVCellID(cluster.getV()) - startRows[cluster.getSensorID()];
+    if (fDistance < 0) fDistance += SensorInfo.getVCells();
+    if (m_chargStartRow[index] != NULL) m_chargStartRow[index]->Fill(fDistance, cluster.getSeedCharge());
+    if (m_startRowCount[index] != NULL) m_startRowCount[index]->Fill(fDistance);
+  }
+
 }

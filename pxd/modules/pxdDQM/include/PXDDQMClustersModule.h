@@ -16,6 +16,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
@@ -51,6 +53,9 @@ namespace Belle2 {
     float m_CutPXDCharge = 0.0;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
+    /** Input array for DAQ Status. */
+    StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
     /** PXDDigits StoreArray name */
     std::string m_storePXDDigitsName;

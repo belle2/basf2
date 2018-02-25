@@ -20,6 +20,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <string>
 #include <TTree.h>
 #include <TFile.h>
@@ -31,7 +32,7 @@ namespace Belle2 {
 
   /** The SVD Data Reduction Analysis Module
    *
-   * this module performs the analysis of the SVD data redution module performances
+   * this module performs the analysis of the SVD data reduction module performances
    *
    */
 
@@ -67,13 +68,16 @@ namespace Belle2 {
 
   private:
 
+    StoreArray<SVDShaperDigit> m_shapers;
     StoreArray<ROIid> m_ROIs;
     StoreArray<RecoTrack> m_trackList;
     StoreArray<SVDIntercept> m_SVDIntercepts;
     StoreArray<MCParticle> m_mcParticles;
 
+    bool m_isSimulation;
 
 
+    std::string m_shapersName; /**< SVDShaperDigits name */
     std::string m_recoTrackListName; /**< Track list name */
     std::string m_SVDInterceptListName; /**< Intercept list name */
     std::string m_ROIListName; /**< ROI list name */
@@ -223,6 +227,7 @@ namespace Belle2 {
 
     unsigned int n_rois;
     unsigned int n_OKrois;
+    unsigned int m_nGoodROIs;
     unsigned int n_intercepts;
     unsigned int n_tracks; /**< number of tracks */
     unsigned int n_tracksWithDigits; /**< number of tracks with digits */

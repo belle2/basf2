@@ -145,21 +145,14 @@ void PXDRawDQMModule::event()
     auto sensor = currentVxdId.getSensorNumber();/// 1 ... 2
 
     // Get startrow and DheID from DAQEvtStats
-    int dhh_id = -1;
-    unsigned int startRow = 0;
-
-    // FIXME: i guess this can be done more elegantly ...
-    auto evt = *m_storeDAQEvtStats;
-    for (auto& pkt : evt) {
-      for (auto& dhc : pkt) {
-        for (auto& dhe : dhc) {
-          if (dhe.getSensorID() == currentVxdId) {
-            dhh_id = dhe.getDHEID();
-            startRow = dhe.getStartRow();
-          }
-        }
-      }
+    const PXDDAQDHEStatus* dhe = (*m_storeDAQEvtStats).findDHE(currentVxdId);
+    if (dhe == nullptr) {
+      B2ERROR("No DHE found for SensorId: " << currentVxdId);
+      continue;
     }
+
+    auto dhh_id = dhe->getDHEID();
+    auto startRow = dhe->getStartRow();
 
     if (dhh_id <= 0 || dhh_id >= 64) {
       B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);

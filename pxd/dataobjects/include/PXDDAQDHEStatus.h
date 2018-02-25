@@ -159,7 +159,7 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
-    ClassDef(PXDDAQDHEStatus, 2);
+    ClassDef(PXDDAQDHEStatus, 3);
 
   }; // class PXDDAQDHEStatus
 

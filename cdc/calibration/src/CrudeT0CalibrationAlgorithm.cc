@@ -37,7 +37,6 @@ void CrudeT0CalibrationAlgorithm::createHisto()
 
   B2INFO("CreateHisto");
 
-
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
@@ -73,6 +72,28 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
 
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
+
+  // Setup Gearbox
+  Gearbox& gearbox = Gearbox::getInstance();
+
+  std::vector<std::string> backends = {"file:"};
+  gearbox.setBackends(backends);
+
+  B2INFO("Start open gearbox.");
+  gearbox.open("geometry/Belle2.xml");
+  B2INFO("Finished open gearbox.");
+
+  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(0, 0, 1);
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDCGeometryPar::Instance(&cdcGeometry);
+
 
   createHisto();
 
@@ -191,7 +212,7 @@ void CrudeT0CalibrationAlgorithm::write()
 void CrudeT0CalibrationAlgorithm::saveHisto()
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  TFile* fhist = new TFile("histCruteT0.root", "recreate");
+  TFile* fhist = new TFile("histCrudeT0.root", "recreate");
   fhist->cd();
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];

@@ -33,17 +33,3 @@ ROIid::Contains(const PXDDigit& thePXDDigit) const
           m_sensorID == thePXDDigit.getSensorID()
          );
 }
-
-bool ROIid::Contains(const Belle2::SVDShaperDigit& theSVDDigit) const
-{
-
-  bool inside = false;
-
-  if (theSVDDigit.isUStrip())
-    inside = (m_minUid <= theSVDDigit.getCellID() && m_maxUid >= theSVDDigit.getCellID());
-  else
-    inside = (m_minVid <= theSVDDigit.getCellID() && m_maxVid >= theSVDDigit.getCellID());
-
-  return (inside && m_sensorID == theSVDDigit.getSensorID());
-
-}

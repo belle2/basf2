@@ -68,8 +68,5 @@ namespace Belle2 {
     TCanvas* m_cEffAll1;
     TH1D* m_hEffAll2;
     TCanvas* m_cEffAll2;
-
-    TH1* GetHisto(TString a);
-
   };
 } // end namespace Belle2

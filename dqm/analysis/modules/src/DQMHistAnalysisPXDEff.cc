@@ -164,47 +164,6 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   }
 }
 
-TH1* DQMHistAnalysisPXDEffModule::GetHisto(TString histoname)
-{
-  TH1* hh1;
-  gROOT->cd();
-  // look in memfile
-  hh1 = findHist(histoname.Data());
-  if (hh1) return hh1; // found in memfile
-
-  B2INFO("Histo " << histoname << " not in memfile");
-  // the following code sux ... is there no root function for that?
-  TDirectory* d = gROOT;
-
-  TString myl = histoname;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        B2INFO("Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histo " << histoname << " found in mem");
-      return (TH1*)obj;
-    }
-  } else {
-    B2INFO("Histo " << histoname << " NOT found in mem");
-  }
-  return NULL;
-}
 
 void DQMHistAnalysisPXDEffModule::event()
 {
@@ -231,12 +190,12 @@ void DQMHistAnalysisPXDEffModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH2D*)GetHisto(locationHits);
+    Hits = (TH2D*)findHist(locationHits);
     TString locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH2D*)GetHisto(locationMatches);
+    Matches = (TH2D*)findHist(locationMatches);
 
     //Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {

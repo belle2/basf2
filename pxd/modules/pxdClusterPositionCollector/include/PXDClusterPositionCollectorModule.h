@@ -11,46 +11,39 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
 namespace Belle2 {
   /**
-   * Calibration Collector Module for PXD hot pixel masking from PXDRawHits
+   * Calibration collector module for PXD cluster position estimation
    *
    *
    */
-  class PXDRawHotPixelMaskCollectorModule : public CalibrationCollectorModule {
+  class PXDClusterPositionCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDRawHotPixelMaskCollectorModule();
+    PXDClusterPositionCollectorModule();
     void prepare() override final;
     void collect() override final;
 
   private:
+    /**< Required input for PXDCluster  */
+    StoreArray<PXDCluster> m_pxdCluster;
 
-    /**< Required input for  PXDRawHit */
-    StoreArray<PXDRawHit> m_pxdRawHit;
+    /**< Required input for PXDTrueHit  */
+    StoreArray<PXDTrueHit> m_pxdTrueHit;
 
-    /** Name of the collection to use for PXDRawHits */
-    std::string m_storeRawHitsName;
+    /** Name of the collection to use for PXDClusters */
+    std::string m_storeClustersName;
 
-    /** Minimum charge (ADU) for detecting a hit. */
-    int m_0cut;
-
-    /** Utility function to check pixel coordinates */
-    inline bool goodHit(const PXDRawHit& rawhit) const
-    {
-      short u = rawhit.getColumn();
-      bool goodU = (u == std::min(std::max(u, short(0)), short(249)));
-      short v = rawhit.getRow();
-      bool goodV = (v == std::min(std::max(v, short(0)), short(767)));
-      return (goodU && goodV);
-    }
+    /** Name of the collection to use for PXDTrueHits */
+    std::string m_storeTrueHitsName;
   };
 }

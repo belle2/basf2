@@ -14,7 +14,6 @@
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <boost/foreach.hpp>
@@ -82,7 +81,10 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
 void PXDUnpackerModule::initialize()
 {
-  m_storeRawPXD.isRequired(m_RawPXDsName);
+  // Required input
+  m_eventMetaData.isRequired();
+  // Optional input
+  m_storeRawPXD.isOptional(m_RawPXDsName);
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::c_ErrorIfAlreadyRegistered);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::c_ErrorIfAlreadyRegistered);
@@ -130,7 +132,11 @@ void PXDUnpackerModule::terminate()
 
 void PXDUnpackerModule::event()
 {
-  StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
+  // if no input, nothing to do
+  if (!m_storeRawPXD) {
+    // Maybe report this case?
+    return;
+  }
 
   int nRaws = m_storeRawPXD.getEntries();
   if (verbose) {
@@ -140,11 +146,11 @@ void PXDUnpackerModule::event()
   m_errorMask = 0;
   m_errorMaskEvent = 0;
 
-  m_meta_event_nr = evtPtr->getEvent();
-  m_meta_run_nr = evtPtr->getRun();
-  m_meta_subrun_nr = evtPtr->getSubrun();
-  m_meta_experiment = evtPtr->getExperiment();
-  m_meta_time = evtPtr->getTime();
+  m_meta_event_nr = m_eventMetaData->getEvent();
+  m_meta_run_nr = m_eventMetaData->getRun();
+  m_meta_subrun_nr = m_eventMetaData->getSubrun();
+  m_meta_experiment = m_eventMetaData->getExperiment();
+  m_meta_time = m_eventMetaData->getTime();
 
   m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
 

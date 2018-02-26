@@ -20,6 +20,7 @@
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
@@ -99,6 +100,8 @@ namespace Belle2 {
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;
+      /** Input ptr for EventMetaData. */
+      StoreObjPtr<EventMetaData> m_eventMetaData;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw ROIs. */

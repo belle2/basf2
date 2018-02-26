@@ -21,78 +21,9 @@ import b2test_utils
 #    configuration. SVD reconstruction chain should silently (or with
 #    a single warning) withstand an absence of SVD data.
 # ====================================================================
-
-
-class insert_svd_digits(basf2.Module):
-    """
-    Register SVDDigits StoreArray in the DataStore and add some digits.
-    """
-
-    def __init__(self, ndigits=0):
-        super().__init__()
-        self.ndigits = ndigits
-
-    def initialize(self):
-        """ Register SVDDigits StoreArray """
-        svd_digits = Belle2.PyStoreArray(Belle2.SVDDigit.Class())
-        svd_digits.registerInDataStore()
-
-    def event(self):
-        store_digits = Belle2.PyStoreArray("SVDDigits")
-        for i in range(self.ndigits):
-            # Make 6-sample groups, but don't care too much.
-            digit = Belle2.SVDDigit(Belle2.VxdID(3, 1, 1), True,
-                                    i / 6, (i / 6) * 2.0, 30 + i % 6, i % 6)
-            place = store_digits.appendNew()
-            place.__assign__(digit)
-
-
-class insert_shaper_digits(basf2.Module):
-    """
-    Register SVDShaperDigits StoreArray in the DataStore and add
-    some digits.
-    """
-
-    def __init__(self, ndigits=0):
-        super().__init__()
-        self.ndigits = ndigits
-
-    def initialize(self):
-        """ Register SVDDigits StoreArray """
-        svd_digits = Belle2.PyStoreArray(Belle2.SVDShaperDigit.Class())
-        svd_digits.registerInDataStore()
-
-    def event(self):
-        store_digits = Belle2.PyStoreArray("SVDShaperDigits")
-        for i in range(self.ndigits):
-            digit = Belle2.SVDShaperDigit(Belle2.VxdID(3, 1, 1), True, 30 + i,
-                                          [0, 0, 30, 35, 25, 15])
-            place = store_digits.appendNew()
-            place.__assign__(digit)
-
-
-class insert_raw_svds(basf2.Module):
-    """
-    Register RawSVDs StoreArray in the DataStore and add
-    some data.
-    """
-
-    def __init__(self, nobjects=0):
-        super().__init__()
-        self.nobjects = nobjects
-
-    def initialize(self):
-        """ Register SVDDigits StoreArray """
-        svd_raws = Belle2.PyStoreArray(Belle2.RawSVD.Class())
-        svd_raw.registerInDataStore()
-
-    def event(self):
-        store_raws = Belle2.PyStoreArray("RawSVDs")
-        for i in range(self.nobjects):
-            araw = Belle2.RawSVD()
-            place = store_raws.appendNew()
-            place.__assign__(araw)
-
+test_successful = True
+test_message = ['successful', 'FAILED']
+# ---------------------------------------------------------------------
 
 if __name__ == "__main__":
 
@@ -101,11 +32,12 @@ if __name__ == "__main__":
     dummy_digit = Belle2.SVDDigit()
     dummy_shaper = Belle2.SVDShaperDigit()
 
-    basf2.B2INFO('\nTest 1. Behaviour with residual digits\n')
-
     with b2test_utils.clean_working_directory():
 
-        basf2.B2INFO('\n1.1. Set up: Generate file with residual digits and RawSVDs.\n')
+        basf2.B2INFO('Test 1. \nBehaviour with residual digits\n')
+
+        basf2.B2INFO('1/6 \nSet up: Using ParticleGun and SVDPacker, we generate\n' +
+                     'a file with RawSVDs and residual digits.')
 
         create_input = basf2.create_path()
         create_input.add_module('EventInfoSetter', expList=[0], runList=[0], evtNumList=[1])
@@ -118,11 +50,12 @@ if __name__ == "__main__":
         create_input.add_module('SVDPacker')
         create_input.add_module('RootOutput', outputFileName='rawPlusDigits.root')
         with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(create_input)
+            result = b2test_utils.safe_process(create_input)
 
-        basf2.B2INFO('Generation completed. No errors should have appeared.')
+        test_successful = test_successful and (result == 0)
+        basf2.B2INFO('Generation {0}.\n'.format(test_message[result]))
 
-        basf2.B2INFO('1.2. Read using default settings of SVDUnpacker.' +
+        basf2.B2INFO('2/6\nRead using default settings of SVDUnpacker.' +
                      '\nWe should see FATAL with message for SVDDigits.')
 
         read_digits_default = basf2.create_path()
@@ -133,11 +66,12 @@ if __name__ == "__main__":
         add_svd_reconstruction(read_digits_default)
 
         with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(read_digits_default)
+            result = b2test_utils.safe_process(read_digits_default)
 
-        basf2.B2INFO('Test completed.\n')
+        test_successful = test_successful and (result == 1)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[1 - result]))
 
-        basf2.B2INFO('1.3. Read shaper digits using default settings of SVDUnpacker.' +
+        basf2.B2INFO('3/6\nRead shaper digits using default settings of SVDUnpacker.' +
                      '\nWe should see FATAL with message for SVDShaperDigits.')
 
         read_shapers_default = basf2.create_path()
@@ -148,11 +82,12 @@ if __name__ == "__main__":
         add_svd_reconstruction(read_shapers_default)
 
         with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(read_shapers_default)
+            result = b2test_utils.safe_process(read_shapers_default)
 
-        basf2.B2INFO('Test completed.\n')
+        test_successful = test_successful and (result == 1)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[1 - result]))
 
-        basf2.B2INFO('1.4. Read the safe way. We should see no errors.')
+        basf2.B2INFO('4/6\nRead the safe way, excluding branches.\nWe should see no errors.')
 
         read_safe_way = basf2.create_path()
         read_safe_way.add_module('RootInput',
@@ -164,11 +99,12 @@ if __name__ == "__main__":
         add_svd_reconstruction(read_safe_way)
 
         with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(read_safe_way)
+            result = b2test_utils.safe_process(read_safe_way)
 
-        basf2.B2INFO('Test completed.\n')
+        test_successful = test_successful and (result == 0)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
 
-        basf2.B2INFO('1.5. Read with the Unpacker silentlyAppend switch.\n' +
+        basf2.B2INFO('5/6\nRead with the Unpacker silentlyAppend switch on.\n' +
                      'We also include the SVDShaperDigitSorter.\n' +
                      'We should see no errors.')
 
@@ -183,13 +119,14 @@ if __name__ == "__main__":
         add_svd_reconstruction(read_append_sort)
 
         with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(read_append_sort)
+            result = b2test_utils.safe_process(read_append_sort)
 
-        basf2.B2INFO('Test completed.\n')
+        test_successful = test_successful and (result == 0)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
 
-        basf2.B2INFO('1.6. Read with the Unpacker silentAppend switch.\n' +
+        basf2.B2INFO('6/6\nRead with the Unpacker silentAppend switch on.\n' +
                      'We don\'t include the SVDShaperDigitSorter.\n' +
-                     'BUT THERE WILL BE NO ERRORS!')
+                     'THERE WILL BE NO ERRORS, but digits and clusters may be duplicated!')
 
         read_append_nosort = basf2.create_path()
         read_append_nosort.add_module('RootInput',
@@ -201,7 +138,55 @@ if __name__ == "__main__":
         add_svd_reconstruction(read_append_nosort)
 
         with b2test_utils.show_only_errors():
-            b2test_utils.safe_process(read_append_nosort)
+            result = b2test_utils.safe_process(read_append_nosort)
 
-        basf2.B2INFO('Test completed.\n')
-        basf2.B2INFO('Test 1 completed: pre-existing digits\n\n')
+        test_successful = test_successful and (result == 0)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+
+        basf2.B2INFO('6 tasks of Test 1 completed\n\n')
+
+        basf2.B2INFO('Test 2\nBehaviour when data absent\n')
+
+        basf2.B2INFO('1/2\nRun unpacking and reconstruction with data.' +
+                     '\nAll settings are standard.' +
+                     '\nWe should see no errors. ')
+
+        unpack_with_data = basf2.create_path()
+        unpack_with_data.add_module(
+            'RootInput',
+            inputFileName='rawPlusDigits.root',
+            excludeBranchNames=[
+                'SVDDigits',
+                'SVDShaperDigits'])
+        unpack_with_data.add_module('Gearbox')
+        unpack_with_data.add_module('Geometry', components=['MagneticField', 'SVD'])
+        add_svd_unpacker(unpack_with_data)
+        add_svd_reconstruction(unpack_with_data)
+
+        with b2test_utils.show_only_errors():
+            result = b2test_utils.safe_process(unpack_with_data)
+
+        test_successful = test_successful and (result == 0)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+
+        basf2.B2INFO('2/2\nRun unpacking and reconstruction without data.' +
+                     '\nAll settings are standard.' +
+                     '\nWe should see no errors. ')
+
+        unpack_without_data = basf2.create_path()
+        unpack_without_data.add_module('EventInfoSetter', expList=[0], runList=[0], evtNumList=[1])
+        unpack_without_data.add_module('Gearbox')
+        unpack_without_data.add_module('Geometry', components=['MagneticField', 'SVD'])
+        add_svd_unpacker(unpack_without_data)
+        add_svd_reconstruction(unpack_without_data)
+
+        with b2test_utils.show_only_errors():
+            result = b2test_utils.safe_process(unpack_without_data)
+
+        test_successful = test_successful and (result == 0)
+        basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
+
+        basf2.B2INFO('2 tasks of Test 2 completed\n')
+
+        basf2.B2INFO('Summary result:\nTests {0}.\n'.format(
+            test_message[0 if test_successful else 1]))

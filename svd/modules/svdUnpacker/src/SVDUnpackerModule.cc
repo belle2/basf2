@@ -80,7 +80,7 @@ void SVDUnpackerModule::initialize()
 {
   m_eventMetaDataPtr.isRequired();
   // Don't panic if no SVD data.
-  m_rawSVD.isRequired(m_rawSVDListName);
+  m_rawSVD.isOptional(m_rawSVDListName);
   m_svdDigit.registerInDataStore(m_svdDigitListName);
   StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
   storeDAQDiagnostics.registerInDataStore();
@@ -117,6 +117,8 @@ void SVDUnpackerModule::beginRun()
 void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
+  if (!rawSVDList || !rawSVDList.getEntries())
+    return;
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);

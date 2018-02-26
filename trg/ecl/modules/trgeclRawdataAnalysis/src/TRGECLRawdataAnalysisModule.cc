@@ -178,7 +178,7 @@ namespace Belle2 {
 
     int Timing = ((HitFineTime >> 3) & 0xF) + ((HitRevoFAM & 0x7F) << 4);
 
-    int m_hitNum = 0;
+    m_hitNum = 0;
     StoreArray<TRGECLTiming> TimingArray;
     TimingArray.appendNew();
     m_hitNum = TimingArray.getEntries() - 1;

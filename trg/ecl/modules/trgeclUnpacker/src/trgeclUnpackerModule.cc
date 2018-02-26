@@ -49,7 +49,8 @@ void TRGECLUnpackerModule::terminate()
 void TRGECLUnpackerModule::initialize()
 {
 
-  StoreArray<TRGECLUnpackerStore>::registerPersistent();
+  m_TRGECLUnpackerArray.registerInDataStore();
+
 }
 
 void TRGECLUnpackerModule::beginRun()
@@ -176,6 +177,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
 
   }
 
+
   if (check_sum == sum_data) {
     flag_checksum = 0;
   } else {
@@ -184,7 +186,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
 
   int evt_size   = evt_info.size();
   int evt_timing = -9999;
-  if (evt_size != 0) {
+  if (evt_size != 0 && flag_checksum == 0) {
     // Find most energetic TC timing
     sort(evt_info.begin(), evt_info.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
@@ -203,11 +205,11 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
     m_ntc   = ntc;
     m_evttime = evt_timing;
     m_checksum = flag_checksum;
-    for (int i = 0; i < evt_size; i++) {
-      m_tcid   = evt_info[i][0];
-      m_time   = evt_info[i][1];
-      m_energy = evt_info[i][2];
-      m_hitwin = evt_info[i][3];
+    for (int ii = 0; ii < evt_size; ii++) {
+      m_tcid   = evt_info[ii][0];
+      m_time   = evt_info[ii][1];
+      m_energy = evt_info[ii][2];
+      m_hitwin = evt_info[ii][3];
       m_caltime = evt_timing - m_time;
 
       StoreArray<TRGECLUnpackerStore> TRGECLUnpackerArray;
@@ -235,7 +237,11 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
     m_evttime  = -9999;
     m_revo     = w_revo;
     m_gdl      = gdl_cnt;
-    m_checksum = 2;
+    if (flag_checksum == 1) {
+      m_checksum = 1;
+    } else {
+      m_checksum = 2;
+    }
 
     StoreArray<TRGECLUnpackerStore> TRGECLUnpackerArray;
     TRGECLUnpackerArray.appendNew();

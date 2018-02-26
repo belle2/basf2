@@ -70,17 +70,30 @@ namespace Belle2 {
     int n_basf2evt;
 
   private :
+    /** */
     int m_revo;
+    /** */
     int m_gdl;
+    /** */
     int m_ntc;
+    /** */
     int m_tcid;
+    /** */
     int m_time;
+    /** */
     int m_caltime;
+    /** */
     int m_evttime;
+    /** */
     int m_energy;
+    /** */
     int m_checksum;
+    /** */
     int m_hitwin;
+    /** */
     int m_hitNum;
+    /** */
+    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerArray;
 
   };
 

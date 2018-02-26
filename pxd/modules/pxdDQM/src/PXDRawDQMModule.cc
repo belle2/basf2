@@ -107,6 +107,7 @@ void PXDRawDQMModule::initialize()
   m_storeRawHits.isRequired(m_storeRawHitsName);
   m_storeRawPedestals.isRequired(m_storeRawPedestalsName);
   m_storeRawAdcs.isRequired(m_storeRawAdcsName);
+  m_storeDAQEvtStats.isRequired();
 }
 
 void PXDRawDQMModule::beginRun()
@@ -137,16 +138,22 @@ void PXDRawDQMModule::event()
   if (hrawPxdHitsCount) hrawPxdHitsCount->Fill(m_storeRawHits.getEntries());
 
   for (auto& it : m_storeRawHits) {
-    int dhh_id;
-    // calculate DHH id from Vxd Id
-    unsigned int layer, ladder, sensor;//, segment;
-    VxdID currentVxdId;
-    currentVxdId = it.getSensorID();
-    layer = currentVxdId.getLayerNumber();/// 1 ... 2
-    ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
-    sensor = currentVxdId.getSensorNumber();/// 1 ... 2
-    // segment = currentVxdId.getSegmentNumber();// Frame nr? ... ignore
-    dhh_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
+
+    VxdID currentVxdId = it.getSensorID();
+    auto layer = currentVxdId.getLayerNumber();/// 1 ... 2
+    auto ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
+    auto sensor = currentVxdId.getSensorNumber();/// 1 ... 2
+
+    // Get startrow and DheID from DAQEvtStats
+    const PXDDAQDHEStatus* dhe = (*m_storeDAQEvtStats).findDHE(currentVxdId);
+    if (dhe == nullptr) {
+      B2ERROR("No DHE found for SensorId: " << currentVxdId);
+      continue;
+    }
+
+    auto dhh_id = dhe->getDHEID();
+    auto startRow = dhe->getStartRow();
+
     if (dhh_id <= 0 || dhh_id >= 64) {
       B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
       continue;
@@ -156,7 +163,7 @@ void PXDRawDQMModule::event()
                                                    100 + it.getRow() + 850 * (layer + layer + sensor - 3));
     if (hrawPxdChargeMap[dhh_id]) hrawPxdChargeMap[dhh_id]->Fill(it.getColumn(), it.getRow(), it.getCharge());
     if (hrawPxdHitsCharge[dhh_id]) hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
-    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - it.getStartRow());
+    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - startRow);
   }
 
   if (hrawPxdAdcMapAll) {

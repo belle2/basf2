@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <string>
 
 namespace Belle2 {
@@ -23,7 +22,7 @@ namespace Belle2 {
     /** The PXDRawHitSorter module.
      *
      * This module sorts the existing PXDRawHits collection and saves PXDDigits
-     * ordered by frame and then by row and column for each half-ladder. This
+     * ordered by row and column for each half-ladder. This
      * provides ordered input to PXDClusterizer.
      *
      * @see PXDClusterizerModule
@@ -54,16 +53,12 @@ namespace Belle2 {
       std::string m_storeRawHitsName;
       /** Name of the collection to use for the PXDDigits */
       std::string m_storeDigitsName;
-      /** Name of the collection to use for the PXDFrames */
-      std::string m_storeFramesName;
       /** Mode: if true, merge duplicate pixels, otherwise only keep the first. */
       bool m_mergeDuplicates;
       /** Mode: if true, merge frames, otherwise keep separate frames */
       bool m_mergeFrames;
-      /** Minimum charge for which a digit is created. */
-      double m_0cut;
-      /** Assign VXDID to data that don't have it. */
-      bool m_assignID;
+      /** Minimum charge for a digit to carry */
+      int m_0cut;
       /** Discard out-of-range hits. */
       bool m_trimOutOfRange;
     };//end class declaration

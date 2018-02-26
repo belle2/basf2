@@ -151,7 +151,7 @@ void QualityCheckModule::initialize()
 //  StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
   StoreArray<TelCluster> storeTelClusters(m_storeTelClustersName);
 //  StoreArray<TelDigit> storeTelDigits(m_storeTelDigitsName);
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+
 
 //  RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
 //  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
@@ -219,7 +219,7 @@ void QualityCheckModule::initialize()
 //  m_storeTelDigitsName = storeTelDigits.getName();
 //  m_relTelClusterDigitName = relTelClusterDigits.getName();
 
-  m_storeFramesName = storeFrames.getName();
+
 
   //StoreObjPtr<TelEventInfo> storeTelEventInfo;
 

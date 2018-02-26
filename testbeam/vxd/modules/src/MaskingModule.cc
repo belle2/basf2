@@ -183,7 +183,6 @@ void MaskingModule::initialize()
   StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
 //  StoreArray<PXDCluster> storeTelClusters(m_storeTelClustersName);
   StoreArray<TelDigit> storeTelDigits(m_storeTelDigitsName);
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
 //  RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
 //  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
@@ -222,7 +221,7 @@ void MaskingModule::initialize()
   m_storeTelDigitsName = storeTelDigits.getName();
 //  m_relTelClusterDigitName = relTelClusterDigits.getName();
 
-  m_storeFramesName = storeFrames.getName();
+
 
   defineHisto();
 }
@@ -277,7 +276,7 @@ void MaskingModule::event()
 //  const StoreArray<PXDCluster> storeTelClusters(m_storeTelClustersName);
 //  const RelationArray relTelClusterDigits(storeTelClusters, storeTelDigits, m_relTelClusterDigitName);
 
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+
 
   StoreObjPtr<EventMetaData> storeEventMetaData;
 

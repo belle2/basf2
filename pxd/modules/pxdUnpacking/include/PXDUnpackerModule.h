@@ -50,6 +50,7 @@ namespace Belle2 {
       void terminate() override final;
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray of processed RawPXDs */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
       std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */

@@ -56,6 +56,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of RawPXDs to be processed", std::string(""));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of generated PXDRawHits", std::string(""));
+  addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of generated PXDDAQEvtStats", std::string(""));
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of generated PXDRawAdcs", std::string(""));
   addParam("PXDRawPedestalsName", m_PXDRawPedestalsName, "The name of the StoreArray of generated PXDRawPedestals", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
@@ -83,12 +84,12 @@ void PXDUnpackerModule::initialize()
 {
   m_storeRawPXD.isRequired(m_RawPXDsName);
   //Register output collections
-  m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
-  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
-  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName);
-  m_storeROIs.registerInDataStore(m_PXDRawROIsName);
-  m_storeDAQEvtStats.registerInDataStore();
-  m_storeRawCluster.registerInDataStore(m_RawClusterName);
+  m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
   B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);

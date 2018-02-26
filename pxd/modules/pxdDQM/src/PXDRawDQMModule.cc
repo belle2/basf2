@@ -30,8 +30,7 @@ REG_MODULE(PXDRawDQM)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_storeRawHits(), m_storeRawAdcs(),
-  m_storeRawPedestals()
+PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_storeRawHits(), m_storeRawAdcs()
 {
   //Set module properties
   setDescription("Monitor raw PXD");
@@ -42,8 +41,6 @@ PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_s
   addParam("RawPXDsName", m_storeRawPxdrarrayName, "The name of the StoreArray of RawPXDs to be processed", string(""));
   addParam("PXDRawHitsName", m_storeRawHitsName, "The name of the StoreArray of PXDRawHits to be processed", string(""));
   addParam("PXDRawAdcsName", m_storeRawAdcsName, "The name of the StoreArray of PXDRawAdcs to be processed", string(""));
-  addParam("PXDRawPedestalsName", m_storeRawPedestalsName, "The name of the StoreArray of PXDRawPedestals to be processed",
-           string(""));
 }
 
 void PXDRawDQMModule::defineHisto()
@@ -62,9 +59,6 @@ void PXDRawDQMModule::defineHisto()
   // ADC map not supported by DHC anymore ... deactive filling, later remove
   hrawPxdAdcMapAll =
     NULL;// new TH2F("hrawPxdAdcMapAll",                               "Pxd Raw Adc Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370/*0*/, 0, 3700, 350/*0*/, 0, 3500);
-  // Pedestal map for Calibration should not be in DQM ... deactive filling, later remove
-  hrawPxdPedestalMapAll =
-    NULL;// new TH2F("hrawPxdPedestalMapAll",                                    "Pxd Raw Pedestal Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370/*0*/, 0, 3700, 350/*0*/, 0, 3500);
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
   for (auto i = 0; i < 64; i++) {
@@ -105,7 +99,6 @@ void PXDRawDQMModule::initialize()
   REG_HISTOGRAM
   m_storeRawPxdrarray.isOptional(m_storeRawPxdrarrayName);
   m_storeRawHits.isRequired(m_storeRawHitsName);
-  m_storeRawPedestals.isRequired(m_storeRawPedestalsName);
   m_storeRawAdcs.isRequired(m_storeRawAdcsName);
   m_storeDAQEvtStats.isRequired();
 }
@@ -118,7 +111,6 @@ void PXDRawDQMModule::beginRun()
   if (hrawPxdHitsCount) hrawPxdHitsCount->Reset();
   if (hrawPxdHitMapAll) hrawPxdHitMapAll->Reset();
   if (hrawPxdAdcMapAll) hrawPxdAdcMapAll->Reset();
-  if (hrawPxdPedestalMapAll) hrawPxdPedestalMapAll->Reset();
   for (int i = 0; i < 64; i++) {
     if (hrawPxdHitMap[i]) hrawPxdHitMap[i]->Reset();
     if (hrawPxdChargeMap[i]) hrawPxdChargeMap[i]->Reset();
@@ -189,33 +181,6 @@ void PXDRawDQMModule::event()
       for (int row = 0; row < 768; row++) {
         for (int col = 0; col < 64; col++) {
           hrawPxdAdcMapAll->Fill(col + chip_offset + ladder * 300 - 200, 100 + row + 850 * (layer + layer + sensor - 3), *(data++));
-        }
-      }
-    }
-  }
-  if (hrawPxdPedestalMapAll) {
-    for (auto& it : m_storeRawPedestals) {
-      int dhh_id;
-      // calculate DHH id from Vxd Id
-      unsigned int layer, ladder, sensor;//, segment;
-      VxdID currentVxdId;
-      currentVxdId = it.getSensorID();
-      layer = currentVxdId.getLayerNumber();/// 1 ... 2
-      ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
-      sensor = currentVxdId.getSensorNumber();/// 1 ... 2
-      // segment = currentVxdId.getSegmentNumber();// Frame nr? ... ignore
-      dhh_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
-      if (dhh_id <= 0 || dhh_id >= 64) {
-        B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
-        continue;
-      }
-
-      const unsigned char* data = it.getData();
-      unsigned int chip_offset;
-      chip_offset = it.getChip() * 64;
-      for (int row = 0; row < 768; row++) {
-        for (int col = 0; col < 64; col++) {
-          hrawPxdPedestalMapAll->Fill(col + chip_offset + ladder * 300 - 200, 100 + row + 850 * (layer + layer + sensor - 3), *(data++));
         }
       }
     }

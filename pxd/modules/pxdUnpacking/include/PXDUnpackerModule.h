@@ -13,7 +13,6 @@
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawPedestal.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
 #include <pxd/dataobjects/PXDRawCluster.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -54,7 +53,6 @@ namespace Belle2 {
       std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
-      std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
@@ -110,8 +108,6 @@ namespace Belle2 {
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** Output array for Raw Adc:Pedestals. */
-      StoreArray<PXDRawPedestal> m_storeRawPedestal;
       /** Output array for Clusters. */
       StoreArray<PXDRawCluster> m_storeRawCluster;
 

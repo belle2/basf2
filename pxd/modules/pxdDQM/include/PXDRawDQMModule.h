@@ -16,7 +16,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawPedestal.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
@@ -56,7 +55,6 @@ namespace Belle2 {
       std::string m_storeRawPxdrarrayName;        /**< RawPXD StoreArray name */
       std::string m_storeRawHitsName;             /**< PXDRawHits StoreArray name */
       std::string m_storeRawAdcsName;             /**< RawAdcs StoreArray name */
-      std::string m_storeRawPedestalsName;        /**< RawPedestals StoreArray name */
 
       /** Storearray for raw data packets  */
       StoreArray<RawPXD> m_storeRawPxdrarray;
@@ -64,8 +62,6 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Storearray for ADC from full frames  */
       StoreArray<PXDRawAdc> m_storeRawAdcs;
-      /** Storearray for Pedestal from full frames   */
-      StoreArray<PXDRawPedestal> m_storeRawPedestals;
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
@@ -77,8 +73,6 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCount;
       /** Histogram 2d hitmap (all)*/
       TH2F* hrawPxdHitMapAll;
-      /** Histogram pedestal 2d hitmap (full frames only) (all pxd) */
-      TH2F* hrawPxdPedestalMapAll;
       /** Histogram Adc 2d hitmap (full frames only) (all pxd) */
       TH2F* hrawPxdAdcMapAll;
       /** Histogram 2d hitmap */

@@ -190,12 +190,12 @@ void DQMHistAnalysisPXDEffModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH2D*)findHist(locationHits);
+    Hits = (TH2D*)findHist(locationHits.Data());
     TString locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH2D*)findHist(locationMatches);
+    Matches = (TH2D*)findHist(locationMatches.Data());
 
     //Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {

@@ -128,6 +128,7 @@ void PXDDAQDQMModule::event()
       }
       if (hDAQDHCReduction[dhc.getDHCID()]) {
         float red = dhc.getRedCnt() ? float(dhc.getRawCnt()) / dhc.getRedCnt() : 0.;
+        B2DEBUG(98, "==DHC " << dhc.getDHCID() << "(Raw)" << dhc.getRawCnt() << " / (Red)" << dhc.getRedCnt() << " = " << red);
         if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
         hDAQDHCReduction[dhc.getDHCID()]->Fill(red);
       }
@@ -143,6 +144,7 @@ void PXDDAQDQMModule::event()
         if (hDAQDHETriggerRowOffset[dhe.getSensorID()]) hDAQDHETriggerRowOffset[dhe.getSensorID()]->Fill(dhe.getStartRow());
         if (hDAQDHEReduction[dhe.getSensorID()]) {
           float red = dhe.getRedCnt() ? float(dhe.getRawCnt()) / dhe.getRedCnt() : 0.;
+          B2DEBUG(98, "==DHE " << dhe.getSensorID() << "(Raw)" << dhe.getRawCnt() << " / (Red)" << dhe.getRedCnt() << " = " << red);
           if (red >= 40.) red = 39.999999999; // Bad, bad workaround. but we want to see the overflows
           hDAQDHEReduction[dhe.getSensorID()]->Fill(red);
         }

@@ -11,7 +11,7 @@
 #include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <string>
 
 using namespace std;
@@ -68,16 +68,16 @@ void PXDRawDQMModule::defineHisto()
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
   for (auto i = 0; i < 64; i++) {
-    auto num1 = (((i >> 5) & 0x1) + 1);
-    auto num2 = ((i >> 1) & 0xF);
-    auto num3 = ((i & 0x1) + 1);
+    auto layer = (((i >> 5) & 0x1) + 1);
+    auto ladder = ((i >> 1) & 0xF);
+    auto sensor = ((i & 0x1) + 1);
 
     // Check if sensor exist
-    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(num1, num2, num3))) {
+    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(layer, ladder, sensor))) {
       //cppcheck-suppress zerodiv
-      string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
+      string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % layer % ladder % sensor % i);
       //cppcheck-suppress zerodiv
-      string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
+      string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
 
       hrawPxdHitMap[i] = new TH2F(("hrawPxdHitMap" + s2).c_str(),
                                   ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 250,

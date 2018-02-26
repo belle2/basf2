@@ -349,6 +349,8 @@ void TrackFinderMCTruthRecoTracksModule::event()
   const int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
   B2DEBUG(100, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
 
+  // prepare rejection of CDC/PXD/SVD hits from higher order loops
+  const double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 
   //register StoreArray which will be filled by this module
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
@@ -489,9 +491,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
     std::vector<TimeHitIDDetector> hitsWithTimeAndDetectorInformation;
 
     int ndf = 0; // count the ndf of one track candidate
-
-    // prepare rejection of CDC hits from higher order loops
-    const double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 
     // create a list containing the indices to the PXDHits that belong to one track
     if (m_usePXDHits) {

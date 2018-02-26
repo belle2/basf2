@@ -504,7 +504,7 @@ void TrackDQMModule::event()
           auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
 
           bool biased = false;
-          if (genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo() == 0) continue;
+          if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
           TVectorD resUnBias = genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()->getResidual(0, biased).getState();
           IsSVDU = -1;
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {

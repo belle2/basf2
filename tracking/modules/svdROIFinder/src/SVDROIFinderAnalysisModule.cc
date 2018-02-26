@@ -191,8 +191,6 @@ SVDROIFinderAnalysisModule::SVDROIFinderAnalysisModule() : Module()
   //Set module properties
   setDescription("This module performs the analysis of the SVDROIFinder module output");
 
-  addParam("isSimulation", m_isSimulation,
-           "set true if you want to evaluate efficiency on simulation", bool(true));
   addParam("writeToRoot", m_writeToRoot,
            "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
 
@@ -202,9 +200,6 @@ SVDROIFinderAnalysisModule::SVDROIFinderAnalysisModule() : Module()
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
-
-  addParam("shapers", m_shapersName,
-           "name of the input collection of SVDShaperDigits", std::string(""));
 
   addParam("SVDInterceptListName", m_SVDInterceptListName,
            "name of the list of interceptions", std::string(""));
@@ -223,15 +218,13 @@ SVDROIFinderAnalysisModule::~SVDROIFinderAnalysisModule()
 void SVDROIFinderAnalysisModule::initialize()
 {
 
-  m_shapers.isRequired(m_shapersName);
   m_trackList.isRequired(m_recoTrackListName);
   m_ROIs.isRequired(m_ROIListName);
   m_SVDIntercepts.isRequired(m_SVDInterceptListName);
   m_mcParticles.isRequired();
 
   n_rois           = 0;
-  n_OKrois           = 0; //simulation
-  m_nGoodROIs = 0; //data
+  n_OKrois           = 0;
   n_intercepts     = 0;
   n_tracks         = 0;
   n_svdDigit       = 0;
@@ -438,15 +431,6 @@ void SVDROIFinderAnalysisModule::event()
     m_h2ROItopRight->Fill(m_ROIs[i]->getMaxUid(), m_ROIs[i]->getMaxVid());
     m_h2ROIuMinMax->Fill(m_ROIs[i]->getMinUid(), m_ROIs[i]->getMaxUid());
     m_h2ROIvMinMax->Fill(m_ROIs[i]->getMinVid(), m_ROIs[i]->getMaxVid());
-
-    for (int s = 0; s < m_shapers.getEntries(); s++) {
-      if (m_ROIs[i]->Contains(*(m_shapers[s]))) {
-        m_nGoodROIs++;
-        break;
-      }
-
-    }
-
 
     bool isOK = false;
 
@@ -800,21 +784,17 @@ void SVDROIFinderAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  if ((m_ROIs.getEntries() > 0) && m_isSimulation) {
-    B2RESULT(" o  SVDROIFinder ANALYSIS: tot ROIs = " << m_ROIs.getEntries() << ", ok ROIs = " << nROIs);
-    B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
-             (double)NtrackHit / Ntrack);
-    for (int i = 0; i < m_ROIs.getEntries(); i++) {
-      VxdID sensor = m_ROIs[i]->getSensorID();
-      B2RESULT(i << " ROI " << sensor.getLadderNumber() << "." << sensor.getLayerNumber() << "." << sensor.getSensorNumber() <<
-               ": " << m_ROIs[i]->getMinUid() << ", " << m_ROIs[i]->getMinVid() << ", " << m_ROIs[i]->getMaxUid() << ", " <<
-               m_ROIs[i]->getMaxVid());
-    }
-  }
+  B2RESULT(" o  SVDROIFinder ANALYSIS: tot ROIs = " << m_ROIs.getEntries() << ", ok ROIs = " << nROIs);
+  B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
+           (double)NtrackHit / Ntrack);
   if (nROIs > m_ROIs.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
 
   m_h1okROIs->Fill(nROIs);
   n_OKrois += nROIs;
+
+  cout << "" << endl;
+
+
 }
 
 
@@ -855,174 +835,166 @@ void SVDROIFinderAnalysisModule::terminate()
   B2RESULT(" number of tracks = " << n_tracks);
   B2RESULT(" number of Intercepts = " << n_intercepts);
   B2RESULT(" number of ROIs = " << n_rois);
-  if (m_isSimulation)
-    B2RESULT(" number of GOOD ROIs = " << n_OKrois);
-  //  B2RESULT("");
+  B2RESULT(" number of GOOD ROIs = " << n_OKrois);
+  B2RESULT("");
   B2RESULT("          average number of ROIs = " << m_h1totROIs->GetMean());
-  if (m_isSimulation) {
-    B2RESULT(" average number of ROIs w digits = " << m_h1okROIs->GetMean());
-    B2RESULT("");
-    B2RESULT("");
-    B2RESULT("tracks w digits: " << n_tracksWithDigits);
-    B2RESULT("tracks w digits in ROI: " << n_tracksWithDigitsInROI);
+  B2RESULT(" average number of ROIs w digits = " << m_h1okROIs->GetMean());
+  B2RESULT("");
+  B2RESULT("");
+  B2RESULT("tracks w digits: " << n_tracksWithDigits);
+  B2RESULT("tracks w digits in ROI: " << n_tracksWithDigitsInROI);
+  B2RESULT("efficiency PTD : " << epsilon2Tot << " +/- " << sqrt(epsilon2Tot * (1 - epsilon2Tot) / n_tracksWithDigits));
 
-    B2RESULT("efficiency PTD : " << epsilon2Tot << " +/- " << sqrt(epsilon2Tot * (1 - epsilon2Tot) / n_tracksWithDigits));
+  Int_t totTrackOneDigiIn = 0; //not used for the moment, added to double check
+  Int_t totnnotINtrack2 = 0;
+  Int_t totnnotINtrack3 = 0;
+  Int_t totnnotINtrack4 = 0;
+  Int_t totnnotINtrack5 = 0;
 
-    Int_t totTrackOneDigiIn = 0; //not used for the moment, added to double check
-    Int_t totnnotINtrack2 = 0;
-    Int_t totnnotINtrack3 = 0;
-    Int_t totnnotINtrack4 = 0;
-    Int_t totnnotINtrack5 = 0;
+  Int_t totTrack[6];
 
-    Int_t totTrack[6];
+  for (int j = 0; j < m_h1TrackOneDigiIn->GetNbinsX(); j++) {
+    totTrackOneDigiIn = totTrackOneDigiIn + m_h1TrackOneDigiIn->GetBinContent(j + 1);
+    totnnotINtrack2 = totnnotINtrack2 + m_h1nnotINtrack2->GetBinContent(j + 1);
+    totnnotINtrack3 = totnnotINtrack3 + m_h1nnotINtrack3->GetBinContent(j + 1);
+    totnnotINtrack4 = totnnotINtrack4 + m_h1nnotINtrack4->GetBinContent(j + 1);
+    totnnotINtrack5 = totnnotINtrack5 + m_h1nnotINtrack5->GetBinContent(j + 1);
 
-    for (int j = 0; j < m_h1TrackOneDigiIn->GetNbinsX(); j++) {
-      totTrackOneDigiIn = totTrackOneDigiIn + m_h1TrackOneDigiIn->GetBinContent(j + 1);
-      totnnotINtrack2 = totnnotINtrack2 + m_h1nnotINtrack2->GetBinContent(j + 1);
-      totnnotINtrack3 = totnnotINtrack3 + m_h1nnotINtrack3->GetBinContent(j + 1);
-      totnnotINtrack4 = totnnotINtrack4 + m_h1nnotINtrack4->GetBinContent(j + 1);
-      totnnotINtrack5 = totnnotINtrack5 + m_h1nnotINtrack5->GetBinContent(j + 1);
-
-      totTrack[j] = m_h1nnotINtrack5->GetBinContent(j + 1) + m_h1nnotINtrack4->GetBinContent(j + 1) + m_h1nnotINtrack3->GetBinContent(
-                      j + 1) + m_h1nnotINtrack2->GetBinContent(j + 1) + m_h1TrackOneDigiIn->GetBinContent(j + 1);
-    }
-
-    B2RESULT("      out ROI = " << totnnotINtrack2);
-    B2RESULT("       no ROI = " << totnnotINtrack3);
-    B2RESULT("  wrongVxdID  = " << totnnotINtrack4);
-    B2RESULT("     no Inter = " << totnnotINtrack5);
-    B2RESULT("");
-
-    B2RESULT("    svdDigit : " << n_svdDigit);
-    B2RESULT("  svdDigitIn : " << n_svdDigitInROI);
-
-    B2RESULT("        eff DGT: " << epsilonTot << " +/- " << sqrt(epsilonTot * (1 - epsilonTot) / n_svdDigit));
-    B2RESULT("  inefficiency (SVDShaperDigits): ");
-    B2RESULT("         out ROI: " << n_notINdigit2);
-    B2RESULT("          no ROI: " << n_notINdigit3);
-    B2RESULT("      wrongVxdID: " << n_notINdigit4);
-    B2RESULT("         noInter: " << n_notINdigit5);
-    B2RESULT("");
-
-
-    B2RESULT(" pT > 1 : " << pt[5]);
-    B2RESULT("         out ROI: " << nnotINdigit2[5]);
-    B2RESULT("          no ROI: " << nnotINdigit3[5]);
-    B2RESULT("      wrongVxdID: " << nnotINdigit4[5]);
-    B2RESULT("         noInter: " << nnotINdigit5[5]);
-    B2RESULT("    svdDigit : " << nsvdDigit[5]);
-    B2RESULT("  svdDigitIn : " << nsvdDigitInROI[5]);
-    if ((nsvdDigit[5] - nsvdDigitInROI[5]) != (nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] + nnotINdigit5[5]))
-      B2RESULT(" svdDigitOut : " << nsvdDigit[5] - nsvdDigitInROI[5] << " != " << nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] +
-               nnotINdigit5[5]);
-    epsilon[5] = (double)nsvdDigitInROI[5] / (double) nsvdDigit[5];
-    epsilonErr[5] = sqrt(epsilon[5] * (1 - epsilon[5]) / nsvdDigit[5]);
-    B2RESULT("  efficiency : " << epsilon[5] << " +/- " << epsilonErr[5]);
-    epsilon2[5] = (double)TrackOneDigiIn[5] / (double) totTrack[5]  ;
-    epsilon2Err[5] = sqrt(epsilon2[5] * (1 - epsilon2[5]) / totTrack[5]);
-    B2RESULT("  efficiency2 : " << epsilon2[5] << " +/- " << epsilon2Err[5]);
-    B2RESULT("");
-
-    B2RESULT(" 0.5 < pT < 1 : " << pt[4]);
-    B2RESULT("         out ROI: " << nnotINdigit2[4]);
-    B2RESULT("          no ROI: " << nnotINdigit3[4]);
-    B2RESULT("      wrongVxdID: " << nnotINdigit4[4]);
-    B2RESULT("         noInter: " << nnotINdigit5[4]);
-    B2RESULT("    svdDigit : " << nsvdDigit[4]);
-    B2RESULT("  svdDigitIn : " << nsvdDigitInROI[4]);
-    if ((nsvdDigit[4] - nsvdDigitInROI[4]) != (nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] + nnotINdigit5[4]))
-      B2RESULT(" svdDigitOut : " << nsvdDigit[4] - nsvdDigitInROI[4] << " != " << nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] +
-               nnotINdigit5[4]);
-    epsilon[4] = (double)nsvdDigitInROI[4] / (double) nsvdDigit[4];
-    epsilonErr[4] = sqrt(epsilon[4] * (1 - epsilon[4]) / nsvdDigit[4]);
-    B2RESULT("  efficiency : " << epsilon[4] << " +/- " << epsilonErr[4]);
-    epsilon2[4] = (double)TrackOneDigiIn[4] / (double) totTrack[4]  ;
-    epsilon2Err[4] = sqrt(epsilon2[4] * (1 - epsilon2[4]) / totTrack[4]);
-    B2RESULT("  efficiency2 : " << epsilon2[4] << " +/- " << epsilon2Err[4]);
-
-    B2RESULT("");
-    B2RESULT(" 0.3 < pT < 0.5 : " << pt[3]);
-    B2RESULT("         out ROI: " << nnotINdigit2[3]);
-    B2RESULT("          no ROI: " << nnotINdigit3[3]);
-    B2RESULT("      wrongVxdID: " << nnotINdigit4[3]);
-    B2RESULT("         noInter: " << nnotINdigit5[3]);
-    B2RESULT("    svdDigit : " << nsvdDigit[3]);
-    B2RESULT("  svdDigitIn : " << nsvdDigitInROI[3]);
-    if ((nsvdDigit[3] - nsvdDigitInROI[3]) != (nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] + nnotINdigit5[3]))
-      B2RESULT(" svdDigitOut : " << nsvdDigit[3] - nsvdDigitInROI[3] << " != " << nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] +
-               nnotINdigit5[3]);
-    epsilon[3] = (double)nsvdDigitInROI[3] / (double) nsvdDigit[3];
-    epsilonErr[3] = sqrt(epsilon[3] * (1 - epsilon[3]) / nsvdDigit[3]);
-    B2RESULT("  efficiency : " << epsilon[3] << " +/- " << epsilonErr[3]);
-    epsilon2[3] = (double)TrackOneDigiIn[3] / (double) totTrack[3];
-    epsilon2Err[3] = sqrt(epsilon2[3] * (1 - epsilon2[3]) / totTrack[3]);
-    B2RESULT("  efficiency2 : " << epsilon2[3] << " +/- " << epsilon2Err[3]);
-
-    B2RESULT("");
-    B2RESULT(" 0.2 < pT < 0.3 : " << pt[2]);
-    B2RESULT("         out ROI: " << nnotINdigit2[2]);
-    B2RESULT("          no ROI: " << nnotINdigit3[2]);
-    B2RESULT("      wrongVxdID: " << nnotINdigit4[2]);
-    B2RESULT("         noInter: " << nnotINdigit5[2]);
-    B2RESULT("    svdDigit : " << nsvdDigit[2]);
-    B2RESULT("  svdDigitIn : " << nsvdDigitInROI[2]);
-    if ((nsvdDigit[2] - nsvdDigitInROI[2]) != (nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] + nnotINdigit5[2]))
-      B2RESULT(" svdDigitOut : " << nsvdDigit[2] - nsvdDigitInROI[2] << " != " << nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] +
-               nnotINdigit5[2]);
-    epsilon[2] = (double)nsvdDigitInROI[2] / (double) nsvdDigit[2];
-    epsilonErr[2] = sqrt(epsilon[2] * (1 - epsilon[2]) / nsvdDigit[2]);
-    B2RESULT("  efficiency : " << epsilon[2] << " +/- " << epsilonErr[2]);
-    epsilon2[2] = (double)TrackOneDigiIn[2] / (double) totTrack[2]  ;
-    epsilon2Err[2] = sqrt(epsilon2[2] * (1 - epsilon2[2]) / totTrack[2]);
-    B2RESULT("  efficiency2 : " << epsilon2[2] << " +/- " << epsilon2Err[2]);
-
-    B2RESULT("");
-    B2RESULT(" 0.1 < pT < 0.2 : " << pt[1]);
-    B2RESULT("         out ROI: " << nnotINdigit2[1]);
-    B2RESULT("          no ROI: " << nnotINdigit3[1]);
-    B2RESULT("      wrongVxdID: " << nnotINdigit4[1]);
-    B2RESULT("         noInter: " << nnotINdigit5[1]);
-    B2RESULT("    svdDigit : " << nsvdDigit[1]);
-    B2RESULT("  svdDigitIn : " << nsvdDigitInROI[1]);
-    if ((nsvdDigit[1] - nsvdDigitInROI[1]) != (nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] + nnotINdigit5[1]))
-      B2RESULT(" svdDigitOut : " << nsvdDigit[1] - nsvdDigitInROI[1] << " ?=? " << nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] +
-               nnotINdigit5[1]);
-    epsilon[1] = (double)nsvdDigitInROI[1] / (double) nsvdDigit[1];
-    epsilonErr[1] = sqrt(epsilon[1] * (1 - epsilon[1]) / nsvdDigit[1]);
-    B2RESULT("  efficiency : " << epsilon[1] << " +/- " << epsilonErr[1]);
-    epsilon2[1] = (double)TrackOneDigiIn[1] / (double) totTrack[1]  ;
-    epsilon2Err[1] = sqrt(epsilon2[1] * (1 - epsilon2[1]) / totTrack[1]);
-    B2RESULT("  efficiency2 : " << epsilon2[1] << " +/- " << epsilon2Err[1]);
-
-    B2RESULT("");
-    B2RESULT(" pT < 0.1 : " << pt[0]);
-    B2RESULT("         out ROI: " << nnotINdigit2[0]);
-    B2RESULT("          no ROI: " << nnotINdigit3[0]);
-    B2RESULT("      wrongVxdID: " << nnotINdigit4[0]);
-    B2RESULT("         noInter: " << nnotINdigit5[0]);
-    B2RESULT("    svdDigit : " << nsvdDigit[0]);
-    B2RESULT("  svdDigitIn : " << nsvdDigitInROI[0]);
-    if ((nsvdDigit[0] - nsvdDigitInROI[0]) != (nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] + nnotINdigit5[0]))
-      B2RESULT(" svdDigitOut : " << nsvdDigit[0] - nsvdDigitInROI[0] << " ?=? " << nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] +
-               nnotINdigit5[0]);
-    epsilon[0] = (double)nsvdDigitInROI[0] / (double) nsvdDigit[0];
-    epsilonErr[0] = sqrt(epsilon[0] * (1 - epsilon[0]) / nsvdDigit[0]);
-    B2RESULT("  efficiency : " << epsilon[0] << " +/- " << epsilonErr[0]);
-    epsilon2[0] = (double)TrackOneDigiIn[0] / (double) totTrack[0]  ;
-    epsilon2Err[0] = sqrt(epsilon2[0] * (1 - epsilon2[0]) / totTrack[0]);
-    B2RESULT("  efficiency2 : " << epsilon2[0] << " +/- " << epsilon2Err[0]);
-
-    B2RESULT("legend:");
-    B2RESULT(" CASO2:  if (ROI exists but no SVDShaperDigit inside)");
-    B2RESULT(" CASO3:  if (ROI does not exist, intercept with correct VxdID)");
-    B2RESULT(" CASO4:  if (intercept with wrong VxdID)");
-    B2RESULT(" CASO5:  if (intercept does not exist)");
-
-    B2RESULT("==========================");
+    totTrack[j] = m_h1nnotINtrack5->GetBinContent(j + 1) + m_h1nnotINtrack4->GetBinContent(j + 1) + m_h1nnotINtrack3->GetBinContent(
+                    j + 1) + m_h1nnotINtrack2->GetBinContent(j + 1) + m_h1TrackOneDigiIn->GetBinContent(j + 1);
   }
-  B2RESULT(" tot ROIs = " << n_rois);
-  B2RESULT(" ROIs with digits = " << m_nGoodROIs);
-  B2RESULT(" SVD INefficiency = " << 1 - (float)m_nGoodROIs / n_rois);
+
+  B2RESULT("      out ROI = " << totnnotINtrack2);
+  B2RESULT("       no ROI = " << totnnotINtrack3);
+  B2RESULT("  wrongVxdID  = " << totnnotINtrack4);
+  B2RESULT("     no Inter = " << totnnotINtrack5);
+  B2RESULT("");
+
+  B2RESULT("    svdDigit : " << n_svdDigit);
+  B2RESULT("  svdDigitIn : " << n_svdDigitInROI);
+
+  B2RESULT("        eff DGT: " << epsilonTot << " +/- " << sqrt(epsilonTot * (1 - epsilonTot) / n_svdDigit));
+  B2RESULT("  inefficiency (SVDShaperDigits): ");
+  B2RESULT("         out ROI: " << n_notINdigit2);
+  B2RESULT("          no ROI: " << n_notINdigit3);
+  B2RESULT("      wrongVxdID: " << n_notINdigit4);
+  B2RESULT("         noInter: " << n_notINdigit5);
+  B2RESULT("");
+
+
+  B2RESULT(" pT > 1 : " << pt[5]);
+  B2RESULT("         out ROI: " << nnotINdigit2[5]);
+  B2RESULT("          no ROI: " << nnotINdigit3[5]);
+  B2RESULT("      wrongVxdID: " << nnotINdigit4[5]);
+  B2RESULT("         noInter: " << nnotINdigit5[5]);
+  B2RESULT("    svdDigit : " << nsvdDigit[5]);
+  B2RESULT("  svdDigitIn : " << nsvdDigitInROI[5]);
+  if ((nsvdDigit[5] - nsvdDigitInROI[5]) != (nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] + nnotINdigit5[5]))
+    B2RESULT(" svdDigitOut : " << nsvdDigit[5] - nsvdDigitInROI[5] << " != " << nnotINdigit2[5] + nnotINdigit3[5] + nnotINdigit4[5] +
+             nnotINdigit5[5]);
+  epsilon[5] = (double)nsvdDigitInROI[5] / (double) nsvdDigit[5];
+  epsilonErr[5] = sqrt(epsilon[5] * (1 - epsilon[5]) / nsvdDigit[5]);
+  B2RESULT("  efficiency : " << epsilon[5] << " +/- " << epsilonErr[5]);
+  epsilon2[5] = (double)TrackOneDigiIn[5] / (double) totTrack[5]  ;
+  epsilon2Err[5] = sqrt(epsilon2[5] * (1 - epsilon2[5]) / totTrack[5]);
+  B2RESULT("  efficiency2 : " << epsilon2[5] << " +/- " << epsilon2Err[5]);
+  B2RESULT("");
+
+  B2RESULT(" 0.5 < pT < 1 : " << pt[4]);
+  B2RESULT("         out ROI: " << nnotINdigit2[4]);
+  B2RESULT("          no ROI: " << nnotINdigit3[4]);
+  B2RESULT("      wrongVxdID: " << nnotINdigit4[4]);
+  B2RESULT("         noInter: " << nnotINdigit5[4]);
+  B2RESULT("    svdDigit : " << nsvdDigit[4]);
+  B2RESULT("  svdDigitIn : " << nsvdDigitInROI[4]);
+  if ((nsvdDigit[4] - nsvdDigitInROI[4]) != (nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] + nnotINdigit5[4]))
+    B2RESULT(" svdDigitOut : " << nsvdDigit[4] - nsvdDigitInROI[4] << " != " << nnotINdigit2[4] + nnotINdigit3[4] + nnotINdigit4[4] +
+             nnotINdigit5[4]);
+  epsilon[4] = (double)nsvdDigitInROI[4] / (double) nsvdDigit[4];
+  epsilonErr[4] = sqrt(epsilon[4] * (1 - epsilon[4]) / nsvdDigit[4]);
+  B2RESULT("  efficiency : " << epsilon[4] << " +/- " << epsilonErr[4]);
+  epsilon2[4] = (double)TrackOneDigiIn[4] / (double) totTrack[4]  ;
+  epsilon2Err[4] = sqrt(epsilon2[4] * (1 - epsilon2[4]) / totTrack[4]);
+  B2RESULT("  efficiency2 : " << epsilon2[4] << " +/- " << epsilon2Err[4]);
+
+  B2RESULT("");
+  B2RESULT(" 0.3 < pT < 0.5 : " << pt[3]);
+  B2RESULT("         out ROI: " << nnotINdigit2[3]);
+  B2RESULT("          no ROI: " << nnotINdigit3[3]);
+  B2RESULT("      wrongVxdID: " << nnotINdigit4[3]);
+  B2RESULT("         noInter: " << nnotINdigit5[3]);
+  B2RESULT("    svdDigit : " << nsvdDigit[3]);
+  B2RESULT("  svdDigitIn : " << nsvdDigitInROI[3]);
+  if ((nsvdDigit[3] - nsvdDigitInROI[3]) != (nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] + nnotINdigit5[3]))
+    B2RESULT(" svdDigitOut : " << nsvdDigit[3] - nsvdDigitInROI[3] << " != " << nnotINdigit2[3] + nnotINdigit3[3] + nnotINdigit4[3] +
+             nnotINdigit5[3]);
+  epsilon[3] = (double)nsvdDigitInROI[3] / (double) nsvdDigit[3];
+  epsilonErr[3] = sqrt(epsilon[3] * (1 - epsilon[3]) / nsvdDigit[3]);
+  B2RESULT("  efficiency : " << epsilon[3] << " +/- " << epsilonErr[3]);
+  epsilon2[3] = (double)TrackOneDigiIn[3] / (double) totTrack[3];
+  epsilon2Err[3] = sqrt(epsilon2[3] * (1 - epsilon2[3]) / totTrack[3]);
+  B2RESULT("  efficiency2 : " << epsilon2[3] << " +/- " << epsilon2Err[3]);
+
+  B2RESULT("");
+  B2RESULT(" 0.2 < pT < 0.3 : " << pt[2]);
+  B2RESULT("         out ROI: " << nnotINdigit2[2]);
+  B2RESULT("          no ROI: " << nnotINdigit3[2]);
+  B2RESULT("      wrongVxdID: " << nnotINdigit4[2]);
+  B2RESULT("         noInter: " << nnotINdigit5[2]);
+  B2RESULT("    svdDigit : " << nsvdDigit[2]);
+  B2RESULT("  svdDigitIn : " << nsvdDigitInROI[2]);
+  if ((nsvdDigit[2] - nsvdDigitInROI[2]) != (nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] + nnotINdigit5[2]))
+    B2RESULT(" svdDigitOut : " << nsvdDigit[2] - nsvdDigitInROI[2] << " != " << nnotINdigit2[2] + nnotINdigit3[2] + nnotINdigit4[2] +
+             nnotINdigit5[2]);
+  epsilon[2] = (double)nsvdDigitInROI[2] / (double) nsvdDigit[2];
+  epsilonErr[2] = sqrt(epsilon[2] * (1 - epsilon[2]) / nsvdDigit[2]);
+  B2RESULT("  efficiency : " << epsilon[2] << " +/- " << epsilonErr[2]);
+  epsilon2[2] = (double)TrackOneDigiIn[2] / (double) totTrack[2]  ;
+  epsilon2Err[2] = sqrt(epsilon2[2] * (1 - epsilon2[2]) / totTrack[2]);
+  B2RESULT("  efficiency2 : " << epsilon2[2] << " +/- " << epsilon2Err[2]);
+
+  B2RESULT("");
+  B2RESULT(" 0.1 < pT < 0.2 : " << pt[1]);
+  B2RESULT("         out ROI: " << nnotINdigit2[1]);
+  B2RESULT("          no ROI: " << nnotINdigit3[1]);
+  B2RESULT("      wrongVxdID: " << nnotINdigit4[1]);
+  B2RESULT("         noInter: " << nnotINdigit5[1]);
+  B2RESULT("    svdDigit : " << nsvdDigit[1]);
+  B2RESULT("  svdDigitIn : " << nsvdDigitInROI[1]);
+  if ((nsvdDigit[1] - nsvdDigitInROI[1]) != (nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] + nnotINdigit5[1]))
+    B2RESULT(" svdDigitOut : " << nsvdDigit[1] - nsvdDigitInROI[1] << " ?=? " << nnotINdigit2[1] + nnotINdigit3[1] + nnotINdigit4[1] +
+             nnotINdigit5[1]);
+  epsilon[1] = (double)nsvdDigitInROI[1] / (double) nsvdDigit[1];
+  epsilonErr[1] = sqrt(epsilon[1] * (1 - epsilon[1]) / nsvdDigit[1]);
+  B2RESULT("  efficiency : " << epsilon[1] << " +/- " << epsilonErr[1]);
+  epsilon2[1] = (double)TrackOneDigiIn[1] / (double) totTrack[1]  ;
+  epsilon2Err[1] = sqrt(epsilon2[1] * (1 - epsilon2[1]) / totTrack[1]);
+  B2RESULT("  efficiency2 : " << epsilon2[1] << " +/- " << epsilon2Err[1]);
+
+  B2RESULT("");
+  B2RESULT(" pT < 0.1 : " << pt[0]);
+  B2RESULT("         out ROI: " << nnotINdigit2[0]);
+  B2RESULT("          no ROI: " << nnotINdigit3[0]);
+  B2RESULT("      wrongVxdID: " << nnotINdigit4[0]);
+  B2RESULT("         noInter: " << nnotINdigit5[0]);
+  B2RESULT("    svdDigit : " << nsvdDigit[0]);
+  B2RESULT("  svdDigitIn : " << nsvdDigitInROI[0]);
+  if ((nsvdDigit[0] - nsvdDigitInROI[0]) != (nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] + nnotINdigit5[0]))
+    B2RESULT(" svdDigitOut : " << nsvdDigit[0] - nsvdDigitInROI[0] << " ?=? " << nnotINdigit2[0] + nnotINdigit3[0] + nnotINdigit4[0] +
+             nnotINdigit5[0]);
+  epsilon[0] = (double)nsvdDigitInROI[0] / (double) nsvdDigit[0];
+  epsilonErr[0] = sqrt(epsilon[0] * (1 - epsilon[0]) / nsvdDigit[0]);
+  B2RESULT("  efficiency : " << epsilon[0] << " +/- " << epsilonErr[0]);
+  epsilon2[0] = (double)TrackOneDigiIn[0] / (double) totTrack[0]  ;
+  epsilon2Err[0] = sqrt(epsilon2[0] * (1 - epsilon2[0]) / totTrack[0]);
+  B2RESULT("  efficiency2 : " << epsilon2[0] << " +/- " << epsilon2Err[0]);
+
+  B2RESULT("legend:");
+  B2RESULT(" CASO2:  if (ROI exists but no SVDShaperDigit inside)");
+  B2RESULT(" CASO3:  if (ROI does not exist, intercept with correct VxdID)");
+  B2RESULT(" CASO4:  if (intercept with wrong VxdID)");
+  B2RESULT(" CASO5:  if (intercept does not exist)");
+
 
   m_gEff2 = new TGraphErrors(6, pt, epsilon2, ptErr, epsilon2Err);
   m_gEff2->SetName("g_eff2");

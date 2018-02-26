@@ -150,7 +150,7 @@ namespace Belle2 {
       int HitTiming    = TCHit ->getTCTime();
       int HitEnergy =  TCHit -> getTCEnergy();
       HitRevoFAM = TCHit -> getRevoFAM();
-      HitFineTime = TCHit -> getFineTime();
+      HitFineTime = TCHit -> getTCTime();
 
       if (iTCID == -1 && HitTiming == 0 && HitEnergy == 0) {continue;}
 

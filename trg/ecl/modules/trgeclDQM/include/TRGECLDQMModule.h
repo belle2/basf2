@@ -3,6 +3,7 @@
 
 #include <framework/core/HistoModule.h>
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
 #include <trg/ecl/TrgEclCluster.h>
 #include <stdlib.h>
@@ -85,7 +86,7 @@ namespace Belle2 {
 
     //!
     StoreArray<TRGECLUnpackerStore> trgeclHitArray;
-
+    StoreArray<TRGECLCluster> trgeclCluster;
   };
 
 }

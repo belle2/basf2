@@ -81,6 +81,8 @@ void TRGECLDQMModule::initialize()
 
   REG_HISTOGRAM
   trgeclHitArray.registerInDataStore();
+  trgeclCluster.registerInDataStore();
+
   defineHisto();
 
 }
@@ -118,8 +120,8 @@ void TRGECLDQMModule::event()
 
     HitTiming    = aTRGECLUnpackerStore ->getTCTime();
     HitRevoFam = aTRGECLUnpackerStore -> getRevoFAM();
-    HitRevoTrg = aTRGECLUnpackerStore -> getRevoTRG();
-    HitFineTiming = aTRGECLUnpackerStore -> getFineTime();
+    HitRevoTrg = aTRGECLUnpackerStore -> getRevoGDL();
+    HitFineTiming = aTRGECLUnpackerStore -> getEVTTime();
 
 
     TCId.push_back(TCID);

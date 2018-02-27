@@ -9,10 +9,14 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdClusterPositionCollector/PXDClusterPositionCollectorModule.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <boost/format.hpp>
 
+#include <TTree.h>
+#include <TMath.h>
 #include <TH1I.h>
 
 using namespace std;
@@ -36,48 +40,95 @@ PXDClusterPositionCollectorModule::PXDClusterPositionCollectorModule() : Calibra
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("clustersName", m_storeClustersName, "Name of the collection to use for PXDClusters", string(""));
-  addParam("trueHitsName", m_storeTrueHitsName, "Name of the collection to use for PXDTrueHits", string(""));
 }
 
 void PXDClusterPositionCollectorModule::prepare() // Do your initialise() stuff here
 {
   m_pxdCluster.isRequired();
-  m_pxdTrueHit.isRequired();
 
   /*
-  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  TIter next(flsdigitsArray);
+  REROOT_FLSDigit *myflsdigit;
+  while( myflsdigit=(REROOT_FlSDigit *)next() ){ Process FLSDigit object. }
 
-  if (gTools->getNumberOfPXDLayers() == 0) {
-    B2WARNING("Missing geometry for PXD, PXD cluster position estimation is skiped.");
-  }
-  //-------------------------------------------------------------------------------------------------
-  // PXDHits: Histogram the number of PXDDigits per event (assuming Belle 2 PXD with < 2% occupancy)
-  //-------------------------------------------------------------------------------------------------
-  auto hPXDHits = new TH1I("hPXDHits",
-                           "Number of hits in PXD per events used for masking, distribution parameters found by PXDHotPixelMaskCollectorModule", 200000, 0,
-                           200000);
-  hPXDHits->GetXaxis()->SetTitle("Number of hits");
-  hPXDHits->GetYaxis()->SetTitle("Events");
-  registerObject<TH1I>("PXDHits", hPXDHits);
+  (*flsdigitsArray)[i];
   */
+
+  /*
+  // Example of saving a Belle2 DBArray of DBObjects defined in the dbobjects directory
+  TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
+  float val = 0.0;
+  for (int i = 0; i < 2; i++) {
+    val += 1.0;
+    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
+  }
+
+  m_rootTRGRawInformation = new TClonesArray("TObjString");
+  m_treeROOTInput->Branch("rootTRGRawInformation", &m_rootTRGRawInformation, 32000, 0);
+
+  void TRGCDC::saveTRGRawInformation(vector<string >& trgInformations)
+  {
+    TClonesArray& rootTRGRawInformation = *m_rootTRGRawInformation;
+    rootTRGRawInformation.Clear();
+    for (unsigned iWindow = 0; iWindow < trgInformations.size(); iWindow++) {
+      TObjString t_rootTRGRawInformation;
+      t_rootTRGRawInformation.SetString(trgInformations[iWindow].c_str());
+      new(rootTRGRawInformation[iWindow]) TObjString(t_rootTRGRawInformation);
+    } // End of hit loop
+  }
+  */
+
+  // Data object creation --------------------------------------------------
+  auto tree = new TTree("PXDCluserPositionCalibration", "PXD Cluser Position Calibration Source Data");
+  m_rootPxdClusterArray = new TClonesArray("Belle2::PXDCluster");
+  m_rootPxdDigitArray = new TClonesArray("Belle2::PXDDigit");
+  m_rootPxdTrueHitArray = new TClonesArray("Belle2::PXDTrueHit");
+  tree->Branch<TClonesArray>("PXDClusterArray", &m_rootPxdClusterArray);
+  tree->Branch<TClonesArray>("PXDDigitArray", &m_rootPxdDigitArray);
+  tree->Branch<TClonesArray>("PXDTrueHitArray", &m_rootPxdTrueHitArray);
+  registerObject<TTree>("pxdCal", tree);
 }
 
 void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
 {
   // If no input, nothing to do
-  if (!m_pxdCluster || !m_pxdTrueHit) return;
-
-  /*
-  auto& geo = VXD::GeoCache::getInstance();
-  auto gTools = geo.getGeoTools();
-
+  if (!m_pxdCluster) return;
 
   for (auto& cluster :  m_pxdCluster) {
 
-    // Increment counter for hit pixel
-    //string name = str(format("PXD_%1%_PixelHitmap") % cluster.getSensorID().getID());
-    //TH1I* collector_sensorhitmap = getObjectPtr<TH1I>(name.c_str());
-    //collector_sensorhitmap->Fill(cluster.getU() * 768 + cluster.getV());
+    // Ignore clustes with more than one truehit
+    if (cluster.getRelationsTo<PXDTrueHit>().size() > 1) {
+      continue;
+    }
+
+    for (auto& truehit : cluster.getRelationsTo<PXDTrueHit>()) {
+
+      // Clear root arrays
+      TClonesArray& pxdClusterArray = *m_rootPxdClusterArray;
+      pxdClusterArray.Clear();
+      TClonesArray& pxdTrueHitArray = *m_rootPxdTrueHitArray;
+      pxdTrueHitArray.Clear();
+      TClonesArray& pxdDigitArray = *m_rootPxdDigitArray;
+      pxdDigitArray.Clear();
+
+      //Get Geometry information
+      auto sensorID = cluster.getSensorID();
+
+      // Fill branche of output tree
+      new(pxdClusterArray[0]) PXDCluster(cluster);
+      new(pxdTrueHitArray[0]) PXDTrueHit(truehit);
+
+
+      // Fill all digits related to cluster in TClonesArray
+      for (int i = 0; i < cluster.getSize(); i++) {
+        const PXDDigit* const storeDigit = cluster.getRelationsTo<PXDDigit>("PXDDigits")[i];
+        new(pxdDigitArray[i]) PXDDigit(*storeDigit);
+      }
+
+      // Fill the tree
+      getObjectPtr<TTree>("pxdCal")->Fill();
+
+    }
   }
-  */
+
 }

@@ -3,10 +3,19 @@
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
+
+from sys import argv
 # logging.package("calibration").log_level = LogLevel.DEBUG
 # logging.package("calibration").debug_level = 100
+
+if len(argv) == 2:
+    data_dir = argv[1]
+else:
+    print("Usage: basf2 collector_only.py <data directory>")
+    sys.exit(1)
+
 main = create_path()
-main.add_module("RootInput", inputFileNames=["test_data/DST_exp1_run*.root"])
+main.add_module("RootInput", inputFileNames=[data_dir + "/*.root"])
 # HistoManager must be used right after RootInput
 main.add_module('HistoManager', histoFileName="CollectorOutput.root", workDirName=".")
 # Granularity can be 'run' or 'all'. If it's 'run' the collector objects are separated into different

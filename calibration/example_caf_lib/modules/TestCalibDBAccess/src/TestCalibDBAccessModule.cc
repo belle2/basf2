@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <iostream>
 
-#include <calibration/modules/TestCalibDBAccess/TestCalibDBAccessModule.h>
+#include <calibration/example_caf_lib/modules/TestCalibDBAccess/TestCalibDBAccessModule.h>
 #include <framework/core/Module.h>
 
 using namespace Belle2;

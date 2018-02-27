@@ -12,6 +12,7 @@ class Test_Machine(TestCase):
     """
     Set of tests for checking Machine Base class
     """
+
     def setUp(self):
         """
         """
@@ -130,6 +131,7 @@ class Test_Machine(TestCase):
 
 def main():
     unittest.main()
+
 
 if __name__ == '__main__':
     main()

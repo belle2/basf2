@@ -1,4 +1,4 @@
-#include <calibration/TestCalibrationAlgorithm.h>
+#include <calibration/example_caf_lib/TestCalibrationAlgorithm.h>
 
 #include <memory>
 
@@ -11,7 +11,6 @@
 #include <calibration/dbobjects/TestCalibObject.h>
 #include <calibration/dbobjects/TestCalibMean.h>
 
-using namespace std;
 using namespace Belle2;
 
 TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")

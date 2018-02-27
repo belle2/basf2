@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <calibration/modules/CaTest/CaTestModule.h>
+#include <calibration/example_caf_lib/modules/CaTest/CaTestModule.h>
 
 #include <string>
 

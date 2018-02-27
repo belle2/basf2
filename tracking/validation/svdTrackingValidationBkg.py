@@ -4,10 +4,10 @@
 """
 <header>
   <contact>tracking@belle2.kek.jp</contact>
-  <input>EvtGenSimNoBkg.root</input>
-  <output>SVDTrackingValidation.root</output>
+  <input>EvtGenSim.root</input>
+  <output>SVDTrackingValidationBkg.root</output>
   <description>
-  This module validates that the svd only track finding is capable of reconstructing tracks in Y(4S) runs.
+  This module validates that the svd only track finding is capable of reconstructing tracks in Y(4S) runs with bkg included.
   </description>
 </header>
 """

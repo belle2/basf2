@@ -58,7 +58,7 @@ SVDROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
       while (itSvdSensors != svdSensors.end()) {
         B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
 
-        ROIDetPlane plane(*itSvdSensors, toleranceZ, tolerancePhi);
+        ROIDetPlane plane(*itSvdSensors);//, toleranceZ, tolerancePhi);
         genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
         plane.setSharedPlanePtr(sharedPlane);
 

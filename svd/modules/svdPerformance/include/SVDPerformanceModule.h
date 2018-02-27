@@ -21,6 +21,7 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -81,6 +82,7 @@ namespace Belle2 {
     StoreArray<SVDShaperDigit> m_svdShapers;
     StoreArray<SVDRecoDigit> m_svdRecos;
     StoreArray<SVDCluster> m_svdClusters;
+    StoreArray<RecoTrack> m_recoTracks;
     StoreArray<Track> m_Tracks;
     StoreArray<TrackFitResult> m_tfr;
 

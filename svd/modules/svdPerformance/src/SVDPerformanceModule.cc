@@ -2,7 +2,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <geometry/GeometryManager.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
@@ -51,6 +50,7 @@ void SVDPerformanceModule::initialize()
   m_svdRecos.isOptional(m_RecoDigitName);
   m_svdClusters.isRequired(m_ClusterName);
   m_Tracks.isRequired(m_TrackName);
+  m_recoTracks.isRequired();
   m_tfr.isRequired(m_TrackFitResultName);
 
 

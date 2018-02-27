@@ -967,11 +967,12 @@ def get_fr_channels(convertedFromBelle=False):
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
 
+    high_energy_photon = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]'
     gamma = Particle('gamma',
                      MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
                                                  'clusterE9E25', 'pt', 'E', 'pz'],
                                       target='isPrimarySignal'),
-                     PreCutConfiguration(userCut='goodGamma == 1' if not convertedFromBelle else
+                     PreCutConfiguration(userCut=high_energy_photon if not convertedFromBelle else
                                          'goodBelleGamma == 1 and clusterBelleQuality == 0',
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='E',

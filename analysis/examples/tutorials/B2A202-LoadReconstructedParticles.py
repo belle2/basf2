@@ -129,7 +129,6 @@ toolsGamma = ['Kinematics', '^gamma']
 toolsGamma += ['MCKinematics', '^gamma']
 toolsGamma += ['MCTruth', '^gamma']
 toolsGamma += ['Cluster', '^gamma']
-toolsGamma += ['CustomFloats[goodGamma]', '^gamma']
 
 toolsK0 = ['EventMetaData', '^K_S0']
 toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']

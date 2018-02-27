@@ -64,8 +64,9 @@ void SVDROIDQMModule::defineHisto()
 
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  m_InterDir = oldDir->mkdir("intercept");
-  m_ROIDir = oldDir->mkdir("roi");
+  TDirectory* roiDir = oldDir->mkdir("SVDROIs");
+  m_InterDir = roiDir->mkdir("intercept");
+  m_ROIDir = roiDir->mkdir("roi");
 
   hCellU  = new TH1F("hCellU", "CellID U", 769, -0.5, 768.5);
   hCellU->GetXaxis()->SetTitle("U cell ID");

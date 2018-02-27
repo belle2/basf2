@@ -46,38 +46,6 @@ void PXDClusterPositionCollectorModule::prepare() // Do your initialise() stuff 
 {
   m_pxdCluster.isRequired();
 
-  /*
-  TIter next(flsdigitsArray);
-  REROOT_FLSDigit *myflsdigit;
-  while( myflsdigit=(REROOT_FlSDigit *)next() ){ Process FLSDigit object. }
-
-  (*flsdigitsArray)[i];
-  */
-
-  /*
-  // Example of saving a Belle2 DBArray of DBObjects defined in the dbobjects directory
-  TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
-  float val = 0.0;
-  for (int i = 0; i < 2; i++) {
-    val += 1.0;
-    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
-  }
-
-  m_rootTRGRawInformation = new TClonesArray("TObjString");
-  m_treeROOTInput->Branch("rootTRGRawInformation", &m_rootTRGRawInformation, 32000, 0);
-
-  void TRGCDC::saveTRGRawInformation(vector<string >& trgInformations)
-  {
-    TClonesArray& rootTRGRawInformation = *m_rootTRGRawInformation;
-    rootTRGRawInformation.Clear();
-    for (unsigned iWindow = 0; iWindow < trgInformations.size(); iWindow++) {
-      TObjString t_rootTRGRawInformation;
-      t_rootTRGRawInformation.SetString(trgInformations[iWindow].c_str());
-      new(rootTRGRawInformation[iWindow]) TObjString(t_rootTRGRawInformation);
-    } // End of hit loop
-  }
-  */
-
   // Data object creation --------------------------------------------------
   auto tree = new TTree("PXDCluserPositionCalibration", "PXD Cluser Position Calibration Source Data");
   m_rootPxdClusterArray = new TClonesArray("Belle2::PXDCluster");

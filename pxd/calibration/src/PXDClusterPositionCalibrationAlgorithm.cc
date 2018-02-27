@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDClusterPositionCalibrationAlgorithm.h>
+#include <TClonesArray.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
 
 #include <string>
 
@@ -31,7 +35,41 @@ PXDClusterPositionCalibrationAlgorithm::PXDClusterPositionCalibrationAlgorithm()
 
 CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate()
 {
+  /* Read data and make histo*/
+  auto tree = getObjectPtr<TTree>("pxdCal");
 
+  TClonesArray* pxdClusterArray = new TClonesArray("Belle2::PXDCluster");
+  TClonesArray* pxdDigitArray = new TClonesArray("Belle2::PXDDigit");
+  TClonesArray* pxdTrueHitArray = new TClonesArray("Belle2::PXDTrueHit");
+
+  tree->SetBranchAddress("PXDClusterArray", &pxdClusterArray);
+  tree->SetBranchAddress("PXDDigitArray", &pxdDigitArray);
+  tree->SetBranchAddress("PXDTrueHitArray", &pxdTrueHitArray);
+
+  const auto nEntries = tree->GetEntries();
+  B2INFO("Number of entries " << nEntries);
+  for (int i = 0; i < nEntries; ++i) {
+    pxdClusterArray->Clear();
+    pxdDigitArray->Clear();
+    pxdTrueHitArray->Clear();
+    tree->GetEntry(i);
+
+    const PXDCluster* const cls = (PXDCluster*)pxdClusterArray->At(0);
+    B2INFO("Cluster sensorID " << cls->getSensorID() << " charge " << cls->getCharge());
+
+    const PXDTrueHit* const hit = (PXDTrueHit*)pxdTrueHitArray->At(0);
+    B2INFO("Cluster hit u " << hit->getU() << " v " << hit->getV());
+
+    int nDigits = pxdDigitArray->GetEntriesFast();
+    for (int iDigit = 0; iDigit < nDigits; iDigit++) {
+      const PXDDigit* const currdigit = (PXDDigit*)pxdDigitArray->At(iDigit);
+      B2INFO("Digit ui " << currdigit->getUCellID() << " vi " << currdigit->getVCellID()  << " charge " << currdigit->getCharge());
+    }
+  }
+
+  pxdClusterArray->Delete();
+  pxdDigitArray->Delete();
+  pxdTrueHitArray->Delete();
 
   // Save the hot pixel mask to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.

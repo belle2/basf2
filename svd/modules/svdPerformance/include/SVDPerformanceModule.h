@@ -14,6 +14,13 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <framework/datastore/StoreArray.h>
+
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -70,6 +77,12 @@ namespace Belle2 {
 
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
+
+    StoreArray<SVDShaperDigit> m_svdShapers;
+    StoreArray<SVDRecoDigit> m_svdRecos;
+    StoreArray<SVDCluster> m_svdClusters;
+    StoreArray<Track> m_Tracks;
+    StoreArray<TrackFitResult> m_tfr;
 
     int m_ntracks;
 

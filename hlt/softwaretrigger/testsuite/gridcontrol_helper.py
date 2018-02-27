@@ -8,21 +8,35 @@ from shutil import copyfile, rmtree
 # BELLE2_BACKGROUND_DIR in the steering file itself, because
 # BELLE2_BACKGROUND_DIR will be overwritten as soon as basf2
 # is sourced on batch nodes.
-DEFAULT_GRIDCONTROL_CONTENT = """
+
+GRIDCONTROL_GLOBAL_CONTENT = """
 [global]
 task = UserTask
 workdir create = True
 workdir space = 0
 backend = {backend}
+"""
+
+GRIDCONTROL_JOB_CONTENT = """
 [jobs]
-wall time = 1:00
+wall time = {job_runtime}
 in flight = {jobs_in_flight}
 memory = 2100
+[wms]
+queue = {queue_name}
+"""
+
+GRIDCONTROL_COMMON_BASF2_CONTENT = """
 [constants]
 BASF2_COMPILE_OPTION = {compile_option}
 BASF2_TOOLS_LOCATION = {tools_location}
 BASF2_RELEASE_LOCATION = {release_location}
 BASF2_STEERING_FILE = {steering_file}
+"""
+
+# configuration for genertion, reco and analysis of events
+DEFAULT_GRIDCONTROL_CONTENT = GRIDCONTROL_GLOBAL_CONTENT \
+    + GRIDCONTROL_JOB_CONTENT + GRIDCONTROL_COMMON_BASF2_CONTENT + """
 GC_BELLE2_BACKGROUND_DIR = {background_dir}
 [parameters]
 repeat = 1
@@ -32,26 +46,11 @@ pfs source = {parameter_file}
 [UserTask]
 executable = .basf2_wrapper.sh
 input files = {steering_file_abs_path}
-[wms]
-queue = s
 """
 
-TEST_PROCESSING_GRIDCONTROL_CONTENT = """
-[global]
-task = UserTask
-workdir create = True
-workdir space = 0
-backend = {backend}
-[jobs]
-wall time = 1:00
-in flight = {jobs_in_flight}
-max retry = 0
-memory = 2100
-[constants]
-BASF2_COMPILE_OPTION = {compile_option}
-BASF2_TOOLS_LOCATION = {tools_location}
-BASF2_RELEASE_LOCATION = {release_location}
-BASF2_STEERING_FILE = {steering_file}
+# configuration to test HLT processing on raw input events
+TEST_PROCESSING_GRIDCONTROL_CONTENT = GRIDCONTROL_GLOBAL_CONTENT \
+    + GRIDCONTROL_JOB_CONTENT + GRIDCONTROL_COMMON_BASF2_CONTENT + """
 BASF2_LOCAL_DB_PATH = {local_db_path}
 {use_gdb}
 [UserTask]
@@ -62,8 +61,6 @@ dataset provider = file
 dataset = :scan:{dataset_folder}
 source recurse = True
 filename filter = *.root
-[wms]
-queue = s
 """
 
 
@@ -83,6 +80,8 @@ def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder
 
     specific_gc_settings = {"dataset_folder": dataset_folder,
                             "steering_file": hlt_steering_file,
+                            "queue_name": "l",  # KEKCC long queue
+                            "job_runtime": "8:00",  # this jobs might take some hours
                             "use_gdb": use_gdb,
                             "local_db_path": local_db_path}
     return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
@@ -128,6 +127,8 @@ def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
 
     specific_gc_settings = {"background_dir": background_dir,
                             "parameter_file": parameter_file,
+                            "queue_name": "s",  # KEKCC short queue
+                            "job_runtime": "1:00",
                             "steering_file": steering_file,
                             "steering_file_abs_path": steering_file_abs_path}
     return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,

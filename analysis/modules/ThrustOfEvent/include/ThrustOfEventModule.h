@@ -24,7 +24,6 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
@@ -68,9 +67,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
-    /** Count the total number of particles */
-    int m_nParticles;
-
+    /** Get all momenta and then calculate the thrust for this event */
     TVector3 getThrustOfEvent(std::vector<std::string>  m_particleList);
 
   };

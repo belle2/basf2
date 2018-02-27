@@ -10,21 +10,21 @@ import ROOT
 from ROOT import Belle2
 
 
-class EventSelectorVXD(Module):
+class EventSelectorVXDRecoHits(Module):
 
     """
-    Python module to select simulated cosmic events
+    Python module to select reconstructed cosmic events
     (which pass VXD volume).
     """
 
     def __init__(self):
         """ init """
-        super(EventSelectorVXD, self).__init__()
+        super(EventSelectorVXDRecoHits, self).__init__()
 
-    def isOK(self, SimHit):
+    def isOK(self, RecoHit):
         """ Events with empty VXD (SVD or PXD) SimHits are removed."""
-        nSimHit = SimHit.getEntries()
-        if nSimHit == 0:
+        nRecoHit = RecoHit.getEntries()
+        if nRecoHit == 0:
             return False
 
         return True
@@ -32,21 +32,19 @@ class EventSelectorVXD(Module):
     def event(self):
         """ Return True if event is fine, False otherwise """
 
-        SVDSimHitArray = Belle2.PyStoreArray('SVDSimHits')
-        PXDSimHitArray = Belle2.PyStoreArray('PXDSimHits')
+        SVDRecoHitArray = Belle2.PyStoreArray('SVDRecoTracks')
+        PXDRecoHitArray = Belle2.PyStoreArray('PXDRecoTracks')
 
-        if self.isOK(SVDSimHitArray):
+        if self.isOK(SVDRecoHitArray):
             someOK = True
-
-        elif self.isOK(PXDSimHitArray):
+        elif self.isOK(PXDRecoHitArray):
             someOK = True
-
         else:
             someOK = False
 
         if someOK:
             EventMetaData = Belle2.PyStoreObj('EventMetaData')
             event = EventMetaData.getEvent()
-            print('Event', event, 'has PXD or SVD SimHits. It will be stored')
+            print('Event', event, 'has PXD or SVD RecoHits. It will be stored')
 
-        super(EventSelectorVXD, self).return_value(someOK)
+        super(EventSelectorVXDRecoHits, self).return_value(someOK)

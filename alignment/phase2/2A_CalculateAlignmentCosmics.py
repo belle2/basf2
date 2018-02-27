@@ -112,7 +112,10 @@ millepede = MillepedeCalibration(['VXDAlignment'],
 # tracks=['CosmicRecoTracks'],
 
 # For simulated data:
-millepede.algo.invertSign()
+# millepede.algo.invertSign()
+
+millepede.algo.steering().command('Fortranfiles')
+millepede.algo.steering().command('constraints.txt')
 
 # millepede.fixPXDYing()
 # millepede.fixPXDYang()

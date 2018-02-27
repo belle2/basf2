@@ -96,6 +96,7 @@ namespace Belle2 {
     TH1* h_chHit = NULL;/**<The number of hits in each channels*/
     TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chips*/
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPDs*/
+    TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
     TH1* h_gelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/

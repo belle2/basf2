@@ -11,9 +11,6 @@
 
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <genfit/Track.h>
-#include <genfit/GFRaveVertexFactory.h>
-
 #include <rave/VacuumPropagator.h>
 #include <rave/MagneticField.h>
 #include <rave/ConstantMagneticField.h>

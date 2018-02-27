@@ -10,6 +10,7 @@
 
 // Own include
 #include <arich/modules/arichUnpacker/ARICHUnpackerModule.h>
+
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
 
 #include <framework/core/ModuleManager.h>
@@ -136,9 +137,12 @@ namespace Belle2 {
           febHead.FEBSlot += 1; /// temporary! FEB Slots on merger should be 1-6 (now 0-5). Remove when firmware is updated!
 
           unsigned mergID = m_mergerMap->getMergerIDfromSN((unsigned)head.mergerID);
+
+          if (mergID == 99) { B2ERROR("ARICHUnpackerModule: unknown merger number: " << mergID << " (SN: " << (unsigned)head.mergerID << "). Merger date will be skipped"); break;}
+
           unsigned moduleID = m_mergerMap->getModuleID(mergID, (unsigned)febHead.FEBSlot);
 
-          if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger 2 module mapping for mergerID " << (unsigned)head.mergerID << " FEB slot: " << (unsigned)febHead.FEBSlot); break;}
+          if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger to FEB mapping:: " << mergID << " (SN: " << (unsigned)head.mergerID << ") FEB slot: " << (unsigned)febHead.FEBSlot << ". Merger data will be skipped"); break;}
 
           // read data
           if (m_debug) std::cout << "Hit channels: " << std::endl;

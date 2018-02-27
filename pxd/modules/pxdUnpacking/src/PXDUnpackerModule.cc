@@ -612,10 +612,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
   /// Most could put in as a class member, but they are only needed within this function
   static unsigned int eventNrOfOnsenTrgFrame = 0;
-  static int countedBytesInDHC =
-    -0x7FFFFFFF;// Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
-  static int countedBytesInDHE =
-    -0x7FFFFFFF;// Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
+  static int countedBytesInDHC = 0;
+  static bool cancheck_countedBytesInDHC = false;
+  static int countedBytesInDHE = 0;
+  static bool cancheck_countedBytesInDHE = false;
   static int countedDHEStartFrames = 0;
   static int countedDHEEndFrames = 0;
   static int mask_active_dhe = 0;// DHE mask (5 bit)
@@ -650,7 +650,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     countedDHEStartFrames = 0;
     countedDHEEndFrames = 0;
     countedBytesInDHC = 0;
+    cancheck_countedBytesInDHC = false;
     countedBytesInDHE = 0;
+    cancheck_countedBytesInDHE = false;
     currentDHCID = 0xFFFFFFFF;
     currentDHEID = 0xFFFFFFFF;
     currentVxdId = 0;
@@ -715,8 +717,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     };
     case EDHCFrameHeaderDataType::c_ONSEN_DHP:
       // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
-      countedBytesInDHC = -0x7FFFFFFF;
-      countedBytesInDHE = -0x7FFFFFFF;
+      cancheck_countedBytesInDHC = false;
+      cancheck_countedBytesInDHE = false;
       [[fallthrough]];
     case EDHCFrameHeaderDataType::c_DHP_ZSD: {
 
@@ -750,8 +752,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     };
     case EDHCFrameHeaderDataType::c_ONSEN_FCE:
       // Set the counted size invalid if negativ, needs a large negative value because we are adding up to that
-      countedBytesInDHC = -0x7FFFFFFF;
-      countedBytesInDHE = -0x7FFFFFFF;
+      cancheck_countedBytesInDHC = false;
+      cancheck_countedBytesInDHE = false;
       [[fallthrough]];
     case EDHCFrameHeaderDataType::c_FCE_RAW: {
 
@@ -793,6 +795,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     };
     case EDHCFrameHeaderDataType::c_DHC_START: {
       countedBytesInDHC = 0;
+      cancheck_countedBytesInDHC = true;
       if (isFakedData_event != dhc.data_dhc_start_frame->isFakedData()) {
         B2ERROR("DHC START is but no Fake event OR Fake Event but DHE END is not.");
       }
@@ -845,11 +848,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
 
+      m_errorMaskDHC = m_errorMask; // forget about anything before this frame
       daqpktstat.newDHC(currentDHCID, m_errorMask);
       break;
     };
     case EDHCFrameHeaderDataType::c_DHE_START: {
       countedBytesInDHE = 0;
+      cancheck_countedBytesInDHE = true;
       last_dhp_readout_frame_lo[0] = -1;
       last_dhp_readout_frame_lo[1] = -1;
       last_dhp_readout_frame_lo[2] = -1;
@@ -872,15 +877,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       found_mask_active_dhp = 0;
       mask_active_dhp = dhc.data_dhe_start_frame->getActiveDHPMask();
-      ///      nr_active_dhp = nr5bits(mask_active_dhp);// unused
 
-      /// ATTENTION seems to the Hi Word is not set!!!!
-//       if ((((unsigned int)dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) != (unsigned int)(
-//             m_meta_event_nr & 0x0000FFFF)) {
-//         B2ERROR("DHE EVT32b: " << ((dhc.data_dhe_start_frame->getEventNrHi() << 16) |
-//                                    dhc.data_dhe_start_frame->getEventNrLo()) << " META "              << (m_meta_event_nr & 0xFFFFFFFF));
-//           m_errorMask |= EPXDErrMask::c_META_MM_DHE;
-//       } else
       if ((((unsigned int)dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) != (unsigned int)(
             m_meta_event_nr & 0xFFFFFFFF)) {
         B2ERROR("DHE EVT32b (HI WORD): " << ((dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) <<
@@ -914,6 +911,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         }
       }
 
+      m_errorMaskDHE = m_errorMask; // forget about anything before this frame
       if (daqpktstat.dhc_size() > 0) {
         // if no DHC has been defined yet, do nothing!
         daqpktstat.dhc_back().newDHE(currentVxdId, currentDHEID, m_errorMask, dhe_first_offset, dhe_first_readout_frame_id_lo);
@@ -953,7 +951,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         }
         int w;
         w = dhc.data_dhc_end_frame->get_words() * 4;
-        if (countedBytesInDHC >= 0) {
+        if (cancheck_countedBytesInDHC) {
           if (countedBytesInDHC != w) {
             B2ERROR("Error: WIE $" << hex << countedBytesInDHC << " != DHC END $" << hex << w);
             m_errorMask |= EPXDErrMask::c_DHC_WIE;
@@ -972,6 +970,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         // Remark, if we have a broken data (DHC_START/END) structure, we might fill the
         // previous DHC object ... but then the data is junk anyway
         daqpktstat.dhc_back().setErrorMask(m_errorMaskDHC);
+        //B2DEBUG(98,"** DHC "<<currentDHCID<<" Raw"<<dhc.data_dhc_end_frame->get_words() * 4 <<" Red"<<countedBytesInDHC);
         daqpktstat.dhc_back().setCounters(dhc.data_dhc_end_frame->get_words() * 4, countedBytesInDHC);
       }
       m_errorMaskDHC = 0;
@@ -1001,7 +1000,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       {
         int w;
         w = dhc.data_dhe_end_frame->get_words() * 2;
-        if (countedBytesInDHE >= 0) {
+        if (cancheck_countedBytesInDHE) {
           if (countedBytesInDHE != w) {
             if (!m_ignoreDHELength) B2ERROR("Error: WIE $" << hex << countedBytesInDHE << " != DHE END $" << hex << w);
             m_errorMask |= EPXDErrMask::c_DHE_WIE;
@@ -1020,6 +1019,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
           // Remark, if we have a broken data (DHE_START/END) structure, we might fill the
           // previous DHE object ... but then the data is junk anyway
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
+          // B2DEBUG(98,"** DHC "<<currentDHEID<<" Raw "<<dhc.data_dhe_end_frame->get_words() * 2 <<" Red"<<countedBytesInDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
         }
       }

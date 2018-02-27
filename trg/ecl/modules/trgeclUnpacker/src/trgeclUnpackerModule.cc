@@ -50,7 +50,6 @@ void TRGECLUnpackerModule::initialize()
 {
 
   m_TRGECLUnpackerArray.registerInDataStore();
-
 }
 
 void TRGECLUnpackerModule::beginRun()
@@ -134,6 +133,11 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
 
     for (int j = 0; j < 4; j++) {
       sum_data = sum_data + summary_data[j];
+      // if(n_basf2evt == 3775){
+      //  cout << "= " << i << " =" << endl;
+      //  printf("%x\n", sum_data);
+      // }
+
     }
     w_ntc  = (summary_data[2] << 8) + summary_data[3];
     ntc    = ntc + w_ntc;
@@ -157,6 +161,10 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
                    ((rdat[i + 1 + j]) & 0xff) +
                    ((rdat[i + 2 + j] >> 24) & 0xff) +
                    ((rdat[i + 2 + j] >> 16) & 0xff);
+        // if(n_basf2evt == 3775){
+        //  cout << "= " << i << " =" << endl;
+        //  printf("%x\n", sum_data);
+        // }
 
         tc_info.push_back(tc_id);
         tc_info.push_back(conv_tc_t);
@@ -184,9 +192,13 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
     flag_checksum = 1;
   }
 
+  // if(n_basf2evt == 3775){
+  //  printf("%x %x %d\n", check_sum, sum_data, flag_checksum);
+  // }
+
   int evt_size   = evt_info.size();
   int evt_timing = -9999;
-  if (evt_size != 0 && flag_checksum == 0) {
+  if (evt_size != 0 && flag_checksum == 0 && nwords > 7) {
     // Find most energetic TC timing
     sort(evt_info.begin(), evt_info.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
@@ -229,7 +241,12 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
     }
   } else {
     m_tcid     = 0;
-    m_ntc      = ntc;
+    if (ntc == 0) {
+      m_ntc = 0;
+    } else {
+      m_ntc = -1;
+    }
+
     m_energy   = 0;
     m_hitwin   = -1;
     m_time     = -9999;

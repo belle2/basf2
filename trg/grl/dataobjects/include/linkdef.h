@@ -7,6 +7,7 @@
 
 #pragma link C++ class Belle2::TRGGRLMATCH+;
 #pragma link C++ class Belle2::TRGGRLMATCHKLM+;
+#pragma link C++ class Belle2::TRGGRLPHOTON+;
 #pragma link C++ class Belle2::TRGGRLInfo+;
 
 #endif

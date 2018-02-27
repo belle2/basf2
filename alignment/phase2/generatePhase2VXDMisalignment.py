@@ -1,46 +1,64 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# *****************************************************************************
-
-# title           : generatePhase2VXDMisalignment.py
-# description     : Generation VXD misalignment in phase 2 geometry
-# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 8. 2. 2018
-
-# *****************************************************************************
-
 
 import os
 import sys
 from basf2 import *
 from ROOT import Belle2
 
-from alignment.utils import AlignmentGeneratorConfig
+import numpy as np
+import pandas as pd
+import math
 
-alignment = AlignmentGeneratorConfig()
+numberOfLayer = 6
+numberOfLadders = [8, 12, 7, 10, 12, 16]
+numberOfSensors = [2, 2, 2, 3, 4, 5]
+numberOfParameters = 6
+payload = Belle2.VXDAlignment()
 
 """
 -------------------------
-Misalignment for Phase II
+Misalignment of for Phase II
 -------------------------
-- Used sensors: 1.1.0, 2.1.0, 3.1.0, 4.1.0, 5.1.0, 6.1.0
-- alignment.set_u('0.0.0', 0.01) -> set U coordinate 100 um
-- alignment.gen_v_gaus('0.0.0', 0.01) -> set V from normal distribution dispersion 100 um
-- alignment.gen_w_uniform('0.0.0', 0.01) -> set W uniform ditribution from interval +/- 100 um
-- alignment.set_alpha('0.0.0', 0.001) -> set ALPHA coordinate 1 mrad
-- alignment.gen_beta_gaus('0.0.0', 0.001) -> set BETA from normal distribution dispersion 1 mrad
-- alignment.gen_gamma_uniform('0.0.0', 0.001) -> set GAMMA uniform ditribution from interval +/- 1 mrad
-- alignment.set_all('0.0.0', 0.0) -> generate "empty" alignment with zeros
 """
 
-alignment.set_all('0.1.0', 0.0)
+# 0.01 -> 100 um
 
-main = create_path()
-main.add_module('EventInfoSetter')
-main.add_module('Gearbox')
-main.add_module('Geometry', components=['PXD', 'SVD'])
-main.add_module('AlignmentGenerator', payloadIov=[0, 0, -1, -1], payloadName="", data=alignment.get_data(), createPayload=True)
-main.add_module('Progress')
+for i in range(1, 7):
+    for j in range(1, numberOfLadders[i - 1] + 1):
+        for l in range(1, numberOfParameters + 1):
+            payload.setGlobalParam(0.0, Belle2.VxdID(i, j, 0).getID(), l)
+            if (j == 1 and l < 4):
+                number = np.random.normal(0.0, 0.01, 1)
+                payload.setGlobalParam(number, Belle2.VxdID(i, j, 0).getID(), l)
 
-process(main)
-print(statistics)
+        for k in range(1, numberOfSensors[i - 1] + 1):
+            for l in range(1, numberOfParameters + 1):
+                payload.setGlobalParam(0.0, Belle2.VxdID(i, j, k).getID(), l)
+                if (l < 4):
+                    number = np.random.normal(0.0, 0.01, 1)
+                    payload.setGlobalParam(number, Belle2.VxdID(i, j, k).getID(), l)
+
+# 1 -> x; 2 -> y; 3 -> z
+
+# misalignment of Yang
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(1, 0, 0, 1).getID(), 1)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(1, 0, 0, 1).getID(), 2)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(1, 0, 0, 1).getID(), 3)
+
+# misalignment of Ying
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(1, 0, 0, 2).getID(), 1)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(1, 0, 0, 2).getID(), 2)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(1, 0, 0, 2).getID(), 3)
+
+# misalignment of Pat
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(3, 0, 0, 1).getID(), 1)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(3, 0, 0, 1).getID(), 2)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(3, 0, 0, 1).getID(), 3)
+
+# misalignment of Mat
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(3, 0, 0, 2).getID(), 1)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(3, 0, 0, 2).getID(), 2)
+payload.setGlobalParam(np.random.normal(0.0, 0.01, 1), Belle2.VxdID(3, 0, 0, 2).getID(), 3)
+
+Belle2.Database.Instance().storeData('VXDAlignment', payload, Belle2.IntervalOfValidity(0, 0, -1, -1))

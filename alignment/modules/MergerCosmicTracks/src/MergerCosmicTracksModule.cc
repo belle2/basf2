@@ -9,11 +9,12 @@
  **************************************************************************/
 
 #include <alignment/modules/MergerCosmicTracks/MergerCosmicTracksModule.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -36,12 +37,14 @@ MergerCosmicTracksModule::MergerCosmicTracksModule() : Module()
            "Flag to using magnetic field during reconstruction.",
            m_usingMagneticField);
   addParam("minimumNumHitCut", m_minimumNumHitCut, "Number of CDC hit per track required for cosmic track", m_minimumNumHitCut);
+  addParam("minimumClusterSize", m_minimumClusterSize, "Minimal cluster size for used PXD clusters for cosmic track",
+           m_minimumClusterSize);
 }
 
 void MergerCosmicTracksModule::initialize()
 {
-  StoreArray<KLMCluster> klmClusters("KLMClusters");
-  klmClusters.isRequired();
+  StoreArray<Track> tracks;
+  tracks.isRequired();
 
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
@@ -55,7 +58,8 @@ void MergerCosmicTracksModule::initialize()
   Belle2::CDC::CDCGeometryPar::Instance();
 }
 
-void MergerCosmicTracksModule::MergingTracks(StoreArray<RecoTrack>recoTrackStoreArray, StoreArray<RecoTrack>mergedRecoTracks)
+void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrack* secondRecoTrack,
+                                             StoreArray<RecoTrack> mergedRecoTracks)
 {
 
   // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
@@ -66,12 +70,12 @@ void MergerCosmicTracksModule::MergingTracks(StoreArray<RecoTrack>recoTrackStore
   RecoTrack* lowerTrack;
 
   // The RecoTrack with smaller timeSeed is upper
-  if (recoTrackStoreArray[0]->getTimeSeed() < recoTrackStoreArray[1]->getTimeSeed()) {
-    upperTrack = recoTrackStoreArray[0];
-    lowerTrack = recoTrackStoreArray[1];
+  if (firstRecoTrack->getTimeSeed() < secondRecoTrack->getTimeSeed()) {
+    upperTrack = firstRecoTrack;
+    lowerTrack = secondRecoTrack;
   } else {
-    upperTrack = recoTrackStoreArray[1];
-    lowerTrack = recoTrackStoreArray[0];
+    upperTrack = secondRecoTrack;
+    lowerTrack = firstRecoTrack;
   }
 
   // estimation of momentum tracks
@@ -122,15 +126,18 @@ void MergerCosmicTracksModule::MergingTracks(StoreArray<RecoTrack>recoTrackStore
   if (upperTrack->hasPXDHits()) {
     int PXDHits = upperTrack->getNumberOfPXDHits();
     for (int i = 0; i < PXDHits; i++) {
-      mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);
+      if (upperTrack->getSortedPXDHitList()[i]->getSize() > m_minimumClusterSize) {mergedRecoTrack->addPXDHit(upperTrack->getSortedPXDHitList()[i], sortingNumber);}
+      // B2INFO("Cluster size of included PXD hit: " << upperTrack->getSortedPXDHitList()[i]->getSize());
       sortingNumber++;
     }
+
   }
 
   if (lowerTrack->hasPXDHits()) {
     int PXDHits = lowerTrack->getNumberOfPXDHits();
     for (int i = 0; i < PXDHits; i++) {
-      mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);
+      if (lowerTrack->getSortedPXDHitList()[i]->getSize() > m_minimumClusterSize) {mergedRecoTrack->addPXDHit(lowerTrack->getSortedPXDHitList()[i], sortingNumber);}
+      // B2INFO("Cluster size of included PXD hit: " << lowerTrack->getSortedPXDHitList()[i]->getSize());
       sortingNumber++;
     }
   }
@@ -202,10 +209,12 @@ void MergerCosmicTracksModule::MergingTracks(StoreArray<RecoTrack>recoTrackStore
 
 void MergerCosmicTracksModule::event()
 {
-
+  StoreArray<ECLConnectedRegion> eclConnectedRegionStoreArray;
+  StoreArray<ECLShower> eclShowerStoreArray;
+  StoreArray<KLMCluster> klmClusterStoreArray;
+  StoreArray<Track> trackStoreArray;
   StoreArray<RecoTrack> recoTrackStoreArray(m_param_recoTracksStoreArrayName);
   StoreArray<RecoTrack> mergedRecoTracks(m_param_mergedRecoTracksStoreArrayName);
-  StoreArray<KLMCluster> klmClustersStoreArray("KLMClusters");
 
   // VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
   // CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
@@ -223,186 +232,148 @@ void MergerCosmicTracksModule::event()
   // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
   float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
 
-  // One RecoTrack in an event
+  // bool mergedTracks = false;
+
   if (recoTrackStoreArray.getEntries() == 1) {
-
-    // No more than 2 KLMClusters
-    int numberKLMClustersEnoughLayers = 0;
-
-    for (int i = 0; i < klmClustersStoreArray.getEntries(); i++) {
-      if (klmClustersStoreArray[i]->getLayers() > 4) {
-        numberKLMClustersEnoughLayers++;
+    int numberKLMClusterEnoughLayers = 0;
+    for (int i = 0; i < klmClusterStoreArray.getEntries(); i++) {
+      if (klmClusterStoreArray[i]->getLayers() > 4) {
+        numberKLMClusterEnoughLayers++;
       }
     }
 
-    if (numberKLMClustersEnoughLayers == 2 || klmClustersStoreArray.getEntries() == 2) {
-
-      // A candidate of CosmicRecoTrack has at least m_minimumNumHitCut (40) CDCHits
+    if (eclConnectedRegionStoreArray.getEntries() == 2 || eclConnectedRegionStoreArray.getEntries() == 1
+        || numberKLMClusterEnoughLayers == 2 || numberKLMClusterEnoughLayers == 1) {
       if (recoTrackStoreArray[0]->getNumberOfCDCHits() > m_minimumNumHitCut) {
+        RelationVector<Track> track = recoTrackStoreArray[0]->getRelationsWith<Track>();
+        if (track.size() != 0) {
+          RelationVector<ECLShower> eclShower = track[0]->getRelationsTo<ECLShower>();
+          if (eclShower.size() != 0 || recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits()) {
 
-        // A candidate of CosmicRecoTrack has B(E)KLM hits
-        if (recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits()) {
-
-          // estimation of momentum tracks
-          int numberOfCDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
-          float totalADCCount = 0;
-          if (recoTrackStoreArray[0]->hasCDCHits()) {
-            int CDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
-            for (int i = 0; i < CDCHits; i++) {
-              totalADCCount = totalADCCount + recoTrackStoreArray[0]->getSortedCDCHitList()[i]->getADCCount();
+            int numberOfCDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
+            float totalADCCount = 0;
+            if (recoTrackStoreArray[0]->hasCDCHits()) {
+              int CDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
+              for (int i = 0; i < CDCHits; i++) {
+                totalADCCount = totalADCCount + recoTrackStoreArray[0]->getSortedCDCHitList()[i]->getADCCount();
+              }
             }
-          }
-
-          if (totalADCCount / numberOfCDCHits < 115) {
-            // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
-            m_magnitudeOfMomentumWithoutMagneticField = exp((-fittedValuesOfFunctions[0] + totalADCCount / numberOfCDCHits) /
-                                                            fittedValuesOfFunctions[1]);
-          } else {
-            m_magnitudeOfMomentumWithoutMagneticField = fittedValuesOfFunctions[2];
-          }
-
-          RecoTrack* mergedRecoTrack;
-          if (m_usingMagneticField == true) {
-            mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
-                                                         recoTrackStoreArray[0]->getMomentumSeed(), recoTrackStoreArray[0]->getChargeSeed());
-          }
-
-          else {
-            TVector3 momentum = recoTrackStoreArray[0]->getMomentumSeed();
-            float magnitudeMomentum = momentum.Mag();
-            float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
-            float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
-            float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
-            TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
-            std::cout << "No Magnetic Field: " << newMomentum.Mag() << "\n";
-            mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
-                                                         newMomentum, recoTrackStoreArray[0]->getChargeSeed());
-          }
-
-          // retain the seed time of the original track. Important for t0 extraction.
-          mergedRecoTrack->setTimeSeed(recoTrackStoreArray[0]->getTimeSeed());
-
-          int sortingNumber = 0;
-
-          if (recoTrackStoreArray[0]->hasPXDHits()) {
-            int PXDHits = recoTrackStoreArray[0]->getNumberOfPXDHits();
-            for (int i = 0; i < PXDHits; i++) {
-              mergedRecoTrack->addPXDHit(recoTrackStoreArray[0]->getSortedPXDHitList()[i], sortingNumber);
-              sortingNumber++;
+            if (totalADCCount / numberOfCDCHits < 115) {
+              // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
+              m_magnitudeOfMomentumWithoutMagneticField = exp((-fittedValuesOfFunctions[0] + totalADCCount / numberOfCDCHits) /
+                                                              fittedValuesOfFunctions[1]);
+            } else {
+              m_magnitudeOfMomentumWithoutMagneticField = fittedValuesOfFunctions[2];
             }
-          }
-
-          if (recoTrackStoreArray[0]->hasSVDHits()) {
-            int SVDHits = recoTrackStoreArray[0]->getNumberOfSVDHits();
-            for (int i = 0; i < SVDHits; i++) {
-              mergedRecoTrack->addSVDHit(recoTrackStoreArray[0]->getSortedSVDHitList()[i], sortingNumber);
-              sortingNumber++;
+            RecoTrack* mergedRecoTrack;
+            if (m_usingMagneticField == true) {
+              mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
+                                                           recoTrackStoreArray[0]->getMomentumSeed(), recoTrackStoreArray[0]->getChargeSeed());
+            } else {
+              TVector3 momentum = recoTrackStoreArray[0]->getMomentumSeed();
+              float magnitudeMomentum = momentum.Mag();
+              float newMomentumX = (momentum.Px() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+              float newMomentumY = (momentum.Py() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+              float newMomentumZ = (momentum.Pz() * m_magnitudeOfMomentumWithoutMagneticField) / magnitudeMomentum;
+              TVector3 newMomentum(newMomentumX, newMomentumY, newMomentumZ);
+              mergedRecoTrack = mergedRecoTracks.appendNew(recoTrackStoreArray[0]->getPositionSeed(),
+                                                           newMomentum, recoTrackStoreArray[0]->getChargeSeed());
             }
-          }
+            mergedRecoTrack->setTimeSeed(recoTrackStoreArray[0]->getTimeSeed());
 
-          if (recoTrackStoreArray[0]->hasCDCHits()) {
-            int CDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
-            for (int i = 0; i < CDCHits; i++) {
-              mergedRecoTrack->addCDCHit(recoTrackStoreArray[0]->getSortedCDCHitList()[i], sortingNumber);
-              sortingNumber++;
+            int sortingNumber = 0;
+            if (recoTrackStoreArray[0]->hasPXDHits()) {
+              int PXDHits = recoTrackStoreArray[0]->getNumberOfPXDHits();
+              for (int i = 0; i < PXDHits; i++) {
+                if (recoTrackStoreArray[0]->getSortedPXDHitList()[i]->getSize() > 1) {mergedRecoTrack->addPXDHit(recoTrackStoreArray[0]->getSortedPXDHitList()[i], sortingNumber);}
+                // B2INFO("Cluster size of included PXD hit: " << recoTrackStoreArray[0]->getSortedPXDHitList()[i]->getSize());
+                sortingNumber++;
+              }
             }
-          }
-
-          if (recoTrackStoreArray[0]->hasBKLMHits()) {
-            int BKLMHits = recoTrackStoreArray[0]->getNumberOfBKLMHits();
-            for (int i = 0; i < BKLMHits; i++) {
-              mergedRecoTrack->addBKLMHit(recoTrackStoreArray[0]->getSortedBKLMHitList()[i], sortingNumber);
-              sortingNumber++;
+            if (recoTrackStoreArray[0]->hasSVDHits()) {
+              int SVDHits = recoTrackStoreArray[0]->getNumberOfSVDHits();
+              for (int i = 0; i < SVDHits; i++) {
+                mergedRecoTrack->addSVDHit(recoTrackStoreArray[0]->getSortedSVDHitList()[i], sortingNumber);
+                sortingNumber++;
+              }
             }
-          }
-
-          if (recoTrackStoreArray[0]->hasEKLMHits()) {
-            int EKLMHits = recoTrackStoreArray[0]->getNumberOfEKLMHits();
-            for (int i = 0; i < EKLMHits; i++) {
-              mergedRecoTrack->addEKLMHit(recoTrackStoreArray[0]->getSortedEKLMHitList()[i], sortingNumber);
+            if (recoTrackStoreArray[0]->hasCDCHits()) {
+              int CDCHits = recoTrackStoreArray[0]->getNumberOfCDCHits();
+              for (int i = 0; i < CDCHits; i++) {
+                mergedRecoTrack->addCDCHit(recoTrackStoreArray[0]->getSortedCDCHitList()[i], sortingNumber);
+                sortingNumber++;
+              }
             }
+            if (recoTrackStoreArray[0]->hasBKLMHits()) {
+              int BKLMHits = recoTrackStoreArray[0]->getNumberOfBKLMHits();
+              for (int i = 0; i < BKLMHits; i++) {
+                mergedRecoTrack->addBKLMHit(recoTrackStoreArray[0]->getSortedBKLMHitList()[i], sortingNumber);
+                sortingNumber++;
+              }
+            }
+            if (recoTrackStoreArray[0]->hasEKLMHits()) {
+              int EKLMHits = recoTrackStoreArray[0]->getNumberOfEKLMHits();
+              for (int i = 0; i < EKLMHits; i++) {
+                mergedRecoTrack->addEKLMHit(recoTrackStoreArray[0]->getSortedEKLMHitList()[i], sortingNumber);
+              }
+            }
+            // mergedTracks = true;
           }
         }
       }
     }
   }
 
-  // Two RecoTracks in an event
   else if (recoTrackStoreArray.getEntries() == 2) {
-
-    // A candidate of CosmicRecoTrack has at least m_minimumNumHitCut (40) CDCHits
     if (recoTrackStoreArray[0]->getNumberOfCDCHits() + recoTrackStoreArray[1]->getNumberOfCDCHits() > m_minimumNumHitCut) {
-
-      // One KLMCluster reconstructed in event
-      if (klmClustersStoreArray.getEntries() == 1 || klmClustersStoreArray.getEntries() == 2) {
-
-        // One from RecoTracks has B(E)KLM hits
-        if (recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits() || recoTrackStoreArray[1]->hasEKLMHits()
-            || recoTrackStoreArray[1]->hasBKLMHits()) {
-
-          // Merging cosmic tracks
-          MergingTracks(recoTrackStoreArray, mergedRecoTracks);
-        }
-
-      } else {
-
-        // Both RecoTracks have B(E)KLM hits
-        if ((recoTrackStoreArray[0]->hasEKLMHits() || recoTrackStoreArray[0]->hasBKLMHits()) && (recoTrackStoreArray[1]->hasEKLMHits()
-            || recoTrackStoreArray[1]->hasBKLMHits())) {
-
-          // Merging cosmic tracks
-          MergingTracks(recoTrackStoreArray, mergedRecoTracks);
-
-        }
-      }
-    }
-  } else {
-
-    // More than 2 RecoTracks
-    // Check how many KLMClusters have more than 4 layers
-
-    int numberKLMClustersEnoughLayers = 0;
-
-    for (int i = 0; i < klmClustersStoreArray.getEntries(); i++) {
-      if (klmClustersStoreArray[i]->getLayers() > 4) {
-        numberKLMClustersEnoughLayers++;
-      }
-    }
-
-    // 2 KLM clusters or 2 KLM clusters with more than 4 layers in event
-    if (numberKLMClustersEnoughLayers == 2 || klmClustersStoreArray.getEntries() == 2) {
-
-      // Check how many tracks has B(E)KLM hits and store their index
-      int indexRecoTracksWithKLMHits[recoTrackStoreArray.getEntries()];
-      int numberRecoTracksWithKLMHits = 0;
-
-      for (int i = 0; i < recoTrackStoreArray.getEntries(); i++) {
-        if (recoTrackStoreArray[i]->hasEKLMHits() || recoTrackStoreArray[i]->hasBKLMHits()) {
-          indexRecoTracksWithKLMHits[numberRecoTracksWithKLMHits] = i;
-          numberRecoTracksWithKLMHits++;
-        }
-      }
-
-      if (numberRecoTracksWithKLMHits > 2) {
-        numberRecoTracksWithKLMHits = 0;
-        for (int i = 0; i < numberRecoTracksWithKLMHits; i++) {
-          int numberKLMHitsInRecoTrack = recoTrackStoreArray[indexRecoTracksWithKLMHits[i]]->getNumberOfBKLMHits() +
-                                         recoTrackStoreArray[indexRecoTracksWithKLMHits[i]]->getNumberOfEKLMHits();
-          if (numberKLMHitsInRecoTrack > 3) {
-            indexRecoTracksWithKLMHits[numberRecoTracksWithKLMHits] = i;
-            numberRecoTracksWithKLMHits++;
+      RelationVector<Track> trackFirst = recoTrackStoreArray[0]->getRelationsWith<Track>();
+      RelationVector<Track> trackSecond = recoTrackStoreArray[1]->getRelationsWith<Track>();
+      if (trackFirst.size() != 0 && trackSecond.size() != 0) {
+        RelationVector<ECLShower> eclShowerFirst = trackFirst[0]->getRelationsTo<ECLShower>();
+        RelationVector<ECLShower> eclShowerSecond = trackSecond[0]->getRelationsTo<ECLShower>();
+        if ((eclShowerFirst.size() != 0 && eclShowerSecond.size() != 0) || ((recoTrackStoreArray[0]->hasEKLMHits()
+            || recoTrackStoreArray[0]->hasBKLMHits()) && (recoTrackStoreArray[1]->hasEKLMHits() || recoTrackStoreArray[1]->hasBKLMHits()))) {
+          if (eclConnectedRegionStoreArray.getEntries() >= 2 || klmClusterStoreArray.getEntries() >= 2) {
+            MergingTracks(recoTrackStoreArray[0], recoTrackStoreArray[1], mergedRecoTracks);
+            // mergedTracks = true;
+          }
+        } else if (eclShowerFirst.size() != 0 || eclShowerSecond.size() != 0 || recoTrackStoreArray[0]->hasEKLMHits()
+                   || recoTrackStoreArray[0]->hasBKLMHits() || recoTrackStoreArray[1]->hasEKLMHits() || recoTrackStoreArray[1]->hasBKLMHits()) {
+          if (eclConnectedRegionStoreArray.getEntries() == 2 || eclConnectedRegionStoreArray.getEntries() == 1
+              || klmClusterStoreArray.getEntries() == 2 || klmClusterStoreArray.getEntries() == 1) {
+            MergingTracks(recoTrackStoreArray[0], recoTrackStoreArray[1], mergedRecoTracks);
+            // mergedTracks = true;
           }
         }
       }
+    }
+  }
 
-      if (numberRecoTracksWithKLMHits == 2) {
-        // A candidate of CosmicRecoTrack has at least m_minimumNumHitCut (40) CDCHits
-        if (recoTrackStoreArray[indexRecoTracksWithKLMHits[0]]->getNumberOfCDCHits() +
-            recoTrackStoreArray[indexRecoTracksWithKLMHits[1]]->getNumberOfCDCHits() > m_minimumNumHitCut) {
-
-          // Merging cosmic tracks
-          MergingTracks(recoTrackStoreArray, mergedRecoTracks);
-
+  else {
+    for (int i = 0; i < recoTrackStoreArray.getEntries(); i++) {
+      RelationVector<Track> trackFirst = recoTrackStoreArray[i]->getRelationsWith<Track>();
+      if (trackFirst.size() != 0) {
+        for (int j = i + 1; j < recoTrackStoreArray.getEntries(); j++) {
+          RelationVector<Track> trackSecond = recoTrackStoreArray[j]->getRelationsWith<Track>();
+          if (trackSecond.size() != 0) {
+            if (recoTrackStoreArray[i]->getNumberOfCDCHits() + recoTrackStoreArray[j]->getNumberOfCDCHits() > m_minimumNumHitCut) {
+              RelationVector<ECLShower> eclShowerFirst = trackFirst[0]->getRelationsTo<ECLShower>();
+              RelationVector<ECLShower> eclShowerSecond = trackSecond[0]->getRelationsTo<ECLShower>();
+              if (eclShowerFirst.size() != 0 && eclShowerSecond.size() != 0) {
+                if (eclShowerFirst[0]->getRelationsWith<Track>().size() == 1 && eclShowerSecond[0]->getRelationsWith<Track>().size() == 1) {
+                  MergingTracks(recoTrackStoreArray[i], recoTrackStoreArray[j], mergedRecoTracks);
+                  // mergedTracks = true;
+                }
+              } else if ((recoTrackStoreArray[i]->hasEKLMHits() || recoTrackStoreArray[i]->hasBKLMHits())
+                         && (recoTrackStoreArray[j]->hasEKLMHits() || recoTrackStoreArray[j]->hasBKLMHits())) {
+                if (recoTrackStoreArray[i]->getNumberOfBKLMHits() + recoTrackStoreArray[i]->getNumberOfEKLMHits() > 3
+                    && recoTrackStoreArray[j]->getNumberOfBKLMHits() + recoTrackStoreArray[j]->getNumberOfEKLMHits() > 3) {
+                  MergingTracks(recoTrackStoreArray[i], recoTrackStoreArray[j], mergedRecoTracks);
+                  // mergedTracks = true;
+                }
+              }
+            }
+          }
         }
       }
     }

@@ -36,21 +36,17 @@ namespace Belle2 {
       void initialize()
       {
         DBObjPtr<PXDClusterPositionEstimatorPar> dbObjPositionEstimator;
-        if (!dbObjPositionEstimator) {
-          // Check that we found the object and if not report the problem
-          B2FATAL("No PXDClusterPositionEstimator payload found.");
-        }
-        m_positionEstimatorPar = *dbObjPositionEstimator;
-
         DBObjPtr<PXDClusterShapeIndexPar> dbObjShapeIndex;
-        if (!dbObjShapeIndex) {
-          // Check that we found the object and if not report the problem
-          B2FATAL("No PXDClusterShapeIndexPar payload found.");
-        }
-        m_shapeIndexPar = *dbObjShapeIndex;
 
-        // Remember that payloads are initialized now
-        m_isInitialized = true;
+        if (dbObjPositionEstimator  && dbObjShapeIndex) {
+          m_positionEstimatorPar = *dbObjPositionEstimator;
+          m_shapeIndexPar = *dbObjShapeIndex;
+          m_isInitialized = true;
+        } else {
+          // Check that we found the objects and if not report the problem
+          // Keep low profile because there is always a fallback
+          B2WARNING("Cannot initialize PXDClusterPositionEstimator: At least one of the payloads PXDClusterPositionEstimatorPar and PXDClusterShapeIndexPar missing.");
+        }
       }
 
       /** Get initialization status. */

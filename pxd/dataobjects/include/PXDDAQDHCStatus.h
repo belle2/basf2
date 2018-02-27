@@ -108,6 +108,11 @@ namespace Belle2 {
     /** iterator-based iteration for DHEs */
     std::vector<PXDDAQDHEStatus>::iterator end()  { return m_pxdDHE.end(); };
 
+    /** const iterator-based iteration for DHEs */
+    std::vector<PXDDAQDHEStatus>::const_iterator cbegin() const { return m_pxdDHE.cbegin(); };
+    /** const iterator-based iteration for DHEs */
+    std::vector<PXDDAQDHEStatus>::const_iterator cend() const { return m_pxdDHE.cend(); };
+
     PXDDAQDHEStatus& dhe_back()  { return m_pxdDHE.back(); };
     size_t dhe_size() const { return m_pxdDHE.size(); };
 
@@ -123,7 +128,7 @@ namespace Belle2 {
     /** Vector of DHE informations belonging to this event */
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
-    ClassDef(PXDDAQDHCStatus, 1);
+    ClassDef(PXDDAQDHCStatus, 2);
 
   }; // class PXDDAQDHCStatus
 

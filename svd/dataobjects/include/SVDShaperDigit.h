@@ -226,6 +226,27 @@ namespace Belle2 {
      * @param cutMinSignal SN threshold
      * @return true if the strip have st least nSamples above threshold, false otherwise
      */
+    bool passesZS(int nSamples, float cutMinSignal) const
+    {
+      int nOKSamples = 0;
+      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++)
+        if (samples_vec[k] > cutMinSignal)
+          nOKSamples++;
+
+      if (nOKSamples >= nSamples)
+        return true;
+
+      return false;
+    }
+
+
+    /*
+     * mark the strip as hot
+     * @param max numner of samples above threshold
+     * @param SN threshold
+     * @return true if the strip is hot, false otherwise
+     */
     bool isHot(int nSamples, float cutMinSignal) const
     {
       int nHotSamples = 0;
@@ -274,12 +295,13 @@ namespace Belle2 {
 
   private:
 
-    VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU; /**< True if U, false if V. */
-    short m_cellID; /**< Strip coordinate in pitch units. */
+    VxdID::baseType m_sensorID = 0; /**< Compressed sensor identifier.*/
+    bool m_isU = false; /**< True if U, false if V. */
+    short m_cellID = 0; /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples; /**< 6 APV signals from the strip. */
-    int8_t m_FADCTime; /**< digit time estimate from the FADC, in ns */
-    SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
+    int8_t m_FADCTime = 0; /**< digit time estimate from the FADC, in ns */
+    SVDModeByte::baseType m_mode = SVDModeByte::c_DefaultID;
+    /**< Mode byte, trigger FADCTime + DAQ mode */
 
     ClassDef(SVDShaperDigit, 2)
 

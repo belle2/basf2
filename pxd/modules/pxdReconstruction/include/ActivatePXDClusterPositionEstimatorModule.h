@@ -9,28 +9,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "pxd/modules/pxdReconstruction/ActivatePXDCalibrationModule.h"
+#pragma once
 
-using namespace Belle2;
-using namespace Belle2::PXD;
-using namespace std;
-
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-REG_MODULE(ActivatePXDCalibration)
-
-ActivatePXDCalibrationModule::ActivatePXDCalibrationModule() : Module()
-{
-  //Set module properties
-  setDescription("Initialization of calibration constants for local PXD reconstruction");
-  setPropertyFlags(c_ParallelProcessingCertified);
-}
+#include <framework/core/Module.h>
 
 
-void ActivatePXDCalibrationModule::initialize()
-{
-  PXDClusterPositionEstimator::getInstance().initialize();
-}
+namespace Belle2 {
+  namespace PXD {
+
+    /** The ActivatePXDClusterPositionEstimator module.
+     *
+     * This module is responsible reading the calibration constants for local PXD
+     * cluster position estimation from the Database.
+     */
+    class ActivatePXDClusterPositionEstimatorModule : public Module {
+
+    public:
+
+      /** Constructor */
+      ActivatePXDClusterPositionEstimatorModule();
+
+      /** Initialize the module */
+      void initialize() override final;
+
+    };  //end class declaration
+
+  }  //end PXD namespace;
+}  // end namespace Belle2
 
 

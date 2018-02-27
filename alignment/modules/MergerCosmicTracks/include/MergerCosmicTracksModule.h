@@ -28,17 +28,19 @@ namespace Belle2 {
     void event() override;
 
     /// Merge cosmic tracks.
-    void MergingTracks(StoreArray<RecoTrack>, StoreArray<RecoTrack>);
+    void MergingTracks(RecoTrack*, RecoTrack*, StoreArray<RecoTrack>);
 
   private:
     /// StoreArray name from which to read the reco tracks.
     std::string m_param_recoTracksStoreArrayName = "";
     /// StoreArray name where the merged reco track is written.
-    std::string m_param_mergedRecoTracksStoreArrayName = "__MergedRecoTracks";
+    std::string m_param_mergedRecoTracksStoreArrayName = "CosmicRecoTracks";
     /// Flag to using magnetic field during reconstruction.
     bool m_usingMagneticField = true;
     /// Number of CDC hit per track required for cosmic track
     unsigned int m_minimumNumHitCut = 40;
+    /// Minimal PXD cluster size for used PXD hits in cosmic track
+    unsigned int m_minimumClusterSize = 0;
     /// Magnitude of cosmic tracks if magnetic field is not used.
     double m_magnitudeOfMomentumWithoutMagneticField;
   };

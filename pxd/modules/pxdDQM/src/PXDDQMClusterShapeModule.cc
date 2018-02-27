@@ -18,7 +18,6 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -111,9 +110,6 @@ void PXDDQMClusterShapeModule::initialize()
 
   StoreArray<PXDTrueHit> pxdtruehit(m_storePXDTrueHitsName);
   m_storePXDTrueHitsName = pxdtruehit.getName();
-
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  m_storeFramesName = storeFrames.getName();
 
   RelationArray relClustersTrueHits(pxdrecohit, pxdtruehit);
 }
@@ -946,7 +942,6 @@ void PXDDQMClusterShapeModule::event()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   const StoreArray<PXDRecoHit> pxdrecohit(m_storePXDRecoHitName);
 

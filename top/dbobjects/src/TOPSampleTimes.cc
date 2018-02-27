@@ -74,7 +74,7 @@ namespace Belle2 {
 
   double TOPSampleTimes::getSample(int window, double time) const
   {
-    time += getFullTime(window, 0);
+    time += window * getTimeRange() / 4.0;
     int n = int(time / getTimeRange());
     if (time < 0) n--;
 

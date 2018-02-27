@@ -523,10 +523,22 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
 
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
-  unsigned int ff55_lower_bits = 0;
+  unsigned int ff55_higher_bits = 0, ff55_lower_bits = 0;
 
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
     ff55_lower_bits = m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF;
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
       const int packet_crcerr_bit = 8;
@@ -547,18 +559,30 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
 
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
     ff55_lower_bits = (m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
       const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                __FILE__, __PRETTY_FUNCTION__, __LINE__);
       } else {
         m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
         printf("[FATAL] B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                __FILE__, __PRETTY_FUNCTION__, __LINE__);
       }
       PrintData(m_buffer, m_nwords);
@@ -568,18 +592,30 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
 
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
     ff55_lower_bits = (m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
       const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                __FILE__, __PRETTY_FUNCTION__, __LINE__);
       } else {
         m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
         printf("[FATAL] B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                __FILE__, __PRETTY_FUNCTION__, __LINE__);
       }
       PrintData(m_buffer, m_nwords);
@@ -587,18 +623,31 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       exit(1);
     }
   }
+
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
     ff55_lower_bits = (m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
       const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                __FILE__, __PRETTY_FUNCTION__, __LINE__);
       } else {
         printf("[FATAL] B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                __FILE__, __PRETTY_FUNCTION__, __LINE__);
       }
       PrintData(m_buffer, m_nwords);

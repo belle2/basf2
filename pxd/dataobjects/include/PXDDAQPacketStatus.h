@@ -100,6 +100,11 @@ namespace Belle2 {
     /** iterator-based iteration for DHCs */
     std::vector<PXDDAQDHCStatus>::iterator end()  { return m_pxdDHC.end(); };
 
+    /** const iterator-based iteration for DHCs */
+    std::vector<PXDDAQDHCStatus>::const_iterator cbegin() const { return m_pxdDHC.cbegin(); };
+    /** const iterator-based iteration for DHCs */
+    std::vector<PXDDAQDHCStatus>::const_iterator cend() const { return m_pxdDHC.cend(); };
+
     PXDDAQDHCStatus& dhc_back()  { return m_pxdDHC.back(); };
     size_t dhc_size() const { return m_pxdDHC.size(); };
 
@@ -113,7 +118,7 @@ namespace Belle2 {
     /** Vector of DHC informations beloning to this event */
     std::vector <PXDDAQDHCStatus> m_pxdDHC;
 
-    ClassDef(PXDDAQPacketStatus, 1);
+    ClassDef(PXDDAQPacketStatus, 2);
 
   }; // class PXDDAQPacketStatus
 

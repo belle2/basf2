@@ -84,7 +84,7 @@ void eventCallback(struct event_handler_args eha)
       g_callback->set(pvname, pvdata);
       LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       std::string val = pvdata;
-      if (pvname == "B2.PXD.RC.State.cur.S") {
+      if (strcmp(pvname_c, PXDRCCallback::pvRCcur) == 0) {
         if (val == "NOTREADY") {
           g_callback->setState(RCState::NOTREADY_S);
         } else if (val == "READY") {
@@ -95,6 +95,8 @@ void eventCallback(struct event_handler_args eha)
           g_callback->setState(RCState::LOADING_TS);
         } else if (val == "UNLOADING") {
           g_callback->setState(RCState::ABORTING_RS); // There is no unloading state yet
+        } else if (val == "ABORTING") {
+          g_callback->setState(RCState::ABORTING_RS);
         } else if (val == "STARTING") {
           g_callback->setState(RCState::STARTING_TS);
         } else if (val == "STOPPING") {

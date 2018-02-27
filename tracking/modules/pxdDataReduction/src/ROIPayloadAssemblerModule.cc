@@ -64,7 +64,7 @@ void ROIPayloadAssemblerModule::initialize()
   eventMetaData.isRequired();
 
   StoreObjPtr<ROIpayload> roiPayloads;
-  roiPayloads.registerInDataStore(m_ROIpayloadName);
+  roiPayloads.registerInDataStore(m_ROIpayloadName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
 
 }
 

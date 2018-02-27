@@ -1,4 +1,4 @@
-mdst
-framework
-mva
-skim
+mdst/*
+framework/*
+mva/*
+skim/*

@@ -45,6 +45,9 @@ def main():
     abs_working_folder = os.path.abspath(working_folder)
     abs_db_target = os.path.join(abs_working_folder, "local_db")
     hlt_steering_file = Belle2.FileSystem.findFile(args.hlt_script)
+    if not hlt_steering_file:
+        print("Steering file not found, aborting !")
+        return 1
 
     gc_config = gridcontrol_helper.write_gridcontrol_hlt_test(working_folder=abs_working_folder,
                                                               hlt_steering_file=hlt_steering_file,

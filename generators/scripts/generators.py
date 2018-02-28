@@ -139,15 +139,21 @@ def add_evtgen_generator(path, finalstate=''):
     )
 
 
-def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenparticledata=0):
+def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticledata=0, *, skip_on_failure=True):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
+
+    See Also:
+        `add_inclusive_continuum_generator()` to add continuum generation with preselected particles
 
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate (str): uubar, ddbar, ssbar, ccbar
         userdecfile (str): EvtGen decfile used for particle decays
-        useevtgenparticledata (bool): Experimental feature to use a consistent set of particle properties between EvtGen and PYTHIA
+        useevtgenparticledata (bool): Experimental feature to use a consistent
+            set of particle properties between EvtGen and PYTHIA
+        skip_on_failure (bool): If True stop event processing right after
+            fragmentation fails. Otherwise continue normally
     """
 
     #: kkmc input file, one for each qqbar mode
@@ -209,10 +215,55 @@ def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenpartic
         useEvtGenParticleData=useevtgenparticledata
     )
 
-    # branch to an empty path if PYTHIA failed, this will change the number of events
-    # but the file meta data will contain the total number of generated events
-    generator_emptypath = create_path()
-    fragmentation.if_value('<1', generator_emptypath)
+    if skip_on_failure:
+        # branch to an empty path if PYTHIA failed, this will change the number of events
+        # but the file meta data will contain the total number of generated events
+        generator_emptypath = create_path()
+        fragmentation.if_value('<1', generator_emptypath)
+
+
+def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='',
+                                      useevtgenparticledata=0, *, include_conjugates=True, max_iterations=100000):
+    """
+    Add continuum generation but require at least one of the given particles be
+    present in the event.
+
+    For example to only generate ccbar events which contain a "D*+" or an
+    electron one could would use
+
+    >>> add_inclusive_continuum_generator(path, "ccbar", ["D*+", 11])
+
+    If you are unsure how the particles are named in Belle II please have a look
+    at the ``b2help-particles`` executable or the `pdg` python module.
+
+    See Also:
+        `add_continuum_generator()` to add continuum generation without preselection
+
+    Parameters:
+        finalstate (str): uubar, ddbar, ssbar, ccbar
+        particles (list): A list of particle names or pdg codes. An event is
+           only accepted if at lease one of those particles appears in the event.
+        userdecfile (str): EvtGen decfile used for particle decays
+        useevtgenparticledata (bool): Experimental feature to use a consistent
+            set of particle properties between EvtGen and PYTHIA
+        include_conjugates (bool): If True (default) accept the event also if a
+            charge conjugate of the given particles is found
+        max_iterations (int): maximum tries per event to generate the requested
+            particle. If exceeded processing will be stopped with a
+            `FATAL <LogLevel.FATAL>` error so for rare particles one might need a
+            larger number.
+    """
+    loop_path = create_path()
+    # we might run this more than once so make sure we remove any particles
+    # before generating new ones
+    loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
+    # add the generator but make sure it doesn't stop processing on
+    # fragmentation failure as is this currently not supported by do_while
+    add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
+    # check for the particles we want
+    loop_path.add_module("InclusiveParticleChecker", particles=particles)
+    # Done, add this to the path and iterate it until we found our particle
+    path.do_while(loop_path, max_iterations=max_iterations)
 
 
 def add_bhwide_generator(path, minangle=0.5):

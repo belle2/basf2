@@ -203,8 +203,8 @@ namespace Belle2 {
     h_hitsPerTrack->Reset();
 
     for (int i = 0; i < 6; i++) {
-      h_secTheta[i] = {};
-      h_secHitsPerTrack[i] = {};
+      h_secTheta[i]->Reset();
+      h_secHitsPerTrack[i]->Reset();
     }
 
   }
@@ -308,8 +308,7 @@ namespace Belle2 {
 
       std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
       int nPhoton = 0;
-      for (int i = 0; i < (int)photons.size(); i++) {
-        auto& photon(photons[i]);
+      for (auto& photon : photons) {
         h_theta->Fill(photon.getThetaCer());
         h_secTheta[sector]->Fill(photon.getThetaCer());
         nPhoton++;

@@ -68,6 +68,9 @@ namespace Belle2 {
 
     bool m_isSimulation;
 
+    float m_edgeU;
+    float m_edgeV;
+    float m_minPVal;
 
     std::string m_shapersName; /**< SVDShaperDigits name */
     std::string m_recoTrackListName; /**< Track list name */
@@ -151,6 +154,7 @@ namespace Belle2 {
     //ROI stuff
     TH2F* m_h2ROIuMinMax;
     TH2F* m_h2ROIvMinMax;
+    TH2F* m_h2ROIcenters;
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
     TH1F* m_h1goodROIs; /**< distribution of number of ROIs containin a SVDShaperDigit, DATA*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/

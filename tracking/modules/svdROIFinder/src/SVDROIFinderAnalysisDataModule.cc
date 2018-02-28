@@ -136,6 +136,10 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   addParam("ROIListName", m_ROIListName,
            "name of the list of ROIs", std::string(""));
 
+  addParam("edgeU", m_edgeU, "fiducial region: edge U [mm]", float(10));
+  addParam("edgeV", m_edgeV, "fiducial region: edge V [mm]", float(10));
+  addParam("minPVal", m_minPVal, "fiducial region: minimum track P-Value", float(0.001));
+
   m_rootEvent = 0;
 }
 
@@ -196,7 +200,7 @@ void SVDROIFinderAnalysisDataModule::initialize()
 
   m_h2ROIuMinMax = new TH2F("h2ROIuMinMax", "u Min vs Max", 960, -100, 860, 960, -100, 860);
   m_h2ROIvMinMax = new TH2F("h2ROIvMinMax", "v Min vs Max", 960, -100, 860, 960, -100, 860);
-
+  m_h2ROIcenters = new TH2F("h2ROIcenters", "Good ROI Centers", 768, 0, 768, 512, 0, 512);
 
   //analysis
   /*  Double_t lowBin[6 + 1];
@@ -299,7 +303,7 @@ void SVDROIFinderAnalysisDataModule::event()
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(theIntercept[0]);
 
     if (!theRC[0]->wasFitSuccessful())
-      break;
+      continue;
 
     RelationVector<Track> theTrack = DataStore::getRelationsWithObj<Track>(theRC[0]);
 
@@ -315,12 +319,47 @@ void SVDROIFinderAnalysisDataModule::event()
     m_h1ROItrack_nSVDhits->Fill(theRC[0]->getNumberOfSVDHits());
     m_h1ROItrack_nCDChits->Fill(theRC[0]->getNumberOfCDCHits());
 
-    if (tfr->getPValue() < 0.001)
-      break;
+    if (tfr->getPValue() < m_minPVal)
+      continue;
+
+    float centerROIU = (m_ROIs[i]->getMaxUid() + m_ROIs[i]->getMinUid()) / 2;
+    float centerROIV = (m_ROIs[i]->getMaxVid() + m_ROIs[i]->getMinVid()) / 2;
+
+    VxdID sensorID = m_ROIs[i]->getSensorID();
+
+    float nStripsU = 768;
+    float nStripsV = 512;
+    float centerSensorU = nStripsU / 2;
+    float centerSensorV = nStripsV / 2;
+    float pitchU = 0.075; //mm
+    float pitchV = 0.240; //mm
+
+    if (sensorID.getLayerNumber() == 3) {
+      nStripsV = 768;
+      pitchU = 0.050;
+      pitchV = 0.160;
+    }
+
+    float edgeStripsU = m_edgeU / pitchU;
+    float edgeStripsV = m_edgeV / pitchV;
+    B2DEBUG(10, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
+    B2DEBUG(10, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
+
+    B2DEBUG(10, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
+    B2DEBUG(10, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
+
+    if ((abs(centerROIU - centerSensorU) > centerSensorU - edgeStripsU)
+        || (abs(centerROIV - centerSensorV) > centerSensorV - edgeStripsV))
+      continue;
 
     nGoodROIs++;
+    m_h2ROIcenters->Fill(centerROIU, centerROIV);
 
-    m_h1GoodROItrack->Fill(1);
+    B2RESULT("");
+    B2RESULT("GOOD ROI " << sensorID.getLayerNumber() << "." << sensorID.getLadderNumber() << "." << sensorID.getSensorNumber() <<
+             ": U side " << m_ROIs[i]->getMinUid() << "->" << m_ROIs[i]->getMaxUid() << ", V side " << m_ROIs[i]->getMinVid() << "->" <<
+             m_ROIs[i]->getMaxVid());
+
     m_h1GoodROItrack_pt->Fill(mom.Perp());
     m_h1GoodROItrack_phi->Fill(mom.Phi());
     m_h1GoodROItrack_cosTheta->Fill(mom.CosTheta());
@@ -342,6 +381,7 @@ void SVDROIFinderAnalysisDataModule::event()
         m_h1FullROItrack_nSVDhits->Fill(theRC[0]->getNumberOfSVDHits());
         m_h1FullROItrack_nCDChits->Fill(theRC[0]->getNumberOfCDCHits());
 
+        B2RESULT("  --> is Full");
         break;
       }
 
@@ -365,16 +405,10 @@ void SVDROIFinderAnalysisDataModule::event()
 
   m_rootEvent++;
 
-  if (nGoodROIs > 0) {
-    B2RESULT(" o  SVDROIFinder ANALYSIS: good ROIs = " << nGoodROIs << ", with shapers = " << nOkROIs);
+  if (nGoodROIs > 0)
+    B2RESULT(" o  Good ROIs = " << nGoodROIs << ", of which Full = " << nOkROIs
+             << " --> efficiency = " << (float)nOkROIs / nGoodROIs);
 
-    for (int i = 0; i < m_ROIs.getEntries(); i++) {
-      VxdID sensor = m_ROIs[i]->getSensorID();
-      B2RESULT(i + 1 << ") ROI " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." << sensor.getSensorNumber() <<
-               ": U side " << m_ROIs[i]->getMinUid() << "->" << m_ROIs[i]->getMaxUid() << ", V side " << m_ROIs[i]->getMinVid() << "->" <<
-               m_ROIs[i]->getMaxVid());
-    }
-  }
   if (nGoodROIs > m_ROIs.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
 
 }
@@ -485,6 +519,7 @@ void SVDROIFinderAnalysisDataModule::terminate()
     m_h1okROIs->Write();
     m_h2ROIuMinMax->Write();
     m_h2ROIvMinMax->Write();
+    m_h2ROIcenters->Write();
 
     m_rootFilePtr->Close();
 

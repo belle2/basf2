@@ -105,7 +105,7 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& /*obj*/)
   //== Data values (16 channels), used in threshold setting and in shaper register readout.
   int addr;
   for (int i = 0; i < 16; i++) {
-    std::string thrname = StringUtil::form("data%d", i + 1);
+    std::string thrname = StringUtil::form("data_reg%d", i + 1);
     addr = 0xC0 + i;
     callback.add(new FEE32Handler(vname + thrname,              callback, hslb, *this, addr));
   }
@@ -113,17 +113,6 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& /*obj*/)
 
 void ECLFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
-  callback.log(LogFile::INFO, "Boot ecl[%d] with config %s",
-               hslb.get_finid(), obj.getName().c_str());
-
-  // Disabled for now.
-  //
-  // callback.log(LogFile::INFO, "Loading shaper firmware");
-  // loadShFw(callback, hslb, obj);
-  // callback.log(LogFile::INFO, "Loading shaper coefficients");
-  // loadShCoefs(callback, hslb, obj);
-  // callback.log(LogFile::INFO, "Loading shaper parameters");
-  // loadShPars(callback, hslb, obj);
 }
 
 void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
@@ -143,7 +132,7 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
       // Print description for custom register into log
       callback.log(LogFile::INFO, "ecl[%d]: write shaper reg0x%x val0x%x (%s)",
                    slot, reg_num, reg_wdata,
-                   o_sh_data.getText("info"));
+                   o_sh_data.getText("info").c_str());
       rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
     }
   }
@@ -185,8 +174,8 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
       std::string type       = o_col_data.getText("type");
       // Print description for custom register into log
       callback.log(LogFile::INFO, "ecl[%d]: write%s reg0x%x val0x%x (%s)",
-                   slot, type, reg_num, reg_wdata,
-                   o_col_data.getText("info"));
+                   slot, type.c_str(), reg_num, reg_wdata,
+                   o_col_data.getText("info").c_str());
       if (type == "fee8") {
         hslb.writefee8(reg_num, reg_wdata);
       } else if (type == "fee32") {
@@ -205,7 +194,7 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
       // Print description for custom register into log
       callback.log(LogFile::INFO, "ecl[%d]: write shaper reg0x%x val0x%x (%s)",
                    slot, reg_num, reg_wdata,
-                   o_sh_data.getText("info"));
+                   o_sh_data.getText("info").c_str());
       rio_sh_wreg(callback, hslb, sh_num, reg_num, reg_wdata);
     }
   }
@@ -294,63 +283,6 @@ int ECLFEE::getShapersInCollector(int col)
   return 8;
 }
 
-/********************** BOOT PROCEDURES **********************/
-
-void ECLFEE::loadShFw(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
-  const int flash_addr = 0xA7000000;
-  const int mask = 0xFFF;
-
-  hslb.writefee32(0x00B0, flash_addr);
-  hslb.writefee32(0x00B2, mask);
-  // Issue 'boot shapers' command
-  hslb.writefee32(0x00B8, 0x1);
-}
-
-void ECLFEE::loadShCoefs(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
-  int col      = getCprCollector(hslb.get_finid(), obj.getName());
-  int sh_count = getShapersInCollector(col);
-
-  const unsigned int ecldsp_addr[12] = {
-    0xA8000000, 0xAA000000, 0xAC000000, 0xAE000000,
-    0xB0000000, 0xB2000000, 0xB4000000, 0xB6000000,
-    0xB8000000, 0xBA000000, 0xBC000000, 0xBE000000
-  };
-
-  for (int sh = 0; sh < sh_count; sh++) {
-    hslb.writefee32(0x00B0, ecldsp_addr[sh]);
-    hslb.writefee32(0x00B2, 1 << sh);
-    // Issue 'write DSP coefs from flash' command
-    hslb.writefee32(0x00B8, 0x2);
-  }
-}
-
-void ECLFEE::loadShPars(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x502, obj.getInt("thread_af"));
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x500, obj.getInt("trbuf"));
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x501, obj.getInt("uthread_af"));
-
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x200, obj.getInt("shaper_proc_mask"));
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x210, obj.getInt("shaper_proc_num"));
-
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x208, obj.getInt("shaper_adc_mask"));
-  rio_sh_wreg(callback, hslb, 0xFFF, 0x218, obj.getInt("shaper_adc_num"));
-
-  // TODO: Add RELAY_G and connected values
-
-  callback.log(LogFile::INFO, "Loading shaper parameters: ADC comp");
-  writeADCComp(callback, hslb, obj);
-
-  callback.log(LogFile::INFO, "Loading shaper parameters: potentiometer");
-  writeAttnData(callback, hslb, obj);
-
-  callback.log(LogFile::INFO, "Loading shaper parameters: thresholds");
-  for (int thr_type = 0; thr_type < 3; thr_type++)
-    writeThresholds(callback, hslb, obj, thr_type);
-}
-
 /********************** SHAPER OPERATIONS **********************/
 
 void ECLFEE::rio_sh_wreg(RCCallback& callback, HSLB& hslb, unsigned int sh_num, unsigned int reg_num, unsigned int reg_wdata)
@@ -364,139 +296,6 @@ void ECLFEE::rio_sh_wreg(RCCallback& callback, HSLB& hslb, unsigned int sh_num, 
   callback.log(LogFile::INFO, "read 0x00B8>>0x%x", hslb.readfee32(0x00B8));
   callback.log(LogFile::INFO, "read 0x00B9>>0x%x", hslb.readfee32(0x00B9));
   // callback.log(LogFile::INFO, "read 0x00B8>>0x%x", hslb.readfee32(0x00B8));
-}
-
-void ECLFEE::writeToShaper(RCCallback& callback, HSLB& hslb, const DBObject& obj,
-                           const char* base_name, int b8_cmd,
-                           std::function<void (int mask, int vals[16])> write_reg,
-                           bool value_per_channel)
-{
-  // ECL_MAX_SHAPERS = 12;
-  // ECL_SHAPER_CHAN = 16;
-  int vals[12][16];
-  int mask     = 1;
-  int col      = getCprCollector(hslb.get_finid(), obj.getName());
-  int sh_count = getShapersInCollector(col);
-
-  // This function tries to optimize writing to shapers:
-  // If several consecutive shapers have same parameters, they are combined
-  // into single data package with SHAPER_MASK == write_mask.
-  int write_mask = 0;
-
-  //== Reading values from the database
-
-  for (int sh = 1; sh <= sh_count; sh++) {
-    if (value_per_channel) {
-      for (int ch = 1; ch <= 16; ch++) {
-        vals[sh - 1][ch - 1] = obj.getInt(getValName(obj, base_name, col, sh, ch));
-      }
-    } else {
-      vals[sh - 1][0] = obj.getInt(getValName(obj, base_name, col, sh, -1));
-    }
-
-    // Check if values of previous shaper are the same.
-
-    if (sh == 1) {
-      write_mask = mask;
-    } else {
-      if (value_per_channel) {
-        int ch;
-        for (ch = 1; ch <= 16; ch++) {
-          if (vals[sh - 1][ch - 1] != vals[sh - 2][ch - 1]) break;
-        }
-        // If all elements are equal, add to write_mask:
-        if (ch == 17) write_mask |= mask;
-        else {
-          write_reg(write_mask, vals[sh]);
-          write_mask = mask;
-        }
-      } else {
-        // If elements are equal, add to write_mask:
-        if (vals[sh - 1][0] == vals[sh - 2][0]) write_mask |= mask;
-        else {
-          write_reg(write_mask, vals[sh]);
-          write_mask = mask;
-        }
-      }
-    }
-
-    if (sh == sh_count) {
-      write_reg(write_mask, vals[sh - 1]);
-    }
-
-    mask <<= 1;
-  }
-
-  if (b8_cmd > 0) {
-    // Issue write command into ShaperDSPs
-    hslb.writefee32(0x00B8, b8_cmd);
-  }
-}
-
-/**
- * @param threshold_type
- *        0-hit, 1-low ampl, 2-skip ampl
- */
-void ECLFEE::writeThresholds(RCCallback& callback, HSLB& hslb, const DBObject& obj,
-                             int threshold_type)
-{
-  std::string base_name = StringUtil::form("thr%d", threshold_type);
-
-  writeToShaper(callback, hslb, obj, base_name.c_str(), 0x40,
-  [&](int mask, int vals[16]) {
-    hslb.writefee32(0x00B2, mask);
-    hslb.writefee32(0x00B4, threshold_type);
-
-    int thr_addr = 0x00C0;
-    for (int ch = 0; ch < 16; ch++) {
-      // Converting low ampl threshold and skip threshold values from
-      // ADC energy units to internal format used by shaper board.
-      if (threshold_type != 0) vals[ch] += 128;
-
-      hslb.writefee32(thr_addr, vals[ch]);
-      thr_addr += 2;
-    }
-  });
-}
-
-// Write potentiometer (aka attenuator) data.
-void ECLFEE::writeAttnData(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
-  const int attn_data_reg = 0x30;
-  const int attn_addr_reg = 0x31;
-
-  writeToShaper(callback, hslb, obj, "pot", 0,
-  [&](int mask, int vals[16]) {
-    int pot_addr = 0x10;
-    for (int ch = 0; ch < 16; ch++) {
-      rio_sh_wreg(callback, hslb, mask, attn_data_reg, vals[ch]);
-      rio_sh_wreg(callback, hslb, mask, attn_addr_reg, pot_addr);
-      pot_addr++;
-    }
-  });
-}
-
-void ECLFEE::writeADCComp(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
-  writeToShaper(callback, hslb, obj, "comp", 0,
-  [&](int mask, int vals[16]) {
-    int adc_comp_addr = 0x020;
-    for (int ch = 0; ch < 16; ch++) {
-      rio_sh_wreg(callback, hslb, mask, adc_comp_addr, vals[ch]);
-      adc_comp_addr++;
-    }
-  });
-}
-
-void ECLFEE::writeRelays(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
-  const int sh_relay_addr = 0x040;
-
-  writeToShaper(callback, hslb, obj, "relay", 0,
-  [&](int mask, int vals[16]) {
-    rio_sh_wreg(callback, hslb, mask, sh_relay_addr, vals[0]);
-    usleep(100000);
-  }, false);
 }
 
 /************************************************/

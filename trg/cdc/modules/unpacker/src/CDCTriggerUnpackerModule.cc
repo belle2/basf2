@@ -12,6 +12,7 @@
 
 #include <array>
 #include <bitset>
+#include <queue>
 #include <string>
 #include <sstream>
 #include <utility>
@@ -127,6 +128,7 @@ namespace Belle2 {
     unsigned numTS;
     unsigned offsetBitWidth;
     static constexpr unsigned TSWidth = 21;
+    using word = std::bitset<wordWidth>;
     /** reserve */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
     {
@@ -175,11 +177,32 @@ namespace Belle2 {
         return;
       }
 
+      // Recently, the content of the last clock appears at the beginning.
+      // Now we decide whether we will change the order of the clocks
+      // based on the 127MHz counter on the 2nd half of the first word [15:0]
+      int ccShift = 0;
+      std::queue<word> counters;
+      for (int iclock = 0; iclock < inputArrayPtr->getEntries(); ++iclock) {
+        counters.emplace(data32tab[iFinesse][headerSize + eventWidth * iclock]);
+      }
+      while (counters.front().to_ulong() > counters.back().to_ulong()) {
+        counters.push(counters.front());
+        counters.pop();
+        ccShift++;
+      }
+      if (ccShift) {
+        B2DEBUG(20, "shifting the first " << ccShift <<
+                " clock(s) to the end for " << name);
+      }
+
       // get event body information
       // make bitstream
       // loop over all clocks
       for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
-        int iclock = (i - headerSize) / eventWidth;
+        int iclock = (i - headerSize) / eventWidth - ccShift;
+        if (iclock < 0) {
+          iclock += inputArrayPtr->getEntries();
+        }
         auto inputClock = (*inputArrayPtr)[iclock];
         auto outputClock = (*outputArrayPtr)[iclock];
         // clear output bitstream

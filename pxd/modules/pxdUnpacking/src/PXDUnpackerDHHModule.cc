@@ -575,7 +575,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static unsigned int dhe_first_readout_frame_id_lo = 0;
-  static unsigned int dhe_first_offset = 0;
+  static unsigned int dhe_first_triggergate = 0;
   static unsigned int currentDHCID = 0xFFFFFFFF;
   static unsigned int currentDHEID = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
@@ -696,7 +696,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
                  dhc.data_direct_readout_frame->getDHEId(),
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
-                 dhe_first_offset, currentVxdId, daqpktstat);
+                 dhe_first_triggergate, currentVxdId, daqpktstat);
 
       break;
     };
@@ -783,7 +783,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       last_dhp_readout_frame_lo[3] = -1;
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
-      dhe_first_offset = dhc.data_dhe_start_frame->getTriggerOffsetRow();
+      dhe_first_triggergate = dhc.data_dhe_start_frame->getTriggerGate();
       if (currentDHEID != 0xFFFFFFFF && (currentDHEID & 0xFFFF) >= dhc.data_dhe_start_frame->getDHEId()) {
         B2ERROR("DHH IDs are not in expected order! " << (currentDHEID & 0xFFFF) << " >= " << dhc.data_dhe_start_frame->getDHEId());
         m_errorMask |= EPXDErrMask::c_DHE_WRONG_ID_SEQ;
@@ -843,7 +843,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 
       if (daqpktstat.dhc_size() > 0) {
         // if no DHC has been defined yet, do nothing!
-        daqpktstat.dhc_back().newDHE(currentVxdId, currentDHEID, m_errorMask, dhe_first_offset, dhe_first_readout_frame_id_lo);
+        daqpktstat.dhc_back().newDHE(currentVxdId, currentDHEID, m_errorMask, dhe_first_triggergate, dhe_first_readout_frame_id_lo);
       }
       break;
     };

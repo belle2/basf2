@@ -83,12 +83,12 @@ void PXDUnpackerModule::initialize()
 {
   m_storeRawPXD.isRequired(m_RawPXDsName);
   //Register output collections
-  m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
-  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
-  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName);
-  m_storeROIs.registerInDataStore(m_PXDRawROIsName);
-  m_storeDAQEvtStats.registerInDataStore();
-  m_storeRawCluster.registerInDataStore(m_RawClusterName);
+  m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeDAQEvtStats.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
   B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);
@@ -624,7 +624,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static unsigned int dhe_first_readout_frame_id_lo = 0;
-  static unsigned int dhe_first_offset = 0;
+  static unsigned int dhe_first_triggergate = 0;
   static unsigned int currentDHCID = 0xFFFFFFFF;
   static unsigned int currentDHEID = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
@@ -746,7 +746,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                  dhc.data_direct_readout_frame->getDHEId(),
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
-                 dhe_first_offset, currentVxdId, daqpktstat);
+                 dhe_first_triggergate, currentVxdId, daqpktstat);
 
       break;
     };
@@ -861,7 +861,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       last_dhp_readout_frame_lo[3] = -1;
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
-      dhe_first_offset = dhc.data_dhe_start_frame->getTriggerOffsetRow();
+      dhe_first_triggergate = dhc.data_dhe_start_frame->getTriggerGate();
       if (currentDHEID != 0xFFFFFFFF && (currentDHEID & 0xFFFF) >= dhc.data_dhe_start_frame->getDHEId()) {
         B2ERROR("DHH IDs are not in expected order! " << (currentDHEID & 0xFFFF) << " >= " << dhc.data_dhe_start_frame->getDHEId());
         m_errorMask |= EPXDErrMask::c_DHE_WRONG_ID_SEQ;
@@ -914,7 +914,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMaskDHE = m_errorMask; // forget about anything before this frame
       if (daqpktstat.dhc_size() > 0) {
         // if no DHC has been defined yet, do nothing!
-        daqpktstat.dhc_back().newDHE(currentVxdId, currentDHEID, m_errorMask, dhe_first_offset, dhe_first_readout_frame_id_lo);
+        daqpktstat.dhc_back().newDHE(currentVxdId, currentDHEID, m_errorMask, dhe_first_triggergate, dhe_first_readout_frame_id_lo);
       }
       break;
     };

@@ -14,8 +14,8 @@
 #include <framework/core/Module.h>
 #include <rawdata/dataobjects/RawTRG.h>
 #include <framework/datastore/StoreArray.h>
-#include <trg/cdc/dataobjects/Bitstream.h>
 
+#include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/Unpacker.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
@@ -44,21 +44,68 @@ namespace Belle2 {
   struct SubTrigger {
     SubTrigger(std::string inName,
                unsigned inEventWidth, unsigned inOffset,
-               unsigned inHeaderSize, std::vector<int> inNodeID,
-               int inDebugLevel = 0) :
+               int inHeaderSize, std::vector<int> inNodeID,
+               int& inDelay, int inDebugLevel = 0) :
       name(inName), eventWidth(inEventWidth), offset(inOffset),
-      headerSize(inHeaderSize), iNode(inNodeID.front()), iFinesse(inNodeID.back()),
+      headerSize(inHeaderSize), iNode(inNodeID.front()),
+      iFinesse(inNodeID.back()), delay(inDelay),
       debugLevel(inDebugLevel) {};
 
     std::string name;
     unsigned eventWidth;
     unsigned offset;
-    unsigned headerSize;
+    int headerSize;
     int iNode;
     int iFinesse;
+
+    /** information from Belle2Link header */
+    std::string firmwareType;
+    std::string firmwareVersion;
+    /** reference to the Belle2Link delay member attribute */
+    int& delay;
+
     int debugLevel;
+
     virtual void reserve(int, std::array<int, nFinesse>) {};
     virtual void unpack(int, std::array<int*, nFinesse>, std::array<int, nFinesse>) {};
+
+    /** Get the B2L header information */
+    virtual void getHeaders(int subDetectorId,
+                            std::array<int*, 4> data32tab,
+                            std::array<int, 4> nWords)
+    {
+      if (subDetectorId != iNode) {
+        return;
+      }
+      if (nWords[iFinesse] < headerSize) {
+        return;
+      }
+      /* get event header information
+       * Ideally, these parameters should not change in the same run,
+       * so it is more efficiency to do it in beginRun().
+       * However, since they are present in all events,
+       * let's check if they really remain unchanged.
+       */
+      if (headerSize >= 2) {
+        firmwareType = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse)[0]);
+        firmwareVersion = CDCTriggerUnpacker::rawIntToString(data32tab.at(iFinesse)[1]);
+        // get the Belle2Link delay
+        // TODO: what is the exact date that this word is introduced?
+        if (headerSize >= 3 || firmwareVersion > "17121900") {
+          std::bitset<wordWidth> thirdWord(data32tab.at(iFinesse)[2]);
+          int newDelay = CDCTriggerUnpacker::subset<32, 12, 20>(thirdWord).to_ulong();
+          if (delay > 0 && delay != newDelay) {
+            B2WARNING(" the Belle2Link delay for " << name <<
+                      "has changed from " << delay << " to " << newDelay << "!");
+          }
+          delay = newDelay;
+        }
+        B2DEBUG(50, name << ": " << firmwareType << ", version " <<
+                firmwareVersion << ", node " << std::hex << iNode <<
+                ", finesse " << iFinesse << ", delay: " << delay);
+      }
+    };
+
     virtual ~SubTrigger() {};
   };
 
@@ -123,8 +170,11 @@ namespace Belle2 {
     /** debug level specified in the steering file */
     int m_debugLevel;
 
+    /** Belle2Link delay of the merger reader */
+    int m_mergerDelay = 0;
+
     /** Belle2Link delay of the 2D finder */
-    short m_2DFinderDelay = 0;
+    int m_2DFinderDelay = 0;
 
     std::vector<SubTrigger*> m_subTrigger;
 

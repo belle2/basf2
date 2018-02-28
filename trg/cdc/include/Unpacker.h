@@ -5,6 +5,7 @@
 #include <bitset>
 #include <numeric>
 #include <cmath>
+#include <algorithm>
 
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>

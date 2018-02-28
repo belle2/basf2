@@ -38,29 +38,34 @@ namespace Belle2 {
   struct Merger : SubTrigger {
     Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
            unsigned inEventWidth, unsigned inOffset,
-           unsigned inHeaderSize, std::vector<int> inNodeID,
-           unsigned inNInnerMergers, int inDebugLevel) :
+           int inHeaderSize, std::vector<int> inNodeID,
+           unsigned inNInnerMergers, int& inDelay,
+           int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset, inHeaderSize, inNodeID,
-                 inDebugLevel),
+                 inDelay, inDebugLevel),
       arrayPtr(inArrayPtr),
       nInnerMergers(inNInnerMergers) {};
 
     StoreArray<MergerBits>* arrayPtr;
     unsigned nInnerMergers;
-    /** reserve */
+    /** reserve enough number of clocks (entries) in the Bitstream StoreArray */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
     {
+      if (subDetectorId != iNode) {
+        return;
+      }
+      if (nWords[iFinesse] < headerSize) {
+        return;
+      }
       size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = arrayPtr->getEntries();
-      if (subDetectorId == iNode) {
-        if (entries == 0) {
-          for (unsigned i = 0; i < nClocks; ++i) {
-            arrayPtr->appendNew();
-          }
-          B2DEBUG(20, name << ": " << nClocks << " clocks");
-        } else if (entries != nClocks) {
-          B2ERROR("Number of clocks in " << name << "conflicts with others!");
+      if (entries == 0) {
+        for (unsigned i = 0; i < nClocks; ++i) {
+          arrayPtr->appendNew();
         }
+        B2DEBUG(20, name << ": " << nClocks << " clocks");
+      } else if (entries != nClocks) {
+        B2ERROR("Number of clocks in " << name << " conflicts with others!");
       }
     };
 
@@ -71,12 +76,12 @@ namespace Belle2 {
       if (subDetectorId != iNode) {
         return;
       }
-      // get header information
-      std::string firmwareType = rawIntToAscii(data32tab.at(iFinesse)[0]);
-      std::string firmwareVersion = rawIntToString(data32tab.at(iFinesse)[1]);
-      B2DEBUG(90, name << ", " << firmwareType << ", version " << firmwareVersion
-              << ", node " << std::hex << iNode << ", finesse " << iFinesse);
-
+      if (nWords[iFinesse] < headerSize) {
+        B2WARNING("The module " << name << " does not have enough data (" <<
+                  nWords[iFinesse] << "). Nothing will be unpacked.");
+        // TODO: need to clear the output bitstream because we return early here
+        return;
+      }
       // make bitstream
       // loop over all clocks
       for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
@@ -109,9 +114,9 @@ namespace Belle2 {
               StoreArray<T2DOutputBitStream>* outArrayPtr,
               std::string inName, unsigned inEventWidth, unsigned inOffset,
               unsigned inHeaderSize, std::vector<int> inNodeID,
-              unsigned inNumTS, int inDebugLevel) :
+              unsigned inNumTS, int& inDelay, int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset / 32, inHeaderSize, inNodeID,
-                 inDebugLevel),
+                 inDelay, inDebugLevel),
       inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
       numTS(inNumTS), offsetBitWidth(inOffset) {};
@@ -125,18 +130,22 @@ namespace Belle2 {
     /** reserve */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
     {
+      if (subDetectorId != iNode) {
+        return;
+      }
+      if (nWords[iFinesse] < headerSize) {
+        return;
+      }
       size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = inputArrayPtr->getEntries();
-      if (subDetectorId == iNode) {
-        if (entries == 0) {
-          for (unsigned i = 0; i < nClocks; ++i) {
-            inputArrayPtr->appendNew();
-            outputArrayPtr->appendNew();
-          }
-          B2DEBUG(20, name << ": " << nClocks << " clocks");
-        } else if (entries != nClocks) {
-          B2ERROR("Number of clocks in " << name << "conflicts with others!");
+      if (entries == 0) {
+        for (unsigned i = 0; i < nClocks; ++i) {
+          inputArrayPtr->appendNew();
+          outputArrayPtr->appendNew();
         }
+        B2DEBUG(20, name << ": " << nClocks << " clocks");
+      } else if (entries != nClocks) {
+        B2ERROR("Number of clocks in " << name << " conflicts with others!");
       }
     };
 
@@ -147,14 +156,22 @@ namespace Belle2 {
       if (subDetectorId != iNode) {
         return;
       }
-      // get header information
-      std::string firmwareType = rawIntToAscii(data32tab.at(iFinesse)[0]);
-      std::string firmwareVersion = rawIntToString(data32tab.at(iFinesse)[1]);
-      // TODO: get B2L delay after it is added to the header
-      // m_2DFinderDelay =
-      B2DEBUG(90, name << ", " << firmwareType << ", version " << firmwareVersion
-              << ", node " << std::hex << iNode << ", finesse " << iFinesse);
+      if (nWords[iFinesse] < headerSize) {
+        B2WARNING("The module " << name << " does not have enough data (" <<
+                  nWords[iFinesse] << "). Nothing will be unpacked.");
+        // clear the input and output bitstream
+        for (auto& inputClock : (*inputArrayPtr)) {
+          for (auto& tsfIn : inputClock.m_signal) {
+            tsfIn[iTracker].fill(zero_val);
+          }
+        }
+        for (auto& outputClock : (*outputArrayPtr)) {
+          outputClock.m_signal[iTracker].fill(zero_val);
+        }
+        return;
+      }
 
+      // get event body information
       // make bitstream
       // loop over all clocks
       for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
@@ -320,6 +337,7 @@ void CDCTriggerUnpackerModule::event()
 
       for (auto trg : m_subTrigger) {
         trg->reserve(subDetectorId, nWords);
+        trg->getHeaders(subDetectorId, data32tab, nWords);
         trg->unpack(subDetectorId, data32tab, nWords);
       }
     }
@@ -328,8 +346,10 @@ void CDCTriggerUnpackerModule::event()
   // decode bitstream and make TSIM objects
   if (m_decode2DFinderTrack) {
     for (short iclock = 0; iclock < m_bits2DTo3D.getEntries(); ++iclock) {
-      decode2DOutput(iclock + m_2DFinderDelay, m_bits2DTo3D[iclock],
-                     &m_2DFinderTracks, &m_TSHits);
+      decode2DOutput(iclock - m_2DFinderDelay,
+                     m_bits2DTo3D[iclock],
+                     &m_2DFinderTracks,
+                     &m_TSHits);
     }
   }
 

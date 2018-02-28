@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kindo Haruki                                             *
+ * Contributors: Kindo Haruki, Luka Santelj                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -116,7 +116,7 @@ namespace Belle2 {
 
     h_hitsPerEvent = newTH1("h_hitsPerEvent", "# of hit per event;# of hits;Events", 150, 0, 150, kRed, kRed);
     h_theta = newTH1("h_theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6, kRed, kRed);
-    h_hitsPerTrack = newTH1("h_hitsPerTrack", "# of hit per track;# of hits;Tracks", 40, 0, 40, kRed, kRed);
+    h_hitsPerTrack = newTH1("h_hitsPerTrack", "# of hit per track;# of hits;Tracks", 41, -0.5, 40.5, kRed, kRed);
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i] = newTH1(Form("h_thetaSec%d", i), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i), 60, 0,
@@ -309,9 +309,11 @@ namespace Belle2 {
       std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
       int nPhoton = 0;
       for (auto& photon : photons) {
-        h_theta->Fill(photon.getThetaCer());
-        h_secTheta[sector]->Fill(photon.getThetaCer());
-        nPhoton++;
+        if (photon.getMirror() == 0) {
+          h_theta->Fill(photon.getThetaCer());
+          h_secTheta[sector]->Fill(photon.getThetaCer());
+          nPhoton++;
+        }
       }
 
       h_hitsPerTrack->Fill(nPhoton);

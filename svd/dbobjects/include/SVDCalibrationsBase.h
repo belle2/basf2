@@ -22,6 +22,9 @@ namespace Belle2 {
     // number of strips per side or a list of defect on a given side
     // This vector will have length 2.
     // Index 0 for the V side, index 1 for the U side
+    // Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
+    // and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
+    // code readibility
     typedef std::vector< typename T::payloadContainerType > SVDSensor;
 
     // An SVDLAdder is a vector of SVDSensors
@@ -124,6 +127,7 @@ namespace Belle2 {
       // tertium non datur
     }
 
+    typedef T t_perSideContainer;
   private:
     TString m_uniqueID; //The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.
 

@@ -15,8 +15,8 @@ LIBS    += -lnsm2_corelib -lnsm2_b2lib -lcaenhvwrapper
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I$(PGSQL_INC_PATH)
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 
-MAINS   = arichhvd.cc
-#$(wildcard *.cc)
+MAINS   = arichhvd.cc make_db.cc
+#MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
 
 SRCS   = $(wildcard $(SRCDIR)/*.cc)

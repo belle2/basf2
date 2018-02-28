@@ -14,12 +14,15 @@ IOSCANPVT* NSM2CA::init_vget_in(const char* recordname)
   std::string node, vname;
   if (find(recordname, "get", node, vname)) {
     node = StringUtil::toupper(node);
-    var_pvt var = {NSMVar(), new IOSCANPVT};
+    var_pvt var = {NSMVar(), new IOSCANPVT, false};
     try {
       m_var.insert(std::map<std::string, var_pvt>::value_type(node+"."+vname, var));
       NSMCommunicator::send(NSMMessage(NSMNode(node), NSMCommand::VGET, vname));
     } catch (const NSMHandlerException& e) {
-      LogFile::error("%s.%d : ", __FILE__, __LINE__, e.what());
+      LogFile::error("%s.%d ", __FILE__, __LINE__);
+      LogFile::error("%s.%d : %s ", __FILE__, __LINE__, vname.c_str());
+      LogFile::error("%s.%d : %s ", __FILE__, __LINE__, node.c_str());
+      LogFile::error("%s.%d : %s ", __FILE__, __LINE__, e.what());
     } catch (const TimeoutException& e) {
     }
     return var.pvt;

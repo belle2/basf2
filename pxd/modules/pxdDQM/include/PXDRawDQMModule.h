@@ -13,9 +13,11 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDRawPedestal.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
 //#include <map>
@@ -64,6 +66,8 @@ namespace Belle2 {
       StoreArray<PXDRawAdc> m_storeRawAdcs;
       /** Storearray for Pedestal from full frames   */
       StoreArray<PXDRawPedestal> m_storeRawPedestals;
+      /** Input array for DAQ Status. */
+      StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
       /** Histogram number of raw packets */
       TH1F* hrawPxdPackets;
@@ -83,8 +87,6 @@ namespace Belle2 {
       TH2F* hrawPxdChargeMap[64];
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[64];
-      /** Histogram raw pixel common mode */
-      TH1F* hrawPxdHitsCommonMode[64];
       /** Histogram raw pixel trigger window */
       TH1F* hrawPxdHitsTimeWindow[64];
 

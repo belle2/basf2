@@ -71,8 +71,13 @@ namespace Belle2 {
 
 
 
-
     private:
+
+      /**how many FADCs we have */
+      unsigned short nFADCboards;
+
+      /** pointer to APVforFADCmap filled by mapping procedure */
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
       std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //unsigned short m_runType;
@@ -167,6 +172,25 @@ namespace Belle2 {
 
       int m_shutUpFTBError;
       int m_FADCTriggerNumberOffset;
+
+      /** Software emulation of pipeline address
+       * This is a replacement of hardware pipeline address emulation.
+       * Pipeline address is emulated by major vote from working APVs.
+       * Can be turned off once hardware emulation works.
+       */
+      bool m_emulatePipelineAddress = false;
+
+      /** Optionally, we can kill digits coming from upset APVs
+       * right in the unpacker.
+       */
+      bool m_killUpsetDigits = false;
+
+      /** Map to store a list of missing APVs */
+      std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;
+
+      /** Map to store a list of upset APVs */
+      std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_upsetAPVs;
+
 
     };//end class declaration
 

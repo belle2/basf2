@@ -83,10 +83,6 @@ namespace Belle2 {
     double m_momentumCut; /**< momentum cut */
     double m_pValueCut;   /**< pValue cut */
     bool m_usePionID; /**< use pion ID in track selection */
-    int m_ADCCutLow = 0; /**< lower cut for ADC */
-    int m_ADCCutHigh = 0; /**< upper cut for ADC */
-    int m_PulseWidthCutLow = 0; /**< lower cut for PulseWidth */
-    int m_PulseWidthCutHigh = 0; /**< upper cut for PulseWidth */
 
     // histograms
     TH1F* m_recoTime = 0;           /**< time distribution */
@@ -97,13 +93,19 @@ namespace Belle2 {
     TH2F* m_recoTimeDiff_Phic = 0;  /**< residuals vs phiCer */
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
 
-    TH1F* m_particleHits = nullptr; /**< Histogram for number ofaccumulated particle hits */
-    TH1F* m_otherHits = nullptr; /**< Histogram for number ofaccumulated other hits */
-    std::vector<TH2F*> m_allHitsXY; /**< Histograms (2D) for channel hits per module*/
-    std::vector<TH1F*> m_allTdc; /**< Histograms for TDC distribution per module*/
-    std::vector<TH1F*> m_particleChannelHits; /**< Histograms for particle channel hits per module*/
-    std::vector<TH1F*> m_particleHitsPerEvent; /**< Histograms for particle hits per event per module*/
-    std::vector<TH1F*> m_otherHitsPerEvent; /**< Histograms for other hits per event per module*/
+    TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
+    TH1F* m_badHits = nullptr; /**< Histogram for number of accumulated bad hits */
+    std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/
+    std::vector<TH2F*> m_badHitsXY; /**< Histograms (2D) for bad hits in x-y*/
+    std::vector<TH2F*> m_goodHitsAsics; /**< Histograms (2D) for good hits for asics*/
+    std::vector<TH2F*> m_badHitsAsics; /**< Histograms (2D) for bad hits for asics*/
+    std::vector<TH1F*> m_goodTdc; /**< Histograms for TDC distribution of good hits*/
+    std::vector<TH1F*> m_badTdc; /**< Histograms for TDC distribution of bad hits*/
+    std::vector<TH1F*> m_goodTiming; /**< Histograms for timing distribution of good hits*/
+    std::vector<TH1F*> m_goodChannelHits; /**< Histograms for good channel hits*/
+    std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits*/
+    std::vector<TH1F*> m_goodHitsPerEvent; /**< Histograms for good hits per event*/
+    std::vector<TH1F*> m_badHitsPerEvent; /**< Histograms for bad hits per event*/
 
     // other
     int m_numModules = 0; /**< number of TOP modules */

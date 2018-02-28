@@ -11,11 +11,6 @@ rawinput = register_module('PXDReadRawONSEN')
 rawinput.param('FileName', 'map.dat')
 
 unpacker = register_module('PXDUnpacker')
-# coment the next three lines in, in order to remap DHP data
-unpacker.param('RemapFlag', True)
-unpacker.param('RemapLUT_IF_OB', 'LUT_IF_OB.csv')
-unpacker.param('RemapLUT_IB_OF', 'LUT_IB_OF.csv')
-
 # unpacker.param('DoNotStore',True);
 # unpacker.param('HeaderEndianSwap',False);
 

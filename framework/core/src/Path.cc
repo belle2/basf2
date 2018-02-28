@@ -252,7 +252,7 @@ See Also:
 
 Parameters:
   path (basf2.Path): sub path to execute repeatedly
-  condition (str): condition on the return value of the last module in `path`.
+  condition (str): condition on the return value of the last module in ``path``.
     The execution will be repeated as long as this condition is fulfilled.
   max_iterations (int): Maximum number of iterations per event. If this number is exceeded
     the execution is aborted.

@@ -440,9 +440,6 @@ You could for example set a special return value if an error occurs, and divert
 the execution into a path containing :b2:mod:`RootOutput` if it is found;
 saving only the data producing/produced by the error.
 
-``expression`` should be one of the operators "<", "<=", "==", "!=", ">=", ">"
-followed by a numerical value to be compared to the return value of the module.
-
 After a conditional path has executed, basf2 will by default stop processing
 the path for this event. This behaviour can be changed by setting the
 ``after_condition_path`` argument.

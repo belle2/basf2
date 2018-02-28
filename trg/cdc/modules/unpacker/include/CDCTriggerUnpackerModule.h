@@ -19,6 +19,7 @@
 #include <trg/cdc/Unpacker.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 
 #include <array>
 #include <bitset>
@@ -154,6 +155,7 @@ namespace Belle2 {
     NodeList m_tracker2DNodeID; /**< list of (COPPER ID, FTSW ID) of 2D tracker */
     bool m_unpackTracker2D;  /**< flag to unpack 2D tracker data */
     bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
+    bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
 
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
@@ -166,6 +168,9 @@ namespace Belle2 {
 
     /** decoded 2D finder track */
     StoreArray<CDCTriggerTrack> m_2DFinderTracks;
+
+    /** additional information of the 2D finder track */
+    StoreArray<CDCTriggerFinderClone> m_2DFinderClones;
 
     /** debug level specified in the steering file */
     int m_debugLevel;

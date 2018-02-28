@@ -169,6 +169,10 @@ namespace Belle2 {
           outputClock.m_signal[iTracker].fill(zero_val);
         }
         return;
+      } else if (nWords[iFinesse] == headerSize) {
+        B2DEBUG(20, "The module " << name <<
+                " contains only the header. Nothing will be unpacked.");
+        return;
       }
 
       // get event body information
@@ -180,36 +184,112 @@ namespace Belle2 {
         auto outputClock = (*outputArrayPtr)[iclock];
         // clear output bitstream
         outputClock->m_signal[iTracker].fill(zero_val);
-        B2DEBUG(20, "clock " << iclock);
+        B2DEBUG(90, "unpacker clock " << iclock);
         if (debugLevel >= 100) {
           printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
+        // get the clock counters
+        std::array<std::bitset<32>, 2> ccword({
+          data32tab[iFinesse][i + 2], data32tab[iFinesse][i + 3]
+        });
         // fill input
+        // Careful. this iTSF is (8 - iSL) / 2
         for (unsigned iTSF = 0; iTSF < nAxialTSF; ++iTSF) {
           // clear input bitstream
-          inputClock->m_signal[iTSF][iTracker].fill(zero_val);
-          for (unsigned pos = 0; pos < numTS * TSWidth; ++pos) {
-            const int j = (offsetBitWidth + pos + iTSF * numTS * TSWidth) / 32;
-            const int k = (offsetBitWidth + pos + iTSF * numTS * TSWidth) % 32;
-            std::bitset<32> word(data32tab[iFinesse][i + j]);
-            // MSB (leftmost) in firmware -> smallest index in Bitstream's
-            // std::array (due to XSIM) -> largest index in std::bitset
-            // so the index is reversed in this assignment
-            inputClock->m_signal[iTSF][iTracker][clockCounterWidth + pos] =
-              std_logic(word[31 - k]);
+          inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker].fill(zero_val);
+
+          if (firmwareVersion < "18012600") {
+            /*
+              data_b2l_r <=
+              x"dddd" & cntr125M(15 downto 0) &
+              cc(4) & cc(3) & cc(2) & cc(1) & cc(0) &
+              ccError &
+              -- 82
+              tsfs(4)(209 downto 0) &
+              tsfs(3)(209 downto 0) &
+              tsfs(2)(209 downto 0) &
+              tsfs(1)(209 downto 0) &
+              tsfs(0)(209 downto 0) &
+            */
+            // fill the clock counters
+            for (unsigned pos = 0; pos < clockCounterWidth; ++pos) {
+              const int j = (pos + iTSF * clockCounterWidth) / 32;
+              const int k = (pos + iTSF * clockCounterWidth) % 32;
+              inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker][pos] =
+                std_logic(ccword[j][31 - k]);
+            }
+            // fill the TS hit
+            offsetBitWidth = 82;
+            for (unsigned pos = 0; pos < numTS * TSWidth; ++pos) {
+              const int j = (offsetBitWidth + pos + iTSF * numTS * TSWidth) / wordWidth;
+              const int k = (offsetBitWidth + pos + iTSF * numTS * TSWidth) % wordWidth;
+              std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+              // MSB (leftmost) in firmware -> smallest index in Bitstream's
+              // std::array (due to XSIM) -> largest index in std::bitset
+              // so the index is reversed in this assignment
+              inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker]
+              [clockCounterWidth + pos] = std_logic(word[wordWidth - 1 - k]);
+            }
+          } else {
+            /*
+              x"dddd" & (15 downto 11 => '0') & revoclk &
+              cntr125M(15 downto 0) &
+              (15 downto 5 => '0') & ccError &
+              -- 64
+              cc(4) & tsfs(4)(209 downto 0) &
+              cc(3) & tsfs(3)(209 downto 0) &
+              cc(2) & tsfs(2)(209 downto 0) &
+              cc(1) & tsfs(1)(209 downto 0) &
+              cc(4) & tsfs(0)(209 downto 0) &
+            */
+            // fill the cc and TS hit
+            offsetBitWidth = 64;
+            unsigned TSFWidth = clockCounterWidth + numTS * TSWidth;
+            for (unsigned pos = 0; pos < TSFWidth; ++pos) {
+              const int j = (offsetBitWidth + pos + iTSF * TSFWidth) / wordWidth;
+              const int k = (offsetBitWidth + pos + iTSF * TSFWidth) % wordWidth;
+              std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+              // MSB (leftmost) in firmware -> smallest index in Bitstream's
+              // std::array (due to XSIM) -> largest index in std::bitset
+              // so the index is reversed in this assignment
+              inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker][pos] =
+                std_logic(word[wordWidth - 1 - k]);
+            }
           }
           if (debugLevel >= 100) {
-            display_hex(inputClock->m_signal[iTSF][iTracker]);
+            display_hex(inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker]);
           }
         }
         // fill output
-        const int outputOffset = nAxialTSF * numTS * TSWidth;
-        for (unsigned pos = 0; pos < 732; ++pos) {
-          const int j = (offsetBitWidth + pos + outputOffset) / 32;
-          const int k = (offsetBitWidth + pos + outputOffset) % 32;
-          std::bitset<32> word(data32tab[iFinesse][i + j]);
-          outputClock->m_signal[iTracker][9 + pos] = word[31 - k] + 2;
+        if (firmwareVersion < "18012600") {
+          /*
+            -- 1132
+            Main_out(731 downto 0) &
+          */
+          const int outputOffset = nAxialTSF * numTS * TSWidth;
+          const int oldtrackWidth = 6;
+          for (unsigned pos = 0; pos < 732; ++pos) {
+            const int j = (offsetBitWidth + pos + outputOffset) / wordWidth;
+            const int k = (offsetBitWidth + pos + outputOffset) % wordWidth;
+            std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+            outputClock->m_signal[iTracker][clockCounterWidth + oldtrackWidth + pos]
+              = std_logic(word[wordWidth - 1 - k]);
+          }
+        } else {
+          /*
+            -- 1159
+            old_track(5 downto 0) &
+            Main_out(731 downto 0) &
+           */
+          const int outputOffset = 1159;
+          for (unsigned pos = 0; pos < T2DOutputWidth; ++pos) {
+            const int j = (pos + outputOffset) / wordWidth;
+            const int k = (pos + outputOffset) % wordWidth;
+            std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+            outputClock->m_signal[iTracker][clockCounterWidth + pos]
+              = std_logic(word[wordWidth - 1 - k]);
+          }
         }
         if (debugLevel >= 100) {
           display_hex(outputClock->m_signal[iTracker]);
@@ -231,6 +311,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "whether to unpack 2D tracker data", false);
   addParam("decode2DFinderTrack", m_decode2DFinderTrack,
            "flag to decode 2D finder track", false);
+  addParam("decode2DFinderInput", m_decode2DFinderInputTS,
+           "flag to decode input TS to 2D", false);
   NodeList defaultMergerNodeID = {
     {0x11000001, 0},
     {0x11000003, 0},
@@ -265,12 +347,14 @@ void CDCTriggerUnpackerModule::initialize()
     m_bitsTo2D.registerInDataStore("CDCTriggerTSFTo2DBits");
     m_bits2DTo3D.registerInDataStore("CDCTrigger2DTo3DBits");
   }
-  if (m_decodeTSHit or m_decode2DFinderTrack) {
+  if (m_decodeTSHit or m_decode2DFinderTrack or m_decode2DFinderInputTS) {
     m_TSHits.registerInDataStore("CDCTriggerSegmentHits");
   }
   if (m_decode2DFinderTrack) {
-    m_2DFinderTracks.registerInDataStore("CDCTrigger2DFinderTrack");
+    m_2DFinderTracks.registerInDataStore("CDCTrigger2DFinderTracks");
     m_2DFinderTracks.registerRelationTo(m_TSHits);
+    m_2DFinderClones.registerInDataStore("CDCTrigger2DFinderClones");
+    m_2DFinderClones.registerRelationTo(m_2DFinderTracks);
   }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
@@ -282,6 +366,7 @@ void CDCTriggerUnpackerModule::initialize()
                    "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / 32,
                    mergerWidth * (nMergers[8] - nMergers[iSL]) / 32, m_headerSize,
                    m_mergerNodeID[iSL / 2], nInnerMergers,
+                   m_mergerDelay,
                    m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_merger));
     }
@@ -292,6 +377,7 @@ void CDCTriggerUnpackerModule::initialize()
         new Tracker2D(&m_bitsTo2D, &m_bits2DTo3D,
                       "Tracker2D" + std::to_string(iTracker), 64, 82, m_headerSize,
                       m_tracker2DNodeID[iTracker], 10,
+                      m_2DFinderDelay,
                       m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_tracker2d));
     }
@@ -349,9 +435,15 @@ void CDCTriggerUnpackerModule::event()
       decode2DOutput(iclock - m_2DFinderDelay,
                      m_bits2DTo3D[iclock],
                      &m_2DFinderTracks,
+                     &m_2DFinderClones,
                      &m_TSHits);
     }
   }
-
+  if (m_decode2DFinderInputTS) {
+    for (short iclock = 0; iclock < m_bitsTo2D.getEntries(); ++iclock) {
+      B2DEBUG(30, "clock " << iclock);
+      decode2DInput(iclock - m_2DFinderDelay, m_bitsTo2D[iclock], &m_TSHits);
+    }
+  }
 }
 

@@ -10,6 +10,7 @@
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <framework/gearbox/Const.h>
 
 namespace Belle2 {
@@ -26,7 +27,7 @@ namespace Belle2 {
     static constexpr int TSFOutputWidth = 429;
     static constexpr int nTrackers = 4;
     static constexpr int nAxialTSF = 5;
-    static constexpr int T2DOutputWidth = 741;
+    static constexpr int T2DOutputWidth = 747;
 
     static constexpr int nMax2DTracksPerClock = 6;
 
@@ -280,25 +281,32 @@ namespace Belle2 {
     void decode2DOutput(short foundTime,
                         T2DOutputBitStream* bits,
                         StoreArray<CDCTriggerTrack>* storeTracks,
+                        StoreArray<CDCTriggerFinderClone>* storeClones,
                         StoreArray<CDCTriggerSegmentHit>* tsHits)
     {
       const unsigned lenTrack = 121;
+      const unsigned oldTrackWidth = 6;
+      const unsigned foundWidth = 6;
       std::array<int, 4> posTrack;
       for (unsigned i = 0; i < posTrack.size(); ++i) {
-        posTrack[i] = 6 + lenTrack * i;
+        posTrack[i] = oldTrackWidth + foundWidth + lenTrack * i;
       }
       for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
         const auto slv = bits->signal()[iTracker];
-        std::string strOutput = slv_to_bin_string(slv).substr(9, T2DOutputWidth - 9);
+        std::string strOutput = slv_to_bin_string(slv).
+                                substr(clockCounterWidth, T2DOutputWidth - clockCounterWidth);
         for (unsigned i = 0; i < nMax2DTracksPerClock; ++i) {
           // The first 6 bits indicate whether a track is found or not
-          if (slv[9 + i] == one_val) {
+          if (slv[clockCounterWidth + oldTrackWidth + i] == one_val) {
             TRG2DFinderTrack trk = decode2DTrack(strOutput.substr(posTrack[i], lenTrack));
             // const CDCTriggerTrack* track =
             B2DEBUG(10, "phi0:" << trk.phi0 << ", omega:" << trk.omega
                     << ", at clock " << foundTime << ", tracker " << iTracker);
             CDCTriggerTrack* track =
               storeTracks->appendNew(trk.phi0, trk.omega, 0., foundTime);
+            CDCTriggerFinderClone* clone =
+              storeClones->appendNew(slv[clockCounterWidth + i] == one_val);
+            clone->addRelationTo(track);
             // TODO: dig out the TS hits in DataStore, and
             // add relations to them.
             // Otherwise, create a new TS hit object and add the relation.
@@ -319,6 +327,55 @@ namespace Belle2 {
                                     0); // found time (unknown)
                 track->addRelationTo(hit);
               }
+            }
+          }
+        }
+      }
+    }
+
+    void decode2DInput(short foundTime,
+                       TSFOutputBitStream* bits,
+                       StoreArray<CDCTriggerSegmentHit>* tsHits)
+    {
+      constexpr unsigned lenTS = 21;
+      // Get the input TS to 2D from the Bitstream
+      for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
+        for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
+          const auto& tracker = bits->signal()[iAx][iTracker];
+          std::string strInput = slv_to_bin_string(tracker);
+          bool noMoreHit = false;
+          for (unsigned pos = clockCounterWidth; pos < TSFOutputWidth; pos += lenTS) {
+            std::string tsHitStr = strInput.substr(pos, lenTS);
+            B2DEBUG(50, tsHitStr);
+            tsOut ts = decodeTSHit(tsHitStr);
+            // check if all the hits are on the MSB side
+            if (ts[2] == 0) {
+              noMoreHit = true;
+              continue;
+            } else if (noMoreHit) {
+              B2WARNING("Discontinuous TS hit detected!");
+            }
+            unsigned iTS = TSIDInSL(ts[0], iAx, iTracker);
+            // Make TS hit object
+            CDCTriggerSegmentHit hit(2 * iAx, // super layer
+                                     iTS, // TS number in super layer
+                                     ts[3], // priority position
+                                     ts[2], // L/R
+                                     ts[1], // priority time
+                                     0, // fastest time (unknown)
+                                     foundTime); // found time
+
+            // add if the TS hit of identical ID and foundTime is not already in the StoreArray
+            // (from the 2D input of another quarter or the 2D track output)
+            if (std::none_of(tsHits->begin(), tsHits->end(),
+            [hit](CDCTriggerSegmentHit storeHit) {
+            return (storeHit.getSegmentID() == hit.getSegmentID() &&
+                    storeHit.foundTime() == hit.foundTime());
+            })) {
+              B2DEBUG(40, "found TS hit ID " << hit.getSegmentID() <<
+                      ", SL" << 2 * iAx << ", local ID " << iTS <<
+                      ", 2D" << iTracker);
+              tsHits->appendNew(hit);
             }
           }
         }

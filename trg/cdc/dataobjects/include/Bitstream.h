@@ -8,7 +8,7 @@
 #define TSF_TO_2D_WIDTH 429
 #define NUM_2D 4
 #define NUM_TSF 5
-#define T2D_TO_3D_WIDTH 741
+#define T2D_TO_3D_WIDTH 747
 
 
 namespace Belle2 {
@@ -64,7 +64,7 @@ namespace Belle2 {
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Bitstream, 2);
+    ClassDef(Bitstream, 3);
   };
 
 }

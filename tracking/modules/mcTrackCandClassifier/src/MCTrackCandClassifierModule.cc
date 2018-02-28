@@ -101,7 +101,7 @@ void MCTrackCandClassifierModule::initialize()
   //  m_selector.registerSubset( mcTrackCands, "idealMCTrackCands");
   //  m_selector.inheritAllRelations();
   StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
-  idealMCTrackCands.registerInDataStore();
+  idealMCTrackCands.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   StoreArray<PXDTrueHit> pxdTrueHits;
   pxdTrueHits.isRequired();

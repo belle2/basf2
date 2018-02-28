@@ -31,10 +31,6 @@ roi = sys.argv[2]
 bkg = sys.argv[3]
 vxdtf = sys.argv[4]
 
-useVXDTF2 = False
-if (vxdtf == 'vxdtf2'):
-    useVXDTF2 = True
-
 input_root_files = './' + release + '/TV_sim_' + bkg + '_' + roi + '_' + release + '.root'
 output_file_name = './' + release + '/TV_reco_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'
 
@@ -62,8 +58,7 @@ add_tracking_reconstruction(
     pruneTracks=False,
     mcTrackFinding=mcTrackFinding,
     trigger_mode="all",
-    skipGeometryAdding=False,
-    use_vxdtf2=useVXDTF2
+    skipGeometryAdding=False
 )
 
 modList = path.modules()

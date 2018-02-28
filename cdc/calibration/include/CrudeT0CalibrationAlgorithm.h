@@ -65,6 +65,12 @@ namespace Belle2 {
       {
         m_cosmic = b;
       }
+
+      /**
+       * Save hitograms of the calibration results.
+       *
+       */
+      void saveHisto();
     protected:
       /// Run algo on data
       virtual EResult calibrate();

@@ -30,18 +30,24 @@ void NSM2CACallback::init(NSMCommunicator& com) throw()
 void NSM2CACallback::timeout(NSMCommunicator&) throw()
 {
   static unsigned long long count = 0;
-  if (count % 20 == 2){
+  if (count % 20 == 1){
     m_nsm2ca->lock();
     NSMVarPVTList& vars(m_nsm2ca->getVars());
     for (NSMVarPVTList::iterator it = vars.begin();
 	 it != vars.end(); it++ ) {
       NSMVar& var((it->second).var);
       std::string vname = var.getName();
-      if (vname == "rcrequest" || vname == "hvrequest") continue;
+      if (vname.size() == 0 || vname == "rcrequest" || vname == "hvrequest") continue;
+      if ((it->second).updated) {
+	//LogFile::info("%s:%d %s", __FILE__, __LINE__, vname.c_str()); 
+	continue;
+      }
       std::string node = var.getNode();
       try {
 	NSMMessage msg(NSMNode(node), NSMCommand::VGET, vname);
+	//LogFile::info("%s:%d %s", __FILE__, __LINE__, vname.c_str()); 
 	NSMCommunicator::send(msg);
+	(it->second).updated = true;
       } catch (const IOException& e) {
 	LogFile::warning(e.what());
       }
@@ -55,6 +61,18 @@ void NSM2CACallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
   NSMMessage msg(com.getMessage());
   std::string name = std::string(var.getNode()) + "." + var.getName();
+  /*
+  NSMVarPVTList& vars(m_nsm2ca->getVars());
+  for (NSMVarPVTList::iterator it = vars.begin();
+       it != vars.end(); it++ ) {
+    NSMVar& var_i((it->second).var);
+    if (var_i.getNode() == var.getNode() && var_i.getName() == var.getName()) {
+      //LogFile::info("%s:%d %s %s", __FILE__, __LINE__, var.getName().c_str(),
+      //		    ((it->second).updated?"true":"false")); 
+      (it->second).updated = true;
+    }
+  }
+  */
   m_nsm2ca->notify(name, var);
 }
 
@@ -77,10 +95,12 @@ void NSM2CACallback::error(const char* nodename, const char* data) throw()
       if (var.getNode() == nodename) {
 	if (var.getName() == "rcstate") {
 	  std::string name = var.getNode() + "." + var.getName();
+	  (it->second).updated = true;
 	  m_nsm2ca->notify(name, NSMVar("rcstate", "NOTREADY"));
 	  return;
 	} else if (var.getName() == "state") {
 	  std::string name = var.getNode() + "." + var.getName();
+	  (it->second).updated = true;
 	  m_nsm2ca->notify(name, NSMVar("state", "ERROR"));
 	  return;
 	}
@@ -103,10 +123,12 @@ void NSM2CACallback::ok(const char* nodename, const char* data) throw()
       if (var.getNode() == nodename) {
 	if (rcstate != RCState::UNKNOWN && var.getName() == "rcstate") {
 	  std::string name = var.getNode() + "." + var.getName();
+	  (it->second).updated = true;
 	  m_nsm2ca->notify(name, NSMVar("rcstate", data));
 	  return;
 	} else if (var.getName() == "state") {
 	  std::string name = var.getNode() + "." + var.getName();
+	  (it->second).updated = true;
 	  m_nsm2ca->notify(name, NSMVar("state", data));
 	  return;
 	}

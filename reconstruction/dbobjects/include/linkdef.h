@@ -9,6 +9,7 @@
 #pragma link C++ class Belle2::CDCDedxWireGain+;
 #pragma link C++ class Belle2::CDCDedxRunGain+;
 #pragma link C++ class Belle2::CDCDedxCosineCor+;
+#pragma link C++ class Belle2::CDCDedxMomentumCor+;
 #pragma link C++ class Belle2::CDCDedx2DCor+;
 #pragma link C++ class Belle2::CDCDedx1DCleanup+;
 #pragma link C++ class Belle2::CDCDedxHadronCor+;

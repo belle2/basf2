@@ -64,6 +64,9 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            false);
   addParam("hideObjects", m_hideObjects,
            "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
+  addParam("customGeometryExtractPath", m_customGeometryExtractPath, "Path to custom file with geometry extract.", std::string(""));
+  addParam("customGeometryExtractPathTop", m_customGeometryExtractPathTop,
+           "Path to custom file with geometry extract with corrected placement of TOP bars.", std::string(""));
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
   if ((!gApplication) || (gApplication->TestBit(TApplication::kDefaultApplication))) {
@@ -100,9 +103,6 @@ void DisplayModule::initialize()
   StoreArray<RecoHitInformation::UsedPXDHit> UsedPXDHits; UsedPXDHits.isOptional();
   StoreArray<RecoHitInformation::UsedSVDHit> UsedSVDHits; UsedSVDHits.isOptional();
   StoreArray<RecoHitInformation::UsedCDCHit> UsedCDCHits; UsedCDCHits.isOptional();
-  StoreArray<TrackCandidateTFInfo> TrackCandidateTFInfos; TrackCandidateTFInfos.isOptional();
-  StoreArray<CellTFInfo> CellTFInfos; CellTFInfos.isOptional();
-  StoreArray<SectorTFInfo> SectorTFInfos; SectorTFInfos.isOptional();
 
   m_display = new DisplayUI(m_automatic);
   if (hasCondition())
@@ -130,6 +130,9 @@ void DisplayModule::initialize()
     //pass some parameters to DisplayUI to be able to change them at run time
     m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   }
+
+  if (!m_customGeometryExtractPath.empty()) EveGeometry::setCustomExtractPath(m_customGeometryExtractPath);
+  if (!m_customGeometryExtractPathTop.empty()) EveGeometry::setCustomExtractPathTop(m_customGeometryExtractPathTop);
 
   EveGeometry::addGeometry(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
   m_visualizer = new EVEVisualization();
@@ -205,22 +208,6 @@ void DisplayModule::event()
     StoreArray<ROIid> testbeamROIs("ROIs");
     for (int i = 0 ; i < testbeamROIs.getEntries(); i++)
       m_visualizer->addROI(testbeamROIs[i]);
-
-    //special VXDTF objects
-    StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
-    for (auto& currentTC : tfcandTFInfo) {
-      m_visualizer->addTrackCandidateTFInfo(&currentTC);
-    }
-
-    StoreArray<CellTFInfo> cellTFInfo;
-    for (auto& currentCell : cellTFInfo) {
-      m_visualizer->addCellTFInfo(&currentCell);
-    }
-
-    StoreArray<SectorTFInfo> sectorTFInfo;
-    for (auto& currentSector : sectorTFInfo) {
-      m_visualizer->addSectorTFInfo(&currentSector);
-    }
   }
 
   if (m_showCDCHits || m_showTriggerObjects) {

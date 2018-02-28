@@ -64,6 +64,9 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
+  moduleParamList->addParameter("onlyUseTracksWithSVD", m_param_onlyUseTracksWithSVD,
+                                "Only use tracks which have an SVD hit associated.",
+                                m_param_onlyUseTracksWithSVD);
 
   // Default values
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
@@ -77,6 +80,8 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
 
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
   moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+
+  moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("PXDSpacePoints");
 
   moduleParamList->getParameter<std::string>("filter").setDefaultValue("mva");
 }
@@ -107,11 +112,13 @@ void CKFToPXDFindlet::apply()
   };
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
 
-  const auto hasNoSVD = [](const RecoTrack * recoTrack) {
-    const auto& svdHitList = recoTrack->getSortedSVDHitList();
-    return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
-  };
-  TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
+  if (m_param_onlyUseTracksWithSVD) {
+    const auto hasNoSVD = [](const RecoTrack * recoTrack) {
+      const auto& svdHitList = recoTrack->getSortedSVDHitList();
+      return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
+    };
+    TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
+  }
 
   B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
 

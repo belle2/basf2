@@ -172,7 +172,7 @@ namespace Belle2 {
       void registerStoreVector()
       {
         if (not isInputStoreVector<I>()) {
-          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut);
+          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
         }
       }
 

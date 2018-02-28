@@ -31,25 +31,11 @@ namespace Belle2 {
     ROIGeneratorModule();
 
     /**
-     * Destructor of the module.
-     */
-    ~ROIGeneratorModule();
-
-    /**
      *Initializes the Module.
      */
     void initialize() override;
 
-    void beginRun() override;
-
     void event() override;
-
-    void endRun() override;
-
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
 
   protected:
 

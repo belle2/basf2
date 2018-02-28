@@ -1,0 +1,112 @@
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:temp")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:tempfpga")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[0]:t1")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[0]:t2")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[1]:t1")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[1]:t2")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[2]:t1")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[2]:t2")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[3]:t1")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[3]:t2")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[4]:t1")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[4]:t2")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[5]:t1")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):arich[$(hslb)]:feb[5]:t2")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+

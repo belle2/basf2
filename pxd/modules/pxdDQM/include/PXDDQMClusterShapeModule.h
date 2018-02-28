@@ -45,18 +45,19 @@ namespace Belle2 {
       /* Destructor */
       virtual ~PXDDQMClusterShapeModule();
 
+    private:
       /** Module functions */
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
+      void initialize() override final;
+      void beginRun() override final;
+      void event() override final;
+      void endRun() override final;
+      void terminate() override final;
 
       /**
       * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
       * to be placed in this function.
       */
-      virtual void defineHisto();
+      void defineHisto() override final;
 
     private:
       /** PXDTrueHits StoreArray name */
@@ -73,8 +74,6 @@ namespace Belle2 {
       std::string m_relPXDRecoHitTrueHitName;
       /** Name of the collection to use for the Reco Track */
       std::string m_storeRecoTrackName;
-      /** Frames StoreArray name */
-      std::string m_storeFramesName;
 
       /** Name of file contain output merged calibration, default=PXD-ClasterShapeCorrections */
       std::string m_CalFileName = "PXD-ClasterShapeCorrections.root";

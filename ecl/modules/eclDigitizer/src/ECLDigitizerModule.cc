@@ -173,7 +173,11 @@ int ECLDigitizerModule::shapeSignals()
       adccounts_t& a = m_adc[j];
       // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
       // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+      if (m_HadronPulseShape) {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[4]); // diode component
+      } else {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+      }
       //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
     }
   }
@@ -432,7 +436,7 @@ void ECLDigitizerModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(4);
+  m_ss.resize(5);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP, 27.7221);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
@@ -448,8 +452,10 @@ void ECLDigitizerModule::readDSPDB()
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
   double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
   m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
-  double psd_params_forPSD[] = {0.654324, 0.110699, 0.606028, 1.2688, 0.553606, 0.304011, 1.2551, 0.771018, 0.454058, 1.25524};
-  m_ss[3].InitSample(psd_params_forPSD, 27.7221);
+  double hadron_params_forPSD[] = {0.627513, 3.11461e-08, 0.709103, 0.444829, 0.755139, 0.040247, 3.10677, 0.772424, 0.741082, 0.401319};
+  m_ss[3].InitSample(hadron_params_forPSD, 22.9879);
+  double diode_params_forPSD[] = {0.646203, 0.0379479, 0.673686, 0.488448, 2.83791e-05, 0.0322106, 3.03532, 0.679642, 0.781015, 0.638214};
+  m_ss[4].InitSample(diode_params_forPSD, 26.8999);
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

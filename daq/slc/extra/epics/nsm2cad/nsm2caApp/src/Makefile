@@ -50,7 +50,7 @@ include $(TOP)/configure/RULES
 #  ADD RULES AFTER THIS LINE
 
 USR_INCLUDES += -I$(BELLE2_DAQ_SLC)/include
-USR_LIBS += daq_slc_base daq_slc_system daq_slc_database daq_slc_nsm daq_slc_runcontrol daq_slc_hvcontrol
+USR_LIBS += daq_slc_base daq_slc_system daq_slc_database daq_slc_nsm daq_slc_runcontrol daq_slc_hvcontrol daq_slc_psql
 USR_LIBS += nsm2_corelib nsm2_b2lib
 USR_LIBS += nsm2_corelib nsm2_b2lib
 USR_LIBS += m pthread dl z rt pq readline ncurses 

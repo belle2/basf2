@@ -515,10 +515,10 @@ namespace Belle2 {
       for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
         Particle* p = pionshlt->getParticle(i);
         /*
-        const ECLCluster* shower = p->getECLCluster();
-        if(shower){
+        const ECLCluster* cluster = p->getECLCluster();
+        if(cluster){
         std::cout<<"++++"<<"find track Cluster"<<"++++"<<std::endl;
-        const Track* track = shower->getRelated<Track>();
+        const Track* track = cluster->getRelated<Track>();
         if(track)
         std::cout<<"++++"<<"Track Match Cluster"<<"++++"<<std::endl;
 

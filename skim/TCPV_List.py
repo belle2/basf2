@@ -17,7 +17,7 @@ def TCPVList():
 
     bd_qqs_Channels = [
         'phi:loose K_S0:all',
-        'eta:loose K_S0:all',
+        'eta\':loose K_S0:all',
         'eta:loose K_S0:all',
         'K_S0:all K_S0:all K_S0:all',
         'pi0:skim K_S0:all',
@@ -26,7 +26,8 @@ def TCPVList():
         'f_0:loose K_S0:all',
         'pi0:skim pi0:skim K_S0:all',
         'phi:loose K_S0:all pi0:skim',
-        'pi+:all pi-:all K_S0:all']
+        'pi+:all pi-:all K_S0:all',
+        'pi+:all pi-:all K_S0:all gamma:E15']
 
     bd_ccs_Channels = ['J/psi:eeLoose K_S0:all',
                        'J/psi:mumuLoose K_S0:all',

@@ -9,8 +9,10 @@
  **************************************************************************/
 
 #include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
+
 #include <TF1.h>
 #include <TH1F.h>
+#include <TCanvas.h>
 
 using namespace Belle2;
 
@@ -38,8 +40,10 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   if (means->GetEntries() < 100)
     return c_NotEnoughData;
 
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
   means->Fit("gaus");
   double rungain = means->GetFunction("gaus")->GetParameter(1);
+  ctmp->Print("dedx_rungains.ps");
 
   B2INFO("dE/dx run gains done: " << rungain);
 

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/relatedTracksCombiner/RelatedTracksCombinerModule.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
@@ -37,7 +38,7 @@ void RelatedTracksCombinerModule::initialize()
   m_vxdRecoTracks.isRequired(m_vxdRecoTracksStoreArrayName);
   m_cdcRecoTracks.isRequired(m_cdcRecoTracksStoreArrayName);
 
-  m_recoTracks.registerInDataStore(m_recoTracksStoreArrayName);
+  m_recoTracks.registerInDataStore(m_recoTracksStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
   RecoTrack::registerRequiredRelations(m_recoTracks);
 
   m_recoTracks.registerRelationTo(m_vxdRecoTracks);
@@ -46,10 +47,12 @@ void RelatedTracksCombinerModule::initialize()
 
 void RelatedTracksCombinerModule::event()
 {
+  TrackFitter trackFitter;
+
   // Loop over all CDC reco tracks and add them to the store array of they do not have a match or combined them with
   // their VXD partner if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
-  for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
+  for (RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
 
     B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
@@ -67,7 +70,7 @@ void RelatedTracksCombinerModule::event()
     }
 
     // Do not output non-fittable tracks
-    if (not vxdTrackAfter and not vxdTrackBefore and not cdcRecoTrack.wasFitSuccessful()) {
+    if (not vxdTrackAfter and not vxdTrackBefore and not trackFitter.fit(cdcRecoTrack)) {
       continue;
     }
 
@@ -91,9 +94,9 @@ void RelatedTracksCombinerModule::event()
   }
 
   // Now we only have to add the VXD tracks without a match
-  for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
+  for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     const RecoTrack* cdcRecoTrack = vxdRecoTrack.getRelated<RecoTrack>(m_cdcRecoTracksStoreArrayName);
-    if (not cdcRecoTrack and vxdRecoTrack.wasFitSuccessful()) {
+    if (not cdcRecoTrack and trackFitter.fit(vxdRecoTrack)) {
       RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
       newTrack->addRelationTo(&vxdRecoTrack);

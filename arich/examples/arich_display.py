@@ -1,6 +1,4 @@
-B1
-4205
-0c  # !/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Script for running arich event display and DQM module on
@@ -72,7 +70,7 @@ if int(options.display):
     display.param('showRecoTracks', True)
     # show full geometry
     display.param('fullGeometry', True)
-    if int(arichtrk):
+    if int(options.arichtrk):
         displ.add_module(display)
     else:
         main.add_module(display)

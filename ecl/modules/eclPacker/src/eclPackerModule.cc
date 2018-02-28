@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -252,7 +253,23 @@ void ECLPackerModule::event()
           if (i_digit < 0) continue;
           int qua = m_eclDigits[i_digit]->getQuality();
           int amp = m_eclDigits[i_digit]->getAmp();
-          int tim = m_eclDigits[i_digit]->getTimeFit();
+          int chi = m_eclDigits[i_digit]->getChi();
+          int tim = 0;
+          int m = 0, p = 0;
+          if (qua == 2) {
+            // pack chisquare
+            int n_bits = ceil(log2(double(chi)));
+            if (n_bits > 9) {
+              p = ceil(float(n_bits - 9) / 2.0);
+              m = chi >> p * 2;
+            } else {
+              p = 0;
+              m = chi;
+            }
+            tim = (p << 9) | m ;
+          } else {
+            tim = m_eclDigits[i_digit]->getTimeFit();
+          }
           unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
           hit_data |= (tim & 0xFFF) << 18;
           hit_data |= ((amp + 128) & 0x3FFFF);

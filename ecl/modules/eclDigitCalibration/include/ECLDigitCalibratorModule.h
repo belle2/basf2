@@ -16,8 +16,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITCALIBRATORMODULE_H_
-#define ECLDIGITCALIBRATORMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -38,6 +37,8 @@
 #include "TFile.h"
 
 namespace Belle2 {
+
+  class EventLevelClusteringInfo;
 
   /** Class to find calibrate digits and convert waveform fit information to physics quantities */
   class ECLDigitCalibratorModule : public Module {
@@ -114,6 +115,8 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
 
+    StoreObjPtr <EventLevelClusteringInfo> m_eventLevelClusteringInfo; /** event level clustering info */
+
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 
     double m_pureCsIEnergyCalib = 0.00005; /**< conversion factor from ADC counts to GeV. */
@@ -177,4 +180,3 @@ namespace Belle2 {
 
 } // end Belle2 namespace
 
-#endif

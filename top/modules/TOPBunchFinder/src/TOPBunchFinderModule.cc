@@ -65,8 +65,10 @@ namespace Belle2 {
     // Add parameters
     addParam("bunchHalfRange", m_bunchHalfRange,
              "Half range of bunch numbers to be searched for", 5);
+    addParam("minTime", m_minTime,
+             "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("sigmaSmear", m_sigmaSmear,
              "sigma in [ns] for additional smearing of PDF", 0.2);
     addParam("minSignal", m_minSignal,
@@ -122,10 +124,6 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_bunchTimeSep = geo->getNominalTDC().getBunchSeparationTime();
 
-    // other
-
-    if (m_maxTime <= 0) m_maxTime = config.getTDCTimeRange();
-
   }
 
   void TOPBunchFinderModule::beginRun()
@@ -146,7 +144,12 @@ namespace Belle2 {
     double mass = Const::pion.getMass();
     TOPreco reco(Nhyp, &mass);
     reco.setPDFoption(TOPreco::c_Rough);
-    reco.setTmax(m_maxTime + m_bunchTimeSep * m_bunchHalfRange);
+
+    // set time window if given, otherwise use the default one from TOPNominalTDC
+
+    if (m_maxTime > m_minTime) {
+      reco.setTimeWindow(m_minTime, m_maxTime);
+    }
 
     // add photon hits to reconstruction object
 
@@ -210,7 +213,7 @@ namespace Belle2 {
 
       // make sum of log likelihoods for different bunches
       for (int i = 0; i < n; i++) {
-        logL[i] += reco.getLogL(t0[i], m_maxTime, m_sigmaSmear);
+        logL[i] += reco.getLogL(t0[i], m_minTime, m_maxTime, m_sigmaSmear);
       }
     }
 
@@ -230,7 +233,7 @@ namespace Belle2 {
 
     // correct time in TOPDigits
 
-    for (auto& digit : topDigits) digit.subtractT0(-bunchTime);
+    for (auto& digit : topDigits) digit.subtractT0(bunchTime);
 
   }
 

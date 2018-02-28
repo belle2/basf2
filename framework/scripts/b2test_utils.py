@@ -122,4 +122,4 @@ def safe_process(*args, **kwargs):
 
     It will return the exitcode of the child process which should be 0 in case of no error
     """
-    run_in_subprocess(target=basf2.process, *args, **kwargs)
+    return run_in_subprocess(target=basf2.process, *args, **kwargs)

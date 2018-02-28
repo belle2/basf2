@@ -211,6 +211,17 @@ namespace Belle2 {
       tsOutArray ts;
     };
 
+    /**
+     *  Calculate the local TS ID (continuous ID in a super layer)
+     *
+     *  @param tsIDInTracker    Segment ID in a single tracker
+     *
+     *  @param iAx              Axial super layer ID (0-4)
+     *
+     *  @param iTracker         ID of the tracker
+     *
+     *  @return the local TS ID
+     */
     unsigned TSIDInSL(unsigned tsIDInTracker, unsigned iAx, unsigned iTracker)
     {
       const unsigned nCellsInSL = nAxialMergers[iAx] * nCellsInLayer;
@@ -230,6 +241,13 @@ namespace Belle2 {
       return iTS;
     }
 
+    /**
+     *  Decode the track segment hit from the bit string
+     *
+     *  @param tsIn    21-bit string of the TS information
+     *
+     *  @return        tsOut (ID, priority time, L/R, priority position)
+     */
     tsOut decodeTSHit(std::string tsIn)
     {
       constexpr unsigned lenID = 8;
@@ -249,6 +267,13 @@ namespace Belle2 {
       return tsOutput;
     }
 
+    /**
+     *  Decode the 2D finder track from the bit string
+     *
+     *  @param trackIn  121-bit string of the TS information
+     *
+     *  @return         TRG2DFinderTrack containing omega, phi0 and related TS hit
+     */
     TRG2DFinderTrack decode2DTrack(std::string trackIn)
     {
       constexpr unsigned lenCharge = 2;
@@ -278,6 +303,20 @@ namespace Belle2 {
       return trackOut;
     }
 
+    /**
+     *  Decode the 2D finder output from the Bitstream
+     *
+     *  @param foundTime    the clock at which this track appears
+     *
+     *  @param bits         pointer to the output Bitstream
+     *
+     *  @param storeTracks  pointer to the track StoreArray
+     *
+     *  @param storeClones  pointer to the StoreArray holding clone info
+     *
+     *  @param tsHits       pointer to the TS hit StoreArray
+     *
+     */
     void decode2DOutput(short foundTime,
                         T2DOutputBitStream* bits,
                         StoreArray<CDCTriggerTrack>* storeTracks,
@@ -333,6 +372,16 @@ namespace Belle2 {
       }
     }
 
+    /**
+     *  Decode the 2D finder input from the Bitstream
+     *
+     *  @param foundTime    the clock at which a TS hit appears
+     *
+     *  @param bits         pointer to the input Bitstream
+     *
+     *  @param tsHits       pointer to the TS hit StoreArray
+     *
+     */
     void decode2DInput(short foundTime,
                        TSFOutputBitStream* bits,
                        StoreArray<CDCTriggerSegmentHit>* tsHits)
@@ -367,6 +416,14 @@ namespace Belle2 {
 
             // add if the TS hit of identical ID and foundTime is not already in the StoreArray
             // (from the 2D input of another quarter or the 2D track output)
+
+            /* TODO: Currently, it is very likely that a TS hit will appear
+             * multiple times in the StoreArray. To avoid adding the input from
+             * another quarter again, we need to look at the clock counter,
+             * because the data from different 2D's are not always synchronized
+             * due to Belle2Link instability. To avoid adding again from the 2D
+             * output, we need to consider the 2D latency.
+             */
             if (std::none_of(tsHits->begin(), tsHits->end(),
             [hit](CDCTriggerSegmentHit storeHit) {
             return (storeHit.getSegmentID() == hit.getSegmentID() &&

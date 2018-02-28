@@ -43,6 +43,7 @@ namespace Belle2 {
   /* enum class SubTriggerType : unsigned char {Merger, TSF, T2D, T3D, Neuro, ETF}; */
 
   struct SubTrigger {
+    /** constructor */
     SubTrigger(std::string inName,
                unsigned inEventWidth, unsigned inOffset,
                int inHeaderSize, std::vector<int> inNodeID,
@@ -52,25 +53,62 @@ namespace Belle2 {
       iFinesse(inNodeID.back()), delay(inDelay),
       debugLevel(inDebugLevel) {};
 
+    /** Name of the UT3 */
     std::string name;
+    /** Size of an event in the Belle2Link data in 32-bit words */
     unsigned eventWidth;
+    /** The starting point of the data in an event */
     unsigned offset;
+    /** Size of the B2L header in words */
     int headerSize;
+    /** COPPER id of the board */
     int iNode;
+    /** FINESSE (HSLB) id) of the board */
     int iFinesse;
 
-    /** information from Belle2Link header */
+    /* information from Belle2Link header */
+    /** type of the FPGA firmware */
     std::string firmwareType;
+    /** version of the FPGA firmware */
     std::string firmwareVersion;
-    /** reference to the Belle2Link delay member attribute */
+    /** Reference to the variable of its Belle2Link delay */
     int& delay;
 
+    /** debug level in the steering file */
     int debugLevel;
 
+    /**
+     *  Calculate the number of clocks in the data,
+     *  reserve that much of clocks in the Bitstream(s)
+     *
+     *  @param subDetectorId   COPPER id of the current data
+     *
+     *  @param nWords          Number of words of each FINESSE in the COPPER
+     */
     virtual void reserve(int, std::array<int, nFinesse>) {};
-    virtual void unpack(int, std::array<int*, nFinesse>, std::array<int, nFinesse>) {};
 
-    /** Get the B2L header information */
+    /**
+     *  Unpack the Belle2Link data and fill the Bitstream
+     *
+     *  @param subDetectorId   COPPER id of the current data
+     *
+     *  @param data32tab       list of pointers to the Belle2Link data buffers
+     *
+     *  @param nWords          Number of words of each FINESSE in the COPPER
+     */
+    virtual void unpack(int,
+                        std::array<int*, nFinesse>,
+                        std::array<int, nFinesse>) {};
+
+    /**
+     *  Get the Belle2Link header information
+     *
+     *  @param subDetectorId   COPPER id of the current data
+     *
+     *  @param data32tab       list of pointers to the Belle2Link data buffers
+     *
+     *  @param nWords          Number of words of each FINESSE in the COPPER
+     */
     virtual void getHeaders(int subDetectorId,
                             std::array<int*, 4> data32tab,
                             std::array<int, 4> nWords)
@@ -78,6 +116,7 @@ namespace Belle2 {
       if (subDetectorId != iNode) {
         return;
       }
+      // empty data buffer
       if (nWords[iFinesse] < headerSize) {
         return;
       }
@@ -107,6 +146,7 @@ namespace Belle2 {
       }
     };
 
+    /** destructor */
     virtual ~SubTrigger() {};
   };
 
@@ -115,7 +155,9 @@ namespace Belle2 {
    *
    * There are 2 output formats:
    * 1. the Bitstream containing the bit content of each module
-   * 2. decoded Basf2 object
+   *    This is useful for the firmware simulation
+   * 2. decoded Basf2 TSIM object
+   *    This is the same as the fast TSIM output
    *
    */
   class CDCTriggerUnpackerModule : public Module {
@@ -181,11 +223,8 @@ namespace Belle2 {
     /** Belle2Link delay of the 2D finder */
     int m_2DFinderDelay = 0;
 
+    /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;
-
-    void unpack(SubTrigger& subTrigger, int subDetectorId,
-                std::array<int*, nFinesse> data32tab,
-                std::array<int, nFinesse> nWords);
 
   };
 

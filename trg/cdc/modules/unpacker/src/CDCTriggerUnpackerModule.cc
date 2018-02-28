@@ -34,20 +34,37 @@ REG_MODULE(CDCTriggerUnpacker)
 //-----------------------------------------------------------------
 
 constexpr std::array<int, 9> CDCTriggerUnpackerModule::nMergers;
+using dataWord = std::bitset<wordWidth>;
 
 namespace Belle2 {
+  //-----------------------------------------------------------------
+  //                 Definition of Subtriggers
+  //-----------------------------------------------------------------
+  /*
+   * To implement an unpacker for a new subtrigger module,
+   * 1. Declare a new struct, inherit from SubTrigger
+   * 2. Hold the pointers to the bitstream(s)
+   * 3. declare as many variables as needed
+   * 4. Implement the virtual methods reserve() and unpack()
+   * 5. Instantiate it in initialize() (one object for one UT3)
+   * 6. Push them back to m_subTrigger
+   */
+
+  /** unpacker for the merger reader (TSF which reads the merger output) */
   struct Merger : SubTrigger {
     Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
            unsigned inEventWidth, unsigned inOffset,
            int inHeaderSize, std::vector<int> inNodeID,
            unsigned inNInnerMergers, int& inDelay,
            int inDebugLevel) :
-      SubTrigger(inName, inEventWidth, inOffset, inHeaderSize, inNodeID,
-                 inDelay, inDebugLevel),
+      SubTrigger(inName, inEventWidth, inOffset,
+                 inHeaderSize, inNodeID, inDelay, inDebugLevel),
       arrayPtr(inArrayPtr),
       nInnerMergers(inNInnerMergers) {};
 
+    /** pointer to the merger output Bitstream */
     StoreArray<MergerBits>* arrayPtr;
+    /** number of merger units in the inner super layer than this one */
     unsigned nInnerMergers;
     /** reserve enough number of clocks (entries) in the Bitstream StoreArray */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
@@ -93,9 +110,9 @@ namespace Belle2 {
         for (unsigned j = offset; j < eventWidth; ++j) {
           int iMerger = (eventWidth - j - 1) / 8 + nInnerMergers;
           int pos = (eventWidth - j - 1) % 8;
-          std::bitset<32> word(data32tab[iFinesse][i + j]);
-          for (int k = 0; k < 32; ++k) {
-            mergerClock->m_signal[iMerger].set(pos * 32 + k, word[k]);
+          dataWord word(data32tab[iFinesse][i + j]);
+          for (int k = 0; k < wordWidth; ++k) {
+            mergerClock->m_signal[iMerger].set(pos * wordWidth + k, word[k]);
           }
         }
       }
@@ -110,26 +127,41 @@ namespace Belle2 {
     }
   };
 
+  /** unpacker for the 2D tracker */
   struct Tracker2D : SubTrigger {
+    /** constructor */
     Tracker2D(StoreArray<TSFOutputBitStream>* inArrayPtr,
               StoreArray<T2DOutputBitStream>* outArrayPtr,
               std::string inName, unsigned inEventWidth, unsigned inOffset,
               unsigned inHeaderSize, std::vector<int> inNodeID,
               unsigned inNumTS, int& inDelay, int inDebugLevel) :
-      SubTrigger(inName, inEventWidth, inOffset / 32, inHeaderSize, inNodeID,
+      SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
                  inDelay, inDebugLevel),
       inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
       numTS(inNumTS), offsetBitWidth(inOffset) {};
 
+    /** pointer to the Bitstream of 2D input */
     StoreArray<TSFOutputBitStream>* inputArrayPtr;
+    /** pointer to the Bitstream of 2D output to 3D/Neuro */
     StoreArray<T2DOutputBitStream>* outputArrayPtr;
+    /** ID of the 2D tracker (0 to 3) */
     unsigned iTracker;
+    /** Number of TS sent to 2D (0 to 20) */
     unsigned numTS;
+    /** starting point of the input data in an Belle2Link event */
     unsigned offsetBitWidth;
+    /** bit width of a single TS hit information */
     static constexpr unsigned TSWidth = 21;
-    using word = std::bitset<wordWidth>;
-    /** reserve */
+
+    /**
+     *  Calculate the number of clocks in the data,
+     *  reserve that much of clocks in the Bitstream(s)
+     *
+     *  @param subDetectorId   COPPER id of the current data
+     *
+     *  @param nWords          Number of words of each FINESSE in the COPPER
+     */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
     {
       if (subDetectorId != iNode) {
@@ -151,6 +183,15 @@ namespace Belle2 {
       }
     };
 
+    /**
+     *  Unpack the Belle2Link data and fill the Bitstream
+     *
+     *  @param subDetectorId   COPPER id of the current data
+     *
+     *  @param data32tab       list of pointers to the Belle2Link data buffers
+     *
+     *  @param nWords          Number of words of each FINESSE in the COPPER
+     */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
                 std::array<int, 4> nWords)
@@ -181,7 +222,7 @@ namespace Belle2 {
       // Now we decide whether we will change the order of the clocks
       // based on the 127MHz counter on the 2nd half of the first word [15:0]
       int ccShift = 0;
-      std::queue<word> counters;
+      std::queue<dataWord> counters;
       for (int iclock = 0; iclock < inputArrayPtr->getEntries(); ++iclock) {
         counters.emplace(data32tab[iFinesse][headerSize + eventWidth * iclock]);
       }
@@ -213,11 +254,11 @@ namespace Belle2 {
                       eventWidth);
         }
         // get the clock counters
-        std::array<std::bitset<32>, 2> ccword({
+        std::array<dataWord, 2> ccword({
           data32tab[iFinesse][i + 2], data32tab[iFinesse][i + 3]
         });
         // fill input
-        // Careful. this iTSF is (8 - iSL) / 2
+        // Careful! this iTSF is (8 - iSL) / 2
         for (unsigned iTSF = 0; iTSF < nAxialTSF; ++iTSF) {
           // clear input bitstream
           inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker].fill(zero_val);
@@ -237,17 +278,33 @@ namespace Belle2 {
             */
             // fill the clock counters
             for (unsigned pos = 0; pos < clockCounterWidth; ++pos) {
-              const int j = (pos + iTSF * clockCounterWidth) / 32;
-              const int k = (pos + iTSF * clockCounterWidth) % 32;
+              const int j = (pos + iTSF * clockCounterWidth) / wordWidth;
+              const int k = (pos + iTSF * clockCounterWidth) % wordWidth;
+              /* The index behaves differently in each containers
+                 Here is an example of a 64-bit wide MSB data
+                 |-------- smaller index in the firmware ----->
+
+                 data in the firmware/VHDL std_logic_vector(63 downto 0)
+                  63 62 61 60 ...                         01 00
+
+                 data in B2L/RawTRG (when using std::bitset<32> for a word)
+                 (31 30 29 28 ... 01 00) (31 30 29 28 ... 01 00)
+                 |------ word 0 -------| |------ word 1 -------|
+
+                 XSim / Bitstream of std::array<char, N> / std::string
+                  00 01 02 03 ...                         62 63
+               */
+              // Here we are filling std::array<char, N>, which has reversed order
+              // to std::bitset, so there is a - sign in [wordWidth - k]
               inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker][pos] =
-                std_logic(ccword[j][31 - k]);
+                std_logic(ccword[j][wordWidth - k]);
             }
             // fill the TS hit
             offsetBitWidth = 82;
             for (unsigned pos = 0; pos < numTS * TSWidth; ++pos) {
               const int j = (offsetBitWidth + pos + iTSF * numTS * TSWidth) / wordWidth;
               const int k = (offsetBitWidth + pos + iTSF * numTS * TSWidth) % wordWidth;
-              std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+              dataWord word(data32tab[iFinesse][i + j]);
               // MSB (leftmost) in firmware -> smallest index in Bitstream's
               // std::array (due to XSIM) -> largest index in std::bitset
               // so the index is reversed in this assignment
@@ -272,10 +329,7 @@ namespace Belle2 {
             for (unsigned pos = 0; pos < TSFWidth; ++pos) {
               const int j = (offsetBitWidth + pos + iTSF * TSFWidth) / wordWidth;
               const int k = (offsetBitWidth + pos + iTSF * TSFWidth) % wordWidth;
-              std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
-              // MSB (leftmost) in firmware -> smallest index in Bitstream's
-              // std::array (due to XSIM) -> largest index in std::bitset
-              // so the index is reversed in this assignment
+              dataWord word(data32tab[iFinesse][i + j]);
               inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker][pos] =
                 std_logic(word[wordWidth - 1 - k]);
             }
@@ -295,7 +349,7 @@ namespace Belle2 {
           for (unsigned pos = 0; pos < 732; ++pos) {
             const int j = (offsetBitWidth + pos + outputOffset) / wordWidth;
             const int k = (offsetBitWidth + pos + outputOffset) % wordWidth;
-            std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+            dataWord word(data32tab[iFinesse][i + j]);
             outputClock->m_signal[iTracker][clockCounterWidth + oldtrackWidth + pos]
               = std_logic(word[wordWidth - 1 - k]);
           }
@@ -309,7 +363,7 @@ namespace Belle2 {
           for (unsigned pos = 0; pos < T2DOutputWidth; ++pos) {
             const int j = (pos + outputOffset) / wordWidth;
             const int k = (pos + outputOffset) % wordWidth;
-            std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+            dataWord word(data32tab[iFinesse][i + j]);
             outputClock->m_signal[iTracker][clockCounterWidth + pos]
               = std_logic(word[wordWidth - 1 - k]);
           }
@@ -386,8 +440,8 @@ void CDCTriggerUnpackerModule::initialize()
       B2DEBUG(20, "in: " << nInnerMergers);
       Merger* m_merger =
         new Merger(&m_mergerBits,
-                   "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / 32,
-                   mergerWidth * (nMergers[8] - nMergers[iSL]) / 32, m_headerSize,
+                   "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / wordWidth,
+                   mergerWidth * (nMergers[8] - nMergers[iSL]) / wordWidth, m_headerSize,
                    m_mergerNodeID[iSL / 2], nInnerMergers,
                    m_mergerDelay,
                    m_debugLevel);

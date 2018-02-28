@@ -87,7 +87,7 @@ void PXDRawDQMModule::defineHisto()
       hrawPxdHitsCharge[i] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
                                       ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
       hrawPxdHitsTimeWindow[i] = new TH1F(("hrawPxdHitsTimeWindow" + s2).c_str(),
-                                          ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 8192, -1024, 8192 - 1024);
+                                          ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 2048, -256, 2048 - 256);
     } else {
       hrawPxdHitMap[i] = NULL;
       hrawPxdChargeMap[i] = NULL;
@@ -152,7 +152,7 @@ void PXDRawDQMModule::event()
     }
 
     auto dhh_id = dhe->getDHEID();
-    auto startRow = dhe->getStartRow();
+    auto startGate = dhe->getTriggerGate();
 
     if (dhh_id <= 0 || dhh_id >= 64) {
       B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
@@ -163,7 +163,8 @@ void PXDRawDQMModule::event()
                                                    100 + it.getRow() + 850 * (layer + layer + sensor - 3));
     if (hrawPxdChargeMap[dhh_id]) hrawPxdChargeMap[dhh_id]->Fill(it.getColumn(), it.getRow(), it.getCharge());
     if (hrawPxdHitsCharge[dhh_id]) hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
-    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - startRow);
+    // Is this histogram necessary? we are folding with occupancy of sensor hits here
+    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 192 - startGate);
   }
 
   if (hrawPxdAdcMapAll) {

@@ -88,6 +88,10 @@ namespace Belle2 {
   protected:
     bool m_debug;/**<debug*/
 
+    bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
+    int m_maxHits; /**< exclude events with very large number of hits in arich */
+    int m_minHits; /**< exclude events with number of hits lower than this */
+
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/
     TH1* h_aeroStat = NULL;/**<Status of each aerogel tiles*/

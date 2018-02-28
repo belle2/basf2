@@ -22,6 +22,7 @@
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
@@ -80,6 +81,9 @@ namespace Belle2 {
     addParam("debug", m_debug, "debug mode", false);
     addParam("UpperMomentumLimit", m_momUpLim, "Upper momentum limit of tracks included in monitoring", 0.);
     addParam("LowerMomentumLimit", m_momDnLim, "Lower momentum limit of tracks included in monitoring", 0.);
+    addParam("ArichEvents", m_arichEvents, "Include only hits from events where an extrapolated track to arich exists", false);
+    addParam("MaxHits", m_maxHits, "Include only events with less than MaxHits hits in ARICH (remove loud events)", 70000);
+    addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in ARICH", 1);
   }
 
   ARICHDQMModule::~ARICHDQMModule()
@@ -170,6 +174,9 @@ namespace Belle2 {
     arichAeroHits.isOptional();
     StoreArray<ARICHLikelihood> likelihoods;
     likelihoods.isOptional();
+    StoreArray<ExtHit> extHits;
+    extHits.isOptional();
+
   }
 
   void ARICHDQMModule::beginRun()
@@ -217,7 +224,16 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMapping> arichChannelMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
 
-    if (arichHits.getEntries() == 0) return;
+    setReturnValue(1);
+
+    if (arichHits.getEntries() < m_minHits || arichHits.getEntries() > m_maxHits) { setReturnValue(0); return;}
+
+
+    Const::EDetector myDetID = Const::EDetector::ARICH; // arich
+    StoreArray<ExtHit> extHits;
+    int arichhit = 0;
+    for (const auto& extHit : extHits) if (extHit.getDetectorID() == myDetID) arichhit = 1;
+    if (!arichhit) { setReturnValue(0); if (m_arichEvents) return;}
 
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
@@ -228,6 +244,7 @@ namespace Belle2 {
     std::vector<int> hpd(420, 0);
     int nHit = 0;
     for (int i = 0; i < arichHits.getEntries(); i++) {
+
       int moduleID = arichHits[i]->getModule();
       h_chHit->Fill((moduleID - 1) * 144 + arichHits[i]->getChannel());
       hpd[moduleID - 1]++;

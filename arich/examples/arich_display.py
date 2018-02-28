@@ -1,50 +1,46 @@
-#!/usr/bin/env python3
+B1
+4205
+0c  # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Script for ARICH cosmics data simple analysis
-# reads arich raw data, stores arichHits and arichDigits into the output root file,
-# makes and displays DQM histograms, runs the event display
+# Script for running arich event display and DQM module on
+# processed data (containing arichHits)
+# To process raw data first use arich/examples/arich_process_raw.py
 #
-# run as: "basf2 ARICHCosmicTestData.py -- -f path2datafile.sroot"
-# add "-s 1" for event display
+# run as: "basf2 arich/examples/arich_display.py -- -f path2processedDatafile.sroot"
+# add "-s 1" for event display, otherwise only DQM histograms are produced
+# add "-a 1" to select only events that have extrapolated track in the arich
 #
 # two parameters (MinHits and MaxHits) are available for DQM module (check below)
 # only events with number of hits within the range are included in DQM histograms
 # and shown in the event display (set to 5 and 40, but change accoring your need)
 #
-# By: Luka Santelj
+# Author: Luka Santelj
 
 from basf2 import *
 import os
 from optparse import OptionParser
-from reconstruction import add_cosmics_reconstruction
 home = os.environ['BELLE2_LOCAL_DIR']
 
 
-reset_database()
+# reset_database()
+# use_central_database("development")
 use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
 
 # parameters
 parser = OptionParser()
-parser.add_option(
-    '-f',
-    '--file',
-    dest='filename',
-    default='/ghi/fs01/belle2/bdata/users/tkonno/cosmic/cosmic.0002.00951.HLT3.f00000.root')
-parser.add_option('-o', '--output', dest='output', default='ARICHHits.root')
-parser.add_option('-d', '--debug', dest='debug', default=0)
+parser.add_option('-f', '--file', dest='filename', default='ARICHHits.root')
 parser.add_option('-s', '--display', dest='display', default=0)
+parser.add_option('-a', '--arichtrk', dest='arichtrk', default=0)
 (options, args) = parser.parse_args()
 
 # create paths
 main = create_path()
 displ = create_path()
 
-
 # root input module
 input_module = register_module('RootInput')
 input_module.param('inputFileName', options.filename)
-# input_module.param('entrySequences',['5100:5300']) # select subrange of events
 main.add_module(input_module)
 
 # Histogram manager module
@@ -52,26 +48,17 @@ histo = register_module('HistoManager')
 histo.param('histoFileName', "histograms.root")  # File to save histograms
 main.add_module(histo)
 
-
 # build geometry if display option
 if int(options.display):
     gearbox = register_module('Gearbox')
     main.add_module(gearbox)
     geometry = register_module('Geometry')
-    geometry.param('components', ['ARICH'])
+    geometry.param('components', ['ARICH', 'MagneticField'])
     main.add_module(geometry)
-
-# unpack raw data
-unPacker = register_module('ARICHUnpacker')
-unPacker.param('debug', int(options.debug))
-main.add_module(unPacker)
-
-# create ARICHHits from ARICHDigits
-arichHits = register_module('ARICHFillHits')
-main.add_module(arichHits)
 
 # create simple DQM histograms
 arichHists = register_module('ARICHDQM')
+arichHists.param('ArichEvents', bool(options.arichtrk))
 arichHists.param('MaxHits', 40)
 arichHists.param('MinHits', 5)
 main.add_module(arichHists)
@@ -83,14 +70,10 @@ if int(options.display):
     display.param('showARICHHits', True)
     # show full geometry
     display.param('fullGeometry', True)
-    displ.add_module(display)
-
-# store dataobjects
-output = register_module('RootOutput')
-output.param('outputFileName', options.output)
-branches = ['ARICHDigits', 'ARICHHits']
-output.param('branchNames', branches)
-main.add_module(output)
+    if int(arichtrk):
+        displ.add_module(display)
+    else:
+        main.add_module(display)
 
 # show progress
 progress = register_module('Progress')

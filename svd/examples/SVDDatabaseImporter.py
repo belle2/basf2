@@ -81,6 +81,9 @@ class dbImporterModule(Module):
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
             print("Noise Imported")
+            # import the pedestals
+            dbImporter.importSVDPedestalCalibrationsFromXML(calibfile)
+            print("Pedestal Imported")
             # import pulse shape calibrations
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print("Pulse Shape Calibrations Imported")

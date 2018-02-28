@@ -32,6 +32,7 @@
 
 // wrapper objects
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
@@ -286,6 +287,13 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
   // with incomplete setup.
   importSVDCalibrationsFromXML< SVDNoiseCalibrations::t_payload  >(SVDNoiseCalibrations::name,
       xmlFileName, "noises",
+      -1.0, errorTollerant);
+}
+
+void SVDDatabaseImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDPedestalCalibrations::t_payload  >(SVDPedestalCalibrations::name,
+      xmlFileName, "pedestals",
       -1.0, errorTollerant);
 }
 

@@ -84,6 +84,7 @@ namespace Belle2 {
      * @param errorTollerant if true bypasses sanity checks
      */
     void importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+    void importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
     void importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
 
     /**

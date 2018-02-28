@@ -44,8 +44,6 @@ namespace Belle2 {
     std::vector<boost::variant<std::string, int>> m_particles;
     /** If true require either the particle or its charge conjugate */
     bool m_includeConjugates{true};
-    /** Maximum amount of tries per event to generate a event */
-    unsigned int m_maxTries{10000};
     /** List of generated particles */
     StoreArray<MCParticle> m_mcParticles;
     /** Set of PDG codes to look for */

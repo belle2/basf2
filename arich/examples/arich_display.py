@@ -68,6 +68,8 @@ if int(options.display):
     display = register_module('Display')
     # show arich hits
     display.param('showARICHHits', True)
+    # show reconstruced tracks
+    display.param('showRecoTracks', True)
     # show full geometry
     display.param('fullGeometry', True)
     if int(arichtrk):

@@ -329,7 +329,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
     // get the point to the static sector
     const StaticSectorType* outerStaticSector = outerSector->getEntry().getAttachedStaticSector();
     // should not happen, but just in case:
-    if (outerStaticSector == NULL) {
+    if (outerStaticSector == nullptr) {
       B2WARNING("Static sector not found. This should not happen!");
       continue;
     }
@@ -343,7 +343,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
       //retrieve the filter, a null pointer is returned if there is no filter
       const auto* filter2sp = outerStaticSector->getFilter2sp(innerSector->getEntry().getFullSecID());
-      if (filter2sp == NULL) {
+      if (filter2sp == nullptr) {
         continue;
       }
 
@@ -427,7 +427,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
     // get the point to the static sector
     const StaticSectorType* outerStaticSector = outerHit->getEntry().m_sector->getAttachedStaticSector();
     // should not happen, but just in case:
-    if (outerStaticSector == NULL) {
+    if (outerStaticSector == nullptr) {
       B2WARNING("Static sector not found. This should not happen!");
       continue;
     }
@@ -445,7 +445,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         //retrieve the filter
         const auto* filter3sp = outerStaticSector->getFilter3sp(centerHit->getEntry().m_sector->getFullSecID(),
                                                                 innerHit->getEntry().m_sector->getFullSecID());
-        if (filter3sp == NULL) {
+        if (filter3sp == nullptr) {
           continue;
         }
 

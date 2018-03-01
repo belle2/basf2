@@ -41,7 +41,7 @@ namespace Belle2 {
       /** REDESIGNCOMMENT CELLULARAUTOMATON:
        * optimization tip:
        * - at the moment for each round the number of active cells is reduced, but the loop runs over all nodes/cells.
-       * Maybe its faster to recreate/refill an ActiceCell-List each round.
+       * TODO: Test Jakob's idea: Maybe its faster to recreate/refill an ActiveCell-List each round.
        */
       unsigned int activeCells = 1, // is set 1 because of following while loop.
                    deadCells = 0,

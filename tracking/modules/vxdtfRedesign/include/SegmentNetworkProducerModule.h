@@ -54,7 +54,7 @@ namespace Belle2 {
       /// Whether the sector was already added to the network
       bool wasCreated;
 
-      /// Stores a sector if one is found, NULL else
+      /// Stores a sector if one is found, nullptr else
       ActiveSector<StaticSectorType, TrackNode>* sector;
 
       /// Stores a static sector
@@ -109,7 +109,7 @@ namespace Belle2 {
     std::vector<RawSectorData> matchSpacePointToSectors();
 
 
-    /// Returns pointer to static sector of a provided SpacePoint; returns NULL-ptr if no sector could be found.
+    /// Returns pointer to static sector of a provided SpacePoint; returns nullptr if no sector could be found.
     const StaticSectorType* findSectorForSpacePoint(const SpacePoint& aSP)
     {
       if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {

@@ -132,7 +132,7 @@ namespace Belle2 {
 
 
     /** Check if a given entry is already in the network */
-    bool isNodeInNetwork(const NodeID nodeID) const
+    inline bool isNodeInNetwork(const NodeID nodeID) const
     {
       return m_nodeMap.count(nodeID);
     }
@@ -206,7 +206,7 @@ namespace Belle2 {
 
 
     /** Returns number of nodes to be found in the network */
-    unsigned int size() const { return m_nodeMap.size(); }
+    inline unsigned int size() const { return m_nodeMap.size(); }
 
 
   protected:

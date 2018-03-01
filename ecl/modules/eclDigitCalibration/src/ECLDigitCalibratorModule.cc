@@ -376,13 +376,18 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
         ++backgroundcount;
 
         //EventLevelClustering counters
+
         //Get digit theta
         const B2Vector3D position  = geom->GetCrystalPos(aECLCalDigit.getCellId() - 1);
         const double theta         = position.Theta();
+
+        //Get detector region
         const auto detectorRegion = ECL::getDetectorRegion(theta);
+
+        //Count out of time digits per region
         if (detectorRegion == ECL::DetectorRegion::FWD) { ++outOfTimeFwd; }
-        if (detectorRegion == ECL::DetectorRegion::BRL) { ++outOfTimeBrl; }
-        if (detectorRegion == ECL::DetectorRegion::BWD) { ++outOfTimeBwd; }
+        else if (detectorRegion == ECL::DetectorRegion::BRL) { ++outOfTimeBrl; }
+        else if (detectorRegion == ECL::DetectorRegion::BWD) { ++outOfTimeBwd; }
       }
     }
     ++totalcount;
@@ -398,12 +403,12 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
   eclEventInformationPtr->setBackgroundECL(backgroundcount);
 
   //Save EventLevelClusterInfo
-  if (!m_eventLevelClusteringInfo) m_eventLevelClusteringInfo.create();
+  if (!m_eventLevelClusteringInfo) {m_eventLevelClusteringInfo.create();}
   m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeFWD(outOfTimeFwd);
   m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBarrel(outOfTimeBrl);
   m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBWD(outOfTimeBwd);
 
-  B2DEBUG(180, "ECLDigitCalibratorModule::determineBackgroundECL found " << outOfTimeFwd << ", " << outOfTimeBrl << ", " <<
+  B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL found " << outOfTimeFwd << ", " << outOfTimeBrl << ", " <<
           outOfTimeBwd << " out of time digits in FWD, BRL, BWD");
 
   B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL(): backgroundcount = " << backgroundcount);

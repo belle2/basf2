@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Benjamin Schwenker                        *
+ * Contributors: Yu Hu and Torben Ferber                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -97,7 +97,7 @@ namespace Belle2 {
       }
 
       GearDir content5(content, "CDCGAPS");
-      // Read parameters for Backward Gap Mom Volume
+      // Read thickness and density for Gaps Volume
       ThicknessPar ThickPar(
         content5.getInt("IRCDCBack"),
         content5.getInt("IPhiCDCBack"),

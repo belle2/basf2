@@ -96,27 +96,25 @@ namespace Belle2 {
         vxdMaterialGeometryPar.getbeastEclMaterials().push_back(MaterialPar);
       }
 
-      GearDir content5(content, "CDCGAPS/BackwardGAP");
+      GearDir content5(content, "CDCGAPS");
       // Read parameters for Backward Gap Mom Volume
-      ThicknessBackPar ThickBackPar;
-      for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < 144; j++) {
-          const double thick = content5.getLength("Bthick_" + to_string(i) + "_" + to_string(j)) / Unit::mm;
-          ThickBackPar.appendNode(thick);
-        }
-      }
-      vxdMaterialGeometryPar.getthickBack() = ThickBackPar;
+      ThicknessPar ThickPar(
+        content5.getInt("IRCDCBack"),
+        content5.getInt("IPhiCDCBack"),
+        content5.getInt("IRCDCFor"),
+        content5.getInt("IPhiCDCFor"),
+        content5.getInt("IRECLBack"),
+        content5.getInt("IPhiECLBack"),
+        content5.getInt("IRECLFor"),
+        content5.getInt("IPhiECLFor"),
+        content5.getInt("IRARICHFor"),
+        content5.getInt("IPhiARICHFor"),
+        content5.getInt("IPhiTOPFor"),
+        content5.getArray("thicknesses"),
+        content5.getArray("density")
+      );
+      vxdMaterialGeometryPar.getthick() = ThickPar;
 
-      GearDir content6(content, "CDCGAPS/ForwardGAP");
-      // Read parameters for Forward Gap Mom Volume
-      ThicknessForPar ThickForPar;
-      for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < 144; j++) {
-          const double thick = content6.getLength("Fthick_" + to_string(i) + "_" + to_string(j)) / Unit::mm;
-          ThickForPar.appendNode(thick);
-        }
-      }
-      vxdMaterialGeometryPar.getthickFor() = ThickForPar;
 
       return vxdMaterialGeometryPar;
     }
@@ -148,37 +146,52 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_back, "VXD.GAPBack", &topVolume, false, 1);
 
       //      Create Materials from BEAST 2  between CDC and ECL.
-      const auto& ThickBack = parameters.getthickBack();
-      std::vector<double> ThicknessBack =  ThickBack.getThick();
-      const auto& ThickFor = parameters.getthickFor();
-      std::vector<double> ThicknessFor =  ThickFor.getThick();
+      const auto& Thick = parameters.getthick();
+      std::vector<double> Thickness =  Thick.getthickness();
+      std::vector<double> Density =  Thick.getdensity();
+      double IRCDCB =  Thick.getIRCDCB();
+      double IPhiCDCB =  Thick.getIPhiCDCB();
+      double IRCDCF =  Thick.getIRCDCF();
+      double IPhiCDCF =  Thick.getIPhiCDCF();
+      double IZECLB =  Thick.getIRECLB();
+      double IPhiECLB =  Thick.getIPhiECLB();
+      double IZECLF =  Thick.getIRECLF();
+      double IPhiECLF =  Thick.getIPhiECLF();
+      double IZARICHF =  Thick.getIRARICHF();
+      double IPhiARICHF =  Thick.getIPhiARICHF();
+      double IPhiTOPF =  Thick.getIPhiTOPF();
 
-      G4Material* medAluminum = geometry::Materials::get("Al");
+//      G4Material* medAluminum = geometry::Materials::get("Al");
       for (const BeastMaterialsPar& material : parameters.getbeastMaterials()) {
         const int materialID = material.getIdentifier();
         const double materialInnerR = material.getInnerR() / Unit::mm;
         const double materialOuterR = material.getOuterR() / Unit::mm;
         const double materialBackwardZ = material.getBackwardZ() / Unit::mm;
         const double materialForwardZ = material.getForwardZ() / Unit::mm;
-        const double cellR = (materialOuterR - materialInnerR) / 16;
         if (materialID < 2) {
           int blockid = 0;
-          for (int iR = 0; iR < 16; iR++) {
+          double IR = 0, IPhi = 0;
+          if (materialID < 1) {IR = IRCDCB; IPhi = IPhiCDCB;}
+          else {IR = IRCDCF; IPhi = IPhiCDCF;}
+          const double cellR = (materialOuterR - materialInnerR) / IRCDCB;
+          for (int iR = 0; iR < IR; iR++) {
             const double rmin = materialInnerR + iR * cellR;
             const double rmax = materialInnerR + (iR + 1) * cellR;
 //            const double materialThick = fabs(materialForwardZ - materialBackwardZ);
             const double materialPosZ = materialBackwardZ;
-            for (int iPhi = 0; iPhi < 144; iPhi++) {
-              const double SPhi = 360 / 144.*iPhi;
-              const double DPhi = 360 / 144.;
+            for (int iPhi = 0; iPhi < IPhi; iPhi++) {
+              const double SPhi = 360. / IPhi * iPhi;
+              const double DPhi = 360. / IPhi;
               const int blockID = blockid;
               if (materialID < 1) {
-                const double materialThick = ThicknessBack[blockid];
-                createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medAluminum, blockID, logical_gap_back);
+                const double materialThick = Thickness[blockid] / Unit::mm;
+                G4Material* mCDCGapback = geometry::Materials::get("CDCGapback");
+                createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, mCDCGapback, blockID, logical_gap_back);
               }
               if (materialID >= 1) {
-                const double materialThick = ThicknessFor[blockid];
-                createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medAluminum, blockID, logical_gap_for);
+                const double materialThick = Thickness[blockid + IRCDCB * IPhiCDCB] / Unit::mm;
+                G4Material* mCDCGapfor = geometry::Materials::get("CDCGapfor");
+                createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, mCDCGapfor, blockID, logical_gap_for);
               }
               blockid++;
             }
@@ -186,16 +199,19 @@ namespace Belle2 {
         }
         if (materialID == 2) {
           int blockid = 0;
-          for (int iZ = 0; iZ < 3; iZ++) {
+          for (int iZ = 0; iZ < IZARICHF; iZ++) {
             const double rmin = materialInnerR;
             const double rmax = materialOuterR;
-            const double materialThick = fabs(materialForwardZ - materialBackwardZ) / 3;
+            const double materialThick = fabs(materialForwardZ - materialBackwardZ) / IZARICHF;
             const double materialPosZ = materialBackwardZ + iZ * materialThick;
-            for (int iPhi = 0; iPhi < 144; iPhi++) {
-              const double SPhi = 360 / 144.*iPhi;
-              const double DPhi = 360 / 144.;
+            for (int iPhi = 0; iPhi < IPhiARICHF; iPhi++) {
+              const double SPhi = 360. / IPhiARICHF * iPhi;
+              const double DPhi = 360. / IPhiARICHF;
               const int blockID = blockid;
-              G4Material* medArichGap = geometry::Materials::get("ArichGap_" + to_string(iZ) + "_" + to_string(iPhi));
+              double density = Density[blockid];
+              G4Material* ArichAir = geometry::Materials::get("Arich_TopGapback");
+              G4Material* medArichGap = new G4Material("ArichGap_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
+              medArichGap->AddMaterial(ArichAir, 1.);
 //              G4Material* medArichGap = geometry::Materials::get("Al");
               createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medArichGap,  blockID, logical_gap_for);
               blockid++;
@@ -208,11 +224,14 @@ namespace Belle2 {
           const double rmax = materialOuterR;
           const double materialThick = materialForwardZ - materialBackwardZ;
           const double materialPosZ = materialBackwardZ;
-          for (int iPhi = 0; iPhi < 144; iPhi++) {
-            const double SPhi = 360 / 144.*iPhi;
-            const double DPhi = 360 / 144.;
+          for (int iPhi = 0; iPhi < IPhiTOPF; iPhi++) {
+            const double SPhi = 360. / IPhiTOPF * iPhi;
+            const double DPhi = 360. / IPhiTOPF;
             const int blockID = blockid;
-            G4Material* medTopGap = geometry::Materials::get("TopGap_" + to_string(iPhi));
+            double density = Density[blockid + IZARICHF * IPhiARICHF];
+            G4Material* TopAir = geometry::Materials::get("Top_ECLGapback");
+            G4Material* medTopGap = new G4Material("TopGap_" + to_string(iPhi), density, 1);
+            medTopGap->AddMaterial(TopAir, 1.);
 //            G4Material* medTopGap = geometry::Materials::get("Al");
             createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, materialID, medTopGap,  blockID, logical_gap_for);
             blockid++;
@@ -221,40 +240,50 @@ namespace Belle2 {
       }
       //      Create Materials from BEAST 2 between barrel and endcap of ECL.
       for (const BeastEclMaterialsPar& material : parameters.getbeastEclMaterials()) {
+        int blockid = 0;
+        double IZECL = 0, IPhiECL = 0;
         const int materialID = material.getIdentifier();
+        if (materialID < 1) {IZECL = IZECLB; IPhiECL = IPhiECLB;}
+        else {IZECL = IZECLF; IPhiECL = IPhiECLF;}
         const double materialInnerR1 = material.getInnerR1() / Unit::mm;
         const double materialOuterR1 = material.getOuterR1() / Unit::mm;
         const double materialInnerR2 = material.getInnerR2() / Unit::mm;
         const double materialOuterR2 = material.getOuterR2() / Unit::mm;
         const double materialBackwardZ = material.getBackwardZ() / Unit::mm;
         const double materialForwardZ = material.getForwardZ() / Unit::mm;
-        const double thick = (materialForwardZ - materialBackwardZ) / 3.0;
-        const double Hf1 = (materialInnerR2 - materialInnerR1) / 3.0;
-        const double Hf2 = (materialOuterR2 - materialOuterR1) / 3.0;
-        for (int iZ = 0; iZ < 3; iZ++) {
+        const double thick = (materialForwardZ - materialBackwardZ) / IZECL;
+        const double Hf1 = (materialInnerR2 - materialInnerR1) / IZECL;
+        const double Hf2 = (materialOuterR2 - materialOuterR1) / IZECL;
+        for (int iZ = 0; iZ < IZECL; iZ++) {
           const double rmin1 = materialInnerR1 + Hf1 * iZ;
           const double rmin2 = materialInnerR1 + Hf1 * (iZ + 1);
           const double rmax1 = materialOuterR1 + Hf2 * iZ;
           const double rmax2 = materialOuterR1 + Hf2 * (iZ + 1);
           const double posZ = materialBackwardZ + thick * iZ;
-          for (int iPhi = 0; iPhi < 144; iPhi++) {
-            const double SPhi = (360 / 144.) * iPhi;
-            const double DPhi = 360 / 144.;
+          for (int iPhi = 0; iPhi < IPhiECL; iPhi++) {
+            const double SPhi = (360. / IPhiECL) * iPhi;
+            const double DPhi = 360. / IPhiECL;
             const string storageName = "forward storage_" + to_string(iZ) + "_" + to_string(iPhi);
             if (materialID == 0) {
-              G4Material* medECLback = geometry::Materials::get("ECLback_" + to_string(iZ) + "_" + to_string(iPhi));
+              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF];
+              G4Material* ECLbackAir = geometry::Materials::get("ECLGapback");
+              G4Material* medECLback = new G4Material("ECLback_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
+              medECLback->AddMaterial(ECLbackAir, 1.);
 //            G4Material* medECLback = geometry::Materials::get("Al");
               createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLback, storageName, logical_gap_back);
             }
             if (materialID == 1) {
-              G4Material* medECLfor = geometry::Materials::get("ECLfor_" + to_string(iZ) + "_" + to_string(iPhi));
+              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF + IZECLB * IPhiECLB];
+              G4Material* ECLforAir = geometry::Materials::get("ECLGapfor");
+              G4Material* medECLfor = new G4Material("ECLfor_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
+              medECLfor->AddMaterial(ECLforAir, 1.);
 //            G4Material* medECLfor = geometry::Materials::get("Al");
               createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLfor, storageName, logical_gap_for);
             }
           }
         }
+        blockid++;
       }
-
     }
 
     void GeoVXDMaterialCreator::createTube(const double rmin, const double rmax, const double SPhi, const double DPhi,

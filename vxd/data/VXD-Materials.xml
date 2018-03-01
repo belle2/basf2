@@ -32,6 +32,48 @@
     </Components>
   </Material>
 
+  <Material name="Arich_TopGapback">
+    <density unit="g/cm3">1.29e-3</density>
+    <Components>
+      <Element fraction="0.7">N</Element>
+      <Element fraction="0.3">O</Element>
+    </Components>
+  </Material>
+  <Material name="Top_ECLGapback">
+    <density unit="g/cm3">1.29e-3</density>
+    <Components>
+      <Element fraction="0.7">N</Element>
+      <Element fraction="0.3">O</Element>
+    </Components>
+  </Material>
+  <Material name="ECLGapback">
+    <density unit="g/cm3">1.29e-3</density>
+    <Components>
+      <Element fraction="0.7">N</Element>
+      <Element fraction="0.3">O</Element>
+    </Components>
+  </Material>
+  <Material name="ECLGapfor">
+    <density unit="g/cm3">1.29e-3</density>
+    <Components>
+      <Element fraction="0.7">N</Element>
+      <Element fraction="0.3">O</Element>
+    </Components>
+  </Material>
+  <Material name="CDCGapback">
+    <density unit="g/cm3">2.699</density>
+    <Components>
+      <Material>Al</Material>
+    </Components>
+  </Material>
+  <Material name="CDCGapfor">
+    <density unit="g/cm3">2.699</density>
+    <Components>
+      <Material>Al</Material>
+    </Components>
+  </Material>
+
+
   <Material name="VXD-DiamondSensor">
     <state>Solid</state>
     <density unit="g/cm3">3.515</density>

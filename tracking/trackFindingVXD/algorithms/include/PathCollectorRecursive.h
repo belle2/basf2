@@ -93,7 +93,7 @@ namespace Belle2 {
       std::stringstream out;
       unsigned int longestPath = 0, longesPathIndex = 0, index = 0;
       out << "Print " << allPaths.size() << " paths:";
-      for (Path aPath : allPaths) {
+      for (Path const& aPath : allPaths) {
         if (longestPath < aPath.size()) {
           longestPath = aPath.size();
           longesPathIndex = index;

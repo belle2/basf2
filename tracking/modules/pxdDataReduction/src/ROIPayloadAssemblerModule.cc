@@ -64,7 +64,8 @@ void ROIPayloadAssemblerModule::initialize()
   eventMetaData.isRequired();
 
   StoreObjPtr<ROIpayload> roiPayloads;
-  roiPayloads.registerInDataStore(m_ROIpayloadName);
+  roiPayloads.registerInDataStore(
+    m_ROIpayloadName); // DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered will not work with two modules in seperate path branches
 
   // in case we don't accept all events, we have to look
   // up the trigger decision
@@ -131,9 +132,13 @@ void ROIPayloadAssemblerModule::event()
     }
   }
 
-  ROIpayload* payload = new ROIpayload(countROIs);// let the ROIpayload compute the size itself
-
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
+
+  if (payloadPtr.isValid()) {
+    B2FATAL("ROIpayload already in datastore, this must not be the case when calling the ROIPayloadAssemblerModule.");
+  }
+
+  ROIpayload* payload = new ROIpayload(countROIs);// let the ROIpayload compute the size itself
 
   payloadPtr.assign(payload);
 

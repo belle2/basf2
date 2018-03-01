@@ -64,7 +64,8 @@ void ROIPayloadAssemblerModule::initialize()
   eventMetaData.isRequired();
 
   StoreObjPtr<ROIpayload> roiPayloads;
-  roiPayloads.registerInDataStore(m_ROIpayloadName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  roiPayloads.registerInDataStore(
+    m_ROIpayloadName); // DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered will not work with two modules in seperate path branches
 
 }
 

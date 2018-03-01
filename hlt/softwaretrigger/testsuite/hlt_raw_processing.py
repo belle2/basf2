@@ -34,6 +34,7 @@ def main():
     # this encodes if its expressreco or hlt, because the files are named similar but are
     # in different folders on disk
     script_name_folder = os.path.basename(os.path.dirname(args.hlt_script))
+    print("Will use the script from folder {} with name {}".format(script_name_folder, script_name))
 
     working_folder = "hlt_raw_processing_{}_{}".format(script_name_folder, script_name)
     print("Using working folder {}".format(working_folder))

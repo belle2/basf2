@@ -43,17 +43,11 @@ namespace Belle2 {
       m_outerNodes.reserve(10);
     }
 
+    /** Forbid copy constructor */
+    DirectedNode(const DirectedNode& node) = delete;
 
-    /** copy constructor */
-    DirectedNode(const DirectedNode& node) :
-      m_entry(node.m_entry),
-      m_innerNodes(node.m_innerNodes),
-      m_outerNodes(node.m_outerNodes),
-      m_metaInfo(node.m_metaInfo),
-      m_family(-1)
-    {
-      B2ERROR("DirectedNode-copy-constructor has been called!");
-    }
+    /** Forbid assignment operator */
+    DirectedNode& operator=(const DirectedNode& node) = delete;
 
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
@@ -89,28 +83,28 @@ namespace Belle2 {
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
     /// Getters
     /** Returns links to all inner nodes attached to this one */
-    std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }
+    inline std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }
 
     /** Returns links to all outer nodes attached to this one */
-    std::vector<DirectedNode<EntryType, MetaInfoType>*>& getOuterNodes() { return m_outerNodes; }
+    inline std::vector<DirectedNode<EntryType, MetaInfoType>*>& getOuterNodes() { return m_outerNodes; }
 
     /** Allows access to stored entry */
-    EntryType& getEntry() { return m_entry; }
+    inline EntryType& getEntry() { return m_entry; }
 
     /** Allows const access to stored entry (needed for external operator overload */
-    const EntryType& getConstEntry() const { return m_entry; }
+    inline const EntryType& getConstEntry() const { return m_entry; }
 
     /** Returns Pointer to this node */
     DirectedNode<EntryType, MetaInfoType>* getPtr() { return this; }
 
     /** Returns reference to MetaInfoType attached to this node */
-    MetaInfoType& getMetaInfo() { return m_metaInfo; }
+    inline MetaInfoType& getMetaInfo() { return m_metaInfo; }
 
     /** Returns identifier of this cell */
-    short getFamily() const { return m_family; }
+    inline short getFamily() const { return m_family; }
 
     /** Assign a family identifier to this cell */
-    void setFamily(short family) { m_family = family; }
+    inline void setFamily(short family) { m_family = family; }
 
 
     /** ************************* DATA MEMBERS ************************* */

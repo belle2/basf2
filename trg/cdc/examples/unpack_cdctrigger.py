@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+###############################################################
+# example steering file to unpack the CDC Trigger data from B2L
+###############################################################
+
+# usage: basf2 SOME_PATH/unpack_cdctrigger.py -i inputFile.[s]root [-o outputFile.root]
+# (items in the square brackets [] are optional)
+
 from basf2 import *
 from ROOT import Belle2
 
@@ -16,14 +23,20 @@ main.add_module(root_input)
 
 unpacker = register_module('CDCTriggerUnpacker')
 unpacker.logging.log_level = LogLevel.DEBUG
+# increase this value to get debug mesages in more detail
 unpacker.logging.debug_level = 10
 unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-unpacker.param('unpackTracker2D', True)
+# size (number of words) of the Belle2Link header
 unpacker.param('headerSize', 3)
+# unpack the data from the 2D tracker and save its Bitstream
+unpacker.param('unpackTracker2D', True)
+# make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
 unpacker.param('decode2DFinderTrack', True)
+# make CDCTriggerSegmentHit objects from the 2D input
 unpacker.param('decode2DFinderInput', True)
 
 main.add_module(unpacker)
+# save the output root file with specified file name
 main.add_module('RootOutput', outputFileName='unpackedCDCTrigger.root')
 process(main)
 print(statistics)

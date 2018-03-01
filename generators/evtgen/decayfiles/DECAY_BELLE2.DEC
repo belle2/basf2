@@ -336,22 +336,24 @@ Decay anti-B0
 #
 # b -> s gamma
 #
-0.000043300 anti-K*0 gamma                                  HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.000043300 anti-K*0 gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
 # PR LHCb add omega gamma
-0.000000440 omega   gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  anti-K_10  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  anti-K'_10 gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  anti-K'*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  anti-K_2*0 gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  anti-K''*0 gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118     anti-Xsd    gamma     BTOXSGAMMA 2 ;
+0.000000440 omega   gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
+0.000000860 rho0    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to SVP_HELAMP
+0.000043  anti-K_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Uncommented and changed model from HELAMP to SVP_HELAMP
+0.0000065  anti-K'_10 gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 1.5e-6
+0.000012400 anti-K_2*0 gamma                                HELAMP 1.0 0.0 1.0 0.0;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to HELAMP
+0.0000017  anti-K''*0 gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
+0.0002735     anti-Xsd    gamma     BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes  
 #
 0.000000160 anti-K0 e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
 0.000001030 anti-K*0 e+      e-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 anti-Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000450 anti-K0 mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001050 anti-K*0 mu+     mu-                            PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 anti-Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+0.00000551 anti-Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes 
+0.000000021 pi+ pi- e+    e-                            PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
+0.000000339 anti-K0 mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000001020 anti-K*0 mu+     mu-                            PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000000021 pi+ pi- mu+     mu-                            PHSP; #[Reconstructed PDG2016]
+0.00000292 anti-Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes  
 0.0000001 anti-K0   tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 anti-K*0  tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 anti-Xsd  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
@@ -1492,11 +1494,10 @@ Decay anti-B0
 0.000001400 f_0     K-      pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007500 anti-K_2*0 phi                                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007600 eta     anti-K0 gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000004600 K-      pi+     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000019500 anti-K0 pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000041000 K-      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000012400 anti-K_2*0 gamma                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000860 rho0    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+# deleted K pi gamma
+#0.000019500 anti-K0 pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.00001300 anti-K0 pi0     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011] #BF(B0->K0 pi0 pi0) = 2/3 * BF(B0 -> K0 pi+ pi-)
+#0.000041000 K-      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000002660 anti-p- p+      anti-K0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001240 anti-p- p+      anti-K*0                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003140 anti-p- Lambda0 pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -1596,22 +1597,27 @@ Decay B0
 #
 # b -> s gamma
 #
-0.000043300 K*0     gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.000043300 K*0     gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
 # PR LHCb add omega gamma
-0.000000440 omega   gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  K_10  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  K'_10  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  K'*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  K_2*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  K''*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118   Xsd    gamma     BTOXSGAMMA 2 ;
+0.000000440 omega   gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
+0.000000860 rho0    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to SVP_HELAMP
+0.000043  K_10  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model from HELAMP to SVP_HELAMP 
+0.0000065  K'_10  gamma                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.5e-6
+0.000012400 K_2*0   gamma               HELAMP 1.0 0.0 1.0 0.0;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to HELAMP
+0.0000017  K''*0  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3
+0.0002735   Xsd    gamma     BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b - s gamma  states 
+
+#
+# b -> s gamma
 #
 0.000000160 K0      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
 0.000001030 K*0     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000450 K0      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001050 K*0     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+0.00000551 Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes 
+0.000000021 pi+ pi- e+    e-                            PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
+0.000000339 K0      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] 
+0.000001020 K*0     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000000021 pi+ pi- mu+     mu-                            PHSP; #[Reconstructed PDG2016]
+0.00000292 Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes 
 0.0000001 K0   tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 K*0  tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 Xsd  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
@@ -2734,11 +2740,10 @@ Decay B0
 0.000001400 f_0     K+      pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007500 K_2*0   phi                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007600 eta     K0      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000004600 K+      pi-     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000019500 K0      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000041000 K+      pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000012400 K_2*0   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000860 rho0    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000004600 K+      pi-     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011] # Commented out as this double counts the K*2_0 decaying into Kpi
+#0.000019500 K0      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.00001300 K0      pi0     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011] # BF(B0-> K0 pi0 pi0) = 2/3 BF(B0 -> K0 pi+ pi-) using isospin
+#0.000041000 K+      pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000002660 p+      anti-p- K0                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001240 p+      anti-p- K*0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003140 p+      anti-Lambda0 pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -2852,20 +2857,32 @@ Decay B-
 #
 # b-> s gamma
 #
-0.000042100 K*-     gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  K_1-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  K'_1-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  K'*-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  K_2*-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  K''*-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118     anti-Xsu    gamma     BTOXSGAMMA 2 ;
+0.000042100 K*-     gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016]
+0.000044000 K_1-    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
+0.000014000 K_2*-   gamma                                   HELAMP 1.0 0.0 1.0 0.0;     #[Reconstructed PDG2016] #Changed model to HELAMP from PHSP
+0.000000980 rho-    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
+0.000001  K'_1-  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000027  K'*-  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000067  K''*-  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.00013792     anti-Xsu    gamma     BTOXSGAMMA 2 ;  #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes  
+
 #
-0.000000550 K-      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001550 K*-     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 anti-Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000520 K-      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001160 K*-     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 anti-Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+# b -> s l l 
+#
+0.000000550 K-      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi-    e+      e-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] #[new mode from mu mu mode]
+0.000001550 K*-     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000038377 anti-Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes 
+0.00000044 K- pi+ pi-    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode from mu mu mode]
+0.000000293 K- pi0 pi0    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin from mu mu mode]
+0.000000079 K- phi    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.000000443 K-      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi-      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] #[new mode]
+0.00000096 K*-     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000044 K- pi+ pi-    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.000000293 K- pi0 pi0    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin]
+0.000000079 K- phi    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.0000021347 anti-Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001 K-        tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 K*-       tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 anti-Xsu  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
@@ -3738,14 +3755,13 @@ Decay B-
 0.000001200 K*-     anti-K*0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000006100 phi     K_1-                                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000008400 phi     K_2*-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000043000 K_1-    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007900 eta     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000003500 phi     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000007600 K-      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000020000 anti-K*0 pi-     gamma                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000046000 anti-K0 pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000014000 K_2*-   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000980 rho-    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000002900 eta'     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2016]
+0.000002700 phi     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#Removing K pi pi gamma and K*0 pi gamma to avoid double counting with higher K states
+#0.000007600 K-      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000020000 anti-K*0 pi-     gamma                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000046000 anti-K0 pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001620 anti-p- p+      pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000005900 anti-p- p+      K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003600 anti-p- p+      K*-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -3857,20 +3873,30 @@ Decay B+
 #
 # b-> s gamma
 #
-0.000042100 K*+     gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  K_1+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  K'_1+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  K'*+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  K_2*+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  K''*+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118   Xsu    gamma  BTOXSGAMMA 2;
+0.000042100 K*+     gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model from HELAMP ro SVP_HELAMP
+0.000044000  K_1+  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0 ; #[Reconstructed PDG2016] #Changed model from HELAMP to  SVP_HELAMP
+0.000014000 K_2*+   gamma                                   HELAMP 1.0 0.0 1.0 0.0;     #[Reconstructed PDG2016] #Changed model to HELAMP from PHSP
+0.000000980 rho+    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
+0.000001  K'_1+  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000027  K'*+  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000067  K''*+  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.00013792   Xsu    gamma  BTOXSGAMMA 2; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes  
+
 #
-0.000000550 K+      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001550 K*+     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000520 K+      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001160 K*+     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+0.000000550 K+      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi+    e+     e-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] #[new mode from mumu mode]
+0.000001550 K*+     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000044   K+  pi+  pi-  e+  e-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode from mumu mode]
+0.000000293   K+  pi0  pi0  e+  e-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin from mumu mode]
+0.000000079 K+ phi    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode from mumu]
+0.0000038377 Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes 
+0.000000443 K+      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi+      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000000960 K*+     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000044   K+  pi+  pi-  mu+  mu-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.000000393   K+  pi0  pi0  mu+  mu-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin]
+0.000000079 K+ phi    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.0000021347 Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001 K+   tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 K*+  tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 Xsu  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
@@ -4740,14 +4766,13 @@ Decay B+
 0.000001200 K*+     K*0                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000006100 phi     K_1+                                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000008400 phi     K_2*+                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000043000 K_1+    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007900 eta     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000003500 phi     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000007600 K+      pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000020000 K*0     pi+     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000046000 K0      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000014000 K_2*+   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000980 rho+    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000002900 eta'     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2016]
+0.000002700 phi     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2016]
+# commented out to avoid overlap with K gamma resonant states
+#0.000007600 K+      pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000020000 K*0     pi+     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000046000 K0      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001620 p+      anti-p- pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000005900 p+      anti-p- K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003600 p+      anti-p- K*+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]

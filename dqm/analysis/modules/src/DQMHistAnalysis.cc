@@ -92,17 +92,11 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
     }
   }
 
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histogram " << histname << " found in mem");
-      g_hist[histname] = (TH1*)obj;//Can't use addHist as we want to overwrite invalid entries
-      return (TH1*)obj;
-    }
-  } else {
-    B2INFO("Histogram " << histname << " NOT found in mem");
+  TH1* found_hist = findHist(d, tok);
+  if (found_hist) {
+    g_hist[histname] = found_hist;//Can't use addHist as we want to overwrite invalid entries
   }
-  return NULL;
+  return found_hist;
 
 }
 
@@ -113,6 +107,22 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   }
   return findHist(histname);
 }
+
+
+TH1* DQMHistAnalysisModule::findHist(const TDirectory* histdir, const TString& histname)
+{
+  TObject* obj = histdir->FindObject(histname);
+  if (obj != NULL) {
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      B2INFO("Histogram " << histname << " found in mem");
+      return (TH1*)obj;
+    }
+  } else {
+    B2INFO("Histogram " << histname << " NOT found in mem");
+  }
+  return NULL;
+}
+
 
 void DQMHistAnalysisModule::setIntValue(const std::string& parname, int vint)
 {

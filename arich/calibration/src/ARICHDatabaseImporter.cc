@@ -42,6 +42,7 @@
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
+#include <arich/utility/ARICHAerogelHist.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -64,6 +65,7 @@
 #include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
+#include <TString.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -862,9 +864,60 @@ void ARICHDatabaseImporter::dumpQEMap(bool simple)
 void ARICHDatabaseImporter::dumpAOP(std::string outRootFileName)
 {
 
-  B2INFO("void ARICHDatabaseImporter::dumpAOP(std::string outRootFileName)");
-  B2INFO("outRootFileName " << outRootFileName);
+  ARICHAerogelHist* h2_aerogel_up_n = new ARICHAerogelHist("h2_aerogel_up_n", "aerogel up n");
+  ARICHAerogelHist* h2_aerogel_up_transmL = new ARICHAerogelHist("h2_aerogel_up_transmL", "aerogel up transmL");
+  ARICHAerogelHist* h2_aerogel_up_thick = new ARICHAerogelHist("h2_aerogel_up_thick", "aerogel up thick");
+  ARICHAerogelHist* h2_aerogel_down_n = new ARICHAerogelHist("h2_aerogel_down_n", "aerogel down n");
+  ARICHAerogelHist* h2_aerogel_down_transmL = new ARICHAerogelHist("h2_aerogel_down_transmL", "aerogel down transmL");
+  ARICHAerogelHist* h2_aerogel_down_thick = new ARICHAerogelHist("h2_aerogel_down_thick", "aerogel down thick");
 
+  DBArray<ARICHAerogelMap> elementsM("ARICHAerogelMap");
+  elementsM.getEntries();
+  DBArray<ARICHAerogelInfo> elementsI("ARICHAerogelInfo");
+  elementsI.getEntries();
+
+  //
+  for (const auto& elementM : elementsM) {
+    if (elementM.getAerogelLayer(0) == 1) {
+      for (const auto& elementI : elementsI) {
+        if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+          //down
+          h2_aerogel_down_n->SetBinContent(h2_aerogel_down_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                           elementM.getAerogelColumnID()), elementI.getAerogelRefractiveIndex());
+          h2_aerogel_down_transmL->SetBinContent(h2_aerogel_down_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                 elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+          h2_aerogel_down_thick->SetBinContent(h2_aerogel_down_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                               elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+        }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+      }// for (const auto& elementI : elementsI) {
+    }
+    if (elementM.getAerogelLayer(1) == 1) {
+      for (const auto& elementI : elementsI) {
+        if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+          //up
+          h2_aerogel_up_n->SetBinContent(h2_aerogel_up_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(), elementM.getAerogelColumnID()),
+                                         elementI.getAerogelRefractiveIndex());
+          h2_aerogel_up_transmL->SetBinContent(h2_aerogel_up_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                               elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+          h2_aerogel_up_thick->SetBinContent(h2_aerogel_up_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                             elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+        }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+      }// for (const auto& elementI : elementsI) {
+    }
+  }//  for (const auto& elementM : elementsM) {
+
+  TFile* rootFile = new TFile(outRootFileName.c_str(), "RECREATE", " Histograms", 1);
+  rootFile->cd();
+  if (rootFile->IsZombie()) {
+    B2ERROR("  ERROR ---> file : " << outRootFileName.c_str() << " is zombi");
+  }
+  h2_aerogel_up_n->Write();
+  h2_aerogel_up_transmL->Write();
+  h2_aerogel_up_thick->Write();
+  h2_aerogel_down_n->Write();
+  h2_aerogel_down_transmL->Write();
+  h2_aerogel_down_thick->Write();
+  rootFile->Close();
 }
 
 

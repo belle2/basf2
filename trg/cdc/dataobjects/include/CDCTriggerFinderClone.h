@@ -23,7 +23,7 @@ namespace Belle2 {
     ~CDCTriggerFinderClone() { }
 
     // accessors
-    /** get size of bounding rectangle of cluster */
+    /** whether this is an old track (appears to be a clone) */
     bool isOldTrack() const { return oldTrack; }
 
   protected:

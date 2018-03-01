@@ -902,7 +902,7 @@ void ARICHDatabaseImporter::importAerogelInfo()
   Database::Instance().storeData("ARICHAerogelInfo", &agelConstants, iov);
 }
 
-void ARICHDatabaseImporter::exportAerogelInfo()
+void ARICHDatabaseImporter::exportAerogelInfo(int verboseLevel)
 {
 
   // Definition:
@@ -946,7 +946,20 @@ void ARICHDatabaseImporter::exportAerogelInfo()
     B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSN() <<
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
            element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
-  }
+    if (verboseLevel > 0) {
+      unsigned int ii = 0;
+      int lllambda = 200;
+      while (lllambda > 0) {
+        lllambda = element.getAerogelTransmittanceLambda(ii);
+        if (lllambda < 0)
+          break;
+        float llval = element.getAerogelTransmittance(ii);
+        B2INFO("   Lambda = " << lllambda << " Transmittance = " << llval);
+        ii++;
+      }// while(lllambda > 0){
+    }// if(verboseLevel>0){
+  }// for (const auto& element : elements) {
+
 }
 
 

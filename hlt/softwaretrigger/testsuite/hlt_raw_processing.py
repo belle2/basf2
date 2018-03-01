@@ -25,7 +25,7 @@ def main():
                         action="store_true", default=False)
     parser.add_argument("--ignore-db-failure", help="Ignore if the DB download was not successful (expert option)",
                         action="store_true", default=False)
-    parser.add_argument("--use-gdb", help="Use the gbb debugger when calling basf2",
+    parser.add_argument("--use-gdb", help="Use the gdb debugger when calling basf2",
                         action="store_true", default=False)
 
     args = parser.parse_args()

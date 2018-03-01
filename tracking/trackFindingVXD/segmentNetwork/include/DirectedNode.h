@@ -68,43 +68,43 @@ namespace Belle2 {
   public:
     /** ************************* OPERATORS ************************* */
     /** == -operator - compares if two nodes are identical */
-    inline bool operator == (const DirectedNode& b) const { return (m_entry == b.getConstEntry()); }
+    bool operator == (const DirectedNode& b) const { return (m_entry == b.getConstEntry()); }
 
     /** != -operator - compares if two nodes are not identical */
-    inline bool operator != (const DirectedNode& b) const { return !(m_entry == b.getConstEntry()); }
+    bool operator != (const DirectedNode& b) const { return !(m_entry == b.getConstEntry()); }
 
     /** == -operator - compares if the entry passed is identical with the one linked in this node */
-    inline bool operator == (const EntryType& b) const { return (m_entry == b); }
+    bool operator == (const EntryType& b) const { return (m_entry == b); }
 
     /** == -operator - compares if the entry passed is not identical with the one linked in this node */
-    inline bool operator != (const EntryType& b) const { return !(m_entry == b); }
+    bool operator != (const EntryType& b) const { return !(m_entry == b); }
 
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
     /// Getters
     /** Returns links to all inner nodes attached to this one */
-    inline std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }
+    std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }
 
     /** Returns links to all outer nodes attached to this one */
-    inline std::vector<DirectedNode<EntryType, MetaInfoType>*>& getOuterNodes() { return m_outerNodes; }
+    std::vector<DirectedNode<EntryType, MetaInfoType>*>& getOuterNodes() { return m_outerNodes; }
 
     /** Allows access to stored entry */
-    inline EntryType& getEntry() { return m_entry; }
+    EntryType& getEntry() { return m_entry; }
 
     /** Allows const access to stored entry (needed for external operator overload */
-    inline const EntryType& getConstEntry() const { return m_entry; }
+    const EntryType& getConstEntry() const { return m_entry; }
 
     /** Returns Pointer to this node */
     DirectedNode<EntryType, MetaInfoType>* getPtr() { return this; }
 
     /** Returns reference to MetaInfoType attached to this node */
-    inline MetaInfoType& getMetaInfo() { return m_metaInfo; }
+    MetaInfoType& getMetaInfo() { return m_metaInfo; }
 
     /** Returns identifier of this cell */
-    inline short getFamily() const { return m_family; }
+    short getFamily() const { return m_family; }
 
     /** Assign a family identifier to this cell */
-    inline void setFamily(short family) { m_family = family; }
+    void setFamily(short family) { m_family = family; }
 
 
     /** ************************* DATA MEMBERS ************************* */
@@ -128,7 +128,7 @@ namespace Belle2 {
   /** ************************* NON-MEMBER FUNCTIONS ************************* */
   /** Non-memberfunction Comparison for equality with EntryType <-> DirectedNode< EntryType > */
   template <class EntryType, class MetaInfoType>
-  inline bool operator == (const EntryType& a, const DirectedNode<EntryType, MetaInfoType>& b)
+  bool operator == (const EntryType& a, const DirectedNode<EntryType, MetaInfoType>& b)
   {
     return (a == b.getConstEntry());
   }

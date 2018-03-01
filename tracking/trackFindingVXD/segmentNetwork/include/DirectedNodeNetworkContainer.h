@@ -85,29 +85,29 @@ namespace Belle2 {
 
 
     /** Returns number of activeSectors found. */
-    inline int sizeActiveSectors() { return m_activeSectors.size(); }
+    int sizeActiveSectors() { return m_activeSectors.size(); }
     /** Returns number of trackNodes found. */
-    inline int sizeTrackNodes() { return m_trackNodes.size(); }
+    int sizeTrackNodes() { return m_trackNodes.size(); }
     /** Returns number of segments found. */
-    inline int sizeSegments() { return m_segments.size(); }
+    int sizeSegments() { return m_segments.size(); }
 
     /** Returns number of activeSectors connections made. */
-    inline int get_activeSectorConnections() { return m_activeSectorConnections; }
+    int get_activeSectorConnections() { return m_activeSectorConnections; }
     /** Returns number of trackNodes connections made. */
-    inline int get_trackNodeConnections() { return m_trackNodeConnections; }
+    int get_trackNodeConnections() { return m_trackNodeConnections; }
     /** Returns number of segments connections made. */
-    inline int get_segmentConnections() { return m_segmentConnections; }
+    int get_segmentConnections() { return m_segmentConnections; }
     /** Returns number of paths found. */
-    inline int get_collectedPaths() { return m_collectedPaths; }
+    int get_collectedPaths() { return m_collectedPaths; }
 
     /** Sets number of activeSectors connections made. */
-    inline void set_activeSectorConnections(int in) { m_activeSectorConnections = in; }
+    void set_activeSectorConnections(int in) { m_activeSectorConnections = in; }
     /** Sets number of trackNodes connections made. */
-    inline void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
+    void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
     /** Sets number of segments connections made. */
-    inline void set_segmentConnections(int in) { m_segmentConnections = in; }
+    void set_segmentConnections(int in) { m_segmentConnections = in; }
     /** Sets number of paths found. */
-    inline void set_collectedPaths(int in) { m_collectedPaths = in; }
+    void set_collectedPaths(int in) { m_collectedPaths = in; }
 
     /** Clear directed node network container
      * Called to clear the directed node network container if the segment network size grows to large.

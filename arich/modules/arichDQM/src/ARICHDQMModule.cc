@@ -233,7 +233,7 @@ namespace Belle2 {
     StoreArray<ExtHit> extHits;
     int arichhit = 0;
     for (const auto& extHit : extHits) if (extHit.getDetectorID() == myDetID) arichhit = 1;
-    if (!arichhit) { setReturnValue(0); if (m_arichEvents) return;}
+    if (!arichhit && extHits.getEntries()) { setReturnValue(0); if (m_arichEvents) return;}
 
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();

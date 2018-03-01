@@ -232,7 +232,7 @@ namespace Belle2 {
     /**
      * Export ARICH aerogel data from the database.
      */
-    void exportAerogelInfo();
+    void exportAerogelInfo(int verboseLevel = 0);
 
     /**
      * Import ARICH aerogel map in the database.

@@ -24,21 +24,25 @@ namespace {
     return 0;
   }
 
+  Int_t plot(TString ahName){
+    ARICHAerogelHist *ah = (ARICHAerogelHist*)_file0->Get(ahName.Data());
+    ah->DrawHisto("ZCOLOT text same","");
+    return 0;
+  }
+
 }
 
 Int_t plotTestARICHAerogelHist() {
 
-  plotTest();
+  //plotTest();
 
-  //Build the plots    
-  //plot( elementsAM, elementsAI, "up", "n");
-  //plot( elementsAM, elementsAI, "down", "n");
-  //plot( elementsAM, elementsAI, "up", "transmL");
-  //plot( elementsAM, elementsAI, "down", "transmL");
-  //plot( elementsAM, elementsAI, "up", "thick");
-  //plot( elementsAM, elementsAI, "down", "thick");
-  //Int_t verboseLevel = 0;
-  //printMy (elementsAM, elementsAI, verboseLevel);
+  plot("h2_aerogel_up_n");
+  plot("h2_aerogel_up_transmL");
+  plot("h2_aerogel_up_thick");
+
+  plot("h2_aerogel_down_n");
+  plot("h2_aerogel_down_transmL");
+  plot("h2_aerogel_down_thick");
 
   return 0;
   

@@ -22,6 +22,8 @@ ieClass = options.whatclass
 hvtest = options.hvtest
 aopRootF = options.aopRootF
 
+home = os.environ['BELLE2_LOCAL_DIR']
+
 # use_local_database()
 use_local_database("test_database.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
@@ -34,10 +36,8 @@ use_local_database("test_database.txt", "test_payloads")
 eventinfo = register_module('EventInfoSetter')
 eventinfo.initialize()
 
-
 main = create_path()
 main.add_module(eventinfo)
-
 
 # create a gearbox module to read read the aerogel data so it can be used
 # it needs to open just the aerogel/AerogelData.xml which includes all other xml
@@ -141,9 +141,11 @@ if(ie == 'export'):
     if(ieClass == 'aerogelTilesInfo'):
         dbImporter.printAeroTileInfo()
     if(ieClass == 'dumpAOP'):
-        dbImporter.dumpAOP()
+        # dbImporter.dumpAOP()
         # dbImporter.dumpAOP("ARICH_AOP.root")
-        # dbImporter.dumpAOP(aopRootF)
+        dbImporter.dumpAOP(aopRootF)
+        com = 'root -l ' + aopRootF + ' ' + home + '/arich/utility/scripts/plotTestARICHAerogelHist.C'
+        os.system(com)
     if(ieClass == 'hapdQA'):
         dbImporter.exportHapdQA()
     if(ieClass == 'hapdQE'):

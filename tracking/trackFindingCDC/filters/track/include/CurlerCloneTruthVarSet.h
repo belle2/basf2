@@ -22,10 +22,10 @@ namespace Belle2 {
     /// Names of the variables to be generated
     constexpr static char const* const curlerCloneTruthVarNames[] = {
       "weight", // if CDCTrack has minimalMatchPurity (50%)
-      "track_is_fake", // less than 80% purity in CDC
-      "track_is_matched", // not fake
+      "truth_track_is_fake", // less than 80% purity in CDC
+      "truth_track_is_matched", // not fake
       "truth_matched_hits",
-      "track_is_curler_clone", // track is clone
+      "truth_track_is_curler_clone", // track is clone
       "truth", // CDC track is not clone
       "truth_first_nloops",
       "truth_event_id",

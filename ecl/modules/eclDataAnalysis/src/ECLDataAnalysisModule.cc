@@ -37,6 +37,9 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 
+//MDST
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
@@ -438,6 +441,8 @@ void ECLDataAnalysisModule::initialize()
 
   B2INFO("[ECLDataAnalysis Module]: Starting initialization of ECLDataAnalysis Module.");
 
+  m_eventLevelClusteringInfo.registerInDataStore();
+
   m_eclSimHits.registerInDataStore(eclSimHitArrayName());
   m_eclHits.registerInDataStore(eclHitArrayName());
 
@@ -484,6 +489,14 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
   m_tree->Branch("evtNo", &m_iEvent, "evtNo/I");
+
+  //EventLevelClusteringInfo
+  m_tree->Branch("eclNumOutOfTimeDigitsFwd",     &m_nECLCalDigitsOutOfTimeFWD,         "eclNumOutOfTimeDigitsFwd/s");
+  m_tree->Branch("eclNumOutOfTimeDigitsBrl",     &m_nECLCalDigitsOutOfTimeBarrel,         "eclNumOutOfTimeDigitsBrl/s");
+  m_tree->Branch("eclNumOutOfTimeDigitsBwd",     &m_nECLCalDigitsOutOfTimeBWD,         "eclNumOutOfTimeDigitsBwd/s");
+  m_tree->Branch("eclNumRejectedShowersFwd",     &m_nECLShowersRejectedFWD,         "eclNumRejectedShowersFwd/b");
+  m_tree->Branch("eclNumRejectedShowersBrl",     &m_nECLShowersRejectedBarrel,         "eclNumRejectedShowersBrl/b");
+  m_tree->Branch("eclNumRejectedShowersBwd",     &m_nECLShowersRejectedBWD,         "eclNumRejectedShowersBwd/b");
 
   m_tree->Branch("eclDigitMultip",     &m_eclDigitMultip,         "ecldigit_Multip/I");
   m_tree->Branch("eclDigitIdx",        "std::vector<int>",         &m_eclDigitIdx);
@@ -845,6 +858,14 @@ void ECLDataAnalysisModule::event()
 {
 
   B2DEBUG(1, "  ++++++++++++++ ECLDataAnalysisModule");
+
+  //EventLevelClusterInfo
+  m_nECLCalDigitsOutOfTimeFWD = 0;
+  m_nECLCalDigitsOutOfTimeBarrel = 0;
+  m_nECLCalDigitsOutOfTimeBWD = 0;
+  m_nECLShowersRejectedFWD = 0;
+  m_nECLShowersRejectedBarrel = 0;
+  m_nECLShowersRejectedBWD = 0;
 
   ///Digits
   m_eclDigitMultip = 0;
@@ -1213,6 +1234,14 @@ void ECLDataAnalysisModule::event()
     m_iRun = -1;
     m_iEvent = -1;
   }
+
+  //EventLevelClusteringInfo
+  m_nECLCalDigitsOutOfTimeFWD = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTimeFWD();
+  m_nECLCalDigitsOutOfTimeBarrel = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTimeBarrel();
+  m_nECLCalDigitsOutOfTimeBWD  = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTimeBWD();
+  m_nECLShowersRejectedFWD = m_eventLevelClusteringInfo->getNECLShowersRejectedFWD();
+  m_nECLShowersRejectedBarrel = m_eventLevelClusteringInfo->getNECLShowersRejectedBarrel();
+  m_nECLShowersRejectedBWD = m_eventLevelClusteringInfo->getNECLShowersRejectedBWD();
 
   //DIGITS
   m_eclDigitMultip = m_eclDigits.getEntries();

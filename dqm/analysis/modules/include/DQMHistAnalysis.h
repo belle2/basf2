@@ -43,6 +43,7 @@ namespace Belle2 {
     static TH1* findHist(const std::string& histname);
     static TH1* findHist(const std::string& dirname,
                          const std::string& histname);
+    static TH1* findHist(const TDirectory* histdir, const TString& histname);
     static void setIntValue(const std::string& parname, int vint);
     static void setFloatValue(const std::string& parname, float vfloat);
     static void setText(const std::string& parname, const std::string& text);

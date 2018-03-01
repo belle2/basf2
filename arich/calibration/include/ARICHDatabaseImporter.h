@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Manca Mrvar, Thomas Kuhr                                 *
+ * Contributors: Manca Mrvar, Thomas Kuhr, Luka Santel, Leonid Burmistrov *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -136,6 +136,13 @@ namespace Belle2 {
      * Dumps module numbering scheme into root file (module position on the detector plane -> module number)
      */
     void dumpModuleNumbering();
+
+    /**
+     * Dumps aerogel tile properties (aerogel optical properties - AOP) into root file with
+     * arich/utility/ARICHAerogelHist histos
+     * @param string with output name
+     */
+    void dumpAOP(std::string outRootFileName = "ARICH_AOP.root");
 
     /**
      * Import parameters of the cosmic test geometry configuration

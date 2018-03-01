@@ -15,16 +15,18 @@ parser = OptionParser()
 parser.add_option('-c', '--class', dest='whatclass', default='none', help='')
 parser.add_option('-x', '--i-e', dest='importexport', default='export', help='')
 parser.add_option('-t', '--hvtest', dest='hvtest', default='no', help='')
+parser.add_option('-o', '--aopRootF', dest='aopRootF', default='ARICH_AOP.root', help='')
 (options, args) = parser.parse_args()
 ie = options.importexport
 ieClass = options.whatclass
 hvtest = options.hvtest
-
+aopRootF = options.aopRootF
 
 # use_local_database()
 use_local_database("test_database.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
 # use_central_database("ARICHdata", LogLevel.ERROR)
+# use_central_database("development", LogLevel.ERROR)
 #
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -138,6 +140,10 @@ if(ie == 'export'):
         dbImporter.exportAerogelMap()
     if(ieClass == 'aerogelTilesInfo'):
         dbImporter.printAeroTileInfo()
+    if(ieClass == 'dumpAOP'):
+        dbImporter.dumpAOP()
+        # dbImporter.dumpAOP("ARICH_AOP.root")
+        # dbImporter.dumpAOP(aopRootF)
     if(ieClass == 'hapdQA'):
         dbImporter.exportHapdQA()
     if(ieClass == 'hapdQE'):

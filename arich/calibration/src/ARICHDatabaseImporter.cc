@@ -11,6 +11,7 @@
 #include <arich/calibration/ARICHDatabaseImporter.h>
 #include <arich/calibration/ARICHDatabaseTools.h>
 #include <arich/dbobjects/ARICHAerogelMap.h>
+#include <arich/dbobjects/ARICHAerogelInfo.h>
 #include <arich/dbobjects/ARICHAsicInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
 #include <arich/dbobjects/ARICHFebTest.h>
@@ -858,7 +859,13 @@ void ARICHDatabaseImporter::dumpQEMap(bool simple)
   }
 }
 
+void ARICHDatabaseImporter::dumpAOP(std::string outRootFileName)
+{
 
+  B2INFO("void ARICHDatabaseImporter::dumpAOP(std::string outRootFileName)");
+  B2INFO("outRootFileName " << outRootFileName);
+
+}
 
 
 // classes for quality assessment and test data

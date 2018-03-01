@@ -2,7 +2,7 @@
 set -e
 
 module () {
-	eval `/usr/bin/modulecmd bash $*`
+	source /etc/profile.d/modules.sh
 }
 
 # This is wrapper to simplify usage of basf2 with grid-control jobs

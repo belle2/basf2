@@ -143,7 +143,7 @@ namespace TreeFitter {
     double pdgLifeTime() const { return m_pdgLifeTime ; }
 
     /** get Tau */
-    double pdgTau() const { return m_pdgMass > 0 ? m_pdgLifeTime / m_pdgMass : 0 ; }
+    double pdgTime() const { return m_pdgMass > 0 ? m_pdgLifeTime : 0; }
 
     /**  get charge */
     int charge() const { return m_charge ; }
@@ -213,13 +213,13 @@ namespace TreeFitter {
     int m_index;
 
     /** pdg mass  */
-    double m_pdgMass;
+    const double m_pdgMass;
 
     /**  particle width */
     double m_pdgWidth;
 
     /** lifetime in cm  */
-    double m_pdgLifeTime;
+    const double m_pdgLifeTime;
 
     /** charge  */
     int m_charge;

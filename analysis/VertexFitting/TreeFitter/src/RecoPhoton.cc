@@ -201,19 +201,6 @@ namespace TreeFitter {
 
     // dr'/dm | m:={xc,yc,zc,Ec} the measured quantities
     Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);
-    //P(0, i2) = -1; // dr0/di2c
-    //P(0, i1) = - p_vec[i2] / p_vec[i1] ; // dr0 / di1c (if x eliminated)
-    //P(0, i3) = 0; // dr0 / dxc (if x eliminated)
-
-    //P(1, i2) = 0; // dr1/dyc
-    //P(1, i1) = - p_vec[i3] / p_vec[i1] ; // dr1 / dxc
-    //P(1, i3) = -1 ; // dr1 / dxc
-
-    //P(2, i1) = -1. * p_vec[i1] / mom; // drE/dpx
-    //P(2, i2) = -1. * p_vec[i2] / mom; // drE/dpy
-    //P(2, i3) = -1. * p_vec[i3] / mom; // drE/dpz
-    //P(2, 3) = 1; // dE/dEc
-
     // deriving by the cluster pars
     P(0, i2) = 1;
     P(0, i1) = - p_vec[i2] / p_vec[i1];
@@ -248,7 +235,8 @@ namespace TreeFitter {
     p.getH()(2, momindex + i1) = -1. * p_vec[i1] / mom;
     p.getH()(2, momindex + i2) = -1. * p_vec[i2] / mom;
     p.getH()(2, momindex + i3) = -1. * p_vec[i3] / mom;
-    p.getH()(2, momindex + 3) = 1;
+    // the photon does not store an energy in the state vector
+    // so no p.getH()(2, momindex + 3) here
 
     return ErrCode::success;
   }

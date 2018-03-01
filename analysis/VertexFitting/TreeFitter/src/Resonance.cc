@@ -9,18 +9,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//Creates and initialises internal particles in the case where you want to treat them as resonances. Not to be confused with RecoResonance, which loads a pre-reconstructed resonance (i.e. from V0, etc)
-
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 
 namespace TreeFitter {
 
-  extern int vtxverbose;
-
-  Resonance::Resonance(Belle2::Particle* particle, const ParticleBase* mother,
-                       bool forceFitAll)
-    : InternalParticle(particle, mother, forceFitAll) {}  //ParticleBase("Resonance unused atm") {}
-
+  Resonance::Resonance(Belle2::Particle* particle,
+                       const ParticleBase* mother,
+                       bool forceFitAll) :
+    InternalParticle(particle, mother, forceFitAll) {}
 
   ErrCode Resonance::initMotherlessParticle(FitParams* fitparams)
   {

@@ -42,9 +42,12 @@ namespace TreeFitter {
     return rc;
   }
 
-  InternalParticle::InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
-                                     bool forceFitAll)
-    : ParticleBase(particle, mother), m_massconstraint(false), m_lifetimeconstraint(false)
+  InternalParticle::InternalParticle(Belle2::Particle* particle,
+                                     const ParticleBase* mother,
+                                     bool forceFitAll) :
+    ParticleBase(particle, mother),
+    m_massconstraint(false),
+    m_lifetimeconstraint(false)
   {
 
     if (particle) {
@@ -100,6 +103,7 @@ namespace TreeFitter {
     if (fitparams->getStateVector()(posindex)  == 0 &&
         fitparams->getStateVector()(posindex + 1) == 0 &&
         fitparams->getStateVector()(posindex + 2) == 0) {
+
       //otherwise, composites are initialized with a vertex at (0,0,0); if it's different, they were already vertexed; use that.
       TVector3 vtx = getBasf2Particle()->getVertex();
       if (vtx.Mag()) { //if it's not zero
@@ -152,7 +156,8 @@ namespace TreeFitter {
           //    HepPoint v ;
           TVector3 v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
-          // FIXME @francesco here was a minus sign I removed
+
+
           fitparams->getStateVector()(posindex)     = -v.x();
           fitparams->getStateVector()(posindex + 1) = -v.y();
           fitparams->getStateVector()(posindex + 2) = -v.z();
@@ -186,10 +191,12 @@ namespace TreeFitter {
         }
       }
     }
+
     // step 3: do the post initialization step of all daughters
     for (auto daughter :  m_daughters) {
       daughter->initParticleWithMother(fitparams);
     }
+
     // step 4: initialize the momentum by adding up the daughter 4-vectors
     initMomentum(fitparams);
     return status;
@@ -203,10 +210,16 @@ namespace TreeFitter {
     // vertex is still the origin, we copy the mother vertex.
     int posindex = posIndex();
     int posindexmom = 0;
-    if (hasPosition() && mother() && fitparams->getStateVector()(posindex) == 0 &&
-        fitparams->getStateVector()(posindex + 1) == 0 && fitparams->getStateVector()(posindex + 2) == 0) {
+
+    if (hasPosition() &&
+        mother() &&
+        fitparams->getStateVector()(posindex) == 0 &&
+        fitparams->getStateVector()(posindex + 1) == 0 && \
+        fitparams->getStateVector()(posindex + 2) == 0) {
+
       posindexmom = mother()->posIndex();
       fitparams->getStateVector().segment(posindex , 3) = fitparams->getStateVector().segment(posindexmom, 3);
+
     }
     // step 5: initialize the lifetime
     return initTau(fitparams);
@@ -215,20 +228,24 @@ namespace TreeFitter {
   ErrCode InternalParticle::initMomentum(FitParams* fitparams) const
   {
     int momindex = momIndex();
-    // reset
     fitparams->getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
-    // now add daughter momenta
+
     int daumomindex = 0, maxrow = 0;
     double e2 = 0, mass = 0;
+
     for (auto daughter : m_daughters) {
+
       daumomindex = daughter->momIndex();
       maxrow = daughter->hasEnergy() ? 4 : 3;
+
       e2 = fitparams->getStateVector().segment(daumomindex, maxrow).squaredNorm();
       fitparams->getStateVector().segment(momindex, maxrow) += fitparams->getStateVector().segment(daumomindex, maxrow);
+
       if (maxrow == 3) {
         mass = daughter->pdgMass();
-        fitparams->getStateVector()(momindex + 3) += sqrt(e2 + mass * mass);
+        fitparams->getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
+
     }
     return ErrCode::success;
   }
@@ -286,9 +303,8 @@ namespace TreeFitter {
           p.getH()(3, daumomindex + jmom) = -px / energy;
         }
 
-        /** FIXME temporarily switched off */
-        //} else if (false && dautauindex >= 0 && daughter->charge() != 0) {
-      } else if (dautauindex >= 0 && daughter->charge() != 0) {
+        //FIXME switched off
+      } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
 
         tau =  fitparams.getStateVector()(dautauindex);
         lambda = bFieldOverC() * daughter->charge();
@@ -347,14 +363,10 @@ namespace TreeFitter {
   void InternalParticle::addToConstraintList(constraintlist& list,
                                              int depth) const
   {
-    // first the daughters
-    // JFK: changed to non const Mon 04 Sep 2017 05:17:18 AM CEST
+
     for (auto daughter : m_daughters) {
       daughter->addToConstraintList(list, depth - 1);
     }
-
-    //double geoprecision  = 1e-5 ; // 1mu
-    //double massprecision = 4*pdgMass()*pdgMass()*1e-5 ; // 0.01 MeV
 
     // the lifetime constraint
     if (tauIndex() >= 0 && m_lifetimeconstraint) {
@@ -368,7 +380,7 @@ namespace TreeFitter {
 
     // the geometric constraint
     if (mother() && tauIndex() >= 0) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
+      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 5));
     }
 
     // the mass constraint

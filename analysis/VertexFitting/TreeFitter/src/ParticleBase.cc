@@ -32,9 +32,9 @@ namespace TreeFitter {
     m_particle(particle),
     m_mother(mother),
     m_index(0),
-    m_pdgMass(0),
+    m_pdgMass(particle->getPDGMass()),
     m_pdgWidth(0),
-    m_pdgLifeTime(0),
+    m_pdgLifeTime(TDatabasePDG::Instance()->GetParticle(particle->getPDGCode())->Lifetime() * 1e9),
     m_charge(0),
     m_name("Unknown")
   {
@@ -42,12 +42,8 @@ namespace TreeFitter {
       const int pdgcode = particle->getPDGCode();
       if (pdgcode) { // PDG code != 0
 
-        m_pdgMass      = particle->getPDGMass();//getMass() might also work
-        m_pdgWidth     = TDatabasePDG::Instance()->GetParticle(pdgcode)->Width();
-        //  m_pdgLifeTime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime();
-        m_pdgLifeTime = pdgLifeTime(particle);
-        double fltcharge = particle->getCharge();//FT: could also come from PDG
-        //FT: getCharge() divides by 3.0 and gives a float, make sure it doesn't create problems
+        double fltcharge = particle->getCharge();
+
         //  round to nearest integer
         m_charge = fltcharge < 0 ? int(fltcharge - 0.5) : int(fltcharge + 0.5);
         m_name = particle->getName();
@@ -66,7 +62,8 @@ namespace TreeFitter {
     m_pdgWidth(0),
     m_pdgLifeTime(0),
     m_charge(0),
-    m_name(name) {}
+    m_name(name)
+  {}
 
 
   ParticleBase::~ParticleBase()
@@ -121,32 +118,45 @@ namespace TreeFitter {
     if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
       B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.");
     }
+
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
         rc = new InternalParticle(particle, 0, forceFitAll);
       } else {
         rc = new InternalParticle(particle, 0, forceFitAll);
       }
+
     } else if (particle->getMdstArrayIndex() || particle->getTrack() || particle->getECLCluster()) { // external particles
       if (particle->getTrack()) {
         rc = new RecoTrack(particle, mother); // reconstructed track
+
       } else if (particle->getECLCluster()) {
         rc = new RecoPhoton(particle, mother); // reconstructed photon
-      } else if (isAResonance(particle)) {
+
+      } else if (isAResonance(particle)) {//FIXME make this klong?
         rc = new RecoResonance(particle, mother);
-      }  else {
+
+      }  else {// FIXME or make this Klong??
+
         rc = new RecoComposite(particle, mother);
       }
+
     } else { // 'internal' particles
+
       if (validfit) {   // fitted composites
         if (isAResonance(particle)) {
+
           rc = new RecoResonance(particle, mother);
+
         } else {
           rc = new RecoComposite(particle, mother);
         }
+
       } else {         // unfitted composites
+
         if (isAResonance(particle)) {
           rc = new Resonance(particle, mother, forceFitAll);
+
         } else {
           rc = new InternalParticle(particle, mother, forceFitAll);
         }
@@ -156,16 +166,16 @@ namespace TreeFitter {
   }
 
 
-  double ParticleBase::pdgLifeTime(Belle2::Particle* particle) //FT: This is actually the decay length in cm (in the CMS)
+  double ParticleBase::pdgLifeTime(Belle2::Particle* particle)
   {
     int pdgcode = particle->getPDGCode();
     double lifetime = 0;
-    double decaylen = 0;
+
     if (pdgcode) {
-      lifetime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime();
+      lifetime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime() * 1e9;
     }
-    decaylen = Belle2::Const::speedOfLight * lifetime * Belle2::Unit::s;
-    return decaylen ;
+
+    return lifetime ;
   }
 
 
@@ -173,32 +183,28 @@ namespace TreeFitter {
   {
     bool rc = false ;
     const int pdgcode = particle->getPDGCode();
-    //    if( pdgcode && particle->isComposite() ) {
-    if (pdgcode && !(particle->getMdstArrayIndex())) {  //FT: this should work for compositeness
-      switch (pdgcode) { //FT: (to do) I'd like this not to be hardcoded
-        //      case PDGCode::gamma:  // conversions are not treated as a resonance
-        case 22: // conversions are not treated as a resonance
+
+    if (pdgcode && !(particle->getMdstArrayIndex())) {
+      switch (pdgcode) {
+
+        case 22: //TODO converted photons ???
           rc = false;
           break ;
-        //      case PDGCode::e_plus: // bremstrahlung is treated as a resonance
-        case -11: // bremstrahlung is treated as a resonance
-        //      case PDGCode::e_minus:
+
+        case -11: //this is meant for bremsstrahlung do we need this TODO?
         case 11:
+
           rc = true ;
           break ;
-        default: // this should take care of the pi0
-          //FIXME check because tau
-          //  rc = particle->isAResonance() || (pdgcode && pdgLifeTime(particle)<1.e-8) ;
-          double ctau = pdgLifeTime(particle) / Belle2::Unit::um; //ctau in [um]
-          //    B2DEBUG(80, "Particle code is " << pdgcode << " with a lifetime of " << TDatabasePDG::Instance()->GetParticle(
-          //    pdgcode)->Lifetime() << " seconds and a decay lenght of " << ctau << " um.");
-          rc = (pdgcode && ctau < 1); //FT: this cut comes from the article
+
+        default:
+          //everything with boosted flight length less than 1 micrometer
+          rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
     }
     return rc ;
   }
 
-  //FT: this was moved from InternalParticle::addToDaughterList
   void ParticleBase::collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex)
   {
     if (mother() && mother()->posIndex() == posindex) {
@@ -233,20 +239,29 @@ namespace TreeFitter {
     }
 
     const int tauindex = tauIndex();
+
     if (tauindex >= 0) {
-      double tau = pdgTau();
+
+      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
       double sigtau = tau > 0 ? 20 * tau : 999;
-      const double maxdecaylength = 20; // [cm] (okay for Ks->pi0pi0)
-      double bcP = particle()->getP();
-      if (bcP > 0.0) {
-        sigtau = std::min(maxdecaylength, sigtau); // FIXME TAU
+
+      const double maxdecaytime = 2000;
+      double mom = particle()->getP();
+
+      if (mom > 0.0) {
+        sigtau = std::min(maxdecaytime, sigtau); // FIXME TAU
       }
+
       if (tau > 0) {
         sigtau = 20 * tau;
+
       } else {
-        sigtau = 100;
+        sigtau = 1000;
+
       }
-      fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
+      //fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
+      fitparams->getCovariance().block<3, 3>(tauindex, tauindex) =
+        Eigen::Matrix<double, 3, 3>::Constant(3, 3, sigtau * sigtau);
     }
 
     return status;
@@ -315,10 +330,17 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
     const int momindex = momIndex();
 
-    const double tau = fitparams.getStateVector()(tauindex);
+    //std::cout << "posindexmother " << posindexmother << " posindex " << posindex << " tauindex " << tauindex << " momindex " << momindex
+    //          << std::endl;
+
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
+    const double mom = p_vec.norm();
+    const double mom3 = mom * mom * mom;
     const Eigen::Matrix<double, 1, 3> x_vec = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
+
+    const Eigen::Matrix<double, 1, 3> tau_vec = fitparams.getStateVector().segment(tauindex, 3);
+    double tau = 0;
 
     double posxmother = 0, posx = 0, momx = 0;
 
@@ -327,8 +349,7 @@ namespace TreeFitter {
       posxmother = x_m(row);
       posx       = x_vec(row);
       momx       = p_vec(row);
-      //momx       = fitparams.getStateVector()(momindex + row) / mom;
-
+      tau = tau_vec(row);
       /**
        * x is the decay vertex of the particle
        * m the decay vertex of the mother
@@ -337,13 +358,30 @@ namespace TreeFitter {
        *  m + p = x
        * thus (tau converts p into units of length):
        *  0 = x - m - tau * p
+       *  this means that the real decay length is l = tau * |p|
        * */
+      //change only tau
+      p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
 
-      p.getResiduals()(row) = posxmother + tau * momx - posx ;
       p.getH()(row, posindexmother + row) = 1;
-      p.getH()(row, momindex + row) = tau;
-      p.getH()(row, posindex + row) = -1.;
-      p.getH()(row, tauindex)       = momx;
+      p.getH()(row, momindex + row) = tau * momx * momx / mom3 ;
+      p.getH()(row, posindex + row) = -1;
+      p.getH()(row, tauindex + row) = momx / mom;
+
+      //pos sign
+      //p.getResiduals()(row) = posxmother + tau * momx - posx ;
+      //p.getH()(row, posindexmother + row) = 1;
+      //p.getH()(row, momindex + row) = tau;
+      //p.getH()(row, posindex + row) = -1.;
+      //p.getH()(row, tauindex)       = momx;
+
+      //neg sign
+      //p.getResiduals()(row) = -posxmother - tau * momx + posx ;
+      //p.getH()(row, posindexmother + row) = -1;
+      //p.getH()(row, momindex + row) = -tau;
+      //p.getH()(row, posindex + row) = 1.;
+      //p.getH()(row, tauindex)       = -momx;
+
     }
 
     return ErrCode::success;
@@ -367,12 +405,6 @@ namespace TreeFitter {
     p.getH()(0, momindex + 2) = 2.0 * pz;
     p.getH()(0, momindex + 3) = -2.0 * E;
 
-    //p.getResiduals()(0) =  E * E - px * px - py * py - pz * pz - mass2;
-
-    //p.getH()(0, momindex) = -2.0 * px;
-    //p.getH()(0, momindex + 1) = -2.0 * py;
-    //p.getH()(0, momindex + 2) = -2.0 * pz;
-    //p.getH()(0, momindex + 3) =  2.0 * E;
     return ErrCode::success;
   }
 
@@ -397,28 +429,12 @@ namespace TreeFitter {
   {
     const int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
-      const ParticleBase* amother = mother();
-      const int momposindex = amother ? amother->posIndex() : -1;
-      const int posindex = posIndex();
-      //const int momindex = momIndex();
 
-      assert(momposindex >= 0); // check code logic: no mother -> no tau
+      assert(mother());
 
-      Eigen::Matrix<double, 3, 1> dxVec = fitparams->getStateVector().segment(posindex, 3)
-                                          - fitparams->getStateVector().segment(momposindex, 3);
+      const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
 
-      const double momdX = dxVec.norm() ; //was px*dx before
-
-      // if tau should be a time devide by mom2 insertad of the sqrt
-      double tau = std::abs(momdX); // / std::sqrt(mom2); //scalar product
-
-      if (tau == 0) {
-        tau = 5;// 5 / std::sqrt(mom2);//pdgTau();
-      }
-
-      if (std::isnan(tau)) {tau = -999;}
-
-      fitparams->getStateVector()(tauindex) = tau;
+      fitparams->getStateVector().segment(tauindex, 3) = Eigen::Matrix<double, 1, 3>::Constant(1, 3, value);
     }
 
     return ErrCode::success;

@@ -20,7 +20,8 @@ namespace TreeFitter {
   public:
 
     /** constructor */
-    InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
+    InternalParticle(Belle2::Particle* particle,
+                     const ParticleBase* mother,
                      bool forceFitAll) ;
 
     /** destructor */
@@ -44,8 +45,8 @@ namespace TreeFitter {
     /** find out which constraint it is and project */
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
 
-    /** space reesrvered in fit params  */
-    virtual int dim() const { return mother() ? 8 : 7 ; }
+    /** space reserved in fit params, if has mother then it has tau */
+    virtual int dim() const { return mother() ? 10 : 7 ; }
 
     /**  type */
     virtual int type() const { return kInternalParticle ; }
@@ -53,11 +54,11 @@ namespace TreeFitter {
     /**   posintion index in fit params*/
     virtual int posIndex() const { return index()   ; }
 
-    /** tau index in fit params  */
+    /** tau index in fit params only if it has a mother */
     virtual int tauIndex() const { return mother() ? index() + 3 : -1 ; }
 
-    /** momentum index in fit params  */
-    virtual int momIndex() const { return mother() ? index() + 4 : index() + 3 ; }
+    /** momentum index in fit params depending on wheter it has a mother  */
+    virtual int momIndex() const { return mother() ? index() + 6 : index() + 3 ; }
 
     /** has energy in fitparams  */
     virtual bool hasEnergy() const { return true ; }

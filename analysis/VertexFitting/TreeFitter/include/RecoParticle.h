@@ -27,13 +27,16 @@ namespace TreeFitter {
     /** init particle without mother */
     virtual ErrCode initMotherlessParticle(FitParams* fitparams);
 
-    /** FIXME obsolete and potial hazard??? */
+    /** dimension of the constraint */
     virtual int dimM() const = 0;
 
     /** name */
     virtual std::string parname(int index) const;
 
-    /** this here sets the size in the state vector */
+    /** this here sets the size in the state vector
+     * we are only interested in the momenta of photons and tracks
+     * as the postion were the track ends or the cluster is, is
+     * not relevant for physics  */
     virtual int dim() const { return 3; }
 
     /** get momentum index */

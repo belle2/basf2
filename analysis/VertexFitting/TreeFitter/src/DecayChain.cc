@@ -20,8 +20,10 @@
 
 namespace TreeFitter {
 
-  DecayChain::DecayChain(Belle2::Particle* particle, bool forceFitAll, const int ipDimension)
-    : m_dim(0), m_headOfChain(0), m_isOwner(true)
+  DecayChain::DecayChain(Belle2::Particle* particle, bool forceFitAll, const int ipDimension) :
+    m_dim(0),
+    m_headOfChain(0),
+    m_isOwner(true)
   {
     if (ipDimension > 1) {
       m_headOfChain = ParticleBase::createInteractionPoint(particle, forceFitAll, ipDimension);
@@ -29,9 +31,11 @@ namespace TreeFitter {
       //use the B,D or whatever as head
       m_headOfChain = ParticleBase::createParticle(particle, 0, forceFitAll);
     }
+
     m_headOfChain->updateIndex(m_dim);
 
     m_cand = locate(particle);
+
     initConstraintList();
   }
 

@@ -332,20 +332,51 @@ namespace TreeFitter {
     // returns the lifetime in the rest frame of the candidate
     std::tuple<double, double> rc;
     const ParticleBase* pb = m_decaychain->locate(&cand);
+
+
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
-      const double tau    = m_fitparams->getStateVector()(tauindex);
-      const double taucov = m_fitparams->getCovariance()(tauindex, tauindex);
+      const int momindex = pb->momIndex();
 
-      // convert tau in units of momentum into units of time
-      const double mass   = pb->pdgMass();
-      //tau: [meter/GeV]
-      //  c: [cm/ns]
-      //  m: GeV
-      const double convfac = mass / Belle2::Const::speedOfLight ;
-      return std::make_tuple(convfac * tau, convfac * convfac * taucov);
-      //return std::make_tuple(tau, taucov);
+      /**
+       * def tau: d_vec / |p_vec|  where d_vec = x_particle - x_mother
+       * thus t = l/|p_vec| * mass / c
+       * so no conversion or anything needed here
+       * */
+
+      const Eigen::Matrix<double, 1, 3> tau_vec = m_fitparams->getStateVector().segment(tauindex, 3);
+      const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(momindex, 3);
+
+      const Eigen::Matrix<double, 3, 3> tau_cov = m_fitparams->getCovariance().block<3, 3>(tauindex, tauindex);
+      const Eigen::Matrix<double, 3, 3> mom_cov = m_fitparams->getCovariance().block<3, 3>(momindex, momindex);
+      Eigen::Matrix<double, 6, 6> comb_cov =  Eigen::Matrix<double, 6, 6>::Zero(6, 6);
+
+      comb_cov.block<3, 3>(0, 0) = tau_cov;
+      comb_cov.block<3, 3>(3, 3) = mom_cov;
+
+      const double mass = pb->pdgMass();
+      const double mBYc = mass / Belle2::Const::speedOfLight;
+      const double absTau = tau_vec.norm();
+      const double absMom = mom_vec.norm();
+      const double mom3 = absMom * absMom * absMom;
+
+      const double t = absTau / absMom * mBYc;
+
+      Eigen::Matrix<double, 1, 6> jac = Eigen::Matrix<double, 1, 6>::Zero();
+      jac(0) = tau_vec(0) / absTau * mBYc / absMom;
+      jac(1) = tau_vec(1) / absTau * mBYc / absMom;
+      jac(2) = tau_vec(2) / absTau * mBYc / absMom;
+      jac(3) = mom_vec(0) / mom3 * mBYc * absTau;
+      jac(4) = mom_vec(1) / mom3 * mBYc * absTau;
+      jac(5) = mom_vec(2) / mom3 * mBYc * absTau;
+
+      const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
+
+      // tau in nanosec
+      return std::make_tuple(t, tErr);
     }
+
+
     return std::make_tuple(-999, -999);
   }
 
@@ -359,8 +390,35 @@ namespace TreeFitter {
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
-      const double len   = fitparams->getStateVector()(tauindex);
-      const double lenErr = fitparams->getCovariance()(tauindex, tauindex);
+      const int momindex = pb->momIndex();
+
+      const double tau   = fitparams->getStateVector()(tauindex);
+      const Eigen::Matrix<double, 1, 3 >p_vec   = fitparams->getStateVector().segment(momindex, 3);
+      const double mom   = p_vec.norm();
+
+      /**
+       * def tau: d_vec / |p_vec|  where d_vec = x_particle - x_mother
+       * l = tau * mom
+       * so we have to propagate the uncertainty of tau and p into the system of l
+       * */
+      const double len = tau * mom;
+
+      Eigen::Matrix<double, 4, 4 > cov4 = Eigen::Matrix<double, 4, 4 >::Zero(4, 4);
+
+      // build cov for all known errors starting with tau
+      cov4(0, 0) = fitparams->getCovariance()(tauindex, tauindex);
+      cov4.block<3, 3>(1, 1) = fitparams->getCovariance().block<3, 3>(momindex, momindex);
+
+      //jacobian: dl/dm | m={tau,px,py,pz}
+      Eigen::Matrix<double, 1, 4 > jac = Eigen::Matrix<double, 1, 4 >::Zero(1, 4);
+      jac(0) = mom; // dl/dtau
+      jac(1) = tau * p_vec(0) / mom; // dl/d_px
+      jac(2) = tau * p_vec(1) / mom;
+      jac(3) = tau * p_vec(2) / mom;
+
+      // now rotate into system of l
+      const double lenErr = jac * cov4.selfadjointView<Eigen::Lower>() * jac.transpose();
+
       return std::make_tuple(len, lenErr);
     }
     return std::make_tuple(-999, -999);

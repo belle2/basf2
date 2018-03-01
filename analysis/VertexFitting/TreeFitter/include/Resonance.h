@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef INTERNALRESONANCE_H
-#define INTERNALRESONANCE_H
+#pragma once
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
 
@@ -20,14 +18,19 @@ namespace TreeFitter {
   class Resonance : public InternalParticle {
   public:
     /** **/
-    Resonance(Belle2::Particle* particle, const ParticleBase* mother,
+    Resonance(Belle2::Particle* particle,
+              const ParticleBase* mother,
               bool forceFitAll);
 
+    /** destructor  */
     virtual ~Resonance() ;
 
+    /**  */
     ErrCode initMotherlessParticle(FitParams* fitparams);
 
+    /**  */
     ErrCode initParticleWithMother(FitParams* fitparams);
+
     /** **/
     virtual int dim() const { return 4; }
     /** **/
@@ -48,6 +51,3 @@ namespace TreeFitter {
   };
 
 }
-
-
-#endif //INTERNALRESONANCE_H

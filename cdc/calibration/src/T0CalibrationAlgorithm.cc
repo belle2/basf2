@@ -102,7 +102,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   createHisto();
 
-  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels;#DeltaT;#channels", 100, -10, 10);
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 100, -10, 10);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, -2, 2);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
@@ -148,10 +149,10 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
       dc[ilay].push_back(0.0);
       s[ilay].push_back(par[1]);
       ds[ilay].push_back(g1->GetParError(1));
-
       dt[ilay][iwire] = par[1];
       err_dt[ilay][iwire] = g1->GetParError(1);
-      hm_All->Fill(par[1]);
+      hm_All->Fill(par[1]); // mean of gauss fitting.
+      hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
 

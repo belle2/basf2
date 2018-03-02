@@ -133,7 +133,6 @@ void PXDUnpackerModule::event()
 {
   // if no input, nothing to do
   if (!m_storeRawPXD) {
-    // Maybe report this case?
     return;
   }
 

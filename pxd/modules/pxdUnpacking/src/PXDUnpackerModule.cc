@@ -85,11 +85,11 @@ void PXDUnpackerModule::initialize()
   m_storeRawPXD.isOptional(m_RawPXDsName);
   //Register output collections
 
-  m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and raw ADC into output file ...  aside from debugging
 
 

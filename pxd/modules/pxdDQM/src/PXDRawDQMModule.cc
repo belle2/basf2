@@ -86,13 +86,16 @@ void PXDRawDQMModule::defineHisto()
                                      ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 250, 0, 250, 768, 0, 768);
       hrawPxdHitsCharge[i] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
                                       ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
-      hrawPxdHitsTimeWindow[i] = new TH1F(("hrawPxdHitsTimeWindow" + s2).c_str(),
-                                          ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 2048, -256, 2048 - 256);
+      hrawPxdHitTimeWindow[i] = new TH1F(("hrawPxdHitTimeWindow" + s2).c_str(),
+                                         ("Pxd Raw Hit Time Window (framenr*192-gate_of_hit), " + s + ";Time [a.u.]").c_str(), 2048, -256, 2048 - 256);
+      hrawPxdGateTimeWindow[i] = new TH1F(("hrawPxdGateTimeWindow" + s2).c_str(),
+                                          ("Pxd Raw Gate Time Window (framenr*192-triggergate_of_hit), " + s + ";Time [a.u.]").c_str(), 2048, -256, 2048 - 256);
     } else {
       hrawPxdHitMap[i] = NULL;
       hrawPxdChargeMap[i] = NULL;
       hrawPxdHitsCharge[i] =  NULL;
-      hrawPxdHitsTimeWindow[i] = NULL;
+      hrawPxdHitTimeWindow[i] = NULL;
+      hrawPxdGateTimeWindow[i] = NULL;
     }
   }
 
@@ -123,7 +126,8 @@ void PXDRawDQMModule::beginRun()
     if (hrawPxdHitMap[i]) hrawPxdHitMap[i]->Reset();
     if (hrawPxdChargeMap[i]) hrawPxdChargeMap[i]->Reset();
     if (hrawPxdHitsCharge[i]) hrawPxdHitsCharge[i]->Reset();
-    if (hrawPxdHitsTimeWindow[i]) hrawPxdHitsTimeWindow[i]->Reset();
+    if (hrawPxdHitTimeWindow[i]) hrawPxdHitTimeWindow[i]->Reset();
+    if (hrawPxdGateTimeWindow[i]) hrawPxdGateTimeWindow[i]->Reset();
   }
 }
 
@@ -164,7 +168,9 @@ void PXDRawDQMModule::event()
     if (hrawPxdChargeMap[dhh_id]) hrawPxdChargeMap[dhh_id]->Fill(it.getColumn(), it.getRow(), it.getCharge());
     if (hrawPxdHitsCharge[dhh_id]) hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
     // Is this histogram necessary? we are folding with occupancy of sensor hits here
-    if (hrawPxdHitsTimeWindow[dhh_id]) hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 192 - startGate);
+    // Think about 1024*framenr-hit_row?
+    if (hrawPxdHitTimeWindow[dhh_id]) hrawPxdHitTimeWindow[dhh_id]->Fill(it.getFrameNr() * 192 - it.getRow() / 4);
+    if (hrawPxdGateTimeWindow[dhh_id]) hrawPxdGateTimeWindow[dhh_id]->Fill(it.getFrameNr() * 192 - startGate);
   }
 
   if (hrawPxdAdcMapAll) {

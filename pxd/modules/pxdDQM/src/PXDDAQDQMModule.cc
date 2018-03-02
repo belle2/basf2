@@ -77,8 +77,8 @@ void PXDDAQDQMModule::defineHisto()
 //     string s = str(format("DHE %d:%d:%d (DHH ID %02Xh)") % num1 % num2 % num3 % i);
 //     string s2 = str(format("_%d.%d.%d") % num1 % num2 % num3);
 
-    hDAQDHETriggerGate[avxdid] = new TH1F("PXDDAQDHETriggerRowOffset_" + bufful,
-                                          "TriggerRowOffset DHE " + buff + "; Trigger Gate; Counts", 192, 0, 192);
+    hDAQDHETriggerGate[avxdid] = new TH1F("PXDDAQDHETriggerGate_" + bufful,
+                                          "TriggerGate DHE " + buff + "; Trigger Gate; Counts", 192, 0, 192);
     hDAQDHEReduction[avxdid] = new TH1F("PXDDAQDHEDataReduction_" + bufful, "Data Reduction DHE " + buff + "; Raw/Red; Counts", 200, 0,
                                         40);// If max changed, check overflow copy below
     hDAQCM[avxdid] = new TH2F("PXDDAQCM_" + bufful, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,

@@ -13,14 +13,10 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <boost/format.hpp>
-
 #include <TTree.h>
 #include <TMath.h>
-#include <TH1I.h>
 
 using namespace std;
-using boost::format;
 using namespace Belle2;
 
 
@@ -48,9 +44,9 @@ void PXDClusterPositionCollectorModule::prepare() // Do your initialise() stuff 
 
   // Data object creation --------------------------------------------------
   auto tree = new TTree("PXDCluserPositionCalibration", "PXD Cluser Position Calibration Source Data");
-  m_rootPxdClusterArray = new TClonesArray("Belle2::PXDCluster");
-  m_rootPxdDigitArray = new TClonesArray("Belle2::PXDDigit");
-  m_rootPxdTrueHitArray = new TClonesArray("Belle2::PXDTrueHit");
+  m_rootPxdClusterArray = new TClonesArray("Belle2::PXDCluster", 1);
+  m_rootPxdDigitArray = new TClonesArray("Belle2::PXDDigit", 1000);
+  m_rootPxdTrueHitArray = new TClonesArray("Belle2::PXDTrueHit", 1);
   tree->Branch<TClonesArray>("PXDClusterArray", &m_rootPxdClusterArray);
   tree->Branch<TClonesArray>("PXDDigitArray", &m_rootPxdDigitArray);
   tree->Branch<TClonesArray>("PXDTrueHitArray", &m_rootPxdTrueHitArray);
@@ -62,6 +58,10 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
   // If no input, nothing to do
   if (!m_pxdCluster) return;
 
+  TClonesArray& pxdClusterArray = *m_rootPxdClusterArray;
+  TClonesArray& pxdTrueHitArray = *m_rootPxdTrueHitArray;
+  TClonesArray& pxdDigitArray = *m_rootPxdDigitArray;
+
   for (auto& cluster :  m_pxdCluster) {
 
     // Ignore clustes with more than one truehit
@@ -69,23 +69,21 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
       continue;
     }
 
+    // Ignore freak clustes with more than 1000 digits
+    if (cluster.getSize() >= 1000) {
+      continue;
+    }
+
     for (auto& truehit : cluster.getRelationsTo<PXDTrueHit>()) {
 
       // Clear root arrays
-      TClonesArray& pxdClusterArray = *m_rootPxdClusterArray;
       pxdClusterArray.Clear();
-      TClonesArray& pxdTrueHitArray = *m_rootPxdTrueHitArray;
       pxdTrueHitArray.Clear();
-      TClonesArray& pxdDigitArray = *m_rootPxdDigitArray;
       pxdDigitArray.Clear();
-
-      //Get Geometry information
-      auto sensorID = cluster.getSensorID();
 
       // Fill branche of output tree
       new(pxdClusterArray[0]) PXDCluster(cluster);
       new(pxdTrueHitArray[0]) PXDTrueHit(truehit);
-
 
       // Fill all digits related to cluster in TClonesArray
       for (int i = 0; i < cluster.getSize(); i++) {
@@ -95,8 +93,6 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
 
       // Fill the tree
       getObjectPtr<TTree>("pxdCal")->Fill();
-
     }
   }
-
 }

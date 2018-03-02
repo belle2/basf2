@@ -87,8 +87,10 @@ namespace Belle2 {
       TH2F* hrawPxdChargeMap[64];
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[64];
-      /** Histogram raw pixel trigger window */
-      TH1F* hrawPxdHitsTimeWindow[64];
+      /** Histogram raw pixel hit "time" window */
+      TH1F* hrawPxdHitTimeWindow[64];
+      /** Histogram raw pixel trigger gate window */
+      TH1F* hrawPxdGateTimeWindow[64];
 
     };//end class declaration
 

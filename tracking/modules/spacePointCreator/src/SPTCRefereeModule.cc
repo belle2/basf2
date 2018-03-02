@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <tracking/modules/spacePointCreator/SPTCRefereeModule.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -75,6 +76,9 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
 
   addParam("minNumSpacePoints", m_PARAMminNumSpacePoints, "minimum number of space points that a track candidate has to "
            "contain (added later, set to 0 to reproduce old behavior", 0);
+
+  addParam("checkIfFitted", m_PARAMcheckIfFitted, "If true a flag is set in the SpacePointTrackCandidate if any related RecoTrack "
+           "with successful track fit is found", m_PARAMcheckIfFitted);
 
   // initialize counters (cppcheck)
   initializeCounters();
@@ -152,14 +156,34 @@ void SPTCRefereeModule::event()
             trackCand->getRefereeStatusString());
 
     // if all tests will be performed -> add checkedByReferee status to the SPTC, CAUTION: if there are new tests this has to be updated!!!, WARNING: if curling check fails, checkedForCurling will return false but hasRefereeStatus(c_checkedByReferee) will return true after this module!
-    if (m_PARAMcheckCurling && m_PARAMcheckMinDistance && m_PARAMcheckSameSensor) {
+    if (m_PARAMcheckCurling && m_PARAMcheckMinDistance && m_PARAMcheckSameSensor && m_PARAMcheckIfFitted) {
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedByReferee);
     }
     bool allChecksClean = true; // assume that all tests will be passed, change to false if one of them fails
     CheckInfo prevChecksInfo;
 
+
     //added check for the number of space points in the track candidate
     if ((int)(trackCand->getNHits()) < m_PARAMminNumSpacePoints) allChecksClean = false;
+
+
+    // set a flag if a fitted recotrack is found for that trackcand
+    if (m_PARAMcheckIfFitted) {
+      // take any related recotrack
+      RelationVector<RecoTrack> relatedRecoTracks = trackCand->getRelationsTo<RecoTrack>("ALL");
+      if (relatedRecoTracks.size() >= 1) {
+        // assume that there is only one!
+        if (relatedRecoTracks[0]->wasFitSuccessful()) {
+          trackCand->addRefereeStatus(SpacePointTrackCand::c_hasFittedRecoTrack);
+        } else {
+          allChecksClean = false;
+          B2DEBUG(1, "Found RecoTrack was not fitted! Will not use this track candidate for training.");
+        }
+      } else {
+        allChecksClean = false;
+        B2DEBUG(1, "No related RecoTrack found. Will not use that track candidate for training");
+      }
+    }
 
 
     if (m_PARAMcheckSameSensor) { // check same sensors if desired
@@ -178,6 +202,7 @@ void SPTCRefereeModule::event()
       B2DEBUG(50, "refereeStatus of TrackCand after checkSameSensor " << trackCand->getRefereeStatus() << " -> " <<
               trackCand->getRefereeStatusString());
     }
+
 
     if (m_PARAMcheckMinDistance) { // check min distance if desired
       const std::vector<int> lowDistanceInds = checkMinDistance(trackCand, m_PARAMminDistance);
@@ -404,7 +429,7 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
 
   B2DEBUG(25, "Splitting SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() <<
           ": number of entries in splitIndices " << splitIndices.size());
-//   int trackStub = 0;
+  //   int trackStub = 0;
   bool dirOfFlight = splitIndices.at(0) != 0; // if first entry is zero the direction of flight is false (= ingoing)
 
   B2DEBUG(999, "first entry of passed vector<int> is " << splitIndices.at(0) << " --> direction of flight is " << dirOfFlight);

@@ -160,10 +160,16 @@ FullSimModule::~FullSimModule()
 void FullSimModule::initialize()
 {
   //FullSim does not create a new collection.
-  //Instead the module will reuse and update the existing one.
+  //For most of the cases, the module will reuse and update the existing one.
 
-  //Make sure these collections already exist
-  StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  //For a certain cases, the input MCParticles collection name may be empty.
+  if (m_mcParticleInputColName.empty()) {
+    StoreArray<MCParticle>().isOptional(m_mcParticleInputColName);
+  } else {
+    StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  }
+
+  //Make sure the EventMetaData collection already exists.
   StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.

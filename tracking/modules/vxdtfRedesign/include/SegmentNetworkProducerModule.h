@@ -178,9 +178,6 @@ namespace Belle2 {
     /// Maximal number of Segment connections; if exceeded, filling of SegmentNetwork will be stopped and the event skipped.
     unsigned short m_PARAMmaxSegmentConnections = 30000;
 
-    /// Maximal size of hit network; if exceeded, filling of HitNetwork will be stopped and the event skipped.
-    unsigned short m_PARAMmaxHitNetworkSize = 3000;
-
     /// Maximal number of hit connections; if exceeded, filling of HitNetwork will be stopped and the event skipped.
     unsigned short m_PARAMmaxTrackNodeConnections = 8000;
 

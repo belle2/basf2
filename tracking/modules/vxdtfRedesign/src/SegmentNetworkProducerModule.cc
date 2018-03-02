@@ -87,11 +87,6 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "Maximal number of Segment connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxSegmentConnections);
 
-  addParam("maxHitNetworkSize",
-           m_PARAMmaxHitNetworkSize,
-           "Maximal size of the HitNetwork; if exceeded, the event execution will be skipped.",
-           m_PARAMmaxHitNetworkSize);
-
   addParam("maxHitConnections",
            m_PARAMmaxTrackNodeConnections,
            "Maximal number of Hit connections; if exceeded, the event execution will be skipped.",
@@ -382,12 +377,6 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
             B2ERROR("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
                     << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
-            m_network->set_trackNodeConnections(nLinked);
-            return false;
-          }
-          if (hitNetwork.size() > m_PARAMmaxHitNetworkSize) {
-            B2ERROR("HitNetwork has exceeded maximal size limit of " << m_PARAMmaxHitNetworkSize
-                    << "! Processing of the event will be aborted. The HitNetwork size was = " << hitNetwork.size());
             m_network->set_trackNodeConnections(nLinked);
             return false;
           }

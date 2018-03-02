@@ -817,14 +817,14 @@ void AlignDQMModule::event()
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       /*
-                const auto& resmap = track.getTrackFitResults();
-                auto hypot = max_element(
-                  resmap.begin(),
-                  resmap.end(),
-                  [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
-                  {return x1.second->getPValue() < x2.second->getPValue();}
-                  );
-                const TrackFitResult* tfr = hypot->second;
+      const auto& resmap = track.getTrackFitResults();
+      auto hypot = max_element(
+      resmap.begin(),
+      resmap.end(),
+      [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
+      {return x1.second->getPValue() < x2.second->getPValue();}
+      );
+      const TrackFitResult* tfr = hypot->second;
       */
       if (tfr == nullptr) continue;
       TString message = Form("AlignDQM: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",

@@ -75,7 +75,7 @@ void TrackDQMModule::initialize()
   }
   StoreArray<Track> Tracks(m_TracksStoreArrayName);
   if (!Tracks || !Tracks.getEntries()) {
-    B2WARNING("Missing recoTracks, Align-DQM is skipped.");
+    B2WARNING("Missing Tracks, Align-DQM is skipped.");
     return;
   }
 

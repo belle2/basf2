@@ -18,6 +18,11 @@ setoption ${BASF2_COMPILE_OPTION}
 
 # back to the jobs scratch folder
 cd ${GC_SCRATCH}
+
+# this will ouput the number of event in the input file
+# useful for later analysis
+b2file-metadata-show ${FILE_NAMES}
+
 echo "Starting steering file..."
 basf2_command="basf2 ${BASF2_STEERING_FILE} -- --input-file ${FILE_NAMES} --no-output --histo-output-file dqm_out.root --root-output-file output.root --local-db-path ${BASF2_LOCAL_DB_PATH} input_buffer output_buffer 2222 0"
 

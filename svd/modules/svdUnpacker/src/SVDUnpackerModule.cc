@@ -69,6 +69,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   addParam("svdDAQDiagnosticsListName", m_svdDAQDiagnosticsListName, "Name of the DAQDiagnostics  list", string(""));
   addParam("softwarePipelineAddressEmulation", m_emulatePipelineAddress, "Estimate emulated pipeline address", bool(true));
   addParam("killDigitsFromUpsetAPVs", m_killUpsetDigits, "Delete digits from upset APVs", bool(false));
+  addParam("silentlyAppend", m_silentAppend, "Append digits to a pre-existing non-empty storeArray", bool(false));
 }
 
 SVDUnpackerModule::~SVDUnpackerModule()
@@ -78,7 +79,8 @@ SVDUnpackerModule::~SVDUnpackerModule()
 void SVDUnpackerModule::initialize()
 {
   m_eventMetaDataPtr.isRequired();
-  m_rawSVD.isRequired(m_rawSVDListName);
+  // Don't panic if no SVD data.
+  m_rawSVD.isOptional(m_rawSVDListName);
   m_svdDigit.registerInDataStore(m_svdDigitListName);
   StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
   storeDAQDiagnostics.registerInDataStore();
@@ -108,7 +110,6 @@ void SVDUnpackerModule::beginRun()
 
 }
 
-
 #ifndef __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
@@ -116,9 +117,24 @@ void SVDUnpackerModule::beginRun()
 void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
+  if (!rawSVDList || !rawSVDList.getEntries())
+    return;
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
+
+  if (!m_silentAppend && svdDigits && svdDigits.getEntries())
+    B2FATAL("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
+            << "This can lead to undesired behaviour. At least remember to\""
+            << "use SVDDigitSorter in your path and set the \n"
+            << "silentAppend parameter of SVDUnpacker to true.");
+
+  if (!m_silentAppend && m_generateShaperDigits &&
+      shaperDigits && shaperDigits.getEntries())
+    B2FATAL("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
+            << "StoreArray. This can lead to undesired behaviour. At least\n"
+            << "remember to use SVDShaperDigitSorter in your path and \n"
+            << "set the silentAppend parameter of SVDUnpacker to true.");
 
   vector<SVDDAQDiagnostic*> diagnosticVector;
   SVDDAQDiagnostic* currentDAQDiagnostic;
@@ -131,8 +147,6 @@ void SVDUnpackerModule::event()
             "No SVDDigit produced for this event");
     return;
   }
-
-  svdDigits.clear();
 
   if (! m_map) { //give up
     B2ERROR("SVD xml map not loaded." << std::endl <<

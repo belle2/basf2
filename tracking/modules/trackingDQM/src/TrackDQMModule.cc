@@ -69,13 +69,13 @@ TrackDQMModule::~TrackDQMModule()
 void TrackDQMModule::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
-  if (!recoTracks || !recoTracks.getEntries()) {
-    B2WARNING("Missing recoTracks, Align-DQM is skipped.");
+  if (!recoTracks.isOptional()) {
+    B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
     return;
   }
   StoreArray<Track> Tracks(m_TracksStoreArrayName);
-  if (!Tracks || !Tracks.getEntries()) {
-    B2WARNING("Missing Tracks, Align-DQM is skipped.");
+  if (!Tracks.isOptional()) {
+    B2WARNING("Missing Tracks array, Track-DQM is skipped.");
     return;
   }
 
@@ -359,9 +359,9 @@ void TrackDQMModule::defineHisto()
 void TrackDQMModule::beginRun()
 {
   StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
-  if (!recoTracks || !recoTracks.getEntries())  return;
+  if (!recoTracks.isOptional())  return;
   StoreArray<Track> Tracks(m_TracksStoreArrayName);
-  if (!Tracks || !Tracks.getEntries()) return;
+  if (!Tracks.isOptional()) return;
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -418,9 +418,9 @@ void TrackDQMModule::beginRun()
 void TrackDQMModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
-  if (!recoTracks || !recoTracks.getEntries())  return;
+  if (!recoTracks.isOptional() || !recoTracks.getEntries())  return;
   StoreArray<Track> tracks(m_TracksStoreArrayName);
-  if (!tracks || !tracks.getEntries()) return;
+  if (!tracks.isOptional() || !tracks.getEntries()) return;
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   try {

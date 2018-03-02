@@ -9,7 +9,8 @@
 // Description : TRG ECL Unpacker Module
 //---------------------------------------------------------------
 // 1.00 : 2017/05/06 : First version
-// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing
+// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing (ETM Ver. old_89)
+// 2.00 : 2018/02/17 : 8 window data (ETM Ver. 100)
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
@@ -22,7 +23,7 @@ REG_MODULE(TRGECLUnpacker);
 
 string TRGECLUnpackerModule::version() const
 {
-  return string("1.01");
+  return string("2.00");
 }
 
 TRGECLUnpackerModule::TRGECLUnpackerModule()
@@ -48,7 +49,7 @@ void TRGECLUnpackerModule::terminate()
 void TRGECLUnpackerModule::initialize()
 {
 
-  m_TRGECLUnpackerStore.registerInDataStore();
+  m_TRGECLUnpackerArray.registerInDataStore();
 }
 
 void TRGECLUnpackerModule::beginRun()
@@ -64,12 +65,14 @@ void TRGECLUnpackerModule::event()
 
   StoreArray<RawTRG> raw_trgarray;
   unsigned int nodeid;
+  int nwords;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
       nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
+      nwords = raw_trgarray[i]->GetDetectorNwords(j, 0);
       if (nodeid == 0x13) {
-        readCOPPEREvent(raw_trgarray[i], j);
+        readCOPPEREvent(raw_trgarray[i], j, nwords);
         n_basf2evt++;
         if (n_basf2evt % 1000 == 0) {
           printf("%.5dK", (int)n_basf2evt / 1000);
@@ -81,182 +84,198 @@ void TRGECLUnpackerModule::event()
   }
 }
 
-void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i)
+void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nwords)
 {
 
   if (raw_copper->GetDetectorNwords(i, 0) > 0) {
-    checkBuffer(raw_copper->GetDetectorBuffer(i, 0));
+    checkBuffer(raw_copper->GetDetectorBuffer(i, 0), nwords);
   }
 }
 
-void TRGECLUnpackerModule::checkBuffer(int* rdat)
+void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
 {
 
-  //  1600 = 12800 /   8
-  //   400 = 12800 /  32
-  // 12800 = 12672(TC data) + 32(revo + ntc + etot) + 96 (null)
-  //    22 = 12672 / 576
-  //  1584 = 12682 /   8
-  //   144 =  1584 /  11
-  unsigned char kdat[1600];
-  for (int i = 0; i < 400; i++) {
-    kdat[4 * i + 3] =  rdat[i]        & 0xff;
-    kdat[4 * i + 2] = (rdat[i] >>  8) & 0xff;
-    kdat[4 * i + 1] = (rdat[i] >> 16) & 0xff;
-    kdat[4 * i + 0] = (rdat[i] >> 24) & 0xff;
-  }
-  // kdat
-  // to be updated......
-  // -------------------
-  // 1599 - 1588 : null
-  // 1587 - 1584 : summary
-  // -------------------
-  // 1583 -    0 : TC data
+  unsigned char check_sum = (rdat[nwords - 1] >> 8) & 0xFF;
 
-  int data[4];
-  int tmp1;
-  int tmp2;
-  int tmp3;
-  int tmp4;
+  unsigned char sum_data  = 0; // checksum
+  unsigned char summary_data[4] = {0};
+  vector<int> tc_info;
+  vector<vector<int>> evt_info;
 
-  int ntc        = 0;
-  int m_hitNum   = 0;
-  int tc_num     = 0;
+  int i      = 0;
+  int window = 0;
+  int w_ntc  = 0;
+  int w_revo = 0;
+  int tc_id  = 0;
+  int tc_t   = 0;
+  int tc_e   = 0;
+  int conv_tc_t = 0;
+  int flag_checksum = 0;
+  int ntc     = 0;
+  int gdl_cnt = 0;
+  int hit_win = 0;
+  // TRG timing = window 3 (TEMP)
 
+  // cout << nwords << endl;
+  // cout << "==========" << endl;
 
-  int p_flag     = 0;
-  int p_time     = 0;
-  int p_peak     = 0;
+  tc_info.clear();
+  evt_info.clear();
 
-  int revo_trg    = ((kdat[1599] & 0xFF) << 3) + ((kdat[1598] >> 5) & 0x7);
-  int revo_fam    = (kdat[1585] >> 1) & 0x7F;
-  int fine_timing = ((kdat[1585] & 0x1) << 6) + ((kdat[1584] >> 2) & 0x3F);
+  gdl_cnt = (rdat[0] >> 16) & 0xffff;
+  sum_data = ((gdl_cnt >> 8) & 0xFF) + (gdl_cnt & 0xff);
 
-  vector<int> tc_data;
-  vector<vector<int>> evt_data;
+  while (i < nwords - 1) {
+    summary_data[0] = (rdat[i] >> 8) & 0xff;
+    summary_data[1] =  rdat[i] & 0xff;
+    summary_data[2] = (rdat[i + 1] >> 24) & 0xff;
+    summary_data[3] = (rdat[i + 1] >> 16) & 0xff;
 
-  evt_data.clear();
-  tc_data.clear();
+    for (int j = 0; j < 4; j++) {
+      sum_data = sum_data + summary_data[j];
+      // if(n_basf2evt == 3775){
+      //  cout << "= " << i << " =" << endl;
+      //  printf("%x\n", sum_data);
+      // }
 
-  for (int j = 0; j < 144; j++) {
-    tmp1 = kdat[11 * j + 10] & 0xFF;
-    tmp2 = kdat[11 * j +  9] & 0xFF;
-    tmp3 = kdat[11 * j +  8] & 0xFC;
-    data[3] = (tmp1 << 14) + (tmp2 << 6) + (tmp3 >> 2);
-    tmp1 = kdat[11 * j +  8] & 0x03;
-    tmp2 = kdat[11 * j +  7] & 0xFF;
-    tmp3 = kdat[11 * j +  6] & 0xFF;
-    tmp4 = kdat[11 * j +  5] & 0xF0;
-    data[2] = (tmp1 << 20) + (tmp2 << 12) + (tmp3 << 4) + (tmp4 >> 4);
-    tmp1 = kdat[11 * j +  5] & 0x0F;
-    tmp2 = kdat[11 * j +  4] & 0xFF;
-    tmp3 = kdat[11 * j +  3] & 0xFF;
-    tmp4 = kdat[11 * j +  2] & 0xC0;
-    data[1] = (tmp1 << 18) + (tmp2 << 10) + (tmp3 << 2) + (tmp4 >> 6);
-    tmp1 = kdat[11 * j +  2] & 0x3F;
-    tmp2 = kdat[11 * j +  1] & 0xFF;
-    tmp3 = kdat[11 * j +  0] & 0xFF;
-    data[0] = (tmp1 << 16) + (tmp2 << 8) + tmp3;
-
-    for (int i = 0; i < 4; i++) {
-      tc_num = 4 * j + i + 1;
-      p_flag = (data[i] >> 21) & 0x1;
-      if (p_flag == 1) {
-        p_peak  =  data[i] & 0xFFF;
-        p_time  = (data[i] >> 12) & 0x1FF; // revo+time
-        tc_data.push_back(tc_num);
-        tc_data.push_back(p_peak);
-        tc_data.push_back(p_time);
-        evt_data.push_back(tc_data);
-        tc_data.clear();
-      }
     }
-
-  }
-  ntc = evt_data.size();
-
-  int t_tc      = 0;
-  int t_energy  = 0;
-  int t_time    = 0;
-  int t_caltime = -999;
-
-  int t_fine_timing = -999;
-  int t_revo_fam    = -999;
-  int t_revo_trg    = -999;
-
-  if (ntc != 0) {
-
-    sort(evt_data.begin(), evt_data.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[1] > aa2[1];});
-
-    int tmp_timepeak = 0;
-    int tmp_peak = 0;
-    int w_time     = -999;
-
-    if (ntc == 1) {
-      tmp_peak     = evt_data[0][1];
-      tmp_timepeak = evt_data[0][1] * evt_data[0][2];
-    } else if (ntc == 2) {
-      tmp_peak     = evt_data[0][1] + evt_data[1][1];
-      tmp_timepeak = (evt_data[0][1] * evt_data[0][2]) + (evt_data[1][1] * evt_data[1][2]);
+    w_ntc  = (summary_data[2] << 8) + summary_data[3];
+    ntc    = ntc + w_ntc;
+    if (window == 3) {
+      w_revo = summary_data[1];
+    }
+    // cout << "window = " << window << endl;
+    // cout << "ntc = " << w_ntc  << endl;
+    if (w_ntc == 0) {
+      i++;
+      window++;
     } else {
-      tmp_peak     = evt_data[0][1] + evt_data[1][1] + evt_data[2][1];
-      tmp_timepeak = (evt_data[0][1] * evt_data[0][2]) + (evt_data[1][1] * evt_data[1][2]) + (evt_data[2][1] * evt_data[2][2]);
-    }
+      for (int j = 0; j < w_ntc; j++) {
+        tc_id     = (rdat[i + 1 + j] >> 3) & 0x3FF;
+        tc_t      = ((rdat[i + 1 + j] & 0x7) << 4) + ((rdat[i + 2 + j] >> 28) & 0xF);
+        conv_tc_t = (window - 3) * 128 + tc_t;
+        tc_e      = (rdat[i + 2 + j] >> 16) & 0xFFF;
+        hit_win   = window;
+        sum_data = sum_data +
+                   ((rdat[i + 1 + j] >>  8) & 0xff) +
+                   ((rdat[i + 1 + j]) & 0xff) +
+                   ((rdat[i + 2 + j] >> 24) & 0xff) +
+                   ((rdat[i + 2 + j] >> 16) & 0xff);
+        // if(n_basf2evt == 3775){
+        //  cout << "= " << i << " =" << endl;
+        //  printf("%x\n", sum_data);
+        // }
 
-    if (tmp_peak != 0) {
-      w_time     = (int)tmp_timepeak / tmp_peak;
-    }
+        tc_info.push_back(tc_id);
+        tc_info.push_back(conv_tc_t);
+        tc_info.push_back(tc_e);
+        tc_info.push_back(hit_win);
+        evt_info.push_back(tc_info);
 
-    sort(evt_data.begin(), evt_data.end(),
+        tc_info.clear();
+        //    cout << tc_id << " " << tc_t << " " << tc_e << endl;
+      }
+      i = i + w_ntc + 1;
+      window++;
+    }
+    //  cout << "i = " << i << endl;
+    // if(i == nwords-1){ // last window
+    //     break;
+    // }
+
+  }
+
+
+  if (check_sum == sum_data) {
+    flag_checksum = 0;
+  } else {
+    flag_checksum = 1;
+  }
+
+  // if(n_basf2evt == 3775){
+  //  printf("%x %x %d\n", check_sum, sum_data, flag_checksum);
+  // }
+
+  int evt_size   = evt_info.size();
+  int evt_timing = -9999;
+  if (evt_size != 0 && flag_checksum == 0 && nwords > 7) {
+    // Find most energetic TC timing
+    sort(evt_info.begin(), evt_info.end(),
+    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
+
+    evt_timing = evt_info[0][1];
+
+    // Sort by TC number
+    sort(evt_info.begin(), evt_info.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
 
-    for (int i = 0; i < ntc; i++) {
-      t_tc          = evt_data[i][0];
-      t_energy      = evt_data[i][1];
-      t_time        = evt_data[i][2];
-      t_caltime     = w_time - t_time;
-      t_fine_timing = fine_timing;
-      t_revo_fam    = revo_fam;
-      t_revo_trg    = revo_trg;
+    // printf("%.4x\n",check_sum);
+    // printf("%.4x\n",sum_data);
+
+    m_gdl   = gdl_cnt;
+    m_revo  = w_revo;
+    m_ntc   = ntc;
+    m_evttime = evt_timing;
+    m_checksum = flag_checksum;
+    for (int ii = 0; ii < evt_size; ii++) {
+      m_tcid   = evt_info[ii][0];
+      m_time   = evt_info[ii][1];
+      m_energy = evt_info[ii][2];
+      m_hitwin = evt_info[ii][3];
+      m_caltime = evt_timing - m_time;
 
       StoreArray<TRGECLUnpackerStore> TRGECLUnpackerArray;
       TRGECLUnpackerArray.appendNew();
       m_hitNum = TRGECLUnpackerArray.getEntries() - 1;
       TRGECLUnpackerArray[m_hitNum]->setEventId(n_basf2evt);
-
-      TRGECLUnpackerArray[m_hitNum]->setTCId(t_tc);
-      TRGECLUnpackerArray[m_hitNum]->setNTC(ntc);
-      TRGECLUnpackerArray[m_hitNum]->setTCEnergy(t_energy);
-      TRGECLUnpackerArray[m_hitNum]->setTCTime(t_time);
-      TRGECLUnpackerArray[m_hitNum]->setTCCALTime(t_caltime);
-      TRGECLUnpackerArray[m_hitNum]->setFineTime(t_fine_timing);
-      TRGECLUnpackerArray[m_hitNum]->setRevoFAM(t_revo_fam);
-      TRGECLUnpackerArray[m_hitNum]->setRevoTRG(t_revo_trg);
-
+      TRGECLUnpackerArray[m_hitNum]->setTCId(m_tcid);
+      TRGECLUnpackerArray[m_hitNum]->setNTC(m_ntc);
+      TRGECLUnpackerArray[m_hitNum]->setTCEnergy(m_energy);
+      TRGECLUnpackerArray[m_hitNum]->setTCTime(m_time);
+      TRGECLUnpackerArray[m_hitNum]->setTCCALTime(m_caltime);
+      TRGECLUnpackerArray[m_hitNum]->setEVTTime(m_evttime);
+      TRGECLUnpackerArray[m_hitNum]->setRevoFAM(m_revo);
+      TRGECLUnpackerArray[m_hitNum]->setRevoGDL(m_gdl);
+      TRGECLUnpackerArray[m_hitNum]->setHitWin(m_hitwin);
+      TRGECLUnpackerArray[m_hitNum]->setChecksum(m_checksum);
     }
   } else {
+    m_tcid     = 0;
+    if (ntc == 0) {
+      m_ntc = 0;
+    } else {
+      m_ntc = -1;
+    }
 
-    t_tc      = 0;
-    t_energy  = 0;
-    t_time    = 0;
-    t_caltime = -999;
-    t_fine_timing = fine_timing;
-    t_revo_fam    = revo_fam;
-    t_revo_trg    = revo_trg;
+    m_energy   = 0;
+    m_hitwin   = -1;
+    m_time     = -9999;
+    m_caltime  = -9999;
+    m_evttime  = -9999;
+    m_revo     = w_revo;
+    m_gdl      = gdl_cnt;
+    if (flag_checksum == 1) {
+      m_checksum = 1;
+    } else {
+      m_checksum = 2;
+    }
 
     StoreArray<TRGECLUnpackerStore> TRGECLUnpackerArray;
     TRGECLUnpackerArray.appendNew();
     m_hitNum = TRGECLUnpackerArray.getEntries() - 1;
     TRGECLUnpackerArray[m_hitNum]->setEventId(n_basf2evt);
-    TRGECLUnpackerArray[m_hitNum]->setTCId(t_tc);
-    TRGECLUnpackerArray[m_hitNum]->setNTC(ntc);
-    TRGECLUnpackerArray[m_hitNum]->setTCEnergy(t_energy);
-    TRGECLUnpackerArray[m_hitNum]->setTCTime(t_time);
-    TRGECLUnpackerArray[m_hitNum]->setTCCALTime(t_caltime);
-    TRGECLUnpackerArray[m_hitNum]->setFineTime(t_fine_timing);
-    TRGECLUnpackerArray[m_hitNum]->setRevoFAM(t_revo_fam);
-    TRGECLUnpackerArray[m_hitNum]->setRevoTRG(t_revo_trg);
+    TRGECLUnpackerArray[m_hitNum]->setTCId(m_tcid);
+    TRGECLUnpackerArray[m_hitNum]->setNTC(m_ntc);
+    TRGECLUnpackerArray[m_hitNum]->setTCEnergy(m_energy);
+    TRGECLUnpackerArray[m_hitNum]->setTCTime(m_time);
+    TRGECLUnpackerArray[m_hitNum]->setTCCALTime(m_caltime);
+    TRGECLUnpackerArray[m_hitNum]->setEVTTime(m_evttime);
+    TRGECLUnpackerArray[m_hitNum]->setRevoFAM(m_revo);
+    TRGECLUnpackerArray[m_hitNum]->setRevoGDL(m_gdl);
+    TRGECLUnpackerArray[m_hitNum]->setHitWin(m_hitwin);
+    TRGECLUnpackerArray[m_hitNum]->setChecksum(m_checksum);
+
   }
+
   return;
 }

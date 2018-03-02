@@ -57,6 +57,9 @@ namespace Belle2 {
     /** parameter for indicating if the check for subsequent SpacePoints being on the same sensor should be done */
     bool m_PARAMcheckSameSensor;
 
+    /** if true it is looked for any related RecoTrack and if that RecoTrack has a valid fit. */
+    bool m_PARAMcheckIfFitted = true;
+
     /** parameter for indicating if the check for the minimal distance between two subsequent SpacePoints should be done */
     bool m_PARAMcheckMinDistance;
 

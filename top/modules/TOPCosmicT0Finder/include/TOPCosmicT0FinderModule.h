@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -82,33 +81,34 @@ namespace Belle2 {
   private:
 
     /**
-     * Return parabolic maximum
-     * @param i0 index of the bin with the maximal value
-     * @return position of the maximum with uncertainty
+     * Return parabolic minimum
+     * @param i0 index of the bin with the minimal value
+     * @return position of the minimum with uncertainty
      */
-    PointWithError getParabolicMaximum(unsigned i0);
+    PointWithError getParabolicMinimum(unsigned i0);
 
     /**
-     * Return parabolic maximum
-     * @param yLeft bin content of left-to-maximal bin
-     * @param yCenter bin content of maximal bin
-     * @param yRight bin content of right-to-maximal bin
+     * Return parabolic minimum
+     * @param yLeft bin content of left-to-minimal bin
+     * @param yCenter bin content of minimal bin
+     * @param yRight bin content of right-to-minimal bin
      * @return a fraction of step to be added to central bin position + error
      */
-    PointWithError getParabolicMaximum(double yLeft, double yCenter, double yRight);
+    PointWithError getParabolicMinimum(double yLeft, double yCenter, double yRight);
 
     bool m_useIncomingTrack; /**< if true use incoming track, otherwise use outcoming */
-    unsigned m_minCDCHits; /**< minimal number of CDC hits of the track */
+    unsigned m_minHits; /**< minimal number of hits on TOP module */
     bool m_applyT0; /**< if true, subtract T0 in TOPDigits */
     int m_numBins;      /**< number of bins to which time range is divided */
     double m_timeRange; /**< time range in which to search [ns] */
-    double m_maxTime;   /**< time limit for photons [ns] */
+    double m_sigma;     /**< additional time spread added to PDF [ns] */
+    bool m_saveHistograms; /**< flag to save histograms */
+    double m_bkgPerModule; /**< average background hits per module */
 
-    std::vector<double> m_logLikelihoods; /**< container for log likelihoods */
+    std::vector<double> m_chi2s; /**< container for chi^2 */
     std::vector<double> m_t0;  /**< container for time axis */
     double m_dt = 0;  /**< bin size */
-
-    std::vector<TH1F*> m_histograms; /**< container for histograms */
+    int m_num = 0; /**< histogram number */
 
   };
 

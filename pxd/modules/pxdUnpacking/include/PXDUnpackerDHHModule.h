@@ -32,9 +32,8 @@ namespace Belle2 {
      * This module is responsible for unpacking the Raw DHH PXD data to Pixels in v_cellID and u_cellID (global tracking coordinates system)
      * Doing that, sophisticated error and consistency checking is done from the lowest data level on
      */
-    class PXDUnpackerDHHModule : public Module {
 
-      enum { ONSEN_MAX_TYPE_ERR = 64};
+    class PXDUnpackerDHHModule : public Module {
 
     public:
       /** Constructor defining the parameters */
@@ -59,12 +58,23 @@ namespace Belle2 {
       bool m_headerEndianSwap;
       /**  ignore missing DATCON */
       bool m_ignoreDATCON;
+      /**  ignore some not set Meta Flags */
+      bool m_ignoreMetaFlags;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-      //* Fix EventMeta - HLT Trigger Offset for DESY TB 2016, only for error reporting, no data is modified */
-      int m_DESY16_FixTrigOffset;
-      //* Fix Row Offset for DESY TB 2016 */
-      int m_DESY16_FixRowOffset;
+      /** Check for susp. Padding/CRC, default off because of many false positive */
+      bool m_checkPaddingCRC;
+      /** Ignore Phase2 FW erro */
+      bool m_ignoreDHPMask;
+      /** Ignore Phase2 FW error */
+      bool m_ignoreDHELength;
+      /** Force Mapping even if DHH bit is not requesting it */
+      bool m_forceMapping;
+      /** Force No Mapping even if DHH bit is requesting it */
+      bool m_forceNoMapping;
+      /** Maximum DHP frame difference until error is reported */
+      unsigned int m_maxDHPFrameDiff;
+
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 
@@ -157,8 +167,6 @@ namespace Belle2 {
       PXDError::PXDErrorFlags m_errorMaskEvent;
       /** give verbose unpacking information -> TODO will be a parameter in next release */
       bool verbose = true;
-      /** ignore missing datcon (dont show error) */
-      bool ignore_datcon_flag = true;
 
       int last_dhp_readout_frame_lo[4];// signed because -1 means undefined
 
@@ -170,7 +178,7 @@ namespace Belle2 {
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_dhp(void* data, unsigned int frame_len);
+      static void dump_dhp(void* data, unsigned int frame_len);
 
     };//end class declaration
 

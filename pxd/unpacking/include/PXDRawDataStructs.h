@@ -107,7 +107,7 @@ namespace Belle2 {
       inline unsigned short getEventNrLo(void) const   {    return trigger_nr_lo;  };
       inline unsigned short getEventNrHi(void) const  {    return trigger_nr_hi;  };
       inline unsigned short getStartFrameNr(void) const  {    return (sfnr_offset & 0xFC00) >> 10;  };  // last DHP frame before trigger
-      inline unsigned short getTriggerOffsetRow(void) const   {    return sfnr_offset & 0x03FF;  }; // and trigger row offset
+      inline unsigned short getTriggerGate(void) const   {    return sfnr_offset & 0xFF;  }; // trigger gate (updated to 8 bit, before 10!)
       inline unsigned int getFixedSize(void) const  {    return 16; };// 8 words
 
       void print(void) const;

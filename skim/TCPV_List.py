@@ -17,7 +17,7 @@ def TCPVList():
 
     bd_qqs_Channels = [
         'phi:loose K_S0:all',
-        'eta:loose K_S0:all',
+        'eta\':loose K_S0:all',
         'eta:loose K_S0:all',
         'K_S0:all K_S0:all K_S0:all',
         'pi0:skim K_S0:all',

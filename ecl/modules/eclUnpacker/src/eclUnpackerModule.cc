@@ -359,9 +359,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             // amplitude is lower than threshold value time = trg_time => fit_time = 0
             newEclDigit->setTimeFit(0);
             // the time data is replaced with chi2 data
-            int chi_p = (dspTime >> 9) & 7;
-            int chi_m = dspTime & 0x1FF;
-            int chi2  = chi_m << (chi_p * 2);
+            const int chi_mantissa = dspTime & 0x1FF;
+            const int chi_exponent = (dspTime >> 9) & 7;
+            const int chi2  = chi_mantissa << (chi_exponent * 2);
             newEclDigit->setChi(chi2);
 
           } else {

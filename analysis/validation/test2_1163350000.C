@@ -226,6 +226,7 @@ void plotDplus(TFile* pfile, TTree* ptree, TFile *outputFile){
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
 
+  const char *title = "D reconstruction forB#rightarrow D^{*}#tau#nu (Hadronic tag)";
   TH1F* h_DmassNoCut_Mode1 = new TH1F("h_DmassNoCut_Mode1",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode1", "D_M","D_dmID==1");
   h_DmassNoCut_Mode1->GetXaxis()->SetTitle("m_{D+} (GeV/c^{2})");
@@ -275,7 +276,7 @@ void plotDplus(TFile* pfile, TTree* ptree, TFile *outputFile){
 
 
 
-  outputFile->cd()
+  outputFile->cd();
   h_DmassNoCut_Mode1->Write();
   h_DmassNoCut_Mode2->Write();
   h_DmassNoCut_Mode3->Write();
@@ -288,6 +289,7 @@ void plotDzero(TFile* pfile, TTree* ptree, TFile *outputFile){
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
 
+  const char *title = "D reconstruction forB#rightarrow D^{*}#tau#nu (Hadronic tag)";
 
   TH1F* h_DmassNoCut_Mode7 = new TH1F("h_DmassNoCut_Mode7",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode7", "D0_M","D0_dmID==7");
@@ -328,7 +330,7 @@ void plotDzero(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{-} from D* decay"));   
   h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_DmassNoCut_Mode11->GetListOfFunctions()->Add(new TNamed("Contact", contact));
-  outputFile->cd()
+  outputFile->cd();
   h_DmassNoCut_Mode7->Write();
   h_DmassNoCut_Mode8->Write();
   h_DmassNoCut_Mode9->Write();
@@ -341,17 +343,15 @@ void test2_1163350000(){
 
   TFile* sample = new TFile(inputfile);
   TTree* treeUpsHad = (TTree*)sample->Get("Y4S");
-  #TTree* treeUpsSL = (TTree*)sample->Get("UpsB0sl");
-  TTree * treeD0 =(TTree*)sample->Get("D0allNoCut")
-  TTree * treeDplus=(TTree*)sample->Get("DpallNoCut")
+  TTree * treeD0 =(TTree*)sample->Get("D0allNoCut");
+  TTree * treeDplus=(TTree*)sample->Get("DpallNoCut");
 
   TFile* outputFile = new TFile("1163350000_Validation.root","RECREATE");
   
   TString Cuts= "";
   plotUpsHad(sample, treeUpsHad, outputFile );
-  #plotUpsSL(sample, treeUpsSL, outputFile);
   plotDzero(sample,treeD0,outputFile);
-  plotDplus(sample,treeDplus,outputFile)
+  plotDplus(sample,treeDplus,outputFile);
   outputFile->Close();
 
 }

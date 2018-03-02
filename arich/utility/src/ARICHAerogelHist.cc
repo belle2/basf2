@@ -96,8 +96,8 @@ ARICHAerogelHist::ARICHAerogelHist(const char* name, const char* title) : TH2Pol
         y[i] = ynew;
       }
       AddBin(n, x, y);
-      delete x;
-      delete y;
+      delete []x;
+      delete []y;
     }
     iR++;
   }// for (auto& m: m_verticesMap) {

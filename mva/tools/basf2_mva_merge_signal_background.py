@@ -9,9 +9,13 @@ This tool is a helper script to combine a set of MC from signal and background f
 --examples--
 .. rubric:: Examples
 
-* Simple example of combining signal and background in output_train.root and output_test.root::
+* Simple example of combining signal and background in output.root :
 
     $ %(prog)s -s /path/to/SignalMC.root -b /path/to/BackgroundMC.root
+
+* Simple example of combining signal and background in output_train.root and output_test.root:
+
+    $ %(prog)s -s /path/to/SignalMC.root -b /path/to/BackgroundMC.root --ftest 0.2
 
 * More complex example:
 
@@ -45,8 +49,8 @@ def getCommandLineOptions():
                         help='Location of signal data root file(s).')
     parser.add_argument('-b', '--data_bkg', dest='data_bkg', type=str, required=True, action='append', nargs='+',
                         help='Location of backgrouns data root file(s).')
-    parser.add_argument('-o', '--output', dest='output', type=str, default='output',
-                        help='Prefix for the output files (default: output)')
+    parser.add_argument('-o', '--output', dest='output', type=str, default='output.root',
+                        help='Output file name, will overwrite existing data (default: output.root)')
     parser.add_argument('-t', '--treename', dest='treename', type=str, default='tree',
                         help='Tree name in data file (default: tree)')
     parser.add_argument('--columns', dest='columns', type=str, required=False, action='append', nargs='+',
@@ -57,33 +61,34 @@ def getCommandLineOptions():
                         help='(Optional) Cut on signal data, replaces --cut for signal.')
     parser.add_argument('--cut_bkg', dest='cut_bkg', type=str, default=None,
                         help='(Optional) Cut on background data, replaces --cut for background.')
-    parser.add_argument('--ftest', dest='ftest', type=float, default=0.2,
-                        help="""Fraction of data used for the test file, (default: 0.2)""")
     parser.add_argument('--fsig', dest='fsig', type=float, default=None,
                         help="(Optional) Fraction of signal.")
+    parser.add_argument('--ftest', dest='ftest', type=float, default=None,
+                        help="""Fraction of data used for the test file, will add '_train' and '_test'
+                        to output files (default: None)""")
     parser.add_argument('--fillnan', dest='fillnan', action='store_true',
                         help='(Optional) Fill nan and inf values with actual numbers')
     parser.add_argument('--signalcolumn', dest='signalcolumn', type=str, default='Signal',
                         help='Name of the new signal column (default: Signal)')
-    parser.add_argument('--random_state', dest='random_state', type=int, default=None,
-                        help='Random state of shuffling between train and test (default: None)')
     args = parser.parse_args()
     return args
 
 
 if __name__ == '__main__':
 
+    # Get oommandline options
     ROOT.gROOT.SetBatch(True)
-
     old_cwd = os.getcwd()
     args = getCommandLineOptions()
 
+    # Prepare the cuts
     cut_sig = args.cut_sig if args.cut_sig is not None else args.cut
     cut_bkg = args.cut_bkg if args.cut_bkg is not None else args.cut
 
     data_sig = sum(args.data_sig, [])
     data_bkg = sum(args.data_bkg, [])
 
+    # Load the data
     print("Load data")
 
     df_sig = read_root(data_sig, args.treename, args.columns, where=cut_sig)
@@ -96,38 +101,46 @@ if __name__ == '__main__':
     print("- %d background candidates selected." % n_bkg)
 
     # Add signal column
-
     df_sig[args.signalcolumn] = 1
     df_bkg[args.signalcolumn] = 0
 
+    # Adjust the signal/background ratio if requested
     if args.fsig is not None:
-        print('Adjusting signal/background ratio from %f to %f.' % (n_sig/float(n_bkg+ n_sig), args.fsig))
+        print('Adjusting signal/background ratio from %f to %f.' % (n_sig / float(n_bkg + n_sig), args.fsig))
         assert 0 < args.fsig < 1, 'Please provide a signal fraction within [0,1]'
 
-        if n_sig>=n_bkg:
-            fs = (args.fsig*n_bkg) / ((1-args.fsig)*n_sig)
+        if n_sig >= n_bkg:
+            fs = (args.fsig * n_bkg) / ((1 - args.fsig) * n_sig)
             print("\t Warning: sampling down signal")
-            df_sig = df_sig.sample(int(n_sig*fs))
+            df_sig = df_sig.sample(int(n_sig * fs))
 
         else:
-            fb = (n_sig/float(n_bkg))*(1/args.fsig - 1)
+            fb = (n_sig / float(n_bkg)) * (1 / args.fsig - 1)
             print("\t Warning: sampling down background")
-            df_bkg = df_bkg.sample(int(fb*n_bkg))
+            df_bkg = df_bkg.sample(int(fb * n_bkg))
 
+    # Merge signal and background DataFrame
     df = df_bkg.append(df_sig, ignore_index=True)
 
+    # Replace NaN
     if args.fillnan:
         print('- Replacing NaN values')
         for c in df.columns:
             df[c] = np.nan_to_num(df[c])
 
-    print('Splitting train/test with fraction', args.ftest)
+    # Split test and train data or saving directly
+    if args.ftest is not None:
+        print('Splitting train/test with fraction', args.ftest)
+        df_train, df_test = train_test_split(df, test_size=args.ftest, random_state=args.random_state)
 
-    df_train, df_test = train_test_split(df, test_size=args.ftest, random_state=args.random_state)
+        filename = str(args.output)
+        if filename.endswith('.root'):
+            filename = filename.split('.root')[0]
 
-    print('Creating output files\n\t -  %s \n\t -  %s' % (args.output + '_train.root', args.output + '_test.root'))
+        print('Creating output files\n\t -  %s \n\t -  %s' % (filename + '_train.root', filename + '_test.root'))
 
-    df_train.to_root(args.output + '_train.root', args.treename)
-    df_test.to_root(args.output + '_test.root', args.treename)
-
-
+        df_train.to_root(filename + '_train.root', args.treename)
+        df_test.to_root(filename + '_test.root', args.treename)
+    else:
+        print('Creating output file\n\t -  %s ' % args.output)
+        df.to_root(args.output, args.treename)

@@ -32,7 +32,7 @@ void HVControlCallback::turnoff() throw(HVHandlerException)
 
 void HVControlCallback::configure(const HVConfig& config) throw(HVHandlerException)
 {
-  load(config, false, true);
+  //load(config, false, true);
 }
 
 void HVControlCallback::standby() throw(HVHandlerException)
@@ -190,7 +190,7 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
         std::string state_s = HVMessage::getStateText((HVMessage::State)state);
         float vmon = m_mon[crateid][l].vmon;
         float cmon = m_mon[crateid][l].cmon;
-        if (m_mon_tmp[crateid][l].state != state) {//yone [i] -> [l]
+        if (m_mon_tmp[crateid][l].state != state) {
           set(vname + "state", state_s);
         }
         m_mon_tmp[crateid][l].state = m_mon[crateid][l].state;
@@ -208,6 +208,8 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
       }
     }
     if (isstable && m_state_demand != getNode().getState()) {
+      //      m_state_demand = getNode().getState();//yone
+      log(LogFile::NOTICE, "yone");//yone
       log(LogFile::NOTICE, "State transit : %s", m_state_demand.getLabel());
       setHVState(m_state_demand);
       reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));

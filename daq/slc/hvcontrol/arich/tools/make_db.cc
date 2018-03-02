@@ -1,11 +1,35 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <typeinfo>
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
+
+  ifstream ifs_serial("../data/serial.txt");
+  string str_serial;
+  if (!ifs_serial) {
+    printf("no file (serial)\n");
+    printf("Did you add one line? CHECK!");
+  }
+  char serial[420][10];
+
+  getline(ifs_serial, str_serial);
+  while (getline(ifs_serial, str_serial)) {
+    int modid = -1;
+    char serial_tmp[10] = "oooooo";
+    sscanf(str_serial.data(), "%d,%s", &modid, &serial_tmp);
+    //    cout<<modid<<","<<serial_tmp<<endl;
+    //    cout<<typeid(serial_tmp).name()<<endl;
+    //    cout<<typeid(serial[modid]).name()<<endl;
+    if ((modid != -1) && (serial_tmp != "oooooo"))sprintf(serial[modid - 1], "%s", serial_tmp);
+    //    printf("modid=%d, serial=%s\n",modid,serial[modid-1]);
+  }
+
+
+
 
   //  char fname[32] = "gb_chmap.csv";
   ifstream ifs_gb("../data/gb_map_pratical.csv");
@@ -61,32 +85,13 @@ int main(int argc, char** argv)
 
 
 
-  ofstream ofs("../data/arich-input_yone.conf");
-  //  ofstream ofs("arich-input_yone.conf");
+  //  ofstream ofs("../data/arich-input_yone.conf");
+  ofstream ofs("tmp_yone.conf");
 
 
   ofs << "nodename                    : ARICH_HV" << endl
       << "config                      : test:kek:peak:000" << endl << endl;
 
-
-  ofs << endl
-      << "crate[1].name                  : arichps1" << endl
-      << "crate[1].host                  : 192.168.0.101" << endl
-      << "crate[1].port                  : 22" << endl
-      << "crate[1].usech                 : 1" << endl << endl;
-  /*
-  ofs << endl
-      << "crate[2].name                  : arichps2" << endl
-      << "crate[2].host                  : 192.168.0.102" << endl
-      << "crate[2].port                  : 22" << endl
-      << "crate[2].usech                 : 1" << endl << endl;
-
-  ofs << endl
-      << "crate[3].name                  : arichps3" << endl
-      << "crate[3].host                  : 192.168.0.103" << endl
-      << "crate[3].port                  : 22" << endl
-      << "crate[3].usech                 : 1" << endl << endl;
-  */
 
   string type = "guard";
   string spare = "spare";
@@ -112,32 +117,15 @@ int main(int argc, char** argv)
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].channel    : " << gb_channel[num] << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].type       : " << gb_type[num] << endl;
 
-            /*
-              if(gb_modid[num]==0){
-              ofs <<"none"<<endl;
-              }else{
-              ofs << gb_type[num] << endl;
-              }
-            */
 
             ofs << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].modid      : " << gb_modid[num] << endl
+                << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].serial     : " << serial[gb_modid[num] - 1] << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].sector     : " << gb_sector[num] << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].turnon     : true" << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].mask       : no" << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].rampup     : 10.000000" << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].rampdown   : 10.000000" << endl
                 << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].vdemand    : " << gb_volt[num] << ".000000" << endl;
-            /*
-            if(gb_type[num] == type){
-            ofs<<"175.000000"<<endl;
-            //      ofs<<gb_volt[num]<<".000000"<<endl;
-            }else if(gb_volt[num]>0){
-            ofs<<"175.000000"<< endl;
-            //      ofs<<gb_volt[num]<<".000000"<< endl;
-            }else{
-            ofs<<gb_volt[num]<<".000000"<<endl;
-            }
-            */
             //    ofs << "crate[0].channel[" << k_gb << "].vlimit     : " << "180.000000"<< endl
             ofs << "crate[" << gb_crate[num]  << "].channel[" << k_gb << "].vlimit     : " << (gb_volt[num] > 0 ? gb_volt[num] + 5 : 0) <<
                 ".000000" << endl
@@ -154,27 +142,6 @@ int main(int argc, char** argv)
     }
   }
 
-  /*
-  for(int slot_tmp=14;slot_tmp<16;slot_tmp++){
-    for(int channel_tmp=0;channel_tmp<48;channel_tmp++){
-      ofs << "crate[0].channel[" << k_gb << "].slot       : " << slot_tmp<<endl
-    << "crate[0].channel[" << k_gb << "].channel    : " << channel_tmp << endl
-    << "crate[0].channel[" << k_gb << "].type       : none " << endl
-    << "crate[0].channel[" << k_gb << "].modid      : -1 " << endl
-    << "crate[0].channel[" << k_gb << "].turnon     : true" << endl
-    << "crate[0].channel[" << k_gb << "].rampup     : 10.000000" << endl
-    << "crate[0].channel[" << k_gb << "].rampdown   : 10.000000" << endl
-    << "crate[0].channel[" << k_gb << "].vdemand    : 10.000000" << endl
-    << "crate[0].channel[" << k_gb << "].vlimit     : 20.000000" << endl
-    << "crate[0].channel[" << k_gb << "].climit     : 10.000000" << endl
-    << "crate[0].channel[" << k_gb << "].voffset    : 0.000000" << endl
-    << "crate[0].channel[" << k_gb << "].vslope     : 1.000000" << endl
-    << "crate[0].channel[" << k_gb << "].coffset    : 0.000000" << endl
-    << "crate[0].channel[" << k_gb << "].cslope     : 1.000000" << endl;
-      k_gb++;
-    }
-  }
-  */
 
 
 
@@ -226,31 +193,6 @@ int main(int argc, char** argv)
     i_hv++;
   }
 
-  /*
-  ofs << endl
-      << "crate[4].name                  : arichps4" << endl
-      << "crate[4].host                  : 192.168.0.104" << endl
-      << "crate[4].port                  : 22" << endl
-      << "crate[4].usech                 : 1" << endl << endl;
-
-  ofs << endl
-      << "crate[5].name                  : arichps5" << endl
-      << "crate[5].host                  : 192.168.0.105" << endl
-      << "crate[5].port                  : 22" << endl
-      << "crate[5].usech                 : 1" << endl << endl;
-
-  ofs << endl
-      << "crate[6].name                  : arichps6" << endl
-      << "crate[6].host                  : 192.168.0.106" << endl
-      << "crate[6].port                  : 22" << endl
-      << "crate[6].usech                 : 1" << endl << endl;
-
-  ofs << endl
-      << "crate[7].name                  : arichps7" << endl
-      << "crate[7].host                  : 192.168.0.107" << endl
-      << "crate[7].port                  : 22" << endl
-      << "crate[7].usech                 : 1" << endl << endl;
-  */
 
   int k_hv = 0;
 
@@ -272,14 +214,9 @@ int main(int argc, char** argv)
             ofs << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].slot       : " << hv_slot[num] << endl
                 << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].channel    : " << hv_channel[num] << endl
                 << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].type       : " << hv_type[num] << endl;
-            /*
-              if(hv_modid[num]<=70){
-              ofs << hv_type[num] << endl;
-              }else{
-              ofs << "none" << endl;
-              }
-            */
+
             ofs << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].modid      : " << hv_modid[num] << endl
+                << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].serial     : " << serial[hv_modid[num] - 1] << endl
                 << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].sector     : " << hv_sector[num] << endl
                 << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].turnon     : true" << endl
                 << "crate[" << hv_crate[num]  << "].channel[" << k_hv << "].mask       : no" << endl
@@ -299,29 +236,9 @@ int main(int argc, char** argv)
 
     }
   }
-  /*
-    for(int slot_tmp=14;slot_tmp<15;slot_tmp++){
-      for(int channel_tmp=0;channel_tmp<16;channel_tmp++){
-        ofs << "crate[1].channel[" << k_hv << "].slot       : " << slot_tmp<<endl
-      << "crate[1].channel[" << k_hv << "].channel    : " << channel_tmp << endl
-      << "crate[1].channel[" << k_hv << "].type       : none " << endl
-      << "crate[1].channel[" << k_hv << "].modid      : -1 " << endl
-      << "crate[1].channel[" << k_hv << "].turnon     : true" << endl
-      << "crate[1].channel[" << k_hv << "].rampup     : 100.000000" << endl
-      << "crate[1].channel[" << k_hv << "].rampdown   : 100.000000" << endl
-      << "crate[1].channel[" << k_hv << "].vdemand    : 100.000000" << endl
-      << "crate[1].channel[" << k_hv << "].vlimit     : 110.000000" << endl
-      << "crate[1].channel[" << k_hv << "].climit     : 10.000000" << endl
-      << "crate[1].channel[" << k_hv << "].voffset    : 0.000000" << endl
-      << "crate[1].channel[" << k_hv << "].vslope     : 1.000000" << endl
-      << "crate[1].channel[" << k_hv << "].coffset    : 0.000000" << endl
-      << "crate[1].channel[" << k_hv << "].cslope     : 1.000000" << endl;
-        k_hv++;
-      }
-    }
-  */
 
 
 
+  /**/
   return 0;
 }

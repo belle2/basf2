@@ -162,8 +162,7 @@ void FullSimModule::initialize()
   //FullSim does not create a new collection.
   //For most of the cases, the module will reuse and update the existing one.
 
-  //For a certain case such as background overlay, we need a dummy storearray.
-  //Otherwise we need the MCParticle collection.
+  //For a certain cases, the input MCParticles collection name may be empty.
   if (m_mcParticleInputColName.empty()) {
     StoreArray<MCParticle>().isOptional(m_mcParticleInputColName);
   } else {

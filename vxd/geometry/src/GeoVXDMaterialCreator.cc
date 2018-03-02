@@ -44,7 +44,7 @@ namespace Belle2 {
 
       GearDir content1(content, "GapMomVolBack");
       // Read parameters for Backward Gap Mom Volume
-      GapMomVolBackPar MomVolBackPar;
+      GapMomVolPar MomVolBackPar;
       for (const GearDir& GapVol : content1.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
@@ -55,7 +55,7 @@ namespace Belle2 {
 
       GearDir content2(content, "GapMomVolFor");
       // Read parameters for Forward Gap Mom Volume
-      GapMomVolForPar MomVolForPar;
+      GapMomVolPar MomVolForPar;
       for (const GearDir& GapVol : content2.getNodes("ZBound")) {
         const double rmin = GapVol.getLength("Rmin") / Unit::mm;
         const double rmax = GapVol.getLength("Rmax") / Unit::mm;
@@ -65,7 +65,7 @@ namespace Belle2 {
       vxdMaterialGeometryPar.getMomVolFor() = MomVolForPar;
 
       GearDir content3(content, "BEAST2Materials");
-      // Read parameters to creates BEAST2 Material
+      // Read parameters to creates BEAST2 Material in the gap between CDC and ECL, ARICH and TOP, TOP and ECL.
       for (const GearDir& material : content3.getNodes("BEAST2Material")) {
         BeastMaterialsPar MaterialPar(
           material.getString("Name"),
@@ -80,7 +80,7 @@ namespace Belle2 {
       }
 
       GearDir content4(content, "BEAST2EclMaterials");
-      // Read parameters to creates BEAST2 Material
+      // Read parameters to creates BEAST2 Material in the gap between barrel and endcap of ECL.
       for (const GearDir& material : content4.getNodes("BEAST2Material")) {
         BeastEclMaterialsPar MaterialPar(
           material.getString("Name"),
@@ -96,9 +96,9 @@ namespace Belle2 {
         vxdMaterialGeometryPar.getbeastEclMaterials().push_back(MaterialPar);
       }
 
-      GearDir content5(content, "CDCGAPS");
+      GearDir content5(content, "TicknessDensity");
       // Read thickness and density for Gaps Volume
-      ThicknessPar ThickPar(
+      ThicknessDensityPar ThickPar(
         content5.getInt("IRCDCBack"),
         content5.getInt("IPhiCDCBack"),
         content5.getInt("IRCDCFor"),
@@ -145,7 +145,7 @@ namespace Belle2 {
       G4LogicalVolume* logical_gap_back = new G4LogicalVolume(solid_gap_back, medAir, "VXD.GAPBack", 0, 0, 0);
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_back, "VXD.GAPBack", &topVolume, false, 1);
 
-      //      Create Materials from BEAST 2  between CDC and ECL.
+      //      Create Materials from BEAST 2 in the gap between CDC and ECL.
       const auto& Thick = parameters.getthick();
       std::vector<double> Thickness =  Thick.getthickness();
       std::vector<double> Density =  Thick.getdensity();
@@ -197,6 +197,7 @@ namespace Belle2 {
             }
           }
         }
+        //      Create Materials from BEAST 2 in the gap between ARICH and TOP.
         if (materialID == 2) {
           int blockid = 0;
           for (int iZ = 0; iZ < IZARICHF; iZ++) {
@@ -218,6 +219,7 @@ namespace Belle2 {
             }
           }
         }
+        //      Create Materials from BEAST 2 in the gap between TOP and ECL.
         if (materialID == 3) {
           int blockid = 0;
           const double rmin = materialInnerR;
@@ -238,7 +240,7 @@ namespace Belle2 {
           }
         }
       }
-      //      Create Materials from BEAST 2 between barrel and endcap of ECL.
+      //      Create Materials from BEAST 2 in the gap between barrel and endcap of ECL.
       for (const BeastEclMaterialsPar& material : parameters.getbeastEclMaterials()) {
         int blockid = 0;
         double IZECL = 0, IPhiECL = 0;

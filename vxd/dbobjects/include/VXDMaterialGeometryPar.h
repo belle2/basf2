@@ -119,17 +119,18 @@ namespace Belle2 {
     ClassDef(BeastEclMaterialsPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
+
   /**
-  * The Class for VXD service geometry
+  * The class for the  mother volume of the phase2 cables and services
   */
-  class GapMomVolBackPar: public TObject {
+  class GapMomVolPar: public TObject {
 
   public:
     /** Constructor */
-    GapMomVolBackPar() {}
+    GapMomVolPar() {}
 
     //! Destructor.
-    ~GapMomVolBackPar() {}
+    ~GapMomVolPar() {}
 
     //! Append a new node.
     void appendNode(double rmin, double rmax , double z)
@@ -154,68 +155,28 @@ namespace Belle2 {
     std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
     std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
 
-    ClassDef(GapMomVolBackPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
-
-  };
-
-
-  /**
-  * The Class for VXD service geometry
-  */
-  class GapMomVolForPar: public TObject {
-
-  public:
-    /** Constructor */
-    GapMomVolForPar() {}
-
-    //! Destructor.
-    ~GapMomVolForPar() {}
-
-    //! Append a new node.
-    void appendNode(double rmin, double rmax , double z)
-    {
-      m_rmin.push_back(rmin);
-      m_rmax.push_back(rmax);
-      m_z.push_back(z);
-    }
-
-    //! Get the number of the mother volume nodes.
-    int getNNodes() const { return m_rmin.size();}
-    //! Get the list of the Rmin corrdinates.
-    std::vector<double> getRmin() const { return m_rmin;}
-    //! Get the list of the Rmax corrdinates.
-    std::vector<double> getRmax() const { return m_rmax;}
-    //! Get the list of the z corrdinates.
-    std::vector<double> getZ() const { return m_z;}
-
-
-  private:
-    std::vector<double> m_rmin; /**< Rmin list of the mother volume. */
-    std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
-    std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
-
-    ClassDef(GapMomVolForPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(GapMomVolPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 
   /**
-  * The thickness for  CDC gap element cell
+  * The class for the thicknesses and the density of  gap element cell
   */
-  class ThicknessPar: public TObject {
+  class ThicknessDensityPar: public TObject {
 
   public:
     /** Constructor */
-    ThicknessPar(double IRCDCB = 0, double IPhiCDCB = 0, double IRCDCF = 0, double IPhiCDCF = 0,
-                 double IRECLB = 0, double IPhiECLB = 0, double IRECLF = 0, double IPhiECLF = 0,
-                 double IRARICHF = 0, double IPhiARICHF = 0,  double IPhiTOPF = 0,
-                 std::vector<double> thicknisses = std::vector<double>(),
-                 std::vector<double> density = std::vector<double>()):
+    ThicknessDensityPar(double IRCDCB = 0, double IPhiCDCB = 0, double IRCDCF = 0, double IPhiCDCF = 0,
+                        double IRECLB = 0, double IPhiECLB = 0, double IRECLF = 0, double IPhiECLF = 0,
+                        double IRARICHF = 0, double IPhiARICHF = 0,  double IPhiTOPF = 0,
+                        std::vector<double> thicknisses = std::vector<double>(),
+                        std::vector<double> density = std::vector<double>()):
       m_IRCDCB(IRCDCB), m_IPhiCDCB(IPhiCDCB), m_IRCDCF(IRCDCF), m_IPhiCDCF(IPhiCDCF), m_IRECLB(IRECLB),
       m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IPhiECLF(IPhiECLF), m_IRARICHF(IRARICHF),
       m_IPhiARICHF(IPhiARICHF), m_IPhiTOPF(IPhiTOPF), m_thick(thicknisses), m_density(density) {}
 
     //! Destructor.
-    ~ThicknessPar() {}
+    ~ThicknessDensityPar() {}
 
     //! Append a new node.
     void appendNode(double thick)
@@ -268,7 +229,7 @@ namespace Belle2 {
     std::vector<double> m_thick; /**< Thickness list of CDC gap element cell. */
     std::vector<double> m_density; /**< Densities list of ECL, ARICH and top gap element cell. */
 
-    ClassDef(ThicknessPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ThicknessDensityPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 
@@ -276,7 +237,7 @@ namespace Belle2 {
 
 
   /**
-  * The Class for VXD service geometry
+  * The Class for phase 2 cables and services geometry
   */
   class VXDMaterialGeometryPar: public TObject {
 
@@ -304,13 +265,13 @@ namespace Belle2 {
     //! Get the list of the z corrdinates.
     std::vector<double> getZ() const { return m_z;}
     //! Get Backward Gap MomVolume.
-    const GapMomVolBackPar& getMomVolBack(void) const { return m_momvolback; }
+    const GapMomVolPar& getMomVolBack(void) const { return m_momvolback; }
     //! Get Backward Gap MomVolume.
-    GapMomVolBackPar& getMomVolBack(void)  { return m_momvolback; }
+    GapMomVolPar& getMomVolBack(void)  { return m_momvolback; }
     //! Get Forward Gap MomVolume.
-    const GapMomVolForPar& getMomVolFor(void) const { return m_momvolfor; }
+    const GapMomVolPar& getMomVolFor(void) const { return m_momvolfor; }
     //! Get Forward Gap MomVolume.
-    GapMomVolForPar& getMomVolFor(void)  { return m_momvolfor; }
+    GapMomVolPar& getMomVolFor(void)  { return m_momvolfor; }
     //! Get Beast Materials.
     const std::vector<BeastMaterialsPar>& getbeastMaterials(void) const { return m_beastMaterials; }
     //! Get Beast Materials.
@@ -320,9 +281,9 @@ namespace Belle2 {
     //! Get Beast Materials at ECL.
     std::vector<BeastEclMaterialsPar>& getbeastEclMaterials(void)  { return m_beastEclMaterials; }
     //! Get Gap element cell Thickness.
-    const ThicknessPar& getthick(void) const { return m_thick; }
+    const ThicknessDensityPar& getthick(void) const { return m_thick; }
     //! Get Gap element cell Thickness.
-    ThicknessPar& getthick(void)  { return m_thick; }
+    ThicknessDensityPar& getthick(void)  { return m_thick; }
 
 
   private:
@@ -333,9 +294,9 @@ namespace Belle2 {
     std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
     std::vector<BeastMaterialsPar> m_beastMaterials; /**< Vector with Beast Materials between CDC and ECL. */
     std::vector<BeastEclMaterialsPar> m_beastEclMaterials; /**< Vector with Beast Materials between barrel and endcap of ECL. */
-    GapMomVolBackPar m_momvolback;
-    GapMomVolForPar m_momvolfor;
-    ThicknessPar m_thick;
+    GapMomVolPar m_momvolback;
+    GapMomVolPar m_momvolfor;
+    ThicknessDensityPar m_thick;
 
     ClassDef(VXDMaterialGeometryPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

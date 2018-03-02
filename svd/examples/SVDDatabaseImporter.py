@@ -3,7 +3,7 @@
 
 """
 SVD Database importer.
-Simple example for testing the import to database.
+Script to Import Calibrations into a local DB
 """
 
 from basf2 import *
@@ -15,59 +15,86 @@ import sys
 import glob
 import subprocess
 import interactive
+import argparse
 from fnmatch import fnmatch
 
-use_local_database("localDB_run400_toImport/database_run400_toImport.txt", "localDB_run400_toImport")
-# use_central_database("GT_gen_prod_004.11_Master-20171213-230000")
+parser = argparse.ArgumentParser(description="SVD Database Importer")
+parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
+parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
+parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
+parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 
-# use_local_database("test/database.txt", "test")
+
+if(len(sys.argv) != 7):
+    print('')
+    print('ERROR: wrong number of arguments passed, check below the correct usage of this script.')
+    print('')
+    print('provided input arguments')
+    print(sys.argv)
+    parser.print_help()
+    exit()
+
+print('')
+
+args = parser.parse_args()
+
+experiment = args.exp[0]
+run = args.run[0]
+if args.calib is not None:
+    calibfile = args.calib[0]
+else:
+    calibfile = args.calib
+if args.mapp is not None:
+    mappingfile = args.mapp[0]
+else:
+    mappingfile = args.mapp
+
+print('experiment number = ' + str(experiment))
+print('       run number = ' + str(run))
+print('  calibration xml = ' + str(calibfile))
+print('      mapping xml = ' + str(mappingfile))
+
+use_local_database("localDB/database.txt", "localDB")
 
 main = create_path()
 
+
 # Event info setter - execute single event
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'expList': [3], 'runList': [400]})
+eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run})
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
+
+# the calibrations are good from the NEXT run
+run = int(int(run) + 1)
+
+# TO DO, enable calibration of calib or mapping, depending on the user input
 
 
 class dbImporterModule(Module):
     def beginRun(self):
         # call the importer class
-        dbImporter = SVDDatabaseImporter(0, 0, -1, -1)
-#        print("classdefined")
-        # import the noises
-#        dbImporter.importSVDNoiseCalibrationsFromXML("Hao_noise.xml")
-        dbImporter.importSVDCalAmpCalibrationsFromXML("Hao_noise.xml")
+        dbImporter = SVDDatabaseImporter(experiment, run, experiment, -1)
+        if args.calib is not None:
+            # import the noises
+            dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
+            print("Noise Imported")
+            # import the pedestals
+            dbImporter.importSVDPedestalCalibrationsFromXML(calibfile)
+            print("Pedestal Imported")
+            # import pulse shape calibrations
+            dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
+            print("Pulse Shape Calibrations Imported")
+        if args.mapp is not None:
+            # import channel mapping
+            dbImporter.importSVDChannelMapping(mappingfile)
+            # print("Channel Mapping Imported")
 
-        print("importNoise_Done")
-
-        # dbImporter.importSVDChannelMapping("Hao_mapping.xml")
-'''
-# import the calibration constants from local runs
-dbImporter.importSVDPulseShapeCalibrations()
-
-print("importPulseShape_Done")
-
-# import the time shift calibration constants
-# for the basic time estimator
-dbImporter.importSVDTimeShiftCorrections()
-
-print("importTimeShiftCorrection_Done")
-
-# import the bad strips status
-dbImporter.importSVDLocalRunBadStrips()
-
-print("importBadStrips_Done")
-
-dbImporter.importSVDChannelMapping()
-'''
 
 main.add_module(dbImporterModule())
-# process single event
+
 process(main)
 
-print("IMPORT COMPLETED!!!")
+print("IMPORT COMPLETED, check the localDB folder and then proceeed with the upload to the central DB")

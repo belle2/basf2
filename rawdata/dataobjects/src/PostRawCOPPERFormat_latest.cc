@@ -280,10 +280,16 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       //
       // Do not stop data
       //
-      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+      printf("[FATAL] POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
              *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
              65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
+#ifndef NO_ERROR_STOP
+      exit(1);
+      //      string err_str = err_buf;     throw (err_str);
+#endif
+
     } else {
       //
       // Stop taking data

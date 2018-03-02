@@ -28,6 +28,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -657,6 +658,19 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Phi();
     }
 
+    double cosToThrustOfEvent(const Particle* part)
+    {
+      StoreObjPtr<ThrustOfEvent> thrust;
+      if (!thrust) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      PCmsLabTransform T;
+      TVector3 th = thrust->getThrustAxis();
+      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      return std::cos(th.Angle(particleMomentum));
+    }
+
 // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -710,11 +724,6 @@ namespace Belle2 {
     double particleMdstSource(const Particle* part)
     {
       return part->getMdstSource();
-    }
-
-    double particleCosMdstArrayIndex(const Particle* part)
-    {
-      return std::cos(part->getMdstArrayIndex());
     }
 
     double particlePvalue(const Particle* part)
@@ -1404,6 +1413,9 @@ namespace Belle2 {
                       "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
     REGISTER_VARIABLE("missingMomentumPhi", missingMomentumPhi,
                       "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
+                      "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
+
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -1485,8 +1497,6 @@ namespace Belle2 {
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
-    REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
-                      " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,

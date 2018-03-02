@@ -18,8 +18,8 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
-#include <string>
 #include <unordered_set>
+#include <string>
 
 namespace Belle2 {
   /** This class implements the methods to map raw SVD hits to BASF2 SVD hits.
@@ -28,7 +28,7 @@ namespace Belle2 {
    * MODIFICATIONS 06/01/2014 by PKvasnick:
    * The code no longer relies on consecutive numbering of FADCs or APVs.
    *
-   * 3 Feb. 2015
+   * 2015-2018
    * MODIFIED and EXTENDED by Jarek Wiechczynski to work with packer (new) and unpacker (updated version)
    *
    */
@@ -93,7 +93,7 @@ namespace Belle2 {
     }; //ChipID class
 
 
-    class SensorID {  //moja dodatkowa klasa zagniezdzona w SVDOnlineToOfflineMap
+    class SensorID {
     public:
       /** Typedefs of the compound id type and chip number types */
       typedef unsigned short baseType;
@@ -200,9 +200,15 @@ namespace Belle2 {
     /**container for FADC numbers from current mapping file */
     std::unordered_set<unsigned char> FADCnumbers;
 
-    /** function that maps FADC numbers as 0-(nFADCboards-1) from FADCnumbers unordered_set */
+    /** map containing FADC numbers assigned to multiple APVs, from xml file */
+    std::unordered_multimap<unsigned char, unsigned char> APVforFADCmap;
+
+
     typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
+
+    /** function that maps FADC numbers as 0-(nFADCboards-1) from FADCnumbers unordered_set */
     void prepFADCmaps(FADCmap&, FADCmap&);
+
 
     unsigned short getFADCboardsNumber()
     {
@@ -228,8 +234,7 @@ namespace Belle2 {
      */
     void ReadSensorSide(int nLayer, int nLadder, int nSensor, bool isU, boost::property_tree::ptree const& xml_side);
 
-    /** Human readable unique name of this map
-     */
+    /** Human readable unique name of this map*/
     std::string m_MapUniqueName;
 
     /** m_sensors[ChipID(FADC,APV25)] gives the SensorInfo for the given APV25 on

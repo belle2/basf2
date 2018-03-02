@@ -45,6 +45,7 @@ namespace Belle2 {
       c_CommonT0Calibrated =  8,
       c_FullyCalibrated = c_TimeBaseCalibrated | c_ChannelT0Calibrated | c_ModuleT0Calibrated | c_CommonT0Calibrated,
       c_OffsetSubtracted = 16,
+      c_EventT0Subtracted = 32,
     };
 
     /**

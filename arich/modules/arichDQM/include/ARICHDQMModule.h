@@ -88,6 +88,10 @@ namespace Belle2 {
   protected:
     bool m_debug;/**<debug*/
 
+    bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
+    int m_maxHits; /**< exclude events with very large number of hits in arich */
+    int m_minHits; /**< exclude events with number of hits lower than this */
+
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/
     TH1* h_aeroStat = NULL;/**<Status of each aerogel tiles*/
@@ -96,6 +100,7 @@ namespace Belle2 {
     TH1* h_chHit = NULL;/**<The number of hits in each channels*/
     TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chips*/
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPDs*/
+    TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
     TH1* h_gelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/

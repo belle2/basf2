@@ -23,7 +23,6 @@ namespace Belle2 {
     static const HVState OVER_CURRENT_ES;
     static const HVState OVER_VOLTAGE_ES;
     static const HVState ERROR_ES;
-    static const HVState MASKED;
 
   public:
     HVState() throw() : NSMState(Enum::UNKNOWN) {}

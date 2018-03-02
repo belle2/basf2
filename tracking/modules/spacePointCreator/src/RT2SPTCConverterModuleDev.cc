@@ -76,7 +76,16 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
 
   addParam("ignorePXDHits", m_ignorePXDHits, "If true no PXD hits will be used when creating the SpacePointTrackCand", bool(false));
 
+  addParam("convertFittedOnly", m_convertFittedOnly, "If true only RecoTracks with successful fit will be converted to "
+           "SpacePointTrackCands", m_convertFittedOnly);
+
   initializeCounters();
+}
+
+/** destructor */
+RT2SPTCConverterModule::~RT2SPTCConverterModule()
+{
+  if (m_trackSel) delete m_trackSel;
 }
 
 // ------------------------------ INITIALIZE ---------------------------------------
@@ -134,6 +143,9 @@ void RT2SPTCConverterModule::event()
   StoreArray<SVDCluster> svdClusters(m_SVDClusterName);
 
   for (auto& recoTrack : m_recoTracks) {
+
+    // if corresponding flag is set only use fitted tracks
+    if (m_convertFittedOnly and not recoTrack.wasFitSuccessful()) continue;
 
     if (m_noKickCutsFile.size() != 0) {
       bool passCut = m_trackSel->trackSelector(recoTrack);

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kindo Haruki                                             *
+ * Contributors: Kindo Haruki, Luka Santelj                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,6 +22,7 @@
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
@@ -80,6 +81,9 @@ namespace Belle2 {
     addParam("debug", m_debug, "debug mode", false);
     addParam("UpperMomentumLimit", m_momUpLim, "Upper momentum limit of tracks included in monitoring", 0.);
     addParam("LowerMomentumLimit", m_momDnLim, "Lower momentum limit of tracks included in monitoring", 0.);
+    addParam("ArichEvents", m_arichEvents, "Include only hits from events where an extrapolated track to arich exists", false);
+    addParam("MaxHits", m_maxHits, "Include only events with less than MaxHits hits in ARICH (remove loud events)", 70000);
+    addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in ARICH", 1);
   }
 
   ARICHDQMModule::~ARICHDQMModule()
@@ -101,7 +105,9 @@ namespace Belle2 {
 
     h_chHit = newTH1("h_chHit", "# of hits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5, kRed, kRed);
     h_chipHit = newTH1("h_chipHit", "# of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5, kRed, kRed);
-    h_hapdHit = newTH1("h_hapdHit", "# of hits in each channel;HAPD serial;Hits", 420, -0.5, 420 - 0.5, kRed, kRed);
+    h_hapdHit = newTH1("h_hapdHit", "# of hits in each channel;HAPD serial;Hits", 420, 0.5, 421 - 0.5, kRed, kRed);
+    h_hapdHitPerEvent = newTH2("h_hapdHitPerEvent", "# of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5, 420 + 0.5, 144,
+                               -0.5, 143.5, kRed, kRed);
     h_mergerHit = newTH1("h_mergerHit", "# of hits in each merger board;MB serial;Hits", 72, -0.5, 72 - 0.5, kRed, kRed);
     h_gelHit = newTH1("h_gelHit", "# of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5, kRed, kRed);
     h_bits = newTH1("h_bits", "# of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5, kRed, kRed);
@@ -110,7 +116,7 @@ namespace Belle2 {
 
     h_hitsPerEvent = newTH1("h_hitsPerEvent", "# of hit per event;# of hits;Events", 150, 0, 150, kRed, kRed);
     h_theta = newTH1("h_theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6, kRed, kRed);
-    h_hitsPerTrack = newTH1("h_hitsPerTrack", "# of hit per track;# of hits;Tracks", 40, 0, 40, kRed, kRed);
+    h_hitsPerTrack = newTH1("h_hitsPerTrack", "# of hit per track;# of hits;Tracks", 41, -0.5, 40.5, kRed, kRed);
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i] = newTH1(Form("h_thetaSec%d", i), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i), 60, 0,
@@ -157,16 +163,20 @@ namespace Belle2 {
     StoreArray<MCParticle> MCParticles;
     MCParticles.isOptional();
     StoreArray<Track> tracks;
-    tracks.isRequired();
+    tracks.isOptional();
     StoreArray<ARICHHit> arichHits;
-    arichHits.isRequired();
+    arichHits.isOptional();
     StoreArray<ARICHDigit> arichDigits;
     arichDigits.isRequired();
     StoreArray<ARICHTrack> arichTracks;
-    arichTracks.isRequired();
+    arichTracks.isOptional();
     StoreArray<ARICHAeroHit> arichAeroHits;
-    arichAeroHits.isRequired();    StoreArray<ARICHLikelihood> likelihoods;
-    likelihoods.isRequired();
+    arichAeroHits.isOptional();
+    StoreArray<ARICHLikelihood> likelihoods;
+    likelihoods.isOptional();
+    StoreArray<ExtHit> extHits;
+    extHits.isOptional();
+
   }
 
   void ARICHDQMModule::beginRun()
@@ -193,8 +203,8 @@ namespace Belle2 {
     h_hitsPerTrack->Reset();
 
     for (int i = 0; i < 6; i++) {
-      h_secTheta[i] = {};
-      h_secHitsPerTrack[i] = {};
+      h_secTheta[i]->Reset();
+      h_secHitsPerTrack[i]->Reset();
     }
 
   }
@@ -214,7 +224,16 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMapping> arichChannelMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
 
-    if (arichHits.getEntries() == 0) return;
+    setReturnValue(1);
+
+    if (arichHits.getEntries() < m_minHits || arichHits.getEntries() > m_maxHits) { setReturnValue(0); return;}
+
+
+    Const::EDetector myDetID = Const::EDetector::ARICH; // arich
+    StoreArray<ExtHit> extHits;
+    int arichhit = 0;
+    for (const auto& extHit : extHits) if (extHit.getDetectorID() == myDetID) arichhit = 1;
+    if (!arichhit && extHits.getEntries()) { setReturnValue(0); if (m_arichEvents) return;}
 
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
@@ -222,24 +241,25 @@ namespace Belle2 {
         if (bits & (1 << i)) h_bits->Fill(i);
       }
     }
-
+    std::vector<int> hpd(420, 0);
     int nHit = 0;
     for (int i = 0; i < arichHits.getEntries(); i++) {
-      h_chHit->Fill((arichHits[i]->getModule() - 1) * 144 + (arichHits[i]->getChannel() - 1));
 
+      int moduleID = arichHits[i]->getModule();
+      h_chHit->Fill((moduleID - 1) * 144 + arichHits[i]->getChannel());
+      hpd[moduleID - 1]++;
       int x = 12 , y = 12;
       arichChannelMap->getXYFromAsic(arichHits[i]->getChannel(), x, y);
       if (x >= 12 || y >= 12) {
         B2INFO("Invalid channel position (x,y)=(" << x << "," << y << ").");
       } else {
-        h_chipHit->Fill((arichHits[i]->getModule() - 1) * 4 + (x + 2 * y));
+        h_chipHit->Fill((moduleID - 1) * 4 + (x + 2 * y));
       }
 
-      int moduleID = arichHits[i]->getModule();
       if (moduleID > 420) {
         B2INFO("Invalid hapd number " << moduleID);
       } else {
-        h_hapdHit->Fill(moduleID - 1);
+        h_hapdHit->Fill(moduleID);
       }
 
       int mergerID = arichMergerMap->getMergerID(moduleID);
@@ -251,7 +271,10 @@ namespace Belle2 {
 
       nHit++;
     }
+
     h_hitsPerEvent->Fill(nHit);
+    int mmid = 1;
+    for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
     for (const auto& arichLikelihood : arichLikelihoods) {
 
@@ -285,11 +308,12 @@ namespace Belle2 {
 
       std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
       int nPhoton = 0;
-      for (int i = 0; i < (int)photons.size(); i++) {
-        auto& photon(photons[i]);
-        h_theta->Fill(photon.getThetaCer());
-        h_secTheta[sector]->Fill(photon.getThetaCer());
-        nPhoton++;
+      for (auto& photon : photons) {
+        if (photon.getMirror() == 0) {
+          h_theta->Fill(photon.getThetaCer());
+          h_secTheta[sector]->Fill(photon.getThetaCer());
+          nPhoton++;
+        }
       }
 
       h_hitsPerTrack->Fill(nPhoton);

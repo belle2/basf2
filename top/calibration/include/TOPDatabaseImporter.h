@@ -122,6 +122,12 @@ namespace Belle2 {
     void importPmtTTSHisto(std::string fileName, std::string treeName);
 
     /**
+     * Import fit results of pulse height disribution for channel gain and threshold efficiency
+     * @param fileName : name of the root file containing relevant data, which is obtained from TOPGainEfficiencyMonitor
+     */
+    void importPmtPulseHeightFitResult(std::string fileName);
+
+    /**
      * Example of exporting TTS histograms
      * @param outFilefileName : name of the root file where data will be saved
      */

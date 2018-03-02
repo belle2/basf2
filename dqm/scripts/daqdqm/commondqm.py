@@ -19,17 +19,17 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # PXD (not useful on HLT)
     if dqm_environment == "expressreco":
         if components is None or 'PXD' in components:
-            pxddqm = register_module('PXDDQMExpressRecoMin')
+            pxddqm = register_module('PXDDQMExpressReco')
             path.add_module(pxddqm)
     # SVD
     if dqm_environment == "expressreco":
         if components is None or 'SVD' in components:
-            svddqm = register_module('SVDDQMExpressRecoMin')
+            svddqm = register_module('SVDDQMExpressReco')
             path.add_module(svddqm)
     # VXD (PXD/SVD common)
     if dqm_environment == "expressreco":
         if components is None or 'PXD' in components or 'SVD' in components:
-            vxddqm = register_module('VXDDQMExpressRecoMin')
+            vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
     # CDC
     if components is None or 'CDC' in components:
@@ -55,3 +55,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'TRG' in components:
         trgecldqm = register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+    # TrackDQM, needs at least one VXD components to be present or will crash otherwise
+    if components is None or 'SVD' in components or 'PXD' in components:
+        trackDqm = register_module('TrackDQM')
+        path.add_module(trackDqm)

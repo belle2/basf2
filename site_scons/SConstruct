@@ -79,7 +79,9 @@ global_env = Environment(
     EXTBINDIR=os.path.join('$EXTDIR', 'bin', extsubdir),
     LINK='g++',
     SHLINK='g++',
-    CCFLAGS=['-Wall', '-isystem$EXTINCDIR'],
+    # for now, add the include folder here, as the path set via
+    # CPPPATH below seems to be ignored for C file compiles
+    CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
     CXXFLAGS=['-std=c++14'],
     # disable warnings when compiling dictionaries, too much root problems
     # involved

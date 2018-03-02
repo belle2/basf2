@@ -145,6 +145,11 @@ namespace Belle2 {
      */
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element);
 
+    /**
+     * return the thrust of all the event.
+     */
+    double thrustOfEvent(const Particle*);
+
   }
 } // Belle2 namespace
 

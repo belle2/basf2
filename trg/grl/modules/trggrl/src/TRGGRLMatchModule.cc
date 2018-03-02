@@ -12,6 +12,7 @@
 #include <trg/grl/modules/trggrl/TRGGRLMatchModule.h>
 #include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <trg/grl/dataobjects/TRGGRLMATCHKLM.h>
+#include <trg/grl/dataobjects/TRGGRLPHOTON.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
@@ -60,6 +61,7 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("DrMatch", m_dr_threshold, "the threshold of dr between track and cluster if they are matched successfully", 25.);
   addParam("DzMatch", m_dz_threshold, "the threshold of dz between track and cluster if they are matched successfully", 30.);
   addParam("DphidMatch", m_dphi_d_threshold, "the threshold of dphi_d between track and cluster if they are matched successfully", 2);
+  addParam("Ephoton", m_e_threshold, "the threshold of cluster energy as a photon", 1.0);
   addParam("KLMMatch", m_dphi_klm_threshold,
            "the threshold of dphi (in degree) between track and KLM sector if they are matched successfully", 65.0);
   addParam("2DtrackCollection", m_2d_tracklist, "the 2d track list used in the match", std::string("TRGCDC2DFinderTracks"));
@@ -71,6 +73,7 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("3DmatchCollection", m_3dmatch_tracklist, "the 3d NN tracklist with associated cluster", std::string("TRG3DMatchTracks"));
   addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with associated KLM track",
            std::string("TRGKLMMatchTracks"));
+  addParam("GRLphotonCollection", m_grlphotonlist, "the isolated cluster list", std::string("TRGGRLPhotons"));
 
 
 }
@@ -127,6 +130,9 @@ void TRGGRLMatchModule::initialize()
   trackKLMmatch.registerRelationTo(track2Dlist);
   trackKLMmatch.registerRelationTo(klmtracklist);
 
+  StoreArray<TRGGRLPHOTON> grlphoton;
+  grlphoton.registerInDataStore(m_grlphotonlist);
+  grlphoton.registerRelationTo(clusterslist);
 }
 
 void TRGGRLMatchModule::beginRun()
@@ -144,6 +150,15 @@ void TRGGRLMatchModule::event()
   StoreArray<TRGGRLMATCH> trackphimatch(m_phimatch_tracklist);
   StoreArray<TRGGRLMATCH> track3Dmatch(m_3dmatch_tracklist);
   StoreArray<TRGGRLMATCHKLM> trackKLMmatch(m_klmmatch_tracklist);
+  StoreArray<TRGGRLPHOTON> grlphoton(m_grlphotonlist);
+
+//initialize the phi map
+
+  track_phimap.clear();
+
+  for (int i = 0; i < 36; i++) {
+    track_phimap.push_back(false);
+  }
 
 //do 2d track match with cluster
   for (int i = 0; i < track2Dlist.getEntries(); i++) {
@@ -169,7 +184,7 @@ void TRGGRLMatchModule::event()
       double ds_ct[2] = {99999., 99999.};
       calculationdistance(track2Dlist[i], clusterlist[j], ds_ct, 0);
       int dphi_d = 0;
-      calculationphiangle(track2Dlist[i], clusterlist[j], dphi_d);
+      calculationphiangle(track2Dlist[i], clusterlist[j], dphi_d, track_phimap);
 
       if (dr_tmp > ds_ct[0]) {
         dr_tmp = ds_ct[0];
@@ -240,6 +255,15 @@ void TRGGRLMatchModule::event()
     }
   }
 
+//pick up isolated clusters as photons with energy thrshold
+  for (int j = 0; j < clusterlist.getEntries(); j++) {
+    if (photon_cluster(clusterlist[j], track_phimap, m_e_threshold)) {
+      TRGGRLPHOTON* photon = grlphoton.appendNew();
+      photon->set_e(clusterlist[j]->getEnergyDep());
+      photon->addRelationTo(clusterlist[j]);
+    }
+  }
+
 }
 
 void TRGGRLMatchModule::endRun()
@@ -285,7 +309,8 @@ void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLClust
 
 }
 
-void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLCluster* _cluster, int& dphi_d)
+void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLCluster* _cluster, int& dphi_d,
+                                            std::vector<bool>& phimap)
 {
 
   //-- 2D track information
@@ -328,6 +353,8 @@ void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLClust
     if (phi_ECL > i * M_PI / 18 && phi_ECL < (i + 1)*M_PI / 18) {phi_ECL_d = i;}
     if (phi_CDC > i * M_PI / 18 && phi_CDC < (i + 1)*M_PI / 18) {phi_CDC_d = i;}
   }
+
+  phimap[phi_CDC_d] = true;
 
   if (abs(phi_ECL_d - phi_CDC_d) == 0 || abs(phi_ECL_d - phi_CDC_d) == 36) {dphi_d = 0;}
   else if (abs(phi_ECL_d - phi_CDC_d) == 1 || abs(phi_ECL_d - phi_CDC_d) == 35) {dphi_d = 1;}
@@ -385,3 +412,34 @@ void TRGGRLMatchModule::sectormatching_klm(CDCTriggerTrack* _track, KLMTriggerTr
   else  { dphi = 2 * M_PI - fabs(phi_CDC - _sector_central); }
 
 }
+
+bool TRGGRLMatchModule::photon_cluster(TRGECLCluster* _cluster, std::vector<bool> phimap, double e_threshold)
+{
+
+  //-- cluster/TRGECL information
+  double    _cluster_x = _cluster->getPositionX();
+  double    _cluster_y = _cluster->getPositionY();
+  double  _cluster_e = _cluster->getEnergyDep();
+
+  // -- ECL phi angle
+  double phi_ECL = 0.0;
+  if (_cluster_x >= 0 && _cluster_y >= 0) {phi_ECL = atan(_cluster_y / _cluster_x);}
+  else if (_cluster_x < 0 && _cluster_y >= 0) {phi_ECL = atan(_cluster_y / _cluster_x) + M_PI;}
+  else if (_cluster_x < 0 && _cluster_y < 0) {phi_ECL = atan(_cluster_y / _cluster_x) + M_PI;}
+  else if (_cluster_x >= 0 && _cluster_y < 0) {phi_ECL = atan(_cluster_y / _cluster_x) + 2 * M_PI;}
+
+  int phi_ECL_d = 0;
+  // digitization on both angle
+  for (int i = 0; i < 36; i++) {
+    if (phi_ECL > i * M_PI / 18 && phi_ECL < (i + 1)*M_PI / 18) {phi_ECL_d = i;}
+  }
+
+  int index = phi_ECL_d, index_p = phi_ECL_d + 1, index_m = phi_ECL_d - 1;
+  if (index_p > 35) {index_p = index_p - 36;}
+  if (index_m < 0) {index_m = index_m + 36;}
+
+  if (!phimap[index] && !phimap[index_p] && !phimap[index_m] && _cluster_e >= e_threshold) {return true;}
+  else {return false;}
+
+}
+

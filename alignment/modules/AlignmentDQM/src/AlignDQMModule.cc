@@ -55,11 +55,11 @@ AlignDQMModule::AlignDQMModule() : HistoModule()
                 );
 
   addParam("TracksStoreArrayName", m_param_TracksStoreArrayName,
-           "StoreArray containing the Tracks to read from.",
+           "StoreArray name where the merged Tracks are written.",
            m_param_TracksStoreArrayName);
 
   addParam("RecoTracksStoreArrayName", m_param_RecoTracksStoreArrayName,
-           "StoreArray containing the RecoTracks to read from.",
+           "StoreArray name where the merged RecoTracks are written.",
            m_param_RecoTracksStoreArrayName);
 
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -805,20 +805,18 @@ void AlignDQMModule::event()
 
   try {
     StoreArray<Track> tracks(m_param_TracksStoreArrayName);
-    //StoreArray<Track> tracks;
-    if (tracks.getEntries() != 0) {
-      for (const Track& track : tracks) {  // over tracks
-        RelationVector<RecoTrack> theRC = track.getRelationsTo<RecoTrack>(m_param_RecoTracksStoreArrayName);
-        //RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
-        if (!theRC.size()) continue;
-        RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
-        int nPXD = (int)pxdClustersTrack.size();
-        RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
-        int nSVD = (int)svdClustersTrack.size();
-        RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
-        int nCDC = (int)cdcHitTrack.size();
-        const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
-        /*
+    if (!tracks) return;
+    for (const Track& track : tracks) {  // over tracks
+      RelationVector<RecoTrack> theRC = track.getRelationsTo<RecoTrack>(m_param_RecoTracksStoreArrayName);
+      if (!theRC.size()) continue;
+      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
+      int nPXD = (int)pxdClustersTrack.size();
+      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+      int nSVD = (int)svdClustersTrack.size();
+      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
+      int nCDC = (int)cdcHitTrack.size();
+      const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
+      /*
                 const auto& resmap = track.getTrackFitResults();
                 auto hypot = max_element(
                   resmap.begin(),
@@ -827,230 +825,229 @@ void AlignDQMModule::event()
                   {return x1.second->getPValue() < x2.second->getPValue();}
                   );
                 const TrackFitResult* tfr = hypot->second;
-        */
-        if (tfr == nullptr) continue;
-        TString message = Form("AlignDQM: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
-                               iTrack,
-                               (float)tfr->getMomentum().Px(),
-                               (float)tfr->getMomentum().Py(),
-                               (float)tfr->getMomentum().Pz(),
-                               (float)tfr->getMomentum().Pt(),
-                               (float)tfr->getMomentum().Mag(),
-                               nPXD, nSVD, nCDC, nPXD + nSVD + nCDC
-                              );
-        B2DEBUG(230, message.Data());
-        iTrack++;
+      */
+      if (tfr == nullptr) continue;
+      TString message = Form("AlignDQM: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
+                             iTrack,
+                             (float)tfr->getMomentum().Px(),
+                             (float)tfr->getMomentum().Py(),
+                             (float)tfr->getMomentum().Pz(),
+                             (float)tfr->getMomentum().Pt(),
+                             (float)tfr->getMomentum().Mag(),
+                             nPXD, nSVD, nCDC, nPXD + nSVD + nCDC
+                            );
+      B2DEBUG(230, message.Data());
+      iTrack++;
 
-        float Phi = 90;
-        if (fabs(tfr->getMomentum().Px()) > 0.00000001) {
-          Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
-        }
-        float pxy = sqrt(tfr->getMomentum().Px() * tfr->getMomentum().Px() + tfr->getMomentum().Py() * tfr->getMomentum().Py());
-        float Theta = 90;
-        if (fabs(tfr->getMomentum().Pz()) > 0.00000001) {
-          Theta = atan2(pxy, tfr->getMomentum().Pz()) * TMath::RadToDeg();
-        }
-        m_MomPhi->Fill(Phi);
-        m_MomTheta->Fill(Theta);
-        m_MomCosTheta->Fill(cos(Theta - 90.0));
+      float Phi = 90;
+      if (fabs(tfr->getMomentum().Px()) > 0.00000001) {
+        Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
+      }
+      float pxy = sqrt(tfr->getMomentum().Px() * tfr->getMomentum().Px() + tfr->getMomentum().Py() * tfr->getMomentum().Py());
+      float Theta = 90;
+      if (fabs(tfr->getMomentum().Pz()) > 0.00000001) {
+        Theta = atan2(pxy, tfr->getMomentum().Pz()) * TMath::RadToDeg();
+      }
+      m_MomPhi->Fill(Phi);
+      m_MomTheta->Fill(Theta);
+      m_MomCosTheta->Fill(cos(Theta - 90.0));
 
-        float Chi2NDF = 0;
-        float NDF = 0;
-        float pValue = 0;
-        if (theRC[0]->wasFitSuccessful()) {
-          if (!theRC[0]->getTrackFitStatus())
+      float Chi2NDF = 0;
+      float NDF = 0;
+      float pValue = 0;
+      if (theRC[0]->wasFitSuccessful()) {
+        if (!theRC[0]->getTrackFitStatus())
+          continue;
+        // add NDF:
+        NDF = theRC[0]->getTrackFitStatus()->getNdf();
+        m_NDF->Fill(NDF);
+        // add Chi2/NDF:
+        m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
+        if (NDF) {
+          Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
+          m_Chi2NDF->Fill(Chi2NDF);
+        }
+        // add p-value:
+        pValue = theRC[0]->getTrackFitStatus()->getPVal();
+        m_PValue->Fill(pValue);
+        // add residuals:
+        int iHit = 0;
+        int iHitPrew = 0;
+
+        VxdID sensorIDPrew;
+
+        float ResidUPlaneRHUnBias = 0;
+        float ResidVPlaneRHUnBias = 0;
+        float fPosSPUPrev = 0;
+        float fPosSPVPrev = 0;
+        float fPosSPU = 0;
+        float fPosSPV = 0;
+        float posU = 0;
+        float posV = 0;
+        int iLayerPrev = 0;
+        int iLayer = 0;
+
+        int IsSVDU = -1;
+        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+          if (!recoHitInfo) {
+            B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;
-          // add NDF:
-          NDF = theRC[0]->getTrackFitStatus()->getNdf();
-          m_NDF->Fill(NDF);
-          // add Chi2/NDF:
-          m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
-          if (NDF) {
-            Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
-            m_Chi2NDF->Fill(Chi2NDF);
           }
-          // add p-value:
-          pValue = theRC[0]->getTrackFitStatus()->getPVal();
-          m_PValue->Fill(pValue);
-          // add residuals:
-          int iHit = 0;
-          int iHitPrew = 0;
+          if (!recoHitInfo->useInFit())
+            continue;
+          if (!((recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) ||
+                (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
+            continue;
 
-          VxdID sensorIDPrew;
+          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
 
-          float ResidUPlaneRHUnBias = 0;
-          float ResidVPlaneRHUnBias = 0;
-          float fPosSPUPrev = 0;
-          float fPosSPVPrev = 0;
-          float fPosSPU = 0;
-          float fPosSPV = 0;
-          float posU = 0;
-          float posV = 0;
-          int iLayerPrev = 0;
-          int iLayer = 0;
-
-          int IsSVDU = -1;
-          for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
-            if (!recoHitInfo) {
-              B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
-              continue;
+          bool biased = false;
+          if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
+          TVectorD resUnBias = genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()->getResidual(0, biased).getState();
+          IsSVDU = -1;
+          if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
+            posU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
+            posV = recoHitInfo->getRelatedTo<PXDCluster>()->getV();
+            TVector3 rLocal(posU, posV, 0);
+            VxdID sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
+            auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+            iLayer = sensorID.getLayerNumber();
+            TVector3 ral = info.pointToGlobal(rLocal);
+            fPosSPU = ral.Phi() / TMath::Pi() * 180;
+            fPosSPV = ral.Theta() / TMath::Pi() * 180;
+            ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+            ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
+            if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
+              int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
+              m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
+              m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
+              iHitPrew = iHit;
             }
-            if (!recoHitInfo->useInFit())
-              continue;
-            if (!((recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) ||
-                  (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
-              continue;
+            iLayerPrev = iLayer;
+            fPosSPUPrev = fPosSPU;
+            fPosSPVPrev = fPosSPV;
+            m_UBResidualsPXD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+            m_UBResidualsPXDU->Fill(ResidUPlaneRHUnBias);
+            m_UBResidualsPXDV->Fill(ResidVPlaneRHUnBias);
 
-            auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
 
-            bool biased = false;
-            if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
-            TVectorD resUnBias = genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()->getResidual(0, biased).getState();
-            IsSVDU = -1;
-            if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
-              posU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
-              posV = recoHitInfo->getRelatedTo<PXDCluster>()->getV();
-              TVector3 rLocal(posU, posV, 0);
-              VxdID sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
-              auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-              iLayer = sensorID.getLayerNumber();
+            int index = gTools->getSensorIndex(sensorID);
+            int indexLayer = gTools->getLayerIndex(sensorID.getLayerNumber());
+            m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+            m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
+            m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
+            m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
+
+            posU *= Unit::convertValueToUnit(1.0, "mm");
+            posV *= Unit::convertValueToUnit(1.0, "mm");
+
+            m_ResMeanPosUVSensCounts[index]->Fill(posU, posV);
+            m_ResMeanUPosUVSens[index]->Fill(posU, posV, ResidUPlaneRHUnBias);
+            m_ResMeanVPosUVSens[index]->Fill(posU, posV, ResidVPlaneRHUnBias);
+            m_ResUPosUSens[index]->Fill(posU, ResidUPlaneRHUnBias);
+            m_ResUPosVSens[index]->Fill(posV, ResidUPlaneRHUnBias);
+            m_ResVPosUSens[index]->Fill(posU, ResidVPlaneRHUnBias);
+            m_ResVPosVSens[index]->Fill(posV, ResidVPlaneRHUnBias);
+
+            m_ResMeanPhiThetaLayerCounts[indexLayer]->Fill(fPosSPU, fPosSPV);
+            m_ResMeanUPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
+            m_ResMeanVPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
+            m_ResUPhiLayer[indexLayer]->Fill(fPosSPU, ResidUPlaneRHUnBias);
+            m_ResVPhiLayer[indexLayer]->Fill(fPosSPU, ResidVPlaneRHUnBias);
+            m_ResUThetaLayer[indexLayer]->Fill(fPosSPV, ResidUPlaneRHUnBias);
+            m_ResVThetaLayer[indexLayer]->Fill(fPosSPV, ResidVPlaneRHUnBias);
+
+          }
+          if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
+            IsSVDU = recoHitInfo->getRelatedTo<SVDCluster>()->isUCluster();
+            VxdID sensorID = recoHitInfo->getRelatedTo<SVDCluster>()->getSensorID();
+            auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+            iLayer = sensorID.getLayerNumber();
+            if (IsSVDU) {
+              posU = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
+              TVector3 rLocal(posU, 0, 0);
               TVector3 ral = info.pointToGlobal(rLocal);
               fPosSPU = ral.Phi() / TMath::Pi() * 180;
-              fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-              ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
-              if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
-                int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
-                m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
-                m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
-                iHitPrew = iHit;
+              if (sensorIDPrew != sensorID) { // other sensor, reset
+                ResidVPlaneRHUnBias = 0;
+                fPosSPV = 0;
               }
-              iLayerPrev = iLayer;
-              fPosSPUPrev = fPosSPU;
-              fPosSPVPrev = fPosSPV;
-              m_UBResidualsPXD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-              m_UBResidualsPXDU->Fill(ResidUPlaneRHUnBias);
-              m_UBResidualsPXDV->Fill(ResidVPlaneRHUnBias);
-
-
-              int index = gTools->getSensorIndex(sensorID);
-              int indexLayer = gTools->getLayerIndex(sensorID.getLayerNumber());
-              m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-              m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
-              m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
-              m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
-
-              posU *= Unit::convertValueToUnit(1.0, "mm");
-              posV *= Unit::convertValueToUnit(1.0, "mm");
-
-              m_ResMeanPosUVSensCounts[index]->Fill(posU, posV);
-              m_ResMeanUPosUVSens[index]->Fill(posU, posV, ResidUPlaneRHUnBias);
-              m_ResMeanVPosUVSens[index]->Fill(posU, posV, ResidVPlaneRHUnBias);
-              m_ResUPosUSens[index]->Fill(posU, ResidUPlaneRHUnBias);
-              m_ResUPosVSens[index]->Fill(posV, ResidUPlaneRHUnBias);
-              m_ResVPosUSens[index]->Fill(posU, ResidVPlaneRHUnBias);
-              m_ResVPosVSens[index]->Fill(posV, ResidVPlaneRHUnBias);
-
-              m_ResMeanPhiThetaLayerCounts[indexLayer]->Fill(fPosSPU, fPosSPV);
-              m_ResMeanUPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
-              m_ResMeanVPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
-              m_ResUPhiLayer[indexLayer]->Fill(fPosSPU, ResidUPlaneRHUnBias);
-              m_ResVPhiLayer[indexLayer]->Fill(fPosSPU, ResidVPlaneRHUnBias);
-              m_ResUThetaLayer[indexLayer]->Fill(fPosSPV, ResidUPlaneRHUnBias);
-              m_ResVThetaLayer[indexLayer]->Fill(fPosSPV, ResidVPlaneRHUnBias);
-
-            }
-            if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
-              IsSVDU = recoHitInfo->getRelatedTo<SVDCluster>()->isUCluster();
-              VxdID sensorID = recoHitInfo->getRelatedTo<SVDCluster>()->getSensorID();
-              auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-              iLayer = sensorID.getLayerNumber();
-              if (IsSVDU) {
-                posU = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-                TVector3 rLocal(posU, 0, 0);
-                TVector3 ral = info.pointToGlobal(rLocal);
-                fPosSPU = ral.Phi() / TMath::Pi() * 180;
-                ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-                if (sensorIDPrew != sensorID) { // other sensor, reset
-                  ResidVPlaneRHUnBias = 0;
-                  fPosSPV = 0;
+              sensorIDPrew = sensorID;
+            } else {
+              posV = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
+              TVector3 rLocal(0, posV, 0);
+              TVector3 ral = info.pointToGlobal(rLocal);
+              fPosSPV = ral.Theta() / TMath::Pi() * 180;
+              ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+              if (sensorIDPrew == sensorID) { // evaluate
+                if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
+                  int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
+                  m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
+                  m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
+                  iHitPrew = iHit;
                 }
-                sensorIDPrew = sensorID;
-              } else {
-                posV = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-                TVector3 rLocal(0, posV, 0);
-                TVector3 ral = info.pointToGlobal(rLocal);
-                fPosSPV = ral.Theta() / TMath::Pi() * 180;
-                ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-                if (sensorIDPrew == sensorID) { // evaluate
-                  if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
-                    int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
-                    m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
-                    m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
-                    iHitPrew = iHit;
-                  }
-                  iLayerPrev = iLayer;
-                  fPosSPUPrev = fPosSPU;
-                  fPosSPVPrev = fPosSPV;
-                  m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-                  m_UBResidualsSVDU->Fill(ResidUPlaneRHUnBias);
-                  m_UBResidualsSVDV->Fill(ResidVPlaneRHUnBias);
-                  int index = gTools->getSensorIndex(sensorID);
-                  int indexLayer = gTools->getLayerIndex(sensorID.getLayerNumber());
-                  m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-                  m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
-                  m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
-                  m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
+                iLayerPrev = iLayer;
+                fPosSPUPrev = fPosSPU;
+                fPosSPVPrev = fPosSPV;
+                m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+                m_UBResidualsSVDU->Fill(ResidUPlaneRHUnBias);
+                m_UBResidualsSVDV->Fill(ResidVPlaneRHUnBias);
+                int index = gTools->getSensorIndex(sensorID);
+                int indexLayer = gTools->getLayerIndex(sensorID.getLayerNumber());
+                m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
+                m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
+                m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
+                m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
 
-                  posU *= Unit::convertValueToUnit(1.0, "mm");
-                  posV *= Unit::convertValueToUnit(1.0, "mm");
+                posU *= Unit::convertValueToUnit(1.0, "mm");
+                posV *= Unit::convertValueToUnit(1.0, "mm");
 
-                  m_ResMeanPosUVSensCounts[index]->Fill(posU, posV);
-                  m_ResMeanUPosUVSens[index]->Fill(posU, posV, ResidUPlaneRHUnBias);
-                  m_ResMeanVPosUVSens[index]->Fill(posU, posV, ResidVPlaneRHUnBias);
-                  m_ResUPosUSens[index]->Fill(posU, ResidUPlaneRHUnBias);
-                  m_ResUPosVSens[index]->Fill(posV, ResidUPlaneRHUnBias);
-                  m_ResVPosUSens[index]->Fill(posU, ResidVPlaneRHUnBias);
-                  m_ResVPosVSens[index]->Fill(posV, ResidVPlaneRHUnBias);
+                m_ResMeanPosUVSensCounts[index]->Fill(posU, posV);
+                m_ResMeanUPosUVSens[index]->Fill(posU, posV, ResidUPlaneRHUnBias);
+                m_ResMeanVPosUVSens[index]->Fill(posU, posV, ResidVPlaneRHUnBias);
+                m_ResUPosUSens[index]->Fill(posU, ResidUPlaneRHUnBias);
+                m_ResUPosVSens[index]->Fill(posV, ResidUPlaneRHUnBias);
+                m_ResVPosUSens[index]->Fill(posU, ResidVPlaneRHUnBias);
+                m_ResVPosVSens[index]->Fill(posV, ResidVPlaneRHUnBias);
 
-                  m_ResMeanPhiThetaLayerCounts[indexLayer]->Fill(fPosSPU, fPosSPV);
-                  m_ResMeanUPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
-                  m_ResMeanVPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
-                  m_ResUPhiLayer[indexLayer]->Fill(fPosSPU, ResidUPlaneRHUnBias);
-                  m_ResVPhiLayer[indexLayer]->Fill(fPosSPU, ResidVPlaneRHUnBias);
-                  m_ResUThetaLayer[indexLayer]->Fill(fPosSPV, ResidUPlaneRHUnBias);
-                  m_ResVThetaLayer[indexLayer]->Fill(fPosSPV, ResidVPlaneRHUnBias);
+                m_ResMeanPhiThetaLayerCounts[indexLayer]->Fill(fPosSPU, fPosSPV);
+                m_ResMeanUPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
+                m_ResMeanVPhiThetaLayer[indexLayer]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
+                m_ResUPhiLayer[indexLayer]->Fill(fPosSPU, ResidUPlaneRHUnBias);
+                m_ResVPhiLayer[indexLayer]->Fill(fPosSPU, ResidVPlaneRHUnBias);
+                m_ResUThetaLayer[indexLayer]->Fill(fPosSPV, ResidUPlaneRHUnBias);
+                m_ResVThetaLayer[indexLayer]->Fill(fPosSPV, ResidVPlaneRHUnBias);
 
-                }
-                if (sensorIDPrew != sensorID) { // other sensor, reset
-                  ResidUPlaneRHUnBias = 0;
-                  fPosSPU = 0;
-                }
-                sensorIDPrew = sensorID;
               }
+              if (sensorIDPrew != sensorID) { // other sensor, reset
+                ResidUPlaneRHUnBias = 0;
+                fPosSPU = 0;
+              }
+              sensorIDPrew = sensorID;
             }
-            iHit++;
           }
+          iHit++;
         }
-        if (((nPXD > 0) || (nSVD > 0)) && (nCDC > 0)) iTrackVXDCDC++;
-        if (((nPXD > 0) || (nSVD > 0)) && (nCDC == 0)) iTrackVXD++;
-        if (((nPXD == 0) && (nSVD == 0)) && (nCDC > 0)) iTrackCDC++;
-        if (m_MomX != NULL) m_MomX->Fill(tfr->getMomentum().Px());
-        if (m_MomY != NULL) m_MomY->Fill(tfr->getMomentum().Py());
-        if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
-        if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
-        if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
-        if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
-        if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
-        if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
-        if (m_Hits != NULL) m_Hits->Fill(nPXD + nSVD + nCDC);
       }
-      if (m_TracksVXD != NULL) m_TracksVXD->Fill(iTrackVXD);
-      if (m_TracksCDC != NULL) m_TracksCDC->Fill(iTrackCDC);
-      if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Fill(iTrackVXDCDC);
-      if (m_Tracks != NULL) m_Tracks->Fill(iTrack);
-
+      if (((nPXD > 0) || (nSVD > 0)) && (nCDC > 0)) iTrackVXDCDC++;
+      if (((nPXD > 0) || (nSVD > 0)) && (nCDC == 0)) iTrackVXD++;
+      if (((nPXD == 0) && (nSVD == 0)) && (nCDC > 0)) iTrackCDC++;
+      if (m_MomX != NULL) m_MomX->Fill(tfr->getMomentum().Px());
+      if (m_MomY != NULL) m_MomY->Fill(tfr->getMomentum().Py());
+      if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
+      if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
+      if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
+      if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
+      if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
+      if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
+      if (m_Hits != NULL) m_Hits->Fill(nPXD + nSVD + nCDC);
     }
+    if (m_TracksVXD != NULL) m_TracksVXD->Fill(iTrackVXD);
+    if (m_TracksCDC != NULL) m_TracksCDC->Fill(iTrackCDC);
+    if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Fill(iTrackVXDCDC);
+    if (m_Tracks != NULL) m_Tracks->Fill(iTrack);
+
   } catch (...) {
     B2DEBUG(70, "Some problem in Alignment DQM module!");
   }

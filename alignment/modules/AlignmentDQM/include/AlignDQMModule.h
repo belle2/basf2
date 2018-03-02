@@ -167,11 +167,11 @@ namespace Belle2 {
     /** Number of all finding tracks */
     TH1F* m_Tracks;
 
-    /// StoreArray name where the merged reco track is written.
-    std::string m_param_TracksStoreArrayName = "Tracks";
+    /// StoreArray name where the merged Tracks are written.
+    std::string m_param_TracksStoreArrayName = "";
 
-    /// StoreArray name where the merged reco track is written.
-    std::string m_param_RecoTracksStoreArrayName = "RecoTracks";
+    /// StoreArray name where the merged RecoTracks are written.
+    std::string m_param_RecoTracksStoreArrayName = "";
   };  //end class declaration
 
 }  // end namespace Belle2

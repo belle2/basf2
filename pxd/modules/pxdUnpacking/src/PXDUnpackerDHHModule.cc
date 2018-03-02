@@ -83,7 +83,6 @@ void PXDUnpackerDHHModule::initialize()
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDAQEvtStats.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);

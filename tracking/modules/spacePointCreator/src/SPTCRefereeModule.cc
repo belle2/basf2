@@ -156,7 +156,7 @@ void SPTCRefereeModule::event()
             trackCand->getRefereeStatusString());
 
     // if all tests will be performed -> add checkedByReferee status to the SPTC, CAUTION: if there are new tests this has to be updated!!!, WARNING: if curling check fails, checkedForCurling will return false but hasRefereeStatus(c_checkedByReferee) will return true after this module!
-    if (m_PARAMcheckCurling && m_PARAMcheckMinDistance && m_PARAMcheckSameSensor) {
+    if (m_PARAMcheckCurling && m_PARAMcheckMinDistance && m_PARAMcheckSameSensor && m_PARAMcheckIfFitted) {
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedByReferee);
     }
     bool allChecksClean = true; // assume that all tests will be passed, change to false if one of them fails

@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """\
-Tool to combine signal and background MC to a train and test ROOT file.
+Tool to combine signal and background MC to a single file or a train and test file.
 
-This tool is a helper script to combine a set of MC from signal and background files into a single train and test file.
+This tool is a helper script to combine a set of MC from signal and background files into a merged file containing a
+new Signal column, where '1' ('0') indicates the origin of signal (background).
+It is possible to assign individual cuts to signal and background data.
+A possible use case is to select only true candidates from signal MC and only wrong candidates from background files.
 
 --examples--
 .. rubric:: Examples
@@ -71,6 +74,8 @@ def get_argument_parser():
                         help='(Optional) Fill nan and inf values with actual numbers')
     parser.add_argument('--signalcolumn', dest='signalcolumn', type=str, default='Signal',
                         help='Name of the new signal column (default: Signal)')
+    parser.add_argument('--random_state', dest='random_state', type=int, default=None,
+                        help='(Optional) Random state for splitting into train and test data (default: None)')
     arguments = parser.parse_args()
     return arguments
 
@@ -91,8 +96,8 @@ if __name__ == '__main__':
     # Load the data
     print("Load data")
 
-    df_sig = read_root(data_sig, args.treename, args.columns, where=cut_sig)
-    df_bkg = read_root(data_bkg, args.treename, args.columns, where=cut_bkg)
+    df_sig = read_root(data_sig, args.treename, args.columns, flatten=True, where=cut_sig)
+    df_bkg = read_root(data_bkg, args.treename, args.columns, flatten=True, where=cut_bkg)
 
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)

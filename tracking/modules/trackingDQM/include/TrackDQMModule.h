@@ -49,6 +49,12 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /** StoreArray name where Tracks are written. */
+    std::string m_TracksStoreArrayName;
+    /** StoreArray name where RecoTracks are written. */
+    std::string m_RecoTracksStoreArrayName;
+
     /** p Value */
     TH1F* m_PValue;
     /** Chi2 */

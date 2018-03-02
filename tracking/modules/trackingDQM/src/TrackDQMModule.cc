@@ -68,7 +68,18 @@ TrackDQMModule::~TrackDQMModule()
 
 void TrackDQMModule::initialize()
 {
-  // Register histograms (calls back defineHisto)
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks || !recoTracks.getEntries()) {
+    B2WARNING("Missing recoTracks, Align-DQM is skipped.");
+    return;
+  }
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks || !Tracks.getEntries()) {
+    B2WARNING("Missing recoTracks, Align-DQM is skipped.");
+    return;
+  }
+
+// Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
 }
@@ -347,6 +358,11 @@ void TrackDQMModule::defineHisto()
 
 void TrackDQMModule::beginRun()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks || !recoTracks.getEntries())  return;
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks || !Tracks.getEntries()) return;
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -401,6 +417,11 @@ void TrackDQMModule::beginRun()
 
 void TrackDQMModule::event()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks || !recoTracks.getEntries())  return;
+  StoreArray<Track> tracks(m_TracksStoreArrayName);
+  if (!tracks || !tracks.getEntries()) return;
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   try {
     int iTrack = 0;
@@ -408,9 +429,9 @@ void TrackDQMModule::event()
     int iTrackCDC = 0;
     int iTrackVXDCDC = 0;
 
-    StoreArray<Track> tracks;
     for (const Track& track : tracks) {  // over tracks
-      RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
+      RelationVector<RecoTrack> theRC = track.getRelationsTo<RecoTrack>(m_RecoTracksStoreArrayName);
+      if (!theRC.size()) continue;
       RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
       int nPXD = (int)pxdClustersTrack.size();
       RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
@@ -419,14 +440,14 @@ void TrackDQMModule::event()
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       /*
-          const auto& resmap = track.getTrackFitResults();
-          auto hypot = max_element(
-            resmap.begin(),
-            resmap.end(),
-            [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
-            {return x1.second->getPValue() < x2.second->getPValue();}
-            );
-          const TrackFitResult* tfr = hypot->second;
+      const auto& resmap = track.getTrackFitResults();
+      auto hypot = max_element(
+      resmap.begin(),
+      resmap.end(),
+      [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
+      {return x1.second->getPValue() < x2.second->getPValue();}
+      );
+      const TrackFitResult* tfr = hypot->second;
       */
       if (tfr == nullptr) continue;
 

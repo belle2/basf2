@@ -11,6 +11,8 @@
 from basf2 import *
 from ROOT import Belle2
 
+# whether we will also unpack CDC data
+unpack_CDCHit = True
 # don't save the event in the output if it doesn't contain trg data
 skim_dummy_trg = True
 
@@ -22,6 +24,14 @@ else:
 
 main = create_path()
 main.add_module(root_input)
+
+if unpack_CDCHit:
+    # Set Database
+    use_database_chain()
+    use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+    cdc_unpacker = register_module('CDCUnpacker')
+    cdc_unpacker.param('enableStoreCDCRawHit', True)
+    main.add_module(cdc_unpacker)
 
 unpacker = register_module('CDCTriggerUnpacker')
 unpacker.logging.log_level = LogLevel.DEBUG
@@ -36,6 +46,12 @@ unpacker.param('unpackTracker2D', True)
 unpacker.param('decode2DFinderTrack', True)
 # make CDCTriggerSegmentHit objects from the 2D input
 unpacker.param('decode2DFinderInput', True)
+# it seems the B2L for 2D0 and 2D1 are swapped
+unpacker.param('2DNodeId', [
+    [0x11000001, 1],
+    [0x11000001, 0],
+    [0x11000002, 0],
+    [0x11000002, 1]])
 
 main.add_module(unpacker)
 
@@ -45,6 +61,13 @@ if skim_dummy_trg:
     unpacker.if_false(empty_path)
 
 # save the output root file with specified file name
-main.add_module('RootOutput', outputFileName='unpackedCDCTrigger.root')
+main.add_module('RootOutput',
+                outputFileName='unpackedCDCTrigger.root',
+                excludeBranchNames=['RawCDCs',
+                                    'RawECLs',
+                                    'RawKLMs',
+                                    'RawSVDs',
+                                    'RawPXDs',
+                                    'RawTOPs'])
 process(main)
 print(statistics)

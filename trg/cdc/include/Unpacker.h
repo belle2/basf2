@@ -338,11 +338,15 @@ namespace Belle2 {
           // The first 6 bits indicate whether a track is found or not
           if (slv[clockCounterWidth + oldTrackWidth + i] == one_val) {
             TRG2DFinderTrack trk = decode2DTrack(strOutput.substr(posTrack[i], lenTrack));
-            // const CDCTriggerTrack* track =
-            B2DEBUG(10, "phi0:" << trk.phi0 << ", omega:" << trk.omega
+            // rotate the tracks from 2D1 to 2D3
+            double globalPhi0 = trk.phi0 + pi() / 2 * iTracker;
+            if (globalPhi0 > pi() * 2) {
+              globalPhi0 -= pi() * 2;
+            }
+            B2DEBUG(15, "phi0:" << globalPhi0 << ", omega:" << trk.omega
                     << ", at clock " << foundTime << ", tracker " << iTracker);
             CDCTriggerTrack* track =
-              storeTracks->appendNew(trk.phi0, trk.omega, 0., foundTime);
+              storeTracks->appendNew(globalPhi0, trk.omega, 0., foundTime);
             CDCTriggerFinderClone* clone =
               storeClones->appendNew(slv[clockCounterWidth + i] == one_val);
             clone->addRelationTo(track);

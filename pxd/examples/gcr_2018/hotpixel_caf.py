@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This steering file shows pretty much the most minimal setup for
-# running the CAF. If we had an algorithm that needed iteration this
-# would be done automatically. Other features include:
-#   * Chaining multiple calibrations together with arbitrary dependencies.
-#   * Running collectors on a batch system backend.
-#   * pre-collector module path to setup the datastore ready for your collector.
-#   * pre-algorithm setup function to setup the environment for the algorithm each
-#     time it's executed.
-#   * By default we iterate over all runs and merge if not enough data, use the
-#     collector module parameter granularity = 'all' to get one big IoV for all data
+# This steering file computes PXD hot pixel masks from root formatted raw data
+# running the CAF
+#
+# Execute as: basf2 hotpixel_caf.py -- --input '/home/benjamin/GCR17/root/e0002r00451/*.root'
+#
+# author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
 import glob
-
 import ROOT
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 
-# input_files = glob.glob("/home/benjamin/GCR17/root/e0002r00451/*.root")
-input_files = glob.glob("PXD_DST_e0002r00451.root")
+import argparse
+parser = argparse.ArgumentParser(description="Estimate cluster shape corrections from training data")
+parser.add_argument('--input', default='', type=str, help='String specifying inputfiles')
+args = parser.parse_args()
+
+
+input_files = glob.glob(args.input)
 
 # Your input files shouldn't be relative paths (for now)
 input_files = [os.path.abspath(path) for path in input_files]
@@ -47,9 +47,7 @@ cal = Calibration(
     algorithms=hotpixelkiller,
     input_files=input_files)
 
-# Adding in setup basf2 paths and functions for the collector and algorithm
-# rootinput = register_module('RootInput')
-# pxdunpacker = register_module('PXDUnpacker')
+# Adding in setup basf2 paths and functions for the collector
 gearbox = register_module('Gearbox')
 gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 geometry = register_module('Geometry')
@@ -57,15 +55,8 @@ geometry.param('components', ['PXD'])
 pre_collector_path = create_path()
 pre_collector_path.add_module(gearbox)
 pre_collector_path.add_module(geometry)
-# pre_collector_path.add_module(rootinput)
-# pre_collector_path.add_module(pxdunpacker)
+pre_collector_path.add_module('PXDUnpacker')
 cal.pre_collector_path = pre_collector_path
-
-main = create_path()
-main.add_module('RootInput', branchNames=['PXDRawHits'])
-main.add_module('HistoManager', histoFileName='RawCollectorOutput.root')
-main.add_module(gearbox)
-main.add_module(geometry)
 
 
 # Create a CAF instance and add the calibration to it.

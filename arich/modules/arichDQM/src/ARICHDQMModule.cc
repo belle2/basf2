@@ -83,7 +83,7 @@ namespace Belle2 {
     addParam("LowerMomentumLimit", m_momDnLim, "Lower momentum limit of tracks included in monitoring", 0.);
     addParam("ArichEvents", m_arichEvents, "Include only hits from events where an extrapolated track to arich exists", false);
     addParam("MaxHits", m_maxHits, "Include only events with less than MaxHits hits in ARICH (remove loud events)", 70000);
-    addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in ARICH", 1);
+    addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in ARICH", 0);
   }
 
   ARICHDQMModule::~ARICHDQMModule()

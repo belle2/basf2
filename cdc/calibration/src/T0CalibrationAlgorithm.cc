@@ -100,6 +100,29 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
+
+  // Setup Gearbox
+  Gearbox& gearbox = Gearbox::getInstance();
+
+  std::vector<std::string> backends = {"file:"};
+  gearbox.setBackends(backends);
+
+  B2INFO("Start open gearbox.");
+  gearbox.open("geometry/Belle2.xml");
+  B2INFO("Finished open gearbox.");
+
+  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(1, 1630, 0);
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDCGeometryPar::Instance(&cdcGeometry);
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
   createHisto();
 
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 100, -10, 10);
@@ -149,9 +172,10 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
       dc[ilay].push_back(0.0);
       s[ilay].push_back(par[1]);
       ds[ilay].push_back(g1->GetParError(1));
+
       dt[ilay][iwire] = par[1];
       err_dt[ilay][iwire] = g1->GetParError(1);
-      hm_All->Fill(par[1]); // mean of gauss fitting.
+      hm_All->Fill(par[1]);// mean of gauss fitting.
       hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
@@ -201,7 +225,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     fout->Close();
   }
   B2INFO("Write constants");
-  write();
+  write(evtPtr);
 
 
   if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
@@ -215,9 +239,17 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
 }
 
-void T0CalibrationAlgorithm::write()
+void T0CalibrationAlgorithm::write(StoreObjPtr<EventMetaData>& evtPtr)
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("T0 L0W63 " << cdcgeo.getT0(WireID(0, 63)));
+
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   TH1F* T0B[300];

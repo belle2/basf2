@@ -81,19 +81,20 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
 
   B2INFO("Start open gearbox.");
   gearbox.open("geometry/Belle2.xml");
+  //  gearbox.open("geometry/Beast2_phase2.xml");
   B2INFO("Finished open gearbox.");
-
   // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
   StoreObjPtr<EventMetaData> evtPtr;
   DataStore::Instance().setInitializeActive(true);
   evtPtr.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  evtPtr.construct(0, 0, 1);
+  //  evtPtr.construct(0, 0, 1);
+  evtPtr.construct(1, 802, 2);
+  //  evtPtr.construct(1, 1630, 0);
   GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
   CDCGeometry cdcGeometry;
   cdcGeometry.read(cdcGearDir);
   CDCGeometryPar::Instance(&cdcGeometry);
-
 
   createHisto();
 
@@ -190,14 +191,19 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
   }
 
   B2INFO("Write constants");
-  write();
+  write(evtPtr);
   saveHisto();
   return c_OK;
 }
 
-void CrudeT0CalibrationAlgorithm::write()
+void CrudeT0CalibrationAlgorithm::write(StoreObjPtr<EventMetaData>& evtPtr)
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
 
   CDCTimeZeros* tz = new CDCTimeZeros();
   for (int ilay = 0; ilay < 56; ++ilay) {

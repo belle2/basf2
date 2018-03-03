@@ -77,7 +77,7 @@ namespace Belle2 {
       ///create histo for each channel
       virtual void createHisto();
       /// write outut or store db
-      virtual void write();
+      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
 
       double m_t0b[300];    /**< T0 for each board*/

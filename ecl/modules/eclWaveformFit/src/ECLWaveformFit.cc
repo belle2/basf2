@@ -191,39 +191,46 @@ void ECLWaveformFitModule::event()
 
     int CurrentCellID = aECLDsp.getCellId();
 
-    //setting relation of eclDSP to aECLDigit
-    bool RelationSet = false;
-    double OnlineAmp = 0;
-    for (auto& aECLDigit : eclDigits) {
-      if (aECLDigit.getCellId() == CurrentCellID) {
-        aECLDsp.addRelationTo(&aECLDigit);
-        OnlineAmp = aECLDigit.getAmp();// Used for inital Fit Par
-        RelationSet = true;
-        break;
-      }
-    }
-
-    if (RelationSet == false) {
-      B2WARNING("Could not set relation to eclDigit. ECLDsp CellID:" << CurrentCellID);
-      continue;
-    }
-
-    const double OnlineEnergy = OnlineAmp *= m_ADCtoEnergy[CurrentCellID - 1];
-    if (OnlineEnergy < m_EnergyThreshold)  continue;
-
     if (aECLDsp.getNADCPoints() > 0) {
 
       //Filling array with ADC values.
-      //TriggerCheck used to skip saved waveforms with no pulses (noise)
-      double TriggerCheck = 0;
-      for (int j = 0; j < EclConfiguration::m_nsmp; j++) {
-        m_CurrentPulseArray31[j] = aECLDsp.getDspA()[j];
-        if (j > 0) {
-          double te = m_CurrentPulseArray31[j] - m_CurrentPulseArray31[j - 1];
-          if (te > TriggerCheck)  TriggerCheck = te;
+      for (int j = 0; j < EclConfiguration::m_nsmp; j++)  m_CurrentPulseArray31[j] = aECLDsp.getDspA()[j];
+
+      //Trigger check to remove noise pulses in random trigger events.
+      //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
+      //Set 10 MeV threshold for now.
+      //Trigger amplitude is computed with algorithm described in slide 5 of:
+      //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
+      //
+      double baselineADC = 0;
+      for (int i = 0; i < 4; i++)  baselineADC += m_CurrentPulseArray31[i + 12];
+      baselineADC /= 4.0;
+      double maxADC = (m_CurrentPulseArray31[20] + m_CurrentPulseArray31[21]) / 2.0;
+
+      double triggerCheck = (maxADC - baselineADC) * m_ADCtoEnergy[CurrentCellID - 1];
+
+      if (triggerCheck < 0.010) continue;
+
+      //setting relation of eclDSP to aECLDigit
+      bool relationSet = false;
+      double OnlineAmp = 0;
+      for (auto& aECLDigit : eclDigits) {
+        if (aECLDigit.getCellId() == CurrentCellID) {
+          aECLDsp.addRelationTo(&aECLDigit);
+          OnlineAmp = aECLDigit.getAmp();// Used for inital Fit Par
+          relationSet = true;
+          break;
         }
       }
-      if (TriggerCheck < 100) continue;
+
+      if (relationSet == false) {
+        B2WARNING("Could not set eclDsp relation to eclDigit. ECLDsp CellID:" << CurrentCellID << " triggerCheck:" << triggerCheck <<
+                  "eclDsps.getEntries():" << eclDsps.getEntries());
+        continue;
+      }
+
+      const double OnlineEnergy = OnlineAmp *= m_ADCtoEnergy[CurrentCellID - 1];
+      if (OnlineEnergy < m_EnergyThreshold)  continue;
 
       //Fit using ROOT::Fit with Photon + Hadron or Diode Templates
       std::vector<double> theROOTFit;

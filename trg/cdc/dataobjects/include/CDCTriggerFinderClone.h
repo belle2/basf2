@@ -13,11 +13,11 @@ namespace Belle2 {
   public:
     /** default constructor */
     CDCTriggerFinderClone():
-      oldTrack(true) { }
+      oldTrack(true), iTracker(0) { }
 
     /** constructor with arguments */
-    CDCTriggerFinderClone(bool inOldTrack):
-      oldTrack(inOldTrack) { }
+    CDCTriggerFinderClone(bool inOldTrack, int inITracker):
+      oldTrack(inOldTrack), iTracker(inITracker) { }
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerFinderClone() { }
@@ -26,9 +26,14 @@ namespace Belle2 {
     /** whether this is an old track (appears to be a clone) */
     bool isOldTrack() const { return oldTrack; }
 
+    int getITracker() const {return iTracker;}
+
   protected:
     /** whether this is an old track */
     bool oldTrack;
+
+    /** ID of the 2D tracker (0 to 3) */
+    int iTracker;
 
     //! Needed to make the ROOT object storable
     ClassDef(CDCTriggerFinderClone, 1);

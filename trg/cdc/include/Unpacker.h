@@ -348,7 +348,7 @@ namespace Belle2 {
             CDCTriggerTrack* track =
               storeTracks->appendNew(globalPhi0, trk.omega, 0., foundTime);
             CDCTriggerFinderClone* clone =
-              storeClones->appendNew(slv[clockCounterWidth + i] == one_val);
+              storeClones->appendNew(slv[clockCounterWidth + i] == one_val, iTracker);
             clone->addRelationTo(track);
             // TODO: dig out the TS hits in DataStore, and
             // add relations to them.

@@ -108,18 +108,27 @@ namespace Belle2 {
      *  @param data32tab       list of pointers to the Belle2Link data buffers
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
+     *
+     *  @return                1 if there are data other than the header
      */
-    virtual void getHeaders(int subDetectorId,
-                            std::array<int*, 4> data32tab,
-                            std::array<int, 4> nWords)
+    virtual int getHeaders(int subDetectorId,
+                           std::array<int*, 4> data32tab,
+                           std::array<int, 4> nWords)
     {
       if (subDetectorId != iNode) {
-        return;
+        return 0;
       }
       // empty data buffer
       if (nWords[iFinesse] < headerSize) {
-        return;
+        B2WARNING("The module " << name << " does not have enough data (" <<
+                  nWords[iFinesse] << "). Nothing will be unpacked.");
+        return 0;
+      } else if (nWords[iFinesse] == headerSize) {
+        B2DEBUG(20, "The module " << name <<
+                " contains only the header. Nothing will be unpacked.");
+        return 0;
       }
+
       /* get event header information
        * Ideally, these parameters should not change in the same run,
        * so it is more efficiency to do it in beginRun().
@@ -144,6 +153,7 @@ namespace Belle2 {
                 firmwareVersion << ", node " << std::hex << iNode <<
                 ", finesse " << iFinesse << ", delay: " << delay);
       }
+      return 1;
     };
 
     /** destructor */

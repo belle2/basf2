@@ -11,6 +11,8 @@
 from basf2 import *
 from ROOT import Belle2
 
+# don't save the event in the output if it doesn't contain trg data
+skim_dummy_trg = True
 
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
 if not input_files.empty() and input_files.front().endswith(".sroot"):
@@ -36,6 +38,12 @@ unpacker.param('decode2DFinderTrack', True)
 unpacker.param('decode2DFinderInput', True)
 
 main.add_module(unpacker)
+
+if skim_dummy_trg:
+    # don't save the output if there are no trigger data in the event
+    empty_path = create_path()
+    unpacker.if_false(empty_path)
+
 # save the output root file with specified file name
 main.add_module('RootOutput', outputFileName='unpackedCDCTrigger.root')
 process(main)

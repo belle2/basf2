@@ -168,8 +168,20 @@ namespace Belle2 {
         return;
       }
       if (nWords[iFinesse] < headerSize) {
+        // reset the input and output bitstream if they won't be filled later
+        for (auto& inputClock : (*inputArrayPtr)) {
+          for (auto& tsfIn : inputClock.m_signal) {
+            tsfIn[iTracker].fill(zero_val);
+          }
+        }
+        for (auto& outputClock : (*outputArrayPtr)) {
+          outputClock.m_signal[iTracker].fill(zero_val);
+        }
+        return;
+      } else if (nWords[iFinesse] == headerSize) {
         return;
       }
+
       size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = inputArrayPtr->getEntries();
       if (entries == 0) {
@@ -199,25 +211,6 @@ namespace Belle2 {
       if (subDetectorId != iNode) {
         return;
       }
-      if (nWords[iFinesse] < headerSize) {
-        B2WARNING("The module " << name << " does not have enough data (" <<
-                  nWords[iFinesse] << "). Nothing will be unpacked.");
-        // clear the input and output bitstream
-        for (auto& inputClock : (*inputArrayPtr)) {
-          for (auto& tsfIn : inputClock.m_signal) {
-            tsfIn[iTracker].fill(zero_val);
-          }
-        }
-        for (auto& outputClock : (*outputArrayPtr)) {
-          outputClock.m_signal[iTracker].fill(zero_val);
-        }
-        return;
-      } else if (nWords[iFinesse] == headerSize) {
-        B2DEBUG(20, "The module " << name <<
-                " contains only the header. Nothing will be unpacked.");
-        return;
-      }
-
       // Recently, the content of the last clock appears at the beginning.
       // Now we decide whether we will change the order of the clocks
       // based on the 127MHz counter on the 2nd half of the first word [15:0]
@@ -470,6 +463,7 @@ void CDCTriggerUnpackerModule::terminate()
 
 void CDCTriggerUnpackerModule::event()
 {
+  setReturnValue(0);
   // Read RawTRG data block.
   B2DEBUG(99,  m_rawTriggers.getEntries() << " COPPERs in RawTRGs");
 
@@ -500,8 +494,11 @@ void CDCTriggerUnpackerModule::event()
 
       for (auto trg : m_subTrigger) {
         trg->reserve(subDetectorId, nWords);
-        trg->getHeaders(subDetectorId, data32tab, nWords);
-        trg->unpack(subDetectorId, data32tab, nWords);
+        // only unpack when there are enough words in the event
+        if (trg->getHeaders(subDetectorId, data32tab, nWords)) {
+          trg->unpack(subDetectorId, data32tab, nWords);
+          setReturnValue(1);
+        }
       }
     }
   }

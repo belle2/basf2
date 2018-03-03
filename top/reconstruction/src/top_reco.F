@@ -274,7 +274,7 @@
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=DATA_TIME(I)
             TERR=DATA_TERR(I)
-            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+            IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
             F=P*TOP_SIGNAL(T,TERR,ICH)+(1-P)*TOP_BGR(T,ICH)
             PLKH=PLKH+LOG(F)
@@ -286,11 +286,12 @@
       END
 
 
-      REAL FUNCTION GET_LOGL(T0,TWIN,SIGT)
+      REAL FUNCTION GET_LOGL(T0,TMIN,TMAX,SIGT)
 
       IMPLICIT NONE
       REAL T0                   ! time shift
-      REAL TWIN                 ! time window
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
       REAL SIGT                 ! additional time smearing
 #include "TOP_DATA.fi"
 #include "TOP_RTRA.fi"
@@ -305,7 +306,12 @@
       IF(N_RTRA.NE.1) RETURN
       IF(RTRA_FLAG(1).NE.1) RETURN
 
-      CALL  GET_NEW_NORM(T0,TWIN,PS,PB)
+      IF(TMAX.LE.TMIN) THEN
+         TMAX=T_MAX
+         TMIN=T_MIN
+      ENDIF
+      
+      CALL  GET_NEW_NORM(T0,TMIN,TMAX,PS,PB)
       SFOT=STFS*PS+STFB*PB
       IF(SFOT.EQ.0) RETURN
 
@@ -313,7 +319,6 @@
       NFOT=0
       NUMCH=NCH(0)+NCH(1)
       P=STFS*PS/SFOT
-      IF(PS.EQ.0) PS=1.         ! to prevent NaN's 
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN
@@ -321,23 +326,25 @@
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=DATA_TIME(I)
             TERR=DATA_TERR(I)
-            IF(T.LT.0.OR.T.GT.TWIN) CYCLE
+            IF(T.LT.TMIN.OR.T.GT.TMAX) CYCLE
             NFOT=NFOT+1
-            F=P*TOP_SIGNAL1(T+T0,TERR,ICH,SIGT)/PS +
-     &           (1-P)*TOP_BGR(T+T0,ICH)/PB
+            F=P*TOP_SIGNAL1(T-T0,TERR,ICH,SIGT) +
+     &           (1-P)*TOP_BGR(T-T0,ICH)
             PLKH=PLKH+LOG(F)
          ENDIF
       ENDDO
       GET_LOGL=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
-
+      RTRA_NFOT(1)=NFOT
+      
       END
 
 
-      SUBROUTINE GET_NEW_NORM(T0,TWIN,PS,PB)
+      SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PB)
       
       IMPLICIT NONE
       REAL T0                   ! time shift
-      REAL TWIN                 ! time window
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
       REAL PS, PB               ! new normalizations for signal and background
 #include "TOP_PIK.fi"
       INTEGER ICH, NUMCH, K
@@ -346,14 +353,15 @@
       NUMCH=NCH(0)+NCH(1)
       DO ICH=0,NUMCH-1
          DO K=1,NUM_PIK(ICH)
-            IF(PIK_POZ(K,ICH).LT.T0) CYCLE
-            IF(PIK_POZ(K,ICH).GT.T0+TWIN) CYCLE
+            IF(PIK_POZ(K,ICH).LT.TMIN-T0) CYCLE
+            IF(PIK_POZ(K,ICH).GT.TMAX-T0) CYCLE
             PS=PS+PIK_NPH(K,ICH)
          ENDDO
       ENDDO
 
-      PB=TWIN/T_MAX
-
+      PB=(TMAX-TMIN)/(T_MAX-T_MIN)
+      IF(PB.LT.0) PB=0.
+      
       END
 
 
@@ -473,7 +481,7 @@
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=DATA_TIME(I)
-            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+            IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             CALL ICHIII(ICH,M,IX,IY,IPMTX,IPMTY,LR)
             IF(LR.LT.0) CYCLE
             ICHX=IPMTX*PMT_NX+IX

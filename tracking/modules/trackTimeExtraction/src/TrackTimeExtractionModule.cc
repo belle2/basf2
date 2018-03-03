@@ -77,6 +77,8 @@ void TrackTimeExtractionModule::event()
   const double extractedTime = extractTrackTimeLoop(recoTracks);
 
   // The uncertainty was calculated using a test MC sample
+  m_eventT0->addTemporaryEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+  // TODO: until now, we have no combination of different t0s in place, so we just set the final one here.
   m_eventT0->setEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
 }
 

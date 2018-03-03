@@ -185,15 +185,15 @@ namespace Belle2 {
       /** helper function to "count" nr of set bits within lower 5 bits.
         * It does not need the class object, thus static.
         */
-      int static nr5bits(int i);
+      static int nr5bits(int i);
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_dhp(void* data, unsigned int frame_len);
+      static void dump_dhp(void* data, unsigned int frame_len);
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_roi(void* data, unsigned int frame_len);
+      static void dump_roi(void* data, unsigned int frame_len);
 
     };//end class declaration
 

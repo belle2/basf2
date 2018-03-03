@@ -79,7 +79,7 @@ void TrackDQMModule::initialize()
     return;
   }
 
-// Register histograms (calls back defineHisto)
+  // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
 }
@@ -430,13 +430,13 @@ void TrackDQMModule::event()
     int iTrackVXDCDC = 0;
 
     for (const Track& track : tracks) {  // over tracks
-      RelationVector<RecoTrack> theRC = track.getRelationsTo<RecoTrack>(m_RecoTracksStoreArrayName);
-      if (!theRC.size()) continue;
-      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
+      RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_RecoTracksStoreArrayName);
+      if (!recoTrack.size()) continue;
+      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
       int nPXD = (int)pxdClustersTrack.size();
-      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(recoTrack[0]);
       int nSVD = (int)svdClustersTrack.size();
-      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
+      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(recoTrack[0]);
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       /*
@@ -479,21 +479,21 @@ void TrackDQMModule::event()
       float Chi2NDF = 0;
       float NDF = 0;
       float pValue = 0;
-      if (theRC[0]->wasFitSuccessful()) {
-        if (!theRC[0]->getTrackFitStatus())
+      if (recoTrack[0]->wasFitSuccessful()) {
+        if (!recoTrack[0]->getTrackFitStatus())
           continue;
 
         // add NDF:
-        NDF = theRC[0]->getTrackFitStatus()->getNdf();
+        NDF = recoTrack[0]->getTrackFitStatus()->getNdf();
         m_NDF->Fill(NDF);
         // add Chi2/NDF:
-        m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
+        m_Chi2->Fill(recoTrack[0]->getTrackFitStatus()->getChi2());
         if (NDF) {
-          Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
+          Chi2NDF = recoTrack[0]->getTrackFitStatus()->getChi2() / NDF;
           m_Chi2NDF->Fill(Chi2NDF);
         }
         // add p-value:
-        pValue = theRC[0]->getTrackFitStatus()->getPVal();
+        pValue = recoTrack[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
         // add residuals:
         int iHit = 0;
@@ -511,7 +511,7 @@ void TrackDQMModule::event()
         int iLayer = 0;
 
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations()) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;
@@ -522,7 +522,7 @@ void TrackDQMModule::event()
                 (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
             continue;
 
-          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
+          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack[0]);
 
           bool biased = false;
           if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;

@@ -215,17 +215,28 @@ namespace Belle2 {
       // Now we decide whether we will change the order of the clocks
       // based on the 127MHz counter on the 2nd half of the first word [15:0]
       int ccShift = 0;
-      std::queue<dataWord> counters;
+      using halfDataWord = std::bitset<16>;
+      std::vector<halfDataWord> counters;
+      counters.reserve(inputArrayPtr->getEntries());
       for (int iclock = 0; iclock < inputArrayPtr->getEntries(); ++iclock) {
-        counters.emplace(data32tab[iFinesse][headerSize + eventWidth * iclock]);
+        counters.emplace_back(data32tab[iFinesse]
+                              [headerSize + eventWidth * iclock] & 0xffff);
       }
-      while (counters.front().to_ulong() > counters.back().to_ulong()) {
-        counters.push(counters.front());
-        counters.pop();
+      while (counters.at(1).to_ulong() - counters.at(0).to_ulong() != 4) {
+        std::rotate(counters.begin(), counters.begin() + 1, counters.end());
         ccShift++;
       }
+      if (! std::is_sorted(counters.begin(), counters.end(),
+      [](halfDataWord i, halfDataWord j) {
+      return (j.to_ulong() - i.to_ulong() == 4);
+      })) {
+        B2WARNING("clock counters are still out of order");
+        for (const auto& c : counters) {
+          B2DEBUG(90, "" << c.to_ulong());
+        }
+      }
       if (ccShift) {
-        B2DEBUG(20, "shifting the first " << ccShift <<
+        B2DEBUG(15, "shifting the first " << ccShift <<
                 " clock(s) to the end for " << name);
       }
 

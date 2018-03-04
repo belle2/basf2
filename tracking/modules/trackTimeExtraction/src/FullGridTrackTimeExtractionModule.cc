@@ -124,12 +124,14 @@ namespace {
    *
    * In the end, the tracks are reset to have the initial time seed.
    */
-  void extractTrackTimeFrom(StoreArray<RecoTrack>& recoTracks, const double& startValue, const unsigned int steps,
-                            std::vector<T0Try>& tries, std::vector<T0Try>& convergedTries,
-                            const double& minimalT0, const double& maximalT0)
+  std::vector<T0Try> extractTrackTimeFrom(StoreArray<RecoTrack>& recoTracks, const double& startValue, const unsigned int steps,
+                                          std::vector<T0Try>& convergedTries,
+                                          const double& minimalT0, const double& maximalT0)
   {
     // Store the initial reco track time values to (a) subtract them on each step and (b) reset the tracks afterwards
     std::vector<std::pair<RecoTrack*, double>> recoTracksWithInitialValue;
+
+    std::vector<T0Try> tries;
 
     for (RecoTrack& recoTrack : recoTracks) {
       recoTracksWithInitialValue.emplace_back(&recoTrack, recoTrack.getTimeSeed());
@@ -193,6 +195,8 @@ namespace {
       recoTrack->setTimeSeed(initialValue);
       recoTrack->deleteFittedInformation();
     }
+
+    return tries;
   }
 }
 
@@ -246,13 +250,17 @@ void FullGridTrackTimeExtractionModule::event()
 
   // Try out phase: test 3 data points between t0 min and t0 max and let them extrapolate a bit.
   std::vector<T0Try> tries;
+  tries.reserve(m_param_numberOfGrids * 4);
   std::vector<T0Try> convergedTries;
 
   const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
 
   for (double i = 1; i < m_param_numberOfGrids; i++) {
-    extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,
-                         m_param_minimalT0Shift, m_param_maximalT0Shift);
+    const std::vector<T0Try>& tmpTries = extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2,
+                                                              convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
+    for (const T0Try& t0Try : tmpTries) {
+      tries.push_back(t0Try);
+    }
   }
 
   if (not convergedTries.empty()) {
@@ -270,7 +278,7 @@ void FullGridTrackTimeExtractionModule::event()
     std::sort(tries.begin(), tries.end());
 
     for (const auto& tryOut : tries) {
-      extractTrackTimeFrom(recoTracks, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
+      extractTrackTimeFrom(recoTracks, tryOut.m_extractedT0, 2, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
       if (not convergedTries.empty()) {
         const double extractedTime = convergedTries.back().m_extractedT0;
         // The uncertainty was calculated using a test MC sample

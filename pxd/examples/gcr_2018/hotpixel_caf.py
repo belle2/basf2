@@ -17,7 +17,7 @@ from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 
 import argparse
-parser = argparse.ArgumentParser(description="Estimate cluster shape corrections from training data")
+parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD from rawhit occupancy")
 parser.add_argument('--input', default='', type=str, help='String specifying inputfiles')
 args = parser.parse_args()
 

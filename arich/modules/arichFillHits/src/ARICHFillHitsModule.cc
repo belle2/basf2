@@ -78,7 +78,7 @@ namespace Belle2 {
       int asicCh = digit.getChannelID();
       int modID = digit.getModuleID();
       uint8_t hitBitmap = digit.getBitmap();
-      if (!(hitBitmap & m_bitMask)) return;
+      if (!(hitBitmap & m_bitMask)) continue;
 
       int xCh, yCh;
       if (not m_chnMap->getXYFromAsic(asicCh, xCh, yCh)) {
@@ -91,6 +91,7 @@ namespace Belle2 {
       arichHits.appendNew(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitpos.X(), hitpos.Y(),
                           m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness())), modID, asicCh);
     }
+
   }
 
 

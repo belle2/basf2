@@ -737,6 +737,12 @@ class CalibrationMachine(Machine):
         else:
             input_files.append(os.path.join(self._collector_job.output_dir, "CollectorOutput.root"))
         algs_runner.input_files = input_files
+
+        # Add any user defined local database chain for this calibration
+        for filename, directory in self.calibration._local_database_chain:
+            B2INFO("Adding local database {0} for calibration algorithms of {1}".format(filename, self.calibration.name))
+            algs_runner.local_database_chain.append((filename, directory))
+
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         list_dependent_databases = []

@@ -74,7 +74,7 @@ void SVDSimpleClusterizerModule::initialize()
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeClusters.registerInDataStore();
+  storeClusters.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
   storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();

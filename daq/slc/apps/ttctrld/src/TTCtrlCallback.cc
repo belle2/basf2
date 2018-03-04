@@ -14,13 +14,13 @@
 
 #define USE_LINUX_VME_UNIVERSE 1
 
+extern "C" {
 #include <ftprogs2/ftstat.h>
 #include <ftprogs2/ft2p_fast.h>
 #include <ftprogs2/ft2p_slow.h>
 #include <ftprogs2/ft2u067.h>
 #include <ftprogs2/ft2p026.h>
 
-extern "C" {
   //typedef ft2p_t slow_t;
   //typedef ft2p_t fast_t;
   typedef struct ft2p_fast fast_t;
@@ -168,18 +168,18 @@ namespace Belle2 {
     virtual ~NSMVHandlerMaxTimeFT() throw() {}
     bool handleSetFloat(float usec)
     {
-      unsigned int offset = 0x500 >> 2;
+      unsigned int offset = 0x9f0 >> 2;
       int v = read_ftsw(g_ftsw, offset);
-      unsigned int val = (v & 0xFF000000) | (unsigned int)(usec * 1e+3 / 7.8);
+      unsigned int val = (v & 0xFF000000) | (unsigned int)(usec * 7.8);
       write_ftsw(g_ftsw, offset, val);
       return true;
     }
     bool handleGetFloat(float& val)
     {
-      unsigned int addr = 0x500;
+      unsigned int addr = 0x9f0;
       unsigned int offset = addr >> 2;
       int v = read_ftsw(g_ftsw, offset);
-      val = (v & 0xFFFFFF) * 7.8e-3;
+      val = (v & 0xFFFFFF) * 7.8;
       return true;
     }
   private:
@@ -193,7 +193,7 @@ namespace Belle2 {
     virtual ~NSMVHandlerMaxTrigFT() throw() {}
     bool handleSetInt(int maxtrg)
     {
-      unsigned int offset = 0x500 >> 2;
+      unsigned int offset = 0x9f0 >> 2;
       int v = read_ftsw(g_ftsw, offset);
       unsigned int val = (v & 0xFFFFFF) | (maxtrg << 24);
       write_ftsw(g_ftsw, offset, val);
@@ -201,7 +201,7 @@ namespace Belle2 {
     }
     bool handleGetInt(int& val)
     {
-      unsigned int addr = 0x500;
+      unsigned int addr = 0x9f0;
       unsigned int offset = addr >> 2;
       int v = read_ftsw(g_ftsw, offset);
       val = v >> 24;
@@ -236,6 +236,7 @@ namespace Belle2 {
     virtual ~NSMVHandlerPortFT() throw() {}
     bool handleSetInt(int val)
     {
+      /*
       NSMVHandlerInt::handleSetInt(val);
       val = 0;
       for (int i = 0; i < 4; i++) {
@@ -254,6 +255,7 @@ namespace Belle2 {
       }
       unsigned int offset = 0x170 >> 2;
       write_ftsw(g_ftsw, offset, val);
+      */
       return true;
     }
   private:
@@ -267,6 +269,7 @@ namespace Belle2 {
     virtual ~NSMVHandlerJTAGEnable() throw() {}
     bool handleSetInt(int val)
     {
+      /*
       NSMVHandlerInt::handleSetInt(val);
       val = 0;
       for (int i = 0; i < 8; i++) {
@@ -277,6 +280,22 @@ namespace Belle2 {
       }
       unsigned int offset = 0x1a0 >> 2;
       write_ftsw(g_ftsw, offset, val);
+      */
+      return true;
+    }
+  private:
+    TTCtrlCallback& m_callback;
+  };
+
+  class TtaddrHandler : public NSMVHandlerInt {
+  public:
+    TtaddrHandler(TTCtrlCallback& callback, const std::string& name)
+      : NSMVHandlerInt(name, true, true, -1), m_callback(callback) {}
+    virtual ~TtaddrHandler() throw() {}
+    bool handleSetInt(int val)
+    {
+      NSMVHandlerInt::handleSetInt(val);
+      //m_callback.ttaddr(StringUtil::replace(getName(), "ttaddr.", ""), (bool)val);
       return true;
     }
   private:
@@ -291,19 +310,20 @@ namespace Belle2 {
     virtual ~NSMVHandlerJTAGFT() throw() {}
     bool handleSetText(const std::string& firmware)
     {
+      /*
       if (File::exist(firmware)) {
-        NSMVHandlerText::handleSetText(firmware);
-        std::stringstream ss;
+      NSMVHandlerText::handleSetText(firmware);
+      std::stringstream ss;
         for (int i = 0; i < 8; i++) {
           int used = 0;
-          std::string vname = StringUtil::form("jtag.fee[%d].enable", i);
+      std::string vname = StringUtil::form("jtag.fee[%d].enable", i);
           m_callback.get(vname, used);
           if (used) {
             ss << "-p" << i << " ";
           }
         }
-        std::string cmd = StringUtil::form("jtagft -%d %s -tfp program ", m_ftswid, ss.str().c_str()) + firmware;
-        LogFile::info(cmd);
+      std::string cmd = StringUtil::form("jtagft -%d %s -tfp program ", m_ftswid, ss.str().c_str()) + firmware;
+      LogFile::info(cmd);
         m_callback.set("msg", "jtagft to " + ss.str());
         m_callback.log(LogFile::INFO, "jtagft to " + ss.str());
         system(cmd.c_str());
@@ -312,8 +332,9 @@ namespace Belle2 {
         return true;
       } else {
         m_callback.log(LogFile::WARNING, "Ignored : No bit file %s", firmware.c_str());
-        m_callback.set("msg", "No bit file: " + firmware);
+        m_callback.set("msg", "No bit file: "+firmware);
       }
+      */
       return false;
     }
   private:
@@ -321,43 +342,7 @@ namespace Belle2 {
     int m_ftswid;
   };
 
-  class TriggerLimit {
-  public:
-    TriggerLimit(TTCtrlCallback& callback, int ftswid)
-      : m_callback(callback), m_ftswid(ftswid) {}
-  public:
-    void run()
-    {
-      char ss[1024];
-      while (true) {
-        g_mutex.lock();
-        try {
-          if (g_flag == true) {
-            stat2u067(g_ftsw, m_ftswid, ss, g_ftstat.state);
-            std::string state = g_ftstat.state;
-            if (state == "READY"
-                //(state == "READY" || state == "PAUSED")
-                && g_ftstat.toutcnt >= g_ftstat.tlimit) {
-              m_callback.log(LogFile::NOTICE, "Trigger limit (state = %s)", g_ftstat.state);
-              m_callback.set("toutcnt", (int)g_ftstat.toutcnt);
-              m_callback.set("ftstate", g_ftstat.state);
-              m_callback.set("endft", (int)1);
-              g_flag = false;
-            }
-          }
-        } catch (const NSMHandlerException& e) {
-          LogFile::error(e.what());
-        }
-        g_mutex.unlock();
-        usleep(1000);
-      }
-    }
-  private:
-    TTCtrlCallback& m_callback;
-    int m_ftswid;
-  };
-
-  std::string popen(const std::string& cmd)
+  std::string mypopen(const std::string& cmd)
   {
     char buf[1000];
     FILE* fp;
@@ -378,8 +363,9 @@ namespace Belle2 {
 
 using namespace Belle2;
 
-TTCtrlCallback::TTCtrlCallback(int ftswid, const std::string& ttdname)
-  : RCCallback(4), m_ftswid(ftswid), m_ttdnode(ttdname)
+TTCtrlCallback::TTCtrlCallback(int ftswid, const std::string& ttdname,
+                               const std::string& rcname)
+  : RCCallback(4), m_ftswid(ftswid), m_ttdnode(ttdname), m_rcnode(rcname)
 {
   m_trgcommands.insert(std::map<std::string, int>::value_type("none", 0));
   m_trgcommands.insert(std::map<std::string, int>::value_type("aux", 1));
@@ -402,7 +388,7 @@ void TTCtrlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
     openData(ttdname + "SLOW", "ft2p_slow", ft2p_slow_revision);
   }
   setAutoReply(true);
-  if (g_ftsw == NULL) {
+  if (m_ttdnode.getName().size() > 0 && g_ftsw == NULL) {
     LogFile::debug("ftsw = %d", m_ftswid);
     g_ftsw = open_ftsw(m_ftswid, FTSW_RDWR);
     if (g_ftsw == NULL) {
@@ -411,7 +397,6 @@ void TTCtrlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   }
   configure(obj);
   g_flag = false;
-  PThread(new TriggerLimit(*this, m_ftswid));
 }
 
 void TTCtrlCallback::configure(const DBObject& obj) throw(RCHandlerException)
@@ -450,6 +435,16 @@ void TTCtrlCallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerMaxTrigFT(*this, "maxtrig"));
   add(new NSMVHandlerCmdFT(*this, "cmdft"));
   add(new NSMVHandlerJTAGFT(*this, "jtagft", m_ftswid, ""));
+  if (m_ftswid == 184) {
+    add(new TtaddrHandler(*this, "ttaddr.pxd"));
+    add(new TtaddrHandler(*this, "ttaddr.svd"));
+    add(new TtaddrHandler(*this, "ttaddr.cdc"));
+    add(new TtaddrHandler(*this, "ttaddr.arich"));
+    add(new TtaddrHandler(*this, "ttaddr.top"));
+    add(new TtaddrHandler(*this, "ttaddr.ecl"));
+    add(new TtaddrHandler(*this, "ttaddr.klm"));
+    add(new TtaddrHandler(*this, "ttaddr.trg"));
+  }
 
   const DBObject& o_port(obj("port"));
   if (o_port.hasObject("fee")) {
@@ -502,6 +497,21 @@ void TTCtrlCallback::configure(const DBObject& obj) throw(RCHandlerException)
   set("trigger_limit", obj.getInt("trigger_limit"));
   set("trigger_type", obj.getText("trigger_type"));
   monitor();
+
+  if (m_ftswid == 184) {
+    try {
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "pxd.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "svd.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "cdc.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "arich.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "top.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "ecl.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "klm.used"));
+      NSMCommunicator::send(NSMMessage(m_rcnode, NSMCommand::VGET, "trg.used"));
+    } catch (const IOException& e) {
+      LogFile::warning(e.what());
+    }
+  }
 }
 
 void TTCtrlCallback::monitor() throw(RCHandlerException)
@@ -686,7 +696,19 @@ void TTCtrlCallback::ok(const char* nodename, const char* data) throw()
 {
   if (m_ttdnode.getName().size() > 0 &&
       m_ttdnode.getName() == nodename) {
-    LogFile::debug("OK from %s (state = %s)", nodename, data);
+    std::string msg = StringUtil::tolower(data);
+    StringList s = StringUtil::split(msg, ' ');
+    if (s.size() > 1) {
+      std::string det = s[0];
+      std::string mode = s[1];
+      if ((det == "pxd" || det == "svd" || det == "cdc" || det == "arich" ||
+           det == "top" || det == "ecl" || det == "klm") &&
+          (mode == "local" || mode == "global")) {
+        log(LogFile::INFO, "Done " + msg);
+        return;
+      }
+    }
+    //LogFile::debug("OK from %s (state = %s)", nodename, data);
     try {
       RCState state(data);
       m_ttdnode.setState(state);
@@ -707,7 +729,21 @@ void TTCtrlCallback::error(const char* nodename, const char* data) throw()
 {
   if (m_ttdnode.getName().size() > 0 &&
       m_ttdnode.getName() == nodename) {
-    log(LogFile::WARNING, "ERROR from %s : %s", nodename, data);
+    std::string msg = StringUtil::tolower(data);
+    StringList s = StringUtil::split(msg, ' ');
+    if (s.size() > 1) {
+      std::string det = s[0];
+      std::string mode = s[1];
+      if ((det == "pxd" || det == "svd" || det == "cdc" || det == "arich" ||
+           det == "top" || det == "ecl" || det == "klm") &&
+          (mode == "local" || mode == "global")) {
+        set("ttaddr." + det, (int)(mode != "global"));
+        set(m_rcnode, det + ".used", (int)(mode != "global"));
+        log(LogFile::ERROR, "Failed " + msg);
+        return;
+      }
+    }
+    log(LogFile::ERROR, "ERROR from %s : %s", nodename, data);
     try {
       //setState(RCState::NOTREADY_S);
     } catch (const std::out_of_range& e) {}
@@ -726,6 +762,19 @@ void TTCtrlCallback::resetft() throw()
     std::string cmd = StringUtil::form("resetft -%d", ftswid);
     LogFile::info(cmd);
     system(cmd.c_str());
+  }
+  g_mutex.unlock();
+}
+
+void TTCtrlCallback::ttaddr(const std::string& name, bool isglobal) throw()
+{
+  g_mutex.lock();
+  try {
+    std::string s = name + std::string((isglobal) ? " global" : " local");
+    LogFile::debug("ttaddr " + s);
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(12, "TTADDR"), s));
+  } catch (const std::out_of_range& e) {
+    LogFile::error(e.what());
   }
   g_mutex.unlock();
 }
@@ -793,7 +842,7 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     set("trun", (int)(u.utime - u.rstutim));
     set("ftstate", fstate);
     //set("statft", ss);
-    std::string s_statft = popen(StringUtil::form("statft -%d", ftswid));
+    std::string s_statft = mypopen(StringUtil::form("statft -%d", ftswid));
     if (s_statft.size() > 0) {
       set("statft", s_statft);
     }
@@ -881,7 +930,7 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     } else if ((ftidlo == 'O' && fpgaver >= 26) ||
              (ftidlo == 'P' && fpgaver >= 26)) {
     */
-  } else {
+  } else if (m_ttdnode.getName().size() > 0) {
     std::string ttdname = m_ttdnode.getName();
     NSMData& dfast(getData(ttdname + "FAST"));
     NSMData& dslow(getData(ttdname + "SLOW"));
@@ -924,7 +973,7 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     set("tstart", (int)s->rstutim);
     set("trun", (int)(f->utime - s->rstutim));
     set("ftstate", fstate);
-    std::string s_statft = popen(StringUtil::form("statft -%d", ftswid));
+    std::string s_statft = mypopen(StringUtil::form("statft -%d", ftswid));
     if (s_statft.size() > 0) {
       set("statft", s_statft);
     }
@@ -979,20 +1028,38 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
   }
   //printf(ss);
 
-  if (ftidhi == 0) {
-    char fpgastr[5];
-    int isfpgastr = 1;
-    int i;
-    for (i = 0; i < 4; i++) {
-      fpgastr[i] = D(fpgaid, (3 - i) * 8 + 7, (3 - i) * 8);
-      if (! isprint(fpgastr[i])) isfpgastr = 0;
-    }
-    fpgastr[4] = 0;
-    if (isfpgastr) {
-      LogFile::fatal("unsupported FPGA firmware %08x (%s%03d) is programmed.",
-                     fpgaid, fpgastr, fpgaver);
-    } else {
-      LogFile::fatal("unknown FPGA firmware %08x is programmed.", fpgaid);
+  if (m_ttdnode.getName().size() > 0) {
+    if (ftidhi == 0) {
+      char fpgastr[5];
+      int isfpgastr = 1;
+      int i;
+      for (i = 0; i < 4; i++) {
+        fpgastr[i] = D(fpgaid, (3 - i) * 8 + 7, (3 - i) * 8);
+        if (! isprint(fpgastr[i])) isfpgastr = 0;
+      }
+      fpgastr[4] = 0;
+      if (isfpgastr) {
+        LogFile::fatal("unsupported FPGA firmware %08x (%s%03d) is programmed.",
+                       fpgaid, fpgastr, fpgaver);
+      } else {
+        LogFile::fatal("unknown FPGA firmware %08x is programmed.", fpgaid);
+      }
     }
   }
 }
+
+void TTCtrlCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
+{
+  if (var.getNode() == m_rcnode.getName() && var.getName().find(".used") != std::string::npos) {
+    std::string dname = StringUtil::replace(var.getName(), ".used", "");
+    std::string vname = "ttaddr." + dname;
+    int used = 0;
+    get(vname, used);
+    if (used != var.getInt()) {
+      ttaddr(dname, var.getInt());
+      set(vname, var.getInt());
+    }
+  }
+  NSMCallback::vset(com, var);
+}
+

@@ -36,7 +36,7 @@ namespace Belle2 {
      * @param xChn returned channel X number
      * @param yChn returned channel Y number
      */
-    void getXYFromAsic(unsigned asicChn, int& xChn, int& yChn) const;
+    bool getXYFromAsic(unsigned asicChn, int& xChn, int& yChn) const;
 
     /**
      * Get asic channel number from HAPD channel X,Y numbers

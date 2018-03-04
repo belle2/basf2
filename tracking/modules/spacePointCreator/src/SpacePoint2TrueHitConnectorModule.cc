@@ -64,7 +64,7 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   defaultInList.push_back(std::string(""));
   addParam("TrueHitNames", m_PARAMtrueHitNames,
            "Container names of TrueHits. NOTE: need one name per 'DetectorType' (i.e. unique entries in 'DetectorType)!", defaultInList);
-  addParam("SpacePointNames", m_PARAMspacePointNames, "Container names of SpacePoints.", defaultInList);
+  addParam("SpacePointNames", m_PARAMspacePointNames, "Container names of SpacePoints.", {"SVDSpacePoints", "PXDSpacePoints"});
   addParam("DetectorTypes", m_PARAMdetectorTypes,
            "detector types to determine which entries in 'TrueHitNames' and 'SpacePointNames' belong to which detector type. Entries have to be 'SVD' or 'PXD'. NOTE: if more 'SpacePointNames' than 'DetectorTypes' get passed, the last entry in 'DetectorTypes' is assumed to be valid for all remaining 'SpacePointNames'!");
   addParam("ClusterNames", m_PARAMclusterNames,
@@ -164,7 +164,7 @@ void SpacePoint2TrueHitConnectorModule::initialize()
     for (unsigned int i = 0; i < m_nContainers; ++i) {
       std::string name = m_inputSpacePoints.at(i).first.getName() + m_PARAMoutputSuffix;
       m_outputSpacePoints.push_back(StoreArray<SpacePoint>(name));
-      m_outputSpacePoints.at(i).registerInDataStore(name, DataStore::c_DontWriteOut);
+      m_outputSpacePoints.at(i).registerInDataStore(name, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
       // register relations (detector dependent)
       if (m_inputSpacePoints.at(i).second == c_SVD) {

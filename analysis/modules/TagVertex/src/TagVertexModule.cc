@@ -144,6 +144,12 @@ namespace Belle2 {
           ver->setMCDeltaT(m_MCdeltaT);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagTracks.size());
+          ver->setTagVl(m_tagVl);
+          ver->setTruthTagVl(m_truthTagVl);
+          ver->setTagVlErr(m_tagVlErr);
+          ver->setTagVol(m_tagVol);
+          ver->setTruthTagVol(m_truthTagVol);
+          ver->setTagVolErr(m_tagVolErr);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -151,6 +157,12 @@ namespace Belle2 {
           ver->setDeltaTErr(-1111.);
           ver->setMCTagBFlavor(0.);
           ver->setMCDeltaT(-1111.);
+          ver->setTagVl(-1111.);
+          ver->setTruthTagVl(-1111.);
+          ver->setTagVlErr(-1111.);
+          ver->setTagVol(-1111.);
+          ver->setTruthTagVol(-1111.);
+          ver->setTagVolErr(-1111.);
         }
       }
 
@@ -805,10 +817,10 @@ namespace Belle2 {
       if ((listZ0[i] > 0.1 || listD0[i] > 0.1) && listTracks[i] != 0) eliminateTrack(listTracks, i);
     }
 
-    B2DEBUG(1, "Required PXD hits " << reqPXDHits);
+    B2DEBUG(10, "Required PXD hits " << reqPXDHits);
     for (unsigned i = 0; i < listTracks.size(); i++) {
       if (listNPXDHits[i] < reqPXDHits) {
-        B2DEBUG(1, "Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
+        B2DEBUG(10, "Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
         eliminateTrack(listTracks, i);
       }
     }
@@ -1011,7 +1023,39 @@ namespace Belle2 {
 
     double dtErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
 
+    m_tagVl = m_tagV.Dot(boostDir);
+    m_truthTagVl = m_MCtagV.Dot(boostDir);
+    m_tagVlErr = sqrt(RotErr(2, 2));
     m_deltaTErr = dtErr;
+
+
+    // calculate tagV component and error in the direction orthogonal to the boost
+
+    TVector3 oboost(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+    double ocy = oboost.Z() / TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
+    double osy = oboost.X() / TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
+    double ocx = TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X()) / oboost.Mag();
+    double osx = oboost.Y() / oboost.Mag();
+
+    TMatrixD oRotY(3, 3);
+    oRotY(0, 0) = ocy;  oRotY(0, 1) = 0;   oRotY(0, 2) = -osy;
+    oRotY(1, 0) = 0;    oRotY(1, 1) = 1;   oRotY(1, 2) = 0;
+    oRotY(2, 0) = osy;  oRotY(2, 1) = 0;   oRotY(2, 2) = ocy;
+
+    TMatrixD oRotX(3, 3);
+    oRotX(0, 0) = 1;   oRotX(0, 1) = 0;    oRotX(0, 2) = 0;
+    oRotX(1, 0) = 0;   oRotX(1, 1) = ocx;  oRotX(1, 2) = -osx;
+    oRotX(2, 0) = 0;   oRotX(2, 1) = osx;  oRotX(2, 2) = ocx;
+
+    TMatrixD oRot = oRotY * oRotX;
+    TMatrixD oRotCopy = oRot;
+    TMatrixD oRotInv = oRot.Invert();
+
+    TMatrixD oRotErr = oRotInv * m_tagVErrMatrix * oRotCopy;
+
+    m_tagVol = m_tagV.Dot(oboost);
+    m_truthTagVol = m_MCtagV.Dot(oboost);
+    m_tagVolErr = sqrt(oRotErr(2, 2));
 
   }
 

@@ -8,9 +8,6 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from ROOT import Belle2
 
-# reset_database()
-# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
-
 numEvents = 2000
 
 # first register the modules

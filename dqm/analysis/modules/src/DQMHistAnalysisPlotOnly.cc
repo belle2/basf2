@@ -90,7 +90,10 @@ void DQMHistAnalysisPlotOnlyModule::initialize()
   for (auto& it : m_histlist) {
     TString a = "";
     if (it.size() == 1) {
-      a = "c_" + TString(it.at(0).c_str());
+      a = TString(it.at(0).c_str());
+      auto p = a.Last('/');
+      if (p == kNPOS) a = "c_" + a;
+      else a.Insert(p + 1, "c_");
     } else if (it.size() == 2) {
       a = it.at(1).c_str();
     } else continue;
@@ -108,10 +111,11 @@ void DQMHistAnalysisPlotOnlyModule::beginRun()
 void DQMHistAnalysisPlotOnlyModule::event()
 {
   for (auto& it : m_canvasList) {
-
+    gROOT->cd();
 //    TH1 *hh1 = findHist(TString(it.first.c_str()));
     TH1* hh1 = GetHisto(it.first.c_str());
     if (hh1 == NULL) {
+      B2DEBUG(10, "Hist " << it.first.c_str() << " not found");
       continue;
 //         hh1 = findHistLocal(it.first);
     }
@@ -142,6 +146,4 @@ void DQMHistAnalysisPlotOnlyModule::terminate()
 {
   B2DEBUG(20, "DQMHistAnalysisPlotOnly: terminate called");
 }
-
-
 

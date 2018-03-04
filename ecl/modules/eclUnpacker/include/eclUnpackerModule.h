@@ -56,6 +56,8 @@ namespace Belle2 {
 
     /** flag for whether or not to store collection with trigger times */
     bool m_storeTrigTime;
+    /** flag for whether or not to store ECLDsp data for unmapped channels*/
+    bool m_storeUnmapped;
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;

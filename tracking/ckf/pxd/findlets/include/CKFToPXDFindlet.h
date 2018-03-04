@@ -76,6 +76,8 @@ namespace Belle2 {
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
     unsigned int m_param_minimalHitRequirement = 1;
+    /// Cut away tracks without SVD hits or not
+    bool m_param_onlyUseTracksWithSVD = true;
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out

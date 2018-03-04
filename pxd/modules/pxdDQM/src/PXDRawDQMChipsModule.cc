@@ -11,7 +11,7 @@
 #include <pxd/modules/pxdDQM/PXDRawDQMChipsModule.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <string>
 
 using namespace std;
@@ -52,26 +52,23 @@ void PXDRawDQMChipsModule::defineHisto()
 
 
   for (auto i = 0; i < 64; i++) {
-    auto num1 = (((i >> 5) & 0x1) + 1);
-    auto num2 = ((i >> 1) & 0xF);
-    auto num3 = ((i & 0x1) + 1);
+    auto layer = (((i >> 5) & 0x1) + 1);
+    auto ladder = ((i >> 1) & 0xF);
+    auto sensor = ((i & 0x1) + 1);
 
     // Check if sensor exist
-    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(num1, num2, num3))) {
+    if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(layer, ladder, sensor))) {
       for (auto j = 0; j < eNumSwitcher; j++) {
         for (auto k = 0; k < eNumDCD; k++) {
           //cppcheck-suppress zerodiv
-          string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh) Switcher %d DCD %d") % num1 % num2 % num3 % i % j % k);
+          string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh) Switcher %d DCD %d") % layer % ladder % sensor % i % j % k);
           //cppcheck-suppress zerodiv
-          string s2 = str(format("_%d.%d.%d_%d_%d") % num1 % num2 % num3 % j % k);
+          string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
 
           hrawPxdHitsCount[i][j][k] = new TH1F(("hrawPxdCount" + s2).c_str(), ("Pxd Raw Count " + s + ";Nr per Event").c_str(), 8192, 0,
                                                8192);
           hrawPxdHitsCharge[i][j][k] = new TH1F(("hrawPxdHitsCharge" + s2).c_str(),
                                                 ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
-          hrawPxdHitsCommonMode[i][j][k] = new TH1F(("hrawPxdHitsCommonMode" + s2).c_str(),
-                                                    ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(),
-                                                    256, 0, 256);
         }
       }
     } else {
@@ -79,7 +76,6 @@ void PXDRawDQMChipsModule::defineHisto()
         for (auto k = 0; k < eNumDCD; k++) {
           hrawPxdHitsCount[i][j][k] =  NULL;
           hrawPxdHitsCharge[i][j][k] =  NULL;
-          hrawPxdHitsCommonMode[i][j][k] = NULL;
         }
       }
     }
@@ -103,7 +99,6 @@ void PXDRawDQMChipsModule::beginRun()
       for (auto k = 0; k < eNumDCD; k++) {
         if (hrawPxdHitsCount[i][j][k]) hrawPxdHitsCount[i][j][k]->Reset();
         if (hrawPxdHitsCharge[i][j][k]) hrawPxdHitsCharge[i][j][k]->Reset();
-        if (hrawPxdHitsCommonMode[i][j][k]) hrawPxdHitsCommonMode[i][j][k]->Reset();
       }
     }
   }
@@ -133,7 +128,6 @@ void PXDRawDQMChipsModule::event()
     // TODO check switcher 0-6? DCD 0-4?
     nhits[dhh_id][switcher][dcd]++;
     if (hrawPxdHitsCharge[dhh_id][switcher][dcd]) hrawPxdHitsCharge[dhh_id][switcher][dcd]->Fill(it.getCharge());
-    if (hrawPxdHitsCommonMode[dhh_id][switcher][dcd]) hrawPxdHitsCommonMode[dhh_id][switcher][dcd]->Fill(it.getCommonMode());
   }
   for (auto i = 0; i < eNumSensors; i++) {
     for (auto j = 0; j < eNumSwitcher; j++) {

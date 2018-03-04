@@ -793,7 +793,7 @@ VertexFitKFit::makeCoreMatrix(void) {
       B = a * a2 * invPt2;
       if (fabs(B) > 1) {
         m_ErrorCode = KFitError::kCannotGetARCSIN;
-        B2DEBUG(1, "KFitError: Cannot calculate arcsin");
+        B2DEBUG(10, "KFitError: Cannot calculate arcsin");
         //KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }

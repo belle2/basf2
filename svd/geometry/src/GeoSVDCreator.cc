@@ -844,12 +844,12 @@ namespace Belle2 {
       // Now lets create forward and backward endmounts for the ribs
       const std::vector<SVDEndmountPar>& Endmounts = support.getEndmounts();
       for (const SVDEndmountPar& endmount : Endmounts) {
-        double height = endmount.getHeight() / Unit::mm / 2.0;
-        double width = endmount.getWidth() / Unit::mm / 2.0;
-        double length = endmount.getLength() / Unit::mm / 2.0;
+        double endMountHeight = endmount.getHeight() / Unit::mm / 2.0;
+        double endMountWidth = endmount.getWidth() / Unit::mm / 2.0;
+        double endMountLength = endmount.getLength() / Unit::mm / 2.0;
         double zpos = endmount.getZ() / Unit::mm;
         double rpos = endmount.getR() / Unit::mm;
-        G4VSolid* endmountBox = new G4Box("endmountBox", height, width, length);
+        G4VSolid* endmountBox = new G4Box("endmountBox", endMountHeight, endMountWidth, endMountLength);
         if (outer) { // holes for the ribs
           endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(-spacing)*placement * G4Translate3D(-rpos, 0,
                                                -zpos));

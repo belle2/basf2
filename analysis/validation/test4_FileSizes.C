@@ -1,11 +1,12 @@
 /*
 <header>
-<input>GenericB_GENSIMRECtoDST.dst.root,DSTtoMDST.mdst.root,MDSTtoUDST.udst.root</input>
+<input>../GenericB_GENSIMRECtoDST.dst.root,../DSTtoMDST.mdst.root,../MDSTtoUDST.udst.root</input>
 <output>FileEventSizes.root</output>
 <contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
 </header>
 */
-void test5_FileSizes() {
+
+void test4_FileSizes() {
 
 // open the file with simulated and reconstructed EvtGen particles
     TFile* input = TFile::Open("../GenericB_GENSIMRECtoDST.dst.root");
@@ -37,6 +38,9 @@ void test5_FileSizes() {
     TFile* output = TFile::Open("FileEventSizes.root", "recreate");
     TNtuple* bench = new TNtuple("DST event size in kB", "tree", "dst:mdst:udst");
     bench->Fill(eventsize,eventsizem,eventsizeu);
+    bench->SetAlias("Description", "File sizes in kB");
+    bench->SetAlias("Check", "Consistency with previous, no large spikes.");
+    bench->SetAlias("Contact", "sam.cunliffe@desy.de;thomas.kuhr@lmu.de");
     bench->Write();
     delete output;
 

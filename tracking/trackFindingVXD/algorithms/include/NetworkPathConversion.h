@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jonas Wagner                                             *
+ * Contributors: Jonas Wagner, Felix Metzner                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,13 +22,13 @@ namespace Belle2 {
   inline SpacePointTrackCand convertNetworkPath(NetworkPath networkPath)
   {
     std::vector <const SpacePoint*> spVector;
-    spVector.reserve(networkPath->size());
-    if (networkPath->empty()) {
+    spVector.reserve(networkPath.size());
+    if (networkPath.empty()) {
       return SpacePointTrackCand();
     }
 
-    auto family = networkPath->at(0)->getFamily();
-    for (auto aNodeIt = networkPath->rbegin(); aNodeIt != networkPath->rend();  ++aNodeIt) {
+    auto family = networkPath[0]->getFamily();
+    for (auto aNodeIt = networkPath.rbegin(); aNodeIt != networkPath.rend();  ++aNodeIt) {
       insertSpacePoints(spVector, (*aNodeIt)->getEntry());
     }
 
@@ -37,12 +37,15 @@ namespace Belle2 {
     return sptc;
   }
 
+
+  /// Convert TrackNode to SpaePoint an add to a SpacePoint path.
   inline void insertSpacePoint(std::vector<const SpacePoint*>& target, TrackNode source)
   {
     target.push_back(source.m_spacePoint);
   }
 
 
+  /// Insert of inner and outer TrackNodes of a Segment as SpacePoints into path of SpacePoints
   inline void insertSpacePoints(std::vector<const SpacePoint*>& target, Segment<TrackNode> source)
   {
     if (target.empty()) {
@@ -52,5 +55,4 @@ namespace Belle2 {
       insertSpacePoint(target, *(source.getOuterHit()));
     }
   }
-
 }

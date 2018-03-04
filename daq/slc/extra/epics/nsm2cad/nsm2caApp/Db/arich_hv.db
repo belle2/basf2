@@ -1,0 +1,800 @@
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[0]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[1]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[2]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[3]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[4]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[5]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[6]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[7]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[8]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[9]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[10]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[11]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[12]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[13]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[14]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[15]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[16]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[17]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[18]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[19]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[20]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[21]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[22]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[23]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[24]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[25]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[26]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[27]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[28]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[29]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[30]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[31]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[32]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[33]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[34]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[35]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[36]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[37]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[38]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[39]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[40]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[0]:channel[41]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[0]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[1]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[2]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[3]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[4]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[5]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[6]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[7]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[8]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[8]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[9]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[10]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[11]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[12]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[13]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[14]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[15]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[16]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[17]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[18]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[19]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[20]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[21]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[22]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[23]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[24]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[25]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[26]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[27]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[28]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[29]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[30]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[31]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[32]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[33]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[34]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[35]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[36]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[37]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[38]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[1]:channel[39]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[0]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[1]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[2]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[3]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[4]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[5]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[6]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[7]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[8]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[8]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[9]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[10]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[11]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[12]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[13]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[14]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(ai, "B2_nsm:get:$(nodename):crate[1]:slot[2]:channel[15]:$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+

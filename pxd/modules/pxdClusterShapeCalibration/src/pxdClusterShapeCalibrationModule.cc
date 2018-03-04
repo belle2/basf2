@@ -13,7 +13,6 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -185,7 +184,6 @@ void pxdClusterShapeCalibrationModule::collect()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   const StoreArray<PXDRecoHit> pxdrecohit(m_storePXDRecoHitName);
 

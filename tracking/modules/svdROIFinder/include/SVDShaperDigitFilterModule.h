@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDSHAPERDIGITFILTERMODULE_H
-#define SVDSHAPERDIGITFILTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -33,28 +32,20 @@ namespace Belle2 {
      */
     SVDShaperDigitFilterModule();
 
-    /**  */
-    virtual ~SVDShaperDigitFilterModule();
+    /** Destructor. */
+    ~SVDShaperDigitFilterModule();
 
-    /**  */
-    virtual void initialize();
+    /**  register new SVDSShaperDigits store arrays (inside/ouside ROIs)*/
+    void initialize();
 
-    /**  */
-    virtual void beginRun();
 
-    /**  */
-    virtual void event();
-
-    /**  */
-    virtual void endRun();
-
-    /**  */
-    virtual void terminate();
+    /**  Filtering of digits inside/outside ROIs*/
+    void event();
 
 
   private:
 
-    StoreArray<ROIid> m_ROIs;
+    StoreArray<ROIid> m_ROIs; /**< rois store array */
     StoreArray<SVDShaperDigit> m_SVDShaperDigits;   /**< The SVDShaperDigits to be filtered */
 
     bool m_CreateOutside; /**< if set, create list of outside pixels, too */
@@ -69,4 +60,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* SVDSHAPERDIGITFILTERMODULE_H */

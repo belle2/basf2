@@ -7,13 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
 
-#ifndef SVDROIFINDER_MODULE_H_
-#define SVDROIFINDER_MODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/svdROIFinder/SVDInterceptor.h>
@@ -50,7 +45,7 @@ namespace Belle2 {
     ~SVDROIFinderModule();
 
     /**
-     *Initializes the Module.
+     *Initializes the Module. Parameter handling.
      */
     void initialize() override;
 
@@ -73,14 +68,14 @@ namespace Belle2 {
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    StoreArray<RecoTrack> m_recotracks;
-    StoreArray<ROIid> m_rois;
-    StoreArray<SVDIntercept> m_intercepts;
+    StoreArray<RecoTrack> m_recotracks; /**<reco trcks store array */
+    StoreArray<ROIid> m_rois; /**< rois store array */
+    StoreArray<SVDIntercept> m_intercepts; /**< svd intercept store array */
 
     int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
 
-    double m_toleranceZ;
-    double m_tolerancePhi;
+    double m_toleranceZ; /**< determination of interesting planes, tolerance along Z*/
+    double m_tolerancePhi;  /**< determination of interesting planes, tolerance in phi*/
 
     double m_sigmaSystU; /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
     double m_sigmaSystV;  /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */
@@ -96,4 +91,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* SVDROIFinderModule_H_ */

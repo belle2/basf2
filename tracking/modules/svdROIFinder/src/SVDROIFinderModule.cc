@@ -3,7 +3,7 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

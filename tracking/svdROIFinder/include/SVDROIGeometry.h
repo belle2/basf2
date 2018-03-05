@@ -37,6 +37,7 @@ namespace Belle2 {
 
     void fillPlaneList(double toleranceZ, double tolerancePhi); /**< fill the list of planes*/
 
+    /** appends the interesting planes*/
     void appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer);
 
   };

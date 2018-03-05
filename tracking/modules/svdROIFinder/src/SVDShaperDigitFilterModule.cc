@@ -61,9 +61,6 @@ void SVDShaperDigitFilterModule::initialize()
   }
 }
 
-void SVDShaperDigitFilterModule::beginRun()
-{
-}
 
 void SVDShaperDigitFilterModule::event()
 {
@@ -95,10 +92,3 @@ void SVDShaperDigitFilterModule::event()
 
 }
 
-void SVDShaperDigitFilterModule::endRun()
-{
-}
-
-void SVDShaperDigitFilterModule::terminate()
-{
-}

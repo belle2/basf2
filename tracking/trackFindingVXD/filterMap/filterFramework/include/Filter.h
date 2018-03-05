@@ -8,23 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #pragma once
-#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
 #include <TBranch.h>
 #include <TTree.h>
 #include <string>
 #include <type_traits>
 #include <iostream>
 
-
 #include <framework/logging/Logger.h>
 
-namespace Belle2 {
+#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
 
+
+namespace Belle2 {
   /**
    * This class is used to select pairs, triplets... of objects.
-   * It is ment to be used on a large set of objects and it is
+   * It is meant to be used on a large set of objects and it is
    * designed to be as efficient as hand written code by exploiting
    * templates. The filter structure is defined at compilation time
    * i.e.  ( var1 > xxx && var2 < yyy ) || var1 <zzz
@@ -33,31 +32,31 @@ namespace Belle2 {
    * evaluation etc. etc.
    * Several other nice features are coded.
    */
-  template< typename ... typePack >
-  class Filter { /* Empty: just specialized templates are interesting */
-
+  template<typename ... typePack>
+  class Filter {
+    /* Empty: just specialized templates are interesting */
   };
 
 
   /**
-   * The all_same struct is ment to check that all the types in a template
+   * The all_same struct is meant to check that all the types in a template
    * pack are of the same type.
-   * If at the end the compiler end here is because the first two
-   * typese are differente: so return false.
+   * If at the end the compiler ends here is because the first two
+   * types are different: so return false.
    */
-  template< typename ... types >
+  template<typename ... types>
   struct all_same : std::false_type {};
 
   /**
-   * The all_same struct is ment to check that all the types in a template
+   * The all_same struct is meant to check that all the types in a template
    * pack are of the same type.
    * It is true if the template pack is formed by a single type.
    */
-  template<typename T >
-  struct all_same< T > : std::true_type {};
+  template<typename T>
+  struct all_same<T> : std::true_type {};
 
   /**
-   * The all_same struct is ment to check that all the types in a template
+   * The all_same struct is meant to check that all the types in a template
    * pack are of the same type.
    * It is true if the template pack is empty.
    */
@@ -65,27 +64,25 @@ namespace Belle2 {
   struct all_same< > : std::true_type {};
 
   /**
-   * The all_same struct is ment to check that all the types in a template
+   * The all_same struct is meant to check that all the types in a template
    * pack are of the same type.
    * If the first two types are identical then eat the first one and check
    * for the others.
    */
-  template<typename T, typename ... types >
-  struct all_same< T, T, types ...> : all_same< T, types ...> {};
+  template<typename T, typename ... types>
+  struct all_same<T, T, types ...> : all_same<T, types ...> {};
 
 
-
-  /** these are just classnames to be leveraged in the template parameters pack  */
+  /** These are just class names to be leveraged in the template parameters pack  */
+  /// Tag class for filter that can be bypassed
   class BypassableFilter;
+  /// Tag class for filter that can be activated
   class ActivableFilter;
 
 
   /** Basic building block of the Filter tools
-   *
    * Example usage:
   \code
-
-
   #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
   #include <tracking/trackFindingVXD/filterMap/filterFramework/UpperBoundedSet.h>
   #include <tracking/trackFindingVXD/filterMap/filterFramework/Filter.h>
@@ -101,9 +98,8 @@ namespace Belle2 {
 
   spacePoint a( {0,0,0} ), b( {1,0,0} );
   cout << filter.accept(a,b) << endl;
-
-
   \endcode
+
    * will produce the output: true
    * The Variable class will provide the static method value x( arg1, arg2)
    * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
@@ -114,41 +110,40 @@ namespace Belle2 {
     class RangeType,
     class Observer
     >
-  class Filter < Variable, RangeType, Observer  > {
+  class Filter <Variable, RangeType, Observer> {
   public:
+    /** Handy typedef for arguments */
+    typedef typename Variable::argumentType argumentType;
+
+    /** Handy typedef for function */
+    typedef typename Variable::functionType functionType;
 
     /** Constructor.
-     *
      * To construct the Filter we need a concrete RangeType. The variable and
      * the observer are passed through the template type pack.
      *
-     * @param range: a class that provides a method \code
-     bool contains( Variable::returnType x) \endcode
-     *
+     * @param range: a class that provides a method contains such as:
+        \code bool contains( Variable::returnType x) \endcode
      */
     explicit Filter(const RangeType& range):
       m_range(range) { };
 
+    /** Empty constructor */
     Filter() { };
 
     /** Getter of the range */
     RangeType getRange(void) const { return m_range; }
 
-    /** Handy typedef */
-    typedef  typename Variable::argumentType argumentType;
-    typedef  typename Variable::functionType functionType;
-
-    /** All the real computations are occuring in this method */
-    template< typename ... argsType >
-    /* this typename expands to bool only if all the argsType are
-     of the same type of the argument of the filter*/
-    typename std::enable_if< all_same< argumentType  , argsType ... >::value, bool >::type
+    /** All the real computations are occurring in this method */
+    template<typename ... argsType>
+    /** This typename expands to bool only if all the argsType are
+     of the same type of the argument of the filter */
+    typename std::enable_if<all_same<argumentType, argsType ... >::value, bool>::type
     accept(const argsType& ... args) const
     {
       typename Variable::variableType value = Variable::value(args ...);
       Observer::notify(Variable(), value, m_range, args ...);
       return m_range.contains(value);
-
     }
 
     /** Persist the range on a TTree.
@@ -172,7 +167,6 @@ namespace Belle2 {
     /** This method creates a new bypassable Filter with the same range of *this
      * E.g.:
     \code
-
 
     #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
     #include <tracking/trackFindingVXD/filterMap/filterFramework/UpperBoundedSet.h>
@@ -200,24 +194,28 @@ namespace Belle2 {
      * false
      * true
      */
-    Filter< Variable, RangeType, BypassableFilter, Observer>
+    Filter<Variable, RangeType, BypassableFilter, Observer>
     bypass(const bool& bypassVariable = false)
     {
-      return Filter< Variable, RangeType, BypassableFilter, Observer>(m_range, bypassVariable);
+      return Filter<Variable, RangeType, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
-    Filter< Variable, RangeType, ActivableFilter, Observer>
+    /** Enable filter
+     * @param enableVariable:
+     * @return
+     */
+    Filter<Variable, RangeType, ActivableFilter, Observer>
     //    __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
     enable(const bool& enableVariable = true)
     {
-      return Filter< Variable, RangeType, ActivableFilter, Observer>(m_range, enableVariable);
+      return Filter<Variable, RangeType, ActivableFilter, Observer>(m_range, enableVariable);
     }
 
     template< class otherObserver >
-    Filter< Variable, RangeType, otherObserver>
+    Filter<Variable, RangeType, otherObserver>
     observeLeaf(const otherObserver&) const
     {
-      return Filter< Variable , RangeType, otherObserver>(m_range);
+      return Filter<Variable, RangeType, otherObserver>(m_range);
     }
 
     template< class otherObserver >
@@ -230,11 +228,9 @@ namespace Belle2 {
       return m_range.getNameAndReference(pointers, Variable::name());
     }
 
-
   protected:
 
     RangeType  m_range;
-
   };
 
 
@@ -242,7 +238,6 @@ namespace Belle2 {
    *
    * An external bool variable bypass can force the Filter accept method to true. E.g.:
   \code
-
 
   #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
   #include <tracking/trackFindingVXD/filterMap/filterFramework/UpperBoundedSet.h>
@@ -259,7 +254,6 @@ namespace Belle2 {
   Filter< Distance3D, UpperBoundedSet, BypassableFilter, VoidObserver >
                filter( UpperBoundedSet( 1.1 ), bypassVariable);
 
-
   spacePoint a( {0,0,0} ), b( {10,0,0} );
   cout << filter.accept(a,b) << endl;
   bypassVariable = true;
@@ -275,74 +269,64 @@ namespace Belle2 {
      * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
      * The Observer will be notified of the actions via its static method notify
      */
-
   template <
     class Variable,
     class RangeType,
     class Observer
     >
-  class Filter < Variable, RangeType, Belle2::BypassableFilter, Observer  >:
-    public Filter< Variable, RangeType, Observer> {
+  class Filter <Variable, RangeType, Belle2::BypassableFilter, Observer>:
+    public Filter<Variable, RangeType, Observer> {
   public:
 
     /** Constructor.
-     *
      * To construct the Filter we need a concrete Range and a reference to a bool value.
      * The variable and the observer are passed through the template type pack.
      *
-     * @param range: a class that provides a method \code
-     bool contains( Variable::returnType x) \endcode
+     * @param range: a class that provides a method contains:
+         \code bool contains( Variable::returnType x) \endcode
      * @param bypass is a bool value controlling the behaviour of accept: if bypass is set to
      * true the method accept will return always true, if bypass is set to false the accept
      * method will return the actual result of the test.
      */
-    Filter(const RangeType& range , const bool& bypass):
-      Filter< Variable, RangeType, Observer >(range)
+    Filter(const RangeType& range, const bool& bypass):
+      Filter<Variable, RangeType, Observer>(range)
     { m_bypass = &bypass; };
-    Filter()  {};
 
-    typedef  typename Variable::argumentType argumentType;
-    typedef  typename Variable::functionType functionType;
+
+    /** Empty constructor */
+    Filter()  { };
+
+    typedef typename Variable::argumentType argumentType;
+    typedef typename Variable::functionType functionType;
 
     /** All the real computations are occuring in this method */
     template< typename ... argsType >
     /* this typename expands to bool only if all the argsType are
      of the same type of the argument of the filter*/
-    typename std::enable_if< all_same< argumentType, argsType ... >::value,
+    typename std::enable_if<all_same<argumentType, argsType ...>::value,
              bool >::type
              accept(const argsType& ... args) const
     {
       typename Variable::variableType value = Variable::value(args ...);
-      Observer::notify(Variable(), value, Filter< Variable, RangeType, Observer >::m_range, args ...);
-      return (*m_bypass) || Filter< Variable, RangeType, Observer >::m_range.contains(value);
+      Observer::notify(Variable(), value, Filter<Variable, RangeType, Observer>::m_range, args ...);
+      return (*m_bypass) || Filter<Variable, RangeType, Observer>::m_range.contains(value);
     }
 
-    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
     {
       return "(" + std::to_string(*m_bypass) + " OR " +
-             Filter< Variable, RangeType, Observer >::m_range.getNameAndReference(pointers, Variable::name()) + ")";
+             Filter<Variable, RangeType, Observer>::m_range.getNameAndReference(pointers, Variable::name()) + ")";
     }
 
-
   private:
-
     const  bool* m_bypass;
   };
-
-  /*  template <
-    class Variable,
-    class RangeType,
-    class Observer
-    >
-    const bool * Filter < Variable, RangeType, BypassableFilter, Observer  >::m_bypass = NULL;
-  */
 
 
   /** Basic building block of the Filter tools
    *
    * An external bool variable Enable/Disable the Filter E.g.:
   \code
-
 
   #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
   #include <tracking/trackFindingVXD/filterMap/filterFramework/UpperBoundedSet.h>
@@ -367,15 +351,14 @@ namespace Belle2 {
 
   \endcode
 
-     * will produce:
-     * true
-     * false
-     *
-     * The Variable class will provide the static method value x( arg1, arg2)
-     * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
-     * The Observer will be notified of the actions via its static method notify
-     */
-
+   * will produce:
+   * true
+   * false
+   *
+   * The Variable class will provide the static method value x( arg1, arg2)
+   * The RangeType object will provide the method contains to decide if x(arg1, arg2) is good
+   * The Observer will be notified of the actions via its static method notify
+   */
   template <
     class Variable,
     class RangeType,
@@ -386,7 +369,6 @@ namespace Belle2 {
   public:
 
     /** Constructor.
-     *
      * To construct the Filter we need a concrete RangeType and a reference to a bool value.
      * The variable and the observer are passed through the template type pack.
      *
@@ -403,6 +385,7 @@ namespace Belle2 {
     };
 
 
+    /** Empty constructor */
     Filter() { };
 
     /** Handy typedef */
@@ -419,8 +402,8 @@ namespace Belle2 {
       Observer::notify(Variable(), value, Filter< Variable, RangeType, Observer >::m_range,
                        args ...);
 
-//    bool enableCopy  = *m_enable;
-//    B2INFO("mrange.contains: " << ", enable (should be true): " << std::to_string(enableCopy) );
+      // bool enableCopy  = *m_enable;
+      // B2INFO("mrange.contains: " << ", enable (should be true): " << std::to_string(enableCopy) );
       return (!(*m_enable)) || Filter< Variable, RangeType, Observer >::m_range.contains(value);
     }
 
@@ -431,23 +414,13 @@ namespace Belle2 {
     }
 
   private:
-
     const bool* m_enable;
   };
 
-  /*template <
-    class Variable,
-    class RangeType,
-    class Observer
-    >
-  const bool * Filter < Variable, RangeType, ActivableFilter, Observer  >::m_enable = NULL;
-  */
 
-  /***
-   * Boolean NOT of a given filters
-   */
-
+  /// Tag class for NOT to identify templates
   class OperatorNot;
+
 
   template <
     class someFilter,
@@ -477,13 +450,12 @@ namespace Belle2 {
     @param otherObserver : the new observer
     */
     template< class otherObserver >
-    Filter<  Belle2::OperatorNot, decltype(someFilter().observeLeaf(otherObserver())), otherObserver>
+    Filter<Belle2::OperatorNot, decltype(someFilter().observeLeaf(otherObserver())), otherObserver>
     observeLeaf(const otherObserver&) const
     {
       return Filter< Belle2::OperatorNot, decltype(someFilter().observeLeaf(otherObserver())), otherObserver >
              (m_filter.observeLeaf(otherObserver()));
     }
-
 
 
     /** Persist the filter on a TTree.
@@ -496,6 +468,7 @@ namespace Belle2 {
       nameOfFilter += c_notSuffix;
       m_filter.persist(t, nameOfFilter);
     }
+
 
     /** Set the Branches addresses to this filter.
      * @param t is the TTree containing the TBranch
@@ -511,11 +484,14 @@ namespace Belle2 {
     explicit Filter(const someFilter& filter):
       m_filter(filter) { };
 
-    Filter() {};
+
+    /** Empty constructor */
+    Filter() { };
+
   private:
     someFilter  m_filter;
-
   };
+
 
   template<typename ... types >
   Filter< OperatorNot, Filter< types...>, VoidObserver >
@@ -525,11 +501,14 @@ namespace Belle2 {
   }
 
 
-  /***
-   * Boolean AND among two filters
-   */
 
 
+
+
+
+
+
+  /// Tag class for AND to identify templates
   class OperatorAnd;
 
   template <
@@ -561,6 +540,7 @@ namespace Belle2 {
       templateObserverType::collect(args ...);
       return returnValue;
     }
+
 
     /** will set the observer for this and both "AND" filters it contains.
     Only the top level "AND" filter will have the new observer, all subsequent Boolean filters will NOT be observed (VoidObserver).
@@ -595,8 +575,6 @@ namespace Belle2 {
     }
 
 
-
-
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created
      * @param branchname is the name of the TBranch holding m_range
@@ -610,7 +588,6 @@ namespace Belle2 {
       std::string nameOfFilterB(branchName);
       nameOfFilterB += c_andSuffixB;
       m_filterB.persist(t, nameOfFilterB);
-
     }
 
 
@@ -632,6 +609,8 @@ namespace Belle2 {
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
 
+
+    /** Empty constructor */
     Filter() { };
 
     std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
@@ -643,17 +622,8 @@ namespace Belle2 {
   private:
     FilterA  m_filterA;
     FilterB  m_filterB;
-
   };
 
-
-  /*
-    template< typename ... argsType >
-    typename std::enable_if <
-    all_same< argumentType, argumentTypeB,
-    argsType ... >::value, bool >::type
-    accept(const argsType& ... args) const
-  */
 
   template <
     typename ... types1,
@@ -664,13 +634,19 @@ namespace Belle2 {
   {
     return Filter <OperatorAnd,
            Filter<types1...>,
-           Filter<types2...>, VoidObserver > (filter1, filter2);
+           Filter<types2...>, VoidObserver> (filter1, filter2);
   }
 
 
-  /***
-   * Boolean OR among two filters
-   */
+
+
+
+
+
+
+
+
+  /// Tag class for OR to identify templates
   class OperatorOr;
 
   template <
@@ -684,15 +660,14 @@ namespace Belle2 {
     const char* c_orSuffixB = "_or_B";
 
   public:
+    typedef typename FilterA::argumentType argumentType;
+    typedef typename FilterB::argumentType argumentTypeB;
+    typedef typename FilterA::functionType functionTypeA;
+    typedef typename FilterB::functionType functionTypeB;
+    typedef typename std::enable_if<all_same<functionTypeA, functionTypeB>::value, functionTypeA>::type functionType;
 
-    typedef  typename FilterA::argumentType argumentType;
-    typedef  typename FilterB::argumentType argumentTypeB;
-    typedef  typename FilterA::functionType functionTypeA;
-    typedef  typename FilterB::functionType functionTypeB;
-    typedef  typename std::enable_if<all_same<functionTypeA, functionTypeB>::value, functionTypeA>::type functionType;
 
-
-    template< typename ... argsType >
+    template<typename ... argsType>
     typename std::enable_if <
     all_same<argumentType, argumentTypeB,
              argsType ... >::value, bool >::type
@@ -707,7 +682,10 @@ namespace Belle2 {
 
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
-    Filter() {};
+
+
+    /** Empty constructor */
+    Filter() { };
 
 
     /** will set the observer for this and both "OR" filters it contains, all subsequent Boolean Filters will not observed (VoidObserver)
@@ -756,7 +734,6 @@ namespace Belle2 {
       std::string nameOfFilterB(branchName);
       nameOfFilterB += c_orSuffixB;
       m_filterB.persist(t, nameOfFilterB);
-
     }
 
     /** Set the Branches addresses to this filter.
@@ -783,8 +760,8 @@ namespace Belle2 {
   private:
     FilterA  m_filterA;
     FilterB  m_filterB;
-
   };
+
 
   template <
     typename ... types1,
@@ -797,6 +774,14 @@ namespace Belle2 {
            Filter< types1...>,
            Filter< types2...>, VoidObserver > (filter1, filter2);
   }
+
+
+
+
+
+
+
+
 
   /** Initialize all the observers in a binary boolean Filter. */
   template< class booleanBinaryOperator,
@@ -813,6 +798,7 @@ namespace Belle2 {
            initializeObservers(Belle2::Filter< types2...>(), args ...);
   }
 
+
   /** Initialize all the observers in a unary boolean Filter. */
   template< class booleanUnaryOperator,
             typename ... types1,
@@ -823,8 +809,8 @@ namespace Belle2 {
     return observer::initialize(args ...) && initializeObservers(Belle2::Filter< types1...>(), args...);
   }
 
-  /** Initialize the observer of a RangeType Filter. */
 
+  /** Initialize the observer of a RangeType Filter. */
   template< class Variable, class RangeType, class observer, typename ... argsTypes>
   bool initializeObservers(const Belle2::Filter<Variable, RangeType, observer>& filter, argsTypes ... args)
   {

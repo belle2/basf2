@@ -365,9 +365,9 @@ namespace TreeFitter {
       //jac(4) = -1* mom_vec(1) / mom3 * mBYc * absTau;
       //jac(5) = -1* mom_vec(2) / mom3 * mBYc * absTau;
 
-      //jac(3) = -1* mom_vec(0) / mom3 * mBYc * absTau;
-      //jac(4) = -1* mom_vec(1) / mom3 * mBYc * absTau;
-      //jac(5) = -1* mom_vec(2) / mom3 * mBYc * absTau;
+      jac(3) = -1 * mom_vec(0) / mom3 * mBYc * absTau;
+      jac(4) = -1 * mom_vec(1) / mom3 * mBYc * absTau;
+      jac(5) = -1 * mom_vec(2) / mom3 * mBYc * absTau;
 
       const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
 

@@ -23,10 +23,10 @@ namespace Belle2 {
     double eclClusterHadronIntensity(const Particle* particle);
 
     /**
-     * return number of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
+     * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
      * Variable is used to separate hadronic showers from electromagnetic showers
      */
-    int eclClusterNumberofHadronDigits(const Particle* particle);
+    double eclClusterNumberOfHadronDigits(const Particle* particle);
 
     /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
@@ -231,7 +231,7 @@ namespace Belle2 {
     /**
      * return 1 if cluster has pulse shape discrimination variables computed
      */
-    int eclClusterHasPulseShapeDiscrimination(const Particle* particle);
+    double eclClusterHasPulseShapeDiscrimination(const Particle* particle);
 
     /**
      * return 1.0 if cluster matched to a trigger cluster

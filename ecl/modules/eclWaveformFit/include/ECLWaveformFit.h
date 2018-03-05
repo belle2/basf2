@@ -77,6 +77,7 @@ namespace Belle2 {
     double m_CurrentPulseArray31[Belle2::ECL::EclConfiguration::m_nsmp];  /** Current waveform adc values.*/
     int m_FitType;  /**0 = photon + hadron, 1 = photon + diode*/
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
+    double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
     std::vector< std::vector<double> > m_PhotonTemplates; /**photon templates*/
     std::vector< std::vector<double> > m_SecondComponentTemplates; /**hadron or diode templates*/

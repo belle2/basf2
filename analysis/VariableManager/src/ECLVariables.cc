@@ -32,26 +32,31 @@
 //ROOT
 #include <TVector3.h>
 
+#include <cmath>
 
 namespace Belle2 {
   namespace Variable {
 
     double eclClusterHadronIntensity(const Particle* particle)
     {
-      double result = 0.0;
+      double result = -999.0;
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getClusterHadronIntensity();
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          result = shower->getClusterHadronIntensity();
+        }
       }
       return result;
     }
 
-    int eclClusterNumberofHadronDigits(const Particle* particle)
+    double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
-      int result = 0;
+      int result = -999;
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getNumberofHadronDigits();
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          result = shower->getNumberOfHadronDigits();
+        }
       }
       return result;
     }
@@ -473,7 +478,7 @@ namespace Belle2 {
       return result;
     }
 
-    int eclClusterHasPulseShapeDiscrimination(const Particle* particle)
+    double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
     {
       int result = 0;
 
@@ -703,11 +708,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
-                      "Status bit to indicate if cluster has waveforms for computing PSD variables.");
+                      "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
     REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
                       "Returns ECL cluster's hadron scintillation component intensity.");
-    REGISTER_VARIABLE("ClusterNumverofHadronDigits", eclClusterNumberofHadronDigits,
-                      "Returns ECL cluster's number of hadron digits.");
+    REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
+                      "Returns ECL cluster's weighted sum of hadron digits (current weights are all 1.0).");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,

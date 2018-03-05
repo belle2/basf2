@@ -52,7 +52,6 @@ double Belle2::ECL::ShaperDSPofflineFit(double Ti, const double* s, double scale
   double f0 = Sv123(t   , s[2], s[3], s[7], s[8], s[1], s[4]);
   double fp = Sv123(t + dt, s[2], s[3], s[7], s[8], s[1], s[4]);
   double w = s[9];
-  // Is this some kind of a low pass filter?
   double svp = (1 - w) * f0 + (0.5 * w) * (fp + fm);
 
   if (t > 0) {

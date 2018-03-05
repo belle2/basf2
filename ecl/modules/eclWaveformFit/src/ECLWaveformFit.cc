@@ -54,7 +54,9 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   // Set module properties
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("EnergyThreshold", m_EnergyThreshold, "Energy Threshold for Fitting Waveforms", 0.05);
+  addParam("TriggerThreshold", m_TriggerThreshold,
+           "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
+  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.05);
   addParam("FitType", m_FitType, "Fit Type Flag for second component. 0 = Hadron, 1 = Diode.", 0);
 }
 
@@ -187,7 +189,7 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentTime(-1);
     aECLDsp.setTwoComponentBaseline(-1);
 
-    if (aECLDsp.getisData() == false)  continue; //Currently for data only
+    if (aECLDsp.getIsData() == false)  continue; //Currently for data only
 
     int CurrentCellID = aECLDsp.getCellId();
 
@@ -201,6 +203,7 @@ void ECLWaveformFitModule::event()
       //Set 10 MeV threshold for now.
       //Trigger amplitude is computed with algorithm described in slide 5 of:
       //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
+      //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
       //
       double baselineADC = 0;
       for (int i = 0; i < 4; i++)  baselineADC += m_CurrentPulseArray31[i + 12];
@@ -209,7 +212,7 @@ void ECLWaveformFitModule::event()
 
       double triggerCheck = (maxADC - baselineADC) * m_ADCtoEnergy[CurrentCellID - 1];
 
-      if (triggerCheck < 0.010) continue;
+      if (triggerCheck < m_TriggerThreshold) continue;
 
       //setting relation of eclDSP to aECLDigit
       bool relationSet = false;

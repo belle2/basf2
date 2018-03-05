@@ -79,7 +79,7 @@ namespace Belle2 {
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
       m_ShowerHadronIntensity = 0;         /**< Shower Hadron Intensity*/
-      m_NumberofHadronDigits = 0;         /**< Shower Number of hadron digits*/
+      m_NumberOfHadronDigits = 0;         /**< Shower Number of hadron digits*/
 
     }
 
@@ -201,7 +201,7 @@ namespace Belle2 {
 
     /*! Set numver of hadron digits
      */
-    void setNumberofHadronDigits(int NumberofHadronDigits) { m_NumberofHadronDigits = NumberofHadronDigits; }
+    void setNumberOfHadronDigits(int NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -359,9 +359,9 @@ namespace Belle2 {
     double getShowerHadronIntensity() const { return m_ShowerHadronIntensity; }
 
     /*! Get number of hadron digits
-     * @return m_NumberofHadronDigits
+     * @return m_NumberOfHadronDigits
      */
-    int getNumberofHadronDigits() const { return m_NumberofHadronDigits; }
+    int getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
@@ -430,6 +430,10 @@ namespace Belle2 {
      */
     bool hasProblematicCrystal() const;
 
+    /*! Check if shower contains pulse shape discrimination information
+     */
+    bool hasPulseShapeDiscrimination() const;
+
     /** Return unique identifier */
     int getUniqueId() const
     {
@@ -467,7 +471,7 @@ namespace Belle2 {
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
     Double32_t m_ShowerHadronIntensity;            /**< Shower Hadron Intensity*/
-    uint8_t m_NumberofHadronDigits;            /**< Number of crystals with large hadron component energy. */
+    uint8_t m_NumberOfHadronDigits;            /**< Number of crystals with large hadron component energy. */
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -478,7 +482,7 @@ namespace Belle2 {
     // 8: added zernikeMVA, removed absZernike20, 42, 53 (AH)
     // 9: renamed variables according to the new mdst scheme (TF)
     // 10: added getUniqueId()
-    // 11: added m_ShowerHadronIntensity and m_NumberofHadronDigits variables (SL)
+    // 11: added m_ShowerHadronIntensity and m_NumberOfHadronDigits variables (SL)
     ClassDef(ECLShower, 11);/**< ClassDef */
 
   };
@@ -496,6 +500,11 @@ namespace Belle2 {
   inline bool ECLShower::hasProblematicCrystal() const
   {
     return hasStatus(c_hasProblematicCrystal);
+  }
+
+  inline bool ECLShower::hasPulseShapeDiscrimination() const
+  {
+    return hasStatus(c_hasPulseShapeDiscrimination);
   }
 
 } // end namespace Belle2

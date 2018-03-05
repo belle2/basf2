@@ -72,7 +72,7 @@ namespace Belle2 {
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.),
       m_ClusterHadronIntensity(0),
-      m_NumberofHadronDigits(0) {}
+      m_NumberOfHadronDigits(0) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
@@ -151,7 +151,7 @@ namespace Belle2 {
     void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
 
     /** set Number of hadron digits in cluster . */
-    void setNumberofHadronDigits(int NumberofHadronDigits) { m_NumberofHadronDigits = NumberofHadronDigits; }
+    void setNumberOfHadronDigits(int NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
 
     /** Set SecondMoment. */
     void setSecondMoment(double secondmoment) { m_secondMoment = secondmoment; }
@@ -229,7 +229,7 @@ namespace Belle2 {
     double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
     /** Return number of hadron digits in cluster*/
-    uint8_t getNumberofHadronDigits() const { return m_NumberofHadronDigits; }
+    uint8_t getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
 
     /** Return second moment (shower shape variable). */
     double getSecondMoment() const { return m_secondMoment; }
@@ -313,6 +313,9 @@ namespace Belle2 {
 
     /** Cluster status. */
     unsigned short m_status;
+
+    /** Number of hadron digits in cluster */
+    uint8_t m_NumberOfHadronDigits;
 
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
@@ -403,12 +406,9 @@ namespace Belle2 {
     /** Cluster Hadron Component Intensity. */
     Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
 
-    /** Number of hadron digits in cluster */
-    uint8_t m_NumberofHadronDigits;  //[0, 255., 8]
-
     /** Class definition */
     ClassDef(ECLCluster, 11);
-    // 11: Added m_ClusterHadronIntensity an m_NumberofHadronDigits variables
+    // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId

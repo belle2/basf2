@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCLUSTERPSDMODULE_H_
-#define ECLCLUSTERPSDMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 // OTHER
 #include <vector>
@@ -52,16 +54,34 @@ namespace Belle2 {
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
 
+    virtual const char* eclShowerArrayName() const
+    { return "ECLShowers" ; }
+
     /** Name of the ECLEventInformation.*/
     virtual const char* eclEventInformationName() const
     { return "ECLEventInformation" ; }
 
-  protected:
-
   private:
     double m_Chi2Threshold;   /** Two component fit chi square threshold .*/
     double m_CrystalHadronEnergyThreshold; /** hadron component energy threshold to classify as hadron.*/
+    StoreArray<ECLCalDigit> eclCalDigits;  /** ECLCalDigit's */
+    StoreArray<ECLShower> eclShowers;  /** ECLShower's */
   };
-} // end Belle2 namespace
 
-#endif
+  /** Class derived from ECL, only difference are the names */
+  class ECLClusterPSDPureCsIModule : public ECLClusterPSDModule {
+  public:
+    /** PureCsI Name of the ECLCalDigitsPureCsI.*/
+    virtual const char* eclCalDigitArrayName() const override
+    { return "ECLCalDigitsPureCsI" ; }
+
+    /** PureCsI Name of the ECLShowersPureCsI.*/
+    virtual const char* eclShowerArrayName() const override
+    { return "ECLShowersPureCsI" ; }
+
+    /** PureCsI Name of the ECLEventInformationPureCsI.*/
+    virtual const char* eclEventInformationName() const override
+    { return "ECLEventInformationPureCsI" ; }
+  };
+
+} // end Belle2 namespace

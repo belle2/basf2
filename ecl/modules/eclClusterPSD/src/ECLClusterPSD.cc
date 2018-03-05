@@ -15,8 +15,6 @@
 
 // ECL
 #include <ecl/modules/eclClusterPSD/ECLClusterPSD.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -24,7 +22,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationsObject.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -59,9 +56,8 @@ ECLClusterPSDModule::~ECLClusterPSDModule()
 void ECLClusterPSDModule::initialize()
 {
   // ECL dataobjects
-  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
-  StoreArray<ECLShower> eclshowers("ECLShowers");
-  eclshowers.registerInDataStore("ECLShowers");
+  eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  eclShowers.registerInDataStore(eclShowerArrayName());
 }
 
 // begin run
@@ -71,10 +67,8 @@ void ECLClusterPSDModule::beginRun()
 
 void ECLClusterPSDModule::event()
 {
-  StoreArray<ECLShower> eclshowers;
-  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
-  for (auto& shower : eclshowers) {
+  for (auto& shower : eclShowers) {
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 
@@ -102,11 +96,11 @@ void ECLClusterPSDModule::event()
 
     if (nWaveforminCluster > 0) {
       if (cluster2CTotalEnergy != 0) shower.setShowerHadronIntensity(cluster2CHadronEnergy / cluster2CTotalEnergy);
-      shower.setNumberofHadronDigits(numberofHadronDigits);
+      shower.setNumberOfHadronDigits(numberofHadronDigits);
       shower.addStatus(ECLShower::c_hasPulseShapeDiscrimination);
     } else {
       shower.setShowerHadronIntensity(0);
-      shower.setNumberofHadronDigits(0);
+      shower.setNumberOfHadronDigits(0);
     }
   }
 }

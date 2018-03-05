@@ -24,9 +24,9 @@ void NtupleClusterTool::setupTree()
   m_e1e9   = new float[nDecayProducts];
   m_e9e21  = new float[nDecayProducts];
   m_nHits  = new int[nDecayProducts];
-  m_ClusterPSD  = new int[nDecayProducts];
+  m_ClusterHasPSD  = new int[nDecayProducts];
   m_ClusterHadronIntensity  = new float[nDecayProducts];
-  m_NumberofHadronDigits = new int[nDecayProducts];
+  m_NumberOfHadronDigits = new int[nDecayProducts];
   m_trackM = new int[nDecayProducts];
 
   m_uncorrE = new float[nDecayProducts];
@@ -45,12 +45,12 @@ void NtupleClusterTool::setupTree()
                    (strNames[iProduct] + "_clusterE9E21/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterNHits").c_str(),      &m_nHits[iProduct],
                    (strNames[iProduct] + "_clusterNHits/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterPSD").c_str(),      &m_ClusterPSD[iProduct],
-                   (strNames[iProduct] + "_clusterPSD/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterHasPSD").c_str(),      &m_ClusterHasPSD[iProduct],
+                   (strNames[iProduct] + "_clusterHasPSD/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterHadronIntensity").c_str(),      &m_ClusterHadronIntensity[iProduct],
                    (strNames[iProduct] + "_clusterHadronIntensity/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_clusterNumberofHadronDigits").c_str(),      &m_NumberofHadronDigits[iProduct],
-                   (strNames[iProduct] + "_clusterNumberofHadronDigits/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_clusterNumberOfHadronDigits").c_str(),      &m_NumberOfHadronDigits[iProduct],
+                   (strNames[iProduct] + "_clusterNumberOfHadronDigits/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterTrackMatch").c_str(), &m_trackM[iProduct],
                    (strNames[iProduct] + "_clusterTrackMatch/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterUncorrE").c_str(),    &m_uncorrE[iProduct],
@@ -73,9 +73,9 @@ void NtupleClusterTool::deallocateMemory()
   delete [] m_region;
   delete [] m_e1e9;
   delete [] m_e9e21;
-  delete [] m_ClusterPSD;
+  delete [] m_ClusterHasPSD;
   delete [] m_ClusterHadronIntensity;
-  delete [] m_NumberofHadronDigits;
+  delete [] m_NumberOfHadronDigits;
   delete [] m_nHits;
   delete [] m_trackM;
 
@@ -101,7 +101,7 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_e1e9[iProduct]    = Variable::eclClusterE1E9(selparticles[iProduct]);
     m_e9e21[iProduct]   = Variable::eclClusterE9E21(selparticles[iProduct]);
     m_nHits[iProduct]   = int(Variable::eclClusterNHits(selparticles[iProduct]));
-    m_ClusterPSD[iProduct]   = int(Variable::eclClusterHasPulseShapeDiscrimination(selparticles[iProduct]));
+    m_ClusterHasPSD[iProduct]   = int(Variable::eclClusterHasPulseShapeDiscrimination(selparticles[iProduct]));
     m_trackM[iProduct]  = int(Variable::eclClusterTrackMatched(selparticles[iProduct]));
 
     m_uncorrE[iProduct]  = Variable::eclClusterUncorrectedE(selparticles[iProduct]);
@@ -111,6 +111,6 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_phi[iProduct]      = Variable::eclClusterPhi(selparticles[iProduct]);
     m_distance[iProduct] = Variable::eclClusterR(selparticles[iProduct]);
     m_ClusterHadronIntensity[iProduct]  = Variable::eclClusterHadronIntensity(selparticles[iProduct]);
-    m_NumberofHadronDigits[iProduct]  = int(Variable::eclClusterNumberofHadronDigits(selparticles[iProduct]));
+    m_NumberOfHadronDigits[iProduct]  = int(Variable::eclClusterNumberOfHadronDigits(selparticles[iProduct]));
   }
 }

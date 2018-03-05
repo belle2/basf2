@@ -33,7 +33,7 @@ namespace Belle2 {
       m_TwoComponentChi2 = -1;  /**< Offline two component chi2*/
       m_TwoComponentTime = 1;  /**< Offline two component time */
       m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
-      m_isData = false;  /**< Data = true MC = false */
+      m_IsData = false;  /**< Data = true MC = false */
     }
 
     /** Constructor for data*/
@@ -41,7 +41,7 @@ namespace Belle2 {
     {
       m_CellId     = CellId;
       m_DspAVector.assign(ADCData, ADCData + NADCPoints);
-      m_isData = flag;
+      m_IsData = flag;
     }
 
     /** Constructor for data*/
@@ -49,7 +49,7 @@ namespace Belle2 {
     {
       m_CellId     = CellId;
       m_DspAVector = ADCData;
-      m_isData = flag;
+      m_IsData = flag;
     }
 
     /*! Set Cell ID
@@ -58,7 +58,7 @@ namespace Belle2 {
 
     /*! Set Data or MC flag. MC = false. Data = true
      */
-    void setisData(bool flag) { m_isData = flag; }
+    void setIsData(bool flag) { m_IsData = flag; }
 
     /*! Set Dsp array
      */
@@ -102,7 +102,7 @@ namespace Belle2 {
     /*! Get Data or MC flag
      * @return Data or MC flag. MC=false Data=true;
      */
-    bool getisData() const { return m_isData; }
+    bool getIsData() const { return m_IsData; }
 
     /*! Get Dsp Array
      * @return Dsp Array 0~31
@@ -159,7 +159,7 @@ namespace Belle2 {
   private:
 
     int m_CellId;      /**< Cell ID */
-    bool m_isData;      /**< Data = true, MC = false*/
+    bool m_IsData;      /**< Data = true, MC = false*/
     double m_TwoComponentTotalAmp; /**< Two comp total amp */
     double m_TwoComponentHadronAmp;   /**< Two comp hadron amp */
     double m_TwoComponentChi2; /**< Two comp chi2 */

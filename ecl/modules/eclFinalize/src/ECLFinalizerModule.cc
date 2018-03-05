@@ -140,7 +140,7 @@ void ECLFinalizerModule::event()
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
       eclCluster->setClusterHadronIntensity(eclShower.getShowerHadronIntensity());
-      eclCluster->setNumberofHadronDigits(eclShower.getNumberofHadronDigits());
+      eclCluster->setNumberOfHadronDigits(eclShower.getNumberOfHadronDigits());
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);

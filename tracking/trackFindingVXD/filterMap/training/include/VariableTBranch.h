@@ -26,7 +26,7 @@ namespace Belle2 {
   public:
     /** Add to the TTree  @param tree a branch whose name and type are
     inferred from @param var **/
-    VariableTBranch(TTree* tree);
+    explicit VariableTBranch(TTree* tree);
 
     /** Standard destructor */
     ~VariableTBranch()
@@ -45,12 +45,10 @@ namespace Belle2 {
 
   /** Constructor specialized for arithmetic types **/
   template <class Variable>
-  VariableTBranch< Variable >::VariableTBranch(TTree* tree)
+  VariableTBranch<Variable>::VariableTBranch(TTree* tree)
   {
     if (tree != nullptr && tree -> GetBranch(Variable::name().c_str()) == nullptr)
       m_branch = tree->Branch(Variable::name().c_str() , & m_storedValue,
                               TBranchLeafType(m_storedValue));
   }
-
-
 }

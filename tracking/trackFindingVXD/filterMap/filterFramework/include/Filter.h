@@ -126,7 +126,7 @@ namespace Belle2 {
      bool contains( Variable::returnType x) \endcode
      *
      */
-    Filter(const RangeType& range):
+    explicit Filter(const RangeType& range):
       m_range(range) { };
 
     Filter() { };
@@ -508,7 +508,7 @@ namespace Belle2 {
       m_filter.setBranchAddress(t, nameOfFilter);
     }
 
-    Filter(const someFilter& filter):
+    explicit Filter(const someFilter& filter):
       m_filter(filter) { };
 
     Filter() {};
@@ -640,10 +640,7 @@ namespace Belle2 {
     }
 
 
-
   private:
-
-
     FilterA  m_filterA;
     FilterB  m_filterB;
 
@@ -662,19 +659,18 @@ namespace Belle2 {
     typename ... types1,
     typename ... types2
     >
-  Filter< Belle2::OperatorAnd, Belle2::Filter< types1...>, Belle2::Filter< types2...> , Belle2::VoidObserver >
-  operator &&(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
+  Filter<Belle2::OperatorAnd, Belle2::Filter<types1...>, Belle2::Filter<types2...>, Belle2::VoidObserver>
+  operator &&(const Filter<types1...>& filter1, const Filter<types2...>& filter2)
   {
-    return Filter < OperatorAnd,
-           Filter< types1...>,
-           Filter< types2...>, VoidObserver > (filter1, filter2);
+    return Filter <OperatorAnd,
+           Filter<types1...>,
+           Filter<types2...>, VoidObserver > (filter1, filter2);
   }
 
 
   /***
    * Boolean OR among two filters
    */
-
   class OperatorOr;
 
   template <
@@ -693,23 +689,20 @@ namespace Belle2 {
     typedef  typename FilterB::argumentType argumentTypeB;
     typedef  typename FilterA::functionType functionTypeA;
     typedef  typename FilterB::functionType functionTypeB;
-    typedef  typename std::enable_if< all_same< functionTypeA, functionTypeB >::value,
-             functionTypeA>::type functionType;
-
+    typedef  typename std::enable_if<all_same<functionTypeA, functionTypeB>::value, functionTypeA>::type functionType;
 
 
     template< typename ... argsType >
     typename std::enable_if <
-    all_same<  argumentType, argumentTypeB,
-               argsType ... >::value, bool >::type
-               accept(const argsType& ... args) const
+    all_same<argumentType, argumentTypeB,
+             argsType ... >::value, bool >::type
+             accept(const argsType& ... args) const
     {
       templateObserverType::prepare(args ...);
       bool returnValue =  m_filterA.accept(args ...) || m_filterB.accept(args ...);
       templateObserverType::collect(args ...);
       return returnValue;
     }
-
 
 
     Filter(const FilterA& filterA, const FilterB& filterB):
@@ -738,21 +731,16 @@ namespace Belle2 {
     @param otherObserver : the new observer
     */
     template< class otherObserver >
-    Filter<  Belle2::OperatorOr, decltype(FilterA().observeLeaf(otherObserver())),
-             decltype(FilterB().observeLeaf(otherObserver())),
-             VoidObserver >
-             observeLeaf(const otherObserver&) const
+    Filter<Belle2::OperatorOr, decltype(FilterA().observeLeaf(otherObserver())),
+           decltype(FilterB().observeLeaf(otherObserver())),
+           VoidObserver>
+           observeLeaf(const otherObserver&) const
     {
       // this will recursively loop over all "and" Filters and set the SAME observer
-      return Filter< Belle2::OperatorOr, decltype(FilterA().observeLeaf(otherObserver())),
+      return Filter<Belle2::OperatorOr, decltype(FilterA().observeLeaf(otherObserver())),
              decltype(FilterB().observeLeaf(otherObserver())),
              VoidObserver >(m_filterA.observeLeaf(otherObserver()), m_filterB.observeLeaf(otherObserver()));
     }
-
-
-
-
-
 
 
     /** Persist the filter on a TTree.
@@ -786,11 +774,10 @@ namespace Belle2 {
       m_filterB.setBranchAddress(t, nameOfFilterB);
     }
 
-    std::string  getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr)
     {
       return "(" + m_filterA.getNameAndReference(pointers) + " OR " + m_filterB.getNameAndReference(pointers) + ")";
     }
-
 
 
   private:
@@ -803,22 +790,22 @@ namespace Belle2 {
     typename ... types1,
     typename ... types2
     >
-  Filter< Belle2::OperatorOr, Belle2::Filter< types1...>, Belle2::Filter< types2...> , Belle2::VoidObserver >
-  operator ||(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
+  Filter<Belle2::OperatorOr, Belle2::Filter<types1...>, Belle2::Filter<types2...> , Belle2::VoidObserver>
+  operator ||(const Filter<types1...>& filter1 , const Filter<types2...>& filter2)
   {
     return Filter < OperatorOr,
            Filter< types1...>,
            Filter< types2...>, VoidObserver > (filter1, filter2);
   }
 
-  /** Initilize all the observers in a binary boolean Filter. */
+  /** Initialize all the observers in a binary boolean Filter. */
   template< class booleanBinaryOperator,
             typename ... types1,
             typename ... types2,
             class observer,
             typename ... argsTypes>
-  bool initializeObservers(Filter< booleanBinaryOperator,
-                           Belle2::Filter< types1...>, Belle2::Filter< types2...> , observer>,
+  bool initializeObservers(const Filter<booleanBinaryOperator, Belle2::Filter< types1...>,
+                           Belle2::Filter<types2...> , observer>&,
                            argsTypes ... args)
   {
     return observer::initialize(args ...) &&
@@ -826,21 +813,20 @@ namespace Belle2 {
            initializeObservers(Belle2::Filter< types2...>(), args ...);
   }
 
-  /** Initilize all the observers in a unary boolean Filter. */
+  /** Initialize all the observers in a unary boolean Filter. */
   template< class booleanUnaryOperator,
             typename ... types1,
             class observer,
             typename ... argsTypes>
-  bool initializeObservers(Filter< booleanUnaryOperator,
-                           Belle2::Filter< types1...>, observer>, argsTypes ... args)
+  bool initializeObservers(const Filter<booleanUnaryOperator, Belle2::Filter<types1...>, observer>&, argsTypes ... args)
   {
     return observer::initialize(args ...) && initializeObservers(Belle2::Filter< types1...>(), args...);
   }
 
-  /** Initilize the observer of a RangeType Filter. */
+  /** Initialize the observer of a RangeType Filter. */
 
   template< class Variable, class RangeType, class observer, typename ... argsTypes>
-  bool initializeObservers(Belle2::Filter<Variable, RangeType, observer> filter, argsTypes ... args)
+  bool initializeObservers(const Belle2::Filter<Variable, RangeType, observer>& filter, argsTypes ... args)
   {
     return observer::initialize(Variable(), filter.getRange(), args ...);
   }

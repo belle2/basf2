@@ -91,7 +91,7 @@ namespace Belle2 {
     @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
       and the actual pointers to the bounds, if equal to nullptr it will not be filled
     **/
-    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "X")
+    std::string getNameAndReference(std::vector<std::pair<char, void*>>* pointers = nullptr, const std::string& varname = "X")
     {
       std::string minVal = std::to_string(m_inf);
       std::string maxVal = std::to_string(m_sup);

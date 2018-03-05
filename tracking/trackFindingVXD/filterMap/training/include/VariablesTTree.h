@@ -21,8 +21,6 @@ namespace Belle2 {
   };
 
 
-
-
   /** Defines the interface using an empty template pack **/
   template<>
   class VariablesTTree<> {
@@ -43,9 +41,8 @@ namespace Belle2 {
     static auto build(const Filter&, TTree* tree) ->
     VariablesTTree<Filter>
     { return VariablesTTree<Filter>(tree); };
-
-
   };
+
 
   /** Specialization for a simple filter  **/
   template< class Variable , class ... other>
@@ -53,7 +50,7 @@ namespace Belle2 {
     public VariablesTTree<> {
     VariableTBranch< Variable > m_varTBranch;
   public:
-    VariablesTTree(TTree* tree): VariablesTTree<>(tree),
+    explicit VariablesTTree(TTree* tree): VariablesTTree<>(tree),
       m_varTBranch(tree) {};
 
     template< class ... SpacePoints >
@@ -63,6 +60,7 @@ namespace Belle2 {
     }
   };
 
+
   /** Specialization for unary operators acting on a filter  **/
   template< class unaryOperator , class ... args, class ... other>
   class VariablesTTree< Filter< unaryOperator, Filter< args ...>,
@@ -70,7 +68,7 @@ namespace Belle2 {
           public VariablesTTree<> {
     VariablesTTree< Filter< args ...> > m_node;
   public:
-    VariablesTTree(TTree* tree): VariablesTTree<>(tree),
+    explicit VariablesTTree(TTree* tree): VariablesTTree<>(tree),
       m_node(tree) {};
 
     template< class ... SpacePoints >
@@ -78,8 +76,8 @@ namespace Belle2 {
     {
       m_node.evaluateOn(sps...);
     }
-
   };
+
 
   /** Specialization for binary operators acting on a filter  **/
   template< class binaryOperator , class ... argsA, class ... argsB,
@@ -91,7 +89,7 @@ namespace Belle2 {
     VariablesTTree< Filter< argsA ... > > m_nodeA;
     VariablesTTree< Filter< argsB ... > > m_nodeB;
   public:
-    VariablesTTree(TTree* tree): VariablesTTree<>(tree),
+    explicit VariablesTTree(TTree* tree): VariablesTTree<>(tree),
       m_nodeA(tree), m_nodeB(tree)
     {};
 
@@ -101,9 +99,5 @@ namespace Belle2 {
       m_nodeA.evaluateOn(sps...);
       m_nodeB.evaluateOn(sps...);
     }
-
   };
-
-
-
 }

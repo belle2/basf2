@@ -28,11 +28,10 @@ namespace Belle2 {
     NoKickCuts() {}
 
     /** constructor with name of the CutFile, used in cuts application */
-    NoKickCuts(std::string m_fileName)
+    explicit NoKickCuts(std::string m_fileName)
     {
       if (m_fileName.size() != 0) FillCuts(m_fileName); //else cuts not applied
     }
-
 
 
     enum EMinMax { /**< enum for minimum/maximum value of cuts */
@@ -89,5 +88,4 @@ namespace Belle2 {
 
     ClassDef(NoKickCuts, 1);
   };
-
 } /** end namespace Belle2 */

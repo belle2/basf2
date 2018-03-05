@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef svdroidqmModule_H
-#define svdroidqmModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
@@ -36,10 +34,8 @@
 
 namespace Belle2 {
 
-  /** The HLT ROI DQM module.
-   *
-   * Creates basic DQM for ROI creation on HLT
-   */
+  /** Creates basic DQM for ROI creation on ExpressReco  */
+
   class SVDROIDQMModule : public HistoModule {
 
   public:
@@ -47,23 +43,23 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDROIDQMModule();
 
-    virtual void initialize();
+    void initialize(); /**< register histograms*/
 
-    virtual void event();
+    void event();/**< fill per-event histograms*/
 
-    virtual void endRun();
+    void endRun(); /**< fill per-run histograms*/
+
+  private:
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
     std::string m_SVDRecoDigitsName; /**< reco digit list name*/
 
-  private:
+    StoreArray<ROIid> m_ROIs; /**< ROis store array*/
+    StoreArray<SVDIntercept> m_Intercepts; /**< SVDINtercept Store Arrays*/
+    StoreArray<SVDShaperDigit> m_SVDShaperDigits; /**< shaper digits sotre array */
+    StoreArray<SVDRecoDigit> m_SVDRecoDigits; /**< reco digit store array*/
 
-    StoreArray<ROIid> m_ROIs;
-    StoreArray<SVDIntercept> m_Intercepts;
-    StoreArray<SVDShaperDigit> m_SVDShaperDigits;
-    StoreArray<SVDRecoDigit> m_SVDRecoDigits;
-
-    VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance(); /**< the geometry */
+    VXD::GeoCache& m_geoCache = VXD::GeoCache::getInstance(); /**< the geo cache instance*/
 
     std::string m_ROIsName; /**< Name of the ROIid StoreArray */
     std::string m_InterceptsName; /**< Name of the SVDIntercept StoreArray */
@@ -96,7 +92,7 @@ namespace Belle2 {
     void fillSensorROIHistos(const ROIid* roi); /**< fill histograms per sensor, filled once per ROI */
     void fillSensorInterHistos(const SVDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
-    int m_numModules; /**< number of modules*/
+    int m_numModules; /**< number of hardware modules*/
 
     TH1F* hnROIs; /**< number of ROIs*/
     TH1F* hnInter; /**< number of intercpets*/
@@ -106,11 +102,10 @@ namespace Belle2 {
     TH1F* hCellV; /**< V cells */
     int n_events; /**< number of events*/
 
-    virtual void defineHisto(); /**< define histograms*/
+    void defineHisto(); /**< define histograms*/
 
   };//end class declaration
 
 
 } // end namespace Belle2
 
-#endif // SVDROIDQMModule_H

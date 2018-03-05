@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVD_DATA_REDUCTION_ANALYSIS_MODULE_H_
-#define SVD_DATA_REDUCTION_ANALYSIS_MODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/Track.h>
@@ -27,50 +26,46 @@
 
 namespace Belle2 {
 
-  /** The SVD Data Reduction AnalysisData Module
-   *
-   * this module performs the analysis of the SVD data reduction module performances
-   *
-   */
+  /** The Module evaluates the efficiency on SVD based on the number of empty ROIs */
 
   class SVDROIFinderAnalysisDataModule : public Module {
 
   public:
 
     /**
-     * Constructor of the module.
+     * Constructor of the module. Usual parameter handling.
      */
     SVDROIFinderAnalysisDataModule();
 
     /**
      * Destructor of the module.
      */
-    virtual ~SVDROIFinderAnalysisDataModule();
+    ~SVDROIFinderAnalysisDataModule();
 
     /**
-     *Initializes the Module.
+     *Initializes the Module. Prepare the root file.
      */
     void initialize() override;
 
     void event() override;
 
     /**
-     * Termination action.
+     * Termination action. Analysis report and writing of the rootfile.
      */
     void terminate() override;
 
   private:
 
-    StoreArray<SVDShaperDigit> m_shapers;
-    StoreArray<ROIid> m_ROIs;
-    StoreArray<RecoTrack> m_trackList;
-    StoreArray<SVDIntercept> m_SVDIntercepts;
+    StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits sotre array*/
+    StoreArray<ROIid> m_ROIs; /**< rois store array*/
+    StoreArray<RecoTrack> m_trackList;/**< reco track store array */
+    StoreArray<SVDIntercept> m_SVDIntercepts; /**< svd intercept store array */
 
-    bool m_isSimulation;
+    bool m_isSimulation; /**< true if the module is run on simulated events*/
 
-    float m_edgeU;
-    float m_edgeV;
-    float m_minPVal;
+    float m_edgeU; /**<fiducial region, edge along U*/
+    float m_edgeV; /**<fiducial region, edge along U*/
+    float m_minPVal; /**<fiducial region, minimum P value of the tracks*/
 
     std::string m_shapersName; /**< SVDShaperDigits name */
     std::string m_recoTrackListName; /**< Track list name */
@@ -181,4 +176,3 @@ namespace Belle2 {
 
 }
 
-#endif

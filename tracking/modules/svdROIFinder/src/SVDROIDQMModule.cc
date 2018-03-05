@@ -133,7 +133,7 @@ void SVDROIDQMModule::event()
 
     fillSensorROIHistos(&it);
 
-    const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+    const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
     const int nPixelsU = aSensorInfo.getUCells();
     const int nPixelsV = aSensorInfo.getVCells();
 
@@ -174,24 +174,24 @@ void SVDROIDQMModule::createHistosDictionaries()
 
   m_numModules = 0;
 
-  std::set<Belle2::VxdID> svdLayers = m_aGeometry.getLayers(VXD::SensorInfoBase::SVD);
+  std::set<Belle2::VxdID> svdLayers = m_geoCache.getLayers(VXD::SensorInfoBase::SVD);
   std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
 
   while (itSvdLayers != svdLayers.end()) {
 
-    std::set<Belle2::VxdID> svdLadders = m_aGeometry.getLadders(*itSvdLayers);
+    std::set<Belle2::VxdID> svdLadders = m_geoCache.getLadders(*itSvdLayers);
     std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();
 
     while (itSvdLadders != svdLadders.end()) {
 
-      std::set<Belle2::VxdID> svdSensors = m_aGeometry.getSensors(*itSvdLadders);
+      std::set<Belle2::VxdID> svdSensors = m_geoCache.getSensors(*itSvdLadders);
       std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
 
       while (itSvdSensors != svdSensors.end()) {
 
         m_numModules++; //counting the total number of modules
 
-        const VXD::SensorInfoBase& wSensorInfo = m_aGeometry.getSensorInfo(*itSvdSensors);
+        const VXD::SensorInfoBase& wSensorInfo = m_geoCache.getSensorInfo(*itSvdSensors);
 
         const int nPixelsU = wSensorInfo.getUCells();
         const int nPixelsV = wSensorInfo.getVCells();
@@ -300,7 +300,7 @@ void SVDROIDQMModule::createHistosDictionaries()
           for (auto& it : SVDShaperDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (it.isUStrip()) {
-                const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+                const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
                 hPtr->Fill(inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID()));
               }
             }
@@ -323,7 +323,7 @@ void SVDROIDQMModule::createHistosDictionaries()
           for (auto& it : SVDShaperDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               if (!it.isUStrip()) {
-                const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+                const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
                 hPtr->Fill(inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID()));
               }
             }
@@ -348,7 +348,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
           for (auto& it : SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && it.isUStrip()) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
               hPtr->Fill(inter->getCoorU(), resid);
             }
@@ -372,7 +372,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
           for (auto& it : SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
               hPtr->Fill(inter->getCoorV(), resid);
             }
@@ -398,7 +398,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
           for (auto& it : SVDRecoDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getCellID());
               hPtr->Fill(it.getCharge(), resid);
             }
@@ -422,7 +422,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
           for (auto& it : SVDRecoDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getCellID());
               hPtr->Fill(it.getCharge(), resid);
             }
@@ -448,7 +448,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
           for (auto& it : SVDShaperDigits)
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorU(), aSensorInfo.getUCellPosition(it.getCellID()));
               //        hPtr->Fill( inter->getCoorU(), it.getVCellID()*75e-4 );
             }
@@ -472,7 +472,7 @@ void SVDROIDQMModule::createHistosDictionaries()
 
           for (auto& it : SVDShaperDigits) {
             if (((int)it.getSensorID() == (int)inter->getSensorID()) && (!it.isUStrip())) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
+              const VXD::SensorInfoBase& aSensorInfo = m_geoCache.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorV(), aSensorInfo.getVCellPosition(it.getCellID()));
               //        hPtr->Fill( inter->getCoorV(), it.getUCellID()*50e-4  );
             }

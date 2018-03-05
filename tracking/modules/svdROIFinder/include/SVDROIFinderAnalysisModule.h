@@ -3,17 +3,12 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
 
-#ifndef SVD_DATA_REDUCTION_ANALYSIS_MODULE_H_
-#define SVD_DATA_REDUCTION_ANALYSIS_MODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -255,5 +250,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

@@ -25,28 +25,24 @@
 
 namespace Belle2 {
 
-  /** The SVD Data Reduction Analysis Module
-   *
-   * this module performs the analysis of the SVD data reduction module performances
-   *
-   */
+  /** This module performs the analysis of the SVD data reduction module performances  */
 
   class SVDROIFinderAnalysisModule : public Module {
 
   public:
 
     /**
-     * Constructor of the module.
+     * Constructor of the module. Usual parameter handling.
      */
     SVDROIFinderAnalysisModule();
 
     /**
      * Destructor of the module.
      */
-    virtual ~SVDROIFinderAnalysisModule();
+    ~SVDROIFinderAnalysisModule();
 
     /**
-     *Initializes the Module.
+     *Initializes the Module. Prepare the root file.
      */
     void initialize() override;
 
@@ -63,13 +59,13 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<SVDShaperDigit> m_shapers;
-    StoreArray<ROIid> m_ROIs;
-    StoreArray<RecoTrack> m_trackList;
-    StoreArray<SVDIntercept> m_SVDIntercepts;
-    StoreArray<MCParticle> m_mcParticles;
+    StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits sotre array*/
+    StoreArray<ROIid> m_ROIs; /**< rois store array*/
+    StoreArray<RecoTrack> m_trackList;/**< reco track store array */
+    StoreArray<SVDIntercept> m_SVDIntercepts; /**< svd intercept store array */
+    StoreArray<MCParticle> m_mcParticles; /**< mc particle store array */
 
-    bool m_isSimulation;
+    bool m_isSimulation; /**< true if the module is run on simulated events*/
 
 
     std::string m_shapersName; /**< SVDShaperDigits name */
@@ -96,9 +92,8 @@ namespace Belle2 {
     TGraphErrors* m_gEff2; /**< efficiency graph */
     TGraphErrors* m_gEff; /**< efficiency graph */
 
-    TH1F* m_h1DigitsPerParticle;
-    TH1F* m_h1RecoTracksPerParticle;
-
+    TH1F* m_h1DigitsPerParticle; /**< number of digits per particle*/
+    TH1F* m_h1RecoTracksPerParticle; /**< number of reco tracks per particle*/
     TH1F* m_h1digiIn; /**< digits contained in ROI histogram*/
     TH1F* m_h1digiOut2; /**< lost digit: ROI exist with right vxdID */
     TH1F* m_h1digiOut3; /**< lost digit: ROI exist with wrong vxdID */
@@ -179,16 +174,16 @@ namespace Belle2 {
     TH1F* m_h1GlobalTime_out5; /**< distribution of global time for PDXDigits not contained in a ROI*/
 
     //ROI stuff
-    TH2F* m_h2ROIbottomLeft;
-    TH2F* m_h2ROItopRight;
-    TH2F* m_h2ROIuMinMax;
-    TH2F* m_h2ROIvMinMax;
+    TH2F* m_h2ROIbottomLeft; /**< bottom left corner coordinates*/
+    TH2F* m_h2ROItopRight; /**< top right corner coordinates*/
+    TH2F* m_h2ROIuMinMax; /**< min VS max of the U coordinate */
+    TH2F* m_h2ROIvMinMax; /**< min VS max of the V coordinate */
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/
     TH1F* m_h1totUstrips; /**< distribution of #u strips of all ROIs*/
     TH1F* m_h1totVstrips; /**< distribution of #u strips of all ROIs*/
 
-    TH1F* m_h1effPerTrack;
+    TH1F* m_h1effPerTrack; /**< efficiency per track */
 
 
 
@@ -220,10 +215,10 @@ namespace Belle2 {
     unsigned int n_notINtrack5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
 
 
-    unsigned int n_rois;
-    unsigned int n_OKrois;
-    unsigned int m_nGoodROIs;
-    unsigned int n_intercepts;
+    unsigned int n_rois; /**< numner of rois */
+    unsigned int n_OKrois; /**<  good rois (simulation) */
+    unsigned int m_nGoodROIs; /**< good rois (data) */
+    unsigned int n_intercepts; /**< number of intercepts*/
     unsigned int n_tracks; /**< number of tracks */
     unsigned int n_tracksWithDigits; /**< number of tracks with digits */
     unsigned int n_tracksWithDigitsInROI; /**< number of tracks with digits in ROI */
@@ -241,11 +236,11 @@ namespace Belle2 {
     unsigned int nnotINdigit3[6]; /**< number of lost digits in bins of pt: no hit, wrong vxdID*/
     unsigned int nnotINdigit4[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with correct vxdID*/
     unsigned int nnotINdigit5[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with wrong vxdID*/
-    unsigned int TrackOneDigiIn[6];
-    unsigned int nnotINtrack2[6];
-    unsigned int nnotINtrack3[6];
-    unsigned int nnotINtrack4[6];
-    unsigned int nnotINtrack5[6];
+    unsigned int TrackOneDigiIn[6]; /**<tracks with one digit in, in pT bins*/
+    unsigned int nnotINtrack2[6];  /**<tracks, inefficiency #2, in pT bins*/
+    unsigned int nnotINtrack3[6];   /**<tracks, inefficiency #3, in pT bins*/
+    unsigned int nnotINtrack4[6];   /**<tracks, inefficiency #4, in pT bins*/
+    unsigned int nnotINtrack5[6];   /**<tracks, inefficiency #5, in pT bins*/
 
   };
 

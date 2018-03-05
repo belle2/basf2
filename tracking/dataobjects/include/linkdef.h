@@ -32,6 +32,7 @@
 
 #pragma link C++ class Belle2::ROIid+;
 #pragma link C++ class Belle2::ROIpayload+;
+#pragma link C++ class Belle2::VXDIntercept+;
 #pragma link C++ class Belle2::PXDIntercept+;
 #pragma link C++ class Belle2::SVDIntercept+;
 #pragma link C++ class Belle2::RecoTrack+;

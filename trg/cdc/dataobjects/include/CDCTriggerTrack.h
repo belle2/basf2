@@ -2,6 +2,9 @@
 #define CDCTRIGGERTRACK_H
 
 #include <framework/dataobjects/Helix.h>
+#include <framework/geometry/BFieldManager.h>
+#include <framework/gearbox/Const.h>
+#include <TVector3.h>
 #include <cmath>
 
 namespace Belle2 {
@@ -42,6 +45,14 @@ namespace Belle2 {
     float getChi3D() const { return m_chi3D; }
     /** get the track found time */
     float getTime() const { return m_time; }
+    /** get the absolute value of the transverse momentum at the perigee
+        assuming d0 = 0
+     */
+    double getPt() const
+    {
+      const double bField = BFieldManager::getField(TVector3(0, 0, getZ0())).Z() / Unit::T;
+      return getTransverseMomentum(bField);
+    }
 
   protected:
     /** chi2 value from 2D fitter */

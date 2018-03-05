@@ -165,7 +165,7 @@ class Machine():
             for state in states:
                 self.add_state(state)
         if initial_state != "default_initial":
-            #: Initial state for this machine. Is actually a `property` decorator
+            #: Pointless docstring since it's a property
             self.initial_state = initial_state
         else:
             self.add_state(initial_state)

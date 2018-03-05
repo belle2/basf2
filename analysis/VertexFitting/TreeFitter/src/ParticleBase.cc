@@ -350,39 +350,27 @@ namespace TreeFitter {
       posx       = x_vec(row);
       momx       = p_vec(row);
       tau = tau_vec(row);
-      /**
-       * x is the decay vertex of the particle
-       * m the decay vertex of the mother
-       * p the momentum vector of the particle
-       * so in vectors:
-       *  m + p = x
-       * thus (tau converts p into units of length):
-       *  0 = x - m - tau * p
-       *  this means that the real decay length is l = tau * |p|
-       * */
-      //change only tau
+
       p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
 
       p.getH()(row, posindexmother + row) = 1;
-      p.getH()(row, momindex + row) = tau * momx * momx / mom3 ;
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex + row) = momx / mom;
-
-      //pos sign
-      //p.getResiduals()(row) = posxmother + tau * momx - posx ;
-      //p.getH()(row, posindexmother + row) = 1;
-      //p.getH()(row, momindex + row) = tau;
-      //p.getH()(row, posindex + row) = -1.;
-      //p.getH()(row, tauindex)       = momx;
-
-      //neg sign
-      //p.getResiduals()(row) = -posxmother - tau * momx + posx ;
-      //p.getH()(row, posindexmother + row) = -1;
-      //p.getH()(row, momindex + row) = -tau;
-      //p.getH()(row, posindex + row) = 1.;
-      //p.getH()(row, tauindex)       = -momx;
-
     }
+
+    p.getH()(0, momindex)   = tau_vec(0) * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
+    p.getH()(1, momindex + 1) = tau_vec(1) * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
+    p.getH()(2, momindex + 2) = tau_vec(2) * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
+
+
+    p.getH()(0, momindex + 1) = - tau_vec(0) * p_vec(0) * p_vec(1) / mom3 ;
+    p.getH()(0, momindex + 2) = - tau_vec(0) * p_vec(0) * p_vec(2) / mom3 ;
+
+    p.getH()(1, momindex + 0) = - tau_vec(1) * p_vec(1) * p_vec(0) / mom3 ;
+    p.getH()(1, momindex + 2) = - tau_vec(1) * p_vec(1) * p_vec(2) / mom3 ;
+
+    p.getH()(2, momindex + 0) = - tau_vec(2) * p_vec(2) * p_vec(0) / mom3 ;
+    p.getH()(2, momindex + 1) = - tau_vec(2) * p_vec(2) * p_vec(1) / mom3 ;
 
     return ErrCode::success;
   }

@@ -333,16 +333,9 @@ namespace TreeFitter {
     std::tuple<double, double> rc;
     const ParticleBase* pb = m_decaychain->locate(&cand);
 
-
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();
       const int momindex = pb->momIndex();
-
-      /**
-       * def tau: d_vec / |p_vec|  where d_vec = x_particle - x_mother
-       * thus t = l/|p_vec| * mass / c
-       * so no conversion or anything needed here
-       * */
 
       const Eigen::Matrix<double, 1, 3> tau_vec = m_fitparams->getStateVector().segment(tauindex, 3);
       const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(momindex, 3);
@@ -361,14 +354,20 @@ namespace TreeFitter {
       const double mom3 = absMom * absMom * absMom;
 
       const double t = absTau / absMom * mBYc;
+      //const double t = absTau / absMom * mBYc;
 
       Eigen::Matrix<double, 1, 6> jac = Eigen::Matrix<double, 1, 6>::Zero();
       jac(0) = tau_vec(0) / absTau * mBYc / absMom;
       jac(1) = tau_vec(1) / absTau * mBYc / absMom;
       jac(2) = tau_vec(2) / absTau * mBYc / absMom;
-      jac(3) = mom_vec(0) / mom3 * mBYc * absTau;
-      jac(4) = mom_vec(1) / mom3 * mBYc * absTau;
-      jac(5) = mom_vec(2) / mom3 * mBYc * absTau;
+
+      //jac(3) = -1* mom_vec(0) / mom3 * mBYc * absTau;
+      //jac(4) = -1* mom_vec(1) / mom3 * mBYc * absTau;
+      //jac(5) = -1* mom_vec(2) / mom3 * mBYc * absTau;
+
+      //jac(3) = -1* mom_vec(0) / mom3 * mBYc * absTau;
+      //jac(4) = -1* mom_vec(1) / mom3 * mBYc * absTau;
+      //jac(5) = -1* mom_vec(2) / mom3 * mBYc * absTau;
 
       const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
 
@@ -392,32 +391,32 @@ namespace TreeFitter {
       const int tauindex = pb->tauIndex();
       const int momindex = pb->momIndex();
 
-      const double tau   = fitparams->getStateVector()(tauindex);
       const Eigen::Matrix<double, 1, 3 >p_vec   = fitparams->getStateVector().segment(momindex, 3);
+      const Eigen::Matrix<double, 1, 3 >tau_vec   = fitparams->getStateVector().segment(tauindex, 3);
       const double mom   = p_vec.norm();
 
-      /**
-       * def tau: d_vec / |p_vec|  where d_vec = x_particle - x_mother
-       * l = tau * mom
-       * so we have to propagate the uncertainty of tau and p into the system of l
-       * */
-      const double len = tau * mom;
+      const double dp = p_vec * tau_vec.transpose();
+      const double len = dp / mom;
 
-      Eigen::Matrix<double, 4, 4 > cov4 = Eigen::Matrix<double, 4, 4 >::Zero(4, 4);
+      Eigen::Matrix<double, 6, 6 > cov6 = Eigen::Matrix<double, 6, 6 >::Zero(6, 6);
 
-      // build cov for all known errors starting with tau
-      cov4(0, 0) = fitparams->getCovariance()(tauindex, tauindex);
-      cov4.block<3, 3>(1, 1) = fitparams->getCovariance().block<3, 3>(momindex, momindex);
+      cov6.block<3, 3>(0, 0) = fitparams->getCovariance().block<3, 3>(tauindex, tauindex);
+      cov6.block<3, 3>(3, 3) = fitparams->getCovariance().block<3, 3>(momindex, momindex);
 
-      //jacobian: dl/dm | m={tau,px,py,pz}
-      Eigen::Matrix<double, 1, 4 > jac = Eigen::Matrix<double, 1, 4 >::Zero(1, 4);
-      jac(0) = mom; // dl/dtau
-      jac(1) = tau * p_vec(0) / mom; // dl/d_px
-      jac(2) = tau * p_vec(1) / mom;
-      jac(3) = tau * p_vec(2) / mom;
+      Eigen::Matrix<double, 1, 6 > jac = Eigen::Matrix<double, 1, 6 >::Zero(1, 6);
+      // d/dtau
+      jac(0) = p_vec(0) / mom;
+      jac(1) = p_vec(1) / mom;
+      jac(2) = p_vec(2) / mom;
 
-      // now rotate into system of l
-      const double lenErr = jac * cov4.selfadjointView<Eigen::Lower>() * jac.transpose();
+      const double px2 = p_vec(0) * p_vec(0);
+      const double py2 = p_vec(1) * p_vec(1);
+      const double pz2 = p_vec(2) * p_vec(2);
+      jac(3) = tau_vec(0) * (-px2 + py2 + pz2) - 2 * p_vec(0) * (tau_vec(1) * p_vec(1) + tau_vec(2) * p_vec(2));
+      jac(4) = tau_vec(1) * (-py2 + px2 + pz2) - 2 * p_vec(1) * (tau_vec(0) * p_vec(0) + tau_vec(2) * p_vec(2));
+      jac(5) = tau_vec(2) * (-pz2 + py2 + px2) - 2 * p_vec(2) * (tau_vec(1) * p_vec(1) + tau_vec(0) * p_vec(0));
+
+      const double lenErr = jac * cov6.selfadjointView<Eigen::Lower>() * jac.transpose();
 
       return std::make_tuple(len, lenErr);
     }

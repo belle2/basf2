@@ -159,12 +159,9 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-  //FullSim does not create a new collection.
   //For most of the cases, the module will reuse and update the existing one.
-
   //In case we simulate only beam background events using BG mixing or BG overlay
-  //there is no module to register them.
-  //Should have no effect if already registered.
+  //there is no module to register. Should have no effect if already registered.
   StoreArray<MCParticle>().registerInDataStore(m_mcParticleInputColName);
 
   //Make sure the EventMetaData collection already exists.

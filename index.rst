@@ -22,6 +22,7 @@ Belle 2 Software or for additional information, please
 .. toctree::
    :glob:
    :maxdepth: 2
+   :numbered:
 
    framework/doc/index*
    */doc/index*

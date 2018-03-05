@@ -33,6 +33,24 @@ namespace Belle2 {
     /// Pixels with higher occupancy are hot and will be masked
     float maxOccupancy;
 
+    /// Mask complete ucells with too high average occupancy after single pixel masking
+    bool maskUCells;
+
+    /// Minimum number of hits per uCell
+    int minHitsU;
+
+    /// Complete uCells with higher average occupancy are hot and will be masked
+    float maxOccupancyU;
+
+    /// Mask complete vcells with too high average occupancy after single pixel masking
+    bool maskVCells;
+
+    /// Minimum number of hits per vCell
+    int minHitsV;
+
+    /// Complete vCells with higher average occupancy are hot and will be masked
+    float maxOccupancyV;
+
   protected:
 
     /// Run algo on data

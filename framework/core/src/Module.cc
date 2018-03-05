@@ -438,7 +438,7 @@ less than 1, the execution will be diverted into ``another_path`` for this event
 
 You could for example set a special return value if an error occurs, and divert
 the execution into a path containing :b2:mod:`RootOutput` if it is found;
-saving only the data producing/ produced by the error.
+saving only the data producing/produced by the error.
 
 After a conditional path has executed, basf2 will by default stop processing
 the path for this event. This behaviour can be changed by setting the

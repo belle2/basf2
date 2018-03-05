@@ -14,12 +14,12 @@
 
 namespace Belle2 {
 
-  /** PXDIntercept stores the U,V coordinates and uncertainties of the intersection of a track
-   *   with an PXD sensor.
+  /** SVDIntercept stores the U,V coordinates and uncertainties of the intersection of a track
+   *   with an SVD sensor.
    */
-  class PXDIntercept : public VXDIntercept {
+  class SVDIntercept : public VXDIntercept {
 
     //! Needed to make the ROOT object storable
-    ClassDef(PXDIntercept, 1);
+    ClassDef(SVDIntercept, 1);
   };
 }

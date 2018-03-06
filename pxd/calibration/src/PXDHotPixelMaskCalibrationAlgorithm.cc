@@ -15,6 +15,7 @@
 #include <boost/format.hpp>
 #include <string>
 #include <vector>
+#include <map>
 #include "TH1I.h"
 
 using namespace std;
@@ -43,6 +44,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     return c_NotEnoughData;
   }
 
+  // This is the masking payload for conditions DB
   PXDMaskedPixelPar* maskedPixelsPar = new PXDMaskedPixelPar();
 
   // Loop over all sensor from collector
@@ -123,6 +125,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
         }
       }
     }
+  }
+
+  // After the masking is done, we compute the fraction of
+  // masked pixels per sensorID
+
+  for (auto elem : maskedPixelsPar->getMaskedPixelMap()) {
+    auto id = elem.first;
+    auto singles = elem.second;
+    B2RESULT("SensorID " << VxdID(id) << " has fraction of masked pixels of " << (float)singles.size() / (768 * 250));
   }
 
   // Save the hot pixel mask to database. Note that this will set the database object name to the same as the collector but you

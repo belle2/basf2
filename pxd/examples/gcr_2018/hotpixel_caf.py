@@ -32,13 +32,13 @@ hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration 
 # We can play around with hotpixelkiller parameters
 hotpixelkiller.minEvents = 1000          # Minimum number of events
 hotpixelkiller.minHits = 5               # Hot pixels have at least this numner of hits in all events
-hotpixelkiller.maxOccupancy = 5.0 / 1000   # Hot pixels occupancy exceeds this limit
+hotpixelkiller.maxOccupancy = 1e-5       # Hot pixels occupancy exceeds this limit
 hotpixelkiller.maskUCells = True
 hotpixelkiller.minHitsU = 20
-hotpixelkiller.maxOccupancyU = 0.0
+hotpixelkiller.maxOccupancyU = 1e-6
 hotpixelkiller.maskVCells = True
 hotpixelkiller.minHitsV = 20
-hotpixelkiller.maxOccupancyV = 0.0
+hotpixelkiller.maxOccupancyV = 1e-6
 # We want to use a specific collector
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 

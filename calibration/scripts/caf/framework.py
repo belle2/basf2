@@ -38,10 +38,6 @@ from caf.state_machines import CalibrationMachine, MachineError, ConditionError,
 
 class CalibrationBase(ABC, Thread):
     """
-    Parameters:
-        name (str): Name of this calibration object. Should be unique if you are going to run it.
-        input_files (list[str]): Input files for this calibration. May contain wildcard expressions useable by `glob.glob`.
-
     Abstract base class of Calibration types. The CAF implements the :py:class:`Calibration` class which inherits from
     this and runs the C++ CalibrationCollectorModule and CalibrationAlgorithm classes. But by inheriting from this
     class and providing the minimal necessary methods/attributes you could plug in your own Calibration types
@@ -49,6 +45,12 @@ class CalibrationBase(ABC, Thread):
 
     .. warning:: Writing your own class inheriting from :py:class:`CalibrationBase` class is not recommended!
                              But it's there if you really need it.
+
+    Parameters:
+        name (str): Name of this calibration object. Should be unique if you are going to run it.
+
+    Keyword Arguments:
+        input_files (list[str]): Input files for this calibration. May contain wildcard expressions useable by `glob.glob`.
     """
     #: The name of the successful completion state.
     #: The :py:class:`CAF` will use this as the state to decide when the Calibration is completed.
@@ -102,7 +104,11 @@ class CalibrationBase(ABC, Thread):
         pass
 
     def depends_on(self, calibration):
-        """Adds dependency of this calibration on another i.e. This calibration
+        """
+        Parameters:
+            calibration (`CalibrationBase`): The Calibration object which will produce constants that this one depends on.
+
+        Adds dependency of this calibration on another i.e. This calibration
         will not run until the dependency has completed, and the constants produced
         will be used via the database chain.
 
@@ -146,19 +152,18 @@ class CalibrationBase(ABC, Thread):
 
 class Calibration(CalibrationBase):
     """
-    Parameters:
-        name (str): Name of this calibration. It should be unique for use in the `CAF`
-        collector: Should be set to a CalibrationCollectorModule() or a string with the module name.
-        algorithms: Should be set to a CalibrationAlgorithm() or a `list` of them.
-        input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
-
     Every Calibration object must have a collector and at least one algorithm.
     You have the option to add in your collector/algorithm by argument here, or
     later by changing the properties.
 
-    A Calibration won't be valid in the `CAF` until it has all of these four attributes set.
+    Parameters:
+        name (str): Name of this calibration. It should be unique for use in the `CAF`
+    Keyword Arguments:
+        collector: Should be set to a CalibrationCollectorModule() or a string with the module name.
+        algorithms: Should be set to a CalibrationAlgorithm() or a `list` of them.
+        input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
 
-    Example:
+    A Calibration won't be valid in the `CAF` until it has all of these four attributes set. For example:
 
     >>> cal = Calibration('TestCalibration1')
     >>> col1 = register_module('CaTest')
@@ -306,17 +311,27 @@ class Calibration(CalibrationBase):
 
     def use_central_database(self, global_tag):
         """
-        Central database global tag to use for this calibration. Default is set from `basf2.get_default_global_tags`
-        If this is set manually it will override the default. To turn off central database usage you
-        should set this global tag to an empty string.
+        Parameters:
+            global_tag (str): The central database global tag to use for this calibration.
+
+        Using this allows you to set the central database for this calibration.
+        If you don't call this, the default is set from `basf2.get_default_global_tags`.
+        If this is set manually it will override the default.
+        To turn off central database completely you should set this global tag to an empty string.
         """
         self._global_tag = global_tag
 
     def use_local_database(self, filename, directory=""):
         """
-        Append a local database to the chain for this calibration. You can call this function multiple times and
-        each database will be added to the chain IN ORDER. The databases are applied to this calibration ONLY.
+        Parameters:
+            filename (str): The path to the database.txt of the local database
 
+        Keyword Argumemts:
+            directory (str): The path to the payloads directory for this local database.
+
+        Append a local database to the chain for this calibration.
+        You can call this function multiple times and each database will be added to the chain IN ORDER.
+        The databases are applied to this calibration ONLY.
         They are applied to the collector job and algorithm step as a database chain of the form:
 
         central DB Global tag (if used) -> these local databases -> CAF created local database constants
@@ -452,7 +467,8 @@ class Calibration(CalibrationBase):
 
     def run(self):
         """
-        Will be run in a new Thread by calling the start() method
+        Main logic of the Calibration object.
+        Will be run in a new Thread by calling the start() method.
         """
         self.machine.root_dir = os.path.join(os.getcwd(), self.name)
         self.machine.iov_to_calibrate = self.iov
@@ -491,13 +507,20 @@ class Calibration(CalibrationBase):
 
 class Algorithm():
     """
-    This is a simple wrapper class around the C++ CalibrationAlgorithm class. Helps to add
-    functionality to algorithms for use by the Calibration and CAF classes rather
+    Parameters:
+        algorithm: The CalibrationAlgorithm instance that we want to execute.
+    Keyword Arguments:
+        data_input (types.FunctionType): An optional function that sets the input files of the algorithm.
+        pre_algorithm (types.FunctionType): An optional function that runs just prior to execution of the algorithm.
+            Useful for set up e.g. module initialisation
+
+    This is a simple wrapper class around the C++ CalibrationAlgorithm class.
+    It helps to add functionality to algorithms for use by the Calibration and CAF classes rather
     than separating the logic into those classes directly.
 
-    This is *not* currently a class that a user should interact with much during `CAF`
-    setup. The `Calibration` class should be doing the most of the creation of the defaults for
-    these objects.
+    This is **not** currently a class that a user should interact with much during `CAF`
+    setup (unless you're doing something advanced).
+    The `Calibration` class should be doing the most of the creation of the defaults for these objects.
 
     Setting the `data_input` function might be necessary if you have set the `Calibration.output_patterns`.
     Also, setting the `pre_algorithm` to a function that should execute prior to each `strategies.AlgorithmStrategy`
@@ -542,8 +565,9 @@ class Algorithm():
 class CAF():
     """
     Parameters:
-      calibration_defaults (dict): A dictionary of default options for calibrations run by this `CAF` instance e.g.\
-    >>> calibration_defaults={"max_iterations":2}
+      calibration_defaults (dict): A dictionary of default options for calibrations run by this `CAF` instance e.g.
+
+                                   >>> calibration_defaults={"max_iterations":2}
 
     This class holds `Calibration` objects and processes them. It defines the initial configuration/setup
     for the calibrations. But most of the real processing is done through the `caf.state_machines.CalibrationMachine`.

@@ -50,6 +50,13 @@ Below is a simplified version of what is happening when `caf.framework.Calibrati
 The CAF Class
 -------------
 
+The :py:class:`caf.framework.CAF` class is essentially an overall configuration object for the calibrations you want
+to run in a single processing run.
+You add :py:class:`Calibration <caf.framework.Calibration>` objects to the CAF in order to have them run.
+The CAF will start them when their dependent calibrations have completed.
+The CAF also creates the overall output directory, checks the basic validity of calibrations (including cyclic-dependency)
+before running, and assigns some default options to calibrations if they weren't set in the calibration itself.
+
 .. figure:: caf_simple_design.png
     :width: 40em
     :align: center

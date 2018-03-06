@@ -42,13 +42,11 @@ class Job:
     This object basically holds necessary information about a process you want to submit to a `Backend`.
 
     Parameters:
-
         name (str): Simply a name to describe the Job, not used for any critical purpose in the CAF
-
+    Keyword Arguments:
         config_file (str): Optional path to a config file containing setup for the job. Generally used for basf2 setup.
-                           Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
-                           By default the backends.default_config_file is used.
-
+            Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
+            By default the backends.default_config_file is used.
 
     .. warning:: It is recommended to always use absolute paths for files when submitting a `Job`.
     """
@@ -267,17 +265,18 @@ class Backend(ABC):
 
 class Local(Backend):
     """
-    :param max_processes: Integer that specifies the size of the process pool that spawns the subjobs.
-        It's the maximium simultaneous subjobs. Try not to specify a large number or a number
-        larger than the number of cores. Won't crash the program but it will slow down
-        and negatively impact performance. Default = 1
-
     Backend for local processes i.e. on the same machine but in a subprocess.
 
     Note that you should call the self.join() method to close the pool and wait for any
     running processes to finish before exiting the process. Once you've called join you will have to set up a new
     instance of this backend to create a new pool. If you don't call `Local.join` or don't create a join yourself
     somewhere, then the main python process might end before your pool is done.
+
+    Keyword Arguments:
+        max_processes (int): Integer that specifies the size of the process pool that spawns the subjobs, default=1.
+            It's the maximium simultaneous subjobs.
+            Try not to specify a large number or a number larger than the number of cores.
+            It won't crash the program but it will slow down and negatively impact performance.
     """
 
     def __init__(self, max_processes=1):

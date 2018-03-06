@@ -2834,8 +2834,8 @@ Decay B-
 0.00075  D*+ pi- pi0      e-   anti-nu_e      PHOTOS  PHSP;
 0.00075  D*0 pi0 pi0      e-   anti-nu_e      PHOTOS  PHSP;
 # D_s(*)K l nu taken from PDG 2017
-0.0003   D_s*+  K-  e- anti-nu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well
-0.0003   D_s+   K-  e- anti-mu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
+0.0003   D_s*+  K-  e- anti-nu_e      PHOTOS PHSP;  
+0.0003   D_s+   K-  e- anti-nu_e      PHOTOS PHSP;  
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
 0.00460  D0  eta  e-   anti-nu_e      PHOTOS  PHSP;
 0.00460  D*0 eta  e-   anti-nu_e      PHOTOS  PHSP;
@@ -3871,7 +3871,7 @@ Decay B+
 0.00075  anti-D*0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
 # D_s(*)K l nu taken from PDG 2017
 0.0003   D_s*-  K+  e+ nu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well
-0.0003   D_s-   K+  e+ mu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
+0.0003   D_s-   K+  e+ nu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
 0.00460  anti-D0  eta  e+   nu_e      PHOTOS  PHSP;
 0.00460  anti-D*0 eta  e+   nu_e      PHOTOS  PHSP;
@@ -3898,7 +3898,7 @@ Decay B+
 0.00075  anti-D*0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
 # D_s(*)K l nu taken from PDG 2017
 0.0003   D_s*-  K+  mu+ nu_mu      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well
-0.0003   D_s-   K+  mu+ mu_mu      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
+0.0003   D_s-   K+  mu+ nu_mu      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
 0.00460  anti-D0  eta  mu+   nu_mu      PHOTOS  PHSP;
 0.00460  anti-D*0 eta  mu+   nu_mu      PHOTOS  PHSP;

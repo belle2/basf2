@@ -45,9 +45,6 @@ pdg.load(Belle2.FileSystem.findFile('/decfiles/dec/Y5S.pdl'))  # to load a diffe
 # detector simulation
 add_simulation(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # reconstruction
 add_reconstruction(main)
 

@@ -29,6 +29,8 @@ void SpacePointLoader::exposeParameters(ModuleParamList* moduleParamList, const 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAssignedHits"), m_param_useAssignedHits,
                                 "Use only already assigned hits",
                                 m_param_useAssignedHits);
+
+  m_storeArrayLoader.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "hits"));
 }
 
 void SpacePointLoader::apply(std::vector<const SpacePoint*>& spacePoints)

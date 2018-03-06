@@ -74,7 +74,7 @@ namespace eudaq {
       std::make_pair(WSAHOST_NOT_FOUND,  "Host not found"),
       std::make_pair(WSANO_DATA,         "No host data of that type was found")
     };
-    static const int k_NumMessages = sizeof g_ErrorList / sizeof* g_ErrorList;
+    static const int k_NumMessages = sizeof g_ErrorList / sizeof * g_ErrorList;
     std::map<int, std::string> g_ErrorCodes(g_ErrorList,
                                             g_ErrorList + k_NumMessages);
 
@@ -100,11 +100,13 @@ namespace eudaq {
 
     class WSAHelper {
     public:
-      WSAHelper() {
+      WSAHelper()
+      {
         WSAData wsadata;
         WSAStartup(MAKEWORD(2, 2), &wsadata);
       }
-      ~WSAHelper() {
+      ~WSAHelper()
+      {
         WSACleanup();
       }
     };

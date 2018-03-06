@@ -201,9 +201,15 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
   B2INFO("Write constants");
   write();
-  if (fabs(hm_All->GetMean()) < m_maxMeanDt && hm_All->GetRMS() < m_maxRMSDt) {
+
+
+  if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
+    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
+    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
     return c_OK;
   } else {
+    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
+    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
     return c_Iterate;
   }
 }

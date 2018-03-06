@@ -8,7 +8,8 @@ namespace depfet {
 
   class DEPFETADCValues: public std::vector< std::vector<uint16_t> > {
   public:
-    DEPFETADCValues(): std::vector< std::vector<uint16_t> >(4, std::vector<uint16_t>(0, 0)), m_moduleNr(0), m_triggerNr(0), m_startGate(-1) {}
+    DEPFETADCValues(): std::vector< std::vector<uint16_t> >(4, std::vector<uint16_t>(0, 0)), m_moduleNr(0), m_triggerNr(0),
+      m_startGate(-1) {}
     int getModuleNr() const { return m_moduleNr; }
     int getTriggerNr() const { return m_triggerNr; }
     int getStartGate() const { return m_startGate; }

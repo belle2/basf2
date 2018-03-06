@@ -3,20 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric,  Dan Santel                                *
+ * Contributors: Marko Staric, Dan Santel, Boqun Wang                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
-
-// I copied 6 lines below from PXDDQMModule.h - is it realy needed?
-#undef DQM
-#ifndef DQM
-#include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 
 #include <framework/core/Module.h>
 #include <string>
@@ -93,9 +85,6 @@ namespace Belle2 {
     bool m_usePionID; /**< use pion ID in track selection */
 
     // histograms
-    TH1F* m_barHits = 0;  /**< number of hits per bar */
-    std::vector<TH1F*> m_pixelHits; /**< number of hits per pixel for each bar */
-    std::vector<TH1F*> m_hitTimes;  /**< time distribution for each bar */
     TH1F* m_recoTime = 0;           /**< time distribution */
     TH1F* m_recoTimeBg = 0;         /**< time distribution background */
     TH1F* m_recoTimeMinT0 = 0;      /**< time distribution in respect to the first peak */
@@ -103,6 +92,20 @@ namespace Belle2 {
     TH1F* m_recoPull = 0;           /**< pull distribution */
     TH2F* m_recoTimeDiff_Phic = 0;  /**< residuals vs phiCer */
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
+
+    TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
+    TH1F* m_badHits = nullptr; /**< Histogram for number of accumulated bad hits */
+    std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/
+    std::vector<TH2F*> m_badHitsXY; /**< Histograms (2D) for bad hits in x-y*/
+    std::vector<TH2F*> m_goodHitsAsics; /**< Histograms (2D) for good hits for asics*/
+    std::vector<TH2F*> m_badHitsAsics; /**< Histograms (2D) for bad hits for asics*/
+    std::vector<TH1F*> m_goodTdc; /**< Histograms for TDC distribution of good hits*/
+    std::vector<TH1F*> m_badTdc; /**< Histograms for TDC distribution of bad hits*/
+    std::vector<TH1F*> m_goodTiming; /**< Histograms for timing distribution of good hits*/
+    std::vector<TH1F*> m_goodChannelHits; /**< Histograms for good channel hits*/
+    std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits*/
+    std::vector<TH1F*> m_goodHitsPerEvent; /**< Histograms for good hits per event*/
+    std::vector<TH1F*> m_badHitsPerEvent; /**< Histograms for bad hits per event*/
 
     // other
     int m_numModules = 0; /**< number of TOP modules */

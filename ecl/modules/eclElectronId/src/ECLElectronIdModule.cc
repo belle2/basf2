@@ -16,6 +16,7 @@
 #include <ecl/electronId/ECLElectronPdf.h>
 #include <ecl/electronId/ECLPionPdf.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -82,10 +83,10 @@ void ECLElectronIdModule::event()
     int nClusters = relShowers.size();
 
     for (const auto& eclShower : relShowers) {
-      //////////Cate's addition///////////
-      if (eclShower.getHypothesisId() != 5) continue;
+
+      if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
       if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
-      ////////////////////////////////////
+
       const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;
       if (shEnergy > maxEnergy) {

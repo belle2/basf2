@@ -817,10 +817,10 @@ namespace Belle2 {
       if ((listZ0[i] > 0.1 || listD0[i] > 0.1) && listTracks[i] != 0) eliminateTrack(listTracks, i);
     }
 
-    B2DEBUG(1, "Required PXD hits " << reqPXDHits);
+    B2DEBUG(10, "Required PXD hits " << reqPXDHits);
     for (unsigned i = 0; i < listTracks.size(); i++) {
       if (listNPXDHits[i] < reqPXDHits) {
-        B2DEBUG(1, "Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
+        B2DEBUG(10, "Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
         eliminateTrack(listTracks, i);
       }
     }

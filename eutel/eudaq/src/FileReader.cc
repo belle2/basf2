@@ -17,7 +17,8 @@ namespace eudaq {
 
   struct FileReader::eventqueue_t {
     struct item_t {
-      item_t(DetectorEvent* ev = 0) : event(ev) {
+      item_t(DetectorEvent* ev = 0) : event(ev)
+      {
         if (ev) {
           for (size_t i = 0; i < ev->NumEvents(); ++i) {
             triggerids.push_back(PluginManager::GetTriggerID(*ev->GetEvent(i)));
@@ -29,7 +30,8 @@ namespace eudaq {
     };
     eventqueue_t(unsigned numproducers = 0)
       : offsets(numproducers, items.end()), firstid((unsigned) - 1), lastid(0) {}
-    bool isempty() const {
+    bool isempty() const
+    {
       for (size_t i = 0; i < offsets.size(); ++i) {
         if (events(i) == 0) {
           return true;
@@ -37,12 +39,14 @@ namespace eudaq {
       }
       return false;
     }
-    size_t events(size_t producer) const {
+    size_t events(size_t producer) const
+    {
       std::list<item_t>::const_iterator it = iter(producer, -1);
       if (it == items.begin()) return 0;
       return std::distance(items.begin(), it);
     }
-    size_t fullevents() const {
+    size_t fullevents() const
+    {
       size_t min = events(0);
       for (size_t i = 1; i < offsets.size(); ++i) {
         size_t evts = events(i);
@@ -50,14 +54,17 @@ namespace eudaq {
       }
       return min;
     }
-    void push(eudaq::Event* ev) {
+    void push(eudaq::Event* ev)
+    {
       DetectorEvent* dev = dynamic_cast<DetectorEvent*>(ev);
       items.push_front(item_t(dev));
     }
-    void discardevent(size_t producer) {
+    void discardevent(size_t producer)
+    {
       --offsets[producer];
     }
-    int clean_back() {
+    int clean_back()
+    {
       int result = 0;
       bool done = false;
       while (!done) {
@@ -75,7 +82,8 @@ namespace eudaq {
       }
       return result;
     }
-    eudaq::DetectorEvent* popevent() {
+    eudaq::DetectorEvent* popevent()
+    {
       unsigned run = getevent(0).GetRunNumber();
       unsigned evt = getevent(0).GetEventNumber();
       unsigned long long ts = NOTIMESTAMP;
@@ -111,7 +119,8 @@ namespace eudaq {
       } while (more);
       return dev;
     }
-    void debug(std::ostream& os) const {
+    void debug(std::ostream& os) const
+    {
       os << "empty=" << (isempty() ? "yes" : "no") << std::flush;
       os << " fullevents=" << fullevents() << std::flush
          << " events=" << events(0) << std::flush;
@@ -119,7 +128,8 @@ namespace eudaq {
         os << "," << events(i) << std::flush;
       }
     }
-    std::list<item_t>::const_iterator iter(size_t producer, int offset = 0) const {
+    std::list<item_t>::const_iterator iter(size_t producer, int offset = 0) const
+    {
       std::list<item_t>::const_iterator it = offsets.at(producer);
       for (int i = 0; i <= offset; ++i) {
         if (it == items.begin()) EUDAQ_THROW("Bad offset in ResyncTLU routine");
@@ -127,17 +137,20 @@ namespace eudaq {
       }
       return it;
     }
-    unsigned getid(size_t producer, size_t offset = 0) const {
+    unsigned getid(size_t producer, size_t offset = 0) const
+    {
       unsigned diff = 0;
       if (firstid != (unsigned) - 1 && getevent(producer).get_id() == TLUID) {
         diff = firstid;
       }
       return (iter(producer, offset)->triggerids[producer] + diff) & IDMASK;
     }
-    const eudaq::Event& getevent(size_t producer, int offset = 0) const {
+    const eudaq::Event& getevent(size_t producer, int offset = 0) const
+    {
       return *iter(producer, offset)->event->GetEvent(producer);
     }
-    unsigned producers() const {
+    unsigned producers() const
+    {
       return offsets.size();
     }
     std::list<item_t> items;

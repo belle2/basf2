@@ -28,7 +28,6 @@ bool DataStorePackage::restore()
     m_data_hlt.setBuffer(m_data.getBuffer());
   } else if (m_eb2 > 0 || nboard > 1) {
     m_data_hlt.setBuffer(m_data.getBody());
-    //(m_sndhdrary.appendNew())->SetBuffer(m_data_hlt.getBuffer());
   }
 
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
@@ -41,20 +40,25 @@ bool DataStorePackage::restore()
     delete msg;
     return false;
   }
+  //B2INFO("nbyte : " << m_data_hlt.getBody()[0]);
   m_streamer->restoreDataStore(msg);
   delete msg;
   if (nboard > 1) {
-    m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());
-    if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {
-      B2FATAL("Bad ONSEN magic for PXD = " << m_data_pxd.getTrailerMagic());
-      return false;
-    } else if (m_data_pxd.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-      B2FATAL("Bad tarailer magic for PXD = " << m_data_pxd.getTrailerMagic());
-      return false;
-    }
-    if (m_data_pxd.getBuffer() != NULL) {
-      m_rawpxdary.appendNew((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize());
-      //(m_sndhdrary.appendNew())->SetBuffer(m_data_pxd.getBuffer());
+    unsigned int offset = m_data_hlt.getWordSize() + m_data.getHeaderWordSize();
+    for (unsigned int i = 0; i < nboard - 1; i++) {
+      m_data_pxd.setBuffer(m_data.getBuffer() + offset);
+      offset += m_data_pxd.getWordSize();
+      if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {
+        B2FATAL("Bad ONSEN magic for PXD = " << m_data_pxd.getTrailerMagic());
+        return false;
+      } else if (m_data_pxd.getTrailerMagic() != BinData::TRAILER_MAGIC) {
+        B2FATAL("Bad tarailer magic for PXD = " << m_data_pxd.getTrailerMagic());
+        return false;
+      }
+      if (m_data_pxd.getBuffer() != NULL) {
+        m_rawpxdary.appendNew((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize());
+        //(m_sndhdrary.appendNew())->SetBuffer(m_data_pxd.getBuffer());
+      }
     }
   } else {
     m_data_pxd.setBuffer(NULL);

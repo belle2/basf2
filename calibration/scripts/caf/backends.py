@@ -17,7 +17,7 @@ import pathlib
 
 import ROOT
 
-__all__ = ['Job', 'Local', 'LSF', 'PBS', 'Batch', 'Backend']
+__all__ = ['Job', 'Backend', 'Local', 'Batch', 'LSF', 'PBS']
 
 #: default configuration file location
 default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/backends.cfg')
@@ -38,20 +38,24 @@ def get_input_data():
 
 class Job:
     """
-    Generic Job object used to tell a Backend what to do.
-    - This is a way to store necessary information about a process for
-    submission and pass it in one object to a backend, rather than having
-    the framework set each parameter directly.
-    - Hopefully means that ANY use case can be more easily supported,
-    not just the CAF. You just have to fill a job object and pass it to a
-    Backend for the job submission to work.
-    - Use absolute paths for all directories, otherwise you'll likely get into trouble
+    This generic Job object is used to tell a Backend what to do.
+    This object basically holds necessary information about a process you want to submit to a `Backend`.
+
+    Parameters:
+        name (str): Simply a name to describe the Job, not used for any critical purpose in the CAF
+    Keyword Arguments:
+        config_file (str): Optional path to a config file containing setup for the job. Generally used for basf2 setup.
+            Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
+            By default the backends.default_config_file is used.
+
+    .. warning:: It is recommended to always use absolute paths for files when submitting a `Job`.
     """
 
     class SubJob():
         """
-        SubJob class. Meant to simply hold basic information about which subjob you are
+        This mini-class simply holds basic information about which subjob you are
         and a reference to the parent Job object to be able to access the main data there.
+        Rather than replicating all of the parent job's configuration again.
         """
 
         def __init__(self, job, subjob_id, input_files=None):
@@ -63,6 +67,9 @@ class Job:
             self.parent = job
             #: Input files specific to this subjob
             self.input_files = input_files
+            #: The result object of this SubJob. Only filled once the parent `Job` object is submitted to a backend
+            #: since the backend creates a special result class depending on its type.
+            self.result = None
 
         @property
         def output_dir(self):
@@ -99,14 +106,6 @@ class Job:
 
     def __init__(self, name, config_file=""):
         """
-        Init method of Job object.
-        Params:
-
-        name = <str>  simply a name to describe the Job, not used for any critical purpose in the CAF
-
-        config_file = <str>  Optional path to a config file containing setup for the job. Generally used for basf2 setup.
-                             Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
-                             By default the backends.default_config_file is used.
         """
         #: Job object's name. Only descriptive, not necessarily unique.
         self.name = name
@@ -137,6 +136,10 @@ class Job:
         self.max_files_per_subjob = -1
         #: dict of subjobs assigned to this job
         self.subjobs = {}
+        #: The result object of this Job. Only filled once the job is submitted to a backend since the backend creates a special
+        #: result class depending on its type. This is also only filled for an overall `Job()` if there are no subjobs.
+        #: If there are subjobs, those will contain the result instead.
+        self.result = None
 
     def __repr__(self):
         """
@@ -224,9 +227,10 @@ class Job:
 
 class Backend(ABC):
     """
-    Base class for backend of CAF.
+    Abstract base class for a valid backend.
     Classes derived from this will implement their own submission of basf2 jobs
-    to whatever backend they describe. Common methods/attributes go here.
+    to whatever backend they describe.
+    Some common methods/attributes go into this base class.
     """
     #: Default submission script name
     submit_script = "submit.sh"
@@ -261,17 +265,18 @@ class Backend(ABC):
 
 class Local(Backend):
     """
-    :param max_processes: Integer that specifies the size of the process pool that spawns the subjobs.
-        It's the maximium simultaneous subjobs. Try not to specify a large number or a number
-        larger than the number of cores. Won't crash the program but it will slow down
-        and negatively impact performance. Default = 1
-
     Backend for local processes i.e. on the same machine but in a subprocess.
 
     Note that you should call the self.join() method to close the pool and wait for any
     running processes to finish before exiting the process. Once you've called join you will have to set up a new
     instance of this backend to create a new pool. If you don't call `Local.join` or don't create a join yourself
     somewhere, then the main python process might end before your pool is done.
+
+    Keyword Arguments:
+        max_processes (int): Integer that specifies the size of the process pool that spawns the subjobs, default=1.
+            It's the maximium simultaneous subjobs.
+            Try not to specify a large number or a number larger than the number of cores.
+            It won't crash the program but it will slow down and negatively impact performance.
     """
 
     def __init__(self, max_processes=1):

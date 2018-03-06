@@ -11,6 +11,7 @@
 #pragma link C++ class Belle2::MuidHit+;
 #pragma link C++ class Belle2::TrackClusterSeparation+;
 #pragma link C++ class Belle2::V0ValidationVertex+;
+#pragma link C++ class Belle2::FullSecID+;
 
 #pragma link C++ class pair <bool, double>+;
 #pragma link C++ class pair <bool, int>+;
@@ -31,7 +32,9 @@
 
 #pragma link C++ class Belle2::ROIid+;
 #pragma link C++ class Belle2::ROIpayload+;
+#pragma link C++ class Belle2::VXDIntercept+;
 #pragma link C++ class Belle2::PXDIntercept+;
+#pragma link C++ class Belle2::SVDIntercept+;
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
 #pragma link C++ class Belle2::SectorMapConfig+;

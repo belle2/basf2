@@ -41,6 +41,12 @@ namespace Belle2 {
     void event() override;
 
   protected:
+
+    /** Compile a regex expression and catch the exception if the regex
+     * string is not valid.
+     */
+    std::regex compileAndCatch(std::string& regexString) const;
+
     /** Storing the option of branches to keep */
     std::vector<std::string> m_matchEntries;
 

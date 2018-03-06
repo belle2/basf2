@@ -1,6 +1,6 @@
-#include "daq/rfarm/manager/RFRunControlCallback.h"
+#include "daq/slc/apps/rfarm/RFRunControlCallback.h"
 
-#include "daq/rfarm/manager/RFMasterCallback.h"
+#include "daq/slc/apps/rfarm/RFMasterCallback.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 

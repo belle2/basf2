@@ -1,7 +1,5 @@
-#include "daq/rfarm/manager/RFMasterCallback.h"
-
-#include "daq/rfarm/manager/RFRunControlCallback.h"
-#include "daq/rfarm/manager/RFCommand.h"
+#include "daq/slc/apps/rfarm/RFMasterCallback.h"
+#include "daq/slc/apps/rfarm/RFRunControlCallback.h"
 #include "daq/rfarm/manager/RfNodeInfo.h"
 #include "daq/rfarm/manager/RfUnitInfo.h"
 
@@ -15,16 +13,12 @@
 
 using namespace Belle2;
 
-RFMasterCallback::RFMasterCallback() throw() : m_callback(NULL)
+RFMasterCallback::RFMasterCallback(ConfigFile& config) throw() : m_callback(NULL)
 {
-  reg(RFCommand::CONFIGURE);
-  reg(RFCommand::UNCONFIGURE);
-  reg(RFCommand::START);
-  reg(RFCommand::STOP);
-  reg(RFCommand::RESUME);
-  reg(RFCommand::PAUSE);
-  reg(RFCommand::RESTART);
-  reg(RFCommand::STATUS);
+  m_rcnode = NSMNode(config.get("hlt.rcnode"));
+  m_script = config.get("hlt.script");
+  m_script_noroi = config.get("hlt.script.noroi");
+  m_script_sendroi = config.get("hlt.script.sendroi");
 }
 
 void RFMasterCallback::initialize(const DBObject& obj) throw(RCHandlerException)
@@ -87,6 +81,9 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerText(vname + ".rcstate", true, false, s.getLabel()));
     add(new NSMVHandlerText(vname + ".rcconfig", true, false, rcconf));
   }
+  add(new NSMVHandlerText("hlt.script", true, true, m_script));
+  add(new NSMVHandlerText("hlt.script.noroi", true, true, m_script_noroi));
+  add(new NSMVHandlerText("hlt.script.sendroi", true, true, m_script_sendroi));
 }
 
 void RFMasterCallback::setState(NSMNode& node, const RCState& state)
@@ -131,7 +128,7 @@ void RFMasterCallback::monitor() throw(RCHandlerException)
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
     if (count % 60 == 59 || node.getState() == RCState::UNKNOWN) {
-      if (NSMCommunicator::send(NSMMessage(node, RFCommand::STATUS))) {
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::STATUS))) {
       } else {
         setState(node, RCState::UNKNOWN);
       }
@@ -180,6 +177,14 @@ void RFMasterCallback::error(const char* nodename, const char* data) throw()
 
 void RFMasterCallback::load(const DBObject& db) throw(RCHandlerException)
 {
+  m_pxd_used = 0;
+  if (m_rcnode.getName().size() > 0) {
+    try {
+      get(m_rcnode, "RUNCONTROL@pxd.used", m_pxd_used);
+    } catch (const TimeoutException& e) {
+      LogFile::warning("failed to read pxd.used on " + m_rcnode.getName());
+    }
+  }
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
     if (node.getName().find("EVP") == std::string::npos) {
@@ -199,7 +204,21 @@ void RFMasterCallback::load(const DBObject& db) throw(RCHandlerException)
     if (node.getState() != RCState::READY_S) {
       if (node.getName() == "ROISENDER") {
         std::string enabled = std::string("ROI=") + db("roisender").getText("enabled");
-        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD, enabled))) {
+        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD/*,std::string(m_pxd_used?"roisw=yes":"roisw=no")*/))) {
+          setState(node, RCState::LOADING_TS);
+          LogFile::debug("%s >> LOADING", node.getName().c_str());
+        } else {
+          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        }
+      } else if (node.getName() == "COLLECTOR") {
+        std::string script;
+        if (m_pxd_used) {
+          get("hlt.script.sendroi", script);
+        } else {
+          get("hlt.script.noroi", script);
+        }
+        LogFile::info(node.getName() + "<<" + script);
+        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD, script))) {
           setState(node, RCState::LOADING_TS);
           LogFile::debug("%s >> LOADING", node.getName().c_str());
         } else {
@@ -297,11 +316,23 @@ void RFMasterCallback::start(int expno, int runno) throw(RCHandlerException)
       }
     }
     if (node.getState() != RCState::RUNNING_S) {
-      if (NSMCommunicator::send(NSMMessage(node, RCCommand::START, 2, pars))) {
-        setState(node, RCState::STARTING_TS);
-        LogFile::debug("%s >> STARTING", node.getName().c_str());
+      std::string script;
+      if (node.getName().find("EVP") != std::string::npos) {
+        get("hlt.script", script);
+        LogFile::info(node.getName() + "<<" + script);
+        if (NSMCommunicator::send(NSMMessage(node, RCCommand::START, 2, pars, script))) {
+          setState(node, RCState::STARTING_TS);
+          LogFile::debug("%s >> STARTING (script=%s)", node.getName().c_str(), script.c_str());
+        } else {
+          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        }
       } else {
-        throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        if (NSMCommunicator::send(NSMMessage(node, RCCommand::START, 2, pars))) {
+          setState(node, RCState::STARTING_TS);
+          LogFile::debug("%s >> STARTING (script=%s)", node.getName().c_str(), script.c_str());
+        } else {
+          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        }
       }
     } else {
       LogFile::debug("%s is RUNNING", node.getName().c_str());

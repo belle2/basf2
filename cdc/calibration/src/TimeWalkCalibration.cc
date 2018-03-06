@@ -120,7 +120,7 @@ bool TimeWalkCalibration::calibrate()
     //if number of poist after slide fit quite low, ignore
     if (m_h1[ib]->GetEntries() < 5) {
       m_flag[ib] = 0;
-      B2WARNING("Low statistic, number of points after slide fit: " << m_h1[ib]->GetEntries());
+      B2WARNING("Low statistic, number of points after slice fit: " << m_h1[ib]->GetEntries());
       continue;
     }
 
@@ -137,7 +137,7 @@ bool TimeWalkCalibration::calibrate()
     else if (m_twParamMode_new == 1) {
       fitToExponentialFunc(m_h1[ib]);//do fitting for mode 1
     } else {
-      B2FATAL("Mode " << m_twParamMode_new << " is not available, please check");
+      B2FATAL("Mode " << m_twParamMode_new << " is not available, please check again");
     }
 
     // read fitted parameters
@@ -177,7 +177,7 @@ bool TimeWalkCalibration::calibrate()
       }
     }
     fhist->Close();
-    B2INFO("All hitograms are stored");
+    B2INFO("All hitograms were stored");
   }
   Write();
   updateT0();
@@ -185,7 +185,7 @@ bool TimeWalkCalibration::calibrate()
 }
 void TimeWalkCalibration::Write()
 {
-  B2INFO("update time walk params");
+  B2INFO("Store calibrated time walk parameters");
   int nfailure(-1);//for no exist board; board 0;
   //  CDCTimeWalks* dbTw = new CDCTimeWalks();
   DBImportObjPtr<CDCTimeWalks> dbTw;
@@ -250,7 +250,7 @@ void TimeWalkCalibration::updateT0()
                            m_lastExperiment, m_lastRun);
     tz.import(iov);
   }
-  B2RESULT("update constant term of tw correction to T0 constant.");
+  B2RESULT("updated constant term of tw correction to T0 constant.");
 }
 void TimeWalkCalibration::fitToExponentialFunc(TH1D* h1)
 {

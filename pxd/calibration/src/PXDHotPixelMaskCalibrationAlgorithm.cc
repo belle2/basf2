@@ -24,8 +24,9 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  minEvents(10000), minHits(5), maxOccupancy(0.00001), maskUCells(false), minHitsU(200), maxOccupancyU(0.00001), maskVCells(false),
-  minHitsV(50), maxOccupancyV(0.00001)
+  minEvents(10000), minHits(5), maxOccupancy(0.00001), maskDrains(false), minHitsDrain(200), maxOccupancyDrain(0.00001),
+  maskRows(false),
+  minHitsRow(50), maxOccupancyRow(0.00001)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
@@ -61,11 +62,11 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     // Check if there was data collected for this sensor
     if (collector_pxdhitmap == nullptr) continue;
 
-    vector<float> unmaskedHitsAlongU(250, 0);
-    vector<int> unmaskedCellsAlongU(250, 0);
+    vector<float> unmaskedHitsAlongDrain(1000, 0);
+    vector<int> unmaskedCellsAlongDrain(1000, 0);
 
-    vector<float> unmaskedHitsAlongV(768, 0);
-    vector<int> unmaskedCellsAlongV(768, 0);
+    vector<float> unmaskedHitsAlongRow(768, 0);
+    vector<int> unmaskedCellsAlongRow(768, 0);
 
     // Mask all hot pixel for this sensor
     for (auto bin = 1; bin <= collector_pxdhitmap->GetXaxis()->GetNbins(); bin++) {
@@ -73,6 +74,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       int pixID = bin - 1;
       int uCell = pixID / 768;
       int vCell = pixID % 768;
+      int drainID = uCell * 4 + vCell % 4;
+
       // First, we mask single pixels exceeding occupancy threshold
       float nhits = (float) collector_pxdhitmap->GetBinContent(bin);
       bool masked = false;
@@ -87,40 +90,42 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       // Then we accumulate hits along u and v direction for unmasked
       // pixels
       if (not masked) {
-        ++unmaskedCellsAlongU[uCell];
-        unmaskedHitsAlongU[uCell] += nhits;
-        ++unmaskedCellsAlongV[vCell];
-        unmaskedHitsAlongV[vCell] += nhits;
+        ++unmaskedCellsAlongDrain[drainID];
+        unmaskedHitsAlongDrain[drainID] += nhits;
+        ++unmaskedCellsAlongRow[vCell];
+        unmaskedHitsAlongRow[vCell] += nhits;
       }
     }
 
-    if (maskUCells) {
-      for (auto uCell = 0; uCell < 250; uCell++) {
-        if (unmaskedHitsAlongU[uCell] > minHitsU && unmaskedCellsAlongU[uCell] > 0) {
-          // Compute average occupancy per uCell
-          float occupancy = unmaskedHitsAlongU[uCell] / unmaskedCellsAlongU[uCell];
-          // Mask residual hot uCell
-          if (occupancy > maxOccupancyU) {
-            for (auto vCell = 0; vCell < 768; vCell++)
+    if (maskDrains) {
+      for (auto drainID = 0; drainID < 1000; drainID++) {
+        if (unmaskedHitsAlongDrain[drainID] > minHitsDrain && unmaskedCellsAlongDrain[drainID] > 0) {
+          // Compute average occupancy per drain
+          float occupancy = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID];
+          // Mask residual hot drain
+          if (occupancy > maxOccupancyDrain) {
+            for (auto iGate = 0; iGate < 192; iGate++) {
+              int uCell = drainID / 4;
+              int vCell = drainID % 4 + iGate * 4;
               maskedPixelsPar->maskSinglePixel(id.getID(),  uCell * 768 + vCell);
-
-            B2RESULT("Masking complete ucell=" << uCell << " on sensor " << id);
+            }
+            B2RESULT("Masking drain line at with drainID=" << drainID << " on sensor " << id);
           }
         }
       }
     }
 
-    if (maskVCells) {
+    if (maskRows) {
       for (auto vCell = 0; vCell < 768; vCell++) {
-        if (unmaskedHitsAlongV[vCell] > minHitsV && unmaskedCellsAlongV[vCell] > 0) {
-          // Compute average occupancy per vCell
-          float occupancy = unmaskedHitsAlongV[vCell] / unmaskedCellsAlongV[vCell];
-          // Mask residual hot vCell
-          if (occupancy > maxOccupancyV) {
+        if (unmaskedHitsAlongRow[vCell] > minHitsRow && unmaskedCellsAlongRow[vCell] > 0) {
+          // Compute average occupancy per row
+          float occupancy = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell];
+          // Mask residual hot row
+          if (occupancy > maxOccupancyRow) {
             for (auto uCell = 0; uCell < 250; uCell++)
               maskedPixelsPar->maskSinglePixel(id.getID(),  uCell * 768 + vCell);
 
-            B2RESULT("Masking complete vCell=" << vCell << " on sensor " << id);
+            B2RESULT("Masking complete row with vCell=" << vCell << " on sensor " << id);
           }
         }
       }

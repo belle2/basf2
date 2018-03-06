@@ -34,7 +34,10 @@
 // DB objects
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
+#include <top/dbobjects/TOPCalChannelPulseHeight.h>
+#include <top/dbobjects/TOPCalChannelThresholdEff.h>
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPPmtInstallation.h>
@@ -46,6 +49,7 @@
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <map>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -56,7 +60,6 @@ using namespace std;
 namespace Belle2 {
 
   using namespace TOP;
-
 
   void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
   {
@@ -260,6 +263,56 @@ namespace Belle2 {
 
     B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: "
              << nCalTot << "/ 8192");
+  }
+
+
+
+  void TOPDatabaseImporter::importModuleT0Calibration(string fileName)
+  {
+
+
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+
+
+    ifstream inFile(fileName);
+    B2INFO("--> Opening constants file " << fileName);
+
+    if (!inFile) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO("--> " << fileName << ": open for reading");
+
+
+    B2INFO("--> importing constants");
+
+    while (!inFile.eof()) {
+      int slot = 0;
+      int dummy = 0;
+      double T0 = 0;
+      double T0_err = 0;
+
+      inFile >> slot >> dummy >> T0 >> T0_err;
+      if (slot < 1 or slot > 16) {
+        B2ERROR("Module ID is not valid. Skipping the entry.");
+        continue;
+      }
+      moduleT0->setT0(slot, T0, T0_err);
+
+    }
+    inFile.close();
+    B2INFO("--> Input file closed");
+
+    IntervalOfValidity iov(0, 0, -1, -1);
+    moduleT0.import(iov);
+
+    B2INFO("Summary: ");
+    for (int iSlot = 1; iSlot < 17; iSlot++) {
+      B2INFO("--> Time offset of Slot " << iSlot << " = " << moduleT0->getT0(iSlot));
+    }
+
+
   }
 
 
@@ -712,6 +765,82 @@ namespace Belle2 {
     Database::Instance().storeData("TOPPmtTTSHistos", &pmtTtsHistos, iov);
 
     B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
+
+    return;
+  }
+
+  void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName)
+  {
+    // declare db objects to be imported
+    DBImportObjPtr<TOPCalChannelPulseHeight> calChannelPulseHeight;
+    DBImportObjPtr<TOPCalChannelThresholdEff> calChannelThresholdEff;
+    calChannelPulseHeight.construct();
+    calChannelThresholdEff.construct();
+
+    TFile* f = new TFile(fileName.c_str());
+    TTree* tr = (TTree*)f->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
+
+    short slotId = 0;
+    short pixelId = 0;
+    float p1 = -1;
+    float p2 = -1;
+    float x0 = -1;
+    float threshold = -1;
+    float efficiency = -1;
+    float chisquare = -1;
+    int ndf = 0;
+    tr->SetBranchAddress("slotId", &slotId);
+    tr->SetBranchAddress("pixelId", &pixelId);
+    tr->SetBranchAddress("p1UseIntegral", &p1);
+    tr->SetBranchAddress("p2UseIntegral", &p2);
+    tr->SetBranchAddress("x0UseIntegral", &x0);
+    tr->SetBranchAddress("thresholdForIntegral", &threshold);
+    tr->SetBranchAddress("efficiencyUseIntegral", &efficiency);
+    tr->SetBranchAddress("chisquareUseIntegral", &chisquare);
+    tr->SetBranchAddress("ndfUseIntegral", &ndf);
+
+    const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+    if (!channelMapper.isValid()) {
+      B2ERROR("No valid channel mapper found");
+      return;
+    }
+
+    long nEntries = tr->GetEntries();
+    std::map<short, float> reducedChisqMap;
+    for (long iEntry = 0 ; iEntry < nEntries ; iEntry++) {
+      tr->GetEntry(iEntry);
+
+      if (efficiency < 0) continue;
+
+      if (!channelMapper.isPixelIDValid(pixelId)) {
+        B2ERROR("invalid pixelID" << pixelId);
+        continue;
+      }
+      auto channel = channelMapper.getChannel(pixelId);
+      short globalChannelNumber = slotId * 1000 + channel;
+      float redChisq = chisquare / ndf;
+
+      //in case entries for the same channel appears multiple time, use data with smaller reduced chisquare
+      //(This can happen when distribution is fit manually and results are appended for channels with fit failure)
+      if (reducedChisqMap.count(globalChannelNumber) == 0
+          or reducedChisqMap[globalChannelNumber] > redChisq) {
+        reducedChisqMap[globalChannelNumber] = redChisq;
+        calChannelPulseHeight->setParameters(slotId, channel, x0, p1, p2);
+        calChannelThresholdEff->setThrEff(slotId, channel, efficiency, (short)threshold);
+
+        if (redChisq > 10.) {
+          calChannelPulseHeight->setUnusable(slotId, channel);
+          calChannelThresholdEff->setUnusable(slotId, channel);
+        }
+      }
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    calChannelPulseHeight.import(iov);
+    calChannelThresholdEff.import(iov);
+
+    B2RESULT("Imported channel-by-channel gain and efficiency data from fitting of pulse height distribution for "
+             << reducedChisqMap.size() << " channels from " << fileName << " file.");
 
     return;
   }

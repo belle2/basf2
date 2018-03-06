@@ -310,7 +310,7 @@ void DQMHistAnalysisPXDERModule::terminate()
 {
 }
 
-int DQMHistAnalysisPXDERModule::getSensorIndex(int Layer, int Ladder, int Sensor) const
+int DQMHistAnalysisPXDERModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -331,7 +331,7 @@ int DQMHistAnalysisPXDERModule::getSensorIndex(int Layer, int Ladder, int Sensor
 }
 
 
-void DQMHistAnalysisPXDERModule::getIDsFromIndex(int Index, int& Layer, int& Ladder, int& Sensor) const
+void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   int tempcounter = 0;
@@ -367,7 +367,8 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
 
   // What happens if they are TH1I, TH1D and not TH1F
 
-  auto temp = new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
+  auto temp = std::unique_ptr<TH1F>(new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(),
+                                             hist->GetXaxis()->GetXmax()));
   double NEvents = 0;
   double flagInt = 0;
   double flagrInt = 0;
@@ -380,7 +381,6 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
     flagrInt += refhist->GetBinContent(j + 1);
   }
   if (NEvents < 100) {  // not enough information for comparition
-    delete temp;
     iret = -1;
     flaghist->SetBinContent(bin + 1, -1);
     return iret;
@@ -465,7 +465,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
     }
     iret = 1;
   } else if (Type == 10) {
-    float flag2  = refhist->Chi2Test(temp);
+    float flag2  = refhist->Chi2Test(temp.get());
     flaghist->SetBinContent(bin + 1, 0);
     if (flag2 > pars[1])
       flaghist->SetBinContent(bin + 1, 2);
@@ -479,7 +479,6 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
     flaghist->SetBinContent(bin + 1, -3);
     iret = -1;
   }
-  delete temp;
   strDebugInfo = Form("SetFlag---> %f, type %i\n", flaghist->GetBinContent(bin + 1), Type);
   B2DEBUG(130, strDebugInfo.Data());
   return iret;

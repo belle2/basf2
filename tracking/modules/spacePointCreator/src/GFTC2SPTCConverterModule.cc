@@ -41,10 +41,10 @@ GFTC2SPTCConverterModule::GFTC2SPTCConverterModule() :
 
   addParam("SingleClusterSVDSP", m_SingleClusterSVDSPName,
            "Single Cluster SVD SpacePoints collection name. NOTE: This StoreArray will be searched for SpacePoints only if 'useSingleClusterSP' is set to true!",
-           string(""));
+           string("SVDSpacePoints"));
   addParam("NoSingleClusterSVDSP", m_NoSingleClusterSVDSPName,
-           "Non Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string(""));
-  addParam("PXDClusterSP", m_PXDClusterSPName, "PXD Cluster SpacePoints collection name.", string(""));
+           "Non Single Cluster SVD SpacePoints collection name. This StoreArray will be searched for SpacePoints", string("SVDSpacePoints"));
+  addParam("PXDClusterSP", m_PXDClusterSPName, "PXD Cluster SpacePoints collection name.", string("PXDSpacePoints"));
 
   addParam("minNDF", m_PARAMminNDF,
            "Minimum number of degrees of freedom a SpacePointTrackCand has to contain in order to get registered in the DataStore. If set to 0, any number is accepted",

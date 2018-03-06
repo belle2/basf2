@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Main reconstruction splitter code for the N1 hypothesis.               *
+ * Main reconstruction splitter code for the nPhoton hypothesis.          *
  * Based on a connected region (CR) we look for local maxima and          *
  * create one shower for each local maximum (LM). In case of multiple     *
  * LM in one CR the energy is shared between the showers based on         *
@@ -17,8 +17,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSPLITTERN1MODULE_H_
-#define ECLSPLITTERN1MODULE_H_
+#pragma once
 
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -219,4 +218,3 @@ namespace Belle2 {
 
 } // end of Belle2 namespace
 
-#endif

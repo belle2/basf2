@@ -85,29 +85,64 @@ namespace Belle2 {
 
     // module parameters
 
-    // histograms
-    TH1F* h_layerHits;          /* number of hits per layer */
-    TH1F* h_ctime;              /* Lowest 16 bits of the B2TT CTIME signal */
-    TH1F* h_simtime;            /* MC simulation event hit time */
-    TH1F* h_time;               /* Reconstructed hit time relative to trigger */
-    TH1F* h_simEDep;            /* MC simulation pulse height */
-    TH1F* h_eDep;               /* Reconstructed pulse height */
-    TH1F* h_simNPixel;          /* Simulated number of MPPC pixels */
-    TH1F* h_nPixel;             /* Reconstructed number MPPC pixels */
-    TH1F* h_moduleID;           /* detector-module identifier */
-    TH1F* h_zStrips;            /* z-measuring strip numbers of the 2D hit */
-    TH1F* h_phiStrip;           /* Phi strip number of muon hit */
-    TH1F* h_sector;             /* Sector number of muon hit */
-    TH1F* h_layer;              /* Layer number of muon hit */
-    TH1F* h_rBKLMHit2ds;        /* Distance from z axis in transverse plane of muon hit */
-    TH1F* h_zBKLMHit2ds;        /* Axial position of muon hit */
-    TH2F* h_yvsxBKLMHit2ds;     /* Position projected into transverse plane of muon hit */
-    TH2F* h_xvszBKLMHit2ds;     /* Position projected into x-z plane of muon hit */
-    TH2F* h_yvszBKLMHit2ds;     /* Position projected into y-z plane of muon hit */
+    //! Histogram: number of hits per layer
+    TH1F* h_layerHits;
+
+    //! Histogram: Lowest 16 bits of the B2TT CTIME signal
+    TH1F* h_ctime;
+
+    //! Histogram: MC simulation event hit time
+    TH1F* h_simtime;
+
+    //! Histogram: Reconstructed hit time relative to trigger
+    TH1F* h_time;
+
+    //! Histogram: MC simulation pulse height
+    TH1F* h_simEDep;
+
+    //! Histogram: Reconstructed pulse height
+    TH1F* h_eDep;
+
+    //! Histogram: Simulated number of MPPC pixels
+    TH1F* h_simNPixel;
+
+    //! Histogram: Reconstructed number MPPC pixels
+    TH1F* h_nPixel;
+
+    //! Histogram: Detector-module identifier
+    TH1F* h_moduleID;
+
+    //! Histogram: z-measuring strip numbers of the 2D hit
+    TH1F* h_zStrips;
+
+    //! Histogram: Phi strip number of muon hit
+    TH1F* h_phiStrip;
+
+    //! Histogram: Sector number of muon hit
+    TH1F* h_sector;
+
+    //! Histogram: Layer number of muon hit
+    TH1F* h_layer;
+
+    //! Histogram: Distance from z axis in transverse plane of muon hit
+    TH1F* h_rBKLMHit2ds;
+
+    //! Histogram: Axial position of muon hit
+    TH1F* h_zBKLMHit2ds;
+
+    //! Histogram: Position projected into transverse plane of muon hit
+    TH2F* h_yvsxBKLMHit2ds;
+
+    //! Histogram: Position projected into x-z plane of muon hit
+    TH2F* h_xvszBKLMHit2ds;
+
+    //! Histogram: Position projected into y-z plane of muon hit
+    TH2F* h_yvszBKLMHit2ds;
 
     // other
     //! name of BKLMDigit store array
     std::string m_outputDigitsName;
+    //! name of BKLMHit store array
     std::string m_outputHitsName;
   };
 

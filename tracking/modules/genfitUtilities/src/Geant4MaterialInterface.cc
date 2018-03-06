@@ -296,17 +296,14 @@ Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
 }
 
 
-void
-Geant4MaterialInterface::getMaterialParameters(double& density,
-                                               double& Z,
-                                               double& A,
-                                               double& radiationLength,
-                                               double& mEE)
+genfit::Material
+Geant4MaterialInterface::getMaterialParameters()
 {
   assert(currentVolume_);
 
   const G4Material* mat = currentVolume_->GetLogicalVolume()->GetMaterial();
 
+  double density, Z, A, radiationLength, mEE;
   if (mat->GetNumberOfElements() == 1) {
     Z = mat->GetZ();
     A = mat->GetA();
@@ -325,15 +322,7 @@ Geant4MaterialInterface::getMaterialParameters(double& density,
   A *= CLHEP::mole / CLHEP::g;
   radiationLength = mat->GetRadlen() / CLHEP::cm;
   mEE = mat->GetIonisation()->GetMeanExcitationEnergy() / CLHEP::eV;
-}
-
-
-void
-Geant4MaterialInterface::getMaterialParameters(genfit::MaterialProperties& parameters)
-{
-  double density, Z, A, radLen, mEE;
-  this->getMaterialParameters(density, Z, A, radLen, mEE);
-  parameters.setMaterialProperties(density, Z, A, radLen, mEE);
+  return genfit::Material(density, Z, A, radiationLength, mEE);
 }
 
 

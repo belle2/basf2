@@ -33,9 +33,6 @@ generateContinuum(noEvents=1000, inclusiveP='D0', decayTable=decayTable, path=ma
 # add_simulation(main, bkgfiles=bg)
 add_simulation(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # reconstruction
 add_reconstruction(main)
 

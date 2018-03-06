@@ -24,6 +24,7 @@
 // Dataobject classes
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHHit.h>
+#include <bitset>
 
 using namespace std;
 
@@ -44,7 +45,7 @@ namespace Belle2 {
     // set module description (e.g. insert text)
     setDescription("Fills ARICHHits collection from ARICHDigits");
     setPropertyFlags(c_ParallelProcessingCertified);
-
+    addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel)", (uint8_t)0xFF);
   }
 
   ARICHFillHitsModule::~ARICHFillHitsModule()
@@ -76,14 +77,21 @@ namespace Belle2 {
     for (const auto& digit : digits) {
       int asicCh = digit.getChannelID();
       int modID = digit.getModuleID();
+      uint8_t hitBitmap = digit.getBitmap();
+      if (!(hitBitmap & m_bitMask)) continue;
+
       int xCh, yCh;
-      m_chnMap->getXYFromAsic(asicCh, xCh, yCh);
+      if (not m_chnMap->getXYFromAsic(asicCh, xCh, yCh)) {
+        B2ERROR("Invalid ARICH hit! This hit will be ignored.");
+        continue;
+      }
 
       TVector2 hitpos = m_geoPar->getChannelPosition(modID, xCh, yCh);
 
       arichHits.appendNew(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitpos.X(), hitpos.Y(),
                           m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness())), modID, asicCh);
     }
+
   }
 
 

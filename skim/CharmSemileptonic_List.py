@@ -18,9 +18,9 @@ def CharmSemileptonicList():
     antiD0SLcuts = 'massDifference(0)<0.15'
 
     D_Channels = ['K-:95eff pi+:95eff',
-                  'K-:95eff pi+:95eff pi0:veryLooseFit',
+                  'K-:95eff pi+:95eff pi0:skim',
                   'K-:95eff pi+:95eff pi+:95eff pi-:95eff',
-                  'K-:95eff pi+:95eff pi+:95eff pi-:95eff pi0:veryLooseFit',
+                  'K-:95eff pi+:95eff pi+:95eff pi-:95eff pi0:skim',
                   ]
 
     DList = []

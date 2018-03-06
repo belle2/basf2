@@ -9,8 +9,10 @@
  **************************************************************************/
 
 #include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
+
 #include <TF1.h>
 #include <TH1F.h>
+#include <TCanvas.h>
 
 using namespace Belle2;
 
@@ -59,10 +61,20 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     dedxcosth[bin].Fill(dedx);
   }
 
+  // Print the histograms for quality control
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
+  ctmp->Divide(3, 3);
+  std::stringstream psname; psname << "dedx_cosine.ps[";
+  ctmp->Print(psname.str().c_str());
+  psname.str(""); psname << "dedx_cosine.ps";
+
   // fit histograms to get gains in bins of cos(theta)
   std::vector<double> cosine;
   for (unsigned int i = 0; i < nbins; ++i) {
-    if (dedxcosth[i].Integral() < 50)
+    ctmp->cd(i % 9 + 1); // each canvas is 9x9
+    dedxcosth[i].DrawCopy("hist");
+
+    if (dedxcosth[i].Integral() < 10)
       cosine.push_back(1.0); // FIXME! --> should return not enough data
     else {
       int status = dedxcosth[i].Fit("gaus");
@@ -73,7 +85,13 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
         cosine.push_back(mean);
       }
     }
+    if ((i + 1) % 9 == 0)
+      ctmp->Print(psname.str().c_str());
   }
+
+  psname.str(""); psname << "dedx_cosine.ps]";
+  ctmp->Print(psname.str().c_str());
+  delete ctmp;
 
   B2INFO("dE/dx Calibration done for CDC dE/dx electron saturation");
 

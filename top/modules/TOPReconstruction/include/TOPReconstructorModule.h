@@ -77,7 +77,8 @@ namespace Belle2 {
     double m_sigmaZ = 0;       /**< track smearing in Z (r.m.s) */
     double m_sigmaTheta = 0;   /**< track smearing in Theta (r.m.s) */
     double m_sigmaPhi = 0;     /**< track smearing in Phi (r.m.s) */
-    double m_maxTime = 0;      /**< optional time limit for photons */
+    double m_minTime = 0;      /**< optional lower time limit for photons */
+    double m_maxTime = 0;      /**< optional upper time limit for photons */
     int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
 
     // others

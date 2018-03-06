@@ -40,9 +40,6 @@ main.add_module(evtgeninput)
 # add_simulation(main, bkgfiles=bg)
 add_simulation(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # reconstruction
 add_reconstruction(main)
 

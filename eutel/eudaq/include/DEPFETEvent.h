@@ -15,7 +15,8 @@ namespace depfet {
     void setRunNumber(int runNumber) { m_runNumber = runNumber; }
     void setEventNumber(int eventNumber) { m_eventNumber = eventNumber; }
 
-    void clear() {
+    void clear()
+    {
       for (iterator it = begin(); it != end(); ++it) it->clear();
     }
   protected:

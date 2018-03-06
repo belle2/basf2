@@ -7,8 +7,7 @@
 #
 # Usage: basf2 runCDCDedxDQM.py
 #
-# Input: B2Electrons.root (from calib1_generate.py),
-#        calibration_results (from calib2_calibrate.py)
+# Input: B2Electrons.root
 # Output: CDCDedxDQM.root
 #
 #
@@ -17,14 +16,6 @@
 
 import os
 from basf2 import *
-
-# use the calibration results from calib2_calibrate.py
-use_local_database("calibration_results/CDCDedxRunGainCalibration/outputdb/database.txt",
-                   "calibration_results/CDCDedxRunGainCalibration/outputdb")
-use_local_database("calibration_results/CDCDedxWireGainCalibration/outputdb/database.txt",
-                   "calibration_results/CDCDedxWireGainCalibration/outputdb")
-use_local_database("calibration_results/CDCDedxCosineCalibration/outputdb/database.txt",
-                   "calibration_results/CDCDedxCosineCalibration/outputdb")
 
 # main path
 main = create_path()

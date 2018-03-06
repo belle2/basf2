@@ -1,7 +1,7 @@
 Import ('env')
 
-env['CONTINUE'] = False
+#env['CONTINUE'] = False
 
-env['LIBS'] = ['framework', 'daq', 'dqm']
+env['LIBS'] = ['framework']
 
 Return ('env')

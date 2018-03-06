@@ -58,8 +58,8 @@ namespace Belle2 {
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
       /*Condition to stop iterate minDt <m_maxDt and rmsDt<m_maxRMS*/
-      double m_maxMeanDt = 0.0025;   /**< Mean of dT distribution  of all channels;*/
-      double m_maxRMSDt = 0.15;   /**< RMS of dT distribution  of all channels*/
+      double m_maxMeanDt = 0.05;   /**< Mean of dT distribution  of all channels;*/
+      double m_maxRMSDt = 0.8;   /**< RMS of dT distribution  of all channels*/
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/

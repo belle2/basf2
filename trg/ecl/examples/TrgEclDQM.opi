@@ -48,8 +48,8 @@
     <canvasLineColor>
       <color red="0" green="0" blue="0" />
     </canvasLineColor>
-    <canvasTitle></canvasTitle>
-    <canvasXTitle>Hit TC ID</canvasXTitle>
+    <canvasTitle>Hit TC Ф ID (BR)</canvasTitle>
+    <canvasXTitle>Hit TC Ф ID (BR)</canvasXTitle>
     <canvasYTitle></canvasYTitle>
     <enabled>true</enabled>
     <font>
@@ -60,7 +60,214 @@
     </foreground_color>
     <height>391</height>
     <histFillColor0>
-      <color name="Disconnected" red="255" green="0" blue="255" />
+      <color red="94" green="255" blue="141" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TCphiId_BR</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TCphiId_BR</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>-f17b141:15d1b1d965b:-7ff0</wuid>
+    <x>1494</x>
+    <y>6</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>Hit TC θ ID</canvasTitle>
+    <canvasXTitle>Hit TC θ ID</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="204" green="255" blue="77" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TCthetaId</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TCthetaId</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>-f17b141:15d1b1d965b:-7fe8</wuid>
+    <x>486</x>
+    <y>6</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>N(Hit TC) / event</canvasTitle>
+    <canvasXTitle>N(Hit TC) / event</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="141" green="0" blue="151" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TCTiming</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TCTiming</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>-f17b141:15d1b1d965b:-7fe0</wuid>
+    <x>990</x>
+    <y>396</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle></canvasTitle>
+    <canvasXTitle>TC ID</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color name="MinorAck" red="255" green="165" blue="77" />
     </histFillColor0>
     <histLineColor0>
       <color red="0" green="0" blue="0" />
@@ -96,9 +303,9 @@
     <useLegend>false</useLegend>
     <visible>true</visible>
     <widget_type>DQMCanvas</widget_type>
-    <width>481</width>
-    <wuid>-77e355e1:15ca5789532:-7fca</wuid>
-    <x>6</x>
+    <width>505</width>
+    <wuid>-f17b141:15d1b1d965b:-7fbc</wuid>
+    <x>-18</x>
     <y>6</y>
   </widget>
   <widget typeId="DQMCanvas" version="1.0.0">
@@ -117,8 +324,8 @@
     <canvasLineColor>
       <color red="0" green="0" blue="0" />
     </canvasLineColor>
-    <canvasTitle></canvasTitle>
-    <canvasXTitle>Total TC Energy (FADC count)</canvasXTitle>
+    <canvasTitle>Total TC Energy (ADC count)</canvasTitle>
+    <canvasXTitle>Total TC Energy (ADC count)</canvasXTitle>
     <canvasYTitle></canvasYTitle>
     <enabled>true</enabled>
     <font>
@@ -166,8 +373,422 @@
     <visible>true</visible>
     <widget_type>DQMCanvas</widget_type>
     <width>505</width>
-    <wuid>-77e355e1:15ca5789532:-7fc0</wuid>
-    <x>492</x>
+    <wuid>7568a9d9:15d2a8ac48d:-7ff3</wuid>
+    <x>486</x>
+    <y>396</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>Hit TC Ф ID (FE)</canvasTitle>
+    <canvasXTitle>Hit TC Ф ID (FE)</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="255" green="255" blue="255" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TCphiId_FWD</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TCphiId_FWD</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>68a9d1bb:15d2b48b4db:-7fe0</wuid>
+    <x>990</x>
     <y>6</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>Hit TC Ф ID (BE)</canvasTitle>
+    <canvasXTitle>Hit TC Ф ID (BE)</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="94" green="255" blue="141" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TCphiId_BWD</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TCphiId_BWD</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>68a9d1bb:15d2b48b4db:-7fd6</wuid>
+    <x>1998</x>
+    <y>6</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>N(Cluster) / event</canvasTitle>
+    <canvasXTitle>N(Cluster) / event</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="141" green="198" blue="255" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TRGTiming</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TRGTiming</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>e1450a8:15d3f508c32:-7fe9</wuid>
+    <x>1494</x>
+    <y>396</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>TC Energy / event</canvasTitle>
+    <canvasXTitle>TC Energy / event</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="56" green="0" blue="0" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_TCEnergy</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_TCEnergy</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>e1450a8:15d3f508c32:-7fcd</wuid>
+    <x>-18</x>
+    <y>396</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>N(Hit TC) / event</canvasTitle>
+    <canvasXTitle>N(Hit TC) / event</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="141" green="0" blue="151" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_n_TChit_event</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_n_TChit_event</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>-5d9713a6:16144baa9d3:-7fec</wuid>
+    <x>-18</x>
+    <y>786</y>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <canvasTitle>N(Cluster) / event</canvasTitle>
+    <canvasXTitle>N(Cluster) / event</canvasXTitle>
+    <canvasYTitle></canvasYTitle>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>391</height>
+    <histFillColor0>
+      <color red="141" green="198" blue="255" />
+    </histFillColor0>
+    <histLineColor0>
+      <color red="0" green="0" blue="0" />
+    </histLineColor0>
+    <histLineWidth0>2.0</histLineWidth0>
+    <histName0>TRG/h_Cluster</histName0>
+    <histTitle0></histTitle0>
+    <histUseFillColor0>true</histUseFillColor0>
+    <histUseLineColor0>true</histUseLineColor0>
+    <name>TRG/h_Cluster</name>
+    <nhists>1</nhists>
+    <padAvarageFactor>-1.0</padAvarageFactor>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <padLogX>false</padLogX>
+    <padLogY>false</padLogY>
+    <padMaxY>-1.0</padMaxY>
+    <padMaxZ>-1.0</padMaxZ>
+    <padMinY>-1.0</padMinY>
+    <padMinZ>-1.0</padMinZ>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <useLegend>false</useLegend>
+    <visible>true</visible>
+    <widget_type>DQMCanvas</widget_type>
+    <width>505</width>
+    <wuid>-5d9713a6:16144baa9d3:-7fe4</wuid>
+    <x>486</x>
+    <y>786</y>
   </widget>
 </display>

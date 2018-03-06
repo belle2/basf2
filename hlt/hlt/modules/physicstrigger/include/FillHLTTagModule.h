@@ -57,10 +57,9 @@ namespace Belle2 {
     bool eventSelect();
 
   private:
-    StoreArray<HLTTag> m_hltTag; /** Array for HLTTag */
-    StoreArray<PhysicsTriggerInformation> m_physicsTriggerInformation; /** Array for PhysicsTriggerInformation */
-
-
-
+    /// Array for HLTTag.
+    StoreArray<HLTTag> m_hltTag;
+    /// Array for PhysicsTriggerInformation.
+    StoreArray<PhysicsTriggerInformation> m_physicsTriggerInformation;
   };
 }

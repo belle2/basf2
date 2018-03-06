@@ -31,8 +31,8 @@ class AlgorithmsRunner(Runner):
     objects. As an example, assume that a single `framework.Calibration` was given and list of two `framework.Algorithm`
     instances to run.
 
-    In this example the chosen `AlgorithmsRunner.run` is simple and just loops over the list of `framework.Algorithm`
-    calling each one's `strategies.AlgorithmStrategy.run` and `strategies.AlgorithmStrategy.commit` methods in order.
+    In this example the chosen :py:meth:`AlgorithmsRunner.run()` is simple and just loops over the list of `caf.framework.Algorithm`
+    calling each one's :py:meth:`caf.strategies.AlgorithmStrategy.run()` methods in order.
     Thereby generating a localdb with the only communication between the `strategies.AlgorithmStrategy` instances coming from the
     database payloads being available from one algorithm to the next.
 
@@ -54,9 +54,9 @@ class AlgorithmsRunner(Runner):
     output data it is your job to filter through the input files and assign them correctly.
 
     A list of local database paths are given to the `AlgorithmsRunner` based on the `framework.Calibration` dependencies and
-    any overall localdb given to the CAF. By default you can call the `setup_database_chain` method to automatically set a
-    database chain based on this list. But you have freedom to not call this at all in `run`, or to implement a different method
-    to deal with this.
+    any overall localdb given to the CAF. By default you can call the "setup_algorithm" transition of the
+    `caf.state_machines.AlgorithmMachine` to automatically set a database chain based on this list.
+    But you have freedom to not call this at all in `run`, or to implement a different method to deal with this.
     """
 
     def __init__(self, name):

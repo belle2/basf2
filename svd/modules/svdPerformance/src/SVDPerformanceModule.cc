@@ -1,21 +1,14 @@
 #include <svd/modules/svdPerformance/SVDPerformanceModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <geometry/GeometryManager.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
 #include <list>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -53,12 +46,12 @@ SVDPerformanceModule::~SVDPerformanceModule()
 void SVDPerformanceModule::initialize()
 {
 
-  StoreObjPtr<EventMetaData> a; a.isRequired();
-  StoreArray<SVDShaperDigit> b; b.isRequired(m_ShaperDigitName);
-  StoreArray<SVDRecoDigit>c; c.isOptional(m_RecoDigitName);
-  StoreArray<SVDCluster>d; d.isRequired(m_ClusterName);
-  StoreArray<Track>e; e.isRequired(m_TrackName);
-  StoreArray<TrackFitResult>f; f.isRequired(m_TrackFitResultName);
+  m_svdShapers.isRequired(m_ShaperDigitName);
+  m_svdRecos.isOptional(m_RecoDigitName);
+  m_svdClusters.isRequired(m_ClusterName);
+  m_Tracks.isRequired(m_TrackName);
+  m_recoTracks.isRequired();
+  m_tfr.isRequired(m_TrackFitResultName);
 
 
   B2INFO("    ShaperDigits: " << m_ShaperDigitName);
@@ -278,16 +271,12 @@ void SVDPerformanceModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   //ShaperDigits
-  StoreArray<SVDShaperDigit> svdShapers(m_ShaperDigitName);
   int nShaperDigi[m_nLayers][m_nSensors][m_nSides];
 
   //RecoDigits
-  StoreArray<SVDRecoDigit> svdRecos(m_RecoDigitName);
   int nRecoDigi[m_nLayers][m_nSensors][m_nSides];
 
-
   // SVD clusters
-  StoreArray<SVDCluster> svdClusters(m_ClusterName);
   int nCl[m_nLayers][m_nSensors][m_nSides];
   int nCltrk[m_nLayers][m_nSensors][m_nSides];
 
@@ -301,13 +290,12 @@ void SVDPerformanceModule::event()
       }
 
   //tracks
-  StoreArray<Track> Tracks(m_TrackName);
-  if (Tracks) {
-    m_nTracks->Fill(Tracks.getEntries());
-    m_ntracks += Tracks.getEntries();
+  if (m_Tracks) {
+    m_nTracks->Fill(m_Tracks.getEntries());
+    m_ntracks += m_Tracks.getEntries();
   }
 
-  BOOST_FOREACH(Track & track, Tracks) {
+  BOOST_FOREACH(Track & track, m_Tracks) {
 
     const TrackFitResult* tfr = NULL;
     if (m_is2017TBanalysis)
@@ -437,85 +425,85 @@ void SVDPerformanceModule::event()
 
   }
 
-  if (Tracks)
-    B2DEBUG(1, "%%%%%%%% NEW EVENT,  number of Tracks =  " << Tracks.getEntries());
+  if (m_Tracks)
+    B2DEBUG(1, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
 
   //shaper digits
-  for (int digi = 0 ; digi < svdShapers.getEntries(); digi++) {
+  for (int digi = 0 ; digi < m_svdShapers.getEntries(); digi++) {
 
 
-    VxdID::baseType theVxdID = (VxdID::baseType)svdShapers[digi]->getSensorID();
+    VxdID::baseType theVxdID = (VxdID::baseType)m_svdShapers[digi]->getSensorID();
     int layer = VxdID(theVxdID).getLayerNumber() - 3;
     int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
-    int side = svdShapers[digi]->isUStrip();
+    int side = m_svdShapers[digi]->isUStrip();
     nShaperDigi[layer][sensor][side]++;
 
 
-    if (!svdShapers[digi]->isUStrip()) {
-      if (((layer == 0) && (svdShapers[digi]->getCellID() > 767)) ||
-          ((layer != 0) && (svdShapers[digi]->getCellID() > 511)))
+    if (!m_svdShapers[digi]->isUStrip()) {
+      if (((layer == 0) && (m_svdShapers[digi]->getCellID() > 767)) ||
+          ((layer != 0) && (m_svdShapers[digi]->getCellID() > 511)))
         B2WARNING(" SVDShaperDigits: unexpected cellID for Layer " << layer << " Ladder " <<  VxdID(theVxdID).getLadderNumber() <<
-                  " Sensor " << VxdID(theVxdID).getSensorNumber() << " V side, strip = " << svdShapers[digi]->getCellID());
+                  " Sensor " << VxdID(theVxdID).getSensorNumber() << " V side, strip = " << m_svdShapers[digi]->getCellID());
     } else {
-      if (svdShapers[digi]->getCellID() > 767)
+      if (m_svdShapers[digi]->getCellID() > 767)
         B2WARNING(" SVDShaperDigits:  unexpected cellID for Layer " << layer << " Ladder " << VxdID(theVxdID).getLadderNumber() <<
-                  " Sensor " << VxdID(theVxdID).getSensorNumber() << " U side, strip = " << svdShapers[digi]->getCellID());
+                  " Sensor " << VxdID(theVxdID).getSensorNumber() << " U side, strip = " << m_svdShapers[digi]->getCellID());
     }
 
   }
 
   //reco digits
-  if (svdRecos.isValid()) {
-    for (int digi = 0 ; digi < svdRecos.getEntries(); digi++) {
+  if (m_svdRecos.isValid()) {
+    for (int digi = 0 ; digi < m_svdRecos.getEntries(); digi++) {
 
-      VxdID::baseType theVxdID = (VxdID::baseType)svdRecos[digi]->getSensorID();
+      VxdID::baseType theVxdID = (VxdID::baseType)m_svdRecos[digi]->getSensorID();
       int layer = VxdID(theVxdID).getLayerNumber() - 3;
       int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
-      int side = svdRecos[digi]->isUStrip();
-      int cellID = svdRecos[digi]->getCellID();
+      int side = m_svdRecos[digi]->isUStrip();
+      int cellID = m_svdRecos[digi]->getCellID();
 
       float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
 
       h_stripNoise[layer][sensor][side]->Fill(thisNoise);
-      h_recoCharge[layer][sensor][side]->Fill(svdRecos[digi]->getCharge());
-      h_recoTime[layer][sensor][side]->Fill(svdRecos[digi]->getTime());
+      h_recoCharge[layer][sensor][side]->Fill(m_svdRecos[digi]->getCharge());
+      h_recoTime[layer][sensor][side]->Fill(m_svdRecos[digi]->getTime());
       nRecoDigi[layer][sensor][side]++;
     }
   }
 
   //clusters  NOT related to tracks
-  for (int cl = 0 ; cl < svdClusters.getEntries(); cl++) {
+  for (int cl = 0 ; cl < m_svdClusters.getEntries(); cl++) {
 
-    float clCharge = svdClusters[cl]->getCharge();
-    int clSize = svdClusters[cl]->getSize();
+    float clCharge = m_svdClusters[cl]->getCharge();
+    int clSize = m_svdClusters[cl]->getSize();
 
-    RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(svdClusters[cl]);
+    RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(m_svdClusters[cl]);
 
     if ((int)theRC.size() > 0)
       continue;
 
-    VxdID::baseType theVxdID = (VxdID::baseType)svdClusters[cl]->getSensorID();
-    int side = svdClusters[cl]->isUCluster();
+    VxdID::baseType theVxdID = (VxdID::baseType)m_svdClusters[cl]->getSensorID();
+    int side = m_svdClusters[cl]->isUCluster();
 
     /*
     //fill time difference
     for (int cl2 = 0 ; cl2 < cl ; cl2++) {
 
-    int layerDist = abs(VxdID(theVxdID).getLayerNumber() - svdClusters[cl2]->getSensorID().getLayerNumber());
+    int layerDist = abs(VxdID(theVxdID).getLayerNumber() - m_svdClusters[cl2]->getSensorID().getLayerNumber());
 
-    int side2 = svdClusters[cl2]->isUCluster();
+    int side2 = m_svdClusters[cl2]->isUCluster();
     if (layerDist == 0) {
     if ((side == 0) && (side2 == 1))
-    h_cl_UV -> Fill(svdClusters[cl2]->getClsTime() - svdClusters[cl]->getClsTime());
+    h_cl_UV -> Fill(m_svdClusters[cl2]->getClsTime() - m_svdClusters[cl]->getClsTime());
 
     if ((side == 1) && (side2 == 0))
-    h_cl_UV -> Fill(svdClusters[cl]->getClsTime() - svdClusters[cl2]->getClsTime());
+    h_cl_UV -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
     } else if (layerDist == 1) {
     if ((side == 1) && (side2 == 1))
-    h_cl_UU -> Fill(svdClusters[cl]->getClsTime() - svdClusters[cl2]->getClsTime());
+    h_cl_UU -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
 
     if ((side == 0) && (side2 == 0))
-    h_cl_VV -> Fill(svdClusters[cl]->getClsTime() - svdClusters[cl2]->getClsTime());
+    h_cl_VV -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
     }
 
     }
@@ -530,14 +518,14 @@ void SVDPerformanceModule::event()
     h_clCharge[layer][sensor][side]->Fill(clCharge);
     h_clSize[layer][sensor][side]->Fill(clSize);
     h_clChargeVSSize[layer][sensor][side]->Fill(clCharge, clSize);
-    h_clSN[layer][sensor][side]->Fill(svdClusters[cl]->getSNR());
+    h_clSN[layer][sensor][side]->Fill(m_svdClusters[cl]->getSNR());
 
-    h_clTime[layer][sensor][side]->Fill(svdClusters[cl]->getClsTime());
+    h_clTime[layer][sensor][side]->Fill(m_svdClusters[cl]->getClsTime());
 
     if (m_is2017TBanalysis) {
-      RelationVector<SVDTrueHit> svdTrueHits = DataStore::getRelationsWithObj<SVDTrueHit>(svdClusters[cl]);
+      RelationVector<SVDTrueHit> svdTrueHits = DataStore::getRelationsWithObj<SVDTrueHit>(m_svdClusters[cl]);
       if (svdTrueHits.size() > 0)
-        h_clTimeVSTrueTime[layer][sensor][side]->Fill(svdClusters[cl]->getClsTime(), svdTrueHits[0]->getGlobalTime());
+        h_clTimeVSTrueTime[layer][sensor][side]->Fill(m_svdClusters[cl]->getClsTime(), svdTrueHits[0]->getGlobalTime());
     }
 
   }

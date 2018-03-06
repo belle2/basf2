@@ -225,7 +225,7 @@ class Calibration(CalibrationBase):
     calibration constants created by earlier completed calibrations to dependent ones.
     """
     #: Allowed transitions that we will use to progress
-    moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
+    moves = ["submit_collector", "complete", "run_algorithms", "iterate", "fail_fully"]
     #: Subdirectory name for algorithm output
     alg_output_dir = "algorithm_output"
 
@@ -749,17 +749,18 @@ class CAF():
             while not finished:
                 finished = True
                 for calibration in self.calibrations.values():
-                    if calibration.dependencies_met() and not calibration.is_alive():
-                        if calibration.state != calibration.end_state and \
-                           calibration.state != calibration.fail_state:
-                            calibration.start()
-
                     # Join the thread if we've hit an end state
                     if calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state:
                         calibration.join()
                     # If we're not ready yet we should go round again
                     else:
                         finished = False
+
+                    if calibration.dependencies_met() and not calibration.is_alive():
+                        if calibration.state != calibration.end_state and \
+                           calibration.state != calibration.fail_state:
+                            calibration.start()
+
                 sleep(self.heartbeat)
 
         # Close down our processing pools nicely

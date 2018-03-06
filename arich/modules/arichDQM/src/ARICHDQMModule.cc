@@ -108,7 +108,7 @@ namespace Belle2 {
     h_hapdHit = newTH1("h_hapdHit", "# of hits in each channel;HAPD serial;Hits", 420, 0.5, 421 - 0.5, kRed, kRed);
     h_hapdHitPerEvent = newTH2("h_hapdHitPerEvent", "# of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5, 420 + 0.5, 144,
                                -0.5, 143.5, kRed, kRed);
-    h_mergerHit = newTH1("h_mergerHit", "# of hits in each merger board;MB serial;Hits", 72, -0.5, 72 - 0.5, kRed, kRed);
+    h_mergerHit = newTH1("h_mergerHit", "# of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5, kRed, kRed);
     h_gelHit = newTH1("h_gelHit", "# of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5, kRed, kRed);
     h_bits = newTH1("h_bits", "# of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5, kRed, kRed);
     h_hits2D = newTH2("h_hits2D", "Distribution of hits on its track position", 460, -115, 115, 460, -115, 115, kRed, kRed);
@@ -266,7 +266,7 @@ namespace Belle2 {
       if (mergerID > 72) {
         B2INFO("Invalid MB number " << mergerID);
       } else {
-        h_mergerHit->Fill(mergerID - 1);
+        h_mergerHit->Fill(mergerID);
       }
 
       nHit++;
@@ -286,7 +286,12 @@ namespace Belle2 {
 
       TVector3 recPos = arichTrack->getPosition();
       int sector = 0;
-      double dPhi = recPos.Phi();
+      double dPhi = 0;
+      if (recPos.Phi() >= 0) {
+        dPhi = 2 * M_PI - recPos.Phi();
+      } else {
+        dPhi = -recPos.Phi();
+      }
       while (dPhi > M_PI / 3 && sector < 6) {
         dPhi -= M_PI / 3;
         sector++;

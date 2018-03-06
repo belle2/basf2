@@ -334,44 +334,38 @@ namespace TreeFitter {
     const ParticleBase* pb = m_decaychain->locate(&cand);
 
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
-      const int tauindex = pb->tauIndex();
+      //const int tauindex = pb->tauIndex();
       const int momindex = pb->momIndex();
 
-      const Eigen::Matrix<double, 1, 3> tau_vec = m_fitparams->getStateVector().segment(tauindex, 3);
       const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(momindex, 3);
 
-      const Eigen::Matrix<double, 3, 3> tau_cov = m_fitparams->getCovariance().block<3, 3>(tauindex, tauindex);
       const Eigen::Matrix<double, 3, 3> mom_cov = m_fitparams->getCovariance().block<3, 3>(momindex, momindex);
-      Eigen::Matrix<double, 6, 6> comb_cov =  Eigen::Matrix<double, 6, 6>::Zero(6, 6);
+      Eigen::Matrix<double, 4, 4> comb_cov =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
 
-      comb_cov.block<3, 3>(0, 0) = tau_cov;
-      comb_cov.block<3, 3>(3, 3) = mom_cov;
+      std::tuple<double, double> lenTuple  = getDecayLength(cand);
+
+      comb_cov(0, 0) = std::get<1>(lenTuple);
+      comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
-      const double absTau = tau_vec.norm();
-      const double absMom = mom_vec.norm();
-      const double mom3 = absMom * absMom * absMom;
+      const double mom = mom_vec.norm();
+      const double mom2 = mom * mom;
+      const double mom3 = mom * mom * mom;
 
-      const double t = absTau / absMom * mBYc;
+      const double len = std::get<0>(lenTuple);
+      const double t = len / mom * mBYc;
       //const double t = absTau / absMom * mBYc;
 
-      Eigen::Matrix<double, 1, 6> jac = Eigen::Matrix<double, 1, 6>::Zero();
-      jac(0) = tau_vec(0) / absTau * mBYc / absMom;
-      jac(1) = tau_vec(1) / absTau * mBYc / absMom;
-      jac(2) = tau_vec(2) / absTau * mBYc / absMom;
-
-      //jac(3) = -1* mom_vec(0) / mom3 * mBYc * absTau;
-      //jac(4) = -1* mom_vec(1) / mom3 * mBYc * absTau;
-      //jac(5) = -1* mom_vec(2) / mom3 * mBYc * absTau;
-
-      jac(3) = -1 * mom_vec(0) / mom3 * mBYc * absTau;
-      jac(4) = -1 * mom_vec(1) / mom3 * mBYc * absTau;
-      jac(5) = -1 * mom_vec(2) / mom3 * mBYc * absTau;
+      Eigen::Matrix<double, 1, 4> jac = Eigen::Matrix<double, 1, 4>::Zero();
+      jac(0) =  1. / mom * mBYc;
+      jac(1) = -1. * mom_vec(0) / mom3 * mBYc;
+      jac(2) = -1. * mom_vec(1) / mom3 * mBYc;
+      jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
 
       const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
 
-      // tau in nanosec
+      // time in nanosec
       return std::make_tuple(t, tErr);
     }
 
@@ -391,32 +385,44 @@ namespace TreeFitter {
       const int tauindex = pb->tauIndex();
       const int momindex = pb->momIndex();
 
-      const Eigen::Matrix<double, 1, 3 >p_vec   = fitparams->getStateVector().segment(momindex, 3);
-      const Eigen::Matrix<double, 1, 3 >tau_vec   = fitparams->getStateVector().segment(tauindex, 3);
-      const double mom   = p_vec.norm();
+      const Eigen::Matrix<double, 1, 3 >tau_vec = fitparams->getStateVector().segment(tauindex, 3);
+      const Eigen::Matrix<double, 1, 3 >mom_vec = fitparams->getStateVector().segment(momindex, 3);
 
-      const double dp = p_vec * tau_vec.transpose();
-      const double len = dp / mom;
+      const double mom = mom_vec.norm();
+      const double mom3 = mom * mom * mom;
 
-      Eigen::Matrix<double, 6, 6 > cov6 = Eigen::Matrix<double, 6, 6 >::Zero(6, 6);
+      const double len = tau_vec.norm();
+      const double len2 = tau_vec * mom_vec.transpose();
+      const double len3 = len2 / mom_vec.norm();
 
-      cov6.block<3, 3>(0, 0) = fitparams->getCovariance().block<3, 3>(tauindex, tauindex);
-      cov6.block<3, 3>(3, 3) = fitparams->getCovariance().block<3, 3>(momindex, momindex);
+      //std::cout << "----------------------------------------------"   << std::endl;
+      //std::cout << "len (tau norm)    " << len  << std::endl;
+      //std::cout << "len (tau * p )    " << len2  << std::endl;
+      //std::cout << "len (tau * p/|p| )" << len3  << std::endl;
+
+      Eigen::Matrix<double, 6, 6 > cov = Eigen::Matrix<double, 6, 6 >::Zero(6, 6);
+
+      cov.block<3, 3>(0, 0) = fitparams->getCovariance().block<3, 3>(tauindex, tauindex);
+      cov.block<3, 3>(3, 3) = fitparams->getCovariance().block<3, 3>(momindex, momindex);
 
       Eigen::Matrix<double, 1, 6 > jac = Eigen::Matrix<double, 1, 6 >::Zero(1, 6);
       // d/dtau
-      jac(0) = p_vec(0) / mom;
-      jac(1) = p_vec(1) / mom;
-      jac(2) = p_vec(2) / mom;
+      //jac(0) = tau_vec(0) / len ;
+      //jac(1) = tau_vec(1) / len ;
+      //jac(2) = tau_vec(2) / len ;
 
-      const double px2 = p_vec(0) * p_vec(0);
-      const double py2 = p_vec(1) * p_vec(1);
-      const double pz2 = p_vec(2) * p_vec(2);
-      jac(3) = tau_vec(0) * (-px2 + py2 + pz2) - 2 * p_vec(0) * (tau_vec(1) * p_vec(1) + tau_vec(2) * p_vec(2));
-      jac(4) = tau_vec(1) * (-py2 + px2 + pz2) - 2 * p_vec(1) * (tau_vec(0) * p_vec(0) + tau_vec(2) * p_vec(2));
-      jac(5) = tau_vec(2) * (-pz2 + py2 + px2) - 2 * p_vec(2) * (tau_vec(1) * p_vec(1) + tau_vec(0) * p_vec(0));
+      jac(0) = mom_vec(0) / mom ;
+      jac(1) = mom_vec(1) / mom ;
+      jac(2) = mom_vec(2) / mom ;
 
-      const double lenErr = jac * cov6.selfadjointView<Eigen::Lower>() * jac.transpose();
+      jac(3) = (tau_vec(0) * (mom_vec(1) * mom_vec(1) + mom_vec(2) * mom_vec(2)) - tau_vec(1) * mom_vec(0) * mom_vec(1) - tau_vec(
+                  2) * mom_vec(0) * mom_vec(2)) / mom3  ;
+      jac(4) = (tau_vec(1) * (mom_vec(0) * mom_vec(0) + mom_vec(2) * mom_vec(2)) - tau_vec(0) * mom_vec(1) * mom_vec(0) - tau_vec(
+                  2) * mom_vec(1) * mom_vec(2)) / mom3  ;
+      jac(5) = (tau_vec(2) * (mom_vec(1) * mom_vec(1) + mom_vec(0) * mom_vec(0)) - tau_vec(1) * mom_vec(2) * mom_vec(1) - tau_vec(
+                  0) * mom_vec(2) * mom_vec(0)) / mom3  ;
+
+      const double lenErr = jac * cov.selfadjointView<Eigen::Lower>() * jac.transpose();
 
       return std::make_tuple(len, lenErr);
     }

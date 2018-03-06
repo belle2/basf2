@@ -176,7 +176,7 @@ void cdcDQM7Module::event()
   int vtdc = 0;
   int ftdc = 0;
 
-  if (nent < 50 || nent > 250) return; //
+  if (nent < 60 || nent > 200) return; //
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
@@ -189,7 +189,7 @@ void cdcDQM7Module::event()
 
     num = sL * 6 + iL + 2;
 
-    if (adcsum > 0) {
+    if (adcsum > 10) { // adcsum cut
 
       if (sL == 0) {
         h_nhits_L[iL]->Fill(wid);
@@ -209,7 +209,7 @@ void cdcDQM7Module::event()
         ftdc = vtdc;
       }// fastest
 
-    }//adc
+    }// adc
 
   }// cdchit
 

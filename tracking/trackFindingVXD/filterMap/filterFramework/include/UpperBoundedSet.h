@@ -27,6 +27,8 @@ namespace Belle2 {
    */
   template< typename SupType >
   class UpperBoundedSet {
+
+    /// Supremum of the set
     SupType m_sup;
   public:
     /// Constructor
@@ -64,6 +66,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** Setting the branch address for a filter in a TTree
+     * @param t : the TTree in which the branch address shall be set
+     * @param branchName : name of the branch
+     */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {

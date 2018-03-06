@@ -25,13 +25,16 @@ namespace Belle2 {
    * Range is used in conjunction with the SelectionVariable to define
    * one of the building blocks of the Filters
    */
-
-  template< typename InfType, typename SupType>
+  template<typename InfType, typename SupType>
   class Range {
+    /// Char suffix used to indicate the infimum of the set
     const char* c_infSuffix = "_inf";
+    /// Char suffix used to indicate the supremum of the set
     const char* c_supSuffix = "_sup";
 
+    /// Infimum of the set
     InfType m_inf;
+    /// Supremum of the set
     SupType m_sup;
   public:
 
@@ -44,7 +47,7 @@ namespace Belle2 {
      * @param x is the result of some SelectionVariable applied to a pair of objects.
      * The return value is true if x belongs to the open set ( m_min, m_sup )
      */
-    template< class VariableType >
+    template<class VariableType>
     inline bool contains(const VariableType& x) const { return m_inf < x && x < m_sup ;};
 
     /** Creates and sets the addresses of the leaves to store the inf and sup values.
@@ -73,6 +76,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** Setting the branch address for a filter in a TTree
+     * @param t : the TTree in which the branch address shall be set
+     * @param branchName : name of the branch
+     */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
@@ -105,9 +112,5 @@ namespace Belle2 {
       }
       return ("(" + minVal + " < " + varname + " < " + maxVal + ")");
     }
-
-
   };
-
-
 }

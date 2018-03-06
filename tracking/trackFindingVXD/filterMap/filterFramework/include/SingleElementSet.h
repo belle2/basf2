@@ -23,10 +23,12 @@ namespace Belle2 {
    * SingleElementSet is used in conjunction with the SelectionVariable to define
    * one of the building blocks of the Filters
    */
-  template< typename Type >
+  template<typename Type>
   class SingleElementSet {
+    /// Member variable for the single element of the set
     Type m_element;
   public:
+    /// Constructor
     explicit SingleElementSet(Type element):  m_element(element) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
@@ -77,6 +79,5 @@ namespace Belle2 {
       }
       return ("(" + val + " == " + varname + ")");
     }
-
   };
 }

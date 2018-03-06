@@ -189,7 +189,7 @@ void cdcDQM7Module::event()
 
     num = sL * 6 + iL + 2;
 
-    if (adcsum > 10) { // adcsum cut
+    if (adcsum > 10) {
 
       if (sL == 0) {
         h_nhits_L[iL]->Fill(wid);
@@ -209,7 +209,7 @@ void cdcDQM7Module::event()
         ftdc = vtdc;
       }// fastest
 
-    }// adc
+    }//adc
 
   }// cdchit
 

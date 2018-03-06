@@ -33,13 +33,14 @@ namespace Belle2 {
       if (m_fileName.size() != 0) FillCuts(m_fileName); //else cuts not applied
     }
 
-
-    enum EMinMax { /**< enum for minimum/maximum value of cuts */
+    /** enum for minimum/maximum value of cuts */
+    enum EMinMax {
       c_Min,
       c_Max
     };
 
-    enum EParameters { /**< enum for parameters name */
+    /** enum for parameters name */
+    enum EParameters {
       c_Omega,
       c_D0,
       c_Phi0,
@@ -47,7 +48,8 @@ namespace Belle2 {
       c_Tanlambda
     };
 
-    enum ECutName { /**< enum for the cuts name */
+    /** enum for the cuts name */
+    enum ECutName {
       c_Norm,
       c_Pow,
       c_Bkg
@@ -86,6 +88,7 @@ namespace Belle2 {
     int m_nbinpar = 5; /**< number of track parameter */
     int m_nbinlay = 7; /**< number of layers (IP too) */
 
+    /// Making this class a ROOT class
     ClassDef(NoKickCuts, 1);
   };
 } /** end namespace Belle2 */

@@ -34,6 +34,7 @@ namespace TreeFitter {
                 composite,
                 track,
                 photon,
+                klong,
                 conversion,
                 kinematic,
                 massEnergy,
@@ -99,7 +100,7 @@ namespace TreeFitter {
     std::string name() const;
 
     /**
-     * JFK dont understand, unused
+     * unused
      * */
     [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 
@@ -147,7 +148,7 @@ namespace TreeFitter {
     /**  dimension of constraint */
     unsigned int m_dim;
 
-    /** unused FIXME  */
+    /** unused  */
     int m_weight;
 
     /** maximum number of iterations for non-linear constraints    */

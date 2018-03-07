@@ -28,9 +28,13 @@ namespace TreeFitter {
 
     /** particle types  */
     enum TFParticleType {kInteractionPoint,
-                         kRecoComposite, kRecoResonance,
-                         kInternalParticle, kRecoTrack,
-                         kResonance, kRecoPhoton,
+                         kRecoComposite,
+                         kRecoResonance,
+                         kInternalParticle,
+                         kRecoTrack,
+                         kResonance,
+                         kRecoPhoton,
+                         kRecoKlong
                          kMissingParticle
                         };
 
@@ -75,7 +79,7 @@ namespace TreeFitter {
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
 
-    /**  indexing in the statevector */
+    /** this sets the index for momentum, position, etc. in the statevector  */
     virtual void updateIndex(int& offset);
 
     /**  get name of parameter i */
@@ -175,25 +179,21 @@ namespace TreeFitter {
 
   protected:
 
-    /** Standard template library::const_iterator */
-    typedef std::vector<ParticleBase*>::const_iterator conIter;
-
-    /** Standard template library::iterator  */
-    typedef std::vector<ParticleBase*>::iterator iter;
-
     /** just an alias */
     typedef std::vector<ParticleBase*> ParticleContainer;
 
-    /**  */
+    /** get pdg lifetime */
     static double pdgLifeTime(Belle2::Particle* particle)  ;
 
-    /**  */
+    /** controls if a particle is treated as a resonance(lifetime=0) or a particle that has a finite lifetime.
+     * A finite life time means it will register a geo constraint for this particle
+     * */
     static bool isAResonance(Belle2::Particle* particle) ;
 
-    /**  */
-    static double bFieldOverC(); // Bz/c
+    /** Bz/c  */
+    static double bFieldOverC();
 
-    /**  */
+    /** initialises tau as a length  */
     ErrCode initTau(FitParams* par) const ;
 
     /** set Index (in statevector) */

@@ -123,18 +123,18 @@ namespace TreeFitter {
         // create a vector with all daughters that constitute a
         // 'trajectory' (ie tracks, composites and daughters of
         // resonances.)
-        ParticleBase::ParticleContainer alldaughters;
+        std::vector<ParticleBase*> alldaughters;
         ParticleBase::collectVertexDaughters(alldaughters, posindex);
 
         // select daughters that are either charged, or have an initialized vertex
-        ParticleBase::ParticleContainer vtxdaughters;
+        std::vector<ParticleBase*> vtxdaughters;
 
         vector<RecoTrack*> trkdaughters;
         for (auto daughter : alldaughters) {
           if (daughter->type() == ParticleBase::kRecoTrack) {
             trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
           } else if (daughter->hasPosition()
-                     && fitparams->getStateVector()(daughter->posIndex()) != 0) { // //JFK: change from daughter->posIndex()+1 2017-11-13
+                     && fitparams->getStateVector()(daughter->posIndex()) != 0) {
             vtxdaughters.push_back(daughter);
           }
         }
@@ -144,16 +144,17 @@ namespace TreeFitter {
           if (trkdaughters.size() > 2) {
             std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
           }
+
           // now, just take the first two ...
           RecoTrack* dau1 = trkdaughters[0];
           RecoTrack* dau2 = trkdaughters[1];
+
           //Using pion hypothesis is fine for initialization purposes
           Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
           Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-          //          B2DEBUG(80, "Helix1 is " << helix1(1) << " | " << helix1(2) << " | " << helix1(3) << " | " << helix1(4) << " | " << helix1(5));
-          //          B2DEBUG(80, "Helix2 is " << helix2(1) << " | " << helix2(2) << " | " << helix2(3) << " | " << helix2(4) << " | " << helix2(5));
+
           double flt1(0), flt2(0);
-          //    HepPoint v ;
+
           TVector3 v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
@@ -221,7 +222,7 @@ namespace TreeFitter {
       fitparams->getStateVector().segment(posindex , 3) = fitparams->getStateVector().segment(posindexmom, 3);
 
     }
-    // step 5: initialize the lifetime
+
     return initTau(fitparams);
   }
 
@@ -303,7 +304,7 @@ namespace TreeFitter {
           p.getH()(3, daumomindex + jmom) = -px / energy;
         }
 
-        //FIXME switched off
+        //FIXME switched off linear approximation should be fine the stuff below uses a helix...
       } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
 
         tau =  fitparams.getStateVector()(dautauindex);
@@ -346,7 +347,6 @@ namespace TreeFitter {
       case Constraint::mass:
       case Constraint::massEnergy:
         status |= projectMassConstraint(fitparams, p);
-        //chisq = filterMassConstraintOnDaughters(fitpar) ;
         break;
       case Constraint::geometric:
         status |= projectGeoConstraint(fitparams, p);
@@ -386,9 +386,6 @@ namespace TreeFitter {
     // the mass constraint
     if (m_massconstraint) {
       if (!m_isconversion) {
-        //     if( mother() && mother()->type()==ParticleBase::kUpsilon)
-        //  list.push_back(Constraint(this,Constraint::massEnergy,depth)) ;
-        //       else
         list.push_back(Constraint(this, Constraint::mass, depth, 1, 10));
       } else {
         list.push_back(Constraint(this, Constraint::conversion, depth, 1, 3));

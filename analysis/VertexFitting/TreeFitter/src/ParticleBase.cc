@@ -84,10 +84,10 @@ namespace TreeFitter {
 
   void ParticleBase::removeDaughter(const ParticleBase* pb)
   {
-    ParticleBase::iter it = std::find(m_daughters.begin(), m_daughters.end(), pb);
-    if (it != m_daughters.end()) {
-      delete *it;
-      m_daughters.erase(it);
+    std::vector<ParticleBase*>::iterator iter = std::find(m_daughters.begin(), m_daughters.end(), pb);
+    if (iter != m_daughters.end()) {
+      m_daughters.erase(iter);
+      delete *iter;
     } else {
       B2ERROR("Cannot remove particle, because not found ...");
     }
@@ -123,7 +123,7 @@ namespace TreeFitter {
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
         rc = new InternalParticle(particle, 0, forceFitAll);
       } else {
-        rc = new InternalParticle(particle, 0, forceFitAll);
+        rc = new InternalParticle(particle, 0, forceFitAll); //FIXME ????????
       }
 
     } else if (particle->getMdstArrayIndex() || particle->getTrack() || particle->getECLCluster()) { // external particles
@@ -133,7 +133,7 @@ namespace TreeFitter {
       } else if (particle->getECLCluster()) {
         rc = new RecoPhoton(particle, mother); // reconstructed photon
 
-      } else if (isAResonance(particle)) {//FIXME make this klong?
+      } else if (isAResonance(particle)) {
         rc = new RecoResonance(particle, mother);
 
       }  else {// FIXME or make this Klong??
@@ -198,6 +198,7 @@ namespace TreeFitter {
           break ;
 
         default:
+
           //everything with boosted flight length less than 1 micrometer
           rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
@@ -242,14 +243,16 @@ namespace TreeFitter {
 
     if (tauindex >= 0) {
 
-      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
+      /** cant multiply by momentum here because unknown but average mom is 3 Gev */
+      double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass() * 3;
+
       double sigtau = tau > 0 ? 20 * tau : 999;
 
-      const double maxdecaytime = 2000;
+      const double maxDecayLength = 2000;
       double mom = particle()->getP();
 
       if (mom > 0.0) {
-        sigtau = std::min(maxdecaytime, sigtau); // FIXME TAU
+        sigtau = std::min(maxDecayLength, sigtau);
       }
 
       if (tau > 0) {
@@ -344,6 +347,9 @@ namespace TreeFitter {
       posx       = x_vec(row);
       momx       = p_vec(row);
 
+      /** the direction of the momentum is very well known from the kinematic constraints
+       *  that is why we do not extract the distance as a vector here
+       * */
       p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
 
       p.getH()(row, posindexmother + row) = 1;
@@ -379,6 +385,9 @@ namespace TreeFitter {
     const double pz = fitparams.getStateVector()(momindex + 2);
     const double E  = fitparams.getStateVector()(momindex + 3);
 
+    /** be awawre that the signs here are important
+     * E-|p|-m extracts a negative mass and messes with the momentum !
+     * */
     p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
 
     p.getH()(0, momindex)     = 2.0 * px;

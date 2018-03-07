@@ -136,7 +136,8 @@ class SingleIOV(AlgorithmStrategy):
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
         self.machine.setup_algorithm(iteration=iteration)
-        B2INFO("Beginning execution of {}".format(self.algorithm.name))
+        # After this point, the logging is in the stdout of the algorithm
+        B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
         runs_to_execute = []
         # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
         if iov:
@@ -197,7 +198,8 @@ class SequentialRunByRun(AlgorithmStrategy):
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
         self.machine.setup_algorithm(iteration=iteration)
-        B2INFO("Beginning execution of {}".format(self.algorithm.name))
+        # After this point, the logging is in the stdout of the algorithm
+        B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
         runs_to_execute = []
         all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
         # If we were given a specific IoV to calibrate we just execute over runs in that IoV

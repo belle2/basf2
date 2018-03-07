@@ -21,7 +21,7 @@ namespace Belle2 {
   class TOPPmtGainPar : public TObject {
   public:
     /**
-     * number of PMT pixeld
+     * number of PMT pixels
      */
     enum {c_NumPmtPixels = 16};
 

@@ -30,7 +30,9 @@ def reconstruction_path(inputfiles):
     path = create_path()
     inputMdstList('MC7', inputfiles, path=path)
     fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5'),
-                       ('gamma', 'goodGamma == 1 and abs(clusterTiming) < 20 and clusterE9E25 > 0.7 and minC2HDist > 35')],
+                       ('gamma', '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or '
+                        '[clusterReg == 3 and E > 0.16]] and abs(clusterTiming) < 20 and clusterE9E25 > 0.7'
+                        ' and minC2HDist > 35')],
                       path=path)
     reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
     massVertexKFit('pi0', 0.1, path=path)

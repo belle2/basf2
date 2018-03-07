@@ -30,7 +30,11 @@ path.add_module(skimfilter)
 # Signal side reconstruction
 fillParticleList('mu+', 'muid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
 fillParticleList('e+', 'eid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
+fillParticleList(
+    'gamma',
+    '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]',
+    writeOut=True,
+    path=path)
 reconstructDecay(
     'B+:sig_e -> gamma e+',
     '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6',
@@ -47,8 +51,10 @@ copyLists('B+:sig', ['B+:sig_e', 'B+:sig_mu'], writeOut=True, path=path)
 looseMCTruth('B+:sig', path=path)
 rankByHighest('B+:sig', 'daughter(0,E)', outputVariable='PhotonCandidateRank', path=path)
 buildRestOfEvent('B+:sig', path=path)
-clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4',
-                  'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
+clean_roe_mask = (
+    'CleanROE',
+    'dr < 2 and abs(dz) < 4',
+    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.9 and trackMatchType==0')
 appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 applyCuts('B+:sig', 'ROE_deltae(CleanROE) < 2.0 and ROE_mbc(CleanROE) > 4.8', path=path)
 

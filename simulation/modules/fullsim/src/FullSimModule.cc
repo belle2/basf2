@@ -159,17 +159,22 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-  //FullSim does not create a new collection.
-  //For most of the cases, the module will reuse and update the existing one.
+  // MCParticles input and output collections can be different.
+  // Output collection is always the default one.
+  // In case we simulate only beam background events using BG mixing or BG overlay
+  // there is no input collection.
 
-  //For a certain cases, the input MCParticles collection name may be empty.
   if (m_mcParticleInputColName.empty()) {
-    StoreArray<MCParticle>().isOptional(m_mcParticleInputColName);
+    // input and output collections are the same
+    // register in datastore because the input collection may not exist (case: only BG)
+    StoreArray<MCParticle>().registerInDataStore();
   } else {
-    StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+    // input and output collections are different
+    StoreArray<MCParticle>().isRequired(m_mcParticleInputColName); // input collection
+    StoreArray<MCParticle>().registerInDataStore(); // output collection
   }
 
-  //Make sure the EventMetaData collection already exists.
+  //Make sure the EventMetaData already exists.
   StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.

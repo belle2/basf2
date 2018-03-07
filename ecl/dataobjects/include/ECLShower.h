@@ -78,8 +78,8 @@ namespace Belle2 {
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
-      m_ShowerHadronIntensity = 0;         /**< Shower Hadron Intensity*/
-      m_NumberOfHadronDigits = 0;         /**< Shower Number of hadron digits*/
+      m_ShowerHadronIntensity = 0.0;         /**< Shower Hadron Intensity*/
+      m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
 
     }
 
@@ -201,7 +201,7 @@ namespace Belle2 {
 
     /*! Set numver of hadron digits
      */
-    void setNumberOfHadronDigits(int NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
+    void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -361,7 +361,7 @@ namespace Belle2 {
     /*! Get number of hadron digits
      * @return m_NumberOfHadronDigits
      */
-    int getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
+    double getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const

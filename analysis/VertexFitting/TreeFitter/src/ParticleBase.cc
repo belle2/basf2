@@ -340,7 +340,7 @@ namespace TreeFitter {
     const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
     const Eigen::Matrix<double, 1, 3> tau_vec = fitparams.getStateVector().segment(tauindex, 3);
-    double tau = 0;
+    double tau = fitparams.getStateVector().segment(tauindex, 3);
 
     double posxmother = 0, posx = 0, momx = 0;
 

@@ -63,7 +63,7 @@ namespace Belle2 {
     }
 
     /** Construct ID from string representing the structure */
-    explicit BKLMElementID(const std::string& module) throw(std::invalid_argument);
+    explicit BKLMElementID(const std::string& module);
 
     /** Copy constructor */
     BKLMElementID(const BKLMElementID& b): m_id(b.m_id) {}

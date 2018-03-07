@@ -50,11 +50,9 @@ void PXDPostErrorCheckerModule::event()
   bool had_dhe = false;
   unsigned short triggergate = 0;
   unsigned short dheframenr = 0;
-  B2DEBUG(20, "Iterate PXD DAQ Status");
-  auto evt = *m_storeDAQEvtStats;
   PXDErrorFlags mask = EPXDErrMask::c_NO_ERROR;
-  B2DEBUG(20, "Iterate PXD Packets");
-  for (auto& pkt : evt) {
+  B2DEBUG(20, "Iterate PXD Packets for this Event");
+  for (auto& pkt : *m_storeDAQEvtStats) {
     B2DEBUG(20, "Iterate DHC in Pkt " << pkt.getPktIndex());
     for (auto& dhc : pkt) {
       B2DEBUG(20, "Iterate DHE in DHC " << dhc.getDHCID());
@@ -81,5 +79,5 @@ void PXDPostErrorCheckerModule::event()
       }
     }
   }
-  evt.addErrorMask(mask);
+  m_storeDAQEvtStats->addErrorMask(mask);
 }

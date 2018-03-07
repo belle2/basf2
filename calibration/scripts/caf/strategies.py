@@ -230,20 +230,44 @@ class SequentialRunByRun(AlgorithmStrategy):
             # Does this count as a successful execution?
             if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
                 self.machine.complete()
-                # If we've succeeded but we have a previous success, commit the previous one
+                # If we've succeeded but we have a previous success we can commit the previous payloads
+                # since we have new ones ready
                 if last_successful_payloads and last_successful_result:
+                    B2INFO("Saving the most recent payloads for {} to be committed later.".format(iov_from_runs(current_runs)))
+                    # Save the payloads and result
+                    new_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
+                    new_successful_result = self.machine.result
+                    B2INFO("We just succeded in execution of the Algorithm."
+                           " Will now commit payloads from the previous success for {}.".format(last_successful_result.iov))
                     self.machine.algorithm.algorithm.commit(last_successful_payloads)
                     self.results.append(last_successful_result)
+                    # If there are remaining runs we need to have the current payloads ready to commit after the next execution
+                    if remaining_runs:
+                        last_successful_payloads = new_successful_payloads
+                        last_successful_result = new_successful_result
+                    # If there's not more runs to process we should also commit the new ones
+                    else:
+                        B2INFO("We have no more runs to process. "
+                               "Will now commit the most recent payloads for {}".format(new_successful_result.iov))
+                        self.machine.algorithm.algorithm.commit(new_successful_payloads)
+                        self.results.append(new_successful_result)
+                        break
+                # if there's no previous success this must be the first run executed
                 else:
-                    # Need to commit if we have a success and no remaining data
-                    if not remaining_runs:
-                        B2INFO("No runs left to be processed, committing results of this execution.")
+                    # Need to save payloads for later if we have a success but runs remain
+                    if remaining_runs:
+                        B2INFO("Saving the most recent payloads for {} to be committed later.".format(iov_from_runs(current_runs)))
+                        # Save the payloads and result
+                        last_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
+                        last_successful_result = self.machine.result
+                    # Need to commit and exit if we have a success and no remaining data
+                    else:
+                        B2INFO("We just succeeded in execution of the Algorithm."
+                               " No runs left to be processed, so we are committing results of this execution.")
                         self.machine.algorithm.algorithm.commit()
                         self.results.append(self.machine.result)
                         break
-                # Save the payloads and result
-                last_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
-                last_successful_result = self.machine.result
+
                 previous_runs = current_runs[:]
                 current_runs = []
             # If it wasn't successful, was it due to lack of data in the runs?

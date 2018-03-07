@@ -259,9 +259,7 @@ namespace TreeFitter {
         sigtau = 1000;
 
       }
-      //fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
-      fitparams->getCovariance().block<3, 3>(tauindex, tauindex) =
-        Eigen::Matrix<double, 3, 3>::Constant(3, 3, sigtau * sigtau);
+      fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
 
     return status;
@@ -330,17 +328,13 @@ namespace TreeFitter {
     const int tauindex = tauIndex();
     const int momindex = momIndex();
 
-    //std::cout << "posindexmother " << posindexmother << " posindex " << posindex << " tauindex " << tauindex << " momindex " << momindex
-    //          << std::endl;
-
     const Eigen::Matrix<double, 1, 3> p_vec = fitparams.getStateVector().segment(momindex, 3);
     const double mom = p_vec.norm();
     const double mom3 = mom * mom * mom;
     const Eigen::Matrix<double, 1, 3> x_vec = fitparams.getStateVector().segment(posindex, 3);
     const Eigen::Matrix<double, 1, 3> x_m = fitparams.getStateVector().segment(posindexmother, 3);
 
-    const Eigen::Matrix<double, 1, 3> tau_vec = fitparams.getStateVector().segment(tauindex, 3);
-    double tau = fitparams.getStateVector().segment(tauindex, 3);
+    double tau = fitparams.getStateVector()(tauindex);
 
     double posxmother = 0, posx = 0, momx = 0;
 
@@ -349,28 +343,27 @@ namespace TreeFitter {
       posxmother = x_m(row);
       posx       = x_vec(row);
       momx       = p_vec(row);
-      tau = tau_vec(row);
 
       p.getResiduals()(row) = posxmother + tau * momx / mom - posx ;
 
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, posindex + row) = -1;
-      p.getH()(row, tauindex + row) = momx / mom;
+      p.getH()(row, tauindex) = momx / mom;
     }
 
-    p.getH()(0, momindex)   = tau_vec(0) * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
-    p.getH()(1, momindex + 1) = tau_vec(1) * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
-    p.getH()(2, momindex + 2) = tau_vec(2) * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
+    p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
+    p.getH()(1, momindex + 1) = tau * (p_vec(0) * p_vec(0) + p_vec(2) * p_vec(2)) / mom3 ;
+    p.getH()(2, momindex + 2) = tau * (p_vec(1) * p_vec(1) + p_vec(0) * p_vec(0)) / mom3 ;
 
 
-    p.getH()(0, momindex + 1) = - tau_vec(0) * p_vec(0) * p_vec(1) / mom3 ;
-    p.getH()(0, momindex + 2) = - tau_vec(0) * p_vec(0) * p_vec(2) / mom3 ;
+    p.getH()(0, momindex + 1) = - tau * p_vec(0) * p_vec(1) / mom3 ;
+    p.getH()(0, momindex + 2) = - tau * p_vec(0) * p_vec(2) / mom3 ;
 
-    p.getH()(1, momindex + 0) = - tau_vec(1) * p_vec(1) * p_vec(0) / mom3 ;
-    p.getH()(1, momindex + 2) = - tau_vec(1) * p_vec(1) * p_vec(2) / mom3 ;
+    p.getH()(1, momindex + 0) = - tau * p_vec(1) * p_vec(0) / mom3 ;
+    p.getH()(1, momindex + 2) = - tau * p_vec(1) * p_vec(2) / mom3 ;
 
-    p.getH()(2, momindex + 0) = - tau_vec(2) * p_vec(2) * p_vec(0) / mom3 ;
-    p.getH()(2, momindex + 1) = - tau_vec(2) * p_vec(2) * p_vec(1) / mom3 ;
+    p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
+    p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
 
     return ErrCode::success;
   }
@@ -420,9 +413,13 @@ namespace TreeFitter {
 
       assert(mother());
 
+      /**
+       * In principle we have to devide by a momentum here but since the initial momentum is unknown
+       * and is maximally a factor of 5 we dont need to do that here
+       * */
       const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
 
-      fitparams->getStateVector().segment(tauindex, 3) = Eigen::Matrix<double, 1, 3>::Constant(1, 3, value);
+      fitparams->getStateVector()(tauindex) = value;
     }
 
     return ErrCode::success;

@@ -40,7 +40,6 @@ namespace TreeFitter {
     m_niter(-1),
     m_prec(prec)
   {
-    //JFK FIXME maybe theres a smarter way
     m_decaychain =  new DecayChain(particle, false, ipDimension);
 
     m_fitparams  = new FitParams(m_decaychain->dim());
@@ -334,7 +333,6 @@ namespace TreeFitter {
     const ParticleBase* pb = m_decaychain->locate(&cand);
 
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
-      //const int tauindex = pb->tauIndex();
       const int momindex = pb->momIndex();
 
       const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(momindex, 3);
@@ -355,7 +353,6 @@ namespace TreeFitter {
 
       const double len = std::get<0>(lenTuple);
       const double t = len / mom * mBYc;
-      //const double t = absTau / absMom * mBYc;
 
       Eigen::Matrix<double, 1, 4> jac = Eigen::Matrix<double, 1, 4>::Zero();
       jac(0) =  1. / mom * mBYc;
@@ -382,50 +379,12 @@ namespace TreeFitter {
   std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
+
       const int tauindex = pb->tauIndex();
-      //const int momindex = pb->momIndex();
 
-      const Eigen::Matrix<double, 1, 3 >tau_vec = fitparams->getStateVector().segment(tauindex, 3);
-      //const Eigen::Matrix<double, 1, 3 >mom_vec = fitparams->getStateVector().segment(momindex, 3);
+      const double len = fitparams->getStateVector()(tauindex);
 
-      //const double mom = mom_vec.norm();
-      //const double mom3 = mom * mom * mom;
-
-      double len = tau_vec(0) + tau_vec(1) + tau_vec(2);
-      len /= 3.;
-
-
-      //std::cout << "----------------------------------------------"   << std::endl;
-      //std::cout << "tau_vec(0) " << tau_vec(0) << " tau_vec(1) " << tau_vec(1) << " tau_vec(2) " << tau_vec(
-      //            2) << " len " << len   << std::endl;
-
-      //std::cout << "len (tau norm)    " << len  << std::endl;
-      //std::cout << "len (tau * p )    " << len2  << std::endl;
-      //std::cout << "len (tau * p/|p| )" << len3  << std::endl;
-
-      Eigen::Matrix<double, 3, 3 > cov = Eigen::Matrix<double, 3, 3 >::Zero(3, 3);
-
-      cov.block<3, 3>(0, 0) = fitparams->getCovariance().block<3, 3>(tauindex, tauindex);
-      //cov.block<3, 3>(3, 3) = fitparams->getCovariance().block<3, 3>(momindex, momindex);
-
-      Eigen::Matrix<double, 1, 3 > jac = Eigen::Matrix<double, 1, 3 >::Zero(1, 3);
-      // d/dtau
-      //jac(0) = tau_vec(0) / len ;
-      //jac(1) = tau_vec(1) / len ;
-      //jac(2) = tau_vec(2) / len ;
-
-      jac(0) = 1. / 3.;
-      jac(1) = 1. / 3.;
-      jac(2) = 1. / 3.;
-
-      //jac(3) = (tau_vec(0) * (mom_vec(1) * mom_vec(1) + mom_vec(2) * mom_vec(2)) - tau_vec(1) * mom_vec(0) * mom_vec(1) - tau_vec(
-      //            2) * mom_vec(0) * mom_vec(2)) / mom3  ;
-      //jac(4) = (tau_vec(1) * (mom_vec(0) * mom_vec(0) + mom_vec(2) * mom_vec(2)) - tau_vec(0) * mom_vec(1) * mom_vec(0) - tau_vec(
-      //            2) * mom_vec(1) * mom_vec(2)) / mom3  ;
-      //jac(5) = (tau_vec(2) * (mom_vec(1) * mom_vec(1) + mom_vec(0) * mom_vec(0)) - tau_vec(1) * mom_vec(2) * mom_vec(1) - tau_vec(
-      //            0) * mom_vec(2) * mom_vec(0)) / mom3  ;
-
-      const double lenErr = jac * cov.selfadjointView<Eigen::Lower>() * jac.transpose();
+      const double lenErr = fitparams->getCovariance()(tauindex, tauindex);
 
       return std::make_tuple(len, lenErr);
     }

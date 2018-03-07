@@ -46,7 +46,7 @@ namespace TreeFitter {
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const { return mother() ? 10 : 7 ; }
+    virtual int dim() const { return mother() ? 8 : 7 ; }
 
     /**  type */
     virtual int type() const { return kInternalParticle ; }
@@ -58,7 +58,7 @@ namespace TreeFitter {
     virtual int tauIndex() const { return mother() ? index() + 3 : -1 ; }
 
     /** momentum index in fit params depending on wheter it has a mother  */
-    virtual int momIndex() const { return mother() ? index() + 6 : index() + 3 ; }
+    virtual int momIndex() const { return mother() ? index() + 4 : index() + 3 ; }
 
     /** has energy in fitparams  */
     virtual bool hasEnergy() const { return true ; }

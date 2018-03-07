@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef THRUSTOEVENT_H
-#define THRUSTOEVENT_H
+#ifndef EVENTSHAPE_H
+#define EVENTSHAPE_H
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -26,7 +26,7 @@ namespace Belle2 {
    * Mainly used to compute the thrust of a tau-taubar event.
    */
 
-  class ThrustOfEvent : public RelationsObject {
+  class EventShape : public RelationsObject {
 
   public:
 
@@ -34,7 +34,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    ThrustOfEvent() : m_thrustAxis(0.0, 0.0, 0.0), m_thrust(0.0) {};
+    EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_thrust(0.0) {};
 
     // setters
     /**
@@ -79,7 +79,7 @@ namespace Belle2 {
 
     float m_thrust;   /**< magnitude of thrust */
 
-    ClassDef(ThrustOfEvent, 1) /**< class definition */
+    ClassDef(EventShape, 1) /**< class definition */
 
   };
 

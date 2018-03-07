@@ -28,7 +28,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -660,13 +660,13 @@ namespace Belle2 {
 
     double cosToThrustOfEvent(const Particle* part)
     {
-      StoreObjPtr<ThrustOfEvent> thrust;
-      if (!thrust) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
       PCmsLabTransform T;
-      TVector3 th = thrust->getThrustAxis();
+      TVector3 th = evtShape->getThrustAxis();
       TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
       return std::cos(th.Angle(particleMomentum));
     }

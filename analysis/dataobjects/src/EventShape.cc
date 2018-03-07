@@ -8,19 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
 
 using namespace Belle2;
 
-void ThrustOfEvent::addThrustAxis(TVector3 thrustAxis)
+void EventShape::addThrustAxis(TVector3 thrustAxis)
 {
   m_thrustAxis = thrustAxis;
 }
 
-void ThrustOfEvent::addThrust(float thrust)
+void EventShape::addThrust(float thrust)
 {
   m_thrust = thrust;
 }

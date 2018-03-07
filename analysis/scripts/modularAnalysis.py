@@ -2036,12 +2036,14 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_main):
+# FIXME: Make this EventShape (include missing)
+def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main):
     """
-    Calculates the Thrust of the event using ParticleLists provided. If no ParticleList is
+    Calculates the Thrust of the event and the missing information using ParticleLists provided. If no ParticleList is
     provided, default ParticleLists are used(all track and all hits in ECL without associated track).
 
-    The Thrust value is stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
+    The Thrust and missing values are
+    stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
     and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
     particle and the Thrust of the event in the CM system, are also created.
 
@@ -2073,7 +2075,7 @@ def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_ma
     else:
         particleLists = inputListNames
 
-    thrustModule = register_module('ThrustOfEvent')
-    thrustModule.set_name('ThrustOfEvent_')
-    thrustModule.param('particleLists', particleLists)
-    path.add_module(thrustModule)
+    eventShapeModule = register_module('EventShape')
+    eventShapeModule.set_name('EventShape_')
+    eventShapeModule.param('particleLists', particleLists)
+    path.add_module(eventShapeModule)

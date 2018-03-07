@@ -3,16 +3,16 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jorge Martinez, Michel Villanueva                        *
+ * Contributors: Jorge Martinez, Michel Villanueva, Ami Rostomyan         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/ThrustOfEvent/ThrustOfEventModule.h>
+#include <analysis/modules/EventShape/EventShapeModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -33,61 +33,61 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ThrustOfEvent)
+REG_MODULE(EventShape)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ThrustOfEventModule::ThrustOfEventModule() : Module()
+EventShapeModule::EventShapeModule() : Module()
 {
   // Set module properties
-  setDescription("Module to compute Thrust of a particle list, mainly used to compute the thrust of a tau-taubar event.");
+  setDescription("Module to compute event shape attributes like Thrust of event, missing momentum and energy.");
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
 
 }
 
-ThrustOfEventModule::~ThrustOfEventModule()
+EventShapeModule::~EventShapeModule()
 {
 }
 
-void ThrustOfEventModule::initialize()
+void EventShapeModule::initialize()
 {
-  StoreObjPtr<ThrustOfEvent> thrustOfEvt;
-  thrustOfEvt.registerInDataStore();
+  StoreObjPtr<EventShape> evtShape;
+  evtShape.registerInDataStore();
 
-  unsigned nParticleLists = m_particleLists.size();
-  B2INFO("Number of ParticleLists to calculate Thrust: " << nParticleLists << " ");
 }
 
-void ThrustOfEventModule::beginRun()
+void EventShapeModule::beginRun()
 {
 }
 
-void ThrustOfEventModule::event()
+void EventShapeModule::event()
 {
-  StoreObjPtr<ThrustOfEvent> thrust;
+  StoreObjPtr<EventShape> thrust;
   if (!thrust) thrust.create();
-
-  TVector3 thrustAxis = ThrustOfEventModule::getThrustOfEvent(m_particleLists);
+  vector<TVector3> forThrust = EventShapeModule::getParticleList(m_particleLists);
+  TVector3 thrustAxis = EventShapeModule::getThrustOfEvent(forThrust);
   thrust->addThrustAxis(thrustAxis);
   thrust->addThrust(thrustAxis.Mag());
+
+  TVector3 missingMomentum = EventShapeModule::getMissingMomentum(forThrust);
 }
 
-void ThrustOfEventModule::endRun()
+void EventShapeModule::endRun()
 {
 }
 
-void ThrustOfEventModule::terminate()
+void EventShapeModule::terminate()
 {
 }
 
-TVector3 ThrustOfEventModule::getThrustOfEvent(vector<string> particleLists)
+vector<TVector3> EventShapeModule::getParticleList(vector<string> particleLists)
 {
   int nParticleLists = particleLists.size();
-  B2DEBUG(10, "ThrustOfEventModule: Getting Thrust of Event");
+  B2INFO("Number of ParticleLists to calculate Event Shape variables: " << nParticleLists << " ");
   PCmsLabTransform T;
   vector<TVector3> forthrust;
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
@@ -106,9 +106,22 @@ TVector3 ThrustOfEventModule::getThrustOfEvent(vector<string> particleLists)
       forthrust.push_back(p_cms.Vect());
     }
   }
+  return forthrust;
+}
 
+
+TVector3 EventShapeModule::getThrustOfEvent(vector<TVector3> forthrust)
+{
   TVector3 th = Thrust::calculateThrust(forthrust);
-
-
   return th;
+}
+
+TVector3 EventShapeModule::getMissingMomentum(vector<TVector3> forthrust)
+{
+  TVector3 beamMomentumCM(0., 0., 0.);
+  int nParticles = forthrust.size();
+  for (int i = 0; i < nParticles; ++i) {
+    beamMomentumCM -= forthrust.at(i);
+  }
+  return beamMomentumCM;
 }

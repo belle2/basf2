@@ -20,7 +20,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -318,13 +318,22 @@ namespace Belle2 {
 
     double thrustOfEvent(const Particle*)
     {
-      StoreObjPtr<ThrustOfEvent> thrust;
-      if (!thrust) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double th = thrust->getThrust();
+      double th = evtShape->getThrust();
       return th;
+    }
+
+    // FIXME: Get x,y,z of thrust and missing
+
+    double missingMomentumCMS(const Particle*)
+    {
+
+      double missing;
+      return missing;
     }
 
 

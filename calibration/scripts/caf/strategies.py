@@ -47,6 +47,9 @@ class AlgorithmStrategy(ABC):
                            "input_files"
                            ]
 
+    #: Granularity of collector that can be run by this algorithm properly
+    allowed_granularities = ["run", "all"]
+
     def __init__(self, algorithm):
         """
         """
@@ -172,6 +175,8 @@ class SequentialRunByRun(AlgorithmStrategy):
     This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
 """
+
+    allowed_granularities = ["run"]
 
     def __init__(self, algorithm):
         """

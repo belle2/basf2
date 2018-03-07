@@ -68,8 +68,6 @@ void ECLClusterPSDModule::beginRun()
 void ECLClusterPSDModule::event()
 {
 
-  const double weight = 1.0;
-
   for (auto& shower : eclShowers) {
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
@@ -80,6 +78,9 @@ void ECLClusterPSDModule::event()
     double nWaveforminCluster = 0;
 
     for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
+
+      const auto weight = relatedDigits.weight(iRel);
+
       const auto caldigit = relatedDigits.object(iRel);
       const double digit2CChi2 = caldigit->getTwoComponentChi2();
 

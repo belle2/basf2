@@ -40,10 +40,10 @@ namespace Belle2 {
     double eclClusterHadronIntensity(const Particle* particle)
     {
       double result = -999.0;
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
-          result = shower->getClusterHadronIntensity();
+          result = cluster->getClusterHadronIntensity();
         }
       }
       return result;
@@ -52,10 +52,10 @@ namespace Belle2 {
     double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
       int result = -999;
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
-          result = shower->getNumberOfHadronDigits();
+          result = cluster->getNumberOfHadronDigits();
         }
       }
       return result;
@@ -482,9 +482,9 @@ namespace Belle2 {
     {
       int result = 0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->hasPulseShapeDiscrimination();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->hasPulseShapeDiscrimination();
       }
       return result;
     }

@@ -162,10 +162,13 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
-simulation.add_simulation(main, components=['PXD', 'SVD', 'MagneticFieldConstant4LimitedRSVD'], usePXDDataReduction=True)
+# turn off the cleanup as the storearrays are needed
+simulation.add_simulation(main, components=['PXD', 'SVD', 'MagneticFieldConstant4LimitedRSVD'], usePXDDataReduction=True,
+                          cleanupPXDDataReduction=False)
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')
-roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0, "SendROIsDownscaler": 0, "CutNrROIs": 5})
+roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0,
+                           "SendROIsDownscaler": 0, "CutNrROIs": 5, "AcceptAll": True})
 
 main.add_module(roiPayloadAssembler)
 

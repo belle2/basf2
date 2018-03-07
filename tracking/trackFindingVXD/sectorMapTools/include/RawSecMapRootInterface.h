@@ -51,11 +51,6 @@ namespace Belle2 {
     /** Mask for storing dataSets to be piped into 3hit-tree. */
     FilterValueDataSet<SecIDTriplet> m_data3Hit;
 
-    /** interface to the TTree storing four-hit-variables. */
-    StoreObjPtr<RootMergeable<TTree>> m_tree4Hit;
-
-    /** Mask for storing dataSets to be piped into 4hit-tree. */
-    FilterValueDataSet<SecIDQuadruplet> m_data4Hit;
 
   public:
 
@@ -67,9 +62,8 @@ namespace Belle2 {
       m_tree2Hit((m_name + std::string("2Hit")), DataStore::c_Persistent),
       m_data2Hit( {}),
                 m_tree3Hit((m_name + std::string("3Hit")), DataStore::c_Persistent),
-                m_data3Hit({}),
-                m_tree4Hit((m_name + std::string("4Hit")), DataStore::c_Persistent),
-                m_data4Hit({})
+                m_data3Hit({})
+
     {
       // the "create" option results in the file not being opened if already existing
       std::string fileName = mapName + "_" + tag +  ".root";
@@ -96,7 +90,7 @@ namespace Belle2 {
       m_file->cd();
 
       // preparing StoreObjPtr:
-      bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")));
+      bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")), DataStore::c_ErrorIfAlreadyRegistered);
       bool constructed = m_tree2Hit.construct((m_name + std::string("2Hit")).c_str(), "Raw data of two-hit-combinations for a sectorMap");
       B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
 
@@ -136,7 +130,7 @@ namespace Belle2 {
       m_file->cd();
 
       // preparing StoreObjPtr:
-      bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")));
+      bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")), DataStore::c_ErrorIfAlreadyRegistered);
       bool constructed = m_tree3Hit.construct((m_name + std::string("3Hit")).c_str(),
                                               "Raw data of three-hit-combinations for a sectorMap");
       B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
@@ -169,50 +163,6 @@ namespace Belle2 {
               m_tree3Hit->get().GetEntries());
     }
 
-
-
-    /** initialize the RawSecMapRootInterface for four-hit-combinations (to be called in Module::initialize(). */
-    void initialize4Hit(std::vector<std::string> filterNames)
-    {
-      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: start");
-      m_file->cd();
-
-      // preparing StoreObjPtr:
-      bool registered = m_tree4Hit.registerInDataStore((m_name + std::string("4Hit")));
-      bool constructed = m_tree4Hit.construct((m_name + std::string("4Hit")).c_str(),
-                                              "Raw data of four-hit-combinations for a sectorMap");
-      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
-
-      // preparing data-mask for 2-hit-combinations:
-      m_data4Hit = FilterValueDataSet<SecIDQuadruplet>(filterNames);
-
-      m_tree4Hit->get().Branch("expNo", &(m_data4Hit.expNo));
-      m_tree4Hit->get().Branch("runNo", &(m_data4Hit.runNo));
-      m_tree4Hit->get().Branch("evtNo", &(m_data4Hit.evtNo));
-      m_tree4Hit->get().Branch("trackNo", &(m_data4Hit.trackNo));
-      m_tree4Hit->get().Branch("pdg", &(m_data4Hit.pdg));
-      m_tree4Hit->get().Branch("outerSecID", &(m_data4Hit.secIDs.outer));
-      m_tree4Hit->get().Branch("outerCenterSecID", &(m_data4Hit.secIDs.outerCenter));
-      m_tree4Hit->get().Branch("innerCenterSecID", &(m_data4Hit.secIDs.innerCenter));
-      m_tree4Hit->get().Branch("innerSecID", &(m_data4Hit.secIDs.inner));
-
-      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: adding " << filterNames.size() << " filters as branches to ttree ");
-      for (auto& name : filterNames) {
-        double* valuePtr = m_data4Hit.getValuePtr(name);
-        if (valuePtr != nullptr) {
-          B2DEBUG(5, "RawSecMapRootInterface::initialize4Hit: adding now branch with name " << name);
-          m_tree4Hit->get().Branch(name.c_str(), valuePtr);
-        } else {
-          B2ERROR("RawSecMapRootInterface::initialize4Hit: filterName " << name <<
-                  " not known! this is unintended behavior - skipping filter");
-        }
-
-      }
-      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: nBranches/nEntries: " << m_tree4Hit->get().GetNbranches() << "/" <<
-              m_tree4Hit->get().GetEntries());
-    }
-
-
     /** returns a reference to the 2-hit-dataset so one can set the relevant values. */
     FilterValueDataSet<SecIDPair>& get2HitDataSet() { return m_data2Hit; }
 
@@ -220,9 +170,6 @@ namespace Belle2 {
     /** returns a reference to the 3-hit-dataset so one can set the relevant values. */
     FilterValueDataSet<SecIDTriplet>& get3HitDataSet() { return m_data3Hit; }
 
-
-    /** returns a reference to the 4-hit-dataset so one can set the relevant values. */
-    FilterValueDataSet<SecIDQuadruplet>& get4HitDataSet() { return m_data4Hit; }
 
 
     /** fill two-hit-combinations in tree, triggers an Error if values not set yet.
@@ -253,20 +200,6 @@ namespace Belle2 {
     }
 
 
-    /** fill four-hit-combinations in tree, triggers an Error if values not set yet.
-     * (data is reset during each fill4Hit-call).*/
-    void fill4Hit()
-    {
-      if (!m_data4Hit.isValid()) {
-        B2ERROR("RawSecMapRootInterface::fill4Hit: attempt to fill invalid data in the tree! -> unintended behavior, data will not be filled.");
-        m_data4Hit.reset();
-        return;
-      }
-      m_tree4Hit->get().Fill();
-      m_data4Hit.reset();
-    }
-
-
     /** write all trees to file at end of processing. */
     void write()
     {
@@ -277,7 +210,7 @@ namespace Belle2 {
         //use TFile you created in initialize()
         m_tree2Hit->write(m_file);
         m_tree3Hit->write(m_file);
-        m_tree4Hit->write(m_file);
+
       }
     }
 

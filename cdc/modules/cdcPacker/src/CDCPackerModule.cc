@@ -73,8 +73,7 @@ void CDCPackerModule::initialize()
 
   B2INFO("CDCPacker: initialize() Called.");
 
-  StoreArray<RawCDC>::registerPersistent(m_rawCDCName);
-
+  m_rawCDCs.registerInDataStore(m_rawCDCName);
   StoreArray<CDCRawHit> storeCDCRawHits(m_cdcRawHitName);
 
   storeCDCRawHits.registerInDataStore();
@@ -188,11 +187,6 @@ void CDCPackerModule::event()
   }
 
 
-  //
-  // Proccess RawCDC data block.
-  //
-  StoreArray<RawCDC> rawCDCs;
-
   RawCOPPERPackerInfo rawcprpacker_info;
   rawcprpacker_info.exp_num = 0;
   rawcprpacker_info.run_subrun_num = 1; // run number : 14bits, subrun # : 8bits
@@ -266,7 +260,7 @@ void CDCPackerModule::event()
       }
     }
 
-    RawCDC* raw_cdc = rawCDCs.appendNew();
+    RawCDC* raw_cdc = m_rawCDCs.appendNew();
     raw_cdc->PackDetectorBuf(buf[0], nwords[0],
                              buf[1], nwords[1],
                              buf[2], nwords[2],

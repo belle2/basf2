@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RELATIONVECTOR_H
-#define RELATIONVECTOR_H
+#pragma once
 
 #include <framework/datastore/RelationEntry.h>
 #include <framework/utilities/ArrayIterator.h>
@@ -147,4 +146,3 @@ namespace Belle2 {
     const_iterator end() const { return const_iterator(this, size()); }
   };
 }
-#endif

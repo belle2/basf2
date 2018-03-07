@@ -32,7 +32,7 @@ PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
   addParam("PXDClusters", m_pxdClustersName,
            "PXDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
+           "SpacePoints collection name", string("PXDSpacePoints"));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -45,7 +45,7 @@ PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
 void PXDSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
-  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
+  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   m_pxdClusters.isRequired(m_pxdClustersName);
 
 
@@ -53,9 +53,9 @@ void PXDSpacePointCreatorModule::initialize()
   m_spacePoints.registerRelationTo(m_pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 
-  B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
-         "pxdClusters: " << m_pxdClusters.getName() <<
-         "\nspacePoints: " << m_spacePoints.getName());
+  B2DEBUG(10, "SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
+          "pxdClusters: " << m_pxdClusters.getName() <<
+          "\nspacePoints: " << m_spacePoints.getName());
 
 
   // set some counters for output:
@@ -101,9 +101,9 @@ void PXDSpacePointCreatorModule::event()
 
 void PXDSpacePointCreatorModule::terminate()
 {
-  B2INFO("PXDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
-         "pxdClusters: " << m_TESTERPXDClusterCtr <<
-         ", spacePoints: " << m_TESTERSpacePointCtr);
+  B2DEBUG(10, "PXDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+          "pxdClusters: " << m_TESTERPXDClusterCtr <<
+          ", spacePoints: " << m_TESTERSpacePointCtr);
 }
 
 

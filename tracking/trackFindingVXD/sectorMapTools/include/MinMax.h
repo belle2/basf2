@@ -25,16 +25,16 @@ namespace Belle2 {
 
     /** construtor, starts with max for min and min for max (will later be replaced by valid entries). */
     MinMax() :
-      m_minMax( {std::numeric_limits< double >::max(), std::numeric_limits< double >::min()}) {}
+      m_minMax( {std::numeric_limits< double >::max(), -std::numeric_limits< double >::max()}) {}
 
     /// reset to start values.
-    void reset() { m_minMax = {std::numeric_limits< double >::max(), std::numeric_limits< double >::min()}; }
+    void reset() { m_minMax = {std::numeric_limits< double >::max(), -std::numeric_limits< double >::max()}; }
 
     /** checks value and replaces old ones if new one is better. returns true if minMax was updated. */
     bool checkAndReplaceIfMinMax(double newVal)
     {
       bool wasAdded = false;
-      if (m_minMax.first > newVal) { m_minMax.first = newVal; wasAdded = true; }
+      if (newVal < m_minMax.first) { m_minMax.first = newVal; wasAdded = true; }
       if (m_minMax.second < newVal) { m_minMax.second = newVal; wasAdded = true; }
       return wasAdded;
     }
@@ -46,7 +46,7 @@ namespace Belle2 {
     std::string print() const
     {
       std::string min = m_minMax.first == std::numeric_limits< double >::max() ? "max<double>" : std::to_string(m_minMax.first);
-      std::string max = m_minMax.second == std::numeric_limits< double >::min() ? "min<double>" : std::to_string(m_minMax.second);
+      std::string max = m_minMax.second == -std::numeric_limits< double >::max() ? "min<double>" : std::to_string(m_minMax.second);
       return "min: " + min + ", max: " + max;
     } /**< print function returning results for min and max as a string. */
   };

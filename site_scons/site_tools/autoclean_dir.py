@@ -29,7 +29,7 @@ def autoclean_dir(env, dirname):
             dirs.remove("__pycache__")
         for filename in files:
             fullname = os.path.join(dirname, filename)
-            if fullname not in targets and not \
+            if fullname not in targets and not filename.startswith('.') and not \
                     (fullname.endswith('.pyc') and fullname[:-1] in targets):
                 print env['CLEANUPCOMSTR'] % fullname
                 os.remove(fullname)

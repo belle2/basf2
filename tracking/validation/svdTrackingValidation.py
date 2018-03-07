@@ -25,6 +25,11 @@ from tracking.validation.run import TrackingValidationRun
 import tracking
 
 
+def setupFinderModule(path):
+    tracking.add_hit_preparation_modules(path, components=["SVD"])
+    tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
+
+
 class SVD4Layer(TrackingValidationRun):
     """
     Validation class for the four 4-SVD Layer tracking
@@ -39,7 +44,7 @@ class SVD4Layer(TrackingValidationRun):
     components = None
 
     #: lambda method which is used by the validation to add the svd finder modules
-    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["SVD"]))
+    finder_module = staticmethod(setupFinderModule)
 
     #: use only the svd hits when computing efficiencies
     tracking_coverage = {
@@ -59,7 +64,7 @@ class SVD4Layer(TrackingValidationRun):
 
 def main():
     """
-    create SVD validation classa and execute
+    create SVD validation class and execute
     """
     validation_run = SVD4Layer()
     validation_run.configure_and_execute_from_commandline()

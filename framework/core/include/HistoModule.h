@@ -1,5 +1,3 @@
-#ifndef HISTO_MODULE_H
-#define HISTO_MODULE_H
 //+
 // File : HistoModule.h
 // Description : Base class of module with histograms
@@ -8,9 +6,10 @@
 // Date : 30 - Jul - 2010
 //-
 
+#pragma once
+
 #include <framework/core/Module.h>
 #include <framework/pcore/RbTuple.h>
-
 
 #define REG_HISTOGRAM   Belle2::RbTupleManager::Instance().register_module ( this );
 
@@ -53,4 +52,3 @@ namespace Belle2 {
   };
 
 }
-#endif

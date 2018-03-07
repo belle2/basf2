@@ -1,4 +1,7 @@
-// rok@f9lab08:~/slc$ g++ -Iinclude -DMPOD_MAIN hvcontrol/arichlv/src/MPOD.cc -lsnmp -o MPOD
+// ~/slc$ g++ -Iinclude -DMPOD_MAIN hvcontrol/arichlv/src/MPOD.cc -lsnmp -o MPOD
+// ~/slc$ g++ -Iinclude -DMPOD_MAIN hvcontrol/arichlv/src/MPOD.cc -lnetsnmp -o MPOD  #Ubuntu 16.04 LTS
+// ~/public_html/mpod$ sudo -H -u www-data bash -c './MPOD 1'
+// sudo cp ~/.snmp/mibs/WIENER-CRATE-MIB.txt /usr/share/snmp/mibs
 #ifdef _WINDOWS
 #include <windows.h>
 #endif
@@ -9,6 +12,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 //#include "MPOD.h"
+#include <time.h>
 #include "daq/slc/hvcontrol/arichlv/MPOD.h"
 
 
@@ -158,13 +162,103 @@ char snmpLastErrorBuffer[1024];
 SnmpDoubleBuffer snmpDoubleBuffer;
 SnmpIntegerBuffer snmpIntegerBuffer;
 
-//************************************************************************
+// ************************************************************************
 static int getNode(const char* const node, SnmpObject* object);
 static int getIndexNode(const char* const nodeBase, int index, SnmpObject* object);
 
 
 
 #ifdef MPOD_MAIN
+int MPOD_CableTest(int id)
+{
+  double ret;
+  int iret;
+  int min = 0;
+  int max = 3;
+  const char  path[100] = "arich-mpod3.b2nsm.kek.jp";
+  //const char  path[100] = "f9mpod2.ijs.si";
+  MPOD_Start();
+  HSNMP crate =  MPOD_Open(path);
+
+  time_t rawtime;
+  struct tm* info;
+  char buffer[80];
+
+  time(&rawtime);
+
+  info = localtime(&rawtime);
+  printf("%s<br/>", asctime(info));
+
+
+  if (!crate) {
+    printf("<h5>Error: Cannot connect to device %s</h5>\n", path);
+    return 0;
+  }
+
+  if (id < 2)  for (int ch = 0; ch < 4; ch++) {
+      setChannelSwitch(crate, ch , id);
+      printf("<br/>\n");
+    }
+  else {
+
+// set output voltage
+    for (int ch = 0; ch < 4; ch++) {
+      setOutputVoltage(crate, ch , ch + 1);
+    }
+
+
+    printf("<table class='mytable' ><tr><th>Ch.</th><th>Vset</th><th>Vstatus</th><th>Imon</th><th>Vmon</th>");
+    // printf("<th>Sense1</th><th>Sense2</th><th>Sense3</th><th>Sense4</th>\n");
+
+    for (int ch = 0; ch < 4; ch++) {
+      printf("<tr><td>%d</td>\n", ch);
+
+      for (int slot = min; slot < max; slot++) {
+        int chid = ch + slot * 100;
+        char  name[0xFF], sch[0xFF];
+        sprintf(sch, "%d", chid + 1);
+        if (slot == min) {
+
+          sprintf(name, "outputVoltage.%s", sch);
+          ret = MPOD_GetDouble(crate, name);
+          printf("<td>%2.5f</td>", ret);
+
+          iret = getChannelSwitch(crate, chid);
+          printf("<td>%d</td>", iret);
+
+          ret = getCurrentMeasurement(crate, chid);
+          printf("<td>%f</td>\n", ret);
+        }
+
+        if (slot == min) {
+          sprintf(name, "outputMeasurementSenseVoltage.%s", sch);
+          ret = MPOD_GetDouble(crate, name);
+          printf("<td>%2.5f</td>", ret);
+        } else {
+          /*
+                  for (int k=0;k<2;k++){
+                    sprintf(sch,"%d", ch +k*4 + slot*100);
+                    sprintf(name,"outputMeasurementSenseVoltage.%s",sch);
+                    ret = MPOD_GetDouble(crate, name);
+                    printf("<td>%2.5f</td>", ret);
+                  }
+          */
+
+        }
+      }
+    }
+    printf("</table>");
+  }
+
+  MPOD_Close(crate);
+  MPOD_End();
+
+  return 0;
+}
+
+
+
+
 #ifdef _WINDOWS
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                       LPSTR lpszCmdLine, int nCmdShow)
@@ -187,13 +281,13 @@ int main(int argc , char**   argv)
   if (InitCVIRTE(hInstance, 0, 0) == 0) return -1;     /* out of memory */
 #endif
 
+  if (argc > 1) {
+    MPOD_CableTest(atoi(argv[1]));
+    return 0;
+  }
+
   MPOD_Start();
 
-
-
-
-
-  printf("-----------------------------------------------------------------\n");
   /*
     for (i=0;i<8;i++) {
       setChannelSwitch(crate, i, 0);

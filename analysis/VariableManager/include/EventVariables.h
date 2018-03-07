@@ -106,6 +106,26 @@ namespace Belle2 {
     double getCrossingAngle(const Particle*);
 
     /**
+     * return nominal beam Px
+     */
+    double getBeamPx(const Particle*);
+
+    /**
+     * return nominal beam Py
+     */
+    double getBeamPy(const Particle*);
+
+    /**
+     * return nominal beam Pz
+     */
+    double getBeamPz(const Particle*);
+
+    /**
+     * return nominal beam energy
+     */
+    double getBeamE(const Particle*);
+
+    /**
      * return x coordinate of the IP
      */
     double getIPX(const Particle*);
@@ -124,6 +144,11 @@ namespace Belle2 {
      * return (i,j) element of the IP covariance matrix.
      */
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element);
+
+    /**
+     * return the thrust of all the event.
+     */
+    double thrustOfEvent(const Particle*);
 
   }
 } // Belle2 namespace

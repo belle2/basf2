@@ -11,9 +11,9 @@
 
 #include <framework/core/Module.h>
 
+#include <TVector3.h>
 #include <vector>
 #include <string>
-
 
 namespace Belle2 {
 
@@ -25,54 +25,42 @@ namespace Belle2 {
   class TrackCreatorModule : public Module {
 
   public:
-    /** Constructor .
-     */
+    /// Constructor adding the description and properties.
     TrackCreatorModule();
 
-    /** Destructor.
-     */
-    virtual ~TrackCreatorModule();
+    /// Require and register the store arrays.
+    void initialize() override;
 
-    /** Initialize the Module.
-     * This method is called only once before the actual event processing starts.
-     */
-    virtual void initialize();
-
-    /** Called when entering a new run.
-     */
-    virtual void beginRun();
-
-    /** This method is the core of the module.
-     * This method is called for each event. All processing of the event has to take place in this method.
-     */
-    virtual void event();
-
-    /** This method is called if the current run ends.
-     */
-    virtual void endRun();
-
-    /** This method is called at the end of the event processing.
-     */
-    virtual void terminate();
+    /// Build/fit the track fit results.
+    void event() override;
 
   private:
-
     // Input
-    std::string m_recoTrackColName;  ///< Name of collection holding the RecoTracks (input).
-    std::string m_mcParticleColName;  ///< Name of collection holding the MCParticles (input, optional).
+    /// Name of collection holding the RecoTracks (input).
+    std::string m_recoTrackColName = "";
+    /// Name of collection holding the MCParticles (input, optional).
+    std::string m_mcParticleColName = "";
 
     // Output
-    std::string m_trackColName;  ///< Name of collection holding the Tracks (output).
-    std::string m_trackFitResultColName;   ///< Name of collection holding the TrackFitResult (output).
+    /// Name of collection holding the Tracks (output).
+    std::string m_trackColName = "";
+    /// Name of collection holding the TrackFitResult (output).
+    std::string m_trackFitResultColName = "";
 
-    std::vector<double> m_beamSpot;  ///< BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
-    std::vector<double>
-    m_beamAxis;   ///< BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
-    std::vector<int> m_additionalPDGCodes;  ///< PDG codes for which TrackFitResults will be created.
-    int m_defaultPDGCode; ///< Default PDG code, for which TrackFitResults will be created.
+    /// BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
+    std::vector<double> m_beamSpot = {0.0, 0.0, 0.0};
+    /// BeamSpot as TVector3
+    TVector3 m_beamSpotAsTVector;
+    /// BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
+    std::vector<double> m_beamAxis = {0.0, 0.0, 1.0};
+    /// BeamAxis as TVector3
+    TVector3 m_beamAxisAsTVector;
+    /// PDG codes for which TrackFitResults will be created.
+    std::vector<int> m_pdgCodes = {211};
 
-    bool m_useClosestHitToIP = false; ///< Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
-    bool m_useBFieldAtHit =
-      false; ///< Flag to calculate the BField at the used hit (closest to IP or first one), instead of the one at the POCA. Use this for cosmics to prevent problems, when cosmics reconstruction end up in the QCS magnet.
+    /// Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
+    bool m_useClosestHitToIP = false;
+    ///< Flag to calculate the BField at the used hit (closest to IP or first one), instead of the one at the POCA. Use this for cosmics to prevent problems, when cosmics reconstruction end up in the QCS magnet.
+    bool m_useBFieldAtHit = false;
   };
 }

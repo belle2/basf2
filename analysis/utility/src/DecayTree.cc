@@ -38,12 +38,12 @@ DecayTree::DecayTree(const std::string& decaystring, bool removeRadiativeGammaFl
 
 }
 
-DecayTree::DecayTree(const DecayTree& tree)
+DecayTree::DecayTree(const DecayTree& tree):
+  m_root_node(tree.m_root_node)
 {
   m_valid = tree.m_valid;
   m_token_count = tree.m_token_count;
   m_match_symbol_position = tree.m_match_symbol_position;
-  m_root_node = tree.m_root_node;
   m_i = tree.m_i;
 
   if (m_valid) {

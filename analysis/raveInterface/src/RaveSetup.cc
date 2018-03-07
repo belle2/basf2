@@ -11,27 +11,12 @@
 
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <genfit/Track.h>
-#include <genfit/GFRaveVertexFactory.h>
-
 #include <rave/VacuumPropagator.h>
 #include <rave/MagneticField.h>
 #include <rave/ConstantMagneticField.h>
 #include <rave/VertexFactory.h>
 #include <rave/KinematicTreeFactory.h>
 
-
-
-//framework genfit and root stuff for GFRave setup
-//#include <genfit/ConstField.h>
-//#include <genfit/FieldManager.h>
-//#include <genfit/FieldManager.h>
-//#include <TGeoManager.h>
-//#include <geometry/GeometryManager.h>
-//#include <geometry/bfieldmap/BFieldMap.h>
-//#include <tracking/gfbfield/GFGeant4Field.h>
-//#include <genfit/TGeoMaterialInterface.h>
-//#include <genfit/MaterialEffects.h>
 //stl stuff
 #include <string>
 using std::string;

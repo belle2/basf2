@@ -15,8 +15,8 @@ def loadStdD0(path=analysis_main):
     Dcuts = '1.82 < M < 1.92'
     D_Channels = ['K-:loose pi+:loose',
                   'K-:loose pi+:loose pi+:loose pi-:loose',
-                  'K-:loose pi+:loose pi0:all',
-                  'K_S0:all pi0:all',
+                  'K-:loose pi+:loose pi0:loose',
+                  'K_S0:all pi0:loose',
                   'K_S0:all pi+:loose pi-:loose',
                   ]
 
@@ -35,7 +35,7 @@ def loadStdDplus(path=analysis_main):
     Dcuts = '1.82 < M < 1.92'
     D_Channels = ['K-:loose pi+:loose pi+:loose',
                   'K_S0:all pi+:loose',
-                  'K_S0:all pi+:loose pi0:all',
+                  'K_S0:all pi+:loose pi0:loose',
                   'K_S0:all pi+:loose pi+:loose pi-:loose',
                   ]
 
@@ -52,8 +52,8 @@ def loadStdDstar0(path=analysis_main):
     # stdPi0()
     # stdKS()
     Dcuts = '1.95 < M < 2.05'
-    D_Channels = ['D0:all pi0:all',
-                  'D0:all gamma:all']
+    D_Channels = ['D0:all pi0:loose',
+                  'D0:all gamma:loose']
 
     DList = []
     for chID, channel in enumerate(D_Channels):
@@ -69,7 +69,7 @@ def loadStdDstarPlus(path=analysis_main):
     # stdKS()
     Dcuts = '1.95 < M < 2.05'
     D_Channels = ['D0:all pi+:all',
-                  'D+:all pi0:all']
+                  'D+:all pi0:loose']
 
     DList = []
     for chID, channel in enumerate(D_Channels):

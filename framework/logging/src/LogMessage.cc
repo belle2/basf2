@@ -21,7 +21,7 @@ using namespace Belle2;
 
 
 LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-                       const std::string& function, const std::string& file, unsigned int line) :
+                       const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
   m_logLevel(logLevel),
   m_message(message),
   m_module(""),
@@ -29,6 +29,7 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
   m_function(function),
   m_file(file),
   m_line(line),
+  m_debugLevel(debugLevel),
   m_logInfo(0)
 {
 }
@@ -60,7 +61,8 @@ std::ostream& LogMessage::print(std::ostream& out) const
     out.flags(flags);
   }
   if (logInfo & LogConfig::c_Level) {
-    out << "[" << LogConfig::logLevelToString(m_logLevel) << "] ";
+    const std::string debugLevel = (m_logLevel == LogConfig::c_Debug) ? (":" + std::to_string(m_debugLevel)) : "";
+    out << "[" << LogConfig::logLevelToString(m_logLevel) << debugLevel << "] ";
   }
   if (ProcHandler::EvtProcID() != -1) {
     //which process is this?

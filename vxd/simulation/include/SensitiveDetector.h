@@ -123,7 +123,7 @@ namespace Belle2 {
       VXD::SensitiveDetectorBase(sensorInfo)
     {
       //Register output collections.
-      //m_mcparticles.required();
+      //m_mcparticles.isRequired();
       m_simhits.registerInDataStore();
       m_truehits.registerInDataStore();
       m_relMCSimHits.registerInDataStore();

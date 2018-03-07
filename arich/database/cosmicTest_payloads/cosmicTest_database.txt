@@ -1,0 +1,10 @@
+dbstore/ARICHGeometryConfig 1 0,0,-1,-1
+dbstore/GeoConfiguration 1 0,0,-1,-1
+dbstore/ARICHSimulationPar 1 0,0,-1,-1
+dbstore/ARICHChannelMapping 1 0,0,-1,-1
+dbstore/ARICHMergerMapping 1 0,0,-1,-1
+dbstore/ARICHCopperMapping 1 0,0,-1,-1
+dbstore/ARICHModuleTest 1 0,0,-1,-1
+dbstore/ARICHHapdQE 1 0,0,-1,-1
+dbstore/ARICHModulesInfo 1 0,0,-1,-1
+dbstore/ARICHChannelMask 1 0,0,-1,-1

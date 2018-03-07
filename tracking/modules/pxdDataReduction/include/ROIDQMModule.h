@@ -45,11 +45,11 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     ROIDQMModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
     std::string m_PXDDigitsName; /**< digit list name*/
 
@@ -100,7 +100,7 @@ namespace Belle2 {
     TH2F* h_HitRow_CellU; /**< pxdRawHit ROW vs CellID U*/
     TH2F* h_HitCol_CellV; /**< pxdRawHit ROW vs CellID U*/
 
-    virtual void defineHisto(); /**< define histograms*/
+    void defineHisto() override; /**< define histograms*/
 
   };//end class declaration
 

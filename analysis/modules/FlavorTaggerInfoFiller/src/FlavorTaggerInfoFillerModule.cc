@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include <analysis/modules/FlavorTaggerInfoFiller/FlavorTaggerInfoFillerModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
@@ -36,7 +37,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
            vector<tuple<string, string, string>>());
   addParam("FANNmlp", m_FANNmlp, "Sets if FANN Combiner output will be saved or not", false);
   addParam("TMVAfbdt", m_TMVAfbdt, "Sets if FANN Combiner output will be saved or not", false);
-  addParam("qrCategories", m_qrCategories, "Sets if individual categories output will be saved or not", false);
+  addParam("qpCategories", m_qpCategories, "Sets if individual categories output will be saved or not", false);
   addParam("istrueCategories", m_istrueCategories, "Sets if individual MC truth for each category is saved or not", false);
   addParam("targetProb", m_targetProb, "Sets if individual Categories output will be saved or not", false);
   addParam("trackPointers", m_trackPointers, "Sets if track pointers to target tracks are saved or not", false);
@@ -123,7 +124,7 @@ void FlavorTaggerInfoFillerModule::event()
     }
   }
 
-  if (m_qrCategories) {
+  if (m_qpCategories) {
 
     bool mcFlag = false;
 
@@ -135,7 +136,7 @@ void FlavorTaggerInfoFillerModule::event()
     for (auto& iTuple : m_eventLevelParticleLists) {
       string particleListName = get<0>(iTuple);
       string category = get<1>(iTuple);
-      string qrCategoryVariable = get<2>(iTuple);
+      string qpCategoryVariable = get<2>(iTuple);
       StoreObjPtr<ParticleList> particleList(particleListName);
 
       if (!particleList.isValid()) {
@@ -143,7 +144,11 @@ void FlavorTaggerInfoFillerModule::event()
       } else {
         if (particleList -> getListSize() == 0) {
           infoMapsFBDT -> setProbEventLevel(category, 0);
-          infoMapsFBDT -> setQrCategory(category, 0);
+          infoMapsFBDT -> setQpCategory(category, 0);
+          if (m_istrueCategories and mcFlag) {
+            infoMapsFBDT -> setHasTrueTarget(category, 0);
+            infoMapsFBDT -> setIsTrueCategory(category, 0);
+          }
           if (m_trackPointers) infoMapsFBDT -> setTargetEventLevel(category, nullptr);
         } else {
 
@@ -153,9 +158,9 @@ void FlavorTaggerInfoFillerModule::event()
                                                    category + "))")-> function(iParticle);
             if (hasMaxProb == 1) {
               float categoryProb = iParticle -> getExtraInfo("isRightCategory(" + category + ")");
-              float qrCategory =  manager.getVariable(qrCategoryVariable)-> function(iParticle);
+              float qpCategory =  manager.getVariable(qpCategoryVariable)-> function(iParticle);
               infoMapsFBDT->setProbEventLevel(category, categoryProb);
-              infoMapsFBDT -> setQrCategory(category, qrCategory);
+              infoMapsFBDT -> setQpCategory(category, qpCategory);
               if (m_istrueCategories and mcFlag) {
                 float isTrueTarget = manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr);
                 infoMapsFBDT -> setHasTrueTarget(category, isTrueTarget);

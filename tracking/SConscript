@@ -14,6 +14,7 @@ env['LIBS'] = [
     'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
     'ecl',
     'mdst_dataobjects',
+    'mva',
     'framework',
     'simulation',
     'genfit2',

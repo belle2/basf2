@@ -115,7 +115,7 @@ def additional_options(path):
             m.param('pdgCodesToUseForFitting', [get_generated_pdg_code()])
 
         if m.type() == "TrackCreator":
-            m.param('defaultPDGCode', get_generated_pdg_code())
+            m.param('pdgCodes', [get_generated_pdg_code()])
 
 
 def run_simulation(path, pt_value, output_filename=''):

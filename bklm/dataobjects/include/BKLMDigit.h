@@ -121,6 +121,9 @@ namespace Belle2 {
     //! @return the number of reconstructed MPPC pixels
     float getNPixel() const { return m_NPixel; }
 
+    //! Get the charge value
+    int getCharge() const { return m_Charge; }
+
     //! @return ctime
     int getCTime() const { return m_CTime; }
 
@@ -151,6 +154,9 @@ namespace Belle2 {
     //! Set the number of reconstructed MPPC pixels (scintillator only)
     //! @param nPixel number of reconstructed MPPC pixels from the pulse-shape analysis
     void setNPixel(float nPixel) { m_NPixel = nPixel; }
+
+    //! Set the charge value
+    void setCharge(int charge) { m_Charge = charge; }
 
     //! Set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
     //! @param status completion status of the pulse-shape analysis
@@ -183,12 +189,15 @@ namespace Belle2 {
     //! reconstructed number of MPPC pixels (=photoelectrons in EKLM)
     float m_NPixel;
 
+    //! reconstructed charge value of MPPC
+    int m_Charge;
+
     //! pulse-fit status
     int m_FitStatus;
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc
-    ClassDef(BKLMDigit, 6)
+    ClassDef(BKLMDigit, 7)
 
   };
 

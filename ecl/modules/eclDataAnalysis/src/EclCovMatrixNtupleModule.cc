@@ -112,8 +112,8 @@ void EclCovMatrixNtupleModule::event()
   // There is only 1 ECLTrig per event
   assert(eclTrigArray.getEntries() == 1);
   ECLGeometryPar* eclgeo = ECLGeometryPar::Instance();
-  for (const auto& digit : eclDigiArray) {
-    size_t cellIndex = static_cast<size_t>(digit.getCellId() - 1);
+  for (const auto& adigit : eclDigiArray) {
+    size_t cellIndex = static_cast<size_t>(adigit.getCellId() - 1);
     eclgeo->Mapping(cellIndex);
     m_theta[cellIndex] =  eclgeo->GetThetaID();
     m_phi[cellIndex] =  eclgeo->GetPhiID();
@@ -124,12 +124,12 @@ void EclCovMatrixNtupleModule::event()
     << endl;
     */
     m_cellID[cellIndex] = cellIndex;
-    m_hitE[cellIndex]     = digit.getAmp();
-    m_DigiTime[cellIndex] = digit.getTimeFit();
+    m_hitE[cellIndex]     = adigit.getAmp();
+    m_DigiTime[cellIndex] = adigit.getTimeFit();
     // The following DeltaT IS DIFFERENT DeltaT in igitizer by the last factor 12.!
     double deltaT = eclTrigArray[0]->getTimeTrig() * 508.0 / 12.0;
     m_DeltaT[cellIndex] = deltaT;
-    m_hitTime[cellIndex] = 1520 - digit.getTimeFit() - 64 * deltaT * 12.0 * 24.0 / 508.0 / 1536.0;
+    m_hitTime[cellIndex] = 1520 - adigit.getTimeFit() - 64 * deltaT * 12.0 * 24.0 / 508.0 / 1536.0;
   }
 
   //The following works only because position of an ECLDigit in the ECLDigiArray

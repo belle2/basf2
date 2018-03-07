@@ -122,13 +122,13 @@ void InclusiveBtagReconstructionModule::event()
             append = false;
             break;
           }
-        }
-        if (append) {
-          std::map<int, std::vector<int>>::iterator it = btagDaughtersMap.find(mdstSource);
-          if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
-            it->second.push_back(particle->getArrayIndex());
-          } else {
-            btagDaughtersMap[mdstSource] = {particle->getArrayIndex()};
+          if (append) {
+            std::map<int, std::vector<int>>::iterator it = btagDaughtersMap.find(mdstSource);
+            if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
+              it->second.push_back(particle->getArrayIndex());
+            } else {
+              btagDaughtersMap[mdstSource] = {particle->getArrayIndex()};
+            }
           }
         }
       }
@@ -142,10 +142,39 @@ void InclusiveBtagReconstructionModule::event()
     StoreArray<Particle> particles;
 
     for (std::vector<int> daughterIndices : btagCandidates) {
+      std::map<int, size_t> nonFinalStateIndicesCount;
       TLorentzVector momentum;
       for (int index : daughterIndices) {
+        // check if there are non-final-state particles. If yes, the momentum should be added just once.
+        if ((particles[index]->getFinalStateDaughters()).size() > 1) {
+          std::map<int, size_t>::iterator it = nonFinalStateIndicesCount.find(index);
+          if (it != nonFinalStateIndicesCount.end()) {
+            nonFinalStateIndicesCount[index]++;
+            continue;
+          } else {
+            nonFinalStateIndicesCount[index] = 1;
+          }
+        }
         momentum += particles[index]->get4Vector();
       }
+      // check the number of the daughters to make sure that the not-final-state particles are not mixed with the other particles that come from the same mdstSource
+      bool rightDaughtersCount = true;
+      for (std::map<int, size_t>::iterator it = nonFinalStateIndicesCount.begin(); it != nonFinalStateIndicesCount.end(); ++it) {
+        if (it->second != (particles[(it->first)]->getFinalStateDaughters()).size()) {
+          rightDaughtersCount = false;
+          break;
+        }
+      }
+      if (rightDaughtersCount == false) {
+        continue;
+      }
+
+      //remove repeated index in daughterIndices
+      std::vector<int>::iterator it;
+      std::sort(daughterIndices.begin(), daughterIndices.end());
+      it = std::unique(daughterIndices.begin(), daughterIndices.end());
+      daughterIndices.resize(std::distance(daughterIndices.begin(), it));
+
       Particle btagCandidate(momentum, -1 * bsig->getPDGCode(), bsig->getFlavorType(), daughterIndices, bsig->getArrayPointer());
       Particle* btag = particles.appendNew(btagCandidate);
       btagList->addParticle(btag);
@@ -157,23 +186,24 @@ void InclusiveBtagReconstructionModule::event()
   }
 }
 
-void Map2Vector::convert(std::map<int, std::vector<int>>& d, std::vector<std::vector<int>>& out)
+void Map2Vector::convert(std::map<int, std::vector<int>>& input, std::vector<std::vector<int>>& output)
 {
-  makeEntries(d.begin(), d.end(), 0, out);
+  makeEntries(input.begin(), input.end(), 0, output);
 }
 
-void Map2Vector::makeEntries(std::map<int, std::vector<int>>::iterator j, const std::map<int, std::vector<int>>::const_iterator& e,
-                             unsigned i, std::vector<std::vector<int>>& out)
+void Map2Vector::makeEntries(std::map<int, std::vector<int>>::iterator positionOnTheMap,
+                             const std::map<int, std::vector<int>>::const_iterator& end,
+                             unsigned i, std::vector<std::vector<int>>& output)
 {
-  if (j == e) {
-    out.push_back(o);
+  if (positionOnTheMap == end) {
+    output.push_back(m_combination);
   } else {
-    std::vector<int>& v = j->second;
-    ++j;
+    std::vector<int>& v = positionOnTheMap->second;
+    ++positionOnTheMap;
     for (int k : v) {
-      if (i < o.size()) o[i] = k;
-      else o.push_back(k);
-      makeEntries(j, e, i + 1, out);
+      if (i < m_combination.size()) m_combination[i] = k;
+      else m_combination.push_back(k);
+      makeEntries(positionOnTheMap, end, i + 1, output);
     }
   }
 };

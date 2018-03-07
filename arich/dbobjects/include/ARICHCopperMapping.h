@@ -68,6 +68,9 @@ namespace Belle2 {
      */
     const std::vector<uint16_t>& getCopperIDs() const { return m_copperIDs;}
 
+    /**
+    * Print mapping parameters
+    */
     void print();
 
   private:

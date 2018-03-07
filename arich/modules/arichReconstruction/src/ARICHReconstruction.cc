@@ -362,6 +362,8 @@ namespace Belle2 {
     double momentum = arichTrack.getMomentum();
 
     double thcResolution = m_recPars->getThcResolution(momentum);
+    if (thcResolution < 0) thcResolution = 0.01; // happens for spurious tracks with 100 GeV momentum!
+
     double wideGaussFract = (m_recPars->getParameters())[0];
     double wideGaussSigma = (m_recPars->getParameters())[1];
 
@@ -494,13 +496,13 @@ namespace Belle2 {
 
           TVector3 initialrf = getTrackPositionAtZ(arichTrack, m_zaero[iAerogel]);
           TVector3 epoint = getTrackMeanEmissionPosition(arichTrack, iAerogel);
-          TVector3 edir  = arichTrack.getDirection();
+          TVector3 edirr  = arichTrack.getDirection();
           TVector3 photonDirection; // calculated photon direction
 
           if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],
                               m_nAerogelLayers - iAerogel, mirrors[mirr]) < 0) break;
 
-          TVector3 dirch = TransformToFixed(edir) * photonDirection;
+          TVector3 dirch = TransformToFixed(edirr) * photonDirection;
           double fi_cer = dirch.Phi();
           double th_cer = dirch.Theta();
 
@@ -525,10 +527,10 @@ namespace Belle2 {
 
             // track a photon from the mean emission point to the detector surface
             TVector3  photonDirection1 = setThetaPhi(thetaCh[iHyp][iAerogel], fi_cer);  // particle system
-            photonDirection1 = TransformFromFixed(edir) * photonDirection1;  // global system
+            photonDirection1 = TransformFromFixed(edirr) * photonDirection1;  // global system
             int ifi = int (fi_cer * 20 / 2. / M_PI);
             TVector3  photonAtAerogelExit = photonDirection1 * (m_thickness[iAerogel] / photonDirection1.z());
-            TVector3  trackAtAerogelExit = edir * (m_thickness[iAerogel] / edir.z());
+            TVector3  trackAtAerogelExit = edirr * (m_thickness[iAerogel] / edirr.z());
             TVector3  dtrackphoton = photonAtAerogelExit - trackAtAerogelExit;
             TVector3 detector_position;
 

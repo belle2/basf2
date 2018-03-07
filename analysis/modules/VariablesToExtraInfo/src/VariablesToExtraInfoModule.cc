@@ -11,6 +11,7 @@
 #include <analysis/modules/VariablesToExtraInfo/VariablesToExtraInfoModule.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;
@@ -40,7 +41,7 @@ VariablesToExtraInfoModule::~VariablesToExtraInfoModule()
 
 void VariablesToExtraInfoModule::initialize()
 {
-  StoreArray<Particle>::required();
+  StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_inputListName);
 
   //collection function pointers

@@ -35,10 +35,12 @@ from generators import get_default_decayfile
 
 
 def removeJPsiSlash(string):
+    """ Remove slashes in a string, which is not allowed for filenames. """
     return string.replace('/', '')
 
 
 def load_config():
+    """ Load the FEI configuration from the Summary.pickle file. """
     if not os.path.isfile('Summary.pickle'):
         raise RuntimeError("""Could not find Summary.pickle!
                               This file is automatically created by the FEI training.
@@ -48,18 +50,30 @@ def load_config():
 
 
 class Statistic(object):
+    """
+    This class provides thhe efficiency, purity and other quantities for a
+    given number of true signal candidates, signal candidates and background candidates
+    """
 
     def __init__(self, nTrueSig, nSig, nBg):
+        """
+        Create a new Statistic object
+        @param nTrueSig the number of true signal particles
+        @param nSig the number of reconstructed signal candidates
+        @param nBg the number of reconstructed background candidates
+        """
         self.nTrueSig = nTrueSig
         self.nSig = nSig
         self.nBg = nBg
 
     @property
     def nTotal(self):
+        """ Returns total number of reconstructed candidates. """
         return self.nSig + self.nBg
 
     @property
     def purity(self):
+        """ Returns the purity of the reconstructed candidates. """
         if self.nSig == 0:
             return 0.0
         if self.nTotal == 0:
@@ -68,6 +82,7 @@ class Statistic(object):
 
     @property
     def efficiency(self):
+        """ Returns the efficiency of the reconstructed signal candidates with respect to the number of true signal particles. """
         if self.nSig == 0:
             return 0.0
         if self.nTrueSig == 0:
@@ -76,6 +91,7 @@ class Statistic(object):
 
     @property
     def purityError(self):
+        """ Returns the uncertainty of the purity. """
         if self.nTotal == 0:
             return 0.0
         return self.calcStandardDeviation(self.nSig, self.nTotal)
@@ -83,7 +99,8 @@ class Statistic(object):
     @property
     def efficiencyError(self):
         """
-        for an efficiency eps = self.nSig/self.nTrueSig, this function calculates the
+        Returns the uncertainty of the efficiency.
+        For an efficiency eps = self.nSig/self.nTrueSig, this function calculates the
         standard deviation according to http://arxiv.org/abs/physics/0701199 .
         """
         if self.nTrueSig == 0:
@@ -91,6 +108,7 @@ class Statistic(object):
         return self.calcStandardDeviation(self.nSig, self.nTrueSig)
 
     def calcStandardDeviation(self, k, n):
+        """ Helper method to calculate the standard deviation for efficiencies. """
         k = float(k)
         n = float(n)
         variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
@@ -99,15 +117,21 @@ class Statistic(object):
         return math.sqrt(variance)
 
     def __str__(self):
+        """ Returns a string representation of a Statistic object. """
         o = "nTrueSig {}    nSig {}    nBg {}\n".format(self.nTrueSig, self.nSig, self.nBg)
         o += "Efficiency {:.3f} ({:.3f})\n".format(self.efficiency, self.efficiencyError)
         o += "Purity {:.3f} ({:.3f})\n".format(self.purity, self.purityError)
         return o
 
     def __add__(self, a):
+        """ Adds two Statistics objects and returns a new object. """
         return Statistic(self.nTrueSig, self.nSig + a.nSig, self.nBg + a.nBg)
 
     def __radd__(self, a):
+        """
+        Returns a new Statistic object if the current one is added to zero.
+        Necessary to apply sum-function to Statistic objects.
+        """
         if a != 0:
             return NotImplemented
         return Statistic(self.nTrueSig, self.nSig, self.nBg)
@@ -286,6 +310,7 @@ class MonitoringModuleStatistics(object):
 
 
 def MonitorCosBDLPlot(particle, filename):
+    """ Creates a CosBDL plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
     df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
@@ -304,6 +329,7 @@ def MonitorCosBDLPlot(particle, filename):
 
 
 def MonitorMbcPlot(particle, filename):
+    """ Creates a Mbc plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
     df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
@@ -322,6 +348,7 @@ def MonitorMbcPlot(particle, filename):
 
 
 def MonitorROCPlot(particle, filename):
+    """ Creates a ROC plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
     df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
@@ -336,6 +363,7 @@ def MonitorROCPlot(particle, filename):
 
 
 def MonitorDiagPlot(particle, filename):
+    """ Creates a Diagonal plot using ROOT. """
     if not particle.final_ntuple.valid:
         return
     df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
@@ -374,9 +402,14 @@ def MonitoringMCCount(particle):
 
 
 class MonitoringBranchingFractions(object):
+    """ Class extracts the branching fractions of a decay channel from the DECAY.DEC file. """
     _shared = None
 
     def __init__(self):
+        """
+        Create a new MonitoringBranchingFraction object.
+        The extracted branching fractions are cached, hence createing more than one object does not do anything.
+        """
         if MonitoringBranchingFractions._shared is None:
             decay_file = get_default_decayfile()
             self.exclusive_branching_fractions = self.loadExclusiveBranchingFractions(decay_file)
@@ -386,12 +419,15 @@ class MonitoringBranchingFractions(object):
             self.exclusive_branching_fractions, self.inclusive_branching_fractions = MonitoringBranchingFractions._shared
 
     def getExclusive(self, particle):
+        """ Returns the exclusive (i.e. without the branching fractions of the daughters) branching fraction of a particle. """
         return self.getBranchingFraction(particle, self.exclusive_branching_fractions)
 
     def getInclusive(self, particle):
+        """ Returns the inclusive (i.e. including all branching fractions of the daughters) branching fraction of a particle. """
         return self.getBranchingFraction(particle, self.inclusive_branching_fractions)
 
     def getBranchingFraction(self, particle, branching_fractions):
+        """ Returns the branching fraction of a particle given a branching_fraction table. """
         result = {c.label: 0.0 for c in particle.channels}
         name = particle.name
         channels = [tuple(sorted(d.split(':')[0] for d in channel.daughters)) for channel in particle.channels]

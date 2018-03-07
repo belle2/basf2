@@ -26,12 +26,12 @@
 #include <ecl/dataobjects/ECLShower.h>
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(ECLShowerCalibrator)
+REG_MODULE(ECLShowerCalibratorPureCsI)
 
 //-----------------------------------------------------------------
 //                 Implementation

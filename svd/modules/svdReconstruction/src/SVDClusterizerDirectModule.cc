@@ -21,6 +21,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -48,7 +49,6 @@ SVDClusterizerDirectModule::SVDClusterizerDirectModule() : Module()
   B2DEBUG(200, "SVDClusterizerDirectModule ctor");
   //Set module properties
   setDescription("Clusterize SVDShaperDigits and reconstruct hits");
-  // FIXME: Not sure this works with StripMap initialization from an xml file.
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
@@ -62,12 +62,9 @@ SVDClusterizerDirectModule::SVDClusterizerDirectModule() : Module()
            "MCParticles collection name", string(""));
 
   // 2. Calibration and time fitter sources
-  addParam("StripMapFileName", m_stripMapXmlName,
-           "Name of strip map file, TB only", string(""));
-  addParam("OOMapFileName", m_ooMapXmlName,
-           "Name of O-O map xml to decode strip map, TB only", string(""));
-  addParam("TimeFitterFileName", m_timeFitterXmlName,
-           "Name of time fitter data file", string("svd/data/SVDTimeNet.xml"));
+  addParam("TimeFitterName", m_timeFitterName,
+           "Name of time fitter data file", string("SVDTimeNet_6samples"));
+  addParam("CalibratePeak", m_calibratePeak, "Use calibrattion (vs. default) for peak widths and positions", bool(false));
 
   // 3. Clustering
   // FIXME: Idiotic names of parameters kept for compatibility with the old clusterizer.
@@ -91,7 +88,7 @@ void SVDClusterizerDirectModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeShaperDigits.required();
+  storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -131,21 +128,18 @@ void SVDClusterizerDirectModule::initialize()
   B2INFO(" -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2INFO(" 2. CALIBRATION DATA:");
-  B2INFO(" -->  StripMap:           " << m_stripMapXmlName);
-  B2INFO(" -->  OOMap:              " << m_ooMapXmlName);
-  B2INFO(" -->  Time NN:            " << m_timeFitterXmlName);
+  B2INFO(" -->  Time NN:            " << m_timeFitterName);
   B2INFO(" 4. CLUSTERING:");
   B2INFO(" -->  Neighbour cut:      " << m_cutAdjacent);
   B2INFO(" -->  Seed cut:           " << m_cutSeed);
   B2INFO(" -->  Cluster charge cut: " << m_cutCluster);
   B2INFO(" -->  HT for clusters >:  " << m_sizeHeadTail);
 
-  // Now that we have the required filenames (or don't), create the strip map object.
-  m_stripMap = std::unique_ptr<StripCalibrationMap>(
-                 new StripCalibrationMap(m_stripMapXmlName, m_ooMapXmlName)
-               );
   // Properly initialize the NN time fitter
-  m_fitter.setNetwrok(m_timeFitterXmlName);
+  // FIXME: Should be moved to beginRun
+  // FIXME: No support for 3/6 sample switching within a run/event
+  DBObjPtr<DatabaseRepresentationOfWeightfile> dbXml(m_timeFitterName);
+  m_fitter.setNetwrok(dbXml->m_data);
 }
 
 void SVDClusterizerDirectModule::createRelationLookup(const RelationArray& relation,
@@ -270,9 +264,8 @@ void SVDClusterizerDirectModule::event()
       B2DEBUG(300, "Digit " << iDigit << ", strip: " << currentStrip << ", lastStrip: " << lastStrip);
       B2DEBUG(300, "First CD: " << firstClusterDigit << " Last CD: " << lastClusterDigit);
       // Get calibration
-      StripCalibrationMap::StripData stripData = m_stripMap->getStripData(sensorID, isU, digit.getCellID());
-      bool validDigit = stripData.m_goodStrip;
-      float stripNoiseADU = stripData.m_noise / stripData.m_calPeak;
+      bool validDigit = true; // no local run mask
+      float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, currentStrip);
 
       // If the strip is not masked away, save normalized samples (sample/stripNoise)
       apvSamples normedSamples;
@@ -344,7 +337,6 @@ void SVDClusterizerDirectModule::event()
     vector<unsigned short> stripNumbers;
     vector<float> stripPositions;
     vector<float> stripNoises;
-    vector<float> stripGains;
     vector<float> timeShifts;
     vector<float> waveWidths;
 
@@ -356,7 +348,6 @@ void SVDClusterizerDirectModule::event()
       stripNumbers.clear();
       stripPositions.clear();
       stripNoises.clear();
-      stripGains.clear();
       timeShifts.clear();
       waveWidths.clear();
 
@@ -368,17 +359,37 @@ void SVDClusterizerDirectModule::event()
 
         unsigned short stripNo = digit.getCellID();
         stripNumbers.push_back(stripNo);
-        StripCalibrationMap::StripData stripData = m_stripMap->getStripData(sensorID, isU, stripNo);
-        stripNoises.push_back(stripData.m_noise);
-        stripGains.push_back(stripData.m_calPeak);
-        timeShifts.push_back(stripData.m_calTimeDelay);
-        waveWidths.push_back(stripData.m_calWidth);
+        // Is the calibrations interface sensible?
+        double stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
+        stripNoises.push_back(
+          m_pulseShapeCal.getChargeFromADC(sensorID, isU, stripNo, stripNoiseADU)
+        );
+        // Some calibrations magic.
+        // FIXME: Only use calibration on real data. Until simulations correspond to
+        // default calibrtion, we cannot use it.
+        double peakWidth = 270;
+        double timeShift = isU ? 2.5 : -2.2;
+        if (m_calibratePeak) {
+          peakWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
+          timeShift = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
+                      - 0.25 * peakWidth;
+        }
+        // Correct with trigger bin information
+        const double triggerBinSep = 4 * 1.96516; //in ns
+        double apvPhase = triggerBinSep * (0.5 + static_cast<int>(digit.getModeByte().getTriggerBin()));
+        timeShift = timeShift + apvPhase;
+        waveWidths.push_back(peakWidth);
+        timeShifts.push_back(timeShift);
+        stripPositions.push_back(
+          isU ? info.getUCellPosition(stripNo) : info.getVCellPosition(stripNo)
+        );
         stripPositions.push_back(
           isU ? info.getUCellPosition(stripNo) : info.getVCellPosition(stripNo)
         );
       }
       // The formulas don't take into account differences in strip noises. So we take RMS
       // strip noise as cluster noise.
+      // cluster noise is in e-!
       float clusterNoise = sqrt(
                              1.0 / clusterSize
                              * inner_product(stripNoises.begin(), stripNoises.end(), stripNoises.begin(), 0.0)

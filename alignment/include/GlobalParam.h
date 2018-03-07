@@ -28,7 +28,7 @@ namespace Belle2 {
     class GlobalParamVector;
     class GlobalDerivativesHierarchy;
 
-
+    /// Object representing no parameters
     class EmptyGlobalParamSet : public TObject {
     public:
       // ------------- Interface to global Millepede calibration ----------------
@@ -202,6 +202,7 @@ namespace Belle2 {
         return m_object.get();
       }
 
+      /// Assignment operator
       GlobalParamSet<DBObjType>& operator=(const GlobalParamSet<DBObjType>& other)
       {
         // check for self-assignment
@@ -437,14 +438,19 @@ namespace Belle2 {
         return static_cast<GlobalParamSet<DBObjType>&>(*m_vector[DBObjType::getGlobalUniqueID()]);
       }
 
+      /// Get map of all contained parameter sets, key = unique id of the set (DB object)
       const std::map<unsigned short, std::unique_ptr<GlobalParamSetAccess>>& getGlobalParamSets() const
       {
         return m_vector;
       }
+
+      /// Get the vector of added interfaces to subdetectors
       const std::vector<std::shared_ptr<IGlobalParamInterface>>& getSubDetectorInterfaces() const
       {
         return m_subDetectorInterfacesVector;
       }
+
+      /// Get set of unique ids of all db objects considered
       std::set<unsigned short> getComponentsIDs() const
       {
         std::set<unsigned short> result;

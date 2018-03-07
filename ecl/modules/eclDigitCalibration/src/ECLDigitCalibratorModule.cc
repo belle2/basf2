@@ -22,6 +22,8 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
+#include <ecl/digitization/EclConfigurationPure.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -60,6 +62,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   addParam("backgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 110.0 * Belle2::Unit::ns);
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
+  addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -78,6 +81,9 @@ void ECLDigitCalibratorModule::initializeCalibration()
 
   m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) *
                        1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.
+  m_pureCsIEnergyCalib = 0.00005; //conversion factor from ADC counts to GeV
+  m_pureCsITimeCalib = 0.1; //conversion factor from eclPureCsIDigitizer to ns
+  m_pureCsITimeOffset = 0.31; //ad-hoc offset correction for pureCsI timing
 
   callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
   callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);
@@ -105,10 +111,14 @@ void ECLDigitCalibratorModule::initialize()
   StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
 
   // Register Digits, CalDigits and their relation in datastore
-  eclDigits.registerInDataStore();
-  eclCalDigits.registerInDataStore();
+  eclDigits.registerInDataStore(eclDigitArrayName());
+  eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   eclCalDigits.registerRelationTo(eclDigits);
-  eclEventInformationPtr.registerInDataStore();
+  eclEventInformationPtr.registerInDataStore(eclEventInformationName());
+
+  //Special information for pure CsI simulation
+  StoreArray<ECLPureCsIInfo> eclPureCsIInfo(eclPureCsIInfoArrayName());
+  eclPureCsIInfo.registerInDataStore(eclPureCsIInfoArrayName());
 
   // initialize calibration
   initializeCalibration();
@@ -187,10 +197,15 @@ void ECLDigitCalibratorModule::event()
   // Output Array(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
+  // Special Array for Pure CsI Simulation
+  StoreArray<ECLPureCsIInfo> eclPureCsIInfo(eclPureCsIInfoArrayName());
+
   // Loop over the input array
   for (auto& aECLDigit : eclDigits) {
 
     // create eclCalDigits if they dont exist already
+
+    bool is_pure_csi = 0;
 
     // append an ECLCalDigit to the storearray
     const auto aECLCalDigit = eclCalDigits.appendNew();
@@ -204,21 +219,44 @@ void ECLDigitCalibratorModule::event()
     }
 
     // perform the digit energy calibration: E = A * Ce * Cs
-    const int amplitude           = aECLDigit.getAmp();
-    double calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
+    const int amplitude = aECLDigit.getAmp();
+    double calibratedEnergy = 0;
+
+    if (m_simulatePure) {
+      if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName()) != NULL) {
+        if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName())->getPureCsI())
+          is_pure_csi = 1;
+      }
+    }
+
+    if (is_pure_csi) {
+      calibratedEnergy = amplitude * m_pureCsIEnergyCalib;
+    } else {
+      calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
+    }
     if (calibratedEnergy < 0.0) calibratedEnergy = 0.0;
 
     // perform the digit timing calibration: t = c * (tfit - Te - Ts)
-    const int time              = aECLDigit.getTimeFit();
-    if (time == -2048) aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
-    double calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                                  v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
+    const int time = aECLDigit.getTimeFit();
+    double calibratedTime = 0;
+    if (time == -2048) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
+    } else { //only calibrate digit time if we have a good waveform fit
+      if (is_pure_csi) {
+        calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
+                                                                    v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1] + m_pureCsITimeOffset;
+      } else {
+        calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
+                                               v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
+      }
+    }
 
-    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", energy = " << calibratedEnergy);
+    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
     B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
+
     aECLCalDigit->setEnergy(calibratedEnergy);
     aECLCalDigit->addStatus(ECLCalDigit::c_IsEnergyCalibrated);
 
@@ -227,7 +265,6 @@ void ECLDigitCalibratorModule::event()
 
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
-
   }
 
   // determine background level

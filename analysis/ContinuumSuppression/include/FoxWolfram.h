@@ -17,7 +17,7 @@
 
 
 namespace Belle2 {
-
+  /** Class to calculate the Fox-Wolfram moments */
   class FoxWolfram {
   public:
 
@@ -25,7 +25,7 @@ namespace Belle2 {
     FoxWolfram() : sum {0, 0, 0, 0, 0} {};
 
     /// Constructor which calculates the Fox Wolfram Moments from a given set of momenta.
-    FoxWolfram(const std::vector<TVector3>& momenta);
+    explicit FoxWolfram(const std::vector<TVector3>& momenta);
 
     /// Destructor
     ~FoxWolfram() {};

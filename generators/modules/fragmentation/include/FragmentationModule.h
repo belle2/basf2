@@ -17,7 +17,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <Pythia8/Pythia.h>
-#include "Pythia8Plugins/EvtGen.h"
+#include <generators/modules/fragmentation/EvtGenDecays.h>
 
 #include <string>
 #include <vector>
@@ -71,6 +71,7 @@ namespace Belle2 {
     int m_useEvtGen;  /**< use EvtGen for some decays. */
     std::string m_DecFile;  /**< EvtGen decay file */
     std::string m_UserDecFile;  /**< User EvtGen decay file */
+    int m_useEvtGenParticleData; /**< Override PYTHIA parameters */
 
     MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */
 

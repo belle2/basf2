@@ -278,7 +278,7 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
       hdPtPhi0->Fill(Phi0m, sigmaPt);}
     // cut at both d0 and z0 dependence for other dependence
     //    if(Z0m>-10 && Z0m < 30 &&  fabs(D0m) > 7 & fabs(D0m) < 15 && fabs(tanLm) <0.45){
-    if(Z0m>-5 && Z0m < 10 &&  D0m >7 && D0m<15){
+    if(Z0m>-5 && Z0m < 10 &&  fabs(D0m) < 3){
       hdtanLTanL->Fill(tanLm,dtanLambda);
       hdPhi0TanL->Fill(tanLm,dPhi0);
       hdD0TanL->Fill(tanLm, dD0);

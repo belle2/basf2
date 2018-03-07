@@ -227,7 +227,9 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
       NSMMessage msg(com.getMessage());
       NSMCommand cmd(msg.getRequestName());
       if (cmd == NSMCommand::VREPLY && var.getName() == msg.getData()) {
-        return msg.getParam(0) > 0;
+        bool ret = msg.getParam(0) > 0;
+        perform(com);
+        return ret;
       } else if (cmd == NSMCommand::VGET || cmd == NSMCommand::VLISTGET ||
                  cmd == NSMCommand::OK || cmd == NSMCommand::ERROR || cmd == NSMCommand::FATAL) {
         perform(com);

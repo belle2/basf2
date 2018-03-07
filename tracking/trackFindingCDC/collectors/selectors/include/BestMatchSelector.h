@@ -61,11 +61,11 @@ namespace Belle2 {
         // (3) repeat
         while (not weightedRelations.empty()) {
           // std:min_element is strange... this actually returns the element with the largest weight
-          const auto maxElement = std::min_element(weightedRelations.begin(), weightedRelations.end(), GreaterWeight());
-          selectedWeightedRelations.push_back(*maxElement);
+          const auto maxElement = *(std::min_element(weightedRelations.begin(), weightedRelations.end(), GreaterWeight()));
+          selectedWeightedRelations.push_back(maxElement);
 
-          const auto& itemSharesFromOrTo = [maxElement](const WeightedRelationItem & item) {
-            return item.getFrom() == maxElement->getFrom() or item.getTo() == maxElement->getTo();
+          const auto itemSharesFromOrTo = [&maxElement](const WeightedRelationItem & item) {
+            return item.getFrom() == maxElement.getFrom() or item.getTo() == maxElement.getTo();
           };
 
           erase_remove_if(weightedRelations, itemSharesFromOrTo);

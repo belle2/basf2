@@ -52,7 +52,7 @@ namespace Belle2 {
 
 
     /** useful constructor for cases where sectors are treated by fullSecID (parameter 1) */
-    Sector(unsigned int secID):
+    explicit Sector(unsigned int secID):
       m_myActiveSector(NULL),
       m_sectorID(secID),
       m_distance2Origin(0),
@@ -70,6 +70,11 @@ namespace Belle2 {
       m_distance2Origin(distance2origin),
       m_useDistance4sort(sortByDistance)
     {}
+
+    /**
+     * Generate the default copy constructor
+     */
+    Sector(const Sector&) = default;
 
 
     /** overloaded assignment operator */

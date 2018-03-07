@@ -18,10 +18,10 @@ from stdLightMesons import *
 
 set_log_level(LogLevel.INFO)
 
-filelist = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000787/s00/e0000/4S/r00000/mixed/sub00/' +
-     'mdst_000001_prod00000787_task00000001.root'
-     ]  # This is an MC7 file used for testing since we don't have MC8 yet; please modify accordingly
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 inputMdstList('default', filelist)
 
 stdPi('95eff')

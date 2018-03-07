@@ -57,6 +57,10 @@ void UpdateParticleTrackCandModule::event()
         auto particle = daughter;
         auto track = particle->getTrack();
         auto trackFitResult = track->getTrackFitResult(Const::pion);
+        if (not trackFitResult) {
+          B2WARNING("Skipping track without valid pion hypothesis.");
+          continue;
+        }
         auto trackCand = trackFitResult->getRelatedFrom<genfit::TrackCand>();
 
         if (m_removePXD || m_removeSVD || m_removeCDC || m_removeBKLM) {

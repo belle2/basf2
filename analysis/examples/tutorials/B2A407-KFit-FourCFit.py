@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ###################################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform four momentum constraint
 # fit with the KFit. In this example the following decay chain:
 #
@@ -31,7 +34,7 @@ inputMdst('default', sys.argv[1])
 
 # Creates a list of good pions and kaons with some PID and IP cut
 stdPhotons('loose')
-fillParticleList('mu+:pid', 'muid>0.1')
+fillParticleList('mu+:pid', 'muonID>0.1')
 
 
 # Reconstructs eta -> gamma gamma

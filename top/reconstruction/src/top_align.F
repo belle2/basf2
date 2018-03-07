@@ -63,7 +63,6 @@ c--   returns log likelihood for given alignment parameters
 #include "TOP_PIK.fi"
       INTEGER MDN
       REAL DX, DY, DZ, RX, RY, RZ, T0
-      REAL TWIN
       REAL GET_LOGL
 
       IF(NPAR.LT.7) THEN
@@ -83,8 +82,7 @@ c--   returns log likelihood for given alignment parameters
 
       CALL SET_ALIGNMENT(MDN,DX,DY,DZ,RX,RY,RZ)
       CALL TOP_RECO
-      TWIN=T_MAX-2.0            ! za koliko manjsi naj bo?
-      TOP_LOGL=GET_LOGL(T0,TWIN,0.0)
+      TOP_LOGL=GET_LOGL(T0,T_MIN,T_MAX,0.0)
       OK=RTRA_FLAG(1).EQ.1
       
       END

@@ -78,6 +78,8 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
   addParam("recovery"  , m_recovery,
            "Try recovery when reading corrupted files. Might allow reading some of the event data but FileMetaData likely to be missing.",
            false);
+  addParam("cacheSize", m_cacheSize,
+           "file cache size in Mbytes. If negative, use root default", 0);
 }
 
 
@@ -147,6 +149,8 @@ void RootInputModule::initialize()
       B2LOG(loglevel, 0, "Couldn't read header of TTree 'persistent' in file '" << fileName << "'");
     B2INFO("Added file " + fileName);
   }
+  // Set cache size
+  if (m_cacheSize >= 0) m_tree->SetCacheSize(m_cacheSize * 1024 * 1024);
 
   // Check if the files we added to the Chain are unique,
   // if the same file is added multiple times the TEventList used for the eventSequence feature
@@ -377,9 +381,6 @@ void RootInputModule::readTree()
       B2FATAL("Could not read data from parent file!");
   }
 
-  const StoreObjPtr<EventMetaData> eventMetaData;
-  if (!m_recovery or fileMetaData)
-    eventMetaData->setParentLfn(fileMetaData->getLfn());
 }
 
 
@@ -520,7 +521,7 @@ bool RootInputModule::readParentTrees()
     TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
-      B2DEBUG(50, "Opening parent file: " << parentPfn);
+      B2DEBUG(100, "Opening parent file: " << parentPfn);
       TFile* file = TFile::Open(parentPfn.c_str(), "READ");
       dir->cd();
       if (!file || !file->IsOpen()) {

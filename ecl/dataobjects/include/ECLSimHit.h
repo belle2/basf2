@@ -40,8 +40,9 @@ namespace Belle2 {
       double FlightTime,      /**< Flight time from IP */
       double Edep,            /**< Deposit energy */
       G4ThreeVector Momentum,     /**< Momentum */
-      G4ThreeVector Position        /**< Position */
-    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep)
+      G4ThreeVector Position,       /**< Position */
+      double Hadronedep              /**< Hadron edep */
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_HadronEdep(Hadronedep)
     {
       m_Position[0] = Position.x(); m_Position[1] = Position.y(), m_Position[2] = Position.z();
       m_Momentum[0] = Momentum.x(); m_Momentum[1] = Momentum.y(), m_Momentum[2] = Momentum.z();
@@ -104,6 +105,11 @@ namespace Belle2 {
      */
     double getEnergyDep() const { return m_Edep; }
 
+    /*! Get Hadron Deposit energy
+     * @return Hadron Deposit energy
+     */
+    double getHadronEnergyDep() const { return m_HadronEdep; }
+
     /*! Get Momentum
      * @return Momentum
      */
@@ -133,9 +139,10 @@ namespace Belle2 {
     double m_Edep;            /**< Deposit energy */
     double m_Momentum[3];     /**< Momentum */
     double m_Position[3];        /**< Position */
+    double m_HadronEdep;      /**< Hadron Energy Deposit */
 
 
-    ClassDef(ECLSimHit, 5);/**< the class title */
+    ClassDef(ECLSimHit, 6);/**< the class title */
 
   };
 } // end namespace Belle2

@@ -1,5 +1,9 @@
 #include <alignment/calibration/MillepedeAlgorithm.h>
 
+#include <TH1F.h>
+#include <TTree.h>
+
+#include <alignment/dataobjects/MilleData.h>
 #include <alignment/PedeApplication.h>
 #include <alignment/PedeResult.h>
 #include <alignment/dataobjects/PedeSteering.h>
@@ -20,11 +24,13 @@ MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm("MillepedeCollec
 
 CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 {
-  B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << getObject<TH1F>("chi2/ndf").GetMean(););
+  auto chisqHist = getObjectPtr<TH1F>("chi2_per_ndf");
+  B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << chisqHist->GetMean());
 
   // Write out binary files from tree and add to steering
   prepareMilleBinary();
-  for (auto file : getObject<MilleData>("mille").getFiles())
+  auto mille = getObjectPtr<MilleData>("mille");
+  for (auto file : mille->getFiles())
     m_steering.addFile(file);
 
   // Run calibration on steering
@@ -54,7 +60,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   // <UniqueID, ElementID, ParameterId, value>
   std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
 
-  for (auto& exprun : getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).getExpRunSet()) {
+  // This function gives you the vector of ExpRuns that were requested for this execution only
+  //auto expRuns = getRunList();
+
+  // Or you can inspect all the input files to get the full RunRange
+  auto expRuns = getRunListFromAllData();
+
+  for (auto& exprun : expRuns) {
     auto event1 = EventMetaData(1, exprun.second, exprun.first);
     result.loadFromDB(event1);
     break;
@@ -107,8 +119,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   }
 
   if (undeterminedParams) {
-    B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
-    return c_NotEnoughData;
+    B2WARNING("There are " << undeterminedParams << " undetermined parameters.");
+    if (!m_ignoreUndeterminedParams) {
+      B2WARNING("Not enough data for calibration.");
+      return c_NotEnoughData;
+    }
   }
 
   //commit();
@@ -134,8 +149,11 @@ void MillepedeAlgorithm::prepareMilleBinary()
   const std::string milleFileName("gbl-data.mille");
 
   // For no entries, no binary file is created
-  auto& gblDataTree = getObject<TTree>("GblDataTree");
-  if (!gblDataTree.GetEntries()) {
+  auto gblDataTree = getObjectPtr<TTree>("GblDataTree");
+  if (!gblDataTree) {
+    B2WARNING("No GBL data tree object in collected data.");
+    return;
+  } else if (!gblDataTree->GetEntries()) {
     B2WARNING("No trajectories in GBL data tree.");
     return;
   }
@@ -153,11 +171,11 @@ void MillepedeAlgorithm::prepareMilleBinary()
 
   // Read vectors of GblData from tree branch
   std::vector<gbl::GblData>* currentGblData = new std::vector<gbl::GblData>();
-  gblDataTree.SetBranchAddress("GblData", &currentGblData);
+  gblDataTree->SetBranchAddress("GblData", &currentGblData);
 
   B2INFO("Writing Millepede binary files...");
-  for (unsigned int iRecord = 0; iRecord < gblDataTree.GetEntries(); ++iRecord) {
-    gblDataTree.GetEntry(iRecord);
+  for (unsigned int iRecord = 0; iRecord < gblDataTree->GetEntries(); ++iRecord) {
+    gblDataTree->GetEntry(iRecord);
 
     if (!currentGblData)
       continue;

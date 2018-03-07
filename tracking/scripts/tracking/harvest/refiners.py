@@ -601,7 +601,7 @@ class SavePullAnalysisRefiner(Refiner):
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
-            stackby_key='_' + stackby if stackby else "",
+            # stackby_key='_' + stackby if stackby else "",
             groupby_key='_' + groupby_part_name + groupby_value if groupby_part_name else "",
             groupby=groupby_part_name,  # deprecated
             groupby_value=groupby_value,  # deprecated

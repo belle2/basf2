@@ -35,18 +35,23 @@ namespace Belle2 {
        *We use a crystal ball function
        */
       struct TemplateParameters {
-        double amplitude = 100.;
-        double risingEdge = 32.;
+        double amplitude = 100.;/**< amplitude of template function */
+        double risingEdge = 32.;/**< rising edge position of template in samples */
       };
 
       /**
        *@brief structure holding values from template fit
        */
       struct FitResult {
-        double amplitude, amplitudeError; /**< fitted amplitude and error*/
-        double backgroundOffset, backgroundOffsetError; /**< fitted background offset and error*/
+        double amplitude; /**< fitted amplitude */
+        double amplitudeError; /**< fitted amplitude error*/
+        double backgroundOffset;/**< fitted background offset */
+        double backgroundOffsetError; /**< fitted background offset error*/
         double risingEdge;/**< fitted rising edge*/
 
+        /**
+         *@brief set the fit result variables to zero
+         */
         void clear()
         {
           amplitude = 0;
@@ -61,10 +66,16 @@ namespace Belle2 {
       *@brief Variables used during template fit minimization
       */
       struct MinimizationSums {
-        double S1;
-        double Sx, Sxx;
-        double Sy, Sxy, Syy;
+        double S1; /**< sum of sample weights */
+        double Sx; /**< sum of template*weight */
+        double Sxx;/**< sum of template*template*weight */
+        double Sy; /**< sum of signal sample * weight */
+        double Sxy;/**< sum of signal sample *template*weight */
+        double Syy;/**< sum of signal sample * signal sample * weight */
 
+        /**
+         *@brief set sums used during template fit to initial values
+         */
         void clear()
         {
           S1 = 0;
@@ -198,17 +209,17 @@ namespace Belle2 {
       void CalculateParabolaVertex(const Point& p1, const Point& p2, const Point& p3,
                                    Point& vertex);
 
-      const TOPRawWaveform m_wf; /** <raw sampled waveforms */
-      const TOPSampleTimes m_sampleTimes; /** <provides timing correction */
-      const double m_averageRMS; /**average RMS of waveform samples, no database for this */
+      const TOPRawWaveform m_wf; /**< raw sampled waveforms */
+      const TOPSampleTimes m_sampleTimes; /**< provides timing correction */
+      const double m_averageRMS; /**< average RMS of waveform samples, no database for this */
 
       static int s_totalTemplateSamples;/**< number of samples used for template*/
       static int s_templateResolution;/**< resolution of template with respect to normal sample spacing*/
       static TemplateParameters s_templateParameters;/**< parameters used for the template calculation*/
-      static std::vector<double> s_templateSamples;/**<precomputed template samples*/
-      static int s_fineOffsetRange;/**<range for offset between template and signal*/
-      static bool s_templateReInitialize;/**<flag showing that the template samples have to be recomputed*/
-      static bool s_useParabola; /** try improving fit by making use of parabolic shape of chisq values*/
+      static std::vector<double> s_templateSamples;/**< precomputed template samples*/
+      static int s_fineOffsetRange;/**< range for offset between template and signal*/
+      static bool s_templateReInitialize;/**< flag showing that the template samples have to be recomputed*/
+      static bool s_useParabola; /**< try improving fit by making use of parabolic shape of chisq values*/
 
       //fit results
       FitResult m_result;/**< fit result from template fit*/

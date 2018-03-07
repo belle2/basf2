@@ -16,7 +16,7 @@ namespace Belle2 {
   /** does a tripletFit of the given hits
    * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
    * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-  class QualityEstimatorTripletFit : public QualityEstimatorBase {
+  class QualityEstimatorTripletFit final : public QualityEstimatorBase {
 
   public:
 

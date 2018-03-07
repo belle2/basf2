@@ -12,12 +12,16 @@
 #define EKLMRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMAlignmentHit.h>
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMTimeCalibration.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
@@ -101,6 +105,15 @@ namespace Belle2 {
 
     /** Default time calibration data. */
     EKLMTimeCalibrationData m_DefaultTimeCalibrationData;
+
+    /** Digits. */
+    StoreArray<EKLMDigit> m_Digits;
+
+    /** EKLM 2d hits. */
+    StoreArray<EKLMHit2d> m_Hit2ds;
+
+    /** Alignment Hits. */
+    StoreArray<EKLMAlignmentHit> m_AlignmentHits;
 
   };
 

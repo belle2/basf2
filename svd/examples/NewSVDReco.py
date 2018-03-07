@@ -9,11 +9,18 @@
 ##############################################################################
 
 from basf2 import *
-from dump_digits import dump_digits
-from dump_clusters import dump_clusters
+from svd.dump_digits import dump_digits
+from svd.dump_clusters import dump_clusters
 
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
+
+# Set database
+"""
+For phase 3 related studies, use this tag
+"""
+# use_local_database('localDB_NN_toImport/database_NN_toImport.txt','localDB_NN_toImport')
+use_central_database("development")
 
 # Register modules
 
@@ -36,18 +43,17 @@ SVDDIGI = register_module('SVDDigitizer')
 SVDDIGI.param('StartSampling', -31.44)
 SVDDIGI.param('GenerateShaperDigits', True)
 # SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
-SVDDIGI.param('RandomizeEventTimes', True)
-SVDDIGI.param('TimeFrameLow', -180)
-SVDDIGI.param('TimeFrameHigh', 150)
+# SVDDIGI.param('RandomizeEventTimes', True)
+# SVDDIGI.param('TimeFrameLow', -180)
+# SVDDIGI.param('TimeFrameHigh', 150)
 # SVD signal reconstructor
 SVDSIGR = register_module('SVDNNShapeReconstructor')
 # Write RecoDigits so that we can check them
 SVDSIGR.param('WriteRecoDigits', True)
-# Direct clusterizer
-SVDCLUST1 = register_module('SVDClusterizerDirect')
-SVDCLUST1.param('Clusters', 'SVDClustersDirect')
 # RecoDigit clusterizer
-SVDCLUST2 = register_module('SVDNNClusterizer')
+SVDCLUST1 = register_module('SVDNNClusterizer')
+# ShaperDigit clusterizer
+SVDCLUST2 = register_module("SVDClusterizerDirect")
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -64,7 +70,7 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # Set the number of events to be processed (100 events)
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1000], 'expList': [0], 'runList': [0]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')
@@ -86,10 +92,9 @@ main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(SVDDIGI)
 main.add_module(SVDSIGR)
-main.add_module(SVDCLUST1)
-main.add_module(dump_clusters('direct_clusters_dump.txt', 'SVDClustersDirect'))
+main.add_module(dump_digits())
 main.add_module(SVDCLUST2)
-main.add_module(dump_clusters('clusters_dump.txt', 'SVDClusters'))
+main.add_module(dump_clusters())
 main.add_module(output)
 
 # Process events

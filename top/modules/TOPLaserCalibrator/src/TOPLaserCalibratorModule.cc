@@ -38,6 +38,7 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TF1.h>
+#include <TMath.h>
 #include <TTree.h>
 #include <TClonesArray.h>
 #include <sstream>
@@ -69,7 +70,8 @@ namespace Belle2 {
     addParam("fitChannel", m_fitChannel, "set 0 - 511 to a specific channel; set 0 to all channels in the fit",
              512);
     addParam("barID", m_barID, "ID of TOP module to calibrate");
-    addParam("fitMethod", m_fitMethod, "gaus: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball", string("gauss"));
+    addParam("refCh", m_refCh, "reference channel of T0 constant");
+    addParam("fitMethod", m_fitMethod, "gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball", string("gauss"));
     addParam("fitRange", m_fitRange, "fit range[nbins, xmin, xmax]", frange);
 
     for (int i = 0; i < c_NumChannels; ++i) {
@@ -83,7 +85,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::initialize()
   {
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
   }
 
   void TOPLaserCalibratorModule::beginRun()
@@ -92,8 +94,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::event()
   {
-    StoreArray<TOPDigit> digits;
-    for (auto& digit : digits) {
+    for (auto& digit : m_digits) {
       if (m_barID != 0 && digit.getModuleID() != m_barID) continue; //if m_barID == 0, use all 16 slots(for MC test)
       unsigned channel = digit.getChannel();
       if (channel < c_NumChannels) {
@@ -109,6 +110,7 @@ namespace Belle2 {
         }
         if (digit.getHitQuality() != TOPDigit::EHitQuality::c_Good) continue;
         if (digit.getTime() < m_fitRange[1] || digit.getTime() > m_fitRange[2]) continue;
+        if (!digit.isTimeBaseCalibrated()) continue;
         histo->Fill(digit.getTime()); //get Time from TOPDigit
       }
     }
@@ -126,6 +128,7 @@ namespace Belle2 {
     }
 
     double dataT[c_NumChannels] = {0};
+    double dataTErr[c_NumChannels] = {0};
     double mcT[c_NumChannels] = {0};
 
     TOP::LaserCalibratorFit t0fit(m_barID);
@@ -136,6 +139,7 @@ namespace Belle2 {
       for (int i = 0; i < c_NumChannels; ++i) {
         t0fit.fitChannel(i);
         dataT[i] = t0fit.getFitT();
+        dataTErr[i] = t0fit.getFitTErr();
       }
     } else {
       t0fit.fitChannel(m_fitChannel);
@@ -157,10 +161,11 @@ namespace Belle2 {
       mcT[channel_mc] = maxpos;
     }
 
-    //w.r.t. channel 0
-    for (int i = 1; i < c_NumChannels; i++) {
-      dataT[i] = dataT[i] - dataT[0];
-      mcT[i] = mcT[i] - mcT[0];
+    //w.r.t. ref. channel
+    for (int i = 0; i < c_NumChannels; i++) {
+      if (i == m_refCh) continue;
+      dataT[i] = dataT[i] - dataT[m_refCh];
+      mcT[i] = mcT[i] - mcT[m_refCh];
     }
 
     delete tree;
@@ -173,13 +178,42 @@ namespace Belle2 {
 
     unsigned channel = 0;
     double t0_const = 0;
+    double t0ConstRaw = 0;
+    double fittedTime = 0;
+    double fittedTimeError = 0;
+    double mcTime = 0;
+    double mcCorrection = 0;
+    double t0ConstError = 0;
 
+    otree->Branch("fittedTime", &fittedTime, "fittedTime/D");
+    otree->Branch("fittedTimeError", &fittedTimeError, "fittedTimeError/D");
+    otree->Branch("mcTime", &mcTime, "mcTime/D");
+    otree->Branch("t0ConstRaw", &t0ConstRaw, "t0ConstRaw/D");
+    otree->Branch("mcCorrection", &mcCorrection, "mcCorrection/D");
     otree->Branch("t0Const", &t0_const, "t0_const/D");
+    otree->Branch("t0ConstError", &t0ConstError, "t0ConstError/D");
     otree->Branch("channel", &channel, "channel/I");
+    otree->Branch("slot", &m_barID, "slot/I");
 
-    for (int i = 1; i < c_NumChannels; i++) {
+    for (int i = 0; i < c_NumChannels; i++) {
+      if (i == m_refCh) {
+        fittedTime = dataT[i];
+        mcTime = mcT[i];
+      } else {
+        fittedTime = dataT[i] + dataT[m_refCh];
+        mcTime = mcT[i] +  mcT[m_refCh];
+      }
+      fittedTimeError = dataTErr[i];
+      t0ConstRaw = dataT[i];
+      mcCorrection = mcT[i];
       channel = i;
-      t0_const = mcT[i] - dataT[i];
+      t0_const = dataT[i] - mcT[i];
+      // assuming that the MC error is negligible
+      t0ConstError = TMath::Sqrt(dataTErr[i] * dataTErr[i] + dataTErr[m_refCh] * dataTErr[m_refCh]);
+      if (i == m_refCh) {
+        t0_const = 0;
+        t0ConstError = dataTErr[m_refCh];
+      }
       otree->Fill();
     }
     otree->Write();

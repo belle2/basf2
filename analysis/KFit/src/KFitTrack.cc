@@ -34,12 +34,14 @@ KFitTrack::KFitTrack(void)
 }
 
 
-KFitTrack::KFitTrack(const KFitTrack& a) : m_PXEBefore(a.m_PXEBefore), m_PXEAfter(a.m_PXEAfter)
+KFitTrack::KFitTrack(const KFitTrack& a) :
+  m_PXEBefore(a.m_PXEBefore),
+  m_PXEAfter(a.m_PXEAfter),
+  m_Charge(a.m_Charge),
+  m_Mass(a.m_Mass),
+  m_Vertex(a.m_Vertex),
+  m_VertexError(a.m_VertexError)
 {
-  this->m_Charge      = a.m_Charge;
-  this->m_Mass        = a.m_Mass;
-  this->m_Vertex      = a.m_Vertex;
-  this->m_VertexError = a.m_VertexError;
 }
 
 

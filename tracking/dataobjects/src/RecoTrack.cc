@@ -3,6 +3,7 @@
 
 #include <genfit/TrackCand.h>
 #include <genfit/AbsTrackRep.h>
+#include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 
@@ -225,42 +226,96 @@ const genfit::TrackPoint* RecoTrack::getCreatedTrackPoint(const RecoHitInformati
   return m_genfitTrack.getPoint(createdTrackPointID);
 }
 
-size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset)
+size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset, bool reversed,
+                                       boost::optional<double> optionalMinimalWeight)
 {
   size_t hitsCopied = 0;
+
+  unsigned int maximalSortingParameter = 0;
+
+  if (reversed) {
+    const auto& recoHitInformations = recoTrack->getRecoHitInformations();
+    const auto sortBySP = [](const RecoHitInformation * lhs, const RecoHitInformation * rhs) {
+      return lhs->getSortingParameter() < rhs->getSortingParameter();
+    };
+    const auto& maximalElement = std::max_element(recoHitInformations.begin(), recoHitInformations.end(), sortBySP);
+    if (maximalElement != recoHitInformations.end()) {
+      maximalSortingParameter = (*maximalElement)->getSortingParameter();
+    }
+  }
+
+  // Helper function to add the sorting parameter offset (or reverse the sign of the sorting parameter)
+  const auto calculateSortingParameter = [maximalSortingParameter, sortingParameterOffset](unsigned int sortingParameters) {
+    if (maximalSortingParameter > 0) {
+      return maximalSortingParameter - sortingParameters + sortingParameterOffset;
+    }
+    return sortingParameters + sortingParameterOffset;
+  };
+
+  const auto testHitWeight = [recoTrack, optionalMinimalWeight](const RecoHitInformation * recoHitInformation) {
+    if (not optionalMinimalWeight) {
+      return true;
+    }
+    double minimalWeight = *optionalMinimalWeight;
+    const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
+    if (trackPoint) {
+      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
+      if (not kalmanFitterInfo) {
+        return false;
+      }
+      const std::vector<double>& weights = kalmanFitterInfo->getWeights();
+      const auto checkWeight = [minimalWeight](const double weight) {
+        return weight >= minimalWeight;
+      };
+      return std::any_of(weights.begin(), weights.end(), checkWeight);
+    }
+    return true;
+  };
 
   for (auto* pxdHit : recoTrack->getPXDHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(pxdHit);
     assert(recoHitInfo);
-    hitsCopied += addPXDHit(pxdHit, recoHitInfo->getSortingParameter() + sortingParameterOffset, recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addPXDHit(pxdHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                              recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* svdHit : recoTrack->getSVDHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(svdHit);
     assert(recoHitInfo);
-    hitsCopied += addSVDHit(svdHit, recoHitInfo->getSortingParameter() + sortingParameterOffset, recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addSVDHit(svdHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                              recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* cdcHit : recoTrack->getCDCHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHit);
     assert(recoHitInfo);
-    hitsCopied += addCDCHit(cdcHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
-                            recoHitInfo->getRightLeftInformation(),
-                            recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addCDCHit(cdcHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                              recoHitInfo->getRightLeftInformation(),
+                              recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* bklmHit : recoTrack->getBKLMHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(bklmHit);
     assert(recoHitInfo);
-    hitsCopied += addBKLMHit(bklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
-                             recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addBKLMHit(bklmHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                               recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* eklmHit : recoTrack->getEKLMHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(eklmHit);
     assert(recoHitInfo);
-    hitsCopied += addEKLMHit(eklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
-                             recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addEKLMHit(eklmHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                               recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   return hitsCopied;
@@ -293,7 +348,18 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
     return false;
   }
 
-  return true;
+  // make sure there is at least one hit with a valid mSoP
+  const unsigned int trackSize = m_genfitTrack.getNumPoints();
+  for (unsigned int i = 0; i < trackSize; i++) {
+    try {
+      m_genfitTrack.getFittedState(i, representation);
+      return true;
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
+    }
+  }
+
+  return false;
 }
 
 void RecoTrack::prune()
@@ -337,13 +403,18 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
   const genfit::MeasuredStateOnPlane* nearestStateOnPlane = nullptr;
   double minimalDistance2 = 0;
   for (unsigned int hitIndex = 0; hitIndex < numberOfPoints; hitIndex++) {
-    const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
+    try {
+      const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
 
-    const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
+      const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
 
-    if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
-      nearestStateOnPlane = &measuredStateOnPlane;
-      minimalDistance2 = currentDistance2;
+      if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
+        nearestStateOnPlane = &measuredStateOnPlane;
+        minimalDistance2 = currentDistance2;
+      }
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      continue;
     }
   }
   return *nearestStateOnPlane;
@@ -459,4 +530,52 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromRecoHi
   }
 
   return fittedResult->getFittedState();
+}
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation) const
+{
+  const unsigned int trackSize = m_genfitTrack.getNumPoints();
+  for (unsigned int i = 0; i < trackSize; i++) {
+    try {
+      return m_genfitTrack.getFittedState(i, representation);
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+    }
+  }
+
+  B2FATAL("There is no single hit with a valid mSoP in this track! Check if the fit failed with wasFitSuccessful before");
+}
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation) const
+{
+  int trackSize = m_genfitTrack.getNumPoints();
+  for (int i = -1; i >= -trackSize; i--) {
+    try {
+      return m_genfitTrack.getFittedState(i, representation);
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+    }
+  }
+
+  B2FATAL("There is no single hit with a valid mSoP in this track!");
+}
+
+std::string RecoTrack::getInfoHTML() const
+{
+  std::stringstream out;
+
+  out << "<b>Charge seed</b>=" << getChargeSeed();
+
+  out << "<b>pT seed</b>=" << getMomentumSeed().Pt();
+  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
+  out << "<br>";
+  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
+  out << "<br>";
+
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
+  }
+  out << "<br>";
+
+  return out.str();
 }

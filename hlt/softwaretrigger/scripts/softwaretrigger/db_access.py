@@ -23,7 +23,7 @@ def list_to_vector(l):
     return vec
 
 
-def upload_cut_to_db(base_identifier, cut_identifier, cut_string, prescale_factor=1, reject_cut=False, iov=None):
+def upload_cut_to_db(cut_string, base_identifier, cut_identifier, prescale_factor=1, reject_cut=False, iov=None):
     """
     Python function to upload the given software trigger cut to the database.
     Additional to the software trigger cut, the base- as well as the cut identifier
@@ -200,20 +200,25 @@ if __name__ == '__main__':
         cut = download_cut_from_db(base_identifier, cut_identifier, True)
         basf2.B2RESULT("Cut condition: " + cut.decompile())
         basf2.B2RESULT("Cut is a reject cut: " + str(cut.isRejectCut()))
-        cuts.append({"cut": cut, "base_identifier": base_identifier, "cut_identifier": cut_identifier})
+        cuts.append({"cut": cut.decompile(), "base_identifier": base_identifier, "cut_identifier": cut_identifier})
 
     basf2.reset_database()
     for cut_params in cuts:
-        upload_cut_to_db(cut_params["cut"], cut_params["base_identifier"], cut_params["cut_identifier"], validity_interval)
+        upload_cut_to_db(
+            cut_params["cut"],
+            cut_params["base_identifier"],
+            cut_params["cut_identifier"],
+            1,
+            False,
+            validity_interval)
     exit(0)
 
     basf2.B2RESULT("We will now create an example cut and upload it to the *local* database.")
     # Create an example cut.
-    cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile("[[highest_1_ecl > 0.1873] or [max_pt > 0.4047]]", 1)
-    basf2.B2RESULT(cut.decompile())
+    cut = "[[highest_1_ecl > 0.1873] or [max_pt > 0.4047]]"
 
     # Upload the cut to the local database
-    upload_cut_to_db(cut, "fast_reco", "test", validity_interval)
+    upload_cut_to_db(cut, "fast_reco", "test", 1, False, validity_interval)
 
     # Download the cut from the local database - set the even number for this.
 

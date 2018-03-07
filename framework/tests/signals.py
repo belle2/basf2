@@ -16,6 +16,37 @@ import tempfile
 import shutil
 from basf2 import *
 
+
+class TestModule(Module):
+    """test"""
+    def __init__(self, init_signal, event_signal):
+        """Setup module for given signal settings"""
+        super().__init__()
+        #: signal to emit to ourselves during initialize()
+        self.init_signal = init_signal
+        #: signal to emit to ourselves during event()
+        self.event_signal = event_signal
+
+    def initialize(self):
+        """If init_signal is true, kill on init, otherwise just print info"""
+
+        if self.init_signal:
+            pid = os.getpid()
+            B2INFO("Killing %s in init (sig %d)" % (pid, self.init_signal))
+            os.kill(pid, self.init_signal)
+        B2INFO("initialize()")
+
+    def event(self):
+        """If init_signal is true raise error, if event_signal is true kill process, otherwise print info"""
+        if self.init_signal:
+            B2FATAL("Processing should have been stopped in init!")
+        if self.event_signal:
+            pid = os.getpid()
+            B2INFO("Killing %s in event (sig %d)" % (pid, self.event_signal))
+            os.kill(pid, self.event_signal)
+        B2INFO("event()")
+
+
 # Tests running in Bamboo have SIGQUIT blocked via sigmask(3),
 # so let's unblock it for this test.
 # See Jira ticket BII-1948 for details
@@ -81,57 +112,26 @@ def run_test(init_signal, event_signal, abort, test_in_process):
     num_events = 5
     if abort:
         num_events = int(1e8)  # larger number to test we abort early.
-    eventinfosetter = register_module('EventInfoSetter', evtNumList=[num_events])
-    output = register_module('RootOutput')
-    output.param('outputFileName', testFile.name)
-    output.param('updateFileCatalog', False)
-
-    class TestModule(Module):
-        """test"""
-
-        def __init__(self):
-            """init."""
-            super().__init__()
-
-        def initialize(self):
-            """reimplementation of Module::initialize()."""
-
-            if init_signal:
-                pid = os.getpid()
-                B2INFO("Killing %s in init (sig %d)" % (pid, init_signal))
-                os.kill(pid, init_signal)
-            B2INFO("initialize()")
-
-        def event(self):
-            """reimplementation of Module::event()."""
-            if init_signal:
-                B2FATAL("Processing should have been stopped in init!")
-            if event_signal:
-                pid = os.getpid()
-                B2INFO("Killing %s in event (sig %d)" % (pid, event_signal))
-                os.kill(pid, event_signal)
-            B2INFO("event()")
 
     # Create paths
     main = create_path()
-    main.add_module(eventinfosetter)
+    main.add_module('EventInfoSetter', evtNumList=[num_events])
     if test_in_process == 0:
-        testmod = main.add_module(TestModule())
+        testmod = main.add_module(TestModule(init_signal, event_signal))
         main.add_module('ProgressBar').set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     elif test_in_process == 1:
-        testmod = main.add_module(TestModule())
+        testmod = main.add_module(TestModule(init_signal, event_signal))
         testmod.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     elif test_in_process == 2:
         main.add_module('ProgressBar').set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
-        testmod = main.add_module(TestModule())
-    main.add_module(output)
+        testmod = main.add_module(TestModule(init_signal, event_signal))
+    main.add_module('RootOutput', outputFileName=testFile.name, updateFileCatalog=False)
 
     B2WARNING("Running with PID " + str(os.getpid()))
     process(main)
     sys.exit(0)
 
 
-# set_log_level(LogLevel.WARNING)
 for nproc in [0, 3]:
     set_nprocesses(nproc)
     for in_proc in [0, 1, 2]:
@@ -158,9 +158,6 @@ for nproc in [0, 3]:
             # Note: Without specifying exception type, we might get those from forked processes, too
             B2WARNING("Exception occured for nproc=%d, test_in_process=%d" % (nproc, in_proc))
             raise
-
-set_log_level(LogLevel.INFO)
-
 
 print("\n")
 print("=========================================================================")

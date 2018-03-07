@@ -33,26 +33,27 @@ namespace Belle2 {
     PXDdigiFilterModule();
 
     /**  */
-    virtual ~PXDdigiFilterModule();
+    ~PXDdigiFilterModule();
 
     /**  */
-    virtual void initialize();
+    void initialize() override;
 
     /**  */
-    virtual void beginRun();
+    void beginRun() override;
 
     /**  */
-    virtual void event();
+    void event() override;
 
     /**  */
-    virtual void endRun();
+    void endRun() override;
 
     /**  */
-    virtual void terminate();
+    void terminate() override;
 
 
   private:
 
+    bool m_CreateOutside; /**< if set, create list of outside pixels, too */
     std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be filtered */
     std::string m_PXDDigitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_PXDDigitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */

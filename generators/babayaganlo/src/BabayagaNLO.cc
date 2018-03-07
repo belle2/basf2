@@ -321,7 +321,8 @@ void BabayagaNLO::setDefaultSettings()
 
 void BabayagaNLO::initExtraInfo()
 {
-  StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+  StoreObjPtr<EventExtraInfo> extrainfo;
+  extrainfo.registerInDataStore();
 }
 
 void BabayagaNLO::init()

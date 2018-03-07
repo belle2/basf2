@@ -17,46 +17,32 @@ from stdCharm import *
 from stdLightMesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
-
+gb2_setuprel = 'build-2017-10-16'
 import sys
 import os
 import glob
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = \
-        ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-         'mdst_000001_prod00000001_task00000001.root'
-
-         ]
-    bkgType = 'old'
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
 
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
-
-stdPhotons('loose')
-loadStdCharged()
+inputMdstList('default', fileList)
 stdPi0s('loose')
-loadStdAllPi0()
+stdPhotons('loose')
+loadStdSkimPhoton()
+loadStdSkimPi0()
+loadStdCharged()
 stdKshorts()
 loadStdLightMesons()
-loadStdPhoton()
-loadStdPhotonE15()
-loadStdSkimPi0()
+cutAndCopyList('gamma:E15', 'gamma:skim', '1.5<E<100')
+
+
 # EWP Skim
 from BtoXgamma_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst('outputFiles/BtoXgamma_' + bkgType, XgammaList)
+skimOutputUdst('BtoXgamma', XgammaList)
 summaryOfLists(XgammaList)
 
 

@@ -17,6 +17,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 // dataobjects
 #include <mdst/dataobjects/V0.h>
@@ -75,6 +76,10 @@ namespace Belle2 {
     addParam("trackHypothesis", m_trackHypothesis,
              "Track hypothesis to use when loading the particle. By default, use the particle's own hypothesis.",
              0);
+
+    addParam("enforceFitHypothesis", m_enforceFitHypothesis,
+             "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
+             m_enforceFitHypothesis);
   }
 
   void ParticleLoaderModule::initialize()
@@ -273,8 +278,8 @@ namespace Belle2 {
         std::pair<Track*, Track*> v0Tracks = v0->getTracks();
         std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
 
-        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP);
-        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM);
+        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP, v0TrackFitResults.first->getParticleType());
+        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM, v0TrackFitResults.second->getParticleType());
 
         const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
         const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
@@ -356,13 +361,19 @@ namespace Belle2 {
         if (m_trackHypothesis == 0)
           pdgCode = get<c_PListPDGCode>(track2Plist);
         else pdgCode = m_trackHypothesis;
-        //
         Const::ChargedStable type(abs(pdgCode));
 
-        // skip tracks with charge = 0
-        const TrackFitResult* trackFit = track->getTrackFitResult(type);
+        // load the TrackFitResult for the requested particle or if not available use
+        // the one with the closest mass
+        const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
+
         if (!trackFit) {
           B2WARNING("Track returned null TrackFitResult pointer for ChargedStable::getPDGCode()  = " << type.getPDGCode());
+          continue;
+        }
+
+        if (m_enforceFitHypothesis && (trackFit->getParticleType().getPDGCode() != type.getPDGCode())) {
+          // the required hypothesis does not exist for this track, skip it
           continue;
         }
 
@@ -372,7 +383,9 @@ namespace Belle2 {
           continue;
         }
 
-        // create particle and add it to the Particle list
+        // create particle and add it to the Particle list. The Particle class
+        // internally also uses the getTrackFitResultWithClosestMass() to load the best available
+        // track fit result
         Particle particle(track, type);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
 

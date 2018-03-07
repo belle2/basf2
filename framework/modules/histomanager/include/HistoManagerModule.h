@@ -1,5 +1,3 @@
-#ifndef HISTO_MANAGER_H
-#define HISTO_MANAGER_H
 //+
 // File : HistoManager.h
 // Description : A module to manage histograms/ntuples/ttrees
@@ -7,6 +5,8 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 27 - Jul - 2010
 //-
+
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -34,6 +34,4 @@ namespace Belle2 {
     bool        m_initmain; /**< True if initialize() was called. */
     bool        m_tupleManagerInitialized; /**< True if RbTupleManager was initialized. */
   };
-} // Namaspace Belle2
-
-#endif /* HISTO_MANAGER_H */
+} // Namespace Belle2

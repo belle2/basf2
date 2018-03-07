@@ -25,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=True,
+                       trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
@@ -50,21 +50,12 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
-    :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
+    :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
-    :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
-
-    # add svd_reconstruction
-    if components is None or 'SVD' in components:
-        add_svd_reconstruction(path)
-
-    # add pxd_reconstruction
-    if components is None or 'PXD' in components:
-        add_pxd_reconstruction(path)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
@@ -73,8 +64,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 mcTrackFinding=False,
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
-                                additionalTrackFitHypotheses=additionalTrackFitHypotheses,
-                                use_vxdtf2=use_vxdtf2,
+                                trackFitHypotheses=trackFitHypotheses,
                                 use_second_cdc_hits=use_second_cdc_hits)
 
     # Statistics summary
@@ -289,6 +279,8 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
+        ClusterMatch = register_module('ClusterMatcher')
+        path.add_module(ClusterMatch)
 
 
 def add_pid_module(path, components=None):
@@ -364,6 +356,9 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
+        # ECL T0 extraction
+        path.add_module('ECLEventT0')
+
         # ECL connected region finder
         ecl_crfinder = register_module('ECLCRFinder')
         path.add_module(ecl_crfinder)
@@ -408,7 +403,7 @@ def add_ecl_track_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)

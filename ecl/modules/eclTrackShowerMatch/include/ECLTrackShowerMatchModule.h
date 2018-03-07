@@ -8,15 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLTRACKSHOWERMATCH_H
-#define ECLTRACKSHOWERMATCH_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
 
 namespace Belle2 {
+  class ECLCluster;
+  class Track;
+  class ExtHit;
+  class ECLCalDigit;
+  class ECLShower;
 
   /** The modules creates and saves in the DataStore a Relation between Tracks and ECLShower.
    * It uses the existing Relation between Tracks and ExtHit, from which the ECL crystals
@@ -59,14 +61,19 @@ namespace Belle2 {
 
     /** Clean up anything you created in initialize(). */
     virtual void terminate();
-  private:
 
+  private:
     /** Minimal distance between track and shower. */
     double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
 
     /** Compute depth. */
     void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
-  };
 
+    //DataStore variabels
+    StoreArray<Track> m_tracks; /**< Track dataStore variables*/
+    StoreArray<ECLShower> m_eclShowers; /**< ECLShower dataStore variables*/
+    StoreArray<ECLCluster> m_eclClusters; /**< ECLCluster dataStore variables*/
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigit dataStore variables*/
+    StoreArray<ExtHit> m_extHits; /**< ExtHit dataStore variables*/
+  };
 } //Belle2
-#endif

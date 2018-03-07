@@ -13,9 +13,6 @@
 #include <analysis/raveInterface/RaveSetup.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <genfit/GFRaveVertexFactory.h>
-#include <genfit/RKTrackRep.h>
-
 #include <rave/VertexFactory.h>
 
 //root
@@ -58,51 +55,12 @@ RaveVertexFitter::~RaveVertexFitter()
 }
 
 
-void RaveVertexFitter::addTrack(const genfit::Track& aGFTrack)
-{
-  const genfit::MeasuredStateOnPlane& fittedState = aGFTrack.getFittedState();
-  m_raveTracks.push_back(GFMeasuredStateToRaveTrack(fittedState));
-}
-
-
-void RaveVertexFitter::addTrack(const genfit::Track* aGFTrackPtr)
-{
-  const genfit::MeasuredStateOnPlane& fittedState = aGFTrackPtr->getFittedState();
-  m_raveTracks.push_back(GFMeasuredStateToRaveTrack(fittedState));
-}
-
 void RaveVertexFitter::addTrack(const TrackFitResult* const aTrackPtr)
 {
   m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
 }
 
 
-
-rave::Track RaveVertexFitter::GFMeasuredStateToRaveTrack(const genfit::MeasuredStateOnPlane& aGFState) const
-{
-  const int id = m_raveTracks.size();
-  TVector3 pos;
-  TVector3 mom;
-  TMatrixDSym cov;
-
-  aGFState.getPosMomCov(pos, mom, cov);
-
-  // state
-  rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(),
-                           mom.X(), mom.Y(), mom.Z());
-
-  rave::Covariance6D ravecov(cov(0, 0), cov(1, 0), cov(2, 0),
-                             cov(1, 1), cov(2, 1), cov(2, 2),
-                             cov(3, 0), cov(4, 0), cov(5, 0),
-                             cov(3, 1), cov(4, 1), cov(5, 1),
-                             cov(3, 2), cov(4, 2), cov(5, 2),
-                             cov(3, 3), cov(4, 3), cov(5, 3),
-                             cov(4, 4), cov(5, 4), cov(5, 5));
-
-  return rave::Track(id, ravestate, ravecov, rave::Charge(aGFState.getCharge() + 0.1), 1,
-                     1); //the two 1s are just dummy values. They are not used by Rave anyway
-
-}
 
 rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* const aTrackPtr) const
 {
@@ -350,7 +308,7 @@ void RaveVertexFitter::updateDaughters()
     fitted7CovM(3, 5) = fitted7CovPart(3, 5); fitted7CovM(5, 3) = fitted7CovM(3, 5);
     fitted7CovM(3, 6) = fitted7CovPart(3, 6); fitted7CovM(6, 3) = fitted7CovM(3, 6);
 
-    fitted7CovM(4, 4) = fittedCov.dxz();      fitted7CovM(4, 4) = fitted7CovM(4, 4);
+    fitted7CovM(4, 4) = fittedCov.dxx();      fitted7CovM(4, 4) = fitted7CovM(4, 4);
     fitted7CovM(4, 5) = fittedCov.dxy();      fitted7CovM(5, 4) = fitted7CovM(4, 5);
     fitted7CovM(4, 6) = fittedCov.dxz();      fitted7CovM(6, 4) = fitted7CovM(4, 6);
 

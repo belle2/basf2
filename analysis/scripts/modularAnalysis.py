@@ -12,6 +12,8 @@ import sys
 import inspect
 from vertex import *
 from analysisPath import *
+from variables import variables
+import basf2_mva
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -120,10 +122,12 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     progress = register_module('ProgressBar')
     path.add_module(progress)
 
+    # None means don't create custom magnetic field, use whatever comes from the
+    # DB
     environToMagneticField = {'MC5': 'MagneticFieldConstant',
-                              'MC6': 'MagneticField',
-                              'MC7': 'MagneticField',
-                              'default': 'MagneticField',
+                              'MC6': None,
+                              'MC7': None,
+                              'default': None,
                               'Belle': 'MagneticFieldConstantBelle'}
 
     fixECLClusters = {'MC5': True,
@@ -133,8 +137,10 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
                       'Belle': False}
 
     if environmentType in environToMagneticField:
-        path.add_module('Gearbox')
-        path.add_module('Geometry', ignoreIfPresent=False, components=[environToMagneticField.get(environmentType)])
+        fieldType = environToMagneticField[environmentType]
+        if fieldType is not None:
+            path.add_module('Gearbox')
+            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -253,6 +259,50 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], 
     outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
                dataDescription=dataDescription)
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+
+
+def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
+    """
+    Write out all particle lists as an index file to be reprocessed using parentLevel flag.
+    Additional branches necessary for file to be read are automatically included.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
+
+    @param str filename the name of the output index file
+    @param str path modules are added to this path
+    @param list(str) includeArrays: datastore arrays/objects to write to the output
+        file in addition to particl lists and related information
+    @param bool keepParents whether the parents of the input event will be saved as the parents of the same event
+        in the output index file. Useful if you are only adding more information to another index file
+    @param bool mc whether the input data is MC or not
+    """
+
+    # Module to mark all branches to not be saved except particle lists
+    onlyPLists = register_module('OnlyWriteOutParticleLists')
+    path.add_module(onlyPLists)
+
+    # Set up list of all other branches we need to make index file complete
+    partBranches = [
+        'Particles',
+        'ParticlesToMCParticles',
+        'ParticlesToPIDLikelihoods',
+        'ParticleExtraInfoMap',
+        'EventExtraInfo'
+    ]
+    branches = ['EventMetaData']
+    persistentBranches = ['FileMetaData']
+    if mc:
+        branches += []
+        # persistentBranches += ['BackgroundInfos']
+    branches += partBranches
+    branches += includeArrays
+
+    r1 = register_module('RootOutput')
+    r1.param('outputFileName', filename)
+    r1.param('additionalBranchNames', branches)
+    r1.param('branchNamesPersistent', persistentBranches)
+    r1.param('keepParents', keepParents)
+    path.add_module(r1)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):
@@ -392,6 +442,9 @@ def correctFSR(
     Takes the particles from the given lepton list copies them to the output list and adds the
     4-vector of the closest photon (considered as radiative) to the lepton, if the given
     criteria for maximal angle and energy are fulfilled.
+    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
+    Information attached to the track is only available for the old lepton, accessable via the daughter
+    metavariable, e.g. <daughter(0, eid)>.
 
     @param outputListName The output lepton list containing the corrected leptons.
     @param inputListName The initial lepton list containing the leptons to correct, should already exists.
@@ -547,15 +600,16 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=analysis_main):
+                      path=analysis_main,
+                      enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'Kid>0.1')
-    pions = ('pi+:std', 'piid>0.1')
+    kaons = ('K+:std', 'kaonID>0.1')
+    pions = ('pi+:std', 'pionID>0.1')
     fillParticleLists([kaons, pions])
 
     The type of the particles to be loaded is specified via the decayString module parameter.
@@ -574,12 +628,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -588,6 +648,7 @@ def fillParticleList(
     cut,
     writeOut=False,
     path=analysis_main,
+    enforceFitHypothesis=False
 ):
     """
     Creates Particles of the desired type from the corresponding MDST dataobjects,
@@ -611,12 +672,18 @@ def fillParticleList(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -625,6 +692,7 @@ def fillParticleListWithTrackHypothesis(
     cut,
     hypothesis,
     writeOut=False,
+    enforceFitHypothesis=False,
     path=analysis_main,
 ):
     """
@@ -634,6 +702,11 @@ def fillParticleListWithTrackHypothesis(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     @param path          modules are added to this path
     """
 
@@ -642,6 +715,7 @@ def fillParticleListWithTrackHypothesis(
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -709,7 +783,7 @@ def fillParticleListsFromMC(
     The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
     For example:
     kaons = ('K+:gen', '')
-    pions = ('pi+:gen', 'piid>0.1')
+    pions = ('pi+:gen', 'pionID>0.1')
     fillParticleListsFromMC([kaons, pions])
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
@@ -776,7 +850,7 @@ def reconstructDecay(
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
     reconstructed as well (meaning that the charge conjugated mother list is created as well).
 
-    @param decayString DecayString specifying what kind of the decay should be reconstructed
+    @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
@@ -786,6 +860,8 @@ def reconstructDecay(
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded a Warning will be
                        printed.
+                       By default, all these candidates will be removed and event will be ignored.
+                       This behaviour can be changed by \'ignoreIfTooManyCandidates\' flag.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
@@ -804,6 +880,46 @@ def reconstructDecay(
         pmake.param("maximumNumberOfCandidates", candidate_limit)
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
+
+
+def reconstructMissingKlongDecayExpert(
+    decayString,
+    cut,
+    dmID=0,
+    writeOut=False,
+    path=analysis_main,
+    recoList="_reco",
+):
+    """
+    Creates mother particle accounting for missing momentum.
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param dmID        user specified decay mode identifier
+    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param path        modules are added to this path
+    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    """
+
+    pcalc = register_module('KlongMomentumCalculatorExpert')
+    pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
+    pcalc.param('decayString', decayString)
+    pcalc.param('cut', cut)
+    pcalc.param('decayMode', dmID)
+    pcalc.param('writeOut', writeOut)
+    pcalc.param('recoList', recoList)
+    analysis_main.add_module(pcalc)
+
+    rmake = register_module('KlongDecayReconstructorExpert')
+    rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
+    rmake.param('decayString', decayString)
+    rmake.param('cut', cut)
+    rmake.param('decayMode', dmID)
+    rmake.param('writeOut', writeOut)
+    rmake.param('recoList', recoList)
+    analysis_main.add_module(rmake)
 
 
 def replaceMass(
@@ -1773,3 +1889,191 @@ if __name__ == '__main__':
     from pager import Pager
     with Pager('List of available functions in modularAnalysis'):
         pretty_print_description_list(desc_list)
+
+
+def markDuplicate(particleList, prioritiseV0, path=analysis_main):
+    """
+    Call DuplicateVertexMarker to find duplicate particles in a list and
+    flag the ones that should be kept
+
+    @param particleList input particle list
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    markdup = register_module('DuplicateVertexMarker')
+    markdup.param('particleList', particleList)
+    markdup.param('prioritiseV0', prioritiseV0)
+    path.add_module(markdup)
+
+
+def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
+    """
+    Merge two particle lists, vertex them and trim duplicates
+
+    @param firstList first particle list to merge
+    @param secondList second particle list to merge
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    listName = firstList.split(':')[0]
+    if (listName == secondList.split(':')[0]):
+        outList = listName + ':merged'
+        copyLists(outList, [firstList, secondList], False, path)
+        vertexKFit(outList, 0.0, '', '', path)
+        markDuplicate(outList, prioritiseV0, path)
+        applyCuts(outList, 'extraInfo(highQualityVertex)')
+    else:
+        B2ERROR("Lists to be merged contain different particles")
+
+
+PI0ETAVETO_COUNTER = 0
+
+
+def writePi0EtaVeto(
+    particleList,
+    decayString,
+    workingDirectory='.',
+    pi0vetoname='Pi0_Prob',
+    etavetoname='Eta_Prob',
+    downloadFlag=True,
+    selection='',
+    path=analysis_main,
+):
+    """
+    Give pi0/eta probability for hard photon.
+
+    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    current default weight files are optimised by MC9.
+    The Input Variables are as below. Aliases are set to some variables when training.
+    M : pi0/eta candidates Invariant mass
+    lowE : soft photon energy in lab frame
+    cTheta : soft photon ECL cluster's polar angle
+    Zmva : soft photon output of MVA using Zernike moments of the cluster
+    minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+
+    If you don't have weight files in your workingDirectory,
+    these files are downloaded from database to your workingDirectory automatically.
+    Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
+    about how to use this function.
+
+    NOTE for debug
+    Please don't use following ParticleList names elsewhere.
+    'gamma:HARDPHOTON', pi0:PI0VETO, eta:ETAVETO,
+    'gamma:PI0SOFT' + str(PI0ETAVETO_COUNTER), 'gamma:ETASOFT' + str(PI0ETAVETO_COUNTER)
+    Please don't use "lowE", "cTheta", "Zmva", "minC2Hdist" as alias elsewhere.
+
+    @param particleList     The input ParticleList
+    @param decayString specify Particle to be added to the ParticleList
+    @param workingDirectory The weight file directory
+    @param downloadFlag whether download default weight files or not
+    @param pi0vetoname extraInfo name of pi0 probability
+    @param etavetoname extraInfo name of eta probability
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param path       modules are added to this path
+    """
+    global PI0ETAVETO_COUNTER
+
+    if PI0ETAVETO_COUNTER == 0:
+        variables.addAlias('lowE', 'daughter(1,E)')
+        variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
+        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+
+    PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
+
+    roe_path = create_path()
+
+    deadEndPath = create_path()
+
+    signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
+
+    fillSignalSideParticleList('gamma:HARDPHOTON', decayString, path=roe_path)
+
+    pi0softname = 'gamma:PI0SOFT'
+    etasoftname = 'gamma:ETASOFT'
+    softphoton1 = pi0softname + str(PI0ETAVETO_COUNTER)
+    softphoton2 = etasoftname + str(PI0ETAVETO_COUNTER)
+
+    fillParticleList(
+        softphoton1,
+        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
+        path=roe_path)
+    applyCuts(softphoton1, 'abs(clusterTiming)<120', path=roe_path)
+    fillParticleList(
+        softphoton2,
+        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
+        path=roe_path)
+    applyCuts(softphoton2, 'abs(clusterTiming)<120', path=roe_path)
+
+    reconstructDecay('pi0:PI0VETO -> gamma:HARDPHOTON ' + softphoton1, '', path=roe_path)
+    reconstructDecay('eta:ETAVETO -> gamma:HARDPHOTON ' + softphoton2, '', path=roe_path)
+
+    if not os.path.isdir(workingDirectory):
+        os.mkdir(workingDirectory)
+        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/pi0veto.root'):
+        if downloadFlag:
+            use_central_database('development')
+            basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
+            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+
+    if not os.path.isfile(workingDirectory + '/etaveto.root'):
+        if downloadFlag:
+            use_central_database('development')
+            basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
+            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
+                        identifier=workingDirectory + '/pi0veto.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO'], extraInfoName='EtaVeto',
+                        identifier=workingDirectory + '/etaveto.root')
+
+    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', 1, path=roe_path)
+    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', 1, path=roe_path)
+
+    variableToSignalSideExtraInfo('pi0:PI0VETO', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
+
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_main):
+    """
+    Calculates the Thrust of the event using ParticleLists provided. If no ParticleList is
+    provided, default ParticleLists are used(all track and all hits in ECL without associated track).
+
+    The Thrust value is stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
+    and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
+    particle and the Thrust of the event in the CM system, are also created.
+
+    @param inputListNames   list of ParticleLists used to calculate the Thrust. If the list is empty,
+                            default ParticleLists pi+:thrust and gamma:thrust are filled.
+    @param default_cleanup  if True, apply default clean up cuts to default
+                            ParticleLists pi+:thrust and gamma:thrust.
+    @param path             modules are added to this path
+    """
+    if not inputListNames:
+        B2INFO("Creating particle lists pi+:thrust and gamma:thrust to get the Thrust of Event.")
+        fillParticleList('pi+:thrust', '')
+        fillParticleList('gamma:thrust', '')
+        particleLists = ['pi+:thrust', 'gamma:thrust']
+
+        if default_cleanup:
+            B2INFO("Using default cleanup in Thrust of Event module.")
+            trackCuts = 'pt > 0.1'
+            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+            trackCuts += ' and -3.0 < dz < 3.0'
+            trackCuts += ' and -0.5 < dr < 0.5'
+            applyCuts('pi+:thrust', trackCuts)
+
+            gammaCuts = 'E > 0.05'
+            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            applyCuts('gamma:thrust', gammaCuts)
+        else:
+            B2INFO("No cleanup in Thrust of Event module.")
+    else:
+        particleLists = inputListNames
+
+    thrustModule = register_module('ThrustOfEvent')
+    thrustModule.set_name('ThrustOfEvent_')
+    thrustModule.param('particleLists', particleLists)
+    path.add_module(thrustModule)

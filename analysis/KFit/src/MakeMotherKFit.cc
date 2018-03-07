@@ -17,7 +17,9 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-MakeMotherKFit::MakeMotherKFit(void)
+MakeMotherKFit::MakeMotherKFit(void):
+  m_Vertex(Hep3Vector()),
+  m_VertexError(HepSymMatrix(3, 0))
 {
   m_ErrorCode = KFitError::kNoError;
   m_FlagAtDecayPoint = true;
@@ -27,8 +29,6 @@ MakeMotherKFit::MakeMotherKFit(void)
   m_FlagBeforeAfter = KFitConst::kAfterFit;
   m_MagneticField = KFitConst::kDefaultMagneticField;
   m_TrackCount = 0;
-  m_Vertex = Hep3Vector();
-  m_VertexError = HepSymMatrix(3, 0);
   m_Charge = 0;
 }
 

@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEROEGAMMASTOOL_H
-#define NTUPLEROEGAMMASTOOL_H
+#pragma once
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
@@ -30,9 +29,9 @@ namespace Belle2 {
   class NtupleROEGammasTool : public NtupleFlatTool {
 
   private:
-    int* m_nROEGoodGammas; /** Number of good ECL showers in ROE. */
-    float m_fP[20];        /** Total momentum. */
-    float m_fP4[20][4];    /** Momentum in lab system (px py pz e). */
+    int* m_nROEGoodGammas; /**< Number of good ECL clusters in ROE. */
+    float m_fP[100];        /**< Total momentum. */
+    float m_fP4[100][4];    /**< Momentum in lab system (px py pz e). */
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
 
@@ -46,4 +45,4 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEROEGAMMASTOOL_H
+

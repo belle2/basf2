@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform Vertex fits
 # using Rave and how to use TagV and save Delta t.
 # The following  decay chain:
@@ -37,13 +39,15 @@ from modularAnalysis import fillParticleList
 from vertex import TagV
 from stdCharged import *
 
-# Add 10 signal MC files (each containing 1000 generated events)
+# Add signal MC files for release 9.
+# 150000 events!
+# Consider using -n flag in command line to limit number of events, e.g.:
+# > basf2 B2A410-TagVertex.py -n 1000
 filelistSIG = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/' +
-     'DBxxxxxxxx/MC5/prod00000103/s00/e0000/4S/r00000/1111440100/sub00/mdst_000001_prod00000103_task00000001.root'
+    ['/ghi/fs01/belle2/bdata/users/morda/JpsimumuK0S/mc9_bg1/sub00/mdst_000001_prod00002439_task00000001.root'
      ]
 
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #

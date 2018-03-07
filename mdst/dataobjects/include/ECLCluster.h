@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCLUSTER_H
-#define ECLCLUSTER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -27,6 +26,31 @@ namespace Belle2 {
    */
   class ECLCluster : public RelationsObject {
   public:
+
+    /** The hypothis ID for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
+    enum Hypothesis {
+      /** CR is split into a muon and n photons (T1) */
+      c_muonNPhotons = 1,
+      /** CR is reconstructed as a charged hadron (T2) */
+      c_chargedHadron = 2,
+      /** CR is split into an electron and n photons (T3) */
+      c_electronNPhotons = 3,
+      /** CR is split into n photons (N1) */
+      c_nPhotons = 5,
+      /** CR is reconstructed as a neutral hadron (N2) */
+      c_neutralHadron = 6,
+      /** CR is reconstructed as merged pi0 (N3) */
+      c_mergedPi0 = 7
+    };
+
+    /** The status information for the ECLCluster. */
+    enum StatusBit {
+      /** bit 0: ECLCluster is matched to a ECL trigger cluster */
+      c_TriggerCluster   = 1 << 0,
+      /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
+      c_TriggerClusterMatching = 1 << 1,
+    };
+
     /**
      *default constructor : all values are set to 0, IDs set to -1, flags to false
      */
@@ -34,7 +58,7 @@ namespace Belle2 {
       m_isTrack(false),
       m_status(0),
       m_connectedRegionId(0),
-      m_hypothesisId(5), // set to 5 (all photons) for b2bii
+      m_hypothesisId(c_nPhotons), // set to c_nPhotons for b2bii
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
       m_covmat_10(0.),
@@ -61,11 +85,24 @@ namespace Belle2 {
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.) {}
 
-    /** Set m_isTrack true if the cluster matches with cluster. */
+    /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
 
     /** Set status. */
-    void setStatus(int status) { m_status = status; }
+    void setStatus(unsigned short status) { m_status = status; }
+
+    /**
+     * Add bitmask to current status.
+     * @param bitmask The status code which should be added.
+     */
+    void addStatus(unsigned short int bitmask) { m_status |= bitmask; }
+
+    /**
+     * Remove bitmask from current status.
+     * @param bitmask The status code which should be removed.
+
+     */
+    void removeStatus(unsigned short int bitmask) { m_status &= (~bitmask); }
 
     /** Set connected region id. */
     void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
@@ -161,7 +198,7 @@ namespace Belle2 {
     bool isNeutral() const { return !m_isTrack; }
 
     /** Return status. */
-    int getStatus() const {return m_status;}
+    unsigned short getStatus() const {return m_status;}
 
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
@@ -252,13 +289,26 @@ namespace Belle2 {
     /** Return (pseudo) unique Id based on CRId, ShowerId and HypothesisID */
     int getUniqueId() const;
 
+    /**
+     * Return if specific status bit is set.
+     * @param bitmask The bitmask which is compared to the status of the cluster.
+     * @return Returns true if the bitmask matches the status code of the cluster.
+     */
+    bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
+
+    /** Check if ECLCluster is matched to an ECLTRGCluster */
+    bool isTriggerCluster() const {return hasStatus(c_TriggerCluster);}
+
+    /** Check if ECLTRGCluster to ECLCluster matcher has run */
+    bool hasTriggerClusterMatching() const {return hasStatus(c_TriggerClusterMatching);}
+
   private:
 
     /** Is related to track (true) or not (false). */
     bool m_isTrack;
 
     /** Cluster status. */
-    int m_status;
+    unsigned short m_status;
 
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
@@ -347,7 +397,8 @@ namespace Belle2 {
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 9);
+    ClassDef(ECLCluster, 10);
+    // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId
     // 7: Changed range of SecondMoment from 0..100 to 0..40
@@ -358,5 +409,3 @@ namespace Belle2 {
   };
 
 }// end namespace Belle2
-
-#endif

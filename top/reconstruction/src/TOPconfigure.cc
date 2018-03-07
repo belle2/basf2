@@ -15,7 +15,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace std;
 
@@ -44,8 +44,7 @@ namespace Belle2 {
       setTOPvolume(m_R1, m_R2, m_Z1, m_Z2);
 
       // magnetic field at TOP
-      TVector3 point(0, geo->getRadius(), 0);
-      TVector3 Bfield = BFieldMap::Instance().getBField(point);
+      TVector3 Bfield = BFieldManager::getField(0, geo->getRadius(), 0) / Unit::T;
       setBfield(-Bfield.Z());
 
       // PMT dimensions: NOTE reconstruction assumes all modules have the same PMT's
@@ -57,11 +56,10 @@ namespace Belle2 {
       // TTS parameterization
       const auto& tts = geo->getNominalTTS().getTTS();
       std::vector<float> frac, mean, sigma;
-      double sigmaTDC = tdc.getTimeJitter();
       for (const auto& gauss : tts) {
         frac.push_back(gauss.fraction);
         mean.push_back(gauss.position);
-        sigma.push_back(sqrt(gauss.sigma * gauss.sigma + sigmaTDC * sigmaTDC));
+        sigma.push_back(gauss.sigma);
       }
       setTTS(tts.size(), frac.data(), mean.data(), sigma.data());
 

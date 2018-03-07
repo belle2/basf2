@@ -175,13 +175,17 @@ namespace Belle2 {
        * After shifting, multiplications or other ooperations on probabilities,
        * we need to restore the normalization and re-build the list used for
        * calculation of EmpiricalDistributionFunction.
+       * If probabilities vanish over all bins, return uniform distribution.
        */
       void normalize(nnFitterBinData& p)
       {
-        // Subtract background
         double pnorm = std::accumulate(p.begin(), p.end(), 0.0);
-        // Inly normalize if the norm makes sense.
-        if (pnorm > 0.0) {
+        // If the norm is too small, return default distribution.
+        if (pnorm < 1.0e-10) {
+          double uniformP = 1.0 / std::distance(p.begin(), p.end());
+          std::fill(p.begin(), p.end(), uniformP);
+        } else {
+          // Normalize if the norm makes sense.
           std::transform(p.begin(), p.end(), p.begin(),
                          std::bind2nd(std::divides<double>(), pnorm));
         }

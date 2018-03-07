@@ -104,8 +104,12 @@ Particle::Particle(const Track* track,
   m_arrayPointer(nullptr)
 {
   if (!track) return;
-  const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
-  if (!trackFit) return;
+
+  auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
+  if (closestMassFitResult == nullptr) return;
+
+  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
+  const auto trackFit = closestMassFitResult;
 
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
@@ -129,7 +133,8 @@ Particle::Particle(const Track* track,
 
 Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
-                   const Const::ChargedStable& chargedStable) :
+                   const Const::ChargedStable& chargedStable,
+                   const Const::ChargedStable& chargedStableUsedForFit) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
@@ -141,7 +146,7 @@ Particle::Particle(const int trackArrayIndex,
 
   setMdstArrayIndex(trackArrayIndex);
 
-
+  m_pdgCodeUsedForFit = chargedStableUsedForFit.getPDGCode();
   int absPDGCode = chargedStable.getPDGCode();
   int signFlip = 1;
   if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
@@ -260,8 +265,8 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      m_identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      m_identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -284,8 +289,8 @@ int Particle::getMdstSource() const
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -721,6 +726,7 @@ std::string Particle::getInfoHTML() const
   stream << "<br>";
   stream << " <b>flavorType</b>=" << m_flavorType;
   stream << " <b>particleType</b>=" << m_particleType;
+  stream << " <b>particleTypeUsedForFit</b>=" << m_pdgCodeUsedForFit;
   stream << "<br>";
 
   stream << " <b>mdstIndex</b>=" << m_mdstIndex;

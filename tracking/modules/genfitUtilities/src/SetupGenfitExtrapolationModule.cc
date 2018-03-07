@@ -16,7 +16,6 @@
 #include <tracking/modules/genfitUtilities/Geant4MaterialInterface.h>
 
 #include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
 #include <genfit/FieldManager.h>

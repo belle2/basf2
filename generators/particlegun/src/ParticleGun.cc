@@ -83,6 +83,9 @@ double ParticleGun::generateValue(EDistribution dist, const vector<double>& para
       return 1. / gRandom->Uniform(1. / params[1], 1. / params[0]);
     case c_uniformCosDistribution:
       return acos(gRandom->Uniform(cos(params[0]), cos(params[1])));
+    case c_uniformLogDistribution:
+    case c_uniformLogPtDistribution:
+      return exp(gRandom->Uniform(log(params[0]), log(params[1])));
     case c_normalDistribution:
     case c_normalPtDistribution:
       return gRandom->Gaus(params[0], params[1]);
@@ -164,7 +167,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     double pt = momentum * sin(theta);
     if (m_params.momentumDist == c_uniformPtDistribution || m_params.momentumDist == c_normalPtDistribution ||
         m_params.momentumDist == c_inversePtDistribution || m_params.momentumDist == c_polylinePtDistribution ||
-        m_params.momentumDist == c_discretePtSpectrum) {
+        m_params.momentumDist == c_uniformLogPtDistribution || m_params.momentumDist == c_discretePtSpectrum) {
       //this means we are actually generating the Pt and not the P, so exchange values
       pt = momentum;
       momentum = (sin(theta) > 0) ? (pt / sin(theta)) : numeric_limits<double>::max();
@@ -216,6 +219,8 @@ bool ParticleGun::setParameters(const Parameters& p)
     {c_uniformDistribution,     "uniform"},
     {c_uniformPtDistribution,   "uniformPt"},
     {c_uniformCosDistribution,  "uniformCos"},
+    {c_uniformLogDistribution,  "uniformLog"},
+    {c_uniformLogPtDistribution,  "uniformLogPt"},
     {c_normalDistribution,      "normal"},
     {c_normalPtDistribution,    "normalPt"},
     {c_normalCosDistribution,   "normalCos"},
@@ -263,6 +268,7 @@ bool ParticleGun::setParameters(const Parameters& p)
   }
   for (auto dist : {"xVertex", "yVertex", "zVertex", "phi", "theta"}) {
     excludeDistribution(dist, c_uniformPtDistribution);
+    excludeDistribution(dist, c_uniformLogPtDistribution);
     excludeDistribution(dist, c_normalPtDistribution);
     excludeDistribution(dist, c_inversePtDistribution);
     excludeDistribution(dist, c_polylinePtDistribution);

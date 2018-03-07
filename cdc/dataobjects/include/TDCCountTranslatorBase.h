@@ -55,6 +55,22 @@ namespace Belle2 {
                                     double theta = static_cast<double>(TMath::Pi() / 2.),
                                     unsigned short adcCount = 0) = 0;
 
+      /**
+       * Get Drift time.
+       * @param tdcCount              TDC count (ns).
+       * @param wireID                Encoded sense wire ID.
+       * @param timeOfFlightEstimator Time of flight (ns).
+       * @param z                     z-position on the wire (cm).
+       * @param adcCount              ADC count.
+       * @return Drift time (ns)
+       */
+      virtual double getDriftTime(unsigned short tdcCount,
+                                  const WireID& wireID,
+                                  double timeOfFlightEstimator,
+                                  double z,
+                                  unsigned short adcCount) = 0;
+
+
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *
        *  @param driftLength             Output of the getDriftLength function.

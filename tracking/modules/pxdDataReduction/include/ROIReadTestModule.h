@@ -35,23 +35,23 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    virtual ~ROIReadTestModule();
+    ~ROIReadTestModule();
 
     /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
+    void beginRun() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
     /**
      * Termination action.
      */
-    virtual void terminate();
+    void terminate() override;
 
   protected:
 

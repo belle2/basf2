@@ -12,9 +12,10 @@ from fnmatch import fnmatch
 set_log_level(LogLevel.INFO)
 
 # use_local_database()
-use_local_database("test_bklm.txt", "test_payloads")
+# use_local_database("test_bklm.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
 # use_central_database("test_bklm", LogLevel.WARNING);
+use_central_database("development", LogLevel.WARNING)
 
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -39,4 +40,6 @@ process(main)
 
 # and run the importer
 dbImporter = BKLMDatabaseImporter()
-dbImporter.exportBklmElectronicMapping()
+# dbImporter.exportBklmElectronicMapping()
+# dbImporter.exportBklmDigitizationParams()
+# dbImporter.exportBklmADCThreshold()

@@ -98,13 +98,13 @@ namespace Belle2 {
           //Place physical volume
           new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logiShieldLayer, physVolName, &topVolume, false, 0);
 
-          B2INFO("Mass of " << side << " layer " << iLayer
-                 << " = " << logiShieldLayer->GetMass() / CLHEP::kg << ".kg.");
+          B2DEBUG(1, "Mass of " << side << " layer " << iLayer
+                  << " = " << logiShieldLayer->GetMass() / CLHEP::kg << ".kg.");
 
           _mass += (logiShieldLayer->GetMass() / CLHEP::kg);
         }
 
-        B2INFO("Total mass of side " << side << " = " << _mass << " kg");
+        B2DEBUG(1, "Total mass of side " << side << " = " << _mass << " kg");
       }
 
       //Place pole pieces
@@ -139,7 +139,7 @@ namespace Belle2 {
         //Place physical volume
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logiPole, physVolName, &topVolume, false, 0);
 
-        B2INFO("Total mass of " << side << " = " << logiPole->GetMass() / CLHEP::kg  << " kg");
+        B2DEBUG(1, "Total mass of " << side << " = " << logiPole->GetMass() / CLHEP::kg  << " kg");
       }
 
 
@@ -184,7 +184,7 @@ namespace Belle2 {
       // Read the shape parameters
       const std::vector<GearDir> planes = poleContent.getNodes("Plane");
       parameters.setPoleNPlanes(iPole, planes.size());
-      B2INFO("Number of planes on side  " << side << " : " << planes.size());
+      B2DEBUG(1, "Number of planes on side  " << side << " : " << planes.size());
 
       for (unsigned int iPlane = 0; iPlane < planes.size(); iPlane++) {
         parameters.setPolePlaneZ(iPole, iPlane, planes.at(iPlane).getLength("posZ") / Unit::mm);
@@ -228,8 +228,8 @@ namespace Belle2 {
         // Read the shape parameters
         const std::vector<GearDir> planes = layerContent.getNodes("Plane");
         parameters.setLayerNPlanes(iShield, iLayer, planes.size());
-        B2INFO("Number of planes on side  " << side << " layer " << iLayer
-               << " : " << planes.size());
+        B2DEBUG(1, "Number of planes on side  " << side << " layer " << iLayer
+                << " : " << planes.size());
 
         for (unsigned int iPlane = 0; iPlane < planes.size(); iPlane++) {
           parameters.setLayerPlaneZ(iShield, iLayer, iPlane, planes.at(iPlane).getLength("posZ") / Unit::mm);

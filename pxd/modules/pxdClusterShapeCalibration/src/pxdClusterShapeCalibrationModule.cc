@@ -11,10 +11,8 @@
 #include <pxd/modules/pxdClusterShapeCalibration/pxdClusterShapeCalibrationModule.h>
 
 #include <framework/pcore/ProcHandler.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -107,7 +105,7 @@ pxdClusterShapeCalibrationModule::pxdClusterShapeCalibrationModule() : Calibrati
 void pxdClusterShapeCalibrationModule::prepare()
 {
   //Register collections
-  StoreObjPtr<EventMetaData>::required();
+  m_eventMetaData.isRequired();
   StoreArray<PXDCluster> storeClusters;
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   m_storeRecoTrackName = recotracks.getName();
@@ -170,7 +168,7 @@ void pxdClusterShapeCalibrationModule::prepare()
     fasc = fopen("PQClusters.asc", "w");
 }
 
-void pxdClusterShapeCalibrationModule::terminate()
+void pxdClusterShapeCalibrationModule::finish()
 {
   if (m_ExportDataForPQ)
     fclose(fasc);
@@ -186,7 +184,6 @@ void pxdClusterShapeCalibrationModule::collect()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   const StoreArray<PXDRecoHit> pxdrecohit(m_storePXDRecoHitName);
 
@@ -408,10 +405,10 @@ void pxdClusterShapeCalibrationModule::collect()
                             m_ResidUTrueRH * 10000, m_ResidVTrueRH * 10000, m_ResidUTrueCl * 10000, m_ResidVTrueCl * 10000);
         B2DEBUG(200, strDebugInfo.Data());
 
-        getObject<TTree>("pxdCal").Fill();
+        getObjectPtr<TTree>("pxdCal")->Fill();
         if (m_iCls % 1000 == 0) {
-          getObject<TTree>("pxdCal").FlushBaskets();
-          getObject<TTree>("pxdCal").AutoSave();
+          getObjectPtr<TTree>("pxdCal")->FlushBaskets();
+          getObjectPtr<TTree>("pxdCal")->AutoSave();
         }
         m_iCls++;
       }
@@ -526,10 +523,10 @@ void pxdClusterShapeCalibrationModule::collect()
         m_InPixUTrue = (truehit.getU() - info.getUCellPosition(info.getUCellID(truehit.getU()))) / info.getUPitch(truehit.getU());
         m_InPixVTrue = (truehit.getV() - info.getVCellPosition(info.getVCellID(truehit.getV()))) / info.getVPitch(truehit.getV());
 
-        getObject<TTree>("pxdCal").Fill();
+        getObjectPtr<TTree>("pxdCal")->Fill();
         if (m_iCls % 1000 == 0) {
-          getObject<TTree>("pxdCal").FlushBaskets();
-          getObject<TTree>("pxdCal").AutoSave();
+          getObjectPtr<TTree>("pxdCal")->FlushBaskets();
+          getObjectPtr<TTree>("pxdCal")->AutoSave();
         }
         m_iCls++;
       } // end of truehit

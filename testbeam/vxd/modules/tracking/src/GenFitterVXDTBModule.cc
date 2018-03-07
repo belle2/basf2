@@ -18,7 +18,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 

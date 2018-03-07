@@ -27,6 +27,12 @@ namespace Belle2 {
     public:
 
       /**
+       * Default constructor
+       */
+      PulseHeightGenerator()
+      {}
+
+      /**
        * Constructor
        * @param x0 distribution parameter [ADC counts]
        * @param p1 distribution parameter, must be non-negative
@@ -34,18 +40,6 @@ namespace Belle2 {
        * @param xmax upper bound of range in which to generate [ADC counts]
        */
       PulseHeightGenerator(double x0, double p1, double p2, double xmax);
-
-      /**
-       * Sets pedestal r.m.s.
-       * @param rms r.m.s [ADC counts]
-       */
-      void setPedestalRMS(double rms) { m_pedestalRMS = rms;}
-
-      /**
-       * Sets pulse height to integral conversion factor
-       * @param scale conversion factor
-       */
-      void setConversionFactor(double scale) {m_scale = scale;}
 
       /**
        * Returns distribution value at x
@@ -64,30 +58,6 @@ namespace Belle2 {
        */
       double generate() const;
 
-      /**
-       * Returns generated pulse height with noise
-       * @return height [ADC counts]
-       */
-      double generateWithNoise() const
-      {
-        return gRandom->Gaus(generate(), m_pedestalRMS);
-      }
-
-      /**
-       * Returns pulse integral with noise corresponding to pulse height
-       * @param pulseHeight pulse height (generated with noise)
-       * @param numSamples number of samples summed-up to calculate the integral
-       * @return integral
-       */
-      double getIntegral(double pulseHeight, int numSamples) const;
-
-      /**
-       * Returns r.m.s of pedestals
-       * @return r.m.s [ADC counts]
-       */
-      double getPedestalRMS() const {return m_pedestalRMS;}
-
-
     private:
 
       double m_x0 = 0; /**< distribution parameter [ADC counts] */
@@ -95,8 +65,6 @@ namespace Belle2 {
       double m_p2 = 0; /**< distribution parameter */
       double m_xmax = 0; /**< upper bound of range [ADC counts] */
       double m_vPeak = 0; /**< peak value */
-      double m_pedestalRMS = 10.0; /**< r.m.s of pedestals [ADC counts] */
-      double m_scale = 7.0; /**< conversion factor of pulse height to integral */
 
     };
 

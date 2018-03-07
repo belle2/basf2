@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework','pxd','svd','vxd'
+]
+
+Return('env')

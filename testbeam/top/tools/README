@@ -1,3 +1,0 @@
-This directory and its subdirectories contain code that has been used to aid in the processing of data from TOP beam tests.  
-
-Some of this code was not originally part of basf2, and should not be part of the compilation of basf2.

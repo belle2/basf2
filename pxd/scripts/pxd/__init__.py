@@ -5,15 +5,23 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_pxd_reconstruction(path):
+def add_pxd_reconstruction(path, clusterName=None, digitsName=None):
 
-    pxd_clusterizer = register_module('PXDClusterizer')
-    path.add_module(pxd_clusterizer)
+    clusterizerName = 'PXDClusterizer'
+
+    if clusterizerName not in [e.name() for e in path.modules()]:
+        clusterizer = register_module('PXDClusterizer')
+        clusterizer.set_name(clusterizerName)
+        if clusterName:
+            clusterizer.param('Clusters', clusterName)
+        if digitsName:
+            clusterizer.param('Digits', digitsName)
+        path.add_module(clusterizer)
 
 
-def add_pxd_simulation(path, digitsname=None):
+def add_pxd_simulation(path, digitsName=None):
 
-    pxd_digitizer = register_module('PXDDigitizer')
-    if digitsname:
-        pxd_digitizer.param('Digits', digitsname)
-    path.add_module(pxd_digitizer)
+    digitizer = register_module('PXDDigitizer')
+    if digitsName:
+        digitizer.param('Digits', digitsName)
+    path.add_module(digitizer)

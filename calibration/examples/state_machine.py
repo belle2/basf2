@@ -39,6 +39,7 @@ def condition_true(**kwargs):
     B2INFO("Evaluating conditions")
     return True
 
+
 # Now build up a machine with some basic states and transitions between them
 m1 = Machine()
 m1.add_state(State("start", enter=enter_new_state, exit=exit_old_state))  # Can use a state object to add new ones

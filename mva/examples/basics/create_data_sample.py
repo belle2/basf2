@@ -16,7 +16,7 @@ variables = ['p', 'pt', 'pz', 'phi',
              'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, dz)', 'daughter(1, dz)',
              'daughter(0, dphi)', 'daughter(1, dphi)',
              'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-             'daughter(0, Kid)', 'daughter(0, piid)', 'daughter(1, Kid)', 'daughter(1, piid)',
+             'daughter(0, kaonID)', 'daughter(0, pionID)', 'daughter(1, kaonID)', 'daughter(1, pionID)',
              'daughterAngle(0, 1)', 'daughterAngle(0, 2)', 'daughterAngle(1, 2)',
              'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
              'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
@@ -28,8 +28,8 @@ spectators = ['isSignal', 'M']
 
 def reconstruction_path(inputfiles):
     path = create_path()
-    inputMdstList('MC6', inputfiles, path=path)
-    fillParticleLists([('K-', 'Kid > 0.5'), ('pi+', 'piid > 0.5'),
+    inputMdstList('MC7', inputfiles, path=path)
+    fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5'),
                        ('gamma', 'goodGamma == 1 and abs(clusterTiming) < 20 and clusterE9E25 > 0.7 and minC2HDist > 35')],
                       path=path)
     reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
@@ -45,16 +45,17 @@ if __name__ == "__main__":
 
     # Create a train, test and validation sample with different MC files
     # Add your root files here
-    path = reconstruction_path([...])
+    f = 'mdst_002001_prod00000789_task00004203.root'
+    path = reconstruction_path([f])
     variablesToNTuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
-    path = reconstruction_path([...])
+    path = reconstruction_path([f])
     variablesToNTuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
-    path = reconstruction_path([...])
+    path = reconstruction_path([f])
     variablesToNTuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
     process(path)

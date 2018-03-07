@@ -70,6 +70,7 @@ namespace Belle2 {
     StoreArray<SpacePoint>
     m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
 
+    float m_minClusterTime; /**< clusters with time below this value are not considered to make spacePoints*/
 
     // modification parameters
     std::string

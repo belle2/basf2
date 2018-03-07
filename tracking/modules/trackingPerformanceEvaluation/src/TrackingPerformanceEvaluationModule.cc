@@ -17,7 +17,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <vxd/geometry/GeoCache.h>
 
@@ -79,10 +79,17 @@ TrackingPerformanceEvaluationModule::~TrackingPerformanceEvaluationModule()
 void TrackingPerformanceEvaluationModule::initialize()
 {
   // MCParticles, Tracks, RecoTracks, MCRecoTracks needed for this module
-  StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<RecoTrack>::required(m_RecoTracksName);
-  StoreArray<RecoTrack>::required(m_MCRecoTracksName);
-  StoreArray<Track>::required(m_TracksName);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired(m_MCParticlesName);
+
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_RecoTracksName);
+
+  StoreArray<RecoTrack> mcRecoTracks;
+  mcRecoTracks.isRequired(m_MCRecoTracksName);
+
+  StoreArray<Track> tracks;
+  tracks.isRequired(m_TracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -354,8 +361,7 @@ void TrackingPerformanceEvaluationModule::event()
 
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
 
-  BFieldMap& bfieldMap = BFieldMap::Instance();
-  TVector3 magField = bfieldMap.getBField(TVector3(0, 0, 0));
+  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   bool hasTrack = false;
   B2DEBUG(99, "+++++ 1. loop on MCParticles");

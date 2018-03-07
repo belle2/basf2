@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-
+  /** Class to calculate the Cleo clone variables */
   class CleoCones {
   public:
 
@@ -44,8 +44,8 @@ namespace Belle2 {
 
   private:
 
-    std::vector<float> m_cleo_cone_with_all;  /** Cleo Cones calculated from all tracks */
-    std::vector<float> m_cleo_cone_with_roe;  /** Cleo Cones calculated from only ROE tracks */
+    std::vector<float> m_cleo_cone_with_all;  /**< Cleo Cones calculated from all tracks */
+    std::vector<float> m_cleo_cone_with_roe;  /**< Cleo Cones calculated from only ROE tracks */
 
   };
 

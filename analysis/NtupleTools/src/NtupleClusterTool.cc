@@ -26,7 +26,7 @@ void NtupleClusterTool::setupTree()
   m_nHits  = new int[nDecayProducts];
   m_ClusterHasPSD  = new int[nDecayProducts];
   m_ClusterHadronIntensity  = new float[nDecayProducts];
-  m_NumberOfHadronDigits = new int[nDecayProducts];
+  m_NumberOfHadronDigits = new float[nDecayProducts];
   m_trackM = new int[nDecayProducts];
 
   m_uncorrE = new float[nDecayProducts];
@@ -50,7 +50,7 @@ void NtupleClusterTool::setupTree()
     m_tree->Branch((strNames[iProduct] + "_clusterHadronIntensity").c_str(),      &m_ClusterHadronIntensity[iProduct],
                    (strNames[iProduct] + "_clusterHadronIntensity/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterNumberOfHadronDigits").c_str(),      &m_NumberOfHadronDigits[iProduct],
-                   (strNames[iProduct] + "_clusterNumberOfHadronDigits/I").c_str());
+                   (strNames[iProduct] + "_clusterNumberOfHadronDigits/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterTrackMatch").c_str(), &m_trackM[iProduct],
                    (strNames[iProduct] + "_clusterTrackMatch/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterUncorrE").c_str(),    &m_uncorrE[iProduct],
@@ -111,6 +111,6 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_phi[iProduct]      = Variable::eclClusterPhi(selparticles[iProduct]);
     m_distance[iProduct] = Variable::eclClusterR(selparticles[iProduct]);
     m_ClusterHadronIntensity[iProduct]  = Variable::eclClusterHadronIntensity(selparticles[iProduct]);
-    m_NumberOfHadronDigits[iProduct]  = int(Variable::eclClusterNumberOfHadronDigits(selparticles[iProduct]));
+    m_NumberOfHadronDigits[iProduct]  = Variable::eclClusterNumberOfHadronDigits(selparticles[iProduct]);
   }
 }

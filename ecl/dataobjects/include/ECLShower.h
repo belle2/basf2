@@ -471,7 +471,7 @@ namespace Belle2 {
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
     Double32_t m_ShowerHadronIntensity;            /**< Shower Hadron Intensity*/
-    uint8_t m_NumberOfHadronDigits;            /**< Number of crystals with large hadron component energy. */
+    Double32_t m_NumberOfHadronDigits;            /**< Weighted sum of crystals with large hadron component energy. */
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)

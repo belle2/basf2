@@ -68,14 +68,16 @@ void ECLClusterPSDModule::beginRun()
 void ECLClusterPSDModule::event()
 {
 
+  const double weight = 1.0;
+
   for (auto& shower : eclShowers) {
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 
     double cluster2CTotalEnergy = 0;
     double cluster2CHadronEnergy = 0;
-    int numberofHadronDigits = 0;
-    int nWaveforminCluster = 0;
+    double numberofHadronDigits = 0;
+    double nWaveforminCluster = 0;
 
     for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
       const auto caldigit = relatedDigits.object(iRel);
@@ -89,8 +91,8 @@ void ECLClusterPSDModule::event()
         const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
         cluster2CTotalEnergy += digit2CTotalEnergy;
         cluster2CHadronEnergy += digit2CHadronComponentEnergy;
-        if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits++;
-        nWaveforminCluster++;
+        if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits += weight;
+        nWaveforminCluster += weight;
       }
     }
 

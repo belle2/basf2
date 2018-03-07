@@ -58,7 +58,7 @@ namespace Belle2 {
     float* m_ClusterHadronIntensity;
 
     /**  number of cluster digits with significant (>3 MeV) hadron component light output*/
-    int* m_NumberOfHadronDigits;
+    float* m_NumberOfHadronDigits;
 
     /**  ratio of energies in inner 3x3 and 5x5-corner cells */
     float* m_e9e21;

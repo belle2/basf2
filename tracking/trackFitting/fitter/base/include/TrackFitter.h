@@ -131,11 +131,8 @@ namespace Belle2 {
       resetFitterToDefaultSettings();
     }
 
-    /**
-     *  Helper function to multiply the PDG code of a charged stable with the charge of the reco track (if needed). This
-     *  means this method will return the value: PDG Code * RecoTrack seed charge
-     */
-    static int createCorrectSignedPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack);
+    /// Helper function to multiply the PDG code of a charged stable with the charge of the reco track (if needed)
+    static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack);
 
     /// Helper function to return an already created track representation of the given reco track for the PDG
     static genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack);

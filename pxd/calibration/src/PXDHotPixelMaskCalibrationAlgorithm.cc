@@ -145,11 +145,6 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   // are free to change it.
   saveCalibration(maskedPixelsPar, "PXDMaskedPixelPar");
 
-  if (getIteration() < 1) {
-    B2INFO("Calibration called for iteration");
-    return c_Iterate;
-  }
-
   B2INFO("PXDHotPixelMask Calibration Successful");
   return c_OK;
 }

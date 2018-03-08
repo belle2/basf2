@@ -41,9 +41,9 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
     // 44-47
     "DHE ID is invalid", "DHC ID Start/End Mismatch", "DHE End w/o Start", "double DHC End",
     // 48-51
-    "DHC TrigNr vs EvtMeta mismatch", "DHE TrigNr vs EvtMeta mismatch", "DHP COL overflow (unconnected drain lines)", "Unexpected (=unsupported) Frame Type",
+    "DHC vs EvtMeta mismatch for TriggerNr", "DHE vs EvtMeta mismatch for TriggerNr", "DHP COL overflow (unconnected drain lines)", "Unexpected (=unsupported) Frame Type",
     // 52-55
-    "unused", "unused", "unused", "unused",
+    "DHC vs EvtMeta mismatch for Exp/Run/Subrun", "DHC vs EvtMeta mismatch for TimeTag", "ONS_TRG: HLT vs EvtMeta mismatch", "ONS_TRG: DATCON vs EvtMeta mismatch",
     // 56-59
     "unused", "unused", "unused", "unused",
     // 60-63

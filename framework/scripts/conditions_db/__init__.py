@@ -298,10 +298,10 @@ def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
     will signal test_basf2 that the test should be skipped and exit
     """
     import sys
-    condb = ConditionsDB(base_url=base_url, max_connections=1)
     try:
-        condb.request("HEAD", "/globalTags", timeout=timeout)
-    except ConditionsDB.RequestError as e:
+        req = requests.request("HEAD", base_url + "globalTags", timeout=60)
+        req.raise_for_status()
+    except Exception as e:
         print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)
         sys.exit(1)
 

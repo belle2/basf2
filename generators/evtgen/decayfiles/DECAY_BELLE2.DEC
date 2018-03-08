@@ -231,7 +231,7 @@ Enddecay
 #
 #
 Decay anti-B0
-# Updated to HFLAV 2016 
+# Updated to PDG 2017 
 #                   b -> c semileptonic
 #
 0.0511     D*+     e-   anti-nu_e       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
@@ -254,8 +254,8 @@ Decay anti-B0
 0.00070  D*0 pi+ pi0 e-   anti-nu_e      PHOTOS  PHSP;
 0.00070  D*+ pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00455  D+  eta  e-   anti-nu_e      PHOTOS  PHSP;
-0.00455  D*+ eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00355  D+  eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00355  D*+ eta  e-   anti-nu_e      PHOTOS  PHSP;
 
 0.0511   D*+     mu-  anti-nu_mu         PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
 0.0214   D+      mu-  anti-nu_mu         PHOTOS  HQET3 1.082 1.186 1.0;
@@ -277,8 +277,8 @@ Decay anti-B0
 0.00070  D*0 pi+ pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
 0.00070  D*+ pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00455  D+  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
-0.00455  D*+ eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00355  D+  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00355  D*+ eta  mu-   anti-nu_mu      PHOTOS  PHSP;
 #
 #                    b -> c tau nu
 #
@@ -1565,8 +1565,8 @@ Decay B0
 0.00070  anti-D*0 pi- pi0 e+   nu_e      PHOTOS  PHSP;
 0.00070  D*- pi0 pi0      e+   nu_e      PHOTOS  PHSP;
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00455  D-  eta  e+   nu_e      PHOTOS  PHSP;
-0.00455  D*- eta  e+   nu_e      PHOTOS  PHSP;
+0.00355  D-  eta  e+   nu_e      PHOTOS  PHSP;
+0.00355  D*- eta  e+   nu_e      PHOTOS  PHSP;
 
 #
 0.0511   D*-     mu+  nu_mu          PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
@@ -1589,8 +1589,8 @@ Decay B0
 0.00070  anti-D*0 pi- pi0 mu+   nu_mu      PHOTOS  PHSP;
 0.00070  D*- pi0 pi0      mu+   nu_mu      PHOTOS  PHSP;
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00455  D-  eta  mu+   nu_mu      PHOTOS  PHSP;
-0.00455  D*- eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00355  D-  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00355  D*- eta  mu+   nu_mu      PHOTOS  PHSP;
 
 
 #
@@ -2811,7 +2811,7 @@ Enddecay
 #
 #
 Decay B-
-# Updated to PDG 2008
+# Updated to PDG 2017
 #                  b -> c semileptonic
 #
 0.0549     D*0     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
@@ -2837,8 +2837,8 @@ Decay B-
 0.0003   D_s*+  K-  e- anti-nu_e      PHOTOS PHSP;  
 0.0003   D_s+   K-  e- anti-nu_e      PHOTOS PHSP;  
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00460  D0  eta  e-   anti-nu_e      PHOTOS  PHSP;
-0.00460  D*0 eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00351  D0  eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00351  D*0 eta  e-   anti-nu_e      PHOTOS  PHSP;
 #
 0.0549   D*0    mu-     anti-nu_mu                      PHOTOS   HQET3 0.908 1.207 1.21 1.401 0.854;
 0.0231   D0     mu-     anti-nu_mu                      PHOTOS   HQET3 1.082 1.186 1.0;
@@ -2863,8 +2863,8 @@ Decay B-
 0.0003   D_s*+  K-  mu- anti-nu_mu     PHOTOS  PHSP;   # GOITY_ROBERTS may or may not work here as well
 0.0003   D_s+   K-  mu- anti-nu_mu     PHOTOS  PHSP;   # GOITY_ROBERTS may or may not work here as well
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00460  D0  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
-0.00460  D*0 eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00351  D0  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00351  D*0 eta  mu-   anti-nu_mu      PHOTOS  PHSP;
 
 
 #
@@ -3873,8 +3873,8 @@ Decay B+
 0.0003   D_s*-  K+  e+ nu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well
 0.0003   D_s-   K+  e+ nu_e      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00460  anti-D0  eta  e+   nu_e      PHOTOS  PHSP;
-0.00460  anti-D*0 eta  e+   nu_e      PHOTOS  PHSP;
+0.00351  anti-D0  eta  e+   nu_e      PHOTOS  PHSP;
+0.00351  anti-D*0 eta  e+   nu_e      PHOTOS  PHSP;
 
 
 0.0549       anti-D*0     mu+  nu_mu      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
@@ -3900,8 +3900,8 @@ Decay B+
 0.0003   D_s*-  K+  mu+ nu_mu      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well
 0.0003   D_s-   K+  mu+ nu_mu      PHOTOS PHSP;  # GOITY_ROBERTS may or may not work here as well   
 # fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
-0.00460  anti-D0  eta  mu+   nu_mu      PHOTOS  PHSP;
-0.00460  anti-D*0 eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00351  anti-D0  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00351  anti-D*0 eta  mu+   nu_mu      PHOTOS  PHSP;
 #
 #                   b -> c tau nu
 #

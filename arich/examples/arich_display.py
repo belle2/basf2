@@ -68,8 +68,9 @@ if int(options.recon):
 # create simple DQM histograms
 arichHists = register_module('ARICHDQM')
 arichHists.param('ArichEvents', bool(options.arichtrk))
-arichHists.param('MaxHits', 40)
-arichHists.param('MinHits', 5)
+# set hit range - include only events with hits in this range (also for event display!)
+arichHists.param('MaxHits', 100)
+arichHists.param('MinHits', 0)
 main.add_module(arichHists)
 
 # add display module if display option
@@ -81,10 +82,8 @@ if int(options.display):
     display.param('showRecoTracks', True)
     # show full geometry
     display.param('fullGeometry', True)
-    if int(options.arichtrk):
-        displ.add_module(display)
-    else:
-        main.add_module(display)
+    displ.add_module(display)
+
 
 # show progress
 progress = register_module('Progress')

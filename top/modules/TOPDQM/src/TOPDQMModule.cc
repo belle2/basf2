@@ -126,6 +126,11 @@ namespace Belle2 {
     m_goodHits->SetOption("LIVE");
     m_badHits->SetOption("LIVE");
 
+    m_goodHits->GetXaxis()->SetTitle("slot no.");
+    m_goodHits->GetYaxis()->SetTitle("hits / event");
+    m_badHits->GetXaxis()->SetTitle("slot no.");
+    m_badHits->GetYaxis()->SetTitle("hits / event");
+
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
       string name, title;
@@ -136,42 +141,57 @@ namespace Belle2 {
       title = str(format("Number of good hits in x-y for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetOption("LIVE");
+      h2->SetStats(kFALSE);
+      h2->GetXaxis()->SetTitle("column");
+      h2->GetYaxis()->SetTitle("row");
       m_goodHitsXY.push_back(h2);
 
       name = str(format("bad_hits_xy_%1%") % (module));
       title = str(format("Number of bad hits in x-y for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetOption("LIVE");
+      h2->SetStats(kFALSE);
+      h2->GetXaxis()->SetTitle("column");
+      h2->GetYaxis()->SetTitle("row");
       m_badHitsXY.push_back(h2);
 
       name = str(format("good_hits_asics_%1%") % (module));
       title = str(format("Number of good hits for asics for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
       h2->SetOption("LIVE");
+      h2->SetStats(kFALSE);
+      h2->GetXaxis()->SetTitle("column");
+      h2->GetYaxis()->SetTitle("row");
       m_goodHitsAsics.push_back(h2);
 
       name = str(format("bad_hits_asics_%1%") % (module));
       title = str(format("Number of bad hits for asics for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
       h2->SetOption("LIVE");
+      h2->SetStats(kFALSE);
+      h2->GetXaxis()->SetTitle("column");
+      h2->GetYaxis()->SetTitle("row");
       m_badHitsAsics.push_back(h2);
 
       name = str(format("good_TDC_%1%") % (module));
       title = str(format("TDC distribution of good hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("TDC");
       m_goodTdc.push_back(h1);
 
       name = str(format("bad_TDC_%1%") % (module));
       title = str(format("TDC distribution of bad hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("TDC");
       m_badTdc.push_back(h1);
 
       name = str(format("good_timing_%1%") % (module));
       title = str(format("Timing distribution of good hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 100, -20, 80);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("time [ns]");
       m_goodTiming.push_back(h1);
 
       name = str(format("good_channel_hits_%1%") % (module));
@@ -179,24 +199,28 @@ namespace Belle2 {
       int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("pixel");
       m_goodChannelHits.push_back(h1);
 
       name = str(format("bad_channel_hits_%1%") % (module));
       title = str(format("Number of bad hits by channel for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("pixel");
       m_badChannelHits.push_back(h1);
 
       name = str(format("good_hits_per_event%1%") % (module));
       title = str(format("Number of good hits per event for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("hits / event");
       m_goodHitsPerEvent.push_back(h1);
 
       name = str(format("bad_hits_per_event%1%") % (module));
       title = str(format("Number of bad hits per event for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
       h1->SetOption("LIVE");
+      h1->GetXaxis()->SetTitle("hits / event");
       m_badHitsPerEvent.push_back(h1);
     }
 

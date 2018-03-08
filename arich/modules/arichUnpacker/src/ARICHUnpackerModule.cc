@@ -55,7 +55,7 @@ namespace Belle2 {
     setDescription("Raw data unpacker for ARICH");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel)", (uint8_t)0xFF);
+    addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel, only used for unsuppresed format!)", (uint8_t)0xFF);
     addParam("debug", m_debug, "prints debug information", 0);
 
     addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", string(""));

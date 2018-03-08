@@ -14,6 +14,8 @@
 
 #include <boost/format.hpp>
 #include <string>
+#include <vector>
+#include <map>
 #include "TH1I.h"
 
 using namespace std;
@@ -22,7 +24,9 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  minEvents(1000000), minHits(10), maxOccupancy(0.00001)
+  minEvents(10000), minHits(5), maxOccupancy(0.00001), maskDrains(false), minHitsDrain(200), maxOccupancyDrain(0.00001),
+  maskRows(false),
+  minHitsRow(50), maxOccupancyRow(0.00001)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
@@ -34,7 +38,6 @@ PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): Cali
 
 CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 {
-
   auto collector_pxdhits = getObjectPtr<TH1I>("PXDHits");
   auto nevents = collector_pxdhits->GetEntries();
   if (nevents < minEvents) {
@@ -42,6 +45,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     return c_NotEnoughData;
   }
 
+  // This is the masking payload for conditions DB
   PXDMaskedPixelPar* maskedPixelsPar = new PXDMaskedPixelPar();
 
   // Loop over all sensor from collector
@@ -58,17 +62,85 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     // Check if there was data collected for this sensor
     if (collector_pxdhitmap == nullptr) continue;
 
+    vector<float> unmaskedHitsAlongDrain(1000, 0);
+    vector<int> unmaskedCellsAlongDrain(1000, 0);
+
+    vector<float> unmaskedHitsAlongRow(768, 0);
+    vector<int> unmaskedCellsAlongRow(768, 0);
+
     // Mask all hot pixel for this sensor
     for (auto bin = 1; bin <= collector_pxdhitmap->GetXaxis()->GetNbins(); bin++) {
+      // Find the current pixel cell
+      int pixID = bin - 1;
+      int uCell = pixID / 768;
+      int vCell = pixID % 768;
+      int drainID = uCell * 4 + vCell % 4;
+
+      // First, we mask single pixels exceeding occupancy threshold
       float nhits = (float) collector_pxdhitmap->GetBinContent(bin);
+      bool masked = false;
       if (nhits > minHits) {
         if (nhits / nevents > maxOccupancy) {
           // This pixel is hot, we have to mask it
-          maskedPixelsPar->maskSinglePixel(id.getID(), bin - 1);
+          maskedPixelsPar->maskSinglePixel(id.getID(), pixID);
+          masked = true;
+          B2RESULT("Masking single pixel with ucell=" << uCell << ", vcell=" << vCell << " on sensor " << id);
+        }
+      }
+      // Then we accumulate hits along u and v direction for unmasked
+      // pixels
+      if (not masked) {
+        ++unmaskedCellsAlongDrain[drainID];
+        unmaskedHitsAlongDrain[drainID] += nhits;
+        ++unmaskedCellsAlongRow[vCell];
+        unmaskedHitsAlongRow[vCell] += nhits;
+      }
+    }
+
+    if (maskDrains) {
+      for (auto drainID = 0; drainID < 1000; drainID++) {
+        if (unmaskedHitsAlongDrain[drainID] > minHitsDrain && unmaskedCellsAlongDrain[drainID] > 0) {
+          // Compute average occupancy per drain
+          float occupancy = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID];
+          // Mask residual hot drain
+          if (occupancy > maxOccupancyDrain) {
+            for (auto iGate = 0; iGate < 192; iGate++) {
+              int uCell = drainID / 4;
+              int vCell = drainID % 4 + iGate * 4;
+              maskedPixelsPar->maskSinglePixel(id.getID(),  uCell * 768 + vCell);
+            }
+            B2RESULT("Masking drain line at with drainID=" << drainID << " on sensor " << id);
+          }
+        }
+      }
+    }
+
+    if (maskRows) {
+      for (auto vCell = 0; vCell < 768; vCell++) {
+        if (unmaskedHitsAlongRow[vCell] > minHitsRow && unmaskedCellsAlongRow[vCell] > 0) {
+          // Compute average occupancy per row
+          float occupancy = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell];
+          // Mask residual hot row
+          if (occupancy > maxOccupancyRow) {
+            for (auto uCell = 0; uCell < 250; uCell++)
+              maskedPixelsPar->maskSinglePixel(id.getID(),  uCell * 768 + vCell);
+
+            B2RESULT("Masking complete row with vCell=" << vCell << " on sensor " << id);
+          }
         }
       }
     }
   }
+
+  // After the masking is done, we compute the fraction of
+  // masked pixels per sensorID
+
+  for (auto elem : maskedPixelsPar->getMaskedPixelMap()) {
+    auto id = elem.first;
+    auto singles = elem.second;
+    B2RESULT("SensorID " << VxdID(id) << " has fraction of masked pixels of " << (float)singles.size() / (768 * 250));
+  }
+
   // Save the hot pixel mask to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
   saveCalibration(maskedPixelsPar, "PXDMaskedPixelPar");

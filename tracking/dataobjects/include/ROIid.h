@@ -13,6 +13,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h> //<pxd/geometry/SensorInfo.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 
 namespace Belle2 {
 
@@ -44,7 +45,8 @@ namespace Belle2 {
     void setMaxVid(double user_maxVid) { m_maxVid = user_maxVid; } /**< set the maximum V id of the ROI*/
     void setSensorID(VxdID user_sensorID) { m_sensorID = user_sensorID;} /**< set the sensor ID of the ROI*/
 
-    bool Contains(const Belle2::PXDDigit& thePXDDigit) const; /**< true id the ROI contains the thePXDDigit*/
+    bool Contains(const Belle2::PXDDigit& thePXDDigit) const; /**< true if the ROI contains the thePXDDigit*/
+    bool Contains(const Belle2::SVDShaperDigit& theSVDDigit) const; /**< true if the ROI contains the theSVDDigit*/
 
   private:
 

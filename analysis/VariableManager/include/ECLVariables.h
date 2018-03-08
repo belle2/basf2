@@ -17,6 +17,18 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * return hadron scintillation component intensity of cluster computed from digits with offline waveforms saved.
+     * Variable is used to separate hadronic showers from electromagnetic showers
+     */
+    double eclClusterHadronIntensity(const Particle* particle);
+
+    /**
+     * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
+     * Variable is used to separate hadronic showers from electromagnetic showers
+     */
+    double eclClusterNumberOfHadronDigits(const Particle* particle);
+
+    /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      * return 11 and 13 if the ECL Cluster is in gap between barrel and forward respectively backward
      * return 0 otherwise
@@ -181,6 +193,11 @@ namespace Belle2 {
      * return the Hypothesis ID of this cluster
      */
     double eclClusterHypothesisId(const Particle* particle);
+
+    /**
+     * return 1 if cluster has pulse shape discrimination variables computed
+     */
+    double eclClusterHasPulseShapeDiscrimination(const Particle* particle);
 
     /**
      * return 1.0 if cluster matched to a trigger cluster

@@ -395,7 +395,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              m_eclDsps.appendNew(cellID, eclWaveformSamples);
+              m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
             }
 
           }

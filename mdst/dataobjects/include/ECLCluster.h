@@ -49,6 +49,8 @@ namespace Belle2 {
       c_TriggerCluster   = 1 << 0,
       /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
       c_TriggerClusterMatching = 1 << 1,
+      /** bit 3: ECLCluster has pulse shape discrimination variables.*/
+      c_PulseShapeDiscrimination = 4 << 0,
     };
 
     /**
@@ -83,7 +85,9 @@ namespace Belle2 {
       m_r(0.),
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
-      m_logEnergyHighestCrystal(-5.) {}
+      m_logEnergyHighestCrystal(-5.),
+      m_ClusterHadronIntensity(0.),
+      m_NumberOfHadronDigits(0.) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
@@ -158,6 +162,12 @@ namespace Belle2 {
     /** Set E9/E21 energy ratio. */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
+    /** set Cluster Hadron Component Intensity. */
+    void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
+
+    /** set Number of hadron digits in cluster . */
+    void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
+
     /** Set SecondMoment. */
     void setSecondMoment(double secondmoment) { m_secondMoment = secondmoment; }
 
@@ -230,6 +240,12 @@ namespace Belle2 {
     /** Return E9/E21 (shower shape variable). */
     double getE9oE21() const { return m_E9oE21; }
 
+    /** Return Cluster hadron intensity*/
+    double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
+
+    /** Return number of hadron digits in cluster*/
+    double getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
+
     /** Return second moment (shower shape variable). */
     double getSecondMoment() const { return m_secondMoment; }
 
@@ -301,6 +317,9 @@ namespace Belle2 {
 
     /** Check if ECLTRGCluster to ECLCluster matcher has run */
     bool hasTriggerClusterMatching() const {return hasStatus(c_TriggerClusterMatching);}
+
+    /** Check if ECLCluster had any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
+    bool hasPulseShapeDiscrimination() const {return hasStatus(c_PulseShapeDiscrimination);}
 
   private:
 
@@ -396,8 +415,15 @@ namespace Belle2 {
     /** Log. Highest Crystal Energy [GeV]. */
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
+    /** Cluster Hadron Component Intensity. */
+    Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
+
+    /** Number of hadron digits in cluster */
+    Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
+
     /** Class definition */
-    ClassDef(ECLCluster, 10);
+    ClassDef(ECLCluster, 11);
+    // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId

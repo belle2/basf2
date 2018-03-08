@@ -299,7 +299,9 @@ def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
     """
     import sys
     try:
-        req = requests.request("HEAD", base_url + "globalTags", timeout=60)
+        if os.environ.get("BELLE2_CONDB_GLOBALTAG", None) == "":
+            raise Exception("Access to the Database is disabled")
+        req = requests.request("HEAD", base_url + "globalTags", timeout=timeout)
         req.raise_for_status()
     except Exception as e:
         print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)

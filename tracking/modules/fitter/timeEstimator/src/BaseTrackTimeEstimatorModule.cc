@@ -123,7 +123,7 @@ void BaseTrackTimeEstimatorModule::event()
 double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(RecoTrack& recoTrack,
     const Const::ChargedStable& particleHypothesis) const
 {
-  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleHypothesis, recoTrack);
+  const int currentPdgCode = TrackFitter::createCorrectSignedPDGCodeForChargedStable(particleHypothesis, recoTrack);
   const genfit::AbsTrackRep* trackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
 
   if (not trackRepresentation or not recoTrack.wasFitSuccessful(trackRepresentation)) {

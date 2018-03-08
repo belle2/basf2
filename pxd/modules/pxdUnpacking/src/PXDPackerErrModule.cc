@@ -118,7 +118,7 @@ PXDPackerErrModule::PXDPackerErrModule() :
 
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
-  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"premapped\" coordinates", false);
+  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
 
 }
@@ -187,6 +187,10 @@ void PXDPackerErrModule::event()
 
   B2DEBUG(20, "PXD Packer Err --> Event");
 
+  // First, throw the dices for a few event-wise properties
+
+  m_trigger_dhp_framenr = gRandom->Integer(0x10000);
+  m_trigger_dhe_gate = gRandom->Integer(192);
 
   m_real_trigger_nr = m_trigger_nr = evtPtr->getEvent();
 
@@ -319,7 +323,6 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   B2DEBUG(20, "PXD Packer Err --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
   /// HLT frame ??? format still t.b.d. TODO
-
   start_frame();
   append_int32((EDHCFrameHeaderDataType::c_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
   B2INFO("Trigger packet: $" << hex << m_run_nr_word1 << ", $" << m_run_nr_word2);
@@ -419,12 +422,12 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
   if (isErrorIn(37)) dhp_active = 0; // mark as no DHP, but send them (see below)
   B2DEBUG(20, "PXD Packer Err --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
   // dhe_id is not dhe_id ...
-  bool dhe_reformat = m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
+  bool dhe_has_remapped = !m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
 
-  if (dhe_reformat != 0) {
+  if (m_InvertMapping) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
-//     assert(dhe_reformat == 0);
+    B2FATAL("Inverse Mapping not implemented in Packer");
   }
 
   /// DHE Start
@@ -439,7 +442,8 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
   }
   if (!isErrorIn(9)) {
     append_int16(0x00000000);  // DHE Time Hi
-    append_int16(0x00000000);  // Last DHP Frame Nr 5-0, Trigger Offset 9-0
+    append_int16(((m_trigger_dhp_framenr & 0x3F) << 10) |
+                 (m_trigger_dhe_gate & 0xFF)); // Last DHP Frame Nr 15-10, Reserved 9-8, Trigger Offset 7-0
   }
   if (!isErrorIn(15)) add_frame_to_payload();
   if (isErrorIn(20)) {
@@ -512,23 +516,27 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
       row = gRandom->Integer(ladder_max_row);// hardware starts counting at 0!
       col = gRandom->Integer(ladder_max_col);// hardware starts counting at 0!
       charge = gRandom->Integer(256);// 0-255
-      if (dhe_reformat) {
+      if (!dhe_has_remapped) {
         do_the_reverse_mapping(row, col, layer, sensor);
       }
       halfladder_pixmap[row][col] = charge;
     }
 
     if (isErrorIn(38)) dhp_active = 0; // no DHP data even if we expect it
-    for (int i = 0; i < 4; i++) {
-      if ((dhp_active & 0x1) or isErrorIn(37)) {
-        pack_dhp(i, dhe_id, dhe_reformat ? 1 : 0);
-        /// The following lines "simulate" a full frame readout frame ... not for production yet!
+    if (m_Clusterize) {
+      B2FATAL("Clusterizer not supported in Packer");
+    } else {
+      for (int i = 0; i < 4; i++) {
+        if ((dhp_active & 0x1) or isErrorIn(37)) {
+          pack_dhp(i, dhe_id, dhe_has_remapped ? 1 : 0);
+          /// The following lines "simulate" a full frame readout frame ... not for production yet!
 //         if (m_trigger_nr == 0x11) {
 //           pack_dhp_raw(i, dhe_id, false);
 //           pack_dhp_raw(i, dhe_id, true);
 //         }
+        }
+        dhp_active >>= 1;
       }
-      dhp_active >>= 1;
     }
   }
 
@@ -559,74 +567,57 @@ void PXDPackerErrModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned 
   // PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
 }
 
-void PXDPackerErrModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
+void PXDPackerErrModule::pack_dhp_raw(int chip_id, int dhe_id)
 {
-  B2DEBUG(20, "PXD Packer Err --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id << " Mode " << adcpedestal);
+  B2DEBUG(20, "PXD Packer Err --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id);
   start_frame();
   /// DHP data Frame
   append_int32((EDHCFrameHeaderDataType::c_DHP_RAW << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
                (m_trigger_nr & 0xFFFF));
-  append_int32((EDHPFrameHeaderDataType::c_RAW << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (0 & 0xFFFF));
+  append_int32((EDHPFrameHeaderDataType::c_RAW << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) |
+               (m_trigger_dhp_framenr & 0xFFFF));
 
   int c1, c2;
   c1 = 64 * chip_id;
   c2 = c1 + 64;
   if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
 
-  if (adcpedestal) {
-    for (int row = 0; row < PACKER_NUM_ROWS; row++) {
-      for (int col = c1; col < c2; col++) {
-        append_int16((halfladder_pixmap[row][col] << 8) | ((row + col) & 0xFF));
-      }
-      for (int col = c2; col < c1 + 64; col++) {
-        append_int16(0);
-      }
+  // ADC data / memdump for pedestal calculation
+  for (int row = 0; row < PACKER_NUM_ROWS; row++) {
+    for (int col = c1; col < c2; col++) {
+      append_int8(halfladder_pixmap[row][col]);
     }
-    for (int row = PACKER_NUM_ROWS; row < 1024; row++) {
-      for (int col = 0; col < 64; col++) {
-        append_int16(0);
-      }
-    }
-  } else {
-    for (int row = 0; row < PACKER_NUM_ROWS; row++) {
-      for (int col = c1; col < c2; col++) {
-        append_int8(halfladder_pixmap[row][col]);
-      }
-      for (int col = c2; col < c1 + 64; col++) {
-        append_int8(0);
-      }
-    }
-    for (int row = PACKER_NUM_ROWS; row < 1024; row++) {
-      for (int col = 0; col < 64; col++) {
-        append_int8(0);
-      }
+    // unconnected drain lines -> 0
+    for (int col = c2; col < c1 + 64; col++) {
+      append_int8(0);
     }
   }
+
   add_frame_to_payload();
 }
 
-void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
+void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
 {
   B2DEBUG(20, "PXD Packer Err --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
   // remark: chip_id != port most of the time ...
   bool empty = true;
   unsigned short last_rowstart = 0;
-  unsigned short frame_id = 0; // to be set TODO
   bool error_done = false;
 
-  if (dhe_reformat != 0) {
+  if (dhe_has_remapped != 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
-    assert(dhe_reformat == 0);
+    assert(dhe_has_remapped == 0);
   }
 
   start_frame();
   /// DHP data Frame
-  append_int32((EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_reformat & 0x1) << 19) | ((
+  append_int32((EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_has_remapped & 0x1) << 19) | ((
                  chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   if (isErrorIn(39)) dhe_id = 0; // mess up dhe_id in DHP header
   if (isErrorIn(40)) chip_id = ~chip_id; // mess up chip id
-  append_int32((EDHPFrameHeaderDataType::c_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
+  append_int32((EDHPFrameHeaderDataType::c_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) |
+               (m_trigger_dhp_framenr & 0xFFFF));
 
   if (isErrorIn(41) or isErrorIn(42)) {
     halfladder_pixmap[PACKER_NUM_ROWS - 1][PACKER_NUM_COLS - 1] = 0x42; // make sure we have a hit

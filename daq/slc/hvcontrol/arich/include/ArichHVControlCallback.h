@@ -111,7 +111,8 @@ namespace Belle2 {
     virtual void fill_num() throw();
     virtual void store(int index) throw(IOException);
     virtual void recall(int index) throw(IOException);
-    void clearAlarm(int crate) throw(IOException);
+    void ClearAlarm(int crate) throw(IOException);
+    void AllClearAlarm() throw(IOException);
 
   private:
     std::vector<int> m_handle;

@@ -1,3 +1,10 @@
+Please use
+peak:039
+
+
+
+below DB should not be use without yonenaga
+
 peak:004
 Guard-Bias : all
 HV : panel#4,6
@@ -83,3 +90,35 @@ mask:
 bad bias->the channels are masked
 bad HV->bias,guard are also masked
 bad guard->HV,bias are also masked
+
+peak:029
+for all sectors
+all tripped channels are masked.
+
+
+peak:031
+2018/02/19 night
+for all sectors
+
+peak:033
+2018/02/21 evening
+for all sector (all PSs are ready)
+
+peak:034(NOT use)
+2018/02/22 evening
+for all sector (all PSs are ready)
+Testing to include serial number
+
+peak:035(NOT use)
+2018/02/22 afternoon
+for all sector(aal PS are ready)
+serial number and sector is included.
+
+peak:036(NOT use)
+2018/02/22 evening
+for all sector(aal PS are ready)
+serial number and sector is included.
+
+peak:038
+
+

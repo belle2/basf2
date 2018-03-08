@@ -68,6 +68,17 @@ TrackDQMModule::~TrackDQMModule()
 
 void TrackDQMModule::initialize()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional()) {
+    B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
+    return;
+  }
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks.isOptional()) {
+    B2WARNING("Missing Tracks array, Track-DQM is skipped.");
+    return;
+  }
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
@@ -347,6 +358,11 @@ void TrackDQMModule::defineHisto()
 
 void TrackDQMModule::beginRun()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional())  return;
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks.isOptional()) return;
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -401,6 +417,11 @@ void TrackDQMModule::beginRun()
 
 void TrackDQMModule::event()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional() || !recoTracks.getEntries())  return;
+  StoreArray<Track> tracks(m_TracksStoreArrayName);
+  if (!tracks.isOptional() || !tracks.getEntries()) return;
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   try {
     int iTrack = 0;
@@ -408,25 +429,25 @@ void TrackDQMModule::event()
     int iTrackCDC = 0;
     int iTrackVXDCDC = 0;
 
-    StoreArray<Track> tracks;
     for (const Track& track : tracks) {  // over tracks
-      RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
-      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
+      RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_RecoTracksStoreArrayName);
+      if (!recoTrack.size()) continue;
+      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
       int nPXD = (int)pxdClustersTrack.size();
-      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(recoTrack[0]);
       int nSVD = (int)svdClustersTrack.size();
-      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
+      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(recoTrack[0]);
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       /*
-          const auto& resmap = track.getTrackFitResults();
-          auto hypot = max_element(
-            resmap.begin(),
-            resmap.end(),
-            [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
-            {return x1.second->getPValue() < x2.second->getPValue();}
-            );
-          const TrackFitResult* tfr = hypot->second;
+      const auto& resmap = track.getTrackFitResults();
+      auto hypot = max_element(
+      resmap.begin(),
+      resmap.end(),
+      [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
+      {return x1.second->getPValue() < x2.second->getPValue();}
+      );
+      const TrackFitResult* tfr = hypot->second;
       */
       if (tfr == nullptr) continue;
 
@@ -458,21 +479,21 @@ void TrackDQMModule::event()
       float Chi2NDF = 0;
       float NDF = 0;
       float pValue = 0;
-      if (theRC[0]->wasFitSuccessful()) {
-        if (!theRC[0]->getTrackFitStatus())
+      if (recoTrack[0]->wasFitSuccessful()) {
+        if (!recoTrack[0]->getTrackFitStatus())
           continue;
 
         // add NDF:
-        NDF = theRC[0]->getTrackFitStatus()->getNdf();
+        NDF = recoTrack[0]->getTrackFitStatus()->getNdf();
         m_NDF->Fill(NDF);
         // add Chi2/NDF:
-        m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
+        m_Chi2->Fill(recoTrack[0]->getTrackFitStatus()->getChi2());
         if (NDF) {
-          Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
+          Chi2NDF = recoTrack[0]->getTrackFitStatus()->getChi2() / NDF;
           m_Chi2NDF->Fill(Chi2NDF);
         }
         // add p-value:
-        pValue = theRC[0]->getTrackFitStatus()->getPVal();
+        pValue = recoTrack[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
         // add residuals:
         int iHit = 0;
@@ -490,7 +511,7 @@ void TrackDQMModule::event()
         int iLayer = 0;
 
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations()) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;
@@ -501,7 +522,7 @@ void TrackDQMModule::event()
                 (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
             continue;
 
-          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
+          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack[0]);
 
           bool biased = false;
           if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;

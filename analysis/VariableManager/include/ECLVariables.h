@@ -48,52 +48,18 @@ namespace Belle2 {
     double minCluster2HelixDistance(const Particle* particle);
 
     /**
-     * Returns true if the cluster with given attributes passes 'good gamma' criteria.
-     * @param calibrated set to false for goodGammaUncalibrated().
-     */
-    bool isGoodGamma(int region, double energy, bool calibrated);
-
-    /**
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 100 MeV
-     * Barrel   : E >  90 MeV
-     * Backward : E > 160 MeV
-     */
-    double goodGamma(const Particle* particle);
-
-    /**
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E_uncalib > 125 MeV && E9/E25>0.7
-     * Barrel   : E_uncalib > 100 MeV
-     * Backward : E_uncalib > 150 MeV
-     */
-    double goodGammaUncalibrated(const Particle* particle);
-
-    /**
-     * Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
+     * [Legacy] Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
      */
     bool isGoodBelleGamma(int region, double energy);
 
     /**
-     * Returns true if the cluster with given attributes passes loose skim 'good gamma' criteria.
-     */
-    bool isGoodSkimGamma(int region, double energy);
-
-    /**
+     * [Legacy]
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV
      * Barrel   : E >  50 MeV
      * Backward : E > 150 MeV
      */
     double goodBelleGamma(const Particle* particle);
-
-    /**
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 30 MeV
-     * Barrel   : E > 20 MeV
-     * Backward : E > 40 MeV
-     */
-    double goodSkimGamma(const Particle* particle);
 
     /**
      * return ECL cluster's Error on Energy

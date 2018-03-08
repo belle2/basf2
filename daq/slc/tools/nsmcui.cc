@@ -15,8 +15,8 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 
-#include <nsm2/nsmlib2.h>
-#include <nsm2/belle2nsm.h>
+#include "nsm2/nsmlib2.h"
+#include "nsm2/belle2nsm.h"
 
 extern "C" {
 #ifdef USE_READLINE

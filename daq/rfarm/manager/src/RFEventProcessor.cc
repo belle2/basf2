@@ -126,6 +126,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), (char*)"1");
   m_flow->clear(1);
 
+  /*
   // 4. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
   if (nsmm->len > 0) {
@@ -133,6 +134,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
   m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  */
 
   // 5. Run receiver
   char* receiver = m_conf->getconf("processor", "receiver", "script");

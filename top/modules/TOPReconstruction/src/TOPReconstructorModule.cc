@@ -78,8 +78,10 @@ namespace Belle2 {
              "track smearing sigma in Theta [radians]", 0.0);
     addParam("sigmaPhi", m_sigmaPhi,
              "track smearing sigma in Phi [radians]", 0.0);
+    addParam("minTime", m_minTime,
+             "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("PDGCode", m_PDGCode,
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
              211);
@@ -168,9 +170,10 @@ namespace Belle2 {
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
     reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
 
-    // set time limit for photons lower than that given by TDC range (optional)
-
-    if (m_maxTime > 0) reco.setTmax(m_maxTime);
+    // set time window if given, otherwise use the default one from TOPNominalTDC
+    if (m_maxTime > m_minTime) {
+      reco.setTimeWindow(m_minTime, m_maxTime);
+    }
 
     // add photons
 

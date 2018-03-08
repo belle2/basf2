@@ -99,6 +99,7 @@ def main(backend_choice):
         # Should really be closing down the processing pool once we're done submitting.
         backend.join()
 
+
 if __name__ == "__main__":
     if not (len(sys.argv) == 2) or (sys.argv[1] not in ("local", "qsub", "bsub")):
         print("Usage: python3 using_backends.py <backend_type>")

@@ -55,7 +55,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
 
 def add_pxd_ckf(path, *args, **kwargs):
     """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
-    if "PXDSpacePointCreator" not in path:
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
     phase2_path = basf2.create_path()
@@ -148,7 +148,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
-    if "SVDSpacePointCreator" not in path:
+    if "SVDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("SVDSpacePointCreator")
 
     phase2_path = basf2.create_path()

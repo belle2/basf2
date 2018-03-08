@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <top/dbobjects/TOPPmtObsoleteData.h>
 
 namespace Belle2 {
 
@@ -23,6 +24,7 @@ namespace Belle2 {
      * number of PMT's in a PMT array (TOP module)
      */
     enum {c_NumPMTs = 32};
+
 
     /**
      * Default constructor
@@ -37,11 +39,12 @@ namespace Belle2 {
      * @param slotNumber slot number
      * @param arrayNumber number of PMT array
      * @param position position of PMT within array (module)
+     * @param type PMT type
      */
     TOPPmtInstallation(const std::string& serialNumber, int moduleCNumber, int slotNumber,
-                       int arrayNumber, int position):
+                       int arrayNumber, int position, TOPPmtObsoleteData::EType type):
       m_serialNumber(serialNumber), m_moduleCNumber(moduleCNumber), m_slotNumber(slotNumber),
-      m_arrayNumber(arrayNumber), m_position(position)
+      m_arrayNumber(arrayNumber), m_position(position), m_type(type)
     {}
 
     /**
@@ -74,6 +77,12 @@ namespace Belle2 {
      */
     int getPosition() const {return m_position;}
 
+    /**
+     * Returns PMT type
+     * @return type
+     */
+    TOPPmtObsoleteData::EType getType() const {return m_type;}
+
 
   private:
 
@@ -83,7 +92,9 @@ namespace Belle2 {
     int m_arrayNumber = 0;      /**< MCP array number (1-based) */
     int m_position = 0;         /**< position within the TOP module (1-based) */
 
-    ClassDef(TOPPmtInstallation, 1); /**< ClassDef */
+    TOPPmtObsoleteData::EType m_type = TOPPmtObsoleteData::c_Unknown;   /**< type (conventional, ALD, ...) */
+
+    ClassDef(TOPPmtInstallation, 2); /**< ClassDef */
 
   };
 

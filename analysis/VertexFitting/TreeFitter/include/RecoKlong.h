@@ -35,17 +35,17 @@ namespace TreeFitter {
     /** update or init params */
     ErrCode initParams();
 
-    /** project photon consztraint */
+    /** project klong consztraint */
     ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const;
 
     /** sets the size of the corresponding residual projection */
-    virtual int dimM() const { return dim(); }
+    virtual int dimM() const { return 3; }
 
     /** how should the energy be calculated ? from momentum or from E ?  */
-    virtual bool hasEnergy() const { return false; }
+    virtual bool hasEnergy() const { return true; }
 
     /**set the size of the particle in the statevector */
-    virtual int dim() const { return m_dim; }
+    virtual int dim() const { return 4; }
 
     /** type */
     virtual int type()     const { return kRecoKlong ; }

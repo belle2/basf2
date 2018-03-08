@@ -19,6 +19,7 @@
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 
 #include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
+#include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/InteractionPoint.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
@@ -122,23 +123,33 @@ namespace TreeFitter {
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite
         rc = new InternalParticle(particle, 0, forceFitAll);
+
       } else {
-        rc = new InternalParticle(particle, 0, forceFitAll); //FIXME ????????
+
+        rc = new InternalParticle(particle, 0, forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
+
       }
 
-    } else if (particle->getMdstArrayIndex() || particle->getTrack() || particle->getECLCluster()) { // external particles
+    } else if (particle->getMdstArrayIndex() ||
+               particle->getTrack() ||
+               particle->getECLCluster() ||
+               particle->getKLMCluster()) { // external particles and final states
+
       if (particle->getTrack()) {
-        rc = new RecoTrack(particle, mother); // reconstructed track
+        rc = new RecoTrack(particle, mother);
 
       } else if (particle->getECLCluster()) {
-        rc = new RecoPhoton(particle, mother); // reconstructed photon
+        rc = new RecoPhoton(particle, mother);
+
+      } else if (particle->getKLMCluster()) {
+        rc = new RecoKlong(particle, mother);
 
       } else if (isAResonance(particle)) {
         rc = new RecoResonance(particle, mother);
 
-      }  else {// FIXME or make this Klong??
-
+      }  else {
         rc = new RecoComposite(particle, mother);
+
       }
 
     } else { // 'internal' particles
@@ -400,7 +411,7 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::projectConstraint(Constraint::Type, const FitParams&, Projection&) const
   {
-    B2ERROR("Trying to project constraint of ParticleBase type. This is undefined.");
+    B2FATAL("Trying to project constraint of ParticleBase type. This is undefined.");
     return ErrCode::badsetup;
   }
 

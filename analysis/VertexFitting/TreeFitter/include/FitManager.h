@@ -32,10 +32,13 @@ namespace TreeFitter {
 
     /** constructor  */
     FitManager() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
-      m_chiSquare(-1), m_niter(-1), m_prec(0.01) {} //Default constructor
+      m_chiSquare(-1), m_niter(-1), m_prec(0.01), m_updateDaugthers(false) {}
 
     /** constructor  */
-    FitManager(Belle2::Particle* particle, double prec = 0.01, int ipDimension = 0);
+    FitManager(Belle2::Particle* particle,
+               double prec = 0.01,
+               int ipDimension = 0,
+               bool updateDaughters = false);
 
     /** destructor does stuff */
     ~FitManager();
@@ -139,6 +142,9 @@ namespace TreeFitter {
 
     /** errorcode */
     ErrCode m_errCode;
+
+    /** if this is set all daughters will be updated otherwise only the head of the tree */
+    const bool m_updateDaugthers;
 
   };
 }

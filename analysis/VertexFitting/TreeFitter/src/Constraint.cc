@@ -57,7 +57,7 @@ namespace TreeFitter {
     Projection p(fitpar->getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
 
-    //std::cout << "               Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
+    //std::cout << "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
     //          << " dim contr " << m_dim << std::endl;
 
     double chisq(0);
@@ -114,6 +114,7 @@ namespace TreeFitter {
       case resonance:    rc = "resonance";  break;
       case track:        rc = "track";      break;
       case photon:       rc = "photon";     break;
+      case klong:        rc = "klong";     break;
       case kinematic:    rc = "kinematic";  break;
       case geometric:    rc = "geometric";  break;
       case mass:         rc = "mass";       break;

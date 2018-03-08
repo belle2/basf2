@@ -38,7 +38,8 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("ipConstraintDimension", m_ipConstraintDimension,
            "Type::Int. Use the x-y-z-beamspot or x-y-beamtube constraint. Zero means no cosntraint which is the default. The Beamspot will be treated as the mother of the particlelist you feed.",
            0);
-
+  addParam("updateAllDaugthers", m_updateDaughters,
+           "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
 }
 
 void TreeFitterModule::initialize()
@@ -57,6 +58,7 @@ void TreeFitterModule::beginRun()
 void TreeFitterModule::event()
 {
   StoreObjPtr<ParticleList> plist(m_particleList);
+
   if (!plist) {
     B2ERROR("ParticleList " << m_particleList << " not found");
     return;
@@ -65,15 +67,19 @@ void TreeFitterModule::event()
   std::vector<unsigned int> toRemove;
   const unsigned int n = plist->getListSize();
   m_nCandidatesBeforeFit += n;
+
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = plist->getParticle(i);
     bool ok = fitTree(particle);
+
     if (!ok) {
       particle->setPValue(-1);
     }
+
     if (particle->getPValue() < m_confidenceLevel) {
       toRemove.push_back(particle->getArrayIndex());
     }
+
   }
   plist->removeParticles(toRemove);
   m_nCandidatesAfter += plist->getListSize();
@@ -92,7 +98,15 @@ void TreeFitterModule::terminate()
 
 bool TreeFitterModule::fitTree(Belle2::Particle* head)
 {
-  std::unique_ptr<TreeFitter::FitManager> TreeFitter(new TreeFitter::FitManager(head, m_precision, m_ipConstraintDimension));
+  std::unique_ptr<TreeFitter::FitManager> TreeFitter(
+    new TreeFitter::FitManager(
+      head,
+      m_precision,
+      m_ipConstraintDimension,
+      m_updateDaughters
+    )
+  );
+
   TreeFitter->setMassConstraintList(m_massConstraintList);
   bool rc = TreeFitter->fit();
   return rc;

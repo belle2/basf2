@@ -31,14 +31,16 @@ namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
                          double prec,
-                         int ipDimension) :
+                         int ipDimension,
+                         bool updateDaughters) :
     m_particle(particle),
     m_decaychain(0),
     m_fitparams(0),
     m_status(VertexStatus::UnFitted),
     m_chiSquare(-1),
     m_niter(-1),
-    m_prec(prec)
+    m_prec(prec),
+    m_updateDaugthers(updateDaughters)
   {
     m_decaychain =  new DecayChain(particle, false, ipDimension);
 
@@ -258,7 +260,6 @@ namespace TreeFitter {
     const TVector3 pos(m_fitparams->getStateVector()(posindex),
                        m_fitparams->getStateVector()(posindex + 1),
                        m_fitparams->getStateVector()(posindex + 2));
-
     TLorentzVector p;
     p.SetPx(m_fitparams->getStateVector()(momindex));
     p.SetPy(m_fitparams->getStateVector()(momindex + 1));
@@ -304,7 +305,12 @@ namespace TreeFitter {
       cand.addExtraInfo("lifeTimeErr", std::get<1>(life));
     }
 
-    if (hasPos) {  //if not final state
+    //FIXME klong are final states and for debugging I care for the vertex
+    if (pb.type() == ParticleBase::kRecoKlong) {
+      cand.setVertex(pos);
+    }
+
+    if (hasPos) {
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
         const double NDFs = nDof();
@@ -316,9 +322,13 @@ namespace TreeFitter {
 
   void FitManager::updateTree(Belle2::Particle& cand) const
   {
-    if (updateCand(cand)) { // if the mother can be updated, update the daughters
+    const bool updateableMother = updateCand(cand);
+
+    if (updateableMother && m_updateDaugthers) {
+
       const int ndaughters = cand.getNDaughters();
       Belle2::Particle* daughter;
+
       for (int i = 0; i < ndaughters; i++) {
         daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
         updateTree(*daughter);
@@ -348,7 +358,6 @@ namespace TreeFitter {
       const double mass = pb->pdgMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
       const double mom = mom_vec.norm();
-      const double mom2 = mom * mom;
       const double mom3 = mom * mom * mom;
 
       const double len = std::get<0>(lenTuple);

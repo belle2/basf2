@@ -26,7 +26,8 @@ namespace TreeFitter {
                  slowdivergingfit = 32,
                  fastdivergingfit = 64,
                  filtererror = 128,
-                 photondimerror = 256
+                 photondimerror = 256,
+                 klongdimerror = 512
                 } ;
 
     /** default constructor */

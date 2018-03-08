@@ -225,7 +225,7 @@ class Calibration(CalibrationBase):
     calibration constants created by earlier completed calibrations to dependent ones.
     """
     #: Allowed transitions that we will use to progress
-    moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
+    moves = ["submit_collector", "complete", "run_algorithms", "iterate", "fail_fully"]
     #: Subdirectory name for algorithm output
     alg_output_dir = "algorithm_output"
 
@@ -296,18 +296,29 @@ class Calibration(CalibrationBase):
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
-        This returns False if any are missing or if the collector and algorithm are mismatched."""
+        This returns False if any are missing or if the collector and algorithm are mismatched.
+
+        We also check that the strategies of the algorithms match the collector granularity.
+        """
         if (not self.collector or not self.algorithms or not self.input_files):
+            B2WARNING("Empty collector, algorithm, or input_files for {}.".format(self.name))
             return False
-        else:
-            for alg in self.algorithms:
-                alg_type = type(alg.algorithm).__name__
-                if self.collector.name() != alg.algorithm.getCollectorName():
-                    B2WARNING(("Algorithm '%s' requested collector '%s' but got '%s'"
-                               % (alg_type, alg.algorithm.getCollectorName(), self.collector.name())))
-                    return False
-            else:
-                return True
+        collector_params = self.collector.available_params()
+        for param in collector_params:
+            if param.name == "granularity":
+                granularity = param.values
+        for alg in self.algorithms:
+            alg_type = type(alg.algorithm).__name__
+            if self.collector.name() != alg.algorithm.getCollectorName():
+                B2WARNING(("Algorithm '%s' requested collector '%s' but got '%s'"
+                           % (alg_type, alg.algorithm.getCollectorName(), self.collector.name())))
+                return False
+            if granularity not in alg.strategy.allowed_granularities:
+                B2WARNING("Selected strategy for {} does not allow collector "
+                          "granularity to be '{}'.".format(alg_type,
+                                                           granularity))
+                return False
+        return True
 
     def use_central_database(self, global_tag):
         """
@@ -727,7 +738,7 @@ class CAF():
         # Checks whether the dependencies we've added will give a valid order
         order = self._order_calibrations()
         if not order:
-            B2FATAL("Couldn't order the calibrations properly. Probably a cyclic dependency.")
+            B2FATAL("Couldn't order the calibrations properly. Could be a cyclic dependency.")
 
         # Check that a backend has been set and use default Local() one if not
         self._check_backend()
@@ -749,17 +760,18 @@ class CAF():
             while not finished:
                 finished = True
                 for calibration in self.calibrations.values():
-                    if calibration.dependencies_met() and not calibration.is_alive():
-                        if calibration.state != calibration.end_state and \
-                           calibration.state != calibration.fail_state:
-                            calibration.start()
-
                     # Join the thread if we've hit an end state
                     if calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state:
                         calibration.join()
                     # If we're not ready yet we should go round again
                     else:
                         finished = False
+
+                    if calibration.dependencies_met() and not calibration.is_alive():
+                        if calibration.state != calibration.end_state and \
+                           calibration.state != calibration.fail_state:
+                            calibration.start()
+
                 sleep(self.heartbeat)
 
         # Close down our processing pools nicely

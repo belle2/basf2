@@ -24,12 +24,19 @@ namespace Belle2 {
     /// Destructor
     virtual ~TestCalibrationAlgorithm() {}
 
+    /// Setter for m_minEntries
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+
+    /// Getter for m_minEntries
+    int getMinEntries() {return m_minEntries;}
+
   protected:
 
     /// Run algo on data
     virtual EResult calibrate();
 
   private:
+    int m_minEntries = 100;
 
   };
 } // namespace Belle2

@@ -160,11 +160,15 @@ Strategy Objects
 .. automodule:: caf.strategies
 
 .. autoclass:: caf.strategies.AlgorithmStrategy
-    :members: __init__, run
+    :members:
+    :special-members:
 
 .. autoclass:: caf.strategies.SingleIOV
     :members:
-    :inherited-members:
+    :show-inheritance:
+
+.. autoclass:: caf.strategies.SequentialRunByRun
+    :members:
     :show-inheritance:
 
 State Machine Framework

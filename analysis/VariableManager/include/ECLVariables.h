@@ -130,6 +130,13 @@ namespace Belle2 {
      */
     double eclClusterTiming(const Particle* particle);
 
+
+    /** return  Error on clusters phi position  */
+    double eclClusterErrorPhi(const Particle* particle);
+
+    /** return  Error on clusters theta position  */
+    double eclClusterErrorTheta(const Particle* particle);
+
     /**
      * return ECL cluster's Error on timing information
      */

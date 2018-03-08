@@ -130,7 +130,7 @@ namespace Belle2 {
       double errorSquared = frame.getMomentumErrorMatrix(part)(3, 3);
 
       if (errorSquared > 0.0)
-        return sqrt(errorSquared);
+        return std::sqrt(errorSquared);
       else
         return 0.0;
     }

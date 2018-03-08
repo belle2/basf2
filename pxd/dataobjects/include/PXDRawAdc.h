@@ -37,7 +37,7 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param data raw data pointer
      */
-    PXDRawAdc(VxdID sensorID, void* data, bool pedestal_flag);
+    PXDRawAdc(VxdID sensorID, void* data);
 
     /** Get the sensor ID.
      * @return ID of the sensor.
@@ -66,9 +66,8 @@ namespace Belle2 {
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object */
     unsigned short m_dhp_header; /**< needed for Chip id */
+    // TODO this is a maximum size here, better use std::vector and let it care
     unsigned char m_adcs[64 * 1024]; /**< Raw ADC data as it is memory dumped by the DHP */
-
-    // ~PXDRawAdc();
 
     ClassDef(PXDRawAdc, 2)
   };

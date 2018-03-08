@@ -45,8 +45,6 @@ PXDUnpackerDHHModule::PXDUnpackerDHHModule() :
   m_storeRawHits(),
   m_storeROIs(),
   m_storeRawAdc(),
-
-  ////Cluster store
   m_storeRawCluster()
 {
   //Set module properties
@@ -270,7 +268,8 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
   //! E.g. not the whole mem is dumped, but only a part of it.
   //! *************************************************************
 
-  if (frame_len != 0x10008) {
+  // 64*768+8 bytes
+  if (frame_len != 0xC008) {
     B2ERROR("Frame size unsupported for RAW ADC frame! $" << hex << frame_len << " bytes");
     return;
   }
@@ -299,12 +298,9 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
   }
 
   /// Endian Swapping is done in Contructors of Raw Objects!
-  if (frame_len == 0x10008) { // 64k
-    B2DEBUG(20, "Raw ADC Data");
-    m_storeRawAdc.appendNew(vxd_id, data, false);
-  } else {
-    // checked already above
-  }
+  B2DEBUG(20, "Raw ADC Data");
+  // size checked already above
+  m_storeRawAdc.appendNew(vxd_id, data);
 };
 
 void PXDUnpackerDHHModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
@@ -447,6 +443,7 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
   */
   last_dhp_readout_frame_lo[dhp_dhp_id] = dhp_readout_frame_lo;
 
+// TODO Please check if this can happen by accident with valid data!
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
     // We see a second "header" with framenr+1 ...
     B2ERROR("DHP data: seems to be double header! skipping ... len " << frame_len);
@@ -504,8 +501,6 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
             }
           } else {
             u_cellID = dhp_col + 64 * dhp_dhp_id; // defaults for already mapped
-            // TODO the behaviour of this bit in firmware is not 100% fix
-            // We use it here for simulation purpose
           }
           if (u_cellID >= 250) {
             B2WARNING("DHP COL Overflow (unconnected drain lines) " << u_cellID << ", ref " << dhe_reformat << ", dhpcol " << dhp_col << ", id "

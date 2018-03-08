@@ -763,10 +763,45 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       if (!isFakedData_event) {
         /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
         /// of this frame against the one from MEta Event Info
-        ///   m_meta_event_nr=evtPtr->getEvent();// filled already above
-        ///   m_meta_run_nr=evtPtr->getRun();// filled already above
-        ///   n_meta_subrun_nr=evtPtr->getSubrun();// filled already above
-        ///   m_meta_experiment=evtPtr->getExperiment();// filled already above
+        if (dhc.data_dhc_start_frame->get_experiment() != m_meta_experiment) {
+          B2ERROR("DHC EXP MM: " <<
+                  dhc.data_dhc_start_frame->get_experiment() << " META " << m_meta_experiment);
+          m_errorMask |= EPXDErrMask::c_META_MM_DHC_ERS;
+        }
+        if (dhc.data_dhc_start_frame->get_run() != m_meta_run_nr) {
+          B2ERROR("DHC RUN MM: " << dhc.data_dhc_start_frame->get_run() << " META "
+                  << m_meta_run_nr);
+          m_errorMask |= EPXDErrMask::c_META_MM_DHC_ERS;
+        }
+        if (dhc.data_dhc_start_frame->get_subrun() != m_meta_subrun_nr) {
+          B2ERROR("DHC SUBRUN MM: " << dhc.data_dhc_start_frame->get_subrun()
+                  << " META " << m_meta_subrun_nr);
+          m_errorMask |= EPXDErrMask::c_META_MM_DHC_ERS;
+        }
+        if ((((unsigned int)dhc.data_dhc_start_frame->getEventNrHi() << 16) | dhc.data_dhc_start_frame->getEventNrLo()) !=
+            (m_meta_event_nr & 0xFFFFFFFF)) {
+          B2ERROR("DHC EVT32b MM: " << ((dhc.data_dhc_start_frame->getEventNrHi() << 16) | dhc.data_dhc_start_frame->getEventNrLo()) <<
+                  " META " << (unsigned int)(m_meta_event_nr & 0xFFFFFFFF));
+          m_errorMask |= EPXDErrMask::c_META_MM_DHC;
+        }
+        uint32_t tt = (((unsigned int)dhc.data_dhc_start_frame->time_tag_mid & 0x7FFF) << 12) | ((unsigned int)
+                      dhc.data_dhc_start_frame->time_tag_lo_and_type >> 4);
+        uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
+        // uint64_t cc = (unsigned int)(m_meta_time / 1000000000ull);
+        // B2ERROR("Meta / 1e9: " << hex << cc << " Diff: " << (dhc.data_dhc_start_frame->time_tag_hi-cc));
+        if ((tt - mm) != 0) {
+          m_errorMask |= EPXDErrMask::c_META_MM_DHC_TT;
+          if (!m_ignoreMetaFlags) {
+            B2ERROR("DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<
+                    dhc.data_dhc_start_frame->time_tag_lo_and_type << " META " << m_meta_time << " TRG Type " <<
+                    (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF));
+            B2ERROR("Meta ns from 127MHz: " << hex << mm << " Diff: " << (tt - mm));
+          }
+        } else {
+          B2DEBUG(20, "DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<
+                  dhc.data_dhc_start_frame->time_tag_lo_and_type << " META " << m_meta_time << " TRG Type " <<
+                  (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF));
+        }
       }
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
@@ -957,15 +992,71 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       m_errorMask |= dhc.data_onsen_roi_frame->check_error(len);
       m_errorMask |= dhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHC header, see reason in function
       m_errorMask |= dhc.check_crc();
-      // if (!m_doNotStore) dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
+      if (!m_doNotStore) {
+        //dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
+        // void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) const
+        // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
+        if (len >= dhc.data_onsen_roi_frame->getMinSize()) {
+          //if ((len - dhc.data_onsen_roi_frame->getMinSize()) % 8 != 0) {
+          // error checking in check_error() above, this is only for dump-ing
+          // dump_roi(data, len - 4); // dump ROI payload, minus CRC
+          //}
+          unsigned int l;
+          l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
+          // Endian swapping is done in Contructor of RawRoi object
+          m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
+        }
+      }
       break;
     case EDHCFrameHeaderDataType::c_ONSEN_TRG:
       /// we do not expect to see this frame in BonnDAQ DHH data
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
-//   m_meta_event_nr=evtPtr->getEvent();
-//   m_meta_run_nr=evtPtr->getRun();
-//   n_meta_subrun_nr=evtPtr->getSubrun();
-//   m_meta_experiment=evtPtr->getExperiment();
+      if (dhc.data_onsen_trigger_frame->get_trig_nr1() != (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)) {
+        B2ERROR("TRG HLT MM: $" << dhc.data_onsen_trigger_frame->get_trig_nr1() << " META " <<
+                (m_meta_event_nr & 0xFFFFFFFF));
+        m_errorMask |= EPXDErrMask::c_META_MM_ONS_HLT;
+      }
+      if (dhc.data_onsen_trigger_frame->get_experiment1() != m_meta_experiment) {
+        B2ERROR("TRG HLT EXP MM: $" << dhc.data_onsen_trigger_frame->get_experiment1() << " META " <<
+                m_meta_experiment);
+        m_errorMask |= EPXDErrMask::c_META_MM_ONS_HLT;
+      }
+      if (dhc.data_onsen_trigger_frame->get_run1() != m_meta_run_nr) {
+        B2ERROR("TRG HLT RUN MM: $" << dhc.data_onsen_trigger_frame->get_run1() << " META " <<
+                m_meta_run_nr);
+        m_errorMask |= EPXDErrMask::c_META_MM_ONS_HLT;
+      }
+      if (dhc.data_onsen_trigger_frame->get_subrun1() != m_meta_subrun_nr) {
+        B2ERROR("TRG HLT SUBRUN MM: $" << dhc.data_onsen_trigger_frame->get_subrun1() << " META " <<
+                m_meta_subrun_nr);
+        m_errorMask |= EPXDErrMask::c_META_MM_ONS_HLT;
+      }
+
+      if (!dhc.data_onsen_trigger_frame->is_fake_datcon()) {
+        if (dhc.data_onsen_trigger_frame->get_trig_nr2() != (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)) {
+          B2ERROR("TRG DC MM: $" << dhc.data_onsen_trigger_frame->get_trig_nr2() << " META " <<
+                  (m_meta_event_nr & 0xFFFFFFFF));
+          m_errorMask |= EPXDErrMask::c_META_MM_ONS_DC;
+        }
+        if (dhc.data_onsen_trigger_frame->get_experiment2() != m_meta_experiment) {
+          B2ERROR("TRG DC EXP MM: $" << dhc.data_onsen_trigger_frame->get_experiment2() << " META " <<
+                  m_meta_experiment);
+          m_errorMask |= EPXDErrMask::c_META_MM_ONS_DC;
+        }
+        if (dhc.data_onsen_trigger_frame->get_run2() != m_meta_run_nr) {
+          B2ERROR("TRG DC RUN MM: $" << dhc.data_onsen_trigger_frame->get_run2() << " META " <<
+                  m_meta_run_nr);
+          m_errorMask |= EPXDErrMask::c_META_MM_ONS_DC;
+        }
+        if (dhc.data_onsen_trigger_frame->get_subrun2() != m_meta_subrun_nr) {
+          B2ERROR("TRG DC SUBRUN MM: $" << dhc.data_onsen_trigger_frame->get_subrun2() << " META " <<
+                  m_meta_subrun_nr);
+          m_errorMask |= EPXDErrMask::c_META_MM_ONS_DC;
+        }
+      }
+
+//       B2ERROR("TRG TAG HLT: $" << hex << dhc.data_onsen_trigger_frame->get_trig_tag1() << " DATCON $" <<  dhc.data_onsen_trigger_frame->get_trig_tag2() << " META " << m_meta_time);
+
       if (verbose) dhc.data_onsen_trigger_frame->print();
       m_errorMask |= dhc.data_onsen_trigger_frame->check_error(m_ignoreDATCON);
       m_errorMask |= dhc.check_crc();

@@ -78,14 +78,6 @@ def create_test_path(runtype="collision", location="hlt", expNum=0):
 
     add_packers(path, components=components)
 
-    # Fix for PXD
-    for mod in path.modules():
-        if mod.name() == 'PXDDigitizer':
-            mod.param("Digits", "simulated_digits")
-
-        if mod.name() == 'PXDPacker':
-            mod.param("PXDDigitsName", "simulated_digits")
-
     # remove everything but HLT input raw objects
     path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep=additonal_store_arrays_to_keep))
 

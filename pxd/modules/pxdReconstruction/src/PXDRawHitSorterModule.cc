@@ -56,7 +56,8 @@ void PXDRawHitSorterModule::initialize()
 {
   //Register collections
   m_storeRawHits.isRequired(m_storeRawHitsName);
-  m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
+  //m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeDigits.registerInDataStore(m_storeDigitsName);
 }
 
 void PXDRawHitSorterModule::event()

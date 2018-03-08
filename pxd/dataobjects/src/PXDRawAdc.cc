@@ -17,15 +17,24 @@
 
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
+#include <framework/logging/Logger.h>
+#include <cstring>
 
 using namespace std;
 using namespace Belle2;
 
-PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data):
+PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, int len):
   m_sensorID(sensorID) , m_adcs()
 {
   unsigned char* d = (unsigned char*)data;
   m_dhp_header = ((boost::spirit::endian::ubig16_t*)data)[2];
   d += 8; // Skip DHH and DHP header, data is 64kb large (+ 8 bytes)
-  memcpy(m_adcs, d, sizeof(m_adcs)); // seems endianess swapping is not needed
+  len -= 8;
+  if (len < 0) {
+    B2ERROR("PXDRawAdc size is negative!");
+  } else {
+    m_adcs.resize(len);// resize vector
+    std::memcpy(&m_adcs[0], d, len);// lowlevel hardcore, TODO maybe better use std::copy ?
+    // seems endianess swapping is not needed
+  }
 };

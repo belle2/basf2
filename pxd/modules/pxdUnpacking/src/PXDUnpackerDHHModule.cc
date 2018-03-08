@@ -300,7 +300,7 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
   /// Endian Swapping is done in Contructors of Raw Objects!
   B2DEBUG(20, "Raw ADC Data");
   // size checked already above
-  m_storeRawAdc.appendNew(vxd_id, data);
+  m_storeRawAdc.appendNew(vxd_id, data, frame_len);
 };
 
 void PXDUnpackerDHHModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)

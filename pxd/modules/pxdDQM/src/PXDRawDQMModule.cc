@@ -184,7 +184,7 @@ void PXDRawDQMModule::event()
 
       unsigned int chip_offset;
       chip_offset = it.getChip() * 64;
-      const unsigned char* data = it.getData();
+      const unsigned char* data = &it.getData()[0];
       for (int row = 0; row < 768; row++) {
         for (int col = 0; col < 64; col++) {
           hrawPxdAdcMapAll->Fill(col + chip_offset + ladder * 300 - 200, 100 + row + 850 * (layer + layer + sensor - 3), *(data++));

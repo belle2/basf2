@@ -413,6 +413,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "list of FTSW ID of 2D tracker", defaultTracker2DNodeID);
   addParam("headerSize", m_headerSize,
            "number of words (number of bits / 32) of the B2L header", 3);
+  addParam("alignFoundTime", m_alignFoundTime,
+           "Whether to align out-of-sync Belle2Link data between different sub-modules", true);
 
 }
 
@@ -525,9 +527,34 @@ void CDCTriggerUnpackerModule::event()
     }
   }
   if (m_decode2DFinderInputTS) {
+    std::array<int, 4> clockCounter2D = {0, 0, 0, 0};
+    std::array<int, 4> timeOffset2D = {0, 0, 0, 0};
+    // Align the data in other boards to 2D0 by looking at the CC in the midpoint of the time window
+    for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
+      if (! m_alignFoundTime || m_bitsTo2D.getEntries() == 0) {
+        break;
+      }
+      auto& trackerData = m_bitsTo2D[m_bitsTo2D.getEntries() / 2]->signal()[0][iTracker];
+      std::string strInput = slv_to_bin_string(trackerData);
+      clockCounter2D[iTracker] = std::stoi(strInput.substr(0, clockCounterWidth), 0, 2);
+      int clockCounterDiff = clockCounter2D[iTracker] - clockCounter2D[0];
+      // clock counter rolls back to 0 from 319
+      if (clockCounterDiff > 300) {
+        clockCounterDiff -= 320;
+      } else if (clockCounterDiff < -300) {
+        clockCounterDiff += 320;
+      }
+      timeOffset2D[iTracker] = clockCounterDiff;
+      if (clockCounterDiff != 0) {
+        B2DEBUG(100, "Adding " << clockCounterDiff << " clock(s) to 2D" << iTracker << " found time");
+      }
+      if (std::abs(clockCounterDiff) > 2) {
+        B2WARNING("Clock counters between 2D differ by " << clockCounterDiff << " clocks!");
+      }
+    }
     for (short iclock = 0; iclock < m_bitsTo2D.getEntries(); ++iclock) {
       B2DEBUG(30, "clock " << iclock);
-      decode2DInput(iclock - m_2DFinderDelay, m_bitsTo2D[iclock], &m_TSHits);
+      decode2DInput(iclock - m_2DFinderDelay, timeOffset2D, m_bitsTo2D[iclock], &m_TSHits);
     }
   }
 }

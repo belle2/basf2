@@ -381,12 +381,15 @@ namespace Belle2 {
      *
      *  @param foundTime    the clock at which a TS hit appears
      *
+     *  @param timeOffset   offset of the foundTime for each 2D
+     *
      *  @param bits         pointer to the input Bitstream
      *
      *  @param tsHits       pointer to the TS hit StoreArray
      *
      */
     void decode2DInput(short foundTime,
+                       std::array<int, 4> timeOffset,
                        TSFOutputBitStream* bits,
                        StoreArray<CDCTriggerSegmentHit>* tsHits)
     {
@@ -416,7 +419,7 @@ namespace Belle2 {
                                      ts[2], // L/R
                                      ts[1], // priority time
                                      0, // fastest time (unknown)
-                                     foundTime); // found time
+                                     foundTime + timeOffset[iTracker]); // found time
 
             // add if the TS hit of identical ID and foundTime is not already in the StoreArray
             // (from the 2D input of another quarter or the 2D track output)
@@ -437,6 +440,8 @@ namespace Belle2 {
                       ", SL" << 2 * iAx << ", local ID " << iTS <<
                       ", 2D" << iTracker);
               tsHits->appendNew(hit);
+            } else {
+              B2DEBUG(45, "skipping redundant hit ID " << hit.getSegmentID() << " in 2D" << iTracker);
             }
           }
         }

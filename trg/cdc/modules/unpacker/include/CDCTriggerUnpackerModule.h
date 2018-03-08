@@ -208,6 +208,7 @@ namespace Belle2 {
     bool m_unpackTracker2D;  /**< flag to unpack 2D tracker data */
     bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
     bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
+    bool m_alignFoundTime;  /**< flag to align found time in different sub-modules */
 
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;

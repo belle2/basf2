@@ -70,7 +70,8 @@ genfit::AbsTrackRep* TrackFitter::getTrackRepresentationForPDG(int pdgCode, cons
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
-  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
+  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = TrackFitter::getTrackRepresentationForPDG(std::abs(currentPdgCode),
+                                                           recoTrack);
 
   if (alreadyPresentTrackRepresentation) {
     B2DEBUG(100, "Reusing the already present track representation with the same PDG code.");

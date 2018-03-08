@@ -278,7 +278,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   //! E.g. not the whole mem is dumped, but only a part of it.
   //! *************************************************************
 
-  if (frame_len != 0x10008) {
+  // Size: 64*768 + 8 bytes for a full frame readout
+  if (frame_len != 0xC008) {
     B2ERROR("Frame size unsupported for RAW ADC frame! $" << hex << frame_len << " bytes");
     return;
   }
@@ -307,12 +308,9 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 
   /// Endian Swapping is done in Contructors of Raw Objects!
-  if (frame_len == 0x10008) { // 64k
-    B2DEBUG(20, "Raw ADC Data");
-    m_storeRawAdc.appendNew(vxd_id, data, false);
-  } else {
-    // checked already above
-  }
+  B2DEBUG(20, "Raw ADC Data");
+  // size checked already above
+  m_storeRawAdc.appendNew(vxd_id, data, false);
 };
 
 void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
@@ -388,7 +386,7 @@ void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
 }
 
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
-                                   unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id,
+                                   unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, VxdID vxd_id,
                                    PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
@@ -566,7 +564,6 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
                    << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
             B2DEBUG(20, "dhe_ID " << dhe_ID);
             B2DEBUG(20, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-            B2DEBUG(20, "toffset " << toffset);
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
@@ -741,7 +738,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                  dhc.data_direct_readout_frame->getDHEId(),
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
-                 dhe_first_triggergate, currentVxdId, daqpktstat);
+                 currentVxdId, daqpktstat);
 
       break;
     };

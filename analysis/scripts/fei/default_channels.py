@@ -104,7 +104,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     if convertedFromBelle:
         gamma_cut = 'goodBelleGamma == 1 and clusterBelleQuality == 0'
     else:
-        gamma_cut = 'goodGamma == 1'
+        gamma_cut = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]'
     if specific:
         gamma_cut += ' and isInRestOfEvent > 0.5'
 
@@ -849,7 +849,7 @@ def get_unittest_channels(specific=False):
 
     gamma = Particle('gamma',
                      MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'clusterE9E25',
-                                                 'pt', 'E', 'pz', 'goodGamma', 'extraInfo(preCut_rank)'],
+                                                 'pt', 'E', 'pz', 'extraInfo(preCut_rank)'],
                                       target='isPrimarySignal'),
                      PreCutConfiguration(userCut='E > 0.05' + specific_cut,
                                          bestCandidateMode='highest',
@@ -967,11 +967,12 @@ def get_fr_channels(convertedFromBelle=False):
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
 
+    high_energy_photon = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]'
     gamma = Particle('gamma',
                      MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
                                                  'clusterE9E25', 'pt', 'E', 'pz'],
                                       target='isPrimarySignal'),
-                     PreCutConfiguration(userCut='goodGamma == 1' if not convertedFromBelle else
+                     PreCutConfiguration(userCut=high_energy_photon if not convertedFromBelle else
                                          'goodBelleGamma == 1 and clusterBelleQuality == 0',
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='E',

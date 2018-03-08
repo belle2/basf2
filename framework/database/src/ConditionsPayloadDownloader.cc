@@ -364,7 +364,8 @@ namespace Belle2 {
       case EConditionsDirectoryStructure::c_digestSubdirectories:
         path /= payload.digest.substr(0, 1);
         path /= payload.digest.substr(1, 2);
-      // intentional fall through to get flat name in addition ...
+        // intentional fall through to get flat name in addition ...
+        [[fallthrough]];
       case EConditionsDirectoryStructure::c_flatDirectory:
         path /= fs::path(payload.payloadUrl).filename();
         break;

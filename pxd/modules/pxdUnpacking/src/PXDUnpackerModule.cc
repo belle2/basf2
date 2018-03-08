@@ -14,7 +14,6 @@
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <boost/foreach.hpp>
@@ -45,7 +44,6 @@ PXDUnpackerModule::PXDUnpackerModule() :
   m_storeRawHits(),
   m_storeROIs(),
   m_storeRawAdc(),
-  m_storeRawPedestal(),
   m_storeRawCluster()
 {
   //Set module properties
@@ -54,8 +52,8 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of RawPXDs to be processed", std::string(""));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of generated PXDRawHits", std::string(""));
+  addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of generated PXDDAQEvtStats", std::string(""));
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of generated PXDRawAdcs", std::string(""));
-  addParam("PXDRawPedestalsName", m_PXDRawPedestalsName, "The name of the StoreArray of generated PXDRawPedestals", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", true);
@@ -79,15 +77,19 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
 void PXDUnpackerModule::initialize()
 {
-  m_storeRawPXD.isRequired(m_RawPXDsName);
+  // Required input
+  m_eventMetaData.isRequired();
+  // Optional input
+  m_storeRawPXD.isOptional(m_RawPXDsName);
   //Register output collections
+
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  m_storeDAQEvtStats.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
+  /// actually, later we do not want to store ROIs and raw ADC into output file ...  aside from debugging
+
 
   B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);
   B2DEBUG(1, "Ignore (missing) DATCON: " << m_ignoreDATCON);
@@ -127,7 +129,10 @@ void PXDUnpackerModule::terminate()
 
 void PXDUnpackerModule::event()
 {
-  StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
+  // if no input, nothing to do
+  if (!m_storeRawPXD) {
+    return;
+  }
 
   int nRaws = m_storeRawPXD.getEntries();
   if (verbose) {
@@ -137,11 +142,11 @@ void PXDUnpackerModule::event()
   m_errorMask = 0;
   m_errorMaskEvent = 0;
 
-  m_meta_event_nr = evtPtr->getEvent();
-  m_meta_run_nr = evtPtr->getRun();
-  m_meta_subrun_nr = evtPtr->getSubrun();
-  m_meta_experiment = evtPtr->getExperiment();
-  m_meta_time = evtPtr->getTime();
+  m_meta_event_nr = m_eventMetaData->getEvent();
+  m_meta_run_nr = m_eventMetaData->getRun();
+  m_meta_subrun_nr = m_eventMetaData->getSubrun();
+  m_meta_experiment = m_eventMetaData->getExperiment();
+  m_meta_time = m_eventMetaData->getTime();
 
   m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
 
@@ -265,7 +270,6 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
 {
 //   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   ubig16_t* dhp_pix = (ubig16_t*)data;
-  // ADC/ADC and ADC/PEDESTAL can only be distinguised by length of frame
 
   //! *************************************************************
   //! Important Remark:
@@ -274,8 +278,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   //! E.g. not the whole mem is dumped, but only a part of it.
   //! *************************************************************
 
-  if (frame_len != 0x10008 && frame_len != 0x20008) {
-    B2ERROR("Frame size unsupported for RAW pedestal frame! $" << hex << frame_len << " bytes");
+  if (frame_len != 0x10008) {
+    B2ERROR("Frame size unsupported for RAW ADC frame! $" << hex << frame_len << " bytes");
     return;
   }
   unsigned int dhp_header_type  = 0;
@@ -304,12 +308,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
 
   /// Endian Swapping is done in Contructors of Raw Objects!
   if (frame_len == 0x10008) { // 64k
-    B2DEBUG(20, "Pedestal Data - (ADC:ADC)");
+    B2DEBUG(20, "Raw ADC Data");
     m_storeRawAdc.appendNew(vxd_id, data, false);
-  } else if (frame_len == 0x20008) { // 128k
-    B2DEBUG(20, "Pedestal Data - (ADC:Pedestal)");
-    m_storeRawAdc.appendNew(vxd_id, data, true);
-    m_storeRawPedestal.appendNew(vxd_id, data);
   } else {
     // checked already above
   }

@@ -45,7 +45,6 @@ PXDUnpackerDHHModule::PXDUnpackerDHHModule() :
   m_storeRawHits(),
   m_storeROIs(),
   m_storeRawAdc(),
-  m_storeRawPedestal(),
 
   ////Cluster store
   m_storeRawCluster()
@@ -57,7 +56,6 @@ PXDUnpackerDHHModule::PXDUnpackerDHHModule() :
   addParam("RawDHHsName", m_RawDHHsName, "The name of the StoreArray of RawDHHs to be processed", std::string(""));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of generated PXDRawHits", std::string(""));
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of generated PXDRawAdcs", std::string(""));
-  addParam("PXDRawPedestalsName", m_PXDRawPedestalsName, "The name of the StoreArray of generated PXDRawPedestals", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", true);
@@ -85,7 +83,6 @@ void PXDUnpackerDHHModule::initialize()
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
-  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDAQEvtStats.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
@@ -265,7 +262,6 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
 {
 //   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   ubig16_t* dhp_pix = (ubig16_t*)data;
-  // ADC/ADC and ADC/PEDESTAL can only be distinguised by length of frame
 
   //! *************************************************************
   //! Important Remark:
@@ -274,8 +270,8 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
   //! E.g. not the whole mem is dumped, but only a part of it.
   //! *************************************************************
 
-  if (frame_len != 0x10008 && frame_len != 0x20008) {
-    B2ERROR("Frame size unsupported for RAW pedestal frame! $" << hex << frame_len << " bytes");
+  if (frame_len != 0x10008) {
+    B2ERROR("Frame size unsupported for RAW ADC frame! $" << hex << frame_len << " bytes");
     return;
   }
   unsigned int dhp_header_type  = 0;
@@ -304,12 +300,8 @@ void PXDUnpackerDHHModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
 
   /// Endian Swapping is done in Contructors of Raw Objects!
   if (frame_len == 0x10008) { // 64k
-    B2DEBUG(20, "Pedestal Data - (ADC:ADC)");
+    B2DEBUG(20, "Raw ADC Data");
     m_storeRawAdc.appendNew(vxd_id, data, false);
-  } else if (frame_len == 0x20008) { // 128k
-    B2DEBUG(20, "Pedestal Data - (ADC:Pedestal)");
-    m_storeRawAdc.appendNew(vxd_id, data, true);
-    m_storeRawPedestal.appendNew(vxd_id, data);
   } else {
     // checked already above
   }

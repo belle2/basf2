@@ -98,11 +98,14 @@ namespace TreeFitter {
 
     for (int row = 0; row < 3; ++row) {
       for (int col = 0; col < 3; ++col) {
-        m_covariance(row, col) = cov7[row + 4][col + 4];
+        m_covariance(row, col) = cov7[row + 4][col + 4] ;
       }
     }
 
-    if (0 == m_covariance(3, 3)) {m_covariance(3, 3) = 1;} //guessing the e uncertainty to be 1 GeV  }
+    /** currently the energy in KLM is calculated as n2dHits in cluster  times 0.214 GeV
+     *  at time of writing - 8.3.18 - the KLMCluster returns 0 for the E covariance
+     * */
+    if (0 == m_covariance(3, 3)) {m_covariance(3, 3) = .214;}
 
     m_clusterPars(0) = cluster_pos.X();
     m_clusterPars(1) = cluster_pos.Y();

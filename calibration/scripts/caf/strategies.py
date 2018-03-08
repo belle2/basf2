@@ -12,10 +12,14 @@ from abc import ABC, abstractmethod
 
 
 class AlgorithmStrategy(ABC):
-    """Base class for Algorithm strategies. These do the actual execution of a single
+    """
+    Base class for Algorithm strategies. These do the actual execution of a single
     algorithm on collected data. Each strategy may be quite different in terms of how fast it may be,
     how database payloads are passed between executions, and whether or not final payloads have an IoV
     that is independent to the actual runs used to calculates them.
+
+    Parameters:
+        algorithm (:py:class:`caf.framework.Algorithm`): The algorithm we will run
 
     This base class defines the basic attributes and methods that will be automatically used by the selected AlgorithmRunner.
     When defining a derived class you are free to use these attributes or to implement as much functionality as you want.
@@ -26,7 +30,7 @@ class AlgorithmStrategy(ABC):
     >>> def __init__(self):
     >>>     super().__init__()
 
-    The most important method to implement is a `AlgorithmStrategy.run` method which will take an algorithm and execute it
+    The most important method to implement is :py:meth:`AlgorithmStrategy.run` which will take an algorithm and execute it
     in the required way defined by the options you have selected/attributes set.
     """
     #: Required attributes that must exist before the strategy can run properly.
@@ -40,7 +44,7 @@ class AlgorithmStrategy(ABC):
                       "input_files"
                       ]
 
-    #: Attributes that must have a value that returns True when tested.
+    #: Attributes that must have a value that returns True when tested by :py:meth:`is_valid`.
     required_true_attrs = ["algorithm",
                            "output_dir",
                            "output_database_dir",
@@ -118,7 +122,8 @@ class SingleIOV(AlgorithmStrategy):
         """
         """
         super().__init__(algorithm)
-        #: Create a basic (mostly empty) AlgorithmMachine, gets setup properly in run()
+        #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
+        #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
 
     def run(self, iov, iteration):
@@ -167,7 +172,7 @@ class SequentialRunByRun(AlgorithmStrategy):
     If the algorithm returns 'not enough data' on the current run set, it won't commit the payloads, but instead adds
     the next run's data and tries again.
 
-    Once an execution on a set of runs return 'iterate' or 'success' we move onto the next runs (if any are left)
+    Once an execution on a set of runs return 'iterate' or 'ok' we move onto the next runs (if any are left)
     and start the same procedure again. Committing of payloads to the outputdb only happens once we're sure that there
     is enough data in the remaining runs to get a full execution. If there isn't enough data remaining, the last runs
     are merged with the previous successful execution's runs and a final execution is performed on all remaining runs.
@@ -182,7 +187,8 @@ class SequentialRunByRun(AlgorithmStrategy):
         """
         """
         super().__init__(algorithm)
-        #: Create a basic (mostly empty) AlgorithmMachine, gets setup properly in run()
+        #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
+        #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
 
     def run(self, iov, iteration):

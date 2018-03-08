@@ -36,7 +36,7 @@ def main(argv):
     ###################################################
     # Test Calibration Setup
     alg_test = TestCalibrationAlgorithm()  # Getting a calibration algorithm instance
-    alg_test.setMinEntries(15000)  #
+    alg_test.setMinEntries(15000)  # This algorithm provides a setting to change when c_NotEnoughData is returned
 
     # Create a single calibration from a collector module name + algorithm + input files
     cal_test = Calibration(name="TestCalibration", collector="CaTest", algorithms=alg_test, input_files=input_files_test)

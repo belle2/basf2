@@ -214,10 +214,8 @@ void ProcHandler::startWorkerProcesses()
 
 void ProcHandler::startOutputProcess()
 {
-  if (s_processID == -1)
-    s_processID = 20000;
   // this was removed in master ...
-  //startProc(&m_processList, "output", 20000);
+  startProc(&m_processList, "output", 20000);
 }
 
 void ProcHandler::setAsMonitoringProcess()

@@ -106,7 +106,7 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
   const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
   if (std::find(trackRepresentations.begin(), trackRepresentations.end(), trackRepresentation) == trackRepresentations.end()) {
-    RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
+    RecoTrackGenfitAccess::addTrackRep(recoTrack, trackRepresentation);
   } else {
     if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit) {
       B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<

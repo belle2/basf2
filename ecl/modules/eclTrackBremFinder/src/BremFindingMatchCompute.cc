@@ -3,7 +3,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace ECL;
 
 bool BremFindingMatchCompute::isMatch()
 {
@@ -40,14 +39,8 @@ bool BremFindingMatchCompute::isMatch()
   PhiAngle clusterPhi = PhiAngle(0, 0);
   ThetaAngle clusterTheta = ThetaAngle(0, 0);
 
-  //if correction shall be used, transform the cluster angles for each hit
-  if (m_angleCorrection) {
-    clusterPhi = PhiAngle((clusterPosition - fitted_pos).Phi(), m_eclCluster.getUncertaintyPhi());
-    clusterTheta = ThetaAngle((clusterPosition - fitted_pos).Theta(), m_eclCluster.getUncertaintyTheta());
-  } else {
-    clusterPhi = PhiAngle(clusterPosition.Phi(), m_eclCluster.getUncertaintyPhi());
-    clusterTheta = ThetaAngle(clusterPosition.Theta(), m_eclCluster.getUncertaintyTheta());
-  }
+  clusterPhi = PhiAngle(clusterPosition.Phi(), m_eclCluster.getUncertaintyPhi());
+  clusterTheta = ThetaAngle(clusterPosition.Theta(), m_eclCluster.getUncertaintyTheta());
 
   PhiAngle hitPhi(hit_phi, err_phi);
   ThetaAngle hitTheta(hit_theta, err_theta);
@@ -66,9 +59,7 @@ bool BremFindingMatchCompute::isMatch()
 
     return (true);
 
-    // todo: can use weight her to signal assigment confidence
-
-    // todo: do not assign, if cluster has already been assigned before ...
+    // todo: can use weight here to signal assigment confidence
 
   } else {
     return (false);

@@ -1,30 +1,22 @@
 #ifndef BREMFINDING_H
 #define BREMFINDING_H
 
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <framework/datastore/RelationVector.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <genfit/AbsFitterInfo.h>
-#include <set>
+#include <genfit/MeasuredStateOnPlane.h>
 
 #include <TMath.h>
 
-#include <functional>
-
 namespace Belle2 {
 
+  /**
+   * Module to compute if an extrapolation to the ECL matches the position of an secondary ECLCLuster
+   * to find bremsstrahlung clusters
+   */
   class BremFindingMatchCompute {
   public:
+    /**
+     * Constructor for setting parameters
+     */
     BremFindingMatchCompute(float clusterAcceptanceFactor, ECLCluster const& cluster,
                             genfit::MeasuredStateOnPlane const& measuredStateOnPlane) :
       m_clusterAcceptanceFactor(clusterAcceptanceFactor),
@@ -32,22 +24,34 @@ namespace Belle2 {
       m_measuredStateOnPlane(measuredStateOnPlane)
     {}
 
-    void setClusterAcceptanceFactor(float acceptanceFactor) {m_clusterAcceptanceFactor = acceptanceFactor;}
-
-    void setAngleCorrectionTrue() {m_angleCorrection = true;}
-
+    /**
+     * Check if the angles of the cluster position and the extrapolation match
+     */
     bool isMatch();
 
+    /**
+     * Return the difference between the angles of extrapolation and cluster position
+     */
     double getDistanceHitCluster() {return m_distanceHitCluster;}
   private:
+    /**
+     * Factor which is multiplied onto the cluster position error to check for matches
+     */
     float m_clusterAcceptanceFactor;
 
+    /**
+     * Bremsstrahlung cluster candidate gets stored here
+     */
     ECLCluster const& m_eclCluster;
 
+    /**
+     * VXD hit
+     */
     genfit::MeasuredStateOnPlane const& m_measuredStateOnPlane;
 
-    bool m_angleCorrection = false;
-
+    /**
+     * Difference between the angles of extrapolation and cluster position
+     */
     double m_distanceHitCluster;
 
 

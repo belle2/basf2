@@ -46,25 +46,24 @@ namespace Belle2 {
   private:
 
     /**
-     * Factor which is multipied onto the cluster position error to check for matches
+     * Factor which is multiplied onto the cluster position error to check for matches
      */
     double m_clusterAcceptanceFactor = 3.0f;
 
     /**
-     * Cut on r coordinate of the hit points, so you can cut CDC hits for example
+     * StoreArray name of the ECLClusters for brem matching
      */
-    double m_hitPositionCut = 15.0;
-
-    /**
-     * Sets if the cluster angle is transformed into the coordinate system of the hits
-     */
-    bool m_angleCorrection = false;
-
-    std::string m_param_recoTracksStoreArrayName = "";
-
     std::string m_param_eclClustersStoreArrayName = "";
 
+    /**
+     * StoreArray name of the Tracks for brem matching
+     */
     std::string m_param_tracksStoreArrayName = "";
+
+    /**
+     * StoreArray name of the RecoTracks for brem matching
+     */
+    std::string m_param_recoTracksStoreArrayName = "";
   };
 
 } //Belle2

@@ -28,53 +28,44 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   setDescription("Use Track direction to pick up possible ECL Brem Cluster");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the reco tracks used for brem search",
-           m_param_recoTracksStoreArrayName);
-
   addParam("eclClustersStoreArrayName", m_param_eclClustersStoreArrayName, "StoreArray name of the ECLClusters for brem matching",
            m_param_eclClustersStoreArrayName);
 
   addParam("tracksStoreArrayName", m_param_tracksStoreArrayName, "StoreArray name of the Tracks for brem matching",
            m_param_tracksStoreArrayName);
 
+  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the reco tracks used for brem search",
+           m_param_recoTracksStoreArrayName);
+
   addParam("clusterAcceptanceFactor", m_clusterAcceptanceFactor,
-           "Factor which is multipied onto the cluster position error to check for matches",
+           "Factor which is multiplied onto the cluster position error to check for matches",
            m_clusterAcceptanceFactor);
-
-  addParam("hitPositionCut", m_hitPositionCut, "Cut on the position of the reco hits, so for example CDC hits were ignored",
-           m_hitPositionCut);
-
-  addParam("angleCorrection", m_angleCorrection,
-           "Shall the angle of the cluster be transformed into the coordinate system of the hits",
-           m_angleCorrection);
 }
 
 void ECLTrackBremFinderModule::initialize()
 {
   StoreArray<ECLCluster> eclClusters(m_param_eclClustersStoreArrayName) ;
   eclClusters.registerRelationTo(eclClusters);
+  eclClusters.isRequired();
 
-  StoreArray<genfit::MeasuredStateOnPlane> mSoPl;
-  eclClusters.registerRelationTo(mSoPl);
-
+  StoreArray<Track> tracks(m_param_tracksStoreArrayName);
+  tracks.isRequired();
 }
 
 void ECLTrackBremFinderModule::event()
 {
   StoreArray<Track> tracks(m_param_tracksStoreArrayName);
   StoreArray<ECLCluster> eclClusters(m_param_eclClustersStoreArrayName);
-  StoreObjPtr<EventMetaData> evtMetaData;
-  StoreArray<genfit::MeasuredStateOnPlane> mSoPl;
 
   // todo: only iterate over the RecoTracks which have been identified as e-Tracks
-  // either use the Clusters matched to tracks (non-neutral) or use the smater decision
+  // either use the Clusters matched to tracks (non-neutral) or use the smarter decision
   // done by the neutral / non-neutral classification code
   // todo: there needs to be a global (all tracks vs. all clusters) conflict resolution,
-  // sort tracks by Pt, as high energy tracks are more likely to radiate bremsstrahlung-photons
-  // whith suffiecient energy to be detected and reconstructed
+  // sort tracks by Pt, as high energy tracks are more likely to radiate bremsstrahlung photons
+  // with sufficient energy to be detected and reconstructed
   for (auto& track : tracks) {
 
-    B2DEBUG(1, "Checking track for related ECLCluster");
+    B2DEBUG(50, "Checking track for related ECLCluster");
 
     // does this track have a cluster assigned ?
     // this is required, otherwise we cannot assign any brems cluster
@@ -84,7 +75,7 @@ void ECLTrackBremFinderModule::event()
       (m_param_eclClustersStoreArrayName);       //check the particle hypothesis ID here (has to be 6 for electron)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
       int particleHypothesisID = relatedCluster.getHypothesisId();
-      if (particleHypothesisID == 6) {
+      if (particleHypothesisID == ECLCluster::c_neutralHadron) {
         primaryClusterOfTrack = &relatedCluster;
       }
     }
@@ -97,7 +88,7 @@ void ECLTrackBremFinderModule::event()
 
     if (!recoTrack) {
       // no reco track
-      B2DEBUG(1, "No RecoTrack for this Track");
+      B2DEBUG(50, "No RecoTrack for this Track");
       continue;
     }
 
@@ -106,15 +97,15 @@ void ECLTrackBremFinderModule::event()
     for (ECLCluster& cluster : eclClusters) {
       //check if the cluster belongs to a photon or electron
       int particleHypothesisID = cluster.getHypothesisId();
-      if (particleHypothesisID == 6) {
-        B2DEBUG(1, "Cluster belongs to electron, bailing out");
+      if (particleHypothesisID != ECLCluster::c_nPhotons) {
+        B2DEBUG(50, "Cluster belongs to electron, bailing out");
         continue;
       }
 
       //check if cluster is already related to a track -> if true, can't be bremsstrahlung cluster
       auto relatedTrack = cluster.getRelatedFrom<Track>();
       if (relatedTrack) {
-        B2DEBUG(1, "Cluster already related to track, bailing out");
+        B2DEBUG(50, "Cluster already related to track, bailing out");
         continue;
       }
 
@@ -122,7 +113,7 @@ void ECLTrackBremFinderModule::event()
       //procedure: first come, first served
       auto relatedCluster = cluster.getRelated<ECLCluster>();
       if (relatedCluster) {
-        B2DEBUG(1, "Cluster already related to cluster!");
+        B2DEBUG(50, "Cluster already related to cluster!");
         continue;
       }
 
@@ -131,110 +122,51 @@ void ECLTrackBremFinderModule::event()
       typedef std::tuple<ECLCluster*, genfit::MeasuredStateOnPlane, double > ClusterMSoPPair;
       BestMatchContainer<ClusterMSoPPair, double> matchContainer;
 
-      // iterate over all trackpoints and see whether this cluster matches
-      // the trackpoints direction
-      genfit::MeasuredStateOnPlane outermostTrackPointFittedState = genfit::MeasuredStateOnPlane();
-      genfit::MeasuredStateOnPlane innermostTrackPointFittedState = genfit::MeasuredStateOnPlane();
+      // iterate over all track points and see whether this cluster matches
+      // the track points direction
+      RecoHitInformation* innerVXD = nullptr;
+      RecoHitInformation* outerVXD = nullptr;
 
-      // todo: what is this ?
-      double maxRho = 0, minRho = 16;
-      bool outermostTrackPointWasSet = false, innermostTrackPointWasSet = false;
-      for (auto& track_point : recoTrack->getHitPointsWithMeasurement()) {
-        auto fitter_info = track_point->getFitterInfo();
+      // only VXD hits shall be used
+      for (auto hit : recoTrack->getRecoHitInformations(true)) {
+        if (hit->getTrackingDetector() == RecoHitInformation::c_PXD || hit->getTrackingDetector() == RecoHitInformation::c_SVD) {
+          if (innerVXD == nullptr) {
+            innerVXD = hit;
+          }
+          outerVXD = hit;
 
-        if (!fitter_info) {
-          // not fitter info available for this hit
-          B2DEBUG(1, "No fitter info available!");
-          continue;
-        }
-        auto fitted_state = fitter_info->getFittedState();
-        auto fitted_pos = fitted_state.getPos();
+          auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
 
-        if (std::sqrt(fitted_pos.X()*fitted_pos.X() + fitted_pos.Y()*fitted_pos.Y()) > m_hitPositionCut) {
-          B2DEBUG(1, "Hit in CDC!");
-          continue;
-        }
-
-        if (fitted_pos.Mag() > maxRho) {
-          outermostTrackPointFittedState = fitted_state;
-          maxRho = fitted_pos.Mag();
-          outermostTrackPointWasSet = true;
-        }
-
-        if (fitted_pos.Mag() < minRho) {
-          innermostTrackPointFittedState = fitted_state;
-          minRho = fitted_pos.Mag();
-          innermostTrackPointWasSet = true;
-        }
-
-        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
-
-        if (m_angleCorrection) {
-          bremFinder.setAngleCorrectionTrue();
-        }
-
-        if (bremFinder.isMatch()) {
-          ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, track_point->getSortingParameter());
-          matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+          auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
+          if (bremFinder.isMatch()) {
+            ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
+            matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+          }
         }
       }
 
-      // todo: put in one method
-      // Set a virtual hit at the edge of the cdc and check if the position matches  a cluster position
-      if (outermostTrackPointWasSet) {
-        auto fitted_state = outermostTrackPointFittedState;
-        try {
-          fitted_state.extrapolateToCylinder(16.);
-        } catch (genfit::Exception& exception1) {
-          B2INFO("exception thrown");
-          continue;
-        }
-
-        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
-        if (bremFinder.isMatch()) {
-          ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, -2);
-          matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
-        }
-      }
-
-      // Set a virtual point to the outer vxd casing
-      if (outermostTrackPointWasSet) {
-        auto fitted_state = outermostTrackPointFittedState;
-        try {
-          fitted_state.extrapolateToCylinder(15.);
-        } catch (genfit::Exception& exception1) {
-          B2INFO("exception thrown");
-          continue;
-        }
-
-        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
-        if (bremFinder.isMatch()) {
-          ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, -3);
-          matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
-        }
-      }
-
-      //Set a virtual hit at the edge of the beampipe and check if the position matches  a cluster position
-      if (innermostTrackPointWasSet) {
-        auto fitted_state = innermostTrackPointFittedState;
-        try {
-          fitted_state.extrapolateToCylinder(1.05);
-        } catch (genfit::Exception& exception1) {
-          B2INFO("exception thrown");
-          continue;
-        }
-
-        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
-        if (bremFinder.isMatch()) {
-          ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, -1);
-          matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+      // generate three virtual hits at the edge of the beampipe, the outer VXD wall and the inner CDC wall
+      // also check these hits for matching ECL clusters
+      if (innerVXD) {
+        std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = { {1.05, innerVXD}, {15.0, outerVXD}, {16.0, outerVXD} };
+        for (auto param : extrapolationParams) {
+          auto fitted_state = recoTrack->getMeasuredStateOnPlaneFromRecoHit(param.second);
+          try {
+            fitted_state.extrapolateToCylinder(param.first);
+            auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
+            if (bremFinder.isMatch()) {
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, param.first);
+              matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+            }
+          } catch (genfit::Exception& exception1) {
+            B2DEBUG(50, "Extrapolation failed!");
+          }
         }
       }
 
       // loop over cluster
       // have we found the best possible track point for this cluster
       if (matchContainer.hasMatch()) {
-
         auto matchClustermSoP = matchContainer.getBestMatch();
         const auto fitted_state = std::get<1>(matchClustermSoP);
 
@@ -245,7 +177,7 @@ void ECLTrackBremFinderModule::event()
         const auto hit_theta = fitted_mom.Theta();
         const auto hit_phi = fitted_mom.Phi();
 
-        B2DEBUG(1, "Best Cluster" << std::endl
+        B2DEBUG(50, "Best Cluster" << std::endl
                 << " Cluster Phi=" << std::get<0>(matchClustermSoP)->getPhi() << " Theta=" << std::get<0>(matchClustermSoP)->getTheta()
                 << " TrackHit Phi=" << hit_phi << " Theta=" << hit_theta);
 
@@ -254,7 +186,6 @@ void ECLTrackBremFinderModule::event()
         // add relation to the respective RecoHitInformation of the RecoTrack
         // add sorting parameter to relation, to get information about the place the photon was radiated
         primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
-
       }
     }
   }

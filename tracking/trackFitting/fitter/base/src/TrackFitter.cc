@@ -45,33 +45,10 @@ int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable
   return currentPdgCode;
 }
 
-genfit::AbsTrackRep* TrackFitter::getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack)
-{
-  if (pdgCode < 0) {
-    B2FATAL("Only positive pdgCode is possible when calling getTrackRepresentationForPDG, got " << pdgCode);
-  }
-
-  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
-
-  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
-    // Check if the track representation is a RKTrackRep.
-    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
-    if (rkTrackRepresenation != nullptr) {
-      // take the aboslute value of the PDG code as the TrackRep holds the PDG code including the charge (so -13 or 13)
-      if (std::abs(rkTrackRepresenation->getPDG()) == pdgCode) {
-        return trackRepresentation;
-      }
-    }
-  }
-
-  return nullptr;
-}
-
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
-  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = TrackFitter::getTrackRepresentationForPDG(std::abs(currentPdgCode),
-                                                           recoTrack);
+  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = recoTrack.getTrackRepresentationForPDG(std::abs(currentPdgCode));
 
   if (alreadyPresentTrackRepresentation) {
     B2DEBUG(100, "Reusing the already present track representation with the same PDG code.");

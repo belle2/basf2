@@ -26,6 +26,7 @@
 namespace genfit {
   class AbsFitter;
   class TrackCand;
+  class AbsTrackRep;
 }
 
 namespace Belle2 {
@@ -545,6 +546,14 @@ namespace Belle2 {
       checkDirtyFlag();
       return m_genfitTrack.getTrackReps();
     }
+
+    /** Return an already created track representation of the given reco track for the PDG. You
+     * are nowt allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
+     * for the given pdgCode.
+     *
+     * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
+     */
+    genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode);
 
     /**
      * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when

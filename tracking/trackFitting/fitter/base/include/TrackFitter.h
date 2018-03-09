@@ -134,13 +134,6 @@ namespace Belle2 {
     /// Helper function to multiply the PDG code of a charged stable with the charge of the reco track (if needed)
     static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack);
 
-    /** Helper function to return an already created track representation of the given reco track for the PDG
-     *
-     * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
-     * @param recoTrack RecoTrack to load the TrackRep from
-     */
-    static genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack);
-
     /**
      * Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
      *

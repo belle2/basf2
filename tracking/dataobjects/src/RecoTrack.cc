@@ -6,6 +6,7 @@
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
+#include <genfit/RKTrackRep.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -428,6 +429,29 @@ void RecoTrack::deleteFittedInformation()
     m_genfitTrack.deleteTrackRep(i);
   }
 }
+
+genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)
+{
+  if (pdgCode < 0) {
+    B2FATAL("Only positive pdgCode is possible when calling getTrackRepresentationForPDG, got " << pdgCode);
+  }
+
+  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = getRepresentations();
+
+  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
+    // Check if the track representation is a RKTrackRep.
+    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
+    if (rkTrackRepresenation != nullptr) {
+      // take the aboslute value of the PDG code as the TrackRep holds the PDG code including the charge (so -13 or 13)
+      if (std::abs(rkTrackRepresenation->getPDG()) == pdgCode) {
+        return trackRepresentation;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 
 /// Helper function to get the seed or the measured state on plane from a track
 std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const

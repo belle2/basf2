@@ -95,7 +95,7 @@ void BestCandidateSelectionModule::event()
   //remove everything but best candidates
   m_inputList->clear();
   int rank = 1;
-  double previous_val;
+  double previous_val = std::nan("0");
   bool first_candidate = true;
   for (const auto& candidate : valueToIndex) {
     Particle* p = particles[candidate.second];

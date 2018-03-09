@@ -44,7 +44,7 @@ namespace TreeFitter {
                 ntypes
               };
 
-    /** operator */
+    /** operator used to sort the constraints */
     bool operator<(const Constraint& rhs) const;
 
     /** operator */
@@ -100,7 +100,7 @@ namespace TreeFitter {
     std::string name() const;
 
     /**
-     * unused
+     * used to be able to weigth the cosntraints
      * */
     [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 
@@ -148,7 +148,7 @@ namespace TreeFitter {
     /**  dimension of constraint */
     unsigned int m_dim;
 
-    /** unused  */
+    /** weight of this constraint currently we set them all to unity  */
     int m_weight;
 
     /** maximum number of iterations for non-linear constraints    */

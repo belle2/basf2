@@ -32,8 +32,6 @@ namespace TreeFitter {
     // if either of the two is external, or either of the two is a
     // mass constraint, we order by _type_
 
-    //JFK FIXME will this code ever be reached??
-
     if ((m_type <= Constraint::composite ||
          rhs.m_type <= Constraint::composite) ||
         (m_type >= Constraint::mass ||

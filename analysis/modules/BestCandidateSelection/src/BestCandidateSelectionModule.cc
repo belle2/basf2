@@ -111,13 +111,8 @@ void BestCandidateSelectionModule::event()
 
     p->addExtraInfo(extraInfoName, rank);
     m_inputList->addParticle(p);
-    if (m_allowMultiRank) {
-      if (candidate.first != previous_val) {
-        rank++;
-      }
-    } else {
-      rank++;
-    }
+
+    if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
 
     previous_val = candidate.first;
 

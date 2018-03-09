@@ -403,6 +403,7 @@ def vertexTree(
     conf_level=0.001,
     massConstraint=[],
     ipConstraintDim=0,
+    updateAllDaughters=False,
     path=analysis_main,
 ):
     """
@@ -412,6 +413,7 @@ def vertexTree(
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param massConstraint list of PDG ids which are mass-constrained
     @param ipConstraintDim constrain head production vertex to IP (2 = (x-y) constraint, 3 = 3D (x-y-z) constraint, 0 = none)
+    @param updateAllDaughters if true the entire tree will be updated with the fitted values. Otherwise only the head.
     @param path         modules are added to this path
     """
 
@@ -421,6 +423,7 @@ def vertexTree(
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('massConstraintList', massConstraint)
     treeFitter.param('ipConstraintDimension', ipConstraintDim)
+    treeFitter.param('updateAllDaughters', updateAllDaughters)
     path.add_module(treeFitter)
 
 

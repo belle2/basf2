@@ -38,7 +38,7 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("ipConstraintDimension", m_ipConstraintDimension,
            "Type::Int. Use the x-y-z-beamspot or x-y-beamtube constraint. Zero means no cosntraint which is the default. The Beamspot will be treated as the mother of the particlelist you feed.",
            0);
-  addParam("updateAllDaugthers", m_updateDaughters,
+  addParam("updateAllDaughters", m_updateDaughters,
            "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
 }
 

@@ -911,7 +911,9 @@ namespace Belle2 {
     /**
      * Add a new TrackRep to a genfit::Track and ensure that a TrackRep with the same PDG id
      * (and its charge conjugate) is not already in the genfit::Track. If this is the case,
-     * a B2ASSERT is raised.
+     * a B2ASSERT is raised. By convention, only one TrackRep for one particle type can exist
+     * inside of a RecoTrack, no matter the charge. So there can only be a electron or positron TrackRep,
+     * but not both.
      *
      * @param recoTrack Track to add TrackRep to
      * @param trackRep TrackRep to add

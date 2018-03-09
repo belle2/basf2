@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  /**NTupleTool to write the hadron-scaled momentum xp*/
+  /**NTupleTool to write the scaled momentum xp*/
   class NtupleXpTool : public NtupleFlatTool {
   private:
 

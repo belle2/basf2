@@ -74,8 +74,6 @@ namespace Belle2 {
       std::string m_relPXDRecoHitTrueHitName;
       /** Name of the collection to use for the Reco Track */
       std::string m_storeRecoTrackName;
-      /** Frames StoreArray name */
-      std::string m_storeFramesName;
 
       /** Name of file contain output merged calibration, default=PXD-ClasterShapeCorrections */
       std::string m_CalFileName = "PXD-ClasterShapeCorrections.root";

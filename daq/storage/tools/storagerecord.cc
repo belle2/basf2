@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/SeqFile.h>
 
 #include <daq/storage/BinData.h>
@@ -118,13 +119,13 @@ public:
     system(("mkdir -p " + filedir).c_str());
     m_filename = StringUtil::form("%s.%4.4d.%5.5d.%s.f%5.5d.sroot",
                                   m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
-    m_path = filedir + m_filename;
-    m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (g_diskid > 0 && g_diskid != m_diskid) {
       B2FATAL("disk-" << m_diskid << " is already full! Terminating process..");
       exit(1);
     }
     g_diskid = m_diskid;
+    m_path = filedir + m_filename;
+    m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {
       B2FATAL("Failed to open file : " << m_path);
       exit(1);
@@ -237,7 +238,7 @@ int main(int argc, char** argv)
     info.open(nodename, nodeid);
   }
   SharedEventBuffer ibuf[10];
-  for (unsigned int ib; ib < ninput; ib++) {
+  for (unsigned int ib = 0; ib < ninput; ib++) {
     ibuf[ib].open(StringUtil::form("%s_%d", ibufname, ib), ibufsize * 1000000);//, true);
   }
   signal(SIGINT, signalHandler);
@@ -269,6 +270,7 @@ int main(int argc, char** argv)
     unsigned int expno;
     unsigned int runno;
   } hd;
+  g_streamersize = 0;
   while (true) {
     if (use_info) info.reportRunning();
     for (unsigned int ib = 0; ib < ninput; ib++) {
@@ -279,6 +281,15 @@ int main(int argc, char** argv)
       int nbyte = evtbuf[0];
       int nword = (nbyte - 1) / 4 + 1;
       bool isnew = false;
+      if (hd.type == MSG_STREAMERINFO) {
+        memcpy(g_streamerinfo, evtbuf, nbyte);
+        g_streamersize = nbyte;
+      }
+      if (expno > hd.expno || runno > hd.runno) {
+        B2WARNING("Old run was detected => discard event exp = " << hd.expno << " (" << expno << "), runno" << hd.runno << "(" << runno <<
+                  ")");
+        continue;
+      }
       if (!newrun || expno < hd.expno || runno < hd.runno) {
         newrun = true;
         isnew = true;
@@ -304,8 +315,6 @@ int main(int argc, char** argv)
         if (file) {
           file.close();
         }
-        memcpy(g_streamerinfo, evtbuf, nbyte);
-        g_streamersize = nbyte;
         file.open(path, ndisks, expno, runno, fileid);
         nbyte_out += nbyte;
         fileid++;
@@ -314,6 +323,9 @@ int main(int argc, char** argv)
       if (use_info) {
         info.addInputCount(1);
         info.addInputNBytes(nbyte);
+      }
+      if (hd.type == MSG_STREAMERINFO) {
+        continue;
       }
       if (file) {
         if (nbyte_out > MAX_FILE_SIZE) {

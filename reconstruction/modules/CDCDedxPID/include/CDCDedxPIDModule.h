@@ -146,7 +146,7 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx) const;
+    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
 
     // parameters to determine the predicted means and resolutions
     std::vector<double> m_curvepars; /**< dE/dx curve parameters */

@@ -26,7 +26,9 @@ REG_MODULE(TrackFinderVXDBasicPathFinder)
 TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Module()
 {
   //Set module properties
-  setDescription("The TrackFinderVXD BasicPathFinder module. \n It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands by simply storing all possible paths stored in the SegmentNetwork.");
+  setDescription("The TrackFinderVXD BasicPathFinder module."
+                 "\n It uses the output produced by the SegmentNetworkProducerModule to create"
+                 "SpacePointTrackCands by simply storing all possible paths stored in the SegmentNetwork.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
@@ -39,9 +41,6 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            m_PARAMSpacePointTrackCandArrayName,
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
-
-  addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
 
   addParam("printNetworks",
            m_PARAMprintNetworks,
@@ -77,15 +76,17 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Maximal number of families allowed in an event; if exceeded, the event execution will be skipped.",
            m_PARAMmaxFamilies);
 
+  addParam("maxPaths",
+           m_PARAMmaxPaths,
+           "Maximal number of paths per an event; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxPaths);
 }
 
 
 void TrackFinderVXDBasicPathFinderModule::initialize()
 {
-  m_spacePoints.isRequired(m_spacePointsName);
-
   m_network.isRequired(m_PARAMNetworkName);
-  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
@@ -116,21 +117,30 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
-  if (nRounds < 0) { B2ERROR("Basic Path Finder failed, skipping event!"); return; }
+  if (nRounds < 0) {
+    B2ERROR("Basic Path Finder failed, skipping event!");
+    return;
+  }
 
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = 0;
   for (auto* aNode : segmentNetwork) {
-    if (m_PARAMstrictSeeding && !(aNode->getOuterNodes().empty())) continue;
-    if (aNode->getInnerNodes().empty()) continue; // mark as seed, if node has got an inner node..
+    if (m_PARAMstrictSeeding && !(aNode->getOuterNodes().empty())) {
+      continue;
+    }
+    if (aNode->getInnerNodes().empty()) {
+      continue;
+    }
 
+    // Mark as seed, if node has got an inner node.
     aNode->getMetaInfo().setSeed(true);
     nSeeds++;
   }
-  B2DEBUG(15, "TrackFinderVXDBasicPathFinderModule - event " << m_eventCounter <<
-          ": arking seeds is now finished. Of " << segmentNetwork.size() <<
-          " cells total -> found " << nSeeds << " seeds");
-  if (nSeeds == 0) { B2WARNING("TrackFinderVXDBasicPathFinderModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
+
+  if (nSeeds == 0) {
+    B2WARNING("In Event: " << m_eventCounter << " no seed could be found -> no TCs created!");
+    return;
+  }
 
   /// mark families
   if (m_PARAMsetFamilies) {
@@ -143,12 +153,17 @@ void TrackFinderVXDBasicPathFinderModule::event()
     m_sptcSelector->prepareSelector(nFamilies);
   }
   /// collect all Paths starting from a Seed:
-  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
+  m_collectedPaths.clear();
+  if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
+    B2ERROR("VXDBasicPathFinder got signal to abort the event.");
+    return;
+  }
+
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  for (auto& aPath : collectedPaths) {
-    SpacePointTrackCand sptc = convertNetworkPath(aPath.get());
+  for (auto& aPath : m_collectedPaths) {
+    SpacePointTrackCand sptc = convertNetworkPath(aPath);
 
     if (m_PARAMselectBestPerFamily) {
       m_sptcSelector->testNewSPTC(sptc);
@@ -166,15 +181,5 @@ void TrackFinderVXDBasicPathFinderModule::event()
       std::vector<const SpacePoint*> path = cand.getHits();
       m_sptcCreator.createSPTC(m_TCs, path, cand.getFamily());
     }
-    B2DEBUG(10, "Created " << bestPaths.size() << " TCs...");
   }
-
-  B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
-          ": CA needed " << nRounds <<
-          " for network with " << segmentNetwork.size() <<
-          " nodes, which resulted in " << nSeeds <<
-          ". Among these the pathCollector found " << m_pathCollector.nTrees <<
-          " and " << collectedPaths.size() <<
-          " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
-          " times.");
 }

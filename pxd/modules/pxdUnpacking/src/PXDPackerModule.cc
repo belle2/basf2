@@ -23,7 +23,7 @@
 
 #include <boost/spirit/home/support/detail/endian.hpp>
 
-#include <pxd/unpacking/PXDUnpackerLookup.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 
 
 #include <TRandom.h>
@@ -63,7 +63,7 @@ PXDPackerModule::PXDPackerModule() :
   addParam("PXDDigitsName", m_PXDDigitsName, "The name of the StoreArray of PXDDigits to be processed", std::string(""));
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
-  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"premapped\" coordinates", false);
+  addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
 
 }
@@ -76,6 +76,9 @@ void PXDPackerModule::initialize()
   m_storeDigits.isRequired(m_PXDDigitsName);
 
   m_packed_events = 0;
+
+  B2INFO("Clusterizer is " << m_Clusterize);
+  B2INFO("InvertMapping is " << m_InvertMapping);
 
   /// read in the mapping for ONSEN->DHC->DHE->DHP
   /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
@@ -148,7 +151,7 @@ void PXDPackerModule::event()
 
   VxdID lastVxdId = -1; /// invalid ... force to set first itertor/index
   /// We assume the Digits are sorted by VxdID (P.K. says they are)
-  /// Thie saves some iterating lateron
+  /// This saves some iterating lateron
   for (auto it = m_storeDigits.begin() ; it != m_storeDigits.end(); it++) {
     VxdID currentVxdId;
     currentVxdId = it->getSensorID();
@@ -168,6 +171,7 @@ void PXDPackerModule::event()
                 dhe_id);
       }
 
+      if (startOfVxdID.count(currentVxdId) > 0) B2FATAL("PXD Digits are not sorted by VxdID!");
       startOfVxdID[currentVxdId] = std::distance(m_storeDigits.begin(), it);
       B2DEBUG(20, "Offset : " << startOfVxdID[currentVxdId]);
     }
@@ -330,9 +334,9 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 {
   B2DEBUG(20, "PXD Packer --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
   // dhe_id is not dhe_id ...
-  bool dhe_reformat = m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
+  bool dhe_has_remapped = !m_InvertMapping; /// unless stated otherwise, DHH will not reformat coordinates
 
-  if (dhe_reformat) {
+  if (m_InvertMapping) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
     B2FATAL("Inverse Mapping not implemented in Packer");
@@ -394,10 +398,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
           row = it->getVCellID();// hardware starts counting at 0!
           col = it->getUCellID();// U/V cell ID DO NOT follow Belle2 Note, thus no -1
           if (row > ladder_max_row || col > ladder_max_col) {
-            B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
+            B2ERROR("U/V out of range U: " << col << " V: " << row);
           } else {
             // fill ADC ... convert float to unsigned char, clamp to 0 - 255 , no scaling ... and how about common mode?
-            if (dhe_reformat) {
+            B2DEBUG(99, "Pixel: V: " << row << ", U: " << col << ", Ch " << it->getCharge());
+            if (!dhe_has_remapped) {
               do_the_reverse_mapping(row, col, layer, sensor);
             }
             halfladder_pixmap[row][col] = (unsigned char) boost::algorithm::clamp(lrint(it->getCharge()), 0, 255);
@@ -411,7 +416,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
     } else {
       for (int i = 0; i < 4; i++) {
         if (dhp_active & 0x1) {
-          pack_dhp(i, dhe_id, dhe_reformat ? 1 : 0);
+          pack_dhp(i, dhe_id, dhe_has_remapped ? 1 : 0);
           /// The following lines "simulate" a full frame readout frame ... not for production yet!
 //         if (m_trigger_nr == 0x11) {
 //           pack_dhp_raw(i, dhe_id, false);
@@ -439,8 +444,8 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
   B2FATAL("code needs to be written");
   // work to be done
   //
-  // PXDUnpackerLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
-  // PXDUnpackerLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
+  // PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
+  // PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
 }
 
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
@@ -496,7 +501,7 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
   add_frame_to_payload();
 }
 
-void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
+void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
 {
   B2DEBUG(20, "PXD Packer --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
   // remark: chip_id != port most of the time ...
@@ -504,15 +509,15 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
   unsigned short last_rowstart = 0;
   unsigned short frame_id = 0; // to be set TODO
 
-  if (dhe_reformat != 0) {
+  if (dhe_has_remapped == 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
-    assert(dhe_reformat == 0);
+    assert(dhe_has_remapped == 0);
   }
 
   start_frame();
   /// DHP data Frame
-  append_int32((EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_reformat & 0x1) << 19) | ((
+  append_int32((EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_has_remapped & 0x1) << 19) | ((
                  chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   append_int32((EDHPFrameHeaderDataType::c_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
@@ -524,6 +529,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
     if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
     for (int col = c1; col < c2; col++) {
       if (halfladder_pixmap[row][col] != 0) {
+        B2DEBUG(99, "Pixel: ROW: " << row << ", COL: " << col << ", Ch " << (int)halfladder_pixmap[row][col]);
         if (rowstart) {
           last_rowstart = ((row & 0x3FE) << (6 - 1)) | 0; // plus common mode 6 bits ... set to 0
           append_int16(last_rowstart);

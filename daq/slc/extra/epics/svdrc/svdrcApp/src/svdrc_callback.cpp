@@ -17,6 +17,7 @@ extern "C" {
 
 #include <daq/slc/nsm/NSMCallback.h>
 #include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/nsm/NSMNode.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Daemon.h>
@@ -31,6 +32,7 @@ extern "C" {
 #include <map>
 
 static Belle2::SVDRCCallback* g_callback = NULL;
+Belle2::NSMNode g_rcnode;
 
 using namespace Belle2;
 
@@ -40,6 +42,7 @@ void init_svdrc(const char* confname)
   const std::string hostname = config.get("nsm.host");
   const int port = config.getInt("nsm.port");
   const std::string nodename = config.get("nsm.nodename");
+  g_rcnode = NSMNode(config.get("rcnode"));
   SEVCHK(ca_context_create(ca_enable_preemptive_callback),"ca_context_create");
   g_callback = new SVDRCCallback(NSMNode(nodename));
   PThread(new NSMNodeDaemon(g_callback, hostname, port));
@@ -73,65 +76,71 @@ void eventCallback(struct event_handler_args eha)
   if(eha.status != ECA_NORMAL) {
     printChidInfo(chid, "eventCallback");
   } else {
-    const char* pvdata  = (const char *)eha.dbr;
+    const std::string pvdata  = StringUtil::toupper((const char *)eha.dbr);
     const char* pvname_c = ca_name(eha.chid);
     if (pvname_c != NULL) {
       std::string pvname = StringUtil::replace(pvname_c, ":", ".");
-      LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
-      int ival = atoi(pvdata);
+      //int ival = atoi(pvdata.c_str());
+      LogFile::info("Event Callback: %s = %s", pvname.c_str(), pvdata.c_str());
       if (pvname == "SVD.CTRL.State") {
-	if (ival == MAIN_STATE_DOWN) {
-	  g_callback->setState(RCState::NOTREADY_S);
-	  g_callback->set(pvname, "DOWN");
-	} else if (ival == MAIN_STATE_IDLE) {
+	if (pvdata == "IDLE") {
 	  g_callback->setState(RCState::NOTREADY_S);
 	  g_callback->set(pvname, "IDLE");
-	} else if (ival == MAIN_STATE_INITIALISING) {
-	  g_callback->setState(RCState::LOADING_TS);
-	  g_callback->set(pvname, "INITIALISING");
-	} else if (ival == MAIN_STATE_CONFIGURING) {
+	} else if (pvdata == "DOWN") {
+	  g_callback->setState(RCState::NOTREADY_S);
+	  g_callback->set(pvname, "DOWN");
+	} else if (pvdata == "CONFIGURING") {
 	  g_callback->setState(RCState::LOADING_TS);
 	  g_callback->set(pvname, "CONFIGURING");
-	} else if (ival == MAIN_STATE_READY) {
+	} else if (pvdata == "READY") {
 	  g_callback->setState(RCState::READY_S);
 	  g_callback->set(pvname, "READY");
-	} else if (ival == MAIN_STATE_CAPTURE_EVENTS) {
-	  g_callback->setState(RCState::RUNNING_S);
-	  g_callback->set(pvname, "CAPTURE_EVENTS");
-	} else if (ival == MAIN_STATE_FINISHING) {
-	  g_callback->setState(RCState::LOADING_TS);
+	} else if (pvdata == "EXITED") {
+	  g_callback->setState(RCState::UNKNOWN);
+	  g_callback->set(pvname, "EXITED");
+	} else if (pvdata == "FINISHED") {
+	  g_callback->setState(RCState::NOTREADY_S);
+	  g_callback->set(pvname, "FINISHED");
+	} else if (pvdata == "FINISHING") {
+	  g_callback->setState(RCState::ABORTING_RS);
 	  g_callback->set(pvname, "FINISHING");
-	} else if (ival == MAIN_STATE_ABORTING) {
+	} else if (pvdata == "RUNNING") {
+	  g_callback->setState(RCState::RUNNING_S);
+	  g_callback->set(pvname, "RUNNING");
+	} else if (pvdata == "ABORTING") {
 	  g_callback->setState(RCState::ABORTING_RS);
 	  g_callback->set(pvname, "ABORTING");
-	} else if (ival == MAIN_STATE_OUT_OF_SYNC) {
-	  g_callback->setState(RCState::UNKNOWN);
-	  g_callback->set(pvname, "OUT_OF_SYNC");
-	} else if (ival == MAIN_STATE_ERROR) {
+	} else if (pvdata == "ERROR") {
 	  g_callback->setState(RCState::ERROR_ES);
 	  g_callback->set(pvname, "ERROR");
 	}
       } else if (pvname == "SVD.CTRL.Request") {
-	if (ival == MAIN_REQ_PROCESSED) {
+	if (pvdata == "PROCESSED") {
 	  g_callback->set(pvname, "PROCESSED");
-	} else if (ival == MAIN_REQ_GET_READY) {
+	} else if (pvdata == "CONFIGURE") {
 	  g_callback->setStateRequest(RCState::READY_S);
-	  g_callback->set(pvname, "GET_READY");
-	} else if (ival == MAIN_REQ_START) {
+	  g_callback->set(pvname, "CONFIGURE");
+	} else if (pvdata == "START") {
 	  g_callback->setStateRequest(RCState::RUNNING_S);
 	  g_callback->set(pvname, "START");
-	} else if (ival == MAIN_REQ_STOP) {
+	} else if (pvdata == "STOP") {
 	  g_callback->setStateRequest(RCState::READY_S);
 	  g_callback->set(pvname, "STOP");
-	} else if (ival == MAIN_REQ_ABORT) {	
+	} else if (pvdata == "ABORT") {	
 	  g_callback->setStateRequest(RCState::NOTREADY_S);
 	  g_callback->set(pvname, "ABORT");
-	} else if (ival == MAIN_REQ_FINISH) {
-	  g_callback->setStateRequest(RCState::NOTREADY_S);
-	  g_callback->set(pvname, "FINISH");
 	}
-      } else {//if (pvname == "B2.RC.SVD.State.cur.S") {
-	  g_callback->set(pvname, pvdata);
+      } else if (pvname == "SVD.FADC.RunMode") {
+	std::string vname = StringUtil::tolower(g_callback->getNode().getName())+".used";
+	LogFile::info("%s.%s>>%s", g_rcnode.getName().c_str(), vname.c_str(), (pvdata == "GLOBAL RUN"?"on":"off"));
+	try {
+	  //  g_callback->set(g_rcnode, vname, (int)(pvdata == "GLOBAL RUN"));
+	} catch (const TimeoutException& e) {
+	  
+	}
+	g_callback->set(pvname, pvdata);
+      } else {//if (pvname == "B2.RC.SVD.State.cur.S"") {
+	g_callback->set(pvname, pvdata);
       } 
     } else {
       LogFile::warning("Unknown PV (chid=%d)", eha.chid);

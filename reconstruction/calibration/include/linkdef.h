@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::CDCDedxCosineAlgorithm-;
 #pragma link C++ class Belle2::CDCDedx2DCorrectionAlgorithm-;
 #pragma link C++ class Belle2::CDCDedx1DCleanupAlgorithm-;
+#pragma link C++ class Belle2::CDCDedxMomentumAlgorithm-;
 
 #endif

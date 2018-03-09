@@ -14,8 +14,8 @@
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
 
-// #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
+
+#include <framework/datastore/StoreObjPtr.h>
 #include <TH2.h>
 #include <TH1.h>
 #include <string>
@@ -47,8 +47,8 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
-      /** Input array for DAQ Status. */ // TODO why array, can be object
-      StoreArray<PXDDAQStatus> m_storeDAQEvtStats;
+      /** Input array for DAQ Status. */
+      StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
       //the geometry
       VXD::GeoCache& m_vxdGeometry;
@@ -60,8 +60,9 @@ namespace Belle2 {
       // TH1F* hDAQErrorPacket;         /** per packet (event builder input) errors  */
       TH2F* hDAQErrorDHC;          /** individual DHC errors  */
       TH2F* hDAQErrorDHE;          /** individual DHE errors  */
-      std::map<VxdID, TH1F*> hDAQDHETriggerRowOffset;/** DHE Trigger Row Offset ("start Row")  */
+      std::map<VxdID, TH1F*> hDAQDHETriggerGate;/** DHE Trigger Gate ("start Row")  */
       std::map<VxdID, TH1F*> hDAQDHEReduction;/** DHE data reduction  */
+      std::map<VxdID, TH2F*> hDAQCM;/** Common Mode per DHE to gate and DHP level */
       std::map<int, TH1F*> hDAQDHCReduction;/** DHC data reduction  */
 
       virtual void defineHisto();

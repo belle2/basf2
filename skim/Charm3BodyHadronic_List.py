@@ -15,7 +15,7 @@ from modularAnalysis import *
 
 
 def D0ToHpJmPi0():
-    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.0'
+    charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.0'
     D0_Channels = ['K-:loose pi+:loose pi0:skim',
                    'pi+:loose pi-:loose pi0:skim',
                    'K+:loose K-:loose pi0:skim',
@@ -33,8 +33,8 @@ def D0ToHpJmPi0():
 
 def DstToD0PiD0ToHpJmPi0():
 
-    Dstcuts = '0 < Q < 0.04'
-    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.0'
+    Dstcuts = '0 < Q < 0.02'
+    charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.0'
     D0_Channels = ['K-:loose pi+:loose pi0:skim',
                    'pi+:loose pi-:loose pi0:skim',
                    'K+:loose K-:loose pi0:skim',

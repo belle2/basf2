@@ -48,6 +48,8 @@ namespace Belle2 {
     virtual void configure(const DBObject&) throw(RCHandlerException) {}
 
   public:
+    bool isGlobal() const throw() { return m_isglobal; }
+    void setGlobal(bool isglobal) throw() { m_isglobal = isglobal; }
     void setState(const RCState& state) throw();
     void setRCConfig(const std::string& rcconfig) { m_rcconfig = rcconfig; }
     void setDBTable(const std::string& table) { m_table = table; }
@@ -69,9 +71,6 @@ namespace Belle2 {
     }
     int getExpNumber() const { return m_expno; }
     int getRunNumber() const { return m_runno; }
-    void setGlobalMaster(const std::string& gmaster) { m_gmaster = gmaster; }
-    const std::string& getGlobalMaster() const { return m_gmaster; }
-    bool isGlobal() const { return m_isglobal; }
 
   private:
     void dbload(int length, const char* data) throw(IOException);
@@ -93,11 +92,10 @@ namespace Belle2 {
     int m_provider_port;
     int m_expno;
     int m_runno;
-    bool m_isglobal;
-    std::string m_gmaster;
 
   protected:
     bool m_showall;
+    bool m_isglobal;
 
   };
 

@@ -54,23 +54,25 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("NoRejectFlag", mNoRejectFlag, "Never reject, just send no ROI", true);
 }
 
-ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
-{
-}
-
-
 void ROIPayloadAssemblerModule::initialize()
 {
 
-  StoreArray<ROIid>::required(m_ROIListName);
-  StoreObjPtr<EventMetaData>::required();
-  StoreObjPtr<ROIpayload>::registerPersistent(m_ROIpayloadName);
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIListName);
 
-}
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData.isRequired();
 
+  StoreObjPtr<ROIpayload> roiPayloads;
+  roiPayloads.registerInDataStore(
+    m_ROIpayloadName); // DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered will not work with two modules in seperate path branches
 
-void ROIPayloadAssemblerModule::beginRun()
-{
+  // in case we don't accept all events, we have to look
+  // up the trigger decision
+  if (!mAcceptAll) {
+    StoreObjPtr<SoftwareTriggerResult> result;
+    result.isRequired();
+  }
 }
 
 
@@ -85,9 +87,11 @@ void ROIPayloadAssemblerModule::event()
 
   if (!mAcceptAll) {
     StoreObjPtr<SoftwareTriggerResult> result;
+    if (!result.isValid()) {
+      B2FATAL("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+    }
     accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
   }
-
 
   map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;
 
@@ -128,9 +132,13 @@ void ROIPayloadAssemblerModule::event()
     }
   }
 
-  ROIpayload* payload = new ROIpayload(countROIs);// let the ROIpayload compute the size itself
-
   StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
+
+  if (payloadPtr.isValid()) {
+    B2FATAL("ROIpayload already in datastore, this must not be the case when calling the ROIPayloadAssemblerModule.");
+  }
+
+  ROIpayload* payload = new ROIpayload(countROIs);// let the ROIpayload compute the size itself
 
   payloadPtr.assign(payload);
 
@@ -180,14 +188,4 @@ void ROIPayloadAssemblerModule::event()
   payload->setCRC();
 
   B2DEBUG(1, " number of ROIs in payload = " << addROI);
-}
-
-
-void ROIPayloadAssemblerModule::endRun()
-{
-}
-
-
-void ROIPayloadAssemblerModule::terminate()
-{
 }

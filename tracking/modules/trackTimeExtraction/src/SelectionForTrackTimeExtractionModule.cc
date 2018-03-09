@@ -48,7 +48,7 @@ void SelectionForTrackTimeExtractionModule::initialize()
   recoTracks.isRequired();
 
   StoreArray<RecoTrack> selectedRecoTracks(m_param_selectedRecoTracksStoreArrayName);
-  selectedRecoTracks.registerInDataStore();
+  selectedRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   RecoTrack::registerRequiredRelations(selectedRecoTracks);
 }

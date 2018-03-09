@@ -44,9 +44,10 @@ ROIReadTestModule::~ROIReadTestModule()
 void ROIReadTestModule::initialize()
 {
 
-  StoreObjPtr<ROIpayload>::required(m_ROIpayloadName);
-  m_pFile = fopen(m_outfileName.c_str(), "w");
+  StoreObjPtr<ROIpayload> roiPayloads;
+  roiPayloads.isRequired(m_ROIpayloadName);
 
+  m_pFile = fopen(m_outfileName.c_str(), "w");
 }
 
 void ROIReadTestModule::beginRun()

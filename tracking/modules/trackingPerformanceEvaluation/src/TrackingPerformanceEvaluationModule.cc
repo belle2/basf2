@@ -79,10 +79,17 @@ TrackingPerformanceEvaluationModule::~TrackingPerformanceEvaluationModule()
 void TrackingPerformanceEvaluationModule::initialize()
 {
   // MCParticles, Tracks, RecoTracks, MCRecoTracks needed for this module
-  StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<RecoTrack>::required(m_RecoTracksName);
-  StoreArray<RecoTrack>::required(m_MCRecoTracksName);
-  StoreArray<Track>::required(m_TracksName);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired(m_MCParticlesName);
+
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_RecoTracksName);
+
+  StoreArray<RecoTrack> mcRecoTracks;
+  mcRecoTracks.isRequired(m_MCRecoTracksName);
+
+  StoreArray<Track> tracks;
+  tracks.isRequired(m_TracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;

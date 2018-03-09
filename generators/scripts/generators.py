@@ -1,7 +1,11 @@
 """
-File summarizing all default generator settings.
-More information: BELLE2-NOTE-PH-2015-006
+This module contains convenience functions to setup most commonly used physics
+generators correctly with their default settings. More information can be found
+in `BELLE2-NOTE-PH-2015-006`_
+
 Contact: Torben Ferber (ferber@physics.ubc.ca)
+
+.. _BELLE2-NOTE-PH-2015-006: https://docs.belle2.org/record/282
 """
 
 from basf2 import *
@@ -17,8 +21,11 @@ def get_default_decayfile():
 def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, subweights=[], maxsubweight=1, maxfinalweight=3.0):
     """
     Add the default two photon generator for four fermion final states
-    :param finalstate: e+e-e+e-, e+e-mu+mu-
-    :param preselection: if true, select events with at least one medium pt particle in the CDC acceptance
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): either "e+e-e+e-" or "e+e-mu+mu-"
+        preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
     """
 
     aafh = register_module('AafhInput')
@@ -71,7 +78,10 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
 def add_kkmc_generator(path, finalstate=''):
     """
     Add the default muon pair and tau pair generator KKMC
-    :param finalstate: mu+mu-, tau+tau-
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate(str): either "mu+mu-" or "tau+tau-"
     """
 
     #: kkmc input file
@@ -109,8 +119,9 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None):
     """
     Add EvtGen for mixed and charged BB
 
-    :param finalstate: charged, mixed, signal
-    :param signaldecfile: decfile to be used if finalstate 'signal' is specified
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): Either "charged" for B+/B- or "mixed" for B0/anti-B0
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
 
@@ -133,11 +144,21 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None):
     )
 
 
-def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenparticledata=0):
+def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticledata=0, *, skip_on_failure=True):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
-    :param finalstate: uubar, ddbar, ssbar, ccbar
-    :param emptypathname branch to reject events where PYTHIA failed to fragment
+
+    See Also:
+        `add_inclusive_continuum_generator()` to add continuum generation with preselected particles
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): uubar, ddbar, ssbar, ccbar
+        userdecfile (str): EvtGen decfile used for particle decays
+        useevtgenparticledata (bool): Experimental feature to use a consistent
+            set of particle properties between EvtGen and PYTHIA
+        skip_on_failure (bool): If True stop event processing right after
+            fragmentation fails. Otherwise continue normally
     """
 
     #: kkmc input file, one for each qqbar mode
@@ -160,8 +181,8 @@ def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenpartic
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: global decay file, should be fine as is
-    decay_file = os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC')
+    #: global decay file
+    decay_file = get_default_decayfile()
 
     if finalstate == 'uubar':
         pass
@@ -199,18 +220,65 @@ def add_continuum_generator(path, finalstate='', userdecfile='', useevtgenpartic
         useEvtGenParticleData=useevtgenparticledata
     )
 
-    # branch to an empty path if PYTHIA failed, this will change the number of events
-    # but the file meta data will contain the total number of generated events
-    generator_emptypath = create_path()
-    fragmentation.if_value('<1', generator_emptypath)
+    if skip_on_failure:
+        # branch to an empty path if PYTHIA failed, this will change the number of events
+        # but the file meta data will contain the total number of generated events
+        generator_emptypath = create_path()
+        fragmentation.if_value('<1', generator_emptypath)
+
+
+def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='',
+                                      useevtgenparticledata=0, *, include_conjugates=True, max_iterations=100000):
+    """
+    Add continuum generation but require at least one of the given particles be
+    present in the event.
+
+    For example to only generate ccbar events which contain a "D*+" or an
+    electron one could would use
+
+    >>> add_inclusive_continuum_generator(path, "ccbar", ["D*+", 11])
+
+    If you are unsure how the particles are named in Belle II please have a look
+    at the ``b2help-particles`` executable or the `pdg` python module.
+
+    See Also:
+        `add_continuum_generator()` to add continuum generation without preselection
+
+    Parameters:
+        finalstate (str): uubar, ddbar, ssbar, ccbar
+        particles (list): A list of particle names or pdg codes. An event is
+           only accepted if at lease one of those particles appears in the event.
+        userdecfile (str): EvtGen decfile used for particle decays
+        useevtgenparticledata (bool): Experimental feature to use a consistent
+            set of particle properties between EvtGen and PYTHIA
+        include_conjugates (bool): If True (default) accept the event also if a
+            charge conjugate of the given particles is found
+        max_iterations (int): maximum tries per event to generate the requested
+            particle. If exceeded processing will be stopped with a
+            `FATAL <LogLevel.FATAL>` error so for rare particles one might need a
+            larger number.
+    """
+    loop_path = create_path()
+    # we might run this more than once so make sure we remove any particles
+    # before generating new ones
+    loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
+    # add the generator but make sure it doesn't stop processing on
+    # fragmentation failure as is this currently not supported by do_while
+    add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
+    # check for the particles we want
+    loop_path.add_module("InclusiveParticleChecker", particles=particles)
+    # Done, add this to the path and iterate it until we found our particle
+    path.do_while(loop_path, max_iterations=max_iterations)
 
 
 def add_bhwide_generator(path, minangle=0.5):
     """
     Add the high precision QED generator BHWIDE to the path. Settings are the default L1/HLT study settings
     with a cross section of about 124000 nb (!)
-    :param path: Add the modules to this path
-    :param minangle: minimum angle of the outgoing electron/positron in the CMS
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        minangle (float): minimum angle of the outgoing electron/positron in the CMS in degrees
     """
 
     if minangle < 0.0 or minangle > 180.0:
@@ -229,10 +297,12 @@ def add_bhwide_generator(path, minangle=0.5):
 def add_babayaganlo_generator(path, finalstate='', minenergy=0.15, minangle=10.0):
     """
     Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006
-    :param path: Add the modules to this path
-    :param finalstate: ee or gg
-    :param minenergy: minimum particle energy
-    :param minangle: angular range from minangle to 180-minangle for primary particles
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): ee or gg
+        minenergy (float): minimum particle energy in GeV
+        minangle (float): angular range from minangle to 180-minangle for primary particles (in degrees)
     """
 
     babayaganlo = path.add_module("BabayagaNLOInput")
@@ -255,9 +325,12 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.15, minangle=10.0
 
 def add_phokhara_generator(path, finalstate=''):
     """
-    Add the high precision QED generator PHOKHARA to the path. Almost full acceptance settings for photons and hadrons/muons.
-    :param path: Add the modules to this path
-    :param finalstate: One of the possible final states using the PHOKHARA particle naming
+    Add the high precision QED generator PHOKHARA to the path. Almost full
+    acceptance settings for photons and hadrons/muons.
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): One of the possible final state "mu+mu-", "pi+pi-", "pi+pi-pi0"
     """
 
     phokhara = path.add_module('PhokharaInput')
@@ -291,27 +364,29 @@ def add_cosmics_generator(path, components=None,
                           data_taking_period='gcr2017', top_in_counter=False):
     """
     Add the cosmics generator CRY with the default parameters to the path.
-    :param path: Add the modules to this path.
 
-    :param data_taking_period: The cosmics generation will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+    Warning:
+        Please remember to also change the reconstruction accordingly, if you
+        set "special" parameters here!
 
-    :param components: list of geometry components to add in the geometry module,
-           or None for all components.
-    :param global_box_size: sets global length, width and height.
-    :param accept_box: sets the size of the accept box. As a default it is
-           set to 8.0 m = the Belle2 detector size.
-    :param keep_box: sets the size of the keep box (keep box >= accept box).
-    :param geometry_xml_file: Name of the xml file to use for the geometry.
-
-    :param cosmics_data_dir: parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
-    :param setup_file: location of the cry.setup file (absolute or relative to the basf2 repo)
-
-
-    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
-           (assuming PMT is put at -z of the counter).
-
-    Please remember to also change the reconstruction accordingly, if you set "special" parameters here!
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        components (list(str)): list of geometry components to add in the
+            geometry module, or None for all components.
+        global_box_size (tuple(float, float, float)): sets global length, width
+            and height (in meters) in which to generate.
+            Default is ``[100, 100, 100]``
+        accept_box (tuple(float, float, float)): sets the size of the accept box in meter.
+            As a default it is set to ``[8.0, 8.0, 8.0]`` (the Belle II detector size).
+        keep_box (tuple(float, float, float)): sets the size of the keep box (keep box >= accept box).
+        geometry_xml_file (str): Name of the xml file to use for the geometry.
+        cosmics_data_dir (str): parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
+        setup_file (str): location of the cry.setup file (absolute or relative to the basf2 repo)
+        data_taking_period (str): The cosmics generation will be added using the
+            parameters, that where used in this period of data taking. The
+            periods can be found in ``cdc/cr/__init__.py``.
+        top_in_counter (bool): time of propagation from the hit point to the PMT in the trigger counter is subtracted
+            (assuming PMT is put at -z of the counter).
     """
     import cdc.cr as cosmics_setup
 

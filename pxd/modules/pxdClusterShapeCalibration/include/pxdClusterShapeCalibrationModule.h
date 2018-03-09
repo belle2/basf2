@@ -106,8 +106,6 @@ namespace Belle2 {
     std::string m_relPXDClusterDigitName;
     /** PXDRecoHit to PXDTrueHit RelationArray name */
     std::string m_relPXDRecoHitTrueHitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
 
     /** Counter of events */
     int m_iEv;

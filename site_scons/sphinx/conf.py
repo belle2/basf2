@@ -133,6 +133,10 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# If true, figures with captions automatically get figure numbers included at the start of the caption.
+# Also the :numref: role is allowed for figures. Referencing figures/sections etc in this way
+# will insert a reference to the reference number instead of the reference text/caption.
+numfig = True
 
 # -- Options for HTML output ----------------------------------------------
 

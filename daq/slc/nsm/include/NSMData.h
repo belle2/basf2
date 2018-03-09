@@ -7,9 +7,9 @@
 #include <daq/slc/base/StringUtil.h>
 
 extern "C" {
-#include "nsm2/nsm2.h"
+#include <nsm2/nsm2.h>
 #if NSM_PACKAGE_VERSION >= 1914
-#include "nsm2/nsmparse.h"
+#include <nsm2/nsmparse.h>
 #endif
 }
 

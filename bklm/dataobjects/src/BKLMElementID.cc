@@ -50,7 +50,7 @@ namespace Belle2 {
     }
   }
 
-  BKLMElementID::BKLMElementID(const std::string& module) throw(invalid_argument)
+  BKLMElementID::BKLMElementID(const std::string& module)
   {
     //We parse the Id from string, so set it to 0 first
     m_id.id = 0;

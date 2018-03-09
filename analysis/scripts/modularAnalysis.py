@@ -892,7 +892,7 @@ def reconstructDecay(
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
     reconstructed as well (meaning that the charge conjugated mother list is created as well).
 
-    @param decayString DecayString specifying what kind of the decay should be reconstructed
+    @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
@@ -924,7 +924,7 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
-def reconstructMissingKLDecay(
+def reconstructMissingKlongDecayExpert(
     decayString,
     cut,
     dmID=0,
@@ -945,8 +945,8 @@ def reconstructMissingKLDecay(
     @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     """
 
-    pcalc = register_module('KLMomentumCalculator')
-    pcalc.set_name('KLMomentumCalculator_' + decayString)
+    pcalc = register_module('KlongMomentumCalculatorExpert')
+    pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
     pcalc.param('cut', cut)
     pcalc.param('decayMode', dmID)
@@ -954,8 +954,8 @@ def reconstructMissingKLDecay(
     pcalc.param('recoList', recoList)
     analysis_main.add_module(pcalc)
 
-    rmake = register_module('KLDecayReconstructor')
-    rmake.set_name('KLDecayReconstrucotr_' + decayString)
+    rmake = register_module('KlongDecayReconstructorExpert')
+    rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
     rmake.param('decayString', decayString)
     rmake.param('cut', cut)
     rmake.param('decayMode', dmID)
@@ -1082,6 +1082,8 @@ def rankByHighest(
     variable,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1095,6 +1097,8 @@ def rankByHighest(
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1104,6 +1108,8 @@ def rankByHighest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('allowMultiRank', allowMultiRank)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1112,6 +1118,8 @@ def rankByLowest(
     variable,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1125,6 +1133,8 @@ def rankByLowest(
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1134,7 +1144,9 @@ def rankByLowest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('selectLowest', True)
+    bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1525,11 +1537,12 @@ def appendROEMask(
 
     - append a ROE mask with only ECLClusters that pass as good photon candidates
 
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
+       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
     - append a ROE mask with track from IP, use equal a-priori probabilities
 
-       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
@@ -1559,7 +1572,8 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 
     @param list_name             name of the input ParticleList
@@ -2069,10 +2083,53 @@ def writePi0EtaVeto(
     roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO'], extraInfoName='EtaVeto',
                         identifier=workingDirectory + '/etaveto.root')
 
-    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', 1, path=roe_path)
-    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', 1, path=roe_path)
+    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', numBest=1, path=roe_path)
 
     variableToSignalSideExtraInfo('pi0:PI0VETO', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
     variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_main):
+    """
+    Calculates the Thrust of the event using ParticleLists provided. If no ParticleList is
+    provided, default ParticleLists are used(all track and all hits in ECL without associated track).
+
+    The Thrust value is stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
+    and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
+    particle and the Thrust of the event in the CM system, are also created.
+
+    @param inputListNames   list of ParticleLists used to calculate the Thrust. If the list is empty,
+                            default ParticleLists pi+:thrust and gamma:thrust are filled.
+    @param default_cleanup  if True, apply default clean up cuts to default
+                            ParticleLists pi+:thrust and gamma:thrust.
+    @param path             modules are added to this path
+    """
+    if not inputListNames:
+        B2INFO("Creating particle lists pi+:thrust and gamma:thrust to get the Thrust of Event.")
+        fillParticleList('pi+:thrust', '')
+        fillParticleList('gamma:thrust', '')
+        particleLists = ['pi+:thrust', 'gamma:thrust']
+
+        if default_cleanup:
+            B2INFO("Using default cleanup in Thrust of Event module.")
+            trackCuts = 'pt > 0.1'
+            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+            trackCuts += ' and -3.0 < dz < 3.0'
+            trackCuts += ' and -0.5 < dr < 0.5'
+            applyCuts('pi+:thrust', trackCuts)
+
+            gammaCuts = 'E > 0.05'
+            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            applyCuts('gamma:thrust', gammaCuts)
+        else:
+            B2INFO("No cleanup in Thrust of Event module.")
+    else:
+        particleLists = inputListNames
+
+    thrustModule = register_module('ThrustOfEvent')
+    thrustModule.set_name('ThrustOfEvent_')
+    thrustModule.param('particleLists', particleLists)
+    path.add_module(thrustModule)

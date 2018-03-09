@@ -42,6 +42,8 @@ exactly in the order in which they were placed into the path.
 The data, to be processed by the modules, is stored in a common storage, the
 DataStore. Each module has read and write access to the storage.
 
+.. _framework_modpath_diagram:
+
 .. figure:: ModulePath.png
   :width: 40em
 

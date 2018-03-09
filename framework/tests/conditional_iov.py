@@ -1,8 +1,10 @@
 import basf2
+from iov_conditional import phase_2_conditional, make_conditional_at
 
 
 class PrinterModule(basf2.Module):
     """Print the given string on each event"""
+
     def __init__(self, print_string):
         """Remember the given string to print later"""
         super().__init__()
@@ -30,30 +32,30 @@ def simulate_run(run_numbers, exp_numbers):
     phase3_path = basf2.create_path()
     phase3_path.add_module(PrinterModule("Phase 3 is here"))
 
+    # No Phase 3 path
+    no_phase3_path = basf2.create_path()
+    no_phase3_path.add_module(PrinterModule("Phase 3 is not here"))
+
     # Weird path
     weird_path = basf2.create_path()
     weird_path.add_module(PrinterModule("Strange condition"))
 
     # Condition for phase2
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1002, maximalExpNumber=1002)
-    condition.if_true(phase2_path, basf2.AfterConditionPath.END)
+    phase_2_conditional(path, phase2_path=phase2_path)
 
     # Condition for phase3
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=1, maximalExpNumber=1)
-    condition.if_true(phase3_path, basf2.AfterConditionPath.END)
+    make_conditional_at(path, iov_list=[(0, 0, 0, -1)], path_when_in_iov=phase3_path, path_when_not_in_iov=no_phase3_path)
 
     # Some weird condition
-    condition = path.add_module("IoVDependentCondition", minimalExpNumber=42, minimalRunNumber=42,
-                                maximalExpNumber=47, maximalRunNumber=47)
-    condition.if_true(weird_path, basf2.AfterConditionPath.END)
+    make_conditional_at(path, iov_list=[(42, 42, 47, 47)], path_when_in_iov=weird_path)
 
-    # None at all
-    path.add_module(PrinterModule("No condition met"))
+    # Finished path
+    path.add_module(PrinterModule("Finish"))
 
     basf2.process(path)
 
 
 if __name__ == "__main__":
     basf2.set_random_seed(1)
-    simulate_run(exp_numbers=[1, 1002], run_numbers=[1, 67])
+    simulate_run(exp_numbers=[0, 1002], run_numbers=[1, 67])
     simulate_run(exp_numbers=[42, 43, 47], run_numbers=[41, 1, 48])

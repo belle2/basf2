@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from ROOT import Belle2, TH2F, TFile, gStyle, TColor, TCanvas
+from ROOT import Belle2, TH2F, TH1F, TFile, gStyle, TColor, TCanvas
 import numpy
 from math import pi
 from interactive import embed
 
 
 # make the monitoring plots
-file_type = 'svg'
+file_type = 'png'
 
 color1501 = TColor(1501, 35 / 255., 55 / 255., 59 / 255.)
 color1502 = TColor(1502, 99 / 255., 120 / 255., 173 / 255.)
 color1503 = TColor(1503, 235 / 255., 129 / 255., 27 / 255.)
 color1504 = TColor(1504, 99 / 255., 173 / 255., 132 / 255.)
 color1505 = TColor(1505, 123 / 255., 111 / 255., 37 / 255.)
+
+nWiresInLayer = [160, 192, 256, 320, 384]
 
 
 def set_style(hist, color=1503, marker=20):
@@ -32,8 +34,13 @@ hhit = TH2F('hit', 'hit', 5, 0, 5, 384, 0, 384)
 hno_ghost = TH2F('ng', 'hit', 5, 0, 5, 384, 0, 384)
 hghost = TH2F('ghost', 'hit', 5, 0, 5, 384, 0, 384)
 
-used = numpy.zeros(37000, numpy.int)
-in_tsim = numpy.zeros(37000, numpy.int)
+hlr = TH1F('lr', 'left right', 4, 0, 4)
+hpri = TH1F('pri', 'priority position', 4, 0, 4)
+hpritime = TH1F('pritime', 'priority time', 512, 0, 512)
+hftime = TH1F('found time', 'found time', 48, -35, 13)
+
+used = numpy.zeros(2336, numpy.int)
+in_tsim = numpy.zeros(2336, numpy.int)
 
 
 class Monitor(Module):
@@ -53,14 +60,22 @@ class Monitor(Module):
         for simhit in self.simhits:
             if simhit.getISuperLayer() % 2 == 0:
                 iax, iw = simhit.getISuperLayer() // 2, simhit.getIWire()
+                if simhit.getPriorityPosition() == 1:
+                    iw += 1
+                if iw == nWiresInLayer[iax]:
+                    iw = 0
                 hall.Fill(iax, iw)
-                in_tsim[simhit.getID()] = 1
+                in_tsim[simhit.getSegmentID()] = 1
         for hit in self.tshits:
-            ind = hit.getID()
+            ind = hit.getSegmentID()
             # only fill the histogram if the same ID is not found in the event
             # In other words, it can't be the same hit from another 2D
             # even if the unpacker does not eliminate repeated hits.
             iax, iw = hit.getISuperLayer() // 2, hit.getIWire()
+            if hit.getPriorityPosition() == 1:
+                iw += 1
+            if iw == nWiresInLayer[iax]:
+                iw = 0
             if not used[ind]:
                 used[ind] = 1
                 hhit.Fill(iax, iw)
@@ -68,6 +83,10 @@ class Monitor(Module):
                     hno_ghost.Fill(iax, iw)
             if not in_tsim[ind]:
                 hghost.Fill(iax, iw)
+                hlr.Fill(hit.getLeftRight())
+                hpri.Fill(hit.getPriorityPosition())
+                hpritime.Fill(hit.priorityTime())
+                hftime.Fill(hit.foundTime())
 
     def terminate(self):
         if not os.path.exists('monitor_plots'):
@@ -140,7 +159,7 @@ class Monitor(Module):
             hits[0].SetTitle(name + ' hit distribution in run {}; #phi (rad)'.format(
                 self.first_run))
             can.SaveAs('monitor_plots/' + name.split()[0] +
-                       '_ts_hits_{:05d}.{}'.format(self.first_run), file_type)
+                       '_ts_hits_{:05d}.{}'.format(self.first_run, file_type))
 
         for ratio, name in [(quos, 'ghost rate'), (quong, 'efficiency (w.r.t. fast TSIM)')]:
             upp = max([g.GetMaximum() for g in ratio])
@@ -159,4 +178,11 @@ class Monitor(Module):
             ratio[0].SetTitle('TSF ' + name + ' in run {};#phi (rad)'.format(
                 self.first_run))
             file_name = name.split()[0]
-            can.SaveAs('monitor_plots/ts_{}_{:05d}.{}'.format(file_name, self.first_run), file_type)
+            can.SaveAs('monitor_plots/ts_{}_{:05d}.{}'.format(file_name, self.first_run, file_type))
+
+        # ghost distribution
+        for h in [hlr, hpri, hpritime, hftime]:
+            set_style(h, 1503)
+            h.Draw()
+            name = h.GetTitle().replace(' ', '_')
+            can.SaveAs('monitor_plots/ghost_{}_{:05d}.{}'.format(name, self.first_run, file_type))

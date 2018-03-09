@@ -301,7 +301,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 
       /** No more than specified number of iterations */
       if (nIter == maxIterations) {fitHist = false;}
-      B2DEBUG(200, crysID << " " << nIter << " " << peakE << " " << constant << " " << tRatio << " " << fitlow);
+      B2DEBUG(10, crysID << " " << nIter << " " << peakE << " " << constant << " " << tRatio << " " << fitlow);
     }
 
     /**-----------------------------------------------------------------------------------------------*/

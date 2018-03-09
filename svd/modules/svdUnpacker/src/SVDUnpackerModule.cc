@@ -49,7 +49,7 @@ REG_MODULE(SVDUnpacker)
 std::string Belle2::SVD::SVDUnpackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
-  m_generateShaperDigits(false),
+  m_generateOldDigits(false),
   m_mapping(m_xmlFileName),
   m_shutUpFTBError(0),
   m_FADCTriggerNumberOffset(0)
@@ -60,7 +60,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
 
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
-  addParam("GenerateShaperDigits", m_generateShaperDigits, "Generate SVDShaperDigits", bool(false));
+  addParam("GenerateOldDigits", m_generateOldDigits, "Generate SVDDigits", bool(false));
   addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVDShaperDigits list", string(""));
   addParam("shutUpFTBError", m_shutUpFTBError,
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
@@ -70,6 +70,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
   addParam("softwarePipelineAddressEmulation", m_emulatePipelineAddress, "Estimate emulated pipeline address", bool(true));
   addParam("killDigitsFromUpsetAPVs", m_killUpsetDigits, "Delete digits from upset APVs", bool(false));
   addParam("silentlyAppend", m_silentAppend, "Append digits to a pre-existing non-empty storeArray", bool(false));
+  addParam("badMappingFatal", m_badMappingFatal, "Throw B2FATAL if there's a wrong payload in the database", bool(false));
 }
 
 SVDUnpackerModule::~SVDUnpackerModule()
@@ -81,19 +82,18 @@ void SVDUnpackerModule::initialize()
   m_eventMetaDataPtr.isRequired();
   // Don't panic if no SVD data.
   m_rawSVD.isOptional(m_rawSVDListName);
-  m_svdDigit.registerInDataStore(m_svdDigitListName);
   StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
   storeDAQDiagnostics.registerInDataStore();
   m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
 
-  if (m_generateShaperDigits) {
-    StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
-    storeShaperDigits.registerInDataStore();
-    storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
-    m_svdShaperDigitListName = storeShaperDigits.getName();
+  if (m_generateOldDigits) {
+    m_svdDigit.registerInDataStore(m_svdDigitListName);
   }
-  // We don't care about old-type digits.
-  m_killUpsetDigits = m_killUpsetDigits && m_generateShaperDigits;
+
+  StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
+  storeShaperDigits.registerInDataStore();
+  storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
+  m_svdShaperDigitListName = storeShaperDigits.getName();
 
 }
 
@@ -123,14 +123,13 @@ void SVDUnpackerModule::event()
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
 
-  if (!m_silentAppend && svdDigits && svdDigits.getEntries())
+  if (!m_silentAppend && m_generateOldDigits && svdDigits && svdDigits.getEntries())
     B2FATAL("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
             << "This can lead to undesired behaviour. At least remember to\""
             << "use SVDDigitSorter in your path and set the \n"
             << "silentAppend parameter of SVDUnpacker to true.");
 
-  if (!m_silentAppend && m_generateShaperDigits &&
-      shaperDigits && shaperDigits.getEntries())
+  if (!m_silentAppend && shaperDigits && shaperDigits.getEntries())
     B2FATAL("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
             << "StoreArray. This can lead to undesired behaviour. At least\n"
             << "remember to use SVDShaperDigitSorter in your path and \n"
@@ -203,7 +202,7 @@ void SVDUnpackerModule::event()
 
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
-        //printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
+        //if (data32tab[buf] != NULL && &data32tab[buf][nWords[buf] - 1] != NULL)                              printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
 
         uint32_t* data32_it = data32tab[buf];
         short fadc = 255, apv = 63, strip, sample[6];
@@ -285,11 +284,9 @@ void SVDUnpackerModule::event()
                      );
             }
 
-            if (m_generateShaperDigits) { // create SVDModeByte object from MainHeader vars
-              //B2INFO("Filling SVDModeByte object");
-              m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
-            }
-
+            // create SVDModeByte object from MainHeader vars
+            //B2INFO("Filling SVDModeByte object");
+            m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
           }
 
           if (m_APVHeader.check == 2) { // APV header
@@ -333,20 +330,24 @@ void SVDUnpackerModule::event()
               sample[5] = m_data_B.sample6;
             }
 
-            for (unsigned int idat = 0; idat < 6; idat++) {
-              // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function
-              SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[idat], idat);
-              svdDigits.appendNew(*newDigit);
-
-              delete newDigit;
+            if (m_generateOldDigits) {
+              for (unsigned int idat = 0; idat < 6; idat++) {
+                // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function
+                SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[idat], idat);
+                if (newDigit) {
+                  svdDigits.appendNew(*newDigit);
+                  delete newDigit;
+                }
+              }
             }
 
-            if (m_generateShaperDigits) {
-              //B2INFO("Generating SVDShaperDigit object");
-              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
+            // Generating SVDShaperDigit object
+            SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
+            if (newShaperDigit) {
               diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));
               delete newShaperDigit;
-            }
+            } else if (m_badMappingFatal)
+              B2FATAL("Respective FADC/APV combination not found -->> incorrect payload in the database! ");
 
           }  //is data frame
 

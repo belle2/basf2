@@ -106,7 +106,7 @@ void BaseRecoFitterModule::event()
       Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
       B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
       const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
-      const genfit::AbsTrackRep* trackRep = TrackFitter::getTrackRepresentationForPDG(pdgCodeToUseForFitting, recoTrack);
+      const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
 
       B2DEBUG(99, "-----> Fit results:");
       if (wasFitSuccessful) {

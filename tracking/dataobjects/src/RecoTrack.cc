@@ -381,7 +381,6 @@ void RecoTrack::prune()
     dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPointID(-1);
   }
 
-
   // Genfits prune method fails, if the number of hits is too small.
   if (getHitPointsWithMeasurement().size() >= 2) {
     m_genfitTrack.prune("FL");

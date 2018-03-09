@@ -53,6 +53,15 @@ namespace Belle2 {
     void importLocalT0Calibration(std::string fileNames);
 
 
+
+    /**
+     * Import module T0 calibration constants to database
+     * The input is the text file
+     * @param fileName name of the dat file with constants of all modules
+     */
+    void importModuleT0Calibration(std::string fileName);
+
+
     /**
      * Prints sample time calibration info about constants stored in database
      */
@@ -111,6 +120,12 @@ namespace Belle2 {
      * @param treeName : name of the tree containing relevant data
      */
     void importPmtTTSHisto(std::string fileName, std::string treeName);
+
+    /**
+     * Import fit results of pulse height disribution for channel gain and threshold efficiency
+     * @param fileName : name of the root file containing relevant data, which is obtained from TOPGainEfficiencyMonitor
+     */
+    void importPmtPulseHeightFitResult(std::string fileName);
 
     /**
      * Example of exporting TTS histograms

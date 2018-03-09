@@ -247,6 +247,11 @@ namespace Belle2 {
     double missingMomentumPhi(const Particle* part);
 
     /**
+     * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
+     */
+    double cosToThrustOfEvent(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);
@@ -275,12 +280,6 @@ namespace Belle2 {
      * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
      */
     double particleMdstSource(const Particle* part);
-
-    /**
-     * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
-     * To be used for random ranking.
-     */
-    double particleCosMdstArrayIndex(const Particle* part);
 
     /**
      * return prob(chi^2,ndf) of fit
@@ -448,62 +447,6 @@ namespace Belle2 {
      * MC truth values are used in the calculations.
      */
     double particleMCRecoilMass(const Particle* particle);
-
-    /**
-     * return X component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVx(const Particle* particle);
-
-    /**
-     * return Y component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVy(const Particle* particle);
-
-    /**
-     * return Z component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVz(const Particle* particle);
-
-    /**
-     * return Delta T (Brec - Btag) in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaT(const Particle* particle);
-
-    /**
-     * return Delta T error in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaTErr(const Particle* particle);
-
-    /**
-     * return generated Delta T (Brec - Btag) in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleMCDeltaT(const Particle* particle);
-
-    /**
-     * return Delta Z (Brec - Btag) in cm
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaZ(const Particle* particle);
-
-    /**
-     * return Delta Boost direction (Brec - Btag) in cm
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaB(const Particle* particle);
 
     /**
      * return magnitude of 3-momentum recoiling against given Particle

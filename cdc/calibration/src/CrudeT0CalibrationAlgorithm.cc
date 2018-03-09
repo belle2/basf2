@@ -37,7 +37,6 @@ void CrudeT0CalibrationAlgorithm::createHisto()
 
   B2INFO("CreateHisto");
 
-
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
@@ -73,6 +72,28 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
 
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
+
+  // Setup Gearbox
+  Gearbox& gearbox = Gearbox::getInstance();
+
+  std::vector<std::string> backends = {"file:"};
+  gearbox.setBackends(backends);
+
+  B2INFO("Start open gearbox.");
+  gearbox.open("geometry/Belle2.xml");
+  B2INFO("Finished open gearbox.");
+
+  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(0, 0, 1);
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDCGeometryPar::Instance(&cdcGeometry);
+
 
   createHisto();
 
@@ -170,6 +191,7 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
 
   B2INFO("Write constants");
   write();
+  saveHisto();
   return c_OK;
 }
 
@@ -185,4 +207,45 @@ void CrudeT0CalibrationAlgorithm::write()
     }
   }
   saveCalibration(tz, "CDCTimeZeros");
+}
+
+void CrudeT0CalibrationAlgorithm::saveHisto()
+{
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  TFile* fhist = new TFile("histCrudeT0.root", "recreate");
+  fhist->cd();
+  TDirectory* top = gDirectory;
+  TDirectory* Direct[56];
+  for (int il = 0; il < 56; ++il) {
+    top->cd();
+    Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
+    Direct[il]->cd();
+    for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
+      if (m_flag[il][w] == 1) {
+        m_hTDC[il][w]->Write();
+      }
+    }
+  }
+  top->cd();
+  TDirectory* board = gDirectory->mkdir("board");
+  board->cd();
+  for (int ib = 0; ib < 300; ++ib) {
+    if (m_hTDCBoard[ib]) {
+      m_hTDCBoard[ib]->Write();
+    }
+  }
+  top->cd();
+  m_hT0All->Write();
+
+  /*
+  if (b.size() > 20) {
+    TGraphErrors* gr = new TGraphErrors(b.size(), &b.at(0), &sb.at(0), &db.at(0), &dsb.at(0));
+    gr->SetName("reso");
+    gr->Write();
+    TGraphErrors* grT0b = new TGraphErrors(b.size(), &b.at(0), &t0b.at(0), &db.at(0), &dt0b.at(0));
+    grT0b->SetName("T0Board");
+    grT0b->Write();
+  }
+  */
+  fhist->Close();
 }

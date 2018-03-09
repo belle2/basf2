@@ -63,8 +63,8 @@ namespace Belle2 {
     void eventInformation(PhysicsTriggerInformation& phy);
 
   private:
-    StoreArray<PhysicsTriggerInformation> m_physicsTriggerInformation; /** Array for PhysicsTriggerInformation */
-
+    /// Array for PhysicsTriggerInformation.
+    StoreArray<PhysicsTriggerInformation> m_physicsTriggerInformation;
 
     /**Access users' cut */
     std::string m_hltcut;

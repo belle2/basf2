@@ -16,6 +16,7 @@ HSNMP crateHsnmp[10];
 */
 void ArichlvControlCallback::initialize(const HVConfig& config) throw()
 {
+
   MPOD_Start();
 
   const HVCrateList& crate_v(config.getCrates());
@@ -24,6 +25,7 @@ void ArichlvControlCallback::initialize(const HVConfig& config) throw()
     const HVCrate& crate(*icrate);
     int crateid = crate.getId();
     std::string host = crate.getName();
+    LogFile::info("Wiener MPOD at " + host + " will now be initialized");
     if (crateHsnmp[crateid] == 0)  crateHsnmp[crateid] = MPOD_Open(host.c_str());
     if (crateHsnmp[crateid] == 0) LogFile::error("Initialize error %d", __LINE__);
     LogFile::info("Wiener MPOD at " + host + " Initialized");
@@ -84,6 +86,7 @@ void ArichlvControlCallback::setRampUpSpeed(int crate, int slot, int channel, fl
   /*set voltage ramp up speed with unit of [V]*/
   //if (crate) setModuleRampSpeedVoltage(crateHsnmp[crate -1], slot, voltage);
   setOutputRiseRate(crateHsnmp[crate], MPODCH(slot, channel), voltage);
+  //  setOutputRiseRate(crateHsnmp[crate], slot, voltage);//yone 201711011402
   LogFile::debug("setrampup called : crate = %d, slot = %d, channel = %d, voltage: %f ---> Module function common for slot",
                  crate, slot, channel, voltage);
 }
@@ -120,6 +123,7 @@ float ArichlvControlCallback::getRampUpSpeed(int crate, int slot, int channel) t
 {
 
   float ret = getModuleRampSpeedVoltage(crateHsnmp[crate], slot);
+  //float ret = getModuleRampSpeedVoltage(crateHsnmp[crate], MPODCH(slot, channel));//yone
   /*return voltage ramp up speed with unit of [V]*/
   return ret;
 }
@@ -148,7 +152,8 @@ float ArichlvControlCallback::getVoltageLimit(int crate, int slot, int channel) 
 
 float ArichlvControlCallback::getCurrentLimit(int crate, int slot, int channel) throw(IOException)
 {
-  float ret = getModuleHardwareLimitCurrent(crateHsnmp[crate], slot);
+  //  float ret = getModuleHardwareLimitCurrent(crateHsnmp[crate], slot);
+  float ret = getOutputCurrent(crateHsnmp[crate], MPODCH(slot, channel));
   /*return current limit with unit of [uA]*/
   return ret;
 }
@@ -156,6 +161,7 @@ float ArichlvControlCallback::getCurrentLimit(int crate, int slot, int channel) 
 float ArichlvControlCallback::getVoltageMonitor(int crate, int slot, int channel) throw(IOException)
 {
   double  ret = getOutputSenseMeasurement(crateHsnmp[crate], MPODCH(slot, channel));
+  //  double  ret = getOutputTerminalMeasurement(crateHsnmp[crate], MPODCH(slot, channel));//yone
   /*return monitored voltage with unit of [V]*/
   return ret;
 }
@@ -228,49 +234,49 @@ int ArichlvControlCallback::getState(int crate, int slot, int channel) throw(IOE
   int status = getOutputStatus(crateHsnmp[crate], MPODCH(slot, channel));
   char strstatus[0xFF] = "";
 
-  if (status & MpodStatus::outputOn) {sprintf(strstatus, "%s On", strstatus); }
-  if (status & MpodStatus::outputInhibit) {sprintf(strstatus, "%s Inhibit", strstatus); }
-  if (status & MpodStatus::outputFailureMinSenseVoltage) {sprintf(strstatus, "%s FailureMinSenseVoltage", strstatus); }
-  if (status & MpodStatus::outputFailureMaxSenseVoltage) {sprintf(strstatus, "%s FailureMaxSenseVoltage", strstatus); }
-  if (status & MpodStatus::outputFailureMaxTerminalVoltage) {sprintf(strstatus, "%s FailureMaxTerminalVoltage", strstatus); }
-  if (status & MpodStatus::outputFailureMaxCurrent) {sprintf(strstatus, "%s FailureMaxCurrent", strstatus); }
-  if (status & MpodStatus::outputFailureMaxTemperature) {sprintf(strstatus, "%s FailureMaxTemperature", strstatus); }
-  if (status & MpodStatus::outputFailureMaxPower) {sprintf(strstatus, "%s FailureMaxPower", strstatus); }
-  if (status & MpodStatus::outputFailureTimeout) {sprintf(strstatus, "%s FailureTimeout", strstatus); }
-  if (status & MpodStatus::outputCurrentLimited) {sprintf(strstatus, "%s CurrentLimited", strstatus); }
-  if (status & MpodStatus::outputRampUp) {sprintf(strstatus, "%s RampUp", strstatus); }
-  if (status & MpodStatus::outputRampDown) {sprintf(strstatus, "%s RampDown", strstatus); }
-  if (status & MpodStatus::outputEnableKill) {sprintf(strstatus, "%s EnableKill", strstatus); }
-  if (status & MpodStatus::outputEmergencyOff) {sprintf(strstatus, "%s EmergencyOff", strstatus); }
-  if (status & MpodStatus::outputAdjusting) {sprintf(strstatus, "%s Adjusting", strstatus); }
-  if (status & MpodStatus::outputConstantVoltage) {sprintf(strstatus, "%s ConstantVoltage", strstatus); }
-  if (status & MpodStatus::outputLowCurrentRange) {sprintf(strstatus, "%s LowCurrentRange", strstatus); }
-  if (status & MpodStatus::outputCurrentBoundsExceeded) {sprintf(strstatus, "%s CurrentBoundsExceeded", strstatus); }
-  if (status & MpodStatus::outputFailureCurrentLimit) {sprintf(strstatus, "%s FailureCurrentLimit", strstatus); }
+  if (status &  outputOn) {sprintf(strstatus, "%s On", strstatus); }
+  if (status &  outputInhibit) {sprintf(strstatus, "%s Inhibit", strstatus); }
+  if (status &  outputFailureMinSenseVoltage) {sprintf(strstatus, "%s FailureMinSenseVoltage", strstatus); }
+  if (status &  outputFailureMaxSenseVoltage) {sprintf(strstatus, "%s FailureMaxSenseVoltage", strstatus); }
+  if (status &  outputFailureMaxTerminalVoltage) {sprintf(strstatus, "%s FailureMaxTerminalVoltage", strstatus); }
+  if (status &  outputFailureMaxCurrent) {sprintf(strstatus, "%s FailureMaxCurrent", strstatus); }
+  if (status &  outputFailureMaxTemperature) {sprintf(strstatus, "%s FailureMaxTemperature", strstatus); }
+  if (status &  outputFailureMaxPower) {sprintf(strstatus, "%s FailureMaxPower", strstatus); }
+  if (status &  outputFailureTimeout) {sprintf(strstatus, "%s FailureTimeout", strstatus); }
+  if (status &  outputCurrentLimited) {sprintf(strstatus, "%s CurrentLimited", strstatus); }
+  if (status &  outputRampUp) {sprintf(strstatus, "%s RampUp", strstatus); }
+  if (status &  outputRampDown) {sprintf(strstatus, "%s RampDown", strstatus); }
+  if (status &  outputEnableKill) {sprintf(strstatus, "%s EnableKill", strstatus); }
+  if (status &  outputEmergencyOff) {sprintf(strstatus, "%s EmergencyOff", strstatus); }
+  if (status &  outputAdjusting) {sprintf(strstatus, "%s Adjusting", strstatus); }
+  if (status &  outputConstantVoltage) {sprintf(strstatus, "%s ConstantVoltage", strstatus); }
+  if (status &  outputLowCurrentRange) {sprintf(strstatus, "%s LowCurrentRange", strstatus); }
+  if (status &  outputCurrentBoundsExceeded) {sprintf(strstatus, "%s CurrentBoundsExceeded", strstatus); }
+  if (status &  outputFailureCurrentLimit) {sprintf(strstatus, "%s FailureCurrentLimit", strstatus); }
   if (!status) {sprintf(strstatus, "%s Off", strstatus); }
 
   LogFile::debug("getState called : crate = %d, slot = %d, channel = %d : %05x %s", crate, slot, channel, status, strstatus);
 
 
-  if (status & MpodStatus::outputInhibit) return HVMessage::OFF;
-  if (status & MpodStatus::outputFailureMinSenseVoltage) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureMaxSenseVoltage) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureMaxTerminalVoltage) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureMaxCurrent) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureMaxTemperature) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureMaxPower) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureTimeout) return HVMessage::ERR;
-  if (status & MpodStatus::outputCurrentLimited) return HVMessage::OCP;
-  if (status & MpodStatus::outputRampUp) return HVMessage::RAMPUP;
-  if (status & MpodStatus::outputRampDown) return HVMessage::RAMPDOWN;
-  if (status & MpodStatus::outputEnableKill) return HVMessage::ERR;
-  if (status & MpodStatus::outputEmergencyOff) return HVMessage::ETRIP;
-  if (status & MpodStatus::outputAdjusting) return HVMessage::ON;
-  if (status & MpodStatus::outputConstantVoltage) return HVMessage::OVP;
-  if (status & MpodStatus::outputLowCurrentRange) return HVMessage::ERR;
-  if (status & MpodStatus::outputCurrentBoundsExceeded) return HVMessage::ERR;
-  if (status & MpodStatus::outputFailureCurrentLimit) return HVMessage::ERR;
-  if (status & MpodStatus::outputOn) return HVMessage::ON;
+  if (status &  outputInhibit) return HVMessage::OFF;
+  if (status &  outputFailureMinSenseVoltage) return HVMessage::ERR;
+  if (status &  outputFailureMaxSenseVoltage) return HVMessage::ERR;
+  if (status &  outputFailureMaxTerminalVoltage) return HVMessage::ERR;
+  if (status &  outputFailureMaxCurrent) return HVMessage::ERR;
+  if (status &  outputFailureMaxTemperature) return HVMessage::ERR;
+  if (status &  outputFailureMaxPower) return HVMessage::ERR;
+  if (status &  outputFailureTimeout) return HVMessage::ERR;
+  if (status &  outputCurrentLimited) return HVMessage::OCP;
+  if (status &  outputRampUp) return HVMessage::RAMPUP;
+  if (status &  outputRampDown) return HVMessage::RAMPDOWN;
+  if (status &  outputEnableKill) return HVMessage::ERR;
+  if (status &  outputEmergencyOff) return HVMessage::ETRIP;
+  if (status &  outputAdjusting) return HVMessage::ON;
+  if (status &  outputConstantVoltage) return HVMessage::OVP;
+  if (status &  outputLowCurrentRange) return HVMessage::ERR;
+  if (status &  outputCurrentBoundsExceeded) return HVMessage::ERR;
+  if (status &  outputFailureCurrentLimit) return HVMessage::ERR;
+  if (status &  outputOn) return HVMessage::ON;
   /*
 
       OFF = 0, // power off,

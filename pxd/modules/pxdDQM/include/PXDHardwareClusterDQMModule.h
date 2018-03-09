@@ -47,11 +47,17 @@ namespace Belle2 {
       /** Default Constructor */
       //virtual ~PXDHardwareClusterDQMModule();
 
-      virtual void initialize();
+    private:
+      /** Module functions */
+      void initialize() override final;
+      void beginRun() override final;
+      void event() override final;
 
-      virtual void beginRun();
-
-      virtual void event();
+      /**
+       * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+       * to be placed in this function.
+      */
+      void defineHisto() override final;
 
     private:
 
@@ -77,8 +83,6 @@ namespace Belle2 {
       /** Histogram Adc of seed pixels */
       TH1F* hHardClusterSeedAdc;
 
-
-      virtual void defineHisto();
 
     };//end class declaration
 

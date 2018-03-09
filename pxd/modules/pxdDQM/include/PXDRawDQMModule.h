@@ -13,9 +13,10 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawPedestal.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
 //#include <map>
@@ -37,11 +38,15 @@ namespace Belle2 {
 
       // virtual ~PXDRawDQMModule();
 
-      virtual void initialize();
+    private:
+      void initialize() override final;
 
-      virtual void beginRun();
+      void beginRun() override final;
 
-      virtual void event();
+      void event() override final;
+
+      void defineHisto() override final;
+
 
     private:
 
@@ -50,7 +55,6 @@ namespace Belle2 {
       std::string m_storeRawPxdrarrayName;        /**< RawPXD StoreArray name */
       std::string m_storeRawHitsName;             /**< PXDRawHits StoreArray name */
       std::string m_storeRawAdcsName;             /**< RawAdcs StoreArray name */
-      std::string m_storeRawPedestalsName;        /**< RawPedestals StoreArray name */
 
       /** Storearray for raw data packets  */
       StoreArray<RawPXD> m_storeRawPxdrarray;
@@ -58,8 +62,8 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Storearray for ADC from full frames  */
       StoreArray<PXDRawAdc> m_storeRawAdcs;
-      /** Storearray for Pedestal from full frames   */
-      StoreArray<PXDRawPedestal> m_storeRawPedestals;
+      /** Input array for DAQ Status. */
+      StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
       /** Histogram number of raw packets */
       TH1F* hrawPxdPackets;
@@ -69,8 +73,6 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCount;
       /** Histogram 2d hitmap (all)*/
       TH2F* hrawPxdHitMapAll;
-      /** Histogram pedestal 2d hitmap (full frames only) (all pxd) */
-      TH2F* hrawPxdPedestalMapAll;
       /** Histogram Adc 2d hitmap (full frames only) (all pxd) */
       TH2F* hrawPxdAdcMapAll;
       /** Histogram 2d hitmap */
@@ -79,12 +81,10 @@ namespace Belle2 {
       TH2F* hrawPxdChargeMap[64];
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[64];
-      /** Histogram raw pixel common mode */
-      TH1F* hrawPxdHitsCommonMode[64];
-      /** Histogram raw pixel trigger window */
-      TH1F* hrawPxdHitsTimeWindow[64];
-
-      virtual void defineHisto();
+      /** Histogram raw pixel hit "time" window */
+      TH1F* hrawPxdHitTimeWindow[64];
+      /** Histogram raw pixel trigger gate window */
+      TH1F* hrawPxdGateTimeWindow[64];
 
     };//end class declaration
 

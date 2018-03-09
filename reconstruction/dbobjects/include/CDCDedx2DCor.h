@@ -60,6 +60,9 @@ namespace Belle2 {
         return 0;
       }
 
+      const int nDocaBins = m_twodgains[0].GetXaxis()->GetNbins();
+      const int nEntaBins = m_twodgains[0].GetYaxis()->GetNbins();
+
       // assume rotational symmetry
       if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;
       if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
@@ -68,7 +71,7 @@ namespace Belle2 {
       int biny = floor((sin(enta) + 1.0) / 0.2);
 
       double mean;
-      if (binx < 0 || biny < 0 || binx >= m_twodgains[0].GetXaxis()->GetNbins() || biny >= m_twodgains[0].GetYaxis()->GetNbins()) {
+      if (binx < 0 || biny < 0 || binx >= nDocaBins || biny >= nEntaBins) {
         B2WARNING("Problem with the 2D correction for CDC dE/dx!");
         mean = 1.0;
       } else mean = m_twodgains[0].GetBinContent(binx, biny);
@@ -83,6 +86,6 @@ namespace Belle2 {
     short m_version; /**< version number for 2D correction */
     std::vector<TH2F> m_twodgains; /**< 2D histograms of doca/enta gains, layer dependent */
 
-    ClassDef(CDCDedx2DCor, 1); /**< ClassDef */
+    ClassDef(CDCDedx2DCor, 2); /**< ClassDef */
   };
 } // end namespace Belle2

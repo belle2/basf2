@@ -22,6 +22,7 @@ particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
 .. _PDG codes: http://pdg.lbl.gov/2017/reviews/rpp2017-rev-monte-carlo-numbering.pdf
 """
 
+import re
 import basf2
 import ROOT
 from ROOT.Belle2 import EvtGenDatabasePDG
@@ -148,3 +149,115 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
         return True
 
     return False
+
+
+def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_width=False):
+    """
+    Search for a particles by name or mass or both.
+
+    This function allows to search for particle by name or mass and will return
+    a list of all particles which match the given criteria.
+
+    By default all searches for the name are case insensitive but if ``name``
+    starts with "~" the search will be case sensitive. The "~" will not be part
+    of the search.
+
+    If ``name_regex=True`` the name will be interpreted as a python
+    :py:mod:`regular expression <re>` and the function will return all particles
+    whose names match the expression.  If ``name_regex=False`` the function will
+    return a list of all particles containing the given pattern as substring
+    ignoring case with two special cases:
+
+    - if ``name`` begins with "^", only particles beginning with the pattern
+      will be searched. The "^" will not be part of the search.
+    - if ``name`` ends with "$" the pattern will only be matched to the end
+      of the particle name. The "$" will not be part of the search.
+
+    If ``include_width=True`` the search will include all particles if their
+    (mass ± width) is within the given limit. If ``include_width`` is a positive
+    number then the particle will be returned if :math:`m ± n*\Gamma` is within the
+    required range where n is the value of ``include_width`` and :math:`\Gamma` the
+    width of the particle.
+
+    Examples:
+        Return a list of all particles
+
+        >>> search()
+
+        Search for all particles containing a "pi" somewhere in the name and ignore the case
+
+        >>> search("pi")
+
+        Search for all particles beginning with K or k
+
+        >>> search("^K")
+
+        Search for all particles ending with "+" and having a maximal mass of 3 GeV:
+
+        >>> search("+$", max_mass=3.0)
+
+        Search for all particles which contain a capital D and have a minimal mass of 1 GeV
+
+        >>> search("~D", min_mass=1.0)
+
+        Search for all partiles which contain a set of parenthesis containing a number
+
+        >>> search(".*\(\d*\).*", name_regex=True)
+
+        Search all particles whose mass ± width covers 1 to 1.2 GeV
+
+        >>> search(min_mass=1.0, max_mass=1.2, include_width=True)
+
+        Search all particles whose mass ± 3*width touches 1 GeV
+
+        >>> search(min_mass=1.0, max_mass=1.0, include_width=3)
+
+
+    Parameters:
+        name (str): Search pattern which will either be matched as a substring
+            or as regular expression if ``name_regex=True``
+        min_mass (float): minimal mass for all returned particles or None for no limit
+        max_mass (float): maximal mass for all returned particles or None for no limit
+        name_regex (bool): if True then ``name`` will be treated as a regular expression
+        include_width (float or bool): if True or >0 include the particles if
+            (mass ± include_width*width) falls within the mass limits
+    """
+
+    pattern = None
+    if name:
+        options = re.IGNORECASE
+        if name[0] == "~":
+            name = name[1:]
+            options = 0
+
+        if not name_regex:
+            if name[0] == "^" and name[-1] == "$":
+                name = "^{}$".format(re.escape(name[1:-1]))
+            elif name[0] == "^":
+                name = "^{}.*".format(re.escape(name[1:]))
+            elif name[-1] == "$":
+                name = ".*{}$".format(re.escape(name[:-1]))
+            else:
+                name = ".*{}.*".format(re.escape(name))
+
+        pattern = re.compile(name, options)
+
+    if include_width is True:
+        include_width = 1
+
+    if include_width < 0:
+        include_width = 0
+
+    result = []
+    for p in _database.ParticleList():
+        if pattern is not None and not pattern.match(p.GetName()):
+            continue
+        m = p.Mass()
+        w = p.Width() * include_width
+        if min_mass is not None and min_mass > (m+w):
+            continue
+        if max_mass is not None and max_mass < (m-w):
+            continue
+        result.append(p)
+
+    return result

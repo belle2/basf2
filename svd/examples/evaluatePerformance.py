@@ -51,9 +51,8 @@ add_svd_reconstruction(main)
 add_tracking_reconstruction(
     main,
     components=["SVD"],
-    use_vxdtf2=True,
     mcTrackFinding=MCTracking,
-    additionalTrackFitHypotheses=[211],
+    trackFitHypotheses=[211],
     skipHitPreparerAdding=True)
 
 

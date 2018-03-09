@@ -15,26 +15,34 @@ from stdPi0s import *
 from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
-
+from stdDiLeptons import *
 set_log_level(LogLevel.INFO)
 
-filelist = \
+from skimExpertFunctions import *
+
+fileList = \
     ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
      'mdst_000001_prod00000001_task00000001.root'
+
      ]
-inputMdstList(filelist)
+
+
+inputMdstList('default', fileList)
+
 
 loadStdCharged()
-loadStdPi0()
+stdPi0s('loose')
+stdPhotons('loose')
 loadStdKS()
 loadStdLightMesons()
-loadStdPhoton()
-loadStdPhotonE15()
+loadStdSkimPi0()
+loadStdSkimPhoton()
 
 loadStdD0()
 loadStdDplus()
 loadStdDstar0()
 loadStdDstarPlus()
+loadStdDiLeptons(True)
 
 
 def add_skim(label, lists):
@@ -55,9 +63,9 @@ from Tau_List import *
 add_skim('TauLFV', TauLFVList())
 
 # EWP Skim
-from EWP_List import *
+from BtoXgamma_List import *
 add_skim('BtoXgamma', B2XgammaList())
-
+from BtoXll_List import *
 add_skim('BtoXll', B2XllList())
 
 # Had Skim
@@ -69,13 +77,13 @@ from TCPV_List import *
 add_skim('TCPV', TCPVList())
 
 # SL Skim
-from Semileptonic_List import *
+from SLUntagged_List import *
 add_skim('SLUntagged', SemileptonicList())
-
+from LeptonicUntagged_List import *
 add_skim('LeptonicUntagged', LeptonicList())
 
 # Charm Skim
-from Charm_List import *
+from CharmRare_List import *
 add_skim('CharmRare', CharmRareList())
 
 # FEI Skim

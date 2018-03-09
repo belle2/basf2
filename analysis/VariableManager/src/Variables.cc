@@ -28,6 +28,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -679,6 +680,19 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Phi();
     }
 
+    double cosToThrustOfEvent(const Particle* part)
+    {
+      StoreObjPtr<ThrustOfEvent> thrust;
+      if (!thrust) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      PCmsLabTransform T;
+      TVector3 th = thrust->getThrustAxis();
+      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      return std::cos(th.Angle(particleMomentum));
+    }
+
 // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -732,11 +746,6 @@ namespace Belle2 {
     double particleMdstSource(const Particle* part)
     {
       return part->getMdstSource();
-    }
-
-    double particleCosMdstArrayIndex(const Particle* part)
-    {
-      return std::cos(part->getMdstArrayIndex());
     }
 
     double particlePvalue(const Particle* part)
@@ -1173,118 +1182,6 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
-    // TDCPV related ---------------------------------------------------------
-    double particleMCTagBFlavor(const Particle* particle)
-    {
-      double result = 1000.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
-    }
-
-    double particleTagVx(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().X();
-
-      return result;
-    }
-
-    double particleTagVy(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Y();
-
-      return result;
-    }
-
-    double particleTagVz(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaTErr(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaTErr();
-
-      return result;
-    }
-
-    double particleMCDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaZ(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = particle->getZ() - vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaB(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert) {
-        PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
-        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-        double c = Const::speedOfLight / 1000.; // cm ps-1
-        result = vert->getDeltaT() * bg * c;
-      }
-      return result;
-    }
 
 // Recoil Kinematics related ---------------------------------------------
 
@@ -1566,6 +1463,9 @@ namespace Belle2 {
                       "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
     REGISTER_VARIABLE("missingMomentumPhi", missingMomentumPhi,
                       "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
+                      "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
+
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -1640,18 +1540,6 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
 
-    VARIABLE_GROUP("TDCPV");
-    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
-    REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
-
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
@@ -1668,8 +1556,6 @@ namespace Belle2 {
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
-    REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
-                      " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,

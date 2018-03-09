@@ -47,6 +47,7 @@ if len(argv) >= 6:
 output = register_module('StorageSerializer')
 output.param('OutputBufferName', argv[3])
 output.param('OutputBufferSize', int(argv[4]))
+output.param('NodeID', int(argv[6]))
 output.param('compressionLevel', 0)
 
 # Create main path

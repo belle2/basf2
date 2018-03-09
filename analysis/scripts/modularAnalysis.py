@@ -324,7 +324,7 @@ def setupEventInfo(noEvents, path=analysis_main):
 def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=False):
     """
     Warning:
-        This functions is deprecated. Please call ``setupForGeneration`` then
+        This functions is deprecated. Please call ``setupEventInfo`` then
         ``add_evtgen_generator`` from the `generators`` package.
 
     ::
@@ -357,7 +357,7 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=Fa
         B2FATAL(message)
 
     from generators import add_evtgen_generator
-    setupForGeneration(noEvents, path)
+    setupEventInfo(noEvents, path)
     if not os.path.exists(decayTable):
         B2FATAL('The specifed decay table file does not exist:' + decayTable)
     add_evtgen_generator(path, 'signal', decayTable)
@@ -373,13 +373,13 @@ def generateContinuum(
 ):
     """
     Warning:
-        This functions is deprecated. Please call ``setupForGeneration`` then
+        This functions is deprecated. Please call ``setupEventInfo`` then
         ``add_continuum_generator`` from the `generators`` package.
 
     ::
-        from modularAnalysis import setupForGeneration
-        from generators import add_continuum_generator
-        setupForGeneration(noEvents, path)
+        from modularAnalysis import setupEventInfo
+        from generators import add_continuum_generator, add_inclusive_continuum_generator
+        setupEventInfo(noEvents, path)
         add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
     @param noEvents   number of events to be generated
@@ -395,7 +395,7 @@ def generateContinuum(
         "Please replace it with functions from generators. Here is some example code: \n"
         "\n"
         "    from modularAnalysis import setupEventInfo\n"
-        "    from generators import add_continuum_generator\n"
+        "    from generators import add_continuum_generator, add_inclusive_continuum_generator\n"
         "    setupEventInfo(noEvents)\n"
         "    add_continuum_generator(path, \"ccbar\")  # for example"
     )
@@ -404,15 +404,16 @@ def generateContinuum(
     else:
         B2FATAL(message)
 
-    from generators import add_continuum_generator
+    from generators import add_inclusive_continuum_generator
     setupEventInfo(noEvents)
     for finalstate in ['uubar', 'ddbar', 'ssbar', 'ccbar']:
         if decayTable.count(finalstate):
             B2INFO("Have parsed your decfile and will generate %s" % finalstate)
-            add_continuum_generator(path, finalstate)
+            add_inclusive_continuum_generator(path, finalstate, [inclusiveP], include_conjugates=inclusiveT - 1)
             return
 
-    add_continuum_generator(path, finalstate='', userdecfile=decayTable)
+    add_inclusive_continuum_generator(path, finalstate='', particles=[inclusiveP],
+                                      userdecfile=decayTable, include_conjugates=inclusiveT - 1)
     return
 
 

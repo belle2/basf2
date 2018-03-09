@@ -393,6 +393,13 @@ genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
   return recoTrack.m_genfitTrack;
 }
 
+void RecoTrackGenfitAccess::addTrackRep(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRep)
+{
+  B2ASSERT("AbsTrackRep with PDG " << trackRep->getPDG() << " (or charge conjugate) already in RecoTrack",
+           recoTrack.getTrackRepresentationForPDG(std::abs(trackRep->getPDG())) != nullptr);
+  RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRep);
+}
+
 const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
     const genfit::AbsTrackRep* representation)
 {

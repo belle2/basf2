@@ -907,6 +907,16 @@ namespace Belle2 {
      * @return genfit::Track of the RecoTrack.
      */
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
+
+    /**
+     * Add a new TrackRep to a genfit::Track and ensure that a TrackRep with the same PDG id
+     * (and its charge conjugate) is not already in the genfit::Track. If this is the case,
+     * a B2ASSERT is raised.
+     *
+     * @param recoTrack Track to add TrackRep to
+     * @param trackRep TrackRep to add
+     */
+    static void addTrackRep(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRep);
   };
 
 }

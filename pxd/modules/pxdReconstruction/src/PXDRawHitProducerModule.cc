@@ -20,6 +20,10 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 
+// FIXME: This module is not needed any longer, since we have a proper PXDPacker. We keep it for the
+// moment, because the PXDPacker lacks simulation of startrow and framenumber fields -> use it as inspiration
+
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -78,8 +82,7 @@ void PXDRawHitProducerModule::event()
     }
     if (frameCounter == 2 && storeDigit.getVCellID() >= startRow) frameCounter = 1;
     storeRawHits.appendNew(
-      sensorID, storeDigit.getVCellID(), storeDigit.getUCellID(), storeDigit.getCharge(),
-      startRow, frameCounter, 0);
+      sensorID, storeDigit.getVCellID(), storeDigit.getUCellID(), storeDigit.getCharge(), frameCounter);
   }
   // That's not all, folks. We have to destroy all current PXDDigits.
   storeDigits.clear();

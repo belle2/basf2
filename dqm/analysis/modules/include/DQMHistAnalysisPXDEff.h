@@ -14,7 +14,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TH1.h>
@@ -49,8 +48,6 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     bool m_singleHists;
 
-    VXD::GeoCache& m_vxdGeometry;
-
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
@@ -72,7 +69,7 @@ namespace Belle2 {
     TH1D* m_hEffAll2;
     TCanvas* m_cEffAll2;
 
-    TH1* findHistLocal(TString& a);
+    TH1* GetHisto(TString a);
 
   };
 } // end namespace Belle2

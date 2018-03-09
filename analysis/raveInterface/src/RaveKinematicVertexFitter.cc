@@ -11,8 +11,6 @@
 #include <analysis/raveInterface/RaveKinematicVertexFitter.h>
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <genfit/GFRaveVertexFactory.h>
-#include <genfit/RKTrackRep.h>
 //root
 #include <Math/ProbFunc.h>
 

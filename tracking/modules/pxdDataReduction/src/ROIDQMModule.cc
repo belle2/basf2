@@ -100,15 +100,22 @@ void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
-  StoreArray<RawFTSW>::optional();
-  StoreArray<PXDDigit>::optional();
-  StoreArray<PXDRawHit>::optional();
-  StoreArray<ROIid>::required(m_ROIsName);
-  StoreArray<PXDIntercept>::required(m_InterceptsName);
+  StoreArray<RawFTSW> rawFTSWs;
+  rawFTSWs.isOptional();
+
+  StoreArray<PXDDigit> pxdDigits;
+  pxdDigits.isOptional();
+
+  StoreArray<PXDRawHit> pxdRawHits;
+  pxdRawHits.isOptional();
+
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIsName);
+
+  StoreArray<PXDIntercept> pxdIntercept;
+  pxdIntercept.isRequired(m_InterceptsName);
 
   n_events = 0;
-
-
 }
 
 void ROIDQMModule::event()

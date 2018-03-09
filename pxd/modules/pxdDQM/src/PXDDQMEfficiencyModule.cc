@@ -236,9 +236,9 @@ void PXDDQMEfficiencyModule::defineHisto()
 
     //nu + 1,nv + 1 Bin numbers when using one bin per pixel
     m_h_track_hits[avxdid] = new TH2D("track_hits_" + buff, "tracks through sensor " + buff,
-                                      m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                                      m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_h_matched_cluster[avxdid] = new TH2D("matched_cluster_" + buff, "clusters matched to track intersections " + buff,
-                                           m_u_bins, -0.5, nu + 0.5, m_v_bins, -0.5, nv + 0.5);
+                                           m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
   // cd back to root directory
   oldDir->cd();

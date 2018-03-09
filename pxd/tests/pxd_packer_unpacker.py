@@ -17,7 +17,6 @@ from rawdata import add_unpackers
 pxd_rawhits_pack_unpack_collection = "PXDRawHits_test"
 pxd_rawhits_pack_unpack_collection_digits = "PXDDigits_test"
 pxd_rawhits_pack_unpack_collection_adc = pxd_rawhits_pack_unpack_collection + "_adc"
-pxd_rawhits_pack_unpack_collection_pedestal = pxd_rawhits_pack_unpack_collection + "_pedestal"
 pxd_rawhits_pack_unpack_collection_roi = pxd_rawhits_pack_unpack_collection + "_roi"
 set_random_seed(42)
 
@@ -138,7 +137,6 @@ for e in main.modules():
     if e.name() == 'PXDUnpacker':
         e.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
         e.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
-        e.param("PXDRawPedestalsName", pxd_rawhits_pack_unpack_collection_pedestal)
         e.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
 
     if e.name() == 'PXDRawHitSorter':

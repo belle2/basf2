@@ -4,7 +4,7 @@
 #############################################################
 # Simple steering file to demonstrate how to run:
 #   PXD, SVD, VXD and Track DQM on BelleII or Phase2 geometry
-#   for ExpressReco on-line use Min modules without analysis
+#   for ExpressReco on-line
 #   Base on module from Martin Ritter:
 #               tracking/examples/DQMTracking_Phase2.py
 # Contributors: Peter Kodys                                              *
@@ -16,6 +16,7 @@ from reconstruction import add_reconstruction
 from L1trigger import add_tsim
 import glob
 
+from reconstruction import add_cosmics_reconstruction
 from daqdqm.commondqm import add_common_dqm
 
 # background (collision) files
@@ -44,6 +45,8 @@ main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_event
 
 # generate BBbar events
 main.add_module('EvtGenInput')
+# generate cosmics events
+# main.add_module('Cosmics')
 
 # detector simulation
 add_simulation(main, bkgfiles=bg)
@@ -53,21 +56,20 @@ add_tsim(main)
 
 # reconstruction - set pruneTracks=False to store RecoHits for TrackDQM
 add_reconstruction(main, pruneTracks=False)
+# reconstruction fo cosmics - set pruneTracks=False to store RecoHits for TrackDQM
+# add_cosmics_reconstruction(main, pruneTracks=False, data_taking_period = 'phase2')
 
 # histomanager: use DqmHistoManager for in-line monitoring, or HistoManager for offline training
 # main.add_module('DqmHistoManager', Port=7777)
 main.add_module('HistoManager', histoFileName='Histos_DQMTracks_Phase2.root')
 # main.add_module('HistoManager', histoFileName='Histos_DQMTracks_BelleII.root')
 
-pxddqmExpRecoMin = register_module('PXDDQMExpressRecoMin')
 pxddqmExpReco = register_module('PXDDQMExpressReco')
-svddqmExpRecoMin = register_module('SVDDQMExpressRecoMin')
 svddqmExpReco = register_module('SVDDQMExpressReco')
-vxddqmExpRecoMin = register_module('VXDDQMExpressRecoMin')
 vxddqmExpReco = register_module('VXDDQMExpressReco')
-main.add_module(pxddqmExpRecoMin)
-main.add_module(svddqmExpRecoMin)
-main.add_module(vxddqmExpRecoMin)
+main.add_module(pxddqmExpReco)
+main.add_module(svddqmExpReco)
+main.add_module(vxddqmExpReco)
 # # The following should do the same as above
 # add_common_dqm(main,['PXD', 'SVD'])
 

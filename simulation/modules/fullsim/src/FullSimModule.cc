@@ -82,7 +82,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
 
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));
-  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(""));
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy,
            "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
   addParam("ThresholdTrials", m_thresholdTrials,
@@ -160,12 +159,22 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-  //Register the collections we want to use
-  StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
-  mcParticles.registerInDataStore();
+  // MCParticles input and output collections can be different.
+  // Output collection is always the default one.
+  // In case we simulate only beam background events using BG mixing or BG overlay
+  // there is no input collection.
 
-  //Make sure these collections already exist
-  StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  if (m_mcParticleInputColName.empty()) {
+    // input and output collections are the same
+    // register in datastore because the input collection may not exist (case: only BG)
+    StoreArray<MCParticle>().registerInDataStore();
+  } else {
+    // input and output collections are different
+    StoreArray<MCParticle>().isRequired(m_mcParticleInputColName); // input collection
+    StoreArray<MCParticle>().registerInDataStore(); // output collection
+  }
+
+  //Make sure the EventMetaData already exists.
   StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.
@@ -249,7 +258,8 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  EventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_mcParticleGraph);
+  //The output collection name will be always "MCParticles".
+  EventAction* eventAction = new EventAction("", m_mcParticleGraph);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.

@@ -11,7 +11,6 @@ input = register_module('SeqRootInput')
 
 unpacker = register_module('PXDUnpacker')
 # unpacker.param('DoNotStore',True);
-# unpacker.param('HeaderEndianSwap',False);
 
 histoman = register_module('HistoManager')
 histoman.param('histoFileName', 'your_histo_file.root')

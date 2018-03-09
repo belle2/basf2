@@ -41,6 +41,12 @@ namespace Belle2 {
      */
     PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false), m_unfiltered(false) {}
 
+    /** Return pointer to PXDDAQDHEStatus for the DHE connected to sensor with VxdID id
+     *  If id not found, it returns nullptr!
+     * @param id VxdID for required DHE
+     */
+    const PXDDAQDHEStatus* findDHE(const VxdID& id) const;
+
     /** Return Usability of data
      * @return conclusion if data is useable
      */
@@ -116,6 +122,11 @@ namespace Belle2 {
     /** iterator-based iteration for packets */
     std::vector<PXDDAQPacketStatus>::iterator end() { return m_pxdPacket.end(); };
 
+    /** const iterator-based iteration for packets */
+    std::vector<PXDDAQPacketStatus>::const_iterator cbegin() const { return m_pxdPacket.cbegin(); };
+    /** const iterator-based iteration for packets */
+    std::vector<PXDDAQPacketStatus>::const_iterator cend() const { return m_pxdPacket.cend(); };
+
     PXDDAQPacketStatus& pkt_back() { return m_pxdPacket.back(); };
     size_t pkt_size() const { return m_pxdPacket.size(); };
 
@@ -130,7 +141,7 @@ namespace Belle2 {
     /** Vector of packet informations beloning to this event */
     std::vector <PXDDAQPacketStatus> m_pxdPacket;
 
-    ClassDef(PXDDAQStatus, 1)
+    ClassDef(PXDDAQStatus, 2)
 
   }; // class PXDDAQStatus
 

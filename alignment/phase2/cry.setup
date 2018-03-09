@@ -1,0 +1,11 @@
+returnGammas 0
+returnKaons 0
+returnPions 0
+returnProtons 0
+returnNeutrons 0
+returnElectrons 0
+returnMuons 1
+date 2-1-2018
+latitude 36.0
+altitude 0
+subboxLength 300

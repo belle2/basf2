@@ -114,7 +114,7 @@ particlegun.param('nTracks', 10)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 

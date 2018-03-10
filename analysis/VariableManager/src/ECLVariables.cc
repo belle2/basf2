@@ -651,9 +651,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
                       "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
     REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
-                      "Returns ECL cluster's hadron scintillation component intensity.");
+                      "Returns ECL cluster's Cluster Hadron Component Intensity (pulse shape discrimination variable). \n"
+                      "Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission. \n"
+                      "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
     REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
-                      "Returns ECL cluster's weighted sum of hadron digits (current weights are all 1.0).");
+                      "Returns ECL cluster's Number of hadron digits in cluster (pulse shape discrimination variable). \n"
+                      "Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. \n"
+                      "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,

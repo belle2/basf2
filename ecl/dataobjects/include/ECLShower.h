@@ -34,13 +34,13 @@ namespace Belle2 {
       c_hasDeadCrystal = 1 << 0,
 
       /** bit 1:  Hot crystal within nominal shower neighbour region.  */
-      c_hasHotCrystal = 2 << 0,
+      c_hasHotCrystal = 1 << 1,
 
       /** combined flag to test whether the shower is 'problematic' */
       c_hasProblematicCrystal = c_hasDeadCrystal | c_hasHotCrystal,
 
-      /** bit 3:  Shower has pulse shape discrimination variables.  */
-      c_hasPulseShapeDiscrimination = 4 << 0,
+      /** bit 2:  Shower has pulse shape discrimination variables.  */
+      c_hasPulseShapeDiscrimination = 1 << 2,
 
     };
 
@@ -470,8 +470,10 @@ namespace Belle2 {
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
-    Double32_t m_ShowerHadronIntensity;            /**< Shower Hadron Intensity*/
-    Double32_t m_NumberOfHadronDigits;            /**< Weighted sum of crystals with large hadron component energy. */
+    Double32_t
+    m_ShowerHadronIntensity;        /**< Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. (SL) */
+    Double32_t
+    m_NumberOfHadronDigits;         /**< Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)

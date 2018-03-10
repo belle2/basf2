@@ -127,13 +127,13 @@ void SVDUnpackerModule::event()
     B2FATAL("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
             << "This can lead to undesired behaviour. At least remember to\""
             << "use SVDDigitSorter in your path and set the \n"
-            << "silentAppend parameter of SVDUnpacker to true.");
+            << "silentlyAppend parameter of SVDUnpacker to true.");
 
   if (!m_silentAppend && shaperDigits && shaperDigits.getEntries())
     B2FATAL("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
             << "StoreArray. This can lead to undesired behaviour. At least\n"
             << "remember to use SVDShaperDigitSorter in your path and \n"
-            << "set the silentAppend parameter of SVDUnpacker to true.");
+            << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
   vector<SVDDAQDiagnostic*> diagnosticVector;
   SVDDAQDiagnostic* currentDAQDiagnostic;

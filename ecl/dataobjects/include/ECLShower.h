@@ -471,9 +471,9 @@ namespace Belle2 {
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
     Double32_t
-    m_ShowerHadronIntensity;        /**< Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. (SL) */
+    m_ShowerHadronIntensity;        /**< Shower Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using showers digits with energy greater than 50 MeV and good offline waveform fit chi2. (SL) */
     Double32_t
-    m_NumberOfHadronDigits;         /**< Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
+    m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)

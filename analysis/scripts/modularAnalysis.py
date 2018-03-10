@@ -343,7 +343,7 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=Fa
 
     message = (
         "The generateY4S function from modularAnalysis is deprecated.\n"
-        "This function will be removed in release - 02. Please update your scripts.\n"
+        "This function will be removed after release - 02. Please update your scripts.\n"
         "Please replace it with functions from generators. Here is some example code: \n"
         "\n"
         "    from modularAnalysis import setupEventInfo"
@@ -391,7 +391,7 @@ def generateContinuum(
     """
     message = (
         "The generateContinuum function from modularAnalysis is deprecated.\n"
-        "This function will be removed in release - 02. Please update your scripts.\n"
+        "This function will be removed after release - 02. Please update your scripts.\n"
         "Please replace it with functions from generators. Here is some example code: \n"
         "\n"
         "    from modularAnalysis import setupEventInfo\n"

@@ -16,6 +16,7 @@
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -437,7 +438,7 @@ void ECLDigitizerModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(5);
+  m_ss.resize(2);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP, 27.7221);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
@@ -451,12 +452,35 @@ void ECLDigitizerModule::readDSPDB()
   // parameters from ps.dat roughly in the same place as in current MC
   double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
-  double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
-  m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
-  double hadron_params_forPSD[] = {0.542623, 0.929354, 0.556139, 0.446967, 0.140175, 0.0312971, 3.12842, 0.791012, 0.619416, 0.385621};
-  m_ss[3].InitSample(hadron_params_forPSD, 29.5092);
-  double diode_params_forPSD[] = {0.578214, 0.00451387, 0.663087, 0.501441, 0.12073, 0.029675, 3.0666, 0.643883, 0.756048, 0.509381};
-  m_ss[4].InitSample(diode_params_forPSD, 28.7801);
+
+  if (m_HadronPulseShape) {
+
+    m_ss.resize(5); //Append space for templates used for hadron pulse shape simulations
+
+    //read MC templates from database
+    DBObjPtr<ECLDigitWaveformParametersForMC> WaveformParametersMC("ECLDigitWaveformParametersForMC");
+    double PhotonParsPSD[10];
+    double HadronParsPSD[10];
+    double DiodeParsPSD[10];
+    for (int i = 0; i < 10; i++) {
+      PhotonParsPSD[i] = WaveformParametersMC->getPhotonParameters()[i + 1];
+      HadronParsPSD[i] = WaveformParametersMC->getHadronParameters()[i + 1];
+      DiodeParsPSD[i] = WaveformParametersMC->getDiodeParameters()[i + 1];
+    }
+
+    //Initialize additinal templates
+    m_ss[2].InitSample(PhotonParsPSD, WaveformParametersMC->getPhotonParameters()[0]);
+    m_ss[3].InitSample(HadronParsPSD, WaveformParametersMC->getHadronParameters()[0]);
+    m_ss[4].InitSample(DiodeParsPSD, WaveformParametersMC->getDiodeParameters()[0]);
+
+    //std::cout<<std::endl;
+    //for(int i=0;i<11;i++)std::cout<<WaveformParametersMC->getPhotonParameters()[i]<<" ";
+    //std::cout<<std::endl;
+    //for(int i=0;i<11;i++)std::cout<<WaveformParametersMC->getHadronParameters()[i]<<" ";
+    //std::cout<<std::endl;
+    //for(int i=0;i<11;i++)std::cout<<WaveformParametersMC->getDiodeParameters()[i]<<" ";
+    //std::cout<<std::endl;
+  }
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

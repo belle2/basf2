@@ -474,7 +474,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         if is_pxd_used(components):
             add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                                   output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                  filter_cut=0.0, only_use_tracks_with_svd=False)
+                                  filter_cut=0.01)
 
         if merge_tracks:
             # merge the tracks together
@@ -702,7 +702,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                     trackFilter="mva",
                     trackFilterParameters={"cut": 0.1})
 
+    output_tracks = "CDCTrackVector"
+
     if with_ca:
+        output_tracks = "CombinedCDCTrackVector"
         path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
 
@@ -710,10 +713,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
         path.add_module("TFCDC_TrackCombiner",
                         inputTracks="CDCTrackVector",
                         secondaryInputTracks="CDCTrackVector2",
-                        tracks="CDCTrackVector")
+                        tracks=output_tracks)
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",
+                    inputTracks=output_tracks,
                     corrections=[
                         "LayerBreak",
                         "OneSuperlayer",
@@ -723,10 +727,12 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     if with_ca:
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
+                        inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
+                    inputTracks=output_tracks,
                     RecoTracksStoreArrayName=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
@@ -936,13 +942,9 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     nameSegNet = 'SegmentNetwork' + suffix
     segNetProducer = register_module('SegmentNetworkProducer')
-    segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
-    segNetProducer.param('printNetworks', False)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
-    segNetProducer.param('addVirtualIP', False)
-    segNetProducer.param('observerType', 0)
     path.add_module(segNetProducer)
 
     #################

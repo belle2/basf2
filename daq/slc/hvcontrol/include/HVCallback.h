@@ -119,7 +119,6 @@ namespace Belle2 {
     };
     hvmon m_mon[30][1000];//yone [200]->[1000]
     hvmon m_mon_tmp[30][1000];//yone [200]->[1000]
-
   };
 
 };

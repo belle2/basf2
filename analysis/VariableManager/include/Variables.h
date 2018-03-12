@@ -247,6 +247,11 @@ namespace Belle2 {
     double missingMomentumPhi(const Particle* part);
 
     /**
+     * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
+     */
+    double cosToThrustOfEvent(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);
@@ -389,8 +394,13 @@ namespace Belle2 {
 
     /**
      * return decay time of matched MCParticle (-999.0 if the particle is not matched)
+     * note this is the delta time between decay of the particle and collision
      */
     double particleMCMatchDecayTime(const Particle* particle);
+
+
+    /** return life time of matched mc particle in CMS frame. */
+    double particleMCMatchLifeTime(const Particle* particle);
 
     /**
      * return px of matched MCParticle (-999.0 if the particle is not matched)

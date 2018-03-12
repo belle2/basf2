@@ -30,7 +30,6 @@ namespace Belle2 {
       m_row(0),
       m_column(0),
       m_charge(0) ,
-      m_startRow(0),
       m_frameNr(0) {};
 
 
@@ -39,13 +38,12 @@ namespace Belle2 {
      * @param row Pixel row coordinate.
      * @param column Pixel column coordinate.
      * @param charge The Pixel charge.
-     * @param startRow Number of the row where the reading electronic startet.
      * @param frameNr number of the (readout) frame.
      */
     PXDRawHit(VxdID sensorID, short row, short column, short charge,
-              unsigned short startRow, unsigned int frameNr):
+              unsigned int frameNr):
       m_sensorID(sensorID), m_row(row), m_column(column),
-      m_charge(charge), m_startRow(startRow), m_frameNr(frameNr)
+      m_charge(charge), m_frameNr(frameNr)
     {};
 
     /** Get the sensor ID.
@@ -80,14 +78,6 @@ namespace Belle2 {
       return m_charge;
     }
 
-    /** Get row where trigger happend / readout started
-     * @return row where reading begins.
-     */
-    unsigned short getStartRow() const
-    {
-      return m_startRow;
-    }
-
     /** Get frame number.
      * @return Number of the Frame.
      */
@@ -102,11 +92,9 @@ namespace Belle2 {
     short m_row;         /**< Absolute pixel position in v. */
     short m_column;         /**< Absolute pixel position in v. */
     short m_charge;           /**< Deposited charge in pixel. */
-    unsigned short m_startRow;  /**< pixel row where reading starts */
     unsigned short m_frameNr;    /**< Number of the Frames */
-    // ~PXDRawHit();
 
-    ClassDef(PXDRawHit, 5)
+    ClassDef(PXDRawHit, 6)
   };
 
 

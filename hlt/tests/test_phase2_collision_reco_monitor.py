@@ -6,6 +6,6 @@ from softwaretrigger.test_support import create_test_path, finalize_test_path
 path, tempfolder = create_test_path(runtype="collision", expNum=1002)
 
 # no reconstruction or software trigger added at all
-add_hlt_processing(path, run_type="collision", softwaretrigger_mode="monitoring")
+add_hlt_processing(path, run_type="collision", softwaretrigger_mode="monitoring", clean_wrapped_path=True)
 
 finalize_test_path(path, tempfolder)

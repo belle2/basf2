@@ -35,15 +35,15 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
     // 32-35
     "SendUnfiltered but Filtered Frame Type", "!SendUnfiltered but Unfiltered Frame Type", "DHP has double header", "Error bit in frame header set",
     // 36-39
-    "Error bit in GHOST frame header not set", "Suspicious Padding/Checksum in DHP ZSP", "DHC Words in Event mismatch", "DHH Words in Event mismatch",
+    "Error bit in GHOST frame header not set", "Suspicious Padding/Checksum in DHP ZSP", "DHC Words in Event mismatch", "DHE Words in Event mismatch",
     // 40-43
     "Row Overflow/out of bounds >=768", "DHP Frames not continuesly", "DHP Frame numbers of different frames differ>1", "DHP Frame differ from DHE Frame by >1",
     // 44-47
     "DHE ID is invalid", "DHC ID Start/End Mismatch", "DHE End w/o Start", "double DHC End",
     // 48-51
-    "DHC TrigNr vs EvtMeta mismatch", "DHE TrigNr vs EvtMeta mismatch", "DHP COL overflow (unconnected drain lines)", "Unexpected (=unsupported) Frame Type",
+    "DHC vs EvtMeta mismatch for TriggerNr", "DHE vs EvtMeta mismatch for TriggerNr", "DHP COL overflow (unconnected drain lines)", "Unexpected (=unsupported) Frame Type",
     // 52-55
-    "unused", "unused", "unused", "unused",
+    "DHC vs EvtMeta mismatch for Exp/Run/Subrun", "DHC vs EvtMeta mismatch for TimeTag", "ONS_TRG: HLT vs EvtMeta mismatch", "ONS_TRG: DATCON vs EvtMeta mismatch",
     // 56-59
     "unused", "unused", "unused", "unused",
     // 60-63

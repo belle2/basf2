@@ -11,6 +11,9 @@
 #include <svd/modules/svdCalibration/SVDCalibrationsMonitorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace Belle2;
 
@@ -47,6 +50,24 @@ void SVDCalibrationsMonitorModule::initialize()
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
+  //tree initialization
+  m_tree = new TTree("calib", "RECREATE");
+  b_run = m_tree->Branch("run", &m_run, "run/i");
+  b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
+  b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
+  b_sensor = m_tree->Branch("sensor", &m_sensor, "sensor/i");
+  b_side = m_tree->Branch("side", &m_side, "side/i");
+  b_noiseAVE = m_tree->Branch("noiseAVE", &m_noiseAVE, "noiseAVE/F");
+  b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
+  b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
+  b_gainRMS = m_tree->Branch("gainRMS", &m_gainRMS, "gainRMS/F");
+  b_peakTimeAVE = m_tree->Branch("peakTimeAVE", &m_peakTimeAVE, "peakTimeAVE/F");
+  b_peakTimeRMS = m_tree->Branch("peakTimeRMS", &m_peakTimeRMS, "peakTimeRMS/F");
+  b_pulseWidthAVE = m_tree->Branch("pulseWidthAVE", &m_pulseWidthAVE, "pulseWidthAVE/F");
+  b_pulseWidthRMS = m_tree->Branch("pulseWidthRMS", &m_pulseWidthRMS, "pulseWidthRMS/F");
+
+
+
   TString NameOfHisto = "";
   TString TitleOfHisto = "";
 
@@ -158,6 +179,9 @@ void SVDCalibrationsMonitorModule::beginRun()
 void SVDCalibrationsMonitorModule::event()
 {
 
+  StoreObjPtr<EventMetaData> meta;
+  m_run = meta->getRun();
+
   //call for a geometry instance
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
@@ -238,6 +262,23 @@ void SVDCalibrationsMonitorModule::event()
 
         } //histogram filled for V side
 
+        m_layer = layer;
+        m_ladder = ladder;
+        m_sensor = sensor;
+        for (int s = 0; s < 2; s++) {
+          m_side = s;
+          m_noiseAVE = h_noise[layer][ladder][sensor][s]->GetMean();
+          m_noiseRMS = h_noise[layer][ladder][sensor][s]->GetRMS();
+          m_gainAVE = h_gainInElectrons[layer][ladder][sensor][s]->GetMean();
+          m_gainRMS = h_gainInElectrons[layer][ladder][sensor][s]->GetRMS();
+          m_peakTimeAVE = h_peakTime[layer][ladder][sensor][s]->GetMean();
+          m_peakTimeRMS = h_peakTime[layer][ladder][sensor][s]->GetRMS();
+          m_pulseWidthAVE = h_pulseWidth[layer][ladder][sensor][s]->GetMean();
+          m_pulseWidthRMS = h_pulseWidth[layer][ladder][sensor][s]->GetRMS();
+
+
+          m_tree->Fill();
+        }
         ++itSvdSensors;
       }
       ++itSvdLadders;
@@ -255,6 +296,9 @@ void SVDCalibrationsMonitorModule::terminate()
 {
   TObject* obj;
   if (m_rootFilePtr != NULL) {
+
+    //write the tree
+    m_tree->Write();
 
     //writing the histrogram list for the noises in ADC units
     m_rootFilePtr->mkdir("noise_ADCunits");

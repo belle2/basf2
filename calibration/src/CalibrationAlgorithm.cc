@@ -24,7 +24,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     Py_ssize_t nObj = PySequence_Length(pyObj);
     // Does it have 2 objects in it?
     if (nObj != 2) {
-      B2DEBUG(100, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
+      B2DEBUG(29, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
       return false;
     }
     long value1, value2;
@@ -33,7 +33,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     item2 = PySequence_GetItem(pyObj, 1);
     // Did the GetItem work?
     if ((item1 == NULL) || (item2 == NULL)) {
-      B2DEBUG(100, "A PyObject pointer was NULL in the sequence");
+      B2DEBUG(29, "A PyObject pointer was NULL in the sequence");
       return false;
     }
     // Are they longs?
@@ -41,18 +41,18 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
       value1 = PyLong_AsLong(item1);
       value2 = PyLong_AsLong(item2);
       if (((value1 == -1) || (value2 == -1)) && PyErr_Occurred()) {
-        B2DEBUG(100, "An error occurred while converting the PyLong to long");
+        B2DEBUG(29, "An error occurred while converting the PyLong to long");
         return false;
       }
     } else {
-      B2DEBUG(100, "One or more of the PyObjects in the ExpRun wasn't a long");
+      B2DEBUG(29, "One or more of the PyObjects in the ExpRun wasn't a long");
       return false;
     }
     // Make sure to kill off the reference GetItem gave us responsibility for
     Py_DECREF(item1);
     Py_DECREF(item2);
   } else {
-    B2DEBUG(100, "ExpRun was not a Python sequence.");
+    B2DEBUG(29, "ExpRun was not a Python sequence.");
     return false;
   }
   return true;
@@ -74,7 +74,7 @@ ExpRun CalibrationAlgorithm::convertPyExpRun(PyObject* pyObj)
 
 CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(PyObject* runs, int iteration, IntervalOfValidity iov)
 {
-  B2DEBUG(100, "Running execute() using Python Object as input argument");
+  B2DEBUG(29, "Running execute() using Python Object as input argument");
   // Reset the execution specific data in case the algorithm was previously called
   m_data.reset();
   m_data.setIteration(iteration);
@@ -120,7 +120,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<ExpRun> runs,
   // Did we receive runs to execute over explicitly?
   if (!(runs.empty())) {
     for (auto expRun : runs) {
-      B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
+      B2DEBUG(29, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
     // We've asked explicitly for certain runs, but we should check if the data granularity is 'run'
     if (strcmp(getGranularity().c_str(), "all") == 0) {
@@ -137,7 +137,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<ExpRun> runs,
       return c_Failure;
     }
     for (auto expRun : runs) {
-      B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
+      B2DEBUG(29, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
   }
 
@@ -258,13 +258,13 @@ string CalibrationAlgorithm::getFullObjectPath(string name, ExpRun expRun) const
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
-  B2DEBUG(100, "Saving calibration TObject = '" <<  name << "' to payloads list.");
+  B2DEBUG(29, "Saving calibration TObject = '" <<  name << "' to payloads list.");
   getPayloads().emplace_back(name, data, iov);
 }
 
 void CalibrationAlgorithm::saveCalibration(TClonesArray* data, const string& name, const IntervalOfValidity& iov)
 {
-  B2DEBUG(100, "Saving calibration TClonesArray '" <<  name << "' to payloads list.");
+  B2DEBUG(29, "Saving calibration TClonesArray '" <<  name << "' to payloads list.");
   getPayloads().emplace_back(name, data, iov);
 }
 
@@ -388,7 +388,7 @@ namespace Belle2 {
         f.reset(TFile::Open(fileName.c_str(), "READ"));
         runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
         if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(100, "Found requested data in file: " << fileName);
+          B2DEBUG(29, "Found requested data in file: " << fileName);
           // Loop over runs in data and check if they exist in our requested ones, then add if they do
           for (auto expRunData : runRangeData->getExpRunSet()) {
             for (auto expRunRequested : requestedRuns) {
@@ -403,14 +403,14 @@ namespace Belle2 {
                 for (auto key : * (objDir->GetListOfKeys())) {
                   string keyName = key->GetName();
                   string objectPath = fileName + "/" + objDirName + "/" + keyName;
-                  B2DEBUG(100, "Adding TTree " << objectPath);
+                  B2DEBUG(29, "Adding TTree " << objectPath);
                   chain->Add(objectPath.c_str());
                 }
               }
             }
           }
         } else {
-          B2DEBUG(100, "No overlapping data found in file: " << fileName);
+          B2DEBUG(29, "No overlapping data found in file: " << fileName);
           continue;
         }
       }
@@ -419,7 +419,7 @@ namespace Belle2 {
       string objDirName = getFullObjectPath(name, allGranExpRun);
       for (const auto& fileName : m_inputFileNames) {
         string objectPath = fileName + "/" + objDirName + "/" + name + "_1";  // Only one index for this granularity
-        B2DEBUG(100, "Adding TTree " << objectPath);
+        B2DEBUG(29, "Adding TTree " << objectPath);
         chain->Add(objectPath.c_str());
       }
     }
@@ -431,7 +431,7 @@ namespace Belle2 {
     // make a TNamed version to input to the map of previous calib objects
     shared_ptr<TNamed> storedObjPtr = static_pointer_cast<TNamed>(objOutputPtr);
     m_data.setCalibObj(name, runRangeRequested, storedObjPtr);
-    B2DEBUG(100, "Passing back merged data " << name);
+    B2DEBUG(29, "Passing back merged data " << name);
     return objOutputPtr;
   }
 }

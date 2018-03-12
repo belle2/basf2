@@ -227,7 +227,7 @@ namespace Belle2 {
      * @param mother The mother particle which decays.
      * @param daughter The daughter particle in which the mother particle decays.
      */
-    void addDecay(GraphParticle& mother, GraphParticle& daughter) throw(NotSameGraphError, DaughterHasMotherError);
+    void addDecay(GraphParticle& mother, GraphParticle& daughter);
 
     /**
      * Return reference to added particle with range check.
@@ -300,7 +300,6 @@ namespace Belle2 {
 
 
   inline void MCParticleGraph::addDecay(MCParticleGraph::GraphParticle& mother, MCParticleGraph::GraphParticle& daughter)
-  throw(MCParticleGraph::NotSameGraphError, MCParticleGraph::DaughterHasMotherError)
   {
     if (this != mother.m_graph || this != daughter.m_graph) throw NotSameGraphError();
     //if (daughter.getMother() != NULL) throw DaughterHasMotherError();

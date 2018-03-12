@@ -58,8 +58,6 @@ namespace Belle2 {
     std::string m_storePXDClustersName;
     /** PXDClustersToPXDDigits RelationArray name */
     std::string m_relPXDClusterDigitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
 
     /** Hitmaps of Digits */
     TH1I* m_hitMapCounts;
@@ -73,12 +71,13 @@ namespace Belle2 {
     TH1F** m_fired;
     /** Clusters per event */
     TH1F** m_clusters;
+    // FIXME: Startrow related histos are expert debugging, not for shifter (-> remove this)
     /** Start row distribution */
-    TH1F** m_startRow;
+    //TH1F** m_startRow;
     /** Cluster seed charge by distance from the start row */
-    TH1F** m_chargStartRow;
+    //TH1F** m_chargStartRow;
     /** counter for Cluster seed charge by distance from the start row */
-    TH1F** m_startRowCount;
+    //TH1F** m_startRowCount;
     /** Charge of clusters */
     TH1F** m_clusterCharge;
     /** Charge of pixels */

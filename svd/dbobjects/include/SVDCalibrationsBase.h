@@ -10,9 +10,12 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 #include <vector>
 #include <TString.h>
+
 namespace Belle2 {
 
   template < class T  >
@@ -91,7 +94,23 @@ namespace Belle2 {
                                     unsigned int side,
                                     unsigned int strip) const
     {
-      return T::get(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip);
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      const auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      const auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      const auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::get(sides[side] , strip);
     }
 
     /**
@@ -111,7 +130,23 @@ namespace Belle2 {
              unsigned int strip,
              typename T::calibrationType value)
     {
-      T::set(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip , value);
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::set(sides[side] , strip, value);
     }
 
     /**

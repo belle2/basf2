@@ -114,6 +114,7 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
   if (state->mSoPSet()) {
     firstMeasurement = state->getMeasuredStateOnPlane();
   } else {
+    B2ASSERT("Previous state was not fitted?", previousStates.back()->mSoPSet());
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 

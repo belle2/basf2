@@ -21,25 +21,29 @@
       TDC_DT=CHWID
       TDC_T0=OFFSET
       TIME_RANGE=TDC_RANGE*TDC_DT
+      T_MIN=-TDC_T0
       T_MAX=TIME_RANGE-TDC_T0
       TDC_INI=.TRUE.
 
       END
 
 
-      SUBROUTINE SET_TMAX(TMAX)
+      SUBROUTINE SET_TIME_WINDOW(TMIN, TMAX)
       
       IMPLICIT NONE
-      REAL TMAX
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
 #include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
       
-      IF(TMAX.GT.0) THEN
+      IF(TMAX.GT.TMIN) THEN
+         T_MIN=TMIN
          T_MAX=TMAX
       ELSE
+         T_MIN=-TDC_T0
          T_MAX=TIME_RANGE-TDC_T0
       ENDIF
-      
+
       END
 
 

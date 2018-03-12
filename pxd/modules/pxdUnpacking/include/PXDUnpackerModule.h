@@ -13,13 +13,13 @@
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawPedestal.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
 #include <pxd/dataobjects/PXDRawCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
@@ -50,9 +50,9 @@ namespace Belle2 {
       void terminate() override final;
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray of processed RawPXDs */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
-      std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
@@ -66,6 +66,10 @@ namespace Belle2 {
       bool m_doNotStore;
       /** Check for susp. Padding/CRC, default off because of many false positive */
       bool m_checkPaddingCRC;
+      /** Ignore Phase2 FW erro */
+      bool m_ignoreDHPMask;
+      /** Ignore Phase2 FW error */
+      bool m_ignoreDHELength;
       /** Force Mapping even if DHH bit is not requesting it */
       bool m_forceMapping;
       /** Force No Mapping even if DHH bit is requesting it */
@@ -94,6 +98,8 @@ namespace Belle2 {
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;
+      /** Input ptr for EventMetaData. */
+      StoreObjPtr<EventMetaData> m_eventMetaData;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw ROIs. */
@@ -102,8 +108,6 @@ namespace Belle2 {
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** Output array for Raw Adc:Pedestals. */
-      StoreArray<PXDRawPedestal> m_storeRawPedestal;
       /** Output array for Clusters. */
       StoreArray<PXDRawCluster> m_storeRawCluster;
 
@@ -185,11 +189,11 @@ namespace Belle2 {
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_dhp(void* data, unsigned int frame_len);
+      static void dump_dhp(void* data, unsigned int frame_len);
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_roi(void* data, unsigned int frame_len);
+      static void dump_roi(void* data, unsigned int frame_len);
 
     };//end class declaration
 

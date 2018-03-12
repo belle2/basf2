@@ -84,6 +84,20 @@ namespace Belle2 {
      * @param errorTollerant if true bypasses sanity checks
      */
     void importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+    /**
+     * This method import to the database the strip
+     * pedestal from the pedestal local runs.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+    /**
+     * This method import to the database the strip pulse
+     * width, time and gain from the injection local runs.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+
     void importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
 
     /**

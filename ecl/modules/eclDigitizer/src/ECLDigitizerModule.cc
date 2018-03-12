@@ -473,13 +473,6 @@ void ECLDigitizerModule::readDSPDB()
     m_ss[3].InitSample(HadronParsPSD, WaveformParametersMC->getHadronParameters()[0]);
     m_ss[4].InitSample(DiodeParsPSD, WaveformParametersMC->getDiodeParameters()[0]);
 
-    //std::cout<<std::endl;
-    //for(int i=0;i<11;i++)std::cout<<WaveformParametersMC->getPhotonParameters()[i]<<" ";
-    //std::cout<<std::endl;
-    //for(int i=0;i<11;i++)std::cout<<WaveformParametersMC->getHadronParameters()[i]<<" ";
-    //std::cout<<std::endl;
-    //for(int i=0;i<11;i++)std::cout<<WaveformParametersMC->getDiodeParameters()[i]<<" ";
-    //std::cout<<std::endl;
   }
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");

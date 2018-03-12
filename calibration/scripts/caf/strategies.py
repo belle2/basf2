@@ -326,6 +326,100 @@ class SequentialRunByRun(AlgorithmStrategy):
                     self.machine.fail()
 
 
+class SimpleRunByRun(AlgorithmStrategy):
+    """
+    Algorithm strategy to do run-by-run calibration of collected data.
+    Runs the algorithm over the input data contained within the requested IoV, starting with the first run's data only.
+
+    This strategy differs from `SequentialRunByRun` in that it *will not merge run data* if the algorithm returns
+    'not enough data' on the current run.
+
+    Once an execution on a run returns *any* result 'iterate', 'ok', 'not_enough_data', or 'failure', we move onto the
+    next run (if any are left).
+    Committing of payloads to the outputdb only happens for 'iterate' or 'ok' return codes.
+
+    .. important:: Unlike most other strategies, this one won't immediately fail and return if a run returns a 'failure' exit
+                   code.
+                   The failure will prevent iteration/successful completion of the CAF though.
+
+    .. warning:: Since this strategy doesn't try to merge data from runs, if *any* run in your input data doesn't contain
+                 enough data to complete the algorithm successfully, you won't be able to get a successful calibration.
+                 The CAF then won't allow you to iterate this calibration, or pass the constants onward to another calibration.
+                 However, you will still have the database created that covers all the successfull runs.
+
+    This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
+    a CalibrationAlgorithm C++ class directly.
+"""
+
+    allowed_granularities = ["run"]
+
+    def __init__(self, algorithm):
+        """
+        """
+        super().__init__(algorithm)
+        #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
+        #: It gets setup properly in :py:func:`run`
+        self.machine = AlgorithmMachine(self.algorithm)
+
+    def run(self, iov, iteration):
+        """
+        Runs the algorithm machine over the collected data and fills the results.
+        """
+        if not self.is_valid():
+            raise StrategyError("This AlgorithmStrategy was not set up correctly!")
+        B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
+        # Now add all the necessary parameters for a strategy to run
+        machine_params = {}
+        machine_params["global_tag"] = self.global_tag
+        machine_params["local_database_chain"] = self.local_database_chain
+        machine_params["dependent_databases"] = self.dependent_databases
+        machine_params["output_dir"] = self.output_dir
+        machine_params["output_database_dir"] = self.output_database_dir
+        machine_params["input_files"] = self.input_files
+        self.machine.setup_from_dict(machine_params)
+        # Start moving through machine states
+        self.machine.setup_algorithm(iteration=iteration)
+        # After this point, the logging is in the stdout of the algorithm
+        B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
+        runs_to_execute = []
+        all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
+        # If we were given a specific IoV to calibrate we just execute over runs in that IoV
+        if iov:
+            runs_to_execute = runs_overlapping_iov(iov, all_runs_collected)
+        else:
+            runs_to_execute = all_runs_collected[:]
+        # The runs we have left to execute
+        remaining_runs = runs_to_execute[:]
+        # Is this the first time executing the algorithm?
+        first_execution = True
+        for exprun in runs_to_execute:
+            if not first_execution:
+                self.machine.setup_algorithm()
+            current_runs = exprun
+            # Remove current run from our remaining runs
+            remaining_runs.pop(0)
+            B2INFO("Executing on IoV = {}".format(iov_from_runs([current_runs])))
+            self.machine.execute_runs(runs=[current_runs], iteration=iteration)
+            first_execution = False
+            B2INFO("Finished execution with result code {}".format(self.machine.result.result))
+            # Does this count as a successful execution?
+            if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
+                # Commit the payloads and result
+                B2INFO("Committing payloads for {}.".format(iov_from_runs([current_runs])))
+                self.machine.algorithm.algorithm.commit()
+                self.results.append(self.machine.result)
+                self.machine.complete()
+            # If it wasn't successful, was it due to lack of data in the runs?
+            elif (self.machine.result.result == AlgResult.not_enough_data.value):
+                B2INFO("There wasn't enough data in the IoV {}".format(iov_from_runs([current_runs])))
+                self.results.append(self.machine.result)
+                self.machine.fail()
+            elif self.machine.result.result == AlgResult.failure.value:
+                B2ERROR("Failure exit code in the IoV {}".format(iov_from_runs([current_runs])))
+                self.results.append(self.machine.result)
+                self.machine.fail()
+
+
 class StrategyError(Exception):
     """
     Basic Exception for this type of class

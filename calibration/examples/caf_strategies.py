@@ -42,13 +42,28 @@ def main(argv):
     cal_test = Calibration(name="TestCalibration", collector="CaTest", algorithms=alg_test, input_files=input_files_test)
 
     # Here we set the AlgorithmStrategy for our algorithm
-    from caf.strategies import SequentialRunByRun, SingleIOV
+    from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
+    # The default value is SingleIOV, you don't have to set this, it is done automatically.
+    # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
+    # You can use granularity='run' or granularity='all' for the collector when using this strategy.
+
+    # cal_test.strategies = SingleIOV
+
     # The SequentialRunByRun strategy executes your algorithm over runs
     # individually to give you payloads for each one (if successful)
+    # If there wasn't enough data in a run to give a success, it tried to merge with the next run's data
+    # and re-execute.
+    # You should only use granularity='run' for the collector when using this strategy.
+
     cal_test.strategies = SequentialRunByRun
-    # The default value is SingleIOV, you don't have to set this, it is done automatically.
-    # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on them all.
-    # cal_test.strategies = SingleIOV
+
+    # The SimpleRunByRun strategy executes your algorithm over runs
+    # individually to give you payloads for each one (if successful)
+    # It will not do any merging of runs which didn't contain enough data.
+    # So failure is expected if your algorithm requires a large amount of data compared to run length.
+    # You should only use granularity='run' for the collector when using this strategy.
+
+    # cal_test.strategies = SimpleRunByRun
 
     ###################################################
     # Create a CAF instance and add the calibration to it. Should run on one CPU core locally by default.

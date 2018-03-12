@@ -26,6 +26,7 @@
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
 #include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
+#include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDRelationFilter.h>
 #include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
 namespace Belle2 {
@@ -86,7 +87,7 @@ namespace Belle2 {
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
     /// Findlet for creating relations between states
-    CKFRelationCreator<CKFToSVDState, ChooseableSVDRelationFilter> m_relationCreator;
+    CKFRelationCreator<CKFToSVDState, ChooseableSVDRelationFilter, SectorMapBasedSVDRelationFilter> m_relationCreator;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
     /// Findlet for resolving overlaps

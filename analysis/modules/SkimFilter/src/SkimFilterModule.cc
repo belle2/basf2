@@ -81,6 +81,6 @@ void SkimFilterModule::terminate()
   stream <<  "\n=======================================================\n";
   stream <<  "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
   stream <<  "\n=======================================================\n";
-  B2DEBUG(19, stream.str());
+  B2INFO(stream.str());
 }
 

@@ -118,8 +118,8 @@ namespace Belle2 {
       /** Print all attributes of this object to terminal*/
       void Print() const
       {
-        B2DEBUG(19, "useBeamSpot: " << m_useBeamSpot);
-        B2DEBUG(19, "number of rave::Tracks: " << m_inputParticles.size());
+        B2INFO("useBeamSpot: " << m_useBeamSpot);
+        B2INFO("number of rave::Tracks: " << m_inputParticles.size());
       }
 
 

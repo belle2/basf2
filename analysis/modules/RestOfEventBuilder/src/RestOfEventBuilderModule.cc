@@ -261,20 +261,20 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   std::string printout;
   for (unsigned i = 0; i < trackFSPs.size(); i++)
     printout += std::to_string(trackFSPs[i]) + " ";
-  B2DEBUG(19, printout);
+  B2INFO(printout);
 
   printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
   for (unsigned i = 0; i < eclFSPs.size(); i++)
     printout += std::to_string(eclFSPs[i]) + " ";
-  B2DEBUG(19, printout);
+  B2INFO(printout);
 
   printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
   for (unsigned i = 0; i < klmFSPs.size(); i++)
     printout += std::to_string(klmFSPs[i]) + " ";
-  B2DEBUG(19, printout);
+  B2INFO(printout);
 
 }

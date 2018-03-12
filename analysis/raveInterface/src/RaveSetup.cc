@@ -93,15 +93,14 @@ void RaveSetup::Print()
 {
   if (getRawInstance() not_eq NULL) {
     if (getRawInstance()->m_useBeamSpot == false) {
-      B2DEBUG(19, "use beam spot is false");
+      B2INFO("use beam spot is false");
     } else {
-      B2DEBUG(19, "use beam spot is true and beam spot position and covariance matrix are:");
+      B2INFO("use beam spot is true and beam spot position and covariance matrix are:");
       getRawInstance()->m_beamSpot.Print();
       getRawInstance()->m_beamSpotCov.Print();
     }
-    B2DEBUG(19, "the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory);
-//    B2DEBUG(19, "the pointer to GFRaveVertexFactory is " << getRawInstance()->m_GFRaveVertexFactory );
+    B2INFO("the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory);
   } else {
-    B2DEBUG(19, "RaveSetup::initialize was not called. There is nothing to Print.");
+    B2INFO("RaveSetup::initialize was not called. There is nothing to Print.");
   }
 }

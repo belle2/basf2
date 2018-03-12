@@ -129,7 +129,7 @@ namespace Belle2 {
         mcPDG = -1;
       printout += "(" + std::to_string(it.first) + ", " + std::to_string(mcPDG) + ", " + std::to_string(it.second) + ")   ";
     }
-    B2DEBUG(19, printout);
+    B2INFO(printout);
   }
 
   void RestOfEventPrinterModule::printECLClusterMask(std::map<unsigned int, bool> eclClusterMask) const
@@ -147,7 +147,7 @@ namespace Belle2 {
         mcPDG = -1;
       printout += "(" + std::to_string(it.first) + ", " + std::to_string(mcPDG) + ", " + std::to_string(it.second) + ")   ";
     }
-    B2DEBUG(19, printout);
+    B2INFO(printout);
   }
 
 } // end Belle2 namespace

@@ -165,8 +165,7 @@ void ParticleStatsModule::terminate()
     }
     stream << "\n";
   }
-
-  B2DEBUG(19, stream.str());
+  B2INFO(stream.str());
   stream.str("");
 
   stream << "\n======================================================================\n";
@@ -182,12 +181,12 @@ void ParticleStatsModule::terminate()
     }
     stream << "\n";
   }
+  B2INFO(stream.str());
 
-  B2DEBUG(19, stream.str());
   stream.str("");
   stream << "\n=======================================================\n";
   stream << "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
   stream << "Total Number of Particles created in the DataStore: " << m_nParticles;
   stream << "\n=======================================================\n";
-  B2DEBUG(19, stream.str());
+  B2INFO(stream.str());
 }

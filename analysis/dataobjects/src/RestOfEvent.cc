@@ -382,5 +382,5 @@ void RestOfEvent::printIndices(std::set<int> indices) const
   for (const int index : indices) {
     printout += std::to_string(index) +  ", ";
   }
-  B2DEBUG(19, printout);
+  B2INFO(printout);
 }

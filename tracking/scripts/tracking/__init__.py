@@ -141,7 +141,66 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_finding(
+def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="RecoTracks",
+                      prune_temporary_tracks=True, use_second_cdc_hits=False,
+                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True):
+    """
+    Add the CKF to the path with all the track finding related to and needed for it.
+    :param path: The path to add the tracking reconstruction modules to
+    :param reco_tracks: The store array name where to output all tracks
+    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
+    :param use_mc_truth: Use the truth information in the CKF modules
+    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without). Defaults to "VXDTF2_after".
+    :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
+           extrapolate also in the other direction.
+    :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
+    :param components: the list of geometry components in use or None for all components.
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
+    """
+    if not is_svd_used(components) and not is_cdc_used(components):
+        return
+
+    cdc_reco_tracks = "CDCRecoTracks"
+    if not is_pxd_used(components) and not is_svd_used(components):
+        cdc_reco_tracks = reco_tracks
+
+    svd_cdc_reco_tracks = "SVDCDCRecoTracks"
+    if not is_pxd_used(components):
+        svd_cdc_reco_tracks = reco_tracks
+
+    svd_reco_tracks = "SVDRecoTracks"
+    pxd_reco_tracks = "PXDRecoTracks"
+
+    full_reco_tracks = reco_tracks
+
+    latest_reco_tracks = None
+
+    if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
+        # CDC track finding with default settings
+        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
+        latest_reco_tracks = cdc_reco_tracks
+
+    if trigger_mode in ["hlt", "all"] and is_svd_used(components):
+        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
+                              temporary_reco_tracks=svd_reco_tracks,
+                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions)
+        latest_reco_tracks = svd_cdc_reco_tracks
+
+    if trigger_mode in ["all"] and is_pxd_used(components):
+        add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              use_mc_truth=use_mc_truth, output_reco_tracks=full_reco_tracks,
+                              temporary_reco_tracks=pxd_reco_tracks,
+                              add_both_directions=add_both_directions)
+
+    if trigger_mode in ["all"] and prune_temporary_tracks:
+        for temporary_reco_track_name in [pxd_reco_tracks, svd_reco_tracks, cdc_reco_tracks, svd_cdc_reco_tracks]:
+            if temporary_reco_track_name != reco_tracks:
+                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
+
+
+def add_non_ckf_based_track_finding(
         path,
         components=None,
         trigger_mode="all",
@@ -280,71 +339,6 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UsePXDHits=is_pxd_used(components),
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
-
-
-def add_ckf_based_track_finding(path,
-                                reco_tracks="RecoTracks",
-                                trigger_mode="all",
-                                use_mc_truth=False,
-                                svd_ckf_mode="VXDTF2_after",
-                                add_both_directions=True,
-                                use_second_cdc_hits=False,
-                                prune_temporary_tracks=True,
-                                components=None):
-    """
-    Add the CKF to the path with all the track finding related to and needed for it.
-    :param path: The path to add the tracking reconstruction modules to
-    :param reco_tracks: The store array name where to output all tracks
-    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
-    :param use_mc_truth: Use the truth information in the CKF modules
-    :param svd_ckf_mode: how to apply the CKF (with VXDTF2 or without). Defaults to "VXDTF2_after".
-    :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
-           extrapolate also in the other direction.
-    :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
-    :param components: the list of geometry components in use or None for all components.
-    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
-        If true, prune them.
-    """
-    if not is_svd_used(components) and not is_cdc_used(components):
-        return
-
-    cdc_reco_tracks = "CDCRecoTracks"
-    if not is_pxd_used(components) and not is_svd_used(components):
-        cdc_reco_tracks = reco_tracks
-
-    svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-    if not is_pxd_used(components):
-        svd_cdc_reco_tracks = reco_tracks
-
-    svd_reco_tracks = "SVDRecoTracks"
-    pxd_reco_tracks = "PXDRecoTracks"
-
-    full_reco_tracks = reco_tracks
-
-    latest_reco_tracks = None
-
-    if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
-        # CDC track finding with default settings
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
-        latest_reco_tracks = cdc_reco_tracks
-
-    if trigger_mode in ["hlt", "all"] and is_svd_used(components):
-        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                              output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
-                              temporary_reco_tracks=svd_reco_tracks,
-                              svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions)
-        latest_reco_tracks = svd_cdc_reco_tracks
-
-    if trigger_mode in ["all"] and is_pxd_used(components):
-        add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                              use_mc_truth=use_mc_truth, output_reco_tracks=full_reco_tracks,
-                              temporary_reco_tracks=pxd_reco_tracks,
-                              add_both_directions=add_both_directions)
-
-    if trigger_mode in ["all"] and prune_temporary_tracks:
-        for temporary_reco_track_name in [pxd_reco_tracks, svd_reco_tracks, cdc_reco_tracks, svd_cdc_reco_tracks]:
-            if temporary_reco_track_name != reco_tracks:
-                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
 def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters'):

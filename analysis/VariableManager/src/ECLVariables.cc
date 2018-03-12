@@ -29,9 +29,34 @@
 //ROOT
 #include <TVector3.h>
 
+#include <cmath>
 
 namespace Belle2 {
   namespace Variable {
+
+    double eclClusterHadronIntensity(const Particle* particle)
+    {
+      double result = -999.0;
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          result = cluster->getClusterHadronIntensity();
+        }
+      }
+      return result;
+    }
+
+    double eclClusterNumberOfHadronDigits(const Particle* particle)
+    {
+      int result = -999;
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          result = cluster->getNumberOfHadronDigits();
+        }
+      }
+      return result;
+    }
 
     double eclClusterDetectionRegion(const Particle* particle)
     {
@@ -220,6 +245,28 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterErrorTheta(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getUncertaintyTheta();
+      }
+      return result;
+    }
+
+    double eclClusterErrorPhi(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getUncertaintyPhi();
+      }
+      return result;
+    }
+
     double eclClusterPhi(const Particle* particle)
     {
       double result = 0.0;
@@ -400,6 +447,17 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
+    {
+      int result = 0;
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->hasPulseShapeDiscrimination();
+      }
+      return result;
+    }
+
     double eclClusterTrigger(const Particle* particle)
     {
       double result = -1.0;
@@ -567,6 +625,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
+    REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi,
+                      "Returns ECL cluster's uncertainty on phi (from background level and energy dependent tabulation).");
+    REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta,
+                      "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
+
+
+
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
                       "Returns ECL cluster's uncorrected energy.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
@@ -612,6 +677,12 @@ namespace Belle2 {
                       "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
+    REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
+                      "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
+    REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
+                      "Returns ECL cluster's hadron scintillation component intensity.");
+    REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
+                      "Returns ECL cluster's weighted sum of hadron digits (current weights are all 1.0).");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,

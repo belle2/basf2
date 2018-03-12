@@ -73,6 +73,10 @@ namespace Belle2 {
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
 
+    /** Name of the ECLDsp.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDsps" ; }
+
     /** Name of the ECLCalDigit.*/
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
@@ -170,6 +174,10 @@ namespace Belle2 {
     /** PureCsI Name of the ECLCalDigitsPureCsI.*/
     virtual const char* eclCalDigitArrayName() const override
     { return "ECLCalDigitsPureCsI" ; }
+
+    /** Name of the ECLDspPureCsI.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDspsPureCsI" ; }
 
     /** PureCsI Name of the ECLEventInformationPureCsI.*/
     virtual const char* eclEventInformationName() const override

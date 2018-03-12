@@ -17,6 +17,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 
 #include <string>
 
@@ -41,7 +42,10 @@ namespace Belle2 {
     std::string m_variableName; /**< Variable which defines the candidate ranking. */
     std::string m_outputVariableName; /**< Name of generated Ranking-Variable, if specified by user */
     bool m_selectLowest; /**< Select the candidate with the lowest value (instead of highest). */
+    bool m_allowMultiRank; /**< Give the same rank to candidates with the same value */
     int m_numBest; /**< Number of best candidates to keep. */
+    std::string m_cutParameter; /**< Selection for candidates to be ranked. */
+    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
     const Variable::Manager::Var* m_variable; /**< Variable which defines the candidate ranking. */

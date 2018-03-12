@@ -100,9 +100,33 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
+
+  // Setup Gearbox
+  Gearbox& gearbox = Gearbox::getInstance();
+
+  std::vector<std::string> backends = {"file:"};
+  gearbox.setBackends(backends);
+
+  B2INFO("Start open gearbox.");
+  gearbox.open("geometry/Belle2.xml");
+  B2INFO("Finished open gearbox.");
+
+  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(1, 1630, 0);
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDCGeometryPar::Instance(&cdcGeometry);
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
   createHisto();
 
-  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels;#DeltaT;#channels", 100, -10, 10);
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 100, -10, 10);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, -2, 2);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
@@ -151,7 +175,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
       dt[ilay][iwire] = par[1];
       err_dt[ilay][iwire] = g1->GetParError(1);
-      hm_All->Fill(par[1]);
+      hm_All->Fill(par[1]);// mean of gauss fitting.
+      hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
 
@@ -200,7 +225,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     fout->Close();
   }
   B2INFO("Write constants");
-  write();
+  write(evtPtr);
 
 
   if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
@@ -214,9 +239,17 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
 }
 
-void T0CalibrationAlgorithm::write()
+void T0CalibrationAlgorithm::write(StoreObjPtr<EventMetaData>& evtPtr)
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("T0 L0W63 " << cdcgeo.getT0(WireID(0, 63)));
+
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   TH1F* T0B[300];

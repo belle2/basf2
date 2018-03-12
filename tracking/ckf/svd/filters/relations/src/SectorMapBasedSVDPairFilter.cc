@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDRelationFilter.h>
+#include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
@@ -17,7 +17,7 @@
 #include <tracking/dataobjects/FullSecID.h>
 
 namespace Belle2 {
-  void SectorMapBasedSVDRelationFilter::beginRun()
+  void SectorMapBasedSVDPairFilter::beginRun()
   {
     Super::beginRun();
 
@@ -27,23 +27,22 @@ namespace Belle2 {
     }
   }
 
-  std::vector<CKFToSVDState*>
-  SectorMapBasedSVDRelationFilter::getPossibleTos(CKFToSVDState* currentState,
-                                                  const std::vector<CKFToSVDState*>& states) const
-  {
-    return states;
-  }
-
-  void SectorMapBasedSVDRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  void SectorMapBasedSVDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "sectorMapName"), m_param_sectorMapName,
                                   "Name of the sector map to use.", m_param_sectorMapName);
   }
 
-  TrackFindingCDC::Weight SectorMapBasedSVDRelationFilter::operator()(const CKFToSVDState& from, const CKFToSVDState& to)
+  TrackFindingCDC::Weight SectorMapBasedSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>&
+      relation)
   {
-    const SpacePoint* outerHit = from.getHit();
-    const SpacePoint* innerHit = to.getHit();
+    const CKFToSVDState* from = relation.first;
+    const CKFToSVDState* to = relation.second;
+
+    B2ASSERT("From and to state must be set", from and to);
+
+    const SpacePoint* outerHit = from->getHit();
+    const SpacePoint* innerHit = to->getHit();
 
     B2ASSERT("Both hits must be present!", outerHit and innerHit);
 
@@ -61,6 +60,15 @@ namespace Belle2 {
     const auto* outerStaticSector = m_vxdtfFilters->getStaticSector(outerSecID);
 
     const auto* filter = outerStaticSector->getFilter2sp(innerSecID);
-    return filter->accept(*outerHit, *innerHit);
+    if (not filter) {
+      return NAN;
+    }
+
+    if (not filter->accept(*outerHit, *innerHit)) {
+      return NAN;
+    }
+
+    B2INFO(outerSecID.getVxdID() << " -> " << innerSecID.getVxdID());
+    return 1;
   }
 }

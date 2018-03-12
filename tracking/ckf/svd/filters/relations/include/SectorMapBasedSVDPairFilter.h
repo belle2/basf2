@@ -9,10 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/ckf/svd/filters/relations/BaseSVDPairFilter.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
-
-#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
@@ -20,9 +18,9 @@
 
 namespace Belle2 {
   /// Filter for relations between CKF SVD states based on SectorMaps
-  class SectorMapBasedSVDRelationFilter : public TrackFindingCDC::RelationFilter<CKFToSVDState> {
+  class SectorMapBasedSVDPairFilter : public BaseSVDPairFilter {
     /// The parent class
-    using Super = TrackFindingCDC::RelationFilter<CKFToSVDState>;
+    using Super = BaseSVDPairFilter;
 
     /// The VXDTF filter
     using SectorMapFilter = VXDTFFilters<SpacePoint>;
@@ -30,17 +28,11 @@ namespace Belle2 {
     using FilterContainer = FiltersContainer<SpacePoint>;
 
   public:
-    using Super::operator();
-
-    /// Return all states.
-    std::vector<CKFToSVDState*> getPossibleTos(CKFToSVDState* from,
-                                               const std::vector<CKFToSVDState*>& states) const final;
-
     /// Expose the parameters of the filter
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     /// Give a final weight to the possibilities by asking the filter.
-    TrackFindingCDC::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) final;
+    TrackFindingCDC::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
 
     /// Initialize the sector map
     void beginRun() final;
@@ -50,8 +42,7 @@ namespace Belle2 {
     FilterContainer& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
     /// The sector map filter, will be set in begin run.
     SectorMapFilter* m_vxdtfFilters = nullptr;
-
     /// Name of the sector map to use
-    std::string m_param_sectorMapName;
+    std::string m_param_sectorMapName = "SVDOnlyDefault";
   };
 }

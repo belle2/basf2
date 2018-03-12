@@ -51,6 +51,11 @@ namespace Belle2 {
     double m_clusterAcceptanceFactor = 3.0f;
 
     /**
+     * Radii where virtual hits for the extrapolation will be generated
+     */
+    std::vector<float> m_virtualHitRadii = {1.05, 15.0, 16.0};
+
+    /**
      * StoreArray name of the ECLClusters for brem matching
      */
     std::string m_param_eclClustersStoreArrayName = "";

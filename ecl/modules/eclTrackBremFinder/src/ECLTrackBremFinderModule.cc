@@ -18,6 +18,7 @@
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
+
 using namespace Belle2;
 
 REG_MODULE(ECLTrackBremFinder)
@@ -40,6 +41,9 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   addParam("clusterAcceptanceFactor", m_clusterAcceptanceFactor,
            "Factor which is multiplied onto the cluster position error to check for matches",
            m_clusterAcceptanceFactor);
+
+  addParam("virtualHitRadii", m_virtualHitRadii, "Radii where virtual hits for the extrapolation will be generated",
+           m_virtualHitRadii);
 }
 
 void ECLTrackBremFinderModule::initialize()
@@ -124,17 +128,9 @@ void ECLTrackBremFinderModule::event()
 
       // iterate over all track points and see whether this cluster matches
       // the track points direction
-      RecoHitInformation* innerVXD = nullptr;
-      RecoHitInformation* outerVXD = nullptr;
-
       // only VXD hits shall be used
       for (auto hit : recoTrack->getRecoHitInformations(true)) {
         if (hit->getTrackingDetector() == RecoHitInformation::c_PXD || hit->getTrackingDetector() == RecoHitInformation::c_SVD) {
-          if (innerVXD == nullptr) {
-            innerVXD = hit;
-          }
-          outerVXD = hit;
-
           auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
 
           auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
@@ -145,22 +141,38 @@ void ECLTrackBremFinderModule::event()
         }
       }
 
-      // generate three virtual hits at the edge of the beampipe, the outer VXD wall and the inner CDC wall
-      // also check these hits for matching ECL clusters
-      if (innerVXD) {
-        std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = { {1.05, innerVXD}, {15.0, outerVXD}, {16.0, outerVXD} };
-        for (auto param : extrapolationParams) {
-          auto fitted_state = recoTrack->getMeasuredStateOnPlaneFromRecoHit(param.second);
-          try {
-            fitted_state.extrapolateToCylinder(param.first);
-            auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
-            if (bremFinder.isMatch()) {
-              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, param.first);
-              matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
-            }
-          } catch (genfit::Exception& exception1) {
-            B2DEBUG(50, "Extrapolation failed!");
+      // set the params for the virtual hits
+      std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = {};
+      for (auto virtualHitRadius : m_virtualHitRadii) {
+        BestMatchContainer<RecoHitInformation*, float> nearestHitContainer;
+        for (auto hit : recoTrack->getRecoHitInformations(true)) {
+          if (hit->useInFit() && recoTrack->hasTrackFitStatus()) {
+            try {
+              auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
+              float hitRadius = measState.getPos().Perp();
+              float distance = abs(hitRadius - virtualHitRadius);
+              nearestHitContainer.add(hit, distance);
+            } catch (NoTrackFitResult) {}
           }
+        }
+        if (nearestHitContainer.hasMatch()) {
+          auto nearestHit = nearestHitContainer.getBestMatch();
+          extrapolationParams.push_back({virtualHitRadius, nearestHit});
+        }
+      }
+
+      // check for matches of the extrapolation of the virtual hits with the cluster position
+      for (auto param : extrapolationParams) {
+        auto fitted_state = recoTrack->getMeasuredStateOnPlaneFromRecoHit(param.second);
+        try {
+          fitted_state.extrapolateToCylinder(param.first);
+          auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
+          if (bremFinder.isMatch()) {
+            ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, param.first);
+            matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+          }
+        } catch (genfit::Exception& exception1) {
+          B2DEBUG(50, "Extrapolation failed!");
         }
       }
 

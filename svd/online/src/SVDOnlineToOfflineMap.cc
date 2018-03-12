@@ -144,7 +144,11 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
   const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
 
-  return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  if (info.m_sensorID) {
+    return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  } else {
+    return NULL;
+  }
 }
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
@@ -161,7 +165,12 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
   SVDShaperDigit::APVRawSamples rawSamples;
   copy(samples, samples + SVDShaperDigit::c_nAPVSamples, rawSamples.begin());
 
-  return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  // create SVDShaperDigit only for existing sensor
+  if (info.m_sensorID) {
+    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  } else {
+    return NULL;
+  }
 }
 
 

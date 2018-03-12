@@ -163,7 +163,7 @@ def add_svd_simulation(path, createDigits=False):
 def add_svd_unpacker(path):
 
     unpacker = register_module('SVDUnpacker')
-    unpacker.param('GenerateShaperDigits', True)
+    unpacker.param('GenerateOldDigits', False)
     path.add_module(unpacker)
 
 

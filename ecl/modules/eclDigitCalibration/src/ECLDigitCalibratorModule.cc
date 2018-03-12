@@ -24,6 +24,7 @@
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/digitization/EclConfigurationPure.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
+#include <ecl/dataobjects/ECLDsp.h>
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -108,10 +109,12 @@ void ECLDigitCalibratorModule::initialize()
   // ECL dataobjects
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
+  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
   StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
 
   // Register Digits, CalDigits and their relation in datastore
   eclDigits.registerInDataStore(eclDigitArrayName());
+  eclDsps.registerInDataStore(eclDspArrayName());
   eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   eclCalDigits.registerRelationTo(eclDigits);
   eclEventInformationPtr.registerInDataStore(eclEventInformationName());
@@ -194,6 +197,8 @@ void ECLDigitCalibratorModule::event()
   // Input Array(s)
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
 
+  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
+
   // Output Array(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
@@ -253,6 +258,29 @@ void ECLDigitCalibratorModule::event()
 
     B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
     B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
+
+    //Calibrating offline fit results
+    ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
+    aECLCalDigit->setTwoComponentChi2(-1);
+    aECLCalDigit->setTwoComponentTotalEnergy(-1);
+    aECLCalDigit->setTwoComponentHadronEnergy(-1);
+    if (aECLDsp) {
+      //require ECLDigit to have offline waveform
+      if (aECLDsp->getTwoComponentChi2() > 0) {
+        //require offline waveform to have offline fit result
+        //
+        double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                   v_calibrationCrystalEnergy[cellid - 1];
+        double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                    v_calibrationCrystalEnergy[cellid - 1];
+        double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
+        //
+        aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
+        aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
+        aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
+        //
+      }
+    }
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);

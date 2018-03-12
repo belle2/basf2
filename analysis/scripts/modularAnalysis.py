@@ -1040,6 +1040,8 @@ def rankByHighest(
     variable,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1053,6 +1055,8 @@ def rankByHighest(
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1062,6 +1066,8 @@ def rankByHighest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('allowMultiRank', allowMultiRank)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1070,6 +1076,8 @@ def rankByLowest(
     variable,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1083,6 +1091,8 @@ def rankByLowest(
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1092,7 +1102,9 @@ def rankByLowest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('selectLowest', True)
+    bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1483,11 +1495,12 @@ def appendROEMask(
 
     - append a ROE mask with only ECLClusters that pass as good photon candidates
 
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
+       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
     - append a ROE mask with track from IP, use equal a-priori probabilities
 
-       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
@@ -1517,7 +1530,8 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 
     @param list_name             name of the input ParticleList
@@ -2027,8 +2041,8 @@ def writePi0EtaVeto(
     roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO'], extraInfoName='EtaVeto',
                         identifier=workingDirectory + '/etaveto.root')
 
-    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', 1, path=roe_path)
-    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', 1, path=roe_path)
+    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', numBest=1, path=roe_path)
 
     variableToSignalSideExtraInfo('pi0:PI0VETO', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
     variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)

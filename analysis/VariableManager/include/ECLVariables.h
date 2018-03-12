@@ -17,6 +17,18 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * return hadron scintillation component intensity of cluster computed from digits with offline waveforms saved.
+     * Variable is used to separate hadronic showers from electromagnetic showers
+     */
+    double eclClusterHadronIntensity(const Particle* particle);
+
+    /**
+     * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
+     * Variable is used to separate hadronic showers from electromagnetic showers
+     */
+    double eclClusterNumberOfHadronDigits(const Particle* particle);
+
+    /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      * return 11 and 13 if the ECL Cluster is in gap between barrel and forward respectively backward
      * return 0 otherwise
@@ -48,52 +60,18 @@ namespace Belle2 {
     double minCluster2HelixDistance(const Particle* particle);
 
     /**
-     * Returns true if the cluster with given attributes passes 'good gamma' criteria.
-     * @param calibrated set to false for goodGammaUncalibrated().
-     */
-    bool isGoodGamma(int region, double energy, bool calibrated);
-
-    /**
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 100 MeV
-     * Barrel   : E >  90 MeV
-     * Backward : E > 160 MeV
-     */
-    double goodGamma(const Particle* particle);
-
-    /**
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E_uncalib > 125 MeV && E9/E25>0.7
-     * Barrel   : E_uncalib > 100 MeV
-     * Backward : E_uncalib > 150 MeV
-     */
-    double goodGammaUncalibrated(const Particle* particle);
-
-    /**
-     * Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
+     * [Legacy] Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
      */
     bool isGoodBelleGamma(int region, double energy);
 
     /**
-     * Returns true if the cluster with given attributes passes loose skim 'good gamma' criteria.
-     */
-    bool isGoodSkimGamma(int region, double energy);
-
-    /**
+     * [Legacy]
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV
      * Barrel   : E >  50 MeV
      * Backward : E > 150 MeV
      */
     double goodBelleGamma(const Particle* particle);
-
-    /**
-     * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 30 MeV
-     * Barrel   : E > 20 MeV
-     * Backward : E > 40 MeV
-     */
-    double goodSkimGamma(const Particle* particle);
 
     /**
      * return ECL cluster's Error on Energy
@@ -129,6 +107,13 @@ namespace Belle2 {
      * return ECL cluster's timing
      */
     double eclClusterTiming(const Particle* particle);
+
+
+    /** return  Error on clusters phi position  */
+    double eclClusterErrorPhi(const Particle* particle);
+
+    /** return  Error on clusters theta position  */
+    double eclClusterErrorTheta(const Particle* particle);
 
     /**
      * return ECL cluster's Error on timing information
@@ -215,6 +200,11 @@ namespace Belle2 {
      * return the Hypothesis ID of this cluster
      */
     double eclClusterHypothesisId(const Particle* particle);
+
+    /**
+     * return 1 if cluster has pulse shape discrimination variables computed
+     */
+    double eclClusterHasPulseShapeDiscrimination(const Particle* particle);
 
     /**
      * return 1.0 if cluster matched to a trigger cluster

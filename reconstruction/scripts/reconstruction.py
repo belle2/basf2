@@ -199,6 +199,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
+        add_ecl_track_brem_finder(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -412,6 +413,18 @@ def add_ecl_track_matcher_module(path, components=None):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)
+
+
+def add_ecl_track_brem_finder(path, components=None):
+    """
+    Add the bremsstrahlung finding module to the path.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
+        brem_finder = register_module('ECLTrackBremFinder')
+        path.add_module(brem_finder)
 
 
 def add_ecl_eip_module(path, components=None):

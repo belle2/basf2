@@ -91,13 +91,9 @@ main.add_module('ParticleGun',
 
 # Create Event information
 main.add_module('EventInfoSetter')  # ,evtNumList=[1], 'runList': [1]})
-simulation.add_simulation(main, cleanupPXDDataReduction=False)
+simulation.add_simulation(main)
 
-# todo: pruneTracks doesn't have to be disabled when ECLTrackBremFinder is added to the reconstruction
-reconstruction.add_reconstruction(main, pruneTracks=False)
-
-# todo: Remove this, when ECLTrackBremFinder is added to the reconstruction
-main.add_module("ECLTrackBremFinder")
+reconstruction.add_reconstruction(main)
 
 main.add_module(CheckRelationBremClusterTestModule())
 

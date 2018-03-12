@@ -43,6 +43,7 @@ void PXDPostErrorCheckerModule::event()
    * - Check that TriggerGate is identical
    * - Check that DHE FrameNr is identical
    * - Check that no DHP frameNr differs by more than xxx - TODO
+   * - Decide if Error Mask etc allows for flagging as good data TODO
    * - Check that we got data for all modules (database) - TODO
    * Be aware of overflows (mask valid bit ranges) for any counter!
    * -> do not use plain min() max(), this will fail!

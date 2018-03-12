@@ -81,15 +81,14 @@ void PXDUnpackerModule::initialize()
   m_eventMetaData.isRequired();
   // Optional input
   m_storeRawPXD.isOptional(m_RawPXDsName);
-  //Register output collections
 
+  //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and raw ADC into output file ...  aside from debugging
-
 
   B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);
   B2DEBUG(1, "Ignore (missing) DATCON: " << m_ignoreDATCON);
@@ -129,37 +128,36 @@ void PXDUnpackerModule::terminate()
 
 void PXDUnpackerModule::event()
 {
-  // if no input, nothing to do
-  if (!m_storeRawPXD) {
-    return;
-  }
-
-  int nRaws = m_storeRawPXD.getEntries();
-  if (verbose) {
-    B2DEBUG(20, "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
-  };
+  m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
 
   m_errorMask = 0;
   m_errorMaskEvent = 0;
 
-  m_meta_event_nr = m_eventMetaData->getEvent();
-  m_meta_run_nr = m_eventMetaData->getRun();
-  m_meta_subrun_nr = m_eventMetaData->getSubrun();
-  m_meta_experiment = m_eventMetaData->getExperiment();
-  m_meta_time = m_eventMetaData->getTime();
-
-  m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
-
-  int inx = 0; // count index for output objects
-  for (auto& it : m_storeRawPXD) {
+  // if no input, nothing to do
+  if (!m_storeRawPXD) {
+    m_errorMask |= EPXDErrMask::c_NO_PXD;
+  } else {
+    int nRaws = m_storeRawPXD.getEntries();
     if (verbose) {
-      B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
+      B2DEBUG(20, "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
     };
-    unpack_rawpxd(it, inx++);
+
+    m_meta_event_nr = m_eventMetaData->getEvent();
+    m_meta_run_nr = m_eventMetaData->getRun();
+    m_meta_subrun_nr = m_eventMetaData->getSubrun();
+    m_meta_experiment = m_eventMetaData->getExperiment();
+    m_meta_time = m_eventMetaData->getTime();
+
+    int inx = 0; // count index for output objects
+    for (auto& it : m_storeRawPXD) {
+      if (verbose) {
+        B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
+      };
+      unpack_rawpxd(it, inx++);
+    }
+
+    if (nRaws == 0) m_errorMask |= EPXDErrMask::c_NO_PXD;
   }
-
-  if (nRaws == 0) m_errorMask |= EPXDErrMask::c_NO_PXD;
-
   m_errorMaskEvent |= m_errorMask;
   m_storeDAQEvtStats->setErrorMask(m_errorMaskEvent);
 
@@ -315,6 +313,13 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
 
 void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
 {
+  //! *************************************************************
+  //! Important Remark:
+  //! Up to now the format for cluster is not well defined.
+  //! We need to wait for the final hardware implementation.
+  //! Then the following code uste be re-checked TODO
+  //! *************************************************************
+
   B2ERROR("FCE (Cluster) Packet have not yet been tested with real HW clusters. Dont assume that this code is working!");
   return;
 
@@ -402,6 +407,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
 //   unsigned int dhp_offset = 0;
   bool rowflag = false;
+  bool pixelflag = true; // just for first row start
 
   if (nr_words < 4) {
     B2ERROR("DHP frame size error (too small) " << nr_words);
@@ -499,6 +505,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     return;
   }
 
+  // Start with offset 4, thus skipping header words
   for (unsigned int i = 4; i < nr_words ; i++) {
 
     if (printflag)
@@ -506,6 +513,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     {
       if (((dhp_pix[i] & 0x8000) >> 15) == 0) {
         rowflag = true;
+        if (!pixelflag) {
+          m_errorMask |= EPXDErrMask::c_DHP_ROW_WO_PIX;
+          B2WARNING("DHP Unpacking: Row w/o Pix");
+        }
+        pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
         if (daqpktstat.dhc_size() > 0) {
@@ -526,6 +538,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           // dump_dhp(data, frame_len);// print out faulty dhp frame
           return;
         } else {
+          pixelflag = true;
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
           dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
           unsigned int v_cellID, u_cellID;

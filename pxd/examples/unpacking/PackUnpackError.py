@@ -4,7 +4,7 @@
 from basf2 import *
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.ERROR)
 
 # to run the framework the used modules need to be registered
 eventinfosetter = register_module('EventInfoSetter')
@@ -35,6 +35,11 @@ packer.param('dhe_to_dhc', [
 
 unpacker = register_module('PXDUnpacker')
 
+packercheck = register_module('PXDPackerErr')
+packercheck.param('dhe_to_dhc', [
+    [0, 2]
+])
+
 simpleoutput = register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')
 
@@ -48,7 +53,6 @@ geometry = register_module('Geometry')
 # geometry.param('Components', ['PXD','SVD'])
 geometry.param('components', ['PXD'])
 
-
 # creating the path for the processing
 main = create_path()
 main.add_module(eventinfosetter)
@@ -57,6 +61,7 @@ main.add_module(geometry)
 main.add_module(histoman)
 main.add_module(packer)
 main.add_module(unpacker)
+main.add_module(packercheck, Check=True, LogLevel.INFO)
 main.add_module(register_module('PXDDAQDQM'))
 # main.add_module(register_module('PXDRawDQM'))
 # main.add_module(register_module('PXDROIDQM'))

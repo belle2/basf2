@@ -31,78 +31,163 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
+using namespace Belle2::PXD::PXDError;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(PXDPackerErr)
 
-/*
- * List of created errors:
- *  1 - HLT-Onsen Trigger differs from Meta
- *  2 - HLT-Onsen Trigger is zero
- *  3 - Run Nr differs between HLT-Onsen and Meta
- *  4 - Subrun Nr differs between HLT-Onsen and Meta
- *  5 - Exp differs between HLT-Onsen and Meta
- *  6 - Wrong ONS Trigger frame length
- *  7 - Wrong DHC Start frame length
- *  8 - Wrong DHC End frame length
- *  9 - Wrong DHE Start frame length
- * 10 - Wrong DHE End frame length
- * 11 - Wrong DHE Start frame length (by 2 bytes), unalign 32 bit frame
- * 12 - Missing ONS Trig frame
- * 13 - Missing DHC Start frame
- * 14 - Missing DHC End frame
- * 15 - Missing DHE Start frame
- * 16 - Missing DHE End frame
- * 17 - Double ONS Trig frame
- * 18 - Double DHC Start frame
- * 19 - Double DHC End frame
- * 20 - Double DHE Start frame
- * 21 - Double DHE End frame
- * 22 - DATCON triggernr+1
- * 23 - HLT Magic broken
- * 24 - DATCON Magic broken
- * 25 - HLT with Accepted not set
- * 26 - HLT triggernr+1
- * 27 - CRC error in second frame (DHC start)
- * 28 - data for all DHE even if disabled in mask
- * 29 - no DHE at all, even so mask tell us otherwise
- * 30 - no DHC at all
- * 31 - DHC end has wrong DHC id
- * 32 - DHE end has wrong DHE id
- * 33 - DHC wordcount wrong by 4 bytes
- * 34 - DHE wordcount wrong by 4 bytes
- * 35 - DHE Trigger Nr Hi word messed up
- * 36 - DHC Trigger Nr Hi word messed up
- * 37 - DHP data, even if mask says no DHP TODO Check
- * 38 - No DHP data, even if mask tell otherwise
- * 39 - DHE id differ in DHE and DHP header
- * 40 - Chip ID differ in DHE and DHP header
- * 41 - Row overflow by 1
- * 42 - Col overflow by 1
- * 43 - Missing Start Row
- * 44 - No PXD raw packet at all
- * 45 - No DATCON data
- * 46 - unused frame type: common mode
- * 47 - unused frame type: FCE
- * 48 - unused frame type: ONS FCE
- * 49 - unused frame type: 0x7, 0x8, 0xA
- * 50 -
- *
- *
- * */
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 using boost::crc_optimal;
-typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhe_crc_32_type;
+typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhc_crc_32_type;
 
 ///******************************************************************
 ///*********************** Main packer code *************************
 ///******************************************************************
+
+bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)
+{
+  /** Check that at least the expected error bit are set, there could be more ... */
+  static std::vector <PXDErrorFlags> errors =  {
+    // Event 0 does not exist...
+    EPXDErrMask::c_NO_ERROR,
+    /*  1 - HLT-Onsen Trigger differs from Meta (meta changed! thus all differ)
+     *  2 - HLT-Onsen Trigger is zero
+     *  3 - Run Nr differs between HLT-Onsen and Meta
+     *  4 - Subrun Nr differs between HLT-Onsen and Meta
+     *  5 - Exp differs between HLT-Onsen and Meta */
+    EPXDErrMask::c_META_MM_ONS_HLT | EPXDErrMask::c_META_MM | EPXDErrMask::c_FRAME_TNR_MM,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /*  6 - Wrong ONS Trigger frame length
+     *  7 - Wrong DHC Start frame length
+     *  8 - Wrong DHC End frame length
+     *  9 - Wrong DHE Start frame length
+     * 10 - Wrong DHE End frame length */
+    EPXDErrMask::c_FIX_SIZE,
+    EPXDErrMask::c_FIX_SIZE,
+    EPXDErrMask::c_FIX_SIZE,
+    EPXDErrMask::c_FIX_SIZE,
+    EPXDErrMask::c_FIX_SIZE,
+    /* 11 - Wrong DHE Start frame length (by 2 bytes), unalign 32 bit frame
+     * 12 - Missing ONS Trig frame
+     * 13 - Missing DHC Start frame
+     * 14 - Missing DHC End frame
+     * 15 - Missing DHE Start frame */
+    EPXDErrMask::c_FRAME_SIZE,
+    EPXDErrMask::c_ONSEN_TRG_FIRST,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_DHC_END_MISS,
+    EPXDErrMask::c_DHE_START_MISS,
+    /* 16 - Missing DHE End frame
+     * 17 - Double ONS Trig frame
+     * 18 - Double DHC Start frame
+     * 19 - Double DHC End frame
+     * 20 - Double DHE Start frame*/
+    EPXDErrMask::c_DHE_START_WO_END,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_DHC_START_SECOND,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /* 21 - Double DHE End frame
+     * 22 - DATCON triggernr+1
+     * 23 - HLT Magic broken
+     * 24 - DATCON Magic broken
+     * 25 - HLT with Accepted not set */
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /* 26 - HLT triggernr+1
+     * 27 - CRC error in second frame (DHC start)
+     * 28 - data for all DHE even if disabled in mask
+     * 29 - no DHE at all, even so mask tell us otherwise
+     * 30 - no DHC at all */
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_DHE_CRC,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /* 31 - DHC end has wrong DHC id
+     * 32 - DHE end has wrong DHE id
+     * 33 - DHC wordcount wrong by 4 bytes
+     * 34 - DHE wordcount wrong by 4 bytes
+     * 35 - DHE Trigger Nr Hi word messed up */
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /* 36 - DHC Trigger Nr Hi word messed up
+     * 37 - DHP data, even if mask says no DHP TODO Check
+     * 38 - No DHP data, even if mask tell otherwise
+     * 39 - DHE id differ in DHE and DHP header
+     * 40 - Chip ID differ in DHE and DHP header */
+    EPXDErrMask::c_META_MM_DHE,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /* 41 - Row overflow by 1
+     * 42 - Col overflow by 1
+     * 43 - Missing Start Row (Pixel w/o row)
+     * 44 - No PXD raw packet at all
+     * 45 - No DATCON data */
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR,
+    /* 46 - unused frame type: common mode
+     * 47 - unused frame type: FCE
+     * 48 - unused frame type: ONS FCE
+     * 49 - unused frame type: 0x7, 0x8, 0xA
+     * 50 - Rows w/o Pixel (several rows after each other) */
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
+    EPXDErrMask::c_DHP_ROW_WO_PIX,
+    /* 51 - NO ERROR
+     *
+     *
+     * */
+    EPXDErrMask::c_NO_ERROR,
+  };
+
+  PXDErrorFlags expected = c_NO_ERROR;
+  if (eventnr > 0 && eventnr < errors.size()) {
+    expected = errors[eventnr];
+  }
+  B2INFO("-- PXD Packer Error Check for Event Nr: " << eventnr);
+  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
+    uint64_t m;
+    m = 1ull << i; // ull is important!
+    if ((m & (mask | expected)) == m) {
+      if ((m & expected) == m && (m & mask) != m) {
+        B2ERROR("Was NOT Set: " << getPXDBitErrorName(i));
+      } else if ((m & expected) != m && (m & mask) == m) {
+        B2RESULT("Optional   : " << getPXDBitErrorName(i));
+      } else if ((m & expected) == m && (m & mask) == m) {
+        B2INFO("As Expected: " << getPXDBitErrorName(i));
+      }
+    }
+  }
+  bool flag = (mask & expected) == expected;
+  if (expected == EPXDErrMask::c_NO_ERROR) {
+    // special check, this event should not contain any error!
+    if (mask != EPXDErrMask::c_NO_ERROR) {
+      B2ERROR("There should be no error in this event, but there were (see above)!");
+    }
+    flag = (mask == EPXDErrMask::c_NO_ERROR);
+  }
+  B2INFO("-- PXD Packer Error Check END --- ");
+  return flag;
+}
 
 PXDPackerErrModule::PXDPackerErrModule() :
   Module(),
@@ -120,58 +205,63 @@ PXDPackerErrModule::PXDPackerErrModule() :
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
   addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
+  addParam("Check",  m_Check, "Check the result of Unpacking", false);
+  addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of read PXDDAQEvtStats", std::string(""));
 
 }
 
 void PXDPackerErrModule::initialize()
 {
   B2DEBUG(20, "PXD Packer Err --> Init");
-  //Register output collections
-  m_storeRaws.registerInDataStore(m_RawPXDsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  if (m_Check) {
+    m_daqStatus.isRequired();
+  } else {
+    //Register output collections
+    m_storeRaws.registerInDataStore(m_RawPXDsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+    m_packed_events = 0;
 
-  m_packed_events = 0;
-
-  /// read in the mapping for ONSEN->DHC->DHE->DHP
-  /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
-  /// DHE->DHP is only defined by port number/active mask ... not implemented yet.
-  for (auto& it : m_dhe_to_dhc) {
-    bool flag;
-    int dhc_id;
-    B2DEBUG(20, "PXD Packer Err --> DHC/DHE");
-    flag = false;
-    if (it.size() != 6) {
-      /// means [ 1 2 3 4 5 -1 ] DHC 1 has DHE 2,3,4,5 on port 0-3 and nothing on port 4
-      B2WARNING("PXD Packer Err --> DHC/DHE maps 1 dhc to 5 dhe (1+5 values), but I found " << it.size());
-    }
-    for (auto& it2 : it) {
-      if (flag) {
-        int v;
-        v = it2;
-        B2DEBUG(20, "PXD Packer Err --> ... DHE " << it2);
-        if (it2 < -1 || it2 >= 64) {
-          if (it2 != -1) B2ERROR("PXD Packer Err --> DHC id " << it2 << " is out of range (0-64 or -1)! disable channel.");
-          v = -1;
-        }
-        m_dhc_mapto_dhe[dhc_id].push_back(v);
-      } else {
-        dhc_id = it2;
-        B2DEBUG(20, "PXD Packer Err --> DHC .. " << it2);
-        if (dhc_id < 0 || dhc_id >= 16) {
-          B2ERROR("PXD Packer Err --> DHC id " << it2 << " is out of range (0-15)! skip");
-          break;
-        }
+    /// read in the mapping for ONSEN->DHC->DHE->DHP
+    /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
+    /// DHE->DHP is only defined by port number/active mask ... not implemented yet.
+    for (auto& it : m_dhe_to_dhc) {
+      bool flag;
+      int dhc_id;
+      B2DEBUG(20, "PXD Packer Err --> DHC/DHE");
+      flag = false;
+      if (it.size() != 6) {
+        /// means [ 1 2 3 4 5 -1 ] DHC 1 has DHE 2,3,4,5 on port 0-3 and nothing on port 4
+        B2WARNING("PXD Packer Err --> DHC/DHE maps 1 dhc to 5 dhe (1+5 values), but I found " << it.size());
       }
-      flag = true;
+      for (auto& it2 : it) {
+        if (flag) {
+          int v;
+          v = it2;
+          B2DEBUG(20, "PXD Packer Err --> ... DHE " << it2);
+          if (it2 < -1 || it2 >= 64) {
+            if (it2 != -1) B2ERROR("PXD Packer Err --> DHC id " << it2 << " is out of range (0-64 or -1)! disable channel.");
+            v = -1;
+          }
+          m_dhc_mapto_dhe[dhc_id].push_back(v);
+        } else {
+          dhc_id = it2;
+          B2DEBUG(20, "PXD Packer Err --> DHC .. " << it2);
+          if (dhc_id < 0 || dhc_id >= 16) {
+            B2ERROR("PXD Packer Err --> DHC id " << it2 << " is out of range (0-15)! skip");
+            break;
+          }
+        }
+        flag = true;
+      }
     }
-  }
-  B2DEBUG(20, "PXD Packer Err --> DHC/DHE done");
+    B2DEBUG(20, "PXD Packer Err --> DHC/DHE done");
 
-  for (auto& it : m_dhc_mapto_dhe) {
-    int port = 0;
-    B2DEBUG(20, "PXD Packer Err --> DHC " << it.first);
-    for (auto& it2 : it.second) {
-      B2DEBUG(20, "PXD Packer Err --> .. connects to DHE " << it2 << " port " << port);
-      port++;
+    for (auto& it : m_dhc_mapto_dhe) {
+      int port = 0;
+      B2DEBUG(20, "PXD Packer Err --> DHC " << it.first);
+      for (auto& it2 : it.second) {
+        B2DEBUG(20, "PXD Packer Err --> .. connects to DHE " << it2 << " port " << port);
+        port++;
+      }
     }
   }
 
@@ -183,38 +273,43 @@ void PXDPackerErrModule::terminate()
 
 void PXDPackerErrModule::event()
 {
-  StoreObjPtr<EventMetaData> evtPtr;
-
   B2DEBUG(20, "PXD Packer Err --> Event");
-
-  // First, throw the dices for a few event-wise properties
-
-  m_trigger_dhp_framenr = gRandom->Integer(0x10000);
-  m_trigger_dhe_gate = gRandom->Integer(192);
+  StoreObjPtr<EventMetaData> evtPtr;
 
   m_real_trigger_nr = m_trigger_nr = evtPtr->getEvent();
 
-  if (isErrorIn(1)) m_trigger_nr += 10;
-  if (isErrorIn(2)) m_trigger_nr = 0;
+  if (m_Check) {
+    CheckErrorMaskInEvent(m_trigger_nr, m_daqStatus->getErrorMask());
+  } else {
 
-  uint32_t run = evtPtr->getRun();
-  uint32_t exp = evtPtr->getExperiment();
-  uint32_t sub = evtPtr->getSubrun();
+    // First, throw the dices for a few event-wise properties
 
-  if (isErrorIn(3)) run++;
-  if (isErrorIn(4)) sub++;
-  if (isErrorIn(5)) exp++;
+    m_trigger_dhp_framenr = gRandom->Integer(0x10000);
+    m_trigger_dhe_gate = gRandom->Integer(192);
 
-  m_run_nr_word1 = ((run & 0xFF) << 8) | (sub & 0xFF);
-  m_run_nr_word2 = ((exp & 0x3FF) << 6) | ((run >> 8) & 0x3F);
-  m_meta_time = evtPtr->getTime();
 
-  B2INFO("Pack Event : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," <<
-         evtPtr->getExperiment() << "," << evtPtr->getTime() << " (MetaInfo)");
+    if (isErrorIn(1)) m_trigger_nr += 10;
+    if (isErrorIn(2)) m_trigger_nr = 0;
 
-  if (!isErrorIn(44)) {
-    pack_event();
-    m_packed_events++;
+    uint32_t run = evtPtr->getRun();
+    uint32_t exp = evtPtr->getExperiment();
+    uint32_t sub = evtPtr->getSubrun();
+
+    if (isErrorIn(3)) run++;
+    if (isErrorIn(4)) sub++;
+    if (isErrorIn(5)) exp++;
+
+    m_run_nr_word1 = ((run & 0xFF) << 8) | (sub & 0xFF);
+    m_run_nr_word2 = ((exp & 0x3FF) << 6) | ((run >> 8) & 0x3F);
+    m_meta_time = evtPtr->getTime();
+
+    B2INFO("Pack Event : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," <<
+           evtPtr->getExperiment() << "," << evtPtr->getTime() << " (MetaInfo)");
+
+    if (!isErrorIn(44)) {
+      pack_event();
+      m_packed_events++;
+    }
   }
 }
 
@@ -268,7 +363,7 @@ void PXDPackerErrModule::add_frame_to_payload(void)
     B2ERROR("Frame is not 32bit aligned!!! Unsupported by Unpacker!");
   }
   // checksum frame
-  dhe_crc_32_type current_crc;
+  dhc_crc_32_type current_crc;
   current_crc.process_bytes(m_current_frame.data(), m_current_frame.size());
   if (isErrorIn(27) and m_onsen_header.size() == 1) current_crc.process_byte(0x42); // mess up CRC in second frame
   append_int32(current_crc.checksum());
@@ -604,7 +699,7 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
   unsigned short last_rowstart = 0;
   bool error_done = false;
 
-  if (dhe_has_remapped != 0) {
+  if (dhe_has_remapped == 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
     assert(dhe_has_remapped == 0);
@@ -649,7 +744,7 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
           rowstart = false;
         }
         int colout = col;
-        append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | charge);
+        if (!isErrorIn(50)) append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | charge);
         empty = false;
       }
     }

@@ -49,6 +49,7 @@ namespace Belle2 {
     int m_memsize;
     int m_interval;
     bool m_autocanvas;
+    bool m_remove_empty;
     std::vector<std::string> m_acfolders;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;

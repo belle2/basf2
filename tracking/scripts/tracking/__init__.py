@@ -177,7 +177,6 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
     latest_reco_tracks = None
 
     if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
-        # CDC track finding with default settings
         add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
@@ -193,76 +192,6 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
                               use_mc_truth=use_mc_truth, output_reco_tracks=full_reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
                               add_both_directions=add_both_directions)
-
-    if trigger_mode in ["all"] and prune_temporary_tracks:
-        for temporary_reco_track_name in [pxd_reco_tracks, svd_reco_tracks, cdc_reco_tracks, svd_cdc_reco_tracks]:
-            if temporary_reco_track_name != reco_tracks:
-                path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
-
-
-def add_non_ckf_based_track_finding(
-        path,
-        components=None,
-        trigger_mode="all",
-        reco_tracks="RecoTracks",
-        prune_temporary_tracks=True,
-        use_second_cdc_hits=False):
-    """
-    Adds the realistic track finding to the path.
-    The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
-    Use the GenfitTrackCandidatesCreator Module to convert back.
-
-    :param path: The path to add the tracking reconstruction modules to
-    :param components: the list of geometry components in use or None for all components.
-    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
-    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
-        If true, prune them.
-    """
-    if not is_svd_used(components) and not is_cdc_used(components):
-        return
-
-    cdc_reco_tracks = "CDCRecoTracks"
-    if not is_pxd_used(components) and not is_svd_used(components):
-        cdc_reco_tracks = reco_tracks
-
-    svd_reco_tracks = "SVDRecoTracks"
-    if not is_cdc_used(components) and not is_pxd_used(components):
-        svd_reco_tracks = reco_tracks
-
-    svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-    if not is_pxd_used(components):
-        svd_cdc_reco_tracks = reco_tracks
-
-    pxd_reco_tracks = "PXDRecoTracks"
-
-    full_reco_tracks = reco_tracks
-
-    latest_reco_tracks = None
-
-    if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
-        add_cdc_track_finding(path, output_reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
-        latest_reco_tracks = cdc_reco_tracks
-
-    if trigger_mode in ["hlt", "all"] and is_svd_used(components):
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
-        latest_reco_tracks = svd_reco_tracks
-
-    if trigger_mode in ["hlt", "all"] and is_svd_used(components) and is_cdc_used(components):
-        # Merge CDC and CXD tracks
-        path.add_module('VXDCDCTrackMerger',
-                        CDCRecoTrackColName=cdc_reco_tracks,
-                        VXDRecoTrackColName=svd_reco_tracks)
-
-        path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
-                        CDCRecoTracksStoreArrayName=cdc_reco_tracks,
-                        recoTracksStoreArrayName=svd_cdc_reco_tracks)
-
-        latest_reco_tracks = svd_cdc_reco_tracks
-
-    if trigger_mode in ["all"] and is_pxd_used(components):
-        add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                              output_reco_tracks=full_reco_tracks)
 
     if trigger_mode in ["all"] and prune_temporary_tracks:
         for temporary_reco_track_name in [pxd_reco_tracks, svd_reco_tracks, cdc_reco_tracks, svd_cdc_reco_tracks]:

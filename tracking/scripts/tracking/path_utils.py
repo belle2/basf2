@@ -306,6 +306,12 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
             add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                                  use_mc_truth=use_mc_truth, direction="forward")
 
+    elif svd_ckf_mode == "VXDTF2_alone":
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
+        path.add_module('VXDCDCTrackMerger',
+                        CDCRecoTrackColName=input_reco_tracks,
+                        VXDRecoTrackColName=temporary_reco_tracks)
+
     else:
         raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
 

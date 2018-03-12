@@ -378,6 +378,85 @@ namespace Belle2 {
       }
     }
   };
+
+  struct Neuro : SubTrigger {
+    Neuro(StoreArray<NNInputBitStream>* inArrayPtr,
+          StoreArray<NNOutputBitStream>* outArrayPtr,
+          std::string inName, unsigned inEventWidth, unsigned inOffset,
+          unsigned inHeaderSize, std::vector<int> inNodeID, int& inDelay,
+          int inDebugLevel) :
+      SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
+                 inDelay, inDebugLevel),
+      inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
+      iTracker(std::stoul(inName.substr(inName.length() - 1))),
+      offsetBitWidth(inOffset) {};
+
+    StoreArray<NNInputBitStream>* inputArrayPtr;
+    StoreArray<NNOutputBitStream>* outputArrayPtr;
+    unsigned iTracker;
+    unsigned offsetBitWidth;
+
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
+    {
+      size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
+      size_t entries = inputArrayPtr->getEntries();
+      if (subDetectorId == iNode) {
+        if (entries == 0) {
+          for (unsigned i = 0; i < nClocks; ++i) {
+            inputArrayPtr->appendNew();
+            outputArrayPtr->appendNew();
+          }
+          B2DEBUG(20, name << ": " << nClocks << " clocks");
+        } else if (entries != nClocks) {
+          B2ERROR("Number of clocks in " << name << "conflicts with others!");
+        }
+      }
+    };
+
+    void unpack(int subDetectorId,
+                std::array<int*, nFinesse> data32tab,
+                std::array<int, nFinesse> nWords)
+    {
+      if (subDetectorId != iNode) {
+        return;
+      }
+      // make bitstream
+      // loop over all clocks
+      for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
+        int iclock = (i - headerSize) / eventWidth;
+        auto inputClock = (*inputArrayPtr)[iclock];
+        auto outputClock = (*outputArrayPtr)[iclock];
+        // clear bitstreams
+        inputClock->m_signal[iTracker].fill(zero_val);
+        outputClock->m_signal[iTracker].fill(zero_val);
+        B2DEBUG(20, "clock " << iclock);
+        if (debugLevel >= 100) {
+          printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
+                      eventWidth);
+        }
+        // fill output
+        for (unsigned pos = 0; pos < NNOutputWidth; ++pos) {
+          const int j = (offsetBitWidth + pos) / wordWidth;
+          const int k = (offsetBitWidth + pos) % wordWidth;
+          std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+          outputClock->m_signal[iTracker][pos] = std_logic(word[wordWidth - 1 - k]);
+        }
+        if (debugLevel >= 100) {
+          display_hex(outputClock->m_signal[iTracker]);
+        }
+        // fill input
+        for (unsigned pos = 0; pos < NNInputWidth; ++pos) {
+          const int j = (offsetBitWidth + pos + NNOutputWidth) / wordWidth;
+          const int k = (offsetBitWidth + pos + NNOutputWidth) % wordWidth;
+          std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+          inputClock->m_signal[iTracker][pos] = std_logic(word[wordWidth - 1 - k]);
+        }
+        if (debugLevel >= 100) {
+          display_hex(inputClock->m_signal[iTracker]);
+        }
+      }
+    }
+  };
 };
 
 CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("RawTRGs")
@@ -390,6 +469,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "whether to unpack merger data (recorded by Merger Reader / TSF)", false);
   addParam("unpackTracker2D", m_unpackTracker2D,
            "whether to unpack 2D tracker data", false);
+  addParam("unpackNeuro", m_unpackNeuro,
+           "whether to unpacker neurotrigger data", false);
   addParam("decode2DFinderTrack", m_decode2DFinderTrack,
            "flag to decode 2D finder track", false);
   addParam("decode2DFinderInput", m_decode2DFinderInputTS,
@@ -411,6 +492,14 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   };
   addParam("2DNodeId", m_tracker2DNodeID,
            "list of FTSW ID of 2D tracker", defaultTracker2DNodeID);
+  NodeList defaultNeuroNodeID = {
+    {0x11000003, 1},
+    {0, 0},
+    {0, 0},
+    {0, 0}
+  };
+  addParam("NeuroNodeId", m_neuroNodeID,
+           "list of FTSW ID of neurotrigger", defaultNeuroNodeID);
   addParam("headerSize", m_headerSize,
            "number of words (number of bits / 32) of the B2L header", 3);
   addParam("alignFoundTime", m_alignFoundTime,
@@ -429,6 +518,10 @@ void CDCTriggerUnpackerModule::initialize()
   if (m_unpackTracker2D) {
     m_bitsTo2D.registerInDataStore("CDCTriggerTSFTo2DBits");
     m_bits2DTo3D.registerInDataStore("CDCTrigger2DTo3DBits");
+  }
+  if (m_unpackNeuro) {
+    m_bitsToNN.registerInDataStore("CDCTriggerNNInputBits");
+    m_bitsFromNN.registerInDataStore("CDCTriggerNNOutputBits");
   }
   if (m_decodeTSHit or m_decode2DFinderTrack or m_decode2DFinderInputTS) {
     m_TSHits.registerInDataStore("CDCTriggerSegmentHits");
@@ -463,6 +556,13 @@ void CDCTriggerUnpackerModule::initialize()
                       m_2DFinderDelay,
                       m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_tracker2d));
+    }
+    if (m_unpackNeuro) {
+      Neuro* m_neuro =
+        new Neuro(&m_bitsToNN, &m_bitsFromNN,
+                  "Neuro" + std::to_string(iTracker), 64, 496, m_headerSize,
+                  m_neuroNodeID[iTracker], m_NeuroDelay, m_debugLevel);
+      m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_neuro));
     }
   }
 }

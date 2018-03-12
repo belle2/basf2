@@ -210,6 +210,9 @@ namespace Belle2 {
     bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
     bool m_alignFoundTime;  /**< flag to align found time in different sub-modules */
 
+    NodeList m_neuroNodeID;  /**< list of (COPPER ID, FTSW ID) of neurotrigger */
+    bool m_unpackNeuro;  /**< flag to unpacker neurotrigger data */
+
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;
 
@@ -225,6 +228,11 @@ namespace Belle2 {
     /** additional information of the 2D finder track */
     StoreArray<CDCTriggerFinderClone> m_2DFinderClones;
 
+    /** bitstream of Neuro input (combination of stereo TS and single 2D track) */
+    StoreArray<CDCTriggerUnpacker::NNInputBitStream> m_bitsToNN;
+    /** bitstream of Neuro output (including intermediate results) */
+    StoreArray<CDCTriggerUnpacker::NNOutputBitStream> m_bitsFromNN;
+
     /** debug level specified in the steering file */
     int m_debugLevel;
 
@@ -233,6 +241,9 @@ namespace Belle2 {
 
     /** Belle2Link delay of the 2D finder */
     int m_2DFinderDelay = 0;
+
+    /** Belle2Link delay of the neurotrigger */
+    int m_NeuroDelay = 0;
 
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;

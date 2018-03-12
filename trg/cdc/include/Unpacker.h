@@ -28,6 +28,8 @@ namespace Belle2 {
     static constexpr int nTrackers = 4;
     static constexpr int nAxialTSF = 5;
     static constexpr int T2DOutputWidth = 747;
+    static constexpr int NNInputWidth = 982;
+    static constexpr int NNOutputWidth = 570;
 
     static constexpr int nMax2DTracksPerClock = 6;
 
@@ -52,6 +54,14 @@ namespace Belle2 {
     using T2DOutputVector = std::array<char, T2DOutputWidth>;
     using T2DOutputBus = std::array<T2DOutputVector, nTrackers>;
     using T2DOutputBitStream = Bitstream<T2DOutputBus>;
+
+    using NNInputVector = std::array<char, NNInputWidth>;
+    using NNInputBus = std::array<NNInputVector, nTrackers>;
+    using NNInputBitStream = Bitstream<NNInputBus>;
+
+    using NNOutputVector = std::array<char, NNOutputWidth>;
+    using NNOutputBus = std::array<NNOutputVector, nTrackers>;
+    using NNOutputBitStream = Bitstream<NNOutputBus>;
 
     // functions
     void printBuffer(int* buf, int nwords)

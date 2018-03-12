@@ -19,5 +19,7 @@
 #pragma link C++ class Belle2::Bitstream<array<array<bitset<TSF_TO_2D_WIDTH>, NUM_2D>,NUM_TSF> >+;
 
 #pragma link C++ class Belle2::Bitstream<array<array<char, T2D_TO_3D_WIDTH>, NUM_2D> >+;
+#pragma link C++ class Belle2::Bitstream<array<array<char, NN_IN_WIDTH>, NUM_2D> >+;
+#pragma link C++ class Belle2::Bitstream<array<array<char, NN_OUT_WIDTH>, NUM_2D> >+;
 
 #endif

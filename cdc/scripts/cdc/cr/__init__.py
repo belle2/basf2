@@ -159,7 +159,8 @@ def add_cdc_cr_simulation(path,
 
 
 def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
-                              topInCounter=False):
+                              topInCounter=False,
+                              pval2ndTrial=0.001):
     """
     Add CDC CR reconstruction
     """
@@ -196,8 +197,8 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
     # Track fitting
     path.add_module("DAFRecoFitter",
-                    # probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
+                    probCut=pval2ndTrial,
+                    pdgCodesToUseForFitting=13
                     )
 
     if eventTimingExtraction is True:
@@ -211,8 +212,8 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
         # Track fitting
         path.add_module("DAFRecoFitter",
-                        # probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
+                        probCut=pval2ndTrial,
+                        pdgCodesToUseForFitting=13
                         )
 
     # Create Belle2 Tracks from the genfit Tracks

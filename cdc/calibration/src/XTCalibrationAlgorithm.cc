@@ -123,9 +123,34 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
 {
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
-  prepare();
-  createHisto();
   B2INFO("Start calibration");
+
+  // Setup Gearbox
+  Gearbox& gearbox = Gearbox::getInstance();
+
+  std::vector<std::string> backends = {"file:"};
+  gearbox.setBackends(backends);
+
+  B2INFO("Start open gearbox.");
+  gearbox.open("geometry/Belle2.xml");
+  B2INFO("Finished open gearbox.");
+
+  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  //  evtPtr.construct(1, 1630, 0);
+  evtPtr.construct(0, 0, 1);
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDCGeometryPar::Instance(&cdcGeometry);
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
+  prepare(evtPtr);
+  createHisto();
+
 
   B2INFO("Start Fitting");
   for (int l = 0; l < 56; ++l) {
@@ -244,14 +269,18 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
   return c_OK;
 }
 
-void XTCalibrationAlgorithm::prepare()
+void XTCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
 {
   B2INFO("Prepare calibration of XT");
   const double rad2deg = 180 / M_PI;
 
-  DBObjPtr<CDCXtRelations> dbXT;
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
   DBStore::Instance().update();
 
+  DBObjPtr<CDCXtRelations> dbXT;
 
   m_nAlphaBins = dbXT->getNoOfAlphaBins();
   m_nThetaBins = dbXT->getNoOfThetaBins();

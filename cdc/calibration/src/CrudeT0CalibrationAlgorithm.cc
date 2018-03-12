@@ -32,17 +32,27 @@ CrudeT0CalibrationAlgorithm::CrudeT0CalibrationAlgorithm(): CalibrationAlgorithm
   );
 }
 
-void CrudeT0CalibrationAlgorithm::createHisto()
+void CrudeT0CalibrationAlgorithm::createHisto(StoreObjPtr<EventMetaData>& evtPtr)
+
 {
 
   B2INFO("CreateHisto");
 
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("create TDChist");
+
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
       m_hTDC[il][w] = new TH1D(Form("hLay%d_ch%d", il, w), "tdc", m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
     }
   }
+
+  B2INFO("create TDChist(board)");
   for (int ib = 0; ib < 300; ++ib) {
     m_hTDCBoard[ib] = new TH1D(Form("hTDCBoard%d", ib), "",  m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
   }
@@ -57,13 +67,14 @@ void CrudeT0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("tdc", &tdc);
 
   const int nEntries = tree->GetEntries();
-
+  B2INFO("fill hist");
   for (int i = 0; i < nEntries ; ++i) {
     tree->GetEntry(i);
     m_hTDC[lay][wire]->Fill(tdc);
     m_hTDCBoard[cdcgeo.getBoardID(WireID(lay, wire))]->Fill(tdc);
     m_hT0All->Fill(tdc);
   }
+  B2INFO("end of filling hist");
 }
 
 CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
@@ -88,15 +99,13 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
   DataStore::Instance().setInitializeActive(true);
   evtPtr.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  //  evtPtr.construct(0, 0, 1);
-  evtPtr.construct(1, 802, 2);
-  //  evtPtr.construct(1, 1630, 0);
+  evtPtr.construct(0, 0, 1);
   GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
   CDCGeometry cdcGeometry;
   cdcGeometry.read(cdcGearDir);
   CDCGeometryPar::Instance(&cdcGeometry);
 
-  createHisto();
+  createHisto(evtPtr);
 
   TH1D* hs = new TH1D("hs", "sigma", 100, 0, 20);
   std::vector<double> sb;

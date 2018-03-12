@@ -100,7 +100,29 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   B2INFO("Start calibration");
   gROOT->SetBatch(1);
 
-  prepare();
+  // Setup Gearbox
+  Gearbox& gearbox = Gearbox::getInstance();
+
+  std::vector<std::string> backends = {"file:"};
+  gearbox.setBackends(backends);
+
+  B2INFO("Start open gearbox.");
+  gearbox.open("geometry/Belle2.xml");
+  B2INFO("Finished open gearbox.");
+
+  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  //  evtPtr.construct(1, 1630, 0);
+  evtPtr.construct(0, 0, 1);
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDCGeometryPar::Instance(&cdcGeometry);
+
+  prepare(evtPtr);
 
   createHisto();
 
@@ -140,19 +162,21 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
     TDirectory* h2D = old->mkdir("h2D");
     h1D->cd();
     for (int ib = 1; ib < 300; ++ib) {
-      if (!m_h1[ib]) continue;
+      if (m_h1[ib] == nullptr) continue;
       if (m_h1[ib]->GetEntries() < 5) continue;
       m_h1[ib]->SetMinimum(-5);
       m_h1[ib]->SetMaximum(5);
       m_h1[ib]->Write();
     }
+
     h2D->cd();
     for (int ib = 1; ib < 300; ++ib) {
-      if (m_h2[ib]) {
-        m_h1[ib]->SetDirectory(0);
-        m_h2[ib]->Write();
-      }
+      if (m_h2[ib] == nullptr) continue;
+      if (m_h2[ib]->GetEntries() < 5) continue;
+      m_h2[ib]->Write();
+
     }
+
     fhist->Close();
     B2INFO("Hitograms were stored");
   }
@@ -175,9 +199,16 @@ void TimeWalkCalibrationAlgorithm::write()
   saveCalibration(dbTw, "CDCTimeWalks");
 }
 
-void TimeWalkCalibrationAlgorithm::prepare()
+void TimeWalkCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
 {
   B2INFO("Prepare calibration");
+
+  //  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
 
   DBObjPtr<CDCTimeWalks> dbTw;
   DBStore::Instance().update();

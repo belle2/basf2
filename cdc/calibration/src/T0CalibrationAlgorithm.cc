@@ -116,7 +116,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   DataStore::Instance().setInitializeActive(true);
   evtPtr.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  evtPtr.construct(1, 1630, 0);
+  //  evtPtr.construct(1, 1630, 0);
+  evtPtr.construct(0, 0, 1);
   GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
   CDCGeometry cdcGeometry;
   cdcGeometry.read(cdcGearDir);

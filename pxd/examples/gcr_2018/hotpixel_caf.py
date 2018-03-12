@@ -30,9 +30,15 @@ print(input_files)
 
 hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration algorithm instance
 # We can play around with hotpixelkiller parameters
-hotpixelkiller.minEvents = 100000        # Minimum number of events
-hotpixelkiller.minHits = 5               # Hot pixels have at least this numner of hits in all events
-hotpixelkiller.maxOccupancy = 0.0        # Hot pixels occupancy exceeds this limit
+hotpixelkiller.minEvents = 30000         # Minimum number of events = typical size of one subrun
+hotpixelkiller.minHits = 5               # Only consider pixels for masking with certain minimum number of hits
+hotpixelkiller.maxOccupancy = 1e-5       # Mask pixels whose occupancy exceeds this limit
+hotpixelkiller.maskDrains = True         # Set True to allow masking of hot drain lines
+hotpixelkiller.minHitsDrain = 10         # Only consider drain lines for masking with certain minimum number of hits
+hotpixelkiller.maxOccupancyDrain = 1e-7  # Maks drain line whose (average) occupancy exceeds this limit
+hotpixelkiller.maskRows = True           # Set True to allow masking of hot rows
+hotpixelkiller.minHitsRow = 10           # Only consider rows for masking with certain minimum number of hits
+hotpixelkiller.maxOccupancyRow = 1e-6    # Mask row whose (average) occupancy exceeds this limit
 # We want to use a specific collector
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 

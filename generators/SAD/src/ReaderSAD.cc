@@ -85,7 +85,7 @@ void ReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, ReaderSAD::A
 }
 
 
-void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
+void ReaderSAD::open(const string& filename)
 {
   if (m_file != NULL) {
     m_file->Close();

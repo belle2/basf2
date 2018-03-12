@@ -115,7 +115,7 @@ def add_kkmc_generator(path, finalstate=''):
     )
 
 
-def add_evtgen_generator(path, finalstate=''):
+def add_evtgen_generator(path, finalstate='', signaldecfile=None):
     """
     Add EvtGen for mixed and charged BB
 
@@ -129,8 +129,13 @@ def add_evtgen_generator(path, finalstate=''):
         pass
     elif finalstate == 'mixed':
         evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
+    elif finalstate == 'signal':
+        evtgen_userdecfile = signaldecfile
     else:
         B2FATAL("add_evtgen_generator final state not supported: {}".format(finalstate))
+
+    if signaldecfile and finalstate in ['charged', 'mixed']:
+        B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
     evtgen = path.add_module(
@@ -170,7 +175,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
     if userdecfile == '':
         pass
     else:
-        B2INFO('Replacing default user decfile: ', userdecfile)
+        B2INFO('Replacing default user decfile: {}'.format(userdecfile))
         decay_user = userdecfile
 
     #: kkmc configuration file, should be fine as is

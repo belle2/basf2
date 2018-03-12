@@ -21,6 +21,7 @@
 # analysis_main is the default path created in the modularAnalysis.py
 from basf2 import *
 from modularAnalysis import *
+from generators import add_inclusive_continuum_generator
 from beamparameters import add_beamparameters
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -37,8 +38,10 @@ set_random_seed(123)
 # set the BeamParameters for running at the Y(4S)
 beamparameters = add_beamparameters(analysis_main, "Y4S")
 
-# generateContinuum function is defined in analysis/scripts/modularAnalysis.py
-generateContinuum(1000, 'Xi-', Belle2.FileSystem.findFile('/analysis/validation/ccbar-psamples.dec'))
+# generate continuum events
+decayTable = Belle2.FileSystem.findFile('/analysis/validation/ccbar-psamples.dec')
+setupEventInfo(1000, main)
+add_inclusive_continuum_generator(main, "ccbar", ["Xi-"], decayTable)
 
 # Load geometry
 loadGearbox()

@@ -24,6 +24,7 @@
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/digitization/EclConfigurationPure.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
+#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/utilityFunctions.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
@@ -261,8 +262,8 @@ void ECLDigitCalibratorModule::event()
       }
     }
 
-    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
-    B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
+    B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
+    B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
@@ -343,7 +344,7 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
 //
 //  double timeresolution = getInterpolatedTimeResolution(x, bin);
 
-  B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
+  B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
             cellid) << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy /
           Belle2::Unit::MeV);
 
@@ -408,10 +409,10 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
   m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBarrel(outOfTimeBrl);
   m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBWD(outOfTimeBwd);
 
-  B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL found " << outOfTimeFwd << ", " << outOfTimeBrl << ", " <<
+  B2DEBUG(35, "ECLDigitCalibratorModule::determineBackgroundECL found " << outOfTimeFwd << ", " << outOfTimeBrl << ", " <<
           outOfTimeBwd << " out of time digits in FWD, BRL, BWD");
 
-  B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL(): backgroundcount = " << backgroundcount);
+  B2DEBUG(35, "ECLDigitCalibratorModule::determineBackgroundECL(): backgroundcount = " << backgroundcount);
   return backgroundcount;
 
 }

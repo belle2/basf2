@@ -11,10 +11,6 @@ using namespace std;
 namespace Belle2 {
   using namespace ECL;
 
-  /** Set up a few arrays and objects in the datastore */
-  //  class ECLShowerTest : public ::testing::Test {
-  //};
-
   /** Test Constructors. */
   TEST(TestgetDetectorRegion, TestgetDetectorRegion)
   {

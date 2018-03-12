@@ -258,8 +258,8 @@ Decay anti-B0
 #
 #                    b -> c tau nu
 #
-0.015000000 D*+     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
-0.011000000 D+      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
+0.016700000 D*+     tau-    anti-nu_tau          HQET3 0.908 1.207 1.21 1.401 0.854;
+0.010300000 D+      tau-    anti-nu_tau          HQET3 1.082 1.186 1.0;
 0.0013   D_1+   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
@@ -307,7 +307,7 @@ Decay anti-B0
 0.000000   D*(2S)+ mu-  anti-nu_mu      PHOTOS    ISGW2;
 0.001892   Xu+  mu-  anti-nu_mu      PHOTOS       VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
 #
-0.000060   pi+    tau- anti-nu_tau                 ISGW2;
+0.000250   pi+    tau- anti-nu_tau                 ISGW2;
 0.000083   rho+   tau- anti-nu_tau                 ISGW2;
 0.000090   a_1+    tau- anti-nu_tau                 ISGW2;
 0.000008   b_1+    tau- anti-nu_tau                 ISGW2;
@@ -1546,8 +1546,8 @@ Decay B0
 #
 #                    b -> c tau nu
 #
-0.015000000 D*-     tau+    nu_tau                          HQET3 0.908 1.207 1.21 1.401 0.854;
-0.011000000 D-      tau+    nu_tau                          HQET3 1.082 1.186 1.0;
+0.016700000 D*-     tau+    nu_tau           HQET3 0.908 1.207 1.21 1.401 0.854;
+0.010300000 D-      tau+    nu_tau           HQET3 1.082 1.186 1.0;
 0.0013   D_1-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
@@ -1567,7 +1567,7 @@ Decay B0
 0.000000   D*(2S)- mu+  nu_mu      PHOTOS  ISGW2;
 0.001892   Xu-  mu+  nu_mu             VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
 #
-0.000060   pi-    tau+ nu_tau                ISGW2;
+0.000250   pi-    tau+ nu_tau                ISGW2;
 0.000083   rho-   tau+ nu_tau                ISGW2;
 0.000090   a_1-    tau+ nu_tau                ISGW2;
 0.000008   b_1-    tau+ nu_tau                ISGW2;
@@ -2789,8 +2789,8 @@ Decay B-
 #
 #                   b -> c tau nu
 #
-0.020000000 D*0     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
-0.007000000 D0      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
+0.018800000 D*0     tau-    anti-nu_tau          HQET3 0.908 1.207 1.21 1.401 0.854;
+0.007700000 D0      tau-    anti-nu_tau          HQET3 1.082 1.186 1.0;
 0.0013   D_10   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*0   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D'_10   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
@@ -3794,8 +3794,8 @@ Decay B+
 #
 #                   b -> c tau nu
 #
-0.020000000 anti-D*0 tau+    nu_tau                         HQET3 0.908 1.207 1.21 1.401 0.854;
-0.007000000 anti-D0 tau+    nu_tau                          HQET3 1.082 1.186 1.0;
+0.0188000000 anti-D*0 tau+    nu_tau            HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0077000000 anti-D0 tau+    nu_tau             HQET3 1.082 1.186 1.0;
 0.0013   anti-D_10   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   anti-D_0*0   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
 0.0020   anti-D'_10   tau+ nu_tau                LLSW 0.68 -0.2 0.3;

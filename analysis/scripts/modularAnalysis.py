@@ -309,15 +309,17 @@ def setupEventInfo(noEvents, path=analysis_main):
     """
     Prepare to generate events. This function sets up the EventInfoSetter.
     You should call this before adding a generator from generators.
-    The experiment and run numbers are set to 1.
+    The experiment and run numbers are set to 0 (run independent generic MC in phase 3).
+    https://confluence.desy.de/display/BI/Experiment+numbering
 
-    @param noEvents   number of events to be generated
-    @param path       modules are added to this path
+    Parameters:
+        noEvents (int): number of events to be generated
+        path (basf2.Path): modules are added to this path
     """
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
+    evtnumbers.param('runList', [0])
+    evtnumbers.param('expList', [0])
     path.add_module(evtnumbers)
 
 
@@ -335,10 +337,11 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=Fa
         # or, for example:
         add_evtgen_generator(path=analysis_main, finalstate='mixed')
 
-    @param noEvents   number of events to be generated
-    @param decayTable file name of the decay table to be used
-    @param path       modules are added to this path
-    @param override_fatal force this function to run ignoring the deprecation
+    Parameters:
+        noEvents (int): number of events to be generated
+        decayTable (str): file name of the decay table to be used
+        path (basf2.Path): modules are added to this path
+        override_fatal (bool): force this function to run ignoring the deprecation
     """
 
     message = (
@@ -382,12 +385,13 @@ def generateContinuum(
         setupEventInfo(noEvents, path)
         add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
-    @param noEvents   number of events to be generated
-    @param inclusiveP each event will contain this particle
-    @param decayTable file name of the decay table to be used
-    @param inclusiveT whether (2) or not (1) charge conjugated inclusive Particles should be included
-    @param path       modules are added to this path
-    @param override_fatal force this function to run ignoring the deprecation
+    Parameters:
+        noEvents (int): number of events to be generated
+        inclusiveP (str): each event will contain this particle
+        decayTable (str): file name of the decay table to be used
+        inclusiveT (int) whether (2) or not (1) charge conjugated inclusive Particles should be included
+        path (basf2.Path): modules are added to this path
+        override_fatal (bool): force this function to run ignoring the deprecation
     """
     message = (
         "The generateContinuum function from modularAnalysis is deprecated.\n"

@@ -180,14 +180,14 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
+    :param pruneTracks: Delete all hits except the first and last after the post-tracking modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     """
 
     if trigger_mode in ["hlt", "all"]:
-        add_dedx_modules(path, components, pruneTracks)
+        add_dedx_modules(path, components)
         add_ext_module(path, components)
         add_top_modules(path, components)
         add_arich_modules(path, components)
@@ -214,6 +214,11 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    if trigger_mode in ["hlt", "all"]:
+        # Prune tracks as soon as the post-tracking steps are complete
+        if pruneTracks:
+            add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
@@ -447,14 +452,13 @@ def add_ext_module(path, components=None):
         path.add_module(ext)
 
 
-def add_dedx_modules(path, components=None, pruneTracks=True):
+def add_dedx_modules(path, components=None):
     """
     Add the dEdX reconstruction modules to the path
     and prune the tracks afterwards if wanted.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
-    :param pruneTracks: delete all hits except the first or last hit in the tracks.
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
@@ -466,7 +470,3 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
-
-    # Prune tracks as soon as the intermediate states at each measurement are not needed anymore.
-    if pruneTracks:
-        add_prune_tracks(path, components)

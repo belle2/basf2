@@ -45,7 +45,7 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
     // 52-55
     "DHC vs EvtMeta mismatch for Exp/Run/Subrun", "DHC vs EvtMeta mismatch for TimeTag", "ONS_TRG: HLT vs EvtMeta mismatch", "ONS_TRG: DATCON vs EvtMeta mismatch",
     // 56-59
-    "TriggerGate differ for DHEs in event", "Trigger FrameNr differ for DHEs in event", "DHP row w/o Pix", "unused",
+    "TriggerGate differ for DHEs in event", "Trigger FrameNr differ for DHEs in event", "DHP row w/o Pix", "DHE_START is not third frame",
     // 60-63
     "unused", "unused", "unused", "unused"
   };

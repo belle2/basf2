@@ -625,7 +625,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static int countedDHEEndFrames = 0;
   static int mask_active_dhe = 0;// DHE mask (5 bit)
   static int nr_active_dhe =
-    0;// just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
+    0;// TODO just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static unsigned int dhe_first_readout_frame_id_lo = 0;
@@ -652,6 +652,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   int type = dhc.getFrameType();
 
   if (Frame_Number == 0) { /// We reset the counters on the first event
+    eventNrOfOnsenTrgFrame = 0;
     countedDHEStartFrames = 0;
     countedDHEEndFrames = 0;
     countedBytesInDHC = 0;
@@ -663,6 +664,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     currentVxdId = 0;
     isUnfiltered_event = false;
     isFakedData_event = false;
+    mask_active_dhe = 0;
+    nr_active_dhe = 0;
+    mask_active_dhp = 0;
+    found_mask_active_dhp = 0;
     if (type == EDHCFrameHeaderDataType::c_DHC_START) {
       B2ERROR("This looks like this is the old Desy 2013/14 testbeam format. Please use the pxdUnpackerDesy1314 module.");
     }
@@ -1189,7 +1194,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
   if (Frame_Number == 2 && nr_active_dhe != 0 && type != EDHCFrameHeaderDataType::c_DHE_START) {
     B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
-    m_errorMask |= EPXDErrMask::c_DHE_START_MISS;
+    m_errorMask |= EPXDErrMask::c_DHE_START_THIRD;
   }
 
   if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI  && type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {

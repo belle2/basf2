@@ -9,7 +9,7 @@ set_log_level(LogLevel.ERROR)
 # to run the framework the used modules need to be registered
 eventinfosetter = register_module('EventInfoSetter')
 # Setting the option for all non-hepevt reader modules:
-eventinfosetter.param('evtNumList', [20])  # we want to process 100 events
+eventinfosetter.param('evtNumList', [30])  # we want to process nr defined error events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 
@@ -61,7 +61,8 @@ main.add_module(geometry)
 main.add_module(histoman)
 main.add_module(packer)
 main.add_module(unpacker)
-main.add_module(packercheck, Check=True, LogLevel.INFO)
+packercheck.set_log_level(LogLevel.INFO)
+main.add_module(packercheck, Check=True)
 main.add_module(register_module('PXDDAQDQM'))
 # main.add_module(register_module('PXDRawDQM'))
 # main.add_module(register_module('PXDROIDQM'))

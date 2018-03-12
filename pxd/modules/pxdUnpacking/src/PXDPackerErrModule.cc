@@ -51,107 +51,107 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
   /** Check that at least the expected error bit are set, there could be more ... */
   static std::vector <PXDErrorFlags> errors =  {
     // Event 0 does not exist...
-    EPXDErrMask::c_NO_ERROR,
+    c_NO_ERROR,
     /*  1 - HLT-Onsen Trigger differs from Meta (meta changed! thus all differ)
      *  2 - HLT-Onsen Trigger is zero
      *  3 - Run Nr differs between HLT-Onsen and Meta
      *  4 - Subrun Nr differs between HLT-Onsen and Meta
      *  5 - Exp differs between HLT-Onsen and Meta */
-    EPXDErrMask::c_META_MM_ONS_HLT | EPXDErrMask::c_META_MM | EPXDErrMask::c_FRAME_TNR_MM,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    c_META_MM | c_META_MM_DHC | c_META_MM_DHE | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+    c_META_MM | c_META_MM_DHC | c_META_MM_DHE | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+    c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+    c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+    c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
     /*  6 - Wrong ONS Trigger frame length
      *  7 - Wrong DHC Start frame length
      *  8 - Wrong DHC End frame length
      *  9 - Wrong DHE Start frame length
      * 10 - Wrong DHE End frame length */
-    EPXDErrMask::c_FIX_SIZE,
-    EPXDErrMask::c_FIX_SIZE,
-    EPXDErrMask::c_FIX_SIZE,
-    EPXDErrMask::c_FIX_SIZE,
-    EPXDErrMask::c_FIX_SIZE,
+    c_FIX_SIZE, // TODO why mismatch?
+    c_FIX_SIZE, // TODO Problem
+    c_FIX_SIZE, // TODO why is DHC End missing not detected?
+    c_FIX_SIZE, // TODO why is DHE Start missing not detected?
+    c_FIX_SIZE, // TODO why is DHE End missing not detected?
     /* 11 - Wrong DHE Start frame length (by 2 bytes), unalign 32 bit frame
      * 12 - Missing ONS Trig frame
      * 13 - Missing DHC Start frame
      * 14 - Missing DHC End frame
      * 15 - Missing DHE Start frame */
-    EPXDErrMask::c_FRAME_SIZE,
-    EPXDErrMask::c_ONSEN_TRG_FIRST,
-    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_FRAME_SIZE, // TODO
+    c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO
+    c_DHC_START_SECOND, // TODO
     EPXDErrMask::c_DHC_END_MISS,
-    EPXDErrMask::c_DHE_START_MISS,
+    EPXDErrMask::c_DHE_START_MISS, // TODO
     /* 16 - Missing DHE End frame
      * 17 - Double ONS Trig frame
      * 18 - Double DHC Start frame
      * 19 - Double DHC End frame
      * 20 - Double DHE Start frame*/
-    EPXDErrMask::c_DHE_START_WO_END,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_DHC_START_SECOND,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_DHE_START_WO_END, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_DHC_START_SECOND, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
     /* 21 - Double DHE End frame
      * 22 - DATCON triggernr+1
      * 23 - HLT Magic broken
      * 24 - DATCON Magic broken
      * 25 - HLT with Accepted not set */
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR, // TODO
+    c_MERGER_TRIGNR | c_META_MM_ONS_DC,
+    c_HLTROI_MAGIC,
+    c_HLTROI_MAGIC,
+    EPXDErrMask::c_NO_ERROR, // TODO
     /* 26 - HLT triggernr+1
      * 27 - CRC error in second frame (DHC start)
      * 28 - data for all DHE even if disabled in mask
      * 29 - no DHE at all, even so mask tell us otherwise
      * 30 - no DHC at all */
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_DHE_CRC,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    c_MERGER_TRIGNR | c_META_MM_ONS_HLT,
+    c_DHE_CRC, // TODO why DHE start missing not detected?
+    c_DHE_ACTIVE, // TODO
+    c_DHE_START_THIRD | c_DHE_ACTIVE,
+    EPXDErrMask::c_NO_ERROR, // TODO
     /* 31 - DHC end has wrong DHC id
      * 32 - DHE end has wrong DHE id
      * 33 - DHC wordcount wrong by 4 bytes
      * 34 - DHE wordcount wrong by 4 bytes
      * 35 - DHE Trigger Nr Hi word messed up */
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
     /* 36 - DHC Trigger Nr Hi word messed up
      * 37 - DHP data, even if mask says no DHP TODO Check
      * 38 - No DHP data, even if mask tell otherwise
      * 39 - DHE id differ in DHE and DHP header
      * 40 - Chip ID differ in DHE and DHP header */
-    EPXDErrMask::c_META_MM_DHE,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_META_MM_DHE, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
     /* 41 - Row overflow by 1
      * 42 - Col overflow by 1
      * 43 - Missing Start Row (Pixel w/o row)
      * 44 - No PXD raw packet at all
      * 45 - No DATCON data */
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
-    EPXDErrMask::c_NO_ERROR,
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
+    EPXDErrMask::c_NO_ERROR, // TODO
     /* 46 - unused frame type: common mode
      * 47 - unused frame type: FCE
      * 48 - unused frame type: ONS FCE
      * 49 - unused frame type: 0x7, 0x8, 0xA
      * 50 - Rows w/o Pixel (several rows after each other) */
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE,
-    EPXDErrMask::c_DHP_ROW_WO_PIX,
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
+    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
+    EPXDErrMask::c_DHP_ROW_WO_PIX, // TODO
     /* 51 - NO ERROR
      *
      *
@@ -169,11 +169,11 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
     m = 1ull << i; // ull is important!
     if ((m & (mask | expected)) == m) {
       if ((m & expected) == m && (m & mask) != m) {
-        B2ERROR("Was NOT Set: " << getPXDBitErrorName(i));
+        B2ERROR("Bit " << i << ": Was NOT Set: " << getPXDBitErrorName(i));
       } else if ((m & expected) != m && (m & mask) == m) {
-        B2RESULT("Optional   : " << getPXDBitErrorName(i));
+        B2RESULT("Bit " << i << ": Optional   : " << getPXDBitErrorName(i));
       } else if ((m & expected) == m && (m & mask) == m) {
-        B2INFO("As Expected: " << getPXDBitErrorName(i));
+        B2INFO("Bit " << i << ": As Expected: " << getPXDBitErrorName(i));
       }
     }
   }
@@ -472,8 +472,10 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
   append_int16((mm >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
   append_int16((mm >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
-  append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
-  if (!isErrorIn(7)) append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8
+  if (!isErrorIn(7)) {
+    append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
+    append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8
+  }
   if (!isErrorIn(13)) add_frame_to_payload();
   if (isErrorIn(18)) {
     // double frame
@@ -604,13 +606,13 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
 
     B2DEBUG(20, "pack_dhe: VxdId: " << VxdID(layer, ladder, sensor) << " " << (int)VxdID(layer, ladder, sensor));
 
-    // Create some random hits (not too many, jut a few per ladder)
+    // Create some fixed hits (not too many, jut a few per ladder)
     for (auto j = 0; j < 10; j++) {
       unsigned int row, col;
       unsigned char charge;
-      row = gRandom->Integer(ladder_max_row);// hardware starts counting at 0!
-      col = gRandom->Integer(ladder_max_col);// hardware starts counting at 0!
-      charge = gRandom->Integer(256);// 0-255
+      row = j * 23;
+      col = j * 23;
+      charge = 20 + j; // 0-255
       if (!dhe_has_remapped) {
         do_the_reverse_mapping(row, col, layer, sensor);
       }

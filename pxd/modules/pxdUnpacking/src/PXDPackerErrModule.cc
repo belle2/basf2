@@ -77,31 +77,31 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
      * 13 - Missing DHC Start frame
      * 14 - Missing DHC End frame
      * 15 - Missing DHE Start frame */
-    EPXDErrMask::c_FRAME_SIZE, // TODO
+    c_FRAME_SIZE, // TODO can check more errors
     c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO
     c_DHC_START_SECOND, // TODO
-    EPXDErrMask::c_DHC_END_MISS,
-    EPXDErrMask::c_DHE_START_MISS, // TODO
+    c_DHC_END_MISS,
+    c_DHE_END_WO_START, // TODO
     /* 16 - Missing DHE End frame
      * 17 - Double ONS Trig frame
      * 18 - Double DHC Start frame
      * 19 - Double DHC End frame
      * 20 - Double DHE Start frame*/
-    EPXDErrMask::c_DHE_START_WO_END, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_DHC_START_SECOND, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
+    c_DHE_START_WO_END, // TODO if two DHE, another error condition shoudl trigger, too
+    c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
+    c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
+    c_DHC_END_DBL, // TODO
+    c_DHE_WRONG_ID_SEQ | c_DHE_START_WO_END, // TODO
     /* 21 - Double DHE End frame
      * 22 - DATCON triggernr+1
      * 23 - HLT Magic broken
      * 24 - DATCON Magic broken
      * 25 - HLT with Accepted not set */
-    EPXDErrMask::c_NO_ERROR, // TODO
+    c_DHE_END_WO_START | c_DHE_START_END_ID, // TODO
     c_MERGER_TRIGNR | c_META_MM_ONS_DC,
     c_HLTROI_MAGIC,
     c_HLTROI_MAGIC,
-    EPXDErrMask::c_NO_ERROR, // TODO
+    c_NO_ERROR | c_NOTSENDALL_TYPE, // TODO =============================================== CHECK TODO Unpacker is not detecting this yet
     /* 26 - HLT triggernr+1
      * 27 - CRC error in second frame (DHC start)
      * 28 - data for all DHE even if disabled in mask
@@ -111,23 +111,23 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
     c_DHE_CRC, // TODO why DHE start missing not detected?
     c_DHE_ACTIVE, // TODO
     c_DHE_START_THIRD | c_DHE_ACTIVE,
-    EPXDErrMask::c_NO_ERROR, // TODO
+    c_DHC_END_MISS, // TODO need some better checks
     /* 31 - DHC end has wrong DHC id
      * 32 - DHE end has wrong DHE id
      * 33 - DHC wordcount wrong by 4 bytes
      * 34 - DHE wordcount wrong by 4 bytes
      * 35 - DHE Trigger Nr Hi word messed up */
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
+    c_DHC_DHCID_START_END_MM,
+    c_DHE_START_END_ID | c_DHE_WRONG_ID_SEQ | c_DHE_ID_INVALID,
+    c_DHC_WIE,
+    c_DHE_WIE,
+    c_META_MM_DHE,
     /* 36 - DHC Trigger Nr Hi word messed up
      * 37 - DHP data, even if mask says no DHP TODO Check
      * 38 - No DHP data, even if mask tell otherwise
      * 39 - DHE id differ in DHE and DHP header
      * 40 - Chip ID differ in DHE and DHP header */
-    EPXDErrMask::c_META_MM_DHE, // TODO
+    c_META_MM_DHC,
     EPXDErrMask::c_NO_ERROR, // TODO
     EPXDErrMask::c_NO_ERROR, // TODO
     EPXDErrMask::c_NO_ERROR, // TODO
@@ -170,6 +170,7 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
     if ((m & (mask | expected)) == m) {
       if ((m & expected) == m && (m & mask) != m) {
         B2ERROR("Bit " << i << ": Was NOT Set: " << getPXDBitErrorName(i));
+        m_found_fatal = true;
       } else if ((m & expected) != m && (m & mask) == m) {
         B2RESULT("Bit " << i << ": Optional   : " << getPXDBitErrorName(i));
       } else if ((m & expected) == m && (m & mask) == m) {
@@ -182,10 +183,12 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
     // special check, this event should not contain any error!
     if (mask != EPXDErrMask::c_NO_ERROR) {
       B2ERROR("There should be no error in this event, but there were (see above)!");
+      m_found_fatal = true;
     }
     flag = (mask == EPXDErrMask::c_NO_ERROR);
   }
   B2INFO("-- PXD Packer Error Check END --- ");
+  if (m_found_fatal) B2FATAL("At least one of the checks failed (see details above)!");
   return flag;
 }
 
@@ -212,6 +215,7 @@ PXDPackerErrModule::PXDPackerErrModule() :
 
 void PXDPackerErrModule::initialize()
 {
+  m_found_fatal = false;
   B2DEBUG(20, "PXD Packer Err --> Init");
   if (m_Check) {
     m_daqStatus.isRequired();
@@ -264,11 +268,11 @@ void PXDPackerErrModule::initialize()
       }
     }
   }
-
 }
 
 void PXDPackerErrModule::terminate()
 {
+  if (m_found_fatal) B2FATAL("At least one of the checks failed (see details above)!");
 }
 
 void PXDPackerErrModule::event()
@@ -360,7 +364,7 @@ void PXDPackerErrModule::pack_event(void)
 void PXDPackerErrModule::add_frame_to_payload(void)
 {
   if (m_current_frame.size() & 0x3) {
-    B2ERROR("Frame is not 32bit aligned!!! Unsupported by Unpacker!");
+    B2WARNING("Frame is not 32bit aligned!!! Unsupported by Unpacker!");
   }
   // checksum frame
   dhc_crc_32_type current_crc;
@@ -417,6 +421,9 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 {
   B2DEBUG(20, "PXD Packer Err --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
+  bool m_send_all = true;
+  bool m_send_roi = false;
+
   /// HLT frame ??? format still t.b.d. TODO
   start_frame();
   append_int32((EDHCFrameHeaderDataType::c_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
@@ -424,9 +431,9 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   if (isErrorIn(23)) {
     append_int32(0xDEAD8000);
   } else if (isErrorIn(25)) {
-    append_int32(0xCAFE0000);// HLT HEADER, NO accepted flag set
+    append_int32(0xCAFE0000);// HLT HEADER, NO accepted flag
   } else {
-    append_int32(0xCAFE8000);// HLT HEADER, accepted flag set
+    append_int32(0xCAFE8000 | (m_send_all ? 0x4000 : 0) | (m_send_roi ? 0x2000 : 0)); // HLT HEADER, accepted flag set
   }
   if (isErrorIn(26)) {
     append_int32(m_trigger_nr + 1);

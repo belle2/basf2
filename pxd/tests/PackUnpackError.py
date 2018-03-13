@@ -60,7 +60,7 @@ main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(histoman)
 main.add_module(packer)
-unpacker.set_log_level(LogLevel.ERROR)
+unpacker.set_log_level(LogLevel.FATAL)
 main.add_module(unpacker)
 packercheck.set_log_level(LogLevel.INFO)
 main.add_module(packercheck, Check=True)
@@ -69,6 +69,8 @@ main.add_module(register_module('PXDDAQDQM'))
 # main.add_module(register_module('PXDROIDQM'))
 main.add_module(register_module('Progress'))
 main.add_module(simpleoutput)
+
+set_module_parameters(main, "PXDUnpacker", logLevel=LogLevel.FATAL)
 
 # Process the events
 process(main)

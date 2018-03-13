@@ -76,6 +76,9 @@ namespace Belle2 {
       /** DHE Trigger Gate for DHE headers */
       unsigned int m_trigger_dhe_gate;
 
+      /** flag if we found one test failing */
+      bool m_found_fatal;
+
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
 

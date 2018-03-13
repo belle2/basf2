@@ -249,6 +249,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
     if (lo & 0x3) {
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
+      m_errorMask |= EPXDErrMask::c_FRAME_SIZE;
     } else {
       B2DEBUG(20, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
       unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
@@ -889,8 +890,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       currentDHEID = dhc.data_dhe_start_frame->getDHEId();
       m_errorMask |= dhc.check_crc();
 
-      if (countedDHEStartFrames != countedDHEEndFrames) {
-        B2ERROR("EDHCFrameHeaderDataType::c_DHE_START without EDHCFrameHeaderDataType::c_DHE_END");
+      if (countedDHEStartFrames > countedDHEEndFrames) {
+        B2ERROR("DHE_START without DHE_END");
         m_errorMask |= EPXDErrMask::c_DHE_START_WO_END;
       }
       countedDHEStartFrames++;
@@ -1013,7 +1014,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= EPXDErrMask::c_DHP_ACTIVE;
       }
       countedDHEEndFrames++;
-      if (countedDHEStartFrames != countedDHEEndFrames) {
+      if (countedDHEStartFrames < countedDHEEndFrames) {
+        // the other case is checked in Start
         B2ERROR("DHE_END without DHE_START");
         m_errorMask |= EPXDErrMask::c_DHE_END_WO_START;
       }
@@ -1180,7 +1182,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       B2ERROR("The number of DHE Start/End does not match the number of active DHE in DHC Header! Header: " << nr_active_dhe <<
               " Start: " << countedDHEStartFrames << " End: " << countedDHEEndFrames << " Mask: $" << hex << mask_active_dhe << " in Event Nr " <<
               eventNrOfThisFrame);
-      m_errorMask |= EPXDErrMask::c_DHE_ACTIVE;
+      if (countedDHEStartFrames == countedDHEEndFrames) m_errorMask |= EPXDErrMask::c_DHE_ACTIVE;
+      if (countedDHEStartFrames > countedDHEEndFrames)  m_errorMask |= EPXDErrMask::c_DHE_START_WO_END;
+      if (countedDHEStartFrames < countedDHEEndFrames)  m_errorMask |= EPXDErrMask::c_DHE_END_WO_START;
     }
 
   } else { //  (Frame_Number != Frames_in_event - 1 &&

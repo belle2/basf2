@@ -52,6 +52,8 @@ namespace Belle2 {
 
     /**
      * Radii where virtual hits for the extrapolation will be generated
+     * The default values are taken from bremsstrahlung studies
+     * They represent the edge of the beampipe, the outer SVD wall and the inner CDC wall
      */
     std::vector<float> m_virtualHitRadii = {1.05, 15.0, 16.0};
 

@@ -69,16 +69,17 @@ void ECLTrackBremFinderModule::event()
   // with sufficient energy to be detected and reconstructed
   for (auto& track : tracks) {
 
-    B2DEBUG(50, "Checking track for related ECLCluster");
+    B2DEBUG(20, "Checking track for related ECLCluster");
 
     // does this track have a cluster assigned ?
     // this is required, otherwise we cannot assign any brems cluster
     ECLCluster* primaryClusterOfTrack = nullptr;
     auto relatedClustersToTrack =
       track.getRelationsWith<ECLCluster>
-      (m_param_eclClustersStoreArrayName);       //check the particle hypothesis ID here (has to be 6 for electron)!!
+      (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (has to be 6 or rather c_neutralHadron for electron)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
       int particleHypothesisID = relatedCluster.getHypothesisId();
+      // todo: check this if other hypothesis than nPhotons and neutralHadron are going to be used
       if (particleHypothesisID == ECLCluster::c_neutralHadron) {
         primaryClusterOfTrack = &relatedCluster;
       }
@@ -92,7 +93,7 @@ void ECLTrackBremFinderModule::event()
 
     if (!recoTrack) {
       // no reco track
-      B2DEBUG(50, "No RecoTrack for this Track");
+      B2DEBUG(20, "No RecoTrack for this Track");
       continue;
     }
 
@@ -102,14 +103,14 @@ void ECLTrackBremFinderModule::event()
       //check if the cluster belongs to a photon or electron
       int particleHypothesisID = cluster.getHypothesisId();
       if (particleHypothesisID != ECLCluster::c_nPhotons) {
-        B2DEBUG(50, "Cluster belongs to electron, bailing out");
+        B2DEBUG(20, "Cluster has not the hypothesis of an electron!");
         continue;
       }
 
       //check if cluster is already related to a track -> if true, can't be bremsstrahlung cluster
       auto relatedTrack = cluster.getRelatedFrom<Track>();
       if (relatedTrack) {
-        B2DEBUG(50, "Cluster already related to track, bailing out");
+        B2DEBUG(20, "Cluster already related to track, bailing out");
         continue;
       }
 
@@ -117,7 +118,7 @@ void ECLTrackBremFinderModule::event()
       //procedure: first come, first served
       auto relatedCluster = cluster.getRelated<ECLCluster>();
       if (relatedCluster) {
-        B2DEBUG(50, "Cluster already related to cluster!");
+        B2DEBUG(20, "Cluster already related to cluster!");
         continue;
       }
 
@@ -172,7 +173,7 @@ void ECLTrackBremFinderModule::event()
             matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
           }
         } catch (genfit::Exception& exception1) {
-          B2DEBUG(50, "Extrapolation failed!");
+          B2DEBUG(20, "Extrapolation failed!");
         }
       }
 

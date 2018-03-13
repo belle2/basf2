@@ -861,7 +861,7 @@ void ARICHDatabaseImporter::dumpQEMap(bool simple)
   }
 }
 
-void ARICHDatabaseImporter::dumpAOP(std::string outRootFileName)
+void ARICHDatabaseImporter::dumpAerogelOpticalProperties(std::string outRootFileName)
 {
 
   ARICHAerogelHist* h2_aerogel_up_n = new ARICHAerogelHist("h2_aerogel_up_n", "aerogel up n");
@@ -871,40 +871,51 @@ void ARICHDatabaseImporter::dumpAOP(std::string outRootFileName)
   ARICHAerogelHist* h2_aerogel_down_transmL = new ARICHAerogelHist("h2_aerogel_down_transmL", "aerogel down transmL");
   ARICHAerogelHist* h2_aerogel_down_thick = new ARICHAerogelHist("h2_aerogel_down_thick", "aerogel down thick");
 
-  DBArray<ARICHAerogelMap> elementsM("ARICHAerogelMap");
-  elementsM.getEntries();
-  DBArray<ARICHAerogelInfo> elementsI("ARICHAerogelInfo");
-  elementsI.getEntries();
+  std::string condDBname = "ARICHdata";
 
-  //
-  for (const auto& elementM : elementsM) {
-    if (elementM.getAerogelLayer(0) == 1) {
-      for (const auto& elementI : elementsI) {
-        if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
-          //down
-          h2_aerogel_down_n->SetBinContent(h2_aerogel_down_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
-                                           elementM.getAerogelColumnID()), elementI.getAerogelRefractiveIndex());
-          h2_aerogel_down_transmL->SetBinContent(h2_aerogel_down_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+  if (condDBname == "ARICHdata") {
+
+    //
+    DBArray<ARICHAerogelMap> elementsM("ARICHAerogelMap");
+    elementsM.getEntries();
+    DBArray<ARICHAerogelInfo> elementsI("ARICHAerogelInfo");
+    elementsI.getEntries();
+
+    //
+    for (const auto& elementM : elementsM) {
+      if (elementM.getAerogelLayer(0) == 1) {
+        for (const auto& elementI : elementsI) {
+          if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+            //down
+            h2_aerogel_down_n->SetBinContent(h2_aerogel_down_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                             elementM.getAerogelColumnID()), elementI.getAerogelRefractiveIndex());
+            h2_aerogel_down_transmL->SetBinContent(h2_aerogel_down_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                   elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+            h2_aerogel_down_thick->SetBinContent(h2_aerogel_down_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                 elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+          }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+        }// for (const auto& elementI : elementsI) {
+      }
+      if (elementM.getAerogelLayer(1) == 1) {
+        for (const auto& elementI : elementsI) {
+          if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+            //up
+            h2_aerogel_up_n->SetBinContent(h2_aerogel_up_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(), elementM.getAerogelColumnID()),
+                                           elementI.getAerogelRefractiveIndex());
+            h2_aerogel_up_transmL->SetBinContent(h2_aerogel_up_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
                                                  elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
-          h2_aerogel_down_thick->SetBinContent(h2_aerogel_down_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+            h2_aerogel_up_thick->SetBinContent(h2_aerogel_up_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
                                                elementM.getAerogelColumnID()), elementI.getAerogelThickness());
-        }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
-      }// for (const auto& elementI : elementsI) {
-    }
-    if (elementM.getAerogelLayer(1) == 1) {
-      for (const auto& elementI : elementsI) {
-        if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
-          //up
-          h2_aerogel_up_n->SetBinContent(h2_aerogel_up_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(), elementM.getAerogelColumnID()),
-                                         elementI.getAerogelRefractiveIndex());
-          h2_aerogel_up_transmL->SetBinContent(h2_aerogel_up_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
-                                               elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
-          h2_aerogel_up_thick->SetBinContent(h2_aerogel_up_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
-                                             elementM.getAerogelColumnID()), elementI.getAerogelThickness());
-        }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
-      }// for (const auto& elementI : elementsI) {
-    }
-  }//  for (const auto& elementM : elementsM) {
+          }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+        }// for (const auto& elementI : elementsI) {
+      }
+    }//  for (const auto& elementM : elementsM) {
+
+  }//  if (condDBname = "ARICHdata") {
+  //else { //  if (condDBname = "ARICHdata") {
+  //To be added later when the information about aerogel optical properties
+  //would be available not only in ARICHdata
+  //}
 
   TFile* rootFile = new TFile(outRootFileName.c_str(), "RECREATE", " Histograms", 1);
   rootFile->cd();

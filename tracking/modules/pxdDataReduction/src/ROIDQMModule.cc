@@ -44,17 +44,17 @@ ROIDQMModule::ROIDQMModule()
 , h_HitCol_CellV(NULL)
 {
   //Set module properties
-  setDescription("Monitor of the  m_roiIDs creation on HLT");
+  setDescription("Monitor of the  ROIs creation on HLT");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("PXDDigitsName", m_PXDDigitsName,
-           "name of the list of m_pxdDigits", std::string(""));
+           "name of the list of PXDDigits", std::string(""));
 
   addParam("InterceptsName", m_InterceptsName,
-           "name of the list of interceptions", std::string(""));
+           "name of the list of Interceptions", std::string(""));
 
   addParam("ROIsName", m_ROIsName,
-           "name of the list of m_roiIDs", std::string(""));
+           "name of the list of ROIs", std::string(""));
 
 }
 

@@ -18,13 +18,13 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 
-#include <vxd/dbobjects/ServiceGapsMaterialsPar.h>
+#include <structure/dbobjects/ServiceGapsMaterialsPar.h>
 
 class G4Material;
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for simulation and reconstrucion of the VXD */
-  namespace VXD {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the structure */
+  namespace structure {
 
     /** The creator for the Service Material geometry of the Belle II detector. */
     class GeoServiceMaterialCreator : public geometry::CreatorBase {
@@ -98,7 +98,7 @@ namespace Belle2 {
 //     G4VPhysicalVolume* physical_gap;
 
     };
-  } // namespace VXD
+  } // namespace structure
 } //namespace Belle2
 
-#endif /* GEOVXDMATERIALCREATOR_H */
+#endif /* GEOSERVICEMATERIALCREATOR_H */

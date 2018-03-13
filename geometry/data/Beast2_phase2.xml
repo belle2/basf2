@@ -12,6 +12,7 @@
   <!-- Define materials -->
   <xi:include href="BasicMaterials.xml"/>
   <xi:include href="../structure/STR-Materials.xml"/>
+  <xi:include href="../structure/ServiceGaps-Materials.xml"/>
   <xi:include href="../ir/IR-Materials.xml"/>
   <xi:include href="../vxd/VXD-Materials.xml"/>
   <xi:include href="../pxd/PXD-Materials.xml"/>

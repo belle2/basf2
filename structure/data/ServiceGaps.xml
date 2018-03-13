@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Creator library="vxd">ServiceMaterialCreator</Creator>
+  <Creator library="structure">ServiceMaterialCreator</Creator>
   <Content>
     <xi:include href="GAPS-thickness-density.xml"/>
     <!-- Service Gaps Materials mother volume geometry Parameter -->

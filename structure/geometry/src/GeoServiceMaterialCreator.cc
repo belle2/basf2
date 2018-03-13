@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/geometry/GeoServiceMaterialCreator.h>
-#include <vxd/geometry/GeoVXDComponents.h>
+#include <structure/geometry/GeoServiceMaterialCreator.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <simulation/background/BkgSensitiveDetector.h>
@@ -32,7 +31,7 @@ namespace Belle2 {
 
   using namespace geometry;
 
-  namespace VXD {
+  namespace structure {
 
     /** Create factory instance so that the framework can instantiate the ServiceMaterialCreator */
     geometry::CreatorFactory<GeoServiceMaterialCreator> GeoServiceMaterialFactory("ServiceMaterialCreator");
@@ -297,10 +296,10 @@ namespace Belle2 {
                         physicalName.c_str(), logical_gap, false, 0);
     }
 
-    void Belle2::VXD::GeoServiceMaterialCreator::createCone(const double rmin1, const double rmax1, const double rmin2,
-                                                            const double rmax2,
-                                                            const double thick, const double SPhi, const double DPhi, const double posZ, G4Material* med,
-                                                            const string& name, G4LogicalVolume*& top)
+    void GeoServiceMaterialCreator::createCone(const double rmin1, const double rmax1, const double rmin2,
+                                               const double rmax2,
+                                               const double thick, const double SPhi, const double DPhi, const double posZ, G4Material* med,
+                                               const string& name, G4LogicalVolume*& top)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -313,5 +312,5 @@ namespace Belle2 {
 
     }
 
-  } // VXD namespace
+  } // structure namespace
 } // Belle2 namespace

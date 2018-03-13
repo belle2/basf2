@@ -13,11 +13,6 @@
 #pragma link C++ class Belle2::VXDBoxTypesPar+;  // implicit
 #pragma link C++ class Belle2::VXDBoxPositionsPar+; // implicit
 #pragma link C++ class Belle2::VXDSlotsPar+; // implicit
-#pragma link C++ class Belle2::ServiceGapsMaterialsPar+;
-#pragma link C++ class Belle2::ServiceGapsMaterialsCdcArichTopPar+;  // implicit
-#pragma link C++ class Belle2::ServiceGapsMaterialsEclPar+;  // implicit
-#pragma link C++ class Belle2::ServiceGapsMomVolPar+;  // implicit
-#pragma link C++ class Belle2::ThicknessDensityPar+;  // implicit
 
 
 

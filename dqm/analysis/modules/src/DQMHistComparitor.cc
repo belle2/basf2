@@ -9,6 +9,7 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
+#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TStyle.h>
@@ -201,64 +202,104 @@ void DQMHistComparitorModule::beginRun()
   B2DEBUG(20, "DQMHistComparitor: beginRun called.");
 }
 
-void DQMHistComparitorModule::event()
+DQMHistComparitorModule::CMPNODE* DQMHistComparitorModule::find_pnode(TString a)
 {
   for (auto& it : m_pnode) {
-
-    TH1* hist1, *hist2;
-
-    B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = GetHisto(it->histo1);
-    if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
-    hist2 = GetHisto(it->histo2);
-    if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
-    // Dont compare if any of hists is missing ... TODO We should clean CANVAS, raise some error if we cannot compare
-    if (!hist1) continue;
-    if (!hist2) continue;
-
-    B2DEBUG(20, "Compare " << it->histo1 << " with ref " << it->histo2);
-    // if compare normalized ... does not work!
-    // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
-
-    double data = 0.0;
-    data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
-//     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
-//     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
-//     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
-#ifdef _BELLE2_EPICS
-    if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
-#endif
-    it->canvas->cd();
-    hist2->SetLineStyle(2);// 2 or 3
-    hist2->SetLineColor(1);
-    // if draw normalized
-    if (1) {
-      TH1* h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
-      h->Scale(hist1->GetEntries() / hist2->GetEntries());
-      h->Draw();
-    } else {
-      hist2->Draw("hist");
-    }
-    hist1->Draw("hist,same");
-    it->canvas->Pad()->SetFrameFillStyle(1);
-    if (hist1->GetEntries() < it->min_entries) {
-      // not enough Entries
-      it->canvas->Pad()->SetFillColor(6);// Magenta
-    } else {
-      if (data < it->error) {
-        it->canvas->Pad()->SetFillColor(2);// Red
-      } else if (data < it->warning) {
-        it->canvas->Pad()->SetFillColor(5);// Yellow
-      } else {
-        it->canvas->Pad()->SetFillColor(0);// White
-      }
-    }
-    it->canvas->Modified();
-    it->canvas->Update();
+    if (it->histo1 == a)
+      return it;
   }
+  return NULL;
+}
+
+void DQMHistComparitorModule::event()
+{
+  TIter nextkey(gROOT->GetListOfKeys());
+  TObject* obj = 0;
+
+  while ((obj = (TObject*)nextkey())) {
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      TString a = obj->GetName();
+
+      CMPNODE* it = find_pnode(a);
+      if (it == NULL) { // new CMPNODE
+        it = new CMPNODE;
+
+        it->histo1 = a;
+        it->histo2 = "ref/" + a;
+        StringList s = StringUtil::split(a.Data(), '/');
+        std::string dirname = s[0];
+        std::string hname = s[1];
+        TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+        it->canvas = c;
+
+        it->min_entries = 100;
+        it->warning = 0.9;
+        it->error = 0.6;
+        it->epicsflag = false;
+
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+        SEVCHK(ca_create_channel(it.at(6).c_str(), NULL, NULL, 10, &n->mychid), "ca_create_channel failure");
+        t->epicsflag = true;
 #endif
+        m_pnode.push_back(it);
+      }
+
+
+      TH1* hist1, *hist2;
+
+      B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
+      hist1 = (TH1*) obj;
+      if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
+      hist2 = GetHisto(it->histo2);
+      if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
+      // Dont compare if any of hists is missing ... TODO We should clean CANVAS, raise some error if we cannot compare
+      if (!hist1) continue;
+      if (!hist2) continue;
+
+      B2DEBUG(20, "Compare " << it->histo1 << " with ref " << it->histo2);
+      // if compare normalized ... does not work!
+      // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
+
+      double data = 0.0;
+      data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
+      //     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
+      //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
+      //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
+#ifdef _BELLE2_EPICS
+      if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
+#endif
+      it->canvas->cd();
+      hist2->SetLineStyle(2);// 2 or 3
+      hist2->SetLineColor(1);
+      // if draw normalized
+      if (1) {
+        TH1* h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
+        h->Scale(hist1->GetEntries() / hist2->GetEntries());
+        h->Draw();
+      } else {
+        hist2->Draw("hist");
+      }
+      hist1->Draw("hist,same");
+      it->canvas->Pad()->SetFrameFillStyle(1);
+      if (hist1->GetEntries() < it->min_entries) {
+        // not enough Entries
+        it->canvas->Pad()->SetFillColor(6);// Magenta
+      } else {
+        if (data < it->error) {
+          it->canvas->Pad()->SetFillColor(2);// Red
+        } else if (data < it->warning) {
+          it->canvas->Pad()->SetFillColor(5);// Yellow
+        } else {
+          it->canvas->Pad()->SetFillColor(0);// White
+        }
+      }
+      it->canvas->Modified();
+      it->canvas->Update();
+#ifdef _BELLE2_EPICS
+      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
+    }
+  }
 }
 
 void DQMHistComparitorModule::endRun()

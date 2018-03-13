@@ -55,6 +55,7 @@ namespace Belle2 {
     virtual void event();
     virtual void endRun();
     virtual void terminate();
+    CMPNODE* find_pnode(TString a);
 
     // Data members
   private:

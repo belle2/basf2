@@ -52,7 +52,7 @@
   <xi:include href="../ir/FarBeamLine.xml"/>
   <xi:include href="../vxd/HeavyMetalShield.xml"/>
   <!--xi:include href="../vxd/Service.xml"/-->
-  <xi:include href="../vxd/Service-Beast2.xml"/>
+  <xi:include href="../vxd/ServiceGaps.xml"/>  
   <xi:include href="../pxd/PXD-phase2.xml"/>
   <xi:include href="../svd/SVD-phase2.xml"/>
   <xi:include href="../cdc/CDC.xml"/>

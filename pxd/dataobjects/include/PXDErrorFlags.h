@@ -43,7 +43,7 @@ namespace Belle2 {
         c_ONSEN_TRG_FIRST = 1ull << 3,
         //
         c_DHC_END_MISS = 1ull << 4,
-        c_DHE_START_MISS = 1ull << 5,
+        c_NR_FRAMES_TO_SMALL = 1ull << 5,
         c_ROI_PACKET_INV_SIZE = 1ull << 6,
         c_DATA_OUTSIDE = 1ull << 7,
         //
@@ -53,7 +53,7 @@ namespace Belle2 {
         c_DHE_CRC = 1ull << 11,
         //
         c_DHC_UNKNOWN = 1ull << 12,
-        c_MERGER_CRC = 1ull << 13,
+        c_XXXMERGER_CRC = 1ull << 13,
         c_PACKET_SIZE = 1ull << 14,
         c_MAGIC = 1ull << 15,
         //

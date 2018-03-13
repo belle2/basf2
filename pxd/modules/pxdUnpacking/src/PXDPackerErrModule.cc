@@ -141,19 +141,30 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
   /* 46 - unused frame type: common mode
    * 47 - unused frame type: FCE
    * 48 - unused frame type: ONS FCE
-   * 49 - unused frame type: 0x7, 0x8, 0xA
-   * 50 - Rows w/o Pixel (several rows after each other) */
+   * 49 - unused frame type: 0x7
+   * 50 - unused frame type: 0x8 */
   c_UNEXPECTED_FRAME_TYPE,
   c_UNEXPECTED_FRAME_TYPE,
   c_UNEXPECTED_FRAME_TYPE,
   c_DHC_UNKNOWN,
+  c_DHC_UNKNOWN,
+  /* 51 - unused frame type: 0xA
+   * 52 - Rows w/o Pixel (several rows after each other)
+   * 53 - no frames in packet (this should be an error) TODO
+   * 54 - broken PXD packet magic
+   * 55 - exceeding allowed nr of frames by far  */
+  c_DHC_UNKNOWN,
   c_DHP_ROW_WO_PIX,
-  /* 51 - NO ERROR
-   * 52 - NO ERROR
-   *
-   * */
-  EPXDErrMask::c_NO_ERROR,
-  EPXDErrMask::c_NO_ERROR,
+  c_NR_FRAMES_TO_SMALL,
+  c_MAGIC,
+  c_FRAME_NR,
+  /* 56 - more frames than actual available, exceeding packet size
+   * 52 - one frame payload exceeding packet size
+   * 53 -
+   * 54 -
+   * 55 -  */
+  c_FRAME_SIZE,
+  c_FRAME_SIZE,
 };
 
 bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)
@@ -368,10 +379,22 @@ void PXDPackerErrModule::pack_event(void)
 
     m_onsen_header.clear();// Reset
     m_onsen_payload.clear();// Reset
-    pack_dhc(it.first, act_port, dhe_ids);
+    if (!isErrorIn(53)) pack_dhc(it.first, act_port, dhe_ids);
     // and write to PxdRaw object
     // header will be finished and endian swapped by constructor; payload already has be on filling the vector
-    m_storeRaws.appendNew(m_onsen_header, m_onsen_payload);
+    auto objptr = m_storeRaws.appendNew(m_onsen_header, m_onsen_payload);
+    if (isErrorIn(54)) {
+      objptr->data()[0] = 0xDEADBEAF; // invalid magic
+    }
+    if (isErrorIn(55)) {
+      objptr->data()[1] = 0x00110000; // invalid #frames
+    }
+    if (isErrorIn(56)) {
+      objptr->data()[1] = 0x00010000; // valid #frames, but will exceed size
+    }
+    if (isErrorIn(57)) {
+      objptr->data()[2] = 0x01010101; // extremely large frame
+    }
   }
 
 }
@@ -591,9 +614,13 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
     start_frame();
     append_int32((EDHCFrameHeaderDataType::c_UNUSED_7 << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
     add_frame_to_payload();
+  }
+  if (isErrorIn(50)) {
     start_frame();
     append_int32((EDHCFrameHeaderDataType::c_UNUSED_8 << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
     add_frame_to_payload();
+  }
+  if (isErrorIn(51)) {
     start_frame();
     append_int32((EDHCFrameHeaderDataType::c_UNUSED_A << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
     add_frame_to_payload();
@@ -768,7 +795,7 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
           rowstart = false;
         }
         int colout = col;
-        if (!isErrorIn(50)) append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | charge);
+        if (!isErrorIn(52)) append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | charge);
         empty = false;
       }
     }

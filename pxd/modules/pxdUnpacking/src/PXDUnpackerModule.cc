@@ -212,6 +212,10 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
     m_errorMask |= EPXDErrMask::c_FRAME_NR;
     return;
   }
+  if (Frames_in_event < 3) {
+    B2ERROR("Number of Frames too small: It cannot contain anything useful. Frames in event: " << Frames_in_event);
+    m_errorMask |= c_NR_FRAMES_TO_SMALL;
+  }
 
   /// NEW format
   if (verbose) {

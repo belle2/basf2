@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/ROIDQMModule.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <rawdata/dataobjects/RawFTSW.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include "time.h"
@@ -47,17 +44,17 @@ ROIDQMModule::ROIDQMModule()
 , h_HitCol_CellV(NULL)
 {
   //Set module properties
-  setDescription("Monitor of the  ROIs creation on HLT");
+  setDescription("Monitor of the  m_roiIDs creation on HLT");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("PXDDigitsName", m_PXDDigitsName,
-           "name of the list of PXDDigits", std::string(""));
+           "name of the list of m_pxdDigits", std::string(""));
 
   addParam("InterceptsName", m_InterceptsName,
            "name of the list of interceptions", std::string(""));
 
   addParam("ROIsName", m_ROIsName,
-           "name of the list of ROIs", std::string(""));
+           "name of the list of m_roiIDs", std::string(""));
 
 }
 
@@ -66,8 +63,8 @@ void ROIDQMModule::defineHisto()
 
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  m_InterDir = oldDir->mkdir("intercept");
-  m_ROIDir = oldDir->mkdir("roi");
+  m_InterDir = oldDir->mkdir("intercept");// TODO will return NULL if dir exists already
+  m_ROIDir = oldDir->mkdir("roi");// TODO will return NULL if dir exists already
 
   hCellUV  = new TH2F("hCellU_vs_CellV", "CellID U vs CellID V", 480, 0, 480, 480, 0, 480);
   hCellUV->GetXaxis()->SetTitle("U cell ID");
@@ -81,12 +78,12 @@ void ROIDQMModule::defineHisto()
   h_HitCol_CellV->GetXaxis()->SetTitle("V cell ID");
   h_HitCol_CellV->GetYaxis()->SetTitle("COL ID");
 
-  m_InterDir->cd();
+  m_InterDir->cd();// TODO will crash if dir exists already s.o.
   hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
 
-  m_ROIDir->cd();
-  hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
-  harea = new TH1F("harea", "ROIs area", 100, 0, 100000);
+  m_ROIDir->cd();// TODO will crash if dir exists already s.o.
+  hnROIs  = new TH1F("hnROIs", "number of m_roiIDs", 100, 0, 100);
+  harea = new TH1F("harea", "m_roiIDs area", 100, 0, 100000);
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
 
 
@@ -100,20 +97,11 @@ void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
-  StoreArray<RawFTSW> rawFTSWs;
-  rawFTSWs.isOptional();
-
-  StoreArray<PXDDigit> pxdDigits;
-  pxdDigits.isOptional();
-
-  StoreArray<PXDRawHit> pxdRawHits;
-  pxdRawHits.isOptional();
-
-  StoreArray<ROIid> roiIDs;
-  roiIDs.isRequired(m_ROIsName);
-
-  StoreArray<PXDIntercept> pxdIntercept;
-  pxdIntercept.isRequired(m_InterceptsName);
+  m_rawFTSWs.isOptional();
+  m_pxdDigits.isOptional();
+  m_pxdRawHits.isOptional();
+  m_roiIDs.isRequired(m_ROIsName);
+  m_pxdIntercept.isRequired(m_InterceptsName);
 
   n_events = 0;
 }
@@ -123,23 +111,18 @@ void ROIDQMModule::event()
 
   n_events++;
 
-  StoreArray<ROIid> ROIs(m_ROIsName);
-  StoreArray<PXDRawHit> PXDRawHits;
-  StoreArray<PXDIntercept> Intercepts(m_InterceptsName);
-
-  StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);
-  for (auto& it : PXDDigits)
+  for (auto& it : m_pxdDigits)
     hCellUV->Fill(it.getUCellID(), it.getVCellID());
 
-  for (auto& itd : PXDDigits)
-    for (auto& itr : PXDRawHits) {
+  for (auto& itd : m_pxdDigits)
+    for (auto& itr : m_pxdRawHits) {
       h_HitRow_CellU->Fill(itd.getUCellID(), itr.getRow());
       h_HitCol_CellV->Fill(itd.getVCellID(), itr.getColumn());
     }
 
-  hnInter->Fill(Intercepts.getEntries());
+  hnInter->Fill(m_pxdIntercept.getEntries());
 
-  for (auto& it : Intercepts)
+  for (auto& it : m_pxdIntercept)
     fillSensorInterHistos(&it);
 
 
@@ -153,7 +136,7 @@ void ROIDQMModule::event()
   int maxU;
   int maxV;
 
-  for (auto& it : ROIs) {
+  for (auto& it : m_roiIDs) {
 
     fillSensorROIHistos(&it);
 
@@ -172,7 +155,7 @@ void ROIDQMModule::event()
 
   }
 
-  hnROIs->Fill(ROIs.getEntries());
+  hnROIs->Fill(m_roiIDs.getEntries());
 
   harea->Fill((double)ROIarea);
 
@@ -227,7 +210,7 @@ void ROIDQMModule::createHistosDictionaries()
         m_ROIDir->cd();
 
         name = "hNROIs_" + sensorid;
-        title = "number of ROIs for sensor " + sensorid;
+        title = "number of m_roiIDs for sensor " + sensorid;
         double value = 0;
         ROIHistoAccumulateAndFill* aHAAF = new ROIHistoAccumulateAndFill {
           new TH1F(name.c_str(), title.c_str(), 25, 0, 25),
@@ -319,9 +302,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID()));
@@ -340,9 +321,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp1D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID()));
@@ -363,9 +342,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double residU = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -388,9 +365,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double residU = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -413,9 +388,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double residU = inter->getCoorU() + aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -438,9 +411,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double residU = inter->getCoorU() + aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -464,9 +435,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -488,9 +457,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
@@ -513,9 +480,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -537,9 +502,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
@@ -563,15 +526,15 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-          StoreArray<RawFTSW> rawFTSW;
-
           struct timeval triggerTime;
-          rawFTSW[0]->GetTTTimeVal(0, & triggerTime);
-          //    int time =  int (   (triggerTime.tv_sec *1e6  + triggerTime.tv_usec  ) ) % 100000;
-          long int time =  triggerTime.tv_usec;
+          // TODO Why not EvetMetaData time?
+          long int time = 0;
+          if (m_rawFTSWs.getEntries() > 0) {
+            this->m_rawFTSWs[0]->GetTTTimeVal(0, & triggerTime);
+            time =  triggerTime.tv_usec;
+          }
 
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -593,14 +556,16 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-          StoreArray<RawFTSW> rawFTSW;
 
           struct timeval triggerTime;
-          rawFTSW[0]->GetTTTimeVal(0, & triggerTime);
-          long int time =  triggerTime.tv_usec;
+          // TODO Why not EvetMetaData time?
+          long int time = 0;
+          if (m_rawFTSWs.getEntries() > 0) {
+            this->m_rawFTSWs[0]->GetTTTimeVal(0, & triggerTime);
+            time =  triggerTime.tv_usec;
+          }
 
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
@@ -623,9 +588,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
@@ -647,9 +610,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
@@ -673,9 +634,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits)
+          for (auto& it : this->m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorU(), aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID()));
@@ -697,9 +656,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this, itPxdSensors](TH1 * hPtr, const PXDIntercept * inter) {
-          StoreArray<PXDDigit> PXDDigits(this->m_PXDDigitsName);
-
-          for (auto& it : PXDDigits) {
+          for (auto& it : this->m_pxdDigits) {
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               hPtr->Fill(inter->getCoorV(), aSensorInfo.getVCellPosition(it.getVCellID()));
@@ -710,9 +667,6 @@ void ROIDQMModule::createHistosDictionaries()
                                   )
                                 )
                                );
-
-
-
 
 
 

@@ -142,6 +142,8 @@ namespace Belle2 {
 
       bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
 
+      static std::vector <PXDErrorFlags> m_errors;
+
     };//end class declaration
 
 

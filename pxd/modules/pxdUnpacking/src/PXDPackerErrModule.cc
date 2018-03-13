@@ -45,123 +45,124 @@ typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhc_crc_32_type;
 ///******************************************************************
 ///*********************** Main packer code *************************
 ///******************************************************************
+std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
+  // Event 0 does not exist...
+  c_NO_ERROR,
+  /*  1 - HLT-Onsen Trigger differs from Meta (meta changed! thus all differ)
+   *  2 - HLT-Onsen Trigger is zero
+   *  3 - Run Nr differs between HLT-Onsen and Meta
+   *  4 - Subrun Nr differs between HLT-Onsen and Meta
+   *  5 - Exp differs between HLT-Onsen and Meta */
+  c_META_MM | c_META_MM_DHC | c_META_MM_DHE | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+  c_META_MM | c_META_MM_DHC | c_META_MM_DHE | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+  c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+  c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+  c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
+  /*  6 - Wrong ONS Trigger frame length
+   *  7 - Wrong DHC Start frame length
+   *  8 - Wrong DHC End frame length
+   *  9 - Wrong DHE Start frame length
+   * 10 - Wrong DHE End frame length */
+  c_FIX_SIZE, // TODO why mismatch?
+  c_FIX_SIZE, // TODO Problem
+  c_FIX_SIZE, // TODO why is DHC End missing not detected?
+  c_FIX_SIZE, // TODO why is DHE Start missing not detected?
+  c_FIX_SIZE, // TODO why is DHE End missing not detected?
+  /* 11 - Wrong DHE Start frame length (by 2 bytes), unalign 32 bit frame
+   * 12 - Missing ONS Trig frame
+   * 13 - Missing DHC Start frame
+   * 14 - Missing DHC End frame
+   * 15 - Missing DHE Start frame */
+  c_FRAME_SIZE, // TODO can check more errors
+  c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO
+  c_DHC_START_SECOND, // TODO
+  c_DHC_END_MISS,
+  c_DHE_END_WO_START, // TODO
+  /* 16 - Missing DHE End frame
+   * 17 - Double ONS Trig frame
+   * 18 - Double DHC Start frame
+   * 19 - Double DHC End frame
+   * 20 - Double DHE Start frame*/
+  c_DHE_START_WO_END, // TODO if two DHE, another error condition shoudl trigger, too
+  c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
+  c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
+  c_DHC_END_DBL, // TODO
+  c_DHE_WRONG_ID_SEQ | c_DHE_START_WO_END, // TODO
+  /* 21 - Double DHE End frame
+   * 22 - DATCON triggernr+1
+   * 23 - HLT Magic broken
+   * 24 - DATCON Magic broken
+   * 25 - HLT with Accepted not set */
+  c_DHE_END_WO_START | c_DHE_START_END_ID, // TODO
+  c_MERGER_TRIGNR | c_META_MM_ONS_DC,
+  c_HLTROI_MAGIC,
+  c_HLTROI_MAGIC,
+  c_NO_ERROR | c_NOTSENDALL_TYPE, // TODO =============================================== CHECK TODO Unpacker is not detecting this yet
+  /* 26 - HLT triggernr+1
+   * 27 - CRC error in second frame (DHC start)
+   * 28 - data for all DHE even if disabled in mask
+   * 29 - no DHE at all, even so mask tell us otherwise
+   * 30 - no DHC at all */
+  c_MERGER_TRIGNR | c_META_MM_ONS_HLT,
+  c_DHE_CRC, // TODO why DHE start missing not detected?
+  c_DHE_ACTIVE, // TODO  why  | c_DHE_WRONG_ID_SEQ | c_DHE_ID_INVALID,
+  c_DHE_START_THIRD | c_DHE_ACTIVE,
+  c_DHC_END_MISS, // TODO need some better checks
+  /* 31 - DHC end has wrong DHC id
+   * 32 - DHE end has wrong DHE id
+   * 33 - DHC wordcount wrong by 4 bytes
+   * 34 - DHE wordcount wrong by 4 bytes
+   * 35 - DHE Trigger Nr Hi word messed up */
+  c_DHC_DHCID_START_END_MM,
+  c_DHE_START_END_ID,
+  c_DHC_WIE,
+  c_DHE_WIE,
+  c_META_MM_DHE,
+  /* 36 - ONS Trigger Nr Hi word messed up
+   * 37 - DHP data, even if mask says no DHP TODO Check
+   * 38 - No DHP data, even if mask tell otherwise
+   * 39 - DHE id differ in DHE and DHP header
+   * 40 - Chip ID differ in DHE and DHP header */
+  c_META_MM_ONS_HLT | c_MERGER_TRIGNR,
+  c_NO_ERROR, // TODO ===========================================TODO Unpacker is not detecting this
+  c_DHP_ACTIVE,
+  c_DHE_DHP_DHEID,
+  c_DHE_DHP_PORT,
+  /* 41 - Row overflow by 1
+   * 42 - Col overflow by 1
+   * 43 - Missing Start Row (Pixel w/o row)
+   * 44 - No PXD raw packet at all
+   * 45 - No DATCON data */
+  c_ROW_OVERFLOW,
+  c_COL_OVERFLOW,
+  c_DHP_PIX_WO_ROW,
+  c_NO_PXD,
+  c_NO_DATCON,
+  /* 46 - unused frame type: common mode
+   * 47 - unused frame type: FCE
+   * 48 - unused frame type: ONS FCE
+   * 49 - unused frame type: 0x7, 0x8, 0xA
+   * 50 - Rows w/o Pixel (several rows after each other) */
+  c_UNEXPECTED_FRAME_TYPE,
+  c_UNEXPECTED_FRAME_TYPE,
+  c_UNEXPECTED_FRAME_TYPE,
+  c_DHC_UNKNOWN,
+  c_DHP_ROW_WO_PIX,
+  /* 51 - NO ERROR
+   * 52 - NO ERROR
+   *
+   * */
+  EPXDErrMask::c_NO_ERROR,
+  EPXDErrMask::c_NO_ERROR,
+};
 
 bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)
 {
   /** Check that at least the expected error bit are set, there could be more ... */
-  static std::vector <PXDErrorFlags> errors =  {
-    // Event 0 does not exist...
-    c_NO_ERROR,
-    /*  1 - HLT-Onsen Trigger differs from Meta (meta changed! thus all differ)
-     *  2 - HLT-Onsen Trigger is zero
-     *  3 - Run Nr differs between HLT-Onsen and Meta
-     *  4 - Subrun Nr differs between HLT-Onsen and Meta
-     *  5 - Exp differs between HLT-Onsen and Meta */
-    c_META_MM | c_META_MM_DHC | c_META_MM_DHE | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
-    c_META_MM | c_META_MM_DHC | c_META_MM_DHE | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
-    c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
-    c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
-    c_META_MM_DHC_ERS | c_META_MM_ONS_HLT | c_META_MM_ONS_DC,
-    /*  6 - Wrong ONS Trigger frame length
-     *  7 - Wrong DHC Start frame length
-     *  8 - Wrong DHC End frame length
-     *  9 - Wrong DHE Start frame length
-     * 10 - Wrong DHE End frame length */
-    c_FIX_SIZE, // TODO why mismatch?
-    c_FIX_SIZE, // TODO Problem
-    c_FIX_SIZE, // TODO why is DHC End missing not detected?
-    c_FIX_SIZE, // TODO why is DHE Start missing not detected?
-    c_FIX_SIZE, // TODO why is DHE End missing not detected?
-    /* 11 - Wrong DHE Start frame length (by 2 bytes), unalign 32 bit frame
-     * 12 - Missing ONS Trig frame
-     * 13 - Missing DHC Start frame
-     * 14 - Missing DHC End frame
-     * 15 - Missing DHE Start frame */
-    c_FRAME_SIZE, // TODO can check more errors
-    c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO
-    c_DHC_START_SECOND, // TODO
-    c_DHC_END_MISS,
-    c_DHE_END_WO_START, // TODO
-    /* 16 - Missing DHE End frame
-     * 17 - Double ONS Trig frame
-     * 18 - Double DHC Start frame
-     * 19 - Double DHC End frame
-     * 20 - Double DHE Start frame*/
-    c_DHE_START_WO_END, // TODO if two DHE, another error condition shoudl trigger, too
-    c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
-    c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
-    c_DHC_END_DBL, // TODO
-    c_DHE_WRONG_ID_SEQ | c_DHE_START_WO_END, // TODO
-    /* 21 - Double DHE End frame
-     * 22 - DATCON triggernr+1
-     * 23 - HLT Magic broken
-     * 24 - DATCON Magic broken
-     * 25 - HLT with Accepted not set */
-    c_DHE_END_WO_START | c_DHE_START_END_ID, // TODO
-    c_MERGER_TRIGNR | c_META_MM_ONS_DC,
-    c_HLTROI_MAGIC,
-    c_HLTROI_MAGIC,
-    c_NO_ERROR | c_NOTSENDALL_TYPE, // TODO =============================================== CHECK TODO Unpacker is not detecting this yet
-    /* 26 - HLT triggernr+1
-     * 27 - CRC error in second frame (DHC start)
-     * 28 - data for all DHE even if disabled in mask
-     * 29 - no DHE at all, even so mask tell us otherwise
-     * 30 - no DHC at all */
-    c_MERGER_TRIGNR | c_META_MM_ONS_HLT,
-    c_DHE_CRC, // TODO why DHE start missing not detected?
-    c_DHE_ACTIVE, // TODO
-    c_DHE_START_THIRD | c_DHE_ACTIVE,
-    c_DHC_END_MISS, // TODO need some better checks
-    /* 31 - DHC end has wrong DHC id
-     * 32 - DHE end has wrong DHE id
-     * 33 - DHC wordcount wrong by 4 bytes
-     * 34 - DHE wordcount wrong by 4 bytes
-     * 35 - DHE Trigger Nr Hi word messed up */
-    c_DHC_DHCID_START_END_MM,
-    c_DHE_START_END_ID | c_DHE_WRONG_ID_SEQ | c_DHE_ID_INVALID,
-    c_DHC_WIE,
-    c_DHE_WIE,
-    c_META_MM_DHE,
-    /* 36 - DHC Trigger Nr Hi word messed up
-     * 37 - DHP data, even if mask says no DHP TODO Check
-     * 38 - No DHP data, even if mask tell otherwise
-     * 39 - DHE id differ in DHE and DHP header
-     * 40 - Chip ID differ in DHE and DHP header */
-    c_META_MM_DHC,
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    /* 41 - Row overflow by 1
-     * 42 - Col overflow by 1
-     * 43 - Missing Start Row (Pixel w/o row)
-     * 44 - No PXD raw packet at all
-     * 45 - No DATCON data */
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    EPXDErrMask::c_NO_ERROR, // TODO
-    /* 46 - unused frame type: common mode
-     * 47 - unused frame type: FCE
-     * 48 - unused frame type: ONS FCE
-     * 49 - unused frame type: 0x7, 0x8, 0xA
-     * 50 - Rows w/o Pixel (several rows after each other) */
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
-    EPXDErrMask::c_UNEXPECTED_FRAME_TYPE, // TODO
-    EPXDErrMask::c_DHP_ROW_WO_PIX, // TODO
-    /* 51 - NO ERROR
-     *
-     *
-     * */
-    EPXDErrMask::c_NO_ERROR,
-  };
 
   PXDErrorFlags expected = c_NO_ERROR;
-  if (eventnr > 0 && eventnr < errors.size()) {
-    expected = errors[eventnr];
+  if (eventnr > 0 && eventnr < m_errors.size()) {
+    expected = m_errors[eventnr];
   }
   B2INFO("-- PXD Packer Error Check for Event Nr: " << eventnr);
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
@@ -188,7 +189,7 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
     flag = (mask == EPXDErrMask::c_NO_ERROR);
   }
   B2INFO("-- PXD Packer Error Check END --- ");
-  if (m_found_fatal) B2FATAL("At least one of the checks failed (see details above)!");
+//   if (m_found_fatal) B2FATAL("This check failed (see details above)!");
   return flag;
 }
 
@@ -272,7 +273,21 @@ void PXDPackerErrModule::initialize()
 
 void PXDPackerErrModule::terminate()
 {
-  if (m_found_fatal) B2FATAL("At least one of the checks failed (see details above)!");
+  if (m_Check) {
+    // Bail out if error detected
+    if (m_found_fatal) B2FATAL("At least one of the checks failed (see details above)!");
+    // Check kindof test coverage
+    B2INFO("Check Test coverage:");
+    PXDErrorFlags mask = c_NO_ERROR;
+    for (auto& it : m_errors) mask |= it;
+    for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
+      uint64_t m;
+      m = 1ull << i; // ull is important!
+      if ((m & mask) == 0) {
+        B2WARNING("Bit " << i << ": Not Covered   : " << getPXDBitErrorName(i));
+      }
+    }
+  }
 }
 
 void PXDPackerErrModule::event()

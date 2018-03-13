@@ -12,16 +12,17 @@
 #define LOOKUPCREATORMODULE_H
 
 #include <framework/core/Module.h>
-#include <analysis/dataobjects/KeyMap.h>
-#include <analysis/dataobjects/LookupTable.h>
+#include <analysis/dbobjects/KeyMap.h>
+#include <analysis/dbobjects/LookupTable.h>
 #include <string>
 
 namespace Belle2 {
 
-  // Just pair of numners - min and max values of bin border
+  /**
+    * Currently, std::pair can not be retreived from python list
+    * We will get LookUpTable entries with tuples and transform tuples to pairs here.
+    */
   typedef std::tuple<double, double> BinLimitsTuple;
-
-  // N-dim bin: pairs of bin limits with name of the axis variable.
   typedef std::map<std::string, BinLimitsTuple> NDBinTuple;
   typedef std::tuple<WeightInfo, NDBinTuple> noIdEntry;
   typedef std::tuple<noIdEntry, double> specificIDEntry;
@@ -37,14 +38,18 @@ namespace Belle2 {
     listOfSpecificIDEntries m_tableIDSpec;
     WeightInfo m_outOfRangeWeight;
 
+    /**
+     * Currently, std::pair can not be retreived from python list
+     * We will get LookUpTable entries with tuples and transform tuples to pairs here.
+     */
+    NDBin NDBinTupleToNDBin(NDBinTuple bin_tuple);
+
   public:
 
     /**
      * Constructor
      */
     LookUpCreatorModule();
-
-    NDBin NDBinTupleToNDBin(NDBinTuple bin_tuple);
 
     /**
      * Initialize the Module.

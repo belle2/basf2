@@ -63,8 +63,14 @@ void ROIDQMModule::defineHisto()
 
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  m_InterDir = oldDir->mkdir("intercept");// TODO will return NULL if dir exists already
-  m_ROIDir = oldDir->mkdir("roi");// TODO will return NULL if dir exists already
+  oldDir->mkdir("intercept");
+  oldDir->cd("intercept");
+  m_InterDir = gDirectory;
+  oldDir->mkdir("roi");
+  oldDir->cd("roi");
+  m_ROIDir =  gDirectory;
+
+  // TODO the following three hist end up in top directory?
 
   hCellUV  = new TH2F("hCellU_vs_CellV", "CellID U vs CellID V", 480, 0, 480, 480, 0, 480);
   hCellUV->GetXaxis()->SetTitle("U cell ID");
@@ -78,10 +84,10 @@ void ROIDQMModule::defineHisto()
   h_HitCol_CellV->GetXaxis()->SetTitle("V cell ID");
   h_HitCol_CellV->GetYaxis()->SetTitle("COL ID");
 
-  m_InterDir->cd();// TODO will crash if dir exists already s.o.
+  m_InterDir->cd();
   hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
 
-  m_ROIDir->cd();// TODO will crash if dir exists already s.o.
+  m_ROIDir->cd();
   hnROIs  = new TH1F("hnROIs", "number of m_roiIDs", 100, 0, 100);
   harea = new TH1F("harea", "m_roiIDs area", 100, 0, 100000);
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);

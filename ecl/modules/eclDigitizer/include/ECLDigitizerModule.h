@@ -107,6 +107,7 @@ namespace Belle2 {
     std::vector<fitparams_t> m_fitparams; /**<  */
     std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
     std::vector<signalsample_t> m_ss; /**< tabulated shape line */
+    std::vector<signalsample_t> m_ss_HadronShapeSimulations; /**< tabulated shape line for hadron shape simulations */
 
     /** Storage for adc hits from entire calorimeter (8736 crystals) */
     std::vector<adccounts_t> m_adc;  /**< ACD counts */
@@ -123,6 +124,8 @@ namespace Belle2 {
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
 
+    /** load hadron signal shapes from database*/
+    void loadHadronSignalShapes();
     /** read Shaper-DSP data from root file */
     void readDSPDB();
     /** Emulate response of energy deposition in a crystal and attached photodiode and make waveforms*/

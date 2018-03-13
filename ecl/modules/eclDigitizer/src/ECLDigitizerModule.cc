@@ -101,6 +101,9 @@ void ECLDigitizerModule::beginRun()
   if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
   if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
   if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
+
+  if (m_HadronPulseShape)  loadHadronSignalShapes();
+
 }
 
 // interface to C shape fitting function function
@@ -143,8 +146,8 @@ int ECLDigitizerModule::shapeSignals()
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
     if (m_HadronPulseShape == true) {
       double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
-      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss[2]);//Gamma Component
-      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss[3]); //Hadron Component
+      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[0]);//Gamma Component
+      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[1]); //Hadron Component
       m_adc[j].totalHadron += hit.getHadronEnergyDep();
     } else {
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
@@ -175,7 +178,7 @@ int ECLDigitizerModule::shapeSignals()
       // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
       // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
       if (m_HadronPulseShape) {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[4]); // diode component
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[2]); // diode component
       } else {
         a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
       }
@@ -322,6 +325,29 @@ void ECLDigitizerModule::terminate()
 {
 }
 
+void ECLDigitizerModule::loadHadronSignalShapes()
+{
+
+  m_ss_HadronShapeSimulations.resize(3);
+
+  //read MC templates from database
+  DBObjPtr<ECLDigitWaveformParametersForMC> waveformParametersMC("ECLDigitWaveformParametersForMC");
+  double photonParsPSD[10];
+  double hadronParsPSD[10];
+  double diodeParsPSD[10];
+  for (int i = 0; i < 10; i++) {
+    photonParsPSD[i] = waveformParametersMC->getPhotonParameters()[i + 1];
+    hadronParsPSD[i] = waveformParametersMC->getHadronParameters()[i + 1];
+    diodeParsPSD[i] = waveformParametersMC->getDiodeParameters()[i + 1];
+  }
+
+  //Initialize templates for hadron shape simulations
+  m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, waveformParametersMC->getPhotonParameters()[0]);
+  m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, waveformParametersMC->getHadronParameters()[0]);
+  m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, waveformParametersMC->getDiodeParameters()[0]);
+
+}
+
 void ECLDigitizerModule::readDSPDB()
 {
   const EclConfiguration& ec = EclConfiguration::get();
@@ -452,28 +478,6 @@ void ECLDigitizerModule::readDSPDB()
   // parameters from ps.dat roughly in the same place as in current MC
   double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
-
-  if (m_HadronPulseShape) {
-
-    m_ss.resize(5); //Append space for templates used for hadron pulse shape simulations
-
-    //read MC templates from database
-    DBObjPtr<ECLDigitWaveformParametersForMC> WaveformParametersMC("ECLDigitWaveformParametersForMC");
-    double PhotonParsPSD[10];
-    double HadronParsPSD[10];
-    double DiodeParsPSD[10];
-    for (int i = 0; i < 10; i++) {
-      PhotonParsPSD[i] = WaveformParametersMC->getPhotonParameters()[i + 1];
-      HadronParsPSD[i] = WaveformParametersMC->getHadronParameters()[i + 1];
-      DiodeParsPSD[i] = WaveformParametersMC->getDiodeParameters()[i + 1];
-    }
-
-    //Initialize templates for hadron shape simulations
-    m_ss[2].InitSample(PhotonParsPSD, WaveformParametersMC->getPhotonParameters()[0]);
-    m_ss[3].InitSample(HadronParsPSD, WaveformParametersMC->getHadronParameters()[0]);
-    m_ss[4].InitSample(DiodeParsPSD, WaveformParametersMC->getDiodeParameters()[0]);
-
-  }
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

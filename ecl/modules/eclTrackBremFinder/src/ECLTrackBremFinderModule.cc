@@ -79,7 +79,7 @@ void ECLTrackBremFinderModule::event()
       (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (has to be 6 or rather c_neutralHadron for electron)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
       int particleHypothesisID = relatedCluster.getHypothesisId();
-      // todo: check this if other hypothesis than nPhotons and neutralHadron are going to be used
+      // todo: check this if other hypothesis than nPhotons and neutralHadron
       if (particleHypothesisID == ECLCluster::c_neutralHadron) {
         primaryClusterOfTrack = &relatedCluster;
       }
@@ -190,7 +190,7 @@ void ECLTrackBremFinderModule::event()
         const auto hit_theta = fitted_mom.Theta();
         const auto hit_phi = fitted_mom.Phi();
 
-        B2DEBUG(50, "Best Cluster" << std::endl
+        B2DEBUG(20, "Best Cluster" << std::endl
                 << " Cluster Phi=" << std::get<0>(matchClustermSoP)->getPhi() << " Theta=" << std::get<0>(matchClustermSoP)->getTheta()
                 << " TrackHit Phi=" << hit_phi << " Theta=" << hit_theta);
 

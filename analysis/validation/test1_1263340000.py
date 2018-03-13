@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*
+
 """
-<input>../1163350000.dst.root</input>
-<output>../1163350000.ntup.root</output>
-<contact> Racha Cheaib racha.cheaib@desy.de</contact>
+<header>
+<input>../1263340000.dst.root</input>
+<output>../1263340000.ntup.root</output>
+<contact>Racha Cheaib racha.cheaib@desy.de</contact>
 <interval>nightly</interval>
 </header>
 """
+
 #######################################################
 #
 # This script demonstrates how to reconstruct Btag using

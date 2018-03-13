@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # Descriptor: B0--> D*+ tau- nu with generic Btag decay
 
-
 """
 <header>
   <output>../1163350000.dst.root</output>

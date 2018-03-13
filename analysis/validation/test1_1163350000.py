@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*
+
 """
+<header>
 <input>../1163350000.dst.root</input>
 <output>../1163350000.ntup.root</output>
-<contact> Racha Cheaib racha.cheaib@desy.de</contact>
+<contact>Racha Cheaib racha.cheaib@desy.de</contact>
 <interval>nightly</interval>
 </header>
 """

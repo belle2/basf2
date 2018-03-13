@@ -2,10 +2,12 @@
 <header>
 <input>../1163350000.ntup.root</input>
 <output>1163350000_Validation.root</output>
-<contact> Racha Cheaib, rcheaib@olemiss.edu, Mario Merola, mario.merola@na.infn.it</contact>
+<contact>Racha Cheaib, rcheaib@olemiss.edu, Mario Merola, mario.merola@na.infn.it</contact>
 <interval>nightly</interval>
 </header>
 */
+
+
 ////////////////////////////////////////////////////////////
 //
 // test2_1163350000.C

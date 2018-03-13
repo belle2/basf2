@@ -1,7 +1,7 @@
 /*
 <header>
-<input>../1263400000.ntup.root</input>
-<output>1263350000_Validation.root</output>
+<input>../1263340000.ntup.root</input>
+<output>1263340000_Validation.root</output>
 <contact> Racha Cheaib, rcheaib@olemiss.edu, Mario Merola, mario.merola@na.infn.it</contact>
 <interval>nightly</interval>
 </header>

@@ -88,8 +88,8 @@ void ROIDQMModule::defineHisto()
   hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
 
   m_ROIDir->cd();
-  hnROIs  = new TH1F("hnROIs", "number of m_roiIDs", 100, 0, 100);
-  harea = new TH1F("harea", "m_roiIDs area", 100, 0, 100000);
+  hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
+  harea = new TH1F("harea", "ROI area", 100, 0, 100000);
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
 
 

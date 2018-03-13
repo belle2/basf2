@@ -468,7 +468,7 @@ void ECLDigitizerModule::readDSPDB()
       DiodeParsPSD[i] = WaveformParametersMC->getDiodeParameters()[i + 1];
     }
 
-    //Initialize additinal templates
+    //Initialize templates for hadron shape simulations
     m_ss[2].InitSample(PhotonParsPSD, WaveformParametersMC->getPhotonParameters()[0]);
     m_ss[3].InitSample(HadronParsPSD, WaveformParametersMC->getHadronParameters()[0]);
     m_ss[4].InitSample(DiodeParsPSD, WaveformParametersMC->getDiodeParameters()[0]);

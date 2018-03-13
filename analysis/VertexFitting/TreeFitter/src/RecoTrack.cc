@@ -68,7 +68,7 @@ namespace TreeFitter {
     const int momindex = momIndex();
 
     for (int row = 0; row < 3; ++row) {
-      //std::cout << "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]  << std::endl;
+      //B2DEBUG(19, "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]);
       fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
 

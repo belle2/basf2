@@ -173,7 +173,7 @@ namespace TreeFitter {
           // normal TrkPoca.
 
           //JFK: FIXME 2017-09-25
-          //std::cout << "Internal particle l181 track + other daughter::Is this implementd?"  << std::endl;
+          //B2DEBUG("Internal particle l181 track + other daughter::Is this implementd?");
           B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
         } else if (mother() && mother()->posIndex() >= 0) {

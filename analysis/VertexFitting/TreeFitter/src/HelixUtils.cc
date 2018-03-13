@@ -22,9 +22,6 @@
 
 //#define OLDHELIX
 
-using std::cout;
-using std::endl;
-
 namespace TreeFitter {
 
 
@@ -47,7 +44,7 @@ namespace TreeFitter {
   {
 
 #ifdef OLDHELIX
-    std::cout << "THIS SHOULD NEVER HAPPEN "  << std::endl;
+    B2ERROR("THIS SHOULD NEVER HAPPEN ");
 #else
 
     TVector3 position(positionAndMomentum(0),
@@ -138,10 +135,11 @@ namespace TreeFitter {
   void HelixUtils::printVertexPar(const TVector3& position, const TVector3& momentum, int charge)
   {
     for (int i = 0; i < 3; ++i)
-      cout << vertexParName(i + 1).c_str() << position[i] << endl ;
+      B2INFO(vertexParName(i + 1).c_str() << position[i]);
     for (int i = 0; i < 3; ++i)
-      cout << vertexParName(i + 4).c_str() << momentum[i] << endl ;
-    cout << "charge:    " << charge << endl ;
+      B2INFO(vertexParName(i + 4).c_str() << momentum[i]);
+    B2INFO("charge:    " << charge);
+
   }
 
   //Calculate Jacobian numerically. Precision is questionable, but you don't have to get the derivative calculation right... good for cross checks
@@ -189,7 +187,7 @@ namespace TreeFitter {
 
       //      jacobian[iArcLength2D][jin] = (LPlusDelta - L) / delta ;
     }
-    //    cout << "Numerical Jacobian: " << endl << jacobian << endl;
+    //    B2DEBUG(19, "Numerical Jacobian: " << jacobian));
   }
 
   void HelixUtils::getJacobianFromVertexNumerical(
@@ -307,12 +305,12 @@ namespace TreeFitter {
       else          phi1[0] = r_1 < 0 ? phi : phinot ;
     }
 
-//     cout << "nsolutions: " << nsolutions << endl ;
-//     cout << "xydist,R,r1,r2: " << dX << " " << Rmin << " " << Rmax << " "
-//   <<  r_1 << " " << r_2 << endl ;
-//     cout << "pars: "
+//     B2DEBUG(19, "nsolutions: " << nsolutions);
+//     B2DEBUG(19, "xydist,R,r1,r2: " << dX << " " << Rmin << " " << Rmax << " "
+//   <<  r_1 << " " << r_2);
+//     B2DEBUG(19, "pars: "
 //   << x0_1 << "," << y0_1 << "," << r_1 << ","
-//     << x0_2 << "," << y0_2 << "," << r_2 << endl ;
+//     << x0_2 << "," << y0_2 << "," << r_2);
 
     // find the best solution for z by running multiples of 2_pi
     double z1(0), z2(0) ;
@@ -330,8 +328,8 @@ namespace TreeFitter {
             double l2 = (dphi2 + n2 * TMath::TwoPi()) / omega_2 ;
             double tmpz2 = (z0_2 + l2 * tandip_2) ;
             if (n2 == 0 || fabs(tmpz2) < 100) {
-              //      cout << "n1,n2: " << i << " " << n1 << " " << n2 << " "
-              //     << l1/cosdip_1<< " " << l2/cosdip_2 << endl ;
+              //      B2DEBUG(19, "n1,n2: " << i << " " << n1 << " " << n2 << " "
+              //     << l1/cosdip_1<< " " << l2/cosdip_2 );
               if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
                 ibest = i ;
                 first = false ;
@@ -352,9 +350,9 @@ namespace TreeFitter {
     double x2 =  r_2 * sin(phi2[ibest]) + x0_2 ;
     double y2 = -r_2 * cos(phi2[ibest]) + y0_2 ;
 
-    //     cout << "bestz1,bestz2: " << bestz1 << " " << bestz2 << endl ;
-    //     cout << "bestx1,bestx2: " << x1 << " " << x2 << endl ;
-    //     cout << "besty1,besty2: " << y1 << " " << y2 << endl ;
+    //     B2DEBUG(19, "bestz1,bestz2: " << bestz1 << " " << bestz2);
+    //     B2DEBUG(19, "bestx1,bestx2: " << x1 << " " << x2 );
+    //     B2DEBUG(19, "besty1,besty2: " << y1 << " " << y2 );
 
     vertex.SetX(0.5 * (x1 + x2));
     vertex.SetY(0.5 * (y1 + y2));
@@ -418,7 +416,7 @@ namespace TreeFitter {
 //    helixpar[HelixUtils::iTanLambda]   = -7 ;
 //    helixpar[HelixUtils::iArcLength2D] = 10 ;
 //
-//    cout << "This goes in: " << endl ;
+//    B2INFO("This goes in: " );
 //    HelixUtils::printHelixPar(helixpar) ;
 //
 //    TVector3 position;
@@ -433,7 +431,7 @@ namespace TreeFitter {
 //                                helixpar[HelixUtils::iArcLength2D], Bz,
 //                                position, momentum, charge);
 //
-//    cout << "This convertes to: " << endl ;
+//    B2INFO("This convertes to: " );
 //    HelixUtils::printVertexPar(position, momentum, charge) ;
 //
 //    Belle2::Helix helixback;
@@ -441,7 +439,7 @@ namespace TreeFitter {
 //    CLHEP::HepMatrix jacobian(5, 6) ;
 //    HelixUtils::helixFromVertex(position, momentum, charge, Bz, helixback, Lback, jacobian);
 //
-//    cout << "We get back: " << endl ;
+//    B2INFO("We get back: " );
 //    CLHEP::HepVector helixparback(6);
 //    helixparback[HelixUtils::iD0]          = helixback.getD0();
 //    helixparback[HelixUtils::iPhi0]        = helixback.getPhi0();
@@ -450,7 +448,7 @@ namespace TreeFitter {
 //    helixparback[HelixUtils::iTanLambda]   = helixback.getTanLambda();
 //    helixparback[HelixUtils::iArcLength2D] = Lback;
 //    HelixUtils::printHelixPar(helixparback) ;
-//    cout << "Analytic Jacobian: " << endl << jacobian << endl;
+//    B2DEBUG(19, "Analytic Jacobian: " << endl << jacobian);
 //    // numeric check of the jacobian
 //    CLHEP::HepMatrix jacobiannum(6, 6) ;
 //    HelixUtils::helixFromVertexNumerical(position, momentum, charge, Bz, helixback, Lback, jacobiannum) ;
@@ -459,9 +457,9 @@ namespace TreeFitter {
 //      for (int jin = 0; jin < 6; ++jin) {
 //        double anaderiv = jacobian[iex][jin] ;
 //        double numderiv = jacobiannum[iex][jin] ;
-//        cout << "d" << HelixUtils::helixParName(iex + 1)
+//        B2DEBUG(19, "d" << HelixUtils::helixParName(iex + 1));
 //             << "/d" << HelixUtils::vertexParName(jin + 1)
-//             << " =  " << numderiv << " (num), " << anaderiv << " (anal)" << endl ;
+//             << " =  " << numderiv << " (num), " << anaderiv << " (anal)" );
 //      }
 //    }
 //  }

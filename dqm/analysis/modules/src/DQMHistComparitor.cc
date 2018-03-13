@@ -237,10 +237,6 @@ void DQMHistComparitorModule::event()
         it->error = 0.6;
         it->epicsflag = false;
 
-#ifdef _BELLE2_EPICS
-        SEVCHK(ca_create_channel(it.at(6).c_str(), NULL, NULL, 10, &n->mychid), "ca_create_channel failure");
-        t->epicsflag = true;
-#endif
         m_pnode.push_back(it);
       }
 

@@ -30,18 +30,18 @@ namespace Belle2 {
     ECLDigitWaveformParametersForMC() {};
 
     /** Get vector of photon template parameters. 11 entries. */
-    const std::vector<double>& getPhotonParameters() const {return m_PhotonPars;};
+    const std::vector<float>& getPhotonParameters() const {return m_PhotonPars;};
 
     /** Get vector of hadron template parameters. 11 entries. */
-    const std::vector<double>& getHadronParameters() const {return m_HadronPars;};
+    const std::vector<float>& getHadronParameters() const {return m_HadronPars;};
 
     /** Get vector of diode template parameters. 11 entries. */
-    const std::vector<double>& getDiodeParameters() const {return m_DiodePars;};
+    const std::vector<float>& getDiodeParameters() const {return m_DiodePars;};
 
     /** Set photon, hadron and diode template parameters.  11 entries per template. One photon, hadron and diode template. */
-    void setTemplateParameters(const std::vector<double>& photonInput,
-                               const std::vector<double>& hadronInput,
-                               const std::vector<double>& diodeInput)
+    void setTemplateParameters(const std::vector<float>& photonInput,
+                               const std::vector<float>& hadronInput,
+                               const std::vector<float>& diodeInput)
     {
       if (photonInput.size() != 11 || hadronInput.size() != 11 || diodeInput.size() != 11) {B2FATAL("ECLDigitWaveformParametersForMC: wrong size vector " << photonInput.size() << " " << hadronInput.size() << " " << diodeInput.size() << " instead of 11");}
       m_PhotonPars = photonInput;
@@ -55,9 +55,9 @@ namespace Belle2 {
     ~ECLDigitWaveformParametersForMC() {};
 
   private:
-    std::vector<double> m_PhotonPars;  /**< photon parameters for MC*/
-    std::vector<double> m_HadronPars;  /**< hadron parameters for MC*/
-    std::vector<double> m_DiodePars;   /**< diode parameters for MC*/
+    std::vector<float> m_PhotonPars;  /**< photon parameters for MC*/
+    std::vector<float> m_HadronPars;  /**< hadron parameters for MC*/
+    std::vector<float> m_DiodePars;   /**< diode parameters for MC*/
 
     //1 Initial Version
     ClassDef(ECLDigitWaveformParametersForMC, 1); /**< ClassDef */

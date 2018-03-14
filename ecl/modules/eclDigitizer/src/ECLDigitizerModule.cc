@@ -332,9 +332,9 @@ void ECLDigitizerModule::loadHadronSignalShapes()
 
   //read MC templates from database
   DBObjPtr<ECLDigitWaveformParametersForMC> waveformParametersMC("ECLDigitWaveformParametersForMC");
-  double photonParsPSD[10];
-  double hadronParsPSD[10];
-  double diodeParsPSD[10];
+  float photonParsPSD[10];
+  float  hadronParsPSD[10];
+  float diodeParsPSD[10];
   for (int i = 0; i < 10; i++) {
     photonParsPSD[i] = waveformParametersMC->getPhotonParameters()[i + 1];
     hadronParsPSD[i] = waveformParametersMC->getHadronParameters()[i + 1];

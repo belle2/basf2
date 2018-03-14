@@ -808,7 +808,8 @@ class PBS(Batch):
         """
         """
         job_id = batch_output.replace("\n", "")
-        job.result = cls.Result(job, job_id)
+        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
+        job.result = cls.PBSResult(job, job_id)
 
     @classmethod
     def _create_cmd(cls, script_path):
@@ -826,52 +827,68 @@ class PBS(Batch):
         sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, env={})
         return sub_out
 
-    class Result():
+    class PBSResult(Result):
         """
-        Simple class to help monitor status of jobs submitted by CAF backend to PBS.
+        Simple class to help monitor status of jobs submitted by `PBS` Backend.
 
-        You pass in a Job ID from a qsub command and when you call the 'ready' method
-        it runs qstat to see whether or not the job has finished.
+        You pass in a `Job` object (or `SubJob`) and job id from a bsub command.
+        When you call the `ready` method it runs bjobs to see whether or not the job has finished.
         """
+
+        #: PBS statuses mapped to Job statuses
+        backend_code_to_status = {"R": "running",
+                                  "C": "completed",
+                                  "FINISHED": "completed",
+                                  "E": "failed",
+                                  "H": "submitted",
+                                  "Q": "submitted",
+                                  "T": "submitted",
+                                  "W": "submitted",
+                                  "H": "submitted"
+                                  }
 
         def __init__(self, job, job_id):
             """
             Pass in the job object and the job id to allow the result to do monitoring and perform
             post processing of the job.
             """
-            #: Job object
-            self.job = job
-            #: Job ID from backend
+            super().__init__(job)
+            #: job id given by LSF
             self.job_id = job_id
-            #: Quicker accessonce result is ready
-            self._is_ready = False
 
-        def ready(self):
+        def update_status(self):
             """
-            Function that queries qstat to check for jobs that are still running.
+            Update the job's status by calling bjobs.
             """
-            if self._is_ready:
-                return True
+            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
+            # Run qstat
             try:
-                d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
+                output = subprocess.check_output(["qstat", "-r", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             except subprocess.CalledProcessError as cpe:
+                # If the job isn't available anymore, let's assume it finished
                 first_line = cpe.output.splitlines()[0]
                 if "Unknown Job Id Error" in first_line:
-                    self._is_ready = True
-                    return True
-            else:
-                return False
+                    new_job_status = self.backend_code_to_status["FINISHED"]
+                    if self.job.status != new_job_status:
+                        self.job.status = new_job_status
+                    return
+                else:
+                    B2ERROR("'qstat' command failed for {} but for an unknown reason.".format(self.job.name))
+                    # If it was some other error just re-raise
+                    raise cpe
+            # If it didn't error, parse the output
+            backend_status = self._get_status_from_output(output)
+            try:
+                new_job_status = self.backend_code_to_status[backend_status]
+            except KeyError as err:
+                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job.name, backend_status))
+            if new_job_status != self.job.status:
+                self.job.status = new_job_status
 
-        def post_process(self):
-            """
-            Does clean up tasks after the main job has finished. Mainly downloading output to the
-            correct output location.
-            """
-            # Once the subprocess is done, move the requested output to the output directory
-            for pattern in self.job.output_patterns:
-                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
-                for file_name in output_files:
-                    shutil.move(file_name, self.job.output_dir)
+        def _get_status_from_output(self, output):
+            info_line = output.splitlines()[5]
+            status_code = info_line.split()[-2]
+            return status_code
 
 
 class LSF(Batch):
@@ -931,8 +948,8 @@ class LSF(Batch):
         """
         Simple class to help monitor status of jobs submitted by LSF Backend.
 
-        You pass in a Job object and job id from a bsub command.
-        When you call the 'ready' method it runs bjobs to see whether or not the job has finished.
+        You pass in a `Job` object and job id from a bsub command.
+        When you call the `ready` method it runs bjobs to see whether or not the job has finished.
         """
 
         #: LSF statuses mapped to Job statuses
@@ -962,7 +979,7 @@ class LSF(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError("Unidentified backend status found for Job({}): {}".format(str(job), backend_status))
+                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job, backend_status))
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
 

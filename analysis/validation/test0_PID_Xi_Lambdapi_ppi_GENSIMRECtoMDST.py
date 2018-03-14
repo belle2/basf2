@@ -40,8 +40,8 @@ beamparameters = add_beamparameters(analysis_main, "Y4S")
 
 # generate continuum events
 decayTable = Belle2.FileSystem.findFile('/analysis/validation/ccbar-psamples.dec')
-setupEventInfo(1000, main)
-add_inclusive_continuum_generator(main, "ccbar", ["Xi-"], decayTable)
+setupEventInfo(1000, analysis_main)
+add_inclusive_continuum_generator(analysis_main, "ccbar", ["Xi-"], decayTable)
 
 # Load geometry
 loadGearbox()

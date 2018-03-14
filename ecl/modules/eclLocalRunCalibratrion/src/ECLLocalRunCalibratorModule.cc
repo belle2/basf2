@@ -38,12 +38,12 @@ const double epsilon = 0.0001;
 
 bool is_good(const double& val)
 {
-  return !isnan(val) && (fabs(val) > epsilon);
+  return !std::isnan(val) && (fabs(val) > epsilon);
 }
 
 bool is_good_posi(const double& val)
 {
-  return !isnan(val) && (val > epsilon);
+  return !std::isnan(val) && (val > epsilon);
 }
 
 //-----------------------------------------------------------------

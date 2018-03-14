@@ -9,7 +9,7 @@ set_log_level(LogLevel.ERROR)
 # to run the framework the used modules need to be registered
 eventinfosetter = register_module('EventInfoSetter')
 # Setting the option for all non-hepevt reader modules:
-eventinfosetter.param('evtNumList', [52])  # we want to process nr defined error events
+eventinfosetter.param('evtNumList', [70])  # we want to process nr defined error events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 

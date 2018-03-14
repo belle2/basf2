@@ -159,12 +159,25 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
   c_MAGIC,
   c_FRAME_NR,
   /* 56 - more frames than actual available, exceeding packet size
-   * 52 - one frame payload exceeding packet size
-   * 53 -
-   * 54 -
-   * 55 -  */
+   * 57 - one frame payload exceeding packet size
+   * 58 - DHC Start frame has wrong trigger Nr HI
+   * 59 - DHC Start frame has wrong trigger Nr LO
+   * 60 - DHE Start frame has wrong trigger Nr LO */
   c_FRAME_SIZE,
   c_FRAME_SIZE,
+  c_META_MM_DHC,
+  c_FRAME_TNR_MM | c_META_MM | c_META_MM_DHC,
+  c_FRAME_TNR_MM | c_META_MM | c_META_MM_DHE,
+  /* 61 - DHE End frame has wrong trigger Nr LO
+   * 62 - DHE End has different DHE Id
+   * 63 - DHE Z_DHP Header DHE ID differ from Start
+   * 64 - Set ERROR Flag in DHE END
+   * 65 - Invalid DHE ID ($3F) in DHE */
+  c_FRAME_TNR_MM | c_META_MM, // TODO why not  |c_META_MM_DHE
+  c_DHE_START_END_ID, // TODO why not c_DHE_START_ID,
+  c_DHE_START_ID | c_DHE_DHP_DHEID,
+  c_HEADER_ERR,
+  c_DHE_ID_INVALID,
 };
 
 bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)
@@ -230,6 +243,7 @@ void PXDPackerErrModule::initialize()
   m_found_fatal = false;
   B2DEBUG(20, "PXD Packer Err --> Init");
   if (m_Check) {
+    B2WARNING("=== Important! A lot of intentional errors will follow. To find the reason for a failing test, check the lines before the FATAL. ====");
     m_daqStatus.isRequired();
   } else {
     //Register output collections
@@ -509,9 +523,12 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
   dhc_byte_count = 0;
   start_frame();
-  append_int32((EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
-               (m_trigger_nr & 0xFFFF));
-  append_int16(m_trigger_nr >> 16);
+  uint32_t header = (EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
+                    (m_trigger_nr & 0xFFFF);
+  if (isErrorIn(59)) header++;
+  append_int32(header);
+  if (!isErrorIn(58)) append_int16(m_trigger_nr >> 16);
+  else  append_int16((m_trigger_nr >> 16) + 1);
 
   uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
   append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
@@ -572,11 +589,15 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
     B2FATAL("Inverse Mapping not implemented in Packer");
   }
 
+  if (isErrorIn(65)) dhe_id = 0x3F; // invalid
   /// DHE Start
   dhe_byte_count = 0;
   start_frame();
-  append_int32((EDHCFrameHeaderDataType::c_DHE_START << 27) | ((dhe_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) |
-               (m_trigger_nr & 0xFFFF));
+  uint32_t header = (EDHCFrameHeaderDataType::c_DHE_START << 27) | ((dhe_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) |
+                    (m_trigger_nr & 0xFFFF);
+  if (isErrorIn(60)) header++;
+  append_int32(header);
+
   if (isErrorIn(35)) append_int16(0x1000);
   else append_int16(m_trigger_nr >> 16); // Trigger Nr Hi
   if (!isErrorIn(11)) {
@@ -691,7 +712,11 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
   if (isErrorIn(34)) dhe_byte_count += 4;
   unsigned int dlen = (dhe_byte_count / 2); // 16 bit words
   start_frame();
-  append_int32((EDHCFrameHeaderDataType::c_DHE_END << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+  header = (EDHCFrameHeaderDataType::c_DHE_END << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF);
+  if (isErrorIn(61)) header++;
+  if (isErrorIn(62)) header += 1 << 20;
+  if (isErrorIn(64)) header |= 0x80000000;
+  append_int32(header);
   append_int16(dlen & 0xFFFF); // 16 bit word count
   append_int16((dlen >> 16) & 0xFFFF); // 16 bit word count
   if (!isErrorIn(10)) append_int32(0x00000000);   // Error Flags
@@ -758,8 +783,10 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
 
   start_frame();
   /// DHP data Frame
-  append_int32((EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_has_remapped & 0x1) << 19) | ((
-                 chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  uint32_t header = (EDHCFrameHeaderDataType::c_DHP_ZSD << 27) | ((dhe_id & 0x3F) << 20) | ((dhe_has_remapped & 0x1) << 19) | ((
+                      chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF);
+  if (isErrorIn(63)) header += 1 << 20;
+  append_int32(header);
   if (isErrorIn(39)) dhe_id = 0; // mess up dhe_id in DHP header
   if (isErrorIn(40)) chip_id = ~chip_id; // mess up chip id
   append_int32((EDHPFrameHeaderDataType::c_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) |

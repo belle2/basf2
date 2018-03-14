@@ -17,7 +17,7 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
   /** Description strings for bit, index = bit number, thus keep order as above */
   static const std::string error_name[ONSEN_MAX_TYPE_ERR] = {
     // 0-3
-    "TestBeam: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
+    "XXXXTestBeam: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
     // 4-7
     "DHC_END missing/wrong placed", "NR of Frames too small", "ROI packet invalid size", "DATA outside of DHE",
     // 8-11

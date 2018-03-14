@@ -5,7 +5,7 @@
 // Author : Chunhua LI, Thomas Hauth
 // Date : 13 - Oct - 2016
 //-
-#include <hlt/softwaretrigger/modules/HLTDQM/SoftwareTriggerHLTDQMModule.h>
+#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 #include <framework/datastore/StoreObjPtr.h>

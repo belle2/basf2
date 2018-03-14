@@ -37,6 +37,8 @@ packercheck.param('dhe_to_dhc', [
     [0, 2]
 ])
 
+logging.enable_summary(False)
+
 # creating minimal path for test
 main = create_path()
 main.add_module(eventinfosetter)

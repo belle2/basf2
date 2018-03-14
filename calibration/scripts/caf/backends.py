@@ -51,6 +51,10 @@ class Job:
     .. warning:: It is recommended to always use absolute paths for files when submitting a `Job`.
     """
 
+    #: Allowed Job status dictionary. The  key is the status name and the value is its level. The lowest level
+    #: out of all subjobs is the one that is the overal status of the overall job.
+    statuses = {"init": 0, "submitted": 1, "running": 2, "failed": 3, "complete": 4}
+
     class SubJob():
         """
         This mini-class simply holds basic information about which subjob you are
@@ -70,6 +74,8 @@ class Job:
             #: The result object of this SubJob. Only filled once the parent `Job` object is submitted to a backend
             #: since the backend creates a special result class depending on its type.
             self.result = None
+            #: Status of the subjob
+            self.status = "init"
 
         @property
         def output_dir(self):
@@ -92,6 +98,9 @@ class Job:
             """Getter for subjobs of SubJob object. Always returns None, used to prevent accessing the parent job by mistake"""
             return None
 
+        def ready(self):
+            return self.result.ready()
+
         @property
         def max_files_per_subjob(self):
             """Always returns -1, used to prevent accessing the parent job by mistake"""
@@ -103,6 +112,9 @@ class Job:
             unless otherwise specified.
             """
             return getattr(self.parent, attribute)
+
+        def __repr__(self):
+            return self.name
 
     def __init__(self, name, config_file=""):
         """
@@ -140,12 +152,14 @@ class Job:
         #: result class depending on its type. This is also only filled for an overall `Job()` if there are no subjobs.
         #: If there are subjobs, those will contain the result instead.
         self.result = None
+        #: The actual status of the overall `Job`. The property handles querying for the subjob status to set this
+        self._status = "init"
 
     def __repr__(self):
         """
         Representation of Job class (what happens when you print a Job() instance)
         """
-        return "\n".join([self.name, str(self.input_sandbox_files), str(self.input_files)])
+        return self.name
 
     def ready(self):
         """
@@ -153,7 +167,7 @@ class Job:
         """
         if self.subjobs:
             for subjob in self.subjobs.values():
-                if not subjob.result.ready():
+                if not subjob.ready():
                     return False
             else:
                 return True
@@ -180,6 +194,26 @@ class Job:
             return subjob
         else:
             B2WARNING("Job({}) already contains SubJob({})! This will not be created.".format(self.name, i))
+
+    @property
+    def status(self):
+        """
+        Returns the status of this Job. If the job has subjobs then it will return the overall status equal to the lowest
+        subjob status in the hierarchy of statuses in `Job.statuses`.
+        """
+        if self.subjobs:
+            subjob_statuses = [subjob.status for subjob in self.subjobs.values()]
+            status_level = min([self.statuses[status] for status in subjob_statuses])
+            for status, level in self.statuses.items():
+                if level == status_level:
+                    self._status = status
+        return self._status
+
+    @status.setter
+    def status(self, status):
+        """
+        """
+        self._status = status
 
     @property
     def basf2_release(self):
@@ -589,6 +623,7 @@ class Batch(Backend):
                 cmd = self._create_cmd(script_path)
                 output = self._submit_to_batch(cmd)
                 self._create_job_result(job, output)
+                job.status = "submitted"
             else:
                 self.submit(list(job.subjobs.values()))
 
@@ -612,6 +647,7 @@ class Batch(Backend):
             cmd = self._create_cmd(script_path)
             output = self._submit_to_batch(cmd)
             self._create_job_result(job, output)
+            job.status = "submitted"
 
     @submit.register(list)
     def _(self, jobs):
@@ -809,6 +845,12 @@ class LSF(Batch):
         When you call the 'ready' method it runs bjobs to see whether or not the job has finished.
         """
 
+        #: Statuses defining when a job is finished. "DONE" is when a job is known to have completed
+        #: with a good exit code. "EXIT" is when a job is known to have completed with a non-zero exit
+        #: code. "FINISHED" is when LSF removed the job from the database before we could find the status,
+        #: meaning that we can no longer know what the exit code was, only that it finished.
+        exit_statuses = ["DONE", "EXIT", "FINISHED"]
+
         def __init__(self, job, job_id):
             """
             Pass in the job object and the job id to allow the result to do monitoring and perform
@@ -828,13 +870,38 @@ class LSF(Batch):
             if self._is_ready:
                 return True
             output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-            stat_line = output.split("\n")[1]
-            status = stat_line.split()[2]
-            if "DONE" in output or "EXIT" in output:
+            status = self._get_status_from_output(output)
+            if status in self.exit_statuses:
+                # Return early if we haven't changed status
+                if status != self.job.status:
+                    if status == "EXIT":
+                        B2DEBUG(29, "Setting {} status to {}".format(self.job, "failed"))
+                        self.job.status = "failed"
+                    else:
+                        B2DEBUG(29, "Setting {} status to {}".format(self.job, "complete"))
+                        self.job.status = "complete"
                 self._is_ready = True
                 return True
-            else:
+            elif status == "RUN":
+                if status != self.job.status:
+                    B2DEBUG(29, "Setting {} status to {}".format(self.job, "running"))
+                    self.job.status = "running"
                 return False
+            elif status == "PEND":
+                if status != self.job.status:
+                    B2DEBUG(29, "Setting {} status to {}".format(self.job, "submitted"))
+                    self.job.status = "submitted"
+                return False
+            else:
+                raise BackendError("Unidentified Job status found: {}".format(status))
+
+        def _get_status_from_output(self, output):
+            if output == "Job <{}> is not found\n".format(self.job_id):
+                return "FINISHED"
+            else:
+                stat_line = output.split("\n")[1]
+                status = stat_line.split()[2]
+                return status
 
         def post_process(self):
             """
@@ -861,5 +928,12 @@ class LSF(Batch):
 class DIRAC(Backend):
     """
     Backend for submitting calibration processes to the grid
+    """
+    pass
+
+
+class BackendError(Exception):
+    """
+    Base exception class for this module
     """
     pass

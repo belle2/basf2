@@ -8,7 +8,8 @@
  * time and amplitude                                                     *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Vitaly Vorobyev (vvorob@inp.nsk.su) (BINP)               *
+ * Contributors: Vitaly Vorobyev (vvorob@inp.nsk.su) (BINP),              *
+ * Sergei Gribanov (S.S.Gribanov@inp.nsk.su) (BINP)                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

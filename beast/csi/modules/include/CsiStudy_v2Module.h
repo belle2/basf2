@@ -79,62 +79,63 @@ namespace Belle2 {
       /** Energy threshold */
       double m_Ethres;
 
-
+      // These histrograms are currently
+      // not used in the code, but just declared.
+      // Commented out by the SW shifter, March 14th 2018
       /** Rate */
-      TH1F* h_csi_rate[2];
+      //TH1F* h_csi_rate[2];
       /** Rate */
-      TH2F* h_csi_rs_rate[2];
+      //TH2F* h_csi_rs_rate[2];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof1[18];
+      //TH2F* h_csi_Evtof1[18];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof2[18];
+      //TH2F* h_csi_Evtof2[18];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof3[18];
+      //TH2F* h_csi_Evtof3[18];
       /** Energy deposited vs TOF */
-      TH2F* h_csi_Evtof[18];
+      //TH2F* h_csi_Evtof[18];
       /** Energy deposited */
-      TH1F* h_csi_edep[18];
+      //TH1F* h_csi_edep[18];
       /** Energy deposited */
-      TH1F* h_csi_edep1[18];
+      //TH1F* h_csi_edep1[18];
       /** Energy deposited */
-      TH1F* h_csi_edep2[18];
+      //TH1F* h_csi_edep2[18];
       /** Energy deposited */
-      TH1F* h_csi_edep1Weight[18];
+      //TH1F* h_csi_edep1Weight[18];
       /** Energy deposited */
-      TH1F* h_csi_edep2Weight[18];
+      //TH1F* h_csi_edep2Weight[18];
       /** Energy deposited */
-      TH2F* h_csi_rs_edep1[18];
+      //TH2F* h_csi_rs_edep1[18];
       /** Energy deposited */
-      TH2F* h_csi_rs_edep2[18];
+      //TH2F* h_csi_rs_edep2[18];
       /** Energy deposited */
-      TH2F* h_csi_rs_edep1Weight[18];
+      //TH2F* h_csi_rs_edep1Weight[18];
       /** Energy deposited */
-      TH2F* h_csi_rs_edep2Weight[18];
+      //TH2F* h_csi_rs_edep2Weight[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energyVrs1[18];
+      //TH2F* h_csi_energyVrs1[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energyVrs2[18];
+      //TH2F* h_csi_energyVrs2[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energyVrs3[18];
+      //TH2F* h_csi_energyVrs3[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energyVrs1W[18];
+      //TH2F* h_csi_energyVrs1W[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energyVrs2W[18];
+      //TH2F* h_csi_energyVrs2W[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energyVrs3W[18];
-
+      //TH2F* h_csi_energyVrs3W[18];
       /** Energy deposited for all section */
-      TH1F* h_csi_energy1[18];
+      //TH1F* h_csi_energy1[18];
       /** Energy deposited for all section */
-      TH1F* h_csi_energy2[18];
+      //TH1F* h_csi_energy2[18];
       /** Energy deposited for all section */
-      TH1F* h_csi_energy3[18];
+      //TH1F* h_csi_energy3[18];
       /** Energy deposited for all section */
-      TH1F* h_csi_energy1W[18];
+      //TH1F* h_csi_energy1W[18];
       /** Energy deposited for all section */
-      TH1F* h_csi_energy2W[18];
+      //TH1F* h_csi_energy2W[18];
       /** Energy deposited for all section */
-      TH1F* h_csi_energy3W[18];
+      //TH1F* h_csi_energy3W[18];
 
       /** Energy threshold */
       double m_Thres_hitRate[18][200];

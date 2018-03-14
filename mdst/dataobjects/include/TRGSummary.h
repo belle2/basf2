@@ -66,6 +66,12 @@ namespace Belle2 {
     /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
+    /**set the ftdl bits, the same as setTRGSummary(int i, int word)*/
+    void setFtdlBits(int i, int word) {m_ftdlBits[i] = word;}
+
+    /**set the Prescaled ftdl bits*/
+    void setPsnmBits(int i, int word) {m_psnmBits[i] = word;}
+
     /** get the trigger result, each word has 32 bits*/
     unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
 

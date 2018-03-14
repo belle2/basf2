@@ -9,22 +9,10 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
-
-#include <framework/logging/Logger.h>
-
-#include <TFile.h>
-#include <TTree.h>
 #include <TPluginManager.h>
-#include <TROOT.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 
 namespace Belle2 {
   namespace MVA {
@@ -91,8 +79,8 @@ namespace Belle2 {
       return description;
     }
 
-    TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& specific_options) : Teacher(general_options),
-      specific_options(specific_options) { }
+    TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options) : Teacher(general_options),
+      specific_options(_specific_options) { }
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
     Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, std::string& jobName) const
@@ -128,7 +116,7 @@ namespace Belle2 {
       }
 
       Weightfile weightfile;
-      std::string logfilename = weightfile.getFileName(".log");
+      std::string logfilename = weightfile.generateFileName(".log");
 
       // Pipe stdout into a logfile to get TMVA output, which contains valueable information
       // which cannot be retreived otherwise!
@@ -188,8 +176,8 @@ namespace Belle2 {
 
 
     TMVATeacherClassification::TMVATeacherClassification(const GeneralOptions& general_options,
-                                                         const TMVAOptionsClassification& specific_options) : TMVATeacher(general_options, specific_options),
-      specific_options(specific_options) { }
+                                                         const TMVAOptionsClassification& _specific_options) : TMVATeacher(general_options, _specific_options),
+      specific_options(_specific_options) { }
 
     Weightfile TMVATeacherClassification::train(Dataset& training_data) const
     {
@@ -298,8 +286,8 @@ namespace Belle2 {
     }
 
     TMVATeacherRegression::TMVATeacherRegression(const GeneralOptions& general_options,
-                                                 const TMVAOptionsRegression& specific_options) : TMVATeacher(general_options, specific_options),
-      specific_options(specific_options) { }
+                                                 const TMVAOptionsRegression& _specific_options) : TMVATeacher(general_options, _specific_options),
+      specific_options(_specific_options) { }
 
     Weightfile TMVATeacherRegression::train(Dataset& training_data) const
     {
@@ -413,7 +401,7 @@ namespace Belle2 {
       }
 
       if (weightfile.containsElement("TMVA_Logfile")) {
-        std::string custom_weightfile = weightfile.getFileName("logfile");
+        std::string custom_weightfile = weightfile.generateFileName("logfile");
         weightfile.getFile("TMVA_Logfile", custom_weightfile);
       }
 
@@ -426,7 +414,7 @@ namespace Belle2 {
       expert_signalFraction = weightfile.getSignalFraction();
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
-      std::string custom_weightfile = weightfile.getFileName(std::string("_") + specific_options.m_method + ".weights.xml");
+      std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
       weightfile.getFile("TMVA_Weightfile", custom_weightfile);
 
       TMVAExpert::load(weightfile);
@@ -457,7 +445,7 @@ namespace Belle2 {
       weightfile.getOptions(specific_options);
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
-      std::string custom_weightfile = weightfile.getFileName(std::string("_") + specific_options.m_method + ".weights.xml");
+      std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
       weightfile.getFile("TMVA_Weightfile", custom_weightfile);
 
       TMVAExpert::load(weightfile);

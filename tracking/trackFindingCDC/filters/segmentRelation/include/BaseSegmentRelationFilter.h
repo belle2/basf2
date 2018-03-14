@@ -9,76 +9,48 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 
-#include <boost/range/iterator_range.hpp>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
+
+    // Guard to prevent repeated instantiations
+    extern template class RelationFilter<const CDCSegment2D>;
+
     /// Base class for filtering the neighborhood of segments
-    class BaseSegmentRelationFilter : public Filter<Relation<const CDCSegment2D>> {
+    class BaseSegmentRelationFilter : public RelationFilter<const CDCSegment2D> {
+
+    private:
+      /// Type of the base class
+      using Super = RelationFilter<const CDCSegment2D>;
 
     public:
-      /// Returns the full range of segments.
-      template<class ASegmentIterator>
-      boost::iterator_range<ASegmentIterator>
-      getPossibleNeighbors(const CDCSegment2D& segment,
-                           const ASegmentIterator& itBegin,
-                           const ASegmentIterator& itEnd) const
-      {
-        std::pair<ASegmentIterator, ASegmentIterator> sameSuperClusterItPair =
-          std::equal_range(itBegin, itEnd, segment, std::less<CDCSegment2D>());
-        return boost::iterator_range<ASegmentIterator>(sameSuperClusterItPair.first,
-                                                       sameSuperClusterItPair.second);
-      }
+      /// Default constructor
+      BaseSegmentRelationFilter();
 
-      /**
-       *  Main filter method returning the weight of the neighborhood relation.
-       *  Return always returns NAN to reject all segment neighbors.
-       */
-      virtual Weight operator()(const CDCSegment2D& from  __attribute__((unused)),
-                                const CDCSegment2D& to  __attribute__((unused)))
-      {
-        return 1;
-      }
+      /// Default destructor
+      virtual ~BaseSegmentRelationFilter();
+
+      /// Returns all equivalent segment in the range.
+      std::vector<const CDCSegment2D*> getPossibleTos(
+        const CDCSegment2D* from,
+        const std::vector<const CDCSegment2D*>& segments) const final;
+
+      using Super::operator();
 
       /**
        *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCSegment2D>& relation) override
-      {
-        const CDCSegment2D* ptrFrom(relation.first);
-        const CDCSegment2D* ptrTo(relation.second);
-        if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-
-        // Make an overlap check to prevent aliases and reverse segments to be linked
-        std::vector<const CDCWireHit*> fromWireHits;
-        fromWireHits.reserve(ptrFrom->size());
-        for (const CDCRecoHit2D& recoHit2D : *ptrFrom) {
-          fromWireHits.push_back(&recoHit2D.getWireHit());
-        }
-        std::sort(fromWireHits.begin(), fromWireHits.end());
-        int nOverlap = 0;
-        for (const CDCRecoHit2D& recoHit2D : *ptrTo) {
-          if (std::binary_search(fromWireHits.begin(), fromWireHits.end(), &recoHit2D.getWireHit())) {
-            ++nOverlap;
-          }
-        }
-
-        if (1.0 * nOverlap / ptrFrom->size() > 0.8 or 1.0 * nOverlap / ptrFrom->size() > 0.8) {
-          return NAN;
-        }
-
-        return operator()(*ptrFrom, *ptrTo);
-      }
+      Weight operator()(const Relation<const CDCSegment2D>& relation) override;
     };
   }
 }

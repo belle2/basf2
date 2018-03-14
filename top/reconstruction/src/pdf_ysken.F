@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction - construct PDF in y-slices
-! M. Staric, nov-2008, jun-2009, feb-2010, dec-2013, apr-2014
+! M. Staric, nov-2008, jun-2009, feb-2010, dec-2013, apr-2014, avg-2017
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
 !-----------------------------------------------------------------------
@@ -27,9 +27,10 @@
 
       INTEGER K4, K, NX(3), NY(3)
       REAL TL0, YD0, YB0, FIC0
-
+      REAL KY
+      
       REAL DTLDX, DTLDL, DTLDE, DTDTHC
-      REAL DYDDX, DYDDL, DYDDE, DYDDZ
+      REAL DYDDX, DYDDL, DYDDE, DYDZ
       REAL DYBDX, DYBDL, DYBDE
       REAL DFICDX, DFICDE
 
@@ -86,10 +87,10 @@
             DYBDL=TOPF_DYB(I0,K0,K2)
             DYBDE=TOPF_DYB(I0,K0,K3)
             IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
-               DYDDZ=F_KY(I0,K4)/F_KZ(I0,K4)
-               IF(TYP.GT.0) DYDDZ=-DYDDZ
+               KY=SIGN(F_DIRB(2),F_KY(I0,K4)) ! unfold in y
+               DYDZ=KY/F_DIRB(3) ! at entrance to prism
                CALL YSKENX(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
+     &              YD0,DYDDE,DYDDL,DYDDX,DYDZ,
      &              YB0,DYBDE,DYBDL,DYBDX,
      &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
             ELSE
@@ -149,7 +150,7 @@
 #include "TOP_TDC.fi"
       INTEGER N
       
-      IF(TIM.LT.0.OR.TIM.GT.T_MAX) RETURN
+      IF(TIM.LT.T_MIN.OR.TIM.GT.T_MAX) RETURN
       IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
       IF(WID.LE.0) RETURN
       IF(FOT.LE.0) RETURN
@@ -230,7 +231,7 @@ c--   mirror reflectivity, total internal reflectivity, bulk absorption
 
       DO K=1,NUM_PHOT(ICHX)
          DO I=1,TTS_NG
-            SIG=WID+TTS_SIG(I)**2
+            SIG=WID+TTS_SIG(I)**2+PH_TERRS(K,ICHX)**2
             X=(PH_TIMES(K,ICHX)-TIM-TTS_T0(I))**2/SIG
             IF(X.LT.10) RETURN
          ENDDO
@@ -595,25 +596,29 @@ c--   Qbar with expansion volume at side LR, type Prism
 #include "TOP_PIK.fi"
 #include "TOP_TRACK.fi"
 #include "TOP_QEFF.fi" 
-      REAL DELY, Y, Y0, Y1, Y2, YCH, DX, DY, YB, DX_PREV, DY_PREV
+      REAL YCH, DXCH, DYCH, DX_PREV
+      REAL DELY, Y1, Y2, YB, DYB, DY, YBAR, BH, DYDZ_TMP
       REAL ECP, S, S_E, S_E2
       INTEGER ICHAN, ICH
       INTEGER I, IPT
-      INTEGER J, J1, J2, IY, IPMTY, K, K1, K2
+      INTEGER J, J1, J2, IY, IPMTY, K, KMI, KMA, K1, K2
+      
       integer NSIZ
       PARAMETER (NSIZ=MAX_NT*4)
-      REAL MASK(0:NSIZ-1,10), WID, WIDI(10)
-      INTEGER MM(10)
-      LOGICAL TAG(10), OK
-      REAL DY1, DYBH, DYBDY, YBAR, BH, Y0_EXT, DY_EXT
-      REAL WYB
-
+      integer NMASKS
+      PARAMETER (NMASKS=100)
+      REAL MASK(0:NSIZ-1,NMASKS), WID, WIDI(NMASKS)
+      INTEGER MM(NMASKS)
+      LOGICAL TAG(NMASKS), OK
+      LOGICAL EVEN
+      
+      
       NT=0
       IF(DYDE.EQ.0.OR.DYBDE.EQ.0) RETURN
-
+      
       ICH=ICHAN(IX,0,IPMTX,0,LR,M)
-      DX=PIK_DXCH(ICH)
-      DELY=(ABS(DYBDL)*T_LEN+ABS(DYBDX)*DX)/2
+      DXCH=PIK_DXCH(ICH)
+      DELY=(ABS(DYBDL)*T_LEN+ABS(DYBDX)*DXCH)/2
       IF(DYBDE.GT.0) THEN
          Y1=YB0-DELY+DYBDE*(EMIN-E_MEAN)
          Y2=YB0+DELY+DYBDE*(EMAX-E_MEAN)
@@ -624,70 +629,53 @@ c--   Qbar with expansion volume at side LR, type Prism
       J1=NINT(Y1/QBAR_B(M))
       J2=NINT(Y2/QBAR_B(M))
       BH=QBAR_B(M)/2
-      DYBDY=DYBDE/DYDE
 
-      K=QBAR_EXT(LR,M)
-      CALL UNFOLD_EXTVOL(M,LR,K1,K2)
-
-      Y0_EXT=(EXT_YUP(K)+EXT_YDN(K))/2
-      DY_EXT=EXT_YUP(K)-EXT_YDN(K)
-      J=NINT(YB0/QBAR_B(M))
-      YBAR=J*QBAR_B(M)
-      DELY=YD0-YBAR
-      IF(BTEST(ABS(J),0)) DELY=-DELY
-      DELY=DELY-Y0_EXT
-      K=NINT(DELY/DY_EXT)
-      DELY=DELY-K*DY_EXT
-      IF(BTEST(ABS(K),0)) DELY=-DELY
-      DELY=DELY+Y0_EXT
-
-      CALL TO_FLAT_SCREEN(DELY,K,DYDZ,Y,OK)
-      IF(BTEST(ABS(J),0)) Y=-Y
-      Y0=Y+YBAR
-
+      CALL UNFOLD_EXTVOL(M,LR,KMI,KMA)
+      
       DX_PREV=0.
-      DY_PREV=0.
       DO IPMTY=0,N_PMTY(LR,M)-1
          DO IY=0,PMT_NY-1
             ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,M)
-            DX=PIK_DXCH(ICH)
-            IF(DX.LE.0) CYCLE
-            DY=PIK_DYCH(ICH)
-            IF(DY.LE.0) CYCLE
+            DXCH=PIK_DXCH(ICH)
+            IF(DXCH.LE.0) CYCLE
+            DYCH=PIK_DYCH(ICH)
+            IF(DYCH.LE.0) CYCLE
+            YCH=PIK_YCH(ICH)
+            IF(DXCH.NE.DX_PREV) THEN
+               DX_PREV=DXCH
+               DO I=1,NMASKS
+                  TAG(I)=.FALSE.
+               ENDDO
+            ENDIF
             IPT=NT
-            DO K=K1,K2
-               CALL TO_FLAT_SCREEN(PIK_YCH(ICH),K,DYDZ,YCH,OK)
-               IF(.NOT.OK) CYCLE
-               CALL DTO_FLAT_SCREEN(PIK_DYCH(ICH),K,DYDZ,DY)
-               IF(DY.LE.0) CYCLE
-               IF(DX.NE.DX_PREV.OR.DY.NE.DY_PREV) THEN
-                  DX_PREV=DX
-                  DY_PREV=DY
-                  DO I=1,10
-                     TAG(I)=.FALSE.
-                  ENDDO
+
+            DO J=J1,J2
+               YBAR=J*QBAR_B(M)
+               EVEN=MOD(ABS(J),2).EQ.0
+               IF(EVEN) THEN
+                  DYDZ_TMP=DYDZ
+               ELSE
+                  DYDZ_TMP=-DYDZ
                ENDIF
-               DYBH=DYBDY*DY/2
-               WYB=BH+DYBH
-               DY=DY/10.
-               IF(BTEST(ABS(J1),0)) YCH=-YCH
-               DO J=J1,J2
-                  YBAR=J*QBAR_B(M)
-                  Y=YCH+YBAR-Y0
-                  YB=YB0+Y*DYBDY-YBAR
-                  YCH=-YCH
-                  IF(ABS(YB).GT.WYB) CYCLE
-                  Y1=MAX(YB-DYBH,-BH)
-                  Y2=MIN(YB+DYBH, BH)
-                  DY1=(Y2-Y1)/DYBDY
-                  I=MIN(NINT(DY1/DY),10)
-                  IF(I.LE.0) CYCLE
+               IF(DYDZ_TMP*(1+2*(LR-1)).GT.0) THEN
+                  K1=0
+                  K2=KMA
+               ELSE
+                  K1=KMI
+                  K2=0
+               ENDIF
+               DO K=K1,K2
+                  CALL TO_BAR_EXIT(YCH,DYCH,BH,K,DYDZ_TMP,YB,DYB)
+                  IF(.NOT.EVEN) YB=-YB
+                  I=MIN(NINT(DYB/2/BH*NMASKS),NMASKS)
+                  IF(I.LT.1) CYCLE
                   IF(.NOT.TAG(I)) THEN
-                     DY1=DY*I
-                     CALL SET_EMASK(DYDE,DYDL,DYDX,DY1,T_LEN,DX,0.,
+                     DYB=2*BH/FLOAT(NMASKS)*FLOAT(I)
+                     DY=DYB/DYBDE*DYDE
+                     CALL SET_EMASK(DYDE,DYDL,DYDX,DY,T_LEN,DXCH,0.,
      &                    MASK(0,I),MM(I),NSIZ,TAG(I),WIDI(I))
                   ENDIF
-                  ECP=((Y1+Y2)/2+YBAR-YB0)/DYBDE+E_MEAN
+                  ECP=(YB+YBAR-YB0)/DYBDE+E_MEAN
                   CALL QE_INTEGRATE(MASK(0,I),MM(I),NSIZ,ECP,WIDI(I),
      &                 S,S_E,S_E2)
                   IF(S.LE.0) CYCLE
@@ -704,7 +692,7 @@ c--   Qbar with expansion volume at side LR, type Prism
                      E0(NT)=S_E
                      SIG2(NT)=S_E2
                      ICHA(NT)=ICH
-                  ELSE
+                 ELSE
                      ECPP(I)=ECP
                      SUM(I)=SUM(I)+S
                      E0(I)=E0(I)+S_E
@@ -998,21 +986,22 @@ c--   sorting required: A>B>C
       INTEGER KK
       REAL SMER_Y, SMER_Z
       REAL ORIG_Y, ORIG_Z
-      REAL YCH, DYDZ, Y, DY
+      REAL YCH, DYCH, BH, DYDZ, Y, DY
       INTEGER LUN
       LOGICAL OK
 #include "TOP_GEO.fi" 
 #include "TOP_EXT.fi" 
       INTEGER ID, II, K, I
-      REAL PHI0, PHI1, YSIZ, AA, Z
+      REAL PHI0, PHI1, YSIZ, AA, Z, Y1, Y2, Z1, Z2
       REAL R_PL(3,0:1), NORM(3,0:1)
       integer nsiz
       PARAMETER (NSIZ=20)
       INTEGER KMI, KMA
       REAL R0(3,-NSIZ:NSIZ), SMER(3,-NSIZ:NSIZ), ORIG(3,-NSIZ:NSIZ)
+      REAL DY0(-NSIZ:NSIZ), DZ0(-NSIZ:NSIZ)
       REAL Z_MAX
       INTEGER MDN_OLD /-1/, LR_OLD /0/
-      SAVE KMI, KMA, R0, SMER, ORIG, MDN_OLD, LR_OLD, Z_MAX
+      SAVE KMI, KMA, R0, SMER, ORIG, DY0, DZ0, MDN_OLD, LR_OLD, Z_MAX
 
       IF(MDN.EQ.MDN_OLD.AND.LR.EQ.LR_OLD) THEN
          KMIN=KMI
@@ -1104,13 +1093,29 @@ c--   sorting required: A>B>C
                SMER(I,K)=(R0(I,K+1)-R0(I,K))/YSIZ
                ORIG(I,K)=R0(I,K)+AA*SMER(I,K)
             ENDDO
+            IF(LR.EQ.0) THEN
+               DY0(K)=SMER(3,K)
+               DZ0(K)=-SMER(2,K)
+            ELSE
+               DY0(K)=-SMER(3,K)
+               DZ0(K)=SMER(2,K)
+            ENDIF
          ELSE
             AA=-EXT_YUP(ID)
             DO I=1,3
                SMER(I,K)=-(R0(I,K+1)-R0(I,K))/YSIZ
                ORIG(I,K)=R0(I,K)+AA*SMER(I,K)
             ENDDO
+            IF(LR.EQ.0) THEN
+               DY0(K)=-SMER(3,K)
+               DZ0(K)=SMER(2,K)
+            ELSE
+               DY0(K)=SMER(3,K)
+               DZ0(K)=-SMER(2,K)
+            ENDIF
          ENDIF
+         DY0(K)=DY0(K)*QBAR_WIN(MDN)
+         DZ0(K)=DZ0(K)*QBAR_WIN(MDN)
       ENDDO
       Z_MAX=EXT_DZ(ID)
       KMIN=KMI
@@ -1126,29 +1131,29 @@ c--   sorting required: A>B>C
       ORIG_Z=ORIG(3,KK)
       RETURN
 
-      ENTRY TO_FLAT_SCREEN(YCH,KK,DYDZ,Y,OK)
+      ENTRY TO_BAR_EXIT(YCH,DYCH,BH,KK,DYDZ,Y,DY) ! note: valid only for LR=0
 
-      Y=YCH*SMER(2,KK)+ORIG(2,KK)
-      Z=YCH*SMER(3,KK)+ORIG(3,KK)
-      IF(KK.GE.0) THEN
-         Y=Y-DYDZ*Z
-      ELSE
-         Y=Y+DYDZ*Z
-      ENDIF
-      OK=ABS(Z).LT.Z_MAX
-      RETURN
-
-      ENTRY DTO_FLAT_SCREEN(DY,KK,DYDZ,Y)
-
-      Y=DY*SMER(2,KK)
-      Z=DY*SMER(3,KK)
-      IF(KK.GE.0) THEN
-         Y=abs(Y-DYDZ*Z)
-      ELSE
-         Y=abs(Y+DYDZ*Z)
-      ENDIF
-      RETURN
+      Y=0
+      DY=0
       
+      Z1=(YCH+DYCH/2)*SMER(3,KK)+ORIG(3,KK)+DZ0(KK)
+      IF(Z1.GT.Z_MAX) RETURN
+      Y1=(YCH+DYCH/2)*SMER(2,KK)+ORIG(2,KK)+DY0(KK)+DYDZ*(Z_MAX-Z1)
+      
+      Z2=(YCH-DYCH/2)*SMER(3,KK)+ORIG(3,KK)+DZ0(KK)
+      IF(Z2.GT.Z_MAX) RETURN
+      Y2=(YCH-DYCH/2)*SMER(2,KK)+ORIG(2,KK)+DY0(KK)+DYDZ*(Z_MAX-Z2)
+
+      IF(Y1.GT.Y2) THEN
+         Y=Y1
+         Y1=Y2
+         Y2=Y
+      ENDIF
+      Y1=MAX(Y1,-BH)
+      Y2=MIN(Y2,BH)
+      Y=(Y1+Y2)/2
+      DY=Y2-Y1
+      RETURN
 
       ENTRY DUMP_UNFOLD(LUN)
 

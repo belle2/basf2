@@ -108,10 +108,14 @@ struct NSMcontext_struct {
 };
 
 
+void nsmlib_logflush();
 void nsmlib_logging(FILE* logfp);
 void nsmlib_checkpoint(NSMcontext* nsmc, int val);
 int nsmlib_debuglevel(int val);
+int nsmlib_addincpath(const char* path);
 const char* nsmlib_nodename(NSMcontext* nsmc, int nodeid);
+int nsmlib_nodeid(NSMcontext* nsmc, const char* nodename);
+int nsmlib_recv(NSMcontext* nsmc, NSMtcphead* hp, int wait_msec);
 int nsmlib_reqid(NSMcontext* nsmc, const char* reqname);
 const char* nsmlib_reqname(NSMcontext* nsmc, int reqid);
 const char* nsmlib_strerror(NSMcontext* nsmc);
@@ -130,14 +134,14 @@ int nsmlib_flushmem(NSMcontext* nsmc,
 int nsmlib_sendreq(NSMcontext* nsmc,
                    const char* node, const char* req,
                    uint npar, int* pars, int len, const char* datap);
+int nsmlib_register_request(NSMcontext* nsmc, const char* name);
 NSMcontext* nsmlib_init(const char* nodename, const char* host,
                         int port, int shmkey);
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
-int nsmlib_recv(NSMcontext* nsmc, NSMtcphead* hp, int wait_msec);
-//char* nsmlib_parsefile(const char* datname, int revision, const char* incpath,
-//                       char* fmtstr, int* revisionp);
+//char *nsmlib_parsefile(const char *datname, int revision, const char *incpath,
+//           char *fmtstr, int *revisionp);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {

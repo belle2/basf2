@@ -9,8 +9,8 @@
 
 #include <svd/modules/svdSimulation/SVDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -22,7 +22,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDModeByte.h>
 #include <boost/tuple/tuple.hpp>
+#include <fstream>
+#include <sstream>
+#include <regex>
 #include <algorithm>
 #include <numeric>
 #include <deque>
@@ -54,8 +59,7 @@ REG_MODULE(SVDDigitizer)
 //-----------------------------------------------------------------
 
 SVDDigitizerModule::SVDDigitizerModule() :
-  Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0), m_histLorentz_u(
-    0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
+  Module(), m_generateDigits(false)
 {
   //Set module properties
   setDescription("Create SVDDigits from SVDSimHits");
@@ -66,11 +70,13 @@ SVDDigitizerModule::SVDDigitizerModule() :
   // 1. Collections
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticle collection name", string(""));
-  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name",
            string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
+  addParam("GenerateDigits", m_generateDigits, "Generate SVDDigits", bool(false));
+  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
+  addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
@@ -80,51 +86,66 @@ SVDDigitizerModule::SVDDigitizerModule() :
 
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
-           "Apply Poisson smearing on chargelets", true);
-  addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
-           true);
+           "Apply Poisson smearing on chargelets", bool(true));
+  addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
+           bool(false));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(2.5));
+           "Zero suppression cut in sigmas of strip noise", double(3.0));
+  addParam("Use3SampleFilter", m_3sampleFilter,
+           "A digit must have at least 3 consecutive samples over threshold",
+           bool(true));
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
-           double(50.0));
+           double(250.0));
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns", double(31.44));
-  addParam("UseIntegrationWindow", m_applyWindow, "Use integration window?",
-           bool(true));
   addParam("StartSampling", m_startSampling,
            "Start of the sampling window, in ns", double(-31.44));
   addParam("nAPV25Samples", m_nAPV25Samples, "number of APV25 samples",
            6);
-  addParam("RandomPhaseSampling", m_randomPhaseSampling,
-           "Start sampling at a random time?", bool(false));
+  addParam("RandomizeEventTimes", m_randomizeEventTimes,
+           "Randomize event times over a frame interval", bool(false));
+  addParam("TimeFrameLow", m_minTimeFrame,
+           "Left edge of event time randomization window, ns", m_minTimeFrame);
+  addParam("TimeFrameHigh", m_maxTimeFrame,
+           "Right edge of event time randomization window, ns", m_maxTimeFrame);
 
-  // 5. Processing
-  addParam("ADC", m_applyADC, "Simulate ADC?", bool(true));
-  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
-  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
-  addParam("ADCbits", m_bitsADC, "Number of ADC bits", int(10));
-
-  // 6. Reporting
+  // 5. Reporting
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
            string(""));
   addParam("storeWaveforms", m_storeWaveforms,
            "Store waveforms in a TTree in the statistics file.", bool(false));
+  addParam("signalsList", m_signalsList,
+           "Store signals (time/charge/tau) in a tab-delimited file",
+           m_signalsList);
 }
 
 void SVDDigitizerModule::initialize()
 {
   //Register all required collections
-  StoreArray<SVDDigit>storeDigits(m_storeDigitsName);
-  storeDigits.registerInDataStore();
-
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
-  storeDigits.registerRelationTo(storeMCParticles);
 
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  storeDigits.registerRelationTo(storeTrueHits);
+
+  StoreArray<SVDShaperDigit>storeShaperDigits(m_storeShaperDigitsName);
+  storeShaperDigits.registerInDataStore();
+  storeShaperDigits.registerRelationTo(storeMCParticles);
+  storeShaperDigits.registerRelationTo(storeTrueHits);
+
+  m_relShaperDigitMCParticleName = DataStore::relationName(
+                                     DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName),
+                                     DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  m_relShaperDigitTrueHitName = DataStore::relationName(
+                                  DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName),
+                                  DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  //  m_relShaperDigitDigitName = DataStore::relationName(
+  //                  DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName),
+  //                  DataStore::arrayName<SVDDigit>(m_storeDigitsName));
+
+  if (m_randomizeEventTimes)
+    StoreObjPtr<EventMetaData> storeEvents;
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -133,21 +154,29 @@ void SVDDigitizerModule::initialize()
   m_relTrueHitSimHitName = DataStore::relationName(
                              DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName),
                              DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
-  m_relDigitMCParticleName = DataStore::relationName(
-                               DataStore::arrayName<SVDDigit>(m_storeDigitsName),
-                               DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  m_relDigitTrueHitName = DataStore::relationName(
-                            DataStore::arrayName<SVDDigit>(m_storeDigitsName),
-                            DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
 
-  //Convert parameters to correct units
+  if (m_generateDigits) {
+    StoreArray<SVDDigit>storeDigits(m_storeDigitsName);
+    storeDigits.registerInDataStore();
+    storeDigits.registerRelationTo(storeMCParticles);
+    storeDigits.registerRelationTo(storeTrueHits);
+    storeDigits.registerRelationTo(storeShaperDigits);
+
+    m_relDigitMCParticleName = DataStore::relationName(
+                                 DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                                 DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+    m_relDigitTrueHitName = DataStore::relationName(
+                              DataStore::arrayName<SVDDigit>(m_storeDigitsName),
+                              DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  }
+
+  // Convert parameters to correct units
   m_segmentLength *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
-  m_minADC = m_minADC * Unit::e;
-  m_maxADC = m_maxADC * Unit::e;
-  m_unitADC = (m_maxADC - m_minADC) / (pow(2.0, m_bitsADC) - 1);
   m_samplingTime *= Unit::ns;
   m_shapingTime *= Unit::ns;
+  m_minTimeFrame *= Unit::ns;
+  m_maxTimeFrame *= Unit::ns;
 
   B2INFO(
     "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
@@ -171,21 +200,14 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
   B2INFO(" -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
   B2INFO(" -->  Zero suppression cut" << m_SNAdjacent);
+  B2INFO(" -->  3-sample filter:    " << (m_3sampleFilter ? "on" : "off"));
   B2INFO(" -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
   B2INFO(" TIMING: ");
   B2INFO(" -->  APV25 shaping time: " << m_shapingTime);
   B2INFO(" -->  Sampling time:      " << m_samplingTime);
-  B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  Start of int. wind.:" << m_startSampling);
   B2INFO(" -->  Number of samples:  " << m_nAPV25Samples);
-  B2INFO(
-    " -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
-  B2INFO(" PROCESSING:");
-  B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
-  B2INFO(" -->  ADC range low (e-): " << m_minADC);
-  B2INFO(" -->  ADC range high (e-):" << m_maxADC);
-  B2INFO(" -->  ADC bits:           " << m_bitsADC);
-  B2INFO(" -->  1 adu (e-)*:        " << m_unitADC);
+  B2INFO(" -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
   B2INFO(" REPORTING: ");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
   B2INFO(
@@ -194,26 +216,53 @@ void SVDDigitizerModule::initialize()
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
     m_rootFile->cd();
-    m_histDiffusion_v = new TH1D("h_holeDiffusion", "Diffusion distance, v",
-                                 200, -100, 100);
-    m_histDiffusion_v->GetXaxis()->SetTitle("Diffusion distance v [um]");
-    m_histDiffusion_u = new TH1D("h_electronDiffusion",
-                                 "Diffusion distance", 200, -100, 100);
-    m_histDiffusion_v->GetXaxis()->SetTitle("Diffusion distance u [um]");
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, electrons",
-                               100, -0.25, 0.25);
+    m_histChargeSharing_v = new TH1D("h_Diffusion_v", " 'Diffusion' distance, v",
+                                     200, -500, 500);
+    m_histChargeSharing_v->GetXaxis()->SetTitle(" distance v [um]");
+    m_histChargeSharing_u = new TH1D("h_Diffusion_u",
+                                     " 'Diffusion' distance, u", 100, -200, 200);
+    m_histChargeSharing_u->GetXaxis()->SetTitle("distance u [um]");
+    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, holes",
+                               100, -0.08, 0);
     m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
     m_histLorentz_v = new TH1D("h_LorentzAngle_v",
-                               "Lorentz angle, holes", 100, -0.002, 0.002);
+                               "Lorentz angle, electrons", 100, -0.002, 0.002);
     m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
     m_signalDist_u = new TH1D("h_signalDist_u",
-                              "Strip signals vs. TrueHits, electrons", 100, -400, 400);
-    m_signalDist_u->GetXaxis()->SetTitle(
-      "U strip position - TrueHit u [um]");
+                              "Strip signals vs. TrueHits, holes", 100, -400, 400);
+    m_signalDist_u->GetXaxis()->SetTitle("U strip position - TrueHit u [um]");
     m_signalDist_v = new TH1D("h_signalDist_v",
-                              "Strip signals vs. TrueHits, holes", 400, -400, 400);
-    m_signalDist_v->GetXaxis()->SetTitle(
-      "V strip position - TrueHit v [um]");
+                              "Strip signals vs. TrueHits, electrons", 100, -400, 400);
+    m_signalDist_v->GetXaxis()->SetTitle("V strip position - TrueHit v [um]");
+
+    m_histMobility_e = new TH1D("h_elecMobility", "electron Mobility",
+                                30, 900, 1200);
+    m_histMobility_e->GetXaxis()->SetTitle("Electron Mobility");
+    m_histMobility_h = new TH1D("h_holeMobility", "hole Mobility",
+                                30, 400, 500);
+    m_histMobility_h->GetXaxis()->SetTitle("Holes Mobility");
+
+    m_histDistanceToPlane_e = new TH1D("h_elecDistToPlane", "electron Distance to Plane",
+                                       50, -0.05, 0.05);
+    m_histDistanceToPlane_e->GetXaxis()->SetTitle("Electron Distance To Plane [cm]");
+    m_histDistanceToPlane_h = new TH1D("h_holeDistToPlane", "holes Distance to Plane",
+                                       50, -0.05, 0.05);
+    m_histDistanceToPlane_h->GetXaxis()->SetTitle("Holes Distance To Plane [cm]");
+
+    m_histVelocity_e = new TH1D("h_elecVelocity", "electrons Velocity (z)",
+                                100, 0.001, 0.01);
+
+    m_histVelocity_e->GetXaxis()->SetTitle("Electron Velocity [cm/s]");
+    m_histVelocity_h = new TH1D("h_holeVelocity", "holes Velocity (z)",
+                                30, -0.002, -0.0004);
+    m_histVelocity_h->GetXaxis()->SetTitle("holes Velocity [cm/s]");
+
+    m_histDriftTime_e = new TH1D("h_elecDriftTime", "electron Drift Time",
+                                 30, 0, 30);
+    m_histDriftTime_e->GetXaxis()->SetTitle("Electron Drift Time");
+    m_histDriftTime_h = new TH1D("h_holeDriftTime", "hole Drift Time",
+                                 30, 0, 30);
+    m_histDriftTime_h->GetXaxis()->SetTitle("Hole Drift Time");
 
     if (m_storeWaveforms) {
       m_waveTree = new TTree("waveTree", "SVD waveforms");
@@ -249,6 +298,15 @@ void SVDDigitizerModule::beginRun()
 
 void SVDDigitizerModule::event()
 {
+  // Generate current event time
+  if (m_randomizeEventTimes) {
+    StoreObjPtr<EventMetaData> storeEvent;
+    m_currentEventTime = gRandom->Uniform(m_minTimeFrame, m_maxTimeFrame);
+    // We have negative event times, so we have to encode!
+    storeEvent->setTime(static_cast<unsigned long>(1000 + m_currentEventTime));
+  } else
+    m_currentEventTime = 0.0;
+
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.first.clear();  // u strips
@@ -272,7 +330,6 @@ void SVDDigitizerModule::event()
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
 
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-
 
   unsigned int nSimHits = storeSimHits.getEntries();
   if (nSimHits == 0)
@@ -361,26 +418,16 @@ void SVDDigitizerModule::event()
     m_rootFile->cd();
     saveWaveforms();
   }
+  if (m_signalsList != "")
+    saveSignals();
 
   saveDigits();
 }
 
 void SVDDigitizerModule::processHit()
 {
-  if (m_applyWindow) {
-    //Ignore hits which are outside of the SVD active time frame.
-    //Here we can only discard hits that arrived after the window was closed;
-    //we will later start sampling only after the window opened.
-    double stopSampling = m_startSampling + m_nAPV25Samples * m_samplingTime;
-    B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentHit->getGlobalTime() << " <= " << stopSampling);
-
-    if (m_currentHit->getGlobalTime() > stopSampling)
-      return;
-  }
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  // Set time of the event
-  m_currentTime = m_currentHit->getGlobalTime();
+  // Set time of the hit
+  m_currentTime = m_currentEventTime + m_currentHit->getGlobalTime();
 
   //Get Steplength and direction
   const TVector3& startPoint = m_currentHit->getPosIn();
@@ -424,14 +471,20 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(30,
           "Drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " << position.y() << ", " << position.z()
           << ").");
+  B2DEBUG(30, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " <<
+          position.y() << ", " << position.z()
+          << ").");
 
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
-  StripSignals& digits = (have_electrons) ? m_currentSensor->first : m_currentSensor->second;
+  StripSignals& digits = (!have_electrons) ? m_currentSensor->first : m_currentSensor->second;
 
   double distanceToPlane = (have_electrons) ?
                            0.5 * m_sensorThickness - position.Z() :
-                           -0.5 * m_sensorThickness - position.Z();
+                           -0.5 * m_sensorThickness - position.Z(); //cm
+
+  if (m_histDistanceToPlane_e && have_electrons) m_histDistanceToPlane_e->Fill(distanceToPlane);
+  if (m_histDistanceToPlane_h && !have_electrons) m_histDistanceToPlane_h->Fill(distanceToPlane);
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
@@ -439,35 +492,56 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
   // Calculate drift times and widths of charge clouds.
   TVector3 v = info.getVelocity(carrierType, mean_pos);
-  double driftTime = distanceToPlane / v.Z();
-  TVector3 center = position + driftTime * v;
+  if (m_histVelocity_e && have_electrons) m_histVelocity_e->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
+  if (m_histVelocity_h && !have_electrons) m_histVelocity_h->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
+
+  double driftTime = distanceToPlane / v.Z(); //ns
+  if (m_histDriftTime_e && have_electrons) m_histDriftTime_e->Fill(driftTime); //ns
+  if (m_histDriftTime_h && !have_electrons) m_histDriftTime_h->Fill(driftTime); //ns
+
+  TVector3 center = position + driftTime * v; //cm
   double mobility = (have_electrons) ?
                     info.getElectronMobility(info.getEField(mean_pos).Mag()) :
                     info.getHoleMobility(info.getEField(mean_pos).Mag());
+
+  if (m_histMobility_e && have_electrons) m_histMobility_e->Fill(mobility); //cm2/V/ns
+  if (m_histMobility_h && !have_electrons) m_histMobility_h->Fill(mobility); //cm2/V/ns
+
   double D = Const::kBoltzmann * info.getTemperature() / Unit::e * mobility;
   double sigma = std::max(1.0e-4, sqrt(2.0 * D * driftTime));
-  double tanLorentz = (have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
+  double tanLorentz = (!have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
+
+  B2DEBUG(30, "velocity (" << v.X() / Unit::um << ", " << v.Y() / Unit::um << ", " << v.Z() / Unit::um << ") um/ns");
+  B2DEBUG(30, "D = " << D << ", driftTime = " << driftTime / Unit::ns << " ns");
+  B2DEBUG(30, "sigma = " << sigma / Unit::um << " um");
+  B2DEBUG(30, "tan Lorentz = " << tanLorentz);
+
   sigma *= sqrt(1.0 + tanLorentz * tanLorentz);
-  if (m_histLorentz_u && have_electrons) m_histLorentz_u->Fill(tanLorentz);
-  if (m_histLorentz_v && !have_electrons) m_histLorentz_v->Fill(tanLorentz);
+  if (m_histLorentz_u && !have_electrons) m_histLorentz_u->Fill(tanLorentz);
+  if (m_histLorentz_v && have_electrons) m_histLorentz_v->Fill(tanLorentz);
 
   //Distribute carrier cloud on strips
   int vID = info.getVCellID(center.Y(), true);
   int uID = info.getUCellID(center.X(), center.Y(), true);
-  int seedStrip = (have_electrons) ? uID : vID;
-  double seedPos = (have_electrons) ?
+  int seedStrip = (!have_electrons) ? uID : vID;
+  double seedPos = (!have_electrons) ?
                    info.getUCellPosition(seedStrip, vID) :
                    info.getVCellPosition(seedStrip);
-  double geomPitch = (have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch();
-  int nCells = (have_electrons) ? info.getUCells() : info.getVCells();
+  double geomPitch = (!have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch();
+  int nCells = (!have_electrons) ? info.getUCells() : info.getVCells();
   std::deque<double> stripCharges;
   std::deque<double> strips; // intermediate strips will be half-integers, like 2.5.
 #define NORMAL_CDF(z) 0.5 * std::erfc( - (z) * 0.707107)
-  double current_pos = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  double current_pos = (!have_electrons) ? seedPos - center.X() : seedPos - center.Y();
   double current_strip = seedStrip;
   double cdf_low = NORMAL_CDF((current_pos - 0.5 * geomPitch) / sigma);
   double cdf_high = NORMAL_CDF((current_pos + 0.5 * geomPitch) / sigma);
   double charge = carriers * (cdf_high - cdf_low);
+
+  B2DEBUG(30, "geomPitch = " << geomPitch / Unit::um << " um");
+  B2DEBUG(30, "charge = " << charge << " = " << carriers << "(carriers) * (" << cdf_high << "(cdf_high) - " << cdf_low <<
+          "(cdf_low));");
+
   stripCharges.push_back(charge);
   strips.push_back(current_strip);
   while (cdf_low > 1.0e-5) {
@@ -479,7 +553,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     strips.push_front(current_strip);
     cdf_low = cdf_current;
   }
-  current_pos = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  current_pos = (!have_electrons) ? seedPos - center.X() : seedPos - center.Y();
   current_strip = seedStrip;
   while (cdf_high < 1.0 - 1.0e-5) {
     current_pos += geomPitch;
@@ -491,6 +565,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     cdf_high = cdf_current;
   }
 #undef NORMAL_CDF
+
   // Pad with zeros for smoothing
   int npads = (strips.front() - floor(strips.front()) == 0) ? 4 : 3;
   for (int i = 0; i < npads; ++i) {
@@ -503,21 +578,30 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     stripCharges.push_back(0);
   }
   // Cross-talk
+  B2DEBUG(30, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
   for (std::size_t index = 2; index <  strips.size() - 2; index += 2) {
+    B2DEBUG(30, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
-    double Cc = (have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
+    double Cc = (!have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
                 info.getCouplingCapacitanceV(currentStrip);
-    double Ci = (have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
+    double Ci = (!have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
                 info.getInterstripCapacitanceV(currentStrip);
-    double Cb = (have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
+    double Cb = (!have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
                 info.getBackplaneCapacitanceV(currentStrip);
 
     double cNeighbour2 = 0.5 * Ci / (Ci + Cb + Cc);
     double cNeighbour1 = Ci / (2 * Ci + Cb);
     double cSelf = Cc / (Ci + Cb + Cc);
 
+    B2DEBUG(30, "  current strip = " << currentStrip);
+    B2DEBUG(30, "     index-2 = " << index - 2 << ", strip = " << strips[index - 2] << ", stripCharge = " << stripCharges[index - 2]);
+    B2DEBUG(30, "     index-1 = " << index - 1 << ", strip = " << strips[index - 1] << ", stripCharge = " << stripCharges[index - 1]);
+    B2DEBUG(30, "     index   = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
+    B2DEBUG(30, "     index+1 = " << index + 1 << ", strip = " << strips[index + 1] << ", stripCharge = " << stripCharges[index + 1]);
+    B2DEBUG(30, "     index+2 = " << index + 2 << ", strip = " << strips[index + 2] << ", stripCharge = " << stripCharges[index + 2]);
+    //se index e' di readout va bene
     readoutCharges.push_back(cSelf * (
                                cNeighbour2 * stripCharges[index - 2]
                                + cNeighbour1 * stripCharges[index - 1]
@@ -526,6 +610,8 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
                                + cNeighbour2 * stripCharges[index + 2]
                              ));
     readoutStrips.push_back(currentStrip);
+    B2DEBUG(30, "    post simulation: " << index << ", strip = " << currentStrip << ", readoutCharge = " <<
+            readoutCharges[readoutCharges.size() - 1]);
   }
   // Trim at sensor edges
   double tail = 0;
@@ -546,10 +632,11 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   if (m_applyPoisson)
     for (auto& c : readoutCharges)
       c = (c <= 0) ? 0 : std::max(0.0, gRandom->Gaus(c, std::sqrt(info.c_fanoFactorSi * c)));
+
   // Fill diagnostic charts
-  if (m_histDiffusion_u && m_histDiffusion_v) {
-    TH1D* histo = (have_electrons) ? m_histDiffusion_u : m_histDiffusion_v;
-    double d = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  if (m_histChargeSharing_u && m_histChargeSharing_v) {
+    TH1D* histo = (!have_electrons) ? m_histChargeSharing_u : m_histChargeSharing_v;
+    double d = (!have_electrons) ? seedPos - center.X() : seedPos - center.Y();
     for (std::size_t index = 0; index < readoutStrips.size(); ++ index) {
       double dist = d + (readoutStrips[index] - seedStrip) * 2 * geomPitch;
       histo->Fill(dist / Unit::um, readoutCharges[index]);
@@ -558,7 +645,9 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   // Store
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
-    digits[readoutStrips[index]].add(m_currentTime + driftTime, readoutCharges[index],
+    // NB> To first approximation, we assign to the signal 1/2*driftTime.
+    // This doesn't change the charge collection, only charge collection timing.
+    digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
                                      m_shapingTime, m_currentParticle, m_currentTrueHit);
     recoveredCharge += readoutCharges[index];
     B2DEBUG(30, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
@@ -573,9 +662,7 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
     double p = gRandom->Uniform(m_noiseFraction, 1.0);
     charge = TMath::NormQuantile(p) * noise;
   } else {
-    if (m_applyNoise) {
-      charge += gRandom->Gaus(0., noise);
-    }
+    charge += gRandom->Gaus(0., noise);
   }
   return charge;
 }
@@ -590,12 +677,33 @@ void SVDDigitizerModule::saveDigits()
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
                                 m_relDigitTrueHitName);
 
+  StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
+  RelationArray relShaperDigitMCParticle(storeShaperDigits, storeMCParticles,
+                                         m_relShaperDigitMCParticleName);
+  RelationArray relShaperDigitTrueHit(storeShaperDigits, storeTrueHits,
+                                      m_relShaperDigitTrueHitName);
+  //    RelationArray relShaperDigitDigits(storeShaperDigits, storeDigits,
+  //               m_relShaperDigitDigitName);
 
   //Set time of the first sample
-  double initTime = m_startSampling;
-  if (m_randomPhaseSampling) {
-    initTime = gRandom->Uniform(0.0, m_samplingTime);
-  }
+  const double bunchTimeSep = 2 * 1.96516; //in ns
+  const int bunchXingsInAPVclock = 8; //m_samplingTime/bunchTimeSep;
+  int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
+  double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
+
+  //set the DAQ mode to 1, 3, or 6-samples:
+  int daqMode = 3;  //does not correspond to anything expected on data
+  if (m_nAPV25Samples == 6)
+    daqMode = 2;
+  else if (m_nAPV25Samples == 3)
+    daqMode = 1;
+  else if (m_nAPV25Samples == 1)
+    daqMode = 0;
+  else
+    B2WARNING("The number of APV samples that you are simulating is not expected! If you are using the CoG in recontruction, do not expect to get reasonable RecoDigits");
+
+  // ... to store digit-digit relations
+  vector<pair<unsigned int, float> > digit_weights;
 
   // Take samples at the desired times, add noise, zero-suppress and save digits.
 
@@ -605,6 +713,7 @@ void SVDDigitizerModule::saveDigits()
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
     double elNoiseU = info.getElectronicNoiseU();
+    double aduEquivalentU = info.getAduEquivalentU();
     double charge_thresholdU = m_SNAdjacent * elNoiseU;
     // Add noisy digits
     if (m_applyNoise) {
@@ -622,6 +731,9 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal& s = stripSignal.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
+      // ... to store digit-digit relations
+      digit_weights.clear();
+      digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
       if (s.isNoise()) {
         double pSelect = 1.0 / m_nAPV25Samples;
@@ -639,49 +751,76 @@ void SVDDigitizerModule::saveDigits()
         }
       }
       // Check that at least three consecutive samples are over threshold
-      auto it = search_n(
-                  samples.begin(), samples.end(), 3, charge_thresholdU,
-      [](double x, double y) { return x > y; }
-                );
-      if (it == samples.end()) continue;
-      // Save samples and relations
+      if (m_3sampleFilter) {
+        auto it = search_n(
+                    samples.begin(), samples.end(), 3, charge_thresholdU,
+        [](double x, double y) { return x > y; }
+                  );
+        if (it == samples.end()) continue;
+      }
+
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
-      for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
-        double sampleCharge = samples.at(iSample);
-        //Limit signal to ADC steps
-        if (m_applyADC)
-          sampleCharge = eToADU(sampleCharge);
-        // Save as a new digit
-        int digIndex = storeDigits.getEntries();
-        storeDigits.appendNew(
-          SVDDigit(sensorID, true, iStrip,
-                   info.getUCellPosition(iStrip), sampleCharge, iSample));
-        //If the digit has any relations to MCParticles, add the Relation
-        if (particles.size() > 0) {
-          relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
-        }
-        //If the digit has any relations to truehits, add the Relations.
-        if (truehits.size() > 0) {
-          relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
-          // Add reporting data
-          if (m_signalDist_u) {
-            for (SVDSignal::relation_value_type trueRel : truehits) {
-              int iTrueHit = trueRel.first;
-              float trueWeight = trueRel.second;
-              if (iTrueHit > -1) {
-                m_signalDist_u->Fill(
-                  (info.getUCellPosition(iStrip)
-                   - storeTrueHits[iTrueHit]->getU())
-                  / Unit::um, trueWeight);
-              } // if iTrieHit
-            } // for trueRel
-          } // if m_signalDist_u
-        } // if truehits.size()
-      } // for iSample
+
+      // Save samples and relations
+      if (m_generateDigits) {
+        for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+          double sampleCharge = samples.at(iSample);
+          //NB: no longer optional!!! Limit signal to ADC steps
+          sampleCharge = floor(max(0.0, min(255.0, sampleCharge / aduEquivalentU)));
+          // Save as a new digit
+          int digIndex = storeDigits.getEntries();
+          digit_weights.emplace_back(digIndex, sampleCharge);
+          storeDigits.appendNew(
+            SVDDigit(sensorID, true, iStrip,
+                     info.getUCellPosition(iStrip), sampleCharge, iSample));
+          //If the digit has any relations to MCParticles, add the Relation
+          if (particles.size() > 0) {
+            relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+          }
+          //If the digit has any relations to truehits, add the Relations.
+          if (truehits.size() > 0) {
+            relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+            // Add reporting data
+            if (m_signalDist_u) {
+              for (SVDSignal::relation_value_type trueRel : truehits) {
+                int iTrueHit = trueRel.first;
+                float trueWeight = trueRel.second;
+                if (iTrueHit > -1) {
+                  m_signalDist_u->Fill(
+                    (info.getUCellPosition(iStrip) - storeTrueHits[iTrueHit]->getU()) / Unit::um, trueWeight);
+                } // if iTrieHit
+              } // for trueRel
+            } // if m_signalDist_u
+          } // if truehits.size()
+        } // for iSample
+      } // Save SVDDigits if required
+
+      // Save SVDShaperDigits
+      SVDShaperDigit::APVRawSamples rawSamples;
+      std::transform(samples.begin(), samples.end(), rawSamples.begin(),
+      [&](double x)->SVDShaperDigit::APVRawSampleType {
+        return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
+      });
+      // Save as a new digit
+      int digIndex = storeShaperDigits.getEntries();
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
+                                                 bunchXingsSinceAPVstart >> 1)));
+      //If the digit has any relations to MCParticles, add the Relation
+      if (particles.size() > 0) {
+        relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+      }
+      //If the digit has any relations to truehits, add the Relations.
+      if (truehits.size() > 0) {
+        relShaperDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+      }
+      //      relShaperDigitDigits.add(digIndex, digit_weights.begin(), digit_weights.end());
+      // generate SVDShaperDigits
     } // for stripSignals
+
     // v-side digits:
     double elNoiseV = info.getElectronicNoiseV();
+    double aduEquivalentV = info.getAduEquivalentV();
     double charge_thresholdV = m_SNAdjacent * elNoiseV;
     // Add noisy digits
     if (m_applyNoise) {
@@ -699,6 +838,9 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal& s = stripSignal.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
+      // ... to store digit-digit relations
+      digit_weights.clear();
+      digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
       if (s.isNoise()) {
         double pSelect = 1.0 / m_nAPV25Samples;
@@ -716,46 +858,70 @@ void SVDDigitizerModule::saveDigits()
         }
       }
       // Check that at least three samples are over threshold
-      auto it = search_n(
-                  samples.begin(), samples.end(), 3, charge_thresholdV,
-      [](double x, double y) { return x > y; }
-                );
-      if (it == samples.end()) continue;
-      // Save samples and relations
+      if (m_3sampleFilter) {
+        auto it = search_n(
+                    samples.begin(), samples.end(), 3, charge_thresholdV,
+        [](double x, double y) { return x > y; }
+                  );
+        if (it == samples.end()) continue;
+      }
+
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
-      for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
-        double sampleCharge = samples.at(iSample);
-        //Limit signal to ADC steps
-        if (m_applyADC)
-          sampleCharge = eToADU(sampleCharge);
-        // Save as a new digit
-        int digIndex = storeDigits.getEntries();
-        storeDigits.appendNew(
-          SVDDigit(sensorID, false, iStrip,
-                   info.getVCellPosition(iStrip), sampleCharge, iSample));
-        //If the digit has any relations to MCParticles, add the Relation
-        if (particles.size() > 0) {
-          relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
-        }
-        //If the digit has any relations to truehits, add the Relations.
-        if (truehits.size() > 0) {
-          relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
-          // Add reporting data
-          if (m_signalDist_v) {
-            for (SVDSignal::relation_value_type trueRel : truehits) {
-              int iTrueHit = trueRel.first;
-              float trueWeight = trueRel.second;
-              if (iTrueHit > -1) {
-                m_signalDist_v->Fill(
-                  (info.getVCellPosition(iStrip)
-                   - storeTrueHits[iTrueHit]->getV())
-                  / Unit::um, trueWeight);
-              } // if iTrieHit
-            } // for trueRel
-          } // if m_signalDist_v
-        } // if truehits.size()
-      } // for iSample
+
+      // Save samples and relations
+      if (m_generateDigits) {
+        for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
+          double sampleCharge = samples.at(iSample);
+          //NB: no longer optional!!! Limit signal to 8-bit ADC steps
+          sampleCharge = floor(max(0.0, min(255.0, sampleCharge / aduEquivalentV)));
+          // Save as a new digit
+          int digIndex = storeDigits.getEntries();
+          digit_weights.emplace_back(digIndex, sampleCharge);
+          storeDigits.appendNew(
+            SVDDigit(sensorID, false, iStrip,
+                     info.getVCellPosition(iStrip), sampleCharge, iSample));
+          //If the digit has any relations to MCParticles, add the Relation
+          if (particles.size() > 0) {
+            relDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+          }
+          //If the digit has any relations to truehits, add the Relations.
+          if (truehits.size() > 0) {
+            relDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+            // Add reporting data
+            if (m_signalDist_v) {
+              for (SVDSignal::relation_value_type trueRel : truehits) {
+                int iTrueHit = trueRel.first;
+                float trueWeight = trueRel.second;
+                if (iTrueHit > -1) {
+                  m_signalDist_v->Fill(
+                    (info.getVCellPosition(iStrip) - storeTrueHits[iTrueHit]->getV()) / Unit::um, trueWeight);
+                } // if iTrieHit
+              } // for trueRel
+            } // if m_signalDist_v
+          } // if truehits.size()
+        } // for iSample
+      } // Save SVDShaperDigits if required
+
+      // Save SVDShaperDigits
+      SVDShaperDigit::APVRawSamples rawSamples;
+      std::transform(samples.begin(), samples.end(), rawSamples.begin(),
+      [&](double x)->SVDShaperDigit::APVRawSampleType {
+        return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
+      });
+      // Save as a new digit
+      int digIndex = storeShaperDigits.getEntries();
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
+                                                 bunchXingsSinceAPVstart >> 1)));
+      //If the digit has any relations to MCParticles, add the Relation
+      if (particles.size() > 0) {
+        relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+      }
+      //If the digit has any relations to truehits, add the Relations.
+      if (truehits.size() > 0) {
+        relShaperDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+      }
+      //      relShaperDigitDigits.add(digIndex, digit_weights.begin(), digit_weights.end());
     } // for stripSignals
   } // FOREACH sensor
 }
@@ -796,6 +962,58 @@ void SVDDigitizerModule::saveWaveforms()
     } // FOREACH stripSignal
   } // FOREACH sensor
   m_rootFile->Flush();
+}
+
+void SVDDigitizerModule::saveSignals()
+{
+  static size_t recordNo = 0;
+  static const string header("Event\tSensor\tSide\tStrip\tContrib\tTime\tCharge\tTau");
+  regex startLine("^|\n"); // for inserting event/sensor/etc info
+  ofstream outfile(m_signalsList, ios::out | ios::app);
+  if (recordNo == 0) outfile << header << endl;
+  for (Sensors::value_type& sensor : m_sensors) {
+    VxdID sensorID(sensor.first);
+    const SensorInfo& info =
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+    // u-side digits:
+    size_t isU = 1;
+    double thresholdU = 3.0 * info.getElectronicNoiseU();
+    for (StripSignals::value_type& stripSignal : sensor.second.first) {
+      size_t strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < thresholdU)
+        continue;
+      // Else print to a string
+      ostringstream preamble;
+      // We don't have eventNo, but we don't care about event boundaries.
+      preamble << "$&" << recordNo << '\t' << sensorID << '\t' << isU << '\t' << strip << '\t';
+      string signalString = s.toString();
+      signalString.pop_back(); // remove the last newline!!!
+      string tableString = regex_replace(signalString, startLine, preamble.str());
+      outfile << tableString << endl; // now we have to add the newline back.
+    } // FOREACH stripSignal
+    // x-side digits:
+    isU = 0;
+    double thresholdV = 3.0 * info.getElectronicNoiseV();
+    for (StripSignals::value_type& stripSignal : sensor.second.second) {
+      size_t strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < thresholdV)
+        continue;
+      // Else print to a string
+      ostringstream preamble;
+      // We don't have eventNo, but we don't care about event boundaries.
+      preamble << "$&" << recordNo << '\t' << sensorID << '\t' << isU << '\t' << strip << '\t';
+      string signalString = s.toString();
+      signalString.pop_back(); // remove the last newline!!!
+      string tableString = regex_replace(signalString, startLine, preamble.str());
+      outfile << tableString << endl; // now we have to add the newline back.
+    } // FOREACH stripSignal
+  } // for sensors
+  outfile.close();
+  recordNo++;
 }
 
 void SVDDigitizerModule::terminate()

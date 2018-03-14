@@ -4,6 +4,11 @@
 #include "framework/core/Module.h"
 #include <string>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <framework/dataobjects/BinnedEventT0.h>
+
 namespace Belle2 {
 
   /** Module for the Event Time Finder of the CDC trigger. */
@@ -34,6 +39,10 @@ namespace Belle2 {
     std::string m_EventTimeName;
 
   private:
+    /** StoreObjPtr holding the event time */
+    StoreObjPtr<BinnedEventT0> m_eventTime;
+    /** list of input track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_hits;
   };
 
 } // namespace Belle2

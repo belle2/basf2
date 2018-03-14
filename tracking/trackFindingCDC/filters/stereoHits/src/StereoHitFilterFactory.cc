@@ -12,13 +12,16 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RandomFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -32,12 +35,14 @@ namespace {
   using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
   using NoneStereoHitFilter = NoneFilter<BaseStereoHitFilter>;
   using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
-  using MCStereoHitFilter = MCFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
-  using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitVarSet>;
+  using MCStereoHitFilter = TruthVarFilter<StereoHitTruthVarSet>;
+  using SimpleStereoHitFilter = ChoosableFromVarSetFilter<StereoHitVarSet>;
   using RecordingStereoHitFilter =
     RecordingFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
   using MVAStereoHitFilter = MVAFilter<StereoHitVarSet>;
 }
+
+template class TrackFindingCDC::FilterFactory<BaseStereoHitFilter>;
 
 StereoHitFilterFactory::StereoHitFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -72,19 +77,19 @@ std::unique_ptr<BaseStereoHitFilter>
 StereoHitFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneStereoHitFilter>();
+    return std::make_unique<NoneStereoHitFilter>();
   } else if (filterName == "all") {
-    return makeUnique<AllStereoHitFilter>();
+    return std::make_unique<AllStereoHitFilter>();
   } else if (filterName == "random") {
-    return makeUnique<RandomStereoHitFilter>();
+    return std::make_unique<RandomStereoHitFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleStereoHitFilter>();
+    return std::make_unique<SimpleStereoHitFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCStereoHitFilter>();
+    return std::make_unique<MCStereoHitFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingStereoHitFilter>("StereoHitFilter.root");
+    return std::make_unique<RecordingStereoHitFilter>("StereoHitFilter.root");
   } else if (filterName == "mva") {
-    return makeUnique<MVAStereoHitFilter>("tracking/data/trackfindingcdc_StereoHitFilter.xml");
+    return std::make_unique<MVAStereoHitFilter>("tracking/data/trackfindingcdc_StereoHitFilter.xml");
   } else {
     return Super::create(filterName);
   }

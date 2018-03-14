@@ -7,8 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/SimpleSegmentTripleRelationFilter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -28,4 +30,3 @@ Weight SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fro
   // could also be a better measure of fit quality
   return  -toSegmentTriple.getStartSegment()->size();
 }
-

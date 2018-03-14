@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+
 #include <tracking/trackFindingCDC/numerics/Modulo.h>
 
 using namespace Belle2;
@@ -44,7 +44,7 @@ WireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
 
   int iRow = 2 * iWire;
   int iOtherRow = 2 * iOtherWire + deltaShift;
-  int iRowDelta = symmetricModulo(iOtherRow - iRow, 2 * nWires);
+  int iRowDelta = symmetricModuloFast(iOtherRow - iRow, 2 * nWires);
   int absIRowDelta = abs(iRowDelta);
 
   if ((absILayerDifference + absIRowDelta) > 4 or absILayerDifference > 2) return WireNeighborKind(); // Invalid case
@@ -71,7 +71,7 @@ WireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
     slope = -slope;
   }
 
-  int oClockDirection = modulo(slope + 3 , 12);
+  int oClockDirection = moduloFast(slope + 3 , 12);
   return WireNeighborKind(cellDistance, oClockDirection);
 }
 

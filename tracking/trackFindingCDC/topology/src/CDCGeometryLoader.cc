@@ -21,6 +21,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

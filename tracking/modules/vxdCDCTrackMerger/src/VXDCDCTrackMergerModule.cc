@@ -7,19 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerModule.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include "genfit/TrackCand.h"
-#include "genfit/RKTrackRep.h"
-#include <mdst/dataobjects/MCParticle.h>
 
-#include <limits>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
+
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
@@ -36,9 +28,6 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   addParam("CDCRecoTrackColName", m_CDCRecoTrackColName, "CDC Reco Tracks");
   addParam("VXDRecoTrackColName", m_VXDRecoTrackColName, "VXD Reco Tracks");
 
-  //output
-  addParam("MergedRecoTrackColName", m_mergedRecoTrackColName, "Merged Reco Tracks");
-
   //merging parameters
   addParam("merge_radius", m_merge_radius,
            "Maximum distance between extrapolated tracks on the CDC wall",
@@ -49,12 +38,6 @@ void VXDCDCTrackMergerModule::initialize()
 {
   m_CDCRecoTracks.isRequired(m_CDCRecoTrackColName);
   m_VXDRecoTracks.isRequired(m_VXDRecoTrackColName);
-
-  m_mergedRecoTracks.registerInDataStore(m_mergedRecoTrackColName);
-
-  // register all required relations to be able to use RecoTrack
-  // and its relations
-  RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
 
   m_CDCRecoTracks.registerRelationTo(m_VXDRecoTracks);
   m_VXDRecoTracks.registerRelationTo(m_CDCRecoTracks);
@@ -81,17 +64,24 @@ void VXDCDCTrackMergerModule::event()
   TVector3 vxdpos;
   TVector3 vxdmom;
 
-  int currentCdcTrack = -1;
-
-  // list holding the indices of all matched VXD and CDC tracks
-  MatchPairList vxdCdcMatched;
+  // Fit all cdc and vxd tracks
+  TrackFitter fitter;
+  for (auto& cdcTrack : m_CDCRecoTracks) {
+    fitter.fit(cdcTrack);
+  }
+  for (auto& vxdTrack : m_VXDRecoTracks) {
+    fitter.fit(vxdTrack);
+  }
 
   for (auto& cdcTrack : m_CDCRecoTracks) {
-    currentCdcTrack++;
-
     // skip CDC Tracks which were not properly fitted
     if (!cdcTrack.wasFitSuccessful())
       continue;
+
+    // skip CDC if it has already a match
+    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+      continue;
+    }
 
     bool matched_track = false;
 
@@ -109,14 +99,18 @@ void VXDCDCTrackMergerModule::event()
       continue;
     }
 
-    // TODO: this can be done indepentend of each other ....
+    // TODO: this can be done independent of each other ....
     int currentVxdTrack = -1;
     int bestMatchedVxdTrack = 0;
     for (auto& vxdTrack : m_VXDRecoTracks) {
       currentVxdTrack++;
-
       // skip VXD Tracks which were not properly fitted
       if (!vxdTrack.wasFitSuccessful()) {
+        continue;
+      }
+
+      // skip VXD if it has already a match
+      if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
         continue;
       }
 
@@ -166,58 +160,8 @@ void VXDCDCTrackMergerModule::event()
     }    //end loop on VXD tracks
 
     if (matched_track) {
-      vxdCdcMatched.push_back(std::make_pair(bestMatchedVxdTrack, currentCdcTrack));
+      // -1 is the convention for "before the CDC track" in the related tracks combiner
+      m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack, -1);
     }
-  }    //loop on CDC
-
-  // add merged tracks to output collection
-  for (auto match : vxdCdcMatched) {
-    auto vxdTrack = m_VXDRecoTracks[match.first];
-    auto cdcTrack = m_CDCRecoTracks[match.second];
-    auto mergedRecoTrack = m_mergedRecoTracks.appendNew(vxdTrack->getPositionSeed(), vxdTrack->getMomentumSeed(),
-                                                        vxdTrack->getChargeSeed());
-    mergedRecoTrack->addHitsFromRecoTrack(vxdTrack);
-    mergedRecoTrack->addHitsFromRecoTrack(cdcTrack, mergedRecoTrack->getNumberOfTotalHits());
-
-    m_VXDRecoTracks[match.first]->addRelationTo(m_CDCRecoTracks[match.second]);
   }
-
-  auto mergedTracksCount = m_mergedRecoTracks.getEntries();
-  auto singleVxdTracksCount = addUnmatchedTracks(m_VXDRecoTracks, vxdCdcMatched, true);
-  auto singleCdcTracksCount = addUnmatchedTracks(m_CDCRecoTracks, vxdCdcMatched, false);
-
-  B2DEBUG(9, "VXDCDCTrackMerger: Merged Tracks: " << mergedTracksCount << " VXD only: " << singleVxdTracksCount << " CDC only: " <<
-          singleCdcTracksCount);
 }
-
-size_t VXDCDCTrackMergerModule::addUnmatchedTracks(StoreArray<RecoTrack>& singleRecoTracks,
-                                                   MatchPairList const& matchedList, bool useFirstIndex)
-{
-  int currentTrack = -1;
-  size_t addCount = 0;
-  for (auto& singleTrack : singleRecoTracks) {
-    currentTrack++;
-    // are there any matches which used this tracks index ?
-    if (std::count_if(matchedList.begin(), matchedList.end(),
-    [currentTrack, useFirstIndex](MatchPairType const & mp) {
-    if (useFirstIndex)
-        return currentTrack == mp.first;
-      else
-        return currentTrack == mp.second;
-    }) == 0) {
-
-      // make sure the track could be properly fit
-      if (!singleTrack.wasFitSuccessful())
-        continue;
-      // this track has not been used by any matchet combinations, add it
-      auto mergedRecoTrack = m_mergedRecoTracks.appendNew(singleTrack.getPositionSeed(), singleTrack.getMomentumSeed(),
-                                                          singleTrack.getChargeSeed());
-      mergedRecoTrack->addHitsFromRecoTrack(&singleTrack);
-      addCount++;
-    }
-
-  }
-
-  return addCount;
-}
-

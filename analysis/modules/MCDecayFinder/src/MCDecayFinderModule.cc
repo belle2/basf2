@@ -46,8 +46,8 @@ void MCDecayFinderModule::initialize()
   m_antiListName = ParticleListName::antiParticleListName(m_listName);
   m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
-  B2DEBUG(1, "particle list name: " << m_listName);
-  B2DEBUG(1, "antiparticle list name: " << m_antiListName);
+  B2DEBUG(10, "particle list name: " << m_listName);
+  B2DEBUG(10, "antiparticle list name: " << m_antiListName);
 
 
   // Register output particle list, particle store and relation to MCParticles
@@ -93,7 +93,7 @@ void MCDecayFinderModule::event()
     for (int iCC = 0; iCC < 2; iCC++) {
       std::unique_ptr<DecayTree<MCParticle>> decay(match(mcparticles[i], m_decaydescriptor, iCC));
       if (decay->getObj()) {
-        B2DEBUG(1, "Match!");
+        B2DEBUG(19, "Match!");
         int iIndex = write(decay.get());
         outputList->addParticle(particles[iIndex]);
       }
@@ -119,13 +119,13 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   if (!isCC && iPDGD != iPDGP) return decay;
   else if (isCC && (iPDGD != -iPDGP && !isSelfConjugatedParticle)) return decay;
   else if (isCC && (iPDGD !=  iPDGP &&  isSelfConjugatedParticle)) return decay;
-  B2DEBUG(1, "PDG code matched: " << iPDGP);
+  B2DEBUG(19, "PDG code matched: " << iPDGP);
 
   // Get number of daughters in the decay descriptor.
   // If no daughters in decay descriptor, no more checks needed.
   int nDaughtersD = d->getNDaughters();
   if (nDaughtersD == 0) {
-    B2DEBUG(1, "DecayDescriptor has no Daughters, everything OK!");
+    B2DEBUG(19, "DecayDescriptor has no Daughters, everything OK!");
     decay->setObj(const_cast<MCParticle*>(mcp));
     return decay;
   }
@@ -143,10 +143,10 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // 2) if radiated photons are included the number of daughters has to be equal!
   bool isIgnorePhotons = d->isIgnorePhotons();
   if (isIgnorePhotons && nDaughtersD > nDaughtersP) {
-    B2DEBUG(1, "DecayDescriptor has more daughters than MCParticle!");
+    B2DEBUG(10, "DecayDescriptor has more daughters than MCParticle!");
     return decay;
   } else if (!isIgnorePhotons && nDaughtersD != nDaughtersP) {
-    B2DEBUG(1, "DecayDescriptor must have same number of daughters as MCParticle!");
+    B2DEBUG(10, "DecayDescriptor must have same number of daughters as MCParticle!");
     return decay;
   }
 
@@ -194,18 +194,18 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
   bool isInclusive = d->isInclusive();
   if (!isInclusive) {
-    B2DEBUG(1, "Decay is not inclusive, check for left over MCParticles!\n");
+    B2DEBUG(10, "Decay is not inclusive, check for left over MCParticles!\n");
     for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
       // Check if additional photons are to be ignored
       if (isIgnorePhotons && daughtersP[*itDP]->getPDG() == 22) continue;
-      B2DEBUG(1, "There was an additional particle left which is not a photon. Found " << daughtersP[*itDP]->getPDG());
+      B2DEBUG(10, "There was an additional particle left which is not a photon. Found " << daughtersP[*itDP]->getPDG());
       return decay;
     }
   } else {
-    B2DEBUG(1, "Inclusive decay, no need to check for additional unmatched particles!");
+    B2DEBUG(19, "Inclusive decay, no need to check for additional unmatched particles!");
   }
   decay->setObj(const_cast<MCParticle*>(mcp));
-  B2DEBUG(1, "Match found!");
+  B2DEBUG(19, "Match found!");
   return decay;
 }
 

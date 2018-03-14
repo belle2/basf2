@@ -22,7 +22,7 @@ TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
 {
   SpacePoint::m_clustersAssigned = {true, true};
   SpacePoint::m_vxdID = telCluster->getSensorID();
-  if (telCluster == NULL) { throw SpacePoint::InvalidNumberOfClusters(); }
+  B2ASSERT("Creation of TBSpacePoint from nullptr not possible", telCluster != nullptr);
   SpacePoint::m_qualityIndicator = 0.5;
   SpacePoint::m_isAssigned = false;
 
@@ -80,7 +80,8 @@ vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible() const
     }
 
   } else {
-    throw SpacePoint::InvalidDetectorType();
+    //TODO: understand if this check is necessary and perform it, but this exception is deleted from the tracking package.
+    //throw SpacePoint::InvalidDetectorType();
   }
 
   B2DEBUG(50, "TBSpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements");

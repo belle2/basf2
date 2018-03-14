@@ -56,11 +56,12 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
 {
   if (!CheckCOPPERMagic(n)) {
     char err_buf[500];
-    PrintData(m_buffer, m_nwords);
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
+            "[FATAL] ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format. : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
+    printf("[DEBUG] %s", err_buf); fflush(stdout);
+    PrintData(m_buffer, m_nwords);
 
     for (int i = 0; i < 4; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
@@ -68,9 +69,9 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
         CheckCRC16(n, i);
       }
     }
-    printf("[DEBUG] ========== CRC check ended. : block %d =========\n", n);
-    string err_str = err_buf;
-    throw (err_str);
+    printf("[DEBUG] ========== No CRC error. : block %d =========\n", n);
+    // string err_str = err_buf;   throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
   int pos_nwords;
   switch (finesse_num) {
@@ -88,12 +89,14 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       break;
     default :
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
-              finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      sprintf(err_buf,
+              "[FATAL] ERROR_EVENT : Specifined FINESSE number( = %d ) is invalid. Exiting... : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+              finesse_num,
+              65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf;
-      throw (err_str);
-
+      //      string err_str = err_buf;    throw (err_str);
+      exit(1); // to reduce multiple error messages
   }
   return m_buffer[ pos_nwords ];
 
@@ -123,30 +126,34 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   if (flag == 0) {
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   if (err_flag == 1) {
-    PrintData(m_buffer, m_nwords);
+
     char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n%s %s %d\n",
+            "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
-
+    PrintData(m_buffer, m_nwords);
     for (int i = 0; i < 4; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
       if (GetFINESSENwords(n, i) > 0) {
         CheckCRC16(n, i);
       }
     }
-    printf("[DEBUG] ========== CRC error is done. : block %d =========\n", n);
+    printf("[DEBUG] ========== No CRC error. : block %d =========\n", n);
 #ifndef NO_ERROR_STOP
-    string err_str = err_buf; throw (err_str);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
 #endif //NO_ERROR_STOP
   }
   return eve_num;
@@ -157,7 +164,8 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   sprintf(err_buf, "[FATAL] You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s", err_buf); fflush(stdout);
-  string err_str = err_buf; throw (err_str);
+  //  string err_str = err_buf; throw (err_str);
+  exit(1); // to reduce multiple error messages
 
   //   sleep(12345678);
   //   exit(1);
@@ -180,8 +188,10 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   // check Magic words
   //
   if (!CheckCOPPERMagic(n)) {
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
+    sprintf(err_buf,
+            "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
             GetMagicDriverHeader(n), GetMagicFPGAHeader(n), GetMagicFPGATrailer(n), GetMagicDriverTrailer(n),
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -193,8 +203,10 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
-            *cur_evenum_rawcprhdr, evenum_feehdr, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            "[FATAL] ERROR_EVENT : Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            *cur_evenum_rawcprhdr, evenum_feehdr,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
@@ -206,27 +218,33 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
+              "[FATAL] ERROR_EVENT : Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
+              GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER counter jump : i %d prev 0x%x cur 0x%x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
+              GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
   } else {
-    printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x\n",
-           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum);
+    printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x : eve 0x%x exp %d run %d sub %d\n",
+           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum,
+           GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n));
 
     // Check if the first event of a run is zero.
     if ((unsigned int)GetRunNo(n) != (prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT) {
       if (*cur_evenum_rawcprhdr != 0) {
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): i %d preveve 0x%x cureve 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
-                n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
+                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                prev_evenum, *cur_evenum_rawcprhdr,
+                prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
+                *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF,
+                GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         err_flag = 1;
       }
@@ -246,12 +264,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
-            n,
-            GetBlockNwords(n),
-            *cur_evenum_rawcprhdr,
-            GetDriverChkSum(n),
-            CalcDriverChkSum(n),
+            "[FATAL] ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, GetDriverChkSum(n), CalcDriverChkSum(n),
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -263,8 +278,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+            "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -279,9 +295,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
         CheckCRC16(n, i);
       }
     }
-    printf("[DEBUG] ========== CRC check is done. : block %d =========\n", n);
-    string err_str = err_buf;
-    throw (err_str);
+    printf("[DEBUG] ========== No CRC error : block %d =========\n", n);
+    //    string err_str = err_buf;    throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   return;
@@ -377,7 +393,8 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
       }
     }
 #ifndef NO_ERROR_STOP
-    string err_str = err_buf; throw (err_str);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
 #endif
   }
   return;
@@ -397,8 +414,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             "[FATAL] This function should be used for PreRawCOPPERFormat_latest containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n %s %s %d\n",
             m_num_nodes, m_num_events,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;    throw (err_str);
-
+    //    string err_str = err_buf;    throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   //////////////////////////////////////////////////
@@ -430,9 +447,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             "[FATAL] ERROR_EVENT : No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   //
@@ -457,9 +473,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   //
@@ -508,41 +523,136 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
 
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
-  if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
+  unsigned int ff55_higher_bits = 0, ff55_lower_bits = 0;
 
-    if ((m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-      printf("[ERROR] B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+  if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
+    ff55_lower_bits = m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF;
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
              m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
+    if (ff55_lower_bits != 0) {
+      const int linkdown_bit = 15;
+      const int packet_crcerr_bit = 8;
+      if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
+        printf("[FATAL] B2link down on slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      } else {
+        m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+        printf("[FATAL] B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      }
       PrintData(m_buffer, m_nwords);
+      fflush(stdout);
+      exit(1);
     }
   }
+
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
-    if ((m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-      printf("[ERROR] B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
+    ff55_lower_bits = (m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
+    if (ff55_lower_bits != 0) {
+      const int linkdown_bit = 15;
+      const int packet_crcerr_bit = 8;
+      if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
+        printf("[FATAL] B2link down on slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+               m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      } else {
+        m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+        printf("[FATAL] B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+               m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      }
       PrintData(m_buffer, m_nwords);
+      fflush(stdout);
+      exit(1);
     }
   }
+
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
-    if ((m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-      printf("[ERROR] B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
+    ff55_lower_bits = (m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
+    if (ff55_lower_bits != 0) {
+      const int linkdown_bit = 15;
+      const int packet_crcerr_bit = 8;
+      if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
+        printf("[FATAL] B2link down on slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+               m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      } else {
+        m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+        printf("[FATAL] B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+               m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      }
       PrintData(m_buffer, m_nwords);
+      fflush(stdout);
+      exit(1);
     }
   }
+
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
-    if ((m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-      printf("[ERROR] B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+    ff55_higher_bits = (unsigned int)(m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
+                       0xFFFF0000;
+    ff55_lower_bits = (m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
+
+    if (ff55_higher_bits != 0xff550000) {
+      printf("[FATAL] HSLB slotA's trailer magic word(0xff55****) is invalid. : Please check COPPER FIFO status to check if the FIFOs becomes completely full. (cpr**** $ cat /proc/copper/FF_STA, LEF_STA) Or event size is greater than 32kB. ( cpr**** $ staths | grep max ) : eve %8u run %d foooter %.8x : %s %s %d\n",
+             cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
+             m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords); fflush(stdout);
+      exit(1);
+    }
+
+    if (ff55_lower_bits != 0) {
+      const int linkdown_bit = 15;
+      const int packet_crcerr_bit = 8;
+      if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
+        printf("[FATAL] B2link down on slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+               m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      } else {
+        printf("[FATAL] B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+               m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      }
       PrintData(m_buffer, m_nwords);
+      fflush(stdout);
+      exit(1);
     }
   }
 
@@ -581,10 +691,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   //
@@ -627,9 +735,9 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             GetMagicDriverTrailer(datablock_id),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
-
 #ifndef NO_ERROR_STOP
-    string err_str = err_buf; throw (err_str);
+    //    string err_str = err_buf; throw (err_str);
+    exit(1); // to reduce multiple error messages
 #endif
 
   }
@@ -667,9 +775,9 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
           CheckCRC16(datablock_id, i);
         }
       }
-      printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", datablock_id);
-      throw (err_str);
-      //      exit(-1);
+      printf("[DEBUG] ========== No CRC error : block %d =========\n", datablock_id);
+      //      throw (err_str);
+      exit(1); // to reduce multiple error messages
 #endif
 
     }
@@ -722,9 +830,8 @@ void PreRawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
       sprintf(err_buf, "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_latest contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
-      string err_str = err_buf; throw (err_str);
-      //       sleep(12345678);
-      //      exit(-1);
+      //      string err_str = err_buf; throw (err_str);
+      exit(1); // to reduce multiple error messages
 #endif
     }
   }
@@ -912,7 +1019,8 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
                 finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
-        string err_str = err_buf;     throw (err_str);
+        //        string err_str = err_buf;     throw (err_str);
+        exit(1); // to reduce multiple error messages
       }
 
       //calcurate XOR checksum diff.( depends on data-format )
@@ -1004,7 +1112,8 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
             new_rawcopper_chksum,  old_rawcopper_chksum, removed_xor_chksum, old_rawcopper_chksum ^ removed_xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
+    //    string err_str = err_buf;     throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
 
   *(buf_to + pos_nwords_to - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM) = new_rawcopper_chksum;
@@ -1074,7 +1183,7 @@ int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fine
   } else {
     PrintData(m_buffer, m_nwords);
 
-    printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
+    printf("Invalid B2LHSLB magic words : header 0x%x (= should be ffaa**** ) or trailer 0x%x (= should be ff55**** ). Exiting... :%s %s %d\n",
            finesse_buf[ POS_MAGIC_B2LHSLB ],
            finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
            __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -1122,8 +1231,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
             (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
-
+    //    string err_str = err_buf;     throw (err_str);
+    exit(1); // to reduce multiple error messages
   }
   return 1;
 
@@ -1165,7 +1274,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f8000
                                                    | ((DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) & tmp_header.FORMAT_VERSION__MASK)
                                                    | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
-  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
+  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << tmp_header.EXP_SHIFT)
                                             | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
   packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
@@ -1234,7 +1343,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     unsigned int temp_ctime_type = packed_buf[ poswords_to + POS_TT_CTIME_TYPE ];
     packed_buf[ poswords_to + POS_TT_TAG ] = rawcpr_info.eve_num;
     packed_buf[ poswords_to + POS_TT_UTIME ] = rawcpr_info.tt_utime;
-    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << 22) | (rawcpr_info.run_subrun_num &
+    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << tmp_header.EXP_SHIFT) | (rawcpr_info.run_subrun_num &
                                               0x003FFFFF);   // exp. and run #
     packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
     poswords_to += SIZE_B2LFEE_HEADER;

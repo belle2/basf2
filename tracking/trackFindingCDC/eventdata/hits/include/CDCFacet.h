@@ -10,18 +10,17 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-#include <utility>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTangent;
+    class CDCRecoHit2D;
+    class CDCRLWireHit;
+    class ParameterLine2D;
+    class Vector2D;
 
     /**
      * Class representing a triple of neighboring oriented wire with additional trajectory information.
@@ -58,11 +57,15 @@ namespace Belle2 {
 
       /// Getter for the contained line fit information.
       const UncertainParameterLine2D& getFitLine() const
-      { return m_fitLine; }
+      {
+        return m_fitLine;
+      }
 
       /// Setter for the contained line fit information.
       void setFitLine(const UncertainParameterLine2D& fitLine) const
-      { m_fitLine = fitLine; }
+      {
+        m_fitLine = fitLine;
+      }
 
       /**
        *  Getter for the tangential line from the first to the second hit.
@@ -86,69 +89,40 @@ namespace Belle2 {
       ParameterLine2D getMiddleToEndLine() const;
 
       /// Getter for the reconstructed position at the first hit on the fit line
-      Vector2D getStartRecoPos2D() const
-      { return getFitLine()->closest(getStartWire().getRefPos2D()); }
+      Vector2D getStartRecoPos2D() const;
 
       /// Getter for the reconstructed position at the second hit on the fit line
-      Vector2D getMiddleRecoPos2D() const
-      { return getFitLine()->closest(getMiddleWire().getRefPos2D()); }
+      Vector2D getMiddleRecoPos2D() const;
 
       /// Getter for the reconstructed position at the third hit on the fit line
-      Vector2D getEndRecoPos2D() const
-      { return getFitLine()->closest(getEndWire().getRefPos2D()); }
+      Vector2D getEndRecoPos2D() const;
 
       /// Getter for the first reconstucted hit
-      CDCRecoHit2D getStartRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(getStartRLWireHit(), getStartRecoPos2D()); }
+      CDCRecoHit2D getStartRecoHit2D() const;
 
       /// Getter for the second reconstucted hit
-      CDCRecoHit2D getMiddleRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(getMiddleRLWireHit(), getMiddleRecoPos2D()); }
+      CDCRecoHit2D getMiddleRecoHit2D() const;
 
       /// Getter for the third reconstucted hit
-      CDCRecoHit2D getEndRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(getEndRLWireHit(), getEndRecoPos2D()); }
+      CDCRecoHit2D getEndRecoHit2D() const;
 
       /// Getter for the tangential line including the hits from the first to the second hit.
-      CDCTangent getStartToMiddle() const
-      { return CDCTangent(getStartRLWireHit(), getEndRLWireHit(), getStartToMiddleLine()); }
+      CDCTangent getStartToMiddle() const;
 
       /// Getter for the tangential line including the hits from the first to the third hit.
-      CDCTangent getStartToEnd() const
-      { return CDCTangent(getStartRLWireHit(), getEndRLWireHit(), getStartToEndLine()); }
+      CDCTangent getStartToEnd() const;
 
       /// Getter for the tangential line including the hits from the second to the third hit.
-      CDCTangent getMiddleToEnd() const
-      { return CDCTangent(getMiddleRLWireHit(), getEndRLWireHit(), getMiddleToEndLine()); }
+      CDCTangent getMiddleToEnd() const;
 
       /// Unset the masked flag of the facet's automaton cell and of the three contained wire hits.
-      void unsetAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().unsetMaskedFlag();
-        getStartWireHit().getAutomatonCell().unsetMaskedFlag();
-        getMiddleWireHit().getAutomatonCell().unsetMaskedFlag();
-        getEndWireHit().getAutomatonCell().unsetMaskedFlag();
-      }
+      void unsetAndForwardMaskedFlag() const;
 
       /// Sets the masked flag of the facet's automaton cell and of the three contained wire hits.
-      void setAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().setMaskedFlag();
-        getStartWireHit().getAutomatonCell().setMaskedFlag();
-        getMiddleWireHit().getAutomatonCell().setMaskedFlag();
-        getEndWireHit().getAutomatonCell().setMaskedFlag();
-      }
+      void setAndForwardMaskedFlag() const;
 
       /// If one of the contained wire hits is marked as masked this facet is set be masked as well.
-      void receiveMaskedFlag() const
-      {
-        if (getStartWireHit().getAutomatonCell().hasMaskedFlag() or
-            getMiddleWireHit().getAutomatonCell().hasMaskedFlag() or
-            getEndWireHit().getAutomatonCell().hasMaskedFlag()) {
-
-          getAutomatonCell().setMaskedFlag();
-        }
-      }
+      void receiveMaskedFlag() const;
 
       /// Mutable getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const

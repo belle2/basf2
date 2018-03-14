@@ -20,6 +20,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ThrustOfEvent.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -131,7 +132,7 @@ namespace Belle2 {
 
       StoreArray<Track> tracks;
       for (int i = 0; i < tracks.getEntries(); ++i) {
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResult(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
         if (iTrack == nullptr) continue;
         TLorentzVector momtrack(iTrack->getMomentum(), 0);
         if (momtrack == momtrack) totalMomChargedtracks += momtrack;
@@ -253,6 +254,30 @@ namespace Belle2 {
       return T.getBeamParams().getMass();
     }
 
+    double getBeamPx(const Particle*)
+    {
+      PCmsLabTransform T;
+      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Px();
+    }
+
+    double getBeamPy(const Particle*)
+    {
+      PCmsLabTransform T;
+      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Py();
+    }
+
+    double getBeamPz(const Particle*)
+    {
+      PCmsLabTransform T;
+      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Pz();
+    }
+
+    double getBeamE(const Particle*)
+    {
+      PCmsLabTransform T;
+      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).E();
+    }
+
     double getIPX(const Particle*)
     {
       PCmsLabTransform T;
@@ -288,6 +313,18 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       return T.getBeamParams().getCovVertex()(elementI, elementJ);
+    }
+
+
+    double thrustOfEvent(const Particle*)
+    {
+      StoreObjPtr<ThrustOfEvent> thrust;
+      if (!thrust) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double th = thrust->getThrust();
+      return th;
     }
 
 
@@ -327,11 +364,18 @@ namespace Belle2 {
     REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] LER energy");
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
     REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Crossing angle");
+    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");
+    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Beam momentum Px (lab)");
+    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");
+    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Beam momentum Pz (lab)");
 
     REGISTER_VARIABLE("IPX", getIPX, "[Eventbased] x coordinate of the IP");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the IP");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
 
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
+
+    REGISTER_VARIABLE("thrustOfEvent", thrustOfEvent, "[Eventbased] Thrust of the event obtained with ThrustOfEvent module")
+
   }
 }

@@ -16,7 +16,11 @@
 
 #include <string>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include "trg/ecl/TrgEclMaster.h"
+#include "trg/ecl/dataobjects/TRGECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLTrg.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 namespace Belle2 {
 
@@ -104,6 +108,9 @@ namespace Belle2 {
     //! Event selection
     int _SelectEvent;
 
+    StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
+    StoreArray<TRGECLTrg> m_TRGECLTrg; /**< output for TRGECLTrg */
+    StoreArray<TRGECLCluster> m_TRGECLCluster; /**< output for TRGECLCluster */
 
   };
 

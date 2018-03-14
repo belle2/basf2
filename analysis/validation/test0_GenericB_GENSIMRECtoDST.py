@@ -3,7 +3,7 @@
 
 """
 <header>
-  <output>GenericB_GENSIMRECtoDST.dst.root</output>
+  <output>../GenericB_GENSIMRECtoDST.dst.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """

@@ -45,9 +45,9 @@ namespace Belle2 {
        * possible to use the Geant4 Navigator for non-simulation purposes. Only
        * during simulation the sensitive detectors will be enabled to record
        * hits
-       * @param active bool to indicate wether hits should be recorded
+       * @param activeStatus bool to indicate wether hits should be recorded
        */
-      static void setActive(bool active) { s_active = active; }
+      static void setActive(bool activeStatus) { s_active = activeStatus; }
       /** Register an relation involving MCParticles.
        * All Relations which point from an MCParticle to something have to be
        * registered with addMCParticleRelation() because the index of the

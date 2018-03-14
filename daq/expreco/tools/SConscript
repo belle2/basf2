@@ -1,7 +1,12 @@
 Import('env')
 
-env['TOOLS_LIBS']['ereco_eventserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['ereco_distributor'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['ereco_eventprocessor'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['ereco_master_local'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['ereco_master'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['ereco_eventsampler'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['eventserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['eventsampler'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['evserverd'] = ['daq', 'framework', '$ROOT_LIBS' ]
 
 Return('env')

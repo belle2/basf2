@@ -171,3 +171,6 @@
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.
 [INFO] ================================================================================
 
+[INFO] The random number seed is set to "something important"
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems

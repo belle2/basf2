@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
     /** Get statistics for given module. */
-    const ModuleStatistics* get(boost::shared_ptr<Module> module);
+    const ModuleStatistics* get(std::shared_ptr<Module> module);
 
     /** Get statistics for the framework itself. */
     const ModuleStatistics* getGlobal();

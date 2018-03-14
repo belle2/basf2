@@ -15,8 +15,7 @@
 //! E.g. not the whole mem is dumped, but only a part of it.
 //! *************************************************************
 
-#ifndef PXDRAWADC_H
-#define PXDRAWADC_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -67,7 +66,7 @@ namespace Belle2 {
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object */
     unsigned short m_dhp_header; /**< needed for Chip id */
-    unsigned char m_adcs[64 * 1024]; /**< Raw ADC data as it is memmory dumped by the DHP */
+    unsigned char m_adcs[64 * 1024]; /**< Raw ADC data as it is memory dumped by the DHP */
 
     // ~PXDRawAdc();
 
@@ -76,4 +75,4 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif
+

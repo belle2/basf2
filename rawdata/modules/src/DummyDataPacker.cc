@@ -57,13 +57,13 @@ void DummyDataPackerModule::initialize()
   /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 
-  raw_cprarray.registerPersistent();
-  raw_svdarray.registerPersistent();
-  raw_cdcarray.registerPersistent();
-  raw_bpidarray.registerPersistent();
-  raw_epidarray.registerPersistent();
-  raw_eclarray.registerPersistent();
-  raw_klmarray.registerPersistent();
+  raw_cprarray.registerInDataStore();
+  raw_svdarray.registerInDataStore();
+  raw_cdcarray.registerInDataStore();
+  raw_bpidarray.registerInDataStore();
+  raw_epidarray.registerInDataStore();
+  raw_eclarray.registerInDataStore();
+  raw_klmarray.registerInDataStore();
   B2INFO("DummyDataPacker: initialize() done.");
 }
 
@@ -124,26 +124,26 @@ void DummyDataPackerModule::event()
 
     nwords_1st_hslb = n_basf2evt % 10 + 1;
     buf_hslb1 = new int[ nwords_1st_hslb];
-    for (int i = 0; i < nwords_1st_hslb; i++) {
-      buf_hslb1[ i ] = i;
+    for (int j = 0; j < nwords_1st_hslb; j++) {
+      buf_hslb1[ j ] = i + j;
     }
 
     nwords_2nd_hslb = (n_basf2evt + 1) % 10 + 1;
     buf_hslb2 = new int[ nwords_2nd_hslb];
-    for (int i = 0; i < nwords_2nd_hslb; i++) {
-      buf_hslb2[ i ] = i + 1;
+    for (int j = 0; j < nwords_2nd_hslb; j++) {
+      buf_hslb2[ j ] = i + j + 1;
     }
 
     nwords_3rd_hslb = 3 * (n_basf2evt + 2) % 10 + 1;
     buf_hslb3 = new int[ nwords_3rd_hslb];
-    for (int i = 0; i < nwords_3rd_hslb; i++) {
-      buf_hslb3[ i ] = i + 2;
+    for (int j = 0; j < nwords_3rd_hslb; j++) {
+      buf_hslb3[ j ] = i + j + 2;
     }
 
     nwords_4th_hslb = 4 * (n_basf2evt + 3)  % 10 + 1;
     buf_hslb4 = new int[ nwords_4th_hslb];
-    for (int i = 0; i < nwords_4th_hslb; i++) {
-      buf_hslb4[ i ] = i + 3;
+    for (int j = 0; j < nwords_4th_hslb; j++) {
+      buf_hslb4[ j ] = i + j + 3;
     }
 
     raw_svd->PackDetectorBuf(buf_hslb1, nwords_1st_hslb,
@@ -169,7 +169,7 @@ void DummyDataPackerModule::event()
   m_eventMetaDataPtr->setRun(rawcprpacker_info.run_subrun_num);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
-  printf("Event # %.8d\n", n_basf2evt);
+  B2DEBUG(0, "Event # " <<  n_basf2evt << endl);
   fflush(stdout);
 
   //
@@ -177,8 +177,7 @@ void DummyDataPackerModule::event()
   //
   if (max_nevt >= 0) {
     if (n_basf2evt >= max_nevt && max_nevt > 0) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n",
-             max_nevt , n_basf2evt);
+      B2DEBUG(0, "[DEBUG] RunStop was detected. ( Setting:  Max event #" << max_nevt << ") Processed Event" << n_basf2evt << endl);
       fflush(stdout);
       m_eventMetaDataPtr->setEndOfData();
     }

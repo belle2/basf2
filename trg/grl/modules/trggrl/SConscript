@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'trg','trg_trg', 'trg_cdc_dataobjects','trg_ecl_dataobjects', 'trg_grl_dataobjects', 'trg_klm_dataobjects']
+env['LIBS'] = ['framework','$ROOT_LIBS','analysis', 'analysis_utility', 'trg','trg_trg', 'trg_cdc_dataobjects','trg_ecl_dataobjects', 'trg_grl_dataobjects', 'trg_klm_dataobjects']
 #print env.Dump()
 
 Return('env')

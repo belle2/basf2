@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Main reconstruction splitter code for the N1 hypothesis.               *
+ * Main reconstruction splitter code for the n photon hypothesis.         *
  * Based on a connected region (CR) we look for local maxima and          *
  * create one shower for each local maximum (LM). In case of multiple     *
  * LM in one CR the energy is shared between the showers based on         *
@@ -29,6 +29,8 @@
 // ECL
 #include <ecl/utility/Position.h>
 
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 // OTHER
 #include <string>
 #include <utility>      // std::pair
@@ -56,22 +58,23 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
   m_eclEventInformation(eclEventInformationName())
 {
   // Set description.
-  setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the all photon hypothesis (N1).");
+  setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the n photon hypothesis.");
   addParam("fullBkgdCount", m_fullBkgdCount, "Number of background digits at full background (as provided by ECLEventInformation).",
            182);
 
   // Set module parameters.
 
   // Splitter.
+  addParam("threshold", m_threshold, "Threshold energy after splitting.", 7.5 * Belle2::Unit::MeV);
   addParam("expConstant", m_expConstant, "Constant a from exp(-a*dist/RM), typical: 1.5 to 3.5?", 2.5); // to be optimized!
   addParam("maxIterations", m_maxIterations, "Maximum number of iterations for centroid shifts.", 100);
   addParam("shiftTolerance", m_shiftTolerance, "Tolerance level for centroid shifts.", 1.0 * Belle2::Unit::mm);
   addParam("minimumSharedEnergy", m_minimumSharedEnergy, "Minimum shared energy.", 25.0 * Belle2::Unit::keV);
   addParam("maxSplits", m_maxSplits, "Maximum number of splits within one connected region.", 10);
   addParam("cutDigitEnergyForEnergy", m_cutDigitEnergyForEnergy,
-           "Minimum digit energy to be included in the shower energy calculation.", 0.5 * Belle2::Unit::MeV);
+           "Minimum digit energy to be included in the shower energy calculation. (NOT USED)", 0.5 * Belle2::Unit::MeV);
   addParam("cutDigitTimeResidualForEnergy", m_cutDigitTimeResidualForEnergy,
-           "Maximum time residual to be included in the shower energy calculation.", 5.0);
+           "Maximum time residual to be included in the shower energy calculation. (NOT USED)", 5.0);
 
   // Neighbour definitions
   addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,
@@ -189,13 +192,13 @@ void ECLSplitterN1Module::event()
     // list theat will hold all cellids in this connected region
     m_cellIdInCR.clear();
 
-    const unsigned int entries = (aCR.getRelationsWith<ECLCalDigit>()).size();
+    const unsigned int entries = (aCR.getRelationsWith<ECLCalDigit>(eclCalDigitArrayName())).size();
 
     m_cellIdInCR.resize(entries);
 
     // Fill all calDigits ids in this CR into a vector to make them 'find'-able.
     int i = 0;
-    for (const auto& caldigit : aCR.getRelationsWith<ECLCalDigit>()) {
+    for (const auto& caldigit : aCR.getRelationsWith<ECLCalDigit>(eclCalDigitArrayName())) {
       m_cellIdInCR[i] = caldigit.getCellId();
       ++i;
     }
@@ -237,7 +240,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   }
 
   // Get the number of LMs in this CR
-  const int nLocalMaximums = aCR.getRelationsWith<ECLLocalMaximum>().size();
+  const int nLocalMaximums = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName()).size();
 
   B2DEBUG(175, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
 
@@ -265,7 +268,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     unsigned int highestEnergyID = 0;
 
     // Add relation to the LM.
-    RelationVector<ECLLocalMaximum> locmaxvector = aCR.getRelationsWith<ECLLocalMaximum>();
+    RelationVector<ECLLocalMaximum> locmaxvector = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName());
     aECLShower->addRelationTo(locmaxvector[0]);
 
     const int locmaxcellid = locmaxvector[0]->getCellId();
@@ -292,12 +295,12 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
                                 neighbourId); // check if the neighbour is in the list for this CR
       if (it == m_cellIdInCR.end()) continue; // not in this CR
 
-      const int pos = m_StoreArrPosition[neighbourId];
-      digits.push_back(*m_eclCalDigits[pos]); // list of digits for position reconstruction
+      const int neighbourpos = m_StoreArrPosition[neighbourId];
+      digits.push_back(*m_eclCalDigits[neighbourpos]); // list of digits for position reconstruction
       weights.push_back(1.0); // list of weights (all 1 in this case for now)
       weightSum += 1.0;
 
-      aECLShower->addRelationTo(m_eclCalDigits[pos], 1.0); // add digits to this shower, weight = 1
+      aECLShower->addRelationTo(m_eclCalDigits[neighbourpos], 1.0); // add digits to this shower, weight = 1
     }
 
     // Get position.
@@ -345,30 +348,31 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
     // Fill shower Ids
     aECLShower->setShowerId(1); // always one (only this single shower in the CR)
-    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+    aECLShower->setHypothesisId(Belle2::ECLCluster::c_nPhotons);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).
     const int posLM = m_StoreArrPositionLM[locmaxcellid];
     for (const auto& aDigit : aCR.getRelationsWith<ECLCalDigit>()) {
-      const int pos = m_StoreArrPosition[aDigit.getCellId()];
-      m_eclLocalMaximums[posLM]->addRelationTo(m_eclCalDigits[pos], 1.0);
+      const int posDigit = m_StoreArrPosition[aDigit.getCellId()];
+      m_eclLocalMaximums[posLM]->addRelationTo(m_eclCalDigits[posDigit], 1.0);
     }
 
-  } else { // this is the really interesing part where showers are split. this alogorithm is based on BaBar code.
+  } // end case with one LM
+  else { // this is the really interesing part where showers are split. this alogorithm is based on BaBar code.
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
     std::map<int, B2Vector3D> centroidList; // key = cellid, value = centroid position
     std::map<int, double> centroidEnergyList; // key = cellid, value = centroid position
-    std::map<int, B2Vector3D> centroidPoints; // key = locmaxid (as index), value = centroid position
-    std::map<int, B2Vector3D> localMaximumsPoints; // key = locmaxid, value = maximum position
     std::map<int, B2Vector3D> allPoints; // key = cellid, value = digit position
     std::map<int, std::vector < double > > weightMap; // key = locmaxid, value = vector of weights
     std::vector < ECLCalDigit > digitVector; // the order of weights in weightMap must be the same
 
     // Fill the maxima positions in a map
-    for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>()) {
+    std::map<int, B2Vector3D> localMaximumsPoints; // key = locmaxid, value = maximum position
+    std::map<int, B2Vector3D> centroidPoints; // key = locmaxid (as index), value = centroid position
+    for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
 
       int cellid = aLocalMaximum.getCellId();
 
@@ -378,183 +382,237 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       centroidPoints.insert(std::map<int, B2Vector3D>::value_type(cellid, vectorPosition));
     }
 
-    // Fill all digits from this CR in a map
-    for (auto& aCalDigit : aCR.getRelationsWith<ECLCalDigit>()) {
-      const int cellid = aCalDigit.getCellId();
-      // get the position of this crystal and fill them in a map
-      B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);
-      allPoints.insert(std::map<int, B2Vector3D>::value_type(cellid, vectorPosition));
-      digits.push_back(aCalDigit);
-    }
-
-    for (const auto& digitpoint : allPoints) {
-      const int cellid = digitpoint.first;
-      const int pos = m_StoreArrPosition[cellid];
-      digitVector.push_back(*m_eclCalDigits[pos]);
-    }
-
-    // -----------------------------------------------------------------------------------------
-    // The 'heart' of the splitter
-    // Start with each local maximum and set it to the first centroid position. Then iterate over all ECLCalDigits
-    // in this CR and calculate the weighted distances to the local maximum
-    int nIterations = 0;
-    double centroidShiftAverage = 0.0;
-    //    double lastcentroidShiftAverage = 0.0;
-
+    // The following will be done iteratively. Empty clusters after splitting will be removed, and the procedure will be repeated.
+    bool iterateclusters = true;
     do {
-      B2DEBUG(175, "Iteration: #" << nIterations << " (of max. " << m_maxIterations << ")");
+      digits.clear();
+      weights.clear();
+      centroidList.clear();
+      centroidEnergyList.clear();
+      allPoints.clear();
+      weightMap.clear();
+      digitVector.clear();
 
-      centroidShiftAverage = 0.0;
-      if (nIterations == 0) {
-        centroidList.clear();
-        centroidEnergyList.clear();
-        weightMap.clear();
+      // Fill all digits from this CR in a map
+      for (auto& aCalDigit : aCR.getRelationsWith<ECLCalDigit>(eclCalDigitArrayName())) {
+        const int cellid = aCalDigit.getCellId();
+        // get the position of this crystal and fill them in a map
+        B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);
+        allPoints.insert(std::map<int, B2Vector3D>::value_type(cellid, vectorPosition));
+        digits.push_back(aCalDigit);
       }
 
-      // Loop over all local maximums points, each one will become a shower!
-      for (const auto& locmaxpoint : localMaximumsPoints) {
+      for (const auto& digitpoint : allPoints) {
+        const int cellid = digitpoint.first;
+        const int pos = m_StoreArrPosition[cellid];
+        digitVector.push_back(*m_eclCalDigits[pos]);
+      }
 
-        // cell id of this local maximum
-        const int locmaxcellid = locmaxpoint.first;
 
-        // clear weights vector
-        weights.clear();
+      // -----------------------------------------------------------------------------------------
+      // The 'heart' of the splitter
+      // Start with each local maximum and set it to the first centroid position. Then iterate over all ECLCalDigits
+      // in this CR and calculate the weighted distances to the local maximum
+      int nIterations = 0;
+      double centroidShiftAverage = 0.0;
+      //    double lastcentroidShiftAverage = 0.0;
 
-        // if this is the first iteration the shower energy is not know, take the local maximum energy * 1.5.
+      do {
+        B2DEBUG(175, "Iteration: #" << nIterations << " (of max. " << m_maxIterations << ")");
+
+        centroidShiftAverage = 0.0;
         if (nIterations == 0) {
-          const int pos = m_StoreArrPosition[locmaxcellid];
-          const double locmaxenergy = m_eclCalDigits[pos]->getEnergy();
-          centroidEnergyList[locmaxcellid] = 1.5 * locmaxenergy;
+          centroidList.clear();
+          centroidEnergyList.clear();
+          weightMap.clear();
         }
 
-        B2DEBUG(175, "local maximum cellid: " << locmaxcellid);
+        // Loop over all local maximums points, each one will become a shower!
+        for (const auto& locmaxpoint : localMaximumsPoints) {
 
-        //-------------------------------------------------------------------
-        // Loop over all digits. They get a weight using the distance to the respective centroid.
-        int nDigit = 0;
-        for (const auto& digitpoint : allPoints) {
+          // cell id of this local maximum
+          const int locmaxcellid = locmaxpoint.first;
 
-          // cellid and position of this digit
-          const int digitcellid = digitpoint.first;
-          B2Vector3D digitpos = digitpoint.second;
+          // clear weights vector
+          weights.clear();
 
-          const int pos = m_StoreArrPosition[digitcellid];
-          const double digitenergy = m_eclCalDigits[pos]->getEnergy();
+          // if this is the first iteration the shower energy is not know, take the local maximum energy * 1.5.
+          if (nIterations == 0) {
+            const int pos = m_StoreArrPosition[locmaxcellid];
+            const double locmaxenergy = m_eclCalDigits[pos]->getEnergy();
+            centroidEnergyList[locmaxcellid] = 1.5 * locmaxenergy;
+          }
 
-          double weight            = 0.0;
-          double energy            = 0.0;
-          double distance          = 0.0;
-          double distanceEnergySum = 0.0;
+          B2DEBUG(175, "local maximum cellid: " << locmaxcellid);
 
-          // Loop over all centroids
-          for (const auto& centroidpoint : centroidPoints) {
+          //-------------------------------------------------------------------
+          // Loop over all digits. They get a weight using the distance to the respective centroid.
+          int nDigit = 0;
+          for (const auto& digitpoint : allPoints) {
 
-            // cell id and position of this centroid
-            const int centroidcellid = centroidpoint.first;
-            B2Vector3D centroidpos = centroidpoint.second;
+            // cellid and position of this digit
+            const int digitcellid = digitpoint.first;
+            B2Vector3D digitpos = digitpoint.second;
 
-            double thisdistance = 0.;
+            const int pos = m_StoreArrPosition[digitcellid];
+            const double digitenergy = m_eclCalDigits[pos]->getEnergy();
 
-            // in the first iteration, this distance is really zero, avoid floating point problems
-            if (nIterations == 0 and digitcellid == centroidcellid) {
-              thisdistance = 0.0;
+            double weight            = 0.0;
+            double energy            = 0.0;
+            double distance          = 0.0;
+            double distanceEnergySum = 0.0;
+
+            // Loop over all centroids
+            for (const auto& centroidpoint : centroidPoints) {
+
+              // cell id and position of this centroid
+              const int centroidcellid = centroidpoint.first;
+              B2Vector3D centroidpos = centroidpoint.second;
+
+              double thisdistance = 0.;
+
+              // in the first iteration, this distance is really zero, avoid floating point problems
+              if (nIterations == 0 and digitcellid == centroidcellid) {
+                thisdistance = 0.0;
+              } else {
+                B2Vector3D vectorDistance = ((centroidpos) - (digitpos));
+                thisdistance = vectorDistance.Mag();
+              }
+
+              // energy of the centroid aka locmax
+              const int thispos = m_StoreArrPosition[centroidcellid];
+              const double thisenergy = m_eclCalDigits[thispos]->getEnergy();
+
+              // Not  the most efficienct way to get this information, but not worth the thinking yet:
+              if (locmaxcellid == centroidcellid) {
+                distance = thisdistance;
+                energy = thisenergy;
+              }
+
+              // Get the product of distance and energy.
+              const double expfactor = exp(-m_expConstant * thisdistance / c_molierRadius);
+              distanceEnergySum += (thisenergy * expfactor);
+
+            } // end centroidPoints
+
+            // Calculate the weight for this digits for this local maximum.
+            if (distanceEnergySum > 0.0) {
+              const double expfactor = exp(-m_expConstant * distance / c_molierRadius);
+              weight = energy * expfactor / distanceEnergySum;
             } else {
-              B2Vector3D vectorDistance = ((centroidpos) - (digitpos));
-              thisdistance = vectorDistance.Mag();
+              weight = 0.0;
             }
 
-            // energy of the centroid aka locmax
-            const int thispos = m_StoreArrPosition[centroidcellid];
-            const double thisenergy = m_eclCalDigits[thispos]->getEnergy();
-
-            // Not  the most efficienct way to get this information, but not worth the thinking yet:
-            if (locmaxcellid == centroidcellid) {
-              distance = thisdistance;
-              energy = thisenergy;
+            // Check if the weighted energy is above threshold
+            if ((digitenergy * weight) < m_minimumSharedEnergy) {
+              weight = 0.0;
             }
 
-            // Get the product of distance and energy.
-            const double expfactor = exp(-m_expConstant * thisdistance / c_molierRadius);
-            distanceEnergySum += (thisenergy * expfactor);
+            // Check for rounding problems larger than unity
+            if (weight > 1.0) {
+              B2WARNING("ECLCRSplitterModule::splitConnectedRegion: Floating point glitch, weight for this digit " << weight <<
+                        ", resetting it to 1.0.");
+              weight = 1.0;
+            }
 
-          } // end centroidPoints
+            // Fill the weight for this digits and this local maximum.
+            B2DEBUG(175, "   cellid: " << digitcellid << ", energy: " << digitenergy << ", weight: " << weight << ", distance: " << distance);
+            weights.push_back(weight);
+            ++nDigit;
 
-          // Calculate the weight for this digits for this local maximum.
-          if (distanceEnergySum > 0.0) {
-            const double expfactor = exp(-m_expConstant * distance / c_molierRadius);
-            weight = energy * expfactor / distanceEnergySum;
-          } else {
-            weight = 0.0;
-          }
+          } // end allPoints
 
-          // Check if the weighted energy is above threshold
-          if ((digitenergy * weight) < m_minimumSharedEnergy) {
-            weight = 0.0;
-          }
+          // Get the old centroid position.
+          B2Vector3D oldCentroidPos = (centroidPoints.find(locmaxcellid))->second;
 
-          // Check for rounding problems larger than unity
-          if (weight > 1.0) {
-            B2WARNING("ECLCRSplitterModule::splitConnectedRegion: Floating point glitch, weight for this digit " << weight <<
-                      ", resetting it to 1.0.");
-            weight = 1.0;
-          }
+          // Calculate the new centroid position.
+          B2Vector3D newCentroidPos = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
 
-          // Fill the weight for this digits and this local maximum.
-          B2DEBUG(175, "   cellid: " << digitcellid << ", energy: " << digitenergy << ", weight: " << weight << ", distance: " << distance);
-          weights.push_back(weight);
-          ++nDigit;
+          // Calculate new energy
+          const double newEnergy = Belle2::ECL::computeEnergySum(digits, weights);
 
-        } // end allPoints
+          // Calculate the shift of the centroid position for this local maximum.
+          const B2Vector3D centroidShift = (oldCentroidPos - newCentroidPos);
 
-        // Get the old centroid position.
-        B2Vector3D oldCentroidPos = (centroidPoints.find(locmaxcellid))->second;
+          // Save the new centroid position (but dont update yet!), also save the weights and energy.
+          centroidList[locmaxcellid] = newCentroidPos;
+          weightMap[locmaxcellid] = weights;
 
-        // Calculate the new centroid position.
-        B2Vector3D newCentroidPos = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
+          B2DEBUG(175, "--> inserting new energy: " << newEnergy << " for local maximum " << locmaxcellid);
+          centroidEnergyList[locmaxcellid] = newEnergy;
+          double showerenergy = (*centroidEnergyList.find(locmaxcellid)).second / Belle2::Unit::MeV;
+          B2DEBUG(175, "--> new energy = " << showerenergy << " MeV");
 
-        // Calculate new energy
-        const double newEnergy = Belle2::ECL::computeEnergySum(digits, weights);
+          // Add this to the average centroid shift.
+          centroidShiftAverage += centroidShift.Mag();
 
-        // Calculate the shift of the centroid position for this local maximum.
-        const B2Vector3D centroidShift = (oldCentroidPos - newCentroidPos);
+          // Debugging output
+          B2DEBUG(175, "   old centroid: " << oldCentroidPos.x() << " cm, " <<  oldCentroidPos.y() << " cm, " <<  oldCentroidPos.z() <<
+                  "cm");
+          B2DEBUG(175, "   new centroid: " << newCentroidPos.x() << " cm, " <<  newCentroidPos.y() << " cm, " <<  newCentroidPos.z() <<
+                  "cm");
+          B2DEBUG(175, "   centroid shift: " << centroidShift.Mag() << " cm");
 
-        // Save the new centroid position (but dont update yet!), also save the weights and energy.
-        centroidList[locmaxcellid] = newCentroidPos;
-        weightMap[locmaxcellid] = weights;
+        } // end localMaximumsPoints
 
-        B2DEBUG(175, "--> inserting new energy: " << newEnergy << " for local maximum " << locmaxcellid);
-        centroidEnergyList[locmaxcellid] = newEnergy;
-        double showerenergy = (*centroidEnergyList.find(locmaxcellid)).second / Belle2::Unit::MeV;
-        B2DEBUG(175, "--> new energy = " << showerenergy << " MeV");
+        // Get the average centroid shift.
+        centroidShiftAverage /= static_cast<double>(nLocalMaximums);
+        //      lastcentroidShiftAverage = centroidShiftAverage;
+        B2DEBUG(175, "--> average centroid shift: " << centroidShiftAverage << " cm (tolerance is " << m_shiftTolerance << " cm)");
 
-        // Add this to the average centroid shift.
-        centroidShiftAverage += centroidShift.Mag();
+        // Update centroid positions for the next round
+        for (const auto& locmaxpoint : localMaximumsPoints) {
+          centroidPoints[locmaxpoint.first] = (centroidList.find(locmaxpoint.first))->second;
+        }
 
-        // Debugging output
-        B2DEBUG(175, "   old centroid: " << oldCentroidPos.x() << " cm, " <<  oldCentroidPos.y() << " cm, " <<  oldCentroidPos.z() <<
-                "cm");
-        B2DEBUG(175, "   new centroid: " << newCentroidPos.x() << " cm, " <<  newCentroidPos.y() << " cm, " <<  newCentroidPos.z() <<
-                "cm");
-        B2DEBUG(175, "   centroid shift: " << centroidShift.Mag() << " cm");
+        ++nIterations;
 
-      } // end localMaximumsPoints
+      } while (nIterations < m_maxIterations and centroidShiftAverage > m_shiftTolerance);
+      // DONE!
 
-      // Get the average centroid shift.
-      centroidShiftAverage /= static_cast<double>(nLocalMaximums);
-      //      lastcentroidShiftAverage = centroidShiftAverage;
-      B2DEBUG(175, "--> average centroid shift: " << centroidShiftAverage << " cm (tolerance is " << m_shiftTolerance << " cm)");
-
-      // Update centroid positions for the next round
+      // check that local maxima are still local maxima
+      std::vector<int> markfordeletion;
+      iterateclusters = false;
       for (const auto& locmaxpoint : localMaximumsPoints) {
-        centroidPoints[locmaxpoint.first] = (centroidList.find(locmaxpoint.first))->second;
+
+        // Get locmax cellid
+        const int locmaxcellid = locmaxpoint.first;
+        const int pos = m_StoreArrPosition[locmaxcellid];
+
+        B2DEBUG(175, "locmaxcellid: " << locmaxcellid);
+        const double lmenergy = m_eclCalDigits[pos]->getEnergy();
+        B2DEBUG(175, "ok: ");
+
+        // Get the weight vector.
+        std::vector < double > myWeights = (*weightMap.find(locmaxcellid)).second;
+
+        for (unsigned int i = 0; i < digitVector.size(); ++i) {
+
+          const ECLCalDigit dig = digitVector[i];
+          const double weight = myWeights[i];
+          const int cellid = dig.getCellId();
+          const double energy = dig.getEnergy();
+
+          // two ways to fail:
+          // 1) another cell has more energy: energy*weight > lmenergy and cellid != locmaxcellid
+          // 2) local maximum has cell has less than threshold energy left: energy*weight < m_threshold and cellid == locmaxcellid
+          if ((energy * weight > lmenergy and cellid != locmaxcellid) or (energy * weight < m_threshold and cellid == locmaxcellid)) {
+            markfordeletion.push_back(locmaxcellid);
+            iterateclusters = true;
+            continue;
+          }
+        }
       }
 
-      ++nIterations;
+      // delete LMs
+      for (const auto lmid : markfordeletion) {
+        localMaximumsPoints.erase(lmid);
+        centroidPoints.erase(lmid);
+      }
 
-    } while (nIterations < m_maxIterations and centroidShiftAverage > m_shiftTolerance);
-    // DONE!
+    } while (iterateclusters);
 
-    // Create the ECLShower objects, one per LocalMaximum
+    // Create the ECLShower objects, one per LocalMaximumPoints
     unsigned int iShower = 1;
     for (const auto& locmaxpoint : localMaximumsPoints) {
 
@@ -580,8 +638,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       std::vector < double > myWeights = (*weightMap.find(locmaxcellid)).second;
 
       // Loop over all digits.
-      std::vector<ECLCalDigit> digits;
-      std::vector<double> weights;
+      std::vector<ECLCalDigit> newdigits;
+      std::vector<double> newweights;
       double highestEnergy = 0.;
       double highestEnergyTime = 0.;
       double highestEnergyTimeResolution = 0.;
@@ -589,10 +647,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       for (unsigned int i = 0; i < digitVector.size(); ++i) {
 
-        const ECLCalDigit digit = digitVector[i];
+        const ECLCalDigit dig = digitVector[i];
         const double weight = myWeights[i];
 
-        const int cellid = digit.getCellId();
+        const int cellid = dig.getCellId();
         const int pos = m_StoreArrPosition[cellid];
 
         // Add weighted relations of all CalDigits to the local maximum.
@@ -602,20 +660,19 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         if (weight > 0.0) {
           if (std::find(neighbourlist.begin(), neighbourlist.end(), cellid) != neighbourlist.end()) {
 
-
             aECLShower->addRelationTo(m_eclCalDigits[pos], weight);
 
-            digits.push_back(digit);
-            weights.push_back(weight);
+            newdigits.push_back(dig);
+            newweights.push_back(weight);
 
             weightSum += weight;
 
-            const double energy = digit.getEnergy();
+            const double energy = dig.getEnergy();
 
             if (energy * weight > highestEnergy) {
               highestEnergy = energy * weight;
-              highestEnergyTime = digit.getTime();
-              highestEnergyTimeResolution = digit.getTimeResolution();
+              highestEnergyTime = dig.getTime();
+              highestEnergyTimeResolution = dig.getTimeResolution();
             }
           }
         }
@@ -633,7 +690,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
       // away from the original LM cell... this will throw a (non fatal) error, and create a cluster with zero energy now).
-      B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters));
+      B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(newdigits, newweights, m_liloParameters));
       aECLShower->setTheta(showerposition->Theta());
       aECLShower->setPhi(showerposition->Phi());
       aECLShower->setR(showerposition->Mag());
@@ -651,16 +708,16 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
 
         std::vector < std::pair<double, double> > weighteddigits;
-        weighteddigits.resize(digits.size());
-        for (unsigned int i = 0; i < digits.size(); ++i) {
-          weighteddigits.at(i) = std::make_pair((digits.at(i)).getEnergy(), weights.at(i));
+        weighteddigits.resize(newdigits.size());
+        for (unsigned int i = 0; i < newdigits.size(); ++i) {
+          weighteddigits.at(i) = std::make_pair((newdigits.at(i)).getEnergy(), newweights.at(i));
         }
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);
         B2DEBUG(150, "Shower Energy (2): " << showerEnergy);
 
       } else {
-        showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
+        showerEnergy = Belle2::ECL::computeEnergySum(newdigits, newweights);
       }
 
       aECLShower->setEnergy(showerEnergy);
@@ -676,7 +733,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Get unique ID
       aECLShower->setShowerId(iShower);
       ++iShower;
-      aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+      aECLShower->setHypothesisId(ECLCluster::c_nPhotons);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 
       // Add relation to the CR.

@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <cassert>
 
 using namespace Belle2;
@@ -26,7 +28,7 @@ bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
   const CDCWireHitCluster& cluster = *ptrCluster;
 
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  unsigned int iSuperLayer = ISuperLayerUtil::getCommon(cluster);
+  ISuperLayer iSuperLayer = ISuperLayerUtil::getFrom(cluster.front());
   if (not ISuperLayerUtil::isInCDC(iSuperLayer)) {
     return false;
   }
@@ -85,7 +87,7 @@ bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
     adcCountVariance = -1;
   }
 
-  var<named("is_stereo")>() = EStereoKindUtil::getCommon(cluster) != EStereoKind::c_Axial;
+  var<named("is_stereo")>() = not ISuperLayerUtil::isAxial(iSuperLayer);
   var<named("size")>() = size;
 
   var<named("total_number_of_neighbors")>() = totalNNeighbors;

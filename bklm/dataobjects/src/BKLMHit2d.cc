@@ -65,3 +65,16 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
   m_GlobalPosition[1] = h.m_GlobalPosition[1];
   m_GlobalPosition[2] = h.m_GlobalPosition[2];
 }
+
+// Assignment operator
+BKLMHit2d& BKLMHit2d::operator=(const BKLMHit2d& h)
+{
+  m_ModuleID = h.m_ModuleID;
+  m_ZStrips = h.m_ZStrips;
+  m_Time = h.m_Time;
+  m_EDep = h.m_EDep;
+  m_GlobalPosition[0] = h.m_GlobalPosition[0];
+  m_GlobalPosition[1] = h.m_GlobalPosition[1];
+  m_GlobalPosition[2] = h.m_GlobalPosition[2];
+  return *this;
+}

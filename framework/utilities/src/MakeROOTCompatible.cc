@@ -13,7 +13,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 
 
 namespace Belle2 {
@@ -71,8 +71,8 @@ namespace Belle2 {
     for (auto& pair : replace) {
       boost::replace_all(str, pair.first, pair.second);
     }
-    const static boost::regex blackList("[^a-zA-Z0-9_]");
-    return boost::regex_replace(str, blackList, "");
+    const static std::regex blackList("[^a-zA-Z0-9_]");
+    return std::regex_replace(str, blackList, "");
   }
 
   std::string invertMakeROOTCompatible(std::string str)

@@ -8,12 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/collectors/matchers/MatcherInterface.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
 #include <map>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHit;
+
     /**
      * A generic matcher algorithm which outputs all combinations of elements
      * with the number of shared hits as a weight.

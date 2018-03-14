@@ -3,7 +3,7 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni, Bjoern Spruck          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,25 +33,11 @@ namespace Belle2 {
     ROIPayloadAssemblerModule();
 
     /**
-     * Destructor of the module.
-     */
-    virtual ~ROIPayloadAssemblerModule();
-
-    /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
-
-    virtual void event();
-
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
+    void event() override;
 
   protected:
 
@@ -59,13 +45,11 @@ namespace Belle2 {
 
     std::string m_ROIListName; /**< name of the ROI list */
     std::string m_ROIpayloadName; /**< name of the payload to be sent to ONSEN */
-    bool m_DESYremap; /**< Remap ROI coordinates for DESY TB 2016, WORKAROUND for missing DHH functionality!!!  */
-    bool m_DESYROIExtension; /**< Extend ROI coordinates for DESY TB 2016, WORKAROUND for missing DHH functionality!!!  */
     unsigned int mSendAllDS; /**< Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality */
     unsigned int mSendROIsDS; /**<  Send ROIs downscaler; Workaround for missing ONSEN functionality */
-
-    signed int m_triggerNumberShift; /**< ideally = 0. Workaround to find the pxd trigger number in the onsen for Testbeam 16*/
-    void DESYremap(unsigned int& tmpRowMin, unsigned int& tmpRowMax, unsigned int& tmpColMin, unsigned int& tmpColMax);
+    unsigned int mCutNrROIs; //*< If Nr of ROIs per DHHID reach this, send out only one full sensor ROI */
+    bool mAcceptAll; /*< Accept all event, dont use HLT decision */
+    bool mNoRejectFlag; /*< Never reject, just send no ROI */
 
   };
 }

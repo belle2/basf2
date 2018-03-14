@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -19,10 +19,10 @@ namespace Belle2 {
     class CDCRLWireHitTriple;
 
     /// Filter for the constuction of good facets based on monte carlo information
-    class MCFacetFilter : public MCSymmetricFilterMixin<BaseFacetFilter> {
+    class MCFacetFilter : public MCSymmetric<BaseFacetFilter> {
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseFacetFilter>;
+      using Super = MCSymmetric<BaseFacetFilter>;
 
     public:
       /**

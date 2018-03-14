@@ -69,6 +69,7 @@ namespace Belle2 {
     int m_threshold = 0; /**< pulse height threshold [ADC counts] */
     int m_hysteresis = 0; /**< pulse height threshold hysteresis [ADC counts] */
     int m_thresholdCount = 0; /**< minimal number of samples above threshold */
+    bool m_setIntegral = false; /**< calculate and set integral for FW-extracted hits */
 
   };
 

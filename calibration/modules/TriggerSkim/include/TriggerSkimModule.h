@@ -9,6 +9,11 @@
  **************************************************************************/
 #pragma once
 
+#include <string>
+
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -19,10 +24,19 @@ namespace Belle2 {
 
     /// Constructor: Sets the description, the properties and the parameters of the module.
     TriggerSkimModule();
+    /// Initialize
     virtual void initialize() override;
+    /// Event function
     virtual void event() override;
 
   private:
+
+    StoreObjPtr<SoftwareTriggerResult> m_trigResults; /**< Required input for trigger results */
+
     std::vector<std::string> m_triggerLines;
+
+    int m_expectedResult;
+
+    std::string m_logicMode;
   };
 }

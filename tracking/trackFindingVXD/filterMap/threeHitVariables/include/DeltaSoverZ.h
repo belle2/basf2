@@ -23,7 +23,7 @@ namespace Belle2 {
   /** calculates the helixparameter describing the deviation in arc length per unit in z.
    * returning unit: radians*cm. */
   template <typename PointType >
-  class DELTASOVERZ_NAME : public SelectionVariable< PointType , double > {
+  class DELTASOVERZ_NAME : public SelectionVariable< PointType , 3, double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(DELTASOVERZ_NAME);

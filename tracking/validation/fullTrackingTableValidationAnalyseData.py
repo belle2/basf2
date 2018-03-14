@@ -13,6 +13,7 @@ import basf2
 from ROOT import TFile, TNamed, Belle2
 
 VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+import os
 
 try:
     from root_pandas import read_root
@@ -20,23 +21,24 @@ try:
 except ImportError:
     basf2.B2FATAL("You need to have pandas installed for this validation script to run.")
 
-
-def load_data():
-    df_matching = read_root("../matching_validation.root")
-    df_tracking = read_root("../tracking_validation.root", tree_key="mc_tree/mc_tree")
-    df_tracking_prefit = read_root("../tracking_validation_prefit.root", tree_key="mc_tree/mc_tree")
-
-    df_fitted = pd.merge(df_matching, df_tracking, left_index=True, right_index=True)
-    df_prefit = pd.merge(df_matching, df_tracking_prefit, left_index=True, right_index=True)
-
-    return df_fitted, df_prefit
+FORMAT_STRING = "&nbsp;{:.2%} <br/> -{:.2%} <br/> <b>-{:.2%}</b> <br/> Matching: {:.2%} <br/> CDC: {:.2%} <br/> VXD: {:.2%}"
+SHORT_FORMAT_STRING = "MC: &nbsp;{:.2%} <br/>Missing: -{:.2%} <br/>Missing and !fit: <b>-{:.2%}</b>"
 
 
 def reducelist(list_of_cuts, df, current_name=None, current_cut=None, x=0, y=0):
     if current_name is not None:
-        yield (y, x, current_name + "_missing"), (
-            current_cut & ((df.is_merged == 1) | (df.is_missing == 1))).sum()
-        yield (y, x, current_name), current_cut.sum()
+        if y == 5:
+            return_string = FORMAT_STRING.format(current_cut.mean(),
+                                                 (current_cut & (df.is_matched == 0)).mean(),
+                                                 (current_cut & (df.fitted_is_matched == 0)).mean(),
+                                                 (current_cut & (df.both_related == 1)).mean(),
+                                                 (current_cut & (df.cdc_has_related == 1)).mean(),
+                                                 (current_cut & (df.vxd_has_related == 1)).mean())
+        else:
+            return_string = SHORT_FORMAT_STRING.format(current_cut.mean(),
+                                                       (current_cut & (df.is_matched == 0)).mean(),
+                                                       (current_cut & (df.fitted_is_matched == 0)).mean())
+        yield (y, x, current_name), return_string
 
     if not list_of_cuts:
         return
@@ -58,50 +60,85 @@ def reducelist(list_of_cuts, df, current_name=None, current_cut=None, x=0, y=0):
                               x + 2 ** (len(list_of_cuts) - 1), y + 1)
 
 
-def get_result(df, test):
-    """
-    Take a data frame with matching results and successively apply the cuts defined in test
-    to the data. In each step, store the amount of rows that have survived or not survived the
-    cut and apply on *both* the next cut (so we end up with 2^(number of cuts) categories in the end).
-    """
-    results = pd.DataFrame(dict(reducelist(test, df[df.is_primary == 1])), index=[0])
-    results = results.unstack()
-    results = pd.DataFrame(results).set_index(results.index.get_level_values(2)).T
-    return results
+def make_chunks(l, n):
+    return [l[i:i + n] for i in range(0, len(l), n)]
+
+
+def write_value_cell(key, value):
+    y, x, name, _ = key
+    colspan = 2 ** int(5 - y)
+
+    colors = {
+        3: ["white", "gray", "orange", "green"],
+        4: ["gray", "white", "gray", "gray",
+            "orange", "orange", "green", "green"],
+        5: ["gray", "gray", "red", "green",
+            "gray", "gray", "gray", "gray",
+            "red", "gray", "red", "orange",
+            "green", "gray", "orange", "green"]
+    }
+
+    if y in colors:
+        color_index = int((x - 2 ** 4) / (2 ** (5 - y)))
+        color = colors[y][color_index]
+    else:
+        color = "white"
+
+    return """
+        <td style="border: 1px solid black" colspan={colspan}
+        align="center" valign=middle bgcolor="{color}">{value}</td>
+    """.format(colspan=colspan, color=color, value=value)
+
+
+def make_html_row(x):
+    keys = [key for key, _ in x.iteritems()]
+    titles = [key[2] for key, _ in x.iteritems()]
+    values = [value for _, value in x.iteritems()]
+
+    chunked_titles = make_chunks(titles, 2)
+    common_prefixes = list(map(os.path.commonprefix, chunked_titles))
+
+    shorter_titles = [title.replace(prefix, "").replace("_", " ")
+                      for list_titles, prefix in zip(chunked_titles, common_prefixes)
+                      for title in list_titles]
+
+    row_content = "".join([write_value_cell(key, value) for key, value in zip(keys, shorter_titles)])
+    html = "<tr>" + row_content + "</tr>"
+
+    row_content = "".join([write_value_cell(key, value) for key, value in x.sort_index().iteritems()])
+    html += "<tr>" + row_content + "</tr>"
+
+    return html
+
+
+def get_html(df, test):
+    results = pd.DataFrame(dict(reducelist(test, df)), index=[0]).unstack()
+
+    last_row_titles = ["", "", "CDCTF may help", "Criteria?", "", "", "", "", "VXDTF may help", "",
+                       "hard cases", "CKF may help", "Criteria?", "", "CKF may help", "Merging"]
+
+    html = "<table>"
+    html += "".join(results.groupby(level=0).apply(make_html_row))
+    html += "<tr>" + ("".join(["<td>" + value + "</td>" for value in last_row_titles])) + "</tr>"
+    html += "</table>"
+
+    return html
 
 
 if __name__ == '__main__':
-    df_fitted, df_prefit = load_data()
-
     # These are the categories to be tested successively
     test = [
         ("all", None),
-        ("has_vxd", lambda x: (x.n_svd_hits >= 2) | (x.n_pxd_hits >= 2)),
+        ("has_vxd", lambda x: (x.n_svd_hits >= 2)),
         ("vxd_was_found", lambda x: x["vxd_was_found"] == 1),
         ("has_cdc", lambda x: x.n_cdc_hits >= 3),
         ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
     ]
 
-    # Retrieve the results for both data frames
-    results_fitted = get_result(df_fitted, test)
-    results_prefit = get_result(df_prefit, test)
-
-    # Merge the data frames together
-    results_fitted.columns = [col + "_fitted" for col in results_fitted.columns]
-    results = pd.merge(results_prefit, results_fitted, left_index=True, right_index=True)
-
-    # Calculate the percentages
-    for col in results.columns:
-        if "missing" in col:
-            results[col + "_percentage"] = 100 * results[col] / results["all_missing"]
-        else:
-            results[col + "_percentage"] = 100 * results[col] / results["all"]
-
-    # Write back the results into an HTML table
-    with open(Belle2.FileSystem.findFile("tracking/validation/table.html"), "r") as f:
-        content = f.read()
+    df = read_root("../matching_validation.root")
+    html = get_html(df, test)
 
     tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
-    html_content = TNamed("Tracking Table Validation", content.format(**dict(zip(results.columns, results.values[0]))))
+    html_content = TNamed("Tracking Table Validation", html)
     html_content.Write()
     tfile.Close()

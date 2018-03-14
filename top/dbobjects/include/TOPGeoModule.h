@@ -59,6 +59,35 @@ namespace Belle2 {
     }
 
     /**
+     * Assignment operator
+     */
+    TOPGeoModule& operator=(const TOPGeoModule& module)
+    {
+      if (this != &module) {
+        TOPGeoBase::operator=(module);
+        m_moduleID = module.getModuleID();
+        m_radius = module.getRadius();
+        m_phi = module.getPhi();
+        m_backwardZ = module.getBackwardZ();
+        m_moduleCNumber = module.getModuleCNumber();
+        m_bar1 = module.getBarSegment1();
+        m_bar2 = module.getBarSegment2();
+        m_mirror = module.getMirrorSegment();
+        m_prism = module.getPrism();
+        m_pmtArray = module.getPMTArray();
+        m_arrayDisplacement = module.getPMTArrayDisplacement();
+        m_moduleDisplacement = module.getModuleDisplacement();
+        if (m_rotation) delete m_rotation;
+        if (m_rotationInverse) delete m_rotationInverse;
+        if (m_translation) delete m_translation;
+        m_rotation = 0;
+        m_rotationInverse = 0;
+        m_translation = 0;
+      }
+      return *this;
+    }
+
+    /**
      * Destructor
      */
     ~TOPGeoModule()

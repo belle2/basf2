@@ -35,7 +35,10 @@ namespace Belle2 {
     BKLMTrack();
 
     //! Copy constructor
-    explicit BKLMTrack(const BKLMTrack& track);
+    explicit BKLMTrack(const BKLMTrack&);
+
+    //! Assignment operator
+    BKLMTrack& operator=(const BKLMTrack&);
 
     //! Destructor
     virtual ~BKLMTrack() {}

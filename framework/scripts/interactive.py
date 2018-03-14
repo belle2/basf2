@@ -16,29 +16,28 @@ be used. Use Ctrl+D to exit the shell.
 See framework/examples/interactive.py for an example.
 """
 
-from basf2 import *
+from IPython import embed
+from traitlets.config.loader import Config
+from IPython.terminal.prompts import Prompts, Token
 
-try:  # current IPython version
-    import IPython
-    embed = IPython.embed
-except:  # older IPython version
-    try:
-        from IPython.Shell import IPShellEmbed
-        embed = IPShellEmbed()
-    except:  # no ipython at all
-        import sys
-        import code
 
-        def embed():
-            """
-            Drop into interactive python shell.
-            """
+class Basf2IPythonPrompt(Prompts):
+    """Provide slightly customized prompts when running basf2 interactively"""
+    def in_prompt_tokens(self, cli=None):
+        """Input prompt"""
+        return [(Token.Prompt, "basf2 in ["),
+                (Token.PromptNum, str(self.shell.execution_count)),
+                (Token.Prompt, ']: ')]
 
-            # no predefined function that does everything for us, so we
-            # have to get local and global variables from the caller:
-            stack_depth = 0
-            call_frame = sys._getframe(stack_depth).f_back
-            local_ns = call_frame.f_locals
-            global_ns = call_frame.f_globals
+    def out_prompt_tokens(self):
+        """Output prompt"""
+        return [(Token.OutPrompt, "basf2 out["),
+                (Token.OutPromptNum, str(self.shell.execution_count)),
+                (Token.OutPrompt, ']: ')]
 
-            code.interact(local=dict(global_ns, **local_ns))
+
+def basf2_shell_config():
+    """Return a config object customizing the shell prompt for basf2"""
+    c = Config()
+    c.TerminalInteractiveShell.prompts_class = Basf2IPythonPrompt
+    return c

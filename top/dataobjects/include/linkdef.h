@@ -7,17 +7,20 @@
 
 #pragma link C++ class Belle2::TOPSimHit+;
 #pragma link C++ class Belle2::TOPSimPhoton+;
+#pragma link C++ class Belle2::TOPSimCalPulse+;
 #pragma link C++ class Belle2::TOPDigit+;
 #pragma link C++ class Belle2::TOPBarHit+;
 #pragma link C++ class Belle2::TOPLikelihood+;
 #pragma link C++ class Belle2::TOPRecBunch+;
 #pragma link C++ class Belle2::TOPRawWaveform+;
-#pragma link C++ class Belle2::TOPWaveform+;
 #pragma link C++ class Belle2::TOPPull+;
 #pragma link C++ class Belle2::TOPTimeZero+;
 #pragma link C++ class Belle2::TOPRawDigit+;
 #pragma link C++ class Belle2::TOPSlowData+;
 #pragma link C++ class Belle2::TOPInterimFEInfo+;
+#pragma link C++ class Belle2::TOPTemplateFitResult+;
+#pragma link C++ class Belle2::TOPTriggerDigit+;
+#pragma link C++ class Belle2::TOPTriggerMCInfo+;
 
 // schema evolution rules to allow reading of old class versions
 

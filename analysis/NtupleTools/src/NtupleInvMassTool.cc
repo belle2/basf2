@@ -40,6 +40,13 @@ void NtupleInvMassTool::setupTree()
   }
 }
 
+void NtupleInvMassTool::deallocateMemory()
+{
+  delete [] m_invM;
+  delete [] m_invMerr;
+  delete [] m_invMsig;
+}
+
 void NtupleInvMassTool::eval(const Particle* particle)
 {
   if (!particle) {

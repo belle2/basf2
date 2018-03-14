@@ -27,7 +27,7 @@ namespace Belle2 {
    * ATTENTION: in contrast to the Two- Three- and FourHit-filters, the TrackletFilters do _NOT_ expect Hits, but a Container with pointers to Hits (e.g. Vector of hits or a SpacePointTrackCandidate, These filters therefore apply to arbitrary numbers of hits in that container.
    * */
   template <typename PointType, typename PointContainerType >
-  class ZIGGZAGGXYWITHSIGMA_NAME : public SelectionVariable< PointContainerType , int > {
+  class ZIGGZAGGXYWITHSIGMA_NAME : public SelectionVariable< PointContainerType , 0, int > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(ZIGGZAGGXYWITHSIGMA_NAME);

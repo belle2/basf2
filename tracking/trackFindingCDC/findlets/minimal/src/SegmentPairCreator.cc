@@ -10,7 +10,12 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentPairCreator.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <vector>
 #include <array>
@@ -23,6 +28,7 @@ using namespace TrackFindingCDC;
 SegmentPairCreator::SegmentPairCreator()
 {
   this->addProcessingSignalListener(&m_segmentPairFilter);
+  this->addProcessingSignalListener(&m_axialSegmentPairCreator);
 }
 
 std::string SegmentPairCreator::getDescription()
@@ -33,11 +39,20 @@ std::string SegmentPairCreator::getDescription()
 void SegmentPairCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_segmentPairFilter.exposeParameters(moduleParamList, prefix);
+  m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed("Axial", prefix));
+
+  moduleParamList->addParameter(prefixed(prefix, "axialBridging"),
+                                m_param_axialBridging,
+                                "Switch to enable the search for axial to axial pairs "
+                                "to enable more stable reconstruction of the middle stereo",
+                                m_param_axialBridging);
 }
 
 void SegmentPairCreator::apply(const std::vector<CDCSegment2D>& inputSegments,
                                std::vector<CDCSegmentPair>& segmentPairs)
 {
+  segmentPairs.reserve(500);
+
   // Group the segments by their super layer id
   for (std::vector<const CDCSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer) {
     segmentsInSuperLayer.clear();
@@ -70,7 +85,78 @@ void SegmentPairCreator::apply(const std::vector<CDCSegment2D>& inputSegments,
       create(fromSegments, toSegments, segmentPairs);
     }
   }
+
   std::sort(segmentPairs.begin(), segmentPairs.end());
+
+  if (not m_param_axialBridging) return;
+
+  // Memory for the axial axial segment pairs.
+  std::vector<CDCAxialSegmentPair> axialSegmentPairs;
+
+  // Create the axial to axial bridges
+  m_axialSegmentPairCreator.apply(inputSegments, axialSegmentPairs);
+
+  // Make pairs by splitting the axial segment pairs and using the *common* fit as the 3d reconstruction bases
+  for (const CDCAxialSegmentPair& axialSegmentPair : axialSegmentPairs) {
+    const CDCSegment2D* startSegment = axialSegmentPair.getStartSegment();
+    const CDCSegment2D* endSegment = axialSegmentPair.getEndSegment();
+
+    CDCTrajectory2D startCommonTrajectory = axialSegmentPair.getTrajectory2D();
+    if (not startCommonTrajectory.isFitted()) continue;
+
+    CDCTrajectory2D startTrajectory2D = startSegment->getTrajectory2D();
+    startCommonTrajectory.setLocalOrigin(startTrajectory2D.getLocalOrigin());
+    startSegment->setTrajectory2D(startCommonTrajectory);
+    std::vector<const CDCSegment2D*> startSegments{startSegment};
+
+    CDCTrajectory2D endCommonTrajectory = axialSegmentPair.getTrajectory2D();
+    CDCTrajectory2D endTrajectory2D = endSegment->getTrajectory2D();
+    endCommonTrajectory.setLocalOrigin(endTrajectory2D.getLocalOrigin());
+    endSegment->setTrajectory2D(endCommonTrajectory);
+    std::vector<const CDCSegment2D*> endSegments{endSegment};
+
+    if (startSegment->getISuperLayer() == endSegment->getISuperLayer()) {
+      ISuperLayer iSuperLayerCommon = startSegment->getISuperLayer();
+
+      ISuperLayer iSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayerCommon);
+      if (ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
+        const std::vector<const CDCSegment2D*>& middleSegments = m_segmentsBySuperLayer[iSuperLayerIn];
+        create(startSegments, middleSegments, segmentPairs);
+        create(middleSegments, endSegments, segmentPairs);
+      }
+
+      ISuperLayer iSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayerCommon);
+      if (ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
+        const std::vector<const CDCSegment2D*>& middleSegments = m_segmentsBySuperLayer[iSuperLayerOut];
+        create(startSegments, middleSegments, segmentPairs);
+        create(middleSegments, endSegments, segmentPairs);
+      }
+
+    } else {
+      ISuperLayer iSuperLayerMiddle =
+        (startSegment->getISuperLayer() + endSegment->getISuperLayer()) / 2;
+      const std::vector<const CDCSegment2D*>& middleSegments = m_segmentsBySuperLayer[iSuperLayerMiddle];
+      create(startSegments, middleSegments, segmentPairs);
+      create(middleSegments, endSegments, segmentPairs);
+    }
+    startSegment->setTrajectory2D(startTrajectory2D);
+    endSegment->setTrajectory2D(endTrajectory2D);
+  }
+
+  auto lessPairAndgreaterWeight = [](const CDCSegmentPair & lhs, const CDCSegmentPair & rhs) {
+    if (lhs < rhs) return true;
+    if (rhs < lhs) return false;
+    return lhs.getAutomatonCell().getCellWeight() > rhs.getAutomatonCell().getCellWeight();
+  };
+
+  std::sort(segmentPairs.begin(), segmentPairs.end(), lessPairAndgreaterWeight);
+
+  // auto samePair = [](const CDCSegmentPair& lhs, const CDCSegmentPair& rhs) {
+  //   if (lhs < rhs) return false;
+  //   if (rhs < lhs) return false;
+  //   return true;
+  // };
+  // erase_unique(segmentPairs, samePair);
 }
 
 void SegmentPairCreator::create(const std::vector<const CDCSegment2D*>& fromSegments,

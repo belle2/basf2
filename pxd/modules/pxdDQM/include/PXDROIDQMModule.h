@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDROIDQMModule_H
-#define PXDROIDQMModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
@@ -34,11 +33,14 @@ namespace Belle2 {
 
       // virtual ~PXDROIDQMModule();
 
-      virtual void initialize();
+    private:
+      void initialize() override final;
 
-      virtual void beginRun();
+      void beginRun() override final;
 
-      virtual void event();
+      void event() override final;
+
+      void defineHisto() override final;
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -55,27 +57,27 @@ namespace Belle2 {
       TH2F* hrawROIHLTmap;      /** Histogram  */
       TH2F* hrawROIHLTsize;      /** Histogram  */
       TH1F* hrawROIHLT_DHHID;     /** Histogram  */
-      TH1F* hrawROIHLTrow1;     /** Histogram  */
-      TH1F* hrawROIHLTrow2; /** Histogram  */
-      TH1F* hrawROIHLTcol1; /** Histogram  */
-      TH1F* hrawROIHLTcol2; /** Histogram  */
-      TH1F* hrawROIHLTrowSize; /** Histogram  */
-      TH1F* hrawROIHLTcolSize; /** Histogram  */
+      TH1F* hrawROIHLTminU;     /** Histogram  */
+      TH1F* hrawROIHLTmaxU; /** Histogram  */
+      TH1F* hrawROIHLTminV; /** Histogram  */
+      TH1F* hrawROIHLTmaxV; /** Histogram  */
+      TH1F* hrawROIHLTsizeV; /** Histogram  */
+      TH1F* hrawROIHLTsizeU; /** Histogram  */
 
       TH2F* hrawROIDCmap;      /** Histogram  */
       TH2F* hrawROIDCsize;      /** Histogram  */
       TH1F* hrawROIDC_DHHID;     /** Histogram  */
-      TH1F* hrawROIDCrow1;     /** Histogram  */
-      TH1F* hrawROIDCrow2; /** Histogram  */
-      TH1F* hrawROIDCcol1; /** Histogram  */
-      TH1F* hrawROIDCcol2; /** Histogram  */
+      TH1F* hrawROIDCminU;     /** Histogram  */
+      TH1F* hrawROIDCmaxU; /** Histogram  */
+      TH1F* hrawROIDCminV; /** Histogram  */
+      TH1F* hrawROIDCmaxV; /** Histogram  */
+      TH1F* hrawROIDCsizeV; /** Histogram  */
+      TH1F* hrawROIDCsizeU; /** Histogram  */
 
       TH2F* hrawROINrDCvsNrHLT; /** Histogram  */
       TH2F* hrawROIEVTsWithOneSource; /** Histogram  */
 
       //map<int,int> sensor_to_histindex;
-
-      virtual void defineHisto();
 
     };//end class declaration
 
@@ -83,4 +85,3 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDROIDQMModule_H

@@ -24,6 +24,20 @@ double SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
                                                 double,
                                                 unsigned short)
 {
+  const double driftTime = getDriftTime(tdcCount, wireID, timeOfFlightEstimator, z, 0);
+
+  //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
+  //Need to reverse calculate the relation between drift lenght and drift time.
+  double driftL = (driftTime >= 0.) ? driftTime * 4e-3 : -999.;
+  return driftL;
+}
+
+double SimpleTDCCountTranslator::getDriftTime(unsigned short tdcCount,
+                                              const WireID& wireID,
+                                              double timeOfFlightEstimator,
+                                              double z,
+                                              unsigned short)
+{
   // translate TDC Count into time information:
   CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();
   double driftTime = (static_cast<double>(geometryPar.getTdcOffset() - (tdcCount + 0.5))); // 1 Unit in the TDC count equals 1 ns
@@ -44,12 +58,8 @@ double SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   //Third: If time of flight was simulated, this has to be undone, too. If it wasn't timeOfFlightEstimator should be taken as 0.
   driftTime -= timeOfFlightEstimator;
 
-  //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
-  //Need to reverse calculate the relation between drift lenght and drift time.
-  double driftL = (driftTime >= 0.) ? driftTime * 4e-3 : -999.;
-  return driftL;
+  return driftTime;
 }
-
 
 /** this function returns the variance that is used as the CDC measurment resolution in track fitting
 if the default resolution of the CDC Digitizer is changed this value has to be changed, too!

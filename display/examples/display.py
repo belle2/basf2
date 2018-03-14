@@ -64,6 +64,9 @@ display.param('showRecoTracks', False)
 # directly show CDCHits as drift cylinders (shortened, z position = 0)
 display.param('showCDCHits', False)
 
+# show trigger objects?
+display.param('showTriggerObjects', False)
+
 
 # --- Track options ---
 # show tracks, vertices, eclgammas?

@@ -35,16 +35,31 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using ELineParameter = NLineParameterIndices::ELineParameter;
 
+    // Guard to prevent repeated template symbol emission
+    struct LineUtil;
+    extern template struct UncertainParametersUtil<LineUtil, ELineParameter>;
+
     /// Utility struct for functions and types related to the line parameters.
     struct LineUtil : UncertainParametersUtil<LineUtil, ELineParameter> {
 
       /// Getter for the signs which have to be applied to reverse the traversal direction
       static ParameterVector reversalSigns()
       {
-        ParameterVector result;
-        result << -1, -1;
-        return result;
+        return ParameterVector({ -1.0, -1.0});
       }
+
+      /**
+       *  Calculates the weighted average between two line parameter sets
+       *  with their respective covariance matrix.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const LineUtil::ParameterVector& fromPar,
+                            const LineUtil::CovarianceMatrix& fromCov,
+                            const LineUtil::ParameterVector& toPar,
+                            const LineUtil::CovarianceMatrix& toCov,
+                            LineUtil::ParameterVector& avgPar,
+                            LineUtil::CovarianceMatrix& avgCov);
     };
 
     /// Vector of the line parameters

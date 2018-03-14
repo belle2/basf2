@@ -9,18 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <Eigen/Dense>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+
+#include <vector>
 #include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
+    class CDCTrajectory2D;
     class CDCWire;
     class CDCWireHit;
     class CDCRLWireHit;
@@ -43,7 +45,7 @@ namespace Belle2 {
        *  Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
        *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
        */
-      explicit CDCObservations2D(EFitPos fitPos = EFitPos::c_RLDriftCircle,
+      explicit CDCObservations2D(EFitPos fitPos = EFitPos::c_RecoPos,
                                  EFitVariance fitVariance = EFitVariance::c_Proper)
         : m_fitPos(fitPos)
         , m_fitVariance(fitVariance)
@@ -51,12 +53,6 @@ namespace Belle2 {
       }
 
     public:
-      /**
-       *  Matrix type used to wrap the raw memory chunk of values
-       *  generated from the various hit types for structured vectorized access.
-       */
-      using EigenObservationMatrix = Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > >;
-
       /**
        *  Gets the pseudo variance.
        *  The pseudo drift length variance is a measure that tries to incorporate the drift length
@@ -80,6 +76,12 @@ namespace Belle2 {
       std::size_t size() const
       {
         return m_observations.size() / 4;
+      }
+
+      /// Return the pointer to the number buffer
+      double* data()
+      {
+        return m_observations.data();
       }
 
       /// Returns true if there are no observations stored.
@@ -224,6 +226,12 @@ namespace Belle2 {
       std::size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair);
 
       /**
+       *  Appends all reconstructed hits from the three dimensional track.
+       *  @return  Number of added hits
+       */
+      std::size_t appendRange(const CDCTrack& track);
+
+      /**
        *  Appends all the reference wire positions.
        *  @note For cross check to legendre finder.
        *  @return  Number of added hits
@@ -266,10 +274,7 @@ namespace Belle2 {
        *  Calculate the total transvers travel distance traversed by these observations comparing
        *  the travel distance of first and last position.
        */
-      double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
-      {
-        return trajectory2D.calcArcLength2DBetween(getFrontPos2D(), getBackPos2D());
-      }
+      double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Checks if the last position of these observations lies at greater travel distance than the
@@ -301,105 +306,6 @@ namespace Belle2 {
 
       /// Returns the number of observations having a drift radius radius
       std::size_t getNObservationsWithDriftRadius() const;
-
-      /**
-       *  Returns the observations structured as an Eigen matrix
-       *  This returns a reference to the stored observations.
-       *  @note      Operations may alter the content of the underlying memory and
-       *             render it useless for subceeding calculations.
-       */
-      EigenObservationMatrix getObservationMatrix();
-
-      /**
-       *  Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for circle fits.
-       *
-       *  Cumulates weights, x positions, y positions, quadratic cylindrical radii and signed drift lengths and products thereof
-       *  @returns symmetric matrix s with the following:
-       *  * \f$ s_{00} = \sum w \f$
-       *  * \f$ s_{01} = \sum x * w \f$
-       *  * \f$ s_{02} = \sum y * w \f$
-       *  * \f$ s_{03} = \sum (r^2 - l^2) * w \f$
-       *  * \f$ s_{04} = \sum l * w \f$
-       *
-       *  * \f$ s_{11} = \sum x * x * w \f$
-       *  * \f$ s_{12} = \sum x * y * w \f$
-       *  * \f$ s_{13} = \sum x * (r^2 - l^2) * w \f$
-       *  * \f$ s_{14} = \sum x * l * w \f$
-       *
-       *  * \f$ s_{22} = \sum y * y * w \f$
-       *  * \f$ s_{23} = \sum y * (r^2 - l^2) * w \f$
-       *  * \f$ s_{24} = \sum y * l * w \f$
-       *
-       *  * \f$ s_{33} = \sum (r^2 - l^2) * (r^2 - l^2) * w \f$
-       *  * \f$ s_{34} = \sum (r^2 - l^2) * l * w \f$
-
-       *  * \f$ s_{44} = \sum l * l * w \f$
-       *  * + symmetric.
-       */
-      Eigen::Matrix<double, 5, 5> getWXYRLSumMatrix();
-
-      /**
-       *  Constructs a symmetric matrix of weighted sums of x, y and drift lengts as relevant for line fits.
-       *
-       *  Cumulates weights, x positions, y positions and signed drift legnths and products thereof
-       *  @returns symmetric matrix s with the following:
-       *  * \f$ s_{00} = \sum w \f$
-       *  * \f$ s_{01} = \sum x * w \f$
-       *  * \f$ s_{02} = \sum y * w \f$
-       *  * \f$ s_{03} = \sum l * w \f$
-       *
-       *  * \f$ s_{11} = \sum x * x * w \f$
-       *  * \f$ s_{12} = \sum x * y * w \f$
-       *  * \f$ s_{13} = \sum x * l * w \f$
-       *
-       *  * \f$ s_{22} = \sum y * y * w \f$
-       *  * \f$ s_{23} = \sum y * l * w \f$
-       *
-       *  * \f$ s_{33} = \sum (r^2 - l^2) * l * w \f$
-       *  * + symmetric
-       */
-      Eigen::Matrix<double, 4, 4> getWXYLSumMatrix();
-
-      /**
-       *  Constructs a symmetric matrix of weighted sums of x, y, r^2 as relevant for circle fits.
-       *
-       *  Cumulates weights, x positions, y positions, quadratic cylindrical radii and products thereof
-       *  @returns symmetric matrix s with the following:
-       *  * \f$ s_{00} = \sum w \f$
-       *  * \f$ s_{01} = \sum x * w \f$
-       *  * \f$ s_{02} = \sum y * w \f$
-       *  * \f$ s_{03} = \sum (r^2 - l^2) * w \f$
-       *
-       *  * \f$ s_{11} = \sum x * x * w \f$
-       *  * \f$ s_{12} = \sum x * y * w \f$
-       *  * \f$ s_{13} = \sum x * (r^2 - l^2) * w \f$
-       *
-       *  * \f$ s_{22} = \sum y * y * w \f$
-       *  * \f$ s_{23} = \sum y * (r^2 - l^2) * w \f$
-       *  * \f$ s_{24} = \sum y * l * w \f$
-       *
-       *  * \f$ s_{33} = \sum (r^2 - l^2) * (r^2 - l^2) * w \f$
-       *  * + symmetric.
-       */
-      Eigen::Matrix<double, 4, 4> getWXYRSumMatrix();
-
-
-      /**
-       *  Constructs a symmetric matrix of weighted sums of x, y as relevant for line fits.
-       *
-       *  Cumulates weights, x positions, y positions and products thereof
-       *  @returns symmetric matrix s with the following:
-       *  * \f$ s_{00} = \sum w \f$
-       *  * \f$ s_{01} = \sum x * w \f$
-       *  * \f$ s_{02} = \sum y * w \f$
-       *
-       *  * \f$ s_{11} = \sum x * x * w \f$
-       *  * \f$ s_{12} = \sum x * y * w \f$
-       *
-       *  * \f$ s_{22} = \sum y * y * w \f$
-       *  * + symmetric.
-       */
-      Eigen::Matrix<double, 3, 3> getWXYSumMatrix();
 
     public:
       /// Getter for the indicator that the reconstructed position should be favoured.

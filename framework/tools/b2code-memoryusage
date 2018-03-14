@@ -12,7 +12,7 @@ This program has three modes: in "record" mode memory consumption is recorded
 for all children of the specified progam while it is executed. After execution
 is complete, the execution time (wall time) and maximum and average amount of
 memory used will be printed to stderr. Optionally, a memory consumption profile
-can be written to disk using the --profile argument. In "plot" mode, a
+can be written to disk using the ``--profile`` argument. In "plot" mode, a
 previously recorded memory profile will be plotted as pdf file using the
 matplotlib plotting library and in mode "both" the memory profile will be
 recorded and plotted in one go.
@@ -26,30 +26,31 @@ used." but does not take into account sharing between differnet processes.
 Proportional memory is like Resident memory but takes sharing of pages between
 processes into account. Swap is the amount of memory swapped out.
 --examples--
-examples:
-  record the memory consumption of a steering file in four processor
-  multiprocessing mode and write the results to console
+.. rubric:: Examples
 
-  $ %(prog)s -m record -- basf2 -p4 steering.py
+* record the memory consumption of a steering file in four processor
+  multiprocessing mode and write the results to console::
 
-  record the proportional and resident memory sizes with 100hz and write them
-  to profile.npz
+    $ %(prog)s -m record -- basf2 -p4 steering.py
 
-  $ %(prog)s -m record -i 0.01 -p profile.npz -t pr -- basf2 -p4 steering.py
+* record the proportional and resident memory sizes with 100hz and write them
+  to profile.npz::
 
-  plot the previously recorded profile.npz and save the plots as profile.pdf
+    $ %(prog)s -m record -i 0.01 -p profile.npz -t pr -- basf2 -p4 steering.py
 
-  $ %(prog)s -m plot -p profile.npz -o profile.pdf
+* plot the previously recorded profile.npz and save the plots as profile.pdf::
 
-  record and plot at once, all memory types except swap, take a value every 5
-  seconds, save the plots as profile.pdf and the data as profile.npz
+    $ %(prog)s -m plot -p profile.npz -o profile.pdf
 
-  $ %(prog)s -i 5 -t vrp -p profile.npz -o profile.pdf -- basf2 -p4 steering.py
+* record and plot at once, all memory types except swap, take a value every 5
+  seconds, save the plots as profile.pdf and the data as profile.npz::
 
-  record the memory consumption of %(prog)s itself when sampling with 100Hz
-  while running sleep for 100 seconds
+    $ %(prog)s -i 5 -t vrp -p profile.npz -o profile.pdf -- basf2 -p4 steering.py
 
-  $ %(prog)s -o self.pdf -- %(prog)s -i 0.01 -m record -- sleep 100
+* record the memory consumption of %(prog)s itself when sampling with 100Hz
+  while running sleep for 100 seconds::
+
+    $ %(prog)s -o self.pdf -- %(prog)s -i 0.01 -m record -- sleep 100
 """
 
 # we want to print some stuff to sys.stderr and the print function makes this
@@ -65,123 +66,56 @@ from collections import defaultdict
 import threading
 import argparse
 
-# Specify the possible arguments
-parser = argparse.ArgumentParser(
-    description=__doc__.split("--examples--")[0],
-    epilog=__doc__.split("--examples--")[1],
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    usage="%(prog)s [optional arguments] [--] program [program arguments]"
-)
 
-parser.add_argument("-m", "--mode", metavar="MODE", dest="mode",
-                    default="both", choices=["record", "plot", "both"],
-                    help="Indicates whether to record memory consumption, plot"
-                    " memory consumption or do both at once. If plot is "
-                    "selected a filename for the recorded data has to be "
-                    "specified using the --profile option "
-                    "(default: %(default)s)")
-parser.add_argument("-p", "--profile", metavar="FILE", dest="profile",
-                    help="filename to write or read records from. Optional for"
-                    " mode=both and mode=record, required for mode=plot")
-parser.add_argument("-o", "--output", metavar="FILE", dest="out",
-                    help="Name of the output PDF file if plotting is enabled "
-                    "(default: %(default)s)", default="memoryusage.pdf")
-parser.add_argument("-i", "--interval", metavar="N", type=float,
-                    dest="interval", default=1,
-                    help="sampling interval in seconds. Smaller interval "
-                    "increases precision at the cost of more cpu and memory "
-                    "utilization by this script (default: %(default)s)")
-parser.add_argument("-t", "--types", default="vrps",
-                    help="Memory types to record. Possible values are "
-                    "v=virtual size, r=resident size, p=proportional size, "
-                    "s=swap or any combination of these "
-                    "(default: %(default)s)")
-parser.add_argument("--system", default=False, action="store_true",
-                    dest="system",
-                    help="If given, also record /proc/meminfo to check "
-                    "consistency. This only works well if no other programs "
-                    "are allocating memory while profile is recorded")
-parser.add_argument("--annotations", default=r"memoryusage annotate:\s*(.*)$",
-                    help="regular expession which to apply against output of "
-                    "program. If a match is found the contents of group 1 will "
-                    "be added to the plots at the time the output was processed")
-parser.add_argument("--no-legend", dest="no_legend", default=False,
-                    action="store_true", help="Omit legend from plot, useful "
-                    "for many cores as legend grows very large in that case")
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
 
-options, args = parser.parse_known_args()
-# remove the -- if present
-if args and args[0] == "--":
-    del args[0]
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
 
-# we need a data file to only record or plot
-if options.mode == "plot" and options.profile is None:
-    print("Mode %s chosen but no file specified, use --profile"
-          % options.mode, file=sys.stderr)
-    sys.exit(1)
-
-# set some variables to steer what we will do later on
-do_record = options.mode != "plot"
-do_plotting = options.mode != "record"
-write_file = do_record and options.profile is not None
-# no need to read the file we just wrote so reading is only done in plotting
-# only mode
-read_file = options.mode == "plot"
-
-if do_record and not args:
-    print("No program to run, please specify which program to run after a --")
-    sys.exit(1)
-
-# check file access
-if read_file:
-    if not os.path.exists(options.profile):
-        print("specified profile file does not exist", file=sys.stderr)
-        sys.exit(1)
-    if not os.access(options.profile, os.R_OK):
-        print("specified profile file is not readable", file=sys.stderr)
-        sys.exit(1)
-
-if write_file:
-    try:
-        f = open(options.profile, "wb")
-        f.close()
-    except IOError:
-        print("specified profile file could not be opened for writing",
-              file=sys.stderr)
-        sys.exit(1)
-
-# if we want to plot we check for matplotlib now
-if do_plotting:
-    try:
-        import matplotlib as mpl
-        mpl.use("Agg")
-        from matplotlib import pyplot as pl
-        from matplotlib.backends.backend_pdf import PdfPages
-    except ImportError:
-        print("Error: Could not find matplotlib which is required to create "
-              "the plots.\nPlease use --mode=record to just record the profile"
-              " or install matplotlib using\n    $ pip3 install matplotlib",
-              file=sys.stderr)
-        sys.exit(1)
-
-# types of memory to plot, can be a list of labels and fields from
-# /proc/<PID>/smaps
-available_types = {
-    "v": ("Virtual size", "Size:"),
-    "r": ("Resident memory", "Rss:"),
-    "p": ("Proportional memory", "Pss:"),
-    "s": ("Swap", "Swap:"),
-}
-memory_types = []
-for memtype in options.types:
-    try:
-        memory_types.append(available_types[memtype])
-    except KeyError:
-        print("Unknown memory type: %s, use one of %s or a combination like %s"
-              % (memtype, ", ".join(available_types.keys()),
-                 "".join(available_types.keys())),
-              file=sys.stderr)
-ntypes = len(memory_types)
+    parser.add_argument("-m", "--mode", metavar="MODE", dest="mode",
+                        default="both", choices=["record", "plot", "both"],
+                        help="Indicates whether to record memory consumption, plot"
+                        " memory consumption or do both at once. If plot is "
+                        "selected a filename for the recorded data has to be "
+                        "specified using the --profile option "
+                        "(default: %(default)s)")
+    parser.add_argument("-p", "--profile", metavar="FILE", dest="profile",
+                        help="filename to write or read records from. Optional for"
+                        " mode=both and mode=record, required for mode=plot")
+    parser.add_argument("-o", "--output", metavar="FILE", dest="out",
+                        help="Name of the output PDF file if plotting is enabled "
+                        "(default: %(default)s)", default="memoryusage.pdf")
+    parser.add_argument("-i", "--interval", metavar="N", type=float,
+                        dest="interval", default=1,
+                        help="sampling interval in seconds. Smaller interval "
+                        "increases precision at the cost of more cpu and memory "
+                        "utilization by this script (default: %(default)s)")
+    parser.add_argument("-t", "--types", default="vrps",
+                        help="Memory types to record. Possible values are "
+                        "v=virtual size, r=resident size, p=proportional size, "
+                        "s=swap or any combination of these "
+                        "(default: %(default)s)")
+    parser.add_argument("--system", default=False, action="store_true",
+                        dest="system",
+                        help="If given, also record /proc/meminfo to check "
+                        "consistency. This only works well if no other programs "
+                        "are allocating memory while profile is recorded")
+    parser.add_argument("--annotations", default=r"memoryusage annotate:\s*(.*)$",
+                        help="regular expession which to apply against output of "
+                        "program. If a match is found the contents of group 1 will "
+                        "be added to the plots at the time the output was processed")
+    parser.add_argument("--no-legend", dest="no_legend", default=False,
+                        action="store_true", help="Omit legend from plot, useful "
+                        "for many cores as legend grows very large in that case")
+    return parser
 
 
 class IntervalTimer(object):
@@ -336,132 +270,6 @@ def check_output():
         sys.stdout.write(line)
         sys.stdout.flush()
 
-# ok, if mode is record or both we now run the program and collect memory
-# information.
-if do_record:
-    # create a list of memory consumptions for each pid
-    process_memory = {}
-    process_names = {}
-    annotations = []
-    total_memory = []
-    system_memory = None
-    runtime = 0
-    if options.system:
-        system_offset = get_system_memory()
-        system_memory = []
-    # run the program
-    try:
-        child = subprocess.Popen(args, stdout=subprocess.PIPE)
-    except OSError as e:
-        print("Problem running '%s': %s" % (" ".join(args), e),
-              file=sys.stderr)
-        sys.exit(1)
-    # we want to check the output for process spawn messages but we don't want
-    # to block the memory checker, so let's use a thread to check the output
-    output_checker = threading.Thread(target=check_output)
-    output_checker.daemon = True
-    output_checker.start()
-    # start the timer
-    timer = IntervalTimer(options.interval)
-
-    diff = []
-    lasttime = 0
-    # while child is running, check its memory usage
-    while True:
-        runtime = timer.wait()
-        lasttime = runtime
-        # check if child is still running
-        if child.poll() is not None:
-            break
-        # if so, find all processes and obtain memory usage for each
-        pids = find_children(child.pid)
-        total = np.zeros(ntypes)
-        for i, pid in enumerate(pids):
-            if pid not in process_memory:
-                cmdline = get_cmdline(pid)
-                if not cmdline:
-                    continue
-                process_names.setdefault(pid, cmdline)
-                process_memory[pid] = []
-
-            mem = get_memory_usage(pid)
-            total += mem
-            # remember the values for this process
-            process_memory[pid].append([runtime] + list(mem))
-
-        # and remember the total as well
-        total_memory.append([runtime] + list(total))
-        if options.system:
-            system_memory.append([runtime,
-                                  get_system_memory() - system_offset])
-
-    # convert lists to numpy arrays
-    total_memory = np.array(total_memory)
-    if options.system:
-        system_memory = np.array(system_memory)
-    for pid in process_memory:
-        process_memory[pid] = np.array(process_memory[pid])
-
-    # make annotations a structured array, otherwise numpy will convert
-    # timestamps to strings
-    annot_max_length = max(len(e[1]) for e in annotations) if len(annotations) else ""
-    annotations = np.array(annotations, dtype=[("time", "f4"), ("text", "U%s" % annot_max_length)])
-
-# recording is done so let's write that data to file if requested. We use
-# numpy.savez to store all data as binary numpy arrays in that file.
-if write_file:
-    with open(options.profile, "wb") as datafile:
-        # numpy archives contain arrays by name so we create a dictionary with
-        # all the name->data relations and save it. For total_memory this is
-        # trivial, for process_names we convert it into a 2D char-array and for
-        # process_memory we store each array with the pid as name
-        keys = {
-            "total_memory": total_memory,
-            "process_names": np.array(list(process_names.items())),
-            "memory_types": np.array(memory_types),
-            "annotations": annotations,
-        }
-        if options.system:
-            keys["system_memory"] = system_memory
-        for pid, data in process_memory.items():
-            keys[str(pid)] = data
-
-        # saving is trivial
-        np.savez_compressed(datafile, **keys)
-
-# apparently we want to load data from file so let's do that
-if read_file:
-    total_memory = None
-    process_names = {}
-    process_memory = {}
-    memory_types = None
-    system_memory = None
-    with open(options.profile, "rb") as datafile:
-        contents = np.load(datafile)
-        # loop over all elements in the file and assign to the correct
-        # variables
-        for key, data in contents.items():
-            if key == "total_memory":
-                total_memory = data
-            elif key == "process_names":
-                for pid, name in data:
-                    process_names[int(pid)] = name
-            elif key == "memory_types":
-                memory_types = data
-            elif key == "system_memory":
-                system_memory = data
-            elif key == "annotations":
-                annotations = data
-            else:
-                process_memory[int(key)] = data
-
-    # number of memory types comes from file so change it
-    ntypes = len(memory_types)
-
-if not process_memory:
-    print("program exited to fast to measure memory, exiting", file=sys.stderr)
-    sys.exit(0)
-
 
 def get_color(i, n):
     """Choose an appropriate color for line i out of n lines
@@ -484,84 +292,284 @@ def plot_memory(data, label, color, marker=True):
         axes[i].plot(data[-1, 0], data[-1, i + 1] / 1000, color=color, marker=".")
 
 
-# start plotting
-if do_plotting:
-    figures = [pl.figure(figsize=(12, 8)) for i in range(ntypes)]
-    # create axes for all memory "types"
-    axes = [fig.add_subplot(1, 1, 1) for fig in figures]
+if __name__ == "__main__":
+    options, args = get_argument_parser().parse_known_args()
+    # remove the -- if present
+    if args and args[0] == "--":
+        del args[0]
 
-    # plot total memory if we saw more than one process
-    if len(process_memory) > 1:
-        plot_memory(total_memory, "Total", "k")
+    # we need a data file to only record or plot
+    if options.mode == "plot" and options.profile is None:
+        print("Mode %s chosen but no file specified, use --profile"
+              % options.mode, file=sys.stderr)
+        sys.exit(1)
 
-    # and plot all processes
-    for i, (pid, val) in enumerate(sorted(process_memory.items())):
-        label = "%s (%d)" % (process_names[pid], pid)
-        plot_memory(val, label, get_color(i, len(process_memory)))
+    # set some variables to steer what we will do later on
+    do_record = options.mode != "plot"
+    do_plotting = options.mode != "record"
+    write_file = do_record and options.profile is not None
+    # no need to read the file we just wrote so reading is only done in plotting
+    # only mode
+    read_file = options.mode == "plot"
 
-    # finalize all plots
-    for i, (a, title) in enumerate(zip(axes, memory_types)):
-        # plot system memory usage if recorded
-        if system_memory is not None and (title[0] != "swap"):
-            a.plot(system_memory[:, 0], system_memory[:, 1] / 1000,
-                   label="system", c="k", alpha=0.5)
-        # and add title and labels
-        a.set_xlabel("Time / s")
-        a.set_ylabel("Memory / MB")
-        a.set_title(title[0])
-        a.set_ylim(ymin=0)
-        a.grid()
-        # and a legend
-        if not options.no_legend:
-            l = a.legend(loc="best")
-            l.get_frame().set_alpha(0.8)
+    if do_record and not args:
+        print("No program to run, please specify which program to run after a --")
+        sys.exit(1)
 
-        # add max line and label it
-        maxvalue = total_memory[:, i + 1].max() / 1000
-        a.axhline(maxvalue, c="k", ls="--", zorder=-1)
-        a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
-                   textcoords="offset points")
+    # check file access
+    if read_file:
+        if not os.path.exists(options.profile):
+            print("specified profile file does not exist", file=sys.stderr)
+            sys.exit(1)
+        if not os.access(options.profile, os.R_OK):
+            print("specified profile file is not readable", file=sys.stderr)
+            sys.exit(1)
 
-        # add annotations if any. As the annotations are not necessarily at the
-        # same times as the memory consumption we let numpy linearly interpolate
-        # the total memory at the times of the annotations
-        annotation_values = np.interp(annotations["time"], total_memory[:, 0], total_memory[:, i + 1] / 1000)
-        # and add a an annotation for each one to the plot
-        for (time, text), value in zip(annotations, annotation_values):
-            args = dict(xy=(time, value), xytext=(0, -20), textcoords="offset points",
-                        rotation="vertical", size="xx-small", arrowprops={"arrowstyle": "->"},
-                        ha="center", va="top")
-            # if total memory is below the center of the plot put the annotation
-            # above, otherwise put it below the line
-            if maxvalue == 0 or value/maxvalue < 0.5:
-                args["va"] = "bottom"
-                args["xytext"] = (0, -args["xytext"][1])
+    if write_file:
+        try:
+            f = open(options.profile, "wb")
+            f.close()
+        except IOError:
+            print("specified profile file could not be opened for writing",
+                file=sys.stderr)
+            sys.exit(1)
 
-            a.annotate(text, **args)
+    # if we want to plot we check for matplotlib now
+    if do_plotting:
+        try:
+            import matplotlib as mpl
+            mpl.use("Agg")
+            from matplotlib import pyplot as pl
+            from matplotlib.backends.backend_pdf import PdfPages
+        except ImportError:
+            print("Error: Could not find matplotlib which is required to create "
+                  "the plots.\nPlease use --mode=record to just record the profile"
+                  " or install matplotlib using\n    $ pip3 install matplotlib",
+                  file=sys.stderr)
+            sys.exit(1)
 
-    # save plots
-    with PdfPages(options.out) as pdf:
-        for f in figures:
-            # select the figure
-            pl.figure(f.number)
-            # adjust the layout to fit exactly on the canvas
-            pl.tight_layout()
-            # add to pdf
-            pdf.savefig(f)
+    # types of memory to plot, can be a list of labels and fields from
+    # /proc/<PID>/smaps
+    available_types = {
+        "v": ("Virtual size", "Size:"),
+        "r": ("Resident memory", "Rss:"),
+        "p": ("Proportional memory", "Pss:"),
+        "s": ("Swap", "Swap:"),
+    }
+    memory_types = []
+    for memtype in options.types:
+        try:
+            memory_types.append(available_types[memtype])
+        except KeyError:
+            print("Unknown memory type: %s, use one of %s or a combination like %s"
+                  % (memtype, ", ".join(available_types.keys()),
+                      "".join(available_types.keys())),
+                  file=sys.stderr)
+    ntypes = len(memory_types)
 
-# finally, print values, first we get the values formated correctly in MB for
-# max, mean and standard deviation and that for each memory type
-values = np.array([["%.2f" % (fct(m)/1000) for m in total_memory.T[1:]]
-                   for fct in(np.max, np.mean, np.std)])
-# now lets find out how many digits we need for each type of value
-digits = [max(map(len, v)) for v in values]
+    # ok, if mode is record or both we now run the program and collect memory
+    # information.
+    if do_record:
+        # create a list of memory consumptions for each pid
+        process_memory = {}
+        process_names = {}
+        annotations = []
+        total_memory = []
+        system_memory = None
+        runtime = 0
+        if options.system:
+            system_offset = get_system_memory()
+            system_memory = []
+        # run the program
+        try:
+            child = subprocess.Popen(args, stdout=subprocess.PIPE)
+        except OSError as e:
+            print("Problem running '%s': %s" % (" ".join(args), e),
+                  file=sys.stderr)
+            sys.exit(1)
+        # we want to check the output for process spawn messages but we don't want
+        # to block the memory checker, so let's use a thread to check the output
+        output_checker = threading.Thread(target=check_output)
+        output_checker.daemon = True
+        output_checker.start()
+        # start the timer
+        timer = IntervalTimer(options.interval)
 
-# now print execution time
-print("{0:20}: {1:.2f} sec".format("execution time", total_memory[:, 0].max()),
-      file=sys.stderr)
-# then memory consumption
-for i, (name, field) in enumerate(memory_types):
-    print("{name:20}: max={values[0]:>{digits[0]}} MB, "
-          "avg={values[1]:>{digits[1]}} +- {values[2]:>{digits[2]}} MB"
-          .format(values=values.T[i], name=name, digits=digits),
+        diff = []
+        lasttime = 0
+        # while child is running, check its memory usage
+        while True:
+            runtime = timer.wait()
+            lasttime = runtime
+            # check if child is still running
+            if child.poll() is not None:
+                break
+            # if so, find all processes and obtain memory usage for each
+            pids = find_children(child.pid)
+            total = np.zeros(ntypes)
+            for i, pid in enumerate(pids):
+                if pid not in process_memory:
+                    cmdline = get_cmdline(pid)
+                    if not cmdline:
+                        continue
+                    process_names.setdefault(pid, cmdline)
+                    process_memory[pid] = []
+
+                mem = get_memory_usage(pid)
+                total += mem
+                # remember the values for this process
+                process_memory[pid].append([runtime] + list(mem))
+
+            # and remember the total as well
+            total_memory.append([runtime] + list(total))
+            if options.system:
+                system_memory.append([runtime, get_system_memory() - system_offset])
+
+        # convert lists to numpy arrays
+        total_memory = np.array(total_memory)
+        if options.system:
+            system_memory = np.array(system_memory)
+        for pid in process_memory:
+            process_memory[pid] = np.array(process_memory[pid])
+
+        # make annotations a structured array, otherwise numpy will convert
+        # timestamps to strings
+        annot_max_length = max(len(e[1]) for e in annotations) if len(annotations) else ""
+        annotations = np.array(annotations, dtype=[("time", "f4"), ("text", "U%s" % annot_max_length)])
+
+    # recording is done so let's write that data to file if requested. We use
+    # numpy.savez to store all data as binary numpy arrays in that file.
+    if write_file:
+        with open(options.profile, "wb") as datafile:
+            # numpy archives contain arrays by name so we create a dictionary with
+            # all the name->data relations and save it. For total_memory this is
+            # trivial, for process_names we convert it into a 2D char-array and for
+            # process_memory we store each array with the pid as name
+            keys = {
+                "total_memory": total_memory,
+                "process_names": np.array(list(process_names.items())),
+                "memory_types": np.array(memory_types),
+                "annotations": annotations,
+            }
+            if options.system:
+                keys["system_memory"] = system_memory
+            for pid, data in process_memory.items():
+                keys[str(pid)] = data
+
+            # saving is trivial
+            np.savez_compressed(datafile, **keys)
+
+    # apparently we want to load data from file so let's do that
+    if read_file:
+        total_memory = None
+        process_names = {}
+        process_memory = {}
+        memory_types = None
+        system_memory = None
+        with open(options.profile, "rb") as datafile:
+            contents = np.load(datafile)
+            # loop over all elements in the file and assign to the correct
+            # variables
+            for key, data in contents.items():
+                if key == "total_memory":
+                    total_memory = data
+                elif key == "process_names":
+                    for pid, name in data:
+                        process_names[int(pid)] = name
+                elif key == "memory_types":
+                    memory_types = data
+                elif key == "system_memory":
+                    system_memory = data
+                elif key == "annotations":
+                    annotations = data
+                else:
+                    process_memory[int(key)] = data
+
+        # number of memory types comes from file so change it
+        ntypes = len(memory_types)
+
+    if not process_memory:
+        print("program exited to fast to measure memory, exiting", file=sys.stderr)
+        sys.exit(0)
+
+    # start plotting
+    if do_plotting:
+        figures = [pl.figure(figsize=(12, 8)) for i in range(ntypes)]
+        # create axes for all memory "types"
+        axes = [fig.add_subplot(1, 1, 1) for fig in figures]
+
+        # plot total memory if we saw more than one process
+        if len(process_memory) > 1:
+            plot_memory(total_memory, "Total", "k")
+
+        # and plot all processes
+        for i, (pid, val) in enumerate(sorted(process_memory.items())):
+            label = "%s (%d)" % (process_names[pid], pid)
+            plot_memory(val, label, get_color(i, len(process_memory)))
+
+        # finalize all plots
+        for i, (a, title) in enumerate(zip(axes, memory_types)):
+            # plot system memory usage if recorded
+            if system_memory is not None and (title[0] != "swap"):
+                a.plot(system_memory[:, 0], system_memory[:, 1] / 1000,
+                       label="system", c="k", alpha=0.5)
+            # and add title and labels
+            a.set_xlabel("Time / s")
+            a.set_ylabel("Memory / MB")
+            a.set_title(title[0])
+            a.set_ylim(ymin=0)
+            a.grid()
+            # and a legend
+            if not options.no_legend:
+                l = a.legend(loc="best")
+                l.get_frame().set_alpha(0.8)
+
+            # add max line and label it
+            maxvalue = total_memory[:, i + 1].max() / 1000
+            a.axhline(maxvalue, c="k", ls="--", zorder=-1)
+            a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
+                       textcoords="offset points")
+
+            # add annotations if any. As the annotations are not necessarily at the
+            # same times as the memory consumption we let numpy linearly interpolate
+            # the total memory at the times of the annotations
+            annotation_values = np.interp(annotations["time"], total_memory[:, 0], total_memory[:, i + 1] / 1000)
+            # and add a an annotation for each one to the plot
+            for (timestamp, text), value in zip(annotations, annotation_values):
+                args = dict(xy=(timestamp, value), xytext=(0, -20), textcoords="offset points",
+                            rotation="vertical", size="xx-small", arrowprops={"arrowstyle": "->"},
+                            ha="center", va="top")
+                # if total memory is below the center of the plot put the annotation
+                # above, otherwise put it below the line
+                if maxvalue == 0 or value/maxvalue < 0.5:
+                    args["va"] = "bottom"
+                    args["xytext"] = (0, -args["xytext"][1])
+
+                a.annotate(text, **args)
+
+        # save plots
+        with PdfPages(options.out) as pdf:
+            for f in figures:
+                # select the figure
+                pl.figure(f.number)
+                # adjust the layout to fit exactly on the canvas
+                pl.tight_layout()
+                # add to pdf
+                pdf.savefig(f)
+
+    # finally, print values, first we get the values formated correctly in MB for
+    # max, mean and standard deviation and that for each memory type
+    values = np.array([["%.2f" % (fct(m)/1000) for m in total_memory.T[1:]]
+                      for fct in(np.max, np.mean, np.std)])
+    # now lets find out how many digits we need for each type of value
+    digits = [max(map(len, v)) for v in values]
+
+    # now print execution time
+    print("{0:20}: {1:.2f} sec".format("execution time", total_memory[:, 0].max()),
           file=sys.stderr)
+    # then memory consumption
+    for i, (name, field) in enumerate(memory_types):
+        print("{name:20}: max={values[0]:>{digits[0]}} MB, "
+              "avg={values[1]:>{digits[1]}} +- {values[2]:>{digits[2]}} MB"
+              .format(values=values.T[i], name=name, digits=digits),
+              file=sys.stderr)

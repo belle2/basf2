@@ -1,6 +1,6 @@
 /* makePlots.C 
  * ROOT macro for ECL validation plots 
- * Author: Benjamin Oberhof 
+ * Authors: Benjamin Oberhof, Elisa Manoni 
  * 2015-06
 */
 
@@ -32,113 +32,71 @@ void ECLCalDigitBarrel(TTree* cluster_treeBarrel);
 void ECLCalDigitBWD(TTree* cluster_treeBWD);
 void ECLMuon(TTree* muon_tree);
 Double_t Novosibirsk(Double_t *xp,Double_t *par);
-//void ECLPion(TTree* pion_tree);
 
 void makeECLPlots() 
 {
   
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
-
-  TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
-  TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
-  TFile* cluster_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
-  TTree* cluster_treeFWD = (TTree*) cluster_inputFWD->Get("m_tree");
-  TFile* clusterReso_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
-  TTree* clusterReso_treeFWD = (TTree*) clusterReso_inputFWD->Get("m_tree");
-  TFile* cd_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
-  TTree* cd_treeFWD = (TTree*) cd_inputFWD->Get("m_tree");
-  TFile* cluster_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
-  TTree* cluster_treeBarrel = (TTree*) cluster_inputBarrel->Get("m_tree");
-  TFile* clusterReso_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
-  TTree* clusterReso_treeBarrel = (TTree*) clusterReso_inputBarrel->Get("m_tree");
-  TFile* cd_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
-  TTree* cd_treeBarrel = (TTree*) cd_inputBarrel->Get("m_tree");
-  TFile* cluster_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
-  TTree* cluster_treeBWD = (TTree*) cluster_inputBWD->Get("m_tree");
-  TFile* clusterReso_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
-  TTree* clusterReso_treeBWD = (TTree*) clusterReso_inputBWD->Get("m_tree");
-  TFile* cd_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
-  TTree* cd_treeBWD = (TTree*) cd_inputBWD->Get("m_tree");
-  TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
-  TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
-  //TFile* pion_input = TFile::Open("../ECLPionOutput.root");
-  //TTree* pion_tree = (TTree*) pion_input->Get("m_tree");
-
-  ECL2D(bkg_tree);
-  ECLBkg(bkg_tree);
-  ECLClusterFWD(cluster_treeFWD);
-  ECLClusterBarrel(cluster_treeBarrel);
-  ECLClusterBWD(cluster_treeBWD);
-  ECLCalDigitFWD(cd_treeFWD);
-  ECLCalDigitBarrel(cd_treeBarrel);
-  ECLCalDigitBWD(cd_treeBWD);
-  ECLMuon(muon_tree);
-  ECLClusterResoFWD(clusterReso_treeFWD);
-  ECLClusterResoBarrel(clusterReso_treeBarrel);
-  ECLClusterResoBWD(clusterReso_treeBWD);
-  //  ECLPi0(pi0_tree);
-  //  ECLPion(pion_tree);
+  if (TFile::Open("../ECLBkgOutput.root") != NULL) {
+    TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
+    TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
+    ECL2D(bkg_tree);
+    ECLBkg(bkg_tree);
+  }
+  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+    TFile* cluster_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
+    TTree* cluster_treeFWD = (TTree*) cluster_inputFWD->Get("m_tree");
+    ECLClusterFWD(cluster_treeFWD);
+  }
+  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+    TFile* clusterReso_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
+    TTree* clusterReso_treeFWD = (TTree*) clusterReso_inputFWD->Get("m_tree");
+    ECLClusterResoFWD(clusterReso_treeFWD);
+  }
+  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+    TFile* cd_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
+    TTree* cd_treeFWD = (TTree*) cd_inputFWD->Get("m_tree");
+    ECLCalDigitFWD(cd_treeFWD);
+  } 
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+    TFile* cluster_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
+    TTree* cluster_treeBarrel = (TTree*) cluster_inputBarrel->Get("m_tree");
+    ECLClusterBarrel(cluster_treeBarrel);
+  } 
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+    TFile* clusterReso_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
+    TTree* clusterReso_treeBarrel = (TTree*) clusterReso_inputBarrel->Get("m_tree");
+    ECLClusterResoBarrel(clusterReso_treeBarrel);
+  }
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+    TFile* cd_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
+    TTree* cd_treeBarrel = (TTree*) cd_inputBarrel->Get("m_tree");
+    ECLCalDigitBarrel(cd_treeBarrel);
+  }
+  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+    TFile* cluster_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
+    TTree* cluster_treeBWD = (TTree*) cluster_inputBWD->Get("m_tree");
+    ECLClusterBWD(cluster_treeBWD);
+  }
+  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+    TFile* clusterReso_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
+    TTree* clusterReso_treeBWD = (TTree*) clusterReso_inputBWD->Get("m_tree");
+    ECLClusterResoBWD(clusterReso_treeBWD);
+  }
+  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+    TFile* cd_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
+    TTree* cd_treeBWD = (TTree*) cd_inputBWD->Get("m_tree");
+    ECLCalDigitBWD(cd_treeBWD);
+  }
+  if (TFile::Open("../ECLMuonOutput.root") != NULL) {
+    TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
+    TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
+    ECLMuon(muon_tree);
+  }
 
 }
-/*
-void ECLPi0(TTree* pi0_tree)
-{
 
-  TFile* output = TFile::Open("ECLPi0.root", "recreate");
-
-  TH1F* hPi0s = new TH1F("hPi0s", "ECL Reconstructed Pi0 Energy for 1 GeV/c Pi0", 100, 0.2, 1.2);
-  hPi0s->GetXaxis()->SetTitle("Pi0 Energy (GeV)");
-  hPi0s->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed energy for 1 GeV Pi0s")); 
-  hPi0s->GetListOfFunctions()->Add(new TNamed("Check","Should not be biased"));
-  hPi0s->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  gPad->RedrawAxis();
-  pi0_tree->Draw("eclPi0Energy>>hPi0s");
-  hPi0s->Write();
-  delete hPi0s;
-
-  TH1F* hPi0mass = new TH1F("hPi0mass", "ECL combined Pi0 Mass for 1 GeV/c Pi0", 100, 0.08, 0.18);
-  hPi0mass->GetXaxis()->SetTitle("Pi0 combined mass (GeV/c^{2})");
-  hPi0mass->GetListOfFunctions()->Add(new TNamed("Description", 
-    "Reconstructed mass for 1 GeV Pi0s")); 
-  hPi0mass->GetListOfFunctions()->Add(new TNamed("Check", 
-    "Should not be biased"));
-  hPi0mass->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  gPad->RedrawAxis();
-  pi0_tree->Draw("eclPi0Mass>>hPi0mass");
-  hPi0mass->Write();
-  delete hPi0mass;
-
-  output->Close();
-  }*/
-
-/*
-void ECLPion(TTree* pion_tree){
-
-  TFile* output = TFile::Open("ECLPion.root", "recreate");
-
-  TH1F* hPionE = new TH1F("hPionE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
-  pion_tree->Draw("eclClusterEnergy>>hPionE","eclClusterEnergy>0");
-  hPionE->GetXaxis()->SetTitle("Cluster energy (GeV)");
-  hPionE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
-  hPionE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));
-  hPionE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
-  hPionE->Write();
-
-
-  TH1F* hPionMultip = new TH1F("hPionMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
-  pion_tree->Draw("eclClusterMultip>>hPionMultip","eclClusterMultip>0");
-  hPionMultip->SetMaximum(600);
-  hPionMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
-  hPionMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
-  hPionMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
-  hPionMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
-  hPionMultip->Write();
-  
-  output->Close();
-  //delete output;
-}
-*/
 
 void ECLMuon(TTree* muon_tree)
 {
@@ -147,23 +105,41 @@ void ECLMuon(TTree* muon_tree)
 
   TH1F* hMuonsE = new TH1F("hMuonsE", "Reconstructed cluster energy for (0.5 - 3 GeV) muons, the typical energy is 0.2 GeV", 100, 0., 0.6);
   muon_tree->Draw("eclClusterEnergy>>hMuonsE","eclClusterToMC1==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)/eclClusterEnergy>0");
-  hMuonsE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hMuonsE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Description","Energy release in the ECL for 1 GeV muons")); 
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 200 MeV"));
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMuonsE->Write();
 
-  TH1F* hMuonsFake = new TH1F("hMuonsFake","Fake (non-bkg) neutral clusters for 1000 muons", 2,0,2);
-  hMuonsFake->SetMaximum(150);
-  muon_tree->Draw("(eclClusterIsTrack)>>hMuonsFake","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&((eclClusterToMCWeight1-eclClusterToBkgWeight)/eclClusterEnergy)>0");
-  //hMuonsFake->SetMaximum(150);
-  hMuonsFake->GetXaxis()->SetTitle("Fake (non-bkg) neutral clusters for 1000 muons");
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Fake gammas every 1000 muons")); 
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be below 5%"));
+  TH1F* hMuonsFake = new TH1F("hMuonsFake","Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons", 20,-2,2);
+  hMuonsFake->SetMaximum(1100);
+  muon_tree->Draw("(2*eclClusterIsTrack-1)>>hMuonsFake","eclClusterToMC1==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
+  //hMuonsFake->Scale(0.1);
+  hMuonsFake->GetXaxis()->SetTitle("Percentage of fake (non-bkg) neutral clusters");
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons")); 
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Number of unmatched clusters should be around/below 5%"));
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFake->Write(); 
 
-  //delete output;
+  TH1F* hMuonsFakeTheta = new TH1F("hMuonsFakeTheta","#theta distribution for fake (non-bkg) neutral clusters", 25, 0, 3.2);
+
+  muon_tree->Draw("eclClusterTheta>>hMuonsFakeTheta","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
+  hMuonsFakeTheta->GetXaxis()->SetTitle("#theta (rad)");
+  hMuonsFakeTheta->GetListOfFunctions()->Add(new TNamed("Description", "#theta distribution for fake gammas")); 
+  hMuonsFakeTheta->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape. For this plot the statistic should be low but may help in problem diagnosis when the number of fake cluster is unexpectedly high."));
+  hMuonsFakeTheta->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
+  hMuonsFakeTheta->Write(); 
+
+  TH1F* hMuonsFakePhi = new TH1F("hMuonsFakePhi","#phi distribution for fake (non-bkg) neutral clusters", 25, -3.6, 3.6);
+
+  muon_tree->Draw("eclClusterPhi>>hMuonsFakePhi","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
+  hMuonsFakePhi->GetXaxis()->SetTitle("#phi (rad)");
+  hMuonsFakePhi->GetListOfFunctions()->Add(new TNamed("Description", "#phi distribution for fake gammas")); 
+  hMuonsFakePhi->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape. For this plot the statistic should be low but may help in prob\
+lem diagnosis when the number of fake cluster is unexpectedly high."));
+  hMuonsFakePhi->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
+  hMuonsFakePhi->Write(); 
+
   output->Close();
   delete output;
 }
@@ -178,7 +154,6 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   cluster_treeFWD->SetBranchAddress("eclClusterHypothesisId", &eclClusterHypothesisId);
   std::vector<int>* eclClusterToMC1=0;
   cluster_treeFWD->SetBranchAddress("eclClusterToMC1", &eclClusterToMC1);
-  //TH1F* FWDMultip = new TH1F("FWDMultip","", 100, 0., 100.);
 
   for(int i=0; i<cluster_treeFWD->GetEntries();i++){
     cluster_treeFWD->GetEntry(i);
@@ -191,10 +166,9 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
     hMultip->Fill(h);
   }
 
-  //cluster_treeFWD->Draw("eclClusterMultip>>hMultip");
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Multiplicity of (true) reconstructed clusters for 100 MeV/c single photons in FWD endcap"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hMultip->GetXaxis()->SetTitle("Cluster Multiplicity");
+  hMultip->GetXaxis()->SetTitle("Cluster multiplicity");
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
 
@@ -202,7 +176,7 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   cluster_treeFWD->Draw("eclClusterEnergy>>hEnergy","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 100 MeV/c single photons in FWD endcap"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 100 MeV and left-side tail.")); 
-  hEnergy->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hEnergy->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
@@ -210,7 +184,7 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   cluster_treeFWD->Draw("eclClusterEnergyDepSum>>hEnDepSum","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 100 MeV/c single photons in FWD endcap"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 100 MeV and left-side tail.")); 
-  hEnDepSum->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hEnDepSum->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
@@ -218,7 +192,7 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   cluster_treeFWD->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 100 MeV/c single photons in FWD endcap"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hECorr->GetXaxis()->SetTitle("Energy Correction (GeV)");
+  hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
 
@@ -257,7 +231,7 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   cluster_treeFWD->Draw("eclCluster Energy Error>>hEError","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEError->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed energy error of the cluster for 100 MeV/c single photons in FWD endcap"));
   hEError->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape"));
-  hEError->GetXaxis()->SetTitle("EError (GeV)");
+  hEError->GetXaxis()->SetTitle("Cluster energy error (GeV)");
   hEError->SetMinimum(.0);
   hEError->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
@@ -325,7 +299,6 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   hIsTrack->SetMinimum(.0);
   hIsTrack->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
-  //
   TH1F* hAbsZernike40 = new TH1F("hAbsZernike40", "Cluster AbsZernike40 in FWD endcap", 100, 0, 2);
   cluster_treeFWD->Draw("eclClusterAbsZernike40>>hAbsZernike40","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hAbsZernike40->GetListOfFunctions()->Add(new TNamed("Description", "Cluster Zernike40 for 100 MeV/c single photons in FWD endcap"));
@@ -380,7 +353,6 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
   hSecondMoment->Write(); 
   hECorr->Write();
 
-  //delete output;
   output->Close();
   delete output;
   delete hMultip;
@@ -417,7 +389,6 @@ void ECLClusterBarrel(TTree* cluster_treeBarrel)
   cluster_treeBarrel->SetBranchAddress("eclClusterHypothesisId", &eclClusterHypothesisId);
   std::vector<int>* eclClusterToMC1=0;
   cluster_treeBarrel->SetBranchAddress("eclClusterToMC1", &eclClusterToMC1);
-  //TH1F* Multip = new TH1F("Multip","", 100, 0., 100.);
 
   for(int i=0; i<cluster_treeBarrel->GetEntries();i++){
     cluster_treeBarrel->GetEntry(i);
@@ -430,44 +401,38 @@ void ECLClusterBarrel(TTree* cluster_treeBarrel)
     hMultip->Fill(h);
   }
 
-  //cluster_treeBarrel->Draw("eclClusterMultip>>hMultip");
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Multiplicity of reconstructed clusters for 100 MeV/c single photons in Barrel"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hMultip->GetXaxis()->SetTitle("Cluster Multiplicity");
+  hMultip->GetXaxis()->SetTitle("Cluster multiplicity");
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
-
 
   TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in Barrel", 100, 0., 0.2);
   cluster_treeBarrel->Draw("eclClusterEnergy>>hEnergy","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 100 MeV/c single photons in Barrel"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 100 MeV and left-side tail.")); 
-  hEnergy->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hEnergy->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-
 
   TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in Barrel", 100, 0., 0.2);
   cluster_treeBarrel->Draw("eclClusterEnergyDepSum>>hEnDepSum","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 100 MeV/c single photons in Barrel"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 100 MeV and left-side tail.")); 
-  hEnDepSum->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hEnDepSum->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-
 
   TH1F* hECorr = new TH1F("hECorr","Cluster Energy correction in Barrel", 100, -0.01, 0.01);
   cluster_treeBarrel->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 100 MeV/c single photons in barrel"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hECorr->GetXaxis()->SetTitle("Energy Correction (GeV)");
+  hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-
 
   TH1F* hHighestE = new TH1F("hHighestE","Highest Energy Deposit in Barrel", 100, 0., 0.14);
   cluster_treeBarrel->Draw("eclClusterHighestE>>hHighestE","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hHighestE->GetListOfFunctions()->Add(new TNamed("Description", "Highest energy deposited in a crystal for 100 MeV/c single photons in Barrel"));
   hHighestE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
-  hHighestE->GetXaxis()->SetTitle("Deposited Energy(GeV)");
+  hHighestE->GetXaxis()->SetTitle("Deposited energy(GeV)");
   hHighestE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-
 
   TH1F* hE9oE21 = new TH1F("hE9oE21","E9/E21 in Barrel", 120, 0., 1.2);
   cluster_treeBarrel->Draw("eclClusterE9oE21>>hE9oE21","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
@@ -483,7 +448,6 @@ void ECLClusterBarrel(TTree* cluster_treeBarrel)
   hE1oE9->GetXaxis()->SetTitle("E1oE9");
   hE1oE9->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
-
   TH1F* hphi = new TH1F("hphi", "Reconstructed #phi Angle in Barrel", 64, -3.2, 3.2);
   cluster_treeBarrel->Draw("eclClusterPhi>>hphi","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hphi->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed #phi angle of the cluster for 100 MeV/c single photons in Barrel"));
@@ -496,7 +460,7 @@ void ECLClusterBarrel(TTree* cluster_treeBarrel)
   cluster_treeBarrel->Draw("eclCluster Energy Error>>hEError","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEError->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed energy error of the cluster for 100 MeV/c single photons in Barrel"));
   hEError->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape"));
-  hEError->GetXaxis()->SetTitle("EError (GeV)");
+  hEError->GetXaxis()->SetTitle("Cluster energy error (GeV)");
   hEError->SetMinimum(.0);
   hEError->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
@@ -618,7 +582,6 @@ void ECLClusterBarrel(TTree* cluster_treeBarrel)
   hSecondMoment->Write();
   hECorr->Write();
 
-  //delete output;
   output->Close();
   delete output;
   delete hMultip;
@@ -654,7 +617,6 @@ void ECLClusterBWD(TTree* cluster_treeBWD)
   cluster_treeBWD->SetBranchAddress("eclClusterHypothesisId", &eclClusterHypothesisId);
   std::vector<int>* eclClusterToMC1=0;
   cluster_treeBWD->SetBranchAddress("eclClusterToMC1", &eclClusterToMC1);
-  //TH1F* Multip = new TH1F("Multip","", 100, 0., 100.);
 
   for(int i=0; i<cluster_treeBWD->GetEntries();i++){
     cluster_treeBWD->GetEntry(i);
@@ -667,42 +629,38 @@ void ECLClusterBWD(TTree* cluster_treeBWD)
     hMultip->Fill(h);
   }
 
-  //cluster_treeBWD->Draw("eclClusterMultip>>hMultip");
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Multiplicity of reconstructed clusters for 100 MeV/c single photons in BWD endcap"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hMultip->GetXaxis()->SetTitle("Cluster Multiplicity");
+  hMultip->GetXaxis()->SetTitle("Cluster multiplicity");
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
-
 
   TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in BWD endcap", 100, 0., 0.2);
   cluster_treeBWD->Draw("eclClusterEnergy>>hEnergy","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 100 MeV/c single photons in BWD endcap"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 100 MeV and left-side tail.")); 
-  hEnergy->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hEnergy->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-
 
   TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in BWD endcap", 100, 0., 0.2);
   cluster_treeBWD->Draw("eclClusterEnergyDepSum>>hEnDepSum","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 100 MeV/c single photons in BWD endcap"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 100 MeV and left-side tail.")); 
-  hEnDepSum->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  hEnDepSum->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
   TH1F* hECorr = new TH1F("hECorr","Cluster Energy correction in BWD endcap", 100, -0.01, 0.01);
   cluster_treeBWD->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 100 MeV/c single photons in BWD endcap"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hECorr->GetXaxis()->SetTitle("Energy Correction (GeV)");
+  hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
   TH1F* hHighestE = new TH1F("hHighestE","Highest Energy Deposit in BWD endcap", 100, 0., 0.14);
   cluster_treeBWD->Draw("eclClusterHighestE>>hHighestE","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hHighestE->GetListOfFunctions()->Add(new TNamed("Description", "Highest energy deposited in a crystal for 100 MeV/c single photons in BWD endcap"));
   hHighestE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
-  hHighestE->GetXaxis()->SetTitle("Deposited Energy(GeV)");
+  hHighestE->GetXaxis()->SetTitle("Deposited energy(GeV)");
   hHighestE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-
 
   TH1F* hE9oE21 = new TH1F("hE9oE21","E9/E21 in BWD endcap", 120, 0., 1.2);
   cluster_treeBWD->Draw("eclClusterE9oE21>>hE9oE21","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
@@ -718,7 +676,6 @@ void ECLClusterBWD(TTree* cluster_treeBWD)
   hE1oE9->GetXaxis()->SetTitle("E1oE9");
   hE1oE9->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
-
   TH1F* hphi = new TH1F("hphi", "Reconstructed #phi Angle in BWD endcap", 64, -3.2, 3.2);
   cluster_treeBWD->Draw("eclClusterPhi>>hphi","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hphi->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed #phi angle of the cluster for 100 MeV/c single photons in BWD endcap"));
@@ -731,7 +688,7 @@ void ECLClusterBWD(TTree* cluster_treeBWD)
   cluster_treeBWD->Draw("eclCluster Energy Error>>hEError","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
   hEError->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed energy error of the cluster for 100 MeV/c single photons in BWD endcap"));
   hEError->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape"));
-  hEError->GetXaxis()->SetTitle("EError (GeV)");
+  hEError->GetXaxis()->SetTitle("Cluster energy error (GeV)");
   hEError->SetMinimum(.0);
   hEError->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
 
@@ -853,7 +810,6 @@ void ECLClusterBWD(TTree* cluster_treeBWD)
   hSecondMoment->Write();
   hECorr->Write();
 
-  //delete output;
   output->Close();
   delete output;
   delete hMultip;
@@ -888,19 +844,10 @@ void ECLClusterResoFWD(TTree* clusterReso_treeFWD)
   clusterReso_treeFWD->Draw("(eclClusterEnergy-0.1)>>hEnergyReso","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5&&eclClusterEnergy>0.05");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Description", "Energy resolution for single photons in FWD endcap, minimum cluster energy 50 MeV"));
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Check", "Consistent resolution")); 
-  hEnergyReso->GetXaxis()->SetTitle("Cluster EnergyReso (GeV)");
+  hEnergyReso->GetXaxis()->SetTitle("Reconstructed cluster energy -  Generated energy (GeV)");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   hEnergyReso->Fit("gaus");
   gStyle->SetOptFit(11111);
-  /*
-  TH1F* hEff = new TH1F("hEff","Cluster Reco Eff in FWD endcap", 3, 0., 3);
-  hEff->SetMinimum(0);
-  cluster_treeFWD->Draw("(eclClusterMultip/1.9)>>hEff");//,"eclClusterTheta>131.5&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
-  hEff->GetListOfFunctions()->Add(new TNamed("Description", "Reco Eff for single photons in FWD endcap"));
-  hEff->GetListOfFunctions()->Add(new TNamed("Check", "Consistent")); 
-  hEff->GetXaxis()->SetTitle("Cluster Reco Eff");
-  hEff->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  */
 
   TFile* output = TFile::Open("ECLClusterResoFWD.root", "recreate");
   hEnergyReso->Write();
@@ -917,19 +864,10 @@ void ECLClusterResoBarrel(TTree* clusterReso_treeBarrel)
   clusterReso_treeBarrel->Draw("(eclClusterEnergy-0.1)>>hEnergyReso","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHypothesisId==5&&eclClusterEnergy>0.05");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Description", "Energy resolution for single photons in Barrel, minimum cluster energy 50 MeV"));
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Check", "Consistent resolution")); 
-  hEnergyReso->GetXaxis()->SetTitle("Cluster EnergyReso (GeV)");
+  hEnergyReso->GetXaxis()->SetTitle("Reconstructed cluster energy -  Generated energy (GeV)");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   hEnergyReso->Fit("gaus");
   gStyle->SetOptFit(11111);
-  /*
-  TH1F* hEff = new TH1F("hEff","Cluster Reco Eff in Barrel endcap", 3, 0., 3);
-  hEff->SetMinimum(0);
-  cluster_treeBarrel->Draw("(eclClusterMultip/1.9)>>hEff");//,"eclClusterTheta>131.5&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
-  hEff->GetListOfFunctions()->Add(new TNamed("Description", "Reco Eff for single photons in Barrel endcap"));
-  hEff->GetListOfFunctions()->Add(new TNamed("Check", "Consistent")); 
-  hEff->GetXaxis()->SetTitle("Cluster Reco Eff");
-  hEff->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  */
 
   TFile* output = TFile::Open("ECLClusterResoBarrel.root", "recreate");
   hEnergyReso->Write();
@@ -941,31 +879,14 @@ void ECLClusterResoBarrel(TTree* clusterReso_treeBarrel)
 
 void ECLClusterResoBWD(TTree* clusterReso_treeBWD)
 {
-  /*
-  TF1 *novoSib1 = new TF1("novoSib1", Novosibirsk,0.08,0.115,4);
-  novoSib1->SetParNames("Constant","#mu","#sigma","#tau");
-  novoSib1->SetParameter(0,10);
-  novoSib1->SetParameter(1,0.1);
-  novoSib1->SetParameter(2,0.007);
-  novoSib1->SetParameter(3,0.95);
-  */
   TH1F* hEnergyReso = new TH1F("hEnergyReso","Cluster EnergyReso in BWD endcap", 100, -0.1, 0.1);
   clusterReso_treeBWD->Draw("(eclClusterEnergy-0.1)>>hEnergyReso","eclClusterTheta>131.5*(3.1415/180)&&eclClusterToMC1==0&&eclClusterHypothesisId==5&&eclClusterEnergy>0.05");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Description", "Energy resolution for single photons in BWD endcap, minimum cluster energy 50 MeV"));
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Check", "Consistent resolution")); 
-  hEnergyReso->GetXaxis()->SetTitle("Cluster EnergyReso (GeV)");
+  hEnergyReso->GetXaxis()->SetTitle("Reconstructed cluster energy -  Generated energy (GeV)");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   hEnergyReso->Fit("gaus");
   gStyle->SetOptFit(11111);
-  /*
-  TH1F* hEff = new TH1F("hEff","Cluster Reco Eff in BWD endcap", 3, 0., 3);
-  hEff->SetMinimum(0);
-  cluster_treeBWD->Draw("(eclClusterMultip/1.9)>>hEff");//,"eclClusterTheta>131.5&&eclClusterToMC1==0&&eclClusterHypothesisId==5");
-  hEff->GetListOfFunctions()->Add(new TNamed("Description", "Reco Eff for single photons in BWD endcap"));
-  hEff->GetListOfFunctions()->Add(new TNamed("Check", "Consistent")); 
-  hEff->GetXaxis()->SetTitle("Cluster Reco Eff");
-  hEff->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  */
 
   TFile* output = TFile::Open("ECLClusterResoBWD.root", "recreate");
   hEnergyReso->Write();
@@ -978,14 +899,12 @@ void ECLClusterResoBWD(TTree* clusterReso_treeBWD)
 void ECLCalDigitFWD(TTree* cd_treeFWD)
 {
 
-
   std::vector<int>* eclCalDigitToMC1=0;
   cd_treeFWD->SetBranchAddress("eclCalDigitToMC1", &eclCalDigitToMC1);
   std::vector<int>* eclCalDigitCellId=0;
   cd_treeFWD->SetBranchAddress("eclCalDigitCellId", &eclCalDigitCellId);
 
   TH1F* hMultip = new TH1F("hMultip","CalDigit Multiplicity in FWD endcap", 30, 0., 30.);
-  //TH1F* Multip = new TH1F("Multip","", 10000, 0., 10000.);
 
   for(int i=0; i<cd_treeFWD->GetEntries(); i++){
     cd_treeFWD->GetEntry(i);
@@ -1000,21 +919,21 @@ void ECLCalDigitFWD(TTree* cd_treeFWD)
 
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Cal Digit multiplicity for 100 MeV/c single photons in FWD endcap"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hMultip->GetXaxis()->SetTitle("CalDigit Multiplicity");
+  hMultip->GetXaxis()->SetTitle("CalDigit multiplicity");
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hAmp = new TH1F("hAmp","CalDigit Amplitude in FWD endcap", 100, 0., 0.04);
   cd_treeFWD->Draw("eclCalDigitAmp>>hAmp","eclCalDigitCellId<1153&&eclCalDigitToMC1==0");
   hAmp->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit amplitude for 100 MeV/c single photons in FWD endcap"));
   hAmp->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hAmp->GetXaxis()->SetTitle("CalDigit Amplitude");
+  hAmp->GetXaxis()->SetTitle("CalDigit amplitude");
   hAmp->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hTimeFit = new TH1F("hTimeFit","CalDigit TimeFit in FWD endcap", 110, -1100., 1100.);
   cd_treeFWD->Draw("eclCalDigitTimeFit>>hTimeFit","eclCalDigitCellId<1153&&eclCalDigitToMC1==0");
   hTimeFit->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit time fit for 100 MeV/c single photons in FWD endcap"));
   hTimeFit->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hTimeFit->GetXaxis()->SetTitle("CalDigit Time Fit");
+  hTimeFit->GetXaxis()->SetTitle("CalDigit time fit");
   hTimeFit->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hFitQuality = new TH1F("hFitQuality","CalDigit FitQuality in FWD endcap", 2, 0., 2.);
@@ -1022,7 +941,7 @@ void ECLCalDigitFWD(TTree* cd_treeFWD)
   cd_treeFWD->Draw("eclCalDigitFitQuality>>hFitQuality","eclCalDigitCellId<1153&&eclCalDigitToMC1==0");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit time fit quality for 100 MeV/c single photons in FWD endcap"));
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hFitQuality->GetXaxis()->SetTitle("CalDigit Time Fit Quality");
+  hFitQuality->GetXaxis()->SetTitle("CalDigit time fit quality");
   hFitQuality->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hCellId = new TH1F("hCellId","CalDigit CellId in FWD endcap", 288, 0., 1153.);
@@ -1030,9 +949,8 @@ void ECLCalDigitFWD(TTree* cd_treeFWD)
   cd_treeFWD->Draw("eclCalDigitCellId>>hCellId","eclCalDigitCellId<1153&&eclCalDigitToMC1==0");
   hCellId->GetListOfFunctions()->Add(new TNamed("Description", "Cal Digit CellID for 100 MeV/c single photons in FWD endcap"));
   hCellId->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hCellId->GetXaxis()->SetTitle("CalDigit Cell ID");
+  hCellId->GetXaxis()->SetTitle("CalDigit cell ID");
   hCellId->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
-
 
   TFile* output = TFile::Open("ECLCalDigitFWD.root", "recreate");
   hMultip->Write();
@@ -1059,7 +977,6 @@ void ECLCalDigitBarrel(TTree* cd_treeBarrel)
   cd_treeBarrel->SetBranchAddress("eclCalDigitCellId", &eclCalDigitCellId);
 
   TH1F* hMultip = new TH1F("hMultip","CalDigit Multiplicity in barrel", 30, 0., 30.);
-  //TH1F* Multip = new TH1F("Multip","", 10000, 0., 10000.);
 
   for(int i=0; i<cd_treeBarrel->GetEntries();i++){
     cd_treeBarrel->GetEntry(i);
@@ -1074,7 +991,7 @@ void ECLCalDigitBarrel(TTree* cd_treeBarrel)
 
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Cal Digit multiplicity for 100 MeV/c single photons in barrel"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hMultip->GetXaxis()->SetTitle("CalDigit Multiplicity");
+  hMultip->GetXaxis()->SetTitle("CalDigit multiplicity");
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hAmp = new TH1F("hAmp","CalDigit Amplitude in Barrel", 100, 0., 0.04);
@@ -1104,9 +1021,8 @@ void ECLCalDigitBarrel(TTree* cd_treeBarrel)
   hCellId->SetMinimum(0);
   hCellId->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit CellID for 100 MeV/c single photons in Barrel endcap"));
   hCellId->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hCellId->GetXaxis()->SetTitle("CalDigit Cell ID");
+  hCellId->GetXaxis()->SetTitle("CalDigit cell ID");
   hCellId->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
-
 
   TFile* output = TFile::Open("ECLCalDigitBarrel.root", "recreate");
   hMultip->Write();
@@ -1134,7 +1050,6 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   cd_treeBWD->SetBranchAddress("eclCalDigitCellId", &eclCalDigitCellId);
 
   TH1F* hMultip = new TH1F("hMultip","CalDigit Multiplicity in BWD endcap", 30, 0., 30.);
-  //TH1F* Multip = new TH1F("Multip","", 10000, 0., 10000.);
 
   for(int i=0; i<cd_treeBWD->GetEntries();i++){
     cd_treeBWD->GetEntry(i);
@@ -1147,11 +1062,9 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
     hMultip->Fill(h);
   }
 
-  //  TH1F* hMultip = new TH1F("hMultip","CalDigit Multiplicity in BWD endcap", 100, 2800., 4200.);
-  //cd_treeBWD->Draw("eclCalDigitMultip>>hMultip","eclCalDigitCellId>7776&&eclCalDigitToMC1==0");
   hMultip->GetListOfFunctions()->Add(new TNamed("Description", "Cal Digit multiplicity for 100 MeV/c single photons in BWD endcap"));
   hMultip->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hMultip->GetXaxis()->SetTitle("CalDigit Multiplicity");
+  hMultip->GetXaxis()->SetTitle("CalDigit multiplicity");
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hAmp = new TH1F("hAmp","CalDigit Amplitude in BWD endcap", 100, 0., 0.04);
@@ -1165,7 +1078,7 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   cd_treeBWD->Draw("eclCalDigitTimeFit>>hTimeFit","eclCalDigitCellId>7776&&eclCalDigitToMC1==0");
   hTimeFit->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit time fit for 100 MeV/c single photons in BWD endcap"));
   hTimeFit->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hTimeFit->GetXaxis()->SetTitle("CalDigit Time Fit");
+  hTimeFit->GetXaxis()->SetTitle("CalDigit time fit");
   hTimeFit->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
   TH1F* hFitQuality = new TH1F("hFitQuality","CalDigit FitQuality in BWD endcap", 2, 0., 2.);
@@ -1181,7 +1094,7 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   cd_treeBWD->Draw("eclCalDigitCellId>>hCellId","eclCalDigitCellId>7776&&eclCalDigitToMC1==0");
   hCellId->GetListOfFunctions()->Add(new TNamed("Description", "CalDigit cell ID for 100 MeV/c single photons in BWD endcap"));
   hCellId->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
-  hCellId->GetXaxis()->SetTitle("CalDigit Cell ID");
+  hCellId->GetXaxis()->SetTitle("CalDigit cell ID");
   hCellId->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
 
 
@@ -1191,7 +1104,6 @@ void ECLCalDigitBWD(TTree* cd_treeBWD)
   hTimeFit->Write();
   hFitQuality->Write();
   hCellId->Write();
-  //delete output;
   output->Close();
   delete output;
   delete hMultip;
@@ -1209,19 +1121,32 @@ void ECLBkg(TTree* bkg_tree)
 
   TH1F* bkgClusterE = new TH1F("bkgClusterE", "Cluster energy, bkg only", 60, 0., 0.2);
   bkg_tree->Draw("eclClusterEnergy>>bkgClusterE","eclClusterEnergy>0&&eclClusterHypothesisId==5");
-  bkgClusterE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
+  bkgClusterE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for bkg clusters")); 
-  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 0"));
+  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 20. (threshold value)"));
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterE->Write();
 
+  TH1F* bkgClusterTheta = new TH1F("bkgClusterTheta", "Cluster theta, bkg only", 50, 0, 3.2);
+  bkg_tree->Draw("eclClusterTheta>>bkgClusterTheta","eclClusterEnergy>0&&eclClusterHypothesisId==5");
+  bkgClusterTheta->GetXaxis()->SetTitle("#theta (rad)");
+  bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster theta for bkg clusters")); 
+  bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape."));
+  bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
+  bkgClusterTheta->Write();
+
+  TH1F* bkgClusterPhi = new TH1F("bkgClusterPhi", "Cluster phi, bkg only", 50, -3.6, 3.6);
+  bkg_tree->Draw("eclClusterPhi>>bkgClusterPhi","eclClusterEnergy>0&&eclClusterHypothesisId==5");
+  bkgClusterPhi->GetXaxis()->SetTitle("#phi (rad)");
+  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster phi for bkg clusters")); 
+  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape."));
+  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
+  bkgClusterPhi->Write();
+
   std::vector<int>* eclClusterHypothesisId=0;
   bkg_tree->SetBranchAddress("eclClusterHypothesisId", &eclClusterHypothesisId);
-  //std::vector<int>* eclCalDigitCellId=0;
-  //cluster_treeFWD->SetBranchAddress("eclCalDigitCellId", &eclCalDigitCellId);
 
-  TH1F* bkgClusterMultip = new TH1F("bkgClusterMultip","Cluster Multiplicity", 60, 0., 60.);
-  //TH1F* BkgMultip = new TH1F("BkgMultip","", 100, 0., 100.);
+  TH1F* bkgClusterMultip = new TH1F("bkgClusterMultip","Cluster Multiplicity", 150, 0., 150.);
 
   for(int i=0; i<bkg_tree->GetEntries();i++){
     bkg_tree->GetEntry(i);
@@ -1233,14 +1158,71 @@ void ECLBkg(TTree* bkg_tree)
     bkgClusterMultip->Fill(h);
   }
 
-  //TH1F* bkgClusterMultip = new TH1F("bkgClusterMultip", "Cluster multiplicity, bkg only", 60, 0, 60);
-  //bkg_tree->Draw("eclClusterMultip>>bkgClusterMultip");
-  bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity Bkg");
+  bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for bkg")); 
-  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2014)"));
+  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 55 (Feb 2018)"));
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   bkgClusterMultip->Write();
+
+  TH1F* bkgOutOfTimeDigitsFWD = new TH1F("bkgOutOfTimeDigitsFWD","# of out-of-time digits in FWD endcap", 100, 0., 100.);
+
+  bkgOutOfTimeDigitsFWD->GetXaxis()->SetTitle("# of out-of-time digits in FWD endcap");
+  bkg_tree->Draw("eclNumOutOfTimeDigitsFwd>>bkgOutOfTimeDigitsFWD");
+  bkgOutOfTimeDigitsFWD->GetListOfFunctions()->Add(new TNamed("Description","# of out-of-time digits in FWD endcap")); 
+  bkgOutOfTimeDigitsFWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 50 (Feb 2018)"));
+  bkgOutOfTimeDigitsFWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgOutOfTimeDigitsFWD->Write();
+
+ TH1F* bkgOutOfTimeDigitsBRL = new TH1F("bkgOutOfTimeDigitsBRL","# of out-of-time digits in barrel", 150, 200., 500.);
+
+  bkgOutOfTimeDigitsBRL->GetXaxis()->SetTitle("# of out-of-time digits in barrel");
+  bkg_tree->Draw("eclNumOutOfTimeDigitsBrl>>bkgOutOfTimeDigitsBRL");
+  bkgOutOfTimeDigitsBRL->GetListOfFunctions()->Add(new TNamed("Description","# of out-of-time digits in barrel")); 
+  bkgOutOfTimeDigitsBRL->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 340 (Feb 2018)"));
+  bkgOutOfTimeDigitsBRL->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgOutOfTimeDigitsBRL->Write();
+
+  TH1F* bkgOutOfTimeDigitsBWD = new TH1F("bkgOutOfTimeDigitsBWD","# of out-of-time digits in BWD endcap", 120, 60., 180.);
+
+  bkgOutOfTimeDigitsBWD->GetXaxis()->SetTitle("# of out-of-time digits in BWD endcap");
+  bkg_tree->Draw("eclNumOutOfTimeDigitsBwd>>bkgOutOfTimeDigitsBWD");
+  bkgOutOfTimeDigitsBWD->GetListOfFunctions()->Add(new TNamed("Description","# of out-of-time digits in BWD endcap")); 
+  bkgOutOfTimeDigitsBWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 100 (Feb 2018)"));
+  bkgOutOfTimeDigitsBWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgOutOfTimeDigitsBWD->Write();
+
+
+
+  TH1F* bkgRejectedShowersFWD = new TH1F("bkgRejectedShowersFWD","# of rejected showers in FWD endcap", 100, 0., 100.);
+
+  bkgRejectedShowersFWD->GetXaxis()->SetTitle("# of rejected ECL showers in FWD endcap");
+  bkg_tree->Draw("eclNumRejectedShowersFwd>>bkgRejectedShowersFWD");
+  bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Description","# of rejected ECL showers in FWD endcap")); 
+  bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 31 (Feb 2018)"));
+  bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgRejectedShowersFWD->Write();
+
+  TH1F* bkgRejectedShowersBRL = new TH1F("bkgRejectedShowersBRL","# of rejected showers in barrel", 150, 100., 250.);
+
+  bkgRejectedShowersBRL->GetXaxis()->SetTitle("# of rejected ECL showers in barrel");
+  bkg_tree->Draw("eclNumRejectedShowersBrl>>bkgRejectedShowersBRL");
+  bkgRejectedShowersBRL->GetListOfFunctions()->Add(new TNamed("Description","# of rejected ECL showers in barrel")); 
+  bkgRejectedShowersBRL->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 180 (Feb 2018)"));
+  bkgRejectedShowersBRL->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgRejectedShowersBRL->Write();
+
+  TH1F* bkgRejectedShowersBWD = new TH1F("bkgRejectedShowersBWD","# of rejected showers in BWD endcap", 100, 0., 100.);
+
+  bkgRejectedShowersBWD->GetXaxis()->SetTitle("# of rejected ECL showers in BWD endcap");
+  bkg_tree->Draw("eclNumRejectedShowersBwd>>bkgRejectedShowersBWD");
+  bkgRejectedShowersBWD->GetListOfFunctions()->Add(new TNamed("Description","# of rejected ECL showers in BWD endcap")); 
+  bkgRejectedShowersBWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 43 (Feb 2018)"));
+  bkgRejectedShowersBWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgRejectedShowersBWD->Write();
  
+
+
+
   output->Close();
   delete output;
 }
@@ -1253,7 +1235,6 @@ void ECL2D(TTree* bkg_tree)
   gStyle->SetOptStat(000000);
 
   TH2F* BDyz = new TH2F("BDyz", "Cluster position (yz-plane)", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  //TH2F* BDyz1 = new TH2F("BDyz1", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz2 = new TH2F("BDyz2", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz3 = new TH2F("BDyz3", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz4 = new TH2F("BDyz4", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
@@ -1328,7 +1309,6 @@ void ECL2D(TTree* bkg_tree)
 
 Double_t Novosibirsk(Double_t *xp,Double_t *par) {
 
-  // from root (RooNovosibirsk.cxx)
   Double_t x=xp[0];
   Double_t a=par[0];
   Double_t mu=par[1];
@@ -1342,7 +1322,6 @@ Double_t Novosibirsk(Double_t *xp,Double_t *par) {
   Double_t arg = 1.0 - ( x - mu ) * tau / sigma;
  
   if (arg < 1.e-7) {
-    //Argument of logaritem negative. Real continuation -> function equals zero
     return 0.0;
   }
    

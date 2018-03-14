@@ -11,23 +11,30 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 #include <tracking/trackFindingCDC/collectors/matchers/SharingHitsMatcher.h>
 #include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
-#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
+
+#include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTrackAdderWithNormalization.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class CDCTrack;
+    class CDCSegment2D;
+
     /**
      * Findlet for the combination of tracks and segments.
      *

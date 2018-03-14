@@ -52,10 +52,10 @@ namespace Belle2 {
       SVDClusterizerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 
@@ -111,16 +111,6 @@ namespace Belle2 {
       double m_elNoiseU;
       /** Noise in e- on v (long) strips, read from SensorInfo */
       double m_elNoiseV;
-      /** Apply ADC conversion? */
-      bool m_applyADC;
-      /** Low limit of ADC range in electrons. */
-      double m_minADC;
-      /** High limit of ADC range in electrons. */
-      double m_maxADC;
-      /** Number of ADC bits. */
-      int m_bitsADC;
-      /** Number of ADU in ADC range. */
-      double m_unitADC;
 
       //4. Clustering
       /** Seed cut in units of m_elNoise. */

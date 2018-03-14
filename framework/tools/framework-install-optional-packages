@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# install optional python packages which are required to 
-# use ipython notebooks productively
-
-pip3 install scipy pandas widgetsnbextension sklearn seaborn root-numpy
-jupyter nbextension enable --py --sys-prefix widgetsnbextension

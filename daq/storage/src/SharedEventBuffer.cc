@@ -176,11 +176,11 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
   return count;
 }
 
-unsigned int SharedEventBuffer::read(int* buf, bool fouce,
+unsigned int SharedEventBuffer::read(int* buf, bool fouce, bool unlocked,
                                      SharedEventBuffer::Header* hdr)
 {
   if (m_buf == NULL) return 0;
-  m_mutex.lock();
+  if (!unlocked) m_mutex.lock();
   m_header->nreader++;
   while (!fouce && m_header->nwriter > 0) {
     m_cond.wait(m_mutex);
@@ -223,6 +223,6 @@ unsigned int SharedEventBuffer::read(int* buf, bool fouce,
     memcpy(hdr, m_header, sizeof(SharedEventBuffer::Header));
   }
   m_cond.broadcast();
-  m_mutex.unlock();
+  if (!unlocked) m_mutex.unlock();
   return count;
 }

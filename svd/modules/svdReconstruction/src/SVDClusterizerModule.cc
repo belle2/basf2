@@ -50,11 +50,11 @@ REG_MODULE(SVDClusterizer)
 //-----------------------------------------------------------------
 
 SVDClusterizerModule::SVDClusterizerModule() : Module(),
-  m_minADC(-96000), m_maxADC(386000), m_bitsADC(10), m_unitADC(375), m_cutSeed(5.0),
-  m_cutAdjacent(3.0), m_cutCluster(5.0), m_sizeHeadTail(3), c_minSamples(1),
-  m_timeTolerance(30), m_useFitter(false), m_shapingTimeElectrons(55),
-  m_shapingTimeHoles(60), m_samplingTime(31.44), m_refTime(-31.44),
-  m_rejectionLevel(0.05), m_rejectionThreshold(0.0), m_assumeSorted(true)
+  m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(5.0), m_sizeHeadTail(3),
+  c_minSamples(1), m_timeTolerance(30), m_useFitter(false),
+  m_shapingTimeElectrons(55), m_shapingTimeHoles(60), m_samplingTime(31.44),
+  m_refTime(-31.44), m_rejectionLevel(0.05), m_rejectionThreshold(0.0),
+  m_assumeSorted(true)
 {
   //Set module properties
   setDescription("Clusterize SVDDigits and reconstruct hits");
@@ -80,13 +80,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("TanLorentz_holes", m_tanLorentzAngle_holes,
            "Tangent of the Lorentz angle for holes", double(-1.0));
 
-  // 3. Processing
-  addParam("ADC", m_applyADC, "Signals in ADU?", bool(true));
-  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
-  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
-  addParam("ADCbits", m_bitsADC, "Number of ADC bits", 10);
-
-  // 4. Clustering
+  // 3. Clustering
   addParam("NoiseSN", m_cutAdjacent,
            "SN for digits to be considered for clustering", m_cutAdjacent);
   addParam("SeedSN", m_cutSeed,
@@ -100,7 +94,7 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("UseTimeFitter", m_useFitter,
            "Use time fitter to calculate strip charges and cluster time", m_useFitter);
 
-  //5. Timing: all times are expected in ns.
+  //4. Timing: all times are expected in ns.
   addParam("ShapingTimeElectrons", m_shapingTimeElectrons,
            "Typical decay time for signals of electrons", m_shapingTimeElectrons);
   addParam("ShapingTimeHoles", m_shapingTimeHoles,
@@ -134,7 +128,7 @@ void SVDClusterizerModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeDigits.required();
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -163,11 +157,6 @@ void SVDClusterizerModule::initialize()
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
-  // Convert things to appropriate units:
-  if (m_applyADC) {
-    m_unitADC = (m_maxADC - m_minADC) / pow(2, m_bitsADC);
-    m_noiseMap.setADU(m_unitADC);
-  }
   // Warn if tanLorentz set
   if (m_tanLorentzAngle_holes > 0 or m_tanLorentzAngle_electrons > 0)
     B2WARNING("The tanLorentz parameters are obsolete and have no effect!");
@@ -269,7 +258,7 @@ void SVDClusterizerModule::event()
     Sensors sensors;
     //Fill sensors
     for (int i = 0; i < nDigits; i++) {
-      B2DEBUG(3, storeDigits[i]->print());
+      B2DEBUG(3, storeDigits[i]->toString());
 
       short prev_id = storeDigits[i]->getPrevID();
       short next_id = storeDigits[i]->getNextID();
@@ -298,8 +287,10 @@ void SVDClusterizerModule::event()
     B2DEBUG(1, "Number of hits: " << sensors.size());
     //Now we loop over sensors and cluster each sensor in turn
     for (SensorIterator it = sensors.begin(); it != sensors.end(); it++) {
+      const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(it->first));
       for (int iSide = 0; iSide < 2; ++iSide) {
         m_noiseMap.setSensorID(it->first, iSide == 0);
+        m_noiseMap.setADU((iSide == 0) ? info.getAduEquivalentU() : info.getAduEquivalentV());
         for (const SVD::Sample& sample : it->second[iSide]) {
           if (!m_noiseMap(sample, m_cutAdjacent)) continue;
           findCluster(sample);
@@ -317,7 +308,7 @@ void SVDClusterizerModule::event()
     int lastTime(0);
     unsigned int lastStrip(0);
     for (int i = 0; i < nDigits; i++) {
-      B2DEBUG(3, storeDigits[i]->print());
+      B2DEBUG(3, storeDigits[i]->toString());
 
       short prev_id = storeDigits[i]->getPrevID();
       short next_id = storeDigits[i]->getNextID();
@@ -342,10 +333,17 @@ void SVDClusterizerModule::event()
         lastTime = 0;
         //Load the correct noise map for the new sensor
         m_noiseMap.setSensorID(sensorID, thisSide);
+        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+        m_noiseMap.setADU(uSide ? info.getAduEquivalentU() : info.getAduEquivalentV());
       }
 
       //Load the correct noise map for the first pixel
-      if (i == 0) m_noiseMap.setSensorID(thisSensorID, thisSide);
+      if (i == 0) {
+        m_noiseMap.setSensorID(thisSensorID, thisSide);
+        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(thisSensorID));
+        m_noiseMap.setADU(thisSide ? info.getAduEquivalentU() : info.getAduEquivalentV());
+      }
+
       //Ignore digits with insufficient signal
       if (!m_noiseMap(sample, m_cutAdjacent)) {
         B2DEBUG(3, "continue");
@@ -398,6 +396,8 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
   bool isU = (side == 0);
   // Just to be sure
   m_noiseMap.setSensorID(sensorID, isU);
+  double adu = isU ? info.getAduEquivalentU() : info.getAduEquivalentV();
+  m_noiseMap.setADU(adu);
   double pitch = isU ? info.getUPitch() : info.getVPitch();
 
   for (ClusterCandidate& cls : m_clusters) {
@@ -565,7 +565,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
                               sensorID, side == 0, clusterPosition, clusterPositionError, clusterTime, clusterTimeStd,
-                              clusterSeed.getCharge(), clusterCharge, clusterSize, clusterSNR
+                              clusterCharge, clusterSeed.getCharge(), clusterSize, clusterSNR
                             ));
 
     //Create Relations to this Digit
@@ -608,6 +608,8 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
   bool isU = (side == 0);
   // Just to be sure
   m_noiseMap.setSensorID(sensorID, isU);
+  double adu = isU ? info.getAduEquivalentU() : info.getAduEquivalentV();
+  m_noiseMap.setADU(adu);
   double pitch = isU ? info.getUPitch() : info.getVPitch();
 
   for (ClusterCandidate& cls : m_clusters) {

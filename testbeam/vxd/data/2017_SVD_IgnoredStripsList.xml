@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='ASCII'?>
+<Meta>
+  <Source>xml/DESY17_TimingScan_Noise_00000809.xml</Source>
+  <Map>xml/2017_svd_mapping.xml</Map>
+</Meta>
+<SVD>
+  <layer n="3">
+    <ladder n="1">
+      <sensor n="1">
+        <side side="u">
+          <strip stripNo="410"/>
+          <strip stripNo="416"/>
+          <strip stripNo="713"/>
+        </side>
+      </sensor>
+      <sensor n="2">
+        <side side="v">
+          <strip stripNo="171"/>
+        </side>
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="4">
+    <ladder n="1">
+      <sensor n="2">
+        <side side="v">
+          <strip stripNo="0"/>
+          <strip stripNo="4"/>
+          <strip stripNo="5"/>
+          <strip stripNo="73"/>
+          <strip stripNo="74"/>
+          <strip stripNo="118"/>
+          <strip stripNo="181"/>
+          <strip stripNo="182"/>
+          <strip stripNo="183"/>
+          <strip stripNo="511"/>
+        </side>
+        <side side="u">
+          <strip stripNo="0"/>
+          <strip stripNo="767"/>
+        </side>
+      </sensor>
+      <sensor n="3">
+        <side side="v">
+          <strip stripNo="0"/>
+          <strip stripNo="258"/>
+          <strip stripNo="259"/>
+          <strip stripNo="511"/>
+        </side>
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="5">
+    <ladder n="1">
+      <sensor n="2">
+        <side side="v">
+          <strip stripNo="0"/>
+          <strip stripNo="1"/>
+          <strip stripNo="2"/>
+          <strip stripNo="7"/>
+          <strip stripNo="15"/>
+          <strip stripNo="17"/>
+          <strip stripNo="277"/>
+          <strip stripNo="284"/>
+          <strip stripNo="397"/>
+          <strip stripNo="398"/>
+          <strip stripNo="399"/>
+          <strip stripNo="426"/>
+          <strip stripNo="441"/>
+          <strip stripNo="442"/>
+          <strip stripNo="443"/>
+          <strip stripNo="469"/>
+          <strip stripNo="470"/>
+          <strip stripNo="471"/>
+          <strip stripNo="511"/>
+        </side>
+        <side side="u">
+          <strip stripNo="0"/>
+          <strip stripNo="1"/>
+          <strip stripNo="369"/>
+          <strip stripNo="384"/>
+          <strip stripNo="488"/>
+          <strip stripNo="766"/>
+          <strip stripNo="767"/>
+        </side>
+      </sensor>
+      <sensor n="3">
+        <side side="v">
+          <strip stripNo="0"/>
+          <strip stripNo="421"/>
+          <strip stripNo="423"/>
+          <strip stripNo="511"/>
+        </side>
+        <side side="u">
+          <strip stripNo="0"/>
+          <strip stripNo="1"/>
+          <strip stripNo="48"/>
+          <strip stripNo="49"/>
+          <strip stripNo="136"/>
+          <strip stripNo="137"/>
+          <strip stripNo="302"/>
+          <strip stripNo="303"/>
+          <strip stripNo="304"/>
+          <strip stripNo="383"/>
+          <strip stripNo="384"/>
+          <strip stripNo="766"/>
+          <strip stripNo="767"/>
+        </side>
+      </sensor>
+    </ladder>
+  </layer>
+  <layer n="6">
+    <ladder n="1">
+      <sensor n="3">
+        <side side="v">
+          <strip stripNo="0"/>
+          <strip stripNo="511"/>
+        </side>
+        <side side="u">
+          <strip stripNo="0"/>
+          <strip stripNo="1"/>
+          <strip stripNo="384"/>
+          <strip stripNo="745"/>
+          <strip stripNo="766"/>
+          <strip stripNo="767"/>
+        </side>
+      </sensor>
+      <sensor n="4">
+        <side side="v">
+          <strip stripNo="0"/>
+          <strip stripNo="15"/>
+          <strip stripNo="189"/>
+          <strip stripNo="511"/>
+        </side>
+        <side side="u">
+          <strip stripNo="0"/>
+          <strip stripNo="1"/>
+          <strip stripNo="383"/>
+          <strip stripNo="384"/>
+          <strip stripNo="766"/>
+          <strip stripNo="767"/>
+        </side>
+      </sensor>
+    </ladder>
+  </layer>
+</SVD>

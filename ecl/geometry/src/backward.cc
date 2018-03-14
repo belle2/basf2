@@ -80,9 +80,9 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
     if (overlap) pv->CheckOverlaps(npoints);
   }
 
-  zr_t vin[] = {{3., 474.9}, {434., 702.27}, {434, 1496 - 20}, {434 - 214.8, 1496 - 20}, {3, 1190.2}};
-  std::vector<zr_t> cin(vin, vin + sizeof(vin) / sizeof(zr_t));
-  G4VSolid* innervolume_solid = new BelleLathe("innervolume_solid", 0, 2 * M_PI, cin);
+  zr_t cont_array_in[] = {{3., 474.9}, {434., 702.27}, {434, 1496 - 20}, {434 - 214.8, 1496 - 20}, {3, 1190.2}};
+  std::vector<zr_t> contour_in(cont_array_in, cont_array_in + sizeof(cont_array_in) / sizeof(zr_t));
+  G4VSolid* innervolume_solid = new BelleLathe("innervolume_solid", 0, 2 * M_PI, contour_in);
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att("air"));
@@ -91,7 +91,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
                                  0);
   if (overlap) gpvbp->CheckOverlaps(npoints);
 
-  G4VSolid* innervolumesector_solid = new BelleLathe("innervolumesector_solid", -M_PI / 8, M_PI / 4, cin);
+  G4VSolid* innervolumesector_solid = new BelleLathe("innervolumesector_solid", -M_PI / 8, M_PI / 4, contour_in);
   G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, Materials::get("G4_AIR"),
       "innervolumesector_logical", 0, 0, 0);
   innervolumesector_logical->SetVisAttributes(att("air"));
@@ -165,11 +165,11 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
     Point_t vin[] = {{434. - zsep, 702.27 - tand(27.81)* zsep}, {434. - 60, 702.27 - tand(27.81) * 60}, {434. - 60, 1496 - 20 - d}, {434. - zsep, 1496 - 20 - d}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
-    G4ThreeVector cin[n * 2];
-    for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2);
-    for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2);
+    G4ThreeVector contour_swall[n * 2];
+    for (int i = 0; i < n; i++) contour_swall[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2);
 
-    G4VSolid* septumwall_solid = new BelleCrystal("septumwall_solid", n, cin);
+    G4VSolid* septumwall_solid = new BelleCrystal("septumwall_solid", n, contour_swall);
 
     G4LogicalVolume* septumwall_logical = new G4LogicalVolume(septumwall_solid, Materials::get("A5052"),
                                                               "septumwall_logical", 0, 0, 0);
@@ -178,10 +178,10 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
                                 "septumwall_physical", innervolumesector_logical, false, 0, 0);
     if (overlap) pv->CheckOverlaps(npoints);
 
-    for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
-    for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
 
-    G4VSolid* septumwall2_solid = new BelleCrystal("septumwall2_solid", n, cin);
+    G4VSolid* septumwall2_solid = new BelleCrystal("septumwall2_solid", n, contour_swall);
 
     G4LogicalVolume* septumwall2_logical = new G4LogicalVolume(septumwall2_solid, Materials::get("A5052"),
                                                                "septumwall2_logical", 0, 0, 0);
@@ -216,12 +216,12 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
     Point_t vin[] = {{3., 474.9}, {434. - zsep, 702.27 - tand(27.81)* zsep}, {434 - zsep, 1496 - 20 - d - dr}, {434 - 214.8 - d / tand(52.90), 1496 - 20 - d - dr}, {3, 1190.2 - dr}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
-    G4ThreeVector cin[n * 2];
+    G4ThreeVector contour_swall[n * 2];
 
-    for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
-    for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
+    for (int i = 0; i < n; i++) contour_swall[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
 
-    G4VSolid* septumwall3_solid = new BelleCrystal("septumwall3_solid", n, cin);
+    G4VSolid* septumwall3_solid = new BelleCrystal("septumwall3_solid", n, contour_swall);
 
     G4LogicalVolume* septumwall3_logical = new G4LogicalVolume(septumwall3_solid, Materials::get("A5052"),
                                                                "septumwall3_logical", 0, 0, 0);

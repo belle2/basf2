@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 

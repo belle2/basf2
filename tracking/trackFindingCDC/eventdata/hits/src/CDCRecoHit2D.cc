@@ -7,9 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
+
+#include <TVector3.h>
+
+#include <ostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -117,4 +128,16 @@ void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
   if (switchSide) {
     m_recoDisp2D = -m_recoDisp2D;
   }
+}
+
+Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D, double z) const
+{
+  return getRLWireHit().reconstruct3D(trajectory2D, z);
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCRecoHit2D& recohit)
+{
+  output << "CDCRecoHit2D(" << recohit.getRLWireHit() << ","
+         << recohit.getRecoDisp2D() << ")" ;
+  return output;
 }

@@ -29,12 +29,26 @@ EclPainterCommon::~EclPainterCommon()
   delete m_hist;
 }
 
+int EclPainterCommon::getBinCount()
+{
+  switch (m_type) {
+    case ENERGY:
+      return 295;
+    case ENERGY_SUM:
+      return 50;
+    case TIME:
+      return 128;
+  }
+
+  return 1;
+}
+
 int EclPainterCommon::getMinX()
 {
   switch (m_type) {
-    case AMP:
-      return 50;
-    case AMP_SUM:
+    case ENERGY:
+      return 0;
+    case ENERGY_SUM:
       return 0;
     case TIME:
       return -2048;
@@ -46,10 +60,10 @@ int EclPainterCommon::getMinX()
 int EclPainterCommon::getMaxX()
 {
   switch (m_type) {
-    case AMP:
-      return 3000;
-    case AMP_SUM:
-      return 45000;
+    case ENERGY:
+      return 150;
+    case ENERGY_SUM:
+      return 2500;
     case TIME:
       return 2048;
   }
@@ -79,11 +93,11 @@ void EclPainterCommon::Draw()
   m_hist->Reset();
 
   switch (getType()) {
-    case AMP:
-      data->fillAmpHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
+    case ENERGY:
+      data->fillEnergyHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
       break;
-    case AMP_SUM:
-      data->fillAmpSumHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
+    case ENERGY_SUM:
+      data->fillEnergySumHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
       break;
     case TIME:
       data->fillTimeHistogram(m_hist, getMinX(), getMaxX(), getDisplayedSubsystem());
@@ -97,14 +111,14 @@ void EclPainterCommon::Draw()
 void Belle2::EclPainterCommon::setTitles()
 {
   const char* name[3] = {
-    "Amplitude per channel",
-    "Amplitude sum per event",
+    "Energy per channel",
+    "Energy sum per event",
     "Time"
   };
   const char* xname[3] = {
-    "Amplitude (ADC counts)",
-    "Amplitude (ADC counts)",
-    "Time (ADC time)"
+    "Energy (MeV)",
+    "Energy (MeV)",
+    "Time (ns)"
   };
 
   int type = (int)getType();

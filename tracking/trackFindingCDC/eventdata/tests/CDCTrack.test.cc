@@ -11,6 +11,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <cdc/dataobjects/WireID.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

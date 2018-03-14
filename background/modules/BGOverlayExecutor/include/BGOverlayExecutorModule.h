@@ -67,16 +67,27 @@ namespace Belle2 {
 
   private:
 
+    std::string m_PXDDigitsName; /**< name of PXD collection to overlay with BG */
+    std::string m_SVDShaperDigitsName; /**< name of SVD collection to overlay with BG */
+    std::string m_CDCHitsName;   /**< name of CDC collection to overlay with BG */
+    std::string m_TOPDigitsName; /**< name of TOP collection to overlay with BG */
+    std::string m_ARICHDigitsName; /**< name of ARICH collection to overlay with BG */
+    std::string m_BKLMDigitsName; /**< name of BKLM collection to overlay with BG */
+    std::string m_EKLMDigitsName; /**< name of EKLM collection to overlay with BG */
+
+    std::string m_extensionName; /**< name added to default branch names */
+
     /**
      * Register simulated and BG digits (both as optional input)
      */
     template <class Digit>
-    void registerDigits()
+    void registerDigits(const std::string& name)
     {
-      StoreArray<Digit> digits;
+      StoreArray<Digit> digits(name);
       digits.isOptional();
-      std::string name = digits.getName() + "_BG";
-      StoreArray<Digit> bgDigits(name);
+      StoreArray<Digit> tmp; // just to get the default name
+      std::string nameBG = tmp.getName() + m_extensionName;
+      StoreArray<Digit> bgDigits(nameBG);
       bgDigits.isOptional();
       B2DEBUG(100, "optional input: " << digits.getName() << " " << bgDigits.getName());
     }
@@ -86,18 +97,19 @@ namespace Belle2 {
      * BG digit can be either merged with existing one in a channel or appended to array.
      */
     template <class Digit>
-    void addBGDigits()
+    void addBGDigits(const std::string& name)
     {
       // simulated digits
-      StoreArray<Digit> digits;
+      StoreArray<Digit> digits(name);
       if (!digits.isValid()) {
         B2DEBUG(100, digits.getName() << " are not valid");
         return;
       }
 
       // background digits
-      std::string name = digits.getName() + "_BG";
-      StoreArray<Digit> bgDigits(name);
+      StoreArray<Digit> tmp; // just to get the default name
+      std::string nameBG = tmp.getName() + m_extensionName;
+      StoreArray<Digit> bgDigits(nameBG);
       if (!bgDigits.isValid()) {
         B2DEBUG(100, bgDigits.getName() << " are not valid");
         return;

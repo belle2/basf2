@@ -98,6 +98,11 @@ public:
     m_mode = mode;
   }
   /**
+   * set to use BField
+   */
+  void BField(bool bfield) {m_BField = bfield;}
+
+  /**
    * Set Paramerters for fit.
    */
   void  setXTParams(double p[8])
@@ -210,12 +215,13 @@ public:
 private:
 
   TProfile* m_h1;  /**< Histogram of xt relation. */
-  TF1* xtpol5 = new TF1("xtpol5", pol5pol1, 0.0, 400, 8);  /**< 5th order polynomial function*/
-  TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 400, 8); /**< 5th order Cheb. polynomial function*/
+  TF1* xtpol5 = new TF1("xtpol5", pol5pol1, 0.0, 700, 8);  /**< 5th order polynomial function*/
+  TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 700, 8); /**< 5th order Cheb. polynomial function*/
 
   int m_mode = 1; /**< XT mode,  0 is for 5th order polynomial, 1 is Chebshev polynomial.*/
   bool m_debug = true;  /**< Print debug durring fitting or not*/
   bool m_draw = false;  /**< Draw and store png plot of each histo or not*/
+  bool m_BField = true; /**< With magnetic field or not*/
   int m_minRequiredEntry = 800; /**< Minimum entry required for each histo. */
   double m_XTParam[8] = {};     /**< Parameter fo xt*/
   double m_FittedXTParams[8] = {}; /**< Fitted parameters */
@@ -249,8 +255,13 @@ void XT::FitPol5()
   int out = 0; /*how many time outer part change fit limit*/
   xtpol5->SetParameters(p0, p1, 0, 0, 0, 0, m_XTParam[6], 0);
   double p6default = m_XTParam[6];
-  xtpol5->SetParLimits(7, 0.0, 0.001);
-  xtpol5->SetParLimits(1, 0.0, 0.006);
+  if (m_BField) {
+    xtpol5->SetParLimits(7, 0.0, 0.001);
+    xtpol5->SetParLimits(1, 0.0, 0.01);
+  } else {
+    xtpol5->SetParLimits(7, 0.0, 0.01);
+    xtpol5->SetParLimits(1, 0.0, 0.01);
+  }
   //  xtpol5->SetParLimits(6, p6default - 30,  p6default + 30);
   for (int i = 0; i < 10; ++i) {
     m_fitflag = 1;
@@ -319,13 +330,41 @@ void XT::FitChebyshev()
     m_fitflag = -1;
     return;
   }
-  m_tmax = m_XTParam[6] + 100;
-  xtCheb5->SetParameters(-0.07, 0.005, 0., 0., 0., 0., m_XTParam[6], 0.001);
-  xtCheb5->SetParLimits(7, 0., 0.01);
+  //  m_tmax = m_XTParam[6] + 100;
+  //xtCheb5->SetParameters(0.0, 0.005, 0., 0., 0., 0., m_XTParam[6], 0.001);
+  double p[6];
+  double par[8];
+  xtCheb5->SetParLimits(7, 0., 0.001);
+  m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
+  m_h1->GetFunction("chebyshev5")->GetParameters(p);
+  xtCheb5->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6], 0.000);
+
   double stat;
   for (int i = 0; i < 10; ++i) {
-    stat = m_h1->Fit("xtCheb5", "M Q", "0", m_tmin, m_tmax);
-    if (stat != 0) break;
+    stat = m_h1->Fit("xtCheb5", "MQ", "0", m_tmin, m_tmax);
+    if (stat == 0) {
+      xtCheb5->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6] - 20, 0.000);
+      m_tmax -= 10;
+      continue;
+    }
+    xtCheb5->GetParameters(par);
+    /*Eval outer region,*/
+    double fp6 = xtCheb5->Eval(par[6]);
+    double fbehindp6 = xtCheb5->Eval(par[6] - 10) - 0.005;
+    if (fp6 < fbehindp6 || fp6 > 1) { /*may be change to good value*/
+      m_fitflag = 2;
+      //      out += 1;
+      xtCheb5->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], par[6] - 20, 0.000);
+      xtCheb5->SetParLimits(6, par[6] - 50,  par[6] - 10);
+      m_tmax -= 10;
+      //      if (m_tmax < p6default + 30) {
+      //  m_tmax = p6default + 30;
+      // }
+    } else {
+      break;
+    }
+    //    m_tmax +=10;
+    //if (stat != 0) break;
   }
   xtCheb5->GetParameters(m_FittedXTParams);
   m_Prob = xtCheb5->GetProb();

@@ -41,7 +41,7 @@ using namespace Belle2;
 //
 //
 TrgEclMaster::TrgEclMaster():
-  TimeWindow(250.0), OverlapWindow(125.), _Clustering(0), _Bhabha(0), _EventTiming(2), _NofTopTC(3)
+  TimeWindow(375.0), OverlapWindow(0.0), _Clustering(0), _Bhabha(0), _EventTiming(1), _NofTopTC(3)
 {
 
   TCEnergy.clear();
@@ -168,43 +168,52 @@ TrgEclMaster::simulate01(int m_nEvent)
   }
   //
   //
-  int nBin = 2 * 8000 / TimeWindow ;
+  int nBin = 8000 / (TimeWindow / 3) ; //8000/125
   double WindowStart = 0;
   double WindowEnd = 0;
   double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
 
-
-  if (_EventTiming == 0) {
-    TimeWindow = 500;
-    OverlapWindow = 0;
-  }
-
+  double check_window_start = 0;
+  double check_window_end = 0;
 
 
   for (int iBin = 0 ; iBin < nBin; iBin ++) {
-    WindowStart = iBin * (TimeWindow - OverlapWindow) + fluctuation - 4000;
-    if (iBin == 0) {WindowStart = - 4000 + fluctuation;}
-    WindowEnd = WindowStart + TimeWindow;
 
+    check_window_start = iBin * (TimeWindow / 3) + fluctuation - 4000;
+    WindowStart = check_window_start;
+    check_window_end  = check_window_start + TimeWindow / 3;
+    WindowEnd = WindowStart + TimeWindow;
     HitTCId.clear();
     TCHitTiming.clear();
     TCHitEnergy.clear();
     TCHitBeamBkgTag.clear();
+
+
     // prepare TC Hit in time window --
     for (int iTCId = 0; iTCId < 576; iTCId++) {
       const int hitsize =  TCTiming[iTCId].size();
       for (int ihit = 0; ihit < hitsize; ihit++) {
-        if (TCTiming[iTCId][ihit] > WindowStart && TCTiming[iTCId][ihit] < WindowEnd) {
+        if (TCTiming[iTCId][ihit] > check_window_start && TCTiming[iTCId][ihit] < check_window_end) {
           HitTCId.push_back(iTCId + 1);
-          TCHitTiming.push_back(TCTiming[iTCId][ihit]);
-          TCHitEnergy.push_back(TCEnergy[iTCId][ihit]);
-          TCHitBeamBkgTag.push_back(TCBeamBkgTag[iTCId][ihit]);
+
         }
       }
     }
-    if (TCHitTiming.size() == 0) {continue;}
-
-
+    if (HitTCId.size() == 0) {continue;}
+    else {
+      HitTCId.clear();
+      for (int iTCId = 0; iTCId < 576; iTCId++) {
+        const int hitsize =  TCTiming[iTCId].size();
+        for (int ihit = 0; ihit < hitsize; ihit++) {
+          if (TCTiming[iTCId][ihit] > WindowStart && TCTiming[iTCId][ihit] < WindowEnd) {
+            HitTCId.push_back(iTCId + 1);
+            TCHitTiming.push_back(TCTiming[iTCId][ihit]);
+            TCHitEnergy.push_back(TCEnergy[iTCId][ihit]);
+          }
+        }
+      }
+      iBin  = iBin + 2;
+    }
     int noftchit = HitTCId.size();
     if (noftchit == 0) {continue;}
 
@@ -781,6 +790,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
 
   return;
 }
+
 //
 //
 //

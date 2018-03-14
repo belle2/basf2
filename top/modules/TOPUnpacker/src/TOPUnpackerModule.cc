@@ -1,12 +1,12 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/*************************************************************************
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2014 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Marko Staric                                             *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 // Own include
 #include <top/modules/TOPUnpacker/TOPUnpackerModule.h>
@@ -30,6 +30,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
+#include <top/dataobjects/TOPTemplateFitResult.h>
 
 #include <bitset>
 
@@ -64,6 +65,8 @@ namespace Belle2 {
              "name of TOPRawWaveform store array", string(""));
     addParam("outputRawDigitsName", m_outputRawDigitsName,
              "name of TOPRawDigit store array", string(""));
+    addParam("outputTemplateFitResultName", m_templateFitResultName,
+             "name of TOPTemplateFitResult", string(""));
     addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
@@ -99,7 +102,11 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
+    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
+    templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
+
     rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
+    rawDigits.registerRelationTo(templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
     waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
 
@@ -129,9 +136,12 @@ namespace Belle2 {
     rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
+    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
+    templateFitResults.clear();
     StoreArray<TOPSlowData> slowData;
     slowData.clear();
 
+    StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
@@ -141,19 +151,28 @@ namespace Belle2 {
         int err = 0;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
-          DataArray array(buffer, bufferSize, m_swapBytes);
-          unsigned word = array.getWord();
-          dataFormat = (word >> 16);
+          //std::cout<<"evtMetaData->getExperiment() == 1\t"<< evtMetaData->getExperiment() << std::endl;
+          if (evtMetaData->getExperiment() == 1) { // GCR data
+            dataFormat = 0x0301;
+            m_swapBytes = true;
+          } else
+            // NOTE: we need to add extra clauses if there are GCR runs between
+            // phases II and III. (See pull request #644 for more details)
+          {
+            DataArray array(buffer, bufferSize, m_swapBytes);
+            unsigned word = array.getWord();
+            dataFormat = (word >> 16);
+          }
         }
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
             unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, false);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, false);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, true);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize, digits);
@@ -287,6 +306,7 @@ namespace Belle2 {
   int TOPUnpackerModule::unpackInterimFEVer01(const int* buffer, int bufferSize,
                                               StoreArray<TOPRawDigit>& rawDigits,
                                               StoreArray<TOPRawWaveform>& waveforms,
+                                              StoreArray<TOPTemplateFitResult>& templateFits,
                                               bool pedestalSubtracted)
   {
 
@@ -364,7 +384,7 @@ namespace Belle2 {
 
       if (scrodID_FE != scrodID) {
         B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
-        B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
+        B2ERROR("Different scrodID's in HLSB and FE header: "
                 << scrodID << " " << scrodID_FE << " word = 0x" << std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();
@@ -411,25 +431,26 @@ namespace Belle2 {
 
         // feature-extracted data (negative signal)
         word = array.getWord(); // word 9
+        //short n_samp_i = (word >> 16) & 0xFFFF;
         word = array.getWord(); // word 10
         short samplePeak_n = word & 0xFFFF;
         short valuePeak_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 11
-        short sampleRise_n = word & 0xFFFF;
-        short valueRise0_n = (word >> 16) & 0xFFFF;
+        //short sampleRise_n = word & 0xFFFF;
+        //short valueRise0_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 12
-        short valueRise1_n = word & 0xFFFF;
-        short sampleFall_n = (word >> 16) & 0xFFFF;
+        //short valueRise1_n = word & 0xFFFF;
+        //short sampleFall_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 13
-        short valueFall0_n = word & 0xFFFF;
-        short valueFall1_n = (word >> 16) & 0xFFFF;
+        //short valueFall0_n = word & 0xFFFF;
+        //short valueFall1_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 14
         short integral_n = word & 0xFFFF;
-        //      short qualityFlags_n = (word >> 16) & 0xFFFF;
+        short qualityFlags_n = (word >> 16) & 0xFFFF;
 
         if (abs(valuePeak_p) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);
@@ -450,8 +471,17 @@ namespace Belle2 {
           //        digit->setErrorFlags(qualityFlags_p); // not good solution !
           digit->addRelationTo(info);
           digits.push_back(digit);
+          //template fit result is saved in negative pulse fe data
+          if (valuePeak_p < 150) {
+            auto* tlpfResult = templateFits.appendNew();
+            tlpfResult->setBackgroundOffset(samplePeak_n);
+            tlpfResult->setAmplitude(valuePeak_n);
+            tlpfResult->setChisquare(qualityFlags_n);
+            tlpfResult->setRisingEdgeAndConvert(integral_n);
+            digit->addRelationTo(tlpfResult);
+          }
         }
-        if (abs(valuePeak_n) != 9999) {
+        /*if (abs(valuePeak_n) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);
           digit->setCarrierNumber(carrierFE);
           digit->setASICNumber(asicFE);
@@ -470,7 +500,7 @@ namespace Belle2 {
           //        digit->setErrorFlags(qualityFlags_n); // not good solution !
           digit->addRelationTo(info);
           digits.push_back(digit);
-        }
+        }*/
       }
 
       // magic word

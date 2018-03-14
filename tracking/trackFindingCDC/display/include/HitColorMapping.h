@@ -13,13 +13,14 @@
 #include <tracking/trackFindingCDC/display/Mapping.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <cdc/dataobjects/CDCHit.h>
 
 #include <map>
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class CDCHit;
+
   namespace TrackFindingCDC {
 
     class CDCWireHit;
@@ -118,6 +119,8 @@ namespace Belle2 {
       /// Function call to map the CDCHit id and object to a color.
       std::string map(int index, const CDCHit& hit) override;
 
+      /// Informal string summarizing the translation from CDCSimHit::getBackgroundTag
+      std::string info() override;
     private:
       /// List of colors to be cycled
       std::vector<std::string> m_colors;

@@ -9,8 +9,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/MCFacetRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseFacetRelationFilter>;
 
 MCFacetRelationFilter::MCFacetRelationFilter(bool allowReverse)
   : Super(allowReverse)
@@ -19,11 +26,23 @@ MCFacetRelationFilter::MCFacetRelationFilter(bool allowReverse)
   this->addProcessingSignalListener(&m_mcFacetFilter);
 }
 
+void MCFacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
+{
+  m_mcFacetFilter.exposeParameters(moduleParamList, prefix);
+}
+
+void MCFacetRelationFilter::initialize()
+{
+  Super::initialize();
+  setAllowReverse(m_mcFacetFilter.getAllowReverse());
+}
+
 Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                          const CDCFacet& toFacet)
 {
   // the last wire of the neighbor should not be the same as the start wire of the facet
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
+  if (fromFacet.getStartWireHit().isOnWire(toFacet.getEndWire())) return NAN;
 
   // Despite of that two facets are neighbors if both are true facets
   // That also implies the correct tof alignment of the hits not common to both facets

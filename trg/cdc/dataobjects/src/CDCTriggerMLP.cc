@@ -4,7 +4,7 @@
 using namespace Belle2;
 
 CDCTriggerMLP::CDCTriggerMLP():
-  nNodes{27, 27, 2}, targetVars(3), outputScale{ -1., 1., -1., 1.},
+  nNodes{27, 27, 2}, trained(false), targetVars(3), outputScale{ -1., 1., -1., 1.},
   phiRange{0., 2. * M_PI}, invptRange{ -5., 5.}, thetaRange{0., M_PI},
   maxHitsPerSL(1), SLpattern(0), SLpatternMask(0), tMax(256),
   relevantID{ -1., 1.,
@@ -15,25 +15,27 @@ CDCTriggerMLP::CDCTriggerMLP():
               -10.5, 1.,
               -1., 1.,
               -1., 11.,
-              -1., 1.}
+              -1., 1.},
+  T0fromHits(false)
 {
   weights.assign(nWeightsCal(), 0.);
 }
 
-CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nNodes,
-                             unsigned short targetVars,
-                             std::vector<float>& outputScale,
-                             std::vector<float>& phiRange,
-                             std::vector<float>& invptRange,
-                             std::vector<float>& thetaRange,
+CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
+                             unsigned short targets,
+                             std::vector<float>& outputscale,
+                             std::vector<float>& phirange,
+                             std::vector<float>& invptrange,
+                             std::vector<float>& thetarange,
                              unsigned short maxHits,
-                             unsigned long SLpattern,
-                             unsigned long SLpatternMask,
-                             unsigned short tMax):
-  nNodes(nNodes), targetVars(targetVars), outputScale(outputScale),
-  phiRange(phiRange), invptRange(invptRange), thetaRange(thetaRange),
-  maxHitsPerSL(maxHits), SLpattern(SLpattern), SLpatternMask(SLpatternMask),
-  tMax(tMax),
+                             unsigned long pattern,
+                             unsigned long patternMask,
+                             unsigned short tmax,
+                             bool calcT0):
+  nNodes(nodes), trained(false), targetVars(targets), outputScale(outputscale),
+  phiRange(phirange), invptRange(invptrange), thetaRange(thetarange),
+  maxHitsPerSL(maxHits), SLpattern(pattern), SLpatternMask(patternMask),
+  tMax(tmax),
   relevantID{ -1., 1.,
               -10., 1.,
               -1., 1.,
@@ -42,7 +44,8 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nNodes,
               -10.5, 1.,
               -1., 1.,
               -1., 11.,
-              -1., 1.}
+              -1., 1.},
+  T0fromHits(calcT0)
 {
   weights.assign(nWeightsCal(), 0.);
 }

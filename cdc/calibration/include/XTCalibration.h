@@ -20,6 +20,8 @@ namespace Belle2 {
       XTCalibration();
       /// Destructor
       virtual ~XTCalibration() {}
+      /// set to use BField
+      virtual void BField(bool bfield) {m_BField = bfield;}
       /// Run in debug or silent
       virtual void setDebug(bool debug = false) {m_debug = debug; }
       /// Set to run with database mode or text mode
@@ -74,6 +76,7 @@ namespace Belle2 {
       bool m_useProfileXTFromInputXT = true; /**< use profile from text file or default in input xt*/
       bool m_LRseparate = true; /**< Separate LR in calibration or mix*/
       bool m_useSliceFit = false; /**< Use slice fit or profile */
+      bool m_BField = true;  /**< with b field or none*/
 
       double m_XT_fit[56][2][18][7][8];  /**< Fitted parameter*/
       double xtold[56][2][18][7][8];     /**< Old paremeter */

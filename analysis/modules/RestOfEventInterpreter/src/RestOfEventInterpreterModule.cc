@@ -24,6 +24,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <iostream>
 #include <utility>
@@ -64,7 +65,7 @@ namespace Belle2 {
   void RestOfEventInterpreterModule::initialize()
   {
     // input
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
     StoreArray<Particle> particles;
     particles.isRequired();
 
@@ -124,12 +125,12 @@ namespace Belle2 {
         double fractionsArray[n];
 
         if (fractionsVector.size() == n) {
-          for (unsigned int i = 0; i < n; i++)
-            fractionsArray[i] = fractionsVector[i];
+          for (unsigned int j = 0; j < n; j++)
+            fractionsArray[j] = fractionsVector[j];
         }
 
-        for (unsigned i = 0; i < roeTracks.size(); i++) {
-          const Track* track = roeTracks[i];
+        for (unsigned j = 0; j < roeTracks.size(); j++) {
+          const Track* track = roeTracks[j];
           const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
           int particlePDG = Const::pion.getPDGCode();
 
@@ -143,19 +144,14 @@ namespace Belle2 {
           } else
             B2FATAL("Size of fractions vector not appropriate! Check the fractions in the ROEInterpreter with mask name: " << maskName);
 
-          // TODO: THIS IS A TEMPORARY FIX SO NO CRASH OCCURS
-          if (particlePDG != 11 and particlePDG != 13 and particlePDG != 211 and particlePDG != 321 and particlePDG != 2212
-              and particlePDG != 1000010020)
-            particlePDG = Const::pion.getPDGCode();
-
           // Skip tracks with charge 0
           Const::ChargedStable type(particlePDG);
-          const TrackFitResult* trackFit = track->getTrackFitResult(type);
+          const TrackFitResult* tfr = track->getTrackFitResultWithClosestMass(type);
 
-          if (!trackFit)
+          if (!tfr)
             continue;
 
-          int charge = trackFit->getChargeSign();
+          int charge = tfr->getChargeSign();
 
           if (charge == 0) {
             B2WARNING("Track with charge=0, this track will always be ignored in ROE!");
@@ -201,8 +197,8 @@ namespace Belle2 {
 
         // Create cluster masks
         std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
-        for (unsigned i = 0; i < roeECLClusters.size(); i++) {
-          const ECLCluster* cluster = roeECLClusters[i];
+        for (unsigned j = 0; j < roeECLClusters.size(); j++) {
+          const ECLCluster* cluster = roeECLClusters[j];
 
           Particle p(cluster);
           Particle* tempPart = &p;

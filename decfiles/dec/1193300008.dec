@@ -1,0 +1,29 @@
+# EventType: 1193300008
+# Descriptor: [B0 -> Xc tau nu]cc
+# NickName: Bd_Xctaunu
+# Documentation: b->c tau nu process, D_0*, D_1, D'_1, D_2 modes
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Florian Bernlochner
+# Email: florian.bernlochner@cern.ch 
+# Cuts: None
+# Date: 20170704
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+
+#central values from HFAG average
+
+Decay B0sig
+0.00039   D_1-   tau+ nu_tau      PHOTOS          LLSW 0.71 -1.6 -0.5 2.9;
+0.00031   D_0*-   tau+ nu_tau     PHOTOS           LLSW 0.68 -0.2 0.3;
+0.00011   D'_1-   tau+ nu_tau       PHOTOS         LLSW 0.68 -0.2 0.3;
+0.00011   D_2*-   tau+ nu_tau       PHOTOS         LLSW 0.71 -1.6 -0.5 2.9;
+Enddecay
+CDecay anti-B0sig
+#
+End

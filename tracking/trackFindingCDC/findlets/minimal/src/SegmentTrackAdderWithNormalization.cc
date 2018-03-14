@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <framework/core/ModuleParamList.templateDetails.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vector>
@@ -78,6 +80,10 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
       // Otherwise reconstruct the position into the third dimension
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit, trajectory3D);
+      if (std::isnan(recoHit3D.getArcLength2D())) {
+        B2DEBUG(100, "Had to skip a NAN hit");
+        continue;
+      }
       recoHits3D.push_back(recoHit3D);
       trackHitRelations.push_back({track, weight, &recoHits3D.back()});
     }
@@ -130,9 +136,19 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     recoHit3D->getWireHit()->setTakenFlag();
   }
 
+  // Drop tracks which have no hits
+  TrackFindingCDC::erase_remove_if(tracks, [](const CDCTrack & track) { return track.empty(); });
+
   // Establish the ordering
   for (CDCTrack& track : tracks) {
     track.sortByArcLength2D();
+    CDCTrajectory3D startTrajectory = track.getStartTrajectory3D();
+    startTrajectory.setLocalOrigin(track.front().getRecoPos3D());
+    track.setStartTrajectory3D(startTrajectory);
+
+    CDCTrajectory3D endTrajectory = track.getEndTrajectory3D();
+    endTrajectory.setLocalOrigin(track.back().getRecoPos3D());
+    track.setEndTrajectory3D(endTrajectory);
   }
 
   // Normalize the trajectory and hit contents of the tracks

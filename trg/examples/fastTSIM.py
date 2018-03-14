@@ -20,14 +20,13 @@ babayaganlo = register_module('BabayagaNLOInput')
 babayaganlo.param('FMax', 7.5e4)
 babayaganlo.param('FinalState', 'ee')
 babayaganlo.param('MaxAcollinearity', 180.0)
-babayaganlo.param('ScatteringAngleRange', [15.0, 165.0])
+babayaganlo.param('ScatteringAngleRange', [15, 165])
 # babayaganlo.param('VacuumPolarization', 'hadr5')
 babayaganlo.param('VacuumPolarization', 'hlmnt')
 babayaganlo.param('SearchMax', 10000)
 babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
-# generateY4S(10, "mixed.dec", main)
 
 add_simulation(main)
 

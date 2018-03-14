@@ -12,12 +12,15 @@
 #include <iostream>
 
 using namespace std;
-using namespace Belle2;
 
-void TOPGeoPMTArrayDisplacement::print(const std::string& title) const
-{
-  TOPGeoBase::print(title);
-  cout << " translation vector: (" << getX() << ", " << getY() << ")"
-       << " " << s_unitName << endl;
-  cout << " rotation angle: " << m_alpha << endl;
-}
+namespace Belle2 {
+
+  void TOPGeoPMTArrayDisplacement::print(const std::string& title) const
+  {
+    TOPGeoBase::print(title);
+    cout << " translation vector: (" << getX() << ", " << getY() << ")"
+         << " " << s_unitName << endl;
+    cout << " rotation angle: " << m_alpha << endl;
+  }
+
+} // end Belle2 namespace

@@ -94,60 +94,78 @@ namespace {
   TEST(OptionsTest, MetaOptions)
   {
     MVA::MetaOptions meta_options;
-    EXPECT_EQ(meta_options.m_use_multiclass, false);
-    EXPECT_EQ(meta_options.m_use_hyperparameter, false);
     EXPECT_EQ(meta_options.m_use_splot, false);
-    EXPECT_EQ(meta_options.m_hyperparameters.size(), 0);
-    EXPECT_EQ(meta_options.m_hyperparameter_metric, "AUC");
     EXPECT_EQ(meta_options.m_splot_variable, "M");
     EXPECT_EQ(meta_options.m_splot_mc_files.size(), 0);
     EXPECT_EQ(meta_options.m_splot_combined, false);
     EXPECT_EQ(meta_options.m_splot_boosted, false);
+    EXPECT_EQ(meta_options.m_use_sideband_substraction, false);
+    EXPECT_EQ(meta_options.m_sideband_variable, "");
+    EXPECT_EQ(meta_options.m_sideband_mc_files.size(), 0u);
+    EXPECT_EQ(meta_options.m_use_reweighting, false);
+    EXPECT_EQ(meta_options.m_reweighting_identifier, "");
+    EXPECT_EQ(meta_options.m_reweighting_variable, "");
+    EXPECT_EQ(meta_options.m_reweighting_data_files.size(), 0u);
+    EXPECT_EQ(meta_options.m_reweighting_mc_files.size(), 0u);
 
-    meta_options.m_use_multiclass = true;
-    meta_options.m_use_hyperparameter = true;
+    meta_options.m_use_reweighting = true;
+    meta_options.m_reweighting_identifier = "test";
+    meta_options.m_reweighting_variable = "A";
+    meta_options.m_reweighting_mc_files = {"reweighting_mc.root"};
+    meta_options.m_reweighting_data_files = {"reweighting_data.root"};
+    meta_options.m_use_sideband_substraction = true;
+    meta_options.m_sideband_variable = "B";
+    meta_options.m_sideband_mc_files = {"sideband_mc.root"};
     meta_options.m_use_splot = true;
-    meta_options.m_hyperparameters = {"x", "y"};
-    meta_options.m_hyperparameter_metric = "SEP";
     meta_options.m_splot_variable = "Q";
-    meta_options.m_splot_mc_files = {"mc.root"};
+    meta_options.m_splot_mc_files = {"splot_mc.root"};
     meta_options.m_splot_combined = true;
     meta_options.m_splot_boosted = true;
 
     boost::property_tree::ptree pt;
     meta_options.save(pt);
-    EXPECT_EQ(pt.get<bool>("use_multiclass"), true);
-    EXPECT_EQ(pt.get<bool>("use_hyperparameter"), true);
     EXPECT_EQ(pt.get<bool>("use_splot"), true);
     EXPECT_EQ(pt.get<bool>("splot_combined"), true);
     EXPECT_EQ(pt.get<bool>("splot_boosted"), true);
-    EXPECT_EQ(pt.get<std::string>("hyperparameter_metric"), "SEP");
-    EXPECT_EQ(pt.get<unsigned int>("number_of_hyperparameters"), 2);
-    EXPECT_EQ(pt.get<std::string>("hyperparameter0"), "x");
-    EXPECT_EQ(pt.get<std::string>("hyperparameter1"), "y");
-    EXPECT_EQ(pt.get<unsigned int>("number_of_mcfiles"), 1);
-    EXPECT_EQ(pt.get<std::string>("splot_mc_file0"), "mc.root");
+    EXPECT_EQ(pt.get<unsigned int>("splot_number_of_mc_files"), 1);
+    EXPECT_EQ(pt.get<std::string>("splot_mc_file0"), "splot_mc.root");
     EXPECT_EQ(pt.get<std::string>("splot_variable"), "Q");
+    EXPECT_EQ(pt.get<bool>("use_sideband_substraction"), true);
+    EXPECT_EQ(pt.get<std::string>("sideband_variable"), "B");
+    EXPECT_EQ(pt.get<bool>("use_reweighting"), true);
+    EXPECT_EQ(pt.get<std::string>("reweighting_identifier"), "test");
+    EXPECT_EQ(pt.get<std::string>("reweighting_variable"), "A");
+    EXPECT_EQ(pt.get<unsigned int>("reweighting_number_of_mc_files"), 1);
+    EXPECT_EQ(pt.get<std::string>("reweighting_mc_file0"), "reweighting_mc.root");
+    EXPECT_EQ(pt.get<unsigned int>("reweighting_number_of_data_files"), 1);
+    EXPECT_EQ(pt.get<std::string>("reweighting_data_file0"), "reweighting_data.root");
+    EXPECT_EQ(pt.get<unsigned int>("sideband_number_of_mc_files"), 1);
+    EXPECT_EQ(pt.get<std::string>("sideband_mc_file0"), "sideband_mc.root");
 
     MVA::MetaOptions meta_options2;
     meta_options2.load(pt);
 
-    EXPECT_EQ(meta_options2.m_use_multiclass, true);
-    EXPECT_EQ(meta_options2.m_use_hyperparameter, true);
     EXPECT_EQ(meta_options2.m_use_splot, true);
-    EXPECT_EQ(meta_options2.m_hyperparameter_metric, "SEP");
-    EXPECT_EQ(meta_options2.m_hyperparameters.size(), 2);
-    EXPECT_EQ(meta_options2.m_hyperparameters[0], "x");
-    EXPECT_EQ(meta_options2.m_hyperparameters[1], "y");
     EXPECT_EQ(meta_options2.m_splot_variable, "Q");
     EXPECT_EQ(meta_options2.m_splot_mc_files.size(), 1);
-    EXPECT_EQ(meta_options2.m_splot_mc_files[0], "mc.root");
+    EXPECT_EQ(meta_options2.m_splot_mc_files[0], "splot_mc.root");
     EXPECT_EQ(meta_options2.m_splot_combined, true);
     EXPECT_EQ(meta_options2.m_splot_boosted, true);
+    EXPECT_EQ(meta_options2.m_use_sideband_substraction, true);
+    EXPECT_EQ(meta_options2.m_sideband_variable, "B");
+    EXPECT_EQ(meta_options2.m_sideband_mc_files.size(), 1);
+    EXPECT_EQ(meta_options2.m_sideband_mc_files[0], "sideband_mc.root");
+    EXPECT_EQ(meta_options2.m_use_reweighting, true);
+    EXPECT_EQ(meta_options2.m_reweighting_identifier, "test");
+    EXPECT_EQ(meta_options2.m_reweighting_variable, "A");
+    EXPECT_EQ(meta_options2.m_reweighting_mc_files.size(), 1);
+    EXPECT_EQ(meta_options2.m_reweighting_mc_files[0], "reweighting_mc.root");
+    EXPECT_EQ(meta_options2.m_reweighting_data_files.size(), 1);
+    EXPECT_EQ(meta_options2.m_reweighting_data_files[0], "reweighting_data.root");
 
     // Test if po::options_description is created without crashing
     auto description = meta_options.getDescription();
-    EXPECT_EQ(description.options().size(), 9);
+    EXPECT_EQ(description.options().size(), 13);
 
   }
 

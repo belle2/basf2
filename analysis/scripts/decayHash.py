@@ -54,6 +54,7 @@ class DecayHashMap(object):
     DecayHashMap using the C++ implementation of DecayTree and DecayNode
     """
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
+        """Constructor"""
         import root_numpy
         ntuple = root_numpy.root2array(rootfile)
         # self._removeGammaFlag = removeRadiativeGammaFlag

@@ -27,8 +27,8 @@ namespace Belle2 {
 
       /** Enum for parametric access to sensor coordinates. */
       enum Coordinate {
-        u = 0,
-        v = 1
+        u = 1,
+        v = 0
       };
       /**
        * Enum to flag charge carriers.
@@ -37,7 +37,7 @@ namespace Belle2 {
         electron = -1, /** electrons */
         hole = +1      /** holes */
       };
-      // FIXME: Consolidate with similar enums in the digitizer.
+
       /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
        * @param id VXD ID of the sensor.
        * @width Width of the sensor.
@@ -55,7 +55,10 @@ namespace Belle2 {
         m_backplaneCapacitanceU(0), m_interstripCapacitanceU(0),
         m_couplingCapacitanceU(0), m_backplaneCapacitanceV(0),
         m_interstripCapacitanceV(0), m_couplingCapacitanceV(0),
-        m_electronicNoiseU(0), m_electronicNoiseV(0), m_electronicNoiseSbwU(0), m_electronicNoiseSbwV(0),
+        m_aduEquivalentU(375), m_aduEquivalentV(375),
+        m_electronicNoiseU(0), m_electronicNoiseV(0),
+        m_aduEquivalentSbwU(375), m_aduEquivalentSbwV(375),
+        m_electronicNoiseSbwU(0), m_electronicNoiseSbwV(0),
         m_isBackward(false)
       {
         setIsBackward(id);
@@ -100,8 +103,12 @@ namespace Belle2 {
                            double backplaneCapacitanceV,
                            double interstripCapacitanceV,
                            double couplingCapacitanceV,
+                           double AduEquivalentU,
+                           double AduEquivalentV,
                            double electronicNoiseU,
                            double electronicNoiseV,
+                           double AduEquivalentSbwU,
+                           double AduEquivalentSbwV,
                            double electronicNoiseSbwU,
                            double electronicNoiseSbwV)
       {
@@ -115,8 +122,12 @@ namespace Belle2 {
         m_backplaneCapacitanceV = backplaneCapacitanceV;
         m_interstripCapacitanceV = interstripCapacitanceV;
         m_couplingCapacitanceV = couplingCapacitanceV;
+        m_aduEquivalentU = AduEquivalentU;
+        m_aduEquivalentV = AduEquivalentV;
         m_electronicNoiseU = electronicNoiseU;
         m_electronicNoiseV = electronicNoiseV;
+        m_aduEquivalentSbwU = AduEquivalentSbwU;
+        m_aduEquivalentSbwV = AduEquivalentSbwV;
         m_electronicNoiseSbwU = electronicNoiseSbwU;
         m_electronicNoiseSbwV = electronicNoiseSbwV;
       }
@@ -137,21 +148,25 @@ namespace Belle2 {
       double getDepletionVoltage() const { return m_depletionVoltage; }
       /** Return the bias voltage on the sensor. */
       double getBiasVoltage() const { return m_biasVoltage; }
-      /** Return the backplane capacitanceU for the sensor. */
+      /** Return the backplane capacitanceU for the sensor's u strips (long). */
       double getBackplaneCapacitanceU(int uID = 0) const;
-      /** Return the interstrip capacitanceU for the sensor. */
+      /** Return the interstrip capacitanceU for the sensor's u strips (long). */
       double getInterstripCapacitanceU(int uID = 0) const;
-      /** Return the coupling capacitanceU of the sensor strips */
+      /** Return the coupling capacitanceU of the sensor's u strips (long) */
       double getCouplingCapacitanceU(int uID = 0) const;
-      /** Return the backplane capacitanceV for the sensor. */
+      /** Return the backplane capacitanceV for the sensor's v strips (short). */
       double getBackplaneCapacitanceV(int vID = 0) const;
-      /** Return the interstrip capacitanceV for the sensor. */
+      /** Return the interstrip capacitanceV for the sensor's v strips (short). */
       double getInterstripCapacitanceV(int vID = 0) const;
-      /** Return the coupling capacitanceV of the sensor strips */
+      /** Return the coupling capacitanceV of the sensor's v strips (short). */
       double getCouplingCapacitanceV(int vID = 0) const;
-      /** Return electronic noise in e- for u (short) strips */
+      /** Return ADU equivalent for u strips */
+      double getAduEquivalentU() const;
+      /** Return ADU equivalent for v strips */
+      double getAduEquivalentV() const;
+      /** Return electronic noise in e- for u (long) strips */
       double getElectronicNoiseU() const;
-      /** Return electronic noise in e- for v (long) strips */
+      /** Return electronic noise in e- for v (short) strips */
       double getElectronicNoiseV() const;
       /** Calculate electron mobility at a given electric field.
        * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
@@ -200,20 +215,20 @@ namespace Belle2 {
       /** Calculate Lorentz shift along a given coordinate in a magnetic field at a given position.
         * This method can only be used for a completely reconstructed 2D cluster.
         * For 1D clusters, use the following method.
-        * @param u u coordinate where the shift is required
-        * @param v v coordinate where the shift is required
+        * @param uCoord u coordinate where the shift is required
+        * @param vCoord v coordinate where the shift is required
         * @return TVector with Lorentz shift along u and v at the given position.
         */
-      const TVector3& getLorentzShift(double u, double v) const;
+      const TVector3& getLorentzShift(double uCoord, double vCoord) const;
 
       /** Calculate mean Lorentz shift along a given coordinate, with B-field averaged
        * along the corresponding strip.
        * Use this for 1D clusters, where only one coordinate is known.
-       * @param uCoordinate True if u, false if v.
+       * @param isUCoordinate True if u, false if v.
        * @param position The position of the strip.
        * @return Mean Lorentz shift along a given coordinate.
        */
-      double getLorentzShift(bool uCoordinate, double position) const;
+      double getLorentzShift(bool isUCoordinate, double position) const;
 
     protected:
       /** Sensor temperature */
@@ -226,25 +241,33 @@ namespace Belle2 {
       double m_depletionVoltage;
       /** The bias voltage on the sensor */
       double m_biasVoltage;
-      /** The backplane capacitance/cm for the sensor */
+      /** The backplane capacitance/cm for the sensor's u strips */
       double m_backplaneCapacitanceU;
-      /** The interstrip capacitance/cm for the sensor. */
+      /** The interstrip capacitance/cm for the sensor's u strips */
       double m_interstripCapacitanceU;
-      /** The coupling capacitance/cm for the sensor. */
+      /** The coupling capacitance/cm for the sensor's u strips */
       double m_couplingCapacitanceU;
-      /** The backplane capacitance/cm for the sensor. */
+      /** The backplane capacitance/cm for the sensor's v strips */
       double m_backplaneCapacitanceV;
-      /** The interstrip capacitance/cm for the sensor. */
+      /** The interstrip capacitance/cm for the sensor's v strips. */
       double m_interstripCapacitanceV;
-      /** The coupling capacitance/cm for the sensor. */
+      /** The coupling capacitance/cm for the sensor's v strips. */
       double m_couplingCapacitanceV;
-      /** The electronic noise for u (short, n-side) strips. */
+      /** ADU equivalent (electrons/ADU) for u strips */
+      double m_aduEquivalentU;
+      /** ADU equivalent (electrons/ADU) for v strips */
+      double m_aduEquivalentV;
+      /** The electronic noise for u (long) strips. */
       double m_electronicNoiseU;
-      /** The electronic noise for v (long, p-side) strips. */
+      /** The electronic noise for v (short) strips. */
       double m_electronicNoiseV;
-      /** The electronic noise for U trips in bw barrel (non-Origami) sensors. */
+      /** ADU equivalent (electrons/ADU) for u strips, Sbw barrel sensors */
+      double m_aduEquivalentSbwU;
+      /** ADU equivalent (electrons/ADU) for v strips, Sbw barrel sensors */
+      double m_aduEquivalentSbwV;
+      /** The electronic noise for u strips in bw barrel (non-Origami) sensors. */
       double m_electronicNoiseSbwU;
-      /** The electronic noise for V trips in bw barrel (non-Origami) sensors. */
+      /** The electronic noise for v strips in bw barrel (non-Origami) sensors. */
       double m_electronicNoiseSbwV;
       /** Is this a backward barrel sensor? */
       bool m_isBackward;
@@ -295,6 +318,22 @@ namespace Belle2 {
     inline double SensorInfo::getCouplingCapacitanceV(int vID) const
     {
       return (m_couplingCapacitanceV * getStripLengthV(vID));
+    }
+
+    inline double SensorInfo::getAduEquivalentU() const
+    {
+      if (m_isBackward)
+        return m_aduEquivalentSbwU;
+      else
+        return m_aduEquivalentU;
+    }
+
+    inline double SensorInfo::getAduEquivalentV() const
+    {
+      if (m_isBackward)
+        return m_aduEquivalentSbwU;
+      else
+        return m_aduEquivalentV;
     }
 
     inline double SensorInfo::getElectronicNoiseU() const

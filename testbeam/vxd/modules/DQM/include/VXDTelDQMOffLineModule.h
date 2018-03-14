@@ -56,7 +56,6 @@
 #include <tuple>
 #include <limits>
 
-#include <pxd/dataobjects/PXDFrame.h>
 #include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <svd/online/SVDIgnoredStripsMap.h>
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Benjamin Schwenker                        *
  *                                                                        *
  **************************************************************************/
 
@@ -106,14 +106,6 @@ namespace Belle2 {
        * @param electrons number of electrons to drift
        */
       void driftCharge(const TVector3& position, double electrons);
-      /** Drift the charge inside the silicon with a simpler approach.
-       * The charge is drifted to the sensor surface with gaussian diffusion and the
-       * fractions of charge are distributed among the hit pixels. Effective
-       * diffusion constant and mean Lorentz angle are used.
-       * @param position start position of the charge
-       * @param electrons number of electrons to drift
-       */
-      void driftChargeSimple(const TVector3& position, double electrons);
       /** Add pure noise digits to the Sensors */
       void addNoiseDigits();
       /** Calculate the noise contribution to one pixel with given charge.
@@ -124,13 +116,11 @@ namespace Belle2 {
       void saveDigits();
 
       /** Initialize the module and check the parameters */
-      virtual void initialize();
+      void initialize() override final;
       /** Initialize the list of existing PXD Sensors */
-      virtual void beginRun();
+      void beginRun() override final;
       /** Digitize one event */
-      virtual void event();
-      /** Terminate the module */
-      virtual void terminate();
+      void event() override final;
 
     protected:
       /** Wether or not to apply noise */
@@ -171,19 +161,20 @@ namespace Belle2 {
       double m_elStepTime;
       /** Maximum number of random walks before abort */
       int    m_elMaxSteps;
-
-      /** Whether or not to apply discrete ADC */
-      bool   m_applyADC;
       /** ENC equivalent of 1 ADU */
       double m_eToADU;
       /** g_q of a pixel in nA/electrons.*/
       double m_gq;
-      /** Is ADC working in fine (hi-res) mode? */
-      bool m_ADCFineMode;
-      /** Zero-suppression threshold in ADU, steerable */
+      /** Slope of the linear ADC transfer curve in nA/ADU */
+      double m_ADCUnit;
+      /** Zero-suppression threshold in ADU*/
       double m_chargeThreshold;
       /** ... and its equivalent in electrons */
       double m_chargeThresholdElectrons;
+      /** Mean pedestal in ADU */
+      double m_pedestalMean;
+      /** RMS pedestal in ADU */
+      double m_pedestalRMS;
       /** Structure containing all existing sensors */
       Sensors m_sensors;
 
@@ -199,20 +190,6 @@ namespace Belle2 {
       const SensorInfo*  m_currentSensorInfo;
       /** Current magnetic field */
       TVector3 m_currentBField;
-
-      /** Name of the ROOT filename to output statistics */
-      std::string m_rootFilename;
-      /** Pointer to the ROOT filename for statistics */
-      TFile* m_rootFile;
-      /** Histogram showing the number of random steps */
-      TH1D*  m_histSteps;
-      /** Histogram showing the diffusion cloud */
-      TH2D*  m_histDiffusion;
-      /** Histogram showing the Lorentz angles in u (r-phi). */
-      TH1D*  m_histLorentz_u;
-      /** Histogram showing the Lorentz angles in v (z). */
-      TH1D*  m_histLorentz_v;
-
 
     };//end class declaration
 

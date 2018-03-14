@@ -219,7 +219,7 @@ namespace Belle2 {
   void TOPDataQualityOnlineModule::initialize()
   {
     REG_HISTOGRAM;
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
   }
 
   void TOPDataQualityOnlineModule::beginRun()
@@ -286,7 +286,6 @@ namespace Belle2 {
 
   void TOPDataQualityOnlineModule::event()
   {
-    StoreArray<TOPDigit> digits;
     vector<int> all_hit(m_numModules, 0), good_hit(m_numModules, 0), bad_hit(m_numModules, 0);
     vector<int> particle_hit(m_numModules, 0), laser_hit(m_numModules, 0), cal_hit(m_numModules, 0), other_hit(m_numModules, 0);
 
@@ -295,12 +294,12 @@ namespace Belle2 {
     vector<int> pixelHit, moduleHit, colHit, rowHit, isCal;
     vector<double> rawTimeHit;
 
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;
       int col = digit.getPixelCol();
       int row = digit.getPixelRow();
       if (i < 0 || i >= m_numModules) {
-        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i);
+        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i + 1);
         continue;
       }
       all_hit[i]++;

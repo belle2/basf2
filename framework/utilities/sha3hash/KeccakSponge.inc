@@ -41,7 +41,7 @@ int Sponge(unsigned int rate, unsigned int capacity, const unsigned char *input,
 
     if (rate+capacity != SnP_width)
         return 1;
-    if ((rate <= 0) || (rate > SnP_width) || ((rate % 8) != 0))
+    if ((rate == 0) || (rate > SnP_width) || ((rate % 8) != 0))
         return 1;
     if (suffix == 0)
         return 1;
@@ -134,7 +134,7 @@ int SpongeInitialize(SpongeInstance *instance, unsigned int rate, unsigned int c
 {
     if (rate+capacity != SnP_width)
         return 1;
-    if ((rate <= 0) || (rate > SnP_width) || ((rate % 8) != 0))
+    if ((rate == 0) || (rate > SnP_width) || ((rate % 8) != 0))
         return 1;
     SnP_StaticInitialize();
     SnP_Initialize(instance->state);

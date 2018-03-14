@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following decay chain involving several decay modes:
 #
@@ -41,7 +43,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
              'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # create and fill final state ParticleLists
 kaons = ('K-', '')
@@ -50,7 +52,8 @@ photons = ('gamma', '')
 fillParticleListsFromMC([kaons, pions, photons])
 
 # 1. reconstruct pi0 -> gamma gamma decay
-reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 0.15')
+# InvM is the sum of daughter momenta whereas M is the initialised PDG mass ...
+reconstructDecay('pi0 -> gamma gamma', '0.1 < InvM < 0.15')
 
 # 2. reconstruct D0 in multiple decay modes
 reconstructDecay('D0:ch1 -> K- pi+', '1.8 < M < 1.9', 1)

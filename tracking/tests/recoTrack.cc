@@ -45,17 +45,16 @@ namespace Belle2 {
       //--- Setup -----------------------------------------------------------------------
       // We do not use the KLM store arrays to test, if the RecoTrack can be used without them.
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<CDCHit>::registerPersistent(m_storeArrayNameOfCDCHits);
-      StoreArray<SVDCluster>::registerPersistent(m_storeArrayNameOfSVDHits);
-      StoreArray<PXDCluster>::registerPersistent(m_storeArrayNameOfPXDHits);
-      StoreArray<RecoTrack>::registerPersistent(m_storeArrayNameOfRecoTracks);
-      StoreArray<RecoHitInformation>::registerPersistent(m_storeArrayNameOfHitInformation);
-
       StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+      cdcHits.registerInDataStore();
       StoreArray<SVDCluster> svdHits(m_storeArrayNameOfSVDHits);
+      svdHits.registerInDataStore();
       StoreArray<PXDCluster> pxdHits(m_storeArrayNameOfPXDHits);
+      pxdHits.registerInDataStore();
       StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
+      recoTracks.registerInDataStore();
       StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfHitInformation);
+      recoHitInformations.registerInDataStore();
 
       cdcHits.registerRelationTo(recoTracks);
       svdHits.registerRelationTo(recoTracks);

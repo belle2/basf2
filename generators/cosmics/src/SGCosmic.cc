@@ -17,7 +17,7 @@
 #include <fstream>
 
 #include <framework/dataobjects/Helix.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -105,8 +105,7 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
 #endif
 
     // Simulate helix parameter at perigee
-    TVector3 bfield = BFieldMap::Instance().getBField(TVector3(0., 0., 0.)); // Magnetic field
-    float bz = bfield[2];
+    float bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T; // Magnetic field
     const float EPS = 0.0001; // Avoid using zero magnetic field
     if (fabs(bz) < EPS) bz = EPS; // Set the value of the magnetic field to a small number
     float d0, phi0, omega, z0, tanLambda; // The definition is the same as in the Helix class

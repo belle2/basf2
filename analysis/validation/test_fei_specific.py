@@ -34,17 +34,23 @@ use_local_database(tempdir + '/localdb/dbcache.txt', tempdir + '/localdb/', Fals
 from fei.default_channels import get_unittest_channels
 import fei
 
-fei.fei.Teacher.MaximumNumberOfMVASamples = int(1e7)
-fei.fei.Teacher.MinimumNumberOfMVASamples = int(10)
+fei.core.Teacher.MaximumNumberOfMVASamples = int(1e7)
+fei.core.Teacher.MinimumNumberOfMVASamples = int(10)
 
 particles = fei.get_unittest_channels()
-inputFile = '/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_000020_prod00000189_task00000020.root'
-# inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
 
+if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
+    sys.exit(0)
+
+# inputFile = '/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_000020_prod00000189_task00000020.root'
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
+
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
 
 sig_path = create_path()
 inputMdstList('MC6', [inputFile], sig_path)
-fillParticleList('mu+:sig', 'muid > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
+fillParticleList('mu+:sig', 'muonID > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
 reconstructDecay('tau+:sig -> mu+:sig', '', 1, writeOut=True, path=sig_path)
 matchMCTruth('tau+:sig', path=sig_path)
 reconstructDecay('B+:sig -> tau+:sig', '', writeOut=True, path=sig_path)
@@ -69,9 +75,9 @@ print(path)
 process(path)
 assert len(glob.glob('mcParticlesCount.root')) == 1
 
+configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', training=True, cache=0)
 fei.do_trainings(particles, configuration)
 path = create_path()
-configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', training=True)
 feistate = fei.get_path(particles, configuration)
 roe_path = create_path()
 cond_module = register_module('SignalSideParticleFilter')
@@ -81,7 +87,7 @@ roe_path.add_module(cond_module)
 path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-assert feistate.stage == 1
+assert feistate.stage == 1, feistate.stage
 print(path)
 process(path)
 assert len(glob.glob('gamma*')) == 2
@@ -148,7 +154,7 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 7
 
-configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', monitor=True)
+configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', monitor=True, training=False)
 feistate = fei.get_path(particles, configuration)
 
 fei.do_trainings(particles, configuration)
@@ -170,11 +176,11 @@ assert len(glob.glob('Monitor_TrainingData_*')) == 11
 assert len(glob.glob('Monitor_PreReconstruction_BeforeRanking_*')) == 11
 assert len(glob.glob('Monitor_PreReconstruction_AfterRanking_*')) == 11
 assert len(glob.glob('Monitor_PreReconstruction_AfterVertex_*')) == 11
-assert len(glob.glob('Monitor_PostReconstruction_AfterMVA_*')) == 11
-assert len(glob.glob('Monitor_PostReconstruction_BeforePostCut_*')) == 7
-assert len(glob.glob('Monitor_PostReconstruction_BeforeRanking_*')) == 7
-assert len(glob.glob('Monitor_PostReconstruction_AfterRanking_*')) == 7
-assert len(glob.glob('Monitor_Final_*')) == 7
+assert len(glob.glob('Monitor_PostReconstruction_AfterMVA_*')) == 6
+assert len(glob.glob('Monitor_PostReconstruction_BeforePostCut_*')) == 5
+assert len(glob.glob('Monitor_PostReconstruction_BeforeRanking_*')) == 5
+assert len(glob.glob('Monitor_PostReconstruction_AfterRanking_*')) == 5
+assert len(glob.glob('Monitor_Final_*')) == 5
 assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 
 shutil.rmtree(tempdir)

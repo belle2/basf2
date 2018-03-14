@@ -31,7 +31,6 @@ TEST(TrackFindingCDCTest, CellularPathFollower_followSingle)
   relations.emplace_back(&startElement, 1, &secondElement);
 
   // Mimic execution of the cellular automaton
-  WeightedNeighborhood<Element> elementNeighborhood(relations);
   startElement.getAutomatonCell().setStartFlag();
   startElement.getAutomatonCell().setCellState(3);
   startElement.getAutomatonCell().setAssignedFlag();
@@ -41,9 +40,7 @@ TEST(TrackFindingCDCTest, CellularPathFollower_followSingle)
 
   CellularPathFollower<Element> cellularPathFollower;
   const std::vector<Element*> elementPath =
-    cellularPathFollower.followSingle(&startElement,
-                                      elementNeighborhood,
-                                      -INFINITY);
+    cellularPathFollower.followSingle(&startElement, relations, -INFINITY);
   EXPECT_EQ(2, elementPath.size());
   EXPECT_EQ(&startElement, elementPath.front());
   EXPECT_EQ(&secondElement, elementPath.back());

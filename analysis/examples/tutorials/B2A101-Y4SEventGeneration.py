@@ -3,6 +3,8 @@
 
 ######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # Y(4S) -> BBbar event generation
 #
 # This tutorial demonstrates how to generate
@@ -21,7 +23,8 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import generateY4S
+from generatoprs import add_evtgen_generator
+from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
 from reconstruction import add_mdst_output
 from modularAnalysis import analysis_main
@@ -32,8 +35,9 @@ from ROOT import Belle2
 # Btag- -> D0 pi-; D0 -> K- pi+
 # Bsig+ -> mu+ nu_mu
 #
-# generateY4S function is defined in analysis/scripts/modularAnalysis.py
-generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
+setupEventInfo(100, analysis_main)
+add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile(
+    'analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.

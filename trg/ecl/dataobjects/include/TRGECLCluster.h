@@ -33,8 +33,12 @@ namespace Belle2 {
     //! The # of TC in Cluster.
     int m_NofTCinCluster;
 
-    //! The # of TC in Cluster.
+    //! The maximum TC Id in Cluster.
     int m_MaxTCId;
+    //! The Theta Id of maximum TC in Cluster.
+    int m_MaxThetaId;
+    //! The Phi Id of maximum TC in Cluster.
+    int m_MaxPhiId;
 
 
     //! icn_flag -  perfect icn : 1 , icn : 2
@@ -63,6 +67,10 @@ namespace Belle2 {
 
     //! The method to set maximum energy TC ID
     void setMaxTCId(int maxtcid) { m_MaxTCId  = maxtcid; }
+    //! The method to set Theta Id of maximum TC in Cluster.
+    void setMaxThetaId(int maxthetaid) { m_MaxThetaId  = maxthetaid; }
+    //! The method to set Phi Id of maximum TC in Cluster.
+    void setMaxPhiId(int maxphiid) { m_MaxPhiId  = maxphiid; }
 
 
     //! The method to set # of output per TC
@@ -94,6 +102,10 @@ namespace Belle2 {
     int getNofTCinCluster() const { return m_NofTCinCluster; }
     //! The method to get the Maximum TC  id
     int getMaxTCId() const { return m_MaxTCId; }
+    //! The method to set Theta Id of maximum TC in Cluster.
+    int getMaxThetaId() { return m_MaxThetaId ; }
+    //! The method to set Phi Id of maximum TC in Cluster.
+    int getMaxPhiId() { return m_MaxPhiId  ;}
 
     //! The method to get deposited energy
     double getEnergyDep() const { return m_edep; }
@@ -123,31 +135,8 @@ namespace Belle2 {
       m_Y = 0;
       m_Z = 0;
       m_MaxTCId = 0;
-    }
-
-    //! Useful Constructor
-    TRGECLCluster(
-      int eventId,
-      int clusterId,
-      int maxTCId,
-      double edep,
-      double TimeAve,
-      int noftchit,
-      int x,
-      int y,
-      int z
-    )
-    {
-      m_MaxTCId = maxTCId;
-      m_eventId = eventId;
-      m_ClusterId = clusterId;
-      m_edep = edep;
-      m_TimeAve = TimeAve;
-      m_NofTCinCluster = noftchit;
-      m_X = x;
-      m_Y = y;
-      m_Z = z;
-
+      m_MaxThetaId = 0;
+      m_MaxPhiId = 0;
 
     }
     //! The Class title

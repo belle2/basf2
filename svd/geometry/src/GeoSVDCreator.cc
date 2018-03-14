@@ -78,8 +78,12 @@ namespace Belle2 {
         infoPar.getBackplaneCapacitanceV(),
         infoPar.getInterstripCapacitanceV(),
         infoPar.getCouplingCapacitanceV(),
+        infoPar.getAduEquivalentU(),
+        infoPar.getAduEquivalentV(),
         infoPar.getElectronicNoiseU(),
         infoPar.getElectronicNoiseV(),
+        infoPar.getAduEquivalentSbwU(),
+        infoPar.getAduEquivalentSbwV(),
         infoPar.getElectronicNoiseSbwU(),
         infoPar.getElectronicNoiseSbwV()
       );
@@ -114,8 +118,12 @@ namespace Belle2 {
         sensor.getDouble("BackplaneCapacitanceV") * unit_pFcm,
         sensor.getDouble("InterstripCapacitanceV") * unit_pFcm,
         sensor.getDouble("CouplingCapacitanceV") * unit_pFcm,
+        sensor.getWithUnit("ADUEquivalentU"),
+        sensor.getWithUnit("ADUEquivalentV"),
         sensor.getWithUnit("ElectronicNoiseU"),
         sensor.getWithUnit("ElectronicNoiseV"),
+        sensor.getWithUnit("ADUEquivalentSbwU", 0),
+        sensor.getWithUnit("ADUEquivalentSbwV", 0),
         sensor.getWithUnit("ElectronicNoiseSbwU", 0),
         sensor.getWithUnit("ElectronicNoiseSbwV", 0)
       );
@@ -836,12 +844,12 @@ namespace Belle2 {
       // Now lets create forward and backward endmounts for the ribs
       const std::vector<SVDEndmountPar>& Endmounts = support.getEndmounts();
       for (const SVDEndmountPar& endmount : Endmounts) {
-        double height = endmount.getHeight() / Unit::mm / 2.0;
-        double width = endmount.getWidth() / Unit::mm / 2.0;
-        double length = endmount.getLength() / Unit::mm / 2.0;
+        double endMountHeight = endmount.getHeight() / Unit::mm / 2.0;
+        double endMountWidth = endmount.getWidth() / Unit::mm / 2.0;
+        double endMountLength = endmount.getLength() / Unit::mm / 2.0;
         double zpos = endmount.getZ() / Unit::mm;
         double rpos = endmount.getR() / Unit::mm;
-        G4VSolid* endmountBox = new G4Box("endmountBox", height, width, length);
+        G4VSolid* endmountBox = new G4Box("endmountBox", endMountHeight, endMountWidth, endMountLength);
         if (outer) { // holes for the ribs
           endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(-spacing)*placement * G4Translate3D(-rpos, 0,
                                                -zpos));

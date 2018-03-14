@@ -1,0 +1,32 @@
+#==================================================================
+# EventType: 1110004010
+# Descriptor: [B0 -> pi0 pi0]cc
+# NickName: Bd_pi0pi0
+# Documentation: 2 Body charmless process, Btag -> nunubar
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: K. Smith
+# Email: khsmith@student.unimelb.edu.au
+# Cuts: None
+# Date: 20170930
+#==================================================================
+#
+Decay Upsilon(4S)
+1.000 B0 anti-B0 B0sig anti-B0sig  VSS_BMIX dm;
+Enddecay
+#
+## Force Btag decays to invisible
+#
+Decay B0
+1.000 nu_tau anti-nu_tau           PHSP;
+Enddecay
+CDecay anti-B0
+#
+## Force Bsig decays to pi0 pi0
+#
+Decay B0sig
+1.000 pi0 pi0                      SSS_CP 1.6 dm 1 0.55 1.0 0.88 0.0;
+Enddecay
+CDecay anti-B0sig
+#
+End

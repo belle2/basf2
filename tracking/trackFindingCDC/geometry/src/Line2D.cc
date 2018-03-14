@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

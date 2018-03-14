@@ -111,6 +111,9 @@ namespace Belle2 {
     //! Get checksum in RawTrailer
     unsigned int GetTrailerChksum(int  n);
 
+    //! Get CRC16 value for an event
+    int GetEventCRC16Value(int n, int finesse_num);
+
     //! Check if COPPER Magic words are correct
     bool CheckCOPPERMagic(int n);
 
@@ -323,12 +326,20 @@ namespace Belle2 {
 
   inline unsigned int PostRawCOPPERFormat_latest::GetTrailerChksum(int  n)
   {
-    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - 2;
+    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM;
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
-
-
+  inline int PostRawCOPPERFormat_latest::GetEventCRC16Value(int n, int finesse_num)
+  {
+    int fin_nwords = GetFINESSENwords(n, finesse_num);
+    if (fin_nwords > 0) {
+      int* buf = GetFINESSEBuffer(n, finesse_num) +  fin_nwords
+                 - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_ERRCNT_CRC16) + SIZE_B2LHSLB_TRAILER) ;
+      return (int)(*buf & 0xffff);
+    }
+    return -1;
+  }
 
 }
 

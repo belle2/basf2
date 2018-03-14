@@ -11,15 +11,12 @@
 #include <b2bii/modules/B2BIIMdstInput/B2BIIMdstInputModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 
 // Belle tables
 #include "belle_legacy/tables/belletdf.h"
 
 // Belle II dataobjects
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/NumberSequence.h>
 
 #include <cstdlib>
@@ -149,8 +146,7 @@ void B2BIIMdstInputModule::initializeDataStore()
 {
   B2DEBUG(99, "[B2BIIMdstInputModule::initializeDataStore] initialization of DataStore started");
 
-  // event meta data Object pointer
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_evtMetaData.registerInDataStore();
 
   B2DEBUG(99, "[B2BIIMdstInputModule::initializeDataStore] initialization of DataStore ended");
 }
@@ -186,8 +182,10 @@ bool B2BIIMdstInputModule::openNextFile()
   m_current_file_entry = -1;
 
   if (m_entrySequences.size() > 0)
-    m_valid_entries_in_current_file = generate_number_sequence(m_entrySequences[m_current_file_position]);
-
+    // exclude ":" since this case is not considered in generate_number_sequence
+    if (m_entrySequences[m_current_file_position] != ":") {
+      m_valid_entries_in_current_file = generate_number_sequence(m_entrySequences[m_current_file_position]);
+    }
   return true;
 }
 
@@ -212,7 +210,8 @@ bool B2BIIMdstInputModule::readNextEvent()
     }
 
   } while (m_entrySequences.size() > 0
-           and m_valid_entries_in_current_file.find(m_current_file_entry) == m_valid_entries_in_current_file.end());
+           and (m_entrySequences[m_current_file_position] != ":"
+                and m_valid_entries_in_current_file.find(m_current_file_entry) == m_valid_entries_in_current_file.end()));
 
   return true;
 }

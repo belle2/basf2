@@ -115,8 +115,8 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
 
   //  char hostname[512], idname[3], shmid[3];
   for (int i = 0; i < maxrecv; i++) {
-    sprintf(hostname, "%s%2.2d", rhostbase, idbase + i);
-    sprintf(idname, "%2.2d", idbase + i);
+    sprintf(hostname, "%s%2.2d", rhostbase, ridbase + i);
+    sprintf(idname, "%2.2d", ridbase + i);
     sprintf(shmid, "%2.2d", i + 20);
     if (rbadlist == NULL  ||
         strstr(rbadlist, hostname) == 0) {

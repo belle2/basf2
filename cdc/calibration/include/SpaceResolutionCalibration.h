@@ -35,8 +35,10 @@ namespace Belle2 {
       virtual void setMinimumNDF(double minndf) {m_ndfmin = minndf;}
       /// Minimum Pval required
       virtual void setMinimumPval(double minPval) {m_Pvalmin = minPval;}
-      ///Bin width of each slide
+      /// Bin width of each slide
       virtual void setBinWidth(double bw) {m_binWidth = bw;}
+      /// Work with B field or not;
+      virtual void BField(bool bfield) {m_BField = bfield;}
       /// Input root file names, results of collector module
       virtual void inputFileNames(std::string inputname)
       {
@@ -94,8 +96,10 @@ namespace Belle2 {
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_useDB = false;     /**<  use db or text mode*/
       bool m_useProfileFromInputSigma = true; /**<  Use binning from old sigma or new one form input*/
+      bool m_BField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
       //      bool m_LRseparate = true;
       double sigma_old[56][2][18][7][8]; /**<old sigma prameters.*/
+      double sigma_new[56][2][18][7][8]; /**<new sigma prameters.*/
       TF1* ffit[56][2][18][7];           /**< fitting function*/
       TGraphErrors* gfit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* gr[56][2][18][7];    /**< sigma graph.*/
@@ -105,6 +109,7 @@ namespace Belle2 {
       TH1F* hu_s[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of biased residual*/
       TH1F* hb_m[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram of unbiased residual*/
       TH1F* hb_s[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of ubiased residual*/
+      int m_fitflag[56][2][Max_nalpha][Max_ntheta] = {{{{0}}}} ; /**< Fit flag; 1:OK ; 0:error*/
 
       std::string m_outputSigmaFileName = "sigma_new.dat"; /**< Output sigma file name */
       std::string m_inputRootFileNames = "rootfile/output*"; /**<  Input root file names*/

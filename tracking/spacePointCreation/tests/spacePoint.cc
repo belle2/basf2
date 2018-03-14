@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/utilities/TestHelpers.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -134,20 +135,19 @@ namespace Belle2 {
 
     // should throw, since no clusters given:
     std::vector<const SVDCluster*> badNoClusters;
-//  SpacePoint blaBla = SpacePoint(badNoClusters, &sensorInfoBase);
-    EXPECT_THROW(SpacePoint(badNoClusters, &sensorInfoBase), std::out_of_range);
+    EXPECT_B2FATAL(SpacePoint(badNoClusters, &sensorInfoBase));
 
     // should throw, since too many clusters (of same sensor) given:
     std::vector<const SVDCluster*> bad3Clusters = { &clusterU1, &clusterV1, &clusterU2 };
-    EXPECT_THROW(SpacePoint(bad3Clusters, &sensorInfoBase), std::runtime_error);
+    EXPECT_B2FATAL(SpacePoint(bad3Clusters, &sensorInfoBase));
 
     // should throw, since two clusters of same type (but on same sensor) given:
     std::vector<const SVDCluster*> badSameType = { &clusterU1, &clusterU2 };
-    EXPECT_THROW(SpacePoint(badSameType, &sensorInfoBase), std::runtime_error);
+    EXPECT_B2FATAL(SpacePoint(badSameType, &sensorInfoBase));
 
     // should throw, since two clusters of different sensors given:
     std::vector<const SVDCluster*> badDifferentSensors = { &clusterV1, &clusterU3 };
-    EXPECT_THROW(SpacePoint(badDifferentSensors, &sensorInfoBase), std::runtime_error);
+    EXPECT_B2FATAL(SpacePoint(badDifferentSensors, &sensorInfoBase));
 
 
     // check results for full 2D cluster-combi:
@@ -541,10 +541,6 @@ namespace Belle2 {
     vector<const SVDCluster*> clustersV = { &clusterV1 };
     SpacePoint testPoint1DV = SpacePoint(clustersV, &sensorInfoBase);
     EXPECT_EQ(testPoint1DV.getNClustersAssigned(), 1);
-
-    // create empty SpacePoint (via default constructor and check if it has 0 assigned Clusters)
-    SpacePoint emptyPoint = SpacePoint();
-    EXPECT_EQ(emptyPoint.getNClustersAssigned(), 0);
   }
 
 

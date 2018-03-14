@@ -16,8 +16,12 @@
 
 #include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<FacetFilterFactory>;
 
 std::vector<std::string> UnionRecordingFacetFilter::getValidVarSetNames() const
 {
@@ -30,13 +34,13 @@ std::unique_ptr<BaseVarSet<const CDCFacet> >
 UnionRecordingFacetFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return makeUnique<BasicFacetVarSet>();
+    return std::make_unique<BasicFacetVarSet>();
   } else if (name == "fitless") {
-    return makeUnique<FitlessFacetVarSet>();
+    return std::make_unique<FitlessFacetVarSet>();
   } else if (name == "bend") {
-    return makeUnique<BendFacetVarSet>();
+    return std::make_unique<BendFacetVarSet>();
   } else if (name == "fit") {
-    return makeUnique<FitFacetVarSet>();
+    return std::make_unique<FitFacetVarSet>();
   } else if (name == "mva") {
     MVAFacetFilter mvaFacetFilter;
     return std::move(mvaFacetFilter).releaseVarSet();

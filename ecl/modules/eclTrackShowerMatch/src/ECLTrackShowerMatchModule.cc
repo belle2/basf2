@@ -9,6 +9,8 @@
 #include <ecl/modules/eclTrackShowerMatch/ECLTrackShowerMatchModule.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <mdst/dataobjects/Track.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -36,11 +38,14 @@ ECLTrackShowerMatchModule::~ECLTrackShowerMatchModule()
 
 void ECLTrackShowerMatchModule::initialize()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<ECLCluster> eclClusters;
-  tracks.registerRelationTo(eclShowers);
-  tracks.registerRelationTo(eclClusters);
+  m_tracks.isRequired();
+  m_eclShowers.isRequired();
+  m_eclClusters.isRequired();
+  m_eclCalDigits.isRequired();
+  m_extHits.isRequired();
+
+  m_tracks.registerRelationTo(m_eclShowers);
+  m_tracks.registerRelationTo(m_eclClusters);
 }
 
 void ECLTrackShowerMatchModule::beginRun()
@@ -49,16 +54,11 @@ void ECLTrackShowerMatchModule::beginRun()
 
 void ECLTrackShowerMatchModule::event()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLShower> eclRecShowers;
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<ECLCalDigit> eclDigits;
-
   Const::EDetector myDetID = Const::EDetector::ECL;
   Const::ChargedStable hypothesis = Const::pion;
   int pdgCode = abs(hypothesis.getPDGCode());
 
-  for (const Track& track : tracks) {
+  for (const Track& track : m_tracks) {
 
     //Unique shower ids related to this track
     set<int> uniqueShowerIds;
@@ -76,11 +76,11 @@ void ECLTrackShowerMatchModule::event()
       const int cell = copyid + 1;
 
       //Find ECLCalDigit with same cell ID as ExtHit
-      const auto idigit = find_if(eclDigits.begin(), eclDigits.end(),
+      const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
       [&](const ECLCalDigit & d) { return d.getCellId() == cell; }
                                  );
       //Couldn't find ECLCalDigit with same cell ID as the ExtHit
-      if (idigit == eclDigits.end()) continue;
+      if (idigit == m_eclCalDigits.end()) continue;
 
       //Save all unique shower IDs of the showers related to idigit
       for (auto& shower : idigit->getRelationsFrom<ECLShower>()) {
@@ -100,9 +100,9 @@ void ECLTrackShowerMatchModule::event()
     } // end loop on ExtHit
   } // end loop on Tracks
 
-  for (auto& shower : eclRecShowers) {
+  for (auto& shower : m_eclShowers) {
     // compute the distance from shower COG and the closest extrapolated track
-    double dist = computeTrkMinDistance(shower, tracks);
+    double dist = computeTrkMinDistance(shower, m_tracks);
     shower.setMinTrkDistance(dist);
     ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
     if (cluster != nullptr)
@@ -177,10 +177,13 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
   double p = 0;
   const Track* selectedTrk = nullptr;
   for (const auto& track : shower.getRelationsFrom<Track>()) {
-    const TrackFitResult* fit = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
     if (fit != 0) cp = fit->getMomentum().Mag();
-    if (cp > p) selectedTrk = & track;
+    if (cp > p) {
+      selectedTrk = & track;
+      p = cp;
+    }
   }
   lTrk = 0;
   lShower = 0;
@@ -208,4 +211,3 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
   lTrk = w0 * trkdir - costh * (w0 * avgDir);
   lTrk /= sin2th;
 }
-

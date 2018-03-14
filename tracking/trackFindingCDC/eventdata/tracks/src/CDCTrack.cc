@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
@@ -15,10 +14,36 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
 #include <tracking/trackFindingCDC/numerics/FloatComparing.h>
-#include <tracking/dataobjects/RecoTrack.h>
+
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
+#include <framework/logging/Logger.h>
+
+#include <algorithm>
+#include <utility>
+#include <cmath>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class CDCRLWireHit;
+  }
+}
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -290,15 +315,6 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   return track;
 }
 
-RecoTrack* CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
-{
-  RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
-  if (not newRecoTrack) return nullptr;
-
-  RecoTrackUtil::fill(*this, *newRecoTrack);
-  return newRecoTrack;
-}
-
 std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
 {
   vector<CDCSegment3D> result;
@@ -348,7 +364,7 @@ CDCTrack CDCTrack::reversed() const
 MayBePtr<const CDCRecoHit3D> CDCTrack::find(const CDCWireHit& wireHit) const
 {
   auto hasWireHit = [&wireHit](const CDCRecoHit3D & recoHit3D) {
-    return recoHit3D.getWireHit() == wireHit;
+    return recoHit3D.hasWireHit(wireHit);
   };
   auto itRecoHit3D = std::find_if(this->begin(), this->end(), hasWireHit);
   return itRecoHit3D == this->end() ? nullptr : &*itRecoHit3D;

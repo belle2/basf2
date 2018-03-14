@@ -11,11 +11,15 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
+#include <iostream>
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
-
+#include <unordered_set>
+#include <string>
 
 namespace Belle2 {
   /** This class implements the methods to map raw SVD hits to BASF2 SVD hits.
@@ -24,7 +28,7 @@ namespace Belle2 {
    * MODIFICATIONS 06/01/2014 by PKvasnick:
    * The code no longer relies on consecutive numbering of FADCs or APVs.
    *
-   * 3 Feb. 2015
+   * 2015-2018
    * MODIFIED and EXTENDED by Jarek Wiechczynski to work with packer (new) and unpacker (updated version)
    *
    */
@@ -89,7 +93,7 @@ namespace Belle2 {
     }; //ChipID class
 
 
-    class SensorID {  //moja dodatkowa klasa zagniezdzona w SVDOnlineToOfflineMap
+    class SensorID {
     public:
       /** Typedefs of the compound id type and chip number types */
       typedef unsigned short baseType;
@@ -162,6 +166,19 @@ namespace Belle2 {
     SVDDigit* NewDigit(unsigned char FADC, unsigned char APV25,
                        unsigned char channel, float charge, float time);
 
+    /** Return a pointer to a new SVDShpaerDigit whose VxdID, isU and cellID is set
+     * @param FADC is FADC number from the SVDRawCopper data.
+     * @param APV25 is the APV25 number from the SVDRawCopper data.
+     * @param channel is the APV25 channel number from the SVDRawCopper data.
+     * @return a pointer to the new SVDShaperDigit owned by the caller whose
+     * Position is 0
+     * FIXME: There should be no such function in this mapping class, no dependence
+     * on SVDShaperDigit and its interface.
+     */
+    SVDShaperDigit* NewShaperDigit(unsigned char FADC, unsigned char APV25,
+                                   unsigned char channel, short samples[6], float time = 0.0,
+                                   SVDModeByte mode = SVDModeByte());
+
     /** Get ChipInfo for a given FADC/APV combination.
      * @param FADC is FADC number from the SVDRawCopper data.
      * @param APV25 is the APV25 number from the SVDRawCopper data.
@@ -179,6 +196,24 @@ namespace Belle2 {
     short getStripNumber(unsigned char channel, const SensorInfo& info) const
     { return (info.m_channel0 + ((unsigned short)channel) * (info.m_parallel ? 1 : -1)); }
 
+
+    /**container for FADC numbers from current mapping file */
+    std::unordered_set<unsigned char> FADCnumbers;
+
+    /** map containing FADC numbers assigned to multiple APVs, from xml file */
+    std::unordered_multimap<unsigned char, unsigned char> APVforFADCmap;
+
+
+    typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
+
+    /** function that maps FADC numbers as 0-(nFADCboards-1) from FADCnumbers unordered_set */
+    void prepFADCmaps(FADCmap&, FADCmap&);
+
+
+    unsigned short getFADCboardsNumber()
+    {
+      return FADCnumbers.size();
+    }
 
   private:
 
@@ -199,11 +234,15 @@ namespace Belle2 {
      */
     void ReadSensorSide(int nLayer, int nLadder, int nSensor, bool isU, boost::property_tree::ptree const& xml_side);
 
+    /** Human readable unique name of this map*/
+    std::string m_MapUniqueName;
+
     /** m_sensors[ChipID(FADC,APV25)] gives the SensorInfo for the given APV25 on
      * the given FADC (Unpacker)
      */
     std::unordered_map< ChipID::baseType, SensorInfo > m_sensors;
     std::unordered_map< SensorID::baseType, std::vector<ChipInfo> > m_chips; // for packer
+
 
 
     /** add chipN on FADCn to the map
@@ -222,6 +261,7 @@ namespace Belle2 {
 
     ChipInfo m_currentChipInfo; /**< internal instance of chipinfo used by the getter */
     SensorInfo m_currentSensorInfo;
+
 
   };
 

@@ -49,7 +49,7 @@ namespace Belle2 {
 
   public:
 
-    ClassDef(GblMultipleScatteringController, 1) /** GBL multiple scattering controller for Belle 2 */
+    //ClassDef(GblMultipleScatteringController, 1) /** GBL multiple scattering controller for Belle 2 */
 
   };
 

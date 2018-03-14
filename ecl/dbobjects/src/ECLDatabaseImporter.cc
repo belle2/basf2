@@ -8,15 +8,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <ecl/dbobjects/ECLDatabaseImporter.h>
+
+//STL
+#include <sstream>
+#include <fstream>
+#include <string>
+
+//Boost
+#include <boost/filesystem.hpp>
 
 // ECL
-#include <ecl/dbobjects/ECLDatabaseImporter.h>
 #include <ecl/dbobjects/ECLDigitEnergyConstants.h>
 #include <ecl/dbobjects/ECLDigitTimeConstants.h>
 #include <ecl/modules/eclShowerShape/ECLShowerShapeModule.h>
 #include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 
 // FRAMEWORK
 #include <framework/gearbox/GearDir.h>
@@ -32,6 +43,7 @@
 #include <TClonesArray.h>
 #include <TTree.h>
 #include <TDirectory.h>
+#include <TGraph2D.h>
 
 
 // NAMESPACES
@@ -315,19 +327,19 @@ void ECLDatabaseImporter::importShowerShapesSecondMomentCorrections()
 
   //N1 theta
   TGraph* theta_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N1");
-  dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
+  dbArray.appendNew(ECLCluster::c_nPhotons, ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
 
   //N1 phi
   TGraph* phi_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N1");
-  dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_phiType , *phi_N1_graph);
+  dbArray.appendNew(ECLCluster::c_nPhotons, ECLShowerShapeModule::c_phiType , *phi_N1_graph);
 
   //N2 theta
   TGraph* theta_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N2");
-  dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
+  dbArray.appendNew(ECLCluster::c_neutralHadron, ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
 
   //N2 phi
   TGraph* phi_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N2");
-  dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_phiType , *phi_N2_graph);
+  dbArray.appendNew(ECLCluster::c_neutralHadron, ECLShowerShapeModule::c_phiType , *phi_N2_graph);
 
 
   //Import to DB
@@ -341,4 +353,87 @@ void ECLDatabaseImporter::importShowerShapesSecondMomentCorrections()
   dbArray.import(iov);
 
   delete inputFile;
+}
+
+void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
+{
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
+
+  //Expect a txt file
+  boost::filesystem::path path(m_inputFileNames[0]);
+  if (path.extension() != ".txt")
+    B2FATAL("Expecting a .txt file. Aborting");
+
+  TGraph2D graph;
+
+  std::string line;
+  std::ifstream infile(m_inputFileNames[0]);
+  double energy;
+  double bkgFactor;
+  double thetaMinInLine;
+  double thetaMaxInLine;
+  double correctionFactor;
+
+  double thetaMin = DBL_MAX;
+  double thetaMax = -DBL_MAX;
+  double energyMin = DBL_MAX;
+  double energyMax = -DBL_MAX;
+
+  while (std::getline(infile, line)) {
+    std::istringstream iss(line);
+    iss >> energy;
+    iss >> bkgFactor;
+    iss >> thetaMinInLine;
+    iss >> thetaMaxInLine;
+    iss >> correctionFactor;
+
+    //    B2INFO(energy << " " << bkgFactor << " " << thetaMinInLine << " " << thetaMaxInLine << " " << correctionFactor);
+
+    const double theta = 0.5 * (thetaMinInLine + thetaMaxInLine);
+
+    //Find thetaMin and thetaMax
+    if (theta < thetaMin)
+      thetaMin = theta;
+
+    if (theta > thetaMax)
+      thetaMax = theta;
+
+    //Find energyMin and energyMax
+    if (energy < energyMin)
+      energyMin = energy;
+
+    if (energy > energyMax)
+      energyMax = energy;
+
+
+
+    graph.SetPoint(graph.GetN(), theta, energy, correctionFactor);
+  }
+
+//  B2INFO(thetaMin << " " << thetaMax << " " << energyMin << " " << energyMax);
+
+//    Import to DB
+  int startExp = 0;
+  int startRun = 0;
+  int endExp = -1;
+  int endRun = -1;
+  IntervalOfValidity iov(startExp, startRun, endExp, endRun);
+
+  if (std::abs(bkgFactor - 1.0) < 1e-9) { //bkgFactor == 1 -> phase 2 backgrounds
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr("ECLShowerEnergyCorrectionTemporary_phase2");
+    dbPtr.construct(graph, thetaMin, thetaMax, energyMin, energyMax);
+
+    //Import into local db
+    dbPtr.import(iov);
+  }
+  /*else (because currently phase_2 and phase_3 are same payload*/ if (std::abs(bkgFactor - 1.0) < 1e-9) {
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr("ECLShowerEnergyCorrectionTemporary_phase3");
+    dbPtr.construct(graph, thetaMin, thetaMax, energyMin, energyMax);
+
+    //Import into local db
+    dbPtr.import(iov);
+  }
+
+
 }

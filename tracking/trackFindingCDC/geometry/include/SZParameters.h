@@ -34,15 +34,17 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using ESZParameter = NSZParameterIndices::ESZParameter;
 
+    // Guard to prevent repeated template symbol emission
+    struct SZUtil;
+    extern template struct UncertainParametersUtil<SZUtil, ESZParameter>;
+
     /// Utility struct for functions and types related to the sz plane parameters.
     struct SZUtil : UncertainParametersUtil<SZUtil, ESZParameter> {
 
       /// Getter for the signs which have to be applied to reverse the parameters
       static ParameterVector reversalSigns()
       {
-        ParameterVector result;
-        result << -1, 1;
-        return result;
+        return  ParameterVector({ -1.0, 1.0});
       }
     };
 

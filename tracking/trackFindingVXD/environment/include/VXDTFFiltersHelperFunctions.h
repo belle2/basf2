@@ -79,7 +79,6 @@ namespace Belle2 {
                 << nHitCombinations
                 << ", allowed only 2-4), skipping print-function!");
 
-      B2INFO("now manually printing static sectors with inner sectors:");
       std::string secIDCombis = "## printed " + std::to_string(nHitCombinations) + "-sector-combi-output of secMap: " + configName +
                                 "\n{";
       for (const auto* staticSector : filters.getStaticSectors()) {
@@ -129,7 +128,7 @@ namespace Belle2 {
       secIDCombis += "};";
 
       if (print2File == true) {
-        B2INFO("Printing static sector relations to file " << configName << "4Mathematica.txt...\n");
+        B2DEBUG(99, "Printing static sector relations to file " << configName << "4Mathematica.txt...\n");
         std::ofstream ofs;
         ofs.open(configName + "4Mathematica.txt", std::ofstream::out | std::ofstream::trunc);
         ofs << secIDCombis;

@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
@@ -23,9 +24,9 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  const Vector2D startWirePos2D = facet.getStartWire().getRefPos2D();
-  const Vector2D middleWirePos2D = facet.getMiddleWire().getRefPos2D();
-  const Vector2D endWirePos2D = facet.getEndWire().getRefPos2D();
+  const Vector2D startWirePos2D = facet.getStartWireHit().getRefPos2D();
+  const Vector2D middleWirePos2D = facet.getMiddleWireHit().getRefPos2D();
+  const Vector2D endWirePos2D = facet.getEndWireHit().getRefPos2D();
 
   // 0 step fit
   {

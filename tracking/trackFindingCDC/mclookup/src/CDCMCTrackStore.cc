@@ -19,13 +19,12 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <boost/range/adaptor/transformed.hpp>
 
 #include <memory>
 
@@ -101,10 +100,10 @@ void CDCMCTrackStore::fillMCTracks()
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCMCMap::MCParticleByCDCHitRelation& relation : mcMap.getMCParticleByHitRelations()) {
+  for (const auto& relation : mcMap.getHitsByMCParticle()) {
 
-    const CDCHit* ptrHit = relation.get<CDCHit>();
-    const MCParticle* ptrMCParticle = relation.get<MCParticle>();
+    const MCParticle* ptrMCParticle = std::get<const MCParticle* const>(relation);
+    const CDCHit* ptrHit = std::get<const CDCHit*>(relation);
 
     if (not mcMap.isBackground(ptrHit) and ptrMCParticle) {
 

@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/AllTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/MCTrackRelationFilter.h>
@@ -17,12 +19,13 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/PhiTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseTrackRelationFilter>;
 
 TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -57,19 +60,19 @@ std::unique_ptr<BaseTrackRelationFilter>
 TrackRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseTrackRelationFilter>>();
+    return std::make_unique<NoneFilter<BaseTrackRelationFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllTrackRelationFilter>();
+    return std::make_unique<AllTrackRelationFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCTrackRelationFilter>();
+    return std::make_unique<MCTrackRelationFilter>();
   } else if (filterName == "unionrecording") {
-    return makeUnique< UnionRecordingTrackRelationFilter>();
+    return std::make_unique< UnionRecordingTrackRelationFilter>();
   } else if (filterName == "feasible") {
-    return makeUnique<MVAFeasibleTrackRelationFilter>();
+    return std::make_unique<MVAFeasibleTrackRelationFilter>();
   } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticTrackRelationFilter>();
+    return std::make_unique<MVARealisticTrackRelationFilter>();
   } else if (filterName == "phi") {
-    return makeUnique<PhiTrackRelationFilter>();
+    return std::make_unique<PhiTrackRelationFilter>();
   } else {
     return Super::create(filterName);
   }

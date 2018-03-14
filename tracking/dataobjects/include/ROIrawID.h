@@ -28,18 +28,19 @@ namespace Belle2 {
       UnusedBits = 21,
       SystemFlagBits = 1,
       DHHIDBits = 6,
-      RowMinBits = 10,
-      ColMinBits = 8,
-      RowMaxBits = 10,
-      ColMaxBits = 8,
-      Bits = UnusedBits + SystemFlagBits + DHHIDBits + RowMinBits + ColMinBits + RowMaxBits + ColMaxBits,
+      MinVBits = 10,
+      MinUBits = 8,
+      MaxVBits = 10,
+      MaxUBits = 8,
+      Bits = UnusedBits + SystemFlagBits + DHHIDBits + MinVBits + MinUBits + MaxVBits + MaxUBits,
 
-      MaxSystemFlag = (1 << SystemFlagBits) - 1,
-      MaxDHHID = (1 << DHHIDBits) - 1,
-      MaxRowMin = (1 << RowMinBits) - 1,
-      MaxColMin = (1 << ColMinBits) - 1,
-      MaxRowMax = (1 << RowMaxBits) - 1,
-      MaxColMax = (1 << ColMaxBits) - 1,
+// the following are unused atm, might be used for consistency checks
+//       MaxSystemFlag = (1 << SystemFlagBits) - 1,
+//       MaxDHHID = (1 << DHHIDBits) - 1,
+//       MaxMinV = (1 << MinVBits) - 1,
+//       MaxMinU = (1 << MinUBits) - 1,
+//       MaxMaxV = (1 << MaxVBits) - 1,
+//       MaxMaxU = (1 << MaxUBits) - 1,
     };
 
 
@@ -48,24 +49,24 @@ namespace Belle2 {
       m_rawID.id = id;
     }; /**< constructor setting the id */
 
-    ROIrawID(baseType SystemFlag, baseType DHHID, baseType RowMin, baseType ColMin, baseType RowMax, baseType ColMax)
+    ROIrawID(baseType SystemFlag, baseType DHHID, baseType MinV, baseType MinU, baseType MaxV, baseType MaxU)
     {
 
       m_rawID.parts.unused = 0;
       m_rawID.parts.systemFlag = SystemFlag;
       m_rawID.parts.DHHID = DHHID;
-      m_rawID.parts.rowMin = RowMin;
-      m_rawID.parts.colMin = ColMin;
-      m_rawID.parts.rowMax = RowMax;
-      m_rawID.parts.colMax = ColMax;
+      m_rawID.parts.minV = MinV;
+      m_rawID.parts.minU = MinU;
+      m_rawID.parts.maxV = MaxV;
+      m_rawID.parts.maxU = MaxU;
     } /**< constructor */
 
     baseType getSystemFlag() const {return m_rawID.parts.systemFlag;} /**< get system flag */
     baseType getDHHID() const {return m_rawID.parts.DHHID;} /**< get DHH ID*/
-    baseType getRowMin() const {return m_rawID.parts.rowMin;} /**< get row min*/
-    baseType getColMin() const {return m_rawID.parts.colMin;} /**< get col min*/
-    baseType getRowMax() const {return m_rawID.parts.rowMax;} /**< get row max*/
-    baseType getColMax() const {return m_rawID.parts.colMax;} /**< get col max*/
+    baseType getMinVid() const {return m_rawID.parts.minV;} /**< get minimum V*/
+    baseType getMinUid() const {return m_rawID.parts.minU;} /**< get minimum U*/
+    baseType getMaxVid() const {return m_rawID.parts.maxV;} /**< get maximum V*/
+    baseType getMaxUid() const {return m_rawID.parts.maxU;} /**< get maximum U*/
     baseType getID() const {return m_rawID.id;} /**< get ROIrawID*/
 
     baseType getBigEndian() const; /**< get bigEndian*/
@@ -73,10 +74,10 @@ namespace Belle2 {
 
     void setSystemFlag(baseType  SystemFlag) {m_rawID.parts.systemFlag = SystemFlag;} /**< set system flag*/
     void setDHHID(baseType DHHID) {m_rawID.parts.DHHID = DHHID;} /**< set DHH ID*/
-    void setRowMin(baseType RowMin) {m_rawID.parts.rowMin = RowMin;} /**< set row min*/
-    void setColMin(baseType ColMin) {m_rawID.parts.colMin = ColMin;} /**< set col min*/
-    void setRowMax(baseType RowMax) {m_rawID.parts.rowMax = RowMax;} /**< set row max*/
-    void setColMax(baseType ColMax) {m_rawID.parts.colMax = ColMax;} /**< set col max*/
+    void setMinVid(baseType MinV) {m_rawID.parts.minV = MinV;} /**< set minimum V*/
+    void setMinUid(baseType MinU) {m_rawID.parts.minU = MinU;} /**< set minimum U*/
+    void setMaxVid(baseType MaxV) {m_rawID.parts.maxV = MaxV;} /**< set maximum V*/
+    void setMaxUid(baseType MaxU) {m_rawID.parts.maxU = MaxU;} /**< set maximum U*/
     void setID(baseType id) {m_rawID.id = id;} /**< set ROIrawID*/
 
 
@@ -94,10 +95,10 @@ namespace Belle2 {
     union {
 baseType id: Bits;
       struct {
-baseType colMax: ColMaxBits;
-baseType rowMax: RowMaxBits;
-baseType colMin: ColMinBits;
-baseType rowMin: RowMinBits;
+baseType maxU: MaxUBits;
+baseType maxV: MaxVBits;
+baseType minU: MinUBits;
+baseType minV: MinVBits;
 baseType DHHID: DHHIDBits;
 baseType systemFlag: SystemFlagBits;
 baseType unused: UnusedBits;

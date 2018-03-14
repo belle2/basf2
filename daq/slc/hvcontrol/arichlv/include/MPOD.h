@@ -215,36 +215,34 @@ EXPORT SnmpIntegerBuffer* setMultipleOutputTripTimeMaxCurrents(HSNMP session, in
 EXPORT SnmpIntegerBuffer* getMultipleOutputSupervisionBehaviors(HSNMP session, int start, int size);
 EXPORT SnmpIntegerBuffer* setMultipleOutputSupervisionBehaviors(HSNMP session, int start, SnmpIntegerBuffer* values);
 //************************************************************
-#define MAX_CRATES 10
 
-extern HSNMP crateHsnmp[MAX_CRATES];
 
 int _VI_FUNC MPOD_Start(void);
 
-int _VI_FUNC MPOD_Open(int mpodn, const char* address);
+HSNMP _VI_FUNC MPOD_Open(const char* address);
 
-int _VI_FUNC MPOD_GetInt(int mpodn, const char* oidstr);
+int _VI_FUNC MPOD_GetInt(HSNMP mpodn, const char* oidstr);
 
-int _VI_FUNC MPOD_SetInt(int mpodn, const char* oidstr, int iset);
+int _VI_FUNC MPOD_SetInt(HSNMP mpodn, const char* oidstr, int iset);
 
-double _VI_FUNC MPOD_GetDouble(int mpodn, const char* oidstr);
+double _VI_FUNC MPOD_GetDouble(HSNMP mpodn, const char* oidstr);
 
-double _VI_FUNC MPOD_SetDouble(int mpodn, const char* oidstr, double dset);
+double _VI_FUNC MPOD_SetDouble(HSNMP mpodn, const char* oidstr, double dset);
 
-char* _VI_FUNC MPOD_GetString(int mpodn, const char* oidstr);
+char* _VI_FUNC MPOD_GetString(HSNMP mpodn, const char* oidstr);
 
-int _VI_FUNC MPOD_GetIntCh(int mpodn, const char* oidstrbase, int ich);
+int _VI_FUNC MPOD_GetIntCh(HSNMP mpodn, const char* oidstrbase, int ich);
 
-int _VI_FUNC MPOD_SetIntCh(int mpodn, const char* oidstrbase, int ich, int iset);
+int _VI_FUNC MPOD_SetIntCh(HSNMP mpodn, const char* oidstrbase, int ich, int iset);
 
-double _VI_FUNC MPOD_GetDoubleCh(int mpodn, const char* oidstrbase, int ich);
+double _VI_FUNC MPOD_GetDoubleCh(HSNMP mpodn, const char* oidstrbase, int ich);
 
-double _VI_FUNC MPOD_SetDoubleCh(int mpodn, const char* oidstrbase, int ich,
+double _VI_FUNC MPOD_SetDoubleCh(HSNMP mpodn, const char* oidstrbase, int ich,
                                  double dset);
 
-char* _VI_FUNC MPOD_GetStringCh(int mpodn, const char* oidstrbase, int ich);
+char* _VI_FUNC MPOD_GetStringCh(HSNMP mpodn, const char* oidstrbase, int ich);
 
-int _VI_FUNC MPOD_Close(int mpodn);
+int _VI_FUNC MPOD_Close(HSNMP mpodn);
 
 int _VI_FUNC MPOD_End(void);
 

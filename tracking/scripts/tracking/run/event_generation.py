@@ -186,6 +186,15 @@ muon_pdg_code = 13
 # PDG code of a tau
 tau_pdg_code = 15
 
+# PDG code of a pion
+pion_pdg_code = 211
+
+# PDG code of a kaon
+kaon_pdg_code = 321
+
+# PDG code of a protons
+proton_pdg_code = 2212
+
 
 def add_single_gun_generator(path):
     """Add ParticleGun with a single muon"""
@@ -242,6 +251,30 @@ def add_gun_generator(path):
                     momentumGeneration='inversePt',
                     thetaGeneration='uniform',
                     thetaParams=[17., 150.])
+
+
+def add_eloss_gun_generator(path):
+    """Add ParticleGun particle gun for energy loss estimations"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[
+                        # muon_pdg_code,
+                        # -muon_pdg_code,
+                        # electron_pdg_code,
+                        # -electron_pdg_code,
+                        pion_pdg_code,
+                        -pion_pdg_code,
+                        # kaon_pdg_code,
+                        # -kaon_pdg_code,
+                        # proton_pdg_code,
+                        # -proton_pdg_code,
+                    ],
+                    momentumParams=[0.3, 2],
+                    nTracks=10,
+                    varyNTracks=False,
+                    thetaGeneration='uniform',
+                    # thetaParams=[17., 150.],
+                    thetaParams=[89., 91],
+                    )
 
 
 def add_forward_gun_generator(path):
@@ -329,6 +362,7 @@ generators_by_short_name = {
     'low_gun': add_low_gun_generator,
     'forward_gun': add_forward_gun_generator,
     'gun': add_gun_generator,
+    'eloss_gun': add_eloss_gun_generator,
     'generic': add_evtgen_generator,
     "EvtGenInput": add_evtgen_generator,  # <- requires beam parameters
     'cosmics': add_cosmics_generator,

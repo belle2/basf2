@@ -73,9 +73,6 @@ namespace Belle2 {
     template <typename OtherType> explicit B2Vector3(const B2Vector3<OtherType>* b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3->X()), static_cast<DataType>(b2Vec3->Y()), static_cast<DataType>(b2Vec3->Z())} {};
 
-
-    /* ************************* OPERATORS ********************************* */
-
     /** member access without boundary check */
     DataType operator()(unsigned i) const { return m_coordinates[i]; }
     /** member access without boundary check */
@@ -125,11 +122,14 @@ namespace Belle2 {
     {
       return B2Vector3<DataType>(a * X(), a * Y(), a * Z());
     }
+    /** Scaling of 3-vectors with a real number */
+    B2Vector3<DataType> operator / (DataType a) const
+    {
+      return B2Vector3<DataType>(X() / a, Y() / a, Z() / a);
+    }
     /**  Scalar product of 3-vectors. */
     DataType operator * (const B2Vector3<DataType>& b) const { return Dot(b); }
 
-
-    /** *********************************************** MATHEMATICS *********************************************** */
 
     /**  The azimuth angle. returns phi from -pi to pi  */
     DataType Phi() const { return X() == 0 && Y() == 0 ? 0 : atan2(Y(), X()); }
@@ -372,9 +372,6 @@ namespace Belle2 {
       }
     }
 
-    /** *********************************************** Additional MATHEMATICS *********************************************** */
-    /* functions defined here are not existing in TVector3 but enhance featureset of B2Vector3 */
-
     /** calculates the absolute value of the coordinates element-wise */
     void Abs()
     {
@@ -392,25 +389,25 @@ namespace Belle2 {
       m_coordinates[2] = std::sqrt(m_coordinates[2]);
     }
 
-    /** safe member access (with boundary check!) should always be used! */
+    /** safe member access (with boundary check!) */
     DataType at(unsigned i) const;
-    /** access variable X (= .at(0) ) */
+    /** access variable X (= .at(0) without boundary check) */
     DataType x() const { return m_coordinates[0]; }
-    /** access variable Y (= .at(1) ) */
+    /** access variable Y (= .at(1) without boundary check) */
     DataType y() const { return m_coordinates[1]; }
-    /** access variable Z (= .at(2) ) */
+    /** access variable Z (= .at(2) without boundary check) */
     DataType z() const { return m_coordinates[2]; }
-    /** access variable X (= .at(0) ) */
+    /** access variable X (= .at(0) without boundary check) */
     DataType X() const { return x(); }
-    /** access variable Y (= .at(1) ) */
+    /** access variable Y (= .at(1)  without boundary check) */
     DataType Y() const { return y(); }
-    /** access variable Z (= .at(2) ) */
+    /** access variable Z (= .at(2) without boundary check) */
     DataType Z() const { return z(); }
-    /** access variable X (= .at(0) ) */
+    /** access variable X (= .at(0) without boundary check) */
     DataType Px() const { return x(); }
-    /** access variable Y (= .at(1) ) */
+    /** access variable Y (= .at(1) without boundary check) */
     DataType Py() const { return y(); }
-    /** access variable Z (= .at(2) ) */
+    /** access variable Z (= .at(2) without boundary check) */
     DataType Pz() const { return z(); }
 
     /** directly copies coordinates to an array of double */
@@ -438,8 +435,6 @@ namespace Belle2 {
     void SetXYZ(const TVector3& tVec);
     /** set all coordinates using a pointer to TVector3 */
     void SetXYZ(const TVector3* tVec);
-
-    /** *********************************************** MISCELLANEOUS *********************************************** */
 
     /** Returns the name of the B2Vector. */
     static std::string name();
@@ -478,8 +473,6 @@ namespace Belle2 {
     }
 
   };
-
-  /** *********************************************** NON-MEMBER FUNCTIONS AND TYPEDEFS *********************************************** */
 
   /** typedef for common usage with double */
   typedef B2Vector3<double> B2Vector3D;
@@ -536,8 +529,6 @@ namespace Belle2 {
     return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z());
   }
 
-
-  /** *********************************************** MEMBER FUNCTIONS TO BE INLINED *********************************************** */
 
   /** Assignment via B2Vector3 */
   template< typename DataType >
@@ -608,6 +599,14 @@ namespace Belle2 {
     m_coordinates[2] = static_cast<Double_t>(tVec->Z());
   }
 
+  template< typename DataType >
+  void B2Vector3<DataType>::GetXYZ(double* carray) const
+  {
+    carray[0] = X();
+    carray[1] = Y();
+    carray[2] = Z();
+  }
+
   /** directly copies coordinates to a TVector3 */
   template< typename DataType >
   void B2Vector3<DataType>::GetXYZ(TVector3* tVec) const
@@ -653,6 +652,5 @@ namespace Belle2 {
   {
     return std::string("B2Vector3<") + typeid(DataType).name() + std::string(">");
   }
-
 
 } // end namespace Belle2

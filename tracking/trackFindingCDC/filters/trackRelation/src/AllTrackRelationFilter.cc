@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/AllTrackRelationFilter.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

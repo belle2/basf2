@@ -10,20 +10,30 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
 #include <tracking/trackFindingCDC/ca/Path.h>
+
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
 
 namespace Belle2 {
-  class RecoTrack;
 
   namespace TrackFindingCDC {
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCSegmentPair;
     class CDCSegmentTriple;
+
+    class CDCWireHit;
+    class Vector2D;
+    class Vector3D;
 
     /// Class representing a sequence of three dimensional reconstructed hits
     class CDCTrack : public std::vector<CDCRecoHit3D> {
@@ -35,7 +45,7 @@ namespace Belle2 {
       /// Constructor from a series of hits.
       explicit CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D);
 
-      /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
+      /// Constructor from a two dimensional segment filling the third dimension with 0 values.
       explicit CDCTrack(const CDCSegment2D& segment);
 
       /// Concats several tracks from a path
@@ -53,28 +63,33 @@ namespace Belle2 {
         return false;
       }
 
-      /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
-      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
-
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/
       std::vector<CDCSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const
-      { return front().getISuperLayer(); }
+      {
+        return front().getISuperLayer();
+      }
 
       /// Getter for the superlayer id the track ends in.
       ISuperLayer getEndISuperLayer() const
-      { return back().getISuperLayer(); }
+      {
+        return back().getISuperLayer();
+      }
 
       /// Getter for the position of the first reconstructed hit.
       const Vector3D& getStartRecoPos3D() const
-      { return front().getRecoPos3D(); }
+      {
+        return front().getRecoPos3D();
+      }
 
       /// Getter for the position of the last reconstructed hit.
       const Vector3D& getEndRecoPos3D() const
-      { return back().getRecoPos3D(); }
+      {
+        return back().getRecoPos3D();
+      }
 
       /// Setter for the two dimensional trajectory. The trajectory should start at the start of the
       /// track and follow its direction.

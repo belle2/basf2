@@ -19,7 +19,8 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_maxSpaceResol(), m_debug4Geo(), m_printMaterialTable(), m_materialDefinitionMode(), m_senseWireZposMode(),
+  m_minTrackLength(), m_maxSpaceResol(), m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
+  m_materialDefinitionMode(), m_senseWireZposMode(),
   m_displacement(),
   m_alignment(),
   m_misalignment(),
@@ -71,7 +72,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //alignmentt switch
   addParam("Alignment", m_alignment, "Switch for wire alignment: on/off.",  true);
   //misalignment switch
-  addParam("Misalignment", m_misalignment, "Switch for wire misalignment: on/off.",  true);
+  //  addParam("Misalignment", m_misalignment, "Switch for wire misalignment: on/off.",  true);
+  m_misalignment = false;
 
 
   //input type for displacement
@@ -80,8 +82,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //input type for alignment
   addParam("AlignmentInputType", m_alignmentInputType, "Input type for wire alignment; db-object (true); text-file (false).", true);
   //input type for misalignment
-  addParam("MisalignmentInputType", m_misalignmentInputType, "Input type for wire misalignment; db-object (true); text-file (false).",
-           true);
+  //  addParam("MisalignmentInputType", m_misalignmentInputType, "Input type for wire misalignment; db-object (true); text-file (false).", true);
+  m_misalignmentInputType = true;
   //input type for xt-relation
   addParam("XtInputType", m_xtInputType, "Input type for xt-relations; db-object (true); text-file (false).", true);
   //input type for sigma
@@ -100,12 +102,12 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 
   //displacement file
   addParam("DisplacementFile", m_displacementFile, "Input file name (on cdc/data) for wire displacement.",
-           string("displacement_v1.1.dat"));
+           string("displacement_v2.2.1.dat"));
   //alignment file
   addParam("AlignmentFile", m_alignmentFile, "Input file name (on cdc/data) for wire alignment.",  string("alignment_v2.dat"));
   //misalignment file
-  addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.",
-           string("misalignment_v2.dat"));
+  //  addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.", string("misalignment_v2.dat"));
+  m_misalignmentFile = string("misalignment_v2.dat");
   //xt-relation
   addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations. You can specify either an uncompressed or gzip file.",
            string("xt_v3_chebyshev.dat.gz"));
@@ -126,6 +128,14 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MaxSpaceResol", m_maxSpaceResol,
            "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
            double(2.5 * 0.0130));
+
+  //mapper geometry flag
+  addParam("MapperGeometry", m_mapperGeometry, "Define B-field mapper geometry used in GCR in 2017 summer. Tentative option.",
+           bool(false));
+
+  //mapper phi-angle
+  addParam("MapperPhiAngle", m_mapperPhiAngle, "Phi-angle (deg.) of B-field mapper used in GCR in 2017 summer. Tentative option.",
+           double(16.7));
 
 }
 
@@ -301,6 +311,16 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
     B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
     m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
+  }
+
+  if (m_gcp.getMapperGeometry() != m_mapperGeometry) {
+    B2INFO("CDCJobCntlParModifier: mapper geometry flag modified: " << m_gcp.getMapperGeometry() << " to " << m_mapperGeometry);
+    m_gcp.setMapperGeometry(m_mapperGeometry);
+  }
+
+  if (m_gcp.getMapperPhiAngle() != m_mapperPhiAngle) {
+    B2INFO("CDCJobCntlParModifier: mapper phi-angle modified: " << m_gcp.getMapperPhiAngle() << " to " << m_mapperPhiAngle);
+    m_gcp.setMapperPhiAngle(m_mapperPhiAngle);
   }
 }
 

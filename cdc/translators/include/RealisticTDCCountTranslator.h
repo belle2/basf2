@@ -31,7 +31,7 @@ namespace Belle2 {
 
       /**
        * If trigger jitter was simulated, in every event one has to give an estimate of the effect.
-       * To reproduce the old behaviour, the other extracted event T0s are deleted before.
+       * To reproduce the old behaviour, we replace the final event t0 here
        * */
       void setEventTime(double eventTime = 0) __attribute__((deprecated))
       {
@@ -39,8 +39,7 @@ namespace Belle2 {
           m_eventTimeStoreObject.create();
         }
 
-        m_eventTimeStoreObject->clear();
-        m_eventTimeStoreObject->addEventT0(eventTime, 0, Const::CDC);
+        m_eventTimeStoreObject->setEventT0(eventTime, 0, Const::CDC);
       }
 
       /**
@@ -62,7 +61,22 @@ namespace Belle2 {
                             double z = 0,
                             double alpha = 0,
                             double theta = static_cast<double>(TMath::Pi() / 2.),
-                            unsigned short adcCount = 0);
+                            unsigned short adcCount = 0) override;
+
+      /**
+       * Get Drift time.
+       * @param tdcCount              TDC count (ns).
+       * @param wireID                Encoded sense wire ID.
+       * @param timeOfFlightEstimator Time of flight (ns).
+       * @param z                     z-position on the wire (cm).
+       * @param adcCount              ADC count.
+       * @return Drift time (ns)
+       */
+      double getDriftTime(unsigned short tdcCount,
+                          const WireID& wireID,
+                          double timeOfFlightEstimator,
+                          double z,
+                          unsigned short adcCount) override;
 
       /**
        * Get position resolution^2 corresponding to the drift length
@@ -80,7 +94,7 @@ namespace Belle2 {
                                       bool leftRight = false,
                                       double z = 0,
                                       double alpha = 0,
-                                      double = static_cast<double>(TMath::Pi() / 2.));
+                                      double = static_cast<double>(TMath::Pi() / 2.)) override;
 
     private:
       /**
@@ -89,6 +103,11 @@ namespace Belle2 {
        *
        */
       bool m_useInWirePropagationDelay;
+
+      /**
+       * Flag to distinguish betw. data and MC.
+       */
+      bool m_realData = false;
 
       /**
        * Event timing. The event time is fetched from the data store using this pointer.

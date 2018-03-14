@@ -38,28 +38,30 @@ namespace {
     binning.m_bckgrd_pdf[1] = 2.0;
     binning.m_bckgrd_pdf[2] = 1.0;
 
+    binning.m_boundaries = {1.0, 2.0, 3.0, 4.0};
+
     binning.normalizePDFs();
 
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0], 1.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1], 2.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2], 3.0 / 6.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0], 1.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1], 2.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2], 3.0 / 6.0 * 3.0);
 
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0], 3.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1], 2.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2], 1.0 / 6.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0], 3.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1], 2.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2], 1.0 / 6.0 * 3.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_yield, 6.0);
     EXPECT_FLOAT_EQ(binning.m_bckgrd_yield, 6.0);
 
     binning.calculateCDFsFromPDFs();
 
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0], 1.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1], 2.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2], 3.0 / 6.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0], 1.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1], 2.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2], 3.0 / 6.0 * 3.0);
 
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0], 3.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1], 2.0 / 6.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2], 1.0 / 6.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0], 3.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1], 2.0 / 6.0 * 3.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2], 1.0 / 6.0 * 3.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_yield, 6.0);
     EXPECT_FLOAT_EQ(binning.m_bckgrd_yield, 6.0);
@@ -109,14 +111,14 @@ namespace {
     EXPECT_FLOAT_EQ(binning.m_boundaries[3], 99.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_pdf.size(), 3);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0] * binning.m_signal_yield, 87.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1] * binning.m_signal_yield, 93.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2] * binning.m_signal_yield, 95.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0] * binning.m_signal_yield * 55.0 / 99.0, 87.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1] * binning.m_signal_yield * 25.0 / 99.0, 93.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2] * binning.m_signal_yield * 19.0 / 99.0, 95.0);
 
     EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf.size(), 3);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0] * binning.m_bckgrd_yield, 93.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1] * binning.m_bckgrd_yield, 87.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2] * binning.m_bckgrd_yield, 95.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0] * binning.m_bckgrd_yield * 55.0 / 99.0, 93.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1] * binning.m_bckgrd_yield * 25.0 / 99.0, 87.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2] * binning.m_bckgrd_yield * 19.0 / 99.0, 95.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_cdf.size(), 3);
     EXPECT_FLOAT_EQ(binning.m_signal_cdf[0] * binning.m_signal_yield, 87.0);
@@ -151,14 +153,14 @@ namespace {
     EXPECT_FLOAT_EQ(binning.m_boundaries[3], 99.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_pdf.size(), 3);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0] * binning.m_signal_yield, 34.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1] * binning.m_signal_yield, 92.0);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2] * binning.m_signal_yield, 149.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0] * binning.m_signal_yield / 3.0, 34.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1] * binning.m_signal_yield / 3.0, 92.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2] * binning.m_signal_yield / 3.0, 149.0);
 
     EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf.size(), 3);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0] * binning.m_bckgrd_yield, 38.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1] * binning.m_bckgrd_yield, 88.0);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2] * binning.m_bckgrd_yield, 149.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0] * binning.m_bckgrd_yield / 3.0, 38.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1] * binning.m_bckgrd_yield / 3.0, 88.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2] * binning.m_bckgrd_yield / 3.0, 149.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_cdf.size(), 3);
     EXPECT_FLOAT_EQ(binning.m_signal_cdf[0] * binning.m_signal_yield, 34.0);

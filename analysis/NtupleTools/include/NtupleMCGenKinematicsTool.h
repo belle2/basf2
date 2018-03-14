@@ -20,14 +20,12 @@ namespace Belle2 {
   /** Tool for NtupleMaker to write out container summaries to flat ntuple. */
   class NtupleMCGenKinematicsTool : public NtupleFlatTool {
   private:
-    //..Number of generated MC particles stored
-    int m_nMCGen;
-    //..PDG number of each
-    int* m_MCGenPDG;
-    //..Index of the mother of this particle in ntuple. -1 means mother is virtual
-    int* m_MCGenMothIndex;
-    //..Magnitude of momentum, theta, and phi (laboratory frame)
-    float* m_MCGenP, *m_MCGenTheta, *m_MCGenPhi;
+    int m_nMCGen;          /**< Number of generated MC particles stored */
+    int* m_MCGenPDG;       /**< PDG number of each */
+    int* m_MCGenMothIndex; /**< Index of the mother of this particle in ntuple. -1 means mother is virtual */
+    float* m_MCGenP;       /**< the magnitude of the momentum in the laboratory frame */
+    float* m_MCGenTheta;   /**< theta in the laboratory frame */
+    float* m_MCGenPhi;     /**< phi in the laboratory frame */
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

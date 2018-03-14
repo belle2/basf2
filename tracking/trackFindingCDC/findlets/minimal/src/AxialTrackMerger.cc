@@ -15,10 +15,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -104,6 +107,32 @@ WithWeight<MayBePtr<CDCTrack> > AxialTrackMerger::calculateBestTrackToMerge(CDCT
 
 double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
+  // First check whether most of the hits from the tracks lie in the backward direction
+  // even if though track is not curling -> tracks should not be merged
+  const CDCTrajectory3D& trajectory3D1 = track1.getStartTrajectory3D();
+  const CDCTrajectory3D& trajectory3D2 = track2.getStartTrajectory3D();
+
+  const Vector2D& phi0Vec1 = trajectory3D1.getFlightDirection3DAtSupport().xy();
+  const Vector2D& phi0Vec2 = trajectory3D2.getFlightDirection3DAtSupport().xy();
+
+  int fbVote12 = 0;
+  int fbVote21 = 0;
+
+  for (const CDCRecoHit3D& recoHit3D : track1) {
+    EForwardBackward fbInfo = phi0Vec2.isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
+    if (not isValid(fbInfo)) continue;
+    fbVote12 += fbInfo;
+  }
+
+  for (const CDCRecoHit3D& recoHit3D : track2) {
+    EForwardBackward fbInfo = phi0Vec1.isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
+    if (not isValid(fbInfo)) continue;
+    fbVote21 += fbInfo;
+  }
+
+  if (not trajectory3D1.isCurler() and fbVote12 < 0) return NAN;
+  if (not trajectory3D2.isCurler() and fbVote21 < 0) return NAN;
+
   // Build common hit list by copying the wire hits into one large list
   // We use the wire hits here as we do not want them to bring
   // their "old" reconstructed position when fitting.
@@ -136,9 +165,6 @@ double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   commonTrajectory2D = fitter.fit(combinedWireHits);
   removeStrangeHits(1, combinedWireHits, commonTrajectory2D);
   commonTrajectory2D = fitter.fit(combinedWireHits);
-
-  // TODO: perform B2B tracks check
-  // if B2B return 0;
 
   // Dismiss this possibility if the hit list size after all the removing of hits is even smaller
   // than the two lists before or if the list is too small

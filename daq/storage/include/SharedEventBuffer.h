@@ -61,7 +61,7 @@ namespace Belle2 {
     }
     unsigned int write(const int* buf, unsigned int nword,
                        bool fouce, unsigned int serial, bool unlocked);
-    unsigned int read(int* buf, bool fouce, Header* hdr = NULL);
+    unsigned int read(int* buf, bool fouce, bool unlocked, Header* hdr = NULL);
 
   private:
     std::string m_path;

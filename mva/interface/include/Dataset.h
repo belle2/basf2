@@ -69,6 +69,18 @@ namespace Belle2 {
       virtual float getSignalFraction();
 
       /**
+       * Return index of feature with the given name
+       * @param feature name of the feature
+       */
+      virtual unsigned int getFeatureIndex(std::string feature);
+
+      /**
+       * Return index of spectator with the given name
+       * @param spectator name of the spectator
+       */
+      virtual unsigned int getSpectatorIndex(std::string spectator);
+
+      /**
        * Returns all values of one feature in a std::vector<float>
        * @param iFeature the position of the feature to return
        */
@@ -184,7 +196,7 @@ namespace Belle2 {
       virtual unsigned int getNumberOfSpectators() const override { return m_spectators.size(); }
 
       /**
-       * Returns the number of events in this dataset which is always one
+       * Returns the number of events in this dataset
        */
       virtual unsigned int getNumberOfEvents() const override { return m_matrix.size(); }
 
@@ -259,6 +271,60 @@ namespace Belle2 {
       std::vector<unsigned int>
       m_event_indices; /**< Mapping from the position of a event in the given subset to its position in the wrapped dataset */
       Dataset& m_dataset; /**< Reference to the wrapped dataset */
+
+    };
+
+    /**
+     * Wraps two other Datasets, one containing signal, the other background events
+     * Used by the reweighting method to train mc files against data files
+     */
+    class CombinedDataset : public Dataset {
+
+    public:
+      /**
+       * Constructs a new CombinedDataset holding a reference to the wrapped Datasets
+       * @param general_options
+       * @param signal_dataset reference to the wrapped Dataset containing signal events
+       * @param background_dataset reference to the wrapped Dataset containing background events
+       */
+      CombinedDataset(const GeneralOptions& general_options, Dataset& signal_dataset, Dataset& background_dataset);
+
+      /**
+       * Returns the number of features in this dataset, so the size of the given subset of the variables
+       */
+      virtual unsigned int getNumberOfFeatures() const override { return m_signal_dataset.getNumberOfFeatures(); }
+
+      /**
+       * Returns the number of spectators in this dataset, so the size of the given subset of the spectators
+       */
+      virtual unsigned int getNumberOfSpectators() const override { return m_signal_dataset.getNumberOfSpectators(); }
+
+      /**
+       * Returns the number of events in the wrapped dataset
+       */
+      virtual unsigned int getNumberOfEvents() const override { return m_signal_dataset.getNumberOfEvents() + m_background_dataset.getNumberOfEvents(); }
+
+      /**
+       * Load the event number iEvent from the wrapped dataset
+       * @param iEvent event number to load
+       */
+      virtual void loadEvent(unsigned int iEvent) override;
+
+      /**
+       * Returns all values of one feature in a std::vector<float> of the wrapped dataset
+       * @param iFeature the position of the feature to return in the given subset
+       */
+      virtual std::vector<float> getFeature(unsigned int iFeature) override;
+
+      /**
+       * Returns all values of one spectator in a std::vector<float> of the wrapped dataset
+       * @param iSpectator the position of the spectator to return in the given subset
+       */
+      virtual std::vector<float> getSpectator(unsigned int iSpectator) override;
+
+    private:
+      Dataset& m_signal_dataset; /**< Reference to the wrapped dataset containing signal events */
+      Dataset& m_background_dataset; /**< Reference to the wrapped dataset containing background events */
 
     };
 

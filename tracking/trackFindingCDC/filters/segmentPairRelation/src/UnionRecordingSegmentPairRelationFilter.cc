@@ -15,10 +15,13 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MVARealisticSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<SegmentPairRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingSegmentPairRelationFilter::getValidVarSetNames() const
@@ -32,14 +35,14 @@ std::unique_ptr<BaseVarSet<Relation<const CDCSegmentPair> > >
 UnionRecordingSegmentPairRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return makeUnique<BasicSegmentPairRelationVarSet>();
+    return std::make_unique<BasicSegmentPairRelationVarSet>();
   } else if (name == "fit") {
-    return makeUnique<FitSegmentPairRelationVarSet>();
+    return std::make_unique<FitSegmentPairRelationVarSet>();
   } else if (name == "realistic") {
     MVARealisticSegmentPairRelationFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "truth") {
-    return makeUnique<TruthSegmentPairRelationVarSet>();
+    return std::make_unique<TruthSegmentPairRelationVarSet>();
   }
   return Super::createVarSet(name);
 }

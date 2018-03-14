@@ -36,7 +36,7 @@ void EKLMAlignmentData::setDx(double dx)
   m_Dx = dx;
 }
 
-double EKLMAlignmentData::getDx()
+double EKLMAlignmentData::getDx() const
 {
   return m_Dx;
 }
@@ -46,7 +46,7 @@ void EKLMAlignmentData::setDy(double dy)
   m_Dy = dy;
 }
 
-double EKLMAlignmentData::getDy()
+double EKLMAlignmentData::getDy() const
 {
   return m_Dy;
 }
@@ -56,7 +56,7 @@ void EKLMAlignmentData::setDalpha(double dalpha)
   m_Dalpha = dalpha;
 }
 
-double EKLMAlignmentData::getDalpha()
+double EKLMAlignmentData::getDalpha() const
 {
   return m_Dalpha;
 }

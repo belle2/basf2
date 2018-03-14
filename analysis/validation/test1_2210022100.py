@@ -35,10 +35,10 @@ inputMdst('default', '../2210022100.dst.root')
 # --------------------------------------------------
 
 loadStdKS()
-loadStdAllPi0()
+stdPi0s('veryLoose')
 
 # reconstruct D0:kpi and perform a mass constrained vertex fit
-reconstructDecay('D0:sig -> K_S0:all pi0:all', 'useCMSFrame(p) > 2.4 and 1.81 < M < 1.91')
+reconstructDecay('D0:sig -> K_S0:all pi0:veryLoose', 'useCMSFrame(p) > 2.4 and 1.81 < M < 1.91')
 massVertexRave('D0:sig', 0.001)
 
 # truth matching
@@ -67,7 +67,7 @@ toolsDZ += ['MCTruth', '^D0 -> K_S0 pi0']
 ntupleFile('../2210022100.ntup.root')
 ntupleTree('dz', 'D0:sig', toolsDZ)
 
-summaryOfLists(['D0:sig', 'K_S0:all', 'pi0:all'])
+summaryOfLists(['D0:sig', 'K_S0:all', 'pi0:veryLoose'])
 # --------------------------------------------------
 # Process the events and print call statistics
 # --------------------------------------------------

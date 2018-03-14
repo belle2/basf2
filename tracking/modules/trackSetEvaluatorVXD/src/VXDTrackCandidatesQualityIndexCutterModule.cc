@@ -52,7 +52,7 @@ void VXDTrackCandidatesQualityIndexCutterModule::event()
 
 void VXDTrackCandidatesQualityIndexCutterModule::deactivateCandidates()
 {
-  for (SpacePointTrackCand sptc : m_spacePointTrackCands) {
+  for (SpacePointTrackCand& sptc : m_spacePointTrackCands) {
     if (sptc.getQualityIndex() < m_minRequiredQuality) {
       sptc.removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }

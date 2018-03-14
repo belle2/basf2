@@ -13,9 +13,9 @@
 #include <analysis/NtupleTools/NtupleMCHierarchyTool.h>
 #include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <analysis/NtupleTools/NtuplePIDTool.h>
-#include <analysis/NtupleTools/NtupleDeltaLogLTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
 #include <analysis/NtupleTools/NtupleTrackHitsTool.h>
+#include <analysis/NtupleTools/NtupleEventBasedTrackingTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
@@ -43,13 +43,16 @@
 #include <analysis/NtupleTools/NtupleSLTool.h>
 #include <analysis/NtupleTools/NtupleErrMatrixTool.h>
 #include <analysis/NtupleTools/NtupleEventWeightsTool.h>
-#include <analysis/NtupleTools/NtupleLETRGTool.h>
 #include <analysis/NtupleTools/NtupleLECDCTool.h>
 #include <analysis/NtupleTools/NtupleLEECLTool.h>
 #include <analysis/NtupleTools/NtupleLEKLMTool.h>
 #include <analysis/NtupleTools/NtupleHLTTagTool.h>
 #include <analysis/NtupleTools/NtupleMCGenKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleKlongIDTool.h>
+#include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
+#include <analysis/NtupleTools/NtupleEventShapeTool.h>
+#include <analysis/NtupleTools/NtupleXpTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -97,14 +100,15 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "Charge") return new NtupleChargeTool(tree, d);
   else if (strToolName == "PDGCode") return new NtuplePDGCodeTool(tree, d);
   else if (strToolName == "MCTruth") return new NtupleMCTruthTool(tree, d);
-  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d);
+  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d, strOption);
+
   else if (strToolName == "MCKinematics") return new NtupleMCKinematicsTool(tree, d);
   else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
-  else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);
   else if (strToolName == "RecoStats") return new NtupleRecoStatsTool(tree, d);
   else if (strToolName == "MCReconstructible") return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName == "Track") return new NtupleTrackTool(tree, d);
   else if (strToolName == "TrackHits") return new NtupleTrackHitsTool(tree, d);
+  else if (strToolName == "EventBasedTracking") return new NtupleEventBasedTrackingTool(tree, d);
   else if (strToolName == "Cluster") return new NtupleClusterTool(tree, d);
   else if (strToolName == "Vertex") return new NtupleVertexTool(tree, d);
   else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);
@@ -129,13 +133,17 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "SL") return new NtupleSLTool(tree, d);
   else if (strToolName == "ErrMatrix") return new NtupleErrMatrixTool(tree, d);
   else if (strToolName == "EventWeights") return new NtupleEventWeightsTool(tree, d);
-  else if (strToolName == "LETRG")  return new NtupleLETRGTool(tree, d);
   else if (strToolName == "LECDC")  return new NtupleLECDCTool(tree, d);
   else if (strToolName == "LEECL")  return new NtupleLEECLTool(tree, d);
   else if (strToolName == "LEKLM")  return new NtupleLEKLMTool(tree, d);
   else if (strToolName == "HLTTag")  return new NtupleHLTTagTool(tree, d);
   else if (strToolName == "MCGenKinematics") return new NtupleMCGenKinematicsTool(tree, d, strOption);
   else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
-  B2WARNING("NtupleTool " << strToolName << " is not available!");
+  else if (strToolName == "KlongID") return new NtupleKlongIDTool(tree, d);
+  else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
+  else if (strToolName == "EventShape") return new NtupleEventShapeTool(tree, d);
+  else if (strToolName == "Xp") return new NtupleXpTool(tree, d);
+
+  B2ERROR("NtupleTool \"" << strToolName << "\" is not available: no tool with that name could be found!");
   return NULL;
 }

@@ -11,7 +11,6 @@
 #include <bklm/modules/bklmDigitizer/BKLMDigitizerModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/GearDir.h>
 
@@ -59,6 +58,9 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
   m_enableConstBkg = 0;
   m_timeResolution = 3.0; // ns
   m_ADCRange = 4096; // to be filled by actual value in FPGA
+  m_MPPCGain = 20;
+  m_ADCOffset = 3400;
+  m_ADCThreshold = 140;
 
 }
 
@@ -68,34 +70,36 @@ BKLMDigitizerModule::~BKLMDigitizerModule()
 
 void BKLMDigitizerModule::initialize()
 {
-  StoreArray<BKLMSimHit> bklmSimHit;
-  bklmSimHit.required();
+  simHits.isRequired();
 
   // Force creation and persistence of BKLM output datastores
-  StoreArray<BKLMDigit> bklmDigit;
-  bklmDigit.registerInDataStore();
-  bklmSimHit.registerRelationTo(bklmDigit);
-  GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/DigitizationParams");
-  m_ADCSamplingTime = dig.getDouble("ADCSamplingTime");
-  m_nDigitizations = dig.getDouble("nDigitizations");
-  m_nPEperMeV = dig.getDouble("nPEperMeV");
-  m_minCosTheta = cos(M_PI * dig.getDouble("MaxTotalIRAngle") / 180.0);
-  m_mirrorReflectiveIndex = dig.getDouble("MirrorReflectiveIndex");
-  m_scintillatorDeExcitationTime = dig.getDouble("ScintDeExTime");
-  m_fiberDeExcitationTime = dig.getDouble("FiberDeExTime");
-  m_fiberLightSpeed = dig.getDouble("FiberLightSpeed");
-  m_attenuationLength = dig.getDouble("AttenuationLength");
-  m_PEAttenuationFreq = dig.getDouble("PEAttenuationFreq"); // wrong value
-  m_PEAttenuationFreq = 1.0 / 8.75; // from T2K paper by F. Retiere: PoS (PD07) 017
-  m_meanSiPMNoise = dig.getDouble("MeanSiPMNoise");
-  m_enableConstBkg = dig.getDouble("EnableConstBkg") > 0;
-  m_timeResolution = dig.getDouble("TimeResolution");
+  bklmDigits.registerInDataStore();
+  simHits.registerRelationTo(bklmDigits);
+
+  m_ADCRange = m_digitParams->getADCRange();
+  m_ADCSamplingTime = m_digitParams->getADCSamplingTime();
+  m_nDigitizations = m_digitParams->getNDigitizations();
+  m_nPEperMeV = m_digitParams->getNPEperMeV();
+  m_minCosTheta = m_digitParams->getMinCosTheta();
+  m_mirrorReflectiveIndex = m_digitParams->getMirrorReflectiveIndex();
+  m_scintillatorDeExcitationTime = m_digitParams->getScintillatorDeExcitationTime();
+  m_fiberDeExcitationTime = m_digitParams->getFiberDeExcitationTime();
+  m_fiberLightSpeed = m_digitParams->getFiberLightSpeed();
+  m_attenuationLength = m_digitParams->getAttenuationLength();
+  m_PEAttenuationFreq = m_digitParams->getPEAttenuationFrequency();
+  m_meanSiPMNoise = m_digitParams->getMeanSiPMNoise();
+  m_enableConstBkg = m_digitParams->getEnableConstBkg();
+  m_timeResolution = m_digitParams->getTimeResolution();
 }
 
 void BKLMDigitizerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, "BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+
+  m_MPPCGain = m_ADCParams->getMPPCGain();
+  m_ADCOffset = m_ADCParams->getADCOffset();
+  m_ADCThreshold = m_ADCParams->getADCThreshold();
 }
 
 void BKLMDigitizerModule::event()
@@ -103,11 +107,9 @@ void BKLMDigitizerModule::event()
   //---------------------------------------------
   // Get BKLM hits collection from the data store
   //---------------------------------------------
-  StoreArray<BKLMSimHit> simHits;
   int nSimHit = simHits.getEntries();
   if (nSimHit == 0) return;
 
-  StoreArray<BKLMDigit> digits;
 
   unsigned int nDigit = 0;
   unsigned int d = 0;
@@ -120,15 +122,15 @@ void BKLMDigitizerModule::event()
         for (int s = simHit->getStripMin(); s <= simHit->getStripMax(); ++s) {
           int moduleID = (simHit->getModuleID() & ~BKLM_STRIP_MASK) | ((s - 1) << BKLM_STRIP_BIT);
           for (d = 0; d < nDigit; ++d) {
-            if (((digits[d]->getModuleID() ^ moduleID) & BKLM_MODULESTRIPID_MASK) == 0) break;
+            if (((bklmDigits[d]->getModuleID() ^ moduleID) & BKLM_MODULESTRIPID_MASK) == 0) break;
           }
           if (d == nDigit) {
-            digits.appendNew(simHit, s);
+            bklmDigits.appendNew(simHit, s);
             nDigit++;
           } else {
             // DIVOT need pileup of RPC hits here
           }
-          simHit->addRelationTo(digits[d]);  // 1 RPC hit to many digits
+          simHit->addRelationTo(bklmDigits[d]);  // 1 RPC hit to many digits
         }
       }
     } else {
@@ -144,7 +146,7 @@ void BKLMDigitizerModule::event()
   }
 
   // Digitize the scintillator-strip hits
-  digitize(volIDToSimHits, digits);
+  digitize(volIDToSimHits, bklmDigits);
 
 }
 
@@ -160,31 +162,30 @@ void BKLMDigitizerModule::digitize(const std::map<int, std::vector<std::pair<int
                                    StoreArray<BKLMDigit>& digits)
 {
 
-  StoreArray<BKLMSimHit> simHits;
 
   // Digitize the pulse(s) in each scintillator strip (identified by volumeID)
   for (std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::const_iterator iVolMap = volIDToSimHits.begin();
        iVolMap != volIDToSimHits.end(); ++iVolMap) {
     // Make one BKLMDigit for each scintillator strip then add relations to this BKLMDigit from each BKLMSimHit
-    BKLMDigit* digit = digits.appendNew((iVolMap->second.front()).second);
+    BKLMDigit* bklmDigit = digits.appendNew((iVolMap->second.front()).second);
     for (std::vector<std::pair<int, BKLMSimHit*> >::const_iterator iSimHit = iVolMap->second.begin(); iSimHit != iVolMap->second.end();
          ++iSimHit) {
-      simHits[iSimHit->first]->addRelationTo(digit);
+      simHits[iSimHit->first]->addRelationTo(bklmDigit);
     }
-    processEntry(iVolMap->second, digit);
+    processEntry(iVolMap->second, bklmDigit);
   }
 
 }
 
-void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, BKLMDigit* digit)
+void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, BKLMDigit* bklmDigit)
 {
 
-  digit->setFitStatus(EKLM::c_FPGANoSignal);
-  digit->setTime(0.0);
-  digit->setEDep(0.0);
-  digit->setSimNPixel(0);
-  digit->setNPixel(0.0);
-  digit->isAboveThreshold(false);
+  bklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+  bklmDigit->setTime(0.0);
+  bklmDigit->setEDep(0.0);
+  bklmDigit->setSimNPixel(0);
+  bklmDigit->setNPixel(0.0);
+  bklmDigit->isAboveThreshold(false);
 
   int nPE = 0;
   std::vector<double> adcPulse(m_nDigitizations, 0.0);
@@ -236,9 +237,9 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
 
   if (first == m_nDigitizations) return;
 
-  digit->setFitStatus(EKLM::c_FPGASuccessfulFit);
-  digit->setTime(first * m_ADCSamplingTime);
-  digit->setSimNPixel(nPE);
+  bklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+  bklmDigit->setTime(first * m_ADCSamplingTime);
+  bklmDigit->setSimNPixel(nPE);
 
   double bkgArea = 0.0;
   int bkgCount = 0;
@@ -257,9 +258,14 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
   double bkgAmplitude = 0.0;
   if (bkgCount > 0) bkgAmplitude = bkgArea / double(bkgCount);
 
-  digit->setNPixel((sum - (last - first + 1) * bkgAmplitude) * 2.0 / m_ADCRange);
-  digit->setEDep(digit->getNPixel() / m_nPEperMeV);
-  digit->isAboveThreshold(nPE > m_discriminatorThreshold);
+  double recNPE = (sum - (last - first + 1) * bkgAmplitude) * 2.0 / m_ADCRange;
+  int charge = recNPE * m_MPPCGain;
+  if (charge > m_ADCOffset) charge = m_ADCOffset; //need improvement
+  bklmDigit->setNPixel(recNPE);
+  bklmDigit->setCharge(charge);
+  bklmDigit->setEDep(bklmDigit->getNPixel() / m_nPEperMeV);
+  //bklmDigit->isAboveThreshold(nPE > m_discriminatorThreshold);
+  bklmDigit->isAboveThreshold(charge > m_ADCThreshold);
   return;
 }
 

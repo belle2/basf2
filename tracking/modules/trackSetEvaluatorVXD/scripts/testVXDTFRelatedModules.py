@@ -350,19 +350,12 @@ else:
         tsEvaluator.param('tcNetworkName', 'tcNetwork')
         main.add_module(tsEvaluator)
 
-        svdOverlapChecker = register_module('SVDOverlapChecker')
-        svdOverlapChecker.param('NameSpacePointTrackCands', 'caSPTCs')
-        main.add_module(svdOverlapChecker)
-        # myGreedy = register_module('TrackSetEvaluatorGreedyDEV')
-        # myGreedy.param('NameSpacePointTrackCands', 'caSPTCs')
-        # main.add_module(myGreedy)
-        myHopfield = register_module('TrackSetEvaluatorHopfieldNNDEV')
-        myHopfield.logging.log_level = LogLevel.DEBUG
-        myHopfield.logging.debug_level = 3
-        myHopfield.param('tcArrayName', 'caSPTCs')
-        main.add_module(myHopfield)
+        svdOverlapResolver = register_module('SVDOverlapResolver')
+        svdOverlapResolver.param('NameSpacePointTrackCands', 'caSPTCs')
+        svdOverlapResolver.param('resolveMethod', 'greedy')
+        # svdOverlapResolver.param('resolveMethod', 'hopfield')
+        svdOverlapResolver.logging.log_level = LogLevel.DEBUG
 
-#        setup_trackSetEvaluators(main, setFilterType, 'caSPTCs', 'tcNetwork')
     main.add_module(vxdAnal)
 
 if useDisplay:

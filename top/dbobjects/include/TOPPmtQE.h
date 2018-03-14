@@ -21,9 +21,9 @@ namespace Belle2 {
   class TOPPmtQE : public TObject {
   public:
     /**
-     * number of PMT channels
+     * number of PMT pixels
      */
-    enum {c_NumChannels = 16};
+    enum {c_NumPmtPixels = 16};
 
     /**
      * Default constructor
@@ -36,21 +36,22 @@ namespace Belle2 {
      * @param serialNumber serial number
      * @param lambdaFirst wavelenght of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
-     * @param CE collection efficiency
+     * @param CE collection efficiency at B = 0T
+     * @param CE collection efficiency at B = 1.5T
      */
-    TOPPmtQE(const std::string& serialNumber, float lambdaFirst, float lambdaStep, float CE):
-      m_serialNumber(serialNumber), m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE(CE)
+    TOPPmtQE(const std::string& serialNumber, float lambdaFirst, float lambdaStep, float CE0, float CE):
+      m_serialNumber(serialNumber), m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE_noB(CE0), m_CE_withB(CE)
     {}
 
     /**
-     * Set quantum efficiency data points for a given channel
-     * @param channel channel number (1-based)
+     * Set quantum efficiency data points for a given pmtPixel
+     * @param pmtPixel pmtPixel number (1-based)
      * @param qe quantum efficiency data points
      */
-    void setQE(unsigned channel, const std::vector<float>& qe)
+    void setQE(unsigned pmtPixel, const std::vector<float>& qe)
     {
-      channel--;
-      if (channel < c_NumChannels) m_QE[channel] = qe;
+      pmtPixel--;
+      if (pmtPixel < c_NumPmtPixels) m_QE[pmtPixel] = qe;
     }
 
     /**
@@ -60,17 +61,17 @@ namespace Belle2 {
     const std::string& getSerialNumber() const {return m_serialNumber;}
 
     /**
-     * Returns quantum efficiency for a given channel and wavelength using linear interpolation
-     * @param channel channel number (1-based)
+     * Returns quantum efficiency for a given pmtPixel and wavelength using linear interpolation
+     * @param pmtPixel pmtPixel number (1-based)
      * @param lambda wavelength in [nm]
      * @return quantum efficiency
      */
-    float getQE(unsigned channel, float lambda) const
+    float getQE(unsigned pmtPixel, float lambda) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
-      channel--;
+      if (pmtPixel > c_NumPmtPixels) pmtPixel = c_NumPmtPixels;
+      pmtPixel--;
 
-      int vsize = m_QE[channel].size();
+      int vsize = m_QE[pmtPixel].size();
       float lambdaLast = m_lambdaFirst + m_lambdaStep * (vsize - 1);
 
       if (lambda < m_lambdaFirst) lambda = m_lambdaFirst;
@@ -80,7 +81,7 @@ namespace Belle2 {
       float lambdaLow  = m_lambdaFirst + ilLow * m_lambdaStep;
       float lambdaHigh = m_lambdaFirst + (ilLow + 1) * m_lambdaStep;
 
-      float qe = (m_QE[ilLow] * (lambda - lambdaLow) + m_QE[ilLow + 1] * (lambdaHigh - lambda)) / m_lambdaStep;
+      float qe = (m_QE[pmtPixel].at(ilLow) * (lambdaHigh - lambda) + m_QE[pmtPixel].at(ilLow + 1) * (lambda - lambdaLow)) / m_lambdaStep;
       return qe;
     }
 
@@ -97,21 +98,28 @@ namespace Belle2 {
     float getLambdaStep() const {return m_lambdaStep;}
 
     /**
-     * Returns collection efficiency
+     * Returns collection efficiency (for no B field)
      * @return collection efficiency
      */
-    float getCE() const {return m_CE;}
+    float getCE0() const {return m_CE_noB;}
+
+    /**
+     * Returns collection efficiency (for B field = 1.5T)
+     * @return collection efficiency
+     */
+    float getCE() const {return m_CE_withB;}
 
 
   private:
 
     std::string m_serialNumber; /**< serial number, e.g. JTxxxx */
-    std::vector<float> m_QE[c_NumChannels]; /**< QE data points */
+    std::vector<float> m_QE[c_NumPmtPixels]; /**< QE data points */
     float m_lambdaFirst = 0; /**< wavelength of the first data point [nm] */
     float m_lambdaStep = 0;  /**< wavelength step [nm] */
-    float m_CE = 0;          /**< relative collection efficiency */
+    float m_CE_noB = 0;      /**< relative collection efficiency, without B field */
+    float m_CE_withB = 0;    /**< relative collection efficiency, with B field */
 
-    ClassDef(TOPPmtQE, 1); /**< ClassDef */
+    ClassDef(TOPPmtQE, 2); /**< ClassDef */
 
   };
 

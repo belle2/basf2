@@ -18,13 +18,13 @@
 
 #include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/EWirePosition.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <iostream>
@@ -100,7 +100,7 @@ namespace Belle2 {
 
     public:
       /// (Re)load all geometry parameters form the CDCGeometryPar to adjust to changes in geometry.
-      void initialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag);
+      void initialize(EWirePosition wirePosition, bool ignoreWireSag);
 
       /**
        *  @name Wire index

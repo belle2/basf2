@@ -153,13 +153,11 @@ namespace Belle2 {
       auto sectorsOnSensor =
         m_compactSectorsIDMap.at(layer).at(ladder).at(sensor);
 
+
       if (normalizedU < 0. || 1. < normalizedU)
-        throw(unboundedNormalizedU()
-              << layer << ladder << sensor << normalizedU);
-      if
-      (normalizedV < 0. || 1. < normalizedV)
-        throw(unboundedNormalizedV()
-              << layer << ladder << sensor << normalizedV);
+        B2WARNING("CompactSecIDs: U not normalized! This may lead to undefined behavior!");
+      if (normalizedV < 0. || 1. < normalizedV)
+        B2WARNING("CompactSecIDs: V not normalized! This may lead to undefined behavior!");
 
       return sectorsOnSensor(normalizedU, normalizedV);
 

@@ -14,71 +14,73 @@
 #include <iostream>
 
 using namespace std;
-using namespace Belle2;
 
-unsigned TOPGeoPMT::getPixelColumn(double x) const
-{
-  if (fabs(x) >= m_sensSizeX / 2) return 0;
-  return m_numColumns - int((x + m_sensSizeX / 2) / m_sensSizeX * m_numColumns);
-}
+namespace Belle2 {
 
-
-unsigned TOPGeoPMT::getPixelRow(double y) const
-{
-  if (fabs(y) >= m_sensSizeY / 2) return 0;
-  return int((y + m_sensSizeY / 2) / m_sensSizeY * m_numRows) + 1;
-}
+  unsigned TOPGeoPMT::getPixelColumn(double x) const
+  {
+    if (fabs(x) >= m_sensSizeX / 2) return 0;
+    return m_numColumns - int((x + m_sensSizeX / 2) / m_sensSizeX * m_numColumns);
+  }
 
 
-bool TOPGeoPMT::isConsistent() const
-{
-  if (m_sizeX <= 0) return false;
-  if (m_sizeY <= 0) return false;
-  if (m_sizeZ <= 0) return false;
-  if (m_wallThickness <= 0) return false;
-
-  if (m_sensSizeX <= 0) return false;
-  if (m_sensSizeY <= 0) return false;
-  if (m_sensThickness <= 0) return false;
-  if (m_numColumns == 0) return false;
-  if (m_numRows == 0) return false;
-  if (m_sensMaterial.empty()) return false;
-
-  if (m_winThickness <= 0) return false;
-  if (m_winMaterial.empty()) return false;
-
-  if (m_botThickness <= 0) return false;
-  if (m_botMaterial.empty()) return false;
-
-  if (m_reflEdgeWidth <= 0) return false;
-  if (m_reflEdgeThickness <= 0) return false;
-
-  return true;
-}
+  unsigned TOPGeoPMT::getPixelRow(double y) const
+  {
+    if (fabs(y) >= m_sensSizeY / 2) return 0;
+    return int((y + m_sensSizeY / 2) / m_sensSizeY * m_numRows) + 1;
+  }
 
 
-void TOPGeoPMT::print(const std::string& title) const
-{
-  TOPGeoBase::print(title);
+  bool TOPGeoPMT::isConsistent() const
+  {
+    if (m_sizeX <= 0) return false;
+    if (m_sizeY <= 0) return false;
+    if (m_sizeZ <= 0) return false;
+    if (m_wallThickness <= 0) return false;
 
-  cout << " outer dimensions: " << getSizeX() << " X " << getSizeY()
-       << " X " << getSizeZ() << " " << s_unitName << endl;
-  cout << " wall thickness:   " << getWallThickness() << " " << s_unitName << endl;
-  cout << " window thickness: " << getWinThickness() << " " << s_unitName << endl;
-  cout << " bottom thickness: " << getBotThickness() << " " << s_unitName << endl;
-  cout << " sensitive area:   " <<  getSensSizeX() << " X " << getSensSizeY()
-       << " " << s_unitName;
-  cout << ", thickness: " << getSensThickness() << " " << s_unitName << endl;
-  cout << " number of pixels: " << getNumColumns() << " X " << getNumRows() << endl;
-  cout << " casing material:    " << getWallMaterial() << endl;
-  cout << " inner material:     " << getFillMaterial() << endl;
-  cout << " window material:    " << getWinMaterial() << endl;
-  cout << " bottom material:    " << getBotMaterial() << endl;
-  cout << " sensitive material: " << getSensMaterial() << endl;
-  cout << " reflective edge: " << endl;
-  cout << "  - width: " << getReflEdgeWidth() << " " << s_unitName;
-  cout << ", thickness: " << getReflEdgeThickness() << " " << s_unitName << endl;
+    if (m_sensSizeX <= 0) return false;
+    if (m_sensSizeY <= 0) return false;
+    if (m_sensThickness <= 0) return false;
+    if (m_numColumns == 0) return false;
+    if (m_numRows == 0) return false;
+    if (m_sensMaterial.empty()) return false;
 
-  printSurface(m_reflEdgeSurface);
-}
+    if (m_winThickness <= 0) return false;
+    if (m_winMaterial.empty()) return false;
 
+    if (m_botThickness <= 0) return false;
+    if (m_botMaterial.empty()) return false;
+
+    if (m_reflEdgeWidth <= 0) return false;
+    if (m_reflEdgeThickness <= 0) return false;
+
+    return true;
+  }
+
+
+  void TOPGeoPMT::print(const std::string& title) const
+  {
+    TOPGeoBase::print(title);
+
+    cout << " outer dimensions: " << getSizeX() << " X " << getSizeY()
+         << " X " << getSizeZ() << " " << s_unitName << endl;
+    cout << " wall thickness:   " << getWallThickness() << " " << s_unitName << endl;
+    cout << " window thickness: " << getWinThickness() << " " << s_unitName << endl;
+    cout << " bottom thickness: " << getBotThickness() << " " << s_unitName << endl;
+    cout << " sensitive area:   " <<  getSensSizeX() << " X " << getSensSizeY()
+         << " " << s_unitName;
+    cout << ", thickness: " << getSensThickness() << " " << s_unitName << endl;
+    cout << " number of pixels: " << getNumColumns() << " X " << getNumRows() << endl;
+    cout << " casing material:    " << getWallMaterial() << endl;
+    cout << " inner material:     " << getFillMaterial() << endl;
+    cout << " window material:    " << getWinMaterial() << endl;
+    cout << " bottom material:    " << getBotMaterial() << endl;
+    cout << " sensitive material: " << getSensMaterial() << endl;
+    cout << " reflective edge: " << endl;
+    cout << "  - width: " << getReflEdgeWidth() << " " << s_unitName;
+    cout << ", thickness: " << getReflEdgeThickness() << " " << s_unitName << endl;
+
+    printSurface(m_reflEdgeSurface);
+  }
+
+} // end Belle2 namespace

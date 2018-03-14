@@ -8,12 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/MVAFeasibleTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::MVA<BaseTrackRelationFilter>;
+
 MVAFeasibleTrackRelationFilter::MVAFeasibleTrackRelationFilter()
-  : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_FeasibleTrackRelationFilter.xml", 0.03)
+  : Super(std::make_unique<VarSet>(), "tracking/data/trackfindingcdc_FeasibleTrackRelationFilter.xml", 0.03)
 {
 }

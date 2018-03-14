@@ -11,14 +11,11 @@
 
 
 #include <reconstruction/modules/KlId/DataWriter/DataWriterModule.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -26,15 +23,14 @@
 
 #include <TTree.h>
 #include <TFile.h>
-#include <genfit/Exception.h>
 #include <cstring>
 #include <utility>
 
-#include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
+#include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
 using namespace Belle2;
 using namespace std;
-using namespace KlIdHelpers;
+using namespace KlId;
 
 
 // --------------------------------------Module----------------------------------------------
@@ -61,16 +57,13 @@ DataWriterModule::~DataWriterModule()
 void DataWriterModule::initialize()
 {
   // require existence of necessary datastore obj
-  StoreArray<KLMCluster>::required();
-  StoreArray<MCParticle>::required();
-  StoreArray<RecoTrack>::required();
-  StoreArray<ECLCluster>::required();
 
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<MCParticle> mcParticles;
-  klmClusters.requireRelationTo(mcParticles);
-  klmClusters.registerRelationTo(eclClusters);
+  m_eclClusters.isRequired();
+  m_klmClusters.isRequired();
+  m_mcParticles.isRequired();
+
+  m_klmClusters.requireRelationTo(m_mcParticles);
+  m_klmClusters.registerRelationTo(m_eclClusters);
 
   m_f = new TFile(m_outPath.c_str(), "recreate");
 
@@ -126,7 +119,6 @@ void DataWriterModule::initialize()
     m_treeKLM -> Branch("KLMKlId",                 & m_KLMKLid);
     m_treeKLM -> Branch("KLMAngleToMC",            & m_KLMAngleToMC);
     m_treeKLM -> Branch("KLMMCWeight",             & m_KLMMCWeight);
-    m_treeKLM -> Branch("KLMgenfitDist",           & m_KLMgenfitDist);
     m_treeKLM -> Branch("KLMtrackFlag",            & m_KLMtrackFlag);
     m_treeKLM -> Branch("KLMeclFlag",              & m_KLMeclFlag);
     m_treeKLM -> Branch("isSignal",                & m_isSignal);
@@ -219,14 +211,8 @@ void DataWriterModule::endRun()
 
 void DataWriterModule::event()
 {
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<RecoTrack> genfitTracks;
-  StoreArray<ECLCluster> eclClusters;
 
-// ------------------ KLM CLUSTERS
-
-  for (const KLMCluster& cluster : klmClusters) {
+  for (const KLMCluster& cluster : m_klmClusters) {
 
     if (!m_useKLM) {continue;}
 
@@ -236,13 +222,13 @@ void DataWriterModule::event()
     m_KLMTheta                       = clusterPos.Theta();
 
     m_KLMglobalZ                     = clusterPos.Z();
-    m_KLMnCluster                    = klmClusters.getEntries();
+    m_KLMnCluster                    = m_klmClusters.getEntries();
     m_KLMnLayer                      = cluster.getLayers();
     m_KLMnInnermostLayer             = cluster.getInnermostLayer();
     m_KLMtime                        = cluster.getTime();
     m_KLMinvM                        = cluster.getMomentum().M2();
     m_KLMenergy                      = cluster.getEnergy();
-    m_KLMhitDepth                    = cluster.getClusterPosition().Mag2();
+    m_KLMhitDepth                    = cluster.getClusterPosition().Mag();
     m_KLMtrackFlag                   = cluster.getAssociatedTrackFlag();
     m_KLMeclFlag                     = cluster.getAssociatedEclClusterFlag();
 
@@ -253,7 +239,7 @@ void DataWriterModule::event()
     m_KLMTrackClusterSepAngle = -999;
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
-    float best_dist = 10000000000000;
+    float best_dist = 100000000;
     float dist;
     for (auto trackSeperation :  trackSeperations) {
       dist = trackSeperation.getDistance();
@@ -267,9 +253,6 @@ void DataWriterModule::event()
         m_KLMTrackClusterSepAngle        = trackSep->getTrackClusterSeparationAngle();
       }
     }
-
-    std::tuple < RecoTrack*, double, std::unique_ptr<const TVector3> > closestTrack = findClosestTrack(clusterPos, 3.14);
-    m_KLMgenfitDist = get<1>(closestTrack);
 
 
     if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
@@ -339,7 +322,7 @@ void DataWriterModule::event()
       m_KLMMCLifetime   = part->getLifetime();
       m_KLMMCPDG        = std::abs(part->getPDG());
       m_KLMMCPrimaryPDG = getPrimaryPDG(part);
-      m_KLMMCMom        = part->getMomentum().Mag2();
+      m_KLMMCMom        = part->getMomentum().Mag();
       m_KLMMCPhi        = part->getMomentum().Phi();
       m_KLMMCTheta      = part->getMomentum().Theta();
     } else {
@@ -354,35 +337,20 @@ void DataWriterModule::event()
       m_KLMMCTheta      = -999;
     }
 
-
-    // use genfit to find nearest track by extrapolation
-    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance
-                                                            = findClosestTrack(clusterPos, 0.26);
-    m_KLMtrackDist = get<1>(closestTrackAndDistance);
-    if (isnan(m_KLMtrackDist) || (!m_KLMtrackDist)) { m_KLMtrackDist = -999;}
-    const TVector3* poca = get<2>(closestTrackAndDistance).get();
-
-    if (poca and closestECLCluster) {
-      const TVector3& trackECLClusterDist = closestECLCluster->getClusterPosition() - *poca;
-      m_KLMtrackToECL = trackECLClusterDist.Mag2();
-    } else {
-      m_KLMtrackToECL = -999;
-    }
-
     KlId* klid = cluster.getRelatedTo<KlId>();
     if (klid) {
       m_KLMKLid = klid->getKlId();
     } else {
       m_KLMKLid = -999;
     }
-    m_isSignal = isKLMClusterSignal(cluster);
+    m_isSignal = isKLMClusterSignal(cluster, 0);
 
 
     m_treeKLM -> Fill();
   }// for klmcluster in klmclusters
 
 // ---------------   ECL CLUSTERS
-  for (const ECLCluster& cluster : eclClusters) {
+  for (const ECLCluster& cluster : m_eclClusters) {
 
     if (!m_useECL) {continue;}
 

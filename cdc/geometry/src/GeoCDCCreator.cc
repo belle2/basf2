@@ -134,10 +134,10 @@ namespace Belle2 {
 
       //      if (cdcgp.getMaterialDefinitionMode() == 2) {
       if (gcp.getMaterialDefinitionMode() == 2) {
-        double density = denHelium + denEthane;
-        cdcMedGas = new G4Material("CDCRealGas", density, 2, kStateGas, realTemperture);
-        cdcMedGas->AddMaterial(medHelium, denHelium / density);
-        cdcMedGas->AddMaterial(medEthane, denEthane / density);
+        const double density2 = denHelium + denEthane;
+        cdcMedGas = new G4Material("CDCRealGas", density2, 2, kStateGas, realTemperture);
+        cdcMedGas->AddMaterial(medHelium, denHelium / density2);
+        cdcMedGas->AddMaterial(medEthane, denEthane / density2);
       }
 
       if (gcp.getPrintMaterialTable()) {
@@ -543,22 +543,22 @@ namespace Belle2 {
         //        if (cdcgp.getMaterialDefinitionMode() == 2) {
         if (gcp.getMaterialDefinitionMode() == 2) {
           G4String sName = "sWire";
-          const G4int ic = 0;
-          TVector3 wb = cdcgp.wireBackwardPosition(iSLayer, ic);
-          //    G4double rsense0 = wb.Perp();
-          TVector3 wf = cdcgp.wireForwardPosition(iSLayer, ic);
-          G4double tAtZ0 = -wb.Z() / (wf.Z() - wb.Z()); //t: param. along the wire
-          TVector3 wAtZ0 = wb + tAtZ0 * (wf - wb);
+          const G4int jc = 0;
+          TVector3 wb0 = cdcgp.wireBackwardPosition(iSLayer, jc);
+          //    G4double rsense0 = wb0.Perp();
+          TVector3 wf0 = cdcgp.wireForwardPosition(iSLayer, jc);
+          G4double tAtZ0 = -wb0.Z() / (wf0.Z() - wb0.Z()); //t: param. along the wire
+          TVector3 wAtZ0 = wb0 + tAtZ0 * (wf0 - wb0);
           //additional chop of wire; must be larger than 126um*(1/10), where 126um is the field wire diameter; 1/10: approx. stereo angle
           const G4double epsl = 25.e-4; // (in cm);
-          G4double reductionBwd = (zback_sensitive_middle + epsl) / wb.Z();
-          //chop the wire at zback_sensitive_middle for avoiding overlap; this is because the wire length defined by wb and wf is larger than the length of middle sensitive tube
-          wb = reductionBwd * (wb - wAtZ0) + wAtZ0;
+          G4double reductionBwd = (zback_sensitive_middle + epsl) / wb0.Z();
+          //chop the wire at zback_sensitive_middle for avoiding overlap; this is because the wire length defined by wb0 and wf0 is larger than the length of middle sensitive tube
+          wb0 = reductionBwd * (wb0 - wAtZ0) + wAtZ0;
           //chop wire at  zfor_sensitive_middle for avoiding overlap
-          G4double reductionFwd = (zfor_sensitive_middle - epsl) / wf.Z();
-          wf = reductionFwd * (wf - wAtZ0) + wAtZ0;
+          G4double reductionFwd = (zfor_sensitive_middle - epsl) / wf0.Z();
+          wf0 = reductionFwd * (wf0 - wAtZ0) + wAtZ0;
 
-          const G4double wireHalfLength = 0.5 * (wf - wb).Mag() * CLHEP::cm;
+          const G4double wireHalfLength = 0.5 * (wf0 - wb0).Mag() * CLHEP::cm;
           const G4double sWireRadius = 0.5 * cdcgp.senseWireDiameter() * CLHEP::cm;
           //    const G4double sWireRadius = 15.e-4 * CLHEP::cm;
           G4Tubs* middleSensitiveSwireShape = new G4Tubs(sName, 0., sWireRadius, wireHalfLength, 0., 360. * CLHEP::deg);
@@ -583,12 +583,12 @@ namespace Belle2 {
             //define sense wire
             TVector3 wb = cdcgp.wireBackwardPosition(iSLayer, ic);
             TVector3 wf = cdcgp.wireForwardPosition(iSLayer, ic);
-            G4double tAtZ0 = -wb.Z() / (wf.Z() - wb.Z());
-            TVector3 wAtZ0 = wb + tAtZ0 * (wf - wb);
-            G4double reductionBwd = (zback_sensitive_middle + epsl) / wb.Z();
-            wb = reductionBwd * (wb - wAtZ0) + wAtZ0;
-            G4double reductionFwd = (zfor_sensitive_middle - epsl) / wf.Z();
-            wf = reductionFwd * (wf - wAtZ0) + wAtZ0;
+            G4double tAtZ02 = -wb.Z() / (wf.Z() - wb.Z());
+            TVector3 wAtZ02 = wb + tAtZ02 * (wf - wb);
+            G4double reductionBwd2 = (zback_sensitive_middle + epsl) / wb.Z();
+            wb = reductionBwd2 * (wb - wAtZ02) + wAtZ02;
+            G4double reductionFwd2 = (zfor_sensitive_middle - epsl) / wf.Z();
+            wf = reductionFwd2 * (wf - wAtZ02) + wAtZ02;
 
             G4double thetaYZ = -asin((wf - wb).Y() / (wf - wb).Mag());
 
@@ -795,6 +795,8 @@ namespace Belle2 {
 
       }
 
+      //Create B-field mapper (here tentatively)
+      createMapper(topVolume);
     }
 
 
@@ -1033,9 +1035,79 @@ namespace Belle2 {
                         physicalName.c_str(), logical_cdc, false, id);
 
     }
+
+    void GeoCDCCreator::createMapper(G4LogicalVolume& topVolume)
+    {
+      CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+      if (!gcp.getMapperGeometry()) return;
+
+      const double xc = 0.5 * (-0.0002769 +  0.0370499) * CLHEP::cm;
+      const double yc = 0.5 * (-0.0615404 + -0.108948) * CLHEP::cm;
+      const double zc = 0.5 * (-35.3   +    48.5) * CLHEP::cm;
+      //3 plates
+      //        const double plateWidth = 13.756 * CLHEP::cm;
+      //        const double plateThick =  1.203 * CLHEP::cm;
+      //        const double plateLength = 83.706 * CLHEP::cm;
+      const double plateWidth  = 13.8 * CLHEP::cm;
+      const double plateThick  =  1.2 * CLHEP::cm;
+      const double plateLength = 83.8 * CLHEP::cm;
+      const double phi = gcp.getMapperPhiAngle() * CLHEP::deg; //phi-angle in lab.
+      //  std::cout << "phi= " << phi << std::endl;
+      //        const double endRingRmin =  4.1135 * CLHEP::cm;
+      //        const double endRingRmax = 15.353 * CLHEP::cm;
+      //        const double endRingThick =  2.057 * CLHEP::cm;
+      const double endPlateRmin     =  4.0 * CLHEP::cm;
+      const double endPlateRmax     = 15.5 * CLHEP::cm;
+      const double bwdEndPlateThick =  1.7 * CLHEP::cm;
+      const double fwdEndPlateThick =  2.0 * CLHEP::cm;
+
+      G4Material* medAluminum = geometry::Materials::get("Al");
+
+      string name = "Plate";
+      int pID = 0;
+      G4Box* plateShape = new G4Box("solid" + name, .5 * plateWidth, .5 * plateThick, .5 * plateLength);
+      G4LogicalVolume* logical0 = new G4LogicalVolume(plateShape, medAluminum, "logical" + name, 0, 0, 0);
+      logical0->SetVisAttributes(m_VisAttributes.back());
+      //        const double x = .5 * plateWidth;
+      const double x = xc + 0.5 * plateWidth;
+      //        const double y = endRingRmin;
+      const double y = yc + endPlateRmin + 0.1 * CLHEP::cm;
+      //        double z = 2.871 * CLHEP::cm;
+      G4ThreeVector xyz(x, y, zc);
+      G4RotationMatrix rotM3 = G4RotationMatrix();
+      xyz.rotateZ(phi);
+      rotM3.rotateZ(phi);
+      new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID);
+
+      const double alf = 120. * CLHEP::deg;
+      xyz.rotateZ(alf);
+      rotM3.rotateZ(alf);
+      new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID + 1);
+
+      xyz.rotateZ(alf);
+      rotM3.rotateZ(alf);
+      new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID + 2);
+
+      //Define 2 end-plates
+      //bwd
+      name = "BwdEndPlate";
+      G4Tubs* BwdEndPlateShape = new G4Tubs("solid" + name, endPlateRmin, endPlateRmax, 0.5 * bwdEndPlateThick, 0., 360.*CLHEP::deg);
+      G4LogicalVolume* logical1 = new G4LogicalVolume(BwdEndPlateShape, medAluminum, "logical" + name, 0, 0, 0);
+      logical1->SetVisAttributes(m_VisAttributes.back());
+      //        z = -40.0105 * CLHEP::cm;
+      double z = -35.3 * CLHEP::cm - 0.5 * bwdEndPlateThick;
+      pID = 0;
+      new G4PVPlacement(0, G4ThreeVector(xc, yc, z), logical1, "physical" + name, &topVolume, false, pID);
+
+      //fwd
+      //        z = 45.7525 * CLHEP::cm;
+      //        new G4PVPlacement(0, G4ThreeVector(0., 0., z), logical1, "physical" + name, &topVolume, false, pID + 1);
+      name = "FwdEndPlate";
+      G4Tubs* FwdEndPlateShape = new G4Tubs("solid" + name, endPlateRmin, endPlateRmax, 0.5 * fwdEndPlateThick, 0., 360.*CLHEP::deg);
+      G4LogicalVolume* logical2 = new G4LogicalVolume(FwdEndPlateShape, medAluminum, "logical" + name, 0, 0, 0);
+      logical2->SetVisAttributes(m_VisAttributes.back());
+      z = 48.5 * CLHEP::cm + 0.5 * fwdEndPlateThick;
+      new G4PVPlacement(0, G4ThreeVector(xc, yc, z), logical2, "physical" + name, &topVolume, false, pID);
+    }
   }
 }
-
-
-
-

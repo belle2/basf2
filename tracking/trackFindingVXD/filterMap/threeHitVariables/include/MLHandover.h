@@ -25,7 +25,7 @@ namespace Belle2 {
    * access to the constructor of the Range classes.
    */
   template<typename PointType, size_t Ndims = 9>
-  class MLHANDOVER_NAME : public SelectionVariable<PointType, std::array<double, Ndims> > {
+  class MLHANDOVER_NAME : public SelectionVariable<PointType, 3, std::array<double, Ndims> > {
 
   public:
 

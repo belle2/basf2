@@ -17,7 +17,8 @@
 #include <TChain.h>
 #include <TTree.h>
 #include <TSystem.h>
-#include "iostream"
+#include <iostream>
+#include <iomanip>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/Database.h>
@@ -26,6 +27,12 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <cdc/calibration/CDCDatabaseImporter.h>
+
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -39,7 +46,7 @@ XTCalibration::XTCalibration():
     " -------------------------- Test Calibration Algoritm -------------------------\n"
     "                                                                               \n"
     "  Testing algorithm which just gets mean of a test histogram collected by      \n"
-    "  CaTest module and provides a DB object with another histogram with one       \n"
+  0    "  CaTest module and provides a DB object with another histogram with one       \n"
     "  entry at calibrated value.                                                   \n"
     " ------------------------------------------------------------------------------\n"
     );
@@ -80,13 +87,16 @@ void XTCalibration::CreateHisto()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {
-          //      int hid = 200+i;
           hprof[i][lr][al][th] = new TProfile(Form("hprof%d_%d_%d_%d", i, lr, al, th),
-                                              Form("Layer %d Theta %3.1f; Drift time (ns);Drift Length (cm)", i, itheta[th]), 120, -20, 400, 0, 1, "i");
-          hist2d[i][lr][al][th] = new TH2D(Form("h%d_%d_%d_%d", i, lr, al, th), Form("Layer_%d_%3.1f; Drift time (ns);Drift Length (cm)", i,
-                                           itheta[th]), 210, -20, 400, 110, 0, 1);
-          if (lr == 1) hist2d_draw[i][al][th] = new TH2D(Form("h_draw%d_%d_%d", i, al, th),
-                                                           Form("Layer_%d_%3.1f; Drift time (ns);Drift Length (cm)", i, itheta[th]), 210, -20, 400, 2200, -1, 1);
+                                              Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
+                                                   i, lr, ialpha[al], itheta[th]), 210, -20, 600, 0, 1.2, "i");
+          hist2d[i][lr][al][th] = new TH2D(Form("h%d_%d_%d_%d", i, lr, al, th),
+                                           Form("(L=%d)-(lr=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
+                                                i, lr, ialpha[al], itheta[th]), 210, -20, 600, 110, 0, 1.2);
+          if (lr == 1)
+            hist2d_draw[i][al][th] = new TH2D(Form("h_draw%d_%d_%d", i, al, th),
+                                              Form("(L=%d)-(#alpha=%3.0f)-(#theta=%3.0f); Drift time (ns);Drift Length (cm)",
+                                                   i, ialpha[al], itheta[th]), 210, -20, 600, 2200, -1.2, 1.2);
         }
       }
     }
@@ -200,18 +210,18 @@ bool XTCalibration::calibrate()
             fitflag[l][lr][al][th] = -1;
             continue;
           }
-          double p0, p1;
+          double p0, p1, tmin;
+          TF1* fpol1;
           if (m_useSliceFit) {
             hist2d[l][lr][al][th]->FitSlicesY(0, 0, -1, 5);
             hist2d_1[l][lr][al][th] = (TH1D*)gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th));
             if (!hist2d_1[l][lr][al][th]) {
               fitflag[l][lr][al][th] = -1;
-              cout << "error, not found results of slices fit" << endl;
+              B2WARNING("error, not found results of slices fit");
               continue;
             }
             hist2d_1[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            p0 = hprof[l][lr][al][th]->GetFunction("pol1")->GetParameter(0);
-            p1 = hprof[l][lr][al][th]->GetFunction("pol1")->GetParameter(1);
+            fpol1 = (TF1*)hprof[l][lr][al][th]->GetFunction("pol1");
           } else {
             /*Set Error for low statistic bin*/
             for (int n = 0; n < hprof[l][lr][al][th]->GetNbinsX(); ++n) {
@@ -220,11 +230,17 @@ bool XTCalibration::calibrate()
               }
             }
             hprof[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            p0 = hprof[l][lr][al][th]->GetFunction("pol1")->GetParameter(0);
-            p1 = hprof[l][lr][al][th]->GetFunction("pol1")->GetParameter(1);
+            fpol1 = (TF1*)hprof[l][lr][al][th]->GetFunction("pol1");
           }
-          //determine tmin in fitting
-          double tmin = -1 * p0 / p1 + 15;
+          if (fpol1) {
+            //determine tmin in fitting
+            p0 = fpol1->GetParameter(0);
+            p1 = fpol1->GetParameter(1);
+            tmin = -1 * p0 / p1 + 15;
+          } else {
+            p0 = 0; p1 = 0.005;
+            tmin = 12;
+          }
           XT* xt;
           if (m_useSliceFit) {
             xt = new XT(hist2d_1[l][lr][al][th], m_xtmode);
@@ -232,10 +248,31 @@ bool XTCalibration::calibrate()
             xt = new XT(hprof[l][lr][al][th], m_xtmode);
           }
           //    xt->setSmallestEntryRequired(m_smallestEntryRequire);
-          xt->setXTParams(p0, p1, 0., 0., 0., 0., m_par6[l], 0.0001);
-          //    xt->setP6(m_par6[l]);
-          xt->setFitRange(tmin, m_par6[l] + 100);
+          if (m_BField) {
+            int ial_old = 0;
+            int ith_old = 0;
+            for (int k = 0; k < nalpha_old; ++k) {
+              if (ialpha[al] < u_alpha_old[k]) {ial_old = k; break;}
+            }
+            for (int j = 0; j < ntheta_old; ++j) {
+              if (itheta[th] < u_theta_old[j]) {ith_old = j; break;}
+            }
+            double p6 =  xtold[l][lr][ial_old][ith_old][6];
+            if (p6 > 400)
+              p6 = 400;
+            if (m_xtmode == xtmode_old) {
+              xt->setXTParams(xtold[l][lr][ial_old][ith_old]);
+              xt->setP6(p6);
+            } else {
+              xt->setXTParams(p0, p1, 0., 0., 0., 0., p6, xtold[l][lr][ial_old][ith_old][7]);
+            }
+            xt->setFitRange(tmin, p6 + 100);
+          } else {
+            xt->setXTParams(p0, p1, 0., 0., 0., 0., m_par6[l], 0.0001);
+            xt->setFitRange(tmin, m_par6[l] + 100);
+          }
           xt->setDebug(m_debug);
+          xt->BField(m_BField);
           xt->FitXT(m_xtmode);
           /*get result*/
           fitflag[l][lr][al][th] = xt->getFitStatus();
@@ -269,7 +306,6 @@ void XTCalibration::Write()
 {
   /*Set parameter for layer that fit do not success*/
   /* and then write output file*/
-  int badfit = 0;
   double par[8];
   ofstream xtout(m_OutputXTFileName.c_str());
   xtout << m_nalpha << endl;
@@ -285,13 +321,17 @@ void XTCalibration::Write()
           << std::setprecision(3) << itheta[i]  << endl;
   }
   xtout << m_xtmode << "  " << 8 << endl;
+
+  int nfitted = 0;
+  int nfailure = 0;
+
   for (int th = 0; th < m_ntheta; ++th) {
     for (int al = 0; al < m_nalpha; ++al) {
       for (int l = 0; l < 56; ++l) {
         for (int lr = 0; lr < 2; ++lr) {
           /*Set Parameter for bad fit*/
           if (fitflag[l][lr][al][th] != 1) {
-            badfit += 1;
+            nfailure += 1;
             printf("fit failure status = %d \n", fitflag[l][lr][al][th]);
             printf("layer %d, r %d, alpha %3.1f, theta %3.1f \n", l, lr, ialpha[al], itheta[th]);
             printf("number of event: %3.2f", hprof[l][lr][al][th]->GetEntries());
@@ -316,6 +356,7 @@ void XTCalibration::Write()
             }
           } else {
             xtf5r[l][lr][al][th]->GetParameters(par);
+            nfitted += 1;
           }
           /*Write params*/
           xtout << l << std::setw(5) << itheta[th] << std::setw(5) << ialpha[al] << std::setw(5) << "0.0" << std::setw(4) << lr << std::setw(
@@ -329,7 +370,10 @@ void XTCalibration::Write()
     }//al
   }//lay
   xtout.close();
-  B2INFO("Finish export xt to text file");
+  B2RESULT(" Total number of xt fit: " << m_nalpha * m_ntheta * 2 * 56);
+  B2RESULT(" Successfully Fitted: " << nfitted);
+  B2RESULT(" Failure Fit: " << nfailure);
+  B2RESULT("Finish export xt to text file");
   if (m_useDB) {
     CDCDatabaseImporter import(0, 0, -1, -1);
     import.importXT(m_OutputXTFileName.c_str());
@@ -338,29 +382,36 @@ void XTCalibration::Write()
 
 void XTCalibration::storeHisto()
 {
+  B2INFO("start store histogram");
   TFile* fout = new TFile("XTFIT.root", "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
+  int nhisto = 0;
   for (int l = 0; l < 56; ++l) {
     top->cd();
     Direct[l] = gDirectory->mkdir(Form("lay_%d", l));
     Direct[l]->cd();
     for (int th = 0; th < m_ntheta; ++th) {
       for (int al = 0; al < m_nalpha; ++al) {
+        hist2d_draw[l][al][th]->Write();
         for (int lr = 0; lr < 2; ++lr) {
           hist2d[l][lr][al][th]->Write();
+          if (fitflag[l][lr][al][th] != 1) continue;
           if (m_useSliceFit) {
             if (hist2d_1[l][lr][al][th]) {
               hist2d_1[l][lr][al][th]->Write();
+              nhisto += 1;
             }
           } else {
             hprof[l][lr][al][th]->Write();
+            nhisto += 1;
           }
         }
       }
     }
   }
   fout->Close();
+  B2RESULT("  " << nhisto << " histograms was stored.");
 }
 
 void XTCalibration::readXT()
@@ -396,7 +447,7 @@ void XTCalibration::readXTFromText()
 {
   std::string fileName1 = "/cdc/data/" + m_xtfile;
   std::string fileName = FileSystem::findFile(fileName1);
-  ifstream ifs;
+  boost::iostreams::filtering_istream ifs;
   if (fileName == "") {
     fileName = FileSystem::findFile(m_xtfile);
   }
@@ -404,8 +455,13 @@ void XTCalibration::readXTFromText()
     B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");
   } else {
     B2INFO("CDCGeometryPar: open " << fileName1);
-    ifs.open(fileName.c_str());
+    if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+      ifs.push(boost::iostreams::gzip_decompressor());
+    }
+    ifs.push(boost::iostreams::file_source(fileName));
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName1 << " !");
+
+
   }
   int npar = 8;
   //read alpha bin info.
@@ -428,6 +484,7 @@ void XTCalibration::readXTFromText()
     //m_thetaPoints[i] = theta2;
   }
 
+  B2INFO("number of alpha - theta bin" << nalpha_old << " - " << ntheta_old);
   short np = 0;
   unsigned short iCL, iLR;
   //  const unsigned short npx = nXTParams - 1;
@@ -446,32 +503,32 @@ void XTCalibration::readXTFromText()
     }
     ++nRead;
 
-    int itheta = -99;
+    int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {
       if (fabs(theta - itheta_old[i]) < epsi) {
-        itheta = i;
+        ith = i;
         break;
       }
     }
-    if (itheta < 0) {
+    if (ith < 0) {
       gSystem->Exec("echo xt_theta error binning>> error");
       return;
     }
 
-    int ialpha = -99;
+    int ial = -99;
     for (unsigned short i = 0; i < nalpha_old; ++i) {
       if (fabs(alpha - ialpha_old[i]) < epsi) {
-        ialpha = i;
+        ial = i;
         break;
       }
     }
-    if (ialpha < 0) {
+    if (ial < 0) {
       gSystem->Exec("echo xt_alpha error binning>> error");
       return;
     }
 
     for (int i = 0; i < np; ++i) {
-      xtold[iCL][iLR][ialpha][itheta][i] = xtc[i];
+      xtold[iCL][iLR][ial][ith][i] = xtc[i];
     }
 
   }  //end of while loop

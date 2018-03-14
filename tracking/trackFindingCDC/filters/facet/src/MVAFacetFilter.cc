@@ -9,13 +9,18 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterVarSet<Chi2FacetFilter>;
+template class TrackFindingCDC::MVA<BaseFacetFilter>;
+
 MVAFacetFilter::MVAFacetFilter()
-  : Super(makeUnique<MVAFacetVarSet>(), "tracking/data/trackfindingcdc_FacetFilter.xml", 2.805)
+  : Super(std::make_unique<MVAFacetVarSet>(), "tracking/data/trackfindingcdc_FacetFilter.xml", 2.805)
 {
 }
 

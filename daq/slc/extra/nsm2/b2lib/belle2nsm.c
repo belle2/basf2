@@ -16,14 +16,16 @@
    20140306 1930 logfp again, but write instead of fwrite/fprintf
    20140902 1935 memset fix
    20140921 1940 flushmem
+   20160420 1946 debugflag separately from corelib
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.40";
+const char *belle2nsm_version = "belle2nsm 1.9.47";
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -36,10 +38,12 @@ const char *belle2nsm_version = "belle2nsm 1.9.40";
  */
 extern int  nsmlib_currecursive;
 #define DBS(nsmc,val) nsmlib_checkpoint(0,val)
+#define DBGFLG(i) (b2nsm_debugflag&(1<<(i)))
 
 NSMcontext *nsm = 0;
 static int b2nsm_errc;
 FILE *logfp = 0;
+static int b2nsm_debugflag = 0;
 
 typedef struct b2nsm_struct {
   char default_dest[32];
@@ -67,6 +71,12 @@ xt()
 	  cur->tm_hour, cur->tm_min, cur->tm_sec, (int)now.tv_usec/1000);
   return buf;
 }
+/* -- b2nsm_addincpath -------------------------------------------------- */
+int
+b2nsm_addincpath(const char *path)
+{
+  return nsmlib_addincpath(path);
+}
 /* -- b2nsm_nodeid ------------------------------------------------------ */
 int
 b2nsm_nodeid(const char *nodename)
@@ -89,8 +99,8 @@ b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
 {
   DBS(nsmc,2000);
   
-  if (logfp) {
-    int i;
+  if (logfp && DBGFLG(0)) {
+    int    i;
     int    npar = msg->npar;
     int   *pars = msg->pars;
     int    len  = msg->len;
@@ -98,9 +108,9 @@ b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
     
     DBS(nsmc,2002);
     nsmlib_log("%s%s%s<=%s",
-	    xt(), nsmc->hookptr ? (const char *)nsmc->hookptr : "",
-	    nsmlib_reqname(nsmc, msg->req),
-	    nsmlib_nodename(nsmc, msg->node));
+               xt(), nsmc->hookptr ? (const char *)nsmc->hookptr : "",
+               nsmlib_reqname(nsmc, msg->req),
+               nsmlib_nodename(nsmc, msg->node));
 
     DBS(nsmc,2004);
     for (i = 0; i < 3 && i < npar; i++) {
@@ -135,11 +145,13 @@ b2nsm_checkpoint(NSMcontext *nsmc, int val)
 {
   nsmlib_checkpoint(nsmc, val);
 }
-/* -- b2nsm_logging ----------------------------------------------------- */
+/* -- b2nsm_debuglevel -------------------------------------------------- */
 int
 b2nsm_debuglevel(int val)
 {
-  return nsmlib_debuglevel(val);
+  int prev = b2nsm_debugflag & 0xffff;
+  b2nsm_debugflag = val & 0xffff;
+  return prev | (nsmlib_debuglevel(val >> 16) << 16);
 }
 /* -- b2nsm_logging ----------------------------------------------------- */
 void
@@ -207,7 +219,7 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
     nsmlib_log("%scallback(%s) registration failed: %s\n",
 	       xt(), name, b2nsm_strerror());
   } else {
-    nsmlib_log("%scallback(%s) registered\n", xt(), name);
+    if (DBGFLG(1)) nsmlib_log("%scallback(%s) registered\n", xt(), name);
   }
   nsmlib_logflush();
 
@@ -477,7 +489,7 @@ b2nsm_init(const char *nodename)
 }
 /* -- (emacs outline mode setup) ------------------------------------- */
 /*
-b// Local Variables: ***
+// Local Variables: ***
 // mode:outline-minor ***
 // outline-regexp:"^/\\* --[+ ]" ***
 // End: ***

@@ -49,9 +49,6 @@ SVDDigitSorterModule::SVDDigitSorterModule() : Module()
            "If true, merge Sample information if more than one digit exists for the same address", true);
   addParam("minSamples", m_minSamples,
            "Minimum number of consecutive samples to accept a strip signal. 1-6, default 3, 1 means filtering disabled.", 3);
-  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
-  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
-  addParam("ADCbits", m_bitsADC, "Number of ADC bits", 10);
   addParam("RejectionThreshold", m_rejectionThreshold,
            "Threshold that at least minSamples consecutive samples must exceed for a strip to pass", 3.0);
 
@@ -71,7 +68,7 @@ void SVDDigitSorterModule::initialize()
   StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  storeDigits.required();
+  storeDigits.isRequired();
   storeMCParticles.isOptional();
   storeTrueHits.isOptional();
 
@@ -88,7 +85,6 @@ void SVDDigitSorterModule::initialize()
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
   m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(m_ignoredStripsListName));
-  m_e2ADC = (m_maxADC - m_minADC) / pow(2, m_bitsADC);
 }
 
 void SVDDigitSorterModule::event()
@@ -139,8 +135,10 @@ void SVDDigitSorterModule::event()
         continue;
       }
       const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+      bool isU = (sensorID.getSegmentNumber() == 0);
+      double ePerADU = isU ? info.getAduEquivalentU() : info.getAduEquivalentV();
       double elNoise = (sensorID.getSegmentNumber() == 0) ? info.getElectronicNoiseU() : info.getElectronicNoiseV();
-      double threshold = m_rejectionThreshold * elNoise / m_e2ADC;
+      double threshold = m_rejectionThreshold * elNoise / ePerADU;
 
       decltype(vxd_samples.second)& samples = vxd_samples.second;
       unsigned int currentStrip = 5000;
@@ -156,7 +154,7 @@ void SVDDigitSorterModule::event()
           if (!pass) {
             samples.erase(currentStart, sensor_it);
             if (sensor_it != firstSample) B2DEBUG(89, "ERASED.");
-            }
+          }
           currentStart = sensor_it;;
           currentCount = 0;
           currentStrip = sensor_it->getCellID();

@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'bklm', 'bklm_dataobjects',
+               '$ROOT_LIBS', 'CLHEP','tracking_dataobjects']
+
+Return('env')

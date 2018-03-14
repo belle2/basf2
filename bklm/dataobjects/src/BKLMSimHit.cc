@@ -41,3 +41,13 @@ BKLMSimHit::BKLMSimHit(const BKLMSimHit& hit) :
   m_PropagationTime(hit.m_PropagationTime)
 {
 }
+
+//! Assignment operator
+BKLMSimHit& BKLMSimHit::operator=(const BKLMSimHit& hit)
+{
+  m_ModuleID = hit.m_ModuleID;
+  m_Time = hit.m_Time;
+  m_EDep = hit.m_EDep;
+  m_PropagationTime = hit.m_PropagationTime;
+  return *this;
+}

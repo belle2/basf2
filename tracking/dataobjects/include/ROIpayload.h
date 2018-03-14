@@ -20,9 +20,16 @@ namespace Belle2 {
 
   /** ROIpayload
    * @TODO: Better explanation, Is there a reason to inherit from TObject and not Relationsobject here?
+   * This Object contains a binary blob which is send as whole from the HLT Roi Sender output
+   * node to the ONSEN system, containing the trigger decision and the Region od Interest (ROI)
+   * for data selection on the PXD modules
+   * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
    */
 
   class ROIpayload : public TObject {
+    enum { OFFSET_MAGIC = 0, OFFSET_LENGTH = 1, OFFSET_HEADER = 2, OFFSET_TRIGNR = 3, OFFSET_RUNNR = 4, OFFSET_ROIS = 5};
+    enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
+
   public:
     typedef boost::spirit::endian::ubig32_t ubig32_t;
 
@@ -66,7 +73,7 @@ namespace Belle2 {
      */
     int getNrROIs() const
     {
-      return (m_length - 6) / 2; // only minus checksum
+      return (m_length - HEADER_SIZE_WITH_LENGTH_AND_CRC) / 2; // only minus checksum
     }
 
     /** Return DHH ID of ROI j
@@ -76,47 +83,48 @@ namespace Belle2 {
     int getDHHID(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[5 + 2 * j] & 0x3F0) >> 4;  // & 0x3F0
+      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x3F0) >> 4;  // & 0x3F0
     }
 
-    /** Return Row 1 of ROI j
+    /** Return MinVid (Row 1) of ROI j
      * @param j Index of ROI
-     * @return  Row 1
+     * @return  MinVid
      */
-    int getRow1(int j) const
+    int getMinVid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return ((((ubig32_t*)m_rootdata)[5 + 2 * j] & 0xF) << 6) | ((((ubig32_t*)m_rootdata)[5 + 2 * j + 1] & 0xFC000000) >> 26) ;
+      return ((((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0xF) << 6) | ((((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH +
+             2 * j + 1] & 0xFC000000) >> 26) ;
     }
 
-    /** Return Row 2 of ROI j
+    /** Return MaxVid (Row 2) of ROI j
      * @param j Index of ROI
-     * @return Row 2
+     * @return MaxVid
      */
-    int getRow2(int j) const
+    int getMaxVid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[5 + 2 * j + 1] & 0x3FF00) >> 8;
+      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x3FF00) >> 8;
     }
 
-    /** Return Col 1 of ROI j
+    /** Return MinUid (Col 1) of ROI j
      * @param j Index of ROI
-     * @return Column 1
+     * @return MinUid
      */
-    int getCol1(int j) const
+    int getMinUid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[5 + 2 * j + 1] & 0x03FC0000) >> 18;
+      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x03FC0000) >> 18;
     }
 
-    /** Return Col 1 of ROI j
+    /** Return MaxUid (Col 2) of ROI j
      * @param j Index of ROI
-     * @return Column 2
+     * @return MaxUid
      */
-    int getCol2(int j) const
+    int getMaxUid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[5 + 2 * j + 1]) & 0xFF;
+      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1]) & 0xFF;
     }
 
     /** Return Type (Datcon or HLT) of ROI j
@@ -126,7 +134,7 @@ namespace Belle2 {
     int getType(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[5 + 2 * j] & 0x400) >> 10;
+      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x400) >> 10;
     }
 
   private:

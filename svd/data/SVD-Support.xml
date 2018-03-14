@@ -660,7 +660,7 @@
 	<CoolingPipes>
 		<Material>Fe</Material>
 		<outerDiameter unit="mm">1.500</outerDiameter>
-		<wallThickness unit="mm">0.050</wallThickness>
+		<wallThickness unit="mm">0.100</wallThickness>
 		<Layer id="4">
 			<!-- number of pipes for this layer/halfshell -->
 			<nPipes>6</nPipes>
@@ -671,7 +671,7 @@
 			<!-- diameter difference of the last bend (optional) -->
 			<deltaL unit="mm"> 14.500</deltaL>
 			<!-- distance between IP and center of the pipes -->
-			<radius   unit="mm">  87.000</radius>
+			<radius   unit="mm">  87.400</radius>
 			<!-- beginning of pipe in z -->
 			<zstart   unit="mm">-163.780</zstart>
 			<!-- end of pipe in z -->
@@ -681,7 +681,7 @@
 			<nPipes>6</nPipes>
 			<startPhi unit="deg">-82.250</startPhi>
 			<deltaPhi unit="deg"> 30.000</deltaPhi>
-			<radius   unit="mm"> 110.650</radius>
+			<radius   unit="mm"> 111.050</radius>
 			<zstart   unit="mm">-202.950</zstart>
 			<zend     unit="mm"> 179.200</zend>
 		</Layer>
@@ -689,7 +689,7 @@
 			<nPipes>8</nPipes>
 			<startPhi unit="deg">-85.831</startPhi>
 			<deltaPhi unit="deg"> 22.500</deltaPhi>
-			<radius   unit="mm"> 142.500</radius>
+			<radius   unit="mm"> 142.900</radius>
 			<zstart   unit="mm">-256.500</zstart>
 			<zend     unit="mm"> 254.650</zend>
 		</Layer>

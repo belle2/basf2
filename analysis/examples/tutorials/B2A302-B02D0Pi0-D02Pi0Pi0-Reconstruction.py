@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following  decay chain:
 #
@@ -25,31 +27,31 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdFSParticles import goodPi0
+from stdFSParticles import stdPi0s
 
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
-     ]
+# filelistSIG = \
+#    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
+#     ]
+filelistSIG = ['/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/\
+prod00002166/e0000/4S/r00000/mixed/sub00/mdst_000001_prod00002166_task00000001.root']
 
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #
-# creates "pi0:all" and "pi0:good" ParticleLists
-# pi0:all candidates are created form all good ECL clusters
-# while pi0:good have to pass good cut
-# on the BoostedDecisionTree output
-goodPi0()
+# creates "pi0:looseFit" ParticleList
+# https://confluence.desy.de/display/BI/Physics+StandardParticles
+stdPi0s('looseFit')
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-reconstructDecay('D0:pi0pi0 -> pi0:good pi0:good', '1.7 < M < 2.0')
+reconstructDecay('D0:pi0pi0 -> pi0:looseFit pi0:looseFit', '1.7 < M < 2.0')
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-reconstructDecay('B0:all -> D0:pi0pi0 pi0:good', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
+reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0:all')
@@ -72,7 +74,7 @@ toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
 # write out the flat ntuple
 ntupleFile('B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root')
 ntupleTree('b0', 'B0:all', toolsB0)
-ntupleTree('pi0', 'pi0:all', toolsPI0)
+ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
 
 # Process the events
 process(analysis_main)

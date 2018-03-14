@@ -8,17 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
+#include <tuple>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCAxialSegmentPair;
+    class CDCTrajectorySZ;
+    class CDCTrajectory2D;
 
     /// Class representing a triple of reconstructed segements in adjacent superlayer
     class CDCSegmentTriple {
@@ -62,113 +68,101 @@ namespace Belle2 {
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(CDCSegmentTriple const& segmentTriple,
-                            const CDCAxialSegment2D* axialSegment)
-      { return segmentTriple.getStartSegment() < axialSegment; }
+      friend bool operator<(CDCSegmentTriple const& segmentTriple, const CDCAxialSegment2D* axialSegment)
+      {
+        return segmentTriple.getStartSegment() < axialSegment;
+      }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(const CDCAxialSegment2D* axialSegment,
-                            CDCSegmentTriple const& segmentTriple)
-      { return axialSegment < segmentTriple.getStartSegment(); }
+      friend bool operator<(const CDCAxialSegment2D* axialSegment, CDCSegmentTriple const& segmentTriple)
+      {
+        return axialSegment < segmentTriple.getStartSegment();
+      }
 
       /// Checks the references to the contained three segment for nullptrs
       bool checkSegments() const
-      { return not(getStartSegment() == nullptr) and not(m_middleSegment == nullptr) and not(m_endSegment == nullptr); }
+      {
+        return not(getStartSegment() == nullptr) and not(m_middleSegment == nullptr) and
+               not(m_endSegment == nullptr);
+      }
 
       /// Getter for the superlayer id of the start segment
-      ISuperLayer getStartISuperLayer() const
-      { return ISuperLayerUtil::getFrom(getStartSegment()); }
+      ISuperLayer getStartISuperLayer() const;
 
       /// Getter for the superlayer id of the middle segment
-      ISuperLayer getMiddleISuperLayer() const
-      { return ISuperLayerUtil::getFrom(getMiddleSegment()); }
+      ISuperLayer getMiddleISuperLayer() const;
 
       /// Getter for the superlayer id of the end segment
-      ISuperLayer getEndISuperLayer() const
-      { return ISuperLayerUtil::getFrom(getEndSegment()); }
-
+      ISuperLayer getEndISuperLayer() const;
 
       /// Getter for the start axial segment.
       const CDCAxialSegment2D* getStartSegment() const
-      { return m_startSegment; }
+      {
+        return m_startSegment;
+      }
 
       /// Setter for the start axial segment.
       void setStartSegment(const CDCAxialSegment2D* startSegment)
-      { m_startSegment = startSegment; }
+      {
+        m_startSegment = startSegment;
+      }
 
       /// Getter for the middle stereo segment
       const CDCStereoSegment2D* getMiddleSegment()  const
-      { return m_middleSegment; }
+      {
+        return m_middleSegment;
+      }
 
       /// Setter for the middle stereo segment
       void setMiddleSegment(const CDCStereoSegment2D* middleSegment)
-      { m_middleSegment = middleSegment; }
+      {
+        m_middleSegment = middleSegment;
+      }
 
       /// Getter for the end axial segment.
       const CDCAxialSegment2D* getEndSegment() const
-      { return m_endSegment; }
+      {
+        return m_endSegment;
+      }
 
       /// Setter for the end axial segment.
       void setEndSegment(const CDCAxialSegment2D* endSegment)
-      { m_endSegment = endSegment; }
-
+      {
+        m_endSegment = endSegment;
+      }
 
       /// Getter for the linear trajectory in the sz direction.
-      CDCTrajectorySZ getTrajectorySZ() const
-      { return getTrajectory3D().getTrajectorySZ(); }
+      CDCTrajectorySZ getTrajectorySZ() const;
 
       /// Getter for the circular trajectory in the xy direction.
-      CDCTrajectory2D getTrajectory2D() const
-      { return getTrajectory3D().getTrajectory2D(); }
+      CDCTrajectory2D getTrajectory2D() const;
 
       /// Getter for the three dimensional helix trajectory
       const CDCTrajectory3D& getTrajectory3D() const
-      { return m_trajectory3D; }
+      {
+        return m_trajectory3D;
+      }
 
       /// Setter for the three dimensional helix trajectory
       void setTrajectory3D(const CDCTrajectory3D& trajectory3D) const
-      { m_trajectory3D = trajectory3D; }
+      {
+        m_trajectory3D = trajectory3D;
+      }
 
       /// Clears the three dimensional helix trajectory
       void clearTrajectory3D() const
-      { m_trajectory3D.clear(); }
+      {
+        m_trajectory3D.clear();
+      }
 
       /// Unsets the masked flag of the segment triple's automaton cell, of the contained segments and of the contained wire hits.
-      void unsetAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().unsetMaskedFlag();
-        const bool toHits = true;
-        getStartSegment()->unsetAndForwardMaskedFlag(toHits);
-        getMiddleSegment()->unsetAndForwardMaskedFlag(toHits);
-        getEndSegment()->unsetAndForwardMaskedFlag(toHits);
-      }
+      void unsetAndForwardMaskedFlag() const;
 
       /// Sets the masked flag of the segment triple's automaton cell. Also forward the masked to the contained segments and the contained wire hits.
-      void setAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().setMaskedFlag();
-        const bool toHits = true;
-        getStartSegment()->setAndForwardMaskedFlag(toHits);
-        getMiddleSegment()->setAndForwardMaskedFlag(toHits);
-        getEndSegment()->setAndForwardMaskedFlag(toHits);
-      }
+      void setAndForwardMaskedFlag() const;
 
       /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
-      void receiveMaskedFlag() const
-      {
-        const bool fromHits = true;
-        getStartSegment()->receiveMaskedFlag(fromHits);
-        getMiddleSegment()->receiveMaskedFlag(fromHits);
-        getEndSegment()->receiveMaskedFlag(fromHits);
-
-        if (getStartSegment()->getAutomatonCell().hasMaskedFlag() or
-            getMiddleSegment()->getAutomatonCell().hasMaskedFlag() or
-            getEndSegment()->getAutomatonCell().hasMaskedFlag()) {
-
-          getAutomatonCell().setMaskedFlag();
-
-        }
-      }
+      void receiveMaskedFlag() const;
 
       /// Mutable getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const
@@ -178,7 +172,7 @@ namespace Belle2 {
 
     private:
       /// Reference to the axial segment in the start of the triple.
-      const CDCSegment2D* m_startSegment;
+      const CDCAxialSegment2D* m_startSegment;
 
       /// Reference to the stereo segment in the middle of the triple.
       const CDCStereoSegment2D* m_middleSegment;

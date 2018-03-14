@@ -67,6 +67,19 @@ namespace prog = boost::program_options;
 namespace {
   void executePythonFile(const string& pythonFile)
   {
+    object main_module = import("__main__");
+    object main_namespace = main_module.attr("__dict__");
+    if (pythonFile.empty()) {
+      // No steering file given, start an interactive ipython session
+      object interactive = import("interactive");
+      main_namespace["__b2shell_config"] = interactive.attr("basf2_shell_config")();
+      exec("import IPython; "
+           " from basf2 import *; "
+           "IPython.embed(config=__b2shell_config, header=f\"Welcome to {basf2label}\"); ",
+           main_namespace, main_namespace);
+      return;
+    }
+    // otherwise execute the steering file
     auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
     if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 
@@ -74,10 +87,6 @@ namespace {
       std::stringstream buffer;
       buffer << file.rdbuf();
       Environment::Instance().setSteering(buffer.str());
-
-      object main_module = import("__main__");
-      object main_namespace = main_module.attr("__dict__");
-
       exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
     } else {
       B2FATAL("The given filename and/or path is not valid: " + pythonFile);
@@ -126,6 +135,7 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("debug_level,d", prog::value<unsigned int>(), "Set default debug level. Also sets the log level to DEBUG.")
     ("events,n", prog::value<unsigned int>(), "Override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "Override run for EventInfoSetter, must be used with -n and --experiment")
     ("experiment", prog::value<int>(), "Override experiment for EventInfoSetter, must be used with -n and --run")
@@ -323,6 +333,13 @@ int main(int argc, char* argv[])
       Environment::Instance().setLogLevelOverride(level);
     }
 
+    // -d
+    if (varMap.count("debug_level")) {
+      unsigned int level = varMap["debug_level"].as<unsigned int>();
+      LogSystem::Instance().getLogConfig()->setDebugLevel(level);
+      LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
+    }
+
     if (varMap.count("visualize-dataflow")) {
       Environment::Instance().setVisualizeDataFlow(true);
       if (Environment::Instance().getNumberProcesses() > 0) {
@@ -361,58 +378,53 @@ int main(int argc, char* argv[])
       if (!libFile.empty())
         pythonFile = libFile;
     }
+  }
 
-    try {
-      //Init Python interpreter
-      Py_InitializeEx(0);
+  try {
+    //Init Python interpreter
+    Py_InitializeEx(0);
 
-      std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-      std::vector<wstring> pyArgvString(arguments.size() + 1);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    std::vector<wstring> pyArgvString(arguments.size() + 1);
+    // Set argument 0 to either script name or the basf2 exectuable
+    if (!pythonFile.empty()) {
       pyArgvString[0] = converter.from_bytes(pythonFile);
-      for (size_t i = 0; i < arguments.size(); i++) {
-        pyArgvString[i + 1] = converter.from_bytes(arguments[i]);
-      }
-      std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
-      for (size_t i = 0; i < pyArgvString.size(); ++i) {
-        pyArgvArray[i] = pyArgvString[i].c_str();
-      }
-      //Pass python filename and additional arguments to python
-      PySys_SetArgv(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
-
-      //Execute Python file
-      executePythonFile(pythonFile);
-
-      //Finish Python interpreter
-      Py_Finalize();
-
-      //basf2.py was loaded, now do module I/O visualization
-      if (!runModuleIOVisualization.empty()) {
-        DataFlowVisualization::executeModuleAndCreateIOPlot(runModuleIOVisualization);
-      }
-
-      //--dry-run: print gathered information
-      if (Environment::Instance().getDryRun()) {
-        Environment::Instance().printJobInformation();
-      }
-    } catch (error_already_set) {
-      //Apparently an exception occured which wasn't handled. So print the traceback
-      PyErr_Print();
-      //And in rare cases, i.e. when redirecting output, the buffers are not
-      //flushed unless we finalize python. So do it now
-      Py_Finalize();
-      return 1;
+    } else {
+      pyArgvString[0] = converter.from_bytes(argv[0]);
     }
-  } else {
-    //---------------------------------------------------
-    //  If no command line parameter was given, run the
-    //  Python interpreter in interactive mode.
-    //---------------------------------------------------
-    pythonFile = FileSystem::findFile((libPath / "basf2.py").string());
-    string extCommand("python3 -i " + pythonFile);
-    if (system(extCommand.c_str()) != 0)
-      return 1;
+    for (size_t i = 0; i < arguments.size(); i++) {
+      pyArgvString[i + 1] = converter.from_bytes(arguments[i]);
+    }
+    std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
+    for (size_t i = 0; i < pyArgvString.size(); ++i) {
+      pyArgvArray[i] = pyArgvString[i].c_str();
+    }
+    //Pass python filename and additional arguments to python
+    PySys_SetArgv(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
+
+    //Execute Python file
+    executePythonFile(pythonFile);
+
+    //Finish Python interpreter
+    Py_Finalize();
+
+    //basf2.py was loaded, now do module I/O visualization
+    if (!runModuleIOVisualization.empty()) {
+      DataFlowVisualization::executeModuleAndCreateIOPlot(runModuleIOVisualization);
+    }
+
+    //--dry-run: print gathered information
+    if (Environment::Instance().getDryRun()) {
+      Environment::Instance().printJobInformation();
+    }
+  } catch (error_already_set) {
+    //Apparently an exception occured which wasn't handled. So print the traceback
+    PyErr_Print();
+    //And in rare cases, i.e. when redirecting output, the buffers are not
+    //flushed unless we finalize python. So do it now
+    Py_Finalize();
+    return 1;
   }
 
   return 0;
 }
-

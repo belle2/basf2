@@ -33,18 +33,21 @@ namespace Belle2 {
        *  @return        Normalised wire index brought to the valid range.
        */
       static IWire wrappedAround(IWire iWire, IWire nWires)
-      { return modulo(iWire, nWires); }
+      {
+        return moduloFast(iWire, nWires);
+      }
 
       /// Gets the next counter clockwise wire id properly wrapping near wire of highest index.
       static IWire getNextCCW(IWire iWire, IWire nWires)
-      { return wrappedAround(iWire + 1, nWires); }
+      {
+        return wrappedAround(iWire + 1, nWires);
+      }
 
       /// Gets the next clockwise wire id properly wrapping near the wire of index zero.
       static IWire getNextCW(IWire iWire, IWire nWires)
-      { return wrappedAround(iWire - 1, nWires); }
-
-
+      {
+        return wrappedAround(iWire - 1, nWires);
+      }
     };
-
   }
 }

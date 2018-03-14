@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'top_dataobjects', 'mdst_dataobjects', 
+               'tracking_dataobjects', 'top', 'top_reconstruction', 
+               '$ROOT_LIBS', 'gfortran']
+
+Return('env')

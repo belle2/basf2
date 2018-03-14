@@ -21,7 +21,7 @@ from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from concurrent.futures import ThreadPoolExecutor
 
 
-def download_payload(destination, db, payloadinfo):
+def check_payload(destination, payloadinfo):
     """
     Download a single payload and return a list of all iovs. If the functions
     returns None there was an error downloading.
@@ -40,6 +40,11 @@ def download_payload(destination, db, payloadinfo):
     for iov in payloadinfo["payloadIovs"]:
         iovlist.append([module, revision, iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]])
 
+    return (local_file, remote_file, checksum, iovlist)
+
+
+def download_file(db, local_file, remote_file, checksum, iovlist):
+    """Actually download the file"""
     # check if existing
     if os.path.exists(local_file):
         if calculate_checksum(local_file) == checksum:
@@ -70,8 +75,16 @@ def command_download(args, db=None):
     Download a global tag from the database
 
     This command allows to download a global tag from the central database to be
-    used locally, either als lockup directory for payloads or as a standalone
+    used locally, either als lookup directory for payloads or as a standalone
     local database if --create-dbfile is specified.
+
+    The command requires the TAGNAME to download and optionally an output
+    directory which defaults to centraldb in the local working directory. It
+    will check for existing payloads in the output directory and only download
+    payloads which are not present or don't have the excpeted checksum.
+
+    One can filter the payloads to be downloaded by payload name using the
+    --filter, --exclude and --regex options.
     """
 
     payloadfilter = ItemFilter(args)
@@ -93,14 +106,14 @@ def command_download(args, db=None):
         group = args.add_mutually_exclusive_group()
         group.add_argument("--tag-pattern", default=False, action="store_true",
                            help="if given, all global tags which match the shell-style "
-                           "pattern TAGNAME will be downloaded: `*` stands for anything, "
-                           "`?` stands for a single character."
-                           "If -c is given as well the database files will be DIR/TAGNAME.txt")
+                           "pattern TAGNAME will be downloaded: ``*`` stands for anything, "
+                           "``?`` stands for a single character. "
+                           "If -c is given as well the database files will be ``DIR/TAGNAME.txt``")
         group.add_argument("--tag-regex", default=False, action="store_true",
                            help="if given, all global tags matching the regular "
                            "expression given by TAGNAME will be downloaded (see "
-                           "https://docs.python.org/3/library/re.html)"
-                           "If -c is given as well the database files will be DIR/TAGNAME.txt")
+                           "https://docs.python.org/3/library/re.html). "
+                           "If -c is given as well the database files will be ``DIR/TAGNAME.txt``")
         return
 
     try:
@@ -138,17 +151,21 @@ def command_download(args, db=None):
             B2ERROR(str(e))
             continue
 
-        download_list = []
+        download_list = {}
         for payload in req.json():
             name = payload["payloadId"]["basf2Module"]["name"]
             if payloadfilter.check(name):
-                download_list.append(payload)
+                local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload)
+                if local_file in download_list:
+                    download_list[local_file][-1] += iovlist
+                else:
+                    download_list[local_file] = [local_file, remote_file, checksum, iovlist]
 
-        # parse the payload list and do the downloading
+        # do the downloading
         full_iovlist = []
         failed = 0
         with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
-            for iovlist in pool.map(lambda x: download_payload(args.destination, db, x), download_list):
+            for iovlist in pool.map(lambda x: download_file(db, *x), download_list.values()):
                 if iovlist is None:
                     failed += 1
                     continue

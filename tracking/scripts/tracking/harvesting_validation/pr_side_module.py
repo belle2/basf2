@@ -20,6 +20,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     """Module to collect matching information about the found particles and to generate
        validation plots and figures of merit on the performance of track finding."""
 
+    """ Expert level behavior:
+        expert_level <= default_expert_level: all figures and plots from this module except tree entries
+        expert_level > default_expert_level: everything including tree entries
+    """
+    default_expert_level = 10
+
     def __init__(
             self,
             name,
@@ -75,6 +81,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         track_match_look_up = self.track_match_look_up
 
         # Matching information
+        mc_reco_track = track_match_look_up.getRelatedMCRecoTrack(reco_track)
         mc_particle = track_match_look_up.getRelatedMCParticle(reco_track)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
 
@@ -82,24 +89,55 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
         pr_to_mc_match_info_crops = self.peel_pr_to_mc_match_info(reco_track)
 
+        # Peel function to get hit purity of subdetectors
+        subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
+
+        # Basic peel function to get Quality Indicators
+        qualityindicator_crops = peelers.peel_quality_indicators(reco_track)
+
         # Get the fit results
         seed_fit_crops = peelers.peel_reco_track_seed(reco_track)
 
         fit_result = track_match_look_up.getRelatedTrackFitResult(reco_track)
         fit_crops = peelers.peel_track_fit_result(fit_result)
+        fit_status_crops = peelers.peel_fit_status(reco_track)
 
-        # Event Info
-        event_meta_data = Belle2.PyStoreObj("EventMetaData")
-        event_crops = peelers.peel_event_info(event_meta_data)
-
-        return dict(
+        crops = dict(
             **mc_particle_crops,
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
+            **subdetector_hit_purity_crops,  # Custom
+            **qualityindicator_crops,
             **seed_fit_crops,
             **fit_crops,
-            **event_crops
+            **fit_status_crops,
         )
+
+        if self.expert_level >= self.default_expert_level:
+
+            # Event Info
+            event_meta_data = Belle2.PyStoreObj("EventMetaData")
+            event_crops = peelers.peel_event_info(event_meta_data)
+
+            # Store Array for easier joining
+            store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
+            mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
+
+            # Information on PR reco track
+            mc_efficiency_information = {
+                "mc_hit_efficiency": track_match_look_up.getRelatedEfficiency(mc_reco_track) if mc_reco_track else float("nan"),
+                **peelers.peel_subdetector_hit_efficiency(reco_track=reco_track, mc_reco_track=mc_reco_track,
+                                                          key="mc_{part_name}")
+            }
+
+            crops.update(
+                **event_crops,
+                **store_array_crops,
+                **mc_store_array_crops,
+                **mc_efficiency_information
+            )
+
+        return crops
 
     def peel_pr_to_mc_match_info(self, reco_track):
         track_match_look_up = self.track_match_look_up
@@ -130,7 +168,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     # #################################### #
 
     # Save a tree of all collected variables in a sub folder
-    save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=1)
+    save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=default_expert_level)
 
     save_clone_rate = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",
@@ -299,14 +337,3 @@ Generally some peaking behvaiour towards zero is too be expected if the errors a
         ],
         y_log=True,
     )
-
-
-class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
-    """Module to collect more matching information about the found particles and to
-       generate validation plots and figures of merit on the performance of track finding.
-       This module gives information on the number of hits etc."""
-
-    def __init__(self, *args, **kwds):
-        warnings.warn("ExpertPRSideTrackingValidationModule is depricated for PRSideTrackingValidationModule",
-                      DeprecationWarning)
-        super().__init__(*args, **kwds)

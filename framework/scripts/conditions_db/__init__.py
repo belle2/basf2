@@ -8,6 +8,7 @@ conditions_db
 Python interface to the ConditionsDB
 """
 
+import os
 from basf2 import B2FATAL, B2ERROR, B2INFO
 import requests
 from requests.packages.urllib3.fields import RequestField
@@ -59,6 +60,11 @@ class ConditionsDB:
         self._session.mount(self._base_url, requests.adapters.HTTPAdapter(
             pool_connections=max_connections, pool_maxsize=max_connections,
             max_retries=retries, pool_block=True))
+        if "BELLE2_CONDB_PROXY" in os.environ:
+            self._session.proxies = {
+                "http": os.environ.get("BELLE2_CONDB_PROXY"),
+                "https": os.environ.get("BELLE2_CONDB_PROXY"),
+            }
 
     def request(self, method, url, message=None, *args, **argk):
         """
@@ -103,12 +109,13 @@ class ConditionsDB:
             else:
                 raise ConditionsDB.RequestError(error)
 
-        try:
-            req.json()
-        except json.JSONDecodeError as e:
-            B2INFO("Invalid response: {}".format(req.content))
-            raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
-                                            .format(e, method=method, url=url))
+        if method != "HEAD":
+            try:
+                req.json()
+            except json.JSONDecodeError as e:
+                B2INFO("Invalid response: {}".format(req.content))
+                raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
+                                                .format(e, method=method, url=url))
         return req
 
     def get_globalTags(self):
@@ -291,10 +298,12 @@ def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
     will signal test_basf2 that the test should be skipped and exit
     """
     import sys
-    condb = ConditionsDB(base_url=base_url, max_connections=1)
     try:
-        condb.request("HEAD", "/globalTags", timeout=timeout)
-    except ConditionsDB.RequestError as e:
+        if os.environ.get("BELLE2_CONDB_GLOBALTAG", None) == "":
+            raise Exception("Access to the Database is disabled")
+        req = requests.request("HEAD", base_url + "globalTags", timeout=timeout)
+        req.raise_for_status()
+    except Exception as e:
         print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)
         sys.exit(1)
 

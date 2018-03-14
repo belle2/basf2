@@ -435,31 +435,31 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   return false;
 }
 
-const std::vector<std::string>& DataStore::getArrayNames(const std::string& arrayName, const TClass* arrayClass,
+const std::vector<std::string>& DataStore::getArrayNames(const std::string& name, const TClass* arrayClass,
                                                          EDurability durability) const
 {
-  static vector<string> names;
-  names.clear();
-  if (arrayName.empty()) {
+  static vector<string> arrayNames;
+  arrayNames.clear();
+  if (name.empty()) {
     static std::unordered_map<const TClass*, string> classToArrayName;
     const auto& it = classToArrayName.find(arrayClass);
     if (it != classToArrayName.end()) {
-      names.emplace_back(it->second);
+      arrayNames.emplace_back(it->second);
     } else {
       const std::string& result = defaultArrayName(arrayClass->GetName());
       classToArrayName[arrayClass] = result;
-      names.emplace_back(result);
+      arrayNames.emplace_back(result);
     }
-  } else if (arrayName == "ALL") {
+  } else if (name == "ALL") {
     for (auto& mapEntry : m_storeEntryMap[durability]) {
       if (mapEntry.second.object and mapEntry.second.isArray and mapEntry.second.objClass->InheritsFrom(arrayClass)) {
-        names.emplace_back(mapEntry.second.name);
+        arrayNames.emplace_back(mapEntry.second.name);
       }
     }
   } else {
-    names.emplace_back(arrayName);
+    arrayNames.emplace_back(name);
   }
-  return names;
+  return arrayNames;
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,

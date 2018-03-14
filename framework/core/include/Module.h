@@ -8,18 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULE_H
-#define MODULE_H
+#pragma once
 
 #include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleCondition.h>
 #include <framework/core/PathElement.h>
-#include <framework/logging/LogConfig.h>
 
-#include <boost/shared_ptr.hpp>
+#include <framework/core/FrameworkExceptions.h>
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/Logger.h>
+
+#include <memory>
 
 #include <list>
 #include <string>
+#include <memory>
 
 namespace boost {
   namespace python {
@@ -38,7 +42,7 @@ namespace Belle2 {
   class Path;
 
   /** Defines a pointer to a module object as a boost shared pointer. */
-  typedef boost::shared_ptr<Module> ModulePtr;
+  typedef std::shared_ptr<Module> ModulePtr;
 
   /**
    * Base class for Modules.
@@ -79,6 +83,7 @@ namespace Belle2 {
       c_HistogramManager            = 8, /**< This module is used to manage histograms accumulated by other modules */
       c_InternalSerializer          = 16,  /**< This module is an internal serializer/deserializer for parallel processing */
       c_TerminateInAllProcesses     = 32,  /**< When using parallel processing, call this module's terminate() function in all processes(). This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process. */
+      c_DontCollectStatistics       = 64,  /**< No statistics is collected for this module. */
     };
 
     /// Forward the EAfterConditionPath definition from the ModuleCondition.
@@ -237,7 +242,7 @@ namespace Belle2 {
      * @param path       Shared pointer to the Path which will be executed if the condition is evaluated to true.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_value(const std::string& expression, boost::shared_ptr<Path> path,
+    void if_value(const std::string& expression, std::shared_ptr<Path> path,
                   EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
@@ -255,7 +260,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _false_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_false(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * A simplified version to set the condition of the module. Please note that successive calls of this function will
@@ -272,7 +277,7 @@ namespace Belle2 {
      * @param path Shared pointer to the Path which will be executed if the return value is _true_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
-    void if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
+    void if_true(std::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
      * Returns true if at least one condition was set for the module.
@@ -308,13 +313,13 @@ namespace Belle2 {
     bool evalCondition() const;
 
     /** Returns the path of the last true condition (if there is at least one, else reaturn a null pointer).  */
-    boost::shared_ptr<Path> getConditionPath() const;
+    std::shared_ptr<Path> getConditionPath() const;
 
     /** What to do after the conditional path is finished. (defaults to c_End if no condition is set)*/
     Module::EAfterConditionPath getAfterConditionPath() const;
 
     /** Return all condition paths currently set (no matter if the condition is true or not). */
-    std::vector<boost::shared_ptr<Path>> getAllConditionPaths() const;
+    std::vector<std::shared_ptr<Path>> getAllConditionPaths() const;
 
     /**
      * Returns true if all specified property flags are available in this module.
@@ -343,12 +348,18 @@ namespace Belle2 {
     template<typename T>
     ModuleParam<T>& getParam(const std::string& name) const;
 
+    /** Return true if this module has a valid return value set */
+    bool hasReturnValue() const { return m_hasReturnValue; }
+    /** Return the return value set by this module. This value is only
+     * meaningful if hasReturnValue() is true */
+    int getReturnValue() const { return m_returnValue; }
+
     /** Create an independent copy of this module.
      *
      * Note that parameters are shared, so changing them on a cloned module will also affect
      * the original module.
      */
-    boost::shared_ptr<PathElement> clone() const override;
+    std::shared_ptr<PathElement> clone() const override;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -362,7 +373,7 @@ namespace Belle2 {
      * a python list of all default values and the description of the parameter.
      * @return A python list containing the parameters of this parameter list.
      */
-    boost::shared_ptr<boost::python::list> getParamInfoListPython() const;
+    std::shared_ptr<boost::python::list> getParamInfoListPython() const;
 
     /**
      * Exposes methods of the Module class to Python.
@@ -616,6 +627,3 @@ namespace Belle2 {
     } proxy##moduleName##Module; }
 
 } // end namespace Belle2
-
-#endif // MODULE_H
-

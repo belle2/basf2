@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # B meson decay with missing energy, e.g. :
 #
@@ -47,7 +49,7 @@ from modularAnalysis import buildRestOfEvent
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdCharged import *
-from stdFSParticles import goodPi0
+from stdFSParticles import stdPi0s
 
 # load data
 inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
@@ -61,15 +63,12 @@ stdLooseK()
 # creates "mu+:loose" ParticleList (and c.c.)
 stdLooseMu()
 
-# creates "pi0:all" and "pi0:good" ParticleLists
-# pi0:all candidates are created form all good ECL clusters
-# while pi0:good have to pass good cut
-# on the BoostedDecisionTree output
-goodPi0()
+# creates "pi0:looseFit" ParticleList
+stdPi0s('looseFit')
 
 # 1. reconstruct D0 in multiple decay modes
 reconstructDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9', 1)
-reconstructDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9', 2)
+reconstructDecay('D0:ch2 -> K-:loose pi+:loose pi0:looseFit', '1.8 < M < 1.9', 2)
 reconstructDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9', 3)
 reconstructDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9', 4)
 reconstructDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9', 5)

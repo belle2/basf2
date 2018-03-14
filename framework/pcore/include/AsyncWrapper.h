@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ASYNCWRAPPER_H
-#define ASYNCWRAPPER_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -86,4 +85,3 @@ namespace Belle2 {
     static RingBuffer* s_currentRingBuffer;
   };
 }
-#endif

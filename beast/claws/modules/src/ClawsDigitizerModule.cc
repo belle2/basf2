@@ -10,11 +10,8 @@
 
 #include <beast/claws/modules/ClawsDigitizerModule.h>
 #include <beast/claws/dataobjects/CLAWSSimHit.h>
-#include <beast/claws/dataobjects/ClawsHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -75,7 +72,7 @@ ClawsDigitizerModule::~ClawsDigitizerModule()
 void ClawsDigitizerModule::initialize()
 {
   B2INFO("ClawsDigitizer: Initializing");
-  StoreArray<ClawsHit>::registerPersistent();
+  m_clawsHit.registerInDataStore();
 
   //get the garfield drift data, gas, and CLAWS paramters
   getXMLData();

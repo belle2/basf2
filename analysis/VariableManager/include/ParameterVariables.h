@@ -59,6 +59,11 @@ namespace Belle2 {
     double daughterInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes);
 
     /**
+     * returns true invariant mass of the daughters specified via the additional arguments
+     */
+    double daughterMCInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes);
+
+    /**
      * returns mass difference between this Particle and one of the daughters specified via the additional argument
      */
     double massDifference(const Particle* particle, const std::vector<double>& daughter_index);

@@ -255,6 +255,22 @@ namespace Belle2 {
         m_maxSpaceResol = input;
       }
 
+      /**
+       * Set mapper geometry flag
+       */
+      void setMapperGeometry(bool torf)
+      {
+        m_mapperGeometry = torf;
+      }
+
+      /**
+       * Set mapper phi-angle (deg.)
+       */
+      void setMapperPhiAngle(double phi)
+      {
+        m_mapperPhiAngle = phi;
+      }
+
 
       /**
        * Get debug flag
@@ -480,6 +496,22 @@ namespace Belle2 {
         return m_maxSpaceResol;
       }
 
+      /**
+       * Get mapper geometry flag
+       */
+      bool getMapperGeometry()
+      {
+        return m_mapperGeometry;
+      }
+
+      /**
+       * Get mapper phi-angle
+       */
+      double getMapperPhiAngle()
+      {
+        return m_mapperPhiAngle;
+      }
+
     private:
       /** Singleton class */
       CDCGeoControlPar();
@@ -496,7 +528,7 @@ namespace Belle2 {
 
       bool m_displacement = true;  /**< Switch for displacement. */
       bool m_alignment = true;  /**< Switch for alignment. */
-      bool m_misalignment = true;  /**< Switch for misalignment. */
+      bool m_misalignment = false;  /**< Switch for misalignment. */
 
       bool m_displacementInputType = true;  /**< Input type for displacement. */
       bool m_alignmentInputType = true;  /**< Input type for alignment. */
@@ -510,8 +542,10 @@ namespace Belle2 {
       bool m_chMapInputType = true;  /**< Input type for channel map. */
 
       double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
+      bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */
+      double m_mapperPhiAngle = 16.7; /**< B-field mapper phi-angle (deg). */
 
-      std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
+      std::string m_displacementFile = "displacement_v2.2.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */
       std::string m_xtFile = "xt_v3_chebyshev.dat.gz";  /**< Xt file. */

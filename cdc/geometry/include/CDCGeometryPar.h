@@ -32,7 +32,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <fstream>
+//#include <fstream>
 
 #include "TVector3.h"
 
@@ -104,12 +104,12 @@ namespace Belle2 {
       //       */
       //      void readDeltaz(const CDCGeometry&);
 
-      /**
-       * Open a file
-       * @param[in] ifs input file-stream
-       * @param[in] fileName0 file-name on cdc/data directory
-       */
-      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
+      //      /**
+      //       * Open a file
+      //       * @param[in] ifs input file-stream
+      //       * @param[in] fileName0 file-name on cdc/data directory
+      //       */
+      //      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
 
       /**
        * Read displacement or (mis)alignment params from text file.
@@ -802,6 +802,16 @@ namespace Belle2 {
                             bool calculateMinTime = true, double minTime = 0.) const;
 
       /**
+       * Return the drift dength to the sense wire; tentative ver.
+       * @param[in] dt Drift time (ns).
+       * @param[in] layer Layer ID.
+       * @param[in] lr Left/Right
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad).
+       * @param[in] theta incident angle (polar angle) (rad).
+       */
+      double getDriftLength0(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
+
+      /**
        * Return the min. drift time (ns).
        * @param[in] layer Layer ID.
        * @param[in] lr Left/Right
@@ -1195,28 +1205,6 @@ namespace Belle2 {
       return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
     }
 
-
-
-//=================================================================
-//Not compile the following functions since they are no longer used
-#if 0
-    //! Gets geometry parameters from gearbox.
-    void read();  // no longer used
-
-    /**
-     * Read XT-relation table in old format.
-     * @param[in] GearDir Gear Dir.
-     * @param[in] mode 0: read simulation file, 1: read reconstruction file.
-     */
-    void oldReadXT(const GearDir, int mode = 0);
-
-    /**
-     * Read spatial resolution table in old format.
-     * @param GearDir Gear Dir.
-     * @param mode 0: read simulation file, 1: read reconstruction file.
-     */
-    void oldReadSigma(const GearDir, int mode = 0);
-#endif
   } // end of namespace CDC
 } // end of namespace Belle2
 

@@ -30,7 +30,7 @@
 #include <framework/io/RootIOUtilities.h>
 #include <TClonesArray.h>
 #include <TFile.h>
-
+#include <TRandom.h>
 
 #include <iostream>
 
@@ -59,6 +59,8 @@ namespace Belle2 {
     // Add parameters
     addParam("inputFileNames", m_inputFileNames,
              "List of files with measured beam background ");
+    addParam("extensionName", m_extensionName,
+             "name added to default branch names", string("_beamBG"));
 
   }
 
@@ -84,6 +86,11 @@ namespace Belle2 {
       if (!f or !f->IsOpen()) {
         B2FATAL("Couldn't open input file " + fileName);
       }
+      auto* persistent = (TTree*) f->Get("persistent");
+      if (!persistent) B2ERROR("No 'persistent' tree found in " + fileName);
+      // check and issue error if file is for BG mixing
+      TBranch* branch = persistent->GetBranch("BackgroundMetaData");
+      if (branch) B2ERROR(fileName << ": wrong sample, this one is aimed for BG mixing");
       delete f;
     }
     dir->cd();
@@ -95,7 +102,9 @@ namespace Belle2 {
     }
     m_numEvents = m_tree->GetEntries();
     if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entires");
-    m_eventCount = 0;
+    m_firstEvent = gRandom->Integer(m_numEvents);
+    B2INFO("BGOverlayInput: starting with event " << m_firstEvent);
+    m_eventCount = m_firstEvent;
 
     // connect selected branches to DataStore
     bool ok = connectBranches();
@@ -104,9 +113,9 @@ namespace Belle2 {
     }
 
     // add BackgroundInfo to persistent tree
-    StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
-    bkgInfos.registerInDataStore();
-    auto* bkgInfo = bkgInfos.appendNew();
+    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+    bkgInfo.registerInDataStore();
+    bkgInfo.create();
     bkgInfo->setMethod(BackgroundInfo::c_Overlay);
     BackgroundInfo::BackgroundDescr descr;
     descr.tag = SimHitBase::bg_other;
@@ -114,7 +123,7 @@ namespace Belle2 {
     descr.fileNames = m_inputFileNames;
     descr.numEvents = m_numEvents;
     m_index = bkgInfo->appendBackgroundDescr(descr);
-    m_BGInfoIndex = bkgInfos.getEntries() - 1;
+    bkgInfo->setExtensionName(m_extensionName);
 
   }
 
@@ -126,19 +135,22 @@ namespace Belle2 {
 
   void BGOverlayInputModule::event()
   {
+    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
 
     for (auto entry : m_storeEntries) {
       entry->resetForGetEntry();
     }
 
+    if (m_eventCount == m_firstEvent and !m_start) {
+      B2INFO("BGOverlayInput: events for BG overlay will be re-used");
+      bkgInfo->incrementReusedCounter(m_index);
+    }
+    m_start = false;
+
     m_tree->GetEntry(m_eventCount);
     m_eventCount++;
     if (m_eventCount >= m_numEvents) {
       m_eventCount = 0;
-      B2INFO("BGOverlayInput: events for BG overlay will be re-used");
-      StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
-      if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
-        bkgInfos[m_BGInfoIndex]->incrementReusedCounter(m_index);
     }
 
     for (auto entry : m_storeEntries) {
@@ -183,33 +195,49 @@ namespace Belle2 {
       TObject* objectPtr = 0;
       branch->SetAddress(&objectPtr);
       branch->GetEntry();
-      bool array = (string(branch->GetClassName()) == "TClonesArray");
-      if (!array) {               // only arrays will be read-in
+      std::string objName = branch->GetClassName();
+
+      if (objName == "TClonesArray") {
+        TClass* objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
+        branch->ResetAddress();
+        delete objectPtr;
+
+        const std::string className = objClass->GetName();
+        if (className.find("Belle2::") == std::string::npos) { // only Belle2 classes
+          m_tree->SetBranchStatus(branchName.c_str(), 0);
+          continue;
+        }
+
+        std::string name = branchName + m_extensionName;
+        bool ok = DataStore::Instance().registerEntry(name, durability, objClass,
+                                                      true, storeFlags);
+        if (!ok) {
+          m_tree->SetBranchStatus(branchName.c_str(), 0);
+          continue;
+        }
+        DataStore::StoreEntry& entry = (map.find(name))->second;
+        m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
+        m_storeEntries.push_back(&entry);
+      } else if (objName == "Belle2::ECLWaveforms") {
+        std::string name = branchName;// + m_extensionName;
+        bool ok = DataStore::Instance().registerEntry(name, durability, objectPtr->IsA(),
+                                                      false, storeFlags);
+        branch->ResetAddress();
+        delete objectPtr;
+
+        if (!ok) {
+          m_tree->SetBranchStatus(branchName.c_str(), 0);
+          continue;
+        }
+        DataStore::StoreEntry& entry = (map.find(name))->second;
+        m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
+        m_storeEntries.push_back(&entry);
+
+      } else {
         m_tree->SetBranchStatus(branchName.c_str(), 0);
         branch->ResetAddress();
         delete objectPtr;
-        continue;
       }
-      TClass* objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
-      branch->ResetAddress();
-      delete objectPtr;
-
-      const std::string className = objClass->GetName();
-      if (className.find("Belle2::") == std::string::npos) { // only Belle2 classes
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
-        continue;
-      }
-
-      std::string name = branchName + "_BG";
-      bool ok = DataStore::Instance().registerEntry(name, durability, objClass,
-                                                    array, storeFlags);
-      if (!ok) {
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
-        continue;
-      }
-      DataStore::StoreEntry& entry = (map.find(name))->second;
-      m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
-      m_storeEntries.push_back(&entry);
 
     }
 

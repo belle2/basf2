@@ -30,6 +30,7 @@ class Split(Module):
             event = evtmetadata.obj().getEvent()
             self.return_value(event // nevent)
 
+
 out = []
 main = create_path()
 main.add_module('RootInput', inputFileName=Dir + run + '.root')

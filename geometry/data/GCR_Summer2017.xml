@@ -37,10 +37,10 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
-  <xi:include href="../ir/BeamPipe-phase2.xml"/>
+  <!-- <xi:include href="../ir/BeamPipe-phase2.xml"/> -->
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>
-  <xi:include href="../vxd/HeavyMetalShield.xml"/>
+  <!-- <xi:include href="../vxd/HeavyMetalShield.xml"/> -->
   <!-- <xi:include href="../pxd/PXD-phase2.xml"/> -->
   <!-- <xi:include href="../svd/SVD-phase2.xml"/> -->
   <xi:include href="../cdc/CDC.xml"/>
@@ -52,7 +52,6 @@
 
   <!-- VXD Tracking and MUID muon identification -->
   <Tracking>
-    <xi:include href="../tracking/VXDTFindex.xml"/>
     <xi:include href="../tracking/MuidParameters.xml"/>
   </Tracking>
 </Detector>

@@ -171,6 +171,7 @@ class TestModule(basf2.Module):
                     basf2.B2WARNING(oldString)
                     basf2.B2WARNING(newString)
 
+
 main.add_module(TestModule(), logLevel=basf2.LogLevel.INFO)
 
 # Process events

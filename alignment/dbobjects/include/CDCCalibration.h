@@ -94,6 +94,19 @@ namespace Belle2 {
     /// Destructor
     ~CDCCalibration() {}
 
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 20;}
+    /// Get global parameter
+    double getGlobalParam(unsigned short element, unsigned short param) {return get(element, param);}
+    /// Set global parameter
+    void setGlobalParam(double value, unsigned short element, unsigned short param) {set(element, param, value);}
+    /// TODO: list stored global parameters
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+    /// Not used
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
+    // ------------------------------------------------------------------------
+
   private:
 
     ClassDef(CDCCalibration, 2); /**< Storage for CDC alignment and calibration constants (mainly now for Millepede) */

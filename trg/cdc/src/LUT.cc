@@ -28,6 +28,8 @@ using namespace std;
 
 namespace Belle2 {
 
+  map<string, TRGCDCLUT> TRGCDCLUT::dictionary;
+
   std::string TRGCDCLUT::version(void) const
   {
     return string("TRGCDCLUT 1.00");
@@ -39,16 +41,6 @@ namespace Belle2 {
 
   TRGCDCLUT::~TRGCDCLUT()
   {
-  }
-
-  double TRGCDCLUT::getValue(double id) const
-  {
-    int range = pow(2, m_bitsize);
-    if (id >= range) {
-      return 0;
-    } else {
-      return double(m_data[id]);
-    }
   }
 
   int TRGCDCLUT::getValue(unsigned id) const
@@ -73,7 +65,7 @@ namespace Belle2 {
     int range = pow(2, nInputBit);
     openFile.open(filename.c_str());
     m_data.resize(range);
-    while (getline(openFile, tmpstr)) {
+    while (getline(openFile, tmpstr) && i < range) {
       if (!(tmpstr.size() == 0)) {
         if (tmpstr[0] >= '0' && tmpstr[0] <= '9') {
           tmpint = atoi(tmpstr.c_str());
@@ -82,10 +74,18 @@ namespace Belle2 {
         } else {
           continue;
         }
-
       }
     }
+    openFile.close();
+  }
 
+  TRGCDCLUT* TRGCDCLUT::getLUT(const std::string& filename, int nInputBit)
+  {
+    if (TRGCDCLUT::dictionary.find(filename) == TRGCDCLUT::dictionary.end()) {
+      TRGCDCLUT::dictionary[filename] = TRGCDCLUT();
+      TRGCDCLUT::dictionary[filename].setDataFile(filename, nInputBit);
+    }
+    return &(TRGCDCLUT::dictionary[filename]);
   }
 }
 

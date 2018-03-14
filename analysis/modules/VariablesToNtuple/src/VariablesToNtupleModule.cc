@@ -17,6 +17,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cmath>
 #include <algorithm>
@@ -58,12 +59,18 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 void VariablesToNtupleModule::initialize()
 {
   if (not m_particleList.empty())
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
+
 
   // Initializing the output root file
+  if (m_fileName.empty()) {
+    B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
+  }
+
   m_file = new TFile(m_fileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_fileName);
+    B2ERROR("Could not create file \"" << m_fileName <<
+            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -71,7 +78,7 @@ void VariablesToNtupleModule::initialize()
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
-    B2WARNING("Tree with this name already exists: " << m_fileName);
+    B2WARNING("Tree with this name already exists: \"" << m_fileName << "\"");
     return;
   }
 

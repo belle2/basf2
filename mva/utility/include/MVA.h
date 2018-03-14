@@ -19,6 +19,6 @@
 
 #include <mva/utility/Binning.h>
 #include <mva/utility/Utility.h>
-#include <mva/utility/SPlot.h>
+#include <mva/utility/DataDriven.h>
 
 #endif

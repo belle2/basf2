@@ -193,3 +193,15 @@ int RawCOPPERFormat::GetEventCRCError(int n)
   return -1;
 }
 
+int RawCOPPERFormat::GetEventCRC16Value(int n, int finesse_num)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. n=%d fin=%d : %s %s %d: Exiting...\n",
+          n, finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+}
+

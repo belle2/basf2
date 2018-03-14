@@ -13,6 +13,7 @@
 #pragma link C++ class Belle2::MVA::ROOTDataset-;
 #pragma link C++ class Belle2::MVA::SingleDataset-;
 #pragma link C++ class Belle2::MVA::SubDataset-;
+#pragma link C++ class Belle2::MVA::CombinedDataset-;
 #pragma link C++ class Belle2::MVA::Options-;
 #pragma link C++ class Belle2::MVA::GeneralOptions-;
 #pragma link C++ class Belle2::MVA::MetaOptions-;

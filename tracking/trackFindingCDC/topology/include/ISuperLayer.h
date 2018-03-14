@@ -10,8 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <utility>
+
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+
 #include <climits>
 
 namespace Belle2 {
@@ -22,11 +23,21 @@ namespace Belle2 {
 
     /// Generic functor to get the superlayer id from an object.
     struct GetISuperLayer {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
       /// Returns the superlayer of an object.
-      template<class T, class SFINAE =  decltype(&T::getISuperLayer)>
+      template<class T, class SFINAE = decltype(&T::getISuperLayer)>
       ISuperLayer operator()(const T& t) const
       {
         return t.getISuperLayer();
+      }
+
+      /// Returns the superlayer of a pointer.
+      template < class T, class SFINAE = decltype(std::declval<T>()->getISuperLayer()) >
+      auto operator()(const T& t) const -> decltype(t->getISuperLayer())
+      {
+        return t->getISuperLayer();
       }
     };
 
@@ -84,31 +95,11 @@ namespace Belle2 {
        */
       static ISuperLayer getNextOutwards(ISuperLayer iSuperLayer);
 
-      /**
-       *  Returns the common superlayer of two objects
-       *  ISuperLayerUtil::c_Invalid if there is no common super layer.
-       */
-      template<class T1, class T2>
-      static ISuperLayer getCommon(const T1& t1, const T2& t2)
-      {
-        return Common<MayIndirectTo<GetISuperLayer>>()(t1, t2).value_or(c_Invalid);
-      }
-
-      /**
-       *  Returns the common superlayer of hits in a container.
-       *  ISuperLayerUtil::c_Invalid if there is no common super layer or the container is empty.
-       */
-      template<class AHits>
-      static ISuperLayer getCommon(const AHits& hits)
-      {
-        return Common<MayIndirectTo<GetISuperLayer>>()(hits).value_or(c_Invalid);
-      }
-
       /// Returns the superlayer of an object.
       template<class T>
       static ISuperLayer getFrom(const T& t)
       {
-        return MayIndirectTo<GetISuperLayer>()(t);
+        return GetISuperLayer()(t);
       }
     };
   }

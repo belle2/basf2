@@ -9,19 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    /// Filter adapter type that rejects all items (just for reference).
-    template<class AFilter>
-    class NoneFilter : public AFilter {
-    public:
-      /// Accept all items.
-      Weight operator()(const typename AFilter::Object& obj __attribute__((unused))) final {
-        return NAN;
-      }
-
-    };
-  }
-}
+// This header file is deprecated
+// Instead use one of the following headers depending on the *minimal* needs of your use.
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>

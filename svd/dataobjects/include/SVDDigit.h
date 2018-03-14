@@ -124,29 +124,19 @@ namespace Belle2 {
 
     /** Display main parameters in this object
      */
-    std::string print()
+    std::string toString() const
     {
       VxdID thisSensorID = static_cast<VxdID>(m_sensorID);
-      VxdID::baseType id      = thisSensorID.getID();
       VxdID::baseType layer   = thisSensorID.getLayerNumber();
       VxdID::baseType ladder  = thisSensorID.getLadderNumber();
       VxdID::baseType sensor  = thisSensorID.getSensorNumber();
       VxdID::baseType segment = thisSensorID.getSegmentNumber();
 
       std::ostringstream os;
-      os << std::endl;
-      os << "Sensor ID     : " << m_sensorID << ", (VXD ID: " << id << ")" << std::endl;
-      os << "(layer: " << layer << ", ladder: " << ladder
-         << ", sensor: " << sensor << ", segment: " << segment << ")"
-         << std::endl;
-      if (m_isU)
-        os << "Strip side    : U" << std::endl;
-      else
-        os << "Strip side    : V" << std::endl;
-      os << "Strip ID      : " << m_cellID << std::endl;
-      os << "Strip Position: " << m_cellPosition << std::endl;
-      os << "Sample Index  : " << m_index << std::endl;
-      os << "Sample Charge : " << m_charge << std::endl;
+      os << "VXDID:" << m_sensorID << "=" << layer << "/" << ladder
+         << "/" << sensor << "#" << segment << " strip: "
+         << ((m_isU) ? "U-" : "V-") << m_cellID << " sample " << m_index
+         << "/" << m_charge << std::endl;
 
       return os.str();
     }

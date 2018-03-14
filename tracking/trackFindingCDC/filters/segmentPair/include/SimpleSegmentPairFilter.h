@@ -15,10 +15,13 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
     class CDCSegment2D;
+    class CDCTrajectory3D;
+    class CDCTrajectory2D;
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleSegmentPairFilter : public Filter<CDCSegmentPair> {
+    class SimpleSegmentPairFilter : public BaseSegmentPairFilter {
 
     public:
       /// Checks if a pair of segments is a good combination

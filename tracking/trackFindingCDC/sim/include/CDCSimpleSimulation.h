@@ -10,9 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <framework/gearbox/Const.h>
 #include <vector>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

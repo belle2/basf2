@@ -30,22 +30,6 @@ namespace Belle2 {
   class CDCAlignment: public DBObjCalibrationConstMapBase {
 
   public:
-    // Define some not used wire/cell ids for other purposes ------------
-    /// Last bit for wire (actually over 100 unused - but useful for us)
-    static const baseType WireNone = 511;
-    /// Last bit for continous layer (unused)
-    static const baseType ICLayerNone = 63;
-    /// layer = (ICLayer, 400)
-    static const baseType Wire4Layers = 400;
-    /// SuperLayer = (SuperLayer, 0, 405)
-    static const baseType Wire4SuperLayers = 405;
-    /// Outer conical end part = (63, 405)
-    static const baseType Wire4EndPartOuter = 410;
-    /// Middle conical end part = (63, 411)
-    static const baseType Wire4EndPartMiddle = 411;
-    /// Inner conical end part = (63, 412)
-    static const baseType Wire4EndPartInner = 412;
-
     // Alignment of wires ------------------------------------------------
     /// Wire X position w.r.t. nominal on backward endplate
     static const baseType wireBwdX = 0;
@@ -60,21 +44,9 @@ namespace Belle2 {
     /// Wire Z position w.r.t. nominal on forward endplate
     static const baseType wireFwdZ = 6;
 
-    // Layer alignment -------------------------------------------------
-    /// Layer X position w.r.t. geometry
-    static const baseType layerX = 0;
-    /// Layer Y position w.r.t. geometry
-    static const baseType layerY = 1;
-
     // Tension and additional wire shape parametrization ---------------
     /// Wire tension w.r.t. nominal (=50. ?)
     static const baseType wireTension = 21;
-
-    // Endplates -------------------------------------------------------
-    /// Backward endplate rotation w.r.t. nominal (geometry)
-    static const baseType endPlateBwdPhi = 46;
-    /// Forward enplate rotation taking endPlateBwdPhi as new nominal
-    static const baseType endPlateFwdDphi = 47;
 
     /// Constructor
     CDCAlignment() : DBObjCalibrationConstMapBase() {}
@@ -117,12 +89,30 @@ namespace Belle2 {
       return get(WireID(ICLayer, ILayer), wireTension);
     }
 
-    /// Direct getter to X shift of layer
-    double getLayerShiftX(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerX);}
-    /// Direct getter to Y shift of layer
-    double getLayerShiftY(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerY);}
     /// Destructor
     ~CDCAlignment() {}
+
+    // ------------- Interface to global Millepede calibration ----------------
+    //TODO: enable the wire alignment
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 27;}
+    /// Get global parameter FIXME does nothing because CDC is not ready
+    double getGlobalParam(unsigned short, unsigned short)
+    {
+      //return get(element, param);
+      return 0.;
+    }
+    /// Set global parameter FIXME does nothing because CDC is not ready
+    void setGlobalParam(double, unsigned short, unsigned short)
+    {
+      //set(element, param, value);
+    }
+    /// list stored global parameters TODO FIXME CDC not ready
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      return {};
+    }
+    // ------------------------------------------------------------------------
 
   private:
 

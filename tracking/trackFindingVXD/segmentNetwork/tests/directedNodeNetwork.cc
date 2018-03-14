@@ -20,6 +20,7 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -76,13 +77,13 @@ namespace DirectedNodeNetworkTests {
     {
       DataStore::Instance().setInitializeActive(true);
 
-      spacePointData.registerInDataStore();
-      pxdClusterData.registerInDataStore();
-      spacePointTrackCandData.registerInDataStore();
+      m_spacePointData.registerInDataStore();
+      m_pxdClusterData.registerInDataStore();
+      m_spacePointTrackCandData.registerInDataStore();
 
-      spacePointData.registerRelationTo(pxdClusterData);
+      m_spacePointData.registerRelationTo(m_pxdClusterData);
 
-      networkContainerInDataStore.registerInDataStore();
+      m_networkContainerInDataStore.registerInDataStore();
       StoreObjPtr<DirectedNodeNetworkContainer> networkContainerInDataStore;
 
       DataStore::Instance().setInitializeActive(false);
@@ -96,41 +97,41 @@ namespace DirectedNodeNetworkTests {
 
         VXD::SensorInfoBase aSensorInfo = provideSensorInfo(aVxdID, (unsigned short)i, (unsigned short)i + 1., (unsigned short)i + 2.);
 
-        const PXDCluster* pxdCluster = pxdClusterData.appendNew(providePXDCluster(float(i) / float(nHits), float(i) / float(nHits),
-                                                                aVxdID));
+        const PXDCluster* pxdCluster = m_pxdClusterData.appendNew(providePXDCluster(float(i) / float(nHits), float(i) / float(nHits),
+                                                                  aVxdID));
 
-        SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
+        SpacePoint* newSP = m_spacePointData.appendNew(pxdCluster, &aSensorInfo);
         B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
 
-      B2DEBUG(10, "DirectedNodeNetworkTest:SetUP: created " << pxdClusterData.getEntries() << "/" << spacePointData.getEntries() <<
+      B2DEBUG(10, "DirectedNodeNetworkTest:SetUP: created " << m_pxdClusterData.getEntries() << "/" << m_spacePointData.getEntries() <<
               " pxdClusters/SpacePoints");
 
       /// prepare some SpacePointTrackCands partially overlapping:
       vector<SpacePoint*> allSpacePoints;
-      for (SpacePoint& aSP : spacePointData) {
+      for (SpacePoint& aSP : m_spacePointData) {
         allSpacePoints.push_back(&aSP);
       }
 
       vector<const SpacePoint*> sps4TC1 = { allSpacePoints.at(0), allSpacePoints.at(1)};
-      SpacePointTrackCand* aSPTC1 = spacePointTrackCandData.appendNew((sps4TC1)); // shares hits with no one
+      SpacePointTrackCand* aSPTC1 = m_spacePointTrackCandData.appendNew((sps4TC1)); // shares hits with no one
       aSPTC1->setQualityIndex(0.92);
 
       vector<const SpacePoint*> sps4TC2 = { allSpacePoints.at(2), allSpacePoints.at(3)};
-      SpacePointTrackCand* aSPTC2 = spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3, tc4, tc5
+      SpacePointTrackCand* aSPTC2 = m_spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3, tc4, tc5
       aSPTC2->setQualityIndex(0.9);
 
       vector<const SpacePoint*> sps4TC3 = { allSpacePoints.at(3), allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC3 = spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2, tc5
+      SpacePointTrackCand* aSPTC3 = m_spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2, tc5
       aSPTC3->setQualityIndex(0.8);
 
       vector<const SpacePoint*> sps4TC4 = { allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC4 = spacePointTrackCandData.appendNew((sps4TC4)); // shares a hit with tc3 too, but not with tc2
+      SpacePointTrackCand* aSPTC4 = m_spacePointTrackCandData.appendNew((sps4TC4)); // shares a hit with tc3 too, but not with tc2
       aSPTC4->setQualityIndex(0.7);
 
       vector<const SpacePoint*> sps4TC5 = { allSpacePoints.at(2), allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC5 = spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
+      SpacePointTrackCand* aSPTC5 = m_spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
       aSPTC5->setQualityIndex(0.65);
       // false positive due to new with placement (cppcheck issue #7163)
       // cppcheck-suppress memleak
@@ -139,11 +140,11 @@ namespace DirectedNodeNetworkTests {
     /** TearDown environment - clear datastore */
     virtual void TearDown() { DataStore::Instance().reset(); }
 
-    StoreArray<SpacePoint> spacePointData; /**< some spacePoints for testing. */
-    StoreArray<PXDCluster> pxdClusterData; /**< some pxd clusters for testing. */
-    StoreArray<SpacePointTrackCand> spacePointTrackCandData; /**< some spacePointTrackCands for testing. */
+    StoreArray<SpacePoint> m_spacePointData; /**< some spacePoints for testing. */
+    StoreArray<PXDCluster> m_pxdClusterData; /**< some pxd clusters for testing. */
+    StoreArray<SpacePointTrackCand> m_spacePointTrackCandData; /**< some spacePointTrackCands for testing. */
     StoreArray<DirectedNodeNetworkContainer>
-    networkContainerInDataStore; /**< testing to store a dummy class containing DirectedNodeNetwork as member . */
+    m_networkContainerInDataStore; /**< testing to store a dummy class containing DirectedNodeNetwork as member . */
   };
 
 
@@ -152,10 +153,10 @@ namespace DirectedNodeNetworkTests {
   /** basic sanity checks: checks mockup for working properly */
   TEST_F(DirectedNodeNetworkTest, MockupSanityCheck)
   {
-    EXPECT_EQ(5, pxdClusterData.getEntries());
-    EXPECT_EQ(5, spacePointData.getEntries());
-    EXPECT_EQ(pxdClusterData.getEntries(), spacePointData.getEntries());
-    EXPECT_EQ(5, spacePointTrackCandData.getEntries());
+    EXPECT_EQ(5, m_pxdClusterData.getEntries());
+    EXPECT_EQ(5, m_spacePointData.getEntries());
+    EXPECT_EQ(m_pxdClusterData.getEntries(), m_spacePointData.getEntries());
+    EXPECT_EQ(5, m_spacePointTrackCandData.getEntries());
   }
 
 
@@ -201,43 +202,43 @@ namespace DirectedNodeNetworkTests {
     for (unsigned int index = 1 ; index < 5; index++) {
       B2INFO("intArray-index " << index << " of array has entry: " << intArray.at(index));
 
-      intNetwork.addNode(std::to_string(intArray.at(index - 1)), intArray.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray.at(index)), intArray.at(index));
+      intNetwork.addNode(intArray.at(index - 1), intArray.at(index - 1));
+      intNetwork.addNode(intArray.at(index), intArray.at(index));
       // correct order: outerEntry, innerEntry:
-      intNetwork.linkNodes(std::to_string(intArray.at(index - 1)), std::to_string(intArray.at(index)));
+      intNetwork.linkNodes(intArray.at(index - 1), intArray.at(index));
 
       // innerEnd has been updated:
       EXPECT_EQ(intArray.at(index), intNetwork.getInnerEnds().at(0)->getEntry());
 
       // entries are now in network:
-      EXPECT_EQ(intArray.at(index - 1), *intNetwork.getNode(std::to_string(intArray.at(index - 1))));
-      EXPECT_EQ(intArray.at(index), *intNetwork.getNode(std::to_string(intArray.at(index))));
+      EXPECT_EQ(intArray.at(index - 1), *intNetwork.getNode(intArray.at(index - 1)));
+      EXPECT_EQ(intArray.at(index), *intNetwork.getNode(intArray.at(index)));
 
       // get all nodes of outer node, expected: 1 inner and no outerNodes:
-      auto& innerNodes = intNetwork.getNode(std::to_string(intArray.at(index - 1)))->getInnerNodes();
-      auto& outerNodes = intNetwork.getNode(std::to_string(intArray.at(index)))->getOuterNodes();
+      auto& innerNodes = intNetwork.getNode(intArray.at(index - 1))->getInnerNodes();
+      auto& outerNodes = intNetwork.getNode(intArray.at(index))->getOuterNodes();
       EXPECT_EQ(1, innerNodes.size());
       EXPECT_EQ(1, outerNodes.size());
 
       // array[index] is now linked as inner node of array[index-1]:
-      EXPECT_EQ(*(innerNodes.at(0)), *(intNetwork.getNode(std::to_string(intArray.at(index)))));
+      EXPECT_EQ(*(innerNodes.at(0)), *(intNetwork.getNode(intArray.at(index))));
     }
-    EXPECT_EQ(0, intNetwork.getNode(std::to_string(intArray.at(0)))->getOuterNodes().size()); // the outermost node has no outerNodes
-    EXPECT_EQ(0, intNetwork.getNode(std::to_string(intArray.at(4)))->getInnerNodes().size()); // the innermost node has no innerNodes
+    EXPECT_EQ(0, intNetwork.getNode(intArray.at(0))->getOuterNodes().size()); // the outermost node has no outerNodes
+    EXPECT_EQ(0, intNetwork.getNode(intArray.at(4))->getInnerNodes().size()); // the innermost node has no innerNodes
 
     // some extra sanity checks, are inner- and outerEnds as expected?
     EXPECT_EQ(intArray.size(), intNetwork.size());
-    std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds = intNetwork.getOuterEnds();
-    std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
-    EXPECT_EQ(1, outerEnds.size());
-    EXPECT_EQ(1, innerEnds.size());
+    std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds_before = intNetwork.getOuterEnds();
+    std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds_before = intNetwork.getInnerEnds();
+    EXPECT_EQ(1, outerEnds_before.size());
+    EXPECT_EQ(1, innerEnds_before.size());
 
-    DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds.at(0);
+    DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds_before.at(0);
     EXPECT_EQ(intArray.at(0), outermostNode->getEntry());
     EXPECT_EQ(outermostNode->getEntry(), *outermostNode);
     EXPECT_EQ(intArray.at(1), *(outermostNode->getInnerNodes().at(0)));
 
-    DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds.at(0);
+    DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds_before.at(0);
     EXPECT_EQ(intArray.at(4), innermostNode->getEntry());
     EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
     EXPECT_EQ(intArray.at(3), *(innermostNode->getOuterNodes().at(0)));
@@ -248,27 +249,27 @@ namespace DirectedNodeNetworkTests {
       for (unsigned int index = 1 ; index < 5; index++) {
         B2INFO("intArray2-index " << index << " of array has entry: " << intArray2.at(index));
 
-        intNetwork.addNode(std::to_string(intArray2.at(index - 1)), intArray2.at(index - 1));
-        intNetwork.addNode(std::to_string(intArray2.at(index)), intArray2.at(index));
+        intNetwork.addNode(intArray2.at(index - 1), intArray2.at(index - 1));
+        intNetwork.addNode(intArray2.at(index), intArray2.at(index));
         // correct order: outerEntry, innerEntry:
-        intNetwork.linkNodes(std::to_string(intArray2.at(index - 1)), std::to_string(intArray2.at(index)));
+        intNetwork.linkNodes(intArray2.at(index - 1), intArray2.at(index));
 
         // entries are now in network:
-        EXPECT_EQ(intArray2.at(index - 1), *intNetwork.getNode(std::to_string(intArray2.at(index - 1))));
-        EXPECT_EQ(intArray2.at(index), *intNetwork.getNode(std::to_string(intArray2.at(index))));
+        EXPECT_EQ(intArray2.at(index - 1), *intNetwork.getNode(intArray2.at(index - 1)));
+        EXPECT_EQ(intArray2.at(index), *intNetwork.getNode(intArray2.at(index)));
 
         // get all nodes of outer node, expected: 1 inner and no outerNodes:
-        auto& innerNodes = intNetwork.getNode(std::to_string(intArray2.at(index - 1)))->getInnerNodes();
-        auto& outerNodes = intNetwork.getNode(std::to_string(intArray2.at(index)))->getOuterNodes();
+        auto& innerNodes = intNetwork.getNode(intArray2.at(index - 1))->getInnerNodes();
+        auto& outerNodes = intNetwork.getNode(intArray2.at(index))->getOuterNodes();
         EXPECT_EQ(1, innerNodes.size());
         EXPECT_EQ(1, outerNodes.size());
 
         // array[index] is now linked as inner node of array[index-1]:
-        EXPECT_TRUE(nodeWasFound(innerNodes, intNetwork.getNode(std::to_string(intArray2.at(index)))));
-        EXPECT_EQ(*(innerNodes.at(0)), *(intNetwork.getNode(std::to_string(intArray2.at(index)))));
+        EXPECT_TRUE(nodeWasFound(innerNodes, intNetwork.getNode(intArray2.at(index))));
+        EXPECT_EQ(*(innerNodes.at(0)), *(intNetwork.getNode(intArray2.at(index))));
       }
-      EXPECT_EQ(0, intNetwork.getNode(std::to_string(intArray2.at(0)))->getOuterNodes().size()); // the outermost node has no outerNodes
-      EXPECT_EQ(0, intNetwork.getNode(std::to_string(intArray2.at(4)))->getInnerNodes().size()); // the innermost node has no innerNodes
+      EXPECT_EQ(0, intNetwork.getNode(intArray2.at(0))->getOuterNodes().size()); // the outermost node has no outerNodes
+      EXPECT_EQ(0, intNetwork.getNode(intArray2.at(4))->getInnerNodes().size()); // the innermost node has no innerNodes
 
       // some extra sanity checks, are inner- and outerEnds as expected?
       EXPECT_EQ(10, intNetwork.size());
@@ -286,34 +287,34 @@ namespace DirectedNodeNetworkTests {
                " of array have entries: " << intArray3.at(index - 1) << "/" << intArray3.at(index) << "\n"
               );
 
-        intNetwork.addNode(std::to_string(intArray3.at(index - 1)), intArray3.at(index - 1));
-        intNetwork.addNode(std::to_string(intArray3.at(index)), intArray3.at(index));
+        intNetwork.addNode(intArray3.at(index - 1), intArray3.at(index - 1));
+        intNetwork.addNode(intArray3.at(index), intArray3.at(index));
         // correct order: outerEntry, innerEntry:
-        intNetwork.linkNodes(std::to_string(intArray3.at(index - 1)), std::to_string(intArray3.at(index)));
+        intNetwork.linkNodes(intArray3.at(index - 1), intArray3.at(index));
 
         // entries are now in network:
-        EXPECT_EQ(intArray3.at(index - 1), *intNetwork.getNode(to_string(intArray3.at(index - 1))));
-        EXPECT_EQ(intArray3.at(index), *intNetwork.getNode(to_string(intArray3.at(index))));
+        EXPECT_EQ(intArray3.at(index - 1), *intNetwork.getNode(intArray3.at(index - 1)));
+        EXPECT_EQ(intArray3.at(index), *intNetwork.getNode(intArray3.at(index)));
 
         // array[index] is now linked as an inner node of array[index-1]:
-        EXPECT_TRUE(nodeWasFound(intNetwork.getNode(to_string(intArray3.at(index - 1)))->getInnerNodes(),
-                                 intNetwork.getNode(to_string(intArray3.at(index)))));
+        EXPECT_TRUE(nodeWasFound(intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes(),
+                                 intNetwork.getNode(intArray3.at(index))));
 
 
         if (index > 1) continue; // the following tests do not work for paths crossing each other, therefore tests would fail
         // innerEnd has been updated:
         std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
-        EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray3.at(index)))));
+        EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray3.at(index))));
         B2INFO("innerEnds after indices " << index - 1 << "/" << index << " are: " << printNodeEntries(innerEnds));
 
         // get all nodes of outer node, expected: 1 inner and no outerNodes:
-        auto& innerNodes = intNetwork.getNode(to_string(intArray3.at(index - 1)))->getInnerNodes();
-        auto& outerNodes = intNetwork.getNode(to_string(intArray3.at(index)))->getOuterNodes();
+        auto& innerNodes = intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes();
+        auto& outerNodes = intNetwork.getNode(intArray3.at(index))->getOuterNodes();
         EXPECT_EQ(1, innerNodes.size());
         EXPECT_EQ(1, outerNodes.size());
       }
-      EXPECT_EQ(0, intNetwork.getNode(to_string(intArray3.at(0)))->getOuterNodes().size()); // the outermost node has no outerNodes
-      EXPECT_EQ(0, intNetwork.getNode(to_string(intArray3.at(4)))->getInnerNodes().size()); // the innermost node has no innerNodes
+      EXPECT_EQ(0, intNetwork.getNode(intArray3.at(0))->getOuterNodes().size()); // the outermost node has no outerNodes
+      EXPECT_EQ(0, intNetwork.getNode(intArray3.at(4))->getInnerNodes().size()); // the innermost node has no innerNodes
 
       // some extra sanity checks, are inner- and outerEnds as expected?
       EXPECT_EQ(13, intNetwork.size());
@@ -332,10 +333,10 @@ namespace DirectedNodeNetworkTests {
       int oldOuterInt = oldOuterMostNode->getEntry();
       onTheFlyCreatedInts.push_back(42);
       int& newInnerInt = onTheFlyCreatedInts.back();
-      EXPECT_TRUE(NULL == intNetwork.getNode(to_string(newInnerInt)));
-      intNetwork.addNode(to_string(newInnerInt), newInnerInt);
-      intNetwork.linkNodes(to_string(newInnerInt), to_string(oldOuterInt));
-      EXPECT_FALSE(NULL == intNetwork.getNode(to_string(newInnerInt)));
+      EXPECT_TRUE(NULL == intNetwork.getNode(newInnerInt));
+      intNetwork.addNode(newInnerInt, newInnerInt);
+      intNetwork.linkNodes(newInnerInt, oldOuterInt);
+      EXPECT_FALSE(NULL == intNetwork.getNode(newInnerInt));
       EXPECT_EQ(14, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       std::vector<DirectedNode<int, VoidMetaInfo>*> newOuterEnds = intNetwork.getOuterEnds();
@@ -353,14 +354,14 @@ namespace DirectedNodeNetworkTests {
       std::vector<DirectedNode<int, VoidMetaInfo>*> oldInnerEnds = intNetwork.getInnerEnds();
 
       EXPECT_EQ(3, oldOuterEnds.size());
-      EXPECT_TRUE(NULL == intNetwork.getNode(to_string(newOuterInt)));
+      EXPECT_TRUE(NULL == intNetwork.getNode(newOuterInt));
       unsigned int sizeB4 = intNetwork.size();
-      intNetwork.addNode(to_string(newOuterInt), newOuterInt);
-      intNetwork.linkNodes(to_string(newOuterInt), to_string(existingInt));
-      EXPECT_FALSE(NULL == intNetwork.getNode(to_string(newOuterInt)));
+      intNetwork.addNode(newOuterInt, newOuterInt);
+      intNetwork.linkNodes(newOuterInt, existingInt);
+      EXPECT_FALSE(NULL == intNetwork.getNode(newOuterInt));
       EXPECT_EQ(sizeB4 + 1, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
-      DirectedNode<int, VoidMetaInfo>* existingNode = intNetwork.getNode(to_string(existingInt));
+      DirectedNode<int, VoidMetaInfo>* existingNode = intNetwork.getNode(existingInt);
       EXPECT_EQ(1, existingNode->getInnerNodes().size());
       EXPECT_EQ(2, existingNode->getOuterNodes().size());
       std::vector<DirectedNode<int, VoidMetaInfo>*> newOuterEnds = intNetwork.getOuterEnds();
@@ -373,24 +374,24 @@ namespace DirectedNodeNetworkTests {
     {
       B2INFO("case: when both were there, but not linked yet: ");
       unsigned int sizeB4 = intNetwork.size();
-      intNetwork.linkNodes(to_string(intArray.at(0)), to_string(intArray.at(2)));
+      intNetwork.linkNodes(intArray.at(0), intArray.at(2));
       EXPECT_EQ(sizeB4, intNetwork.size()); // size of network does not change
       EXPECT_EQ(3, intNetwork.getInnerEnds().size()); // this can not change here
       EXPECT_EQ(4, intNetwork.getOuterEnds().size());
-      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(to_string(intArray.at(0)))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(2, innerEnds.size());
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(1)))));
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(2)))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(1))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(2))));
       EXPECT_TRUE(nodeWasFound(innerEnds, innerEnds.at(1)));
 
 
       B2INFO("case: when outer both were there and already linked: ");
-      EXPECT_FALSE(intNetwork.linkNodes(to_string(intArray.at(0)), to_string(intArray.at(2))));
+      EXPECT_FALSE(intNetwork.linkNodes(intArray.at(0), intArray.at(2)));
       // nothing was added, everything the same as last case:
       EXPECT_EQ(sizeB4, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       EXPECT_EQ(4, intNetwork.getOuterEnds().size());
-      std::vector<DirectedNode<int, VoidMetaInfo>*> moreInnerEnds = intNetwork.getNode(to_string(intArray.at(0)))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> moreInnerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(innerEnds.size(), moreInnerEnds.size());
       EXPECT_TRUE(nodeWasFound(innerEnds, moreInnerEnds.at(0)));
       EXPECT_TRUE(nodeWasFound(innerEnds, moreInnerEnds.at(1)));
@@ -401,15 +402,15 @@ namespace DirectedNodeNetworkTests {
       B2INFO("case: addInnerToLastOuterNode: both were there, but not linked yet: ");
       unsigned int networkSizeB4 = intNetwork.size();
       unsigned int nInnerEndsB4 = intNetwork.getInnerEnds().size();
-      intNetwork.addInnerToLastOuterNode(to_string(intArray.at(3)));
+      intNetwork.addInnerToLastOuterNode(intArray.at(3));
       EXPECT_EQ(networkSizeB4, intNetwork.size());
       EXPECT_EQ(nInnerEndsB4, intNetwork.getInnerEnds().size());
-      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(to_string(intArray.at(0)))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(3, innerEnds.size());
 
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(1)))));
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(2)))));
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(3)))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(1))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(2))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(3))));
     }
 
 
@@ -417,15 +418,15 @@ namespace DirectedNodeNetworkTests {
       B2INFO("case: addInnerToLastOuterNode: both were there, but already linked (same results as before, but with an error for unintended behavior):");
       unsigned int networkSizeB4 = intNetwork.size();
       unsigned int nInnerEndsB4 = intNetwork.getInnerEnds().size();
-      intNetwork.addInnerToLastOuterNode(to_string(intArray.at(3)));
+      intNetwork.addInnerToLastOuterNode(intArray.at(3));
       EXPECT_EQ(networkSizeB4, intNetwork.size());
       EXPECT_EQ(nInnerEndsB4, intNetwork.getInnerEnds().size());
-      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(to_string(intArray.at(0)))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(3, innerEnds.size());
 
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(1)))));
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(2)))));
-      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(to_string(intArray.at(3)))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(1))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(2))));
+      EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(3))));
     }
     /*
     {

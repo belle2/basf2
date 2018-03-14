@@ -3,6 +3,9 @@
 
 from basf2 import *
 
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -22,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
+                       trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
@@ -47,11 +50,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
-    :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
+    :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
-    :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
@@ -62,9 +64,11 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 mcTrackFinding=False,
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
-                                additionalTrackFitHypotheses=additionalTrackFitHypotheses,
-                                use_vxdtf2=use_vxdtf2,
+                                trackFitHypotheses=trackFitHypotheses,
                                 use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -86,10 +90,11 @@ def add_cosmics_reconstruction(
         components=None,
         pruneTracks=True,
         skipGeometryAdding=False,
-        eventTimingExtraction=False,
+        eventTimingExtraction=True,
         addClusterExpertModules=True,
         merge_tracks=True,
-        pre_general_run_setup=None,
+        top_in_counter=False,
+        data_taking_period='gcr2017',
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -97,21 +102,26 @@ def add_cosmics_reconstruction(
     plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
+    :param data_taking_period: The cosmics generation will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
+
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
-           If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
+
+    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
+           (assuming PMT is put at -z of the counter).
     """
 
     # Add cdc tracking reconstruction modules
@@ -121,8 +131,12 @@ def add_cosmics_reconstruction(
                                    skip_geometry_adding=skipGeometryAdding,
                                    event_time_extraction=eventTimingExtraction,
                                    merge_tracks=merge_tracks,
-                                   pre_general_run_setup=pre_general_run_setup,
+                                   data_taking_period=data_taking_period,
+                                   top_in_counter=top_in_counter,
                                    use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -148,6 +162,9 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
                                    pruneTracks=False,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
@@ -163,17 +180,19 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
+    :param pruneTracks: Delete all hits except the first and last after the post-tracking modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     """
 
     if trigger_mode in ["hlt", "all"]:
-        add_dedx_modules(path, components, pruneTracks)
+        add_dedx_modules(path, components)
         add_ext_module(path, components)
         add_top_modules(path, components)
         add_arich_modules(path, components)
+
+    path.add_module('StatisticsSummary').set_name('Sum_PID')
 
     if trigger_mode in ["fast_reco", "all"]:
         add_ecl_modules(path, components)
@@ -195,6 +214,13 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    if trigger_mode in ["hlt", "all"]:
+        # Prune tracks as soon as the post-tracking steps are complete
+        if pruneTracks:
+            add_prune_tracks(path, components)
+
+    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
 
 def add_mdst_output(
@@ -258,6 +284,8 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
+        ClusterMatch = register_module('ClusterMatcher')
+        path.add_module(ClusterMatch)
 
 
 def add_pid_module(path, components=None):
@@ -333,6 +361,9 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
+        # ECL T0 extraction
+        path.add_module('ECLEventT0')
+
         # ECL connected region finder
         ecl_crfinder = register_module('ECLCRFinder')
         path.add_module(ecl_crfinder)
@@ -377,7 +408,7 @@ def add_ecl_track_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)
@@ -421,14 +452,13 @@ def add_ext_module(path, components=None):
         path.add_module(ext)
 
 
-def add_dedx_modules(path, components=None, pruneTracks=True):
+def add_dedx_modules(path, components=None):
     """
     Add the dEdX reconstruction modules to the path
     and prune the tracks afterwards if wanted.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
-    :param pruneTracks: delete all hits except the first or last hit in the tracks.
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
@@ -440,7 +470,3 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
-
-    # Prune tracks as soon as the intermediate states at each measurement are not needed anymore.
-    if pruneTracks:
-        add_prune_tracks(path, components)

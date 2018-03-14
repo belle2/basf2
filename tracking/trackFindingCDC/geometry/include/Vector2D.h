@@ -16,14 +16,15 @@
 #include <tracking/trackFindingCDC/numerics/ERotation.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
-#include <TVector2.h>
+#include <utility>
+#include <string>
+#include <iosfwd>
 #include <cmath>
-#include <iostream>
-#include <sstream>
+
+class TVector2;
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
     /**
      * A two dimensional vector which is equipped with functions for correct handeling \n
      * of orientation related issues in addition to the expected vector methods. \n
@@ -40,11 +41,7 @@ namespace Belle2 {
       }
 
       /// Constructor translating from a TVector2 instance
-      explicit Vector2D(const TVector2& tvector)
-        : m_x(tvector.X())
-        , m_y(tvector.Y())
-      {
-      }
+      explicit Vector2D(const TVector2& tVector2);
 
       /// Constructor from two coordinates
       Vector2D(const double x, const double y)
@@ -65,13 +62,8 @@ namespace Belle2 {
       {
       }
 
-      /// Assignment translating from a TVector3 instance
-      Vector2D& operator=(const TVector2& tvector)
-      {
-        setX(tvector.X());
-        setY(tvector.Y());
-        return *this;
-      }
+      /// Assignment translating from a TVector2 instance
+      Vector2D& operator=(const TVector2& tvector);
 
       /// Constucts a unit vector with azimuth angle equal to phi
       static Vector2D Phi(const double phi)
@@ -129,10 +121,7 @@ namespace Belle2 {
       }
 
       /// Casting the back to TVector2 seamlessly
-      operator const TVector2()
-      {
-        return TVector2(x(), y());
-      }
+      operator const TVector2();
 
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const
@@ -172,20 +161,8 @@ namespace Belle2 {
         return std::isnan(x()) or std::isnan(y());
       }
 
-      /// Output operator for debugging
-      friend std::ostream& operator<<(std::ostream& output, const Vector2D& vector)
-      {
-        output << "Vector2D(" << vector.x() << "," << vector.y() << ")";
-        return output;
-      }
-
       /// Output operator for python
-      std::string __str__() const
-      {
-        std::stringstream sstream;
-        sstream << *this;
-        return sstream.str();
-      }
+      std::string __str__() const;
 
       /// Calculates the two dimensional dot product.
       double dot(const Vector2D& rhs) const
@@ -698,8 +675,9 @@ namespace Belle2 {
 
       /// Memory for the second coordinate
       double m_y;
-
     };
 
+    /// Output operator for debugging
+    std::ostream& operator<<(std::ostream& output, const Vector2D& vector2D);
   }
 }

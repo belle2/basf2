@@ -108,6 +108,7 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_OUTPUT_ID);
     m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), idbuf);
+    m_flow->clear(RF_OUTPUT_ID);
   } else if (strstr(src, "file") != 0) {
     // Run file writer
     char* writer = m_conf->getconf("collector", "writer", "script");
@@ -144,6 +145,7 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
         strstr(badlist, idname) == 0) {
       sprintf(hostname, "%s%2.2d", hostbase, idbase + i);
       m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, (char*)rbufin.c_str(), hostname, port, (char*)shmname.c_str(), shmid);
+      m_flow->clear(i);
       m_nnodes++;
     }
   }
@@ -196,6 +198,9 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 
 int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
+  // Clear RingBuffer
+  //  m_rbufin->forceClear();
+  //  m_rbufout->forceClear();
   return 0;
 }
 

@@ -55,9 +55,9 @@ namespace Belle2 {
 
     /** initialize */
     void initialize(int);
-    /**simulates ECL trigger. */
+    /**simulates ECL trigger for Global Cosmic data  */
     void simulate01(int);
-    /**simulates ECL trigger. */
+    /**simulates ECL trigger for Data Analysis */
     void simulate02(int);
 
   public:

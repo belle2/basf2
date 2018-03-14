@@ -28,28 +28,28 @@ class CombinedTrackingValidationModule(metamodules.PathModule):
         """Constructor"""
 
         #: Output TFile to be opened in the initialize methode
-        self.output_file_name = output_file_name
+        self.output_file_name = output_file_name or name + 'TrackingValidation.root'
 
         # First forward the output_file_name to the separate modules
         # but we open the TFile in the top level and forward it to them on initialize.
 
         eventwise_module = self.EventwiseModule(name,
                                                 contact,
-                                                output_file_name=output_file_name,
+                                                output_file_name=self.output_file_name,
                                                 reco_tracks_name=reco_tracks_name,
                                                 mc_reco_tracks_name=mc_reco_tracks_name,
                                                 expert_level=expert_level)
 
         pr_side_module = self.PRSideModule(name,
                                            contact,
-                                           output_file_name=output_file_name,
+                                           output_file_name=self.output_file_name,
                                            reco_tracks_name=reco_tracks_name,
                                            mc_reco_tracks_name=mc_reco_tracks_name,
                                            expert_level=expert_level)
 
         mc_side_module = self.MCSideModule(name,
                                            contact,
-                                           output_file_name=output_file_name,
+                                           output_file_name=self.output_file_name,
                                            reco_tracks_name=reco_tracks_name,
                                            mc_reco_tracks_name=mc_reco_tracks_name,
                                            expert_level=expert_level)

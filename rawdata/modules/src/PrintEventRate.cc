@@ -68,7 +68,7 @@ void PrintEventRateModule::initialize()
 
 
 
-void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i, int blksize, int evtcnt)
+void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
   m_cur_utime = raw_copper->GetTTUtime(i);
   m_cur_event = raw_copper->GetEveNo(i);
@@ -97,6 +97,7 @@ void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i, int bl
     m_prev_event = m_cur_event;
     m_prev_tot_bytes = 0;
   }
+
 
 }
 
@@ -237,7 +238,7 @@ void PrintEventRateModule::event()
         //        printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
         RawCOPPER temp_raw_copper;
         temp_raw_copper.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
-        printCOPPEREvent(&temp_raw_copper, 0, m_datablk_blksize, m_evecnt);
+        printCOPPEREvent(&temp_raw_copper, 0);
 
       }
     }
@@ -245,49 +246,49 @@ void PrintEventRateModule::event()
 
   for (int i = 0; i < cpr_blknum; i++) {
     for (int j = 0; j < raw_cprarray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_cprarray[ i ], j, m_cpr_blksize, m_cpr_evecnt);
+      printCOPPEREvent(raw_cprarray[ i ], j);
     }
   }
 
   for (int i = 0; i < svd_blknum; i++) {
     for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_svdarray[ i ], j, m_svd_blksize, m_svd_evecnt);
+      printCOPPEREvent(raw_svdarray[ i ], j);
     }
   }
 
   for (int i = 0; i < cdc_blknum; i++) {
     for (int j = 0; j < raw_cdcarray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_cdcarray[ i ], j, m_cdc_blksize, m_cdc_evecnt);
+      printCOPPEREvent(raw_cdcarray[ i ], j);
     }
   }
 
   for (int i = 0; i < top_blknum; i++) {
     for (int j = 0; j < raw_toparray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_toparray[ i ], j, m_top_blksize, m_top_evecnt);
+      printCOPPEREvent(raw_toparray[ i ], j);
     }
   }
 
   for (int i = 0; i < arich_blknum; i++) {
     for (int j = 0; j < raw_aricharray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_aricharray[ i ], j, m_arich_blksize, m_arich_evecnt);
+      printCOPPEREvent(raw_aricharray[ i ], j);
     }
   }
 
   for (int i = 0; i < ecl_blknum; i++) {
     for (int j = 0; j < raw_eclarray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_eclarray[ i ], j, m_ecl_blksize, m_ecl_evecnt);
+      printCOPPEREvent(raw_eclarray[ i ], j);
     }
   }
 
   for (int i = 0; i < klm_blknum; i++) {
     for (int j = 0; j < raw_klmarray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_klmarray[ i ], j, m_klm_blksize, m_klm_evecnt);
+      printCOPPEREvent(raw_klmarray[ i ], j);
     }
   }
 
   for (int i = 0; i < trg_blknum; i++) {
     for (int j = 0; j < raw_trgarray[ i ]->GetNumEntries(); j++) {
-      printCOPPEREvent(raw_trgarray[ i ], j, m_trg_blksize, m_trg_evecnt);
+      printCOPPEREvent(raw_trgarray[ i ], j);
     }
   }
 

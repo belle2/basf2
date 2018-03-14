@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::TRGECLHitMC+;
 #pragma link C++ class Belle2::TRGECLCluster+;
 #pragma link C++ class Belle2::TRGECLUnpackerStore+;
-//#pragma link C++ class Belle2::TRGECLUnpackerAna+;
+#pragma link C++ class Belle2::TRGECLTiming+;
 //#pragma link C++ class Belle2::TRGECLUnpackerEVT+;
 #pragma link C++ class Belle2::TRGECLWaveform+;
 

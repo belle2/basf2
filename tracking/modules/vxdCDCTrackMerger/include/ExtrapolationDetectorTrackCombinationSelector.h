@@ -10,11 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/core/ModuleParamList.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 namespace Belle2 {
   class RecoTrack;
+  class ModuleParamList;
 
   /**
    * Selector doing an extrapolation of the two tracks in the relations

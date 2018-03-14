@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/hitXP/hitXPModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -56,21 +56,32 @@ namespace Belle2 {
     std::set<hitXP, hitXP::timeCompare> m_setHitXP; /**< set of hit to order the hit in time */
     std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
-    double m_pmax = 2.; /**< range analyzed with cuts */
+    double m_pmax = 10.; /**< range analyzed with cuts */
+    int m_numberOfCuts; /**< number of catastrophic interaction for each track */
+    bool m_outputFlag; /**< true=produce validation output */
 
-    // enum Eparameters { /**< name of the track parameters */
-    //   omega,
-    //   d0,
-    //   phi0,
-    //   z0,
-    //   tanlambda
-    // };
+    TFile* m_noKickOutputTFile; /**< validartion output TFile */
+    TH1F* m_momSel; /**< histogram of selected tracks */
+    TH1F* m_momCut; /**< histrogram of cutted tracks */
+    TH1F* m_momEff; /**< histogram for efficiency */
+    TH1F* m_PDGIDCut; /**< histogram for PDGID of cutted track */
+    TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
+    TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
+    TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
+    bool m_isCutted;
+    double m_pMag;
+    double m_pt;
+    double m_pdgID;
+    int m_Ncuts;
+    TTree* m_noKickTree;
 
-    /** Constructor with input file for use specific cuts file */
-    NoKickRTSel(std::string fileName) :
+    /** Constructor with input file for use specific cuts file and allows validation */
+    NoKickRTSel(std::string fileName, bool outputHisto) :
       m_trackCuts(fileName)
     {
+      m_outputFlag = false;
       initNoKickRTSel();
+      initHistoNoKick(outputHisto);
     }
 
     /** Empty Constructor that uses the defaults cuts file. */
@@ -86,6 +97,7 @@ namespace Belle2 {
       m_hitXP.clear();
       m_setHitXP.clear();
       m_8hitTrack.clear();
+      m_numberOfCuts = 0;
     }
 
     /**  this method build a vector of hitXP from a track. The ouput is the
@@ -118,6 +130,42 @@ namespace Belle2 {
     * input (the selected hit of the track)
     */
     bool globalCut(const std::vector<hitXP>& track8);
+
+    /** This metod initialize some validation histograms of the Training Sample Selection.
+    * The input boolean allows the initialization, otherwise the method is empty (no validation)
+    */
+    void initHistoNoKick(bool outHisto)
+    {
+      if (outHisto) {
+        m_noKickOutputTFile = new TFile("TrackSelection_NoKick.root", "RECREATE");
+        m_momSel = new TH1F("m_momSel", "m_momSel", 100, 0, 4);
+        m_momCut = new TH1F("m_momCut", "m_momCut", 100, 0, 4);
+        m_momEff = new TH1F("m_momEff", "m_momEff", 100, 0, 4);
+
+        m_PDGIDSel = new TH1F("m_PDGIDSel", "m_PDGIDSel", 6000, -3000, 3000);
+        m_PDGIDCut = new TH1F("m_PDGIDCut", "m_PDGIDCut", 6000, -3000, 3000);
+        m_PDGIDEff = new TH1F("m_PDGIDEff", "m_PDGIDEff", 6000, -3000, 3000);
+
+        m_nCutHit = new TH1F("m_nCutHit", "m_nCutHit", 30, 0, 30);
+
+
+        m_noKickTree = new TTree("noKickTree", "noKickTree");
+        m_noKickTree->Branch("is_rejected", &m_isCutted);
+        m_noKickTree->Branch("p_mag", &m_pMag);
+        m_noKickTree->Branch("pt", &m_pt);
+        m_noKickTree->Branch("pdgID", &m_pdgID);
+        m_noKickTree->Branch("number_of_rejected_SP", &m_Ncuts);
+
+        m_outputFlag = true;
+      }
+
+    }
+
+    /** This method produce the validation histograms (to be used the endrun
+    combined with the filling in trackSelector method)
+    */
+    void produceHistoNoKick();
+
 
     ClassDef(NoKickRTSel, 1);
   };

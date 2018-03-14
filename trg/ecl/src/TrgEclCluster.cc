@@ -150,7 +150,7 @@ TrgEclCluster::save(int m_nEvent)
   for (int iposition = 0; iposition < 3 ; iposition ++) {
     const int Ncluster = ClusterEnergy[iposition].size();
     for (int icluster = 0; icluster < Ncluster; icluster++) {
-      if (ClusterEnergy[iposition][icluster] == 0) {continue;}
+      if (ClusterEnergy[iposition][icluster] <= 0) {continue;}
 
       StoreArray<TRGECLCluster> ClusterArray;
       ClusterArray.appendNew();
@@ -158,6 +158,8 @@ TrgEclCluster::save(int m_nEvent)
       ClusterArray[m_hitNum]->setEventId(m_nEvent);
       ClusterArray[m_hitNum]->setClusterId(clusterId);
       ClusterArray[m_hitNum]->setMaxTCId(MaxTCId[iposition][icluster]);
+      ClusterArray[m_hitNum]->setMaxThetaId(_TCMap->getTCThetaIdFromTCId(MaxTCId[iposition][icluster]));
+      ClusterArray[m_hitNum]->setMaxPhiId(_TCMap->getTCPhiIdFromTCId(MaxTCId[iposition][icluster]));
       ClusterArray[m_hitNum]->setNofTCinCluster(NofTCinCluster[iposition][icluster]);
       ClusterArray[m_hitNum]->setEnergyDep(ClusterEnergy[iposition][icluster]);
       ClusterArray[m_hitNum]->setTimeAve(ClusterTiming[iposition][icluster]);

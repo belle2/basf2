@@ -14,9 +14,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/io/RootIOUtilities.h>
 
-#include <TDirectory.h>
-
 #include <boost/filesystem/operations.hpp>
+
 #include <iostream>
 
 namespace Belle2 {
@@ -43,6 +42,30 @@ namespace Belle2 {
           signal_weight_sum += m_weight;
       }
       return signal_weight_sum / weight_sum;
+
+    }
+
+    unsigned int Dataset::getFeatureIndex(std::string feature)
+    {
+
+      auto it = std::find(m_general_options.m_variables.begin(), m_general_options.m_variables.end(), feature);
+      if (it == m_general_options.m_variables.end()) {
+        B2ERROR("Unknown feature named " << feature);
+        return 0;
+      }
+      return std::distance(m_general_options.m_variables.begin(), it);
+
+    }
+
+    unsigned int Dataset::getSpectatorIndex(std::string spectator)
+    {
+
+      auto it = std::find(m_general_options.m_spectators.begin(), m_general_options.m_spectators.end(), spectator);
+      if (it == m_general_options.m_spectators.end()) {
+        B2ERROR("Unknown spectator named " << spectator);
+        return 0;
+      }
+      return std::distance(m_general_options.m_spectators.begin(), it);
 
     }
 
@@ -245,6 +268,49 @@ namespace Belle2 {
 
     }
 
+    CombinedDataset::CombinedDataset(const GeneralOptions& general_options, Dataset& signal_dataset,
+                                     Dataset& background_dataset) : Dataset(general_options), m_signal_dataset(signal_dataset),
+      m_background_dataset(background_dataset) { }
+
+    void CombinedDataset::loadEvent(unsigned int iEvent)
+    {
+      if (iEvent < m_signal_dataset.getNumberOfEvents()) {
+        m_signal_dataset.loadEvent(iEvent);
+        m_target = 1.0;
+        m_isSignal = true;
+        m_weight = m_signal_dataset.m_weight;
+        m_input = m_signal_dataset.m_input;
+        m_spectators = m_signal_dataset.m_spectators;
+      } else {
+        m_background_dataset.loadEvent(iEvent - m_signal_dataset.getNumberOfEvents());
+        m_target = 0.0;
+        m_isSignal = false;
+        m_weight = m_background_dataset.m_weight;
+        m_input = m_background_dataset.m_input;
+        m_spectators = m_background_dataset.m_spectators;
+      }
+    }
+
+    std::vector<float> CombinedDataset::getFeature(unsigned int iFeature)
+    {
+
+      auto s = m_signal_dataset.getFeature(iFeature);
+      auto b = m_background_dataset.getFeature(iFeature);
+      s.insert(s.end(), b.begin(), b.end());
+      return s;
+
+    }
+
+    std::vector<float> CombinedDataset::getSpectator(unsigned int iSpectator)
+    {
+
+      auto s = m_signal_dataset.getSpectator(iSpectator);
+      auto b = m_background_dataset.getSpectator(iSpectator);
+      s.insert(s.end(), b.begin(), b.end());
+      return s;
+
+    }
+
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
       for (auto variable : general_options.m_variables)
@@ -311,12 +377,21 @@ namespace Belle2 {
     {
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_weight_variable);
       int nentries = getNumberOfEvents();
-      std::vector<float> values(nentries);
+      std::vector<float> values(nentries, 1.);
+
+      if (branchName.empty()) {
+        B2INFO("No TBranch name given for weights. Using 1s as default weights.");
+        return values;
+      }
 
       float object;
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      if (not branch) {
+        B2WARNING("TBranch for weights named '" << branchName.c_str()  << "' does not exist! Using 1s as default weights.");
+        return values;
+      }
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         auto entry = m_tree->LoadTree(i);
@@ -339,6 +414,9 @@ namespace Belle2 {
 
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
     {
+      if (iFeature >= getNumberOfFeatures()) {
+        B2ERROR("Feature index " << iFeature << " is out of bounds of given number of features: " << getNumberOfFeatures());
+      }
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
@@ -347,6 +425,9 @@ namespace Belle2 {
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      if (not branch) {
+        B2ERROR("TBranch for features named '" << branchName.c_str()  << "' does not exist!");
+      }
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         auto entry = m_tree->LoadTree(i);
@@ -369,6 +450,10 @@ namespace Belle2 {
 
     std::vector<float> ROOTDataset::getSpectator(unsigned int iSpectator)
     {
+      if (iSpectator >= getNumberOfSpectators()) {
+        B2ERROR("Spectator index " << iSpectator << " is out of bounds of given number of spectators: " << getNumberOfSpectators());
+      }
+
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
@@ -377,6 +462,9 @@ namespace Belle2 {
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      if (not branch) {
+        B2ERROR("TBranch for spectators named '" << branchName.c_str()  << "' does not exist!");
+      }
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         auto entry = m_tree->LoadTree(i);

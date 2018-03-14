@@ -26,8 +26,10 @@
 #include <framework/database/DBArray.h>
 
 // ECL
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 
 // ROOT
 #include <TMath.h>
@@ -37,19 +39,21 @@
 #include <fstream>      // std::ifstream
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(ECLShowerCorrector)
+REG_MODULE(ECLShowerCorrectorPureCsI)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
-  m_leakageCorrectionPtr("ecl_shower_corrector_leakage_corrections"),
+  m_leakageCorrectionPtr_bgx0("ecl_shower_corrector_leakage_corrections"),
+  m_leakageCorrectionPtr_phase2bgx1("ECLShowerEnergyCorrectionTemporary_phase2"),
+  m_leakageCorrectionPtr_phase3bgx1("ECLShowerEnergyCorrectionTemporary_phase3"),
   m_eclShowers(eclShowerArrayName()),
   m_eclEventInformation(eclEventInformationName())
 {
@@ -93,8 +97,8 @@ void ECLShowerCorrectorModule::event()
   // Loop over all ECLShowers.
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct N1 showers! N2 showers keep the raw energy! (TF)
-    if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
+    // Only correct EM showers! Other showers keep the raw energy!
+    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();
@@ -102,25 +106,29 @@ void ECLShowerCorrectorModule::event()
       const double phi           = eclShower.getPhi() * TMath::RadToDeg();
 
       // Get the correction
-      double correctionFactor = getLeakageCorrection(theta, phi, energy, backgroundLevel);
+      double correctionFactor = 1.0;
+
+      if (backgroundLevel < 0.1) correctionFactor = getLeakageCorrection(theta, phi, energy, backgroundLevel); // "Sumans corrections"
+      else correctionFactor = getLeakageCorrectionTemporary(theta, energy, backgroundLevel); // "Elisas and Claudias corrections"
+
       B2DEBUG(175, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel << " --> correction factor=" <<
               correctionFactor);
 
       if (correctionFactor < 1.e-5 or correctionFactor > 10.) {
-        B2ERROR("correction factor=" << correctionFactor << " is very small/too large! Resetting to 1.0.");
+        B2ERROR("Correction factor=" << correctionFactor << " is very small/too large! Resetting to 1.0.");
         correctionFactor = 1.0;
       }
 
       const double correctedEnergy = energy * correctionFactor;
       const double correctedEnergyHighest = energyHighest * correctionFactor;
-      B2DEBUG(175, "correction factor=" << correctionFactor << ", correctedEnergy=" << correctedEnergy << ", correctedEnergyHighest=" <<
+      B2DEBUG(175, "Correction factor=" << correctionFactor << ", correctedEnergy=" << correctedEnergy << ", correctedEnergyHighest=" <<
               correctedEnergyHighest);
 
       // Set the correction
       eclShower.setEnergy(correctedEnergy);
       eclShower.setEnergyHighestCrystal(correctedEnergyHighest);
 
-    } // end correction N1 only
+    } // end correction
   } // end loop over all shower
 
 }
@@ -137,14 +145,28 @@ void ECLShowerCorrectorModule::terminate()
 
 void ECLShowerCorrectorModule::prepareLeakageCorrections()
 {
+  m_leakage_bgx1[0] = m_leakageCorrectionPtr_phase2bgx1->getGraph2D();
+  m_leakage_bgx1_limits[0].resize(4);
+  m_leakage_bgx1_limits[0][0] = m_leakageCorrectionPtr_phase2bgx1->getThetaMin();
+  m_leakage_bgx1_limits[0][1] = m_leakageCorrectionPtr_phase2bgx1->getThetaMax();
+  m_leakage_bgx1_limits[0][2] = m_leakageCorrectionPtr_phase2bgx1->getEnergyMin();
+  m_leakage_bgx1_limits[0][3] = m_leakageCorrectionPtr_phase2bgx1->getEnergyMax();
+
+  m_leakage_bgx1[1] = m_leakageCorrectionPtr_phase3bgx1->getGraph2D();
+  m_leakage_bgx1_limits[1].resize(4);
+  m_leakage_bgx1_limits[1][0] = m_leakageCorrectionPtr_phase3bgx1->getThetaMin();
+  m_leakage_bgx1_limits[1][1] = m_leakageCorrectionPtr_phase3bgx1->getThetaMax();
+  m_leakage_bgx1_limits[1][2] = m_leakageCorrectionPtr_phase3bgx1->getEnergyMin();
+  m_leakage_bgx1_limits[1][3] = m_leakageCorrectionPtr_phase3bgx1->getEnergyMax();
+
   // Prepare energy correction constants taken from the database to be used in an interpolation correction
   // get all information from the payload
-  m_numOfBfBins        = m_leakageCorrectionPtr->getNumOfBfBins()[0];
-  m_numOfEnergyBins    = m_leakageCorrectionPtr->getNumOfEnergyBins()[0];
-  m_numOfPhiBins       = m_leakageCorrectionPtr->getNumOfPhiBins()[0];
-  m_numOfReg1ThetaBins = m_leakageCorrectionPtr->getNumOfReg1ThetaBins()[0];
-  m_numOfReg2ThetaBins = m_leakageCorrectionPtr->getNumOfReg2ThetaBins()[0];
-  m_numOfReg3ThetaBins = m_leakageCorrectionPtr->getNumOfReg3ThetaBins()[0];
+  m_numOfBfBins        = m_leakageCorrectionPtr_bgx0->getNumOfBfBins()[0];
+  m_numOfEnergyBins    = m_leakageCorrectionPtr_bgx0->getNumOfEnergyBins()[0];
+  m_numOfPhiBins       = m_leakageCorrectionPtr_bgx0->getNumOfPhiBins()[0];
+  m_numOfReg1ThetaBins = m_leakageCorrectionPtr_bgx0->getNumOfReg1ThetaBins()[0];
+  m_numOfReg2ThetaBins = m_leakageCorrectionPtr_bgx0->getNumOfReg2ThetaBins()[0];
+  m_numOfReg3ThetaBins = m_leakageCorrectionPtr_bgx0->getNumOfReg3ThetaBins()[0];
 
   // Resize the multidimensional vectors
   m_reg1CorrFactorArrays.resize(m_numOfBfBins);
@@ -169,16 +191,16 @@ void ECLShowerCorrectorModule::prepareLeakageCorrections()
     }
   }
 
-  m_avgRecEn = m_leakageCorrectionPtr->getAvgRecEn();
+  m_avgRecEn = m_leakageCorrectionPtr_bgx0->getAvgRecEn();
 
   // Fill the multidimensional vectors
-  m_correctionFactor = m_leakageCorrectionPtr->getCorrectionFactor();
-  m_bgFractionBinNum = m_leakageCorrectionPtr->getBgFractionBinNum();
-  m_regNum = m_leakageCorrectionPtr->getRegNum();
-  m_phiBinNum = m_leakageCorrectionPtr->getPhiBinNum();
-  m_thetaBinNum = m_leakageCorrectionPtr->getThetaBinNum();
-  m_energyBinNum = m_leakageCorrectionPtr->getEnergyBinNum();
-  m_correctionFactor = m_leakageCorrectionPtr->getCorrectionFactor();
+  m_correctionFactor = m_leakageCorrectionPtr_bgx0->getCorrectionFactor();
+  m_bgFractionBinNum = m_leakageCorrectionPtr_bgx0->getBgFractionBinNum();
+  m_regNum = m_leakageCorrectionPtr_bgx0->getRegNum();
+  m_phiBinNum = m_leakageCorrectionPtr_bgx0->getPhiBinNum();
+  m_thetaBinNum = m_leakageCorrectionPtr_bgx0->getThetaBinNum();
+  m_energyBinNum = m_leakageCorrectionPtr_bgx0->getEnergyBinNum();
+  m_correctionFactor = m_leakageCorrectionPtr_bgx0->getCorrectionFactor();
 
   for (unsigned i = 0; i < m_correctionFactor.size(); ++i) {
     if (m_regNum[i] == 1) {
@@ -190,15 +212,39 @@ void ECLShowerCorrectorModule::prepareLeakageCorrections()
     }
   }
 
-  m_phiPeriodicity = m_leakageCorrectionPtr->getPhiPeriodicity()[0];
-  m_lReg1Theta = m_leakageCorrectionPtr->getLReg1Theta()[0];
-  m_hReg1Theta = m_leakageCorrectionPtr->getHReg1Theta()[0];
-  m_lReg2Theta = m_leakageCorrectionPtr->getLReg2Theta()[0];
-  m_hReg2Theta = m_leakageCorrectionPtr->getHReg2Theta()[0];
-  m_lReg3Theta = m_leakageCorrectionPtr->getLReg3Theta()[0];
-  m_hReg3Theta = m_leakageCorrectionPtr->getHReg3Theta()[0];
+  m_phiPeriodicity = m_leakageCorrectionPtr_bgx0->getPhiPeriodicity()[0];
+  m_lReg1Theta = m_leakageCorrectionPtr_bgx0->getLReg1Theta()[0];
+  m_hReg1Theta = m_leakageCorrectionPtr_bgx0->getHReg1Theta()[0];
+  m_lReg2Theta = m_leakageCorrectionPtr_bgx0->getLReg2Theta()[0];
+  m_hReg2Theta = m_leakageCorrectionPtr_bgx0->getHReg2Theta()[0];
+  m_lReg3Theta = m_leakageCorrectionPtr_bgx0->getLReg3Theta()[0];
+  m_hReg3Theta = m_leakageCorrectionPtr_bgx0->getHReg3Theta()[0];
 
 }
+
+double ECLShowerCorrectorModule::getLeakageCorrectionTemporary(const double theta,
+    const double energy,
+    const double background)
+{
+  // Corrections are available for Phase2BG15x1 and Phase3BG15x1.
+  int type = 0;
+  if (background > 0.75) type = 1;
+
+  double theta_clip = theta;
+  double energy_clip = energy;
+
+  // check and clip boundaries since TGraph2D returns zero outside of them
+  if (theta_clip < m_leakage_bgx1_limits[type][0]) theta_clip = m_leakage_bgx1_limits[type][0] + 1e-5;
+  if (theta_clip > m_leakage_bgx1_limits[type][1]) theta_clip = m_leakage_bgx1_limits[type][1] - 1e-5;
+  if (energy_clip < m_leakage_bgx1_limits[type][2]) energy_clip = m_leakage_bgx1_limits[type][2] + 1e-5;
+  if (energy_clip > m_leakage_bgx1_limits[type][3]) energy_clip = m_leakage_bgx1_limits[type][3] - 1e-5;
+
+  double corr = m_leakage_bgx1[type].Interpolate(theta_clip, energy_clip);
+
+  return corr;
+
+}
+
 
 
 double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,

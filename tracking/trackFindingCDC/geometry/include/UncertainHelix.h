@@ -10,16 +10,23 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/geometry/Helix.h>
-#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
+#include <tracking/trackFindingCDC/geometry/SZLine.h>
 
-#include <cmath>
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <cstddef>
+#include <iosfwd>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class Vector3D;
 
     /// A general helix class including a covariance matrix.
     class UncertainHelix {
@@ -105,17 +112,17 @@ namespace Belle2 {
 
       /**
        *  Construct the average helix including its covariance matrix from two different stereo
-       * angle projections.
+       *  angle projections.
        *
        *  The averaging in the higher dimensional helix parameter space from the lower dimensional
-       * projectsions
+       *  projections
        *  is accomplished by considering the ambiguity matrix of the projections.
        *  The average only succeeds when the projections are not parallel two each other which is
-       * generally the case
+       *  generally the case
        *  for two different super layers of different stereo kind.
        *
        *  Both circle and helix parameters and their covariance matrix are considered to be passed
-       * on the same origin.
+       *  on the same origin.
        *
        *  @param perigeeCircle1    First perigee circle
        *  @param ambiguityMatrix1  Ambiguity matrix of the first perigee parameters with respect to
@@ -127,10 +134,10 @@ namespace Belle2 {
        * fitted.
        */
       static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
-                                    const JacobianMatrix<3, 5>& fromAmbiguity,
+                                    const PerigeeHelixAmbiguity& fromAmbiguity,
                                     const UncertainPerigeeCircle& toPerigeeCircle,
-                                    const JacobianMatrix<3, 5>& toAmbiguity,
-                                    const SZParameters& szParameters = SZParameters(0.0, 0.0));
+                                    const PerigeeHelixAmbiguity& toAmbiguity,
+                                    const SZParameters& szParameters);
 
       /**
        *  Construct the average helix including its covariance matrix incoorporating additional
@@ -151,7 +158,7 @@ namespace Belle2 {
        */
       static UncertainHelix average(const UncertainHelix& helix,
                                     const UncertainPerigeeCircle& perigeeCircle,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix)
+                                    const PerigeeHelixAmbiguity& ambiguityMatrix)
       {
         return average(perigeeCircle, ambiguityMatrix, helix);
       }
@@ -174,7 +181,7 @@ namespace Belle2 {
        *  @param helix            Second perigee circle
        */
       static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
-                                    const JacobianMatrix<3, 5>& fromAmbiguity,
+                                    const PerigeeHelixAmbiguity& fromAmbiguity,
                                     const UncertainHelix& toHelix);
 
     public:
@@ -320,16 +327,9 @@ namespace Belle2 {
         double arcLength2D = m_helix.shiftPeriod(nPeriods);
         SZJacobian szJacobian = m_helix.szLine().passiveMoveByJacobian(Vector2D(arcLength2D, 0));
         PerigeeJacobian perigeeJacobian = PerigeeUtil::identity();
-        HelixJacobian jacobian = JacobianMatrixUtil::stackBlocks(perigeeJacobian, szJacobian);
+        HelixJacobian jacobian = HelixUtil::stackBlocks(perigeeJacobian, szJacobian);
         HelixUtil::transport(jacobian, m_helixCovariance);
         return arcLength2D;
-      }
-
-    public:
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
-      {
-        return output << "Uncertain" << uncertainHelix.helix();
       }
 
     private:
@@ -347,5 +347,7 @@ namespace Belle2 {
 
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const UncertainHelix& uncertainHelix);
   }
 }

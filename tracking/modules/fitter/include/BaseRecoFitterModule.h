@@ -43,8 +43,12 @@ namespace Belle2 {
 
   protected:
     /**
-     * Method do create the used filter.
+     * Method to create the used filter.
      * This method has to by implemented by the derived class
+     *
+     * If you return a nullptr here, it means the default fitter (defined by the TrackFitter)
+     * is used.
+     *
      * @return The fitter we will use for fitting.
      */
     virtual std::shared_ptr<genfit::AbsFitter> createFitter() const = 0;

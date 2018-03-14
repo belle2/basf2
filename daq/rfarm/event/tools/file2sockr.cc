@@ -88,6 +88,7 @@ int main(int argc, char** argv)
   gettimeofday(&tnow, NULL);
   gettimeofday(&tprev, NULL);
 
+  double datasize = 0.0;
   printf("Start event loop\n");
   // Loop for event records
   for (;;) {
@@ -121,6 +122,8 @@ int main(int argc, char** argv)
         printf("Error in reading file : %d\n", is);
         exit(-1);
       }
+      // Wait for 5 sec so that processing of previous file is completed.
+      sleep(10);
     }
 
     // Put the message to Socket
@@ -147,13 +150,18 @@ int main(int argc, char** argv)
       usleep(rand.Poisson(minterval));
 
     nevent++;
+    datasize += (double)is;
+
     if (nevent % EVENTINTERVAL == 0) {
       gettimeofday(&tnow, NULL);
       double delta = (double)((tnow.tv_sec - tprev.tv_sec) * 1000000 +
                               (tnow.tv_usec - tprev.tv_usec));
       double rate = ((double)EVENTINTERVAL) / delta * 1.0E6;
-      printf("Event = %8d; Average rate = %7.2f Hz\n", nevent, rate);
+      double flow = datasize / delta;
+      printf("Event = %8d; Ave. rate = %7.2f Hz, flow = %7.2f MB/s\n",
+             nevent, rate, flow);
       tprev = tnow;
+      datasize = 0.0;
     }
   }
 }

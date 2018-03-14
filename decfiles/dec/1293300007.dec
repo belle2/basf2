@@ -1,0 +1,28 @@
+# EventType: 1293300007
+# Descriptor: [B+ -> Xc tau nu ]cc
+# NickName: Bu_Xctaunu
+# Documentation: b->c tau nu process, D and D* modes
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Florian Bernlochner
+# Email: florian.bernlochner@cern.ch 
+# Cuts: None
+# Date: 20170704
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+#central values from HFAG average
+
+Decay B+sig
+0.01325   anti-D*0    tau+ nu_tau        PHOTOS        HQET3 0.920 1.205 1.21 1.404 0.854;
+0.00689   anti-D0    tau+ nu_tau         PHOTOS       HQET3 1.0541 1.128 1.0;
+Enddecay
+CDecay B-sig
+
+#
+End

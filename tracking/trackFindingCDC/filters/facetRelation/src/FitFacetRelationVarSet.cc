@@ -11,7 +11,16 @@
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/LineParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
 using namespace Belle2;
@@ -27,11 +36,11 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   const UncertainParameterLine2D& fromFitLine = fromFacet->getFitLine();
   const UncertainParameterLine2D& toFitLine   = toFacet->getFitLine();
 
-  LineCovariance fromCovariance = fromFitLine.lineCovariance();
-  LineParameters fromParameters = fromFitLine.lineParameters();
+  LineCovariance fromCov = fromFitLine.lineCovariance();
+  LineParameters fromPar = fromFitLine.lineParameters();
 
-  LineCovariance toCovariance   = toFitLine.lineCovariance();
-  LineParameters toParameters   = toFitLine.lineParameters();
+  LineCovariance toCov   = toFitLine.lineCovariance();
+  LineParameters toPar   = toFitLine.lineParameters();
 
   Vector2D fromTangential = fromFacet->getStartToEndLine().tangential();
   Vector2D toTangential   = toFacet->getStartToEndLine().tangential();
@@ -46,8 +55,8 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
 
-  Vector2D frontWirePos2D = fromFacet->getStartWire().getRefPos2D();
-  Vector2D backWirePos2D  = toFacet->getEndWire().getRefPos2D();
+  Vector2D frontWirePos2D = fromFacet->getStartWireHit().getRefPos2D();
+  Vector2D backWirePos2D  = toFacet->getEndWireHit().getRefPos2D();
   {
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
@@ -86,7 +95,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     {
       double phi0_var = fromFacet->getFitLine().lineCovariance()(c_Phi0, c_Phi0);
       if (not std::isfinite(phi0_var)) {
-        B2INFO("from addr " << fromFacet);
+        B2INFO("from addr " << *fromFacet);
         B2INFO("From cov " << std::endl << fromFacet->getFitLine().lineCovariance());
         B2INFO("From cov " << std::endl << fromFitLine.lineCovariance());
       }
@@ -94,50 +103,35 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     {
       double phi0_var = toFacet->getFitLine().lineCovariance()(c_Phi0, c_Phi0);
       if (not std::isfinite(phi0_var)) {
-        B2INFO("to addr " << toFacet);
+        B2INFO("to addr " << *toFacet);
         B2INFO("To cov " << std::endl << toFacet->getFitLine().lineCovariance());
         B2INFO("To cov " << std::endl << toFitLine.lineCovariance());
       }
     }
 
-    var<named("phi0_from_sigma")>() = std::sqrt(fromCovariance(c_Phi0, c_Phi0));
-    var<named("phi0_to_sigma")>() = std::sqrt(toCovariance(c_Phi0, c_Phi0));
-    var<named("phi0_ref_sigma")>() = std::sqrt(fromCovariance(c_Phi0, c_Phi0) + toCovariance(c_Phi0, c_Phi0));
-    var<named("phi0_ref_diff")>() = AngleUtil::normalised(toParameters(c_Phi0) - fromParameters(c_Phi0));
+    var<named("phi0_from_sigma")>() = std::sqrt(fromCov(c_Phi0, c_Phi0));
+    var<named("phi0_to_sigma")>() = std::sqrt(toCov(c_Phi0, c_Phi0));
+    var<named("phi0_ref_sigma")>() = std::sqrt(fromCov(c_Phi0, c_Phi0) + toCov(c_Phi0, c_Phi0));
+    var<named("phi0_ref_diff")>() = AngleUtil::normalised(toPar(c_Phi0) - fromPar(c_Phi0));
     var<named("phi0_ref_pull")>() =
-      std::fabs(AngleUtil::normalised(toParameters(c_Phi0) - fromParameters(c_Phi0)) /
-                std::sqrt((toCovariance(c_Phi0, c_Phi0) + fromCovariance(c_Phi0, c_Phi0))));
+      std::fabs(AngleUtil::normalised(toPar(c_Phi0) - fromPar(c_Phi0)) /
+                std::sqrt((toCov(c_Phi0, c_Phi0) + fromCov(c_Phi0, c_Phi0))));
 
-    LineParameters refParameters;
-    refParameters(c_I) = (fromParameters(c_I) + toParameters(c_I)) / 2;
-    refParameters(c_Phi0) = AngleUtil::average(fromParameters(c_Phi0), toParameters(c_Phi0));
+    LineParameters avgPar;
+    LineCovariance avgCov;
+    double chi2 = LineUtil::average(fromPar, fromCov, toPar, toCov, avgPar, avgCov);
 
-    LineParameters relFromParameters;
-    relFromParameters(c_I) = fromParameters(c_I) - refParameters(c_I);
-    relFromParameters(c_Phi0) = AngleUtil::normalised(fromParameters(c_Phi0) - refParameters(c_Phi0));
+    LineParameters meanPar = (fromPar + toPar) / 2.0;
+    meanPar(c_Phi0) = AngleUtil::average(fromPar(c_Phi0), toPar(c_Phi0));
 
-    LineParameters relToParameters;
-    relToParameters(c_I) = toParameters(c_I) - refParameters(c_I);
-    relToParameters(c_Phi0) = AngleUtil::normalised(toParameters(c_Phi0) - refParameters(c_Phi0));
-
-    LineParameters relAvgParameters;
-    LineCovariance avgCovariance;
-
-    double chi2 = CovarianceMatrixUtil::average(relFromParameters, fromCovariance,
-                                                relToParameters, toCovariance,
-                                                relAvgParameters, avgCovariance);
-
-    LineParameters avgParameters;
-
-    avgParameters(c_I) = relAvgParameters(c_I) + refParameters(c_I);
-    avgParameters(c_Phi0) = AngleUtil::normalised(relAvgParameters(c_Phi0) + refParameters(c_Phi0));
+    LineParameters relAvgPar = avgPar - meanPar;
+    relAvgPar(c_Phi0) = AngleUtil::normalised(relAvgPar(c_Phi0));
 
     var<named("chi2_comb")>() = chi2;
-    var<named("phi0_comb_pull")>() = std::fabs(relAvgParameters(c_Phi0) /
-                                               std::sqrt(avgCovariance(c_Phi0, c_Phi0)));
-    var<named("phi0_comb_diff")>() = relAvgParameters(c_Phi0);
-    var<named("phi0_comb_sigma")>() = std::sqrt(avgCovariance(c_Phi0, c_Phi0));
-
+    var<named("phi0_comb_pull")>() =
+      std::fabs(relAvgPar(c_Phi0) / std::sqrt(avgCov(c_Phi0, c_Phi0)));
+    var<named("phi0_comb_diff")>() = relAvgPar(c_Phi0);
+    var<named("phi0_comb_sigma")>() = std::sqrt(avgCov(c_Phi0, c_Phi0));
   }
 
   // Fitter

@@ -11,11 +11,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
-using namespace Belle2::TrackFindingCDC;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::ChooseableFilter<SegmentFilterFactory>;
 
 SegmentRejecter::SegmentRejecter(const std::string& defaultFilterName)
   : m_segmentFilter(defaultFilterName)

@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BACKGROUNDMETADATA_H
-#define BACKGROUNDMETADATA_H
+#pragma once
 
-#include <TObject.h>
+#include <framework/pcore/Mergeable.h>
 #include <simulation/dataobjects/SimHitBase.h>
+#include <framework/core/FrameworkExceptions.h>
 #include <string>
 
 namespace Belle2 {
@@ -20,22 +20,28 @@ namespace Belle2 {
   /**
    * Metadata information about the beam background file
    */
-  class BackgroundMetaData: public TObject {
+  class BackgroundMetaData: public Mergeable {
 
   public:
+
+    /**
+     * Exception definition
+     */
+    BELLE2_DEFINE_EXCEPTION(BackgroundMetaDataNotMergeable,
+                            "BackgroundMetaData: objects cannot be merged");
+
     /**
      * Enum for BG file types
      */
-    enum EFileType { c_Usual = 0,  /**< usual BG file */
-                     c_ECL   = 1,  /**< additional for ECL */
-                     c_PXD   = 2   /**< additional for PXD */
+    enum EFileType { c_Usual = 0,   /**< usual BG file */
+                     c_ECL   = 1,   /**< additional for ECL */
+                     c_PXD   = 2    /**< additional for PXD */
                    };
 
     /**
      * Constructor
      */
-    BackgroundMetaData() : m_backgroundTag(SimHitBase::bg_other),
-      m_realTime(0.0), m_fileType(c_Usual)
+    BackgroundMetaData()
     {}
 
     /**
@@ -86,19 +92,35 @@ namespace Belle2 {
      */
     EFileType getFileType() const {return m_fileType;}
 
+    /**
+     * Implementation of abstract class function
+     */
+    virtual void merge(const Mergeable* other);
+
+    /**
+     * Implementation of abstract class function
+     */
+    virtual void clear();
+
+
   private:
 
+    /**
+     * Checks if other object can be merged with this object
+     * @param other object to be merged with this object
+     * @return true, if can be merged
+     */
+    bool canBeMerged(const BackgroundMetaData* other);
+
     std::string m_backgroundType; /**< beam background type */
-    SimHitBase::BG_TAG m_backgroundTag; /**< background tag value */
-    float m_realTime; /**< real time that corresponds to beam background sample */
-    EFileType m_fileType; /**< file type */
+    SimHitBase::BG_TAG m_backgroundTag = SimHitBase::bg_other; /**< background tag */
+    float m_realTime = 0; /**< real time that corresponds to beam background sample */
+    EFileType m_fileType = c_Usual; /**< file type */
 
     /**
      * Class definition required for creation of ROOT dictionary.
      */
-    ClassDef(BackgroundMetaData, 2);
+    ClassDef(BackgroundMetaData, 3);
   };
 }
 
-
-#endif /* BACKGROUNDMETADATA_H */

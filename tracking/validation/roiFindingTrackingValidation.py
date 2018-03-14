@@ -4,28 +4,25 @@
 """
 <header>
   <contact>giulia.casarosa@desy.de</contact>
-  <input>EvtGenSimNoBkg.root</input>
   <output>ROIFindingValidation.root</output>
   <description>
   This module validates the ROI Finding module.
   </description>
 </header>
 """
+#   <input>EvtGenSimNoBkg.root</input>
 
 NAME = 'ROIFinding'  # not used?
 CONTACT = 'giulia.casarosa@desy.de'
-INPUT_FILE = '../EvtGenSimNoBkg.root'
+# INPUT_FILE = '../EvtGenSimNoBkg.root' #can't use it because PXDDataReduction in simulated
 # INPUT_FILE = 'simRootOutput.root'  # for debugging purposes
 OUTPUT_FILE = 'ROIFindingTrackingValidation.root'
 N_EVENTS = 1000
 
 ACTIVE = True
 
-CREATE_INPUT = False  # for debugging purposes, use it with the basf2 -n option
-if CREATE_INPUT:
-    OUTPUT_FILE = 'simRootOutput.root'
-
 from simulation import add_simulation
+from svd import add_svd_reconstruction
 
 import basf2
 import ROOT
@@ -81,7 +78,6 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
         self.theta_phi_L1 = collections.deque()
 
     def event(self):
-
         ''' ROIs quantities'''
         rois = Belle2.PyStoreArray('ROIs')
 
@@ -104,7 +100,7 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
         in_pxd = Belle2.PyStoreArray('filteredPXDDigits')
 
         if len(tot_pxd) > 0:
-            self.drf.append(len(in_pxd)/len(tot_pxd))
+            self.drf.append(len(in_pxd) / len(tot_pxd))
 
         ''' PXDIntercepts Statistical Error '''
         inters = Belle2.PyStoreArray('PXDIntercepts')
@@ -204,57 +200,52 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
 
 path = basf2.create_path()
 
-if CREATE_INPUT:
-    path.add_module('EventInfoSetter')
-    path.add_module('EvtGenInput')
-    add_simulation(path)
+path.add_module('EventInfoSetter', evtNumList=N_EVENTS)
+path.add_module('EvtGenInput')
+add_simulation(path, usePXDDataReduction=False)
+add_svd_reconstruction(path, isROIsimulation=True)
 
-if not CREATE_INPUT:
+#    path.add_module('RootInput', inputFileName=INPUT_FILE, entrySequences=["0:{}".format(N_EVENTS-1)])
+# path.add_module('Gearbox')
+# path.add_module('Geometry')
 
-    path.add_module('RootInput', inputFileName=INPUT_FILE, entrySequences=["0:{}".format(N_EVENTS-1)])
-    path.add_module('Gearbox')
-    path.add_module('Geometry')
+pxd_unfiltered_digits = 'PXDDigits'
+pxd_filtered_digits = 'filteredPXDDigits'
 
-    pxd_unfiltered_digits = 'PXDDigits'
-    pxd_filtered_digits = 'filteredPXDDigits'
+# SVD tracking
+svd_reco_tracks = '__ROIsvdRecoTracks'
+add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], '__ROIsvdClusters')  # CDC is not used at the moment!
 
-    # SVD+CDC tracking
-    svd_reco_tracks = '__ROIsvdRecoTracks'
-    add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)
+# ROI Finding
+pxdDataRed = basf2.register_module('PXDROIFinder')
+param_pxdDataRed = {
+    'recoTrackListName': svd_reco_tracks,
+    'PXDInterceptListName': 'PXDIntercepts',
+    'ROIListName': 'ROIs',
+    'tolerancePhi': 0.15,
+    'toleranceZ': 0.5,
+    'sigmaSystU': 0.02,
+    'sigmaSystV': 0.02,
+    'numSigmaTotU': 10,
+    'numSigmaTotV': 10,
+    'maxWidthU': 0.5,
+    'maxWidthV': 0.5,
+}
+pxdDataRed.param(param_pxdDataRed)
+path.add_module(pxdDataRed)
 
-    # ROI Finding
-    pxdDataRed = basf2.register_module('PXDDataReduction')
-    param_pxdDataRed = {
-        'recoTrackListName': svd_reco_tracks,
-        'PXDInterceptListName': 'PXDIntercepts',
-        'ROIListName': 'ROIs',
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
+# Filtering of PXDDigits
+pxd_digifilter = basf2.register_module('PXDdigiFilter')
+pxd_digifilter.param('ROIidsName', 'ROIs')
+pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
+pxd_digifilter.param('PXDDigitsInsideROIName', pxd_filtered_digits)
+pxd_digifilter.param('PXDDigitsOutsideROIName', 'PXDDigitsOutside')
+path.add_module(pxd_digifilter)
 
-    # Filtering of PXDDigits
-    pxd_digifilter = basf2.register_module('PXDdigiFilter')
-    pxd_digifilter.param('ROIidsName', 'ROIs')
-    pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
-    pxd_digifilter.param('PXDDigitsInsideROIName', pxd_filtered_digits)
-    pxd_digifilter.param('PXDDigitsOutsideROIName', 'PXDDigitsOutside')
-    path.add_module(pxd_digifilter)
-
-    ROIValidationPlots = ROIFindingTrackingValidationPlots()
-    path.add_module(ROIValidationPlots)
+ROIValidationPlots = ROIFindingTrackingValidationPlots()
+path.add_module(ROIValidationPlots)
 
 path.add_module('Progress')
-
-if CREATE_INPUT:
-    path.add_module('RootOutput', outputFileName=OUTPUT_FILE)
 
 if ACTIVE:
     basf2.process(path)

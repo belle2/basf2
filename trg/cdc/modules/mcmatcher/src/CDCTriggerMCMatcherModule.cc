@@ -1,10 +1,5 @@
 #include "trg/cdc/modules/mcmatcher/CDCTriggerMCMatcherModule.h"
 
-#include <framework/datastore/StoreArray.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/gearbox/Const.h>
 
 #include <Eigen/Dense>
@@ -87,38 +82,28 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
 void
 CDCTriggerMCMatcherModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_TrgTrackCollectionName);
-  StoreArray<MCParticle>::required(m_MCParticleCollectionName);
-  StoreArray<MCParticle>::registerPersistent(m_MCTrackableCollectionName);
+  m_segmentHits.isRequired(m_hitCollectionName);
+  m_prTracks.isRequired(m_TrgTrackCollectionName);
+  m_mcParticles.isRequired(m_MCParticleCollectionName);
+  m_mcTracks.registerInDataStore(m_MCTrackableCollectionName);
 
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack> tracks(m_TrgTrackCollectionName);
-  StoreArray<MCParticle> mcparticles(m_MCParticleCollectionName);
-  StoreArray<MCParticle> mctracks(m_MCTrackableCollectionName);
-
-  mcparticles.requireRelationTo(segmentHits);
-  tracks.requireRelationTo(segmentHits);
-  mcparticles.registerRelationTo(mctracks);
-  mcparticles.registerRelationTo(tracks);
-  mctracks.registerRelationTo(segmentHits);
-  mctracks.registerRelationTo(tracks);
-  tracks.registerRelationTo(mcparticles);
-  tracks.registerRelationTo(mctracks);
+  m_mcParticles.requireRelationTo(m_segmentHits);
+  m_prTracks.requireRelationTo(m_segmentHits);
+  m_mcParticles.registerRelationTo(m_mcTracks);
+  m_mcParticles.registerRelationTo(m_prTracks);
+  m_mcTracks.registerRelationTo(m_segmentHits);
+  m_mcTracks.registerRelationTo(m_prTracks);
+  m_prTracks.registerRelationTo(m_mcParticles);
+  m_prTracks.registerRelationTo(m_mcTracks);
 }
 
 
 void
 CDCTriggerMCMatcherModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  StoreArray<CDCTriggerTrack> prTracks(m_TrgTrackCollectionName);
-  StoreArray<MCParticle> mcParticles(m_MCParticleCollectionName);
-  StoreArray<MCParticle> mcTracks(m_MCTrackableCollectionName);
-
   // get all trackable particles
-  for (int imc = 0; imc < mcParticles.getEntries(); ++imc) {
-    MCParticle* mcParticle = mcParticles[imc];
+  for (int imc = 0; imc < m_mcParticles.getEntries(); ++imc) {
+    MCParticle* mcParticle = m_mcParticles[imc];
 
     // minimum requirement: charged and seen in CDC
     if (!mcParticle->hasSeenInDetector(Const::CDC) || mcParticle->getCharge() == 0)
@@ -147,7 +132,7 @@ CDCTriggerMCMatcherModule::event()
     if (nAxial < m_minAxial || nStereo < m_minStereo) continue;
 
     // copy particle to list of trackable particles
-    MCParticle* mcTrack = mcTracks.appendNew(mcTracks.getPtr(), *mcParticle);
+    MCParticle* mcTrack = m_mcTracks.appendNew(m_mcTracks.getPtr(), *mcParticle);
     mcParticle->addRelationTo(mcTrack);
     for (unsigned ihit = 0; ihit < relHits.size(); ++ihit) {
       mcTrack->addRelationTo(relHits[ihit]);
@@ -159,8 +144,8 @@ CDCTriggerMCMatcherModule::event()
 
   B2DEBUG(100, "########## start MC matching ############");
 
-  int nMCTracks = mcTracks.getEntries();
-  int nPRTracks = prTracks.getEntries();
+  int nMCTracks = m_mcTracks.getEntries();
+  int nPRTracks = m_prTracks.getEntries();
 
   B2DEBUG(100, "Number of pattern recognition tracks is " << nPRTracks);
   B2DEBUG(100, "Number of Monte-Carlo tracks is " << nMCTracks);
@@ -177,7 +162,7 @@ CDCTriggerMCMatcherModule::event()
   {
     std::map<HitId, TrackId>::iterator itMCInsertHit = mcTrackId_by_hitId.end();
     TrackId mcTrackId = -1;
-    for (const MCParticle& mcTrack : mcTracks) {
+    for (const MCParticle& mcTrack : m_mcTracks) {
       ++mcTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
         mcTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
@@ -196,7 +181,7 @@ CDCTriggerMCMatcherModule::event()
   {
     std::multimap<HitId, TrackId>::iterator itPRInsertHit = prTrackId_by_hitId.end();
     TrackId prTrackId = -1;
-    for (const CDCTriggerTrack& prTrack : prTracks) {
+    for (const CDCTriggerTrack& prTrack : m_prTracks) {
       ++prTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
         prTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
@@ -226,9 +211,9 @@ CDCTriggerMCMatcherModule::event()
 
   // examine every hit to which mcTrack and prTrack it belongs.
   // if the hit is not part of any mcTrack put the hit in the background column.
-  for (HitId hitId = 0; hitId < segmentHits.getEntries(); ++hitId) {
+  for (HitId hitId = 0; hitId < m_segmentHits.getEntries(); ++hitId) {
     // skip stereo hits
-    if (m_axialOnly && segmentHits[hitId]->getISuperLayer() % 2) continue;
+    if (m_axialOnly && m_segmentHits[hitId]->getISuperLayer() % 2) continue;
 
     // First search the unique mcTrackId for the hit.
     // If the hit is not assigned to any mcTrack the Id is set to the background column.
@@ -324,7 +309,7 @@ CDCTriggerMCMatcherModule::event()
 
   // ### Classify the pattern recognition tracks ###
   for (TrackId prTrackId = 0; prTrackId < nPRTracks; ++prTrackId) {
-    CDCTriggerTrack* prTrack = prTracks[prTrackId];
+    CDCTriggerTrack* prTrack = m_prTracks[prTrackId];
 
     const pair<TrackId, Purity>& purestMCTrackId = purestMCTrackId_by_prTrackId[prTrackId];
     const TrackId& mcTrackId = purestMCTrackId.first;
@@ -339,7 +324,7 @@ CDCTriggerMCMatcherModule::event()
     } else {
       // check whether the highest purity Monte-Carlo track has in turn
       // the highest efficiency pattern recognition track equal to this track.
-      MCParticle* mcTrack = mcTracks[mcTrackId];
+      MCParticle* mcTrack = m_mcTracks[mcTrackId];
 
       const pair<TrackId, Efficiency>& mostEfficientPRTrackId =
         mostEfficientPRTrackId_by_mcTrackId[mcTrackId];
@@ -377,7 +362,7 @@ CDCTriggerMCMatcherModule::event()
 
   // ### Classify the Monte-Carlo tracks ###
   for (TrackId mcTrackId = 0; mcTrackId < nMCTracks; ++mcTrackId) {
-    MCParticle* mcTrack = mcTracks[mcTrackId];
+    MCParticle* mcTrack = m_mcTracks[mcTrackId];
 
     const pair<TrackId, Efficiency>& mostEfficiencyPRTrackId =
       mostEfficientPRTrackId_by_mcTrackId[mcTrackId];
@@ -390,7 +375,7 @@ CDCTriggerMCMatcherModule::event()
     } else {
       // check whether the highest efficiency pattern recognition track has in turn
       // the highest purity Monte-Carlo track equal to this track.
-      CDCTriggerTrack* prTrack = prTracks[prTrackId];
+      CDCTriggerTrack* prTrack = m_prTracks[prTrackId];
 
       const pair<TrackId, Purity>& purestMCTrackId = purestMCTrackId_by_prTrackId[prTrackId];
       const TrackId& mcTrackIdCompare = purestMCTrackId.first;

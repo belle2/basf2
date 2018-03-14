@@ -1,0 +1,7 @@
+Import ('env')
+
+#env['CONTINUE'] = False
+
+env['LIBS'] = ['framework']
+
+Return ('env')

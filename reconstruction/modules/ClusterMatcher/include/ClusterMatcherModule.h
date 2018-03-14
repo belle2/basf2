@@ -14,7 +14,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Cluster.h>
 
 
 namespace Belle2 {
@@ -45,6 +47,12 @@ namespace Belle2 {
 
   private:
 
+    // required input
+    StoreArray<ECLCluster> m_eclClusters; /**< Required array of input ECLClusters */
+    StoreArray<KLMCluster> m_klmClusters; /**< Required array of input KLMClusters */
+
+    // output
+    StoreArray<Cluster> m_Clusters; /**< array of output Clusters */
 
   }; // end class
 } // end namespace Belle2

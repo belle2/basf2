@@ -155,7 +155,7 @@ namespace Belle2 {
        * @param general_options defining all shared options
        * @param specific_options defininf all method specific options
        */
-      TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& specific_options);
+      TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options);
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       /**
@@ -190,7 +190,7 @@ namespace Belle2 {
        * @param general_options defining all shared options
        * @param specific_options defining all method specific options
        */
-      TMVATeacherClassification(const GeneralOptions& general_options, const TMVAOptionsClassification& specific_options);
+      TMVATeacherClassification(const GeneralOptions& general_options, const TMVAOptionsClassification& _specific_options);
 
       /**
        * Train a mva method using the given dataset returning a Weightfile
@@ -213,7 +213,7 @@ namespace Belle2 {
        * @param general_options defining all shared options
        * @param specific_options defining all method specific options
        */
-      TMVATeacherRegression(const GeneralOptions& general_options, const TMVAOptionsRegression& specific_options);
+      TMVATeacherRegression(const GeneralOptions& general_options, const TMVAOptionsRegression& _specific_options);
 
       /**
        * Train a mva method using the given dataset returning a Weightfile

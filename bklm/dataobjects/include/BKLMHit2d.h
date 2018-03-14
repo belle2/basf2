@@ -39,6 +39,9 @@ namespace Belle2 {
     //! Copy constructor
     BKLMHit2d(const BKLMHit2d&);
 
+    //! Assignment operator
+    BKLMHit2d& operator=(const BKLMHit2d&);
+
     //! Destructor
     virtual ~BKLMHit2d() {}
 

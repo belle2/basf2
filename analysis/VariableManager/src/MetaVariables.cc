@@ -34,6 +34,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <limits>
 
 #include <cmath>
@@ -187,52 +188,175 @@ namespace Belle2 {
       }
     }
 
+    // Formula of other variables, going to require a space between all operators and operations.
+    // Later can add some check for : (colon) trailing + or - to distinguish between particle lists
+    // and operations, but for now cbf.
     Manager::FunctionPtr formula(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
-        char operation = ' ';
-        int pos = 0;
 
-        if (arguments[0].find('+') != std::string::npos) {
-          pos = arguments[0].find('+');
-          operation = '+';
-        } else if (arguments[0].find('-') != std::string::npos) {
-          pos = arguments[0].find('-');
-          operation = '-';
-        } else if (arguments[0].find('*') != std::string::npos) {
-          pos = arguments[0].find('*');
-          operation = '*';
-        } else if (arguments[0].find('/') != std::string::npos) {
-          pos = arguments[0].find('/');
-          operation = '/';
-        } else if (arguments[0].find('^') != std::string::npos) {
-          pos = arguments[0].find('^');
-          operation = '^';
-        }
+        // First use shunting algorithm to change to RPN
+        std::map<std::string, int> operators;
+        operators["^"] = 4;
+        operators["*"] = 3;
+        operators["/"] = 3;
+        operators["+"] = 2;
+        operators["-"] = 2;
 
-        if (operation != ' ') {
-          std::string lhs = std::string("formula(") + arguments[0].substr(0, pos) + std::string(")");
-          std::string rhs = std::string("formula(") + arguments[0].substr(pos + 1) + std::string(")");
+        std::vector<std::string> brackets;
+        brackets.push_back("[");
+        brackets.push_back("]");
 
-          const Variable::Manager::Var* var = Manager::Instance().getVariable(lhs);
-          const Variable::Manager::Var* var2 = Manager::Instance().getVariable(rhs);
+        std::string seperators("^*/+-[]");
+        std::string next_arg;
+        std::size_t prev_pos = 0;
+        std::size_t pos = 0;
 
-          auto func = [var, operation, var2](const Particle * particle) -> double {
-            switch (operation)
-            {
-              case '+': return var->function(particle) + var2->function(particle);
-              case '-': return var->function(particle) - var2->function(particle);
-              case '*': return var->function(particle) * var2->function(particle);
-              case '/': return var->function(particle) / var2->function(particle);
-              case '^': return std::pow(var->function(particle), var2->function(particle));
+        // Putting an initial parser here so later we can make this smarter and
+        // not have strict requirements on the input format
+        std::vector<std::string> input_queue;
+
+        while ((pos = arguments[0].find_first_of(seperators, prev_pos)) != std::string::npos) {
+          next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
+
+          // Ignore everything inside another function's arguments (mostly particle lists we want to avoid)
+          if (arguments[0].find_first_of("(", prev_pos) != std::string::npos && arguments[0].find_first_of("(", prev_pos) < pos) {
+            if (arguments[0].find_first_of(")", prev_pos) > pos) {
+              pos = arguments[0].find_first_of(")", prev_pos);
+              pos = arguments[0].find_first_of(seperators, pos + 1);
+              if (pos == std::string::npos) {
+                // Reached end of the input
+                next_arg = arguments[0].substr(prev_pos);
+                break;
+              } else {
+                next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
+              }
             }
-            return 0;
-          };
-          return func;
-        } else {
-          const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-          return var->function;
+          }
+          boost::trim(next_arg);
+          // Add argument and following operand unless it's just an empty space
+          if (next_arg.size() != 0) {
+            input_queue.push_back(next_arg);
+          }
+          input_queue.push_back(arguments[0].substr(pos, 1));
+          prev_pos = pos + 1;
         }
+        next_arg = arguments[0].substr(prev_pos);
+        boost::trim(next_arg);
+        if (next_arg.size() != 0) {
+          input_queue.push_back(next_arg);
+        }
+
+        std::string rpn_inqueue;
+        for (auto const& in : input_queue) {
+          rpn_inqueue += in;
+        }
+        //B2INFO("RPN formula input stack: " << rpn_inqueue);
+
+        std::vector<std::string> output_queue;
+        std::vector<std::string> operator_stack;
+
+        //B2INFO("Entering RPN converter.");
+        for (auto const& input : input_queue) {
+
+          std::map<std::string, int>::iterator op = operators.find(input);
+          std::vector<std::string>::iterator bra = std::find(std::begin(brackets), std::end(brackets), input);
+
+          // Check if it's a number first
+          if (op == operators.end() && bra == brackets.end()) {
+            output_queue.push_back(input);
+
+            // Check if it's an operation
+          } else if (op != operators.end()) {
+            // Check if operator on top of op stack has higher precedence than the one we found
+            // But needs to be left associative (i.e. not a ^)
+            // Also needs to handle last operator being a bracket
+            while (
+              operator_stack.size() > 0 &&
+              operators.find(operator_stack.back()) != operators.end() &&
+              operators.find(operator_stack.back())->second > operators.find(op->first)->second &&
+              operators.find(operator_stack.back())->second != 4) {
+              output_queue.push_back(operator_stack.back());
+              operator_stack.pop_back();
+            }
+            // Now can read next operator onto the operator stack
+            operator_stack.push_back(input);
+            // Open bracket case
+          } else if (bra != brackets.end() && input.compare(brackets[0]) == 0) {
+            operator_stack.push_back(input);
+            // Close bracket case
+          } else if (bra != std::end(brackets) && input.compare(brackets[1]) == 0) {
+            while (
+              operator_stack.size() > 0 &&
+              operator_stack.back().compare(brackets[0]) != 0) {
+              output_queue.push_back(operator_stack.back());
+              operator_stack.pop_back();
+            }
+            // Should only be left bracket on top now, if not unmatched parenthesis.
+            // Should add error check for this.
+            operator_stack.pop_back();
+          }
+
+          // Get the next argument
+          std::string cur_queue;
+          for (auto const& out : output_queue) {
+            cur_queue += out;
+          }
+          //B2INFO("Current RPN formula output queue: " << cur_queue);
+        }
+
+        // No more arguments to read, clean up:
+        while (operator_stack.size() > 0) {
+          output_queue.push_back(operator_stack.back());
+          operator_stack.pop_back();
+        }
+
+        // Display to screen (debugging purposes)
+        std::string rpn_queue;
+        for (auto const& out : output_queue) {
+          rpn_queue += out;
+        }
+        //B2INFO("RPN formula output stack: " << rpn_queue);
+
+
+        // Then can do normal RPN calculation
+        //B2INFO("Entering RPN calculator.");
+        // Need to use a stack of FunctionPtr for this I think
+        std::vector<Belle2::Variable::Manager::FunctionPtr> operand_stack;
+
+        for (auto const& output : output_queue) {
+
+          std::map<std::string, int>::iterator op = operators.find(output);
+
+          if (op != operators.end()) {
+            Manager::FunctionPtr rhs = operand_stack.back();
+            operand_stack.pop_back();
+            Variable::Manager::FunctionPtr lhs = operand_stack.back();
+            operand_stack.pop_back();
+
+            char operation = op->first.front();
+
+            auto func = [lhs, operation, rhs](const Particle * particle) -> double {
+              switch (operation)
+              {
+                case '+': return lhs(particle) + rhs(particle);
+                case '-': return lhs(particle) - rhs(particle);
+                case '*': return lhs(particle) * rhs(particle);
+                case '/': return lhs(particle) / rhs(particle);
+                case '^': return std::pow(lhs(particle), rhs(particle));
+              }
+              B2INFO("No operation match.");
+              return 0;
+            };
+            operand_stack.push_back(func);
+
+          } else {
+            operand_stack.push_back(Manager::Instance().getVariable(output)->function);
+          }
+
+        }
+
+        return operand_stack.back();
       } else {
         B2FATAL("Wrong number of arguments for meta function formula");
       }
@@ -252,7 +376,7 @@ namespace Belle2 {
           StoreArray<Track> tracks;
           for (const auto& track : tracks)
           {
-            const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
+            const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
             if (trackFit->getChargeSign() == 0) {
               // Ignore track
             } else {
@@ -323,6 +447,24 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function passesCut");
+      }
+    }
+
+    Manager::FunctionPtr passesEventCut(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle*) -> double {
+          if (cut->check(nullptr))
+            return 1;
+          else
+            return 0;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function passesEventCut");
       }
     }
 
@@ -677,6 +819,28 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr ifNANgiveX(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        double defaultOutput;
+        try {
+          defaultOutput = Belle2::convertString<double>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The arguments of daughterInvM meta function must be a number!");
+          return nullptr;
+        }
+        auto func = [var, defaultOutput](const Particle * particle) -> double {
+          double output = var->function(particle);
+          if (std::isnan(output)) return defaultOutput;
+          else return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function ifNANgiveX");
+      }
+    }
+
     Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -908,35 +1072,6 @@ endloop:
 
     }
 
-
-    Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 2) {
-        Const::PIDDetectorSet set = Const::TOP;
-        if (arguments[0] == "TOP") {
-          set = Const::TOP;
-        } else if (arguments[0] == "ARICH") {
-          set = Const::ARICH;
-        } else {
-          B2FATAL("Encountered unsupported sub-detector type " + arguments[0] + " in NBDeltaIfMissing only TOP and ARICH are supported."
-                  "Note that other sub-detectors providing PID information like ECL, dEdx do not have missing values!");
-        }
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, set](const Particle * particle) -> double {
-          const PIDLikelihood* pid = particle->getPIDLikelihood();
-          if (!pid)
-            return -999;
-          if (not pid->isAvailable(set))
-            return -999;
-          return var->function(particle);
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments for meta function NBDeltaIfMissing");
-      }
-    }
-
-
     Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -985,14 +1120,16 @@ endloop:
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
-                      "[Eventbased] ]Returns the number of clean Clusters in the event\n"
+                      "[Eventbased] Returns the number of clean Clusters in the event\n"
                       "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.");
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
-                      "[Eventbased] ]Returns the number of clean Tracks in the event\n"
+                      "[Eventbased] Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
-    REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
+    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
-                      "Useful Calculate formula, no parenthesis allowed yet.");
+                      "Parenthesis MUST be in the form of square brackets: [v1 * v2].\n"
+                      "Currently only supports one level of round parentheses () in variable names,"
+                      " i.e. passesCut(cut) as an input variable will fail if the cut also contains ( or ).");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");
@@ -1008,6 +1145,9 @@ endloop:
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
                       "Returns -999 if particle is a nullptr.");
+    REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
+                      "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)\n"
@@ -1057,11 +1197,11 @@ endloop:
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
-                      "[eventbased] Returns extra info stored under the given name in the event extra info.\n"
+                      "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
-                      "[eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
+                      "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
@@ -1080,15 +1220,12 @@ endloop:
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
+                      "Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
+                      "Useful for technical purposes while training MVAs.");
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("NBDeltaIfMissing(detector, variable)", NBDeltaIfMissing,
-                      "Returns value of variable if pid information of detector is available otherwise -999 (delta function of NeuroBayes).\n"
-                      "Possible values for detector are TOP and ARICH.\n"
-                      "Useful as a feature variable for the NeuroBayes classifier, which tags missing values with -999.\n"
-                      "E.g. NBDeltaIfMissing(TOP, eid_TOP) returns electron id of TOP if this information is available, otherwise -999.\n"
-                      "     NBDeltaIfMissing(ARICH, Kid_ARICH) returns kaon id of ARICH if this information is available, otherwise -999.");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"

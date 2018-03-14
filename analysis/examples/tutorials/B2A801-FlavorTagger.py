@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to include the flavor
 # tagging user interphase into your analysis.
 # The following decay chain:
@@ -44,8 +46,8 @@ inputMdstList('MC5', filelistSIG)
 # use standard final state particle lists
 #
 # creates "highPID" ParticleLists (and c.c.)
-fillParticleList('pi+:highPID', 'piid > 0.5 and d0 < 5 and abs(z0) < 10')
-fillParticleList('mu+:highPID', 'muid > 0.2 and d0 < 2 and abs(z0) < 4')
+fillParticleList('pi+:highPID', 'pionID > 0.5 and d0 < 5 and abs(z0) < 10')
+fillParticleList('mu+:highPID', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4')
 
 
 # reconstruct Ks -> pi+ pi- decay
@@ -75,25 +77,25 @@ buildRestOfEvent('B0:jspiks')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to specify the system build or revision you are using only if you train by yourself!!!
-# Otherwise the flavor tagger automatically looks for the release you set before.
-
-# Alternatively you can download them from my realease:
-# copy the folder in @login.cc.kek.jp:
-# scp -r /home/belle2/abudinen/public/FT-build-20xx-xx-xx/FlavorTagging
-# into your workingDirectory/.
+# You just have to use a special global tag of the conditions database. Check in
+# https://confluence.desy.de/display/BI/Physics+FlavorTagger
+# E.g. for release-00-09-01
+use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
 # The default working directory is '.'
 # If you have an own analysis package it is recomended to use
 # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
+# To save CPU time the weight files should be saved in the same server were you run.
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 flavorTagger(
     particleLists=['B0:jspiks'],
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data')
+    weightFiles='B2JpsiKs_muBGx1')
 #
+# BGx0 stays for MC generated without machine Background.
+# Please use B2JpsiKs_muBGx1 if you use MC generated with machine background.
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
 #
@@ -131,19 +133,19 @@ flavorTagger(
 # 'IntermediateKinLepton',
 # 'Kaon',
 # 'SlowPion',
-# 'FastPion',
+# 'FastHadron',
 # 'Lambda',
 # 'FSC',
 # 'MaximumPstar',
 # 'KaonPion']
 #
 # If you train by yourself you need to run this file 6 times alternating between "Sampler" and "Teacher" modes
-# in order to train track, event and combiner levels.
-# with 3 different samples of 500k events (one for each sampler).
+# in order to train event and combiner levels.
+# with 3 different samples of at least 500k events (one for each sampler).
 # Three different 500k events samples are needed in order to avoid biases between levels.
 # We mean 500k of correctly corrected and MC matched neutral Bs. (isSignal > 0)
 # You can also train track and event level for all categories (1st to 4th runs) and then train the combiner
-# for a specific combination (las two runs).
+# for a specific combination (last two runs).
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
 #
@@ -174,7 +176,7 @@ toolsDST += ['ROEMultiplicities', '^B0']
 # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
 # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
 # If you set qrCategories, the output of each category is saved.
-toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qrCategories]', '^B0']
+toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
 
 toolsDST += ['TagVertex', '^B0']
 toolsDST += ['DeltaT', '^B0']

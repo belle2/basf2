@@ -31,6 +31,7 @@
 
 namespace Belle2 {
 
+  /** Moment-calculation of the k_sfw improved Super-Fox-Wolfram moments */
   class KsfwMoments {
   public:
 
@@ -72,12 +73,12 @@ namespace Belle2 {
     ~KsfwMoments() {};
 
     /**
-     *
+     * Sets the flag that specifiies we are using the finalstate for signal
      */
     int usefinal(int uf) { if (uf == 0 || uf == 1) m_uf = uf; return m_uf; }
 
     /**
-     *
+     * Return the flag that specifiies we are using the finalstate for signal
      */
     int usefinal() const { return m_uf; }
 
@@ -102,7 +103,11 @@ namespace Belle2 {
     double Hso(int i, int j, int uf = -1) const { return m_Hso[uf < 0 ? m_uf : uf][i][j]; }
 
 
-    double var(int i)   // the same order as the original k_sfw.cc
+    /**
+     * Returns calculated KSFW Moments
+     * i is the index ordered as in Belle
+     */
+    double var(int i)
     {
       if (i < 0)  return 0;
       if (i < 1)  return et();
@@ -116,11 +121,11 @@ namespace Belle2 {
     }
 
   private:
-    int m_uf;              /**  */
-    double m_Hso[2][3][5]; /** KSFW moments */
-    double m_Hoo[2][5];    /** KSFW moments */
-    double m_et[2];        /** Transverse energy */
-    double m_mm2[2];       /** Missing mass squared */
+    int m_uf;              /**< Flag that specifiies we are using the final state for signal */
+    double m_Hso[2][3][5]; /**< KSFW moments */
+    double m_Hoo[2][5];    /**< KSFW moments */
+    double m_et[2];        /**< Transverse energy */
+    double m_mm2[2];       /**< Missing mass squared */
   };
 
 } // Belle2 namespace

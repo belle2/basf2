@@ -195,6 +195,9 @@ namespace Belle2 {
     //! check CRC event Error
     virtual int GetEventCRCError(int n);
 
+    //! Get Event CRC16 value
+    virtual int GetEventCRC16Value(int n, int finesse_num);
+
     //! get node-ID from data
     virtual unsigned int GetNodeID(int n) = 0;
 

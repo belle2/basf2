@@ -16,24 +16,47 @@ namespace Belle2 {
     class CDCWireHit;
 
     /// An aggregation of CDCWireHits.
-    class CDCWireHitCluster : public std::vector<Belle2::TrackFindingCDC::CDCWireHit*> {
+    class CDCWireHitCluster : public std::vector<CDCWireHit*> {
+
+      /// Type of the base class
+      using Super = std::vector<CDCWireHit*>;
 
     public:
+      /// Default constructor
+      CDCWireHitCluster() = default;
+
+      /// Default copy constructor
+      CDCWireHitCluster(const CDCWireHitCluster& wireHitCluster) = default;
+
+      /// Constructor from a bunch of wire hits
+      explicit CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
+        : Super(std::move(wireHits))
+      {
+      }
+
       /// Get the super cluster id of this cluster
       int getISuperCluster() const
-      { return m_iSuperCluster; }
+      {
+        return m_iSuperCluster;
+      }
 
       /// Set the super cluster id of this cluster
       void setISuperCluster(int iSuperCluster)
-      { m_iSuperCluster = iSuperCluster; }
+      {
+        m_iSuperCluster = iSuperCluster;
+      }
 
       /// Return if this was set as background
       bool getBackgroundFlag() const
-      { return m_backgroundFlag; }
+      {
+        return m_backgroundFlag;
+      }
 
       /// Set whether this cluster is consider as made of background
       void setBackgroundFlag(bool backgroundFlag = true)
-      { m_backgroundFlag = backgroundFlag; }
+      {
+        m_backgroundFlag = backgroundFlag;
+      }
 
     private:
       /// Memory for the super cluster id
@@ -41,8 +64,6 @@ namespace Belle2 {
 
       /// Memory for the flag marking this cluster as background
       bool m_backgroundFlag = false;
-
     };
-
   }
 }

@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef RelationIndexContainer_H
-#define RelationIndexContainer_H
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -51,9 +50,9 @@ namespace Belle2 {
     struct Element {
 
       /** Create a new element. */
-      Element(RelationElement::index_type indexFrom,  RelationElement::index_type indexTo,
-              const FROM* from, const TO* to,  RelationElement::weight_type weight):
-        indexFrom(indexFrom), indexTo(indexTo), from(from), to(to), weight(weight) {}
+      Element(RelationElement::index_type indexFrom_,  RelationElement::index_type indexTo_,
+              const FROM* from_, const TO* to_,  RelationElement::weight_type weight_):
+        indexFrom(indexFrom_), indexTo(indexTo_), from(from_), to(to_), weight(weight_) {}
 
       /** index of the element from which the relation points. */
       RelationElement::index_type indexFrom;
@@ -205,5 +204,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif

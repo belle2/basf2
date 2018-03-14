@@ -1,447 +1,357 @@
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGRLProjectsModule.cc
-// Section  : TRG GRL
-// Owner    : Chunhua Li
-// Email    : chunhua.li@unimelb.edu.au
-//-----------------------------------------------------------------------------
-// Description : A trigger module for GRL
-//-----------------------------------------------------------------------------
-// 0.00 : 2017/03/01 : First version
-//-----------------------------------------------------------------------------
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: czhearty                                                 *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-
-#include <stdlib.h>
-#include <iostream>
-
-#include <trg/trg/Debug.h>
 #include <trg/grl/modules/trggrl/TRGGRLProjectsModule.h>
-#include <trg/grl/dataobjects/TRGGRLMATCH.h>
-#include <trg/grl/dataobjects/TRGGRLInfo.h>
-#include <framework/gearbox/Unit.h>
-//#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
-#include <trg/grl/dataobjects/TRGGRLMATCH.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/ecl/dataobjects/TRGECLTrg.h>
-#include <trg/klm/dataobjects/KLMTriggerHit.h>
-#include <trg/klm/dataobjects/KLMTriggerTrack.h>
-
-#include <framework/datastore/DataStore.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/ecl/TrgEclMapping.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/logging/Logger.h>
 
+#include <TLorentzVector.h>
+#include <TMath.h>
+#include <TRandom3.h>
 
-
+#include <iostream>
+#include <bitset>
+#include <fstream>
 
 
 using namespace std;
+using namespace Belle2;
+using namespace ECL;
 
-namespace Belle2 {
 
-  /** Register module for TRGGRL */
-  REG_MODULE(TRGGRLProjects);
+//..ECL look up tables
+std::vector<int> TCThetaID;
+std::vector<float> TCPhiLab;
+std::vector<float> TCcotThetaLab;
+std::vector<float> TCPhiCOM;
+std::vector<float> TCThetaCOM;
+std::vector<float> TC1GeV;
 
-  string
-  TRGGRLProjectsModule::version() const
-  {
-    return string("TRGGRLProjectsModule 0.00");
+
+//..Other
+double radtodeg;
+//int iEvent(0);
+//int nInAcc=0;
+
+//..Trigger counters
+const int ntrig = 18;
+//int trigbit[ntrig];
+//int prescale[ntrig];
+//int RawCount[ntrig];
+//bool passBeforePrescale[ntrig];
+//int pass2[ntrig][ntrig]={};
+//int pass2Acc[ntrig][ntrig]={};
+//std::vector<string> trigName;
+
+//int nUseful;
+//std::vector<int> itUseful;
+
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(TRGGRLProjects)
+
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
+{
+  // Set module properties
+
+  // string desc = "TRGGRLProjectsModule(" + version() + ")";
+  setDescription("TRGGRLProjectsModule");
+  setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("DebugLevel", _debugLevel, "TRGGRL debug level", _debugLevel);
+  addParam("ConfigFile",
+           m_configFilename,
+           "The filename of CDC trigger config file",
+           m_configFilename);
+  addParam("SimulationMode",
+           m_simulationMode,
+           "TRGGRL simulation switch",
+           1);
+  addParam("FastSimulationMode",
+           m_fastSimulationMode,
+           "TRGGRL fast simulation mode",
+           m_fastSimulationMode);
+  addParam("FirmwareSimulationMode",
+           m_firmwareSimulationMode,
+           "TRGGRL firmware simulation mode",
+           m_firmwareSimulationMode);
+  addParam("2DfinderCollection", m_2DfinderCollectionName,
+           "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
+           string("TRGCDC2DFinderTracks"));
+  addParam("2DfitterCollection", m_2DfitterCollectionName,
+           "Name of the StoreArray holding the tracks made by the 2D fitter to be used as input.",
+           string("TRGCDC2DFitterTracks"));
+  addParam("3DfitterCollection", m_3DfitterCollectionName,
+           "Name of the StoreArray holding the tracks made by the 3D fitter to be used as input.",
+           string("TRGCDC3DFitterTracks"));
+  addParam("NNCollection", m_NNCollectionName,
+           "Name of the StoreArray holding the tracks made by the neural network (NN).",
+           string("TRGCDCNeuroTracks"));
+  addParam("2DmatchCollection", m_2DmatchCollectionName,
+           "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
+           string("TRG2DMatchTracks"));
+  addParam("3DmatchCollection", m_3DmatchCollectionName,
+           "Name of the StoreArray holding the matched 3D NN tracks and clusters made",
+           string("TRG3DMatchTracks"));
+  addParam("TrgGrlInformation", m_TrgGrlInformationName,
+           "Name of the StoreArray holding the information of tracks and clusters from cdc ecl klm.",
+           string("TRGGRLObjects"));
+  addParam("TRGECLClusters", m_TrgECLClusterName,
+           "Name of the StoreArray holding the information of trigger ecl clusters ",
+           string("TRGECLClusters"));
+  addParam("TRGECLTrgs", m_TrgECLTrgsName,
+           "Name of the StoreArray holding the information of ecl trigger",
+           string("TRGECLTrgs"));
+  addParam("TrgKLMTracks", m_KLMTrackName,
+           "Name of the StoreArray holding the information of klm track ",
+           string("TRGKLMTracks"));
+  addParam("TrgKLMHits", m_KLMHitName,
+           "Name of the StoreArray holding the information of klm hit",
+           string("TRGKLMHits"));
+  addParam("ECLClusterTimeWindow", m_eclClusterTimeWindow,
+           "The time window of the signal eclclusters",
+           100.0);
+  addParam("ClusEngThreshold", m_energythreshold, "The energy threshold of clusters", {0.1, 0.3, 1.0, 2.0});
+}
+
+//-----------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
+void TRGGRLProjectsModule::initialize()
+{
+  radtodeg = 180. / TMath::Pi();
+  //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
+  TrgEclMapping* trgecl_obj = new TrgEclMapping();
+  for (int tc = 1; tc <= 576; tc++) {
+    TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
   }
 
-  TRGGRLProjectsModule::TRGGRLProjectsModule(): Module()
-  {
+  //-----------------------------------------------------------------------------------------
+  //..ECL look up tables
+  PCmsLabTransform boostrotate;
+  for (int tc = 1; tc <= 576; tc++) {
 
-    string desc = "TRGGRLProjectsModule(" + version() + ")";
-    setDescription(desc);
-    setPropertyFlags(c_ParallelProcessingCertified);
+    //..Four vector of a 1 GeV lab photon at this TC
+    TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
+    TLorentzVector CellLab(1., 1., 1., 1.);
+    CellLab.SetTheta(CellPosition.Theta());
+    CellLab.SetPhi(CellPosition.Phi());
+    CellLab.SetRho(1.);
+    CellLab.SetE(1.);
 
-    addParam("DebugLevel", _debugLevel, "TRGGRL debug level", _debugLevel);
-    addParam("ConfigFile",
-             m_configFilename,
-             "The filename of CDC trigger config file",
-             m_configFilename);
-    addParam("SimulationMode",
-             m_simulationMode,
-             "TRGGRL simulation switch",
-             1);
-    addParam("FastSimulationMode",
-             m_fastSimulationMode,
-             "TRGGRL fast simulation mode",
-             m_fastSimulationMode);
-    addParam("FirmwareSimulationMode",
-             m_firmwareSimulationMode,
-             "TRGGRL firmware simulation mode",
-             m_firmwareSimulationMode);
-    addParam("2DfinderCollection", m_2DfinderCollectionName,
-             "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
-             string("TRGCDC2DFinderTracks"));
-    addParam("2DfitterCollection", m_2DfitterCollectionName,
-             "Name of the StoreArray holding the tracks made by the 2D fitter to be used as input.",
-             string("TRGCDC2DFitterTracks"));
-    addParam("3DfitterCollection", m_3DfitterCollectionName,
-             "Name of the StoreArray holding the tracks made by the 3D fitter to be used as input.",
-             string("TRGCDC3DFitterTracks"));
-    addParam("NNCollection", m_NNCollectionName,
-             "Name of the StoreArray holding the tracks made by the neural network (NN).",
-             string("TRGCDCNeuroTracks"));
-    addParam("2DmatchCollection", m_2DmatchCollectionName,
-             "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
-             string("TRG2DMatchTracks"));
-    addParam("3DmatchCollection", m_3DmatchCollectionName,
-             "Name of the StoreArray holding the matched 3D NN tracks and clusters made",
-             string("TRG3DMatchTracks"));
-    addParam("TrgGrlInformation", m_TrgGrlInformationName,
-             "Name of the StoreArray holding the information of tracks and clusters from cdc ecl klm.",
-             string("TRGGRLObjects"));
-    addParam("TRGECLClusters", m_TrgECLClusterName,
-             "Name of the StoreArray holding the information of trigger ecl clusters ",
-             string("TRGECLClusters"));
-    addParam("TRGECLTrgs", m_TrgECLTrgsName,
-             "Name of the StoreArray holding the information of ecl trigger",
-             string("TRGECLTrgs"));
-    addParam("TrgKLMTracks", m_KLMTrackName,
-             "Name of the StoreArray holding the information of klm track ",
-             string("TRGKLMTracks"));
-    addParam("TrgKLMHits", m_KLMHitName,
-             "Name of the StoreArray holding the information of klm hit",
-             string("TRGKLMHits"));
-    addParam("ECLClusterTimeWindow", m_eclClusterTimeWindow,
-             "The time window of the signal eclclusters",
-             100.0);
-    addParam("ClusEngThreshold", m_energythreshold, "The energy threshold of clusters", {0.1, 0.3, 1.0, 2.0});
-    addParam("Belle2Phase", m_belle2phase,
-             "This parameter choose the L1 trigger menu corresponding to the Belle2 Phase, options: Phase2, Phase3", string("Phase2"));
+    //..cotan Theta and phi in lab
+    TCPhiLab.push_back(CellPosition.Phi()*radtodeg);
+    double tantheta = tan(CellPosition.Theta());
+    TCcotThetaLab.push_back(1. / tantheta);
 
-    if (TRGDebug::level())
-      cout << "TRGGRLProjectsModule ... created" << endl;
+    //..Corresponding 4 vector in the COM frame
+    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
+    TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
+
+    //..Scale to give 1 GeV in the COM frame
+    TC1GeV.push_back(1. / CellCOM.E());
   }
 
-  TRGGRLProjectsModule::~TRGGRLProjectsModule()
-  {
-  }
+  m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
-  void
-  TRGGRLProjectsModule::initialize()
-  {
+}
 
-//  TRGDebug::level(_debugLevel);
+void
+TRGGRLProjectsModule::beginRun()
+{
+  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
+  //...GDL config. name...
+}
+//-----------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
+void TRGGRLProjectsModule::event()
+{
+  //if(iEvent%1000==0) {cout << "TRGGRLProjects event " << iEvent << endl;}
+  //iEvent++;
 
-    if (TRGDebug::level()) {
-      cout << "TRGGRLProjectsModule::initialize ... options" << endl;
-      cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-           << endl;
-    }
-
-    StoreArray<CDCTriggerTrack>::required(m_2DfinderCollectionName);
-    StoreArray<CDCTriggerTrack>::required(m_2DfitterCollectionName);
-    StoreArray<CDCTriggerTrack>::required(m_3DfitterCollectionName);
-    StoreArray<CDCTriggerTrack>::required(m_NNCollectionName);
-    StoreArray<TRGGRLMATCH>::required(m_2DmatchCollectionName);
-    StoreArray<TRGGRLMATCH>::required(m_3DmatchCollectionName);
-    StoreArray<TRGECLCluster>::required(m_TrgECLClusterName);
-    StoreArray<TRGECLTrg>::required(m_TrgECLTrgsName);
-
-    StoreArray<KLMTriggerHit>::required(m_KLMHitName);
-    StoreArray<KLMTriggerTrack>::required(m_KLMTrackName);
-
-    StoreObjPtr<TRGGRLInfo>::registerPersistent(m_TrgGrlInformationName);
-
-    m_RtD = 180. / 3.1415926;
-
-
-  }
-
-  void
-  TRGGRLProjectsModule::beginRun()
-  {
-
-    //...GDL config. name...
-    string cfn = m_configFilename;
-
-    if (m_belle2phase == "Phase3") {
-      B2INFO("L1 Trigger Menu at Phase 3 is applied");
-    } else if (m_belle2phase == "Phase2") {
-      B2INFO("L1 Trigger Menu at Phase 2 is applied");
-    } else {
-      B2ERROR("The setting phase is not Phase2 or Phase3, L1 Trigger Menu at Phase 3 is applied forcedly");
-    }
-
-    if (TRGDebug::level()) {
-      cout << "TRGGDLModule ... beginRun called " << endl;
-      cout << "                 configFile = " << cfn << endl;
+  //---------------------------------------------------------------------
+  //..Read in the necessary arrays
+  StoreArray<TRGECLTrg> trgArray;
+  //StoreArray<MCParticle> MCParticleArray;
+  StoreArray<CDCTriggerTrack> cdc3DTrkArray("TRGCDC3DFitterTracks");
+  StoreArray<TRGECLCluster> eclTrgClusterArray("TRGECLClusters");
+  StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
+  trgInfo.create();
+  //---------------------------------------------------------------------
+  //..Use only clusters within 100 ns of event timing (from ECL).
+  int ntrgArray = trgArray.getEntries();
+  double EventTiming = -9999.;
+  if (ntrgArray > 0) {EventTiming = trgArray[0]->getEventTiming();}
+  std::vector<int> selTC;
+  std::vector<int> selTheta;
+  std::vector<float> selE;
+  for (int ic = 0; ic < eclTrgClusterArray.getEntries(); ic++) {
+    double tcT = abs(eclTrgClusterArray[ic]->getTimeAve() - EventTiming);
+    if (tcT < 100.) {
+      int TC = eclTrgClusterArray[ic]->getMaxTCId();
+      selTC.push_back(TC);
+      selTheta.push_back(TCThetaID[TC - 1]);
+      selE.push_back(eclTrgClusterArray[ic]->getEnergyDep());
     }
   }
 
-  void
-  TRGGRLProjectsModule::event()
-  {
-    TRGDebug::enterStage("TRGGRLProjectsModule event");
-    StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
-    StoreArray<CDCTriggerTrack> tracks2Dfitter(m_2DfitterCollectionName);
-    StoreArray<CDCTriggerTrack> tracks3Dfitter(m_3DfitterCollectionName);
-    StoreArray<CDCTriggerTrack> tracksNN(m_NNCollectionName);
-    StoreArray<TRGGRLMATCH>     tracks2Dmatch(m_2DmatchCollectionName);
-    StoreArray<TRGGRLMATCH>     tracks3Dmatch(m_3DmatchCollectionName);
-    StoreArray<TRGECLCluster> eclclusters(m_TrgECLClusterName);
-    StoreArray<TRGECLTrg> ecltrgs;
-    StoreArray<KLMTriggerTrack> klmtrk;
-    StoreArray<KLMTriggerHit> klmhit;
-    int ntrk_2dfinder = tracks2Dfinder.getEntries();
-    int ntrk_2dfitter = tracks2Dfitter.getEntries();
-    int ntrk_3dfitter = tracks3Dfitter.getEntries();
-    int ntrk_NN = tracksNN.getEntries();
-    int ntrk_mat2d = tracks2Dmatch.getEntries();
-    int ntrk_mat3d = tracks3Dmatch.getEntries();
-    int n_klmtrk = klmtrk.getEntries();
-    int n_klmhit = klmhit.getEntries();
-    //number of ecl clusters without time requirement
-    // int ncluster_ori = eclclusters.getEntries();
-    StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-    trgInfo.create();
-    trgInfo->setN2Dfindertrk(ntrk_2dfinder);
-    trgInfo->setN2Dfittertrk(ntrk_2dfitter);
-    trgInfo->setN3Dfittertrk(ntrk_3dfitter);
-    trgInfo->setNNNtrk(ntrk_NN);
-    trgInfo->setN2Dmatchtrk(ntrk_mat2d);
-    trgInfo->setN3Dmatchtrk(ntrk_mat3d);
-    trgInfo->setNklmtrk(n_klmtrk);
-    trgInfo->setNklmhit(n_klmhit);
-    //trgInfo->setNcluster(ncluster);
+  //---------------------------------------------------------------------
+  //..Trigger objects from CDC alone
+  //  nTrk3D  nTrkZ10  nTrkZ25
+  int nTrk3D = cdc3DTrkArray.getEntries();
+  int nTrkZ10 = 0;
+  int nTrkZ25 = 0;
+  for (int itrk = 0; itrk < nTrk3D; itrk++) {
+    double z0 = cdc3DTrkArray[itrk]->getZ0();
+    if (abs(z0) < 10.) {nTrkZ10++;}
+    if (abs(z0) < 25.) {nTrkZ25++;}
+  }
 
-    TRGDebug::leaveStage("TRGGRLProjectsModule event");
+  trgInfo->setN3Dfittertrk(nTrk3D);
+  trgInfo->setN3DfittertrkZ10(nTrkZ10);
+  trgInfo->setN3DfittertrkZ25(nTrkZ25);
 
-
-
-    //get the clusters list in Time Window to reduce beam induced background
-    std::vector<TRGECLCluster*> clustersinwindow;
-    ///get event time for ECL firstly
-    double eventtime = -999999.;
-    double energytot = -9999.;
-    for (int i = 0; i < ecltrgs.getEntries(); i++) {
-      double evt_time = ecltrgs[i]->m_eventtiming;
-      double evt_energy = ecltrgs[i]->m_etot;
-      if (energytot < evt_energy) {
-        energytot = evt_energy;
-        eventtime = evt_time;
-      }
+  //---------------------------------------------------------------------
+  //..Trigger objects using single ECL clusters
+  // nClust n300MeV n2GeV n2GeV414 n2GeV231516 n2GeV117 n1GeV415 n1GeV2316 n1GeV117
+  int nClust = selTC.size();
+  int n300MeV = 0;
+  int n2GeV = 0;
+  int n2GeV414 = 0;
+  int n2GeV231516 = 0;
+  int n2GeV117 = 0;
+  int n1GeV415 = 0;
+  int n1GeV2316 = 0;
+  int n1GeV117 = 0;
+  for (int ic = 0; ic < nClust; ic++) {
+    if (selE[ic] > 0.3) {n300MeV++;}
+    float thresh = TC1GeV[selTC[ic] - 1];
+    if (selE[ic] > (thresh + thresh)) {
+      n2GeV++;
+      if (selTheta[ic] >= 4 && selTheta[ic] <= 14) {n2GeV414++;}
+      if (selTheta[ic] == 2 || selTheta[ic] == 3 || selTheta[ic] == 15 || selTheta[ic] == 16) {n2GeV231516++;}
+      if (selTheta[ic] == 1 || selTheta[ic] == 17) {n2GeV117++;}
     }
-
-    for (int i = 0; i < eclclusters.getEntries(); i++) {
-      double ctime = eclclusters[i]->getTimeAve() - eventtime;
-      if (fabs(ctime) < m_eclClusterTimeWindow) clustersinwindow.push_back(eclclusters[i]);
+    if (selE[ic] > thresh) {
+      if (selTheta[ic] >= 4 && selTheta[ic] <= 15) {n1GeV415++;}
+      if (selTheta[ic] == 2 || selTheta[ic] == 3 || selTheta[ic] == 16) {n1GeV2316++;}
+      if (selTheta[ic] == 1 || selTheta[ic] == 17) {n1GeV117++;}
     }
-    //get the number of clusers with specific threshold in the time window
-    int nclus[5] = {0, 0, 0, 0, 0};
-    //region requirement for single photon trigger
-    //phase3, exclude the TC close to beam pipe.
-    double SinglePhotonRegion_phase3[2] = {30.0, 140.0};
-    //phase2, trigger eclclusters in all region
-    double SinglePhotonRegion_phase2[2] = {0.0, 180.0};
-    double SinglePhotonRegion[2];
-    for (int i = 0; i < 2; i++) {
-      if (m_belle2phase == "Phase3") {
-        SinglePhotonRegion[i] = SinglePhotonRegion_phase3[i];
-      } else if (m_belle2phase == "Phase2") {
-        SinglePhotonRegion[i] = SinglePhotonRegion_phase2[i];
-      } else {
-        SinglePhotonRegion[i] = SinglePhotonRegion_phase3[i];
-      }
-    }
+  }
+  trgInfo->setNcluster(nClust);
+  trgInfo->setNhigh300cluster(n300MeV);
+  trgInfo->setNhigh1GeVcluster415(n1GeV415);
+  trgInfo->setNhigh1GeVcluster2316(n1GeV2316);
+  trgInfo->setNhigh1GeVcluster117(n1GeV117);
+  trgInfo->setNhigh2GeVcluster(n2GeV);
+  trgInfo->setNhigh2GeVcluster414(n2GeV414);
+  trgInfo->setNhigh2GeVcluster231516(n2GeV231516);
+  trgInfo->setNhigh2GeVcluster117(n2GeV117);
 
-    if (!clustersinwindow.empty()) {
-      for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
-        double energy_clu = clustersinwindow[i]->getEnergyDep();
-        //if (energy_clu > m_energythreshold[0]) nclus[0]++;
-        if (!clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName)) nclus[0]++;
-        if (energy_clu > m_energythreshold[1]) nclus[1]++;
-        double  x1 = clustersinwindow[i]->getPositionX();
-        double  y1 = clustersinwindow[i]->getPositionY();
-        double  z1 = clustersinwindow[i]->getPositionZ();
-        TVector3 vec1(x1, y1, z1);
-        double  theta1 = vec1.Theta() * m_RtD;
-        if (energy_clu > m_energythreshold[2] && theta1 > SinglePhotonRegion[0] && theta1 < SinglePhotonRegion[1])nclus[2]++;
-        if (energy_clu > m_energythreshold[3]) nclus[3]++;
-        if (energy_clu > m_energythreshold[3] && (theta1 < 20. || theta1 > 140.)) nclus[4]++;
+  //---------------------------------------------------------------------
+  //..Trigger objects using back-to-back ECL clusters, plus Bhabha vetoes
+  //  nPhiPairHigh nPhiPairLow n3DPair nECLBhabha nTrkBhabha
+  int nPhiPairHigh = 0;
+  int nPhiPairLow = 0;
+  int n3DPair = 0;
+  int nECLBhabha = 0;
+  int nTrkBhabha = 0;
+  for (int i0 = 0; i0 < nClust - 1; i0++) {
+    for (int i1 = i0 + 1; i1 < nClust; i1++) {
 
-      }
-    }
-    trgInfo->setNhighcluster1(nclus[1]);
-    trgInfo->setNhighcluster2(nclus[2]);
-    trgInfo->setNhighcluster3(nclus[3]);
-    trgInfo->setNhighcluster4(nclus[4]);
-    trgInfo->setNneucluster(nclus[0]);
-    trgInfo->setNcluster(clustersinwindow.size());
+      //..back to back in phi
+      float dphi = abs(TCPhiCOM[selTC[i1] - 1] - TCPhiCOM[selTC[i0] - 1]);
+      if (dphi > 180.) {dphi = 360 - dphi;}
+      if (dphi > 170. && selE[i0] > 0.25 && selE[i1] > 0.25) {nPhiPairHigh++;}
+      if (dphi > 170. && (selE[i0] < 0.25 || selE[i1] < 0.25)) {nPhiPairLow++;}
 
-    //set the cut thresholds of bhabha veto for phase2 and phase3
-    //Bhabha [delta_phi, delta_theta_down, delta_theta_up, e1, e2, e1+e2]
-    //Phase3
-    double Bhabha_phase3[6] = {20.0, 10.0, 50.0, 3.0, 2.0, 6.0};
-    double eclBhabha_phase3[6] = {50.0, 0.0, 50.0, 3.0, 2.0, 6.0};
-    //Phase2, more strict criteria is used.
-    double Bhabha_phase2[6] = {20.0, 10.0, 50.0, 4.0, 3.0, 8.0};
-    double eclBhabha_phase2[6] = {30.0, 0.0, 40.0, 4.0, 3.0, 8.0};
+      //..3D
+      float thetaSum = TCThetaCOM[selTC[i0] - 1] + TCThetaCOM[selTC[i1] - 1];
+      if (dphi > 160. && thetaSum > 160. && thetaSum < 200.) {n3DPair++;}
 
-    double Bhabha_cut[6], eclBhabha_cut[6];
-    for (int i = 0; i < 6; i++) {
-      if (m_belle2phase == "Phase2") {
-        Bhabha_cut[i] = Bhabha_phase2[i];
-        eclBhabha_cut[i] = eclBhabha_phase2[i];
-      } else if (m_belle2phase == "Phase3") {
-        Bhabha_cut[i] = Bhabha_phase3[i];
-        eclBhabha_cut[i] = eclBhabha_phase3[i];
-      } else {
-        Bhabha_cut[i] = Bhabha_phase3[i];
-        eclBhabha_cut[i] = eclBhabha_phase3[i];
-      }
-    }
+      //..ecl Bhabha
+      if (dphi > 160. && thetaSum > 165. && thetaSum < 190. && selE[i0] > 3.*TC1GeV[selTC[i0] - 1] && selE[i1] > 3.*TC1GeV[selTC[i1] - 1]
+          && (selE[i0] > 4.5 * TC1GeV[selTC[i0] - 1] ||  selE[i1] > 4.5 * TC1GeV[selTC[i1] - 1])) {
+        nECLBhabha++;
 
-    //Bhabha----------------begin
-    int bhabha_bit = 0;
-    if (ntrk_mat3d == 2 && ntrk_2dfinder == 2) {
-      for (int i = 0; i < ntrk_mat3d - 1; i++) {
-        const TRGECLCluster* eclcluster1 = tracks3Dmatch[i]->getRelatedTo<TRGECLCluster>();
-        const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
-        if (eclcluster1 == nullptr || cdctrk1 == nullptr) continue;
-        double e1 = eclcluster1->getEnergyDep();
-        double phi1 = cdctrk1->getPhi0() * m_RtD;
-        if (phi1 < 0) phi1 += 360.;
-        double tanLam1 = cdctrk1->getTanLambda();
-        double theta1 = acos(tanLam1 / sqrt(1. + tanLam1 * tanLam1)) * m_RtD;
-
-        for (int j = i + 1; j < ntrk_mat3d; j++) {
-          const TRGECLCluster* eclcluster2 = tracks3Dmatch[j]->getRelatedTo<TRGECLCluster>();
-          const CDCTriggerTrack* cdctrk2 = tracks3Dmatch[j]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
-          if (eclcluster2 == nullptr || cdctrk2 == nullptr) continue;
-          double e2 = eclcluster2->getEnergyDep();
-          double phi2 = cdctrk2->getPhi0() * m_RtD;
-          if (phi2 < 0) phi2 += 360.;
-          double tanLam2 = cdctrk2->getTanLambda();
-          double theta2 = acos(tanLam2 / sqrt(1. + tanLam2 * tanLam2)) * m_RtD;
-          double deltphi = fabs(fabs(phi1 - phi2) - 180.);
-          double delttheta = fabs(theta1 + theta2 - 180.);
-          bool ang = (deltphi < Bhabha_cut[0] && delttheta > Bhabha_cut[1] && delttheta < Bhabha_cut[2]);
-          bool eng = ((e1 > Bhabha_cut[3] && e2 > Bhabha_cut[4]) || (e1 > Bhabha_cut[4] && e2 > Bhabha_cut[3])) && (e1 + e2 > Bhabha_cut[5]);
-          if (ang && eng)bhabha_bit = 1;
+        //..Bhabha also using the CDC
+        bool c0matched = false;
+        bool c1matched = false;
+        for (int itrk = 0; itrk < nTrk3D; itrk++) {
+          double phiTrk = cdc3DTrkArray[itrk]->getPhi0() * radtodeg;
+          double ptTrk = cdc3DTrkArray[itrk]->getTransverseMomentum(1.5);
+          float dphi0 = abs(phiTrk - TCPhiLab[selTC[i0] - 1]);
+          if (dphi0 > 180.) {dphi0 = 360. - dphi0;}
+          float dphi1 = abs(phiTrk - TCPhiLab[selTC[i1] - 1]);
+          if (dphi1 > 180.) {dphi1 = 360. - dphi1;}
+          if (ptTrk > 1. && dphi0 < 15.) {c0matched = true;}
+          if (ptTrk > 1. && dphi1 < 15.) {c1matched = true;}
         }
+        if (c0matched && c1matched) {nTrkBhabha++;}
       }
     }
-    trgInfo->setBhabhaVeto(bhabha_bit);
-//Bhabha--------------end
-
-//eclBhabhaVeto--------begin
-//count the back-to-back cluster pair here as well
-    int eclbhabha_bit = 0;
-    int nbb_cluster = 0;
-
-    if (clustersinwindow.size() >= 2) {
-      for (unsigned i = 0; i < clustersinwindow.size() - 1; i++) {
-        TRGECLCluster* cluster1 = clustersinwindow[i];
-        double e1 = cluster1->getEnergyDep();
-        double  x1 = cluster1->getPositionX();
-        double  y1 = cluster1->getPositionY();
-        double  z1 = cluster1->getPositionZ();
-        TVector3 vec1(x1, y1, z1);
-        double  theta1 = vec1.Theta() * m_RtD;
-        double  phi1 = vec1.Phi() * m_RtD;
-        if (phi1 < 0) phi1 += 360.;
-
-        for (unsigned j = i + 1; j < clustersinwindow.size(); j++) {
-          TRGECLCluster* cluster2 = clustersinwindow[j];
-          double e2 = cluster2->getEnergyDep();
-          double  x2 = cluster2->getPositionX();
-          double  y2 = cluster2->getPositionY();
-          double  z2 = cluster2->getPositionZ();
-          TVector3 vec2(x2, y2, z2);
-          double  theta2 = vec2.Theta() * m_RtD;
-          double  phi2 = vec2.Phi() * m_RtD;
-          if (phi2 < 0) phi2 += 360.;
-
-          double etot = e1 + e2;
-          double deltphi = fabs(fabs(phi1 - phi2) - 180);
-          double delttheta = fabs(theta1 + theta2 - 180);
-          bool ang = (delttheta < eclBhabha_cut[2] && deltphi < eclBhabha_cut[0]);
-          bool eng = (etot > eclBhabha_cut[5] && (e1 > eclBhabha_cut[3] || e2 > eclBhabha_cut[3]) && (e1 > eclBhabha_cut[4]
-                      && e2 > eclBhabha_cut[4]));
-          if (ang && eng) eclbhabha_bit = 1;
-
-          if (deltphi < 100. && delttheta < 100.) nbb_cluster++;
-        }
-      }
-    }
-    trgInfo->seteclBhabhaVeto(eclbhabha_bit);
-    trgInfo->setNbbCluster(nbb_cluster);
-//eclBhabhaVeto---------end
-
-//single track bahbhaveto-------begin
-    int sbhabha_bit = 0;
-    for (int i = 0; i < ntrk_mat3d; i++) {
-      const TRGECLCluster* eclcluster1 = tracks3Dmatch[i]->getRelatedTo<TRGECLCluster>();
-      const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
-      if (eclcluster1 == nullptr || cdctrk1 == nullptr) continue;
-      double e1 = eclcluster1->getEnergyDep();
-      if (ntrk_2dfinder == 1 && e1 > 1.0 && eclbhabha_bit == 1)sbhabha_bit = 1;
-    }
-    trgInfo->setsBhabhaVeto(sbhabha_bit);
-//single track bahbhaveto-------end
-
-
-//the back to back track and ecl cluster pair -----begin
-    int npair_tc = 0;
-    for (int i = 0; i < tracksNN.getEntries(); i++) {
-      double phi = tracksNN[i]->getPhi0() * m_RtD;
-      if (phi < 0) phi += 360.;
-      double tanLam = tracksNN[i]->getTanLambda();
-      double theta = acos(tanLam / sqrt(1. + tanLam * tanLam)) * m_RtD;
-      if (!clustersinwindow.empty()) {
-        for (unsigned j = 0; j < clustersinwindow.size(); j++) {
-          TRGECLCluster* cluster = clustersinwindow[j];
-          double  x = cluster->getPositionX();
-          double  y = cluster->getPositionY();
-          double  z = cluster->getPositionZ();
-          TVector3 vec(x, y, z);
-          double  theta2 = vec.Theta() * m_RtD;
-          double  phi2 = vec.Phi() * m_RtD;
-          if (phi2 < 0) phi2 += 360.;
-          double deltphi = fabs(fabs(phi - phi2) - 180);
-          double delttheta = fabs(fabs(theta + theta2) - 180);
-          if (deltphi < 60. && delttheta < 60.) npair_tc++;
-        }
-      }
-    }
-    trgInfo->setNbbTrkCluster(npair_tc);
-//the back to back track and ecl cluster pair -----end
-
-
-
-//the neutral cluster counting
-    /*
-        int nneu_cluster = 0;
-        if (!clustersinwindow.empty()) {
-          for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
-            if (clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName)) continue;
-            else nneu_cluster++;
-          }
-        }
-        trgInfo->setNneucluster(nneu_cluster);
-    */
-
   }
 
-  void
-  TRGGRLProjectsModule::endRun()
-  {
-    if (TRGDebug::level())
-      cout << "TRGGRLProjectsModule ... endRun called " << endl;
+  trgInfo->setBhabhaVeto(nTrkBhabha);
+  trgInfo->seteclBhabhaVeto(nECLBhabha);
+  trgInfo->setPairHigh(nPhiPairHigh);
+  trgInfo->setPairLow(nPhiPairLow);
+  trgInfo->set3DPair(n3DPair);
+
+
+  //---------------------------------------------------------------------
+  //..Trigger objects using 1 track and at least 1 cluster
+  // nSameHem1Trk nOppHem1Trk
+  int nSameHem1Trk = 0;
+  int nOppHem1Trk = 0;
+  if (nTrk3D == 1) {
+    double phiTrk = cdc3DTrkArray[0]->getPhi0() * radtodeg;
+    double cotTrk = cdc3DTrkArray[0]->getCotTheta();
+    for (int i0 = 0; i0 < nClust; i0++) {
+      float dphi = abs(phiTrk - TCPhiLab[selTC[i0] - 1]);
+      if (dphi > 180.) {dphi = 360. - dphi;}
+      float dCot = cotTrk - TCcotThetaLab[selTC[i0] - 1];
+      if (dphi > 80.) {nOppHem1Trk++;}
+      if (dphi < 80. && (dCot < -0.8 || dCot > 0.6)) {nSameHem1Trk++;}
+    }
   }
 
+  trgInfo->setNSameHem1Trk(nSameHem1Trk);
+  trgInfo->setNOppHem1Trk(nOppHem1Trk);
 
-  void
-  TRGGRLProjectsModule::terminate()
-  {
-    if (TRGDebug::level())
-      cout << "TRGGRLProjectsModule ... terminate called " << endl;
-  }
+}
+
+void
+TRGGRLProjectsModule::endRun()
+{
+  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
+}
 
 
-} // namespace Belle2
+
+void TRGGRLProjectsModule::terminate()
+{
+
+}
+
+

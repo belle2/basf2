@@ -1,20 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-import os
-import random
 from basf2 import *
 import ROOT
 import math
-from ROOT import *
 from ROOT import Belle2
-from ROOT import TVector3
-from ROOT import TFile, TTree, TH1F
 from modularAnalysis import *
 from array import array
-from ROOT import gSystem
-from ROOT import Belle2
 
 from heapq import nlargest
 from effCalculation import EffCalculation

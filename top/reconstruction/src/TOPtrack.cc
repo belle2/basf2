@@ -45,15 +45,13 @@ namespace Belle2 {
 
 
     TOPtrack::TOPtrack(const Track* track,
-                       const Const::ChargedStable& chargedStable):
-      m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(0),
-      m_atTop(false), m_moduleID(0),
-      m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
+                       const Const::ChargedStable& chargedStable)
     {
 
       if (!track) return;
 
       // set pointers first
+
       m_track = track;
 
       Const::EDetector myDetID = Const::EDetector::TOP;
@@ -84,10 +82,11 @@ namespace Belle2 {
       }
 
       // set track parameters
+
       m_position = m_extHit->getPosition();
       m_momentum = m_extHit->getMomentum();
       setTrackLength(m_extHit->getTOF(), chargedStable);
-      const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
       if (!fitResult) {
         B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
         return;
@@ -95,6 +94,56 @@ namespace Belle2 {
       m_charge = fitResult->getChargeSign();
       if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
       m_moduleID = m_extHit->getCopyID();
+      m_valid = true;
+    }
+
+
+    TOPtrack::TOPtrack(const Track* track, int moduleID,
+                       const Const::ChargedStable& chargedStable)
+    {
+
+      if (!track) return;
+
+      // set pointers first
+
+      m_track = track;
+
+      Const::EDetector myDetID = Const::EDetector::TOP;
+      int pdgCode = abs(chargedStable.getPDGCode());
+
+      RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
+      double tmin = 1e10; // some large time
+      for (const auto& extHit : extHits) {
+        if (abs(extHit.getPdgCode()) != pdgCode) continue;
+        if (extHit.getDetectorID() != myDetID) continue;
+        if (extHit.getCopyID() != moduleID) continue;
+        if (extHit.getTOF() < tmin) {
+          tmin = extHit.getTOF();
+          m_extHit = &extHit;
+        }
+      }
+      if (!m_extHit) return;
+
+      m_mcParticle = track->getRelated<MCParticle>();
+      if (m_mcParticle) {
+        const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
+        for (const auto& barHit : barHits) {
+          if (barHit.getModuleID() == m_extHit->getCopyID()) m_barHit = &barHit;
+        }
+      }
+
+      // set track parameters
+      m_position = m_extHit->getPosition();
+      m_momentum = m_extHit->getMomentum();
+      setTrackLength(m_extHit->getTOF(), chargedStable);
+      const auto* fitResult = track->getTrackFitResultWithClosestMass(chargedStable);
+      if (!fitResult) {
+        B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+        return;
+      }
+      m_charge = fitResult->getChargeSign();
+      if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
+      m_moduleID = moduleID;
       m_valid = true;
     }
 

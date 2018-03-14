@@ -364,7 +364,7 @@ namespace {
 
       //test postfix
       EXPECT_TRUE((it++) == it2);
-      it2++;
+      ++it2;
 
       //test prefix
       EXPECT_TRUE(it != (++it2));
@@ -464,8 +464,6 @@ namespace {
     EXPECT_FALSE(evtArray.isRequired());
     EXPECT_FALSE(evtPtr.isValid());
     EXPECT_FALSE(evtArray.isValid());
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
-    EXPECT_FALSE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_FALSE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
     EXPECT_FALSE(StoreArray<EventMetaData>(evtArray.getName()).isRequired());
 
@@ -487,8 +485,6 @@ namespace {
     EXPECT_TRUE(evtArray.isRequired());
     EXPECT_FALSE(evtPtr.isValid()); // not valid until created
     EXPECT_TRUE(evtArray.isValid());
-    EXPECT_TRUE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
-    EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_TRUE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
     EXPECT_TRUE(StoreArray<EventMetaData>(evtArray.getName()).isRequired());
     DataStore::Instance().setInitializeActive(false);

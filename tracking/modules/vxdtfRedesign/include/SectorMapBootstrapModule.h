@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                                   *
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
- * Contributors: Eugenio Paoloni                                                *
+ * Contributors: Eugenio Paoloni, Thomas Lueck                                  *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
@@ -12,6 +12,8 @@
 
 //framework:
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 
 #include <vector>
 #include <string>
@@ -34,33 +36,61 @@ namespace Belle2 {
     SectorMapBootstrapModule();
 
     //! Destructor
-    virtual ~SectorMapBootstrapModule() { };
+    ~SectorMapBootstrapModule()
+    {
+      if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
+    };
 
-    virtual void initialize()   ;
-    virtual void beginRun()     ;
-    virtual void event()        ;
-    virtual void endRun()       ;
+    void initialize() override   ;
+    void beginRun() override     ;
+    void event() override        ;
+    void endRun() override       ;
 
   private:
-    void bootstrapSectorMap(void);
-    void bootstrapSectorMap(const SectorMapConfig& config);
-    void persistSectorMap(void);
-    void retrieveSectorMap(void);
-    void retrieveSectorMapFromDB(void);
 
+    /// puts several empty sectormaps into the framework
+    void bootstrapSectorMap(void);
+    /** puts one empty sectormap into the framework:
+      @param config: the configuration used to generate the empty sectormap */
+    void bootstrapSectorMap(const SectorMapConfig& config);
+    /// writes a sectormap to a root file
+    void persistSectorMap(void);
+    /// retrieves SectorMap from file or from the DB
+    void retrieveSectorMap(void);
+
+    /// the name of the tree the setups are stored in in the root file
     const std::string c_setupKeyNameTTreeName     = "Setups";
+    /// the name of the branch the setupt are stored in the tree
     const std::string c_setupKeyNameBranchName      = "name";
 
+    /// the name of the input root file the sectormaps are read from
     std::string m_sectorMapsInputFile = "SectorMaps.root";
+    /// the name of the ouput root file the sectormaps are written to
     std::string m_sectorMapsOutputFile = "SectorMaps.root";
 
-    // if specified (non "") ONLY the setup with this name will be read. Else all setups in the root file will be read
+    /// if specified (non "") ONLY the setup with this name will be read. Else all setups in the root file will be read
     std::string m_setupToRead = std::string("");
 
-    // if true the sector map will be read from the DB. NOTE: this will override m_readSectorMap (read from file)
+    /// pointer to the DBObjPtr for the payloadfile from which the sectormap is read
+    DBObjPtr<PayloadFile>* m_ptrDBObjPtr = nullptr;
+
+
+    /** vector of tuple<int, string> specifying how 2-hit filters are altered.
+      The int entry of the tuple contains the index of the cut value to be changed
+      (see Filter::getNameAndReference function) and the string entry of the tuple contains a regex for a TF1 */
+    std::vector< std::tuple<int, std::string> > m_twoHitFilterAdjustFunctions = {};
+
+    /** vector of tuple<int, string>  specifying how 3-hit filters are altered.
+      The int entry of the tuple contains the index of the cut value to be changed
+      (see Filter::getNameAndReference function) and the string entry of the tuple contains a regex for a TF1 */
+    std::vector< std::tuple<int, std::string> > m_threeHitFilterAdjustFunctions = {};
+
+    /// if true the sector map will be read from the DB. NOTE: this will override m_readSectorMap (read from file)
     bool m_readSecMapFromDB = false;
 
+    /// if true a sectormap will be read from a file. NOTE: this will be overridden by m_readSecMapFromDB!
     bool m_readSectorMap  = true;
+    /// if true the sectormap will be written to an output file
     bool m_writeSectorMap = false;
   };
 } // Belle2 namespace

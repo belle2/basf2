@@ -9,7 +9,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <iostream>
@@ -33,12 +33,13 @@ namespace TrgTest {
       StoreObjPtr<EventMetaData> evtPtr;
       DataStore::Instance().setInitializeActive(true);
       evtPtr.registerInDataStore();
-      StoreArray<CDCTriggerSegmentHit>::registerPersistent("CDCTriggerSegmentHits");
-      StoreArray<CDCTriggerTrack>::registerPersistent("CDCTriggerTracks");
-      StoreObjPtr<EventT0>::registerPersistent("EventT0");
-      StoreArray<CDCTriggerSegmentHit> hits;
+      StoreArray<CDCTriggerSegmentHit> segmentHits;
+      segmentHits.registerInDataStore();
       StoreArray<CDCTriggerTrack> tracks;
-      tracks.registerRelationTo(hits);
+      tracks.registerInDataStore();
+      StoreObjPtr<BinnedEventT0> eventT0;
+      eventT0.registerInDataStore();
+      tracks.registerRelationTo(segmentHits);
       DataStore::Instance().setInitializeActive(false);
       evtPtr.construct(0, 0, 1);
 
@@ -112,9 +113,10 @@ namespace TrgTest {
     }
 
     // dummy event time
-    StoreObjPtr<EventT0> T0("EventT0");
+    StoreObjPtr<BinnedEventT0> T0;
     T0.create();
-    T0->addEventT0(0, Const::CDC);
+    T0->addBinnedEventT0(0, Const::CDC);
+    neuroTrigger.getEventTime(0, *track);
 
     // define different hit numbers to test
     // the basis is a combination that should pass all requirements,

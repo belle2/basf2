@@ -124,7 +124,7 @@ toolsB += ['DeltaEMbc', '^B+']
 toolsB += ['Cluster', 'B+ -> [anti-D0 -> K- pi+ [pi0 -> ^gamma ^gamma]] pi+']
 toolsB += ['MCTruth', '^B+ -> ^anti-D0 pi+']
 toolsB += ['CustomFloats[isSignal]', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[Kid_belle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
+toolsB += ['CustomFloats[kIDBelle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
 
 toolsTrackPI = ['EventMetaData', 'pi+']
 toolsTrackPI += ['Kinematics', '^pi+']

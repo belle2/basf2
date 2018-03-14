@@ -12,16 +12,19 @@
 #include <iostream>
 
 using namespace std;
-using namespace Belle2;
 
-void TOPGeoModuleDisplacement::print(const std::string& title) const
-{
-  TOPGeoBase::print(title);
-  cout << " translation vector: (" << getX() << ", "
-       << getY() << ", " << getZ() << ")" << " " << s_unitName << endl;
-  cout << " rotation angles: ";
-  cout << getAlpha() << " ";
-  cout << getBeta() << " ";
-  cout << getGamma() << " ";
-  cout << endl;
-}
+namespace Belle2 {
+
+  void TOPGeoModuleDisplacement::print(const std::string& title) const
+  {
+    TOPGeoBase::print(title);
+    cout << " translation vector: (" << getX() << ", "
+         << getY() << ", " << getZ() << ")" << " " << s_unitName << endl;
+    cout << " rotation angles: ";
+    cout << getAlpha() << " ";
+    cout << getBeta() << " ";
+    cout << getGamma() << " ";
+    cout << endl;
+  }
+
+} // end Belle2 namespace

@@ -88,7 +88,7 @@ int HistoServer::server()
             //            if (lpos != (int)string::npos) {
             if (lpos > 1) {
               //              subdir = objname.substr(lpos - 1);
-              subdir = objname.substr(lpos);
+              subdir = objname.substr(lpos - 1);
               if (subdir == "EXIT") subdir = "";
               //              printf("HistoServer : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
             } else {

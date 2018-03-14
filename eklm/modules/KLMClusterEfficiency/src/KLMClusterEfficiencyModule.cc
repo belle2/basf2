@@ -21,11 +21,7 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
-
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
@@ -107,8 +103,6 @@ void KLMClusterEfficiencyModule::beginRun()
 
 void KLMClusterEfficiencyModule::event()
 {
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<MCParticle> mcParticles;
   static int nevent = 0;
   char str[128];
   int i1, i2, i3, n1, n2, n3;
@@ -116,11 +110,11 @@ void KLMClusterEfficiencyModule::event()
   TVector3 decayVertex, clusterPosition, hitPosition;
   float angle;
   bool haveKL0;
-  n1 = klmClusters.getEntries();
+  n1 = m_KLMClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
     haveKL0 = false;
     RelationVector<MCParticle> clusterMCParticles =
-      klmClusters[i1]->getRelationsTo<MCParticle>();
+      m_KLMClusters[i1]->getRelationsTo<MCParticle>();
     n2 = clusterMCParticles.size();
     for (i2 = 0; i2 < n2; i2++) {
       if (clusterMCParticles[i2]->getPDG() == 130)
@@ -153,17 +147,17 @@ void KLMClusterEfficiencyModule::event()
     for (i1 = 0; i1 < n1; i1++) {
       clusterMarker->SetMarkerColor(i1 + 1);
       hitMarker->SetMarkerColor(i1 + 1);
-      clusterPosition = klmClusters[i1]->getClusterPosition();
+      clusterPosition = m_KLMClusters[i1]->getClusterPosition();
       clusterMarker->DrawMarker(clusterPosition.Z(), clusterPosition.X());
       RelationVector<BKLMHit2d> bklmHit2ds =
-        klmClusters[i1]->getRelationsTo<BKLMHit2d>();
+        m_KLMClusters[i1]->getRelationsTo<BKLMHit2d>();
       n2 = bklmHit2ds.size();
       for (i2 = 0; i2 < n2; i2++) {
         hitPosition = bklmHit2ds[i2]->getGlobalPosition();
         hitMarker->DrawMarker(hitPosition.Z(), hitPosition.X());
       }
       RelationVector<EKLMHit2d> eklmHit2ds =
-        klmClusters[i1]->getRelationsTo<EKLMHit2d>();
+        m_KLMClusters[i1]->getRelationsTo<EKLMHit2d>();
       n2 = eklmHit2ds.size();
       for (i2 = 0; i2 < n2; i2++) {
         hitPosition = eklmHit2ds[i2]->getPosition();
@@ -176,17 +170,17 @@ void KLMClusterEfficiencyModule::event()
     for (i1 = 0; i1 < n1; i1++) {
       clusterMarker->SetMarkerColor(i1 + 1);
       hitMarker->SetMarkerColor(i1 + 1);
-      clusterPosition = klmClusters[i1]->getClusterPosition();
+      clusterPosition = m_KLMClusters[i1]->getClusterPosition();
       clusterMarker->DrawMarker(clusterPosition.Z(), clusterPosition.Y());
       RelationVector<BKLMHit2d> bklmHit2ds =
-        klmClusters[i1]->getRelationsTo<BKLMHit2d>();
+        m_KLMClusters[i1]->getRelationsTo<BKLMHit2d>();
       n2 = bklmHit2ds.size();
       for (i2 = 0; i2 < n2; i2++) {
         hitPosition = bklmHit2ds[i2]->getGlobalPosition();
         hitMarker->DrawMarker(hitPosition.Z(), hitPosition.Y());
       }
       RelationVector<EKLMHit2d> eklmHit2ds =
-        klmClusters[i1]->getRelationsTo<EKLMHit2d>();
+        m_KLMClusters[i1]->getRelationsTo<EKLMHit2d>();
       n2 = eklmHit2ds.size();
       for (i2 = 0; i2 < n2; i2++) {
         hitPosition = eklmHit2ds[i2]->getPosition();
@@ -199,17 +193,17 @@ void KLMClusterEfficiencyModule::event()
     for (i1 = 0; i1 < n1; i1++) {
       clusterMarker->SetMarkerColor(i1 + 1);
       hitMarker->SetMarkerColor(i1 + 1);
-      clusterPosition = klmClusters[i1]->getClusterPosition();
+      clusterPosition = m_KLMClusters[i1]->getClusterPosition();
       clusterMarker->DrawMarker(clusterPosition.X(), clusterPosition.Y());
       RelationVector<BKLMHit2d> bklmHit2ds =
-        klmClusters[i1]->getRelationsTo<BKLMHit2d>();
+        m_KLMClusters[i1]->getRelationsTo<BKLMHit2d>();
       n2 = bklmHit2ds.size();
       for (i2 = 0; i2 < n2; i2++) {
         hitPosition = bklmHit2ds[i2]->getGlobalPosition();
         hitMarker->DrawMarker(hitPosition.X(), hitPosition.Y());
       }
       RelationVector<EKLMHit2d> eklmHit2ds =
-        klmClusters[i1]->getRelationsTo<EKLMHit2d>();
+        m_KLMClusters[i1]->getRelationsTo<EKLMHit2d>();
       n2 = eklmHit2ds.size();
       for (i2 = 0; i2 < n2; i2++) {
         hitPosition = eklmHit2ds[i2]->getPosition();
@@ -220,17 +214,17 @@ void KLMClusterEfficiencyModule::event()
     c1->Print(str);
     nevent++;
   }
-  n1 = mcParticles.getEntries();
+  n1 = m_MCParticles.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
-    if (mcParticles[i1]->getPDG() != 130)
+    if (m_MCParticles[i1]->getPDG() != 130)
       continue;
-    decayVertex = mcParticles[i1]->getDecayVertex();
+    decayVertex = m_MCParticles[i1]->getDecayVertex();
     m_DecayVertexX = decayVertex.X();
     m_DecayVertexY = decayVertex.Y();
     m_DecayVertexZ = decayVertex.Z();
     m_MaxDecayVertexHitAngle = 0;
     RelationVector<BKLMHit2d> mcBKLMHit2ds =
-      mcParticles[i1]->getRelationsFrom<BKLMHit2d>();
+      m_MCParticles[i1]->getRelationsFrom<BKLMHit2d>();
     n2 = mcBKLMHit2ds.size();
     for (i2 = 0; i2 < n2; i2++) {
       hitPosition = mcBKLMHit2ds[i2]->getGlobalPosition();
@@ -239,7 +233,7 @@ void KLMClusterEfficiencyModule::event()
         m_MaxDecayVertexHitAngle = angle;
     }
     RelationVector<EKLMHit2d> mcEKLMHit2ds =
-      mcParticles[i1]->getRelationsFrom<EKLMHit2d>();
+      m_MCParticles[i1]->getRelationsFrom<EKLMHit2d>();
     n2 = mcEKLMHit2ds.size();
     for (i2 = 0; i2 < n2; i2++) {
       hitPosition = mcEKLMHit2ds[i2]->getPosition();
@@ -248,7 +242,7 @@ void KLMClusterEfficiencyModule::event()
         m_MaxDecayVertexHitAngle = angle;
     }
     RelationVector<KLMCluster> kl0Clusters =
-      mcParticles[i1]->getRelationsFrom<KLMCluster>();
+      m_MCParticles[i1]->getRelationsFrom<KLMCluster>();
     n2 = kl0Clusters.size();
     if (n2 == 0)
       m_NonreconstructedKL0++;
@@ -266,10 +260,10 @@ void KLMClusterEfficiencyModule::event()
           m_ReconstructedKL01Cluster[0]++;
       } else if (es1 > 0)
         m_ReconstructedKL01Cluster[2]++;
-      RelationVector<MCParticle> mcParticles2 =
+      RelationVector<MCParticle> m_MCParticles2 =
         kl0Clusters[0]->getRelationsTo<MCParticle>();
-      if (mcParticles2.size() == 1) {
-        if (mcParticles2.weight(0) == 1)
+      if (m_MCParticles2.size() == 1) {
+        if (m_MCParticles2.weight(0) == 1)
           m_ExactlyReconstructedKL0++;
       }
     } else if (n2 == 2) {

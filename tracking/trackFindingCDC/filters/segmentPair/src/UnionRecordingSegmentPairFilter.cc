@@ -21,8 +21,12 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<SegmentPairFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingSegmentPairFilter::getValidVarSetNames() const
@@ -48,28 +52,28 @@ std::unique_ptr<BaseVarSet<CDCSegmentPair> >
 UnionRecordingSegmentPairFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return makeUnique<BasicSegmentPairVarSet>();
+    return std::make_unique<BasicSegmentPairVarSet>();
   } else if (name == "hit_gap") {
-    return makeUnique<HitGapSegmentPairVarSet>();
+    return std::make_unique<HitGapSegmentPairVarSet>();
   } else if (name == "skimmed_hit_gap") {
-    return makeUnique<SkimmedHitGapSegmentPairVarSet>();
+    return std::make_unique<SkimmedHitGapSegmentPairVarSet>();
   } else if (name == "fitless") {
-    return makeUnique<FitlessSegmentPairVarSet>();
+    return std::make_unique<FitlessSegmentPairVarSet>();
   } else if (name == "feasible") {
     MVAFeasibleSegmentPairFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "pre_fit") {
     const bool preliminaryFit = true;
-    return makeUnique<FitSegmentPairVarSet>(preliminaryFit);
+    return std::make_unique<FitSegmentPairVarSet>(preliminaryFit);
   } else if (name == "fit") {
-    return makeUnique<FitSegmentPairVarSet>(false);
+    return std::make_unique<FitSegmentPairVarSet>(false);
   } else if (name == "realistic") {
     MVARealisticSegmentPairFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "truth") {
-    return makeUnique<TruthSegmentPairVarSet>();
+    return std::make_unique<TruthSegmentPairVarSet>();
   } else if (name == "trail") {
-    return makeUnique<TrailSegmentPairVarSet>();
+    return std::make_unique<TrailSegmentPairVarSet>();
   } else {
     return Super::createVarSet(name);
   }

@@ -31,6 +31,8 @@ namespace Belle2 {
     // functions for filler
     void log(int size);
 
+    void clear(int id);
+
     // functions for retriever
     RfShm_Cell& getinfo(int id);
     void fillNodeInfo(int id, RfNodeInfo* info, bool inout);

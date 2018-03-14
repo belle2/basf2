@@ -1,5 +1,5 @@
 #pragma once
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TEveTrackPropagator.h>
 
@@ -15,7 +15,7 @@ namespace Belle2 {
     {
       TEveVector v;
 
-      v.Set(BFieldMap::Instance().getBField(B2Vector3D(x, y, z)));
+      v.Set(BFieldManager::getField(x, y, z) / Unit::T);
       v.fZ *= -1; //Eve has inverted B field convention
       v.fZ -= 1e-6; //field must not be zero!
 

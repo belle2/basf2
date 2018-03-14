@@ -93,7 +93,8 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[1].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[2].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[3].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
-        self.assertEqual(particles[4].preCutConfig.userCut, 'goodGamma == 1 and isInRestOfEvent > 0.5')
+        self.assertEqual(particles[4].preCutConfig.userCut, '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09]'
+                         ' or [clusterReg == 3 and E > 0.16]] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[6].preCutConfig.userCut, '0.4 < M < 0.6')
         self.assertEqual(particles[6].channels[2].preCutConfig.userCut, '0.4 < M < 0.6 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
@@ -113,7 +114,7 @@ class TestGetDefaultChannels(unittest.TestCase):
         self.assertEqual(particles[3].preCutConfig.userCut, '[dr < 2] and [abs(dz) < 4] and isInRestOfEvent > 0.5')
         self.assertEqual(particles[4].preCutConfig.userCut, 'goodBelleGamma == 1 and clusterBelleQuality == 0 '
                                                             'and isInRestOfEvent > 0.5')
-        self.assertEqual(particles[5].preCutConfig.userCut, '0.08 < M < 0.18 and isInRestOfEvent > 0.5')
+        self.assertEqual(particles[5].preCutConfig.userCut, '0.08 < InvM < 0.18 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[6].preCutConfig.userCut, '0.4 < M < 0.6 and isInRestOfEvent > 0.5')
         self.assertEqual(particles[16].preCutConfig.userCut, 'isInRestOfEvent > 0.5')
 
@@ -127,7 +128,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'B0:semileptonic', 'B+:semileptonic'])
 
         chargedVariables = ['eIDBelle',
-                            'atcPIDBelle(3,2)', 'Kid_belle',
+                            'atcPIDBelle(3,2)', 'kIDBelle',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
@@ -175,6 +176,7 @@ class TestGetFRChannels(unittest.TestCase):
         self.assertEqual(len(particles[13].channels), 1)
         self.assertEqual(len(particles[14].channels), 15)
         self.assertEqual(len(particles[15].channels), 17)
+
 
 if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()

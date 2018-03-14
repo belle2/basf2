@@ -19,7 +19,7 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/crc.hpp>
-#include <rawdata/dataobjects/RawKLM.h>
+//#include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 #include <framework/database/DBArray.h>
@@ -43,12 +43,13 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
+  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", true);
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
-  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge (~NPE) lower this value will be marked as bad",
-           double(7.0));
+  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge lower this value will be marked as bad",
+           double(140.0));
+  addParam("loadThresholdFromDB", m_loadThresholdFromDB, "load threshold from DataBase (true) or not (false)", true);
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
   addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
 }
@@ -61,80 +62,41 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 
 void BKLMUnpackerModule::initialize()
 {
-  //StoreArray<BKLMDigit>::registerPersistent();
-  StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
-  bklmDigits.registerInDataStore();
+  rawKLM.isRequired();
+  //StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
+  bklmDigits.registerInDataStore(m_outputDigitsName);
   if (m_loadMapFromDB) loadMapFromDB();
-  else loadMap();
 }
 
 void BKLMUnpackerModule::loadMapFromDB()
 {
-  DBArray<BKLMElectronicMapping> elements("BKLMElectronicMapping");
-  elements.getEntries();
+  DBArray<BKLMElectronicMapping> elements;
   for (const auto& element : elements) {
-    B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
-           ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-           ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-           " plane(z/phi) = " << element.getPlane());
+    B2DEBUG(1, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
+            ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
+            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            " plane(z/phi) = " << element.getPlane());
 
     int copperId = element.getCopperId();
     int slotId = element.getSlotId();
     int laneId = element.getLaneId();
     int axisId = element.getAxisId();
+    int channelId = element.getChannelId();
     int sector = element.getSector();
     int isForward = element.getIsForward();
     int layer = element.getLayer();
     int plane =  element.getPlane();
-    int elecId = electCooToInt(copperId - BKLM_ID, slotId, laneId, axisId);
+    int stripId = element.getStripId();
+    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1 , laneId, axisId, channelId);
     int moduleId = 0;
     B2DEBUG(1, "reading Data Base...");
     moduleId = (isForward ? BKLM_END_MASK : 0)
                | ((sector - 1) << BKLM_SECTOR_BIT)
                | ((layer - 1) << BKLM_LAYER_BIT)
-               | ((plane) << BKLM_PLANE_BIT);
+               | ((plane) << BKLM_PLANE_BIT)
+               | ((stripId - 1) << BKLM_STRIP_BIT);
     m_electIdToModuleId[elecId] = moduleId;
     B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
-  }
-
-}
-
-void BKLMUnpackerModule::loadMap()
-{
-  GearDir dir("/Detector/ElectronicsMapping/BKLM");
-
-  for (GearDir& copper : dir.getNodes("COPPER")) {
-    // UNUSED int id=copper.getInt("ID");
-    int copperId = copper.getInt("@id");
-    //      cout <<"copper id: "<< id <<endl;
-    for (GearDir& slot : copper.getNodes("Slot")) {
-      int slotId = slot.getInt("@id");
-      //      cout << "slotid : " << slotId << endl;
-      B2DEBUG(1, "slotid: " << slotId);
-      for (GearDir& lane : slot.getNodes("Lane")) {
-        int laneId = lane.getInt("@id");
-        for (GearDir& axis : lane.getNodes("Axis")) {
-          int axisId = axis.getInt("@id");
-          int sector = axis.getInt("Sector");
-          int isForward = axis.getInt("IsForward");
-          int layer = axis.getInt("Layer");
-          int plane = axis.getInt("Plane");
-          int elecId = electCooToInt(copperId - BKLM_ID, slotId, laneId, axisId);
-          int moduleId = 0;
-
-
-          B2DEBUG(1, "reading xml file...");
-          B2DEBUG(1, " copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId);
-          B2DEBUG(1, " sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane);
-          moduleId = (isForward ? BKLM_END_MASK : 0)
-                     | ((sector - 1) << BKLM_SECTOR_BIT)
-                     | ((layer - 1) << BKLM_LAYER_BIT)
-                     | ((plane) << BKLM_PLANE_BIT);
-          m_electIdToModuleId[elecId] = moduleId;
-          B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
-        }
-      }
-    }
   }
 
 }
@@ -143,15 +105,19 @@ void BKLMUnpackerModule::loadMap()
 void BKLMUnpackerModule::beginRun()
 {
   if (m_loadMapFromDB) loadMapFromDB();
-  else loadMap();
+
+  if (m_loadThresholdFromDB) {
+    m_scintADCOffset = m_ADCParams->getADCOffset();
+    m_scintThreshold = m_ADCParams->getADCThreshold();
+  }
 
 }
 
 
 void BKLMUnpackerModule::event()
 {
-  StoreArray<RawKLM> rawKLM;
-  StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
+
+  //StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
   bklmDigits.clear();
 
   B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");
@@ -251,19 +217,10 @@ void BKLMUnpackerModule::event()
           unsigned short axis = (bword1 >> 7) & 1;
           //lane is the slot in the crate
           unsigned short lane = (bword1 >> 8) & 0x1F;
-          unsigned short flag = (bword1 >> 14);
+          //unsigned short flag = (bword1 >> 14);
           unsigned short ctime = bword2 & 0xFFFF; //full bword
           unsigned short tdc = bword3 & 0x7FF;
           unsigned short charge = bword4 & 0xFFF;
-          int layer = lane;
-          if (flag == 1) layer = lane - 5; //layer 1-based
-          if (m_rawdata && layer < 3) { // z phi plane of sci. is flipped, may be tentative
-            if (axis == 0) axis = 1;
-            else if (axis == 1) axis = 0;
-            else B2WARNING("BKLMUnpackerModule:: axis bit of scintillator is abnormal " << axis);
-          }
-          //channel = getChannel(layer, axis, channel);//for data
-
 
           //if ((1 == layer || 2 == layer)  && fabs(charge - m_scintADCOffset) < m_scintThreshold) continue;
 
@@ -272,18 +229,16 @@ void BKLMUnpackerModule::event()
           //  cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
           //  " charge: " << charge << endl;
 
-          int electId = electCooToInt(copperId - BKLM_ID, finesse_num + 1, layer, axis);
+          int electId = electCooToInt(copperId - BKLM_ID, finesse_num , lane, axis, channel);
           int moduleId = 0;
-          int sector = -1;
-          int isForward = -1;
-          int plane = -1;
+          bool outRange = false;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
             if (!m_useDefaultModuleId) {
-              B2WARNING("could not find copperid " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane << ", axis " << axis <<
-                        " in mapping");
+              B2DEBUG(1, "could not find copperid " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane << ", axis " << axis <<
+                      " in mapping");
               continue;
             } else {
-              moduleId = getDefaultModuleId(copperId, finesse_num, layer, axis);
+              moduleId = getDefaultModuleId(copperId, finesse_num, lane, axis, channel, outRange);
             }
           } else { //found moduleId in the mapping
             moduleId = m_electIdToModuleId[electId];
@@ -292,35 +247,46 @@ void BKLMUnpackerModule::event()
             //only channel and inrpc flag is not set yet
           }
           //moduleId counts are zero based
-          layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-          sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
-          isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
-          plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
+          int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+          //int sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
+          //int isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
+          //int plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
+          channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
-          if (layer > 14) { B2WARNING("BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
+          if (layer > 14) { B2DEBUG(1, "BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
 
-          //handle the flipped channels and out-of-range channels. This way is not good at all, but do this for a while before data format is fixed
-          if (m_rawdata) channel = getChannel(sector + 1, layer + 1, plane, channel);
-          bool outRange = false;
-          if (m_rawdata) channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
-          if (outRange) { B2WARNING("BKLMUnpackerModule:: channel number is out of range " << channel); continue; }
+          if (outRange) {
+            std::string message = "BKLMUnpackerModule:: channel number is out of range ";
+            m_rejected[message] += 1;
+            m_rejectedCount++;
+            if (m_rejectedCount < 10) {
+              B2INFO("BKLMUnpackerModule:: channel number is out of range " << channel);
+            } else if (m_rejectedCount == 10) {
+              B2INFO("BKLMUnpackerModule:: channel number is out of range "
+                     << "(message will be suppressed now)");
+            }
+            continue;
+          }
 
           //still have to add the channel and axis
           if (layer > 1) moduleId |= BKLM_INRPC_MASK;
-          moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
+          //moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
+          moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit digit(moduleId, ctime, tdc, charge);
-          if (layer < 2 && !(charge < m_scintThreshold))  digit.isAboveThreshold(true);
+          BKLMDigit bklmDigit(moduleId, ctime, tdc, m_scintADCOffset - charge);
+          if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))  bklmDigit.isAboveThreshold(true);
 
-          B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<
-                  " layer: " << digit.getLayer() << " isPhi: " << digit.isPhiReadout());
-          B2DEBUG(1, "BKLMUnpackerModule:: charge " << digit.getNPixel() << " tdc" << digit.getTime() << " ctime " << ctime <<
-                  " isAboveThresh " << digit.isAboveThreshold() << " isRPC " << digit.inRPC() << " moduleId " << digit.getModuleID());
+          B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << bklmDigit.getSector() << " isforward: " << bklmDigit.isForward()
+                  <<
+                  " layer: " << bklmDigit.getLayer() << " isPhi: " << bklmDigit.isPhiReadout());
+          B2DEBUG(1, "BKLMUnpackerModule:: charge " << bklmDigit.getCharge() << " tdc" << bklmDigit.getTime() << " ctime " << ctime <<
+                  " isAboveThresh " << bklmDigit.isAboveThreshold() << " isRPC " << bklmDigit.inRPC() << " moduleId " << bklmDigit.getModuleID());
 
-          bklmDigits.appendNew(digit);
+          bklmDigits.appendNew(bklmDigit);
 
-          B2DEBUG(1, "from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " <<
-                  " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward());
+          B2DEBUG(1, "from bklmDigit:sector " << bklmDigit.getSector() << " layer: " << bklmDigit.getLayer() << " strip: " <<
+                  bklmDigit.getStrip() << ", " <<
+                  " isphi? " << bklmDigit.isPhiReadout() << " fwd? " << bklmDigit.isForward());
         }
       } //finesse boards
 
@@ -331,21 +297,24 @@ void BKLMUnpackerModule::event()
 }
 
 
-int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axis)
+int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axis, int channel)
 {
   //  there are at most 16 copper -->4 bit
   // 4 finesse --> 2 bit
-  // < 16 lanes -->4 bit
+  // < 20 lanes -->5 bit
   // axis --> 1 bit
-  unsigned int ret = 0;
+  // channel --> 6 bit
+  int ret = 0;
   copper = copper & 0xF;
   ret |= copper;
   finesse = finesse & 3;
   ret |= (finesse << 4);
-  lane = lane & 0xF;
+  lane = lane & 0x1F;
   ret |= (lane << 6);
   axis = axis & 0x1;
-  ret |= (axis << 10);
+  ret |= (axis << 11);
+  channel = channel & 0x3F;
+  ret |= (channel << 12);
 
   return ret;
 
@@ -373,31 +342,45 @@ void BKLMUnpackerModule::endRun()
 void BKLMUnpackerModule::terminate()
 {
 
+  for (const auto& message : m_rejected) {
+    B2INFO(message.first << "(occured " << message.second << " times)");
+  }
 
 }
 
 
-int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, int axis)
+int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, int axis, int channel, bool& outOfRange)
 {
 
   int sector = 0;
   int isForward = 0;
+  int layer = 0;
+  int plane = 0;
+  int stripId = 0;
   if (copperId == 117440513 || copperId == 117440514) isForward = 1;
   if (copperId == 117440515 || copperId == 117440516) isForward = 0;
   if (copperId == 117440513 || copperId == 117440515) sector = finesse + 3;
   if (copperId == 117440514 || copperId == 117440516) sector = (finesse + 7 > 8) ? finesse - 1 : finesse + 7;
 
+  if (lane > 2) layer = lane - 5;
+  else layer = lane;
+  if (lane > 2) plane = axis;
+  else { if (axis == 0) plane = 1; else plane = 0; }
+
+  stripId =  getChannel(layer, plane, channel);
+  stripId =  flipChannel(isForward, sector, layer, plane, stripId, outOfRange);
   //attention: moduleId counts are zero based
   int moduleId = (isForward ? BKLM_END_MASK : 0)
                  | ((sector - 1) << BKLM_SECTOR_BIT)
-                 | ((lane - 1) << BKLM_LAYER_BIT)
-                 | ((axis) << BKLM_PLANE_BIT);
+                 | ((layer - 1) << BKLM_LAYER_BIT)
+                 | ((plane) << BKLM_PLANE_BIT)
+                 | ((stripId - 1) << BKLM_STRIP_BIT);
 
   return moduleId;
 
 }
 
-unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, unsigned short channel)
+unsigned short BKLMUnpackerModule::getChannel(int layer, int axis, unsigned short channel)
 {
 
   if (layer == 1) {
@@ -433,7 +416,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
 
 
   //if (layer > 2) channel = channel + 1;
-  if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
+  //if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
   //if (sector == 7 && layer > 2 && layer < 16) channel = channel;
 
   return channel;
@@ -460,10 +443,12 @@ unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int la
     if (layer > 2 && plane == 0) MaxiChannel = 48;
   }
 
-  if (!(isForward && (sector == 7 || sector == 8 || sector == 1 || sector == 2) && layer > 2
-        && plane == 1)) channel = MaxiChannel - channel + 1;
+  bool dontFlip = false;
+  if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+  if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+  if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
 
-  if (channel < 1 || channel > MaxiChannel) isOutRange = true;
+  if (channel < 1 || channel > MaxiChannel)  isOutRange = true;
 
   return channel;
 }

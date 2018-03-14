@@ -9,13 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/pcore/RootMergeable.h>
-#include <TFile.h>
-#include <TTree.h>
+#include <tracking/trackFindingCDC/utilities/Named.h>
+
+#include <RtypesCore.h>
+
 #include <functional>
+#include <vector>
 #include <memory>
+#include <string>
+
+class TTree;
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -59,13 +62,11 @@ namespace Belle2 {
       void capture();
 
     private:
-      /// Reference to the open TFile.
-      TFile* m_tFile;
+      /// Forward declartion of implementation.
+      class Impl;
 
-      /// Reference to the TTree.
-      StoreObjPtr<RootMergeable<TTree> > m_tTree;
-
+      /// Pointer to implementation hiding the details.
+      std::unique_ptr<Impl> m_impl;
     };
-
   }
 }

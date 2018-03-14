@@ -57,6 +57,16 @@ void RFFlowStat::log(int size)
     m_t0 = tnow;
   }
 }
+void RFFlowStat::clear(int cellid)
+{
+  RfShm_Cell& cell = getinfo(cellid);
+  cell.nevent = 0;
+  cell.nqueue = 0;
+  cell.flowrate = 0;
+  cell.avesize = 0;
+  cell.evtrate = 0;
+  cell.elapsed = 0;
+}
 
 // Retriever function
 RfShm_Cell& RFFlowStat::getinfo(int id)

@@ -57,12 +57,12 @@ trgeclfam.param('ShapingFunction', 1)  # Choose shaping function (0: Original fu
 
 trgecl = register_module("TRGECL")
 trgecl.param('Clustering', 0)  # Output Clustering method(0 : Use only ICN , 1 : ICN + Max TC )
-trgecl.param('EventTiming', 2)  # Output EventTiming method(0 : Belle  , 1 : Most energetic TC timing , 2 : Energy weighted Timing)
+trgecl.param('EventTiming', 1)  # Output EventTiming method(0 : Belle  , 1 : Most energetic TC timing , 2 : Energy weighted Timing)
 trgecl.param('Bhabha', 0)  # Bhabha tagging method(0 : Belle 1: Belle II(but not supported yet))
 trgecl.param('EventSelect', 1)  # TRGECL Event Seclection(0: no selection 1: select 1 high energy bin in 1 events( 64 bins /event))
 # trgecl.param('NofTopTC',3)  # The # of Considered TC in  the caculation of eventtiming method 2(Default is 3).
-# trgecl.param('TimeWindow',250) # Trigger decision time window size (ns)
-# trgecl.param('OverlapWindow',125) # TRGECL Trigger decision Time Window (ns)
+trgecl.param('TimeWindow', 250)  # Trigger decision time window size (ns)
+trgecl.param('OverlapWindow', 125)  # TRGECL Trigger decision Time Window (ns)
 
 # trgeclMC = register_module("MCMatcherTRGECL")
 

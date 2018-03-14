@@ -7,25 +7,16 @@ import ROOT
 from ROOT import Belle2
 import numpy as np
 
-main = create_path()
-
-input = register_module('RootInput')
-input.param('inputFileName', sys.argv[1])
-# input.initialize()
 
 gear = register_module('Gearbox')
-# gear.initialize()
+gear.initialize()
 geom = register_module('Geometry')
-# geom.param('components', ['PXD', 'SVD'])
-# geom.initialize()
-
-main.add_module(input)
-main.add_module(gear)
-main.add_module(geom)
-process(main)
+geom.param('components', ['PXD', 'SVD'])
+geom.initialize()
 
 # Create the algorithm
 algo = Belle2.MillepedeAlgorithm()
+algo.setInputFileNames([sys.argv[1]])
 
 # Configure Millepede
 # change 'inversion' to 'diagonalization' to get lowest and highest
@@ -179,10 +170,6 @@ for ipar in range(0, algo.result().getNoParameters()):
 
     profile.SetBinContent(ibin, value[0])
     profile.SetBinError(ibin, error[0])
-
-# Example how to access collected data (but you need exp and run number)
-chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
-pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
 # Skip into interactive environment
 # You can draw something in the trees or the profile

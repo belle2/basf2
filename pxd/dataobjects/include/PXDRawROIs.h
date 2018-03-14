@@ -58,41 +58,41 @@ namespace Belle2 {
       return (m_rois[2 * j] >> 4) & 0x3F; // & 0x3F0
     }
 
-    /** Return Row 1 of ROI j
+    /** Return MinVid (Row 1) of ROI j
      * @param j Index of ROI
-     * @return  Row 1
+     * @return  MinVid
      */
-    int getRow1(int j) const
+    int getMinVid(int j) const
     {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
       return ((m_rois[2 * j] << 6) & 0x3C0) | ((m_rois[2 * j + 1] >> 26) & 0x3F) ;//  & 0x00F , & 0xFC000000
     }
 
-    /** Return Row 2 of ROI j
+    /** Return MaxVid (Row 2) of ROI j
      * @param j Index of ROI
-     * @return Row 2
+     * @return MaxVid
      */
-    int getRow2(int j) const
+    int getMaxVid(int j) const
     {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
       return (m_rois[2 * j + 1] >> 8) & 0x3FF;  // & 0x0003FF00
     }
 
-    /** Return Col 1 of ROI j
+    /** Return MinUid (Col 1) of ROI j
      * @param j Index of ROI
-     * @return Column 1
+     * @return MinUid
      */
-    int getCol1(int j) const
+    int getMinUid(int j) const
     {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
       return (m_rois[2 * j + 1] >> 18) & 0xFF; // & 0x03FC0000
     }
 
-    /** Return Col 1 of ROI j
+    /** Return MaxUid (Col 2) of ROI j
      * @param j Index of ROI
-     * @return Column 2
+     * @return MaxUid
      */
-    int getCol2(int j) const
+    int getMaxUid(int j) const
     {
       if (j < 0 || j >= (int)m_2timesNrROIs / 2) return -1;
       return (m_rois[2 * j + 1]) & 0xFF;

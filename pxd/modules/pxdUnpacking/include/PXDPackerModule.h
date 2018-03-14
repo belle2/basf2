@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDPackerModule_H
-#define PXDPackerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -21,10 +20,6 @@ namespace Belle2 {
 
   namespace PXD {
 
-#define PACKER_NUM_ROWS 768
-#define PACKER_NUM_COLS 250
-
-
     /** The PXDPacker module.
      *
      * This module is responsible for packing (simulated) Pixels back to
@@ -33,25 +28,27 @@ namespace Belle2 {
      * Not yet ready for MC Production, only lab use recommended.
      */
     class PXDPackerModule : public Module {
+      enum {PACKER_NUM_ROWS = 768};
+      enum {PACKER_NUM_COLS = 250};
 
     public:
       /** Constructor defining the parameters */
       PXDPackerModule();
 
-      /** Initialize the module */
-      virtual void initialize();
-      /** do the packing */
-      virtual void event();
-      /** Terminate the module */
-      virtual void terminate();
-
     private:
+
+      /** Initialize the module */
+      void initialize() override final;
+      /** do the packing */
+      void event() override final;
+      /** Terminate the module */
+      void terminate() override final;
 
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
-      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
-      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
+      bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
+      bool m_Clusterize; /** Use clusterizer (FCE format) */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
@@ -83,7 +80,7 @@ namespace Belle2 {
       std::vector <unsigned char> m_current_frame;
 
       /** Input array for Digits. */
-      StoreArray<PXDDigit> storeDigits;
+      StoreArray<PXDDigit> m_storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
 
@@ -124,14 +121,14 @@ namespace Belle2 {
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];//! temporary hitmap buffer for pixel to raw data conversion
+      /** temporary hitmap buffer for pixel to raw data conversion */
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
 
-      // ignore common mode for now...
+      unsigned int dhe_byte_count; /**< Byte count in current DHE package */
+      unsigned int dhc_byte_count; /**< Byte count in current DHC package */
 
     };//end class declaration
 
 
   } //end PXD namespace;
 } // end namespace Belle2
-
-#endif // PXDPackerModule_H

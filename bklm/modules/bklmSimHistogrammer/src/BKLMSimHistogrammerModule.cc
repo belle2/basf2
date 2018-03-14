@@ -20,10 +20,7 @@
 
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
 #include <eklm/simulation/FPGAFitter.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/dataobjects/SimHitBase.h>
 
 #include <TRandom.h>
@@ -59,14 +56,9 @@ BKLMSimHistogrammerModule::~BKLMSimHistogrammerModule()
 
 void BKLMSimHistogrammerModule::initialize()
 {
-  StoreArray<BKLMSimHit> bklmSimHit;
-  StoreArray<BKLMHit2d>::required();
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<BKLMHit2d> bklmHit2ds;
-  StoreArray<BKLMHit1d> bklmHit1ds;
-  StoreArray<BKLMDigit> digits;
 
-  bklmSimHit.required();
+  hits2D.isRequired();
+  simHits.isRequired();
 
 
   m_file = new TFile(m_filename.c_str(), "recreate");
@@ -106,11 +98,6 @@ void BKLMSimHistogrammerModule::event()
   //---------------------------------------------
   // Get BKLM hits collection from the data store
   //---------------------------------------------
-  StoreArray<BKLMSimHit> simHits;
-  StoreArray<BKLMDigit> digits;
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<BKLMHit2d> hits2D;
-  StoreArray<BKLMHit1d> hits1D;
 
   int nSimHit = simHits.getEntries();
 
@@ -135,9 +122,9 @@ void BKLMSimHistogrammerModule::event()
     cout << "looking at 1DHit " << i << endl;
     int scaledTag = -1;
     RelationVector<BKLMDigit> bklmDigits = hits1D[i]->getRelationsTo<BKLMDigit>();
-    for (const auto& digit : bklmDigits) {
-      RelationVector<BKLMSimHit> simHits = digit.getRelationsWith<BKLMSimHit>();
-      for (const auto& simHit : simHits) {
+    for (const auto& bklmDigit : bklmDigits) {
+      RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
+      for (const auto& simHit : relatedSimHits) {
         auto bgTag = simHit.getBackgroundTag();
         scaledTag = bgTag;
         //other has numeric value of 99
@@ -235,9 +222,9 @@ void BKLMSimHistogrammerModule::event()
     RelationVector<BKLMHit1d> related1DHits = hits2D[i]->getRelationsTo<BKLMHit1d>();
     for (const auto& hit1d : related1DHits) {
       RelationVector<BKLMDigit> bklmDigits = hit1d.getRelationsTo<BKLMDigit>();
-      for (const auto& digit : bklmDigits) {
-        RelationVector<BKLMSimHit> simHits = digit.getRelationsWith<BKLMSimHit>();
-        for (const auto& simHit : simHits) {
+      for (const auto& bklmDigit : bklmDigits) {
+        RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
+        for (const auto& simHit : relatedSimHits) {
           auto bgTag = simHit.getBackgroundTag();
           scaledTag = bgTag;
           //other has numeric value of 99

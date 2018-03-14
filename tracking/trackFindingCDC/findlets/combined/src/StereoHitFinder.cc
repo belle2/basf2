@@ -12,8 +12,12 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::ChooseableFilter<StereoHitFilterFactory>;
 
 StereoHitFinder::StereoHitFinder() : Super()
 {

@@ -7,22 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #include <tracking/trackFindingCDC/ca/CellularPathFollower.h>
-
-//#include <cdc/geometry/CDCGeometryPar.h>
-#include <framework/logging/Logger.h>
-
-#include<cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-
-
-
-
-
-

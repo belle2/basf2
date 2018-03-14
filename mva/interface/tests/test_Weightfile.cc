@@ -28,7 +28,7 @@ namespace {
   class TestOptions : public MVA::Options {
 
   public:
-    TestOptions(const std::string& x, const std::string& y) : x(x), y(y) { }
+    TestOptions(const std::string& _x, const std::string& _y) : x(_x), y(_y) { }
     virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
     virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
     virtual po::options_description getDescription() override
@@ -300,14 +300,14 @@ namespace {
   {
 
     MVA::Weightfile weightfile;
-    std::string filename = weightfile.getFileName(".xml");
+    std::string filename = weightfile.generateFileName(".xml");
     unsigned int length = filename.size();
     EXPECT_TRUE(filename.substr(length - 4, length) == ".xml");
 
     {
       MVA::Weightfile weightfile2;
       weightfile2.setRemoveTemporaryDirectories(true);
-      filename = weightfile2.getFileName(".xml");
+      filename = weightfile2.generateFileName(".xml");
       {
         std::ofstream a(filename);
       }
@@ -318,7 +318,7 @@ namespace {
     {
       MVA::Weightfile weightfile2;
       weightfile2.setRemoveTemporaryDirectories(false);
-      filename = weightfile2.getFileName(".xml");
+      filename = weightfile2.generateFileName(".xml");
       {
         std::ofstream a(filename);
       }
@@ -333,7 +333,7 @@ namespace {
     {
       MVA::Weightfile weightfile2;
       weightfile2.setTemporaryDirectory(tempdir);
-      filename = weightfile2.getFileName(".xml");
+      filename = weightfile2.generateFileName(".xml");
       EXPECT_EQ(filename.substr(0, tempdir.size()), tempdir);
     }
     free(directory_template);

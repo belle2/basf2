@@ -12,12 +12,13 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+
 using namespace Belle2;
 using namespace std;
 using boost::property_tree::ptree;
 
 
-SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
+SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUniqueName("")
 {
 
   // Create an empty property tree object
@@ -54,7 +55,11 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
 
   try {
     // traverse pt: let us navigate through the daughters of <SVD>
-    for (ptree::value_type const & v : propertyTree.get_child("SVD")) {
+    for (ptree::value_type const& v : propertyTree.get_child("SVD")) {
+      if (v.first == "unique") {
+        m_MapUniqueName = v.second.get<string>("<xmlattr>.name");
+        B2INFO("Loading the offline -> online SVD map named " << m_MapUniqueName);
+      }
       // if the daughter is a <layer> then read it!
       if (v.first == "layer")
         ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);
@@ -90,13 +95,15 @@ const SVDOnlineToOfflineMap::SensorInfo& SVDOnlineToOfflineMap::getSensorInfo(un
 
 
 
-const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsigned short layer,  unsigned short ladder, unsigned short dssd, bool side, unsigned short strip)
+const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsigned short layer,  unsigned short ladder,
+    unsigned short dssd, bool side, unsigned short strip)
 {
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
   if (chipIter == m_chips.end()) {
-    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip << " : combination not found in the SVD Off-line to On-line map ");
+    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip <<
+              " : combination not found in the SVD Off-line to On-line map ");
 
     m_currentChipInfo.fadc = 0;
     m_currentChipInfo.apv = 0;
@@ -137,7 +144,33 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
   const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
 
-  return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  if (info.m_sensorID) {
+    return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  } else {
+    return NULL;
+  }
+}
+
+SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
+                                                      unsigned char APV25, unsigned char channel, short samples[6], float time, SVDModeByte mode)
+{
+  // Issue a warning, we'll be sending out a null pointer.
+  if (channel > 127) {
+    B2WARNING(" channel #" <<  int(channel) << " out of range (0-127).");
+    return NULL;
+  }
+  const SensorInfo& info = getSensorInfo(FADC, APV25);
+  short strip = getStripNumber(channel, info);
+
+  SVDShaperDigit::APVRawSamples rawSamples;
+  copy(samples, samples + SVDShaperDigit::c_nAPVSamples, rawSamples.begin());
+
+  // create SVDShaperDigit only for existing sensor
+  if (info.m_sensorID) {
+    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  } else {
+    return NULL;
+  }
 }
 
 
@@ -145,7 +178,7 @@ void
 SVDOnlineToOfflineMap::ReadLayer(int nlayer, ptree const& xml_layer)
 {
   // traverse xml_layer: let us navigate through the daughters of <layer>
-  for (ptree::value_type const & v : xml_layer) {
+  for (ptree::value_type const& v : xml_layer) {
     // if the daughter is a <ladder> then read it!
     if (v.first == "ladder") {
       ReadLadder(nlayer, v.second.get<int>("<xmlattr>.n") , v.second);
@@ -157,7 +190,7 @@ void
 SVDOnlineToOfflineMap::ReadLadder(int nlayer, int nladder, ptree const& xml_ladder)
 {
   // traverse xml_ladder: let us navigate through the daughters of <ladder>
-  for (ptree::value_type const & v : xml_ladder) {
+  for (ptree::value_type const& v : xml_ladder) {
     // if the daughter is a <sensor> then read it!
     if (v.first == "sensor") {
       ReadSensor(nlayer, nladder, v.second.get<int>("<xmlattr>.n") , v.second);
@@ -169,7 +202,7 @@ void
 SVDOnlineToOfflineMap::ReadSensor(int nlayer, int nladder, int nsensor, ptree const& xml_sensor)
 {
   // traverse xml_sensor: let us navigate through the daughters of <sensor>
-  for (ptree::value_type const & v : xml_sensor) {
+  for (ptree::value_type const& v : xml_sensor) {
     // if the daughter is one side <> then read it!
     if (v.first == "side") {
       std::string tagSide = v.second.get<std::string>("<xmlattr>.side");
@@ -200,13 +233,17 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
   vector<ChipInfo> vecInfo;   // for packer
   SensorID sid(nlayer, nladder, nsensor, isU);
 
-  for (ptree::value_type const & v : xml_side) {
+  for (ptree::value_type const& v : xml_side) {
     // if the daughter is a <chip>
 
     if (v.first == "chip") {
       auto tags = v.second;
       unsigned char  chipN = tags.get<unsigned char>("<xmlattr>.n");
       unsigned char  FADCn = tags.get<unsigned char>("<xmlattr>.FADCn");
+
+      //storing info on FADC numbers and related APV chips
+      FADCnumbers.insert(FADCn);
+      APVforFADCmap.insert(std::pair<unsigned char, unsigned char>(FADCn, chipN));
 
       ChipID cid(FADCn, chipN);
 
@@ -245,3 +282,14 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
 
   m_chips[sid] = vecInfo;  // for packer
 }
+
+void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
+{
+  unsigned short it = 0;
+
+  for (auto ifadc = FADCnumbers.begin(); ifadc != FADCnumbers.end(); ++ifadc) {
+    map2[it] = *ifadc;
+    map1[*ifadc] = it++;
+  }
+}
+

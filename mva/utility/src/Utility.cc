@@ -9,37 +9,22 @@
  **************************************************************************/
 
 #include <mva/utility/Utility.h>
-#include <mva/utility/SPlot.h>
+#include <mva/utility/DataDriven.h>
 #include <mva/methods/PDF.h>
+#include <mva/methods/Reweighter.h>
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Combination.h>
-
-#include <mva/interface/Interface.h>
-#include <mva/interface/Options.h>
-#include <mva/interface/Weightfile.h>
-
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/logging/Logger.h>
 
 #include <framework/utilities/MakeROOTCompatible.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <TFile.h>
-#include <TTree.h>
-#include <TBranch.h>
-
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <cerrno>
-#include <memory>
 #include <chrono>
+#include <string>
 
 namespace Belle2 {
   namespace MVA {
@@ -131,7 +116,7 @@ namespace Belle2 {
     }
 
     void expert(const std::vector<std::string>& filenames, const std::vector<std::string>& datafiles, const std::string& treename,
-                const std::string& outputfile, int experiment, int run, int event)
+                const std::string& outputfile, int experiment, int run, int event, bool copy_target)
     {
 
       std::vector<Weightfile> weightfiles;
@@ -160,12 +145,16 @@ namespace Belle2 {
         GeneralOptions general_options;
         weightfile.getOptions(general_options);
         general_options.m_treename = treename;
-        // Override possible restritction of number of evetns in training
+        // Override possible restriction of number of events in training
         // otherwise this would apply to the expert as well.
         general_options.m_max_events = 0;
 
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);
+        // define if target variables should be copied
+        if (not copy_target) {
+          general_options.m_target_variable = std::string();
+        }
 
         general_options.m_datafiles = datafiles;
         auto& branch = branches[i];
@@ -210,11 +199,28 @@ namespace Belle2 {
 
     void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options, const MetaOptions& meta_options)
     {
-      if (not meta_options.m_use_splot) {
+      unsigned int number_of_enabled_meta_trainings = 0;
+      if (meta_options.m_use_splot)
+        number_of_enabled_meta_trainings++;
+      if (meta_options.m_use_sideband_substraction)
+        number_of_enabled_meta_trainings++;
+      if (meta_options.m_use_reweighting)
+        number_of_enabled_meta_trainings++;
+
+      if (number_of_enabled_meta_trainings > 1) {
+        B2ERROR("You enabled more than one meta training option. You can only use one (sPlot, SidebandSubstraction or Reweighting)");
+        return;
+      }
+
+      if (meta_options.m_use_splot) {
+        teacher_splot(general_options, specific_options, meta_options);
+      } else if (meta_options.m_use_sideband_substraction) {
+        teacher_sideband_substraction(general_options, specific_options, meta_options);
+      } else if (meta_options.m_use_reweighting) {
+        teacher_reweighting(general_options, specific_options, meta_options);
+      } else {
         ROOTDataset data(general_options);
         teacher_dataset(general_options, specific_options, data);
-      } else {
-        teacher_splot(general_options, specific_options, meta_options);
       }
     }
 
@@ -273,14 +279,57 @@ namespace Belle2 {
       mc_general_options.m_variables = {meta_options.m_splot_variable};
       ROOTDataset mc_dataset(mc_general_options);
 
-      Binning binning = Binning::CreateEqualFrequency(mc_dataset.getFeature(0) , mc_dataset.getWeights(), mc_dataset.getSignals(), 100);
+      auto mc_signals = mc_dataset.getSignals();
+      auto mc_weights = mc_dataset.getWeights();
+      auto mc_feature = mc_dataset.getFeature(0);
+      auto data_feature = discriminant_dataset.getFeature(0);
+      auto data_weights = discriminant_dataset.getWeights();
+
+      Binning binning = Binning::CreateEqualFrequency(mc_feature , mc_weights, mc_signals, 100);
 
       float signalFraction = binning.m_signal_yield / (binning.m_signal_yield + binning.m_bckgrd_yield);
 
-      // Overall normalization could be different on data
-      float yield_correction = data_dataset.getNumberOfEvents() / mc_dataset.getNumberOfEvents();
-      binning.m_signal_yield *= yield_correction;
-      binning.m_bckgrd_yield *= yield_correction;
+      std::vector<double> data(100, 0);
+      double total_data = 0.0;
+      for (unsigned int iEvent = 0; iEvent < data_dataset.getNumberOfEvents(); ++iEvent) {
+        data[binning.getBin(data_feature[iEvent])] += data_weights[iEvent];
+        total_data += data_weights[iEvent];
+      }
+
+      // We do a simple fit here to estimate the signal and backgrund yields
+      // We could use RooFit here to avoid using custom code,
+      // but I found RooFit to be difficult and unstable ...
+
+      float best_yield = 0.0;
+      double best_chi2 = 1000000000.0;
+      bool empty_bin = false;
+      for (double yield = 0; yield < total_data; yield += 1) {
+        double chi2 = 0.0;
+        for (unsigned int iBin = 0; iBin < 100; ++iBin) {
+          double deviation = (data[iBin] - (yield * binning.m_signal_pdf[iBin] + (total_data - yield) * binning.m_bckgrd_pdf[iBin]) *
+                              (binning.m_boundaries[iBin + 1] - binning.m_boundaries[iBin]) / (binning.m_boundaries[100] - binning.m_boundaries[0]));
+          if (data[iBin] > 0)
+            chi2 += deviation * deviation / data[iBin];
+          else
+            empty_bin = true;
+        }
+        if (chi2 < best_chi2) {
+          best_chi2 = chi2;
+          best_yield = yield;
+        }
+      }
+
+      if (empty_bin) {
+        B2WARNING("Encountered empty bin in data histogram during fit of the components for sPlot");
+      }
+
+      B2INFO("sPlot best yield " << best_yield);
+      B2INFO("sPlot Yields On MC " << binning.m_signal_yield << " " << binning.m_bckgrd_yield);
+
+      binning.m_signal_yield = best_yield;
+      binning.m_bckgrd_yield = (total_data - best_yield);
+
+      B2INFO("sPlot Yields Fitted On Data " << binning.m_signal_yield << " " << binning.m_bckgrd_yield);
 
       if (meta_options.m_splot_boosted) {
         GeneralOptions boost_general_options = data_general_options;
@@ -313,6 +362,91 @@ namespace Belle2 {
       auto combination_expert = teacher_dataset(combination_general_options, combination_options, data_dataset);
 
       return combination_expert;
+    }
+
+    std::unique_ptr<Belle2::MVA::Expert> teacher_reweighting(const GeneralOptions& general_options,
+                                                             const SpecificOptions& specific_options,
+                                                             const MetaOptions& meta_options)
+    {
+      if (std::find(general_options.m_variables.begin(), general_options.m_variables.end(),
+                    meta_options.m_reweighting_variable) != general_options.m_variables.end()) {
+        B2ERROR("You cannot use the reweighting variable as a feature in your training");
+        return nullptr;
+      }
+
+      GeneralOptions data_general_options = general_options;
+      data_general_options.m_target_variable = "";
+      data_general_options.m_datafiles = meta_options.m_reweighting_data_files;
+      ROOTDataset data_dataset(data_general_options);
+
+      GeneralOptions mc_general_options = general_options;
+      mc_general_options.m_datafiles = meta_options.m_reweighting_mc_files;
+      ROOTDataset mc_dataset(mc_general_options);
+
+      CombinedDataset boost_dataset(general_options, data_dataset, mc_dataset);
+
+      GeneralOptions boost_general_options = general_options;
+      boost_general_options.m_identifier = general_options.m_identifier + "_boost.xml";
+      auto boost_expert = teacher_dataset(boost_general_options, specific_options, boost_dataset);
+
+      GeneralOptions reweighter_general_options = general_options;
+      reweighter_general_options.m_identifier = meta_options.m_reweighting_identifier;
+      reweighter_general_options.m_method = "Reweighter";
+      ReweighterOptions reweighter_specific_options;
+      reweighter_specific_options.m_weightfile = boost_general_options.m_identifier;
+      reweighter_specific_options.m_variable = meta_options.m_reweighting_variable;
+
+      if (meta_options.m_reweighting_variable != "") {
+        if (std::find(reweighter_general_options.m_spectators.begin(), reweighter_general_options.m_spectators.end(),
+                      meta_options.m_reweighting_variable) == reweighter_general_options.m_spectators.end() and
+            std::find(reweighter_general_options.m_variables.begin(), reweighter_general_options.m_variables.end(),
+                      meta_options.m_reweighting_variable) == reweighter_general_options.m_variables.end() and
+            reweighter_general_options.m_target_variable != meta_options.m_reweighting_variable and
+            reweighter_general_options.m_weight_variable != meta_options.m_reweighting_variable) {
+          reweighter_general_options.m_spectators.push_back(meta_options.m_reweighting_variable);
+        }
+      }
+
+      ROOTDataset dataset(reweighter_general_options);
+      auto reweight_expert = teacher_dataset(reweighter_general_options, reweighter_specific_options, dataset);
+      auto weights = reweight_expert->apply(dataset);
+      ReweightingDataset reweighted_dataset(general_options, dataset, weights);
+      auto expert = teacher_dataset(general_options, specific_options, reweighted_dataset);
+
+      return expert;
+    }
+
+    std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_substraction(const GeneralOptions& general_options,
+        const SpecificOptions& specific_options,
+        const MetaOptions& meta_options)
+    {
+
+      if (std::find(general_options.m_variables.begin(), general_options.m_variables.end(),
+                    meta_options.m_sideband_variable) != general_options.m_variables.end()) {
+        B2ERROR("You cannot use the sideband variable as a feature in your training");
+        return nullptr;
+      }
+
+      GeneralOptions data_general_options = general_options;
+      if (std::find(data_general_options.m_spectators.begin(), data_general_options.m_spectators.end(),
+                    meta_options.m_sideband_variable) == data_general_options.m_spectators.end()) {
+        data_general_options.m_spectators.push_back(meta_options.m_sideband_variable);
+      }
+      ROOTDataset data_dataset(data_general_options);
+
+      GeneralOptions mc_general_options = general_options;
+      mc_general_options.m_datafiles = meta_options.m_sideband_mc_files;
+      if (std::find(mc_general_options.m_spectators.begin(), mc_general_options.m_spectators.end(),
+                    meta_options.m_sideband_variable) == mc_general_options.m_spectators.end()) {
+        mc_general_options.m_spectators.push_back(meta_options.m_sideband_variable);
+      }
+      ROOTDataset mc_dataset(mc_general_options);
+
+      GeneralOptions sideband_general_options = general_options;
+      SidebandDataset sideband_dataset(sideband_general_options, data_dataset, mc_dataset, meta_options.m_sideband_variable);
+      auto expert = teacher_dataset(general_options, specific_options, sideband_dataset);
+
+      return expert;
     }
 
 

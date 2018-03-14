@@ -20,6 +20,9 @@
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
+#include <boost/optional.hpp>
+#include <bitset>
+
 namespace Belle2 {
   /**
    * Module for converting RecoTracks to SpacePointTrackCands
@@ -37,14 +40,16 @@ namespace Belle2 {
 
     RT2SPTCConverterModule(); /**< Constructor*/
 
-    virtual void
-    initialize(); /**< initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays) */
+    ~RT2SPTCConverterModule(); /**< destructor */
 
-    virtual void event(); /**< event: convert RecoTracks to SpacePointTrackCands */
+    void initialize()
+    override; /**< initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays) */
 
-    virtual void endRun();
+    void event() override; /**< event: convert RecoTracks to SpacePointTrackCands */
 
-    virtual void terminate(); /**< terminate: print some summary information on the processed events */
+    void endRun() override;
+
+    void terminate() override; /**< terminate: print some summary information on the processed events */
 
   protected:
 
@@ -79,7 +84,8 @@ namespace Belle2 {
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
-    std::string m_SVDAndPXDSPName; /**< Non SingleCluster SVD SpacePoints AND PXD SpacePoints collection name */
+    boost::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
+    boost::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 
@@ -96,19 +102,20 @@ namespace Belle2 {
     bool m_useSingleClusterSP; /**< If true use single cluster SpacePoint collection as fallback */
     bool m_markRecoTracks; /**< If True RecoTracks where conversion problems occurred are marked dirty */
 
-    /** NoKickCuts members */
+    /** if true only RecoTracks with successful fit will be converted */
+    bool m_convertFittedOnly = false;
+
+    /** data members used fot the NoKickCuts method */
     NoKickRTSel* m_trackSel; /**< member to call method of NoKickCuts selection */
     std::string m_noKickCutsFile; /**< name of TFile of the cuts */
     bool m_noKickOutput; /**< true=produce TFile with effects of NoKickCuts on tracks */
 
+
+
+
+
     int m_ncut = 0; /**< counter of the cuttet tracks */
     int m_npass = 0; /**< counter of the selected tracks */
-
-    /** validation NoKickCuts members */
-    TFile* m_momentumTFile; /**< validartion output TFile */
-    TH1F* m_momSel; /**< histogram of selected tracks */
-    TH1F* m_momCut; /**< histrogram of cutted tracks */
-    TH1F* m_momEff; /**< histogram for efficiency */
 
 
     // state variables

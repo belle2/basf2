@@ -25,6 +25,7 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dbobjects/TOPSampleTimes.h>
 
 // Root
@@ -96,6 +97,8 @@ namespace Belle2 {
     addParam("method", m_method, "method: 0 - profile histograms only, "
              "1 - matrix inversion, 2 - iterative, "
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);
+    addParam("useFallingEdge", m_useFallingEdge,
+             "if true, use cal pulse falling edge instead of rising edge", false);
 
   }
 
@@ -107,7 +110,7 @@ namespace Belle2 {
   {
 
     // input
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
 
     // checks
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -133,24 +136,36 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     double sampleWidth = geo->getNominalTDC().getSampleWidth();
 
-    std::vector<std::pair<double, double> > hits[c_NumChannels];
+    vector<pair<double, double> > hits[c_NumChannels];
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getModuleID() != m_moduleID) continue;
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
-      double t = digit.getRawTime() + digit.getFirstWindow() * c_WindowSize;
+      double rawTime = digit.getRawTime();
+      double errScaleFactor = 1;
+      if (m_useFallingEdge) {
+        const auto* rawDigit = digit.getRelated<TOPRawDigit>();
+        if (!rawDigit) {
+          B2ERROR("No relation to TOPRawDigit - can't determine falling edge time error");
+          continue;
+        }
+        // rawTime may include corrections due to window number discontinuity,
+        // therefore one must add the width and not just use getCFDFallingTime()
+        rawTime += rawDigit->getFWHM();
+        errScaleFactor = rawDigit->getCFDFallingTimeError(1.0) / rawDigit->getCFDLeadingTimeError(1.0);
+      }
+      double t = rawTime + digit.getFirstWindow() * c_WindowSize;
       if (t < 0) {
         B2ERROR("Got negative sample number - digit ignored");
         continue;
       }
-      double et = digit.getTimeError() / sampleWidth;
+      double et = digit.getTimeError() / sampleWidth * errScaleFactor;
       if (et <= 0) {
         B2ERROR("Time error is not given - digit ignored");
         continue;
       }
       unsigned channel = digit.getChannel();
-      if (channel < c_NumChannels) hits[channel].push_back(std::make_pair(t, et));
+      if (channel < c_NumChannels) hits[channel].push_back(make_pair(t, et));
     }
 
     for (unsigned channel = 0; channel < c_NumChannels; channel++) {
@@ -195,14 +210,14 @@ namespace Belle2 {
 
       // open output root file
 
-      std::string fileName = m_directoryName + "/tbcSlot";
+      string fileName = m_directoryName + "/tbcSlot";
       if (m_moduleID < 10) {
-        fileName += "0" + std::to_string(m_moduleID);
+        fileName += "0" + to_string(m_moduleID);
       } else {
-        fileName += std::to_string(m_moduleID);
+        fileName += to_string(m_moduleID);
       }
-      fileName += "_" + std::to_string(bs) + "-scrod" +
-                  std::to_string(scrodID) + ".root";
+      fileName += "_" + to_string(bs) + "-scrod" +
+                  to_string(scrodID) + ".root";
       TFile* fout = TFile::Open(fileName.c_str(), "recreate");
       if (!fout) {
         B2ERROR("Can't open the output file " << fileName);
@@ -262,7 +277,7 @@ namespace Belle2 {
   }
 
 
-  bool TOPTimeBaseCalibratorModule::calibrateChannel(std::vector<TwoTimes>& ntuple,
+  bool TOPTimeBaseCalibratorModule::calibrateChannel(vector<TwoTimes>& ntuple,
                                                      unsigned scrodID, unsigned chan,
                                                      TH1F& Hchi2, TH1F& Hndf,
                                                      TH1F& HDeltaT)
@@ -270,9 +285,9 @@ namespace Belle2 {
 
     // determine outlayer removal cuts
 
-    std::string name = "timeDiff_ch" + to_string(chan);
-    std::string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
-    std::string title = "Cal pulse time difference vs. sample for " + forWhat;
+    string name = "timeDiff_ch" + to_string(chan);
+    string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
+    string title = "Cal pulse time difference vs. sample for " + forWhat;
     TProfile prof(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
                   m_minTimeDiff, m_maxTimeDiff, "S");
     prof.SetXTitle("sample number");
@@ -284,7 +299,7 @@ namespace Belle2 {
     hist.SetXTitle("sample number");
     hist.SetYTitle("entries per sample");
 
-    std::vector<double> profMeans(c_TimeAxisSize, (m_maxTimeDiff + m_minTimeDiff) / 2);
+    vector<double> profMeans(c_TimeAxisSize, (m_maxTimeDiff + m_minTimeDiff) / 2);
     double sigma = (m_maxTimeDiff - m_minTimeDiff) / 6;
 
     for (int iter = 0; iter < 5; iter++) {
@@ -349,7 +364,7 @@ namespace Belle2 {
   }
 
 
-  bool TOPTimeBaseCalibratorModule::matrixInversion(const std::vector<TwoTimes>& ntuple,
+  bool TOPTimeBaseCalibratorModule::matrixInversion(const vector<TwoTimes>& ntuple,
                                                     unsigned scrodID, unsigned chan,
                                                     double meanTimeDifference,
                                                     TH1F& Hchi2, TH1F& Hndf,
@@ -359,12 +374,12 @@ namespace Belle2 {
     // Ax = b: construct matrix A and right side vector b
 
     TMatrixDSym A(c_TimeAxisSize);
-    std::vector<double> b(c_TimeAxisSize, 0.0);
+    vector<double> b(c_TimeAxisSize, 0.0);
 
     for (const auto& twoTimes : ntuple) {
       if (!twoTimes.good) continue;
 
-      std::vector<double> m(c_TimeAxisSize, 0.0);
+      vector<double> m(c_TimeAxisSize, 0.0);
       int i1 = int(twoTimes.t1);
       m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
       int i2 = int(twoTimes.t2);
@@ -387,7 +402,7 @@ namespace Belle2 {
 
     // save as histograms
 
-    std::string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
+    string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
     saveAsHistogram(A, "matA_ch" + to_string(chan), "Matrix for " + forWhat);
     saveAsHistogram(b, "vecB_ch" + to_string(chan), "Right side for " + forWhat);
 
@@ -400,7 +415,7 @@ namespace Belle2 {
       return false;
     }
 
-    std::vector<double> x(c_TimeAxisSize, 0.0);
+    vector<double> x(c_TimeAxisSize, 0.0);
     for (int k = 0; k < c_TimeAxisSize; k++) {
       for (int j = 0; j < c_TimeAxisSize; j++) {
         x[k] += A(k, j) * b[j];
@@ -415,7 +430,7 @@ namespace Belle2 {
     for (const auto& twoTimes : ntuple) {
       if (!twoTimes.good) continue;
 
-      std::vector<double> m(c_TimeAxisSize, 0.0);
+      vector<double> m(c_TimeAxisSize, 0.0);
       int i1 = int(twoTimes.t1);
       m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
       int i2 = int(twoTimes.t2);
@@ -444,10 +459,10 @@ namespace Belle2 {
     for (auto& xi : x) xi *= DeltaT;
     HDeltaT.SetBinContent(chan + 1, DeltaT);
 
-    std::vector<double> err;
+    vector<double> err;
     for (int k = 0; k < c_TimeAxisSize; k++) err.push_back(sqrt(A(k, k)) * DeltaT);
 
-    std::vector<double> sampleTimes;
+    vector<double> sampleTimes;
     sampleTimes.push_back(0);
     for (auto xi : x) sampleTimes.push_back(xi + sampleTimes.back());
 
@@ -461,8 +476,8 @@ namespace Belle2 {
 
     // calibrated cal pulse time difference
 
-    std::string name = "timeDiffcal_ch" + to_string(chan);
-    std::string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
+    string name = "timeDiffcal_ch" + to_string(chan);
+    string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
     TH2F Hcor(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
               100, DeltaT - 0.5, DeltaT + 0.5);
     Hcor.SetXTitle("sample number");
@@ -680,12 +695,12 @@ namespace Belle2 {
   }
 
 
-  void TOPTimeBaseCalibratorModule::saveAsHistogram(const std::vector<double>& vec,
-                                                    const std::vector<double>& err,
-                                                    const std::string& name,
-                                                    const std::string& title,
-                                                    const std::string& xTitle,
-                                                    const std::string& yTitle) const
+  void TOPTimeBaseCalibratorModule::saveAsHistogram(const vector<double>& vec,
+                                                    const vector<double>& err,
+                                                    const string& name,
+                                                    const string& title,
+                                                    const string& xTitle,
+                                                    const string& yTitle) const
   {
     if (vec.empty()) return;
 
@@ -701,8 +716,8 @@ namespace Belle2 {
 
 
   void TOPTimeBaseCalibratorModule::saveAsHistogram(const TMatrixDSym& M,
-                                                    const std::string& name,
-                                                    const std::string& title) const
+                                                    const string& name,
+                                                    const string& title) const
   {
     int n = M.GetNrows();
     TH2F h(name.c_str(), title.c_str(), n, 0, n, n, 0, n);

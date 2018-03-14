@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <mva/interface/Options.h>
 #include <boost/property_tree/ptree.hpp>
 
@@ -97,62 +96,103 @@ namespace Belle2 {
     {
       po::options_description description("Meta options");
       description.add_options()
-      ("use_multiclass", po::value<bool>(&m_use_multiclass), "whether to do multiclass training (Not implemented)")
       ("use_splot", po::value<bool>(&m_use_splot), "whether to do an splot training")
       ("splot_variable", po::value<std::string>(&m_splot_variable), "Variable used as discriminating variable in sPlot training")
       ("splot_mc_files", po::value<std::vector<std::string>>(&m_splot_mc_files)->multitoken(),
        "Monte carlo files containing the discriminant variable with the mc truth")
       ("splot_combined", po::value<bool>(&m_splot_combined), "Combine sPlot training with PDF classifier for discriminating variable")
       ("splot_boosted", po::value<bool>(&m_splot_boosted), "Use boosted sPlot training (aPlot)")
-      ("use_hyperparameter", po::value<bool>(&m_use_hyperparameter), "whether to do hyperparameter search (not implementend)")
-      ("hyperparameter_metric", po::value<std::string>(&m_hyperparameter_metric), "Hyperparameter metric (not implemented)")
-      ("hyperparameters", po::value<std::vector<std::string>>(&m_hyperparameters)->multitoken(),
-       "Hyperparameters of the chosen option which should be searched (not implemented)");
+      ("use_sideband_substraction", po::value<bool>(&m_use_sideband_substraction), "whether to do a sideband substraction training")
+      ("sideband_mc_files", po::value<std::vector<std::string>>(&m_sideband_mc_files)->multitoken(),
+       "Monte carlo files used to estimate the number of events in the different regions. (Must contain the same signal / background distribution as is expected in data)")
+      ("sideband_variable", po::value<std::string>(&m_sideband_variable),
+       "Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband substraction")
+      ("use_reweighting", po::value<bool>(&m_use_reweighting), "whether to do a reweighting pre training")
+      ("reweighting_variable", po::value<std::string>(&m_reweighting_variable),
+       "Variable defining for which events the reweighting should be used (1) or not used (0). If empty the reweighting is applied to all events")
+      ("reweighting_identifier", po::value<std::string>(&m_reweighting_identifier),
+       "Identifier used to save the reweighting expert.")
+      ("reweighting_mc_files", po::value<std::vector<std::string>>(&m_reweighting_mc_files)->multitoken(),
+       "Monte carlo files for the reweighting pretraining (Must contain the same luminosity as the given data files)")
+      ("reweighting_data_files", po::value<std::vector<std::string>>(&m_reweighting_data_files)->multitoken(),
+       "Data files for the reweighting pretraining (Must contain the same luminosity as the given MC files)");
       return description;
     }
 
     void MetaOptions::load(const boost::property_tree::ptree& pt)
     {
-      m_use_multiclass = pt.get<bool>("use_multiclass");
-      m_use_hyperparameter = pt.get<bool>("use_hyperparameter");
-      m_hyperparameter_metric = pt.get<std::string>("hyperparameter_metric");
-      m_use_splot = pt.get<bool>("use_splot");
-      m_splot_combined = pt.get<bool>("splot_combined");
-      m_splot_boosted = pt.get<bool>("splot_boosted");
-      m_splot_variable = pt.get<std::string>("splot_variable");
+      m_use_splot = pt.get<bool>("use_splot", false);
+      m_splot_combined = pt.get<bool>("splot_combined", false);
+      m_splot_boosted = pt.get<bool>("splot_boosted", false);
+      m_splot_variable = pt.get<std::string>("splot_variable", "");
 
-      unsigned int numberOfMCFiles = pt.get<unsigned int>("number_of_mcfiles");
-      m_splot_mc_files.resize(numberOfMCFiles);
-      for (unsigned int i = 0; i < numberOfMCFiles; ++i) {
+      unsigned int splot_number_of_mc_files = pt.get<unsigned int>("splot_number_of_mc_files", 0);
+      m_splot_mc_files.resize(splot_number_of_mc_files);
+      for (unsigned int i = 0; i < splot_number_of_mc_files; ++i) {
         m_splot_mc_files[i] = pt.get<std::string>(std::string("splot_mc_file") + std::to_string(i));
       }
 
-      unsigned int numberOfHyperparameters = pt.get<unsigned int>("number_of_hyperparameters");
-      m_hyperparameters.resize(numberOfHyperparameters);
-      for (unsigned int i = 0; i < numberOfHyperparameters; ++i) {
-        m_hyperparameters[i] = pt.get<std::string>(std::string("hyperparameter") + std::to_string(i));
+      m_use_sideband_substraction = pt.get<bool>("use_sideband_substraction");
+      m_sideband_variable = pt.get<std::string>("sideband_variable");
+
+      unsigned int sideband_number_of_mc_files = pt.get<unsigned int>("sideband_number_of_mc_files", 0);
+      m_sideband_mc_files.resize(sideband_number_of_mc_files);
+      for (unsigned int i = 0; i < sideband_number_of_mc_files; ++i) {
+        m_sideband_mc_files[i] = pt.get<std::string>(std::string("sideband_mc_file") + std::to_string(i));
       }
+
+      m_use_reweighting = pt.get<bool>("use_reweighting", false);
+      m_reweighting_variable = pt.get<std::string>("reweighting_variable");
+      m_reweighting_identifier = pt.get<std::string>("reweighting_identifier");
+
+      unsigned int reweighting_number_of_mc_files = pt.get<unsigned int>("reweighting_number_of_mc_files", 0);
+      m_reweighting_mc_files.resize(reweighting_number_of_mc_files);
+      for (unsigned int i = 0; i < reweighting_number_of_mc_files; ++i) {
+        m_reweighting_mc_files[i] = pt.get<std::string>(std::string("reweighting_mc_file") + std::to_string(i));
+      }
+
+      unsigned int reweighting_number_of_data_files = pt.get<unsigned int>("reweighting_number_of_data_files", 0);
+      m_reweighting_data_files.resize(reweighting_number_of_data_files);
+      for (unsigned int i = 0; i < reweighting_number_of_data_files; ++i) {
+        m_reweighting_data_files[i] = pt.get<std::string>(std::string("reweighting_data_file") + std::to_string(i));
+      }
+
     }
 
     void MetaOptions::save(boost::property_tree::ptree& pt) const
     {
-      pt.put("use_multiclass", m_use_multiclass);
-      pt.put("use_hyperparameter", m_use_hyperparameter);
-      pt.put("hyperparameter_metric", m_hyperparameter_metric);
       pt.put("use_splot", m_use_splot);
       pt.put("splot_variable", m_splot_variable);
       pt.put("splot_combined", m_splot_combined);
       pt.put("splot_boosted", m_splot_boosted);
 
-      pt.put("number_of_mcfiles", m_splot_mc_files.size());
+      pt.put("splot_number_of_mc_files", m_splot_mc_files.size());
       for (unsigned int i = 0; i < m_splot_mc_files.size(); ++i) {
         pt.put(std::string("splot_mc_file") + std::to_string(i), m_splot_mc_files[i]);
       }
 
-      pt.put("number_of_hyperparameters", m_hyperparameters.size());
-      for (unsigned int i = 0; i < m_hyperparameters.size(); ++i) {
-        pt.put(std::string("hyperparameter") + std::to_string(i), m_hyperparameters[i]);
+      pt.put("use_sideband_substraction", m_use_sideband_substraction);
+      pt.put("sideband_variable", m_sideband_variable);
+
+      pt.put("sideband_number_of_mc_files", m_sideband_mc_files.size());
+      for (unsigned int i = 0; i < m_sideband_mc_files.size(); ++i) {
+        pt.put(std::string("sideband_mc_file") + std::to_string(i), m_sideband_mc_files[i]);
       }
+
+      pt.put("use_reweighting", m_use_reweighting);
+      pt.put("reweighting_variable", m_reweighting_variable);
+      pt.put("reweighting_identifier", m_reweighting_identifier);
+
+      pt.put("reweighting_number_of_mc_files", m_reweighting_mc_files.size());
+      for (unsigned int i = 0; i < m_reweighting_mc_files.size(); ++i) {
+        pt.put(std::string("reweighting_mc_file") + std::to_string(i), m_reweighting_mc_files[i]);
+      }
+
+      pt.put("reweighting_number_of_data_files", m_reweighting_data_files.size());
+      for (unsigned int i = 0; i < m_reweighting_data_files.size(); ++i) {
+        pt.put(std::string("reweighting_data_file") + std::to_string(i), m_reweighting_data_files[i]);
+      }
+
     }
 
   }

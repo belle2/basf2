@@ -21,7 +21,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <vxd/geometry/GeoCache.h>
 
@@ -63,8 +63,11 @@ V0findingPerformanceEvaluationModule::~V0findingPerformanceEvaluationModule()
 
 void V0findingPerformanceEvaluationModule::initialize()
 {
-  StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<V0ValidationVertex>::required(m_V0sName);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired(m_MCParticlesName);
+
+  StoreArray<V0ValidationVertex> v0ValidationVertices;
+  v0ValidationVertices.isRequired(m_V0sName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -164,8 +167,7 @@ void V0findingPerformanceEvaluationModule::event()
 
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
 
-  BFieldMap& bfieldMap = BFieldMap::Instance();
-  TVector3 magField = bfieldMap.getBField(TVector3(0, 0, 0));
+  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(99, "+++++ 1. loop on MCParticles");
   BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {

@@ -11,16 +11,12 @@
 #include <bklm/modules/bklmReconstruction/BKLMReconstructorModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
@@ -55,7 +51,14 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
   addParam("Prompt window (ns)", m_PromptWindow,
            "Half-width of prompt window relative to PromptTime",
-           double(50.0));
+           //double(50.0));
+           double(2000.0));
+  addParam("Alignment correction flag", m_ifAlign,
+           "flag for alignment correction, do the correction (true) or not (false), default is false",
+           bool(false));
+  addParam("load time window from db", m_loadTimingFromDB,
+           "locad timing window from database (true) or not (false), default is true",
+           bool(true));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -64,14 +67,11 @@ BKLMReconstructorModule::~BKLMReconstructorModule()
 
 void BKLMReconstructorModule::initialize()
 {
-  StoreArray<BKLMDigit>::required();
+  digits.isRequired();
 
   // Force creation and persistence of BKLM output datastores and relations
-  StoreArray<BKLMHit1d> hit1ds;
   hit1ds.registerInDataStore();
-  StoreArray<BKLMHit2d> hit2ds;
   hit2ds.registerInDataStore();
-  StoreArray<BKLMDigit> digits;
   hit1ds.registerRelationTo(digits);
   hit2ds.registerRelationTo(hit1ds);
 
@@ -82,7 +82,14 @@ void BKLMReconstructorModule::initialize()
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, "BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+
+  if (m_loadTimingFromDB) {
+    m_DtMax = m_timing->getCoincidenceWindow();
+    m_PromptTime = m_timing->getPromptTime();
+    m_PromptWindow = m_timing->getPromptWindow();
+  }
+
 }
 
 void BKLMReconstructorModule::event()
@@ -90,39 +97,38 @@ void BKLMReconstructorModule::event()
 
   // Construct StoreArray<BKLMHit1D> from StoreArray<BKLMDigit>
 
-  StoreArray<BKLMDigit> digits;
   // sort by module+strip number
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
-    BKLMDigit* digit = digits[d];
-    if (digit->inRPC() || digit->isAboveThreshold()) {
-      volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+    BKLMDigit* bklmDigit = digits[d];
+    if (bklmDigit->inRPC() || bklmDigit->isAboveThreshold()) {
+      volIDToDigits.insert(std::pair<int, int>(bklmDigit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
     }
   }
   if (volIDToDigits.empty()) return;
 
-  StoreArray<BKLMHit1d> hit1ds;
+  hit1ds.clear();
 
   std::vector<BKLMDigit*> cluster;
   int oldVolID = volIDToDigits.begin()->first;
   double averageTime = digits[volIDToDigits.begin()->second]->getTime();
 
   for (std::map<int, int>::iterator iVolMap = volIDToDigits.begin(); iVolMap != volIDToDigits.end(); ++iVolMap) {
-    BKLMDigit* digit = digits[iVolMap->second];
-    if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_DtMax)) {
+    BKLMDigit* bklmDigit = digits[iVolMap->second];
+    if ((iVolMap->first > oldVolID + 1) || (std::fabs(bklmDigit->getTime() - averageTime) > m_DtMax)) {
       hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
       cluster.clear();
     }
     double n = (double)(cluster.size());
-    averageTime = (n * averageTime + digit->getTime()) / (n + 1.0);
-    cluster.push_back(digit);
+    averageTime = (n * averageTime + bklmDigit->getTime()) / (n + 1.0);
+    cluster.push_back(bklmDigit);
     oldVolID = iVolMap->first;
   }
   hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
 
   // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
 
-  StoreArray<BKLMHit2d> hit2ds;
+  hit2ds.clear();
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
@@ -138,7 +144,8 @@ void BKLMReconstructorModule::event()
       double phiTime = hit1ds[phiIndex]->getTime() - propagationTimes.y();
       double zTime = hit1ds[zIndex]->getTime() - propagationTimes.z();
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
-      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift());
+      //! the second param in localToGlobal is whether do the alignment correction (true) or not (false)
+      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_ifAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time); // also creates relations hit2d to each hit1d
       if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();

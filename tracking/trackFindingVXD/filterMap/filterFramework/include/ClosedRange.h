@@ -14,6 +14,8 @@
 #include <TBranch.h>
 #include <TTree.h>
 
+#include <framework/logging/Logger.h>
+
 #include <typeinfo>
 
 #include <string>
@@ -28,8 +30,6 @@ namespace Belle2 {
 
   template< typename MinType, typename MaxType>
   class ClosedRange {
-    MinType m_min;
-    MaxType m_max;
   public:
 
     /** Constructor */
@@ -69,10 +69,15 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** sets branch addresses of the given tree to the m_min and m_msx. Note: it assumes a certain oder for
+     * @param t: the tree of the which the branch addresses need to be set
+     * @param variableName: specifier for the leafs
+    */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
-      t->SetBranchAddress(branchName.c_str(), & m_min);
+      // sets branch address and checks for validity
+      if (t->SetBranchAddress(branchName.c_str(), & m_min) < 0) B2FATAL("ClosedRange: branch address not valid");
     }
 
     /** Accessor to the inf of the set (which is also the min) */
@@ -80,6 +85,36 @@ namespace Belle2 {
 
     /** Accessor to the sup of the set (which is alsto the max) */
     MaxType getSup(void) const { return m_max; } ;
+
+
+    /** generates a "name" and fills the vector with the variable references
+    @param filtername: optional name of the filter this range is attached to make the output look nicer
+    @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
+      and the actual pointers to the bounds, if equal to nullptr it will not be filled
+    **/
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "X")
+    {
+      std::string minVal = std::to_string(m_min);
+      std::string maxVal = std::to_string(m_max);
+      // if pointer to vector is provided fill it
+      if (pointers != nullptr) {
+        // use the position in the vector as unique identifier
+        minVal = "#" + std::to_string(pointers->size());
+        (*pointers).push_back({TBranchLeafType(m_min), &m_min});
+        maxVal = "#" + std::to_string(pointers->size());
+        (*pointers).push_back({TBranchLeafType(m_max), &m_max});
+      }
+      return ("(" + minVal + " <= " + varname + " <= " + maxVal + ")");
+    }
+
+  private:
+
+    // NOTE: the persit function assumes that these data members (m_min, m_max) are in exactly that
+    // order defined! So DO NOT move these declarations!!!!
+    /// the minimum of this range
+    MinType m_min;
+    /// the maximum of this range
+    MaxType m_max;
 
   };
 

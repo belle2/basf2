@@ -37,8 +37,6 @@ namespace Belle2 {
     /** Map of all signals in all sensors */
     typedef std::map<VxdID, Sensor> Sensors;
 
-
-
     /** The SVD Digitizer module.
      * This module is responsible for converting the simulated energy
      * deposition from Geant4 into real SVD detector response of single strips.
@@ -77,28 +75,28 @@ namespace Belle2 {
        */
       void saveWaveforms();
 
+      /** Save signals to a root-delimited file (to be analyzed in Python).
+       * This method is only called when a name is set for the file.
+       */
+      void saveSignals();
+
       /** Initialize the module and check module parameters */
-      virtual void initialize();
+      virtual void initialize() override;
       /** Initialize the list of existing SVD Sensors */
-      virtual void beginRun();
+      virtual void beginRun() override;
       /** Digitize one event */
-      virtual void event();
+      virtual void event() override;
       /** Terminate the module */
-      virtual void terminate();
+      virtual void terminate() override;
 
     protected:
 
-      /** A small helper function to convert between electons and ADU */
-      inline double eToADU(double charge) const
-      {
-        return round(std::min(m_maxADC, std::max(m_minADC, charge)) / m_unitADC);
-      }
       // Members holding module parameters:
 
       // 1. Collections
       /** Name of the collection for the MCParticles */
       std::string m_storeMCParticlesName;
-      /** Name of the collection for the SVDDigits */
+      /** Name of the (optional) collection for the SVDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection for the SVDSimhits */
       std::string m_storeSimHitsName;
@@ -113,6 +111,18 @@ namespace Belle2 {
       /** Name of the relation between SVDDigits and SVDTrueHits */
       std::string m_relDigitTrueHitName;
 
+      // 1* Production of SVDShaperDigits
+      /** Whether or not to generate single-sample SVDDigits */
+      bool m_generateDigits;
+      /** Name of the collection for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
+      /** Name of the relation between SVDShaperDigits and MCParticles */
+      std::string m_relShaperDigitMCParticleName;
+      /** Name of the relation between SVDShaperDigits and SVDTrueHits */
+      std::string m_relShaperDigitTrueHitName;
+      /** Name of the relation between SVDShaperDigits and SVDDigits */
+      std::string m_relShaperDigitDigitName;
+
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
@@ -121,11 +131,13 @@ namespace Belle2 {
 
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge */
-      bool   m_applyPoisson;
+      bool  m_applyPoisson = true;
       /** Whether or not to apply Gaussian noise */
-      bool  m_applyNoise;
+      bool  m_applyNoise = false;
       /** Zero-suppression cut. */
-      double m_SNAdjacent;
+      double m_SNAdjacent = 3.0;
+      /** Use 3-sample filter? */
+      bool m_3sampleFilter = true;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction;
 
@@ -134,8 +146,21 @@ namespace Belle2 {
       double m_shapingTime;
       /** Interval between two waveform samples (30 ns). */
       double m_samplingTime;
-      /** Whether or not to apply a time window cut */
-      bool   m_applyWindow;
+      /** Randomize event times?
+       * If set to true, event times will be randomized uniformly from
+       * m_minTimeFrame to m_maxTimeFrame.
+       */
+      bool m_randomizeEventTimes = false;
+      /** Low edge of randomization time frame */
+      float m_minTimeFrame = -300;
+      /** High edge of randomization time frame */
+      float m_maxTimeFrame = 150;
+      /** Current event time.
+       * This is what gets randomized if m_randomizeEventTimes is true.
+       */
+      float m_currentEventTime = 0.0;
+
+
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
@@ -144,30 +169,14 @@ namespace Belle2 {
        * Number of consecutive APV25 samples
        */
       int m_nAPV25Samples;
-      /** Whether or not to apply random phase sampling.
-       * If set to true, the first samples of the event will be taken at a random time point
-       * with probability centered around the time when first particle reaches
-       * the SVD. */
-      bool m_randomPhaseSampling;
 
-      // 5. Processing
-      /** Whether or not to apply discrete ADC on output values. */
-      bool   m_applyADC;
-      /** Low end of ADC range in e-. */
-      double m_minADC;
-      /** High end of ADC range in e-. */
-      double m_maxADC;
-      /** Number of ADC bits. */
-      int m_bitsADC;
-      /** adu in electrons (derived from the above). */
-      double m_unitADC;
-
-      // 6. Reporting
+      // 5. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename;
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms;
-
+      /** Name of the tab-delimited listing of signals */
+      std::string m_signalsList = "";
 
       // Other data members:
 
@@ -184,9 +193,8 @@ namespace Belle2 {
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
-      /** Time of the current detector event, from the currently processed SimHit.. */
-      double             m_currentTime;
-
+      /** Time of the current SimHit.. */
+      double m_currentTime;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness;
       /** The depletion voltage of the Silicon sensor */
@@ -205,6 +213,10 @@ namespace Belle2 {
       double m_interstripCapacitanceV;
       /** The coupling capacitanceV for the sensor. */
       double m_couplingCapacitanceV;
+      /** ADU equivalent charge for u-strips. */
+      double m_aduEquivalentU;
+      /** ADU equivalent charge for v-strips. */
+      double m_aduEquivalentV;
       /** Electronic noise for u-strips. */
       double m_elNoiseU;
       /** Electronic noise for v-strips. */
@@ -212,21 +224,39 @@ namespace Belle2 {
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */
-      TFile* m_rootFile;
-      /** Histogram showing the diffusion cloud in u (r-phi). */
-      TH1D*  m_histDiffusion_u;
-      /** Histogram showing the diffusion cloud in v (z). */
-      TH1D*  m_histDiffusion_v;
+      TFile* m_rootFile = nullptr;
+      /** Histogram showing the charge sharing + diffusion in u (r-phi). */
+      TH1D*  m_histChargeSharing_u = nullptr;
+      /** Histogram showing the charge sharing + diffusion in v (z). */
+      TH1D*  m_histChargeSharing_v = nullptr;
+
+      /** Histogram showing the mobility of e-. */
+      TH1D*  m_histMobility_e = nullptr;
+      /** Histogram showing the mobility of h. */
+      TH1D*  m_histMobility_h = nullptr;
+      /** Histogram showing the velocity of e-. */
+      TH1D*  m_histVelocity_e = nullptr;
+      /** Histogram showing the velocity of h. */
+      TH1D*  m_histVelocity_h = nullptr;
+      /** Histogram showing the distance to plane for e. */
+      TH1D*  m_histDistanceToPlane_e = nullptr;
+      /** Histogram showing the distance to plane for h. */
+      TH1D*  m_histDistanceToPlane_h = nullptr;
+      /** Histogram showing the drift time of e. */
+      TH1D*  m_histDriftTime_e = nullptr;
+      /** Histogram showing the drift time of h. */
+      TH1D*  m_histDriftTime_h = nullptr;
+
       /** Histogram showing the Lorentz angles in u (r-phi). */
-      TH1D*  m_histLorentz_u;
+      TH1D*  m_histLorentz_u = nullptr;
       /** Histogram showing the Lorentz angles in v (z). */
-      TH1D*  m_histLorentz_v;
+      TH1D*  m_histLorentz_v = nullptr;
       /** Histogram showing the distribution of digit signals in u (r-phi).*/
-      TH1D*  m_signalDist_u;
+      TH1D*  m_signalDist_u = nullptr;
       /** Histogram showing the distribution of digit signals in v (z).*/
-      TH1D*  m_signalDist_v;
+      TH1D*  m_signalDist_v = nullptr;
       /** Tree for waveform storage. */
-      TTree* m_waveTree;
+      TTree* m_waveTree = nullptr;
 
     };//end class declaration
 

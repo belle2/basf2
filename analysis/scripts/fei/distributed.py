@@ -30,6 +30,17 @@
  After the training the weightfiles will be stored in the localdb in the collection directory
  You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
  Alternatively you can just copy the localdb to somehwere and use it directly.
+
+ Example:
+ python3 ~/release/analysis/scripts/fei/distributed.py
+   -s kekcc2
+   -f ~/release/analysis/examples/FEI/B_generic.py
+   -w /home/belle2/tkeck/group/B2TauNuWorkspace_2/new_fei
+   -n 100
+   -d $(ls /ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000786/s00/e0000/4S/r00000/mixed/sub01/*.root
+        | head -n 50)
+      $(ls /ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000788/s00/e0000/4S/r00000/charged/sub01/*.root
+        | head -n 50)
 """
 
 
@@ -142,13 +153,15 @@ def create_report(args):
     If this fails you can also copy the collection directory somewhere and
     execute the commands by hand.
     """
+    import fei.core
     os.chdir(args.directory + '/collection')
     ret = subprocess.call('basf2 fei/printReporting.py > ../summary.txt', shell=True)
     ret = subprocess.call('basf2 fei/latexReporting.py ../summary.tex', shell=True)
     for i in glob.glob("*.xml"):
-        subprocess.call("basf2_mva_evaluate.py -id '{i}.xml' -data '{i}.root' "
-                        "--treename variables -o '../{i}.pdf'".format(i=i[:-4]),
-                        shell=True)
+        if not fei.core.Teacher.check_if_weightfile_is_fake(i):
+            subprocess.call("basf2_mva_evaluate.py -id '{i}.xml' -data '{i}.root' "
+                            "--treename variables -o '../{i}.pdf'".format(i=i[:-4]),
+                            shell=True)
     os.chdir(args.directory)
     return ret == 0
 
@@ -192,7 +205,7 @@ def do_trainings(args):
     for i in range(args.nJobs):
         for weightfile_on_disk, _ in weightfiles:
             os.symlink(args.directory + '/collection/' + weightfile_on_disk,
-                       'jobs/{}/'.format(i) + weightfile_on_disk)
+                       args.directory + '/jobs/{}/'.format(i) + weightfile_on_disk)
     # Check if some xml files are missing
     xmlfiles = glob.glob("*.xml")
     for i in range(args.nJobs):
@@ -242,10 +255,16 @@ def merge_root_files(args):
         print('Merge the following files', rootfiles)
         for f in rootfiles:
             output = args.directory + '/collection/' + f
-            inputs = glob.glob(args.directory + '/jobs/*/' + f)
+            inputs = [args.directory + '/jobs/{}/'.format(i) + f for i in range(args.nJobs)]
             ret = subprocess.call(['fei_merge_files', output] + inputs)
             if ret != 0:
                 raise RuntimeError('Error during merging root files')
+            # Replace mcParticlesCount.root with merged file in all directories
+            # so that the individual jobs calculate the correct mcCounts and sampling rates
+            if f == 'mcParticlesCount.root':
+                for i in inputs:
+                    os.remove(i)
+                    os.symlink(output, i)
 
 
 def update_input_files(args):
@@ -319,10 +338,17 @@ if __name__ == '__main__':
             start = 5
         elif args.skip == 'resubmit':
             start = 6
+        elif args.skip == 'report':
+            start = 7
         elif args.skip == 'run':
             start = 0
         else:
             raise RuntimeError('Unkown skip parameter {}'.format(args.skip))
+
+        if start == 7:
+            import sys
+            create_report(args)
+            sys.exit(0)
 
         # The user wants to submit the jobs again
         if start >= 5:
@@ -342,6 +368,8 @@ if __name__ == '__main__':
                             os.remove(success_file)
                     else:
                         continue
+                # Reset Summary file
+                shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + '/jobs/{}/Summary.pickle'.format(i))
                 if not submit_job(args, i):
                     raise RuntimeError('Error during submiting job')
 

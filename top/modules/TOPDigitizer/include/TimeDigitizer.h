@@ -15,8 +15,8 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <framework/datastore/StoreArray.h>
-#include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
 #include <top/dbobjects/TOPSampleTimes.h>
+#include <top/dbobjects/TOPSignalShape.h>
 
 #include <map>
 #include <vector>
@@ -31,16 +31,36 @@ namespace Belle2 {
     public:
 
       /**
+       * hit type enumerators
+       */
+      enum EType {
+        c_Hit = 0,
+        c_ChargeShare = 1,
+        c_CrossTalk = 2,
+        c_CalPulse = 3
+      };
+
+      /**
+       * hit data other than time
+       */
+      struct Hit {
+        double pulseHeight = 0; /**< generated pulse height */
+        EType type = c_Hit;     /**< hit type */
+        const TOPSimHit* simHit = 0;  /**< pointer to simulated hit */
+        const TOPSignalShape* shape = 0; /**< waveform shape of this hit */
+      };
+
+      /**
        * Constructor
        * @param moduleID TOP module ID
        * @param pixelID pixel ID
        * @param window storage window number (first window of waveform)
-       * @param generator pulse height generator
+       * @param storageDepth analog storage depth
+       * @param rmsNoise r.m.s of noise [ADC counts]
        * @param sampleTimes sample times
        */
-      TimeDigitizer(int moduleID, int pixelID, unsigned window,
-                    const TOP::PulseHeightGenerator& generator,
-                    const TOPSampleTimes& sampleTimes);
+      TimeDigitizer(int moduleID, int pixelID, unsigned window, unsigned storageDepth,
+                    double rmsNoise, const TOPSampleTimes& sampleTimes);
 
       /**
        * Sets sample times
@@ -56,15 +76,20 @@ namespace Belle2 {
       }
 
       /**
+       * Sets noise level
+       * @param rmsNoise r.m.s. of noise [ADC counts]
+       */
+      void setNoise(double rmsNoise) {m_rmsNoise = rmsNoise;}
+
+      /**
        * Add time of simulated hit
        * @param t time of simulated hit
-       * @param simHit pointer to simulated hit or NULL
+       * @param pulseHeight simulated pulse height
+       * @param type hit type
+       * @param simHit pointer to simulated hit
        */
-      void addTimeOfHit(double t, const TOPSimHit* simHit = NULL)
-      {
-        if (!m_valid) return;
-        m_times.insert(std::pair<double, const TOPSimHit*>(t, simHit));
-      }
+      void addTimeOfHit(double t, double pulseHeight, EType type,
+                        const TOPSimHit* simHit = 0);
 
       /**
        * Return bar ID
@@ -142,15 +167,13 @@ namespace Belle2 {
                     StoreArray<TOPDigit>& digits,
                     int threshold = 0,
                     int thresholdCount = 0,
-                    double timeJitter = 0);
+                    double timeJitter = 0) const;
 
       /**
        * Do full waveform time digitization.
        * As a result, the digitized hits are appended to TOPRawDigits, then
        * they are converted to TOPDigits and the relations to
        * TOPSimHits and MCParticles are set with proper weights.
-       *
-       * Note: under development!
        *
        * @param waveforms generated waveforms
        * @param rawDigits array of TOPRawDigits
@@ -164,7 +187,7 @@ namespace Belle2 {
                     StoreArray<TOPDigit>& digits,
                     int threshold,
                     int hysteresis = 0,
-                    int thresholdCount = 0);
+                    int thresholdCount = 0) const;
 
     private:
 
@@ -194,13 +217,14 @@ namespace Belle2 {
       std::vector<short> generateWaveform(const std::vector<double>& baselines,
                                           const std::vector<double>& rmsNoises,
                                           const std::vector<double>& pedestals,
-                                          int ADCRange);
+                                          int ADCRange) const;
 
 
-      int m_moduleID;         /**< module ID (1-based) */
-      int m_pixelID;          /**< pixel (e.g. software channel) ID (1-based) */
+      int m_moduleID = 0;     /**< module ID (1-based) */
+      int m_pixelID = 0;      /**< pixel (e.g. software channel) ID (1-based) */
       unsigned m_window = 0;  /**< storage window number */
-      TOP::PulseHeightGenerator m_pulseHeightGenerator; /**< pulse height generator */
+      unsigned m_storageDepth = 0;  /**< ASIC analog storage depth */
+      double m_rmsNoise = 0;  /**< r.m.s of noise [ADC counts] */
       const TOPSampleTimes* m_sampleTimes = 0; /**< sample times */
 
       unsigned m_channel = 0; /**< hardware channel number (0-based) */
@@ -210,7 +234,7 @@ namespace Belle2 {
       unsigned m_chan = 0;    /**< ASIC channel number */
       bool m_valid = false;   /**< true, if module/pixel is mapped to hardware */
 
-      std::multimap<double, const TOPSimHit*> m_times; /**< sorted hit times */
+      std::multimap<double, const Hit> m_times; /**< hits sorted by time */
 
     };
 

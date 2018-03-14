@@ -234,6 +234,13 @@ namespace Belle2 {
     //! Set No of TC Hit
     void setBwdNofTCHit(double BwdNofTCHit) { m_BwdNofTCHit = BwdNofTCHit; }
 
+    //! Get No of TC Hit
+    double getNofTCHit() { return m_NofTCHit; }
+    //! Get Etot
+    double getEtot() { return m_etot; }
+    //! Get Event Timing
+    double getEventTiming() { return m_eventtiming; }
+
 
 
 

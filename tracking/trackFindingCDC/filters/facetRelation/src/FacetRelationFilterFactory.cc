@@ -17,12 +17,15 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseFacetRelationFilter>;
 
 FacetRelationFilterFactory::FacetRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -58,21 +61,21 @@ std::unique_ptr<BaseFacetRelationFilter >
 FacetRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseFacetRelationFilter>>();
+    return std::make_unique<NoneFilter<BaseFacetRelationFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllFacetRelationFilter>();
+    return std::make_unique<AllFacetRelationFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCFacetRelationFilter>();
+    return std::make_unique<MCFacetRelationFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleFacetRelationFilter>();
+    return std::make_unique<SimpleFacetRelationFilter>();
   } else if (filterName == "chi2") {
-    return makeUnique<Chi2FacetRelationFilter>();
+    return std::make_unique<Chi2FacetRelationFilter>();
   } else if (filterName == "chi2_old") {
-    return makeUnique<Chi2FacetRelationFilter>(130.0, 200.0);
+    return std::make_unique<Chi2FacetRelationFilter>(130.0, 200.0);
   } else if (filterName == "unionrecording") {
-    return makeUnique<UnionRecordingFacetRelationFilter>();
+    return std::make_unique<UnionRecordingFacetRelationFilter>();
   } else if (filterName == "mva") {
-    return makeUnique<MVAFacetRelationFilter>();
+    return std::make_unique<MVAFacetRelationFilter>();
   } else {
     return Super::create(filterName);
   }

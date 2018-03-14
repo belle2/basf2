@@ -115,6 +115,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
       char portchar[256];
       sprintf(portchar, "%d", port);
       m_pid_sender[m_nnodes] = m_proc->Execute(sender, (char*)ringbuf.c_str(), portchar, (char*)shmname.c_str(), shmid);
+      m_flow->clear(i);
       m_nnodes++;
     }
   }
@@ -130,6 +131,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_INPUT_ID);
     m_pid_recv = m_proc->Execute(receiver, (char*)ringbuf.c_str(), src, port, (char*)shmname.c_str(), idbuf);
+    m_flow->clear(RF_INPUT_ID);
   } else if (strstr(src, "file") != 0) {
     // Run file reader
     char* filein = m_conf->getconf("distributor", "fileinput", "script");
@@ -171,6 +173,7 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFEventServer::Start(NSMmsg*, NSMcontext*)
 {
   //  m_rbufin->clear();
+  //  m_rbufin->forceClear();
   return 0;
 }
 

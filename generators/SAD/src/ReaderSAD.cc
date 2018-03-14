@@ -85,7 +85,7 @@ void ReaderSAD::initialize(TGeoHMatrix* transMatrix, double sRange, ReaderSAD::A
 }
 
 
-void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
+void ReaderSAD::open(const string& filename)
 {
   if (m_file != NULL) {
     m_file->Close();
@@ -107,32 +107,23 @@ void ReaderSAD::open(const string& filename) throw(SADCouldNotOpenFileError)
   m_tree->SetBranchAddress("rate", &m_lostRate);
   m_tree->SetBranchAddress("E", &m_lostE);
 
-  //Start my addition
   m_tree->SetBranchAddress("ssraw", &m_inputSAD_ssraw);
   m_tree->SetBranchAddress("sraw", &m_inputSAD_sraw);
   m_tree->SetBranchAddress("ss", &m_inputSAD_ss);
-  //m_tree->SetBranchAddress("s", &m_inputSAD_s);
   m_tree->SetBranchAddress("Lss", &m_inputSAD_Lss);
   m_tree->SetBranchAddress("nturn", &m_inputSAD_nturn);
-  //m_tree->SetBranchAddress("x", &m_inputSAD_x);
-  //m_tree->SetBranchAddress("y", &m_inputSAD_y);
-  //m_tree->SetBranchAddress("px", &m_inputSAD_px);
-  //m_tree->SetBranchAddress("py", &m_inputSAD_py);
   m_tree->SetBranchAddress("xraw", &m_inputSAD_xraw);
   m_tree->SetBranchAddress("yraw", &m_inputSAD_yraw);
   m_tree->SetBranchAddress("r", &m_inputSAD_r);
   m_tree->SetBranchAddress("rr", &m_inputSAD_rr);
   m_tree->SetBranchAddress("dp_over_p0", &m_inputSAD_dp_over_p0);
-  //m_tree->SetBranchAddress("E", &m_inputSAD_E);
-  //m_tree->SetBranchAddress("rate", &m_inputSAD_rate);
   m_tree->SetBranchAddress("watt", &m_inputSAD_watt);
-  //End my addition
 
   m_readEntry = -1;
 
-  //Start my addition
-  StoreArray<SADMetaHit>::registerPersistent();
-  //End my addition
+  StoreArray<SADMetaHit> hit;
+  hit.registerInDataStore();
+
 }
 
 

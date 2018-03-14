@@ -10,7 +10,7 @@ import math
 
 # local database with Kichimi-san TBC and T0 constants
 reset_database()
-pathTo = '/ghi/fs01/belle2/bdata/group/detector/TOP/DB_TBT0_20170421/'  # on KEKCC
+pathTo = '/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/'  # on KEKCC
 use_local_database(pathTo + "localDB/localDB.txt", pathTo + "localDB")
 
 # Create path

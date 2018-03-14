@@ -11,13 +11,15 @@
 
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <cmath>
+#include <cstddef>
+#include <iosfwd>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class GeneralizedCircle;
+    class Vector2D;
 
     /**
      *  Adds an uncertainty matrix to the circle in perigee parameterisation.
@@ -240,16 +242,6 @@ namespace Belle2 {
         return PerigeeUtil::transported(jacobian, perigeeCovariance());
       }
 
-    public:
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const UncertainPerigeeCircle& circle)
-      {
-        return output << "UncertainPerigeeCircle("
-               << "curvature=" << circle->curvature() << ","
-               << "phi0=" << circle->phi0() << ","
-               << "impact=" << circle->impact() << ")";
-      }
-
     private:
       /// Memory for the underlying circle
       PerigeeCircle m_perigeeCircle;
@@ -265,5 +257,7 @@ namespace Belle2 {
 
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const UncertainPerigeeCircle& circle);
   }
 }

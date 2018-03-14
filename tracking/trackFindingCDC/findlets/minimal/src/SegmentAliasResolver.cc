@@ -14,10 +14,13 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -60,6 +63,7 @@ void SegmentAliasResolver::exposeParameters(ModuleParamList* moduleParamList, co
 
 void SegmentAliasResolver::initialize()
 {
+  Super::initialize();
   for (const std::string& investigatedAlias : m_param_investigateAlias) {
     if (investigatedAlias == "full") {
       m_fullAlias = true;

@@ -17,7 +17,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -36,7 +36,7 @@ namespace {
       XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
       PrecisionFunction precisionFunction = &PrecisionUtil::getOriginCurvPrecision;
 
-      return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+      return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
 
     } else if (pass == EPass::NonCurlersWithIncreasingThreshold) {
       int maxLevel = 10;
@@ -44,7 +44,7 @@ namespace {
       XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
       PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
-      return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+      return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
 
     } else if (pass == EPass::FullRange) {
       int maxLevel = 10;
@@ -52,7 +52,7 @@ namespace {
       XYSpans xySpans({{0, maxTheta}, {0.00, 0.30}});
       PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
-      return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+      return std::make_unique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
     }
     B2FATAL("Invalid pass");
   }

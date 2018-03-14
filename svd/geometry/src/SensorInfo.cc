@@ -8,7 +8,7 @@
 #include <svd/geometry/SensorInfo.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TVector3.h>
 #include <math.h>
@@ -46,10 +46,12 @@ double SensorInfo::getHoleMobility(double E) const
 
 const TVector3 SensorInfo::getEField(const TVector3& point) const
 {
+
   TVector3 E(0, 0,
-             2.0 * m_depletionVoltage / m_thickness
-             * (point.Z() + 0.5 * m_thickness)
+             - 2.0 * m_depletionVoltage / m_thickness
+             * ((point.Z() + 0.5 * m_thickness) / m_thickness)
              - (m_biasVoltage - m_depletionVoltage) / m_thickness);
+
   return E;
 }
 
@@ -60,10 +62,10 @@ const TVector3& SensorInfo::getBField(const TVector3& point) const
   static double bRadius = 0.5 * Unit::cm;
   if (TVector3(point - oldPoint).Mag() > bRadius) { // renew if far point
     TVector3 pointGlobal = pointToGlobal(point);
-    TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
+    TVector3 bGlobal = BFieldManager::getField(pointGlobal);
     TVector3 bLocal = vectorToLocal(bGlobal);
     oldPoint = point;
-    oldField = bLocal * Unit::T;
+    oldField = bLocal;
   }
   return oldField;
 }
@@ -86,13 +88,13 @@ const TVector3 SensorInfo::getVelocity(CarrierType carrier,
   // Calculate products
   TVector3 EcrossB = E.Cross(B);
   TVector3 BEdotB = E.Dot(B) * B;
-  TVector3 v = mobility * E + mobility * mobilityH * EcrossB
-               + +mobility * mobilityH * mobilityH * BEdotB;
-  v *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
-  return v;
+  TVector3 velocity = mobility * E + mobility * mobilityH * EcrossB
+                      + +mobility * mobilityH * mobilityH * BEdotB;
+  velocity *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
+  return velocity;
 }
 
-const TVector3& SensorInfo::getLorentzShift(double u, double v) const
+const TVector3& SensorInfo::getLorentzShift(double uCoord, double vCoord) const
 {
   static TVector3 result;
   double distanceToFrontPlane = 0.5 * m_thickness;
@@ -100,19 +102,19 @@ const TVector3& SensorInfo::getLorentzShift(double u, double v) const
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
-  TVector3 v_e = getVelocity(electron, TVector3(u, v, +0.5 * distanceToFrontPlane));
-  TVector3 v_h = getVelocity(hole, TVector3(u, v, -0.5 * distanceToBackPlane));
+  TVector3 v_e = getVelocity(electron, TVector3(uCoord, vCoord, +0.5 * distanceToFrontPlane));
+  TVector3 v_h = getVelocity(hole, TVector3(uCoord, vCoord, -0.5 * distanceToBackPlane));
 
   // Calculate drift directions
   TVector3 center_e = fabs(distanceToFrontPlane / v_e.Z()) * v_e;
   TVector3 center_h = fabs(distanceToBackPlane / v_h.Z()) * v_h;
-  result.SetXYZ(center_e.X(), center_h.Y(), 0.0);
+  result.SetXYZ(center_h.X(), center_e.Y(), 0.0);
   return result;
 }
 
-double SensorInfo::getLorentzShift(bool uCoordinate, double position) const
+double SensorInfo::getLorentzShift(bool isUCoordinate, double position) const
 {
-  if (uCoordinate)
+  if (isUCoordinate)
     return getLorentzShift(position, 0.0).X();
   else
     return getLorentzShift(0.0, position).Y();

@@ -5,9 +5,9 @@
 
 """
 <header>
-  <input>MDSTtoUDST.udst.root</input>
-  <output>UDSTtoNTUP.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+<input>../MDSTtoUDST.udst.root</input>
+<output>../UDSTtoNTUP.ntup.root</output>
+<contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """
 
@@ -25,7 +25,7 @@ from stdPhotons import *
 
 inputMdst('default', '../MDSTtoUDST.udst.root')
 loadStdCharged()
-loadStdPhoton()
+stdPhotons('all')
 
 # Here the ParticleLists will be extracted from the UDST to dump to ntuple
 ntupleFile('../UDSTtoNTUP.ntup.root')

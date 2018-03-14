@@ -20,6 +20,7 @@ ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo)
   , m_sensorPhiMax(2 * M_PI)
   , m_sensorZMin(-10)
   , m_sensorZMax(10)
+  , m_layer(0)
   , m_sensorInfo(sensorInfo)
 {
 
@@ -37,6 +38,8 @@ ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo)
   setO(globalSensorPos);
 
   setUV(globaluVector, globalvVector);
+
+  m_layer = (aSensorInfo.getID()).getLayerNumber();
 }
 
 ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tolerancePhi)
@@ -74,13 +77,15 @@ ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tole
   m_sensorZMin = aSensorInfo.pointToGlobal(minVecV).Z() - toleranceZ;
   m_sensorZMax = aSensorInfo.pointToGlobal(maxVecV).Z() + toleranceZ;
 
+  m_layer = (aSensorInfo.getID()).getLayerNumber();
+
 }
 
 
 ROIDetPlane::~ROIDetPlane() {}
 
 
-bool ROIDetPlane::isSensorInRange(TVector3 trackPosition)
+bool ROIDetPlane::isSensorInRange(TVector3 trackPosition, int layer)
 {
 
   double trackPhi = std::atan2(trackPosition.Y(), trackPosition.X());
@@ -100,6 +105,8 @@ bool ROIDetPlane::isSensorInRange(TVector3 trackPosition)
       return false;
     }
   }
+  if (layer != m_layer)
+    return false;
 
   return true;
 }

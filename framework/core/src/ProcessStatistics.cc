@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/Module.h>
 #include <framework/core/ProcessStatistics.h>
 
 #include <framework/logging/Logger.h>
@@ -18,7 +17,8 @@
 #include <framework/utilities/HTML.h>
 
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/regex.hpp>
+#include <regex>
+#include <boost/format.hpp>
 
 #include <algorithm>
 #include <sstream>
@@ -201,8 +201,8 @@ TObject* ProcessStatistics::Clone(const char*) const
 std::string ProcessStatistics::getInfoHTML() const
 {
   std::string s = getStatisticsString();
-  const static boost::regex tagRegex("^==*$");
-  s = boost::regex_replace(s, tagRegex, "");
+  const static std::regex tagRegex("^==*$");
+  s = std::regex_replace(s, tagRegex, "");
 
   boost::algorithm::replace_all(s, "|", "</td><td>");
   boost::algorithm::replace_all(s, "\n", "</td></tr><tr><td>");

@@ -13,11 +13,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
+#include <string>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

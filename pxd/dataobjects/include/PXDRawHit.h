@@ -30,10 +30,7 @@ namespace Belle2 {
       m_row(0),
       m_column(0),
       m_charge(0) ,
-      m_startRow(0),
-      m_frameNr(0),
-      m_commonMode(0),
-      m_sorPreWord(0) {};
+      m_frameNr(0) {};
 
 
     /**
@@ -41,14 +38,12 @@ namespace Belle2 {
      * @param row Pixel row coordinate.
      * @param column Pixel column coordinate.
      * @param charge The Pixel charge.
-     * @param startRow Number of the row where the reading electronic startet.
      * @param frameNr number of the (readout) frame.
-     * @param commonMode Common Mode correction for this pixel.
      */
     PXDRawHit(VxdID sensorID, short row, short column, short charge,
-              unsigned short startRow, unsigned int frameNr, unsigned int commonMode = 0, unsigned int sorPreWord = 0):
+              unsigned int frameNr):
       m_sensorID(sensorID), m_row(row), m_column(column),
-      m_charge(charge), m_startRow(startRow), m_frameNr(frameNr), m_commonMode(commonMode), m_sorPreWord(sorPreWord)
+      m_charge(charge), m_frameNr(frameNr)
     {};
 
     /** Get the sensor ID.
@@ -83,47 +78,23 @@ namespace Belle2 {
       return m_charge;
     }
 
-    /** Get cluster start pixel in u direction.
-     * @return row where reading begins.
-     */
-    unsigned short getStartRow() const
-    {
-      return m_startRow;
-    }
-
-    /** Get number of the Frames.
-     * @return Number of the Frames.
+    /** Get frame number.
+     * @return Number of the Frame.
      */
     unsigned short getFrameNr() const
     {
       return m_frameNr;
     }
 
-    /** Get Common Mode correction.
-     * @return Common Mode correction.
-     */
-    unsigned short getCommonMode() const
-    {
-      return m_commonMode;
-    }
-
-    unsigned int getSorPreWord() const
-    {
-      return m_sorPreWord;
-    }
 
   private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
     short m_row;         /**< Absolute pixel position in v. */
     short m_column;         /**< Absolute pixel position in v. */
     short m_charge;           /**< Deposited charge in pixel. */
-    unsigned short m_startRow;  /**< pixel row where reading starts */
     unsigned short m_frameNr;    /**< Number of the Frames */
-    short m_commonMode;    /**< Common Mode correction */
-    unsigned int m_sorPreWord;
-    // ~PXDRawHit();
 
-    ClassDef(PXDRawHit, 3)
+    ClassDef(PXDRawHit, 6)
   };
 
 

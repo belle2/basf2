@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h> /* for ntoha etc */
+#include <netinet/in.h> /* for ntoha etc */
+#include <arpa/inet.h>  /* for ntoha etc */
+
 #include "nsm2.h"
 
 #define HASHMAX 2039

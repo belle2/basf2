@@ -27,10 +27,6 @@ PXDInterceptor::PXDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, dou
   m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi);
 }
 
-//PXDInterceptor::PXDInterceptor()
-//{
-//}
-
 PXDInterceptor::~PXDInterceptor()
 {
 }
@@ -47,16 +43,19 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* interceptList, const
 
     B2DEBUG(1, " %%%%%  track candidate Nr. : " << i + 1);
 
-    genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*trackList[i]);
+    if (! trackList[i] ->wasFitSuccessful()) {
+      B2DEBUG(1, "%%%%% Fit not successful! discard this RecoTrack");
+      continue;
+    }
 
     // extrapolate track to cylinders (PXD layers 1 and 2)
     for (unsigned int pxdLayer = 0; pxdLayer < pxdLayers.size(); pxdLayer++) {
 
+      B2DEBUG(1, " fill intercept List, Layer: " << pxdLayer);
       // get current state of track
-      genfit::MeasuredStateOnPlane gfTrackState;
+      genfit::MeasuredStateOnPlane gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromFirstHit();
 
       try {
-        gfTrackState = gfTrack.getFittedState();
         gfTrackState.extrapolateToCylinder(m_pxdLayerRadius[pxdLayer]);
       }  catch (...) {
         B2DEBUG(1, "extrapolation to cylinder failed");
@@ -64,8 +63,11 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* interceptList, const
       }
 
       std::list<ROIDetPlane> selectedPlanes;
-      m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos());
+      B2DEBUG(1, "    append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
+              gfTrackState.getPos().Z());
+      m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos(), pxdLayer + 1);
 
+      B2DEBUG(1, "    append intercepts for track " << i);
       appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToPXDIntercepts);
     } //loop on layers
   } //loop on the track list

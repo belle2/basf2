@@ -17,9 +17,8 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -142,7 +141,7 @@ void AxialTrackCreatorHitHough::initialize()
 
   // Construct hough tree
   int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
-  m_houghTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
+  m_houghTree = std::make_unique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
   m_houghTree->setSectorLevelSkip(m_param_sectorLevelSkip);
   m_houghTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
   m_houghTree->assignArray<DiscreteCurv>(m_param_curvBounds, m_param_discreteCurvOverlap);
@@ -192,16 +191,15 @@ void AxialTrackCreatorHitHough::terminate()
 
 std::vector<float> AxialTrackCreatorHitHough::getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel)
 {
-  using BinSpan = std::array<double, 2>;
+  using BinSpan = std::array<float, 2>;
   using BinSpans = std::vector<BinSpan>;
   std::vector<BinSpans> binSpansByLevel(granularityLevel + 1);
-
   binSpansByLevel[0].push_back(BinSpan({curvSpan[0], curvSpan[1]}));
 
-  for (int level = 0; level < granularityLevel; ++level) {
-    for (BinSpan& binSpan : binSpansByLevel[level]) {
-      double subBinWidth = std::fabs(binSpan[1] - binSpan[0]) / 2;
-      double middle = (binSpan[0] + binSpan[1]) / 2;
+  for (int level = 1; level <= granularityLevel; ++level) {
+    for (const BinSpan& binSpan : binSpansByLevel[level - 1]) {
+      const float subBinWidth = std::fabs(binSpan[1] - binSpan[0]) / 2;
+      const float middle = binSpan[0] + (binSpan[1] - binSpan[0]) / 2.0;
 
       // Expaning bins somewhat to have a overlap
       // Assuming granularity level = 12
@@ -209,26 +207,26 @@ std::vector<float> AxialTrackCreatorHitHough::getDefaultCurvBounds(std::array<fl
       // Never expand for curvatures lower than 0.005
       // (copied from the legendre method. Works well, but some experimentation
       //  needs to be made to know why)
-      double extension = 0;
-      if ((level + 7 <= granularityLevel)
-          // or (std::fabs(middle) <= 0.007)
-          or (std::fabs(middle) <= 0.005)
-         ) {
-        extension = 0;
-      } else if (level + 5 < granularityLevel) {
-        extension = subBinWidth / 4.0;
-      } else {
-        extension = subBinWidth / 8.0;
-      }
+      const float extension = [&]() {
+        if ((level + 7 <= granularityLevel)
+            // or (std::fabs(middle) <= 0.007)
+            or (std::fabs(middle) <= 0.005)) {
+          return 0.0;
+        } else if (level + 5 < granularityLevel) {
+          return subBinWidth / 4.0;
+        } else {
+          return subBinWidth / 8.0;
+        }
+      }();
 
-      double lower1 = binSpan[0];
-      double upper1 = middle + extension;
+      const float lower1 = binSpan[0] - extension;
+      const float upper1 = middle + extension;
 
-      double lower2 = middle - extension;
-      double upper2 = binSpan[1];
+      const float lower2 = middle - extension;
+      const float upper2 = binSpan[1] + extension;
 
-      binSpansByLevel[level + 1].push_back({lower1, upper1});
-      binSpansByLevel[level + 1].push_back({lower2, upper2});
+      binSpansByLevel[level].push_back({lower1, upper1});
+      binSpansByLevel[level].push_back({lower2, upper2});
     }
   }
 

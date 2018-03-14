@@ -1,4 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
+from abc import ABC, abstractmethod
 import subprocess
 import multiprocessing as mp
 from collections import defaultdict
@@ -13,7 +17,7 @@ import pathlib
 
 import ROOT
 
-__all__ = ['Job', 'Local', 'LSF', 'PBS', 'Batch', 'Backend']
+__all__ = ['Job', 'Backend', 'Local', 'Batch', 'LSF', 'PBS']
 
 #: default configuration file location
 default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/backends.cfg')
@@ -24,6 +28,9 @@ _input_data_file_path = "input_data_files.data"
 
 
 def get_input_data():
+    """
+    Simple pickle load of the default input data pickle file name for the CAF
+    """
     with open(_input_data_file_path, 'br') as input_data_file:
         input_data = list(pickle.load(input_data_file))
     return input_data
@@ -31,26 +38,38 @@ def get_input_data():
 
 class Job:
     """
-    Generic Job object used to tell a Backend what to do.
-    - This is a way to store necessary information about a process for
-    submission and pass it in one object to a backend, rather than having
-    the framework set each parameter directly.
-    - Hopefully means that ANY use case can be more easily supported,
-    not just the CAF. You just have to fill a job object and pass it to a
-    Backend for the job submission to work.
-    - Use absolute paths for all directories, otherwise you'll likely get into trouble
+    This generic Job object is used to tell a Backend what to do.
+    This object basically holds necessary information about a process you want to submit to a `Backend`.
+
+    Parameters:
+        name (str): Simply a name to describe the Job, not used for any critical purpose in the CAF
+    Keyword Arguments:
+        config_file (str): Optional path to a config file containing setup for the job. Generally used for basf2 setup.
+            Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
+            By default the backends.default_config_file is used.
+
+    .. warning:: It is recommended to always use absolute paths for files when submitting a `Job`.
     """
 
     class SubJob():
         """
-        SubJob class. Meant to simply hold basic information about which subjob you are
+        This mini-class simply holds basic information about which subjob you are
         and a reference to the parent Job object to be able to access the main data there.
+        Rather than replicating all of the parent job's configuration again.
         """
 
         def __init__(self, job, subjob_id, input_files=None):
+            """
+            """
+            #: Id of Subjob
             self.id = subjob_id
+            #: Job() instance of parent to this SubJob
             self.parent = job
+            #: Input files specific to this subjob
             self.input_files = input_files
+            #: The result object of this SubJob. Only filled once the parent `Job` object is submitted to a backend
+            #: since the backend creates a special result class depending on its type.
+            self.result = None
 
         @property
         def output_dir(self):
@@ -87,14 +106,6 @@ class Job:
 
     def __init__(self, name, config_file=""):
         """
-        Init method of Job object.
-        Params:
-
-        name = <str>  simply a name to describe the Job, not used for any critical purpose in the CAF
-
-        config_file = <str>  Optional path to a config file containing setup for the job. Generally used for basf2 setup.
-                             Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
-                             By default the backends.default_config_file is used.
         """
         #: Job object's name. Only descriptive, not necessarily unique.
         self.name = name
@@ -125,6 +136,10 @@ class Job:
         self.max_files_per_subjob = -1
         #: dict of subjobs assigned to this job
         self.subjobs = {}
+        #: The result object of this Job. Only filled once the job is submitted to a backend since the backend creates a special
+        #: result class depending on its type. This is also only filled for an overall `Job()` if there are no subjobs.
+        #: If there are subjobs, those will contain the result instead.
+        self.result = None
 
     def __repr__(self):
         """
@@ -137,10 +152,11 @@ class Job:
         Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
         """
         if self.subjobs:
-            if all(map(lambda x: x.result.ready(), self.subjobs.values())):
-                return True
+            for subjob in self.subjobs.values():
+                if not subjob.result.ready():
+                    return False
             else:
-                return False
+                return True
         else:
             return self.result.ready()
 
@@ -209,24 +225,28 @@ class Job:
                 subjob.post_process()
 
 
-class Backend():
+class Backend(ABC):
     """
-    Base class for backend of CAF.
+    Abstract base class for a valid backend.
     Classes derived from this will implement their own submission of basf2 jobs
-    to whatever backend they describe. Common methods/attributes go here.
+    to whatever backend they describe.
+    Some common methods/attributes go into this base class.
     """
-
+    #: Default submission script name
     submit_script = "submit.sh"
 
     def __init__(self):
+        """
+        """
         pass
 
+    @abstractmethod
     def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
-        raise NotImplementedError('Need to implement a submit() method in {} backend.'.format(self.__class__.__name__))
+        pass
 
     @staticmethod
     def _dump_input_data(job):
@@ -245,17 +265,18 @@ class Backend():
 
 class Local(Backend):
     """
-    :param max_processes: Integer that specifies the size of the process pool that spawns the subjobs.
-        It's the maximium simultaneous subjobs. Try not to specify a large number or a number
-        larger than the number of cores. Won't crash the program but it will slow down
-        and negatively impact performance. Default = 1
-
     Backend for local processes i.e. on the same machine but in a subprocess.
 
     Note that you should call the self.join() method to close the pool and wait for any
     running processes to finish before exiting the process. Once you've called join you will have to set up a new
     instance of this backend to create a new pool. If you don't call `Local.join` or don't create a join yourself
     somewhere, then the main python process might end before your pool is done.
+
+    Keyword Arguments:
+        max_processes (int): Integer that specifies the size of the process pool that spawns the subjobs, default=1.
+            It's the maximium simultaneous subjobs.
+            Try not to specify a large number or a number larger than the number of cores.
+            It won't crash the program but it will slow down and negatively impact performance.
     """
 
     def __init__(self, max_processes=1):
@@ -468,7 +489,7 @@ class Batch(Backend):
         """
         Init method for Batch Backend. Does default setup based on config file.
         """
-        self.subjobs_to_files = None
+        #: ConfigParser object containing some setup config for this class
         self.config = configparser.ConfigParser()
         self.config.read(default_config_file)
 
@@ -481,12 +502,12 @@ class Batch(Backend):
                                    "method in {} backend.".format(self.__class__.__name__)))
 
     @classmethod
+    @abstractmethod
     def _submit_to_batch(cls, cmd):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        raise NotImplementedError(("Need to implement a _submit_to_batch(cls, cmd) "
-                                   "method in {} backend.".format(self.__class__.__name__)))
+        pass
 
     @method_dispatch
     def submit(self, job):
@@ -603,12 +624,18 @@ class Batch(Backend):
         B2INFO('All Requested Jobs Submitted')
 
     @classmethod
+    @abstractmethod
     def _create_job_result(cls, job, batch_output):
-        raise NotImplementedError("Need to implement a _create_job_result(job, batch_output) method")
+        """
+        """
+        pass
 
     @classmethod
+    @abstractmethod
     def _create_cmd(cls, job):
-        raise NotImplementedError("Need to implement a _create_cmd(job) method")
+        """
+        """
+        pass
 
 
 class PBS(Batch):
@@ -652,11 +679,15 @@ class PBS(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.replace("\n", "")
         job.result = cls.Result(job, job_id)
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         return submission_cmd
@@ -666,7 +697,7 @@ class PBS(Batch):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, env={})
         return sub_out
 
     class Result():
@@ -686,16 +717,21 @@ class PBS(Batch):
             self.job = job
             #: Job ID from backend
             self.job_id = job_id
+            #: Quicker accessonce result is ready
+            self._is_ready = False
 
         def ready(self):
             """
             Function that queries qstat to check for jobs that are still running.
             """
+            if self._is_ready:
+                return True
             try:
                 d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             except subprocess.CalledProcessError as cpe:
                 first_line = cpe.output.splitlines()[0]
                 if "Unknown Job Id Error" in first_line:
+                    self._is_ready = True
                     return True
             else:
                 return False
@@ -750,6 +786,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         submission_cmd = " ".join(submission_cmd)
@@ -780,15 +818,20 @@ class LSF(Batch):
             self.job = job
             #: job id given by LSF
             self.job_id = job_id
+            #: Quicker way to know if it's ready once it has been checked
+            self._is_ready = False
 
         def ready(self):
             """
             Function that queries bjobs to check for jobs that are still running.
             """
+            if self._is_ready:
+                return True
             output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             stat_line = output.split("\n")[1]
             status = stat_line.split()[2]
             if "DONE" in output or "EXIT" in output:
+                self._is_ready = True
                 return True
             else:
                 return False
@@ -806,6 +849,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")

@@ -159,8 +159,8 @@ namespace Belle2 {
     {
 
       Weightfile weightfile;
-      std::string custom_weightfile = weightfile.getFileName();
-      std::string custom_steeringfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
+      std::string custom_steeringfile = weightfile.generateFileName();
 
       uint64_t numberOfFeatures = training_data.getNumberOfFeatures();
       uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
@@ -221,17 +221,17 @@ namespace Belle2 {
           double wSum = 0.0;
           double wSum2 = 0.0;
           double mean = 0.0;
-          double S = 0.0;
+          double running_std = 0.0;
           auto feature = training_data.getFeature(iFeature);
           for (uint64_t i = 0; i < weights.size(); ++i) {
             wSum += weights[i];
             wSum2 += weights[i] * weights[i];
             double meanOld = mean;
             mean += (weights[i] / wSum) * (feature[i] - meanOld);
-            S += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);
+            running_std += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);
           }
           means[iFeature] = mean;
-          stds[iFeature] = std::sqrt(S / (wSum - 1));
+          stds[iFeature] = std::sqrt(running_std / (wSum - 1));
         }
       }
 
@@ -372,7 +372,7 @@ namespace Belle2 {
     void PythonExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       weightfile.getFile("Python_Weightfile", custom_weightfile);
       weightfile.getOptions(m_general_options);
       weightfile.getOptions(m_specific_options);
@@ -385,19 +385,18 @@ namespace Belle2 {
       try {
         auto pickle = boost::python::import("pickle");
         auto builtins = boost::python::import("builtins");
-        auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
-        auto unpickled_fit_object = pickle.attr("load")(file);
-
         m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
         if (weightfile.containsElement("Python_Steeringfile")) {
-          std::string custom_steeringfile = weightfile.getFileName();
+          std::string custom_steeringfile = weightfile.generateFileName();
           weightfile.getFile("Python_Steeringfile", custom_steeringfile);
           auto steeringfile = builtins.attr("open")(custom_steeringfile.c_str(), "rb");
           auto source_code = pickle.attr("load")(steeringfile);
           builtins.attr("exec")(boost::python::object(source_code), boost::python::object(m_framework.attr("__dict__")));
         }
 
+        auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
+        auto unpickled_fit_object = pickle.attr("load")(file);
         m_state = m_framework.attr("load")(unpickled_fit_object);
       } catch (...) {
         PyErr_Print();

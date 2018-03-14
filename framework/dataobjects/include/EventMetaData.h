@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef EVENTMETADATA_H
-#define EVENTMETADATA_H
+
+#pragma once
 
 #include <TObject.h>
 
@@ -41,7 +41,6 @@ namespace Belle2 {
     enum EventErrorFlag {
       c_B2LinkPacketCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
       c_B2LinkEventCRCError = 0x2, /**< HSLB_COPPER CRC error  is detected in the event */
-      c_HLTError       = 0x4  /**< Error is returned from HLT modules. */
     };
 
     /** Event Setter.
@@ -202,4 +201,3 @@ namespace Belle2 {
     ClassDef(EventMetaData, 4); /**< Store event number, run number, and experiment number. */
   }; //class
 } // namespace Belle2
-#endif // EVENTMETADATA

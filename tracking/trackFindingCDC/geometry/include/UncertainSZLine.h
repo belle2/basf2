@@ -10,11 +10,16 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/geometry/SZLine.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+
+#include <cstddef>
+#include <iosfwd>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class Vector2D;
 
     /// A line in sz where s is the transverse travel distance as seen in the xy projection with
     /// uncertainties in the slope and intercept of the line.
@@ -192,14 +197,6 @@ namespace Belle2 {
         return SZUtil::transported(jacobian, szCovariance());
       }
 
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const UncertainSZLine& uncertainSZLine)
-      {
-        return output << "UncertainSZLine("
-               << "tanL=" << uncertainSZLine->slope() << ","
-               << "z0=" << uncertainSZLine->intercept() << ")";
-      }
-
     private:
       /// Memory for the underlying line
       SZLine m_szLine;
@@ -212,8 +209,9 @@ namespace Belle2 {
 
       /// Memory for the number of degrees of freedim of the fit of this line.
       size_t m_ndf = 0;
-
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const UncertainSZLine& uncertainSZLine);
   }
 }

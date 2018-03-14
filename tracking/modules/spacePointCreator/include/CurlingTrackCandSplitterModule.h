@@ -45,17 +45,14 @@ namespace Belle2 {
 
   public:
 
-    /** typedef for less writing effort and to have the same BaseType in all modules */ // TODO: utilize this throughout the Module
-    typedef SpacePoint::SpBaseType ModBaseType;
-
     CurlingTrackCandSplitterModule(); /**< Constructor */
 
     /** initialize: initialize counters, register stuff in DataStore, check if all necessary StoreArrays are present, etc. */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void event(); /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
+    void event() override; /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
 
-    virtual void terminate(); /**< terminate: print some summary on the modules work */
+    void terminate() override; /**< terminate: print some summary on the modules work */
 
     /** Some constants for initialization */
     enum {
@@ -155,7 +152,7 @@ namespace Belle2 {
 
     bool m_saveCompleteCurler; /**< set to true if all parts of a curling TrackCand should be stored in a separate StoreArray (no parameter!) */
 
-    Belle2::B2Vector3<SpacePoint::SpBaseType> m_origin; /**< origin used internally (set from user set value) */
+    B2Vector3<double> m_origin; /**< origin used internally (set from user set value) */
 
     int m_spacePointTCCtr; /**< Counter for presented SpacePointTrackCands */
 
@@ -182,7 +179,7 @@ namespace Belle2 {
      * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
      */
     template<class TrueHit>
-    std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>, const Belle2::B2Vector3<SpacePoint::SpBaseType> >
+    std::pair<const B2Vector3<double>, const B2Vector3<double> >
     getGlobalPositionAndMomentum(TrueHit* aTrueHit);
 
     /**
@@ -192,9 +189,8 @@ namespace Belle2 {
     splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices);
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
-    bool getDirectionOfFlight(const std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>,
-                              const Belle2::B2Vector3<SpacePoint::SpBaseType>>& hitPosAndMom,
-                              const Belle2::B2Vector3<SpacePoint::SpBaseType> origin);
+    bool getDirectionOfFlight(std::pair<const B2Vector3<double>, const B2Vector3<double> > const& hitPosAndMom,
+                              const B2Vector3<double> origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster
@@ -273,11 +269,11 @@ namespace Belle2 {
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomZ;
 
     /** get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates). Returning a TaggedUVPos makes it possible to properly analyze SpacePoints with only one Cluster */
-    TaggedUVPos getUV(const Belle2::SpacePoint* spacePoint);
+    TaggedUVPos getUV(const SpacePoint* spacePoint);
 
     /** Get The Values that are later written to a ROOT file */
     template <class TrueHit>
-    void getValuesForRoot(const Belle2::SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
+    void getValuesForRoot(const SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
 
     void writeToRoot(RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };

@@ -71,8 +71,8 @@ int main(int argc, char* argv[])
       std::string method = vm["method"].as<std::string>();
       if (specific_options.find(method) != specific_options.end()) {
         cmdline_description.add(specific_options[method]->getDescription());
-        po::parsed_options parsed = po::command_line_parser(argc, argv).options(cmdline_description).run();
-        po::store(parsed, vm);
+        po::parsed_options specific_parsed = po::command_line_parser(argc, argv).options(cmdline_description).run();
+        po::store(specific_parsed, vm);
         po::notify(vm);
       } else {
         std::cerr << "Provided method is unkown" << std::endl;

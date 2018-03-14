@@ -100,15 +100,22 @@ void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
-  StoreArray<RawFTSW>::optional();
-  StoreArray<PXDDigit>::optional();
-  StoreArray<PXDRawHit>::optional();
-  StoreArray<ROIid>::required(m_ROIsName);
-  StoreArray<PXDIntercept>::required(m_InterceptsName);
+  StoreArray<RawFTSW> rawFTSWs;
+  rawFTSWs.isOptional();
+
+  StoreArray<PXDDigit> pxdDigits;
+  pxdDigits.isOptional();
+
+  StoreArray<PXDRawHit> pxdRawHits;
+  pxdRawHits.isOptional();
+
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIsName);
+
+  StoreArray<PXDIntercept> pxdIntercept;
+  pxdIntercept.isRequired(m_InterceptsName);
 
   n_events = 0;
-
-
 }
 
 void ROIDQMModule::event()
@@ -208,10 +215,10 @@ void ROIDQMModule::createHistosDictionaries()
 
         m_numModules++; //counting the total number of modules
 
-        const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(*itPxdSensors);
+        const VXD::SensorInfoBase& wSensorInfo = m_aGeometry.getSensorInfo(*itPxdSensors);
 
-        const int nPixelsU = aSensorInfo.getUCells();
-        const int nPixelsV = aSensorInfo.getVCells();
+        const int nPixelsU = wSensorInfo.getUCells();
+        const int nPixelsV = wSensorInfo.getVCells();
         string sensorid = std::to_string(itPxdSensors->getLayerNumber()) + "_" + std::to_string(itPxdSensors->getLadderNumber()) + "_" +
                           std::to_string(itPxdSensors->getSensorNumber());
 
@@ -224,8 +231,8 @@ void ROIDQMModule::createHistosDictionaries()
         double value = 0;
         ROIHistoAccumulateAndFill* aHAAF = new ROIHistoAccumulateAndFill {
           new TH1F(name.c_str(), title.c_str(), 25, 0, 25),
-          [](const ROIid*, double & value) {value++;},
-          [](TH1 * hPtr, double & value) { hPtr->Fill(value); },
+          [](const ROIid*, double & val) {val++;},
+          [](TH1 * hPtr, double & val) { hPtr->Fill(val); },
           value
         };
         hROIDictionaryEvt.insert(pair< Belle2::VxdID, ROIHistoAccumulateAndFill& > ((Belle2::VxdID)*itPxdSensors, *aHAAF));
@@ -657,7 +664,7 @@ void ROIDQMModule::createHistosDictionaries()
         // scatter plot: U,V intercept in cm VS U,V cell position
         name = "hCoorU_vs_UDigit_" + sensorid;
         title = "U intercept (cm) vs U Digit (ID) " + sensorid;
-        TH2F* tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
+        tmp2D = new TH2F(name.c_str(), title.c_str(), 1000, -5, 5, 1000, -5, 5);
         tmp2D->GetXaxis()->SetTitle("intercept U coor (cm)");
         tmp2D->GetYaxis()->SetTitle("digit U coor (cm)");
         hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >

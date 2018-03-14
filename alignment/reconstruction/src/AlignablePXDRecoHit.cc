@@ -9,14 +9,23 @@
  **************************************************************************/
 
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
-
+#include <alignment/Manager.h>
 #include <alignment/Hierarchy.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 
+#include <alignment/GlobalDerivatives.h>
+
+
 using namespace std;
 using namespace Belle2;
+using namespace alignment;
 
 std::pair<std::vector<int>, TMatrixD> AlignablePXDRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-  return alignment::HierarchyManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(), sop);
+  auto globals = GlobalCalibrationManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
+                 sop);
+  // TODO: Move Lorentz outside
+  //auto globalsLorentz = GlobalCalibrationManager::getInstance().getLorentzShiftHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
+  //               sop);
+  return GlobalDerivatives(globals);
 }

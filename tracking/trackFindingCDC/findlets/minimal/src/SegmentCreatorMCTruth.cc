@@ -18,11 +18,14 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-
-#include <framework/core/ModuleParamList.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <TRandom.h>
 
@@ -85,13 +88,16 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
 
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
     for (const CDCHitVector& mcSegment : mcSegments) {
-      if (mcSegment.size() < 3) continue;
       outputSegments.push_back(CDCSegment2D());
       CDCSegment2D& segment2D = outputSegments.back();
       for (const CDCHit* ptrHit : mcSegment) {
+        const CDCWireHit* wireHit = simHitLookUp.getWireHit(ptrHit, inputWireHits);
+        if (not wireHit) continue;
+
         CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, inputWireHits);
         segment2D.push_back(recoHit2D);
       }
+      if (segment2D.size() < 3) outputSegments.pop_back();
     }
   }
 

@@ -44,16 +44,16 @@ void SPTC2GFTCConverterModule::initialize()
 
   // Register StoreArray<genfit::TrackCand> in the DataStore
   StoreArray<genfit::TrackCand> genfitTCs(m_genfitTCName);
-  genfitTCs.registerPersistent(m_genfitTCName);
+  genfitTCs.registerInDataStore(m_genfitTCName, DataStore::c_ErrorIfAlreadyRegistered);
 
   StoreArray<SpacePointTrackCand> spTCs(m_SPTCName);
-  spTCs.required(m_SPTCName);
+  spTCs.isRequired(m_SPTCName);
 
   // Register Relation between the two StoreArrays
   spTCs.registerRelationTo(genfitTCs);
 
-  StoreArray<PXDCluster>::required(m_PXDClustersName);
-  StoreArray<SVDCluster>::required(m_SVDClustersName);
+  StoreArray<PXDCluster> PXDClusters(m_PXDClustersName); PXDClusters.isRequired(m_PXDClustersName);
+  StoreArray<SVDCluster> SVDClusters(m_SVDClustersName); SVDClusters.isRequired(m_SVDClustersName);
 }
 
 void SPTC2GFTCConverterModule::event()
@@ -144,7 +144,7 @@ std::vector<int> SPTC2GFTCConverterModule::getRelatedClusters(const Belle2::Spac
     B2DEBUG(1, "Found no related Clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
             spacePoint->getArrayName());
     throw ClusterNotFound();
-  } else if (relatedClusters.size() > 2) throw SpacePoint::InvalidNumberOfClusters();
+  } else B2ASSERT("Too many clusters!", relatedClusters.size() < 3);
 
   for (const ClusterType& cluster : relatedClusters) {
     clusterInds.push_back(cluster.getArrayIndex());

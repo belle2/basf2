@@ -22,7 +22,7 @@ namespace Belle2 {
   /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm.
    * */
   template <typename PointType >
-  class DELTADISTCIRCLECENTER_NAME : public SelectionVariable< PointType , double > {
+  class DELTADISTCIRCLECENTER_NAME : public SelectionVariable< PointType , 4, double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(DELTADISTCIRCLECENTER_NAME);

@@ -45,7 +45,6 @@ class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin)
             except FileNotFoundError:
                 print("Crops pickle file not found. Create it now.")
             else:
-                harvesting_module.show_results = self.show_results
                 harvesting_module.refine(crops)
 
         super().postprocess()

@@ -7,6 +7,8 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::MVA::Binning-;
-#pragma link C++ class Belle2::MVA::SplotDataset-;
+#pragma link C++ class Belle2::MVA::SPlotDataset-;
+#pragma link C++ class Belle2::MVA::ReweightingDataset-;
+#pragma link C++ class Belle2::MVA::SidebandDataset-;
 
 #endif

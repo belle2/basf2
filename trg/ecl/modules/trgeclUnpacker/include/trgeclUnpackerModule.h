@@ -9,6 +9,7 @@
 // Description : TRG ECL Unpacker Module
 //---------------------------------------------------------------
 // 1.00 : 2017/05/06 : First version
+// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing
 //---------------------------------------------------------------
 
 #ifndef TRGECLUNPACKER_H
@@ -59,20 +60,40 @@ namespace Belle2 {
     std::string version() const;
 
     /** Read data from TRG copper.*/
-    virtual void readCOPPEREvent(RawTRG*, int);
+    virtual void readCOPPEREvent(RawTRG*, int, int);
 
     /** Unpacker main function.*/
-    virtual void checkBuffer(int*);
-
-    /** Utility of TRG ECL.*/
-    std::string u_int2string(int, int);
+    virtual void checkBuffer(int*, int);
 
   protected :
     /** Event number */
     int n_basf2evt;
 
   private :
-
+    /** */
+    int m_revo;
+    /** */
+    int m_gdl;
+    /** */
+    int m_ntc;
+    /** */
+    int m_tcid;
+    /** */
+    int m_time;
+    /** */
+    int m_caltime;
+    /** */
+    int m_evttime;
+    /** */
+    int m_energy;
+    /** */
+    int m_checksum;
+    /** */
+    int m_hitwin;
+    /** */
+    int m_hitNum;
+    /** */
+    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerArray;
 
   };
 

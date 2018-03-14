@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   BinData data;
   unsigned int count = 0;
   while (true) {
-    sbuf.read(evtbuf, false);
+    sbuf.read(evtbuf, false, false);
     nword = evtbuf[0];
     if (file) {
       fwrite(evtbuf, nword * sizeof(int), 1, file);

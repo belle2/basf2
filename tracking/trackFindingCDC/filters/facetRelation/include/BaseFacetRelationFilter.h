@@ -9,63 +9,34 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
 
-    /**
-     *  Base class for filtering the neighborhood of facets.
-     *  Base implementation providing the getLowestPossibleNeighbor and
-     *  isStillPossibleNeighbor method using the geometry of the facet.
-     *  Besides that it accepts all facets.
-     */
-    class BaseFacetRelationFilter : public Filter<Relation<const CDCFacet> > {
+    // Guard to prevent repeated instantiations
+    extern template class RelationFilter<const CDCFacet>;
+
+    /// Base class for filtering the neighborhood of facets.
+    class BaseFacetRelationFilter : public RelationFilter<const CDCFacet> {
 
     public:
+      /// Default constructor
+      BaseFacetRelationFilter();
+
+      /// Default destructor
+      ~BaseFacetRelationFilter();
+
       /**
-       *  Returns a two iterator range covering the range of possible neighboring
+       *  Returns the selection of facets covering the range of possible neighboring
        *  facets of the given facet out of the sorted range given by the two other argumets.
        */
-      template <class AFacetIt>
-      boost::iterator_range<AFacetIt>
-      getPossibleNeighbors(const CDCFacet& facet, const AFacetIt& itBegin, const AFacetIt& itEnd) const
-      {
-        const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();
-        std::pair<AFacetIt, AFacetIt> neighbors = std::equal_range(itBegin, itEnd, rearRLWireHitPair);
-        return {neighbors.first, neighbors.second};
-      }
-
-      /**
-       *  Main filter method returning the weight of the neighborhood relation.
-       *  Return always returns NAN to reject all facet neighbors.
-       */
-      virtual Weight operator()(const CDCFacet& from  __attribute__((unused)),
-                                const CDCFacet& to  __attribute__((unused)))
-      {
-        return 1;
-      }
-
-      /**
-       *  Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.
-       */
-      Weight operator()(const Relation<const CDCFacet>& relation) override
-      {
-        const CDCFacet* ptrFrom(relation.getFrom());
-        const CDCFacet* ptrTo(relation.getTo());
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return this->operator()(*ptrFrom, *ptrTo);
-      }
+      std::vector<const CDCFacet*> getPossibleTos(
+        const CDCFacet* from,
+        const std::vector<const CDCFacet*>& facets) const final;
     };
   }
 }

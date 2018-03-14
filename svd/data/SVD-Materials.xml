@@ -10,6 +10,30 @@
       <Element fraction="0.1282">N</Element>
     </Components>
   </Material>
+  <Material name="SVD-Keratherm">
+    <state>Solid</state>
+    <density unit="g/cm3">1.9</density>
+    <Components>
+      <Element fraction="0.30">H</Element>
+      <Element fraction="0.20">Si</Element>
+      <Element fraction="0.30">O</Element>
+      <Element fraction="0.20">N</Element>
+    </Components>
+  </Material>
+
+ <!-- The real density should be 1.32 g/cm3. Here a larger value is used, because of the 
+      limited space underneath the cooling pipe (the clamps are supposed to surround the 
+      cooling pipe, but this would cause overlaps) -->
+ <Material name="SVD-Peek">
+    <state>Solid</state>
+    <density unit="g/cm3">3.0</density>
+    <Components>
+      <Element fraction="0.08">H</Element>
+      <Element fraction="0.76">C</Element>
+      <Element fraction="0.16">O</Element>
+    </Components>
+  </Material>
+
   <Material name="SVD-Glue">
     <state>Solid</state>
     <Components>

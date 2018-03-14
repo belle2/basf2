@@ -12,6 +12,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <tracking/trackFindingCDC/utilities/Common.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace Belle2;
@@ -59,11 +61,10 @@ void CDCWireTopology::initialize()
   }
 }
 
-void CDCWireTopology::reinitialize(CDC::CDCGeometryPar::EWirePosition wirePosSet,
-                                   bool ignoreWireSag)
+void CDCWireTopology::reinitialize(EWirePosition wirePosition, bool ignoreWireSag)
 {
   for (CDCWire& wire : m_wires) {
-    wire.initialize(wirePosSet, ignoreWireSag);
+    wire.initialize(wirePosition, ignoreWireSag);
   }
 
   for (CDCWireLayer& wireLayer : m_wireLayers) {
@@ -75,7 +76,7 @@ void CDCWireTopology::reinitialize(CDC::CDCGeometryPar::EWirePosition wirePosSet
   }
 }
 
-ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindricalR)
+ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(double cylindricalR)
 {
   const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();
   const std::vector<CDCWireSuperLayer>& wireSuperLayers = cdcWireTopology.getWireSuperLayers();

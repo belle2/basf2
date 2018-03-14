@@ -10,11 +10,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 #include <memory>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

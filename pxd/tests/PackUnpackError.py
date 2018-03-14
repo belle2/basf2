@@ -13,9 +13,6 @@ eventinfosetter.param('evtNumList', [70])  # we want to process nr defined error
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 
-histoman = register_module('HistoManager')
-histoman.param('histoFileName', 'your_histo_file.root')
-
 packer = register_module('PXDPackerErr')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
@@ -40,39 +37,15 @@ packercheck.param('dhe_to_dhc', [
     [0, 2]
 ])
 
-simpleoutput = register_module('RootOutput')
-simpleoutput.param('outputFileName', 'Output.root')
-
-# Load parameters
-gearbox = register_module('Gearbox')
-
-# Create geometry
-geometry = register_module('Geometry')
-
-# Select subdetectors to be built
-# geometry.param('Components', ['PXD','SVD'])
-geometry.param('components', ['PXD'])
-
-# creating the path for the processing
+# creating minimal path for test
 main = create_path()
 main.add_module(eventinfosetter)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(histoman)
 main.add_module(packer)
-unpacker.set_log_level(LogLevel.FATAL)
+unpacker.set_log_level(LogLevel.FATAL)  # this does not work yet, will fall back to ERROR
 main.add_module(unpacker)
-packercheck.set_log_level(LogLevel.INFO)
+packercheck.set_log_level(LogLevel.INFO)  # tell us more in the log in case of any problem
 main.add_module(packercheck, Check=True)
-main.add_module(register_module('PXDDAQDQM'))
-# main.add_module(register_module('PXDRawDQM'))
-# main.add_module(register_module('PXDROIDQM'))
-main.add_module(register_module('Progress'))
-main.add_module(simpleoutput)
 
-set_module_parameters(main, "PXDUnpacker", logLevel=LogLevel.FATAL)
-
-# Process the events
 process(main)
-# if there are less events in the input file the processing will be stopped at
+
 # EOF.

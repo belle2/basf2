@@ -53,7 +53,10 @@ class Job:
 
     #: Allowed Job status dictionary. The  key is the status name and the value is its level. The lowest level
     #: out of all subjobs is the one that is the overal status of the overall job.
-    statuses = {"init": 0, "submitted": 1, "running": 2, "failed": 3, "complete": 4}
+    statuses = {"init": 0, "submitted": 1, "running": 2, "failed": 3, "completed": 4}
+
+    #: Job statuses that correspond to the Job being finished (successfully or not)
+    exit_statuses = ["failed", "completed"]
 
     class SubJob():
         """
@@ -75,7 +78,7 @@ class Job:
             #: since the backend creates a special result class depending on its type.
             self.result = None
             #: Status of the subjob
-            self.status = "init"
+            self._status = "init"
 
         @property
         def output_dir(self):
@@ -100,6 +103,20 @@ class Job:
 
         def ready(self):
             return self.result.ready()
+
+        @property
+        def status(self):
+            """
+            Returns the status of this SubJob.
+            """
+            return self._status
+
+        @status.setter
+        def status(self, status):
+            """
+            """
+            B2INFO("Setting {} status to {}".format(self.name, status))
+            self._status = status
 
         @property
         def max_files_per_subjob(self):
@@ -164,6 +181,8 @@ class Job:
     def ready(self):
         """
         Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
+        It will return False as soon as it hits the first failure. Meaning that you cannot guarantee that all subjobs will have
+        their status updated when calling this method. Instead use :py:meth:`update_status` to update all statuses if necessary.
         """
         if self.subjobs:
             for subjob in self.subjobs.values():
@@ -173,6 +192,17 @@ class Job:
                 return True
         else:
             return self.result.ready()
+
+    def update_status(self):
+        """
+        Calls :py:meth:`update_status` on the job, or all its subjobs to force update the status of all of them.
+        """
+        if self.subjobs:
+            for subjob in self.subjobs.values():
+                subjob.result.update_status()
+        else:
+            self.result.update_status()
+        return self.status
 
     def add_basf2_setup(self):
         """
@@ -202,17 +232,23 @@ class Job:
         subjob status in the hierarchy of statuses in `Job.statuses`.
         """
         if self.subjobs:
-            subjob_statuses = [subjob.status for subjob in self.subjobs.values()]
-            status_level = min([self.statuses[status] for status in subjob_statuses])
-            for status, level in self.statuses.items():
-                if level == status_level:
-                    self._status = status
+            job_status = self._get_overall_status_from_subjobs()
+            if job_status != self._status:
+                self.status = job_status
         return self._status
+
+    def _get_overall_status_from_subjobs(self):
+        subjob_statuses = [subjob.status for subjob in self.subjobs.values()]
+        status_level = min([self.statuses[status] for status in subjob_statuses])
+        for status, level in self.statuses.items():
+            if level == status_level:
+                return status
 
     @status.setter
     def status(self, status):
         """
         """
+        B2INFO("Setting {} status to {}".format(self.name, status))
         self._status = status
 
     @property
@@ -552,6 +588,7 @@ class Batch(Backend):
         Should set a Result object as an attribute of the job. Result object should allow a 'ready' member method to
         be called from it which queries the batch system and the job id about whether or not the job has finished.
         """
+        B2INFO("Submitting job {}".format(job.name))
         # Make sure the output directory of the job is created
         job_output_path = pathlib.Path(job.output_dir)
         job_output_path.mkdir(parents=True, exist_ok=True)
@@ -642,7 +679,7 @@ class Batch(Backend):
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
                 print(" ".join(job.cmd), file=batch_file)
-            B2INFO("Submitting Job({})".format(job.name))
+            B2INFO("Submitting SubJob({})".format(job.name))
             script_path = os.path.join(job.working_dir, self.submit_script)
             cmd = self._create_cmd(script_path)
             output = self._submit_to_batch(cmd)
@@ -652,9 +689,9 @@ class Batch(Backend):
     @submit.register(list)
     def _(self, jobs):
         """
-        Submit method of PBS() that takes a list of jobs instead of just one and submits each one.
+        Submit method of Batch Backend that takes a list of jobs instead of just one and submits each one.
         """
-        # Submit the jobs to PBS
+        B2INFO("Submitting a list of jobs to a Batch backend")
         for job in jobs:
             self.submit(job)
         B2INFO('All Requested Jobs Submitted')
@@ -849,7 +886,14 @@ class LSF(Batch):
         #: with a good exit code. "EXIT" is when a job is known to have completed with a non-zero exit
         #: code. "FINISHED" is when LSF removed the job from the database before we could find the status,
         #: meaning that we can no longer know what the exit code was, only that it finished.
-        exit_statuses = ["DONE", "EXIT", "FINISHED"]
+
+        #: LSF statuses mapped to Job statuses
+        backend_code_to_status = {"RUN": "running",
+                                  "DONE": "completed",
+                                  "FINISHED": "completed",
+                                  "EXIT": "failed",
+                                  "PEND": "submitted"
+                                  }
 
         def __init__(self, job, job_id):
             """
@@ -867,33 +911,28 @@ class LSF(Batch):
             """
             Function that queries bjobs to check for jobs that are still running.
             """
+            B2DEBUG(29, "Calling {}.result.ready()".format(self.job.name))
             if self._is_ready:
                 return True
-            output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-            status = self._get_status_from_output(output)
-            if status in self.exit_statuses:
-                # Return early if we haven't changed status
-                if status != self.job.status:
-                    if status == "EXIT":
-                        B2DEBUG(29, "Setting {} status to {}".format(self.job, "failed"))
-                        self.job.status = "failed"
-                    else:
-                        B2DEBUG(29, "Setting {} status to {}".format(self.job, "complete"))
-                        self.job.status = "complete"
-                self._is_ready = True
+            self.update_status()
+            if self.job.status in self.job.exit_statuses:
                 return True
-            elif status == "RUN":
-                if status != self.job.status:
-                    B2DEBUG(29, "Setting {} status to {}".format(self.job, "running"))
-                    self.job.status = "running"
-                return False
-            elif status == "PEND":
-                if status != self.job.status:
-                    B2DEBUG(29, "Setting {} status to {}".format(self.job, "submitted"))
-                    self.job.status = "submitted"
-                return False
             else:
-                raise BackendError("Unidentified Job status found: {}".format(status))
+                return False
+
+        def update_status(self):
+            """
+            Update the job's status by calling bjobs.
+            """
+            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
+            output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
+            backend_status = self._get_status_from_output(output)
+            try:
+                new_job_status = self.backend_code_to_status[backend_status]
+            except KeyError as err:
+                raise BackendError("Unidentified backend status found for Job({}): {}".format(str(job), backend_status))
+            if new_job_status != self.job.status:
+                self.job.status = new_job_status
 
         def _get_status_from_output(self, output):
             if output == "Job <{}> is not found\n".format(self.job_id):

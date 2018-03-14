@@ -16,13 +16,11 @@
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <framework/database/DBObjPtr.h>
 
 // ROOT
 #include <TRandom.h>
@@ -42,7 +40,7 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerModule::ECLDigitizerModule() : Module()
+ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -102,7 +100,7 @@ void ECLDigitizerModule::beginRun()
   if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
   if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
 
-  if (m_HadronPulseShape)  loadHadronSignalShapes();
+  if (m_HadronPulseShape)  callbackHadronSignalShapes();
 
 }
 
@@ -325,26 +323,29 @@ void ECLDigitizerModule::terminate()
 {
 }
 
-void ECLDigitizerModule::loadHadronSignalShapes()
+void ECLDigitizerModule::callbackHadronSignalShapes()
 {
 
-  m_ss_HadronShapeSimulations.resize(3);
+  if (m_waveformParametersMC.hasChanged()) {
 
-  //read MC templates from database
-  DBObjPtr<ECLDigitWaveformParametersForMC> waveformParametersMC("ECLDigitWaveformParametersForMC");
-  float photonParsPSD[10];
-  float  hadronParsPSD[10];
-  float diodeParsPSD[10];
-  for (int i = 0; i < 10; i++) {
-    photonParsPSD[i] = waveformParametersMC->getPhotonParameters()[i + 1];
-    hadronParsPSD[i] = waveformParametersMC->getHadronParameters()[i + 1];
-    diodeParsPSD[i] = waveformParametersMC->getDiodeParameters()[i + 1];
+    m_ss_HadronShapeSimulations.resize(3);
+
+    //read MC templates from database
+    float photonParsPSD[10];
+    float hadronParsPSD[10];
+    float diodeParsPSD[10];
+    for (int i = 0; i < 10; i++) {
+      photonParsPSD[i] = m_waveformParametersMC->getPhotonParameters()[i + 1];
+      hadronParsPSD[i] = m_waveformParametersMC->getHadronParameters()[i + 1];
+      diodeParsPSD[i] = m_waveformParametersMC->getDiodeParameters()[i + 1];
+    }
+
+    //Initialize templates for hadron shape simulations
+    m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
+    m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
+    m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
+
   }
-
-  //Initialize templates for hadron shape simulations
-  m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, waveformParametersMC->getPhotonParameters()[0]);
-  m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, waveformParametersMC->getHadronParameters()[0]);
-  m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, waveformParametersMC->getDiodeParameters()[0]);
 
 }
 

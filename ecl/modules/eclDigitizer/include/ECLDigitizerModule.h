@@ -25,6 +25,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <framework/database/DBObjPtr.h>
 #include <vector>
 
 
@@ -124,8 +126,12 @@ namespace Belle2 {
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
 
-    /** load hadron signal shapes from database*/
-    void loadHadronSignalShapes();
+    /** dbobject for hadron signal shapes*/
+    DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+
+    /** callback hadron signal shapes from database*/
+    void callbackHadronSignalShapes();
+
     /** read Shaper-DSP data from root file */
     void readDSPDB();
     /** Emulate response of energy deposition in a crystal and attached photodiode and make waveforms*/

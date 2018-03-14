@@ -14,6 +14,7 @@
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
+#include <top/utilities/Chi2MinimumFinder1D.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -101,10 +102,6 @@ namespace Belle2 {
     timeZeros.registerRelationTo(extHits);
     timeZeros.registerRelationTo(barHits);
 
-    // Step size of the search region
-
-    m_dt = m_timeRange / m_numBins;
-
     // Configure TOP detector
 
     TOPconfigure config;
@@ -189,6 +186,10 @@ namespace Belle2 {
     reco.reconstruct(topTrack);
     if (reco.getFlag() != 1) return;
 
+    // event is accepted for t0 determination
+
+    m_acceptedCount++;
+
     // find rough t0
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -238,36 +239,29 @@ namespace Belle2 {
       t0Sken += binSize;
     }
 
-    // calculate log likelihoods
+    // calculate log likelihoods and find precise t0
 
-    m_chi2s.clear();
-    m_t0.clear();
     double t0min = t0Rough - m_timeRange / 2;
     double t0max = t0Rough + m_timeRange / 2;
-    m_t0.push_back(t0min + m_dt / 2);
-    for (int i = 1; i < m_numBins; i++) {
-      m_t0.push_back(m_t0.back() + m_dt);
-    }
     timeMin += t0Rough;
     timeMax += t0Rough;
-    for (double t0 : m_t0) {
-      m_chi2s.push_back(-2 * reco.getLogL(t0, timeMin, timeMax, m_sigma));
+    Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
+    const auto& binCenters = finder.getBinCenters();
+    for (unsigned i = 0; i < binCenters.size(); i++) {
+      double t0 = binCenters[i];
+      finder.add(i, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigma));
     }
+    const auto& t0 = finder.getMinimum();
+    if (t0.position < t0min or t0.position > t0max or !t0.valid) return; // out of range
 
-    // find minimum
+    // event t0 is successfully determined
 
-    int i0 = 0;
-    for (int i = 0; i < m_numBins; i++) {
-      if (m_chi2s[i] < m_chi2s[i0]) i0 = i;
-    }
-    double chi2_min = m_chi2s[i0];
-    for (auto& chi2 : m_chi2s) chi2 -= chi2_min;
+    m_successCount++;
 
-    PointWithError t0 = getParabolicMinimum(i0);
-    if (t0.value < t0min or t0.value > t0max or t0.error == 0) return; // out of range
+    // store results
 
     StoreArray<TOPTimeZero> timeZeros;
-    auto* timeZero = timeZeros.appendNew(topTrack.getModuleID(), t0.value, t0.error,
+    auto* timeZero = timeZeros.appendNew(topTrack.getModuleID(), t0.position, t0.error,
                                          reco.getNumOfPhotons());
     timeZero->addRelationTo(topTrack.getTrack());
     timeZero->addRelationTo(topTrack.getExtHit());
@@ -277,11 +271,10 @@ namespace Belle2 {
 
     if (m_saveHistograms) {
       std::string name;
+
       name = "chi2_" + to_string(m_num);
-      TH1F chi2(name.c_str(), "muon chi2 = -2 logL vs. t0", m_numBins, t0min, t0max);
-      chi2.SetXTitle("t_{0} [ns]");
-      chi2.SetYTitle("log L_{#mu}");
-      for (int i = 0; i < m_numBins; i++) chi2.SetBinContent(i + 1, m_chi2s[i]);
+      std::string title = "muon -2 logL vs. t0; t_{0} [ns]; -2 log L_{#mu}";
+      auto chi2 = finder.getHistogram(name, title);
 
       name = "hits_" + to_string(m_num);
       TH1F hits(name.c_str(), "time distribution of photons (t0-subtracted)",
@@ -289,7 +282,7 @@ namespace Belle2 {
       hits.SetXTitle("time [ns]");
       for (const auto& digit : selDigits) {
         if (digit->getHitQuality() == TOPDigit::c_Good)
-          hits.Fill(digit->getTime() - t0.value);
+          hits.Fill(digit->getTime() - t0.position);
       }
 
       name = "pdf_" + to_string(m_num);
@@ -306,7 +299,9 @@ namespace Belle2 {
 
     if (m_applyT0) {
       for (auto& digit : topDigits) {
-        digit.subtractT0(t0.value);
+        digit.subtractT0(t0.position);
+        double err = digit.getTimeError();
+        digit.setTimeError(sqrt(err * err + t0.error * t0.error));
         digit.addStatus(TOPDigit::c_EventT0Subtracted);
       }
     }
@@ -320,31 +315,8 @@ namespace Belle2 {
 
   void TOPCosmicT0FinderModule::terminate()
   {
-  }
-
-
-  PointWithError TOPCosmicT0FinderModule::getParabolicMinimum(unsigned i0)
-  {
-    if (i0 == 0) i0++;
-    if (i0 == m_t0.size() - 1) i0--;
-
-    PointWithError x = getParabolicMinimum(m_chi2s[i0 - 1],
-                                           m_chi2s[i0],
-                                           m_chi2s[i0 + 1]);
-    return PointWithError(m_t0[i0] + x.value * m_dt, x.error * m_dt);
-  }
-
-
-  PointWithError TOPCosmicT0FinderModule::getParabolicMinimum(double yLeft,
-                                                              double yCenter,
-                                                              double yRight)
-  {
-    double D21 = yCenter - yLeft;
-    double D32 = yRight - yCenter;
-    double A = (D32 - D21) / 2;
-    if (A <= 0) return PointWithError(0, 0);
-    double B = (D32 + D21) / 2;
-    return PointWithError(- B / 2 / A, sqrt(1 / A));
+    B2RESULT("TOPCosmicT0Finder: accepted events " << m_acceptedCount
+             << ", event T0 determined for " << m_successCount << " events");
   }
 
 

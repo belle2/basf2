@@ -13,9 +13,6 @@
 
 #include <framework/core/HistoModule.h>
 
-//Functions to make histograms
-#include <arich/modules/arichDQM/newTHs.h>
-
 //ARICH dataobjects
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
@@ -102,12 +99,12 @@ namespace Belle2 {
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPDs*/
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
-    TH1* h_gelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
+    TH1* h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/
     TH2* h_hits2D = NULL;/**<2D hit map of whale ARICH*/
     TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
-    TH2* h_gelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
-    TH2* h_gelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/
+    TH2* h_aerogelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
+    TH2* h_aerogelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/
 
     TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
     TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/

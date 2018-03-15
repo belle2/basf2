@@ -428,11 +428,14 @@ class CalibrationMachine(Machine):
                                     self._build_iov_dict,
                                     self._create_collector_job,
                                     self._submit_collector])
-        self.add_transition("fail", "running_collector", "collector_failed")
+        self.add_transition("fail", "running_collector", "collector_failed",
+                            conditions=self._collector_job_failed)
         self.add_transition("complete", "running_collector", "collector_completed",
-                            conditions=self._collector_ready,
+                            conditions=[self._collector_ready,
+                                        self._collector_job_completed],
                             before=self._post_process_collector)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
+                            before=self._check_valid_collector_output,
                             after=[self._run_algorithms,
                                    self.automatic_transition])
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
@@ -510,6 +513,14 @@ class CalibrationMachine(Machine):
         """
         """
         self.iteration += 1
+
+    def _collector_job_completed(self):
+        B2DEBUG(29, "Checking for failed collector job")
+        return self._collector_job.status == "completed"
+
+    def _collector_job_failed(self):
+        B2DEBUG(29, "Checking for failed collector job")
+        return self._collector_job.status == "failed"
 
     def _no_failed_iov(self):
         """
@@ -774,6 +785,23 @@ class CalibrationMachine(Machine):
         job.output_patterns = self.calibration.output_patterns
         B2DEBUG(20, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))
         self._collector_job = job
+
+    def _check_valid_collector_output(self):
+        B2INFO("Checking that Collector output exists for all colector jobs "
+               "using {}.output_patterns.".format(self.calibration.name))
+        if not self._collector_job.subjobs:
+            output_files = []
+            for pattern in self._collector_job.output_patterns:
+                output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
+            if not output_files:
+                raise MachineError("No output files from Collector Job")
+        else:
+            for subjob in self._collector_job.subjobs.values():
+                output_files = []
+                for pattern in subjob.output_patterns:
+                    output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
+                if not output_files:
+                    raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
 
     def _run_algorithms(self):
         """

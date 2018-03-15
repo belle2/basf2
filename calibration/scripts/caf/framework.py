@@ -12,8 +12,9 @@ __all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 import os
 import sys
 from threading import Thread
+from time import sleep
 
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
+from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import get_default_global_tags
 
 from abc import ABC, abstractmethod
@@ -484,22 +485,47 @@ class Calibration(CalibrationBase):
         self.machine.root_dir = os.path.join(os.getcwd(), self.name)
         self.machine.iov_to_calibrate = self.iov
         self.machine.collector_backend = self.backend
-        from time import sleep
-        while self.machine.state != "completed":
-            for trigger in self.moves:
-                try:
-                    if trigger in self.machine.get_transitions(self.machine.state):
-                        B2INFO("Attempting transition: {} for calibration {}.".format(trigger, self.name))
-                        getattr(self.machine, trigger)()
-                    #: current state
-                    self.state = self.machine.state
-                    sleep(self.heartbeat)  # Only sleeps if transition completed
-                except ConditionError:
-                    continue
+        while self.state != self.end_state and self.state != self.fail_state:
+            try:
+                B2INFO("Attempting collector submission for calibration {}.".format(self.name))
+                self.machine.submit_collector()
+                self.state = self.machine.state
+            except Except as err:
+                B2FATAL(str(err))
 
-            if self.machine.state == "failed":
-                B2FATAL("Calibration {} failed".format(self.name))
-                break
+            self._poll_collector()
+
+            # If we failed take us to the final fail state
+            if self.state == "collector_failed":
+                self.machine.fail_fully()
+                self.state = self.machine.state
+                return
+
+            self.machine.run_algorithms()
+            self.state = self.machine.state
+            # If we failed take us to the final fail state
+            if self.machine.state == "algorithms_failed":
+                self.machine.fail_fully()
+                self.state = self.machine.state
+                return
+
+    def _poll_collector(self):
+        """
+        """
+        while self.machine.state == "running_collector":
+            try:
+                B2INFO("Checking if collector jobs for calibration {} have finished successfully.".format(self.name))
+                self.machine.complete()
+                self.state = self.machine.state
+            # ConditionError is thrown when the condtions for the transition have returned false, it's not serious.
+            except ConditionError:
+                try:
+                    B2DEBUG(29, "Checking if collector jobs for calibration {} have failed.".format(self.name))
+                    self.machine.fail()
+                    self.state = self.machine.state
+                except ConditionError:
+                    pass
+            sleep(self.heartbeat)  # Sleep until we want to check again
 
     def setup_defaults(self):
         """
@@ -755,7 +781,6 @@ class CAF():
                     calibration.backend = self.backend
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
-            from time import sleep
             finished = False
             while not finished:
                 finished = True

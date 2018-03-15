@@ -70,6 +70,11 @@ namespace Belle2 {
       /** Time(Tag) from MetaInfo */
       unsigned long long int m_meta_time;
 
+      /** DHP Readout Frame Nr for DHP and DHE headers */
+      unsigned int m_trigger_dhp_framenr;
+      /** DHE Trigger Gate for DHE headers */
+      unsigned int m_trigger_dhe_gate;
+
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
 
@@ -102,7 +107,7 @@ namespace Belle2 {
 
       /** Pack one DHP RAW to buffer.
        */
-      void pack_dhp_raw(int dhp_id, int dhe_id, bool adcpedestal);
+      void pack_dhp_raw(int dhp_id, int dhe_id);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame

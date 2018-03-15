@@ -693,6 +693,25 @@ namespace Belle2 {
       return std::cos(th.Angle(particleMomentum));
     }
 
+    double b2bTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bPhi(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
+
 // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -1465,6 +1484,11 @@ namespace Belle2 {
                       "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
     REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
                       "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
+
+    REGISTER_VARIABLE("b2bTheta", b2bTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bPhi", b2bPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,

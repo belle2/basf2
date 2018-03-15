@@ -232,9 +232,9 @@ namespace Belle2 {
      *
      *  @return the local TS ID
      */
-    unsigned TSIDInSL(unsigned tsIDInTracker, unsigned iAx, unsigned iTracker)
+    unsigned TSIDInSL(unsigned tsIDInTracker, unsigned iSL, unsigned iTracker)
     {
-      const unsigned nCellsInSL = nAxialMergers[iAx] * nCellsInLayer;
+      const unsigned nCellsInSL = nMergers[iSL] * nCellsInLayer;
       // get global TS ID
       unsigned iTS = tsIDInTracker + nCellsInSL * iTracker / nTrackers;
       // periodic ID overflow when phi0 > 0 for the 4th tracker
@@ -242,7 +242,7 @@ namespace Belle2 {
         iTS -= nCellsInSL;
       }
       // ID in SL8 is shifted by 16
-      if (iAx == 4) {
+      if (iSL == 8) {
         if (iTS < 16) {
           iTS += nCellsInSL;
         }
@@ -369,7 +369,7 @@ namespace Belle2 {
             for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
               const auto& ts = trk.ts[iAx];
               if (ts[3] > 0) {
-                unsigned iTS = TSIDInSL(ts[0], iAx, iTracker);
+                unsigned iTS = TSIDInSL(ts[0], 2 * iAx, iTracker);
                 CDCTriggerSegmentHit* hit =
                   tsHits->appendNew(2 * iAx, // super layer
                                     iTS, // TS number in super layer
@@ -421,7 +421,7 @@ namespace Belle2 {
             } else if (noMoreHit) {
               B2WARNING("Discontinuous TS hit detected!");
             }
-            unsigned iTS = TSIDInSL(ts[0], iAx, iTracker);
+            unsigned iTS = TSIDInSL(ts[0], 2 * iAx, iTracker);
             // Make TS hit object
             CDCTriggerSegmentHit hit(2 * iAx, // super layer
                                      iTS, // TS number in super layer

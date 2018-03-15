@@ -47,7 +47,6 @@ SeqRootMergerModule::~SeqRootMergerModule()
 
 void SeqRootMergerModule::initialize()
 {
-  RootIOUtilities::loadDictionaries();
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
   for (size_t i = 0; i < inputFiles.size(); i++) {
     m_file.push_back(new SeqFile(inputFiles[i].c_str(), "r"));

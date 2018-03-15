@@ -417,10 +417,6 @@ class CalibrationMachine(Machine):
         #: and find out an overall number of jobs remaining + estimated remaining time
         self._collector_timing = {}
 
-        #: Required interval before we ask to update ALL collector job statuses,
-        #: allowing us to find out the fraction of running/completed
-        self._update_heartbeat = 300
-
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
@@ -548,7 +544,7 @@ class CalibrationMachine(Machine):
 
     def _post_process_collector(self):
         """
-        Runs a merging job on the collector output ROOT files
+        Used to run a merging job on the collector output ROOT files. Now does nothing.
         """
         pass
 
@@ -556,7 +552,7 @@ class CalibrationMachine(Machine):
         """
         """
         since_last_update = time.time() - self._collector_timing["last_update"]
-        if since_last_update > self._update_heartbeat:
+        if since_last_update > self.calibration.collector_full_update_interval:
             B2DEBUG(29, "Updating full set of collector job statuses.")
             self._collector_job.update_status()
             self._collector_timing["last_update"] = time.time()

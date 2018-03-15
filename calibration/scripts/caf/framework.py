@@ -284,8 +284,6 @@ class Calibration(CalibrationBase):
 
         self._local_database_chain = []
         self.use_central_database(get_default_global_tags())
-        #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
-        self.machine = CalibrationMachine(self)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
         #: Plugin your own runner class to change how your calibration will run the list of algorithms.
@@ -293,7 +291,14 @@ class Calibration(CalibrationBase):
         #: The `backend <backends.Backend>` we'll use for our collector submission in this calibration.
         #: It will be set by the CAF if not here
         self.backend = None
+        #: While checking if the collector is finished we don't bother wastefully checking every subjob's status.
+        #: We exit once we find the first subjob that isn't ready.
+        #: But after this interval has elapsed we do a full :py:meth:`caf.backends.Job.update_status` call and
+        #: print the fraction of SubJobs completed.
+        self.collector_full_update_interval = 300
         self.setup_defaults()
+        #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
+        self.machine = CalibrationMachine(self)
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -501,8 +506,17 @@ class Calibration(CalibrationBase):
                 self.state = self.machine.state
                 return
 
-            self.machine.run_algorithms()
-            self.state = self.machine.state
+            # It's possible that we might raise an error while attempting to run due
+            # to some problems e.g. Missing collector output files
+            # We catch the error and exit with failed state so the CAF will stop
+            try:
+                self.machine.run_algorithms()
+                self.state = self.machine.state
+            except MachineError as err:
+                B2ERROR(str(err))
+                self.state = "failed"
+                return
+
             # If we failed take us to the final fail state
             if self.machine.state == "algorithms_failed":
                 self.machine.fail_fully()
@@ -761,6 +775,8 @@ class CAF():
         the output directory. You should check the validity of your new local database before uploading
         to the conditions DB via the basf2 tools/interface to the DB.
         """
+        if not self.calibrations:
+            B2FATAL("There were no Calibration objects to run. Maybe you tried to add invalid ones?")
         # Checks whether the dependencies we've added will give a valid order
         order = self._order_calibrations()
         if not order:

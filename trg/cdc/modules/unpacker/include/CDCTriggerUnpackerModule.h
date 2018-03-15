@@ -211,7 +211,8 @@ namespace Belle2 {
     bool m_alignFoundTime;  /**< flag to align found time in different sub-modules */
 
     NodeList m_neuroNodeID;  /**< list of (COPPER ID, FTSW ID) of neurotrigger */
-    bool m_unpackNeuro;  /**< flag to unpacker neurotrigger data */
+    bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */
+    bool m_decodeNeuro;  /**< flag to decode neurotrigger data */
 
     /** bitstream of TSF output to 2D tracker */
     StoreArray<CDCTriggerUnpacker::TSFOutputBitStream> m_bitsTo2D;

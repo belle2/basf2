@@ -475,6 +475,8 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "flag to decode 2D finder track", false);
   addParam("decode2DFinderInput", m_decode2DFinderInputTS,
            "flag to decode input TS to 2D", false);
+  addParam("decodeNeuro", m_decodeNeuro,
+           "flag to decode neurotrigger data", false);
   NodeList defaultMergerNodeID = {
     {0x11000001, 0},
     {0x11000003, 0},
@@ -523,10 +525,11 @@ void CDCTriggerUnpackerModule::initialize()
     m_bitsToNN.registerInDataStore("CDCTriggerNNInputBits");
     m_bitsFromNN.registerInDataStore("CDCTriggerNNOutputBits");
   }
-  if (m_decodeTSHit or m_decode2DFinderTrack or m_decode2DFinderInputTS) {
+  if (m_decodeTSHit or m_decode2DFinderTrack or
+      m_decode2DFinderInputTS or m_decodeNeuro) {
     m_TSHits.registerInDataStore("CDCTriggerSegmentHits");
   }
-  if (m_decode2DFinderTrack) {
+  if (m_decode2DFinderTrack or m_decodeNeuro) {
     m_2DFinderTracks.registerInDataStore("CDCTrigger2DFinderTracks");
     m_2DFinderTracks.registerRelationTo(m_TSHits);
     m_2DFinderClones.registerInDataStore("CDCTrigger2DFinderClones");
@@ -655,6 +658,11 @@ void CDCTriggerUnpackerModule::event()
     for (short iclock = 0; iclock < m_bitsTo2D.getEntries(); ++iclock) {
       B2DEBUG(30, "clock " << iclock);
       decode2DInput(iclock - m_2DFinderDelay, timeOffset2D, m_bitsTo2D[iclock], &m_TSHits);
+    }
+  }
+  if (m_decodeNeuro) {
+    for (short iclock = 0; iclock < m_bitsFromNN.getEntries(); ++iclock) {
+      decodeNNInput(iclock, m_bitsToNN[iclock], &m_2DFinderTracks, &m_TSHits);
     }
   }
 }

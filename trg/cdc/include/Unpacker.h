@@ -313,6 +313,35 @@ namespace Belle2 {
       return trackOut;
     }
 
+    /** Search for hit in datastore and add it, if there is no matching hit.
+     *
+     *  @return   pointer to the hit (existing or newly created)
+     */
+    CDCTriggerSegmentHit* addTSHit(tsOut ts, unsigned iSL, unsigned iTracker,
+                                   StoreArray<CDCTriggerSegmentHit>* tsHits,
+                                   int foundTime = 0)
+    {
+      unsigned iTS = TSIDInSL(ts[0], iSL, iTracker);
+      // check if hit is already existing in datastore
+      CDCTriggerSegmentHit* hit = nullptr;
+      for (int ihit = 0; ihit < tsHits->getEntries(); ++ihit) {
+        CDCTriggerSegmentHit* compare = (*tsHits)[ihit];
+        if (compare->getISuperLayer() == iSL &&
+            compare->getIWireCenter() == iTS &&
+            compare->getPriorityPosition() == ts[3] &&
+            compare->getLeftRight() == ts[2] &&
+            compare->priorityTime() == int(ts[1])) {
+          hit = compare;
+          break;
+        }
+      }
+      if (!hit) {
+        hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime);
+        B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime);
+      }
+      return hit;
+    }
+
     /**
      *  Decode the 2D finder output from the Bitstream
      *

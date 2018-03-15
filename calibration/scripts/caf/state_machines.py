@@ -814,12 +814,14 @@ class CalibrationMachine(Machine):
         algs_runner.output_database_dir = output_database_dir
         algs_runner.output_dir = os.path.join(self.root_dir, str(self.iteration), self.calibration.alg_output_dir)
         input_files = []
+
         if self._collector_job.subjobs:
             for subjob in self._collector_job.subjobs.values():
-                input_file = os.path.join(subjob.output_dir, "CollectorOutput.root")
-                input_files.append(input_file)
+                for pattern in subjob.output_patterns:
+                    input_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
         else:
-            input_files.append(os.path.join(self._collector_job.output_dir, "CollectorOutput.root"))
+            for pattern in self._collector_job.output_patterns:
+                input_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
         algs_runner.input_files = input_files
 
         # Add any user defined local database chain for this calibration

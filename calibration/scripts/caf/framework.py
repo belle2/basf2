@@ -13,6 +13,7 @@ import os
 import sys
 from threading import Thread
 from time import sleep
+from pathlib import Path
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import get_default_global_tags
@@ -20,21 +21,22 @@ from basf2 import get_default_global_tags
 from abc import ABC, abstractmethod
 import ROOT
 
-from caf.utils import past_from_future_dependencies
-from caf.utils import topological_sort
-from caf.utils import all_dependencies
-from caf.utils import decode_json_string
-from caf.utils import method_dispatch
-from caf.utils import find_sources
-from caf.utils import AlgResult
-from caf.utils import temporary_workdir
-from caf.utils import IoV
-from caf.utils import IoV_Result
+from .utils import B2INFO_MULTILINE
+from .utils import past_from_future_dependencies
+from .utils import topological_sort
+from .utils import all_dependencies
+from .utils import decode_json_string
+from .utils import method_dispatch
+from .utils import find_sources
+from .utils import AlgResult
+from .utils import temporary_workdir
+from .utils import IoV
+from .utils import IoV_Result
 
 from caf import strategies
 from caf import runners
 import caf.backends
-from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 
 
 class CalibrationBase(ABC, Thread):
@@ -586,7 +588,8 @@ class Algorithm():
         #: The name of the algorithm, default is the Algorithm class name
         self.name = algorithm.__cppname__.replace('Belle2::', '')
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
-        #: The list of input files from the collector output will be passed to it
+        #: The list of files matching the `Calibration.output_patterns` from the collector output
+        #: directories will be passed to it
         self.data_input = data_input
         if not self.data_input:
             self.data_input = self.default_inputdata_setup
@@ -607,10 +610,15 @@ class Algorithm():
     def default_inputdata_setup(self, input_file_paths):
         """
         Simple setup to set the input file names to the algorithm. Applied to the data_input attribute
-        by default. This simply takes all files returned from the `Calibration.output_patterns` and sets them
-        as input files to the CalibrationAlgorithm class.
+        by default. This simply takes all files returned from the `Calibration.output_patterns` and filters
+        for only the CollectorOutput.root files. Then it sets them as input files to the CalibrationAlgorithm class.
         """
-        self.algorithm.setInputFileNames(input_file_paths)
+        collector_output_files = list(filter(lambda file_path: "CollectorOutput.root" == Path(file_path).name,
+                                             input_file_paths))
+        info_lines = ["Input files used in {}:".format(self.name)]
+        info_lines.extend(collector_output_files)
+        B2INFO_MULTILINE(info_lines)
+        self.algorithm.setInputFileNames(collector_output_files)
 
 
 class CAF():

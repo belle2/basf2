@@ -75,10 +75,10 @@ namespace TreeFitter {
       }
     }
 
-    // std::cout << "Beam Spot uncertainty : x "
+    // B2DEBUG(19, "Beam Spot uncertainty : x "
     //   << std::sqrt(m_ipCovariance(0, 0)) << " y: "
     //   << std::sqrt(m_ipCovariance(1, 1)) << " z: "
-    //   << std::sqrt(m_ipCovariance(2, 2)) << std::endl;
+    //   << std::sqrt(m_ipCovariance(2, 2)) );
 
     return ErrCode::success;
   }

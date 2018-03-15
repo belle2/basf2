@@ -507,5 +507,16 @@ namespace Belle2 {
      * return a random number between 0 and 1
      */
     double random(const Particle*);
+
+    /**
+     * returns the theta angle (lab) that is back-to-back (cms) to the particle
+     */
+    double b2bTheta(const Particle* particle);
+
+    /**
+     * returns the phi angle (lab) that is back-to-back (cms) to the particle
+     */
+    double b2bPhi(const Particle* particle);
+
   }
 } // Belle2 namespace

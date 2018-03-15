@@ -14,7 +14,9 @@ We use gridcontrol for this. To install it, please do a
 
     pip3 install -r requirements.txt
 
-in this folder.
+in this folder. If you use a centrally installed basf2, you use to install into your user folder with
+
+    pip3 install --user -r requirements.txt
 
 All former results in the same store location (given by console argument) will be replaced!
 """

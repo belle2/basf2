@@ -55,8 +55,8 @@ namespace TreeFitter {
     Projection p(fitpar->getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
 
-    //std::cout << "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
-    //          << " dim contr " << m_dim << std::endl;
+    //B2DEBUG(19, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
+    //          << " dim contr " << m_dim);
 
     double chisq(0);
     int iter(0);
@@ -91,8 +91,8 @@ namespace TreeFitter {
       }
     }
 
-    //std::cout <<  "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq
-    //          << " NDF" << m_dim << " for " << this->name() << std::endl;
+    //B2DEBUG(19, "n---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq
+    //          << " NDF" << m_dim << " for " << this->name());
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);

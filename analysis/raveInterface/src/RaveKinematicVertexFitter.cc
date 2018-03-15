@@ -30,7 +30,7 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <iostream>
-using std::cout; using std::endl; using std::cerr;
+
 using namespace Belle2;
 using namespace analysis;
 

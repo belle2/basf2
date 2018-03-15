@@ -10,7 +10,7 @@ from ROOT import Belle2 as b2
 
 # generate events
 ma.setupEventInfo(10000)
-add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile('decfiles/dec/1120600000.dec'))
+add_evtgen_generator(ma.analysis_main, 'signal', Belle2.FileSystem.findFile('decfiles/dec/1120600000.dec'))
 ma.loadGearbox()
 
 # grab all taus, and also find the signal

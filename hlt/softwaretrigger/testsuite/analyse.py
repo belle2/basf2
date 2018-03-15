@@ -4,6 +4,8 @@ Script to be called by gridcontrol to extract STM variables and results out of a
 
 import basf2
 import os
+import pandas
+import pickle
 
 from softwaretrigger.variable_modules import SummarizeTriggerResults, SummarizeTriggerVariables, PickleHarvestingModule
 from effCalculation import EffModule
@@ -55,6 +57,9 @@ def main():
     # Get all parameters for this calculation
     input_file = os.environ.get("input_file")
     output_file = os.environ.get("output_file")
+    shift_information = os.environ.get("shift_information")
+
+    print(shift_information)
 
     output_variables_file = output_file.replace(".root", "_variables.pkl")
     output_results_file = output_file.replace(".root", "_hlt_results.pkl")
@@ -72,6 +77,13 @@ def main():
     basf2.log_to_file(log_file)
     basf2.print_path(path)
     basf2.process(path)
+
+    # write the shift information to the pickle files
+    shift_parameter, shift_value = eval(shift_information)
+    variables_pickle = pickle.load(open(output_variables_file, 'rb'))
+    for item in variables_pickle:
+        item.update({'shift_parameter': shift_parameter, 'shift_value': shift_value})
+    pickle.dump(variables_pickle, open(output_variables_file, 'wb'))
 
 
 if __name__ == "__main__":

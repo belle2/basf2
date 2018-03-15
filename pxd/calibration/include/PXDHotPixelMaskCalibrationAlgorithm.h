@@ -21,9 +21,6 @@ namespace Belle2 {
     /// Constructor set the prefix to PXDHotPixelMaskCalibrationAlgorithm
     PXDHotPixelMaskCalibrationAlgorithm();
 
-    /// Destructor
-    virtual ~PXDHotPixelMaskCalibrationAlgorithm() {}
-
     /// Minimum number of collected events
     int minEvents;
 
@@ -56,6 +53,13 @@ namespace Belle2 {
     /// Run algo on data
     virtual EResult calibrate();
 
+  private:
+    /** Number of vCells of Belle II PXD sensors*/
+    const unsigned short c_nVCells = 768;
+    /** Number of uCells of Belle II PXD sensors*/
+    const unsigned short c_nUCells = 250;
+    /** Number of drain lines of Belle II PXD sensors*/
+    const unsigned short c_nDrains = 1000;
 
   };
 } // namespace Belle2

@@ -174,7 +174,6 @@ namespace Belle2 {
           for (int iR = 0; iR < IR; iR++) {
             const double rmin = materialInnerR + iR * cellR;
             const double rmax = materialInnerR + (iR + 1) * cellR;
-//            const double materialThick = fabs(materialForwardZ - materialBackwardZ);
             const double materialPosZ = materialBackwardZ;
             for (int iPhi = 0; iPhi < IPhi; iPhi++) {
               const double SPhi = 360. / IPhi * iPhi;

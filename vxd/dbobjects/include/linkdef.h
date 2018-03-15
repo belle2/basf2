@@ -15,7 +15,6 @@
 #pragma link C++ class Belle2::VXDSlotsPar+; // implicit
 
 
-
 #pragma link C++ class Belle2::VXDGeometryPar+;
 #pragma link C++ class Belle2::VXDHalfShellPar+;
 #pragma link C++ class Belle2::VXDGlobalPar+;

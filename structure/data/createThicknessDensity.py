@@ -100,6 +100,6 @@ for element in elements:
     sNode.appendChild(textNode)
     top_element.appendChild(sNode)
 
-xmlfile = open('GAPS-thickness-density_vac.xml', 'w')
+xmlfile = open('GAPS-thickness-density.xml', 'w')
 doc.writexml(xmlfile, addindent=' ' * 4, newl='\n', encoding='utf-8')
 xmlfile.close()

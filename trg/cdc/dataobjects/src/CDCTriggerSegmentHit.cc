@@ -76,3 +76,20 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(const CDCHit& priorityHit,
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime),
   m_eWire(priorityHit.getID())
 {}
+
+unsigned short
+CDCTriggerSegmentHit::getIWireCenter() const
+{
+  std::array<int, 9> nWiresInSuperLayer = {
+    160, 160, 192, 224, 256, 288, 320, 352, 384
+  };
+  unsigned short iWire = getIWire();
+  unsigned short iSL = getISuperLayer();
+  if (m_priorityPosition == 1) {
+    iWire += 1;
+    if (iWire == nWiresInSuperLayer[iSL]) {
+      iWire = 0;
+    }
+  }
+  return iWire;
+}

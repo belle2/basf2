@@ -81,6 +81,8 @@ namespace Belle2 {
     {
       return WireID(m_eWire).getIWire();
     }
+    /** get wire number of center wire within layer. */
+    unsigned short getIWireCenter() const;
     /** get the encoded wire number of the priority wire.
      *
      *  This number can be used directly e.g. with the = operator to create a WireID object.

@@ -199,6 +199,10 @@ namespace Belle2 {
 namespace std {
   /** customized hash-function for being able to use unordered_map. */
   template <> struct hash<Belle2::SubGraphID> {
+    /** Create Hash value from graphID
+     * @param graphID : the subgraph ID
+     * @return the hash value
+     */
     std::size_t operator()(const Belle2::SubGraphID& graphID) const
     {
       std::size_t hashVal = 0;

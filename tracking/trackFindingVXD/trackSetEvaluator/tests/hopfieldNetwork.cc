@@ -21,19 +21,25 @@ using namespace std;
 using namespace Belle2;
 
 
+/// Test of HopfieldNetwork Class
 class HopfieldNetworkTest : public ::testing::Test {
 protected:
 
-  //Container on which the Hopfield Algorithm runs.
-  //Output comes in form of tcInfo4Hopfield.neuronValue. Typically > 0.7 signal, < 0.7 bkg;
+  /**Container on which the Hopfield Algorithm runs.
+   * Output comes in form of tcInfo4Hopfield.neuronValue. Typically > 0.7 signal, < 0.7 bkg;
+   */
   vector <OverlapResolverNodeInfo> m_trackCandidateInfos;
 
-  //Container on which the Greedy Algorithm (Scrooge) runs.
-  //Output comes in form of qiTrackOverlap.isActive, which is simply a bool,
-  //if the corresponding track was taken or not.
-  vector <OverlapResolverNodeInfo>          m_qiTrackOverlap;
+  /**Container on which the Greedy Algorithm (Scrooge) runs.
+   * Output comes in form of qiTrackOverlap.isActive, which is simply a bool,
+   * if the corresponding track was taken or not. */
+  vector <OverlapResolverNodeInfo> m_qiTrackOverlap;
 
-  unsigned int myTrueTracks   = 10;
+  unsigned int myTrueTracks = 10; /**< Number of true tracks */
+
+  /** Create sample for test
+   * @return test sample info
+   */
   vector<OverlapResolverNodeInfo> getInput()
   {
     vector<OverlapResolverNodeInfo> trackCandidateInfos;
@@ -65,7 +71,6 @@ protected:
     }
     return trackCandidateInfos;
   }
-
 };
 
 TEST_F(HopfieldNetworkTest, TestPerformance)

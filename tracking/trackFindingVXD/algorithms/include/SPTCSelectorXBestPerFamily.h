@@ -21,6 +21,9 @@
 
 
 namespace Belle2 {
+  /**
+   * Algorithm to collect the x best TrackCandidates per family based on a VXD Quality estimator method output.
+   */
   class SPTCSelectorXBestPerFamily {
 
   public:

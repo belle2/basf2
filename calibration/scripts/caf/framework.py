@@ -663,9 +663,6 @@ class CAF():
         self.dependencies = {}
         #: Output path to store results of calibration and bookkeeping information
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
-        #: Polling frequency while waiting to transition between processing steps. If your collector will take
-        #: a long time to finish its jobs, it is best to set this a little higher to avoid unnecessary polling.
-        self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
         #: The ordering and explicit future dependencies of calibrations. Will be filled during `CAF.run()` for you.
         self.order = None
         #: Private backend attribute

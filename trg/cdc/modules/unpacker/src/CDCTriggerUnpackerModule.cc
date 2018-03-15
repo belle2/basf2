@@ -403,8 +403,13 @@ namespace Belle2 {
       if (subDetectorId == iNode) {
         if (entries == 0) {
           for (unsigned i = 0; i < nClocks; ++i) {
-            inputArrayPtr->appendNew();
-            outputArrayPtr->appendNew();
+            auto inputClock = inputArrayPtr->appendNew();
+            auto outputClock = outputArrayPtr->appendNew();
+            // fill bitstreams for all trackers with zeros
+            for (unsigned j = 0; j < nTrackers; ++j) {
+              inputClock->m_signal[j].fill(zero_val);
+              outputClock->m_signal[j].fill(zero_val);
+            }
           }
           B2DEBUG(20, name << ": " << nClocks << " clocks");
         } else if (entries != nClocks) {
@@ -426,9 +431,6 @@ namespace Belle2 {
         int iclock = (i - headerSize) / eventWidth;
         auto inputClock = (*inputArrayPtr)[iclock];
         auto outputClock = (*outputArrayPtr)[iclock];
-        // clear bitstreams
-        inputClock->m_signal[iTracker].fill(zero_val);
-        outputClock->m_signal[iTracker].fill(zero_val);
         B2DEBUG(20, "clock " << iclock);
         if (debugLevel >= 100) {
           printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,

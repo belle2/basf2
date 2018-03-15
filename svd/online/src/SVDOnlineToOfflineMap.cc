@@ -101,17 +101,10 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
-  if (chipIter == m_chips.end()) {
-    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip <<
-              " : combination not found in the SVD Off-line to On-line map ");
+  if (chipIter == m_chips.end())  B2FATAL(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
+                                            ", isU=" << side << ", strip=" << strip <<
+                                            " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
 
-    m_currentChipInfo.fadc = 0;
-    m_currentChipInfo.apv = 0;
-    m_currentChipInfo.stripFirst = 0;
-    m_currentChipInfo.stripLast = 0;
-    m_currentChipInfo.apvChannel = 0;
-    return m_currentChipInfo;
-  }
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
 

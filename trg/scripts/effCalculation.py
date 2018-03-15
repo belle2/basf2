@@ -75,7 +75,6 @@ class EffModule(Module):
         """
         self.Ntot_event += 1
         trgresult = Belle2.PyStoreObj('TRGSummary')
-#       summary = trgresult.getTRGSummary(0)
         summary = trgresult.getPsnmBits(0)
         if summary >= 1:
             self.Ntrg_event += 1

@@ -19,6 +19,7 @@
 #include <rawdata/dataobjects/RawDHH.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
@@ -49,6 +50,7 @@ namespace Belle2 {
       void terminate() override final;
 
       std::string m_RawDHHsName;  /**< The name of the StoreArray of processed RawDHHs */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
@@ -96,6 +98,8 @@ namespace Belle2 {
 
       /** Input array for PXD Raw. */
       StoreArray<RawDHH> m_storeRawDHH;
+      /** Input ptr for EventMetaData. */
+      StoreObjPtr<EventMetaData> m_eventMetaData;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw ROIs. */
@@ -130,11 +134,10 @@ namespace Belle2 {
        * @param dhe_ID raw DHE ID from DHC frame
        * @param dhe_DHPport raw DHP port from DHC frame
        * @param dhe_reformat flag if DHE did reformatting
-       * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
-                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
+                      unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
 
       /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
        * @param data pointer to dhp data

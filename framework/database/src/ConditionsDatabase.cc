@@ -24,6 +24,7 @@
 
 #include <cstdio>
 #include <fstream>
+#include <iomanip>
 #include <sys/file.h>
 
 using namespace std;
@@ -83,15 +84,15 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
 
   if (!m_downloader->exists(name)) {
     if (!m_invertLogging)
-      B2LOG(m_logLevel, 0, "No payload " << name << " found in the conditions database for global tag "
-            << m_globalTag << ".");
+      B2LOG(m_logLevel, 0, "No entry " << std::quoted(name) << " found for this run in the conditions "
+            "database for global tag " << std::quoted(m_globalTag) << ".");
     return result;
   }
 
   const auto& info = m_downloader->get(name);
 
   if (info.filename.empty()) {
-    B2ERROR("Failed to get " << name << " from conditions database.");
+    // error raised already ...
     return result;
   }
 
@@ -101,8 +102,8 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   result.second = info.iov;
 
   if (m_invertLogging)
-    B2LOG(m_logLevel, 0, "payload " << name << " found in the conditions database for global tag "
-          << m_globalTag << ". IoV=" << info.iov);
+    B2LOG(m_logLevel, 0, "Payload " << std::quoted(name) << " found in the conditions database for global tag "
+          << std::quoted(m_globalTag) << ". IoV=" << info.iov);
 
   // Update database local cache file but only if payload is found in m_payloadDir
   if (fs::absolute(fs::path(info.filename)).parent_path() != fs::path(m_payloadDir)) {

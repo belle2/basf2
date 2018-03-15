@@ -106,25 +106,22 @@ namespace Belle2 {
     h_chipHit = new TH1D("h_chipHit", "Number of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
     h_hapdHit = new TH1D("h_hapdHit", "Number of hits in each channel;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
     h_hapdHitPerEvent = new TH2D("h_hapdHitPerEvent", "Number of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5,
-                                 420 + 0.5, 144,
-                                 -0.5, 143.5);
+                                 420 + 0.5, 144, -0.5, 143.5);
     h_mergerHit = new TH1D("h_mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
     h_aerogelHit = new TH1D("h_aerogelHit", "Number of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5);
     h_bits = new TH1D("h_bits", "Number of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5);
     h_hits2D = new TH2D("h_hits2D", "2D distribution of hits per track;X[cm];Y[cm];Hits", 460, -115, 115, 460, -115, 115);
     h_tracks2D = new TH2D("h_tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 460, -115, 115, 460, -115, 115);
 
-    h_hitsPerEvent = new TH1D("h_hitsPerEvent", "Number of hit per event;Number of hits;Events", 150, 0, 150);
+    h_hitsPerEvent = new TH1D("h_hitsPerEvent", "Number of hit per event;Number of hits;Events", 150, -0.5, 150 - 0.5);
     h_theta = new TH1D("h_theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6);
     h_hitsPerTrack = new TH1D("h_hitsPerTrack", "Number of hit per track;Number of hits;Tracks", 41, -0.5, 40.5);
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i] = new TH1D(Form("h_thetaSec%d", i + 1), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i + 1),
-                               60, 0,
-                               M_PI / 6);
+                               60, 0, M_PI / 6);
       h_secHitsPerTrack[i] = new TH1D(Form("h_hitsPerTrackSec%d", i + 1),
-                                      Form("Number of hit per track in sector %d;Number of hits;Tracks",
-                                           i + 1), 40, 0, 40);
+                                      Form("Number of hit per track in sector %d;Number of hits;Tracks", i + 1), 40, 0, 40);
     }
 
     TDirectory* dirAerogel = NULL;

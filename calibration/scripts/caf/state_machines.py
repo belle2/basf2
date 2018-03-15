@@ -9,6 +9,7 @@ import pickle
 import multiprocessing
 import glob
 import shutil
+import time
 
 from basf2 import *
 import ROOT
@@ -25,6 +26,7 @@ from .utils import get_iov_from_file
 from .utils import find_absolute_file_paths
 from .utils import runs_overlapping_iov
 from .utils import runs_from_vector
+from .utils import B2INFO_MULTILINE
 from .backends import Job
 from .backends import LSF
 from .backends import PBS
@@ -410,6 +412,15 @@ class CalibrationMachine(Machine):
         #: root directory for this Calibration
         self.root_dir = os.path.join(os.getcwd(), calibration.name)
 
+        #: Times of various useful updates to the collector job e.g. start, elapsed, last update
+        #: Used to periodically call update_status on the collector job
+        #: and find out an overall number of jobs remaining + estimated remaining time
+        self._collector_timing = {}
+
+        #: Required interval before we ask to update ALL collector job statuses,
+        #: allowing us to find out the fraction of running/completed
+        self._update_heartbeat = 300
+
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
@@ -533,12 +544,36 @@ class CalibrationMachine(Machine):
     def _collector_ready(self):
         """
         """
+        since_last_update = time.time() - self._collector_timing["last_update"]
+        if since_last_update > self._update_heartbeat:
+            B2DEBUG(29, "Updating full set of collector job statuses.")
+            self._collector_job.update_status()
+            self._collector_timing["last_update"] = time.time()
+            if self._collector_job.subjobs:
+                num_completed = sum((subjob.status in subjob.exit_statuses) for subjob in self._collector_job.subjobs.values())
+                total_subjobs = len(self._collector_job.subjobs)
+                B2INFO("{}/{} Collector SubJobs finished in {}".format(num_completed, total_subjobs, self.calibration.name))
         return self._collector_job.ready()
 
     def _submit_collector(self):
         """
         """
         self.collector_backend.submit(self._collector_job)
+        self._collector_timing["start"] = time.time()
+        self._collector_timing["last_update"] = time.time()
+        if self._collector_job.subjobs:
+            extra_indent = "  "
+            for subjob in self._collector_job.subjobs.values():
+                info_lines = ["Collector SubJob({}) Details".format(subjob.name)]
+                info_lines.append("SubJob ID number: {}".format(subjob.id))
+                try:
+                    job_id = subjob.result.job_id
+                    info_lines.append("Batch Job ID: {}".format(job_id))
+                except AttributeError:
+                    pass
+                info_lines.append("Input Files:")
+                info_lines.extend(extra_indent+file_path for file_path in subjob.input_files)
+                B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):
         """

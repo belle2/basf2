@@ -244,6 +244,27 @@ def add_mdst_output(
     return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
+def add_cdst_output(
+    path,
+    mc=True,
+    filename='cdst.root',
+    additionalBranches=[],
+    dataDescription=None,
+):
+    """
+    This function adds the cDST output modules to a path, saving only objects defined as part of the cDST data format.
+
+    @param path Path to add modules to
+    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param filename Output file name.
+    @param additionalBranches Additional objects/arrays of event durability to save
+    @param dataDescription Additional key->value pairs to be added as data description
+           fields to the output FileMetaData
+    """
+
+    return mdst.add_cdst_output(path, mc, filename, additionalBranches, dataDescription)
+
+
 def add_arich_modules(path, components=None):
     """
     Add the ARICH reconstruction to the path.

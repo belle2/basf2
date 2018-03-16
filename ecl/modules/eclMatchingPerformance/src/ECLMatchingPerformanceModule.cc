@@ -17,6 +17,11 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
+
 #include <root/TFile.h>
 #include <root/TTree.h>
 
@@ -78,7 +83,7 @@ void ECLMatchingPerformanceModule::event()
     setVariablesToDefaultValue();
     const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
     if (recoTrack) {
-      const TrackFitResult* fitResult = track.getTrackFitResult(Const::pion);
+      const TrackFitResult* fitResult = track.getTrackFitResult(Const::muon);
       B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
       // write some data to the root tree
@@ -97,6 +102,26 @@ void ECLMatchingPerformanceModule::event()
       m_pValue = fitResult->getPValue();
       m_charge = (int)fitResult->getChargeSign();
       m_d0 = fitResult->getD0();
+      m_ndf = recoTrack->getTrackFitStatus()->getNdf();
+
+      // Count hits
+      m_trackProperties.nPXDhits = recoTrack->getNumberOfPXDHits();
+      m_trackProperties.nSVDhits = recoTrack->getNumberOfSVDHits();
+      m_trackProperties.nCDChits = recoTrack->getNumberOfCDCHits();
+      // for (genfit::TrackPoint* tp : recoTrack->getHitPointsWithMeasurement()) {
+      //   for (genfit::AbsMeasurement* m : tp->getRawMeasurements()) {
+      //     if (dynamic_cast<PXDRecoHit*>(m))
+      //       ++m_trackProperties.nPXDhits;
+      //     else if (dynamic_cast<SVDRecoHit*>(m))
+      //       ++m_trackProperties.nSVDhits;
+      //     else if (dynamic_cast<SVDRecoHit2D*>(m))
+      //       m_trackProperties.nSVDhits += 2;
+      //     else if (dynamic_cast<CDCRecoHit*>(m))
+      //       ++m_trackProperties.nCDChits;
+      //     else
+      //       B2ERROR("Unknown AbsMeasurement in track.");
+      //   }
+      // }
 
       ECLCluster* eclCluster = track.getRelatedTo<ECLCluster>();
       if (eclCluster != nullptr) {
@@ -212,6 +237,12 @@ void ECLMatchingPerformanceModule::setupTree()
 
   addVariableToTree("d0", m_d0);
 
+  addVariableToTree("ndf", m_ndf);
+
+  addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
+  addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
+  addVariableToTree("nCDChits", m_trackProperties.nCDChits);
+
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
 
@@ -256,6 +287,8 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
   m_charge = 0;
 
   m_d0 = -999;
+
+  m_ndf = -999;
 
   m_matchedToECLCluster = 0;
 

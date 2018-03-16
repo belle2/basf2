@@ -107,6 +107,7 @@ namespace Belle2 {
           // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
           // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
           const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
+          if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
           Particle particle(track, charged);
           if (particle.getParticleType() == Particle::c_Track) {
             TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();

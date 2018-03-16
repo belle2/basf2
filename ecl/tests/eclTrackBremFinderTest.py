@@ -25,7 +25,7 @@ class CheckRelationBremClusterTestModule(Module):
         bremCluster = None
 
         for cluster in clusters:
-            if cluster.isTrack():
+            if cluster.isTrack() and cluster.getHypothesisId() == 5:
                 # this is the primary of the electron
 
                 # is there a relation to our secondary cluster ?

@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jorge Martinez, Michel Villanueva, Ami Rostomyan         *
+ * Contributors: Michel Villanueva, Ami Rostomyan, Jorge Martinez         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -66,14 +66,17 @@ void EventShapeModule::beginRun()
 
 void EventShapeModule::event()
 {
-  StoreObjPtr<EventShape> thrust;
-  if (!thrust) thrust.create();
-  vector<TVector3> forThrust = EventShapeModule::getParticleList(m_particleLists);
-  TVector3 thrustAxis = EventShapeModule::getThrustOfEvent(forThrust);
-  thrust->addThrustAxis(thrustAxis);
-  thrust->addThrust(thrustAxis.Mag());
+  StoreObjPtr<EventShape> eventShape;
+  if (!eventShape) eventShape.create();
+  vector<TVector3> listOfParticles = EventShapeModule::getParticleList(m_particleLists);
 
-  TVector3 missingMomentum = EventShapeModule::getMissingMomentum(forThrust);
+  TVector3 thrustAxis = EventShapeModule::getThrustOfEvent(listOfParticles);
+  eventShape->addThrustAxis(thrustAxis);
+  eventShape->addThrust(thrustAxis.Mag());
+
+  TVector3 missingMomentum = EventShapeModule::getMissingMomentum(listOfParticles);
+  B2INFO("Missing " << missingMomentum.Mag());
+  eventShape->addMissingMomentum(missingMomentum);
 }
 
 void EventShapeModule::endRun()

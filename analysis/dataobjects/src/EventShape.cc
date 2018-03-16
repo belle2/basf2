@@ -20,6 +20,12 @@ void EventShape::addThrustAxis(TVector3 thrustAxis)
   m_thrustAxis = thrustAxis;
 }
 
+void EventShape::addMissingMomentum(TVector3 missingMomentum)
+{
+  m_missingMomentum = missingMomentum;
+}
+
+
 void EventShape::addThrust(float thrust)
 {
   m_thrust = thrust;

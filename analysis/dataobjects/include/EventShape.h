@@ -34,7 +34,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_thrust(0.0) {};
+    EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_thrust(0.0), m_missingMomentum(0.0, 0.0, 0.0) {};
 
     // setters
     /**
@@ -43,6 +43,14 @@ namespace Belle2 {
      * @param TVector3 thrust axis
      */
     void addThrustAxis(TVector3 thrustAxis);
+
+    // setters
+    /**
+     * Add the missing momentum value.
+     *
+     * @param TVector3 missing momentum
+     */
+    void addMissingMomentum(TVector3 missingMomentum);
 
     /**
      * Add magnitude of thrust.
@@ -63,6 +71,16 @@ namespace Belle2 {
     }
 
     /**
+     * Get missing momentum vector.
+     *
+     * @return TVector3 missing momentum
+     */
+    TVector3 getMissingMomentum(void) const
+    {
+      return m_missingMomentum;
+    }
+
+    /**
      * Get magnitude of thrust.
      *
      * @return Float magnitude of thrust
@@ -78,6 +96,8 @@ namespace Belle2 {
     TVector3 m_thrustAxis; /**< Thrust axis */
 
     float m_thrust;   /**< magnitude of thrust */
+
+    TVector3 m_missingMomentum; /**< Missing momentum of the event */
 
     ClassDef(EventShape, 1) /**< class definition */
 

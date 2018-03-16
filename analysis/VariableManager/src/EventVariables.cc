@@ -327,13 +327,30 @@ namespace Belle2 {
       return th;
     }
 
-    // FIXME: Get x,y,z of thrust and missing
+    // FIXME: Get x,y,z of thrust
 
-    double missingMomentumCMS(const Particle*)
+    double missingMomentumOfEvent(const Particle*)
     {
-
-      double missing;
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      TVector3 missingMomentum = evtShape->getMissingMomentum();
+      double missing = missingMomentum.Mag();
       return missing;
+    }
+
+    double missingThetaOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      TVector3 missingMomentum = evtShape->getMissingMomentum();
+      double missingTheta = missingMomentum.Theta();
+      return missingTheta;
     }
 
 
@@ -384,7 +401,11 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
 
-    REGISTER_VARIABLE("thrustOfEvent", thrustOfEvent, "[Eventbased] Thrust of the event obtained with ThrustOfEvent module")
+    REGISTER_VARIABLE("thrustOfEvent", thrustOfEvent, "[Eventbased] Thrust of the event obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEvent", missingMomentumOfEvent,
+                      "[Eventbased] Missing momentum in CMS of the event obtained with EventShape module")
+    REGISTER_VARIABLE("missingThetaOfEvent", missingThetaOfEvent,
+                      "[Eventbased] Missing momentum theta of the event obtained with EventShape module in CMS")
 
   }
 }

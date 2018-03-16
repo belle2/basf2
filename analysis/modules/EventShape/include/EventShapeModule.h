@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jorge Martinez, Michel Villanueva, Ami Rostomyan         *                                                    *
+ * Contributors: Michel Villanueva, Ami Rostomyan, Jorge Martinez         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

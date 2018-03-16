@@ -9,7 +9,6 @@ from modularAnalysis import *
 import b2biiConversion
 import ROOT
 from ROOT import Belle2
-ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 # In case you have problems with the conditions database you can use the localdb of the FEI directly
 # use_local_database('/home/belle2/tkeck/feiv4/Belle1_2017_convertedMC_Track14_2/localdb/database.txt',

@@ -14,7 +14,7 @@ from modularAnalysis import *
 
 
 def D0ToNeutrals():
-    charmcuts = '1.78 < M < 1.94'
+    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
     D0_Channels = ['pi0:skim pi0:skim',
                    'K_S0:all pi0:skim',
                    'K_S0:all K_S0:all',
@@ -28,18 +28,3 @@ def D0ToNeutrals():
 
     Lists = D0List
     return Lists
-
-
-def DstToD0Neutrals():
-
-    D0List = D0ToNeutrals()
-
-    Dstcuts = '0 < Q < 0.04'
-
-    DstList = []
-    for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID)
-        massVertexRave('D*+:' + str(chID), 0.001)
-        DstList.append('D*+:' + str(chID))
-
-    return DstList

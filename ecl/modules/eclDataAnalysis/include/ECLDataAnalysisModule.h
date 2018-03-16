@@ -7,20 +7,40 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
-
-#ifndef ECLDATAANALYSISMODULE_H_
-#define ECLDATAANALYSISMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
+
+// ECL
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <ecl/dataobjects/ECLEventInformation.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+// FRAMEWORK
+#include <framework/gearbox/Unit.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// GEOMETRY
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+
+class TFile;
+class TTree;
 
 namespace Belle2 {
+  class Track;
+  class TrackFitResult;
+  class ECLPidLikelihood;
+  class EventLevelClusteringInfo;
 
   /** The ECL Data Analysis Module
    *
@@ -61,45 +81,131 @@ namespace Belle2 {
   private:
 
     /** members of ECLReconstructor Module */
-
     TFile* m_rootFilePtr; /**< root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
-    //bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
+    bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
-    //bool m_doMC; /**< if true, MC info is stored*/
-    //std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
-    //std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
-    //std::string m_pure_cal_digits; /**< Pure CsI cal digits StoreArray name*/
+
+    //dataStore objects
+    StoreArray<Track> m_tracks;  /**< Tracks storeArray */
+    StoreArray<TrackFitResult> m_trackFitResults;  /**< TrackFitResult storeArray */
+    StoreArray<ECLPidLikelihood> m_eclPidLikelihoods; /**< ECLPidLikelihood storeArray */
+
+    /** Store array: ECLSimHit. */
+    StoreArray<ECLSimHit> m_eclSimHits;
+    /** Store array: ECLHit. */
+    StoreArray<ECLHit> m_eclHits;
+    /** Store array: ECLDigit. */
+    StoreArray<ECLDigit> m_eclDigits;
+    /** Store array: ECLCalDigit. */
+    StoreArray<ECLCalDigit> m_eclCalDigits;
+    /** Store array: ECLConnectedRegion. */
+    StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
+    /** Store array: ECLShower. */
+    StoreArray<ECLShower> m_eclShowers;
+    /** Store array: ECLCluster. */
+    StoreArray<ECLCluster> m_eclClusters;
+    /** Store array: ECLLocalMaximum. */
+    StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
+    /** Store object pointer: ECLEventInformation. */
+    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
+
+    /** Default name ECLCalDigits array*/
+    virtual const char* eclSimHitArrayName() const
+    { return "ECLSimHits" ; }
+    /** Default name ECLCalDigits array*/
+    virtual const char* eclHitArrayName() const
+    { return "ECLHits" ; }
+    /** Default name ECLDigits array*/
+    virtual const char* eclDigitArrayName() const
+    { return "ECLDigits" ; }
+    /** Default name ECLCalDigits array*/
+    virtual const char* eclCalDigitArrayName() const
+    { return "ECLCalDigits" ; }
+    /** Default name ECLShower array*/
+    virtual const char* eclShowerArrayName() const
+    { return "ECLShowers" ; }
+    /** Default name ECLClusters array*/
+    virtual const char* eclClusterArrayName() const
+    { return "ECLClusters" ; }
+    /** Default name ECLConnectedRegions array*/
+    virtual const char* eclConnectedRegionArrayName() const
+    { return "ECLConnectedRegions" ; }
+    /** Default name ECLLocalMaxima array*/
+    virtual const char* eclLocalMaximumArrayName() const
+    { return "ECLLocalMaximums" ; }
+
+
+    /** Store array: ECLPureDigit. */
+    StoreArray<ECLDigit> m_eclPureDigits;
+    /** Store array: ECLPureCalDigit. */
+    StoreArray<ECLCalDigit> m_eclPureCalDigits;
+    /** Store array: ECLPureConnectedRegion. */
+    StoreArray<ECLConnectedRegion> m_eclPureConnectedRegions;
+    /** Store array: ECLPureShower. */
+    StoreArray<ECLShower> m_eclPureShowers;
+    /** Store array: ECLPureCluster. */
+    StoreArray<ECLCluster> m_eclPureClusters;
+    /** Store array: ECLPureLocalMaximum. */
+    StoreArray<ECLLocalMaximum> m_eclPureLocalMaximums;
+
+    /** Default name ECLPureDigits array*/
+    virtual const char* eclPureDigitArrayName() const
+    { return "ECLDigitsPureCsI" ; }
+    /** Default name ECLPureCalDigits array*/
+    virtual const char* eclPureCalDigitArrayName() const
+    { return "ECLCalDigitsPureCsI" ; }
+    /** Default name ECLPureShower array*/
+    virtual const char* eclPureShowerArrayName() const
+    { return "ECLShowersPureCsI" ; }
+    /** Default name ECLPureClusters array*/
+    virtual const char* eclPureClusterArrayName() const
+    { return "ECLClustersPureCsI" ; }
+    /** Default name ECLPureConnectedRegions array*/
+    virtual const char* eclPureConnectedRegionArrayName() const
+    { return "ECLConnectedRegionsPureCsI" ; }
+    /** Default name ECLPureLocalMaxima array */
+    virtual const char* eclPureLocalMaximumArrayName() const
+    { return "ECLLocalMaximumsPureCsI" ; }
+
+    StoreArray<MCParticle> m_mcParticles; /**< MCParticles StoreArray*/
 
     TTree* m_tree; /**< Root tree and file for saving the output */
-    //TFile* m_rootFile;
 
     // variables
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
 
-    /*int m_eclTriggerMultip;
-    std::vector<int>* m_eclTriggerIdx;
-    std::vector<int>* m_eclTriggerCellId;
-    std::vector<double>* m_eclTriggerTime;*/
+    //EventLevelClusterInfo
+    /** Number of out of time, energetic ECLCalDigits, FWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
+    /** Number of out of time, energetic ECLCalDigits, Barrel. */
+    uint16_t m_nECLCalDigitsOutOfTimeBarrel {0};
+    /** Number of out of time, energetic ECLCalDigits, BWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), FWD. */
+    uint8_t m_nECLShowersRejectedFWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), Barrel. */
+    uint8_t m_nECLShowersRejectedBarrel {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
+    uint8_t m_nECLShowersRejectedBWD {0};
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
     std::vector<int>* m_eclDigitToMC; /**< Index of MCParticle related to that ECLDigit */
-    //std::vector<int>* m_eclDigitToHit; /**< Index of ECLHit related to that ECLDigit */
     std::vector<int>* m_eclDigitCellId; /**< Number of ECLDigit CellId */
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
     std::vector<int>* m_eclDigitFitQuality;  /**< ECLDigit fit quality */
-    //std::vector<int>* m_eclDigitToShower; /**< Index of Shower related to that ECLDigit */
     std::vector<int>* m_eclDigitToCalDigit; /**< Index of CalDigit related to that ECLDigit */
 
     int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */
     std::vector<int>* m_eclCalDigitIdx; /**< ECLCalDigit index */
-    //std::vector<int>* m_eclCalDigitToMC; /**< Index of MCParticle related to that ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMC1; /**< Index of first MCParticle related to ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMC1PDG; /**< PDG code of first MCParticle related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitToMCWeight1; /**< Energy contribution of first MCParticle related to ECLCalDigit */
@@ -119,7 +225,6 @@ namespace Belle2 {
     m_eclCalDigitToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitSimHitSum; /**< Full energy contribution related to ECLCalDigit */
     std::vector<int>* m_eclCalDigitToShower; /**< Index of ECLShower related to that ECLCalDigit */
-    //std::vector<int>* m_eclCalDigitToHit; /**< Index of ECLHit related to that ECLCalDigit */
     std::vector<int>* m_eclCalDigitCellId; /**< Number of ECLCalDigit CellId */
     std::vector<double>* m_eclCalDigitAmp;  /**< ECLCalDigit amplitude */
     std::vector<double>* m_eclCalDigitTimeFit;  /**< ECLCalDigit timing */
@@ -134,8 +239,12 @@ namespace Belle2 {
     std::vector<double>*    m_eclCRLikelihoodElectronNGamma;  /**< Connected Region Electron Likelihood */
     std::vector<double>*    m_eclCRLikelihoodNGamma;  /**< Connected Region Gamma Likelihood */
     std::vector<double>*    m_eclCRLikelihoodNeutralHadron;  /**< Connected Region Neutral Hadron Likelihood*/
-    std::vector<double>*    m_eclCRLikelihoodMergedPi0  /**< Connected Region Merged Pi0 Likelihood */;
-    //std::vector<double>*    m_eclCRToCalDigit;
+    std::vector<double>*    m_eclCRLikelihoodMergedPi0;  /**< Connected Region Merged Pi0 Likelihood */
+
+    int m_eclLMMultip;  /**< Local Maxima multiplicity */
+    std::vector<int>* m_eclLMId; /**< Local Maximum ID */
+    std::vector<int>* m_eclLMType; /**< Local Maximum type */
+    std::vector<int>* m_eclLMCellId; /**< Local Maximum Cell ID */
 
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
     std::vector<int>* m_eclSimHitIdx;  /**< Index of ECLSimHit*/
@@ -156,8 +265,8 @@ namespace Belle2 {
     std::vector<int>* m_eclHitToMC; /**< Index of MCParticle related to ECLHit */
     std::vector<int>* m_eclHitToDigit; /**< Index of ECLDigit related to ECLHit */
     std::vector<int>* m_eclHitToDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
-    //std::vector<int>* m_eclHitToPureDigit; /**< Index of ECLDigit related to ECLHit */
-    //std::vector<int>* m_eclHitToPureDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
+    std::vector<int>* m_eclHitToPureDigit; /**< Index of ECLDigit related to ECLHit, PureCsI option */
+    std::vector<int>* m_eclHitToPureDigitAmp; /**< Amplitude of ECLDigit related to ECLHit, PureCsI option */
     std::vector<int>* m_eclHitCellId; /**< ECLHit CellID */
     std::vector<double>* m_eclHitEnergyDep; /**< ECLHit energy */
     std::vector<double>* m_eclHitTimeAve; /**< ECLHit time */
@@ -185,7 +294,6 @@ namespace Belle2 {
     m_eclClusterToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCluster */
     std::vector<double>* m_eclClusterSimHitSum; /**< Energy contribution of 1st MCParticle related to ECLCluster */
     std::vector<int>* m_eclClusterToShower; /**< Index of ECLShower related to ECLCluster */
-    //std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy; /**< ECLCluster energy */
     std::vector<double>* m_eclClusterEnergyError; /**< ECLCluster energy error*/
     std::vector<double>* m_eclClusterTheta;  /**< ECLCluster polar direction */
@@ -200,9 +308,6 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
-    std::vector<double>* m_eclClusterPx;  /**< Reconstructed momentum along X */
-    std::vector<double>* m_eclClusterPy;  /**< Reconstructed momentum along Y */
-    std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
     std::vector<double>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
     std::vector<double>* m_eclClusterDeltaL; /**< Reconstructed Cluster DeltaL */
@@ -216,66 +321,112 @@ namespace Belle2 {
     std::vector<int>* m_eclClusterDetectorRegion; /**< Cluster Detector Region */
     std::vector<int>* m_eclClusterHypothesisId; /**< Cluster Detector Region */
 
-    //int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
-    //std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
-    //std::vector<int>* m_eclPureDigitToMC; /**< Index of MCParticle related to that ECLPureDigit */
-    //std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLPureDigit CellId */
-    //std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
-    //std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */
-    //std::vector<int>* m_eclPureDigitFitQuality;  /**< ECLPureDigit fit quality */
-    //std::vector<int>* m_eclPureDigitToCluster;  /**< ECLPureDigit To Cluster */
+    int m_eclPureDigitMultip; /**< Number of ECLDigits per event, PureCsI option */
+    std::vector<int>* m_eclPureDigitIdx; /**< ECLDigit index, PureCsI option */
+    std::vector<int>* m_eclPureDigitToMC; /**< Index of MCParticle related to that ECLDigit, PureCsI option */
+    std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLDigit CellId, PureCsI option */
+    std::vector<int>* m_eclPureDigitAmp;  /**< ECLDigit amplitude, PureCsI option */
+    std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLDigit timing, PureCsI option */
+    std::vector<int>* m_eclPureDigitFitQuality;  /**< ECLDigit fit quality, PureCsI option */
+    std::vector<int>* m_eclPureDigitToCluster;  /**< ECLDigit To Cluster, PureCsI option */
 
-    //int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event */
-    //std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index */
-    //std::vector<int>* m_eclPureClusterToMC; /**< Index of MCParticle related to that ECLPureCluster */
-    //std::vector<double>* m_eclPureClusterEnergy; /**< ECLPureCluster energy */
-    //std::vector<double>* m_eclPureClusterEnergyError; /**< ECLPureCluster energy error*/
-    //std::vector<double>* m_eclPureClusterTheta;  /**< ECLPureCluster polar direction */
-    //std::vector<double>* m_eclPureClusterThetaError;  /**< ECLPureCluster error on polar direction */
-    //std::vector<double>* m_eclPureClusterPhi;  /**< ECLPureCluster azimuthal direction */
-    //std::vector<double>* m_eclPureClusterPhiError;  /**< ECLPureCluster error on azimuthal direction */
-    //std::vector<double>* m_eclPureClusterR;  /**< ECLPureCluster distance from IP */
-    //std::vector<double>* m_eclPureClusterEnergyDepSum;  /**< ECLPureCluster simulated energy */
-    //std::vector<double>* m_eclPureClusterTiming;  /**< ECLPureCluster time */
-    //std::vector<double>* m_eclPureClusterTimingError;  /**< ECLPureCluster time error */
-    //std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLPureCluster*/
-    //std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in ECLPureCluster */
-    //std::vector<double>* m_eclPureClusterLat; /**< ECLPureCluster shape parameter */
-    //std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in ECLPureCluster */
-    //std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag */
-    //std::vector<double>* m_eclPureClusterMergedPi0;  /**< Flag for merged pi0 */
-    //std::vector<double>* m_eclPureClusterPx;  /**< Reconstructed momentum along X */
-    //std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
-    //std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
-    //std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
-    //std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL */
+    int m_eclPureCalDigitMultip; /**< Number of ECLCalDigits per event, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitIdx; /**< ECLCalDigit index, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC1; /**< Index of first MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC1PDG; /**< PDG code of first MCParticle related to CalDigit, PureCsI option */
+    std::vector<double>*
+    m_eclPureCalDigitToMCWeight1; /**< Energy contribution of first MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC2; /**< Index of second MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC2PDG; /**< PDG code of second MCParticle related to CalDigit, PureCsI option */
+    std::vector<double>*
+    m_eclPureCalDigitToMCWeight2; /**< Energy contribution of second MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC3; /**< Index of third MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC3PDG; /**< PDG code of third MCParticle related to CalDigit, PureCsI option */
+    std::vector<double>*
+    m_eclPureCalDigitToMCWeight3; /**< Energy contribution of third MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC4; /**< Index of fourth MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC4PDG; /**< PDG code of fourth MCParticle related to CalDigit, PureCsI option */
+    std::vector<double>*
+    m_eclPureCalDigitToMCWeight4; /**< Energy contribution of fourth MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC5; /**< Index of fifth MCParticle related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToMC5PDG; /**< PDG code of fifth MCParticle related to CalDigit, PureCsI option */
+    std::vector<double>*
+    m_eclPureCalDigitToMCWeight5; /**< Energy contribution of fifth MCParticle related to CalDigit, PureCsI option */
+    std::vector<double>*
+    m_eclPureCalDigitToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to CalDigit, PureCsI option */
+    std::vector<double>* m_eclPureCalDigitSimHitSum; /**< Full energy contribution related to CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToShower; /**< Index of ECLShower related to that CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitCellId; /**< Number of CalDigit CellId, PureCsI option */
+    std::vector<double>* m_eclPureCalDigitAmp;  /**< CalDigit amplitude, PureCsI option */
+    std::vector<double>* m_eclPureCalDigitTimeFit;  /**< CalDigit timing, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitFitQuality;  /**< CalDigit fit quality, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToCR; /**< Index of CR related to that CalDigit, PureCsI option */
+    std::vector<int>* m_eclPureCalDigitToLM; /**< Index of LM related to that CalDigit, PureCsI option */
 
-    /*
-    int m_eclGammaMultip;
-    std::vector<int>* m_eclGammaIdx;
-    std::vector<double>* m_eclGammaEnergy;
-    std::vector<double>* m_eclGammaTheta;
-    std::vector<double>* m_eclGammaPhi;
-    std::vector<double>* m_eclGammaPx;
-    std::vector<double>* m_eclGammaPy;
-    std::vector<double>* m_eclGammaPz;
-    std::vector<double>* m_eclGammaR;
-    std::vector<int>* m_eclGammaToPi0;
+    std::vector<int>*    m_eclPureCRIdx; /**< Connected Region ID, PureCsI option */
+    std::vector<int>*    m_eclPureCRIsTrack;  /**< Int for Connected Region - Track Match, PureCsI option */
+    std::vector<double>* m_eclPureCRLikelihoodMIPNGamma;  /**< Connected Region MIP Likelihood, PureCsI option */
+    std::vector<double>*    m_eclPureCRLikelihoodChargedHadron;  /**< Connected Region Charged Hadron Likelihood, PureCsI option */
+    std::vector<double>*    m_eclPureCRLikelihoodElectronNGamma;  /**< Connected Region Electron Likelihood, PureCsI option */
+    std::vector<double>*    m_eclPureCRLikelihoodNGamma;  /**< Connected Region Gamma Likelihood, PureCsI option */
+    std::vector<double>*    m_eclPureCRLikelihoodNeutralHadron;  /**< Connected Region Neutral Hadron Likelihood, PureCsI option */
+    std::vector<double>*    m_eclPureCRLikelihoodMergedPi0;  /**< Connected Region Merged Pi0 Likelihood, PureCsI option */
 
-    int m_eclPi0Multip;
-    std::vector<int>* m_eclPi0Idx;
-    //    std::vector<int>* m_eclPi0ToGamma;
-    std::vector<int>* m_eclPi0ShowerId1;
-    std::vector<int>* m_eclPi0ShowerId2;
-    std::vector<double>* m_eclPi0Energy;
-    std::vector<double>* m_eclPi0Px;
-    std::vector<double>* m_eclPi0Py;
-    std::vector<double>* m_eclPi0Pz;
-    std::vector<double>* m_eclPi0Mass;
-    std::vector<double>* m_eclPi0MassFit;
-    std::vector<double>* m_eclPi0Chi2;
-    std::vector<double>* m_eclPi0PValue;
-    */
+    int m_eclPureLMMultip;  /**< Local Maxima multiplicity, PureCsI option */
+    std::vector<int>* m_eclPureLMId; /**< Local Maximum ID, PureCsI option */
+    std::vector<int>* m_eclPureLMType; /**< Local Maximum type, PureCsI option */
+    std::vector<int>* m_eclPureLMCellId; /**< Local Maximum Cell ID, PureCsI option */
+
+    int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event, PureCsI option */
+    std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC1; /**< Index of first MCParticle related to ECLCluster, PureCsI option */
+    std::vector<double>*
+    m_eclPureClusterToMCWeight1; /**< Energy contribution of first MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC1PDG; /**< PDG code of first MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC2; /**< Index of second MCParticle related to ECLCluster, PureCsI option */
+    std::vector<double>*
+    m_eclPureClusterToMCWeight2; /**< Energy contribution of second MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC2PDG; /**< PDG code of second MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC3; /**< Index of third MCParticle related to ECLCluster, PureCsI option */
+    std::vector<double>*
+    m_eclPureClusterToMCWeight3; /**< Energy contribution of third MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC3PDG; /**< PDG code of third MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC4; /**< Index of fourth MCParticle related to ECLCluster, PureCsI option */
+    std::vector<double>*
+    m_eclPureClusterToMCWeight4; /**< Energy contribution of fourth MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC4PDG; /**< PDG code of fourth MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC5; /**< Index of fifth MCParticle related to ECLCluster, PureCsI option */
+    std::vector<double>*
+    m_eclPureClusterToMCWeight5; /**< Energy contribution of 5th MCParticle related to ECLCluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterToMC5PDG; /**< PDG code of fifth MCParticle related to ECLCluster, PureCsI option */
+    std::vector<double>*
+    m_eclPureClusterToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCluster, PureCsI option */
+    std::vector<double>* m_eclPureClusterEnergy; /**< Cluster energy, PureCsI option */
+    std::vector<double>* m_eclPureClusterEnergyError; /**< Cluster energy error, PureCsI option */
+    std::vector<double>* m_eclPureClusterTheta;  /**< Cluster polar direction, PureCsI option */
+    std::vector<double>* m_eclPureClusterThetaError;  /**< Cluster error on polar direction, PureCsI option */
+    std::vector<double>* m_eclPureClusterPhi;  /**< Cluster azimuthal direction, PureCsI option */
+    std::vector<double>* m_eclPureClusterPhiError;  /**< Cluster error on azimuthal direction, PureCsI option */
+    std::vector<double>* m_eclPureClusterR;  /**< Cluster distance from IP, PureCsI option */
+    std::vector<double>* m_eclPureClusterEnergyDepSum;  /**< Cluster simulated energy, PureCsI option */
+    std::vector<double>* m_eclPureClusterTiming;  /**< Cluster time, PureCsI option */
+    std::vector<double>* m_eclPureClusterTimingError;  /**< Cluster time error, PureCsI option */
+    std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for Cluster, PureCsI option */
+    std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in Cluster, PureCsI option */
+    std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
+    std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
+    std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters, PureCsI option */
+    std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL, PureCsI option */
+    std::vector<double>* m_eclPureClusterClosestTrackDist;  /**< Reconstructed Distance to Closest Track, PureCsI option */
+    std::vector<double>* m_eclPureClusterAbsZernike40;  /**< Reconstructed Zernike40, PureCsI option */
+    std::vector<double>* m_eclPureClusterAbsZernike51;  /**< Reconstructed Zernike51, PureCsI option */
+    std::vector<double>* m_eclPureClusterZernikeMVA;  /**< Output of MVA classifier based on Zernike Momenta, PureCsI option */
+    std::vector<double>* m_eclPureClusterSecondMoment;  /**< Reconstructed Cluster Second Moment, PureCsI option */
+    std::vector<double>* m_eclPureClusterE1oE9;  /**< Reconstructed E1oE9, PureCsI option */
+    std::vector<double>* m_eclPureClusterDeltaTime99;  /**< Reconstructed DeltaT99, PureCsI option */
+    std::vector<int>* m_eclPureClusterDetectorRegion; /**< Clusters detector region, PureCsI option */
+    std::vector<int>* m_eclPureClusterHypothesisId; /**< Cluster ID Hyp, PureCsI option */
 
     int m_eclShowerMultip; /**< Number of ECLShowers per event */
     std::vector<int>* m_eclShowerIdx; /**< Shower Index */
@@ -356,7 +507,6 @@ namespace Belle2 {
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
-
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */
     std::vector<int>* m_mcPdg; /**< MCParticle PDG code */
@@ -399,6 +549,5 @@ namespace Belle2 {
     std::vector<double>* m_eclLogLikeMu; /**< PID track muon likelyhood */
     std::vector<double>* m_eclLogLikePi; /**< PID track pion likelyhood */
   };
-}
 
-#endif
+}

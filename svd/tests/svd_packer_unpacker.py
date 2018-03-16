@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from svd import add_svd_simulation
 from ROOT import Belle2
 import os
 import numpy
 
 import simulation
 
-mapping_file = Belle2.FileSystem.findFile("svd/data/svd_mapping.xml")
 svd_digits_pack_unpack_collection = "SVDDigits_test"
 set_random_seed(42)
 
@@ -20,8 +20,8 @@ class SvdPackerUnpackerTestModule(Module):
     """
 
     def sortDigits(self, unsortedPyStoreArray):
-        """ use a some digit information to sort the CDCDigits list
-            Returns a python-list containing the CDCDigts
+        """ use a some digit information to sort the SVDDigits list
+            Returns a python-list containing the SVDDigits
         """
 
         # first convert to a python-list to be abple to sort
@@ -37,7 +37,7 @@ class SvdPackerUnpackerTestModule(Module):
                 x.isUStrip()))
 
     def event(self):
-        """ load the CDC Digits of the simulation and the packed/unpacked ones
+        """ load the SVD Digits of the simulation and the packed/unpacked ones
         and compare them"""
 
         # load the digits and the collection which results from the packer and unpacker
@@ -83,6 +83,7 @@ class SvdPackerUnpackerTestModule(Module):
             assert hit.getSensorID().getSensorNumber() == hitPackedUnpacked.getSensorID().getSensorNumber()
             assert hit.getSensorID().getSegmentNumber() == hitPackedUnpacked.getSensorID().getSegmentNumber()
 
+
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
@@ -99,22 +100,21 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for svd only
-simulation.add_simulation(main, components=['SVD'])
+add_svd_simulation(main, createDigits=True)
 
 main.add_module(progress)
 
 nodeid = 0
 Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
-Packer.param('svdDigitListName', 'SVDDigits')
+Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
-Packer.param('xmlMapFileName', mapping_file)
 main.add_module(Packer)
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
-unPacker.param('xmlMapFileName', mapping_file)
+unPacker.param('GenerateOldDigits', True)
 main.add_module(unPacker)
 
 # run custom test module to check if the SVDDigits and the

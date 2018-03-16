@@ -141,7 +141,8 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime());
+        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
+                          digit.getTimeError());
     }
 
     TOPalign::setPhotonYields(m_minBkgPerBar, m_scaleN0);

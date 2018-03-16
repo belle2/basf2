@@ -18,7 +18,7 @@ namespace Belle2 {
     class CDCSegment2D;
     class CDCTrack;
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;
 
     /// Base class for segment to track association filters

@@ -151,7 +151,7 @@ void QualityCheckModule::initialize()
 //  StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
   StoreArray<TelCluster> storeTelClusters(m_storeTelClustersName);
 //  StoreArray<TelDigit> storeTelDigits(m_storeTelDigitsName);
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+
 
 //  RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
 //  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
@@ -159,21 +159,21 @@ void QualityCheckModule::initialize()
 
   // FTSW is necessary, without it just fail.
   StoreArray<RawFTSW> storeFTSW("");
-  storeFTSW.required();
+  storeFTSW.isRequired();
   m_storeRawFTSWsName = storeFTSW.getName();
   m_TLUStartTagFromFTSW = static_cast<unsigned short>(storeFTSW[0]->Get15bitTLUTag(0));
   m_TLUStartTagFromFTSWCor = m_TLUStartTagFromFTSW;
 
   // EventMetaData
   StoreObjPtr<EventMetaData> storeEventMetaData;
-//  storeEventMetaData.required();
+//  storeEventMetaData.isRequired();
 
   // EventMetaData
   //m_storeFileMetaDataName = storeFileMetaData.getName();
   const StoreObjPtr<FileMetaData> storeFileMetaData(m_storeFileMetaDataName, DataStore::c_Persistent);
   int Experiment = storeEventMetaData->getExperiment();
   int RunNo = storeEventMetaData->getRun();
-//  storeFileMetaData.required();
+//  storeFileMetaData.isRequired();
   m_ProcessEvents = storeFileMetaData->getNEvents();
   int RunLow = storeFileMetaData->getRunLow();
   int RunHigh = storeFileMetaData->getRunHigh();
@@ -219,7 +219,7 @@ void QualityCheckModule::initialize()
 //  m_storeTelDigitsName = storeTelDigits.getName();
 //  m_relTelClusterDigitName = relTelClusterDigits.getName();
 
-  m_storeFramesName = storeFrames.getName();
+
 
   //StoreObjPtr<TelEventInfo> storeTelEventInfo;
 

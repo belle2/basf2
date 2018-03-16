@@ -11,11 +11,12 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
 
-#include <framework/core/ModuleParamList.icc.h>
-#include <framework/core/ModuleParam.dcl.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParam.h>
 
 #include <RtypesCore.h>
 
+#include <algorithm>
 #include <string>
 #include <memory>
 #include <cmath>
@@ -79,8 +80,6 @@ namespace Belle2 {
     template <class AFilter>
     void FilterVarSet<AFilter>::initialize()
     {
-      Super::initialize();
-
       ModuleParamList moduleParamList;
       const std::string prefix = "";
       m_ptrFilter->exposeParameters(&moduleParamList, prefix);
@@ -92,35 +91,9 @@ namespace Belle2 {
         m_cut = cutParam.getValue();
         cutParam.setDefaultValue(NAN);
       }
-      if (m_ptrFilter) m_ptrFilter->initialize();
-    }
 
-    template <class AFilter>
-    void FilterVarSet<AFilter>::beginRun()
-    {
-      Super::beginRun();
-      if (m_ptrFilter) m_ptrFilter->beginRun();
-    }
-
-    template <class AFilter>
-    void FilterVarSet<AFilter>::beginEvent()
-    {
-      Super::beginEvent();
-      if (m_ptrFilter) m_ptrFilter->beginEvent();
-    }
-
-    template <class AFilter>
-    void FilterVarSet<AFilter>::endRun()
-    {
-      if (m_ptrFilter) m_ptrFilter->endRun();
-      Super::endRun();
-    }
-
-    template <class AFilter>
-    void FilterVarSet<AFilter>::terminate()
-    {
-      if (m_ptrFilter) m_ptrFilter->terminate();
-      Super::terminate();
+      this->addProcessingSignalListener(m_ptrFilter.get());
+      Super::initialize();
     }
 
     template <class AFilter>

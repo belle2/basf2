@@ -30,17 +30,13 @@ namespace Belle2 {
 
   public:
     /// Constructor for the V0Fitter.
-    V0Fitter(const std::string& trackFitResultColName = "", const std::string& v0ColName = "",
-             const std::string& v0ValidationVertexColName = "",
-             const std::string& gfTrackColName = "");
-
-    /// Enable validation output.
-    void enableValidation() { m_validation = true; }
+    V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
+             const std::string& v0ValidationVerticesName = "",
+             const std::string& recoTracksName = "",
+             bool enableValidation = false);
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
-                        double vertexChi2CutInside,
-                        double massWindowKshortInside,
                         double vertexChi2CutOutside);
 
     /// Fit V0 with given hypothesis and store if fit was successful.
@@ -88,15 +84,13 @@ namespace Belle2 {
 
   private:
     bool m_validation;  ///< Validation flag.
-    std::string m_RecoTrackColName;   ///< RecoTrackColName (input).
+    std::string m_recoTracksName;   ///< RecoTrackColName (input).
 
     StoreArray<TrackFitResult> m_trackFitResults;  ///< TrackFitResultColName (output).
     StoreArray<V0> m_v0s;  ///< V0ColName (output).
     StoreArray<V0ValidationVertex> m_validationV0s;  ///< V0ValidationVertexColName (output, optional).
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
-    double m_vertexChi2CutInside;  ///< Chi2 cut inside beampipe.
-    double m_massWindowKshortInside;  ///< Kshort invariant mass cut inside beampipe.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
   };
 

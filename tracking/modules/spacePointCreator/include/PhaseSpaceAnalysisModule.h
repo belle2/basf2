@@ -36,9 +36,9 @@ namespace Belle2 {
   public:
     PhaseSpaceAnalysisModule(); /**< Constructor */
 
-    virtual void initialize(); /**< initialize */
-    virtual void event(); /**< event */
-    virtual void terminate(); /**< terminate */
+    void initialize() override; /**< initialize */
+    void event() override; /**< event */
+    void terminate() override; /**< terminate */
 
     /** helper class to have all RootVariables assembled in one container */
     struct RootVariables {

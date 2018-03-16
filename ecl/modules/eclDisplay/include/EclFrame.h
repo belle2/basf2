@@ -107,7 +107,7 @@ namespace Belle2 {
     /**  Current EclPainter */
     EclPainter* m_ecl_painter;
     /**  ECLChannelMapper, class for conversion from CellID to (crate, shaper, chn_id). */
-    ECLChannelMapper* m_mapper;
+    ECL::ECLChannelMapper* m_mapper;
 
     /**  This flag controls whether to display newly loaded events automatically. */
     bool m_auto_display;
@@ -118,7 +118,9 @@ namespace Belle2 {
 
     /**  Enum for menu commands. */
     enum EclFrameCommandIdentifiers {
+      M_FILE_OPEN,
       M_FILE_SAVE,
+      M_FILE_EXPORT_TREE, /**< Export EclDisplay data into simple TTree*/
       M_FILE_EXIT,
 
       M_VIEW_EVENTS, /**< Display histograms for events. */
@@ -129,39 +131,19 @@ namespace Belle2 {
       M_VIEW_DET_BARR  /**< Use data from barrel only. */
     };
     /**  Possible export filetypes for histograms. */
-    const char* filetypes[30] = {
-      "PDF",                        "*.pdf",
-      "PostScript",                 "*.ps",
-      "Encapsulated PostScript",    "*.eps",
-      "SVG",                        "*.svg",
-      "TeX",                        "*.tex",
-      "GIF",                        "*.gif",
-      "ROOT macros",                "*.C",
-      "ROOT files",                 "*.root",
-      "XML",                        "*.xml",
-      "PNG",                        "*.png",
-      "XPM",                        "*.xpm",
-      "JPEG",                       "*.jpg",
-      "TIFF",                       "*.tiff",
-      "XCF",                        "*.xcf",
-      0,                            0
-    };
+    static const char* filetypes[];
 
   public:
     /**
      * @param auto_load Display new events as soon as they are loaded.
      */
     EclFrame(int painter_type, EclData* data, bool auto_display,
-             ECLChannelMapper* mapper);
+             ECL::ECLChannelMapper* mapper);
     /**
      * ECLFrame destructor. Calls parent class Cleanup() method.
      */
     virtual ~EclFrame();
 
-    /**
-     * Getter for m_open
-     */
-    bool isOpen();
     /**
      * Update view of the data.
      */
@@ -222,10 +204,6 @@ namespace Belle2 {
      * See EclPainterFactory.h, EclPainterType.
      */
     void changeType(int type, bool redraw = true);
-    /**
-     * When window is closed, this slot sets 'm_open' field to false.
-     */
-    void setClosed();
     ClassDef(EclFrame, 0)
   };
 }

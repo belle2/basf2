@@ -17,27 +17,37 @@
 #include <string>
 
 namespace Belle2 {
-
-
-  /** minimal class to store combination of sector and spacePoint, since SpacePoint can not carry sectorConnection */
+  /** Minimal class to store combination of sector and spacePoint, since SpacePoint can not carry sectorConnection */
   struct TrackNode {
-
-    /** to improve readability of the code, here the definition of the static sector type. */
+    /** To improve readability of the code, here the definition of the static sector type. */
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
-    /** pointer to sector */
+    /** Constructor */
+    TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
+
+    /** Constructor with information from SpacePoint */
+    TrackNode(SpacePoint* spacePoint) :
+      m_sector(nullptr), m_spacePoint(spacePoint), m_identifier(spacePoint->getArrayIndex())
+    {}
+
+    /** Destructor */
+    ~TrackNode() {}
+
+
+    /** Pointer to sector */
     ActiveSector<StaticSectorType, TrackNode>* m_sector;
 
-    /** pointer to spacePoint */
+    /** Pointer to spacePoint */
     SpacePoint* m_spacePoint;
 
-    /** unique integer identifier */
+    /** Unique integer identifier */
     const std::int32_t m_identifier;
 
-    /** overloaded '=='-operator
+
+    /** Overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
-     * WARNING TODO write a test for that one!
-    * TODO find good reasons why one would like to create TrackNodes without Hits and ActiveSectors linked to them! */
+     * TODO write a test for that one!
+     * TODO find good reasons why one would like to create TrackNodes without Hits and ActiveSectors linked to them! */
     bool operator==(const TrackNode& b) const
     {
       // simple case: no null-ptrs interfering:
@@ -67,10 +77,12 @@ namespace Belle2 {
     }
 
 
-    /** overloaded '!='-operator */
+    /** Overloaded '!='-operator */
     bool operator!=(const TrackNode& b) const
     {
-      if (m_spacePoint == nullptr) B2FATAL("TrackNode::operator !=: m_spacePoint for Tracknode not set - aborting run.");
+      if (m_spacePoint == nullptr) {
+        B2FATAL("TrackNode::operator !=: m_spacePoint for Tracknode not set - aborting run.");
+      }
       return !(*this == b);
     }
 
@@ -78,31 +90,28 @@ namespace Belle2 {
     /** returns reference to hit. */
     const SpacePoint& getHit() const
     {
-      if (m_spacePoint == nullptr) B2FATAL("TrackNode::getHit: m_spacePoint for Tracknode not set - aborting run.");
+      if (m_spacePoint == nullptr) {
+        B2FATAL("TrackNode::getHit: m_spacePoint for Tracknode not set - aborting run.");
+      }
       return *m_spacePoint;
     }
+
 
     /** returns reference to hit. */
     ActiveSector<StaticSectorType, TrackNode>& getActiveSector()
     {
-      if (m_sector == nullptr) B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.");
+      if (m_sector == nullptr) {
+        B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.");
+      }
       return *m_sector;
     }
 
-    /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
 
-    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex
-      m_sector(nullptr), m_spacePoint(spacePoint), m_identifier(spacePoint->getArrayIndex())
-    {}
+    /** Return ID of this node */
+    std::int32_t getID() const { return m_identifier; }
 
-    /** destructor */
-    ~TrackNode() {}
 
-    /** return ID of this node */
-    const std::int32_t getID() const { return m_identifier; }
-
-    /** returns longer debugging name of this node */
+    /** Returns longer debugging name of this node */
     std::string getName() const
     {
       if (m_identifier >= 0)
@@ -110,7 +119,5 @@ namespace Belle2 {
       else
         return "SP: missing";
     }
-
   };
-
-} //Belle2 namespace
+}

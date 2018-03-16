@@ -43,7 +43,6 @@ muid.param('MaxDt', 2000)
 
 # efficiency based on bklm-stand-alone tracks
 # bklmTrack =  register_module('BKLMTracking')
-# bklmTrack.param('MaxDt',2000)
 # bklmTrack.param('StudyEffiMode', 1)
 # bklmTrack.param('outputName',"bklmEffi_run3173.root")
 

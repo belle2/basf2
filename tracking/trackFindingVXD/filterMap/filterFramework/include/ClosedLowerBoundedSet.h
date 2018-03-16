@@ -14,6 +14,8 @@
 #include <TBranch.h>
 #include <TTree.h>
 
+#include <framework/logging/Logger.h>
+
 #include <typeinfo>
 
 namespace Belle2 {
@@ -26,11 +28,12 @@ namespace Belle2 {
 
   template< typename MinType >
   class ClosedLowerBoundedSet {
-    MinType m_min;
   public:
 
     /** Constructor */
-    ClosedLowerBoundedSet(MinType min): m_min(min) {};
+    explicit ClosedLowerBoundedSet(MinType min): m_min(min) {};
+
+    /** Constructor without argument */
     ClosedLowerBoundedSet(): m_min(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
@@ -61,15 +64,40 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** sets the branch address for m_min
+      @param t: pointer to the tree that contains the branch
+      @param branchName: reference to name of the branch
+    */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
-      t->SetBranchAddress(branchName.c_str(), & m_min);
+      if (t->SetBranchAddress(branchName.c_str(), & m_min) < 0) B2FATAL("ClosedLowerBoundedSet: branch address not valid");
     }
 
     /** Accessor to the inf of the set (which coincides with the min)*/
     MinType getInf(void) const { return m_min; } ;
 
+
+    /** generates a "name" and fills the vector with the variable references
+    @param filtername: optional name of the filter this range is attached to make the output look nicer
+    @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
+      and the actual pointers to the bounds, if equal to nullptr it will not be filled
+    **/
+    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, const std::string& varname = "X")
+    {
+      std::string minVal = std::to_string(m_min);
+      // if pointer to vector is provided fill it
+      if (pointers != nullptr) {
+        // use the position in the vector as unique identifier
+        minVal = "#" + std::to_string(pointers->size());
+        (*pointers).push_back({TBranchLeafType(m_min), &m_min});
+      }
+      return ("(" + minVal + " <= " + varname + ")");
+    }
+
+  private:
+    /// the minimum value for this range
+    MinType m_min;
   };
 
 

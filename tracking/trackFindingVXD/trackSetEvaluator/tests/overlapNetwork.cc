@@ -17,9 +17,10 @@ using namespace std;
 using namespace Belle2;
 
 
+/// Test OverlapNetwork Class
 class OverlapNetworkTest : public ::testing::Test {
 protected:
-  //An overlap matrix for testing purposes:
+  /// An overlap matrix for testing purposes:
   std::vector<std::vector <unsigned short> > smallOverlapTestMatrix =
   {{2, 4, 6, 8}, {3, 5, 7, 9}, {0}, {1}, {0}, {1}, {0}, {1}, {0}, {1}};
 };

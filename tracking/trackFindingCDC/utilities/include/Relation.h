@@ -34,7 +34,7 @@ namespace Belle2 {
       using Super::Super;
 
       /// Operator for ordering of relations.
-      bool operator<(const Relation<From, To>& rhs)
+      bool operator<(const Relation<From, To>& rhs) const
       {
         return (getFrom() < rhs.getFrom() or
                 (not(rhs.getFrom() < getFrom()) and

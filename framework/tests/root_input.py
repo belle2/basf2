@@ -12,42 +12,28 @@ logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
 
 
 class NoopModule(Module):
-
     """Doesn't do anything."""
 
 
-input = register_module('RootInput')
-eventinfo = register_module('EventInfoPrinter')
-printcollections = register_module('PrintCollections')
-
-input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/root_input.root'))
-# load all branches, minus PXDClusters (relations with PXDClusters are automatically excluded)
-input.param('branchNames', [
-    'EventMetaData',
-    'PXDDigits',
-    'PXDTrueHits',
-    'PXDClusters'])
-# (yes, we also added PXDClusters in branchNames, to check if it's overridden by excludeBranchNames)
-input.param('excludeBranchNames', ['PXDClusters'])
-input.param('skipNEvents', 1)
-input.logging.log_level = LogLevel.WARNING
-
 main = create_path()
-
 # not used for anything, just checking wether the master module
 # can be found if it's not the first module in the path.
 main.add_module(NoopModule())
-
-main.add_module(input)
-main.add_module(eventinfo)
-main.add_module(printcollections)
+# load all branches, minus PXDClusters (relations with PXDClusters are automatically excluded)
+# (yes, we also added PXDClusters in branchNames, to check if it's overridden by excludeBranchNames)
+input_module = main.add_module("RootInput", inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'),
+                               branchNames=['EventMetaData', 'PXDDigits', 'PXDTrueHits', 'PXDClusters'],
+                               excludeBranchNames=['PXDClusters'], skipNEvents=1, logLevel=LogLevel.WARNING)
+# print event information and datastore contents
+main.add_module("EventInfoPrinter")
+main.add_module("PrintCollections", printForEvent=0)
 
 # Process events
 process(main)
 
 # Test restricting the number of events per file
 # This issues a warning because a part of the events is out of range
-input.param('entrySequences', ["0,3:10,23"])
+input_module.param('entrySequences', ["0,3:10,23"])
 process(main)
 
 # Test starting directly with a given event. There will be a fatal error if the
@@ -66,7 +52,7 @@ for evtNo in range(1, 6):
 
 # Test eventSequences in detail
 main = create_path()
-input = main.add_module('RootInput', inputFileNames=[
+input_module = main.add_module('RootInput', inputFileNames=[
     Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
     Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')], logLevel=LogLevel.WARNING)
 # The first file contains the following event numbers (in this order)
@@ -74,7 +60,7 @@ input = main.add_module('RootInput', inputFileNames=[
 # We select more event than the file contains, to check if it works anyway
 # The second file contains the following event numbers (in this order)
 # 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
-input.param('entrySequences', ['0,3:4,10:100', '1:2,4,12:13'])
+input_module.param('entrySequences', ['0,3:4,10:100', '1:2,4,12:13'])
 
 expected_event_numbers = [2, 9, 10, 15, 16, 6, 3, 9, 18, 14]
 processed_event_numbers = []
@@ -85,6 +71,7 @@ class TestingModule(Module):
     Test module which writes out the processed event numbers
     into the global processed_event_numbers list
     """
+
     def event(self):
         """
         Called for each event

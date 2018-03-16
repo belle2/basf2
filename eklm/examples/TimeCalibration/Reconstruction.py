@@ -20,10 +20,10 @@ eklmtimecalibration = register_module('EKLMTimeCalibrationCollector')
 # Create the main path and add the modules
 main = create_path()
 main.add_module(input)
+main.add_module("HistoManager", histoFileName=sys.argv[2])
 main.add_module(gearbox)
 add_reconstruction(main)
 main.add_module(eklmtimecalibration)
-main.add_module('RootOutput', branchNames=['EventMetaData'], outputFileName=sys.argv[2])
 
 # generate events
 process(main)

@@ -18,7 +18,22 @@ namespace Belle2 {
     /// An aggregation of CDCWireHits.
     class CDCWireHitCluster : public std::vector<CDCWireHit*> {
 
+      /// Type of the base class
+      using Super = std::vector<CDCWireHit*>;
+
     public:
+      /// Default constructor
+      CDCWireHitCluster() = default;
+
+      /// Default copy constructor
+      CDCWireHitCluster(const CDCWireHitCluster& wireHitCluster) = default;
+
+      /// Constructor from a bunch of wire hits
+      explicit CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
+        : Super(std::move(wireHits))
+      {
+      }
+
       /// Get the super cluster id of this cluster
       int getISuperCluster() const
       {

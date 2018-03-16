@@ -15,45 +15,26 @@ from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
-ccbar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
-     'mdst_00051*_prod00000198_task0000051*.root']
-
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = ccbar_wBG
-    bkgType = 'notSpecified'
+inputMdstList('default', fileList)
 
 
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
-
-
+loadStdSkimPi0()
 loadStdCharged()
 loadStdKS()
-loadStdSkimPi0()
+stdPi0s()
 
 from Charm2BodyNeutralsD0_List import *
 
 D0ToNeutralsList = D0ToNeutrals()
-skimOutputUdst('outputFiles/Charm2BodyNeutralsD0_' + bkgType, D0ToNeutralsList)
+skimOutputUdst('Charm2BodyNeutralsD0', D0ToNeutralsList)
+
 summaryOfLists(D0ToNeutralsList)
 
-'''
-DstToD0NeutralsList = DstToD0NeutralsList()
-skimOutputUdst('DstToD0Neutrals_Standalone_'+filelist, DstToD0NeutralsList)
-summaryOfLists(DstToD0NeutralsList)
-'''
 
 process(analysis_main)
 

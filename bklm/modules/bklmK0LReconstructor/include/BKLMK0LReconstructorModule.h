@@ -12,6 +12,9 @@
 #define BKLMK0LRECONSTRUCTORMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
 
@@ -51,6 +54,12 @@ namespace Belle2 {
 
     //! Name of the KLMCluster collection
     std::string m_KLMClustersColName;
+
+    //! 2d hits StoreArray
+    StoreArray<BKLMHit2d> hit2ds;
+
+    //! klmClusters StoreArray
+    StoreArray<KLMCluster> klmClusters;
 
   };
 

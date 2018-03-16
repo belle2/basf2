@@ -171,13 +171,25 @@ class Particle(object):
         self.postCutConfig = postCutConfig
 
     def __eq__(self, a):
+        """
+        Compares to Particle objects.
+        They are equal if their identifier, name, label, all channels, preCutConfig and postCutConfig is equal
+        @param a another Particle object
+        """
         return (self.identifier == a.identifier and self.name == a.name and self.label == a.label and
                 self.channels == a.channels and self.preCutConfig == a.preCutConfig and self.postCutConfig == a.postCutConfig)
 
     def __str__(self):
+        """
+        Creates a string representation of a Particle object.
+        """
         return str((self.identifier, self.channels, self.preCutConfig, self.postCutConfig, self.mvaConfig))
 
     def __hash__(self):
+        """
+        Creates a hash of a Particle object.
+        This is necessary to use this as a key in a dictionary
+        """
         return hash((self.identifier, self.channels, self.preCutConfig, self.postCutConfig, self.mvaConfig))
 
     @property

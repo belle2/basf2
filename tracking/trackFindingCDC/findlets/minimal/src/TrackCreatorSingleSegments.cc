@@ -15,10 +15,15 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+TrackCreatorSingleSegments::TrackCreatorSingleSegments()
+{
+  m_param_minimalHitsBySuperLayerId = std::map<ISuperLayer, size_t> ({{0, 15}});
+}
 
 std::string TrackCreatorSingleSegments::getDescription()
 {

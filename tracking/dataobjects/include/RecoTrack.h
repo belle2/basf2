@@ -18,6 +18,8 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
@@ -217,9 +219,13 @@ namespace Belle2 {
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
      *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
      *        this reco track.
+     * @param reversed: add the hits in a reversed order - each sorting parameter is set to
+     *        maximal sorting parameter - sorting parameter + offset
+     * @param minimalWeight: if set, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
-    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -550,37 +556,15 @@ namespace Belle2 {
 
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
     * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr)
-    {
-      return getMeasuredStateOnPlaneFromHit(0, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
-    * useful for extrapolation of measurements to other locations
     * Const version.
     */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      return getMeasuredStateOnPlaneFromHit(0, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr)
-    {
-      return getMeasuredStateOnPlaneFromHit(-1, representation);
-    }
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
     * useful for extrapolation of measurements to other locations
     * Const version.
     */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      return getMeasuredStateOnPlaneFromHit(-1, representation);
-    }
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /**
      * Return genfit's MeasuredStateOnPlane on plane for associated with one RecoHitInformation. The caller needs to ensure that
@@ -729,6 +713,18 @@ namespace Belle2 {
       m_matchingStatus = matchingStatus;
     }
 
+    /// Get the quality index attached to this RecoTrack given by one of the reconstruction algorithms. 0 means likely fake.
+    float getQualityIndicator() const
+    {
+      return m_qualityIndicator;
+    }
+
+    /// Set the quality index attached to this RecoTrack. 0 means likely fake.
+    void setQualityIndicator(float qualityIndicator)
+    {
+      m_qualityIndicator = qualityIndicator;
+    }
+
     /**
      * Delete all fitted information for all representations
      *
@@ -740,6 +736,8 @@ namespace Belle2 {
      */
     void deleteFittedInformation();
 
+    /// Get useful information on EventDisplay
+    virtual std::string getInfoHTML() const;
 
   private:
     /// Internal storage for the genfit track.
@@ -763,6 +761,8 @@ namespace Belle2 {
     bool m_dirtyFlag = true;
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
+    /// Quality index for classification of fake vs. MC-matched Tracks.
+    float m_qualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -805,7 +805,7 @@ namespace Belle2 {
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr) {
-        B2FATAL("Queried hit is not in the reco track!");
+        B2FATAL("Queried hit is not in the reco track! Did you prune it?");
       } else {
         return recoHitInformation;
       }
@@ -870,25 +870,6 @@ namespace Belle2 {
       return hitList;
     }
 
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements other locations
-    * Const version.
-    */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
-    }
-
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.
     void checkDirtyFlag() const
     {
@@ -898,7 +879,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 7);
+    ClassDef(RecoTrack, 8);
   };
 
   /**

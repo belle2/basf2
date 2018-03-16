@@ -11,9 +11,10 @@
 #include <svd/modules/svdCalibration/SVDDatabaseTestModule.h>
 #include <framework/logging/Logger.h>
 
-#include <svd/dbobjects/SVDNoiseCalibrations.h>
-#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
+//#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
+//#include <svd/dbobjects/SVDLocalRunBadStrips.h>
+
+#include <vxd/dataobjects/VxdID.h>
 
 using namespace std;
 using namespace Belle2;
@@ -51,12 +52,35 @@ void SVDDatabaseTestModule::event()
   /** Get default values for noise, charge and ADC counts and
    * print them
    */
-  B2INFO("Noise = " << m_obj_noise->getNoise(1, true, 1));
-  B2INFO("Charge [e] = " << m_obj_pulseShape->getChargeFromADC(1, true, 1, 1));
-  B2INFO("ADC counts [a.u.] = " << m_obj_pulseShape->getADCFromCharge(1, true, 1, 22500.));
-  B2INFO("Peaking time [ns] = " << m_obj_pulseShape->getPeakTime(1, true, 1));
-  B2INFO("Pulse width [ns] = " << m_obj_pulseShape->getWidth(1, true, 1));
+  VxdID sensorID(3, 1, 1);
+  B2INFO("Noise L3_1_1 side V strip 0 = " << m_obj_noise.getNoise(sensorID, false, 0));
+  B2INFO("Noise L3_1_1 side U strip 0 = " << m_obj_noise.getNoise(sensorID , true, 0));
+  B2INFO("Test the retrieval of the noise in electrons:");
+  B2INFO("Noise L3_1_1 side V strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID, false, 0));
+  B2INFO("Noise L3_1_1 side U strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID , true, 0));
+
+  VxdID sensorID_L4(4, 1, 1);
+  B2INFO("Noise L4_1_1 side V strip 0 = " << m_obj_noise.getNoise(sensorID_L4, false, 0));
+  B2INFO("Noise L4_1_1 side U strip 0 = " << m_obj_noise.getNoise(sensorID_L4 , true, 0));
+  B2INFO("Test the retrieval of the noise in electrons:");
+  B2INFO("Noise L4_1_1 side V strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID_L4, false, 0));
+  B2INFO("Noise L4_1_1 side U strip 0 [electrons]= " << m_obj_noise.getNoiseInElectrons(sensorID_L4 , true, 0));
+
+  B2INFO("~~~~~~~~~~~~~~\n");
+
+  B2INFO("Charge [e]        L3_1_1 side V strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorID, false, 0, 60));
+  B2INFO("ADC counts [a.u.] L3_1_1 side V strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorID, false, 0, 22500.));
+  B2INFO("Peaking time [ns] L3_1_1 side V strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, false, 0));
+  B2INFO("Pulse width [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getWidth(sensorID, false, 0));
+  B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, false, 0));
+  B2INFO("~~~~~~~~~~~~~~\n");
+
+  B2INFO("Charge [e]        L3_1_1 side U strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorID, true, 0, 60));
+  B2INFO("ADC counts [a.u.] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorID, true, 0, 22500.));
+  B2INFO("Peaking time [ns] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, true, 0));
+  B2INFO("Pulse width [ns]  L3_1_1 side U strip 0 = " << m_obj_pulseShape.getWidth(sensorID, true, 0));
+  B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, true, 0));
+
   B2INFO("isBad = " << m_obj_badStrip->isBad(1, true, 1));
 
 }
-

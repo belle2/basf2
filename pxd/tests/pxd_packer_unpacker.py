@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Disabling this test for the time being as it fails the incremental builds for
-# a long time now which gives no additional information to anyone.
-# See https://agira.desy.de/browse/BII-1647
-# FIXME: remove once packer is fixed
+
 import sys
 # print("TEST SKIPPED: Test fails due to changes in packer which were not propagated to unpacker. See BII-1647", file=sys.stderr)
 # sys.exit(1)
@@ -15,11 +12,11 @@ import numpy
 
 import simulation
 from rawdata import add_packers
+from rawdata import add_unpackers
 
 pxd_rawhits_pack_unpack_collection = "PXDRawHits_test"
 pxd_rawhits_pack_unpack_collection_digits = "PXDDigits_test"
 pxd_rawhits_pack_unpack_collection_adc = pxd_rawhits_pack_unpack_collection + "_adc"
-pxd_rawhits_pack_unpack_collection_pedestal = pxd_rawhits_pack_unpack_collection + "_pedestal"
 pxd_rawhits_pack_unpack_collection_roi = pxd_rawhits_pack_unpack_collection + "_roi"
 set_random_seed(42)
 
@@ -116,7 +113,7 @@ particlegun.param('nTracks', 10)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 
@@ -129,24 +126,22 @@ simulation.add_simulation(main, components=['PXD'], usePXDDataReduction=False)
 
 main.add_module(progress)
 
-# create raw data
+# Create raw data form simulated digits
 add_packers(main, components=['PXD'])
 
-# unpack raw data. creates collection PXDRawHits_test
-pxdunpacker = register_module('PXDUnpacker')
-pxdunpacker.param('HeaderEndianSwap', True)
-pxdunpacker.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
-pxdunpacker.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
-pxdunpacker.param("PXDRawPedestalsName", pxd_rawhits_pack_unpack_collection_pedestal)
-pxdunpacker.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
-main.add_module(pxdunpacker)
+# Unpack raw data to pack_unpack_collections
+add_unpackers(main, components=['PXD'])
 
-# sort rawhits. creates collection PXDDigits_test
-pxdhitsorter = register_module('PXDRawHitSorter')
-pxdhitsorter.param('mergeFrames', True)
-pxdhitsorter.param('rawHits', pxd_rawhits_pack_unpack_collection)
-pxdhitsorter.param('digits', pxd_rawhits_pack_unpack_collection_digits)
-main.add_module(pxdhitsorter)
+# Change names of collections to avoid conflicts
+for e in main.modules():
+    if e.name() == 'PXDUnpacker':
+        e.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
+        e.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
+        e.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
+
+    if e.name() == 'PXDRawHitSorter':
+        e.param('rawHits', pxd_rawhits_pack_unpack_collection)
+        e.param('digits', pxd_rawhits_pack_unpack_collection_digits)
 
 
 # run custom test module to check if the simulated PXDDigits and the

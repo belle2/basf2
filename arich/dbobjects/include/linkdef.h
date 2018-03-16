@@ -45,4 +45,12 @@
 #pragma link C++ class Belle2::ARICHChannelMask+;
 #pragma link C++ class Belle2::ARICHModuleTest+;
 #pragma link C++ class Belle2::ARICHMagnetTest+;
+#pragma link C++ class Belle2::ARICHBiasCablesMapping+;
+#pragma link C++ class Belle2::ARICHBiasChannelsMapping+;
+#pragma link C++ class Belle2::ARICHBiasVoltages+;
+#pragma link C++ class Belle2::ARICHBiasCrateCableMapping+;
+#pragma link C++ class Belle2::ARICHHvChannelsMapping+;
+#pragma link C++ class Belle2::ARICHHvCablesMapping+;
+#pragma link C++ class Belle2::ARICHHvCrateCableMapping+;
+#pragma link C++ class Belle2::ARICHAeroTilesInfo+;
 #endif

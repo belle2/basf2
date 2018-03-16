@@ -3,46 +3,72 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef TREEFITTERMODULE_H
-#define TREEFITTERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
-//#include <string>
 
 namespace Belle2 {
-
   class Particle;
 
+  /** Module to fit an entire decay tree.
+   * The newton method is used to minimize the chi2 derivative.
+   * We use a kalman filter witihin the newton method to smooth the statevector.   */
   class TreeFitterModule : public Module {
-  public:
-    TreeFitterModule();
-    virtual ~TreeFitterModule();
 
+  public:
+    /** constructor   */
+    TreeFitterModule();
+
+    /**   initialize  */
     virtual void initialize() override;
+
+    /** performed at the start of run */
     virtual void beginRun() override;
+
+    /** performed for each event   */
     virtual void event() override;
-    virtual void endRun() override;
+
+    /** stuff at the end */
     virtual void terminate() override;
 
   private:
-    //define your own data members here
-    std::string m_particleList;     //name of ParticleList
-    double m_confidenceLevel;       //minimum confidence level to accept fit
-    double m_precision;             //max level of chi2 fluctuation required before the fit is considered stable and converging
-    int m_verbose;                  //BaBar verbosity (to be phased out in favor of Belle2's logger)
-    // now loaded for individual particles (FT)
-    std::vector<int> m_massConstraintList; //PDG codes of particles to mass constrain. Later, this will be a decayDescriptor.
-    //    double m_Bfield;                //Bfield from database
-    //
-    bool doTreeFit(Particle* head);
-    bool printDaughters(Particle* mother);
-    //
 
+    /** plot ascii art and statistics */
+    void plotFancyASCII();
+
+    /**   name of the particle list fed to the fitter  */
+    std::string m_particleList;
+
+    /** minimum confidence level to accept fit   */
+    double m_confidenceLevel;
+
+    /** convergence precision for the newton method  */
+    double m_precision;
+
+    /**  babar verbosity to be removed  */
+    int m_verbose;
+
+    /** unused    */
+    std::vector<int> m_massConstraintList;
+
+    /** Use x-y-z beamspot constraint (int 3) or x-y beamtube constraint (int 2) or nothing (default int 0).
+     * The Beamspot will be treated as the mother of the particle you feed. */
+    int m_ipConstraintDimension;
+
+    /** this fits all particle candidates contained in the m_particleList  */
+    bool fitTree(Particle* head);
+
+    /** before the fit */
+    unsigned int m_nCandidatesBeforeFit;
+
+    /** after the fit  */
+    unsigned int m_nCandidatesAfter;
+
+    /** flag if you want to update all particles in the decay tree.
+     * False means only the head of the tree will be updated */
+    bool m_updateDaughters;
   };
 }
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGPYTHONINTERFACE_H_
-#define LOGPYTHONINTERFACE_H_
+#pragma once
 
 #include <boost/python/dict.hpp>
 
@@ -126,7 +125,7 @@ namespace Belle2 {
      * @param filename The text file name
      * @param append Flag whether output should be appended to an existing file
      */
-    void addLogFile(const std::string& filename, bool append = true);
+    void addLogFile(const std::string& filename, bool append = false);
 
     /**
      * Add the console as output connection. Color will be used automatically if supported
@@ -205,5 +204,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* LOGPYTHON_H_ */

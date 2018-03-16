@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <top/dbobjects/TOPPmtObsoleteData.h>
 
 namespace Belle2 {
 
@@ -24,6 +25,7 @@ namespace Belle2 {
      */
     enum {c_NumPMTs = 32};
 
+
     /**
      * Default constructor
      */
@@ -34,11 +36,15 @@ namespace Belle2 {
      * Useful constructor
      * @param serialNumber serial number
      * @param moduleCNumber module construction number
+     * @param slotNumber slot number
      * @param arrayNumber number of PMT array
      * @param position position of PMT within array (module)
+     * @param type PMT type
      */
-    TOPPmtInstallation(const std::string& serialNumber, int moduleCNumber, int arrayNumber, int position):
-      m_serialNumber(serialNumber), m_moduleCNumber(moduleCNumber), m_arrayNumber(arrayNumber), m_position(position)
+    TOPPmtInstallation(const std::string& serialNumber, int moduleCNumber, int slotNumber,
+                       int arrayNumber, int position, TOPPmtObsoleteData::EType type):
+      m_serialNumber(serialNumber), m_moduleCNumber(moduleCNumber), m_slotNumber(slotNumber),
+      m_arrayNumber(arrayNumber), m_position(position), m_type(type)
     {}
 
     /**
@@ -54,6 +60,12 @@ namespace Belle2 {
     int getModuleCNumber() const {return m_moduleCNumber;}
 
     /**
+     * Returns slot number
+     * @return slot number
+     */
+    int getSlotNumber() const {return m_slotNumber;}
+
+    /**
      * Returns PMT array number
      * @return PMT array number
      */
@@ -65,15 +77,24 @@ namespace Belle2 {
      */
     int getPosition() const {return m_position;}
 
+    /**
+     * Returns PMT type
+     * @return type
+     */
+    TOPPmtObsoleteData::EType getType() const {return m_type;}
+
 
   private:
 
     std::string m_serialNumber; /**< serial number, e.g. JTxxxx */
     int m_moduleCNumber = 0;    /**< module construction number (1-based) */
+    int m_slotNumber = 0;       /**< slot number (1-based) */
     int m_arrayNumber = 0;      /**< MCP array number (1-based) */
     int m_position = 0;         /**< position within the TOP module (1-based) */
 
-    ClassDef(TOPPmtInstallation, 1); /**< ClassDef */
+    TOPPmtObsoleteData::EType m_type = TOPPmtObsoleteData::c_Unknown;   /**< type (conventional, ALD, ...) */
+
+    ClassDef(TOPPmtInstallation, 2); /**< ClassDef */
 
   };
 

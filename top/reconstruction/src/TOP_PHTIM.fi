@@ -6,6 +6,7 @@ c--   TOP_PHTIM.fi: photon times in channels x
 
       INTEGER NUM_PHOT(0:NUM_CHX-1) ! number of photons in a channel x
       REAL PH_TIMES(MAX_PHOT,0:NUM_CHX-1) ! photon times [ns]
+      REAL PH_TERRS(MAX_PHOT,0:NUM_CHX-1) ! photon time uncertaities [ns]
       LOGICAL FORCE_SCAN        ! force y-scan
 
-      COMMON /TOP_PHTIM/ NUM_PHOT, PH_TIMES, FORCE_SCAN
+      COMMON /TOP_PHTIM/ NUM_PHOT, PH_TIMES, PH_TERRS, FORCE_SCAN

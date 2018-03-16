@@ -15,8 +15,9 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -36,10 +37,12 @@ void TrackCreatorSegmentPairAutomaton::apply(
   const std::vector<WeightedRelation<const CDCSegmentPair>>& inputSegmentPairRelations,
   std::vector<CDCTrack>& outputTracks)
 {
+  // Obtain the segment pairs as pointers
+  std::vector<const CDCSegmentPair*> segmentPairPtrs =
+    as_pointers<const CDCSegmentPair>(inputSegmentPairs);
+
   m_segmentPairPaths.clear();
-  m_cellularPathFinder.apply(inputSegmentPairs,
-                             WeightedNeighborhood<const CDCSegmentPair>(inputSegmentPairRelations),
-                             m_segmentPairPaths);
+  m_cellularPathFinder.apply(segmentPairPtrs, inputSegmentPairRelations, m_segmentPairPaths);
 
   // Reduce to plain tracks
   CDCAxialStereoFusion fusionFitter;

@@ -31,11 +31,13 @@ using namespace TrackFindingCDC;
 
 void TruthAxialSegmentPairVarSet::initialize()
 {
+  Super::initialize();
   CDCMCManager::getInstance().requireTruthInformation();
 }
 
 void TruthAxialSegmentPairVarSet::beginEvent()
 {
+  Super::beginEvent();
   CDCMCManager::getInstance().fill();
 }
 

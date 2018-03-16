@@ -25,13 +25,19 @@ namespace Belle2 {
    * access to the constructor of the Range classes.
    */
   template<typename PointType, size_t Ndims = 9>
-  class MLHANDOVER_NAME : public SelectionVariable<PointType, std::array<double, Ndims> > {
+  class MLHANDOVER_NAME : public SelectionVariable<PointType, 3, std::array<double, Ndims> > {
 
   public:
 
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(MLHANDOVER_NAME);
 
+    /** Getter for coordinate values of the three hits used in a three hit filter
+     * @param innerHit : the inner hit
+     * @param centerHit : the center hit
+     * @param outerHit : the outer hit
+     * @return array containing the coordinates of the three hits in the order x, y, z for inner, x, y, y for center, outer
+     */
     static std::array<double, Ndims> value(const PointType& innerHit, const PointType& centerHit, const PointType& outerHit)
     {
       return std::array<double, Ndims> {{

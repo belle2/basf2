@@ -23,9 +23,6 @@ namespace Belle2 {
       using Super = ProcessingSignalListener;
 
     public:
-      /// Register a processing signal listener to be notified.
-      void addProcessingSignalListener(ProcessingSignalListener* psl);
-
       /// Receive and dispatch signal before the start of the event processing
       void initialize() override;
 
@@ -40,6 +37,13 @@ namespace Belle2 {
 
       /// Receive and dispatch Signal for termination of the event processing.
       void terminate() override;
+
+    protected:
+      /// Register a processing signal listener to be notified.
+      void addProcessingSignalListener(ProcessingSignalListener* psl);
+
+      /// Get the number of currently registered listeners.
+      int getNProcessingSignalListener();
 
     private:
       /// References to subordinary signal processing listener contained in this findlet.

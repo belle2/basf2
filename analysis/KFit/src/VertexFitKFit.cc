@@ -20,7 +20,10 @@ using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
 
-VertexFitKFit::VertexFitKFit(void)
+VertexFitKFit::VertexFitKFit(void):
+  m_BeforeVertex(HepPoint3D(0, 0, 0)),
+  m_AfterVertexError(HepSymMatrix(3, 0)),
+  m_BeamError(HepSymMatrix(3, 0))
 {
   m_CorrelationMode = false;
   m_FlagFitted = false;
@@ -29,9 +32,6 @@ VertexFitKFit::VertexFitKFit(void)
   m_FlagTube = false;
   m_iTrackTube = -1;
   m_CHIsqVertex = 0;
-  m_BeforeVertex = HepPoint3D(0, 0, 0);
-  m_AfterVertexError = HepSymMatrix(3, 0);
-  m_BeamError = HepSymMatrix(3, 0);
   m_NecessaryTrackCount = 2;
   m_V_E = HepMatrix(3, 3, 0);
   m_v   = HepMatrix(3, 1, 0);
@@ -793,7 +793,7 @@ VertexFitKFit::makeCoreMatrix(void) {
       B = a * a2 * invPt2;
       if (fabs(B) > 1) {
         m_ErrorCode = KFitError::kCannotGetARCSIN;
-        B2DEBUG(1, "KFitError: Cannot calculate arcsin");
+        B2DEBUG(10, "KFitError: Cannot calculate arcsin");
         //KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }

@@ -1,0 +1,4 @@
+dbstore/VXDAlignment 1 3,1,3,-1
+dbstore/software_trigger_cut&testbeam&accept_min_svd_cluster 1 3,1,3,-1
+dbstore/software_trigger_cut&testbeam&accept_min_pt 1 3,1,3,-1
+dbstore/software_trigger_cut&testbeam&accept_busy_event_no_track 1 3,1,3,-1

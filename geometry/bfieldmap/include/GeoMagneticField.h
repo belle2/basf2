@@ -12,6 +12,7 @@
 #define GEOMAGNETICFIELD_H
 
 #include <geometry/CreatorBase.h>
+#include <framework/dbobjects/MagneticField.h>
 
 #include <boost/function.hpp>
 #include <map>
@@ -51,11 +52,18 @@ namespace Belle2 {
      */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+    /** Nothing to be done when creating from DB, the payload should be found automatically */
+    virtual void createFromDB(const std::string&, G4LogicalVolume&, geometry::GeometryTypes) {}
+
+    virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
+
+    /** Create a Database configuration from Gearbox parameters */
+    MagneticField createConfiguration(const GearDir& content);
 
   protected:
 
-    typedef std::map < std::string, boost::function < void (const GearDir&) > >
-    CompTypeMap; /**< Typedef for the map connecting the name of the component to the method reading the parameters.*/
+    /** Typedef for the map connecting the name of the component to the method reading the parameters.*/
+    typedef std::map < std::string, boost::function < void (const GearDir&) > > CompTypeMap;
     CompTypeMap m_componentTypeMap; /**< Maps the name of the component to the function reading the parameters.*/
 
     /**
@@ -95,6 +103,10 @@ namespace Belle2 {
      */
     void read3dBField(const GearDir& component);
 
+    /** Add a constant field component to a magnetic field configuration for the DB */
+    void addConstantBField(const GearDir& component, MagneticField& fieldmap);
+    /** Add a 3D field component to a magnetic field configuration for the DB */
+    void add3dBField(const GearDir& component, MagneticField& fielmap);
   private:
 
   };

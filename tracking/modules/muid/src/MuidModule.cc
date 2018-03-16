@@ -72,7 +72,7 @@ MuidModule::MuidModule() :
   addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
            "Name of collection holding the TrackClusterSeparations", string(""));
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
-  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-30)", double(30.0));
+  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-2000)", double(2000.0));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
            double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));

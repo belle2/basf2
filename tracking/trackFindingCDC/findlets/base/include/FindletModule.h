@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <utility>
 #include <vector>
@@ -28,6 +28,9 @@ namespace Belle2 {
     class FindletModule : public Module {
 
     private:
+      /// Type of the base class
+      using Super = Module;
+
       /// Tuple of input / output types of the findlet
       using IOTypes = typename AFindlet::IOTypes;
 
@@ -94,6 +97,7 @@ namespace Belle2 {
       /// Initialize the Module before event processing
       virtual void initialize() override
       {
+        Super::initialize();
         this->requireOrRegisterStoreVectors(Indices());
         m_findlet.initialize();
       }
@@ -101,6 +105,7 @@ namespace Belle2 {
       /// Signal the beginning of a new run.
       virtual void beginRun() override
       {
+        Super::beginRun();
         m_findlet.beginRun();
       }
 
@@ -116,12 +121,14 @@ namespace Belle2 {
       virtual void endRun() override
       {
         m_findlet.endRun();
+        Super::endRun();
       }
 
       /// Signal to terminate the event processing
       virtual void terminate() override
       {
         m_findlet.terminate();
+        Super::terminate();
       }
 
     private:
@@ -165,7 +172,7 @@ namespace Belle2 {
       void registerStoreVector()
       {
         if (not isInputStoreVector<I>()) {
-          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut);
+          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
         }
       }
 

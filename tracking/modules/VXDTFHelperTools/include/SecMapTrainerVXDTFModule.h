@@ -28,17 +28,11 @@
 
 
 namespace Belle2 {
-
-
-
   /** The SecMapTrainerVXDTFModule
-   *
    * this module analyzes a big number of events (pGun or evtGen) to create raw sectorMaps which are needed for the VXDTF.
    * This information will be exported via and root files.
-   *
   . */
   class SecMapTrainerVXDTFModule : public Module {
-
 
   public:
 
@@ -46,34 +40,29 @@ namespace Belle2 {
     SecMapTrainerVXDTFModule();
 
     /** SecMapTrainerVXDTFModule destructor. */
-    virtual ~SecMapTrainerVXDTFModule() {}
+    ~SecMapTrainerVXDTFModule() {}
 
     /** initialize. */
-    virtual void initialize();
+    void initialize() override;
 
     /** beginRun. */
-    virtual void beginRun()
+    void beginRun() override
     { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - beginRun ~~~~~~~~~~"); }
 
     /** event. */
-    virtual void event();
+    void event() override;
 
     /** endRun. */
-    virtual void endRun()
+    void endRun() override
     { B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - end of endRun ~~~~~~~~~~"); }
 
     /** terminate. */
-    virtual void terminate();
+    void terminate() override;
 
     /** initialize variables to avoid nondeterministic behavior. */
     void InitializeVariables() {}
 
-
-
-
-
   protected:
-
     /** Event Data for distinguishing events. */
     StoreObjPtr<EventMetaData> m_eventData;
 
@@ -86,14 +75,15 @@ namespace Belle2 {
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMspTCarrayName;
 
-    bool m_PARAMallowTraining; /**> If true, training will be executed and filled into rootFiles, if not, only things like basf2 -m work but no training can be done. */
+    /// If true, training will be executed and filled into rootFiles,
+    /// if not, only things like basf2 -m work but no training can be done.
+    bool m_PARAMallowTraining;
 
     // TODO:
-//  /** Name of storeArray containing the spacePointTrackCands. */
-//  std::vector<std::string> m_PARAMsecMapNames;
-//
-//  /** secMap-specific configurations for training (musst have same size as m_PARAMsecMapNames. */
-//  std::vector<TrainerConfigData> m_PARAMsecMapConfigs;
-  private:
+    ///** Name of storeArray containing the spacePointTrackCands. */
+    //std::vector<std::string> m_PARAMsecMapNames;
+
+    ///** secMap-specific configurations for training (musst have same size as m_PARAMsecMapNames. */
+    //std::vector<TrainerConfigData> m_PARAMsecMapConfigs;
   };
 }

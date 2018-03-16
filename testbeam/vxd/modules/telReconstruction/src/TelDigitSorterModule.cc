@@ -58,7 +58,7 @@ void TelDigitSorterModule::initialize()
   StoreArray<TelDigit> storeDigits(m_storeDigitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<TelTrueHit> storeTrueHits(m_storeTrueHitsName);
-  storeDigits.required();
+  storeDigits.isRequired();
   storeMCParticles.isOptional();
   storeTrueHits.isOptional();
 

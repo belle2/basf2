@@ -29,13 +29,16 @@ namespace Belle2 {
      *  This number can be set differently for each super layer
      *  Usually only the segments of the inner most super layer might be interesting to be treated as tracks.
      */
-    class TrackCreatorSingleSegments : public Findlet<const CDCSegment2D, CDCTrack> {
+    class TrackCreatorSingleSegments : public Findlet<const CDCSegment2D, CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegment2D, CDCTrack>;
+      using Super = Findlet<const CDCSegment2D, CDCTrack&>;
 
     public:
+      /// Constructor setting up default parameters.
+      TrackCreatorSingleSegments();
+
       /// Short description of the findlet
       std::string getDescription() final;
 
@@ -53,7 +56,8 @@ namespace Belle2 {
        *  for which left over segments shall be forwarded as tracks,
        *  if they exceed the minimal hit requirement.
        *
-       *  Defaults to empty map, meaning no segments are promoted.
+       *  Defaults to {{0, 15}}, meaning a segment with more then 15 hits
+       *  in the first super layer will become a track.
        */
       std::map<ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
     };

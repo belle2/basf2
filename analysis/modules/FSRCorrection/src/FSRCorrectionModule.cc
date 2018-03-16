@@ -82,13 +82,13 @@ namespace Belle2 {
     } else if (!m_decaydescriptor.init(m_inputListName)) {
       B2ERROR("[FSRCorrectionModule] Invalid input particle list name: " << m_inputListName);
     } else {
-      StoreObjPtr<ParticleList>::required(m_inputListName);
+      StoreObjPtr<ParticleList>().isRequired(m_inputListName);
     }
 
     if (!m_decaydescriptorGamma.init(m_gammaListName)) {
       B2ERROR("[FSRCorrectionModule] Invalid gamma particle list name: " << m_gammaListName);
     } else {
-      StoreObjPtr<ParticleList>::required(m_gammaListName);
+      StoreObjPtr<ParticleList>().isRequired(m_gammaListName);
     }
 
     // make output list

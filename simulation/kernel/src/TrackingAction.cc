@@ -18,6 +18,7 @@
 #include <G4Track.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
+#include <G4EmProcessSubType.hh>
 #include <G4DecayProcessType.hh>
 #include <G4Event.hh>
 
@@ -26,8 +27,11 @@ using namespace Belle2::Simulation;
 
 TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph),
-  m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false),
-  m_EnergyCut(0.0), m_storeTrajectories(false), m_distanceTolerance(0),
+  m_ignoreOpticalPhotons(false),
+  m_ignoreSecondaries(false), m_secondariesEnergyCut(0.0),
+  m_ignoreBremsstrahlungPhotons(false), m_bremsstrahlungPhotonsEnergyCut(0.0),
+  m_ignorePairConversions(false), m_pairConversionsEnergyCut(0.0),
+  m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
   if (false) {
@@ -90,21 +94,30 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
     currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
     currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+
     //Primary or secondary particle?
-    if (dynamicParticle->GetPrimaryParticle() != NULL) {  //Primary
+    if (dynamicParticle->GetPrimaryParticle() != NULL) {
+      //Primary particle
       currParticle.setSecondaryPhysicsProcess(0);
       currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
-    } else if (track->GetCreatorProcess() != NULL) {  //Secondary
+
+    } else if (track->GetCreatorProcess() != NULL) {
+      //Secondary particle
       const int& processSubType = track->GetCreatorProcess()->GetProcessSubType();
-      currParticle.setSecondaryPhysicsProcess(processSubType);
-      if (processSubType >= static_cast<int>(DECAY) && processSubType <= static_cast<int>(DECAY_External))  //Decay-in-flight
+      currParticle.setSecondaryPhysicsProcess(processSubType); //Store the physics process type.
+
+      //Decay-in-flight
+      if (processSubType >= static_cast<int>(DECAY) && processSubType <= static_cast<int>(DECAY_External))
         currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
+
     } else {
+      //Unknown origin. This could be a bug originated from Geant4.
       currParticle.setSecondaryPhysicsProcess(-1);
     }
-    //Either we store all trajectories
+
+    //Either we store all the trajectories
     if (m_storeTrajectories > 2 ||
-        //Or only primay ones
+        //Or only the primary ones
         (m_storeTrajectories == 1 && dynamicParticle->GetPrimaryParticle() != NULL) ||
         //Or all except optical photons
         (m_storeTrajectories == 2 && track->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())) {
@@ -123,24 +136,27 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
 {
   G4StepPoint* postStep = track->GetStep()->GetPostStepPoint();
 
-  // Get particle of current track
+  // Get particle of the current track
   try {
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
 
-    // Add particle and decay Information to all secondaries
+    // Add particle and decay Information to all the secondaries
     for (G4Track* daughterTrack : *fpTrackingManager->GimmeSecondaries()) {
 
       // Add the particle to the particle graph and as UserInfo to the track
       // if it is a secondary particle created by Geant4.
-      if (daughterTrack->GetDynamicParticle()->GetPrimaryParticle() == NULL && daughterTrack->GetUserInformation() == NULL) {
+      if (daughterTrack->GetDynamicParticle()->GetPrimaryParticle() == NULL &&
+          daughterTrack->GetUserInformation() == NULL) {
         MCParticleGraph::GraphParticle& daughterParticle = m_mcParticleGraph.addParticle();
         const_cast<G4Track*>(daughterTrack)->SetUserInformation(new TrackInfo(daughterParticle));
 
-        currParticle.decaysInto(daughterParticle); //Add the decay
+        currParticle.decaysInto(daughterParticle); //Add the decay history
 
         // Optical photons and secondaries:  steering of output to MCParticles
         if (daughterTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
-          if (m_IgnoreOpticalPhotons) daughterParticle.setIgnore();
+
+          // Optical photons
+          if (m_ignoreOpticalPhotons) daughterParticle.setIgnore();
           // to apply quantum efficiency only once, if optical photon is a daugher of optical photon
           if (track->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
             TrackInfo* currInfo = dynamic_cast<TrackInfo*>(track->GetUserInformation());
@@ -148,11 +164,31 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
             daughterInfo->setStatus(currInfo->getStatus());
             daughterInfo->setFraction(currInfo->getFraction());
           }
-        } else {
+
+        } else if (daughterTrack->GetCreatorProcess()->GetProcessSubType() == fBremsstrahlung) {
+
+          // Bremsstrahlung photons
           // Do not store the generator info in the final MCParticles block
-          // if the ignore flag is set or its kinetic energy is too low.
-          if (m_IgnoreSecondaries || daughterTrack->GetKineticEnergy() < m_EnergyCut)
+          // if the ignore flag is set or its energy is too low in [MeV].
+          if (m_ignoreBremsstrahlungPhotons || daughterTrack->GetKineticEnergy() < m_bremsstrahlungPhotonsEnergyCut)
             daughterParticle.setIgnore();
+
+        } else if (daughterTrack->GetCreatorProcess()->GetProcessSubType() == fGammaConversion) {
+
+          // e+ or e- created by gamma conversion to pairs
+          // Do not store the generator info in the final MCParticles block
+          // if the ignore flag is set or kinetic energy is too low in [MeV].
+          if (m_ignorePairConversions || daughterTrack->GetKineticEnergy() < m_pairConversionsEnergyCut)
+            daughterParticle.setIgnore();
+
+        } else {
+
+          // Do not store the generator info in the final MCParticles block
+          // if the ignore flag is set or its kinetic energy is too low in [MeV].
+          if (m_ignoreSecondaries || daughterTrack->GetKineticEnergy() < m_secondariesEnergyCut)
+            daughterParticle.setIgnore();
+
+          //B2INFO("Secondary Physics Process: " << daughterTrack->GetCreatorProcess()->GetProcessSubType());
         }
 
       }

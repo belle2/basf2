@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_UTILITIES_MULTIVARIATENORMALGENERATOR_H
-#define FRAMEWORK_UTILITIES_MULTIVARIATENORMALGENERATOR_H
 
 #include <Eigen/Dense>
 #include <TRandom.h>
@@ -196,6 +194,3 @@ namespace Belle2 {
     return setMeanCov(tmean, cov);
   }
 }
-
-#endif // FRAMEWORK_UTILITIES_MULTIVARIATENORMALGENERATOR_H
-

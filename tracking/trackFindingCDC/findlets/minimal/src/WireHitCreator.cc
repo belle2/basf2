@@ -21,11 +21,12 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -79,6 +80,11 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 m_param_useSecondHits,
                                 "Use the second hit information in the track finding.",
                                 m_param_useSecondHits);
+
+  moduleParamList->addParameter(prefixed(prefix, "useBadWires"),
+                                m_param_useBadWires,
+                                "Also create the hits that are on bad wires.",
+                                m_param_useBadWires);
 
   moduleParamList->addParameter(prefixed(prefix, "useDegreeSector"),
                                 m_param_useDegreeSector,
@@ -150,6 +156,7 @@ void WireHitCreator::initialize()
 
 void WireHitCreator::beginRun()
 {
+  Super::beginRun();
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   wireTopology.reinitialize(m_wirePosition, m_param_ignoreWireSag);
 }
@@ -162,6 +169,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   CDC::TDCCountTranslatorBase& tdcCountTranslator = *m_tdcCountTranslator;
   CDC::ADCCountTranslatorBase& adcCountTranslator = *m_adcCountTranslator;
+  CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
 
   // Create the wire hits into a vector
   StoreArray<CDCHit> hits;
@@ -200,6 +208,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       continue;
     }
 
+    // ignore hit if it is on a bad wire
+    if (not m_param_useBadWires and geometryPar.isBadWire(wireID)) {
+      continue;
+    }
+
     ISuperLayer iSL = wireID.getISuperLayer();
     if (not m_useSuperLayers[iSL]) continue;
 
@@ -223,6 +236,8 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       if (not useMCParticleId) continue;
     }
 
+
+
     // Consider the particle as incoming in the top part of the CDC for a downwards flight direction
     bool isIncoming = m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0;
     const double alpha = isIncoming ?  M_PI : 0;
@@ -230,6 +245,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double flightTimeEstimate =
       FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
+    const double driftTime =  tdcCountTranslator.getDriftTime(hit.getTDCCount(),
+                                                              wire.getWireID(),
+                                                              flightTimeEstimate,
+                                                              wire.getRefZ(),
+                                                              hit.getADCCount());
     const bool left = false;
     const bool right = true;
     const double theta = M_PI / 2;
@@ -291,7 +311,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double refChargeDeposit =
       (leftRefChargeDeposit + rightRefChargeDeposit) / 2.0;
 
-    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit);
+    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit, driftTime);
   }
 
   std::sort(outputWireHits.begin(), outputWireHits.end());

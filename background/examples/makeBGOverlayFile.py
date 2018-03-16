@@ -11,16 +11,41 @@ import sys
 # Output file: BGforOverlay.root
 # -----------------------------------------------------------------------------------
 
-set_log_level(LogLevel.ERROR)
-
-if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    print('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG samples')
+argvs = sys.argv
+if len(argvs) > 1:
+    if argvs[1] == 'phase2':
+        phase = 2
+        compression = 3
+    elif argvs[1] == 'phase3':
+        phase = 3
+        compression = 4
+    else:
+        B2ERROR('The argument can be either phase2 or phase3')
+        sys.exit()
+else:
+    B2ERROR('No argument given specifying the running phase')
+    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3' + ' [scaleFactor=1]')
     sys.exit()
 
-bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+scaleFactor = 1.0
+if len(argvs) > 2:
+    scaleFactor = float(argvs[2])
+
+if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG samples')
+    sys.exit()
+
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
 if len(bg) == 0:
-    print('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
+    B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
+
+B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
+       str(compression))
+B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+B2INFO('With scaling factor: ' + str(scaleFactor))
+
+set_log_level(LogLevel.ERROR)
 
 # Create path
 main = create_path()
@@ -32,6 +57,8 @@ main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')
+if phase == 2:
+    gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 main.add_module(gearbox)
 
 # Geometry
@@ -41,6 +68,7 @@ main.add_module(geometry)
 # Beam background mixer
 bkgmixer = register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)
+bkgmixer.param('overallScaleFactor', scaleFactor)
 main.add_module(bkgmixer)
 
 # PXD digitizer (no data reduction!)
@@ -66,7 +94,7 @@ main.add_module(arich_digitizer)
 
 # ECL digitization
 ecl_digitizer = register_module('ECLDigitizer')
-main.add_module(ecl_digitizer)
+main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=compression)
 
 # BKLM digitization
 bklm_digitizer = register_module('BKLMDigitizer')
@@ -79,8 +107,8 @@ main.add_module(eklm_digitizer)
 # Output: digitized hits only
 output = register_module('RootOutput')
 output.param('outputFileName', 'BGforOverlay.root')
-output.param('branchNames', ['PXDDigits', 'SVDDigits', 'CDCHits', 'TOPDigits',
-                             'ARICHDigits', 'ECLDsps', 'BKLMDigits', 'EKLMDigits'])
+output.param('branchNames', ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
+                             'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)
 
 # Show progress of processing

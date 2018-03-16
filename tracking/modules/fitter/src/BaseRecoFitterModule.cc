@@ -79,7 +79,9 @@ void BaseRecoFitterModule::event()
                      m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
-  fitter.resetFitter(genfitFitter);
+  if (genfitFitter) {
+    fitter.resetFitter(genfitFitter);
+  }
 
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
@@ -104,23 +106,21 @@ void BaseRecoFitterModule::event()
       Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
       B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
       const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+      const genfit::AbsTrackRep* trackRep = TrackFitter::getTrackRepresentationForPDG(pdgCodeToUseForFitting, recoTrack);
 
       B2DEBUG(99, "-----> Fit results:");
       if (wasFitSuccessful) {
-        const genfit::FitStatus* fs = recoTrack.getTrackFitStatus();
+        const genfit::FitStatus* fs = recoTrack.getTrackFitStatus(trackRep);
         const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
         B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
         B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
         //Calculate probability
-        double pValue = recoTrack.getTrackFitStatus()->getPVal();
+        double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
         B2DEBUG(99, "       pValue of the fit: " << pValue);
-        B2DEBUG(99, "Charge after fit " << recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge());
-        B2DEBUG(99, "Position after fit " << recoTrack.getMeasuredStateOnPlaneFromFirstHit().getPos().X() << " " <<
-                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getPos().Y() << " " <<
-                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getPos().Z());
-        B2DEBUG(99, "Momentum after fit " << recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom().X() << " " <<
-                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom().Y() << " " <<
-                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom().Z());
+        const genfit::MeasuredStateOnPlane& mSoP = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+        B2DEBUG(99, "Charge after fit " << mSoP.getCharge());
+        B2DEBUG(99, "Position after fit " << mSoP.getPos().X() << " " << mSoP.getPos().Y() << " " << mSoP.getPos().Z());
+        B2DEBUG(99, "Momentum after fit " << mSoP.getMom().X() << " " << mSoP.getMom().Y() << " " << mSoP.getMom().Z());
       } else {
         B2DEBUG(99, "       fit failed!");
       }

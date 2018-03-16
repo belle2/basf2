@@ -29,14 +29,6 @@ ROIPixelTranslator::ROIPixelTranslator(double user_sigmaSystU, double user_sigma
   , m_maxWidthV(user_maxWidthV)
 {}
 
-/*ROIPixelTranslator::ROIPixelTranslator(const PXDDataReductionModule *theModule)
-  : m_sigmaSystU(theModule->getSigmaSystU())
-  , m_sigmaSystV(theModule->getSigmaSystV())
-  , m_numSigmaTotU(theModule->getNumSigmaTotU())
-  , m_numSigmaTotV(theModule->getNumSigmaTotV())
-  , m_maxWidthU(theModule->getMaxWidthU())
-  , m_maxWidthV(theModule->getMaxWidthV)
-  {}*/
 
 ROIPixelTranslator::ROIPixelTranslator(const ROIinfo* theROIinfo)
   : m_sigmaSystU(theROIinfo->sigmaSystU)
@@ -46,6 +38,7 @@ ROIPixelTranslator::ROIPixelTranslator(const ROIinfo* theROIinfo)
   , m_maxWidthU(theROIinfo->maxWidthU)
   , m_maxWidthV(theROIinfo->maxWidthV)
 {}
+
 
 ROIPixelTranslator::~ROIPixelTranslator()
 {}

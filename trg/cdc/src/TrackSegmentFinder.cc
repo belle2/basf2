@@ -55,25 +55,29 @@ namespace Belle2 {
 
     m_Trg_PI = 3.141592653589793;
 
-    // For ROOT file
-    if (m_makeRootFile) m_fileTSF = new TFile("TSF.root", "RECREATE");
-
-    m_treeInputTSF = new TTree("m_treeInputTSF", "InputTSF");
     m_hitPatternInformation = new TClonesArray("TVectorD");
-    m_treeInputTSF->Branch("hitPatternInformation", &m_hitPatternInformation,
-                           32000, 0);
-
-    m_treeOutputTSF = new TTree("m_treeOutputTSF", "OutputTSF");
     m_particleEfficiency = new TClonesArray("TVectorD");
-    m_treeOutputTSF->Branch("particleEfficiency", &m_particleEfficiency, 32000, 0);
     m_tsInformation = new TClonesArray("TVectorD");
-    m_treeOutputTSF->Branch("tsInformation", &m_tsInformation, 32000, 0);
-
-    // For neural network TSF. Filled only when TSF and priority is hit.
-    m_treeNNTSF = new TTree("m_treeNNTSF", "NNTSF");
     m_nnPatternInformation = new TClonesArray("TVectorD");
-    m_treeNNTSF->Branch("nnPatternInformation", &m_nnPatternInformation, 32000, 0);
 
+    // For ROOT file
+    TDirectory* currentDir = gDirectory;
+    if (m_makeRootFile) {
+      m_fileTSF = new TFile("TSF.root", "RECREATE");
+
+      m_treeInputTSF = new TTree("m_treeInputTSF", "InputTSF");
+      m_treeInputTSF->Branch("hitPatternInformation", &m_hitPatternInformation,
+                             32000, 0);
+
+      m_treeOutputTSF = new TTree("m_treeOutputTSF", "OutputTSF");
+      m_treeOutputTSF->Branch("particleEfficiency", &m_particleEfficiency, 32000, 0);
+      m_treeOutputTSF->Branch("tsInformation", &m_tsInformation, 32000, 0);
+
+      // For neural network TSF. Filled only when TSF and priority is hit.
+      m_treeNNTSF = new TTree("m_treeNNTSF", "NNTSF");
+      m_treeNNTSF->Branch("nnPatternInformation", &m_nnPatternInformation, 32000, 0);
+    }
+    currentDir->cd();
   }
 
 
@@ -99,10 +103,8 @@ namespace Belle2 {
   {
 
     delete m_nnPatternInformation;
-    delete m_treeNNTSF;
     delete m_tsInformation;
     delete m_particleEfficiency;
-    delete m_treeOutputTSF;
     delete m_hitPatternInformation;
     delete m_treeInputTSF;
     if (m_makeRootFile) delete m_fileTSF;
@@ -130,7 +132,7 @@ namespace Belle2 {
     TRGDebug::enterStage("Track Segment Finder");
 
     // Saves TS information
-    saveTSInformation(tss);
+    //saveTSInformation(tss);
 
     //...Store TS hits...
     const unsigned n = tss.size();
@@ -150,7 +152,7 @@ namespace Belle2 {
     saveTSFResults(segmentHitsSL);
 
     // Saves NNTS information. Only when ts is hit.
-    saveNNTSInformation(tss);
+    //saveNNTSInformation(tss);
 
     if (TRGDebug::level() > 1) {
       cout << TRGDebug::tab() << "TS hit list" << endl;
@@ -719,7 +721,7 @@ namespace Belle2 {
         //cout<<ts.name()<<" has "<<nHitWires<<" hit wires."<<endl;
       }
     } // End of loop over all TSs
-    m_treeInputTSF->Fill();
+    if (m_makeRootFile) m_treeInputTSF->Fill();
     //cout<<"End saving TS information"<<endl;
   } // End of save function
 
@@ -885,7 +887,7 @@ namespace Belle2 {
       } // End of loop over all TS in super layer
     } // End of loop over all hit TSs
 
-    m_treeOutputTSF->Fill();
+    if (m_makeRootFile) m_treeOutputTSF->Fill();
 
   } // End of saving TSF results
 
@@ -1034,7 +1036,7 @@ namespace Belle2 {
       } // End of if TS is hit
     } // End loop of all TSs
 
-    m_treeNNTSF->Fill();
+    if (m_makeRootFile) m_treeNNTSF->Fill();
 
   } // End of save function
 

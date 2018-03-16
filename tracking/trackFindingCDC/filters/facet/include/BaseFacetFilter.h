@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<const CDCFacet>;
 
     /// Base class for all facet filters

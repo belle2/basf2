@@ -15,7 +15,6 @@
 #include "daq/roisend/h2m.h"
 
 #include "daq/rfarm/manager/RFFlowStat.h"
-#include "daq/dataflow/SocketManager.h"
 
 using namespace std;
 
@@ -251,6 +250,7 @@ perl_split_uint16t(char d, const char* string, unsigned short ret[])
   return count;
 }
 
+// Main
 
 int
 main(int argc, char* argv[])
@@ -326,11 +326,9 @@ main(int argc, char* argv[])
     exit(1);
   }
 
-  // SocketManager as an interface to listen()
-  Belle2::SocketManager sockman(sd_acc);
-
-  // Loop forever
-  for (;;) {
+  // Loop forever for ONSEN connection
+  bool connected = false;
+  while (!connected) {
     // Connect to ONSEN if not
     if (need_reconnection_to_onsen) {
       /* in case of sd_con is connected, disconnect it */
@@ -346,6 +344,7 @@ main(int argc, char* argv[])
           need_reconnection_to_onsen = 0;
           event_count = 0;
           LOG_FPRINTF(stderr, "merger_merge: MM_init_connect_to_onsen(): Connected to ONSEN\n");
+          connected = true;
           break;
         }
 
@@ -356,18 +355,56 @@ main(int argc, char* argv[])
         continue;
       }
     }
+  }
 
-    // Handle connection with HLTOUTs
+  // Preparation for select()
 
-    int exam_stat = sockman.examine();
-    if (exam_stat == 0) {
-      printf("merger_merge: connection request detected\n");
-    } else if (exam_stat == 1) {
-      //      printf ( "merger_merge: data on socket\n" );
-      vector<int>& recvsock = sockman.connected_socket_list();
-      for (vector<int>::iterator it = recvsock.begin(); it !=  recvsock.end(); ++it) {
-        int fd = *it;
-        if (sockman.connected(fd)) {
+  printf("Starting select() loop\n") ;
+  fflush(stdout);
+
+  fd_set allset;
+  FD_ZERO(&allset);
+  FD_SET(sd_acc, &allset);
+  int maxfd = sd_acc;
+  int minfd = sd_acc;
+  fd_set rset, wset;
+
+  // Handle Obtain ROI and send it to ONSEN
+  for (;;) {
+    memcpy(&rset, &allset, sizeof(rset));
+    memcpy(&wset, &allset, sizeof(wset));
+
+    struct timeval timeout;
+    timeout.tv_sec = 0; // 1sec
+    timeout.tv_usec = 1000; // 1msec (in microsec)
+    //    printf ( "Select(): maxfd = %d, start select...; rset=%x, wset=%x\n", maxfd, rset, wset);
+    int rc = select(maxfd + 1, &rset, NULL, NULL, NULL);
+    //    printf ( "Select(): returned with %d,  rset = %8.8x\n", rc, rset );
+    if (rc < 0) {
+      perror("select");
+      continue;
+    } else if (rc == 0) // timeout
+      continue;
+
+    int t;
+    if (FD_ISSET(sd_acc, &rset)) {   // new connection
+      struct sockaddr_in isa;
+      socklen_t i = sizeof(isa);
+      getsockname(sd_acc, (struct sockaddr*)&isa, &i);
+      if ((t =::accept(sd_acc, (struct sockaddr*)&isa, &i)) < 0) {
+        //      m_errno = errno;
+        return (-1);
+      }
+      printf("New socket connection t=%d\n", t);
+      FD_SET(t, &allset);
+      if (minfd == sd_acc) minfd = t;
+      if (t > maxfd) maxfd = t;
+      continue;
+    } else {
+      for (int fd = minfd; fd < maxfd + 1; fd++) {
+        n_bytes_from_hltout = 0;
+        if (FD_ISSET(fd, &rset)) {
+          //    printf ( "fd is available for reading = %d\n", fd );
           /* recv packet */
           int ret;
           ret = MM_get_packet(fd, buf);
@@ -388,7 +425,7 @@ main(int argc, char* argv[])
         }
 
         /* send packet */
-        {
+        if (n_bytes_from_hltout > 0) {
           int ret;
           unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
 

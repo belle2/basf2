@@ -10,20 +10,16 @@
 
 from basf2 import *
 
-# EventInfoSetter - generate event meta data
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'expList': [71, 71, 73, 73, 73],
-                       'runList': [3, 4, 10, 20, 30],
-                       'evtNumList': [40, 600, 20, 500, 301]})
-# eventinfo - show event meta info
-eventinfo = register_module('EventInfoPrinter')
-
 # Create main path
 main = create_path()
 
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(eventinfo)
+# EventInfoSetter - generate event meta data
+eventinfosetter = main.add_module('EventInfoSetter',
+                                  expList=[71, 71, 73, 73, 73],
+                                  runList=[3, 4, 10, 20, 30],
+                                  evtNumList=[40, 600, 20, 500, 301])
+# eventinfo - show event meta info
+eventinfo = main.add_module('EventInfoPrinter')
 main.add_module('Gearbox')
 
 # Process all events

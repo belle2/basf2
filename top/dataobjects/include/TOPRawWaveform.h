@@ -248,7 +248,7 @@ namespace Belle2 {
      * @return true, if no gaps before the last sample
      */
     bool areWindowsInOrder(unsigned lastSample = 0xFFFFFFFF,
-                           unsigned short storageDepth = 512) const
+                           unsigned short storageDepth = 508) const
     {
       unsigned last = lastSample / c_WindowSize + 1;
       unsigned size = m_windows.size();

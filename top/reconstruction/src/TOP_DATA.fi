@@ -3,13 +3,12 @@ c--   TOP_DATA.fi: digitized data
       integer NSIZ_DATA
       PARAMETER (NSIZ_DATA=65536)
       INTEGER N_DATA               ! number of data
-      INTEGER DATA_MOD(NSIZ_DATA)  ! module number
-      INTEGER DATA_ICH(NSIZ_DATA)  ! channel number
-      INTEGER DATA_TDC(NSIZ_DATA)  ! TDC (digitized) time 
-      REAL DATA_TIME(NSIZ_DATA)    ! time in [ns] (converted from TDC) 
-      INTEGER N_RESTORE            ! n_data to restore
+      INTEGER DATA_MOD(NSIZ_DATA)  ! module number (moduleID - 1)
+      INTEGER DATA_ICH(NSIZ_DATA)  ! channel number (pixelID - 1)
+      REAL DATA_TIME(NSIZ_DATA)    ! time in [ns]
+      REAL DATA_TERR(NSIZ_DATA)    ! time uncertainty in [ns]
 
-      COMMON /TOP_DATA/ N_DATA, DATA_MOD, DATA_ICH, DATA_TDC, DATA_TIME,
-     &                  N_RESTORE
+      COMMON /TOP_DATA/ N_DATA, DATA_MOD, DATA_ICH, DATA_TIME,
+     &     DATA_TERR
 
 

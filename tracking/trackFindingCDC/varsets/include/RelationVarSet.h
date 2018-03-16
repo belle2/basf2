@@ -24,12 +24,12 @@ namespace Belle2 {
     template <class ABaseVarSet>
     class RelationVarSet : public BaseVarSet<Relation<const typename ABaseVarSet::Object> > {
 
+      /// Type of the base class
+      using Super = BaseVarSet<Relation<const typename ABaseVarSet::Object> >;
+
     public:
       /// Object type from which the variables shall be extracted
       using BaseObject = typename ABaseVarSet::Object;
-
-      /// Object type from which variables shall be extracted.
-      using Object = typename std::pair<const BaseObject*, const BaseObject*>;
 
     public:
       /**
@@ -38,39 +38,9 @@ namespace Belle2 {
        */
       void initialize() override
       {
-        m_firstVarSet.initialize();
-        m_secondVarSet.initialize();
-      }
-
-      /// Signal the beginning of a new run
-      void beginRun() override
-      {
-        m_firstVarSet.beginRun();
-        m_secondVarSet.beginRun();
-      }
-
-      /// Signal the beginning of a new event
-      void beginEvent() override
-      {
-        m_firstVarSet.beginEvent();
-        m_secondVarSet.beginEvent();
-      }
-
-      /// Signal the end of a run
-      void endRun() override
-      {
-        m_secondVarSet.endRun();
-        m_firstVarSet.endRun();
-      }
-
-      /**
-       *  Terminate the variable set after event processing.
-       *  Can be specialised if the derived variable set has to tear down aquired resources.
-       */
-      void terminate() override
-      {
-        m_secondVarSet.terminate();
-        m_firstVarSet.terminate();
+        this->addProcessingSignalListener(&m_firstVarSet);
+        this->addProcessingSignalListener(&m_secondVarSet);
+        Super::initialize();
       }
 
       /// Main method that extracts the variable values from the complex object.
@@ -83,7 +53,7 @@ namespace Belle2 {
       }
 
       /// Method for extraction from an object instead of a pointer.
-      bool extract(const std::pair<const BaseObject*, const BaseObject*>& obj)
+      bool extract(const Relation<const BaseObject>& obj)
       {
         return extract(&obj);
       }

@@ -81,6 +81,9 @@ namespace Belle2 {
       /// Parameter : If true, the second hit information will be used to create Wire Hits
       bool m_param_useSecondHits = false;
 
+      /// Parameter : If true, the hits on bad wires are not ignored.
+      bool m_param_useBadWires = false;
+
       /// Parameter : Angular range in degrees for which hits should be unpacked
       std::tuple<double, double> m_param_useDegreeSector{INFINITY, INFINITY};
 

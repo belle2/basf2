@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PATHELEMENT_H_
-#define PATHELEMENT_H_
+#pragma once
 
-#include <boost/shared_ptr.hpp>
-
+#include <memory>
 #include <list>
 #include <string>
-
 
 namespace Belle2 {
 
@@ -37,10 +34,9 @@ namespace Belle2 {
     virtual std::string getPathString() const = 0;
 
     /** Create an independent copy of this element.  */
-    virtual boost::shared_ptr<PathElement> clone() const = 0;
+    virtual std::shared_ptr<PathElement> clone() const = 0;
 
     /** Returns a sequential list of Modules in this path element. */
-    virtual std::list<boost::shared_ptr<Module> > getModules() const = 0;
+    virtual std::list<std::shared_ptr<Module> > getModules() const = 0;
   };
 } // end namespace Belle2
-#endif

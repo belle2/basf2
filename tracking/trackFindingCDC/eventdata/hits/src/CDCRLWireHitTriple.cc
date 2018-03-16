@@ -114,7 +114,7 @@ CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
   const short middleToEndCellDistance =  middleToEndNeighborKind.getCellDistance();
   return Shape(startToMiddleCellDistance,
                middleToEndCellDistance,
-               symmetricModulo(oClockDelta, 12));
+               symmetricModuloFast(oClockDelta, 12));
 }
 
 std::ostream& TrackFindingCDC::

@@ -18,6 +18,7 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 # For GCR, July 2017.
 # use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 # For GCR, July and August 2017.
+# use_central_database("production", LogLevel.WARNING)
 use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
@@ -27,6 +28,7 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
     #    files = glob.glob(prefix + '/output_cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
     files = glob.glob(prefix + '/e{0:0>4}/cosmics/r{1:0>5}/all/dst/sub00/dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
     #    files = glob.glob(prefix + 'dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
+    #    files = glob.glob(prefix + '/dst_run{0}'.format(run) + '.root')
 
     # create path
     main = create_path()
@@ -42,7 +44,9 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
                                   ("/Global/height", "8.", "m"),
                               ])
     main.add_module(gearbox)
-    main.add_module('Geometry')
+    #    main.add_module('Geometry')
+    main.add_module('Geometry',
+                    excludedComponents=['EKLM'])
 
     output = "/".join([dest, 'qam.{0:0>4}.{1:0>5}.root'.format(exp, run)])
     main.add_module('CDCCosmicAnalysis',
@@ -69,7 +73,9 @@ if __name__ == "__main__":
         #        prefix='/ghi/fs01/belle2/bdata/users/karim/data/GCR1/build-2017-08-21',
         #        prefix='/home/belle/muchida/basf2/release/cdc/examples/performance/output',
         prefix='/hsm/belle2/bdata/Data/release-00-09-01/DB00000266/GCR1/prod00000001',
-        #        prefix='/ghi/fs01/belle2/bdata/users/karim/data/GCR1/release-00-09-02/',
+        #        prefix='/ghi/fs01/belle2/bdata/users/karim/MC/GCR1/release-00-09-02',
+        #        prefix='/ghi/fs01/belle2/bdata/users/karim/MC/GCR1/prerelease-00-09-02',
+        #        prefix='/ghi/fs01/belle2/bdata/users/karim/data/GCR1/release-00-09-00_new/',
         # dest='/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/test'
         dest='.'  # Store current directory.
         )

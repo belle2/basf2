@@ -1,8 +1,3 @@
 Import('env')
-env['TOOLS_LIBS']['wave_test'] = ['svd','vxd','$ROOT_LIBS']
-env['TOOLS_LIBS']['wave_single'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['wavestats_single'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['p_efficiency'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['b_efficiency'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['ci_efficiency'] = ['svd', 'vxd', '$ROOT_LIBS']
+env['TOOLS_LIBS']['fitter_test'] = ['EG','boost_serialization', 'svd', 'framework']
 Return('env')

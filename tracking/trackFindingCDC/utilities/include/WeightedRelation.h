@@ -46,7 +46,7 @@ namespace Belle2 {
       {}
 
       /// Operator for ordering of relations.
-      bool operator<(const WeightedRelation<From, To>& rhs)
+      bool operator<(const WeightedRelation<From, To>& rhs) const
       {
         return (getFrom() < rhs.getFrom() or
                 (not(rhs.getFrom() < getFrom()) and

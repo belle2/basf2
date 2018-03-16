@@ -54,7 +54,9 @@ TelDataMergerModule::TelDataMergerModule() : Module(),
   setDescription("Data Merger Module for EUDET telescope data.");
 
   //Parameter definition
-  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
+  addParam("inputFileName", m_inputFileName,
+           "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.",
+           std::string(""));
   addParam("storeDigitsName", m_storeDigitsName, "DataStore name of TelDigits collection", std::string(""));
   addParam("bufferSize", m_bufferSize, "Size of the telescope data buffer", m_bufferSize);
   addParam("nEventsProcess", m_nEventsProcess, "Number of events to process", m_nEventsProcess);
@@ -143,14 +145,15 @@ bool TelDataMergerModule::processNormalEvent(const eudaq::Event& ev)
     tbEvt.setTriggerId(currentTLUTagFromEUDAQ);
 
 #ifdef debug_log
-    m_debugLog << "TEL\tTelEvent\t" << tbEvt.getEventNumber() % 32768 << "\tTLU_tag\t" << currentTLUTagFromEUDAQ << "\ttimestamp\t" << tbEvt.getTimeStamp() << std::endl;
+    m_debugLog << "TEL\tTelEvent\t" << tbEvt.getEventNumber() % 32768 << "\tTLU_tag\t" << currentTLUTagFromEUDAQ << "\ttimestamp\t" <<
+               tbEvt.getTimeStamp() << std::endl;
 #endif
 
     BoundedSpaceMap<eudaq_timestamp_type, short_digit_type>::collection_type digitTuples;
     for (size_t plane = 0; plane < tbEvt.getNumTelPlanes(); ++plane) {
       const std::shared_ptr<const std::vector<TelDigit> > digits = tbEvt.getTelDigits(plane);
       if (digits->size() == 0) return false;
-      for (const TelDigit & digit : *digits) {
+      for (const TelDigit& digit : *digits) {
         short_digit_type dtuple =
           std::make_tuple(digit.getSensorID().getID(), digit.getUCellID(), digit.getVCellID());
         digitTuples.push_back(dtuple);
@@ -204,11 +207,11 @@ void TelDataMergerModule::initialize()
 
   // EventMetaData
   StoreObjPtr<EventMetaData> storeEventMetaData;
-  storeEventMetaData.required();
+  storeEventMetaData.isRequired();
 
   // FTSW is necessary, without it just fail.
   StoreArray<RawFTSW> storeFTSW("");
-  storeFTSW.required();
+  storeFTSW.isRequired();
   m_storeRawFTSWsName = storeFTSW.getName();
 
   // Register output data collections

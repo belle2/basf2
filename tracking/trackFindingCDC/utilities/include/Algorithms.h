@@ -13,6 +13,8 @@
 
 #include <vector>
 #include <iterator>
+#include <algorithm>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -247,5 +249,19 @@ namespace Belle2 {
     {
       return std::find(std::begin(ts), std::end(ts), item) != std::end(ts);
     };
+
+    /**
+     * Convenience function to obtain pointers from a range of objects
+     */
+    template <class T, class Ts>
+    std::vector<T*> as_pointers(Ts& ts)
+    {
+      using std::begin;
+      using std::end;
+      std::size_t size = end(ts) - begin(ts);
+      std::vector<T*> result(size, nullptr);
+      std::transform(begin(ts), end(ts), result.begin(), [](T & t) { return std::addressof<T>(t);});
+      return result;
+    }
   }
 }

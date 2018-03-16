@@ -20,10 +20,13 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <rawdata/dataobjects/RawSVD.h>
-#include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 //
 
 
@@ -50,40 +53,48 @@ namespace Belle2 {
 
 
       std::string m_rawSVDListName;
-      std::string m_svdDigitListName;
-      std::string m_xmlMapFileName;
+      std::string m_svdShaperDigitListName;
+
+      bool m_simulate3sampleData;
 
 
     private:
-      //   table of FADC numbers as in xml file      forward  |  backward
-      const unsigned short iFADCnumber[48] = {1, 129,     33, 161,
-                                              8, 9, 136, 137,     40, 41, 42, 168, 169, 170,
-                                              16, 17, 144, 145,     48, 49, 50, 51, 52, 176, 177, 178, 179, 180,
-                                              24, 25, 26, 27, 152, 153, 154, 155,     56, 57, 58, 59, 60, 61, 184, 185, 186, 187, 188, 189
-                                             };
+
+
+      typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
+
+      /**how many FADCs we have */
+      unsigned short nFADCboards;
+
+      /** pointer to APVforFADCmap filled by mapping procedure */
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
       int n_basf2evt; //event number
       int m_nodeid; // Node ID
 
+      static std::string m_xmlFileName;
+      DBObjPtr<PayloadFile> m_mapping;
 
-      SVDOnlineToOfflineMap* m_map;
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //SVDStripNoiseMap* m_noiseMap;
-      std::unordered_map<unsigned short, unsigned short> fadcNumbers;
+
+      /**maps containing assignment (0,1,2,3,4,..,nFADCboards-1) <-> FADC numbers  */
+      FADCmap FADCnumberMap;
+      FADCmap FADCnumberMapRev;
+
       short iCRC;
       std::vector<uint32_t> data_words;
       uint32_t crc16Input[1000];
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
-      void inline addData32(uint32_t data32)
+      void inline addData32(uint32_t adata32)
       {
-        data_words.push_back(data32);
-        crc16Input[iCRC] = data32;
+        data_words.push_back(adata32);
+        crc16Input[iCRC] = adata32;
         iCRC++;
       }
 
 
-      void loadMap();
-      void prepFADClist();
       void binPrintout(unsigned int nwords);
 
       struct DataInfo {
@@ -104,7 +115,8 @@ namespace Belle2 {
         unsigned int trgTiming : 3;
         unsigned int onebit : 1;
         unsigned int FADCnum : 8;
-        unsigned int evtType : 3;
+        unsigned int evtType : 1; // Event type(0): 0…TTD event, 1…standalone event
+        unsigned int DAQMode : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
         unsigned int runType : 2;
         unsigned int check : 3; //MSB
       };
@@ -113,14 +125,11 @@ namespace Belle2 {
       struct APVHeader {
         unsigned int CMC1 : 8; //LSB
         unsigned int CMC2 : 4;
-
-        unsigned int FIFOfullErr: 1;
-        unsigned int FrameErr: 1;
-        unsigned int DetectErr: 1;
-        unsigned int APVErr : 1;
-
+        unsigned int fifoErr: 1;
+        unsigned int frameErr: 1;
+        unsigned int detectErr: 1;
+        unsigned int apvErr : 1;
         unsigned int pipelineAddr : 8;
-
         unsigned int APVnum : 6;
         unsigned int check : 2; //MSB
       };
@@ -144,13 +153,11 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-
         unsigned int emPipeAddr: 8;
-
-        unsigned int wiredOrErr: 1;
-        unsigned int error0: 1;
-        unsigned int error1: 1;
-        unsigned int error2: 1;
+        unsigned int fifoErrOR: 1;
+        unsigned int frameErrOR: 1;
+        unsigned int detectErrOR: 1;
+        unsigned int apvErrOR: 1;
         unsigned int check : 4; //MSB
       };
 
@@ -172,7 +179,9 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDShaperDigit> m_svdShaperDigit; /**< Required input for SVDShaperDigit */
       int m_FADCTriggerNumberOffset;
 
     };

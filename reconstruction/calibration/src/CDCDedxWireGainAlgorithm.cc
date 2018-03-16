@@ -8,6 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <algorithm>
+#include <iostream>
+
+#include <TH1F.h>
+#include <TLine.h>
+#include <TCanvas.h>
+
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
 
 using namespace Belle2;
@@ -17,7 +24,7 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxWireGainCollector")
+CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -30,40 +37,84 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDC
 CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
-  // You HAVE to set these pointers to 0!
+  // HAVE to set these pointers to 0!
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
 
-  ttree.SetBranchAddress("wire", &wire);
-  ttree.SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("wire", &wire);
+  ttree->SetBranchAddress("dedxhit", &dedxhit);
 
-  std::map<int, std::vector<double> > wirededx;
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  std::vector<std::vector<double>> wirededx(14336, std::vector<double>());
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
       wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }
   }
 
-  B2INFO("dE/dx Calibration done for " << wirededx.size() << " CDC wires");
+  // Print the histograms for quality control
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
+  ctmp->Divide(3, 3);
+  std::stringstream psname; psname << "dedx_wiregains.ps[";
+  ctmp->Print(psname.str().c_str());
+  psname.str(""); psname << "dedx_wiregains.ps";
 
-  TClonesArray* gains = new TClonesArray("Belle2::CDCDedxWireGain");
-  int counter = 0;
-  for (auto const& awire : wirededx) {
-    new((*gains)[counter++]) CDCDedxWireGain(awire.first, calculateMean(awire.second, 0.05, 0.25));
+  TH1F* base = new TH1F("base", "", 250, 0, 5);
+  TLine* tl = new TLine();
+  unsigned int outermin = 8 * 160;
+  double outeravg = 0; int nouterwires = 0;
+
+  std::vector<double> means;
+  for (unsigned int i = 0; i < wirededx.size(); ++i) {
+    ctmp->cd(i % 9 + 1); // each canvas is 9x9
+    for (unsigned int j = 0; j < wirededx[i].size(); ++j) {
+      base->Fill(wirededx[i][j]);
+    }
+    base->DrawCopy("hist");
+
+    double mean = 1.0;
+    if (wirededx[i].size() < 10) {
+      means.push_back(mean); // <-- FIX ME, should return not enough data
+    } else {
+      mean = calculateMean(wirededx[i], 0.05, 0.25);
+      means.push_back(mean);
+      if (i >= outermin) {
+        outeravg += mean;
+        nouterwires++;
+      }
+    }
+
+    tl->SetX1(mean); tl->SetX2(mean);
+    tl->SetY1(0); tl->SetY2(base->GetMaximum());
+    tl->Draw("same");
+
+    base->Reset();
+    if ((i + 1) % 9 == 0)
+      ctmp->Print(psname.str().c_str());
   }
-  saveCalibration(gains, "CDCDedxWireGains");
 
-  // Iterate
-  //  B2INFO("mean: " << mean);
-  //  if (mean - 42. >= 1.)
-  //    return c_Iterate;
+  psname.str(""); psname << "dedx_wiregains.ps]";
+  ctmp->Print(psname.str().c_str());
+  delete ctmp;
+  delete base;
+  delete tl;
+
+  // Normalize the outer layers to 1
+  outeravg /= nouterwires;
+  for (unsigned int i = 0; i < 14336; ++i) {
+    means[i] /= outeravg;
+  }
+
+  B2INFO("dE/dx Calibration done for " << means.size() << " CDC wires");
+
+  CDCDedxWireGain* gains = new CDCDedxWireGain(means);
+  saveCalibration(gains, "CDCDedxWireGain");
 
   return c_OK;
 }

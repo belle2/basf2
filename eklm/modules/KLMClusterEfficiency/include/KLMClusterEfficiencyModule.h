@@ -17,6 +17,9 @@
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
 
@@ -142,6 +145,12 @@ namespace Belle2 {
 
     /** Number of K_L0 reconstructed as >= 2 clusters. */
     int m_ReconstructedKL03Clusters;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_KLMClusters;
+
+    /** MC particles. */
+    StoreArray<MCParticle> m_MCParticles;
 
   };
 

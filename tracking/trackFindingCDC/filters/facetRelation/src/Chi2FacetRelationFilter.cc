@@ -11,13 +11,14 @@
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -52,6 +53,7 @@ void Chi2FacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 void Chi2FacetRelationFilter::initialize()
 {
+  Super::initialize();
   if (m_param_chi2CutByISuperLayer.size() == 1) {
     for (int iSL = 0; iSL < ISuperLayerUtil::c_N; ++iSL) {
       m_chi2CutByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[0];

@@ -14,10 +14,9 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
-import glob
 
-# background (collision) files
-bg = glob.glob('./BG/[A-Z]*.root')
+set_random_seed(12345)
+
 
 # create path
 main = create_path()
@@ -35,11 +34,7 @@ evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/12130
 main.add_module(evtgeninput)
 
 # detector simulation
-# add_simulation(main, bkgfiles=bg)
 add_simulation(main)
-
-# HLT L3 simulation
-main.add_module('Level3')
 
 # reconstruction
 add_reconstruction(main)

@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegmentTriple;
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<CDCSegmentTriple>;
 
     /// Base filter for the constuction of segment triples.

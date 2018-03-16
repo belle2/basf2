@@ -31,6 +31,8 @@ namespace Belle2 {
   class NtupleCMSKinematicsTool : public NtupleFlatTool {
 
   private:
+    /** number of decay products */
+    int m_nDecayProducts;
 
     /** CMS momentum magnitude */
     float* m_fP;
@@ -41,10 +43,16 @@ namespace Belle2 {
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
 
+    /** Delete 'new's */
+    void deallocateMemory();
+
   public:
 
     /** Constuctor. */
     NtupleCMSKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+
+    /** Destructor. */
+    ~NtupleCMSKinematicsTool() {deallocateMemory();}
 
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

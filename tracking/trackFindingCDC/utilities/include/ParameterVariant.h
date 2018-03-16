@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/core/ModuleParam.dcl.h>
+#include <framework/core/ModuleParam.h>
 
 #include <boost/variant/variant.hpp>
 

@@ -17,17 +17,26 @@ namespace Belle2 {
 
   TOPTemplateFitResult::TOPTemplateFitResult() {}
 
-  TOPTemplateFitResult::TOPTemplateFitResult(unsigned short risingEdge, short backgroundOffset,
-                                             short amplitude, unsigned short chisquare)
+  TOPTemplateFitResult::TOPTemplateFitResult(short risingEdge, short backgroundOffset,
+                                             short amplitude, short chisquare)
   {
     m_risingEdgeRaw = risingEdge;
     m_risingEdge = risingEdgeShortToRisingEdgeDouble(risingEdge);
     m_backgroundOffset = backgroundOffset;
     m_amplitude = amplitude;
     m_chisquare = chisquare;
+    m_risingEdgeTime = -1.;
   }
 
-  void TOPTemplateFitResult::setRisingEdge(unsigned short risingEdge)
+  TOPTemplateFitResult::TOPTemplateFitResult(double risingEdge, double risingEdgeTime, double backgroundOffset,
+                                             double amplitude, double chisquare)
+    : m_risingEdge(risingEdge), m_risingEdgeTime(risingEdgeTime), m_backgroundOffset(backgroundOffset), m_amplitude(amplitude),
+      m_chisquare(chisquare)
+  {
+    m_risingEdgeRaw = -1;
+  }
+
+  void TOPTemplateFitResult::setRisingEdgeAndConvert(unsigned short risingEdge)
   {
     m_risingEdgeRaw = risingEdge;
     m_risingEdge = risingEdgeShortToRisingEdgeDouble(risingEdge);
@@ -43,37 +52,6 @@ namespace Belle2 {
       mask = mask >> 1;
     }
     return risingEdgeD;
-  }
-
-  double TOPTemplateFitResult::getMean() const
-  {
-    //center of template is gaussian function -> there is a relation between rising edge
-    //position and template mean
-    return m_risingEdge + sqrt(2 * logf(2)) * m_templateSigma;
-  }
-
-  double TOPTemplateFitResult::getTemplateFunctionValue(double x) const
-  {
-    return crystalball(x) + m_backgroundOffset;
-  }
-
-  double TOPTemplateFitResult::crystalball(double x) const
-  {
-    double absAlpha;
-    double value;
-    double t = (x - getMean()) / m_templateSigma;
-    if (m_templateAlpha < 0) t = -t;
-    if (m_templateAlpha > 0) absAlpha = m_templateAlpha;
-    else absAlpha = -m_templateAlpha;
-
-    if (t >= -absAlpha) {
-      value = exp(-0.5 * t * t) * m_amplitude;
-    } else {
-      double a = powf(m_templateN / absAlpha, m_templateN) * exp(-0.5 * absAlpha * absAlpha);
-      double b = m_templateN / absAlpha - absAlpha;
-      value = a / powf(b - t, m_templateN) * m_amplitude;
-    }
-    return value;
   }
 
 } // end Belle2 namespace

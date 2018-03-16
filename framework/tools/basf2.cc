@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("debug_level,d", prog::value<unsigned int>(), "Set default debug level. Also sets the log level to DEBUG.")
     ("events,n", prog::value<unsigned int>(), "Override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "Override run for EventInfoSetter, must be used with -n and --experiment")
     ("experiment", prog::value<int>(), "Override experiment for EventInfoSetter, must be used with -n and --run")
@@ -332,6 +333,13 @@ int main(int argc, char* argv[])
       Environment::Instance().setLogLevelOverride(level);
     }
 
+    // -d
+    if (varMap.count("debug_level")) {
+      unsigned int level = varMap["debug_level"].as<unsigned int>();
+      LogSystem::Instance().getLogConfig()->setDebugLevel(level);
+      LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
+    }
+
     if (varMap.count("visualize-dataflow")) {
       Environment::Instance().setVisualizeDataFlow(true);
       if (Environment::Instance().getNumberProcesses() > 0) {
@@ -420,4 +428,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

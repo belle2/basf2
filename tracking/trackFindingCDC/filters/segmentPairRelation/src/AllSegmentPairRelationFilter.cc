@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/AllSegmentPairRelationFilter.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;

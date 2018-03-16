@@ -58,6 +58,11 @@ void connectionCallback(struct connection_handler_args args)
 {
   chid chid = args.chid;
   printChidInfo(chid, "connectionCallback");
+  // if the channel :req or :cur gets disconnected, translate that back to a disconnected on the nsm side!
+  if (args.op == CA_OP_CONN_DOWN) {
+    // will not harm to report UNKNOWN for either two disconnects, as they are one the same gw/ioc. if we cannot send request its as awful as if cannot get actual status.
+    g_callback->setState(RCState::UNKNOWN);
+  }
 }
 
 void accessRightsCallback(struct access_rights_handler_args args)
@@ -88,7 +93,9 @@ void eventCallback(struct event_handler_args eha)
           g_callback->setState(RCState::RUNNING_S);
         } else if (val == "LOADING") {
           g_callback->setState(RCState::LOADING_TS);
-        } else if (val == "UNLOADING" || val == "ABORTING") {
+        } else if (val == "UNLOADING") {
+          g_callback->setState(RCState::ABORTING_RS); // There is no unloading state yet
+        } else if (val == "ABORTING") {
           g_callback->setState(RCState::ABORTING_RS);
         } else if (val == "STARTING") {
           g_callback->setState(RCState::STARTING_TS);
@@ -100,15 +107,17 @@ void eventCallback(struct event_handler_args eha)
           g_callback->setState(RCState::ERROR_ES);
         }
       } else if (strcmp(pvname_c, PXDRCCallback::pvRCreq) == 0) {
-        if (val == "NOTREADY") {
-          g_callback->setStateRequest(RCState::NOTREADY_S);
-        } else if (val == "READY") {
-          g_callback->setStateRequest(RCState::READY_S);
-        } else if (val == "RUNNING") {
-          g_callback->setStateRequest(RCState::RUNNING_S);
-        } else {
-          LogFile::warning("Event callback for req with invalid request (%s)", pvname_c);
-        }
+        // That IS confusing, why should we (re)set nsm req state which was
+        // used to set this PV? (kindof loop)
+        // even if the PV is changed on the PXDRC (local operation), I do not see a reason to
+        // report that back in this way.
+        // if (val == "NOTREADY") {
+        //   g_callback->setStateRequest(RCState::NOTREADY_S);
+        // } else if (val == "READY") {
+        //   g_callback->setStateRequest(RCState::READY_S);
+        // } else if (val == "RUNNING") {
+        //   g_callback->setStateRequest(RCState::RUNNING_S);
+        // }
       }
     } else {
       LogFile::warning("Unknown PV (chid=%d)", eha.chid);

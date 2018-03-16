@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegmentPair;
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<CDCSegmentPair>;
 
     /// Base class for all axial to stereo segment pairs filters

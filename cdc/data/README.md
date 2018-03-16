@@ -16,6 +16,11 @@ Format: super layerID (0-8), layerID in the super-layer (0-), wireID(0-), boardI
  - sort in order of alpha
  (- Unit: cm and nsec).
  (- unsigned driftL).
+* xt_v3.0.1_chebyshev.dat.gz : went back to xt_v2.1.dat; modified strange two
+                               bins (lyr=9,lr=0,thet=60,alpha=60 and
+                               lyr=11,lr=0,theta=60,alpha=50); recreated simple
+                               poly. ver. of xt.dat; then converted to
+                               chebyshev poly. version.
 * xt_v3_chebyshev.dat.gz     : created from xt_v3.
 * xt_v3.dat                  : created from xt_v2.1 <- obsolete.
 * xt_noB_v1_chebyshev.dat.gz : created from xt_noB_v1.
@@ -132,14 +137,15 @@ The file contains (mis)alignment parameters w.r.t. displaced geometry (=design+d
 
 Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward end-plate [cm], (dx,dy,dz) of sense wire at forward end-plate [cm], tension [grW]
 
-* misalignment.dat: assume (dx,dy,dz)=0 and tension=50grW for all wires.
+* misalignment.dat: assume (dx,dy,dz)=0 and tension=50grW for all wires  -> deleted.
 * alignment.dat:  : = misalignment.dat <- obsolete.
 
-* misalignment_v1.dat: assume (dx,dy,dz)=0 and measured tensions for all wires except for Layer#7 47 and Layer#8 47.
+* misalignment_v1.dat: assume (dx,dy,dz)=0 and measured tensions for all wires except for Layer#7 47 and Layer#8 47  -> deleted.
 * alignment_v1.dat:  : = misalignment_v1.dat <- obsolete
 
-* misalignment_v2.dat: assume (dx,dy,dz)=0 and measured tensions for all wires = 0 
+* misalignment_v2.dat: assume (dx,dy,dz)=0 and measured tensions for all wires = 0  -> deleted.
 * alignment_v2.dat:  : = misalignment_v2.dat
+* alignment_v3.dat: introduced so that this plus displacement_v2.2.1 can reproduce the wire positons which are produced from displacement_v1.1 plus align_201702.dat (by Thanh).
 
 # tentative correction for the difference betw. old design and final design
 
@@ -161,3 +167,5 @@ Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at ba
 * deisplacement_v1.1.dat: add corrections for the longer outer wall (by 430um w.r.t. design)
 * deisplacement_v2.dat: add corrections (in z-direction only) for the end-plate displacements due to wire tensions.
 * deisplacement_v2.1.dat: add other remaining corrections (for endp-late tilt, rotation, etc.). (x,y) as well as z are changed.
+* deisplacement_v2.2.1.dat: fixed two bugs in v2.1.
+

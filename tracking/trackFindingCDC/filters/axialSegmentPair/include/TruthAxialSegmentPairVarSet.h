@@ -48,6 +48,9 @@ namespace Belle2 {
      */
     class TruthAxialSegmentPairVarSet : public VarSet<TruthAxialSegmentPairVarNames> {
 
+      /// Type of the base class
+      using Super = VarSet<TruthAxialSegmentPairVarNames>;
+
     public:
       /// Require the Monte Carlo information before the event processing starts
       void initialize() final;

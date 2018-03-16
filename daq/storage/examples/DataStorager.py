@@ -31,8 +31,8 @@ SVDClust = register_module('SVDClusterizer')
 vxdtf = register_module('VXDTF')
 # SVD_DQM = register_module('SVDDQM')
 # vxdtf_dqm = register_module('VXDTFDQM')
-trackfitter = register_module('GenFitter')
-roiprod = register_module('PXDDataReduction')
+# trackfitter = register_module('GenFitter')
+# roiprod = register_module('PXDDataReduction')
 roipayload = register_module('ROIPayloadAssembler')
 
 # Modules
@@ -47,6 +47,7 @@ if len(argv) >= 6:
 output = register_module('StorageSerializer')
 output.param('OutputBufferName', argv[3])
 output.param('OutputBufferSize', int(argv[4]))
+output.param('NodeID', int(argv[6]))
 output.param('compressionLevel', 0)
 
 # Create main path

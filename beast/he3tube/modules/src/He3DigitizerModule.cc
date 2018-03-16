@@ -10,11 +10,8 @@
 
 #include <beast/he3tube/modules/He3DigitizerModule.h>
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
-#include <beast/he3tube/dataobjects/He3tubeHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -71,7 +68,7 @@ He3DigitizerModule::~He3DigitizerModule()
 void He3DigitizerModule::initialize()
 {
   B2INFO("He3Digitizer: Initializing");
-  StoreArray<He3tubeHit>::registerPersistent();
+  m_he3tubeHit.registerInDataStore();
 
   StoreArray<MCParticle>   mcParticles;
   StoreArray<He3tubeSimHit>  simHits;

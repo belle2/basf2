@@ -78,12 +78,13 @@ void TOPFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 
 void TOPFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
-  callback.log(LogFile::DEBUG, "Load: Starting Prep Data");
-  PrepBoardstackData::PrepareBoardStack(hslb, callback);
+  //callback.log(LogFile::DEBUG, "Load: Starting Prep Data");
+  //PrepBoardstackData::PrepareBoardStack(hslb, callback);
 }
 
 void TOPFEE::monitor(RCCallback& callback, HSLB& hslb)
 {
+  /*
   int id = hslb.get_finid();
   map<int, BoardStackStatus>::iterator it = m_statusMonitor.find(id);
   if (it != m_statusMonitor.end()) {
@@ -91,6 +92,7 @@ void TOPFEE::monitor(RCCallback& callback, HSLB& hslb)
   } else {
     callback.log(LogFile::DEBUG, StringUtil::form("Boardstack %d not found", id));
   }
+  */
 }
 
 

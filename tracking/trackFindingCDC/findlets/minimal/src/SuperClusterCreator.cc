@@ -12,13 +12,16 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -123,23 +126,17 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
       }
     }
   }
-  WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-                                                inputWireHits,
-                                                m_wireHitRelations);
 
-  WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
+  /// Obtain the wire hits as pointers
+  const std::vector<CDCWireHit*> wireHitPtrs = as_pointers<CDCWireHit>(inputWireHits);
+
+  /// Create the wire hit relations
+  RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
 
   B2ASSERT("Expect wire hit neighborhood to be symmetric ",
            WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
-  // Obtain the wire hits as pointers.
-  std::vector<CDCWireHit*> ptrWireHits;
-  ptrWireHits.reserve(inputWireHits.size());
-  for (CDCWireHit& wireHit : inputWireHits) {
-    ptrWireHits.push_back(&wireHit);
-  }
-
-  m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputSuperClusters);
+  m_wirehitClusterizer.apply(wireHitPtrs, m_wireHitRelations, outputSuperClusters);
 
   int iSuperCluster = -1;
   for (CDCWireHitCluster& superCluster : outputSuperClusters) {

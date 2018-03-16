@@ -1,11 +1,17 @@
 #include <calibration/CalibrationCollectorModule.h>
-#include <calibration/CalibrationAlgorithm.h>
+#include <framework/pcore/ProcHandler.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace Calibration;
 
-CalibrationCollectorModule::CalibrationCollectorModule() : Module(), m_expRunEvents()
+CalibrationCollectorModule::CalibrationCollectorModule() :
+  HistoModule(),
+  m_dir(nullptr),
+  m_manager(),
+  m_expRunEvents()
 {
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   addParam("granularity", m_granularity,
            "Granularity of data collection. Data is separated by runs (=run) or not separated at all (=all)", std::string("run"));
 
@@ -23,17 +29,13 @@ CalibrationCollectorModule::CalibrationCollectorModule() : Module(), m_expRunEve
            "all events are collected, but for preScale=0.5 only 50 percent will be. Since this is based on a random choice, you should set the "
            "random seed to a fixed value if you want repeatable results.\n\n"
            "Should be a float in range [0.0,1.0], default=1.0", float(1.0));
+
 }
-
-
 
 void CalibrationCollectorModule::initialize()
 {
-  if (m_granularity != "run" && m_granularity != "all")
-    B2ERROR("Invalid granularity option provided: '" << m_granularity << "' Allowed options are: 'run' or 'all'");
-
-  registerObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME, new RunRange());
-
+  m_evtMetaData.isRequired();
+  REG_HISTOGRAM
   prepare();
 }
 
@@ -65,20 +67,25 @@ void CalibrationCollectorModule::event()
 
 void CalibrationCollectorModule::beginRun()
 {
-  // Which ExpRun are we in?
-  StoreObjPtr<EventMetaData> emd;
-  pair<int, int> exprun = {emd->getExperiment(), emd->getRun()};
+  /** It seems that the beginRun() function is called in each basf2 subprocess when the run changes in each process.
+    * This is nice because it allows us to write the new (exp,run) object creation in the beginRun function as though
+    * the other processes don't exist.
+    */
+  // Current (Exp,Run)
+  ExpRun expRun = make_pair(m_emd->getExperiment(), m_emd->getRun());
+  m_runRange->add(expRun.first, expRun.second);
 
   // Do we care about the number of events collected in each (input data) ExpRun?
   // If so, we want to create values for the events collected map
   if (m_maxEventsPerRun > -1) {
     // Do we have a count for this ExpRun yet? If not create one
-    auto i_eventsInExpRun = m_expRunEvents.find(exprun);
-    if (i_eventsInExpRun == m_expRunEvents.end())
-      m_expRunEvents[exprun] = 0;
+    auto i_eventsInExpRun = m_expRunEvents.find(expRun);
+    if (i_eventsInExpRun == m_expRunEvents.end()) {
+      m_expRunEvents[expRun] = 0;
+    }
 
     // Set our pointer to the correct location for this ExpRun
-    m_eventsCollectedInRun = &m_expRunEvents[exprun];
+    m_eventsCollectedInRun = &m_expRunEvents[expRun];
     // Want to reset our flag to start collection if necessary
     if ((*m_eventsCollectedInRun) < m_maxEventsPerRun) {
       B2INFO("New run has had less events than the maximum collected so far ("
@@ -96,18 +103,56 @@ void CalibrationCollectorModule::beginRun()
       m_runCollectOnRun = false;
     }
   }
-
   // Granularity=all removes data spliting by runs by setting
   // always the same exp, run for calibration data objects
-  if (m_granularity == "all")
-    exprun = { -1, -1};
-
-  // For getObject<> to work
-  m_currentExpRun = exprun;
-
-  // Even for granularity=all, we want to remember all runs...
-  getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).add(emd->getExperiment(), emd->getRun());
-
+  if (m_granularity == "all") {
+    m_expRun = { -1, -1};
+  } else {
+    m_expRun = expRun;
+  }
+  m_manager.createExpRunDirectories(m_expRun);
   // Run the user's startRun() implementation if there is one
   startRun();
+}
+
+void CalibrationCollectorModule::defineHisto()
+{
+  if (!ProcHandler::parallelProcessingUsed() || ProcHandler::isWorkerProcess()) {
+    m_dir = gDirectory->mkdir(getName().c_str());
+    m_manager.setDirectory(m_dir);
+    B2INFO("Saving output to TDirectory " << m_dir->GetPath());
+    B2DEBUG(100, "Creating directories for individual collector objects.");
+    m_manager.createDirectories();
+    m_runRange = new RunRange();
+    m_runRange->setGranularity(m_granularity);
+    m_runRange->SetName(Calibration::RUN_RANGE_OBJ_NAME.c_str());
+    m_dir->Add(m_runRange);
+  }
+  inDefineHisto();
+}
+
+void CalibrationCollectorModule::endRun()
+{
+  closeRun();
+  // Moving between runs possibly creates new objects if getObjectPtr is called and granularity is run
+  // So we should write and clear the current memory objects.
+  if (m_granularity == "run") {
+    ExpRun expRun = make_pair(m_emd->getExperiment(), m_emd->getRun());
+    m_manager.writeCurrentObjects(expRun);
+    m_manager.clearCurrentObjects(expRun);
+  }
+}
+
+void CalibrationCollectorModule::terminate()
+{
+  finish();
+  // actually this should be done by the write() called by HistoManager....
+
+  // Haven't written objects yet if collecting with granularity == all
+  // Write them now that everything is done.
+//  if (m_granularity == "all") {
+//    m_manager.writeCurrentObjects(m_expRun);
+//    m_manager.clearCurrentObjects(m_expRun);
+//  }
+  m_manager.deleteHeldObjects();
 }

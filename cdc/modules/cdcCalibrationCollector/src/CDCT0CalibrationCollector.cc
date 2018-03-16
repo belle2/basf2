@@ -141,8 +141,8 @@ void CDCT0CalibrationCollectorModule::collect()
       Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     }
 
-    getObject<TH1D>("hPval").Fill(Pval);
-    getObject<TH1D>("hNDF").Fill(ndf);
+    getObjectPtr<TH1D>("hPval")->Fill(Pval);
+    getObjectPtr<TH1D>("hNDF")->Fill(ndf);
 
     if (Pval < m_PvalCut || ndf < m_ndfCut) continue;
     //cut at Pt
@@ -150,7 +150,7 @@ void CDCT0CalibrationCollectorModule::collect()
     //reject events don't have eventT0
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
-      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
       } else {
         continue;
@@ -224,9 +224,9 @@ void CDCT0CalibrationCollectorModule::collect()
           // substract event t0;
           t -= evtT0;
 
-          getObject<TH1F>(Form("hdT_lay%d_cell%d", lay, IWire)).Fill(t - t_fit);
-          getObject<TH1F>(Form("hT0b%d", boardID)).Fill(t - t_fit);
-          getObject<TH1F>("hTotal").Fill(t - t_fit);
+          getObjectPtr<TH1F>(Form("hdT_lay%d_cell%d", lay, IWire))->Fill(t - t_fit);
+          getObjectPtr<TH1F>(Form("hT0b%d", boardID))->Fill(t - t_fit);
+          getObjectPtr<TH1F>("hTotal")->Fill(t - t_fit);
         } //NDF
         // }//end of if isU
       }//end of for
@@ -234,7 +234,7 @@ void CDCT0CalibrationCollectorModule::collect()
   }//end of func
 }
 
-void CDCT0CalibrationCollectorModule::terminate()
+void CDCT0CalibrationCollectorModule::finish()
 {
 }
 

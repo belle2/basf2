@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
@@ -20,12 +19,13 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <algorithm>
 #include <functional>
@@ -90,28 +90,33 @@ void SegmentCreatorFacetAutomaton::apply(
     B2ASSERT("Expect the facets to be sorted",
              std::is_sorted(std::begin(facetsInCluster), std::end(facetsInCluster)));
 
+    // Obtain the facets as pointers
+    std::vector<const CDCFacet*> facetPtrsInCluster = as_pointers<const CDCFacet>(facetsInCluster);
+
     // Cut out the chunk of relevant facet relations
     const CDCFacet& firstFacet = facetsInCluster.front();
-    auto beginFacetRelationInSuperCluster =
+    auto beginFacetRelationInCluster =
       std::lower_bound(inputFacetRelations.begin(), inputFacetRelations.end(), &firstFacet);
 
     const CDCFacet& lastFacet = facetsInCluster.back();
-    auto endFacetRelationInSuperCluster =
+    auto endFacetRelationInCluster =
       std::upper_bound(inputFacetRelations.begin(), inputFacetRelations.end(), &lastFacet);
 
     const int iCluster = firstFacet.getICluster();
 
-    WeightedNeighborhood<const CDCFacet> facetNeighborhood(beginFacetRelationInSuperCluster,
-                                                           endFacetRelationInSuperCluster);
+    std::vector<WeightedRelation<const CDCFacet>>
+                                               facetRelationsInCluster(beginFacetRelationInCluster,
+                                                   endFacetRelationInCluster);
 
     // Apply the cellular automaton in a multipass manner
     m_facetPaths.clear();
-    m_cellularPathFinder.apply(facetsInCluster, facetNeighborhood, m_facetPaths);
+    m_cellularPathFinder.apply(facetPtrsInCluster, facetRelationsInCluster, m_facetPaths);
 
-    // Helper function to check if a segment is also present in the graph of facets
-    // Used in the search for aliasing segments
+    // Helper function to check if a given reverse or alias segment is
+    // also present in the graph of facets. Used in the search for
+    // aliasing segments.
     auto getFacetPath = [&facetsInCluster,
-                         &facetNeighborhood,
+                         &facetRelationsInCluster,
     &iCluster](const CDCSegment2D & segment, bool checkRelations = true) {
       CDCRLWireHitSegment rlWireHitSegment = segment.getRLWireHitSegment();
       CDCFacetSegment aliasFacetSegment = CDCFacetSegment::create(rlWireHitSegment);
@@ -129,8 +134,9 @@ void SegmentCreatorFacetAutomaton::apply(
         // Check whether there is a relation to this new facet
         if (not facetPath.empty() and checkRelations) {
           const CDCFacet* fromFacet = facetPath.back();
-          auto relationsFromFacet =
-            std::equal_range(facetNeighborhood.begin(), facetNeighborhood.end(), fromFacet);
+          auto relationsFromFacet = std::equal_range(facetRelationsInCluster.begin(),
+                                                     facetRelationsInCluster.end(),
+                                                     fromFacet);
           if (std::count_if(relationsFromFacet.first, relationsFromFacet.second, Second() == facet) == 0) break;
         }
         facetPath.push_back(facet);

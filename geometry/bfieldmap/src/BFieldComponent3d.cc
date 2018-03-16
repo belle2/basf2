@@ -261,16 +261,19 @@ B2Vector3D BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, un
   const unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
   const unsigned int strideR = m_mapSize[1];
 
-  double wz0 = 1 - wz1, wr0 = 1 - wr1, wphi0 = 1 - wphi1;
-  unsigned int j000 = iz * strideZ + ir * strideR + iphi;
-  unsigned int j001 = j000 + 1;
-  unsigned int j010 = j000 + strideR;
-  unsigned int j011 = j001 + strideR;
-  unsigned int j100 = j000 + strideZ;
-  unsigned int j101 = j001 + strideZ;
-  unsigned int j110 = j010 + strideZ;
-  unsigned int j111 = j011 + strideZ;
-  double w00 = wphi0 * wr0, w10 = wphi0 * wr1, w01 = wphi1 * wr0, w11 = wphi1 * wr1;
+  const double wz0 = 1 - wz1, wr0 = 1 - wr1, wphi0 = 1 - wphi1;
+  const unsigned int j000 = iz * strideZ + ir * strideR + iphi;
+  const unsigned int j001 = j000 + 1;
+  const unsigned int j010 = j000 + strideR;
+  const unsigned int j011 = j001 + strideR;
+  const unsigned int j100 = j000 + strideZ;
+  const unsigned int j101 = j001 + strideZ;
+  const unsigned int j110 = j010 + strideZ;
+  const unsigned int j111 = j011 + strideZ;
+  const double w00 = wphi0 * wr0;
+  const double w10 = wphi0 * wr1;
+  const double w01 = wphi1 * wr0;
+  const double w11 = wphi1 * wr1;
   const vector<B2Vector3F>& B = m_bmap;
   return
     (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +

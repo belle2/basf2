@@ -49,7 +49,7 @@ ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, 
 ModuleCondition::ModuleCondition(const ModuleCondition& other)
 {
   if (other.m_conditionPath) {
-    boost::shared_ptr<Path> p = boost::static_pointer_cast<Path>(other.m_conditionPath->clone());
+    std::shared_ptr<Path> p = std::static_pointer_cast<Path>(other.m_conditionPath->clone());
     m_conditionPath = p;
   }
   m_conditionOperator = other.m_conditionOperator;
@@ -90,7 +90,7 @@ std::string ModuleCondition::getString() const
 
 namespace {
   /// Same function as in the class itself, but return by value
-  boost::shared_ptr<Path> _getPathPython(ModuleCondition* m) {return m->getPath(); };
+  std::shared_ptr<Path> _getPathPython(ModuleCondition* m) {return m->getPath(); };
 }
 
 void ModuleCondition::exposePythonAPI()

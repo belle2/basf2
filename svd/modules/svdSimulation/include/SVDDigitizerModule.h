@@ -75,6 +75,11 @@ namespace Belle2 {
        */
       void saveWaveforms();
 
+      /** Save signals to a root-delimited file (to be analyzed in Python).
+       * This method is only called when a name is set for the file.
+       */
+      void saveSignals();
+
       /** Initialize the module and check module parameters */
       virtual void initialize() override;
       /** Initialize the list of existing SVD Sensors */
@@ -91,7 +96,7 @@ namespace Belle2 {
       // 1. Collections
       /** Name of the collection for the MCParticles */
       std::string m_storeMCParticlesName;
-      /** Name of the collection for the SVDDigits */
+      /** Name of the (optional) collection for the SVDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection for the SVDSimhits */
       std::string m_storeSimHitsName;
@@ -107,9 +112,9 @@ namespace Belle2 {
       std::string m_relDigitTrueHitName;
 
       // 1* Production of SVDShaperDigits
-      /** Whether or not to generate compound SVDShaperDigits */
-      bool m_generateShaperDigits;
-      /** Name of the (optional) collection for the SVDShaperDigits */
+      /** Whether or not to generate single-sample SVDDigits */
+      bool m_generateDigits;
+      /** Name of the collection for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;
       /** Name of the relation between SVDShaperDigits and MCParticles */
       std::string m_relShaperDigitMCParticleName;
@@ -126,11 +131,13 @@ namespace Belle2 {
 
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge */
-      bool   m_applyPoisson;
+      bool  m_applyPoisson = true;
       /** Whether or not to apply Gaussian noise */
-      bool  m_applyNoise;
+      bool  m_applyNoise = false;
       /** Zero-suppression cut. */
-      double m_SNAdjacent;
+      double m_SNAdjacent = 3.0;
+      /** Use 3-sample filter? */
+      bool m_3sampleFilter = true;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction;
 
@@ -139,8 +146,21 @@ namespace Belle2 {
       double m_shapingTime;
       /** Interval between two waveform samples (30 ns). */
       double m_samplingTime;
-      /** Whether or not to apply a time window cut */
-      bool   m_applyWindow;
+      /** Randomize event times?
+       * If set to true, event times will be randomized uniformly from
+       * m_minTimeFrame to m_maxTimeFrame.
+       */
+      bool m_randomizeEventTimes = false;
+      /** Low edge of randomization time frame */
+      float m_minTimeFrame = -300;
+      /** High edge of randomization time frame */
+      float m_maxTimeFrame = 150;
+      /** Current event time.
+       * This is what gets randomized if m_randomizeEventTimes is true.
+       */
+      float m_currentEventTime = 0.0;
+
+
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
@@ -149,17 +169,14 @@ namespace Belle2 {
        * Number of consecutive APV25 samples
        */
       int m_nAPV25Samples;
-      /** Whether or not to apply random phase sampling.
-       * If set to true, the first samples of the event will be taken at a random time point
-       * with probability centered around the time when first particle reaches
-       * the SVD. */
-      bool m_randomPhaseSampling;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename;
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms;
+      /** Name of the tab-delimited listing of signals */
+      std::string m_signalsList = "";
 
       // Other data members:
 
@@ -176,7 +193,7 @@ namespace Belle2 {
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
-      /** Time of the current detector event, from the SimHit.. */
+      /** Time of the current SimHit.. */
       double m_currentTime;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness;

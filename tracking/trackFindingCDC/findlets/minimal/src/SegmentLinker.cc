@@ -9,11 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <vector>
 #include <string>
@@ -60,14 +61,16 @@ void SegmentLinker::apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
     }
   }
 
+  // Obtain the segments as pointers
+  std::vector<const CDCSegment2D*> segment2DPtrs = as_pointers<const CDCSegment2D>(inputSegment2Ds);
+
   // Create linking relations
   m_segment2DRelations.clear();
-  m_segment2DRelationCreator.apply(inputSegment2Ds, m_segment2DRelations);
+  m_segment2DRelationCreator.apply(segment2DPtrs, m_segment2DRelations);
 
   // Find linking paths
   m_segment2DPaths.clear();
-  WeightedNeighborhood<const CDCSegment2D> segment2DNeighborhood(m_segment2DRelations);
-  m_cellularPathFinder.apply(inputSegment2Ds, segment2DNeighborhood, m_segment2DPaths);
+  m_cellularPathFinder.apply(segment2DPtrs, m_segment2DRelations, m_segment2DPaths);
 
   // Unmasked hits in case the blocking logic is requested
   const bool toHits = true;

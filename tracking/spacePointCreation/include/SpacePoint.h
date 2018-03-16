@@ -60,6 +60,7 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
       m_positionError(1., 1., 1.), //TODO: Describe Design Decision for not using the default (0.,0.,0.)
+      m_UClusterTime(0.), m_VClusterTime(0.),
       m_vxdID(0), m_sensorType(VXD::SensorInfoBase::SensorType::VXD) // type is set to generic VXD
     {}
 
@@ -71,10 +72,15 @@ namespace Belle2 {
      *  @param clustersAssigned   states, if u (.first) or v (.second) is assigned.
      *  @param sensorID           VxdID of sensor the SpacePoint shall be on.
      *  @param detID              SensorType detector-type (PXD, SVD, ...) to be used.
+     *  @param UClusterTime       Time in ns of the cluster on the U side
+     *  @param VClusterTime       Time in ns of the cluster on the V side
      */
     SpacePoint(B2Vector3<double> pos, B2Vector3<double> posError, std::pair<double, double> normalizedLocal,
-               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
-      m_position(pos), m_positionError(posError), m_normalizedLocal(normalizedLocal),
+               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
+               double UClusterTime = 0. , double VClusterTime = 0.) :
+      m_position(pos), m_positionError(posError),
+      m_normalizedLocal(normalizedLocal),
+      m_UClusterTime(UClusterTime), m_VClusterTime(VClusterTime),
       m_clustersAssigned(clustersAssigned),
       m_vxdID(sensorID), m_sensorType(detID)
     {}
@@ -120,6 +126,12 @@ namespace Belle2 {
     /** return the z-value of the global position of the SpacePoint */
     double Z() const { return m_position.Z(); }
 
+    /** return the time in ns of the cluster on the U side **/
+    double TimeU() const { return m_UClusterTime; }
+
+    /** return the time in ns of the cluster on the V side **/
+    double TimeV() const { return m_VClusterTime; }
+
     /** return the position vector in global coordinates */
     const B2Vector3<double>& getPosition() const { return m_position; }
 
@@ -159,6 +171,13 @@ namespace Belle2 {
 
     /** Setter for association with a track.*/
     void setAssignmentState(bool isAssigned) const { m_isAssigned = isAssigned; }
+
+    /// Returns true if the SP is single clustered and the cluster is a u cluster
+    bool isUOnly() const { return m_clustersAssigned.first and not m_clustersAssigned.second; }
+    /// Returns true if the SP is single clustered and the cluster is a v cluster
+    bool isVOnly() const { return not m_clustersAssigned.first and m_clustersAssigned.second; }
+    /// Returns true if the SP is not single clustered
+    bool isUAndV() const { return m_clustersAssigned.first and m_clustersAssigned.second; }
 
     /** Getter for status of assignment to a track.*/
     bool getAssignmentState() const { return m_isAssigned; }
@@ -230,6 +249,7 @@ namespace Belle2 {
      * The returned value is now dependent of vCluster and valid only for this cluster!
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      *
+     * function kept only for backward compatibility with VXDTF1
      */
     static double getUWedged(const std::pair<double, double>& hitLocalUnwedged, VxdID vxdID,
                              const VXD::SensorInfoBase* aSensorInfo = nullptr)
@@ -255,23 +275,33 @@ namespace Belle2 {
 
 
 
-    /** checks first parameter for boundaries.
-     *
-     * does take second/third argument for checking for lower/upper boundary.
-     * if boundary is crossed, value gets reset to boundary value
+    /** Enforce  @param value in the  range [ @param lower, @param higher ].
+     * param = min ( max( param,lower)  ,higher )
+     * @param value is the coordinate that must be constrained in the range
+     * @param lower is the lower limit of the prescribed range
+     * @param higher is the upper limit of the prescribed range
+     * @param otherValue is for debugging and logging purposes
+     * @param side is for debugging purposes: 0 for U side 1 for V side
+     * @paramvxdID vxdID is for debugging purposes
      * */
-    static void boundaryCheck(double& value, double lower = 0, double higher = 1)
+    static void boundaryEnforce(double& value, const double& otherValue, double lower = 0, double higher = 1, unsigned int side = 0,
+                                VxdID vxdID = VxdID())
     {
       // Times to times there are normalized coordinates that are out of the boundaries.
       // We do apply a smal sloppyness here
 
       double sloppyTerm = 1e-3;
       if (value < lower - sloppyTerm) {
-        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
+        B2WARNING("SpacePoint::boundaryEnforce: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
+        B2WARNING("On sensor: " << vxdID << " side: " << (side == 0 ? " U " : " V") <<
+                  " when the other coordinate is: " << otherValue);
+
         value = lower;
       }
       if (value > higher + sloppyTerm) {
-        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
+        B2WARNING("SpacePoint::boundaryEnforce: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
+        B2WARNING("On sensor: " << vxdID << " side: " << (side == 0 ? " U " : " V") <<
+                  " when the other coordinate is: " << otherValue);
         value = higher;
       }
 
@@ -313,6 +343,15 @@ namespace Belle2 {
      */
     std::pair<double, double> m_normalizedLocal;
 
+    /** Time of the cluster on the U side in ns
+     */
+    double m_UClusterTime;
+
+    /** Time of the cluster on the V side in ns
+     */
+    double m_VClusterTime;
+
+
     /** The bool value is true, when correct information of the coordinate exists.
      *
      *  .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
@@ -344,6 +383,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 11)
+    ClassDefOverride(SpacePoint, 12)
   };
 }

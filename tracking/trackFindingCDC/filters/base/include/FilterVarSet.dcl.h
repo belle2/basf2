@@ -44,8 +44,8 @@ namespace Belle2 {
      *  The variables that are extracted from the filter response are the weight
      *  and a boolean whether the response was NaN.
      */
-    template<class AFilter>
-    class  FilterVarSet : public VarSet<FilterVarNames<AFilter> > {
+    template <class AFilter>
+    class FilterVarSet : public VarSet<FilterVarNames<AFilter>> {
 
     private:
       /// Type of the base class
@@ -71,18 +71,6 @@ namespace Belle2 {
 
       /// Initialize the filter before event processing
       void initialize() final;
-
-      /// Allow setup work to take place at beginning of new run
-      void beginRun() final;
-
-      /// Allow setup work to take place at beginning of new event
-      void beginEvent() final;
-
-      /// Allow clean up to take place at end of run
-      void endRun() final;
-
-      /// Terminate the filter after event processing
-      void terminate() final;
 
       /**
        *  Getter for the named references to the individual variables

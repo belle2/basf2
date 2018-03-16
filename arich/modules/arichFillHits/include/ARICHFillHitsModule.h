@@ -73,6 +73,7 @@ namespace Belle2 {
 
     DBObjPtr<ARICHGeometryConfig> m_geoPar; /**< geometry configuration parameters from the DB */
     DBObjPtr<ARICHChannelMapping> m_chnMap; /**< (x,y) to asic channel mapping */
+    uint8_t m_bitMask; /**< hit bit mask (only convert digits with hit in bitmask bits) */
 
   };
 

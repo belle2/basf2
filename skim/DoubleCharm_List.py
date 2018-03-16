@@ -10,6 +10,8 @@
 from basf2 import *
 from modularAnalysis import *
 
+# VERY HIGH RETENTION RATE: NEEDS TO BE REDUCED
+
 
 def DoubleCharmList():
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'

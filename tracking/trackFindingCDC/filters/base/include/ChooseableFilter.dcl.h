@@ -44,9 +44,6 @@ namespace Belle2 {
       Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory,
                  const std::string& filterName);
 
-      /// Default destructor
-      ~Chooseable();
-
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
@@ -100,9 +97,6 @@ namespace Belle2 {
 
       /// Constructor of the chooseable filter taking the default filter name
       ChooseableFilter(const std::string& filterName);
-
-      /// Default destructor
-      ~ChooseableFilter();
     };
   }
 }

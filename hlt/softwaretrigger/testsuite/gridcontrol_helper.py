@@ -145,7 +145,7 @@ def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder
 
     if local_execution:
         # only run as much jobs as physical CPU (account for hyperthreading multiplier here)
-        jobs_in_flight = int(multiprocessing.cpu_count() / 4)
+        jobs_in_flight = int(multiprocessing.cpu_count() / 2)
         backend = "host"
     else:
         jobs_in_flight = jobs_in_flight

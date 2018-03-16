@@ -4,17 +4,14 @@
 from basf2 import *
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.ERROR)
 
 # to run the framework the used modules need to be registered
 eventinfosetter = register_module('EventInfoSetter')
 # Setting the option for all non-hepevt reader modules:
-eventinfosetter.param('evtNumList', [20])  # we want to process 100 events
+eventinfosetter.param('evtNumList', [70])  # we want to process nr defined error events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
-
-histoman = register_module('HistoManager')
-histoman.param('histoFileName', 'your_histo_file.root')
 
 packer = register_module('PXDPackerErr')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
@@ -35,35 +32,22 @@ packer.param('dhe_to_dhc', [
 
 unpacker = register_module('PXDUnpacker')
 
-simpleoutput = register_module('RootOutput')
-simpleoutput.param('outputFileName', 'Output.root')
+packercheck = register_module('PXDPackerErr')
+packercheck.param('dhe_to_dhc', [
+    [0, 2]
+])
 
-# Load parameters
-gearbox = register_module('Gearbox')
+logging.enable_summary(False)
 
-# Create geometry
-geometry = register_module('Geometry')
-
-# Select subdetectors to be built
-# geometry.param('Components', ['PXD','SVD'])
-geometry.param('components', ['PXD'])
-
-
-# creating the path for the processing
+# creating minimal path for test
 main = create_path()
 main.add_module(eventinfosetter)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(histoman)
 main.add_module(packer)
+unpacker.set_log_level(LogLevel.FATAL)  # this does not work yet, will fall back to ERROR
 main.add_module(unpacker)
-main.add_module(register_module('PXDDAQDQM'))
-# main.add_module(register_module('PXDRawDQM'))
-# main.add_module(register_module('PXDROIDQM'))
-main.add_module(register_module('Progress'))
-main.add_module(simpleoutput)
+packercheck.set_log_level(LogLevel.INFO)  # tell us more in the log in case of any problem
+main.add_module(packercheck, Check=True)
 
-# Process the events
 process(main)
-# if there are less events in the input file the processing will be stopped at
+
 # EOF.

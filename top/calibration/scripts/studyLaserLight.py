@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # ------------------------------------------------------------------------
-# Basic module to study the time resolution using the laser light
+# Module to produce the laser time histograms that serve as input to the laser
+# resolution fitter
 #
 # Contributors: Umberto Tamponi (tamponi@to.infn.it)
 #
@@ -21,6 +22,7 @@ import ROOT
 import pylab
 import numpy
 import time
+from laserResolutionTools import fitLaserResolution, plotLaserResolution
 
 
 class TOPLaserHistogrammerModule(Module):
@@ -47,6 +49,16 @@ class TOPLaserHistogrammerModule(Module):
         0.,
         100)  # 10 ps binning
 
+    h_crossOccupancy = [[TH2F(
+        'crossOccupancy_' + str(slotA) + '_' + str(slotB),
+        ' ',
+        200,
+        0,
+        200,
+        200,
+        0.,
+        200) for slotA in range(16)] for slotB in range(16)]
+
     #: output root file
     outname = 'outStudyLaserResolution.root'
 
@@ -63,8 +75,8 @@ class TOPLaserHistogrammerModule(Module):
     m_maxAmp = 700.
     #: minimum amplitude to accept a TOPDigit
     m_minAmp = 250.
-    #: root file with the MC distribition of the laser light, to get the light path corrections
-    m_mcCorrectionsFile = 't0MC.root'
+    #: root file with the MC distribution of the laser light, to get the light path corrections
+    m_mcCorrectionsFile = '/group/belle2/group/detector/TOP/calibration/MCreferences/t0MC.root'
     #: positions of the first and second peak
     m_MCPeaks = [[]]
 
@@ -103,47 +115,36 @@ class TOPLaserHistogrammerModule(Module):
         #: output name
         self.m_ignoreNotCalibrated = ignoreNotCal
 
-    def beginRun(self):
-        self.m_MCPeaks = [[-1. for second in range(2)] for first in range(512)]    # default
-        tfileIn = TFile(self.m_mcCorrectionsFile)
-        histoMC = tfileIn.Get('LaserTimingVSChannelOneSlot')
-        for kCh in range(512):
-            timeProjection = histoMC.ProjectionY('projection', kCh + 1, kCh + 1)
-            timeProjection.GetXaxis().SetRangeUser(0., 1.)
-            spectrum = TSpectrum()
-            numPeaks = spectrum.Search(timeProjection, 2., 'nobackground', 0.1)
-            peaks = spectrum.GetPositionX()
-            print(str(numPeaks))
-            if numPeaks is not 0:
-                print('channel ' + str(kCh) + ' ' + str(peaks[0]) + ' ' +
-                      str(self.m_MCPeaks[kCh][0]) + ' ' + str(self.m_MCPeaks[kCh][1]))
-            for iPeak in range(numPeaks):
-                if iPeak < 2:
-                    self.m_MCPeaks[kCh][iPeak] = peaks[iPeak]
-
     def event(self):
         ''' Event processor: fill histograms '''
 
         digits = Belle2.PyStoreArray('TOPDigits')
-
+        nhits = [0 for i in range(16)]
         for digit in digits:
-            if((not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()) or digit.getHitQuality() != 1):
+            if(not self.ignoreNotCalibrated and not digit.isTimeBaseCalibrated()):
                 continue
-            if(digit.getPulseHeight() > self.m_minAmp or digit.getPulseHeight() < self.m_maxAmp):
-                continue
-            if (and digit.getPulseWidth() > self.m_minWidth and digit.getPulseWidth() < self.m_maxWidth):
+            if (digit.getHitQuality() == 1 and
+                digit.getPulseWidth() > self.m_minWidth and digit.getPulseWidth() < self.m_maxWidth and
+                    digit.getPulseHeight() > self.m_minAmp and digit.getPulseHeight() < self.m_maxAmp):
                 slotID = digit.getModuleID()
                 hwchan = digit.getChannel()
                 self.h_LaserTimingVSChannel.Fill(512 * (slotID - 1) + hwchan, digit.getTime())
                 simhits = digit.getRelationsWith('TOPSimHits')
+                nhits[slotID - 1] = nhits[slotID - 1] + 1
                 for simhit in simhits:
                     self.h_LaserTimingVSChannelOneSlot.Fill(hwchan, simhit.getTime())
+        for slotA in range(16):
+            for slotB in range(16):
+                self.h_crossOccupancy[slotA][slotB].Fill(nhits[slotA], nhits[slotB])
 
     def terminate(self):
         ''' Write histograms to file, fills and fits the resolution plots'''
         tfile = TFile(self.outname, 'recreate')
         self.h_LaserTimingVSChannel.Write()
         self.h_LaserTimingVSChannelOneSlot.Write()
+        for slotA in range(16):
+            for slotB in range(16):
+                self.h_crossOccupancy[slotA][slotB].Write()
         tfile.Close()
 
 
@@ -219,12 +220,12 @@ if datatype != 'root':
     # Convert to TOPDigits
     converter = register_module('TOPRawDigitConverter')
     if dbaddress == 'none':
-        print("Not using TBC")
+        print("Not using Calibrations")
         converter.param('useSampleTimeCalibration', False)
         converter.param('useChannelT0Calibration', False)
         converter.param('useModuleT0Calibration', False)
     else:
-        print("Using TBC")
+        print("Using Calibrations")
         converter.param('useSampleTimeCalibration', True)
         converter.param('useChannelT0Calibration', True)
         converter.param('useModuleT0Calibration', True)
@@ -256,3 +257,7 @@ process(main)
 # Print call statistics
 print(statistics)
 print(statistics(statistics.TERM))
+
+
+fitLaserResolution(dataFile=outfile, outputFile='laserResolutionResults.root', pdfType='cb', saveFits=True)
+plotLaserResolution()

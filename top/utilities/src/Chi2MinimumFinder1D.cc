@@ -46,6 +46,12 @@ namespace Belle2 {
 
     void Chi2MinimumFinder1D::findMinimum()
     {
+      if (m_chi2.size() < 3) {
+        m_minimum.position = (m_xmin + m_xmax) / 2;
+        m_minimum.error = (m_xmax - m_xmin) / 2;
+        return;
+      }
+
       unsigned i0 = 1;
       for (unsigned i = i0; i < m_chi2.size() - 1; i++) {
         if (m_chi2[i] < m_chi2[i0]) i0 = i;

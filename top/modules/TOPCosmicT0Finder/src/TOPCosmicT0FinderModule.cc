@@ -14,6 +14,7 @@
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
+#include <top/reconstruction/TOP1Dpdf.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
 // framework - DataStore
@@ -63,6 +64,8 @@ namespace Belle2 {
              "if true, use incoming track, otherwise use outcoming track", true);
     addParam("minHits", m_minHits,
              "minimal number of detected photons in a module", (unsigned) 10);
+    addParam("minSignal", m_minSignal,
+             "minimal number of expected signal photons", 5.0);
     addParam("applyT0", m_applyT0, "if true, subtract T0 in TOPDigits", true);
     addParam("numBins", m_numBins, "number of bins time range is divided to", 200);
     addParam("timeRange", m_timeRange, "time range in which to search [ns]", 10.0);
@@ -148,12 +151,13 @@ namespace Belle2 {
     }
     if (!selectedTrack) return;
 
-    TOPtrack topTrack(selectedTrack, moduleID, Const::muon);
-    if (!topTrack.isValid()) return;
     if (moduleID == 0) {
       B2ERROR("moduleID == 0");
       return;
     }
+
+    TOPtrack topTrack(selectedTrack, moduleID, Const::muon);
+    if (!topTrack.isValid()) return;
 
     // select photons: at least m_minHits
 
@@ -185,6 +189,7 @@ namespace Belle2 {
 
     reco.reconstruct(topTrack);
     if (reco.getFlag() != 1) return;
+    if (reco.getExpectedPhotons() - reco.getExpectedBG() < m_minSignal) return;
 
     // event is accepted for t0 determination
 
@@ -192,59 +197,27 @@ namespace Belle2 {
 
     // find rough t0
 
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    const auto& tdc = geo->getNominalTDC();
-    double timeMin = tdc.getTimeMin();
-    double timeMax = tdc.getTimeMax();
-    double binSize = 1.0; // ns
-    int nbins = int((timeMax - timeMin) / binSize);
-    binSize = (timeMax - timeMin) / nbins;
-    TH1F pdf("pdf", "PDF", nbins, timeMin, timeMax);
-    double tminPDF = timeMax;
-    for (int pix = 1; pix <= 512; pix++) {
-      for (int k = 0; k < reco.getNumofPDFPeaks(pix); k++) {
-        float pos = 0;
-        float wid = 0;
-        float nph = 0;
-        reco.getPDFPeak(pix, k, pos, wid, nph);
-        pdf.Fill(pos, nph);
-        if (pos < tminPDF) tminPDF = pos;
-      }
-    }
+    TOP1Dpdf pdf1d(reco, topTrack.getModuleID(), 1.0); // ~1 ns bin size
+    double t0_min = pdf1d.getTminFot() - pdf1d.getTmaxPDF() - 2 * pdf1d.getBinSize();
+    double t0_max = pdf1d.getTmaxFot() - pdf1d.getTminPDF();
+    int numBins = std::max(int((t0_max - t0_min) / pdf1d.getBinSize()), 3);
+    t0_max = t0_min + numBins * pdf1d.getBinSize();
 
-    double tminFot = selDigits[0]->getTime();
-    double tmaxFot = tminFot;
-    for (const auto& digit : selDigits) {
-      double t = digit->getTime();
-      tminFot = std::min(tminFot, t);
-      tmaxFot = std::max(tmaxFot, t);
+    Chi2MinimumFinder1D roughFinder(numBins, t0_min, t0_max);
+    const auto& bins = roughFinder.getBinCenters();
+    for (unsigned i = 0; i < bins.size(); i++) {
+      double t0 = bins[i];
+      roughFinder.add(i, -2 * pdf1d.getLogL(t0));
     }
-    double t0Sken = tminFot - tminPDF - 10.0;
-    double t0Rough = 0;
-    double chi2Min = 0;
-    bool start = true;
-    double bkg = std::max(m_bkgPerModule / (timeMax - timeMin) * binSize, 0.001);
-    while (t0Sken < tmaxFot - tminPDF) {
-      double chi2 = 0;
-      for (const auto& digit : selDigits) {
-        double t = digit->getTime();
-        double f = pdf.GetBinContent(pdf.FindBin(t - t0Sken)) + bkg;
-        chi2 += -2 * log(f);
-      }
-      if (start or chi2 < chi2Min) {
-        start = false;
-        chi2Min = chi2;
-        t0Rough = t0Sken;
-      }
-      t0Sken += binSize;
-    }
+    const auto& t0Rough = roughFinder.getMinimum();
 
-    // calculate log likelihoods and find precise t0
+    // find precise t0
 
-    double t0min = t0Rough - m_timeRange / 2;
-    double t0max = t0Rough + m_timeRange / 2;
-    timeMin += t0Rough;
-    timeMax += t0Rough;
+    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
+    double timeMin = tdc.getTimeMin() + t0Rough.position;
+    double timeMax = tdc.getTimeMax() + t0Rough.position;
+    double t0min = t0Rough.position - m_timeRange / 2;
+    double t0max = t0Rough.position + m_timeRange / 2;
     Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
     const auto& binCenters = finder.getBinCenters();
     for (unsigned i = 0; i < binCenters.size(); i++) {
@@ -276,6 +249,13 @@ namespace Belle2 {
       std::string title = "muon -2 logL vs. t0; t_{0} [ns]; -2 log L_{#mu}";
       auto chi2 = finder.getHistogram(name, title);
 
+      name = "pdf_" + to_string(m_num);
+      auto pdf = pdf1d.getHistogram(name, "PDF projected to time axis");
+      pdf.SetName(name.c_str());
+      pdf.SetXTitle("time [ns]");
+      pdf.SetLineColor(2);
+      pdf.SetOption("hist");
+
       name = "hits_" + to_string(m_num);
       TH1F hits(name.c_str(), "time distribution of photons (t0-subtracted)",
                 pdf.GetNbinsX(), pdf.GetXaxis()->GetXmin(), pdf.GetXaxis()->GetXmax());
@@ -284,12 +264,6 @@ namespace Belle2 {
         if (digit->getHitQuality() == TOPDigit::c_Good)
           hits.Fill(digit->getTime() - t0.position);
       }
-
-      name = "pdf_" + to_string(m_num);
-      pdf.SetName(name.c_str());
-      pdf.SetXTitle("time [ns]");
-      pdf.SetLineColor(2);
-      pdf.SetOption("hist c");
 
       timeZero->setHistograms(chi2, pdf, hits);
       m_num++;

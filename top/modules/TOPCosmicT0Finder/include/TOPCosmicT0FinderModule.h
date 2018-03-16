@@ -65,6 +65,7 @@ namespace Belle2 {
 
     bool m_useIncomingTrack; /**< if true use incoming track, otherwise use outcoming */
     unsigned m_minHits; /**< minimal number of hits on TOP module */
+    double m_minSignal; /**< minimal number of expected signal photons */
     bool m_applyT0; /**< if true, subtract T0 in TOPDigits */
     int m_numBins;      /**< number of bins to which time range is divided */
     double m_timeRange; /**< time range in which to search [ns] */

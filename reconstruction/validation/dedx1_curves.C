@@ -43,7 +43,7 @@ void plot(const TString &input_filename)
 
   const int num_detectors = 3;
   const char* detectors[] = { "PXD", "SVD", "CDC" };
-  const double dedx_cutoff[] = { 10e3, 1.5e4, 150.0 };
+  const double dedx_cutoff[] = { 10e3, 5.e6, 10.0 };
   for(int idet = 1; idet < num_detectors; idet++) { //PXD not in input file, anyway
     if( idet == 1 )
       tree->Project(TString::Format("dedx_p_%d", idet), TString::Format("VXDDedxTracks.m_dedx_avg_truncated[][%d]:VXDDedxTracks.m_p", idet), TString::Format("VXDDedxTracks.m_p < 3 && VXDDedxTracks.m_dedx_avg_truncated[][%d] < %f ", idet, dedx_cutoff[idet]));

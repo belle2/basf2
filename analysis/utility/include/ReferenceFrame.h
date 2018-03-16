@@ -333,21 +333,24 @@ namespace Belle2 {
 
   };
 
+  /** A template class to apply the reference frame */
   template<class T>
   class UseReferenceFrame {
   public:
+    /** Constructor which applies the reference frame  */
     template<class ...Args>
     UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
     {
       ReferenceFrame::Push(&m_frame);
     }
 
+    /** */
     ~UseReferenceFrame()
     {
       ReferenceFrame::Pop();
     }
   private:
-    T m_frame;
+    T m_frame; /**< the reference frame */
   };
 
 } // Belle2 namespace

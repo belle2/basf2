@@ -19,25 +19,27 @@
 
 namespace Belle2 {
 
-  SELECTION_VARIABLE(Difference, double,
+  /// Quick definition of a selection variable implementing the difference of 2 doubles
+  SELECTION_VARIABLE(Difference, 2, double,
                      static double value(const double& t1,
                                          const double& t2)
   { return t1 - t2; };
                     );
 
-  SELECTION_VARIABLE(Sum, double,
+  /// Quick definition of a selection variable implementing the sum of 2 doubles
+  SELECTION_VARIABLE(Sum, 2, double,
                      static double value(const double& t1,
                                          const double& t2)
   { return t1 + t2; };
                     );
 
+  /// Test for VariablesTTree
   class VariablesOnTTree: public ::testing::Test {
   protected:
 
   public:
-
-    TTree* tree1;
-    TTree* tree2;
+    TTree* tree1; /**< a TTree */
+    TTree* tree2; /**< another TTree */
     VariablesOnTTree() : tree1(nullptr), tree2(nullptr)
     {
       tree1 = new TTree("t1", "t1");
@@ -52,6 +54,7 @@ namespace Belle2 {
     }
   };
 
+  /// Basic test of the class
   TEST_F(VariablesOnTTree, basic_test)
   {
     auto filter1 = 0 < Difference() < 1 && 0 < Sum() < 1;
@@ -68,10 +71,7 @@ namespace Belle2 {
     variables2.evaluateOn(c, d);
     tree2->Fill();
 
-
     tree1->Scan();
     tree2->Scan();
-
   }
-
 }

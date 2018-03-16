@@ -3,17 +3,17 @@
 
 from basf2 import *
 from ROOT import Belle2
-import multiprocessing
+from b2test_utils import clean_working_directory, safe_process
 
 
 class TestModule(Module):
     """Test if the DataStore contains the expected content."""
 
-    def isInverted(self):
-        """
-        Returns true if the check should be for the inversion
-        """
-        return False
+    def __init__(self, is_inverted):
+        """Create a new instance. If is_inverted is True we check of absence of content"""
+        super().__init__()
+        #: variable to remember if we test for existence or absence
+        self._is_inverted = is_inverted
 
     def event(self):
         """reimplementation of Module::event().
@@ -26,7 +26,7 @@ class TestModule(Module):
         PXDDigits = Belle2.PyStoreArray('PXDDigits')
 
         # PXDClusters are in our keep list, should still be there
-        if self.isInverted():
+        if self._is_inverted:
             assert PXDClusters.getEntries() == 0
             # while the PXDDigits should be empty
             assert PXDDigits.getEntries() > 0
@@ -40,50 +40,54 @@ class TestModule(Module):
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         assert evtmetadata
 
-
-class TestModuleInverted(Module):
-
-    def isInverted(self):
-        """
-        Returns true if the check should be for the inversion
-        """
-        return True
-
-
+set_log_level(LogLevel.ERROR)
 set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
 logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
+# find file to read
+input_file = Belle2.FileSystem.findFile('framework/tests/root_input.root')
 
-main = create_path()
+with clean_working_directory():
+    main = create_path()
 
-main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'))
-main.add_module('EventInfoPrinter')
-main.add_module('PrintCollections')
-main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'])
-main.add_module(register_module('PrintCollections'))
-main.add_module(TestModule())
+    main.add_module('RootInput', inputFileName=input_file)
+    main.add_module('EventInfoPrinter')
+    main.add_module('PrintCollections')
+    main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'])
+    main.add_module('PrintCollections')
+    main.add_module(TestModule(False))
 
-# ensure the pruned datastore is still write-able to disk
-main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
+    # ensure the pruned datastore is still write-able to disk
+    main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
 
-# Process events
-process(main)
+    # Process events
+    process(main)
 
-os.remove('prune_datastore_output_test.root')
+    # now test if the negated logic works, too
+    main = create_path()
 
-# now test if the negated logic works, too
-main = create_path()
+    main.add_module('RootInput', inputFileName=input_file)
+    main.add_module('EventInfoPrinter')
+    main.add_module('PrintCollections')
+    main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'], keepMatchedEntries=False)
+    main.add_module('PrintCollections')
+    main.add_module(TestModule(True))
 
-main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'))
-main.add_module('EventInfoPrinter')
-main.add_module('PrintCollections')
-main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'], keepMatchedEntries=False)
-main.add_module(register_module('PrintCollections'))
-main.add_module(TestModuleInverted())
+    # ensure the pruned datastore is still write-able to disk
+    main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
 
-# ensure the pruned datastore is still write-able to disk
-main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
+    # Process events
+    process(main)
 
-# Process events
-process(main)
+    # now test if a regex which cannot be compiled is properly reported
+    main = create_path()
+
+    main.add_module('RootInput', inputFileName=input_file)
+    main.add_module('EventInfoPrinter')
+    main.add_module('PrintCollections')
+    main.add_module('PruneDataStore', matchEntries=['[a-b][a'], keepMatchedEntries=False)
+    main.add_module('PrintCollections')
+
+    # Process events
+    assert(not safe_process(main) == 0)

@@ -312,7 +312,7 @@ namespace Belle2 {
      * Set vector of dead channel numbers
      * @param channel FEB channel id
      */
-    void setDeadChannels(std::vector<int> deadChannels) {m_deadChannel = deadChannels; }
+    void setDeadChannels(const std::vector<int>& deadChannels) {m_deadChannel = deadChannels; }
 
     /**
      * Return size of the list of dead channels
@@ -373,7 +373,7 @@ namespace Belle2 {
      * Set vector of slopes (rough settings)
      * @param vector of slopes[mV/offset step]
      */
-    void setSlopesRough(std::vector<float> slopesRough) {m_slopesRough = slopesRough; }
+    void setSlopesRough(const std::vector<float>& slopesRough) {m_slopesRough = slopesRough; }
 
     /**
      * Return size of the list of slopes (rough settings)
@@ -398,7 +398,7 @@ namespace Belle2 {
      * Set vector of slopes (fine settings)
      * @param vector of slopes[mV/offset step]
      */
-    void setSlopesFine(std::vector<float> slopesFine) {m_slopesFine = slopesFine; }
+    void setSlopesFine(const std::vector<float>& slopesFine) {m_slopesFine = slopesFine; }
 
     /**
      * Return size of the list of slopes (fine settings)
@@ -417,13 +417,13 @@ namespace Belle2 {
      * Add FWHM value&sigma for i-th channel
      * @param FWHM value&sigma
      */
-    void appendFWHM(std::pair<float, float> fwhm) {m_fwhm.push_back(fwhm); }
+    void appendFWHM(const std::pair<float, float>& fwhm) {m_fwhm.push_back(fwhm); }
 
     /**
      * Set vector of FWHM values&sigma
      * @param vector of FWHM values&sigma
      */
-    void setFWHM(std::vector<std::pair<float, float>> fwhm) {m_fwhm = fwhm; }
+    void setFWHM(const std::vector<std::pair<float, float>>& fwhm) {m_fwhm = fwhm; }
 
     /**
      * Return size of the list of FWHM

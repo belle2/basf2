@@ -76,8 +76,8 @@ void PXDClusterizerModule::initialize()
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeClusters.registerInDataStore();
-  storeDigits.required();
+  storeClusters.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

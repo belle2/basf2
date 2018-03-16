@@ -1,5 +1,3 @@
-#ifndef SEQFILE_H
-#define SEQFILE_H
 //+
 // File : seqfile.h
 // Description : Blocked file management for sequential binary I/O
@@ -8,6 +6,7 @@
 // Date : 28 - Aug - 2003
 //-
 
+#pragma once
 
 #include <iosfwd>
 #include <memory>
@@ -63,5 +62,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

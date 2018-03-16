@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Matt Barrett                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,12 +13,19 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/StringWrapper.h>
 #include <analysis/utility/MCMatching.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+#include <string>
+#include <vector>
+
+#include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
 
@@ -28,23 +35,38 @@ namespace Belle2 {
         DataStore::c_Persistent)
   {
     setDescription("Creates the Monte Carlo decay string of a Particle and its daughters. "
-                   "The MC decay string of the particle is hashed and saved as a 32bit pattern in the extra info field decayHash of the particle. "
-                   "The MC decay string of the particel + its daughters is hashed as well and saved as another 32bit pattern in the extra info field decayHashExtended of the particle. "
-                   "The mapping hash <-> MC decay string in saved in a TTree by this module. "
+                   "The MC decay string of the particle is hashed and saved as a 32bit pattern in the extra info field decayHash of the particle.  "
+                   "The MC decay string of the particel + its daughters is hashed as well and saved as another 32bit pattern in the extra info field decayHashExtended of the particle.  "
+                   "The mapping hash <-> MC decay string in saved in a TTree by this module.  "
                    "The 32bit pattern must be saved as a float (because our extra info field, variable manager and ntuple output only supports float) "
-                   "But they just represent 32 bits of a hash!");
+                   "but they just represent 32 bits of a hash!  "
+                   "The MC decay string can also be stored in an analysis ROOT file using the MCDecayString NtupleTool.  "
+                   "Details on the MC decay string format can be found here: "
+                   "https://confluence.desy.de/display/BI/Physics+MCDecayString");
     setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
     addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
     addParam("fileName", m_fileName, "Filename in which the hash strings are saved, if empty the strings are not saved",
              std::string(""));
     addParam("treeName", m_treeName, "Tree name in which the hash strings are saved", std::string("hashtable"));
+    addParam("conciseString", m_useConciseString, "If set to true, the code will use a more concise format for the string.", false);
+    addParam("identifiers", m_identifiers, "Identifiers used to identify particles in the concise format.",
+             std::string("abcdefghijklmnopqrstuvwxyz"));
 
     m_file = nullptr;
   }
 
   void ParticleMCDecayStringModule::initialize()
   {
-    StoreObjPtr<ParticleList>::required(m_listName);
+    StoreObjPtr<ParticleList>().isRequired(m_listName);
+
+    //This might not work for non-default names of Particle array:
+    StoreArray<Particle> particles;
+    particles.isRequired();
+
+    StoreArray<StringWrapper> stringWrapperArray;
+    stringWrapperArray.registerInDataStore();
+    particles.registerRelationTo(stringWrapperArray);
+
 
     // Initializing the output root file
     if (m_fileName != "") {
@@ -80,12 +102,15 @@ namespace Belle2 {
   {
 
     StoreObjPtr<ParticleList> pList(m_listName);
+    StoreArray<StringWrapper> stringWrapperArray;
 
     for (unsigned iParticle = 0; iParticle < pList->getListSize(); ++iParticle) {
       Particle* particle = pList->getParticle(iParticle);
 
       const std::string decayString = getMCDecayStringFromMCParticle(particle->getRelatedTo<MCParticle>());
-      const std::string decayStringExtended = getDecayString(*particle);
+      std::string decayStringExtended = getDecayString(*particle); //removed const to allow string to be modified to a different format.
+
+      if (m_useConciseString) {convertToConciseString(decayStringExtended);}
 
       uint32_t decayHash = m_hasher(decayString);
       uint32_t decayHashExtended = m_hasher(decayStringExtended);
@@ -112,6 +137,10 @@ namespace Belle2 {
       particle->addExtraInfo(c_ExtraInfoNameExtended, m_decayHashExtended);
 
       m_decayString = decayStringExtended;
+
+      StringWrapper* stringWrapper = stringWrapperArray.appendNew();
+      particle->addRelationTo(stringWrapper);
+      stringWrapper->setString(m_decayString);
 
       auto it = m_hashset->get().find(m_decayHashFull);
       if (it == m_hashset->get().end()) {
@@ -261,6 +290,101 @@ namespace Belle2 {
     }
 
     return ss.str();
+  }
+
+  void ParticleMCDecayStringModule::convertToConciseString(std::string& string)
+  {
+
+    std::vector<std::string> decayStrings;
+    boost::split(decayStrings, string, boost::is_any_of("|"));
+
+    if (decayStrings.empty()) {
+      B2WARNING("ParticleMCDecayStringModule: unable to convert decay string to concise format.");
+      return;
+    }
+
+    unsigned int nParticles(decayStrings.size() - 1);
+    if (nParticles > m_identifiers.size()) {
+      B2WARNING("ParticleMCDecayStringModule: not enough identifiers have been specified to use the concise string format:"
+                << std::endl << "Number of particles in your decay mode = " << nParticles << std::endl
+                << "Available identifiers: " << m_identifiers << std::endl
+                << "Standard format will be used instead.");
+      return;
+    }
+
+    //Find positions of carets in original strings, store them, and then erase them.
+    std::string mode("");
+    std::vector<int> caretPositions;
+    for (std::vector<std::string>::iterator iter(decayStrings.begin()); iter != decayStrings.end(); ++iter) {
+      std::string thisString(*iter);
+      if ("" == mode) {
+        mode = thisString;
+        continue;
+      }
+
+      int caretPosition(thisString.find("^")); // -1 if no match.
+      caretPositions.push_back(caretPosition);
+      if (caretPosition > -1) {
+        iter->erase(caretPosition, 1);
+      }
+    }
+
+    //Check if all of the decay strings are the same (except for No matches):
+    std::string theDecayString("");
+    for (std::vector<std::string>::iterator iter(decayStrings.begin()); iter != decayStrings.end(); ++iter) {
+      std::string thisString(*iter);
+      if (thisString == mode) {continue;}
+
+      //last decay string does not have a space at the end, don't want this to stop a match.
+      char finalChar(thisString.back());
+      if (finalChar != ' ') {thisString = thisString + " ";}
+
+      if (" (No match) " != thisString) {
+        if ("" == theDecayString) {
+          theDecayString = thisString;
+        } else {
+          if (theDecayString != thisString) {
+            //TODO: add string format if multiple decay strings are present (e.g. pile-up events).
+            return;
+          }
+        }
+      }
+    }
+
+    std::string modifiedString(theDecayString);
+
+    //insert identifiers in positions where carets were:
+    int nStrings(caretPositions.size());
+    for (int iString(0); iString < nStrings; ++iString) {
+      std::string identifier(m_identifiers.substr(iString, 1));
+      int insertPosition(caretPositions.at(iString));
+      if (insertPosition > -1) {
+        for (int jString(0); jString < iString; ++jString) {
+          if (caretPositions.at(jString) > -1 && caretPositions.at(jString) <= caretPositions.at(iString)) {
+            ++insertPosition;
+          }
+        }
+        modifiedString.insert(insertPosition, identifier);
+      }
+    }
+
+    modifiedString = mode + "|" + modifiedString;
+
+    //add a list of the unmatched particles at the end of the string:
+    bool noMatchStringAdded(false);
+    for (int iString(0); iString < nStrings; ++iString) {
+      int insertPosition(caretPositions.at(iString));
+      if (-1 == insertPosition) {
+        if (!noMatchStringAdded) {
+          modifiedString += " | No match: ";
+          noMatchStringAdded = true;
+        }
+        modifiedString += m_identifiers.substr(iString, 1);
+      }
+    }
+
+    string = modifiedString;
+    return;
   }
 
 } // Belle2 namespace

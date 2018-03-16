@@ -15,8 +15,8 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/core/InputController.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+#include <memory>
 
 #include <iostream>
 #include <cstdlib>
@@ -93,12 +93,14 @@ Environment::Environment() :
     B2FATAL("The environment variable BELLE2_EXTERNALS_DIR is not set. Please execute the 'setuprel' script first.");
   }
 
-  // add module directories for current build options
-  std::string added_dirs;
+  // add module directories for current build options, starting with the working directory on program startup
+  std::string added_dirs = fs::initial_path().string();
+  ModuleManager::Instance().addModuleSearchPath(added_dirs);
+
   if (envarAnalysisDir) {
     const string analysisModules = (fs::path(envarAnalysisDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(analysisModules);
-    added_dirs += analysisModules;
+    added_dirs += " " + analysisModules;
   }
 
   if (envarLocalDir) {
@@ -126,7 +128,7 @@ Environment::~Environment()
 {
 }
 
-void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
+void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
   const std::list<ModulePtr>& modules = path->getModules();
 

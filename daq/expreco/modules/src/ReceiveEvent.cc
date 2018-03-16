@@ -86,7 +86,16 @@ void ReceiveEventModule::event()
   // Get a record from socket
   EvtMessage* msg = m_recv->recv();
   if (msg == NULL) {
-    return;
+    printf("Connection is closed. Reconnecting.\n");
+    int nrepeat = 5000;
+    for (;;) {
+      int rstat = (m_recv->sock())->reconnect(nrepeat);
+      if (rstat == - 1)
+        continue;
+      else
+        break;
+    }
+    //    return;
   }
   B2INFO("Rx: got an event from Socket, size=" << msg->size());
   // Check for termination record

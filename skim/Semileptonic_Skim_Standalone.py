@@ -14,32 +14,18 @@ from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
 from stdCharm import *
-
+gb2_setuprel = 'build-2017-10-16'
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file: ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-
-elif len(sys.argv) == 1:
-    fileList = ''
-    bkgType = 'old'
-
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
-
+inputMdstList('default', fileList)
+stdPi0s('loose')
+stdPhotons('loose')
 loadStdCharged()
-loadStdPi0()
+loadStdSkimPi0()
+loadStdSkimPhoton()
 loadStdKS()
 
 loadStdD0()
@@ -50,11 +36,11 @@ loadStdDstarPlus()
 # SL Skim
 from Semileptonic_List import *
 SLList = SemileptonicList()
-skimOutputUdst('outputFiles/SLUntagged_' + bkgType, SLList)
+skimOutputUdst('SLUntagged', SLList)
 summaryOfLists(SLList)
 
 lepList = LeptonicList()
-skimOutputUdst('outputFiles/LeptonicUntagged_' + bkgType, lepList)
+skimOutputUdst('LeptonicUntagged', lepList)
 summaryOfLists(lepList)
 
 process(analysis_main)

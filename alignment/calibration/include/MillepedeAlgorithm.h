@@ -44,6 +44,9 @@ namespace Belle2 {
     /// Set components (BeamParameters...) to calibrate or empty for all available in data
     void setComponents(const std::vector<std::string>& components) {m_components = components;}
 
+    /// Report failure(false) or success (true) even if some parameters could not be determined
+    void ignoreUndeterminedParams(bool ignore = true) {m_ignoreUndeterminedParams = ignore;}
+
   protected:
 
     /// Run algo on data
@@ -60,6 +63,8 @@ namespace Belle2 {
     alignment::PedeResult m_result{};
     /// The Pede application (unsuccesfull until execution)
     alignment::PedeApplication m_pede{};
+    /// Report failure(false) or success (true) even if some parameters could not be determined
+    bool m_ignoreUndeterminedParams{false};
 
     /// Convert IOV to string (to be able to use it as a key in map)
     std::string to_string(const IntervalOfValidity& iov)
@@ -81,8 +86,6 @@ namespace Belle2 {
 
     /// Write out binary files from data in tree with GBL data to be used by Millepede and add them to steering
     void prepareMilleBinary();
-
-    ClassDef(MillepedeAlgorithm, 1); /**< Class implementing Millepede calibration algorithm */
 
   };
 } // namespace Belle2

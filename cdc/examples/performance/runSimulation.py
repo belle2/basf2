@@ -15,7 +15,7 @@ from basf2 import *
 from ROOT import Belle2
 import datetime
 from generators import add_cosmics_generator
-# from simulation import add_simulation
+from simulation import add_simulation
 
 import os.path
 import sys
@@ -71,14 +71,15 @@ def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=F
 
     add_cosmics_generator(path=main_path,
                           components=components,
-                          global_box_size=[20, 20, 3],
-                          accept_box=[4, 2.5, 2.5],  # LWH
-                          keep_box=[4, 2.5, 2.5],
+                          global_box_size=[8, 8, 8],
+                          accept_box=[0.7, 0.3, 0.3],  # LWH
+                          keep_box=[0.7, 0.3, 0.3],
                           cosmics_data_dir='data/generators/modules/cryinput/',
                           setup_file='./cry.setup',
                           data_taking_period=period,
                           top_in_counter=topInCounter)
 
+    # add_simulation(main_path)
     add_cdc_cr_simulation(main_path, components=components)
 
     if triggerType is not None:

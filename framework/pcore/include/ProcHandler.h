@@ -3,8 +3,7 @@
 /// @author Soohyung Lee
 /// @date Jul 14 2008
 
-#ifndef PROCHANDLER_H
-#define PROCHANDLER_H
+#pragma once
 
 #include <set>
 #include <string>
@@ -81,5 +80,3 @@ namespace Belle2 {
     unsigned int m_numWorkerProcesses; /**< Number of worker processes controlled by this ProcHandler. */
   };
 }
-
-#endif

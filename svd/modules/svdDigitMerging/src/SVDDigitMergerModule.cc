@@ -65,7 +65,7 @@ void SVDDigitMergerModule::initialize()
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeDigits.required();
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

@@ -22,7 +22,7 @@ namespace Belle2 {
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class SLOPERZ_NAME : public SelectionVariable< PointType , double > {
+  class SLOPERZ_NAME : public SelectionVariable< PointType , 2 , double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(SLOPERZ_NAME);

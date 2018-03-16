@@ -1,6 +1,6 @@
 ####  Data for Database (ARICHDatabaseImporter.py)
 
-All data can be found at: https://belle2.cc.kek.jp/svn/groups/arich/database/data/
+All data can be found at: https://stash.desy.de/projects/B2G/repos/arich_database
 Data for classes: ARICHAerogelInfo, ARICHAsicInfo, ARICHFebTest, ARICHHapdQA, ARICHHapdQE, ARICHHapdInfo
 
 #### Importing and exporting data to/from DB

@@ -12,16 +12,15 @@
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 #include <framework/gearbox/Const.h>
 
+#include <TError.h>
+
 #include <string>
 #include <memory>
-
-#include <TError.h>
 
 namespace genfit {
   class AbsFitter;
   class AbsTrackRep;
 }
-
 
 namespace Belle2 {
 
@@ -112,6 +111,13 @@ namespace Belle2 {
    */
   class TrackFitter {
   public:
+    /// Default deltaPValue for the default DAF fitter
+    static constexpr double s_defaultDeltaPValue = 1.0;
+    /// Default probCut for the default DAF fitter
+    static constexpr double s_defaultProbCut = 0.001;
+    /// Default maxFailedHits for the default DAF fitter
+    static constexpr unsigned int s_defaultMaxFailedHits = 5;
+
     /// Create a new fitter instance.
     TrackFitter(const std::string& storeArrayNameOfPXDHits = "",
                 const std::string& storeArrayNameOfSVDHits = "",
@@ -125,50 +131,23 @@ namespace Belle2 {
       resetFitterToDefaultSettings();
     }
 
-    static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack)
-    {
-      int currentPdgCode = particleType.getPDGCode();
+    /// Helper function to multiply the PDG code of a charged stable with the charge of the reco track (if needed)
+    static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack);
 
-      const auto& pdgParticleCharge = particleType.getParticlePDG()->Charge();
-      const auto& recoTrackCharge = recoTrack.getChargeSeed();
+    /** Helper function to return an already created track representation of the given reco track for the PDG
+     *
+     * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
+     * @param recoTrack RecoTrack to load the TrackRep from
+     */
+    static genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack);
 
-      // Copy from GenfitterModule
-      B2ASSERT("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).",
-               fabs(pdgParticleCharge) == fabs(recoTrackCharge * 3.0));
-
-      /*
-      * Because the charged stable particles do describe a positive as well as a negative particle,
-      * we have to correct the charge if needed.
-      */
-      if (std::signbit(pdgParticleCharge) != std::signbit(recoTrackCharge))
-        currentPdgCode *= -1;
-
-      return currentPdgCode;
-    }
-
-    static genfit::AbsTrackRep* getTrackRepresentationForPDG(const int pdgCode, const RecoTrack& recoTrack)
-    {
-      const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
-
-      for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
-        // Check if the track representation is a RKTrackRep.
-        const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
-        if (rkTrackRepresenation != nullptr) {
-          if (rkTrackRepresenation->getPDG() == pdgCode) {
-            return trackRepresentation;
-          }
-        }
-      }
-
-      return nullptr;
-    }
-
-    /// Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
-    void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter)
-    {
-      m_fitter = fitter;
-      m_skipDirtyCheck = true;
-    }
+    /**
+     * Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
+     *
+     * Whenever you call this function, all tracks will be automatically refitted, although
+     * they might be already fitted (because you use non-default parameters, so we assume you want other fit results).
+     */
+    void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter);
 
     /**
      * Use the default settings of the fitter to fit the reco tracks.
@@ -294,11 +273,6 @@ namespace Belle2 {
     std::shared_ptr<genfit::AbsFitter> m_fitter;
     /// Flag to skip the dirty flag check which is needed when using non-default fitters.
     bool m_skipDirtyCheck = false;
-
-    /// This is the difference on pvalue between two fit iterations of the DAF procedure which
-    /// is used as a early termination criteria of the DAF procedure. This is large on purpose
-    /// See https://agira.desy.de/browse/BII-1725 for details
-    const double m_dafDeltaPval = 1.0f;
 
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;

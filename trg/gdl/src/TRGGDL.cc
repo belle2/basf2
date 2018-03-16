@@ -29,7 +29,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <trg/gdl/dataobjects/TRGGDLResults.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 
 #include <framework/logging/Logger.h>
@@ -130,7 +130,9 @@ namespace Belle2 {
   void
   TRGGDL::initialize(void)
   {
-    configure();
+    //if it is firmware simulation, do the cofigurnation
+    //fastsimulation doesn't use the configuration currently
+    if (_simulationMode == 2) configure();
   }
 
   void
@@ -200,9 +202,9 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGDL fastSim");
 
-    StoreObjPtr<TRGGDLResults> GDLResult;
+    StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
-      B2WARNING("TRGGDLResults exist already, check it!!!!");
+      B2WARNING("TRGSummary exist already, check it!!!!");
       return;
     } else {
       //TRGGDLResults* GDLResult = L1TrgResults.appendNew();
@@ -348,8 +350,9 @@ namespace Belle2 {
         int bitval = 0;
         if (passBeforePrescale[i]) bitval = doprescale(sf[i]);
         L1Summary = L1Summary | (bitval << i);
+        GDLResult->setPreScale(0, i, sf[i]);
       }
-      GDLResult->setL1TriggerRsults(L1Summary);
+      GDLResult->setTRGSummary(0, L1Summary);
     }
   }
 

@@ -34,11 +34,11 @@ void NtupleFlavorTaggingTool::setupTree()
   //string method("");
 
   const char* categories[] = { "Muon",  "IntermediateMuon", "Electron", "IntermediateElectron", "KinLepton",
-                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar", "KaonPion"
+                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", "Lambda", "FSC", "MaximumPstar", "KaonPion"
                              };
 
   for (auto& category : categories) {
-    m_qrCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
+    m_qpCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
     m_hasTrueTargets.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
     m_isTrueCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
   }
@@ -66,14 +66,14 @@ void NtupleFlavorTaggingTool::setupTree()
       } else if (optioni == "FANN-MLP") {
         B2INFO("Flavor Tagger Output saved for FANN Multivariate Method");
         m_useFANN = true;
-      } else if (optioni == "qrCategories") {
+      } else if (optioni == "qpCategories") {
         B2INFO("Flavor Tagger Output for each category saved");
         m_saveCategories = true;
       } else {
         B2FATAL("Invalid option used for Flavor Tagger ntuple tool: " << m_strOption <<
                 ". Write 'FBDT' and/or 'FANN' to save the Flavor Tagger Output related to these combiner methods or leave the option empty to use the default FBDT Method"
                 <<
-                ". Write 'qrCategories' to save the qr output of all used categories");
+                ". Write 'qpCategories' to save the qp output of all used categories");
       }
     }
   }
@@ -91,9 +91,9 @@ void NtupleFlavorTaggingTool::setupTree()
                    (strNames[iProduct] + "_qrMC/F").c_str());
 
     if (m_saveCategories == true) {
-      for (auto& categoryEntry : m_qrCategories) {
-        m_tree->Branch((strNames[iProduct] + "_qr" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
-                       (strNames[iProduct] + "_qr" + categoryEntry.first + "/F").c_str());
+      for (auto& categoryEntry : m_qpCategories) {
+        m_tree->Branch((strNames[iProduct] + "_qp" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
+                       (strNames[iProduct] + "_qp" + categoryEntry.first + "/F").c_str());
       }
       for (auto& categoryEntry : m_hasTrueTargets) {
         m_tree->Branch((strNames[iProduct] + "_hasTrueTarget" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
@@ -125,6 +125,20 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
     qrCombinedFANN[iProduct] = -2;
     qrMC[iProduct] = 0;
 
+    if (m_saveCategories == true and (m_useFBDT == true or m_useFANN == true)) {
+      for (auto& categoryEntry : m_qpCategories) {
+        categoryEntry.second[iProduct] = -2;
+      }
+
+      for (auto& categoryEntry : m_hasTrueTargets) {
+        categoryEntry.second[iProduct] = -2;
+      }
+
+      for (auto& categoryEntry : m_isTrueCategories) {
+        categoryEntry.second[iProduct] = -2;
+      }
+    }
+
     FlavorTaggerInfo* flavorTaggerInfo = selparticles[iProduct]->getRelatedTo<FlavorTaggerInfo>();
 
     if (flavorTaggerInfo != nullptr) {
@@ -136,23 +150,12 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
         if (m_useFANN == true) qrCombinedFANN[iProduct] = flavorTaggerInfo->getMethodMap("FANN")->getQrCombined();
 
         if (m_saveCategories == true and (m_useFBDT == true or m_useFANN == true)) {
-          for (auto& categoryEntry : m_qrCategories) {
-            categoryEntry.second[iProduct] = 0;
-          }
-
-          for (auto& categoryEntry : m_hasTrueTargets) {
-            categoryEntry.second[iProduct] = 0;
-          }
-
-          for (auto& categoryEntry : m_isTrueCategories) {
-            categoryEntry.second[iProduct] = 0;
-          }
 
           std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo -> getMethodMap("FBDT")-> getHasTrueTarget();
           std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getIsTrueCategory();
-          std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getQrCategory();
-          for (auto& categoryEntry : iQrCategories) {
-            m_qrCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
+          std::map<std::string, float> iQpCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getQpCategory();
+          for (auto& categoryEntry : iQpCategories) {
+            m_qpCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
           }
 
           for (auto& categoryEntry : iHasTrueTargets) {

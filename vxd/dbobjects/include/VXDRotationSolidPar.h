@@ -57,14 +57,21 @@ namespace Belle2 {
     std::list< std::pair<double, double> >& getOuterPoints()  { return m_outerPoints; }
 
   private:
+    /** Name of rotation solid (envelope)*/
     std::string m_name;
+    /** Name of the material */
     std::string m_material;
+    /** Name of color */
     std::string m_color;
+    /** Minimum phi angle */
     double m_minPhi;
+    /** Maximum phi angle */
     double m_maxPhi;
+    /** Flags rotation solid (envelope) exists */
     bool m_exists;
-    //! List of points in the ZX plane
+    //! List of inner points in the ZX plane
     std::list< std::pair<double, double> > m_innerPoints;
+    //! List of outer points in the ZX plane
     std::list< std::pair<double, double> > m_outerPoints;
 
     ClassDef(VXDRotationSolidPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

@@ -20,7 +20,6 @@
 
 // stl
 #include <vector>
-// #include <utility> // for pair
 
 // ROOT
 #include <TVectorD.h>
@@ -32,12 +31,13 @@
 
 namespace Belle2 {
 
-  /** The SpacePointTrackCand class.
+  /** Storage for (VXD) SpacePoint-based track candidates.
    *
-   * Stores a track candidate using space points (instead of recohits).
-   * tmadlener: the design follows rather closely the one from genfit::TrackCand
+   *  Often abbreviated SPTC in other contexts.
+   *  Design follows rather closely the one from genfit::TrackCand.
+   *  \sa SpacePoint
    */
-  class SpacePointTrackCand: public RelationsObject {
+  class SpacePointTrackCand final : public RelationsObject {
 
   public:
 
@@ -58,52 +58,53 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(SPTCSortingParameterSizeInvalid,
                             "Trying to modify SortingParameters, but number of new SortingParameters differs from number of SpacePoints");
 
-    /** Status information that can be set to indicate several properties of the SpacePointTrackCand
-     * NOTE: there are some properties that are at the moment stored in other members of the SpacePointTrackCand but can be moved
-     * into here if memory usage is an issue
-     * NOTE: if you add something here, it should also be added in the 'getRefereeStatusString' method!
+    /** Status information that can be set to indicate several properties of the SpacePointTrackCand.
+     *
+     *  NOTE: Some properties are at the moment stored in other members of the SpacePointTrackCand,
+     *        can be moved here, if memory usage is an issue.
+     *  NOTE: If you add something here, it should also be added in the 'getRefereeStatusString' method!
      */
     enum RefereeStatusBit {
-      c_checkedByReferee = 1, /**< bit 0: SpacePointTrackCand has been checked by a Referee (all possible tests) */
-      c_checkedClean = 2, /**< bit 1: The SpacePointTrackCand shows no 'problematic' behaviour */
-      c_hitsOnSameSensor = 4, /**< bit 2: SpacePointTrackCand has two (or more) SpacePoints on same sensor */
-      /** bit 3: SpacePointTrackCand has two (or more) SpacePoints that are not far enough apart.
-       * NOTE: distance is judged by referee (and also set there) */
+      c_checkedByReferee = 1,     /**< bit 0: SPTC has been checked by a Referee (all possible tests). */
+      c_checkedClean = 2,         /**< bit 1: SPTC shows no 'problematic' behaviour. */
+      c_hitsOnSameSensor = 4,     /**< bit 2: SPTC has two (or more) SpacePoints on same sensor. */
+      /**  bit 3: SPTC has two (or more) SpacePoints that are not far enough apart.
+       *   NOTE: distance is judged by referee (and also set there). */
       c_hitsLowDistance = 8,
-      c_removedHits = 16, /**< bit 4: SpacePoints were removed from this SpacePointTrackCand */
-      /** bit 5: All of the SpacePoints of the SpacePointTrackCand have a relation to (at least one) TrueHit(s) */
-      c_checkedTrueHits =  32,
-      /** bit 6: It has been checked if two consecutive SpacePoints are on the same sensor for this SpacePointTrackCand */
+      c_removedHits = 16,         /**< bit 4: SpacePoints were removed from this SPTC. */
+      c_checkedTrueHits =  32,    /**< bit 5: All SpacePoints of the SPTC have a relation to at least one TrueHit. */
+      /**  bit 6: It has been checked, if two consecutive SpacePoints
+       *   are on the same sensor for this SPTC. */
       c_checkedSameSensors = 64,
-      c_checkedMinDistance =  128, /**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart */
-      c_curlingTrack = 256, /**< bit 8: SpacePointTrackCand is curling (resp. is part of a curling SpacePointTrackCand) */
-      /** bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SpacePointTrackCand */
-      c_omittedClusters = 512,
-      c_singleClustersSPs = 1024, /**< bit 10: The SpacePointTrackCand contains single Cluster SpacePoints */
-      c_isActive =  2048, /**< bit 11: SPTC is active (i.e. if false, some module rejected it for further use */
-      c_isReserved = 4096, /**< bit 12: SPTC is reserved (i.e. should not be altered and should be treated with high priority) */
-      c_initialState = 0 + c_isActive, /**< this is the initialState which will always be set in the beginning and applied after reset */
+      c_checkedMinDistance =  128,/**< bit 7: It has been checked if two consecutive SpacePoints are far enough apart. */
+      c_curlingTrack = 256,       /**< bit 8: SPTC is curling (resp. is part of a curling SPTC). */
+      c_omittedClusters = 512,    /**< bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SPTC. */
+      c_singleClustersSPs = 1024, /**< bit 10: SPTC contains single Cluster SpacePoints. */
+      c_isActive =  2048,         /**< bit 11: SPTC is active (i.e. if false, some module rejected it for further use. */
+      c_isReserved = 4096,        /**< bit 12: SPTC is reserved (i.e. should not be altered and should be treated with high priority). */
+      c_hasFittedRecoTrack = 1 << 13,  /**< bit 13: SPTC is related to a RecoTrack which has a successful fit.
+        NOTE: this check is performed on the original SPTC, if the current one is a copy of that the relation may be lost*/
+      c_initialState = 0 + c_isActive, /**< This is the initialState, which will always be set in the beginning and at reset. */
     };
 
-    /**
-     * empty constructor sets pdg code to zero, such that it is possible to determine whether a particle hyptohesis has been asigned
-     * to the track candidate or not
-     * Also MCTrackID is initialized to -1,
-     * Each SpacePointTrackCand is created in c_isActive-state and has to be deactivated manually if need be
+    /** Empty constructor with default values, including it to be active.
+     *
+     *  Sets pdg code to zero to make it  possible to determine, whether a particle hyptohesis has been asigned
+     *  to the track candidate or not.MCTrackID is initialized to -1. <br>
+     *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
-    SpacePointTrackCand();
+    SpacePointTrackCand() = default;
 
-    /**
-     * constructor from a vector<SpacePoint*> and some additional information:
-     * pdg code and charge estimate as well as the MCTrackID of the track candidate
-     * sortingParameters are generated from the order of the SpacePoints!
-     * Each SpacePointTrackCand is created in c_isActive-state and has to be deactivated manually if need be
+    /** Constructor from a vector<SpacePoint*> and some additional information.
+     *
+     *  @param pdgCode    Mass hypothesis to be used.
+     *  @param charge     Charge hypthesis for the tracked particle.
+     *  @param mcTrackID  ???
+     *  sortingParameters are generated from the order of the SpacePoints!
+     *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
     SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
                         int mcTrackID = -1);
-
-    /** destructor */
-    virtual ~SpacePointTrackCand() = default;
 
 
     /**
@@ -268,6 +269,16 @@ namespace Belle2 {
     std::string getRefereeStatusString(std::string delimiter = " ") const;
 
     /**
+     * return family identifier
+     */
+    short getFamily() const { return m_family; }
+
+    /**
+     * assign family identifier
+     */
+    void setFamily(short family) { m_family = family; }
+
+    /**
      * set the sorting parameters
      */
     void setSortingParameters(const std::vector<double>& sortParams);
@@ -277,6 +288,7 @@ namespace Belle2 {
      */
     void setPdgCode(int pdgCode);
 
+    /** Setter for assumed charge of tracked particle. */
     void setChargeSeed(double charge) { m_q = charge; }
 
     /**
@@ -332,6 +344,10 @@ namespace Belle2 {
     /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
     void removeSpacePoint(int indexInTrackCand);
 
+    /** Overloading the less operator to compare SPTCs based on their quality index. This is used in
+     *  in SPTCSelectorXBestPerFamily for instance. */
+    bool operator <(const SpacePointTrackCand& rhs) const { return m_qualityIndex < rhs.m_qualityIndex; }
+
   protected:
     /**
      * pointers to SpacePoints in the datastore
@@ -343,35 +359,41 @@ namespace Belle2 {
      */
     std::vector<double> m_sortingParameters;
 
+
+    /**
+     * identifier for tracks that share at least two SpacePoints.
+     */
+    short m_family = -1;
+
     /**
      * PDG code of particle
      */
-    int m_pdg;
+    int m_pdg = 0;
 
     /**
      * track ID from MC simulation
      */
-    int m_MCTrackID;
+    int m_MCTrackID = -1;
 
     /**
      * global momentum plus position state (seed) vector
      */
-    TVectorD m_state6D;
+    TVectorD m_state6D = TVectorD(6);
 
     /**
      * global momentum plus position state (seed) covariance matrix
      */
-    TMatrixDSym m_cov6D;
+    TMatrixDSym m_cov6D = TMatrixDSym(6);
 
     /**
      * charge of the particle in units of elementary charge
      */
-    double m_q;
+    double m_q = 0;
 
     /**
      * direction of flight. true is outgoing, false is ingoing
      */
-    bool m_flightDirection;
+    bool m_flightDirection = true;
 
     /**
      * Index of TrackStub in a curling Track Candidate.
@@ -380,12 +402,12 @@ namespace Belle2 {
      * + If it is a curling TrackCand the counter starts at 1, indicating that this is the first outgoing part of the TrackCand.
      * COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)
      */
-    int m_iTrackStub;
+    int m_iTrackStub = -1;
 
     /**
      * bit-field to indicate different properties that are checked by the referee module
      */
-    unsigned short int m_refereeStatus;
+    unsigned short int m_refereeStatus = c_isActive;
 
     /**
      * An estimation for the quality of the track.
@@ -393,9 +415,9 @@ namespace Belle2 {
      * Normally defined between 0-1 to describe the propability that this track is real(istic).
      * The quality of the track has to be determined by another function or module.
      * */
-    double m_qualityIndex;
+    double m_qualityIndex = 0.5;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
-    ClassDef(SpacePointTrackCand, 8)
+    ClassDef(SpacePointTrackCand, 10)
   };
 }

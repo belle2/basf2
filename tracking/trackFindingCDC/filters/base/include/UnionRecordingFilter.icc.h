@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <vector>

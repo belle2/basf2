@@ -25,12 +25,12 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   for (int i = 0 ; i < m_num_connections; i++) {
     //  m_hostname_from.push_back( "localhost");
     m_hostname_from.push_back(host_recv);
-    //  m_port_from.push_back(33000);
+    //  m_port_from.push_back(30000);
     m_port_from.push_back(port_recv) ;
     m_socket_recv.push_back(-1);
   }
 
-  //  m_port_to = 34001;
+  //  m_port_to = 31001;
   m_port_to = port_send;
   //  m_hostname_local = "localhost";
   m_hostname_local = host_send;
@@ -485,11 +485,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
-          pre_rawcpr_fmt->PrintData(pre_rawcpr_fmt->GetWholeBuffer(), pre_rawcpr_fmt->TotalBufNwords());
-          char err_buf[500];
-          strcpy(err_buf, err_str.c_str());
-          print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-          exit(1);
+          exit(1); // Error in the contents of an event was detected
         }
 #endif
 

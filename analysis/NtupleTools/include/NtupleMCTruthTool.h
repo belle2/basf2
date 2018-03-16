@@ -29,9 +29,13 @@ namespace Belle2 {
     int* m_iTruthIDMatch;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
+    /** Delete 'new's */
+    void deallocateMemory();
   public:
     /** Constuctor. */
     NtupleMCTruthTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    /** Destructor. */
+    ~NtupleMCTruthTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

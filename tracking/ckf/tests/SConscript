@@ -1,9 +1,0 @@
-Import('env')
-
-env['LIBS'] = [
-    'tracking',
-    '$ROOT_LIBS',
-    '$PYTHON_LIBS'
-    ]
-
-Return('env')

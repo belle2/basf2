@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::IntraRunDependency+;
 #pragma link C++ class Belle2::EventDependency+;
 #pragma link C++ class Belle2::DBStore-;
+#pragma link C++ class Belle2::Database-;
 
 #endif

@@ -77,9 +77,10 @@ void SkimFilterModule::event()
 void SkimFilterModule::terminate()
 {
   B2INFO("SkimFilter Summary: \n");
-
-  std::cout << "\n=======================================================\n";
-  std::cout << "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
-  std::cout << "\n=======================================================\n";
+  std::ostringstream stream;
+  stream <<  "\n=======================================================\n";
+  stream <<  "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
+  stream <<  "\n=======================================================\n";
+  B2INFO(stream.str());
 }
 

@@ -26,7 +26,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -236,6 +236,8 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       if (not useMCParticleId) continue;
     }
 
+
+
     // Consider the particle as incoming in the top part of the CDC for a downwards flight direction
     bool isIncoming = m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0;
     const double alpha = isIncoming ?  M_PI : 0;
@@ -243,6 +245,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double flightTimeEstimate =
       FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
+    const double driftTime =  tdcCountTranslator.getDriftTime(hit.getTDCCount(),
+                                                              wire.getWireID(),
+                                                              flightTimeEstimate,
+                                                              wire.getRefZ(),
+                                                              hit.getADCCount());
     const bool left = false;
     const bool right = true;
     const double theta = M_PI / 2;
@@ -304,7 +311,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double refChargeDeposit =
       (leftRefChargeDeposit + rightRefChargeDeposit) / 2.0;
 
-    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit);
+    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit, driftTime);
   }
 
   std::sort(outputWireHits.begin(), outputWireHits.end());

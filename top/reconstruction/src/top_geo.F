@@ -4,6 +4,7 @@
 ! M. Staric, mar-2009, feb-2010, sept-2011, jan-2012
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm 
 ! mar-2017: change in some commons
+! dec-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE SET_TOPVOL(R1,R2,Z1,Z2)
@@ -447,8 +448,6 @@ c--   returns module ID or -1 (=failure)
 
       IF(TOP_INI) THEN
          IF(FLAG.NE.0) CALL TOP_GEO_DUMP
-         PRINT*,'TOP configured with ',NUM_MOD,' Q-bars.'
-         PRINT*
       ELSE
          PRINT*,'**** TOP configuration failed.'
       ENDIF
@@ -469,6 +468,7 @@ c-- internal functions --------------------------------------------------
 #include "TOP_TDC.fi"
 #include "TOP_PAR.fi"
 #include "TOP_EXT.fi"
+#include "TOP_PIK.fi"
 
       INTEGER I
       LOGICAL FOCTOP
@@ -498,7 +498,8 @@ c-- internal functions --------------------------------------------------
       ENDDO
       PRINT*,'TDC range [channels]:     ', TDC_RANGE
       PRINT*,'TDC channel width [ps]:   ', TDC_DT*1000.
-      PRINT*,'TDC offset [ps]:          ', TDC_T0*1000.
+      PRINT*,'TDC offset [ns]:          ', TDC_T0
+      PRINT*,'time range [ns]:          ', T_MIN, T_MAX
       PRINT*,'CFD pile-up time [ns]:    ', CFD_DT
       PRINT*,'CFD double hit res. [ns]: ', CFD_DELT
       PRINT*,'mean photon energy [eV]:  ', E_MEAN

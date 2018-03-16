@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following  decay chain:
 #
@@ -28,11 +30,13 @@ from modularAnalysis import ntupleTree
 from stdFSParticles import stdPi0s
 
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
-     ]
+# filelistSIG = \
+#    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
+#     ]
+filelistSIG = ['/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/\
+prod00002166/e0000/4S/r00000/mixed/sub00/mdst_000001_prod00002166_task00000001.root']
 
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #

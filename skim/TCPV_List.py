@@ -17,7 +17,7 @@ def TCPVList():
 
     bd_qqs_Channels = [
         'phi:loose K_S0:all',
-        'eta:loose K_S0:all',
+        'eta\':loose K_S0:all',
         'eta:loose K_S0:all',
         'K_S0:all K_S0:all K_S0:all',
         'pi0:skim K_S0:all',
@@ -26,7 +26,8 @@ def TCPVList():
         'f_0:loose K_S0:all',
         'pi0:skim pi0:skim K_S0:all',
         'phi:loose K_S0:all pi0:skim',
-        'pi+:all pi-:all K_S0:all']
+        'pi+:all pi-:all K_S0:all',
+        'pi+:all pi-:all K_S0:all gamma:E15']
 
     bd_ccs_Channels = ['J/psi:eeLoose K_S0:all',
                        'J/psi:mumuLoose K_S0:all',
@@ -38,11 +39,13 @@ def TCPVList():
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):
         reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID)
+        applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4')
         bd_qqs_List.append('B0:TCPV_qqs' + str(chID))
 
     bd_ccs_List = []
     for chID, channel in enumerate(bd_ccs_Channels):
         reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID)
+        applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4')
         bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
     tcpvLists = bd_qqs_List + bd_ccs_List

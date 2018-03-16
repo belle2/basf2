@@ -12,29 +12,26 @@ from modularAnalysis import *
 def stdPi(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of pion lists:
-
       - 'pi+:all' with no cuts on track
-      - 'pi+:99eff' with tracks satisfying 99% efficiency cuts and 'chiProb > 0.001'
-      - 'pi+:95eff' (default) with tracks satisfying 95% efficiency cuts and 'chiProb > 0.001'
-      - 'pi+:90eff' with tracks satisfying 90% efficiency cuts and 'chiProb > 0.001'
-      - 'pi+:85eff' with tracks satisfying 85% efficiency cuts and 'chiProb > 0.001'
+      - 'pi+:99eff' with 99% selection efficiency and good track
+      - 'pi+:95eff' with 95% selection efficiency and good track
+      - 'pi+:90eff' with 90% selection efficiency and good track
+      - 'pi+:85eff' with 85% selection efficiency and good track
 
     @param listtype name of standard list
     @param path     modules are added to this path
     """
 
     if listtype == 'all':
-        fillParticleList('pi+:all', '', True, path)
+        fillParticleList('pi+:all', '', True, path=path)
     elif listtype == '99eff':
-        fillParticleList('pi+:99eff', 'piid > 0.009 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:99eff', 'pionID > 0.002 and chiProb > 0.001', True, path=path)
     elif listtype == '95eff':
-        fillParticleList('pi+:95eff', 'piid > 0.046 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:95eff', 'pionID > 0.232 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':
-        fillParticleList('pi+:90eff', 'piid > 0.426 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:90eff', 'pionID > 0.504 and chiProb > 0.001', True, path=path)
     elif listtype == '85eff':
-        fillParticleList('pi+:85eff', 'piid > 0.658 and chiProb > 0.001', True, path)
-    else:
-        fillParticleList('pi+:all', '', True, path)
+        fillParticleList('pi+:85eff', 'pionID > 0.743 and chiProb > 0.001', True, path=path)
 
 ###
 
@@ -42,29 +39,23 @@ def stdPi(listtype='95eff', path=analysis_main):
 def stdK(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of kaon lists:
-
       - 'K+:all' with no cuts on track
-      - 'K+:99eff' with tracks satisfying 99% efficiency cuts and 'chiProb > 0.001'
-      - 'K+:95eff' (default) with tracks satisfying 95% efficiency cuts and 'chiProb > 0.001'
-      - 'K+:90eff' with tracks satisfying 90% efficiency cuts and 'chiProb > 0.001'
-      - 'K+:85eff' with tracks satisfying 85% efficiency cuts and 'chiProb > 0.001'
+      - 'K+:95eff' with 95% selection efficiency and good track
+      - 'K+:90eff' with 90% selection efficiency and good track
+      - 'K+:85eff' with 85% selection efficiency and good track
 
     @param listtype name of standard list
     @param path     modules are added to this path
     """
 
     if listtype == 'all':
-        fillParticleList('K+:all', '', True, path)
-    elif listtype == '99eff':
-        fillParticleList('K+:99eff', 'Kid > 0.010 and chiProb > 0.001', True, path)
+        fillParticleList('K+:all', '', True, path=path)
     elif listtype == '95eff':
-        fillParticleList('K+:95eff', 'Kid > 0.048 and chiProb > 0.001', True, path)
+        fillParticleList('K+:95eff', 'kaonID > 0.159 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':
-        fillParticleList('K+:90eff', 'Kid > 0.332 and chiProb > 0.001', True, path)
+        fillParticleList('K+:90eff', 'kaonID > 0.517 and chiProb > 0.001', True, path=path)
     elif listtype == '85eff':
-        fillParticleList('K+:85eff', 'Kid > 0.674 and chiProb > 0.001', True, path)
-    else:
-        fillParticleList('K+:all', '', True, path)
+        fillParticleList('K+:85eff', 'kaonID > 0.685 and chiProb > 0.001', True, path=path)
 
 ###
 
@@ -72,63 +63,70 @@ def stdK(listtype='95eff', path=analysis_main):
 def stdPr(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of proton lists:
-
       - 'p+:all' with no cuts on track
-      - 'p+:95eff' (default) with tracks satisfying cuts 'prid > 0.079' and 'chiProb > 0.001'
-      - 'p+:90eff' with tracks satisfying cuts 'prid > 0.872' and chiProb > 0.001'
+      - 'p+:95eff' with 95% selection efficiency and good track
+      - 'p+:90eff' with 90% selection efficiency and good track
+      - 'p+:85eff' with 85% selection efficiency and good track
 
     @param listtype name of standard list
     @param path     modules are added to this path
     """
 
     if listtype == 'all':
-        fillParticleList('p+:all', '', True, path)
+        fillParticleList('p+:all', '', True, path=path)
     elif listtype == '95eff':
-        fillParticleList('p+:95eff', 'prid > 0.079 and chiProb > 0.001', True, path)
+        fillParticleList('p+:95eff', 'protonID > 0.258 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':
-        fillParticleList('p+:90eff', 'prid > 0.872 and chiProb > 0.001', True, path)
-    else:
-        fillParticleList('p+:all', '', True, path)
+        fillParticleList('p+:90eff', 'protonID > 0.910 and chiProb > 0.001', True, path=path)
+    elif listtype == '85eff':
+        fillParticleList('p+:85eff', 'protonID > 0.996 and chiProb > 0.001', True, path=path)
 
-# Benchmarks for electrons are missing, default is 'all' instead of '95eff'
+###
 
 
-def stdE(listtype='all', path=analysis_main):
+def stdE(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of electron lists:
       - 'e+:all' with no cuts on track
-      - 'e+:99eff' with 99% selection efficiency
+      - 'e+:99eff' with 99% selection efficiency and good track
+      - 'e+:95eff' with 95% selection efficiency and good track
 
     @param listtype name of standard list
     @param path     modules are added to this path
     """
 
     if listtype == 'all':
-        fillParticleList('e+:all', '', True, path)
+        fillParticleList('e+:all', '', True, path=path)
     elif listtype == '99eff':
-        fillParticleList('e+:99eff', 'eid > 0.750 and chiProb > 0.001', True, path)
-    else:
-        fillParticleList('e+:all', '', True, path)
+        fillParticleList('e+:99eff', 'electronID > 0.004 and chiProb > 0.001', True, path=path)
+    elif listtype == '95eff':
+        fillParticleList('e+:95eff', 'electronID > 0.597 and chiProb > 0.001', True, path=path)
 
-# Benchmarks for muons are missing, default is 'all' instead of '95eff'
+###
 
 
-def stdMu(listtype='all', path=analysis_main):
+def stdMu(listtype='95eff', path=analysis_main):
     """
     Function to prepare one of several standartized types of muon lists:
       - 'mu+:all' with no cuts on track
-      - 'mu+:95eff' with 95% selection efficiency
+      - 'mu+:95eff' with 95% selection efficiency and good track
+      - 'mu+:90eff' with 90% selection efficiency and good track
+      - 'mu+:85eff' with 85% selection efficiency and good track
 
     @param listtype name of standard list
     @param path     modules are added to this path
     """
 
     if listtype == 'all':
-        fillParticleList('mu+:all', '', True, path)
+        fillParticleList('mu+:all', '', True, path=path)
     elif listtype == '95eff':
-        fillParticleList('e+:95eff', 'muid > 0.625 and chiProb > 0.001', True, path)
-    else:
-        fillParticleList('mu+:all', '', True, path)
+        fillParticleList('mu+:95eff', 'muonID > 0.004 and chiProb > 0.001', True, path=path)
+    elif listtype == '90eff':
+        fillParticleList('mu+:90eff', 'muonID > 0.438 and chiProb > 0.001', True, path=path)
+    elif listtype == '85eff':
+        fillParticleList('mu+:85eff', 'muonID > 0.697 and chiProb > 0.001', True, path=path)
+
+###
 
 
 def loadStdCharged(path=analysis_main):
@@ -147,18 +145,18 @@ def loadStdCharged(path=analysis_main):
     """
 
     # No PID
-    stdK('all', path)
-    stdPi('all', path)
-    stdPr('all', path)
-    stdE('all', path)
-    stdMu('all', path)
+    stdK('all', path=path)
+    stdPi('all', path=path)
+    stdPr('all', path=path)
+    stdE('all', path=path)
+    stdMu('all', path=path)
 
     # Loose PID
-    stdLooseK(path)
-    stdLoosePi(path)
-    stdLooseE(path)
-    stdLooseMu(path)
-    stdLoosePr(path)
+    stdLooseK(path=path)
+    stdLoosePi(path=path)
+    stdLooseE(path=path)
+    stdLooseMu(path=path)
+    stdLoosePr(path=path)
 
 ###
 
@@ -169,62 +167,62 @@ def stdLoosePi(path=analysis_main):
     """
     Creation of 'pi+:loose' list with the following requirements to the track:
 
-      - 'piid > 0.1'
+      - 'pionID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('pi+:loose', 'piid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('pi+:loose', 'pionID > 0.1 and chiProb > 0.001', True, path=path)
 
 
 def stdLooseK(path=analysis_main):
     """
     Creation of 'K+:loose' list with the following requirements to the track:
 
-      - 'Kid > 0.1'
+      - 'kaonID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('K+:loose', 'Kid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('K+:loose', 'kaonID > 0.1 and chiProb > 0.001', True, path=path)
 
 
 def stdLooseMu(path=analysis_main):
     """
     Creation of 'mu+:loose' list with the following requirements to the track:
 
-      - 'muid > 0.1'
+      - 'muonID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('mu+:loose', 'muid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('mu+:loose', 'muonID > 0.1 and chiProb > 0.001', True, path=path)
 
 
 def stdLooseE(path=analysis_main):
     """
     Creation of 'e+:loose' list with the following requirements to the track:
 
-      - 'eid > 0.1'
+      - 'electronID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('e+:loose', 'eid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('e+:loose', 'electronID > 0.1 and chiProb > 0.001', True, path=path)
 
 
 def stdLoosePr(path=analysis_main):
     """
     Creation of 'p+:loose' list with the following requirements to the track:
 
-      - 'prid > 0.1'
+      - 'protonID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('p+:loose', 'prid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('p+:loose', 'protonID > 0.1 and chiProb > 0.001', True, path=path)

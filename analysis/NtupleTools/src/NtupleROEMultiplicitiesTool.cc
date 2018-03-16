@@ -11,7 +11,6 @@
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/VariableManager/Variables.h>
 
 #include <TBranch.h>
 
@@ -25,15 +24,12 @@ void NtupleROEMultiplicitiesTool::setupTree()
 
   m_nTracks     = new int[nDecayProducts];
   m_nECLClusters = new int[nDecayProducts];
-  m_nGoodECLClusters = new int[nDecayProducts];
   m_nKLMClusters = new int[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_nROETracks").c_str(),  &m_nTracks[iProduct], (strNames[iProduct] + "_nROETracks/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_nROEECLClusters").c_str(), &m_nECLClusters[iProduct],
                    (strNames[iProduct] + "_nROEECLClusters/I").c_str());
-    m_tree->Branch((strNames[iProduct] + "_nGoodROEClusters").c_str(), &m_nGoodECLClusters[iProduct],
-                   (strNames[iProduct] + "_nGoodROEClusters/I").c_str());
     m_tree->Branch((strNames[iProduct] + "_nROEKLMClusters").c_str(), &m_nKLMClusters[iProduct],
                    (strNames[iProduct] + "_nROEKLMClusters/I").c_str());
   }
@@ -55,15 +51,6 @@ void NtupleROEMultiplicitiesTool::eval(const Particle* particle)
       m_nTracks[iProduct]      = roe->getNTracks();
       m_nECLClusters[iProduct]  = roe->getNECLClusters();
       m_nKLMClusters[iProduct]  = roe->getNKLMClusters();
-
-      const auto& remainECLClusters = roe->getECLClusters();
-      int result = 0;
-      for (auto& remainECLCluster : remainECLClusters) {
-        Particle gamma(remainECLCluster);
-        if (Variable::goodGamma(&gamma) > 0)
-          result++;
-      }
-      m_nGoodECLClusters[iProduct]  = result;
     }
   }
 }

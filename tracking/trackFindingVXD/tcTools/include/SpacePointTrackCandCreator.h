@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler, Jonas Wagner                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,17 +23,13 @@ namespace Belle2 {
   struct SpacePointTrackCandCreator {
 
     /** takes simple vectors of SpacePoints and convert them to real SpacePointTrackCand.
-     * returns number of TCs successfully created. */
-    unsigned int createSPTCs(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> >& allPaths)
+     *  Returns the created Space Point. */
+    SpacePointTrackCand* createSPTC(SPTCContainerType& tcContainer, std::vector<const SpacePoint*>& spacePoints, short family = -1)
     {
-      unsigned int nTCsCreated = 0;
+      SpacePointTrackCand* newSPTC = tcContainer.appendNew(spacePoints);
+      newSPTC->setFamily(family);
 
-      for (std::vector<const SpacePoint*>& aPath : allPaths) {
-        tcContainer.appendNew(aPath);
-        nTCsCreated++;
-      }
-
-      return nTCsCreated;
+      return newSPTC;
     }
   };
 

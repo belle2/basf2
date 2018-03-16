@@ -6,5 +6,8 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::BeamParameters+;
+#pragma link C++ class Belle2::MagneticFieldComponent+;
+#pragma link C++ class Belle2::MagneticFieldComponentConstant+;
+#pragma link C++ class Belle2::MagneticField+;
 
 #endif

@@ -14,6 +14,7 @@ class PerEventStatisticsGetterModule(basf2.Module):
         (3) Each subsequent line also contains the sum of all previous rows, so you have to subtract the line before
         to get the correct result (you have something like a cummulative time).
     """
+
     def __init__(self, output_file_name):
         """
         Create a new PerEventStatisticsGetterModule. You have to give the name of the
@@ -81,7 +82,10 @@ class PerEventStatisticsGetterModule(basf2.Module):
             self.ttree_inputs = [np.zeros(1, dtype=float) for module in module_stats]
 
             for i, stat in enumerate(module_stats):
-                module_name = stat.name
+                # escape the module names in ROOT-safe manner. Otherwise weird stuff happens like
+                # sub-branches get created or the branch cannot be opened in the TBrowser
+                module_name = Belle2.makeROOTCompatible(stat.name)
+
                 ttree.Branch(module_name + "_" + str(i), self.ttree_inputs[i], module_name + "_" + str(i) + "/D")
 
             self.branches_added = True

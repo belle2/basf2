@@ -38,24 +38,23 @@ namespace Belle2 {
     /** Used Flavor Tagger eventLevel Categories of the lists */
     std::vector<std::tuple<std::string, std::string, std::string>> m_eventLevelParticleLists;
 
-    bool m_FANNmlp; /** Sets if FANN Combiner output will be saved or not **/
+    bool m_FANNmlp; /**< Sets if FANN Combiner output will be saved or not **/
 
-    bool m_TMVAfbdt; /** Sets if FastBDT Combiner output will be saved or not **/
+    bool m_TMVAfbdt; /**< Sets if FastBDT Combiner output will be saved or not **/
 
-    bool m_qrCategories; /** Sets if individual Categories output will be saved or not **/
+    bool m_qpCategories; /**< Sets if individual Categories output will be saved or not **/
 
-    bool m_targetProb; /** Sets if individual Categories output will be saved or not **/
+    bool m_targetProb; /**< Sets if individual Categories output will be saved or not **/
 
-    bool m_trackPointers; /** Sets if track pointers to target tracks are saved or not **/
+    bool m_trackPointers; /**< Sets if track pointers to target tracks are saved or not **/
 
-    bool m_istrueCategories;  /** Sets if individual MC thruth for each Category is saved or not **/
+    bool m_istrueCategories;  /**< Sets if individual MC thruth for each Category is saved or not **/
 
   public:
     /** Constructor. */
     FlavorTaggerInfoFillerModule();
 
-    /** Initialises the module.
-     */
+    /** Initialises the module. */
     virtual void initialize() override;
     /** Method called for each event. */
     virtual void event() override;

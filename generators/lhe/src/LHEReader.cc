@@ -27,7 +27,7 @@ using namespace Belle2;
 
 const boost::char_separator<char> LHEReader::sep(",; \t");
 
-void LHEReader::open(const string& filename) throw(LHECouldNotOpenFileError)
+void LHEReader::open(const string& filename)
 {
   m_lineNr = 0;
   m_input.open(filename.c_str());
@@ -35,7 +35,7 @@ void LHEReader::open(const string& filename) throw(LHECouldNotOpenFileError)
 }
 
 
-int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(LHEInvalidDaughterIndicesError, LHEEmptyEventError)
+int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
 //   int eventID = -1;
 //   int nparticles = readEventHeader(eventID, eventWeight);
@@ -120,8 +120,8 @@ std::string LHEReader::getLine()
 }
 
 
-// int LHEReader::readEventHeader(int& eventID, double& eventWeight) throw(LHEHeaderNotValidError)
-int LHEReader::readEventHeader(double& eventWeight) throw(LHEHeaderNotValidError)
+// int LHEReader::readEventHeader(int& eventID, double& eventWeight)
+int LHEReader::readEventHeader(double& eventWeight)
 {
 
   // Search for next <event>
@@ -168,7 +168,7 @@ int LHEReader::readEventHeader(double& eventWeight) throw(LHEHeaderNotValidError
 }
 
 
-int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(LHEConvertFieldError, LHEParticleFormatError)
+int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle)
 {
   int mother = -1;
 

@@ -79,7 +79,9 @@ global_env = Environment(
     EXTBINDIR=os.path.join('$EXTDIR', 'bin', extsubdir),
     LINK='g++',
     SHLINK='g++',
-    CCFLAGS=['-Wall', '-isystem$EXTINCDIR'],
+    # for now, add the include folder here, as the path set via
+    # CPPPATH below seems to be ignored for C file compiles
+    CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
     CXXFLAGS=['-std=c++14'],
     # disable warnings when compiling dictionaries, too much root problems
     # involved
@@ -232,7 +234,8 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 # cling remembers include paths to be able to find them at run-time, so only use -I here
 # remove all compiler warnings
 global_env['CLINGFLAGS'] = ["-std=c++14"] + [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
-                                             if not (s.startswith("-W") or s.startswith('-wd'))]
+                                             if not (s.startswith("-W") or s.startswith('-wd'))] + \
+                           ["-noIncludePaths"]
 
 special_targets = ['tests', 'b2test-units', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
 explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and

@@ -14,7 +14,7 @@ from modularAnalysis import *
 
 
 def D0ToNeutrals():
-    charmcuts = '1.78 < M < 1.94'
+    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
     D0_Channels = ['pi0:skim pi0:skim',
                    'K_S0:all pi0:skim',
                    'K_S0:all K_S0:all',

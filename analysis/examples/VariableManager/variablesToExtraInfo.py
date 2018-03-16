@@ -20,7 +20,7 @@ else:
 
 inputMdstList('MC7', [filename])
 
-fillParticleLists([('K-', 'Kid > 0.2'), ('pi+', 'piid > 0.2')])
+fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')])
 reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
 matchMCTruth('D0')
 

@@ -66,6 +66,7 @@ def partial_fit(state, X, S, y, w, epoch):
     Pass received data to tensorflow session
     """
     class TestCallback(Callback):
+
         def on_epoch_end(self, epoch, logs={}):
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
@@ -90,7 +91,7 @@ if __name__ == "__main__":
                  'daughter(0, dr)', 'daughter(1, dr)',
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"

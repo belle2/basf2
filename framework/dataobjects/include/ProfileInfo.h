@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef PROFILEINFO_H
-#define PROFILEINFO_H
+
+#pragma once
 
 #include <TObject.h>
 
@@ -76,4 +76,3 @@ namespace Belle2 {
 
   }; //class
 } // namespace Belle2
-#endif

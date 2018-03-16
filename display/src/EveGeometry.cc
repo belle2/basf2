@@ -21,6 +21,8 @@ using namespace Belle2::TangoPalette;
 namespace {
   static TEveGeoTopNode* s_eveTopNode = nullptr;
   static TEveGeoShape* s_simplifiedShape = nullptr;
+  static std::string s_eveGeometryExtractPath = "/data/display/geometry_extract.root";
+  static std::string s_eveGeometryExtractPathTop = "/data/display/geometry_extract_top.root";
 }
 
 void EveGeometry::addGeometry(EType visMode)
@@ -63,7 +65,7 @@ void EveGeometry::addGeometry(EType visMode)
   }
   B2DEBUG(100, "Loading geometry projections...");
 
-  const std::string extractPath = FileSystem::findFile("/data/display/geometry_extract.root");
+  const std::string extractPath = FileSystem::findFile(s_eveGeometryExtractPath);
   TFile* f = TFile::Open(extractPath.c_str(), "READ");
   TEveGeoShapeExtract* gse = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
   s_simplifiedShape = TEveGeoShape::ImportShapeExtract(gse, 0);
@@ -81,7 +83,7 @@ void EveGeometry::addGeometry(EType visMode)
     el->Destroy();
   }
   //and add fixed ones instead
-  const std::string extractPathTop = FileSystem::findFile("/data/display/geometry_extract_top.root");
+  const std::string extractPathTop = FileSystem::findFile(s_eveGeometryExtractPathTop);
   f = TFile::Open(extractPathTop.c_str(), "READ");
   TEveGeoShapeExtract* gsetop = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
   TEveGeoShape* top_extract = TEveGeoShape::ImportShapeExtract(gsetop, 0);
@@ -173,4 +175,14 @@ void EveGeometry::saveExtract()
   //s_eveTopNode->ExpandIntoListTreesRecursively();
   //s_eveTopNode->SaveExtract("display_geometry_full.root", "Extract", false);
   gGeoManager = my_tgeomanager;
+}
+
+void EveGeometry::setCustomExtractPath(const std::string& extractPath)
+{
+  s_eveGeometryExtractPath = extractPath;
+}
+
+void EveGeometry::setCustomExtractPathTop(const std::string& extractPathTop)
+{
+  s_eveGeometryExtractPathTop = extractPathTop;
 }

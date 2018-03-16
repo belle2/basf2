@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Umberto Tamponi (tamponi@to.infn.it)                     *
+ * Contributors: Umberto Tamponi (tamponi@to.infn.it), Marko Staric       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +25,15 @@ namespace Belle2 {
   public:
 
     /**
+     * Calibration status of a constant
+     */
+    enum EStatus {
+      c_Default = 0,    /**< uncalibrated default value */
+      c_Calibrated = 1, /**< good calibrated value */
+      c_Unusable = 2    /**< bad calibrated value */
+    };
+
+    /**
      * Default constructor
      * All the calibrations constants and the related errors are set to zero
      */
@@ -40,8 +49,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
-        return ;
+        B2ERROR("Invalid module number, constant not set (" << ClassName() << ")");
+        return;
       }
       m_alpha[module] = alpha;
       m_errAlpha[module] = errAlpha;
@@ -57,8 +66,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
-        return ;
+        B2ERROR("Invalid module number, constant not set (" << ClassName() << ")");
+        return;
       }
       m_beta[module] = beta;
       m_errBeta[module] = errBeta;
@@ -74,8 +83,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
-        return ;
+        B2ERROR("Invalid module number, constant not set (" << ClassName() << ")");
+        return;
       }
       m_gamma[module] = gamma;
       m_errGamma[module] = errGamma;
@@ -91,8 +100,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
-        return ;
+        B2ERROR("Invalid module number, constant not set (" << ClassName() << ")");
+        return;
       }
       m_x[module] = x;
       m_errX[module] = errX;
@@ -108,8 +117,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
-        return ;
+        B2ERROR("Invalid module number, constant not set (" << ClassName() << ")");
+        return;
       }
       m_y[module] = y;
       m_errY[module] = errY;
@@ -125,13 +134,40 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
-        return ;
+        B2ERROR("Invalid module number, constant not set (" << ClassName() << ")");
+        return;
       }
       m_z[module] = z;
       m_errZ[module] = errZ;
     }
 
+    /**
+     * Switches calibration status to calibrated
+     * @param moduleID module ID (1-based)
+     */
+    void setCalibrated(int moduleID)
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) {
+        B2ERROR("Invalid module number, status not set (" << ClassName() << ")");
+        return;
+      }
+      m_status[module] = c_Calibrated;
+    }
+
+    /**
+     * Switches calibration status to unusable to flag badly calibrated constant
+     * @param moduleID module ID (1-based)
+     */
+    void setUnusable(int moduleID)
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) {
+        B2ERROR("Invalid module number, status not set (" << ClassName() << ")");
+        return;
+      }
+      m_status[module] = c_Unusable;
+    }
 
     /**
      * Gets the angle alpha on a single module
@@ -142,8 +178,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_alpha[module];
     }
@@ -157,8 +193,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_beta[module];
     }
@@ -172,8 +208,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_gamma[module];
     }
@@ -187,8 +223,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_x[module];
     }
@@ -202,8 +238,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_y[module];
     }
@@ -217,8 +253,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_z[module];
     }
@@ -233,8 +269,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_errAlpha[module];
     }
@@ -248,8 +284,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_errBeta[module];
     }
@@ -263,8 +299,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_errGamma[module];
     }
@@ -278,8 +314,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_errX[module];
     }
@@ -293,8 +329,8 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_errY[module];
     }
@@ -308,13 +344,47 @@ namespace Belle2 {
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16. Returning 0.");
-        return 0. ;
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
       }
       return m_errZ[module];
     }
 
+    /**
+     * Returns calibration status
+     * @param moduleID module ID (1-based)
+     * @return true, if good calibrated
+     */
+    bool isCalibrated(int moduleID) const
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) return false ;
+      return m_status[module] == c_Calibrated;
+    }
 
+    /**
+     * Returns calibration status
+     * @param moduleID module ID (1-based)
+     * @return true, if default (not calibrated)
+     */
+    bool isDefault(int moduleID) const
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) return false ;
+      return m_status[module] == c_Default;
+    }
+
+    /**
+     * Returns calibration status
+     * @param moduleID module ID (1-based)
+     * @return true, if bad calibrated
+     */
+    bool isUnusable(int moduleID) const
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) return false ;
+      return m_status[module] == c_Unusable;
+    }
 
 
   private:
@@ -339,8 +409,9 @@ namespace Belle2 {
     float m_errY[c_numModules] = {0}; /**< error on the y displacement. 0 by default. */
     float m_errZ[c_numModules] = {0}; /**< error on the z displacement. 0 by default. */
 
+    EStatus m_status[c_numModules] = {c_Default}; /**< calibration status */
 
-    ClassDef(TOPCalModuleAlignment, 1); /**< ClassDef */
+    ClassDef(TOPCalModuleAlignment, 3); /**< ClassDef */
 
   };
 

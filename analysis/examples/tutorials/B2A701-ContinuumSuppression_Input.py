@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial runs over skims of centrally produced B->KsPi0 and continuum MC
 # mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
 # tutorials B2A702 AND B2A703 for training, testing, and applying the MVAExpert.
@@ -44,11 +46,11 @@ outfile = step + '.root'
 # Perform analysis.
 main = create_path()
 
-inputMdstList('MC5', input, path=main)
+inputMdstList('default', input, path=main)
 
 fillParticleList('gamma:all', '', path=main)
-fillParticleList('pi+:good', 'chiProb > 0.001 and piid > 0.5', path=main)
-fillParticleList('pi-:good', 'chiProb > 0.001 and piid > 0.5', path=main)
+fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
+fillParticleList('pi-:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
 
 reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', 1, path=main)
 reconstructDecay('pi0  -> gamma:all gamma:all', '0.115<=M<=0.152', 1, path=main)

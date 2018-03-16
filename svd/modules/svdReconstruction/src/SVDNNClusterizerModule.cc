@@ -22,6 +22,7 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -49,7 +50,6 @@ SVDNNClusterizerModule::SVDNNClusterizerModule() : Module()
   B2DEBUG(200, "SVDNNClusterizerModule ctor");
   //Set module properties
   setDescription("Clusterize SVDRecoDigits and reconstruct hits");
-  // FIXME: Not sure this works with StripMap initialization from an xml file.
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
@@ -63,12 +63,9 @@ SVDNNClusterizerModule::SVDNNClusterizerModule() : Module()
            "MCParticles collection name", string(""));
 
   // 2. Calibration and time fitter sources
-  addParam("StripMapFileName", m_stripMapXmlName,
-           "Name of strip map file, TB only", string(""));
-  addParam("OOMapFileName", m_ooMapXmlName,
-           "Name of O-O map xml to decode strip map, TB only", string(""));
-  addParam("TimeFitterFileName", m_timeFitterXmlName,
-           "Name of time fitter data file", string("svd/data/SVDTimeNet.xml"));
+  addParam("TimeFitterName", m_timeFitterName,
+           "Name of time fitter data file", string("SVDTimeNet_6samples"));
+  addParam("CalibratePeak", m_calibratePeak, "Use calibrattion (vs. default) for peak widths and positions", bool(false));
 
   // 3. Clustering
   // FIXME: Idiotic names of parameters kept for compatibility with the old clusterizer.
@@ -92,7 +89,7 @@ void SVDNNClusterizerModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeRecoDigits.required();
+  storeRecoDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -132,21 +129,18 @@ void SVDNNClusterizerModule::initialize()
   B2INFO(" -->  DigitTrueRel:       " << m_relRecoDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2INFO(" 2. CALIBRATION DATA:");
-  B2INFO(" -->  StripMap:           " << m_stripMapXmlName);
-  B2INFO(" -->  OOMap:              " << m_ooMapXmlName);
-  B2INFO(" -->  Time NN:            " << m_timeFitterXmlName);
+  B2INFO(" -->  Time NN:            " << m_timeFitterName);
   B2INFO(" 4. CLUSTERING:");
   B2INFO(" -->  Neighbour cut:      " << m_cutAdjacent);
   B2INFO(" -->  Seed cut:           " << m_cutSeed);
   B2INFO(" -->  Cluster charge cut: " << m_cutCluster);
   B2INFO(" -->  HT for clusters >:  " << m_sizeHeadTail);
 
-  // Now that we have the required filenames (or don't), create the strip map object.
-  m_stripMap = std::unique_ptr<StripCalibrationMap>(
-                 new StripCalibrationMap(m_stripMapXmlName, m_ooMapXmlName)
-               );
   // Properly initialize the NN time fitter
-  m_fitter.setNetwrok(m_timeFitterXmlName);
+  // FIXME: Should be moved to beginRun
+  // FIXME: No support for 3/6 sample switching within a run/event
+  DBObjPtr<DatabaseRepresentationOfWeightfile> dbXml(m_timeFitterName);
+  m_fitter.setNetwrok(dbXml->m_data);
 }
 
 void SVDNNClusterizerModule::createRelationLookup(const RelationArray& relation,
@@ -339,17 +333,28 @@ void SVDNNClusterizerModule::event()
 
         unsigned short stripNo = recoDigit.getCellID();
         stripNumbers.push_back(stripNo);
-        StripCalibrationMap::StripData stripData = m_stripMap->getStripData(sensorID, isU, stripNo);
-        stripNoises.push_back(stripData.m_noise);
-        stripGains.push_back(stripData.m_calPeak);
-        timeShifts.push_back(stripData.m_calTimeDelay);
-        waveWidths.push_back(stripData.m_calWidth);
+        // Is the calibrations interface sensible?
+        double stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
+        stripNoises.push_back(
+          m_pulseShapeCal.getChargeFromADC(sensorID, isU, stripNo, stripNoiseADU)
+        );
+        // Some calibrations magic.
+        // FIXME: Only use calibration on real data. Until simulations correspond to
+        // default calibrtion, we cannot use it.
+        double peakWidth = 270;
+        double timeShift = isU ? 4.0 : 0.0;
+        if (m_calibratePeak) {
+          peakWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
+          timeShift = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
+                      - 0.25 * peakWidth;
+        }
+        waveWidths.push_back(peakWidth);
+        timeShifts.push_back(timeShift);
         stripPositions.push_back(
           isU ? sensorInfo.getUCellPosition(stripNo) : sensorInfo.getVCellPosition(stripNo)
         );
         // Recover samples from ShaperDigits and store them.
         apvSamples normedSamples;
-        float stripNoiseADU = stripData.m_noise / stripData.m_calPeak;
         const SVDShaperDigit* shaperDigit = recoDigit.getRelatedTo<SVDShaperDigit>();
         if (!shaperDigit) // PANIC, this should not happen.
           B2FATAL("Missing SVDRecoDigits->SVDShaperDigits relation. This should not happen.");

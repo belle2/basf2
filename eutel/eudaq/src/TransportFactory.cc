@@ -29,12 +29,15 @@ namespace eudaq {
     template <typename T_Server, typename T_Client>
     struct MakeTransportInfo : public TransportFactory::TransportInfo {
       MakeTransportInfo(const std::string& thename) :
-        TransportInfo(thename, theserverfactory, theclientfactory) {
+        TransportInfo(thename, theserverfactory, theclientfactory)
+      {
       }
-      static TransportServer* theserverfactory(const std::string& param) {
+      static TransportServer* theserverfactory(const std::string& param)
+      {
         return new T_Server(param);
       }
-      static TransportClient* theclientfactory(const std::string& param) {
+      static TransportClient* theclientfactory(const std::string& param)
+      {
         return new T_Client(param);
       }
     };

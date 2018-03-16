@@ -16,6 +16,7 @@
 #include <ecl/electronId/ECLElectronPdf.h>
 #include <ecl/electronId/ECLPionPdf.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -50,11 +51,11 @@ void ECLElectronIdModule::initialize()
   if (eParams.empty()  || muParams.empty() || piParams.empty())
     B2FATAL("Electron ID pdfs parameter files not found.");
 
-  (m_pdf[Const::electron.getIndex()] = new ECLElectronPdf)->init(eParams.c_str());
-  (m_pdf[Const::muon.getIndex()] = new ECLMuonPdf)->init(muParams.c_str());
+  (m_pdf[Const::electron.getIndex()] = new Belle2::ECL::ECLElectronPdf)->init(eParams.c_str());
+  (m_pdf[Const::muon.getIndex()] = new Belle2::ECL::ECLMuonPdf)->init(muParams.c_str());
   (m_pdf[Const::proton.getIndex()] =
      m_pdf[Const::kaon.getIndex()] =
-       m_pdf[Const::pion.getIndex()] = new ECLPionPdf)->init(piParams.c_str());
+       m_pdf[Const::pion.getIndex()] = new Belle2::ECL::ECLPionPdf)->init(piParams.c_str());
 }
 
 void ECLElectronIdModule::beginRun()
@@ -67,7 +68,9 @@ void ECLElectronIdModule::event()
   StoreArray<ECLPidLikelihood> eclPidLikelihoods;
 
   for (const auto& track : tracks) {
-    const TrackFitResult* fitRes = track.getTrackFitResult(Const::pion);
+    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // the tracking will not always successfully fit with a pion hypothesis
+    const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
@@ -80,10 +83,10 @@ void ECLElectronIdModule::event()
     int nClusters = relShowers.size();
 
     for (const auto& eclShower : relShowers) {
-      //////////Cate's addition///////////
-      if (eclShower.getHypothesisId() != 5) continue;
+
+      if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
       if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
-      ////////////////////////////////////
+
       const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;
       if (shEnergy > maxEnergy) {
@@ -101,7 +104,7 @@ void ECLElectronIdModule::event()
     double eop = energy / p;
 
     for (const auto& hypo : Const::chargedStableSet) {
-      ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
+      Belle2::ECL::ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
       if (currentpdf == 0) {
         currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }

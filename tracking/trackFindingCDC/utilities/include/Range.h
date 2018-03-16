@@ -31,7 +31,7 @@ namespace Belle2 {
       using Iterator = AIterator;
 
       /// Iterator definition for stl
-      using const_iterator = Iterator;
+      using iterator = Iterator;
 
       /// The type the iterator references
       using Reference = typename std::iterator_traits<AIterator>::reference;

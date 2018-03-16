@@ -2,8 +2,6 @@ from basf2 import *
 from ROOT import Belle2
 import ROOT
 from tracking import add_cdc_cr_track_finding
-from tracking import add_cdc_track_finding
-from tracking import add_cdc_cr_track_fit_and_track_creator
 from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
@@ -146,15 +144,6 @@ def add_cdc_cr_simulation(path,
 
     #    path.add_module(RandomizeTrackTimeModule(8.0))
 
-    # Select events and reset global timing.
-    sel = register_module("CDCCosmicSelectorAfterFullSim",
-                          lOfRegion=500,
-                          wOfRegion=500,
-                          xOfRegion=0,
-                          zOfRegion=50)
-    path.add_module(sel)
-    sel.if_false(empty_path)
-
     # CDC digitization
     if components is None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigitizer')
@@ -228,7 +217,7 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
-                    defaultPDGCode=13,
+                    pdgCodes=[13],
                     useClosestHitToIP=True,
                     useBFieldAtHit=True
                     )

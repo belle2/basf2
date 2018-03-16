@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RELATIONSOBJECT_H
-#define RELATIONSOBJECT_H
+#pragma once
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationVector.h>
@@ -424,5 +423,3 @@ namespace Belle2 {
   /** Provides interface for getting/adding relations to objects in StoreArrays. See RelationsInterface for details. */
   typedef RelationsInterface<TObject> RelationsObject;
 }
-
-#endif /* RELATIONSOBJECT_H */

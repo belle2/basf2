@@ -59,23 +59,41 @@ namespace Belle2 {
 
 
   /**
-   * Combines Particle indices (in StoreArray) for different mdst sources (getMdstSource)
+   * Helper class to make a vector of all possible combinations of `int` numbers contained in the input vectors (passed as values in a map).
+   * In every resulting combination, there is only one number from each input vector.
+   *
+   * It is used by InclusiveBtagReconstructionModule to combine Particle indices (in StoreArray) for different mdst sources (getMdstSource)
    * to form std::vector of all combinations not sharing common mdst source.
    */
   class Map2Vector {
 
   public:
     /**
-     * Converts map<mdstSource, vector<arrayIndex>> to vector<vector<daughterArrayIndex>>
+     * Do the conversion using makeEntries().
+     * (e.g convert map<mdstSource, vector<arrayIndex>> to vector<vector<daughterArrayIndex>>)
+     *
+     * @param input - the input map
+     * @param output - an empty vector to push back output combinations
      */
-    void convert(std::map<int, std::vector<int> >& d, std::vector<std::vector<int> >& out);
+    void convert(std::map<int, std::vector<int> >& input, std::vector<std::vector<int> >& output);
 
   protected:
-    void makeEntries(std::map<int, std::vector<int>>::iterator j, const std::map<int, std::vector<int>>::const_iterator& e, unsigned i,
-                     std::vector<std::vector<int>>& out);
+    /**
+     * Recursively iterates over a map until the end is reached, then the output is ready.
+     *
+     * @param positionOnTheMap - current position on the input map
+     * @param end - the end of the input map
+     * @param i - current m_combination index
+     * @param output - a vector to push back resulting combinations
+     */
+    void makeEntries(std::map<int, std::vector<int>>::iterator positionOnTheMap,
+                     const std::map<int, std::vector<int>>::const_iterator& end, unsigned i,
+                     std::vector<std::vector<int>>& output);
 
   private:
-    std::vector<int> o;
+    std::vector<int>
+    m_combination; /**< Vector containing current combination of numbers (e.g. arrayIndices of current Btag candidate's children) */
+
   };
 }
 

@@ -104,4 +104,4 @@ class TestHVControlCallback(HVControlCallback):
 
 if __name__ == '__main__':
     callback = TestHVControlCallback()
-    callback.run("arichlv")
+    callback.run("konno")

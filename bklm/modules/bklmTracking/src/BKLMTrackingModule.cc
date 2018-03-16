@@ -12,7 +12,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <bklm/geometry/GeometryPar.h>
 
 using namespace std;
@@ -43,10 +42,7 @@ BKLMTrackingModule::~BKLMTrackingModule()
 void BKLMTrackingModule::initialize()
 {
 
-  StoreArray<BKLMTrack> m_storeTracks;
-  StoreArray<BKLMHit2d> hits2D;
-  StoreArray<RecoTrack> recoTracks;
-  StoreArray<RecoHitInformation> recoHitInformation;
+  hits2D.isRequired();
   m_storeTracks.registerInDataStore();
   m_storeTracks.registerRelationTo(hits2D);
   m_storeTracks.registerRelationTo(recoTracks);
@@ -99,7 +95,7 @@ void BKLMTrackingModule::event()
   //unsigned long expNumber = eventMetaData->getExperiment();
 
   //StoreArray<BKLMHit2d> hits2D;
-  StoreArray<BKLMTrack> m_storeTracks;
+  //StoreArray<BKLMTrack> m_storeTracks;
   m_storeTracks.clear();
 
   if (!m_studyEffi) {
@@ -122,11 +118,9 @@ void BKLMTrackingModule::event()
 
 void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iLayer)
 {
-  StoreArray<BKLMHit2d> hits2D;
-  StoreArray<BKLMTrack> m_storeTracks;
   m_storeTracks.clear();
-  std::list<BKLMTrack*> tracks;
-  tracks.clear();
+  //std::list<BKLMTrack*> tracks;
+  //tracks.clear();
 
   //cout<<" mode "<<mode<<", iForward "<<iForward<<", "<<iSector<<" , "<<iLayer<<endl;
   BKLMTrackFitter* m_fitter = new BKLMTrackFitter();
@@ -199,7 +193,7 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
           (*j)->isOnStaTrack(true);
           m_track->addRelationTo((*j));
         }
-        tracks.push_back(m_track);
+        //tracks.push_back(m_track);
         //m_track->getTrackParam().Print();
         //m_track->getTrackParamErr().Print();
         //match BKLMTrack to RecoTrack
@@ -298,7 +292,7 @@ bool BKLMTrackingModule::sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2)
 bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& closestTrack)
 {
 
-  StoreArray<RecoTrack> recoTracks;
+  //StoreArray<RecoTrack> recoTracks;
   RelationVector<BKLMHit2d> bklmHits = bklmTrk->getRelationsTo<BKLMHit2d> ();
 
   if (bklmHits.size() < 1) { B2INFO("BKLMTrackingModule::something is wrong! there is BKLMTrack but no bklmHits"); return false;}
@@ -362,20 +356,17 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
 {
 
-//std::list<BKLMTrack*> tracks;
-  StoreArray<BKLMHit2d> hits2D;
-  StoreArray<BKLMTrack> tracks;
   set<int> m_pointUsed;
   m_pointUsed.clear();
-  if (tracks.getEntries() < 1) return;
+  if (m_storeTracks.getEntries() < 1) return;
 
-  for (int it = 0; it < tracks.getEntries(); it++) {
-    //if(tracks[it]->getTrackChi2()>10) continue;
-    //if(tracks[it]->getNumHitOnTrack()<6) continue;
+  for (int it = 0; it < m_storeTracks.getEntries(); it++) {
+    //if(m_storeTracks[it]->getTrackChi2()>10) continue;
+    //if(m_storeTracks[it]->getNumHitOnTrack()<6) continue;
     int cnt1 = 0;
     int cnt2 = 0;
 
-    RelationVector<BKLMHit2d> relatedHit2D = tracks[it]->getRelationsTo<BKLMHit2d>();
+    RelationVector<BKLMHit2d> relatedHit2D = m_storeTracks[it]->getRelationsTo<BKLMHit2d>();
     for (const BKLMHit2d& hit2D : relatedHit2D) {
       if (hit2D.getLayer() > iLayer + 1) cnt1 ++;
       if (hit2D.getLayer() < iLayer + 1) cnt2 ++;
@@ -397,7 +388,7 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
     if (local[1] > local2[1]) { maxLocalY = local[1]; minLocalY = local2[1]; } else { maxLocalY = local2[1]; minLocalY = local[1];}
     if (local[2] > local2[2]) { maxLocalZ = local[2]; minLocalZ = local2[2]; } else { maxLocalZ = local2[2]; minLocalZ = local[2];}
 
-    TVectorD trkPar = tracks[it]->getLocalTrackParam();
+    TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
 
     //first layer is the reference layer
     //if (iForward == 1 && (iSector + 1 ) ==5)  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iForward, iSector + 1, 1)<<endl;
@@ -437,7 +428,7 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
         if (m_pointUsed.find(he) != m_pointUsed.end()) continue;
 
         double error, sigma;
-        float distance = distanceToHit(tracks[it], hits2D[he], error, sigma);
+        float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
 
         if (distance < 10 && sigma < 5) { m_iffound = true; }
         if (m_iffound) {

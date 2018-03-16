@@ -11,13 +11,13 @@
 #include <pxd/modules/pxdReconstruction/PXDRawHitSorterModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
 #include <vxd/geometry/GeoCache.h>
 
 #include <pxd/reconstruction/Pixel.h>
+#include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <set>
 
@@ -45,68 +45,52 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   addParam("mergeDuplicates", m_mergeDuplicates,
            "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
-  addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", -1000.0);
-  addParam("assignID", m_assignID, "Assign VxdID to RAwHits that don't have it", true);
+  addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
   addParam("digits", m_storeDigitsName, "PXDDigit collection name", string(""));
-  addParam("frames", m_storeFramesName, "PXDFrames collection name", string(""));
-  addParam("ignoredPixelsListName", m_ignoredPixelsListName, "Name of the xml with ignored pixels list", string(""));
-
 }
 
 
 void PXDRawHitSorterModule::initialize()
 {
   //Register collections
-  StoreArray<PXDRawHit>::required(m_storeRawHitsName);
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  storeDigits.registerInDataStore();
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  storeFrames.registerInDataStore();
-
-  m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(m_ignoredPixelsListName));
+  m_storeRawHits.isRequired(m_storeRawHitsName);
+  //m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeDigits.registerInDataStore(m_storeDigitsName);
 }
 
 void PXDRawHitSorterModule::event()
 {
-  StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-
   // if no input, nothing to do
-  if (!storeRawHits || !storeRawHits.getEntries()) return;
+  if (!m_storeRawHits || !m_storeRawHits.getEntries()) return;
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //Mapping of Pixel information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Pixel>> sensors;
-  std::map<VxdID, std::set<unsigned short>> startRows;
 
   // Fill sensor information to get sorted Pixel indices
-  const int nPixels = storeRawHits.getEntries();
+  const int nPixels = m_storeRawHits.getEntries();
   unsigned short currentFrameNumber(0);
   VxdID currentSensorID(0);
+  // TODO: It seems there is no need for the frameCounter any more ... should remove it as well.
   unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
-    const PXDRawHit* const rawhit = storeRawHits[i];
+    const PXDRawHit* const rawhit = m_storeRawHits[i];
     // If malformed object, drop it.
     VxdID sensorID = rawhit->getSensorID();
     if (!geo.validSensorID(sensorID)) {
-      if (m_assignID) {
-        sensorID.setLayerNumber(2);
-        sensorID.setLadderNumber(1);
-        sensorID.setSensorNumber(2);
-      } else {
-        B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
-        continue;
-      }
+      B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
+      continue;
     }
     if (m_trimOutOfRange && !goodHit(rawhit))
       continue;
     // Zero-suppression cut
     if (rawhit->getCharge() < m_0cut) continue;
-    Pixel px(rawhit, rawhit->getStartRow());
+    // FIXME: The index of the temporary Pixel object seems not needed here.
+    // Set this index always to zero
+    Pixel px(rawhit, 0);
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
       frameCounter = 1;
@@ -116,12 +100,11 @@ void PXDRawHitSorterModule::event()
       currentFrameNumber = rawhit->getFrameNr();
     }
     if (m_mergeFrames) frameCounter = 0;
-    sensorID.setSegmentNumber(frameCounter); // should be 0 anyway...
+
     // We need some protection against crap data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
-      if (m_ignoredPixelsListName == "" || m_ignoredPixelsList->pixelOK(sensorID, PXDIgnoredPixelsMap::map_pixel(px.getU(), px.getV()))) {
+      if (PXDPixelMasker::getInstance().pixelOK(sensorID, px.getU(), px.getV())) {
         sensors[sensorID].insert(px);
-        startRows[sensorID].insert(rawhit->getStartRow());
       }
     }
   }
@@ -135,21 +118,18 @@ void PXDRawHitSorterModule::event()
       //Normal case: pixel has different address
       if (!lastpx || px > *lastpx) {
         //Write the digit
-        storeDigits.appendNew(sensorID, px.getU(), px.getV(), px.getCharge());
+        m_storeDigits.appendNew(sensorID, px.getU(), px.getV(), px.getCharge());
         ++index;
       } else {
         //We already have a pixel at this address, see if we merge or drop the new one
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
-          const PXDDigit& old = *storeDigits[index - 1];
-          *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
-                                             old.getVCellID(), old.getCharge() + px.getCharge());
+          const PXDDigit& old = *m_storeDigits[index - 1];
+          *m_storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
+                                               old.getVCellID(), old.getCharge() + px.getCharge());
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;
     }
-    for (unsigned short startRow : startRows[sensorID])
-      storeFrames.appendNew(sensorID, startRow);
-
   }
 }

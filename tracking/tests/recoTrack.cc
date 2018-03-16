@@ -45,17 +45,16 @@ namespace Belle2 {
       //--- Setup -----------------------------------------------------------------------
       // We do not use the KLM store arrays to test, if the RecoTrack can be used without them.
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<CDCHit>::registerPersistent(m_storeArrayNameOfCDCHits);
-      StoreArray<SVDCluster>::registerPersistent(m_storeArrayNameOfSVDHits);
-      StoreArray<PXDCluster>::registerPersistent(m_storeArrayNameOfPXDHits);
-      StoreArray<RecoTrack>::registerPersistent(m_storeArrayNameOfRecoTracks);
-      StoreArray<RecoHitInformation>::registerPersistent(m_storeArrayNameOfHitInformation);
-
       StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+      cdcHits.registerInDataStore();
       StoreArray<SVDCluster> svdHits(m_storeArrayNameOfSVDHits);
+      svdHits.registerInDataStore();
       StoreArray<PXDCluster> pxdHits(m_storeArrayNameOfPXDHits);
+      pxdHits.registerInDataStore();
       StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
+      recoTracks.registerInDataStore();
       StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfHitInformation);
+      recoHitInformations.registerInDataStore();
 
       cdcHits.registerRelationTo(recoTracks);
       svdHits.registerRelationTo(recoTracks);
@@ -89,15 +88,15 @@ namespace Belle2 {
                                           m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
     }
 
-    RecoTrack* m_recoTrack;
-    RecoTrack* m_recoTrack2;
-    std::string m_storeArrayNameOfRecoTracks;
-    std::string m_storeArrayNameOfCDCHits;
-    std::string m_storeArrayNameOfSVDHits;
-    std::string m_storeArrayNameOfPXDHits;
-    std::string m_storeArrayNameOfBKLMHits;
-    std::string m_storeArrayNameOfEKLMHits;
-    std::string m_storeArrayNameOfHitInformation;
+    RecoTrack* m_recoTrack; /**< pointer to recoTrack */
+    RecoTrack* m_recoTrack2; /**< pointer to other recoTrack */
+    std::string m_storeArrayNameOfRecoTracks; /**< name of recoTracks storeArray */
+    std::string m_storeArrayNameOfCDCHits; /**< name of storeArray with CDC hits */
+    std::string m_storeArrayNameOfSVDHits; /**< name of storeArray with SVD hits */
+    std::string m_storeArrayNameOfPXDHits; /**< name of storeArray with PXD hits */
+    std::string m_storeArrayNameOfBKLMHits; /**< name of storeArray with BKLM hits */
+    std::string m_storeArrayNameOfEKLMHits; /**< name of storeArray with EKLM hits */
+    std::string m_storeArrayNameOfHitInformation; /**< name of storeArray with hit information */
   };
 
   /** Test simple Setters and Getters. */
@@ -307,7 +306,7 @@ namespace Belle2 {
     }
   }
 
-  /* Test the getRecoHitInformations() function */
+  /** Test the getRecoHitInformations() function */
   TEST_F(RecoTrackTest, recoHitInformations)
   {
     StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);

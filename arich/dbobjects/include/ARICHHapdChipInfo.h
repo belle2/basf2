@@ -201,7 +201,7 @@ namespace Belle2 {
      * Set the list of cut channels
      * @param channel HAPD channel numbers
      */
-    void setCutChannel(std::vector<int> channels) {m_cutChannel = channels; }
+    void setCutChannel(const std::vector<int>& channels) {m_cutChannel = channels; }
 
     /**
      * Return size of the list of cut channels
@@ -226,7 +226,7 @@ namespace Belle2 {
      * Set the list of bad channels
      * @param channel HAPD channel numbers
      */
-    void setBadChannel(std::vector<int> channels) {m_badChannel = channels; }
+    void setBadChannel(const std::vector<int>& channels) {m_badChannel = channels; }
 
     /**
      * Return size of the list of cut channels

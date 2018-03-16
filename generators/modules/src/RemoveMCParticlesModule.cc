@@ -42,9 +42,13 @@ namespace {
 RemoveMCParticlesModule::RemoveMCParticlesModule() : Module()
 {
   //Set module properties
-  setDescription("Remove particles from the MCParticle Collection.\n BEWARE: At "
-                 "the moment, Relations to that MCParticle collection will become "
-                 "invalid and are not fixed automatically");
+  setDescription(R"DOC(
+Remove particles from the MCParticle Collection.
+
+Warning:
+  At the moment, Relations to that MCParticle collection will become invalid
+  and are not fixed automatically
+)DOC");
 
   //Parameter definition
   addParam("collectionName", m_particleList, "Collection to perform the cuts on", std::string(""));
@@ -74,7 +78,9 @@ RemoveMCParticlesModule::RemoveMCParticlesModule() : Module()
 
 void RemoveMCParticlesModule::initialize()
 {
-  StoreArray<MCParticle>::required(m_particleList);
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
+
   std::sort(m_pdgCodes.begin(), m_pdgCodes.end());
   m_minTheta *= Unit::deg;
   m_maxTheta *= Unit::deg;
@@ -126,7 +132,7 @@ void RemoveMCParticlesModule::applyCuts(const MCParticle& particle, bool cut)
   if (cut) m_mpg[particle.getArrayIndex()].setIgnore(true);
 
   //Then we look at all daughters
-  for (MCParticle * daughter : particle.getDaughters()) {
+  for (MCParticle* daughter : particle.getDaughters()) {
     applyCuts(*daughter, cut);
   }
 }

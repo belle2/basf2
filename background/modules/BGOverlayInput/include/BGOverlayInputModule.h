@@ -83,6 +83,8 @@ namespace Belle2 {
     TChain* m_tree = 0;            /**< tree pointer */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */
     unsigned m_eventCount = 0;     /**< current event (tree entry) */
+    unsigned m_firstEvent = 0;     /**< randomly choosen first event (tree entry) */
+    bool m_start = true;           /**< flag denoting first call of event function */
     StoreEntries m_storeEntries;   /**< store entries with connected branches */
     unsigned m_index = 0; /**< index of BackgroundDescr in BackgroundInfo object */
 

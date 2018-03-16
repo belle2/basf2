@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -135,6 +135,9 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     track->push_back(*recoHit3D);
     recoHit3D->getWireHit()->setTakenFlag();
   }
+
+  // Drop tracks which have no hits
+  TrackFindingCDC::erase_remove_if(tracks, [](const CDCTrack & track) { return track.empty(); });
 
   // Establish the ordering
   for (CDCTrack& track : tracks) {

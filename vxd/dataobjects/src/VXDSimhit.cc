@@ -65,10 +65,10 @@ std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantDistance(dou
   return result;
 }
 
-std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantNumber(double electrons) const
+std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantNumber(double electronsPerStep) const
 {
   VXDElectronDeposit total(m_electronProfile.back());
-  const int nSteps = (int)(total.getElectrons() / electrons) + 1;
+  const int nSteps = (int)(total.getElectrons() / electronsPerStep) + 1;
   std::vector<std::pair<float, float>> result;
   result.reserve(nSteps);
   //Account for the discrete number of steps and adjust number of electrons

@@ -170,7 +170,7 @@ for value in components:
                         cond = (val_param.layer == layer) & (val_param.ladder == ladder) & (val_param.sensor == sensor)
                         try:
                             c = float(val_param[value][cond])
-                        except:
+                        except BaseException:
                             c = 0.
                         if (cmax - cmin) > 0.:
                             color_value = (c - cmin) / (cmax - cmin)

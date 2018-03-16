@@ -22,8 +22,10 @@ namespace Belle2 {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Track>::registerPersistent();
-      StoreArray<TrackFitResult>::registerPersistent();
+      StoreArray<Track> tracks;
+      tracks.registerInDataStore();
+      StoreArray<TrackFitResult> trackFitResults;
+      trackFitResults.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
     }
 

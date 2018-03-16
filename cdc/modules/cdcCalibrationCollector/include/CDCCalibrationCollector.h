@@ -55,7 +55,7 @@ namespace Belle2 {
       /**
        * Termination action.
        */
-      virtual void terminate();
+      virtual void finish();
 
     private:
 

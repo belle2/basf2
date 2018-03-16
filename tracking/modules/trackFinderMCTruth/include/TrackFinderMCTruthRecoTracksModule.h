@@ -42,21 +42,31 @@ namespace Belle2 {
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      */
-    void initialize();
+    void initialize() override;
 
     /** Called when entering a new run.
      */
-    void beginRun();
+    void beginRun() override;
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.
      */
-    void event();
+    void event() override;
     /** This method is called if the current run ends.
      */
-    void endRun();
+    void endRun() override;
 
   private:
+
+    /** helper function which returns true if the current hit is within n loops
+     * the template give the hit type and the according sim hit type (e.g. CDCHit and CDCSimHit)
+     * @param Bz: the z-component of the B field
+     * @param aHit: pointer to the hit under investiation
+     * @param nLoops: the number of loops the hit should be in
+     * @return : returns true if the hit is on the < nLoops th loop of the track*/
+    template<class THit, class TSimHit>
+    bool isWithinNLoops(double Bz, const THit* aHit, double nLoops);
+
     bool m_usePXDHits;                                          /**< Boolean to select if PXDHits should be used*/
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
@@ -98,6 +108,8 @@ namespace Belle2 {
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
     double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into seperate tracks. If < 0, don't do splitting.*/
+
+    bool m_discardAuxiliaryHits = false; /**< if true hits marked as auxiliary will not be included in the RecoTrack */
   };
 }
 

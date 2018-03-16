@@ -18,8 +18,12 @@
 
 namespace Belle2 {
 
+  /** Class to calculate the thrust axis */
   class Thrust {
   public:
+    /**
+     * calculates the thrust axis
+     */
     static TVector3 calculateThrust(const std::vector<TVector3>& momenta);
   };
 

@@ -29,7 +29,6 @@ import random
 
 from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficiencies
 from gridcontrol_helper import write_gridcontrol_swtrigger, call_gridcontrol
-from symbol import parameters
 
 
 def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase, shifts):
@@ -152,7 +151,7 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
-def calculate_efficiencies(channels, storage_location, local_execution, filename_used_shift):
+def calculate_efficiencies(channels, storage_location, local_execution, filename_used_shift, shifts):
     """
     Helper function to call gridcontrol on the analyse.py steering file with
     the correct arguments. Will run one job per reconstructed file.
@@ -169,13 +168,11 @@ def calculate_efficiencies(channels, storage_location, local_execution, filename
             output_file = input_file.replace("/reconstructed/", "/analysed/")
             output_file = output_file.replace("reconstructed_", "analysed_")
             output_dir = os.path.dirname(output_file)
-            print(output_file)
 
             # get the original filename from the generation
             filename = os.path.split(input_file)[1]
             filename = filename.replace("reconstructed_", "generated_")
             shift_information = filename_used_shift[filename]
-            print(shift_information)
 
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -190,8 +187,10 @@ def calculate_efficiencies(channels, storage_location, local_execution, filename
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
-    extract_efficiencies(channels=channels, storage_location=storage_location)
-    extract_l1_efficiencies(channels=channels, storage_location=storage_location)
+    extract_efficiencies(channels=channels, storage_location=storage_location,
+                         shifts=shifts, filename_used_shift=filename_used_shift)
+    extract_l1_efficiencies(channels=channels, storage_location=storage_location,
+                            shifts=shifts, filename_used_shift=filename_used_shift)
     extract_file_sizes(channels=channels, storage_location=storage_location)
 
 
@@ -210,10 +209,10 @@ if __name__ == "__main__":
 
         "gg",
 
-        #        "continuum_ccbar",
-        #        "continuum_uubar",
-        #        "continuum_ddbar",
-        #        "continuum_ssbar",
+        "continuum_ccbar",
+        "continuum_uubar",
+        "continuum_ddbar",
+        "continuum_ssbar",
 
         "BB_charged",
         "BB_mixed",
@@ -243,7 +242,7 @@ if __name__ == "__main__":
     parser.add_argument("--cosmics", action="store_true", help="for cosmics events")
     parser.add_argument("--no-roi-filter", help="Don't apply the Region-Of-Interest filter for the PXD hits",
                         action="store_true", default=False)
-    parser.add_argument("--shift", action="store_true", help="Shall a shift be performed", default=False)
+    parser.add_argument("--shift", action="store_true", help="Test hlt for varying detector conditions", default=False)
 
     args = parser.parse_args()
 
@@ -289,4 +288,4 @@ if __name__ == "__main__":
 
         # Calculate file size and efficiencies for each channel
         calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
-                               local_execution=args.local, filename_used_shift=filename_used_shift)
+                               local_execution=args.local, filename_used_shift=filename_used_shift, shifts=shifts_to_study)

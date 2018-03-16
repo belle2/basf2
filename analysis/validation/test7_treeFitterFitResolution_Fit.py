@@ -66,44 +66,6 @@ variables = [
     'mcDX',
     'mcDY',
     'mcDZ',
-    # not really needed
-    #    'daughter(0,x)',  # J/Psi
-    #    'daughter(0,y)',
-    #    'daughter(0,z)',
-    #    'daughter(0,z_uncertainty)',
-    #    'daughter(0,y_uncertainty)',
-    #    'daughter(0,x_uncertainty)',
-    #    'daughter(0,mcDX)',
-    #    'daughter(0,mcDY)',
-    #    'daughter(0,mcDX)',
-    #
-    #    'daughter(0,p)',
-    #    'daughter(0,mcP)',
-    #    'daughter(0,pErr)',
-    #    'daughter(0,E)',
-    #    'daughter(0,mcE)',
-    #    'daughter(0,E_uncertainty)',
-    #    'daughter(0,M)',
-    #    'daughter(0,InvM)',
-    #
-    #    'daughter(1,x)',  # Ks
-    #    'daughter(1,y)',
-    #    'daughter(1,z)',
-    #    'daughter(1,z_uncertainty)',
-    #    'daughter(1,y_uncertainty)',
-    #    'daughter(1,x_uncertainty)',
-    #    'daughter(1,mcDX)',
-    #    'daughter(1,mcDY)',
-    #    'daughter(1,mcDX)',
-    #
-    #    'daughter(1,p)',
-    #    'daughter(1,mcP)',
-    #    'daughter(1,pErr)',
-    #    'daughter(1,E)',
-    #    'daughter(1,mcE)',
-    #    'daughter(1,E_uncertainty)',
-    #    'daughter(1,M)',
-    #    'daughter(1,InvM)',
 ]
 
 analysis_main.add_module('VariablesToNtuple',
@@ -114,8 +76,6 @@ analysis_main.add_module('VariablesToNtuple',
 
 summaryOfLists(['B0:jpsiks'])
 
-# Process the events
 process(analysis_main)
 
-# print out the summary
 print(statistics)

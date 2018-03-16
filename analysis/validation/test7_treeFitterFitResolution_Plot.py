@@ -25,7 +25,6 @@ for iFile in workingFiles:
 
 outputFile = ROOT.TFile("test7_TreeFitterOutput.root", "RECREATE")
 
-debug = False
 RangeMicrons = 100
 RangePull = 5
 nBins = 50
@@ -78,11 +77,11 @@ histOperationStrings = [
     "(x - mcDX) / x_uncertainty>>B0_vertex_pullx_s",
     "(y - mcDY) / y_uncertainty>>B0_vertex_pully_s",
     "(z - mcDZ) / z_uncertainty>>B0_vertex_pullz_s",
-    "(x - mcDX)*10000>>B0_vertex_resolutionx_s",  # B0 vertex in micrometer
-    "(y - mcDY)*10000>>B0_vertex_resolutiony_s",  # B0 vertex in micrometer
-    "(z - mcDZ)*10000>>B0_vertex_resolutionz_s",  # B0 vertex in micrometer
-    "chiProb>>pVal_s",  # B0 vertex in micrometer
-    "chiProb>>pVal_b",  # B0 vertex in micrometer
+    "(x - mcDX)*10000>>B0_vertex_resolutionx_s",
+    "(y - mcDY)*10000>>B0_vertex_resolutiony_s",
+    "(z - mcDZ)*10000>>B0_vertex_resolutionz_s",
+    "chiProb>>pVal_s",
+    "chiProb>>pVal_b",
 ]
 
 drawToNewHist = chain.Draw

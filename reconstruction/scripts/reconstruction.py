@@ -255,6 +255,8 @@ def add_arich_modules(path, components=None):
         arich_fillHits = register_module('ARICHFillHits')
         path.add_module(arich_fillHits)
         arich_rec = register_module('ARICHReconstructor')
+        # enabled for ARICH DQM plots
+        arichRecon.param('storePhotons', 1)
         path.add_module(arich_rec)
 
 

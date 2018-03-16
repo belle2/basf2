@@ -28,13 +28,6 @@ namespace Belle2 {
    */
   class TRGSummary : public TObject {
 
-  private:
-
-    /**
-     * version of this code
-     */
-    static const int c_Version = 1;
-
   public:
 
     /** types of trigger timing source defined in b2tt firmware */
@@ -150,6 +143,11 @@ namespace Belle2 {
     }
 
   private:
+
+    /**
+     * version of this code
+     */
+    static const int c_Version = 1;
 
     /** input bits from subdetectors */
     unsigned int m_inputBits[10] = {0};

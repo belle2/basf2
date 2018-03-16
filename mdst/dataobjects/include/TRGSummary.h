@@ -24,7 +24,7 @@ namespace Belle2 {
    *   psnm (Prescale and Mask) bits
    *     prescaled ftdl bits
    *   timType
-   *     4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON
+   *     types of trigger timing source defined in b2tt firmware
    */
   class TRGSummary : public TObject {
 
@@ -33,7 +33,44 @@ namespace Belle2 {
     /**
      * version of this code
      */
-    static const int c_Version = 0;
+    static const int c_Version = 1;
+
+  public: //enum
+    /** types of trigger timing source defined in b2tt firmware */
+    enum timingType {
+      /** events triggered by top timing */
+      TTYP_PID0 = 0,
+      /** events triggered by top timing */
+      TTYP_PID1 = 4,
+      /** events triggered by top timing */
+      TTYP_PID2 = 8,
+      /** events triggered by top timing */
+      TTYP_PID3 = 12,
+      /** reserved (not defined yet) */
+      TTYP_RSV0 = 2,
+      /** reserved (not defined yet) */
+      TTYP_RSV1 = 6,
+      /** reserved (not defined yet) */
+      TTYP_RSV2 = 10,
+      /** reserved (not defined yet) */
+      TTYP_RSV3 = 14,
+      /** events triggered by ecl timing */
+      TTYP_ECL = 1,
+      /** events triggered by cdc timing */
+      TTYP_CDC = 3,
+      /** delayed physics events for background */
+      TTYP_DPHY = 5,
+      /** random trigger events */
+      TTYP_RAND = 7,
+      /** test pulse input */
+      TTYP_TEST = 9,
+      /** reserved (not defined yet) */
+      TTYP_RSV4 = 11,
+      /** f also used for begin-run */
+      TTYP_RSV5 = 13,
+      /** reserved (not defined yet) */
+      TTYP_NONE = 15
+    };
 
   public:
 
@@ -44,7 +81,7 @@ namespace Belle2 {
     TRGSummary(unsigned int inputBits[10],
                unsigned int ftdlBits[10],
                unsigned int psnmBits[10],
-               unsigned int timType)
+               timingType timType)
     {
       for (int i = 0; i < 10; i++) {
         m_inputBits[i] = inputBits[i];
@@ -106,9 +143,9 @@ namespace Belle2 {
     }
 
     /*! get timing source information
-     * @return     timing source
+     * @return     timing source type
      */
-    unsigned int getTimType() const
+    timingType getTimType() const
     {
       return m_timType;
     }
@@ -126,17 +163,8 @@ namespace Belle2 {
      */
     unsigned int m_psnmBits[10] = {0};
 
-    /*! source of trigger timing defined in b2tt firmware
-     * @ 0,4,8,12: events triggered by top timing
-     * @ 2,6,10,11,13,14: reserved (not defined yet)
-     * @ 1: events triggered by ecl timing
-     * @ 3: events triggered by cdc timing
-     * @ 5: delayed physics events for background
-     * @ 7: random trigger
-     * @ 9: test pulse input
-     * @ 15: 15 is also used for begin-run
-     */
-    unsigned int m_timType = 0;
+    /** types of trigger timing source defined in b2tt firmware */
+    timingType m_timType;
 
     /** the prescale factor of each bit*/
     unsigned int m_prescaleBits[10][32] = {0};

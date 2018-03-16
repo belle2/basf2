@@ -76,11 +76,10 @@ void ECLTrackBremFinderModule::event()
     ECLCluster* primaryClusterOfTrack = nullptr;
     auto relatedClustersToTrack =
       track.getRelationsWith<ECLCluster>
-      (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (has to be 6 or rather c_neutralHadron for electron)!!
+      (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (take c_nPhotons hypothesis)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
-      int particleHypothesisID = relatedCluster.getHypothesisId();
-      // todo: check this if other hypothesis than nPhotons and neutralHadron
-      if (particleHypothesisID == ECLCluster::c_neutralHadron) {
+      auto particleHypothesisID = relatedCluster.getHypothesisId();
+      if (particleHypothesisID == ECLCluster::c_nPhotons) {
         primaryClusterOfTrack = &relatedCluster;
       }
     }
@@ -103,7 +102,7 @@ void ECLTrackBremFinderModule::event()
       //check if the cluster belongs to a photon or electron
       int particleHypothesisID = cluster.getHypothesisId();
       if (particleHypothesisID != ECLCluster::c_nPhotons) {
-        B2DEBUG(20, "Cluster has not the hypothesis of an electron!");
+        B2DEBUG(20, "Cluster has wrong hypothesis!");
         continue;
       }
 

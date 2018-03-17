@@ -173,7 +173,7 @@ namespace Belle2 {
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
 
-      /// vector of shell ids and their placements in top volume
+      /// Map of shell ids and their placements in top volume
       std::map<VxdID, TGeoHMatrix> m_halfShellPlacements {};
       /// Map of shell ids and their associated ladder ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};

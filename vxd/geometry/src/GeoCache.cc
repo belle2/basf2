@@ -212,25 +212,21 @@ namespace Belle2 {
 
     void GeoCache::addSensorPlacement(VxdID ladder, VxdID sensor, const G4Transform3D& placement)
     {
-      auto sensorsPlacements = m_sensorPlacements.find(ladder);
-      if (sensorsPlacements == m_sensorPlacements.end())
-        m_sensorPlacements.insert(std::make_pair(ladder, std::vector<std::pair<VxdID, TGeoHMatrix>>()));
-
       m_sensorPlacements[ladder].push_back(std::make_pair(sensor, g4Transform3DToTGeo(placement)));
     }
 
     void GeoCache::addLadderPlacement(VxdID halfShell, VxdID ladder, const G4Transform3D& placement)
     {
-      auto laddersPlacements = m_ladderPlacements.find(halfShell);
-      if (laddersPlacements == m_ladderPlacements.end())
-        m_ladderPlacements.insert(std::make_pair(halfShell, std::vector<std::pair<VxdID, TGeoHMatrix>>()));
-
       m_ladderPlacements[halfShell].push_back(std::make_pair(ladder, g4Transform3DToTGeo(placement)));
+      // Add the (empty) container for sensor placements inside this ladder
+      m_sensorPlacements[ladder] = std::vector<std::pair<VxdID, TGeoHMatrix>>();
     }
 
     void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement)
     {
       m_halfShellPlacements[halfShell] = g4Transform3DToTGeo(placement);
+      // Add the (empty) container for ladder placements inside this halfshell
+      m_ladderPlacements[halfShell] = std::vector<std::pair<VxdID, TGeoHMatrix>>();
     }
 
     const map<VxdID, TGeoHMatrix>& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}

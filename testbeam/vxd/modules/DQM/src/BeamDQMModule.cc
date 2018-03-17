@@ -148,8 +148,8 @@ void BeamDQMModule::event()
       // don't make much sense otherwise.
       if (fs->getNdf() < 3)
         continue;
-      for (unsigned int i = 0; i < track->getNumPoints(); ++i) {
-        const genfit::TrackPoint* tp = track->getPoint(i);
+      for (unsigned int j = 0; j < track->getNumPoints(); ++j) {
+        const genfit::TrackPoint* tp = track->getPoint(j);
         if (!tp->hasRawMeasurements())
           continue;
 

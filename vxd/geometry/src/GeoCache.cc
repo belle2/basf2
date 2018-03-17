@@ -228,9 +228,12 @@ namespace Belle2 {
       m_ladderPlacements[halfShell].push_back(std::make_pair(ladder, g4Transform3DToTGeo(placement)));
     }
 
-    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement) {m_halfShellPlacements.push_back(std::make_pair(halfShell, g4Transform3DToTGeo(placement)));}
+    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement)
+    {
+      m_halfShellPlacements[halfShell] = g4Transform3DToTGeo(placement);
+    }
 
-    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
+    const map<VxdID, TGeoHMatrix>& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
 
     const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getSensorPlacements(VxdID ladder) const
     {

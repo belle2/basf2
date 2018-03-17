@@ -511,7 +511,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops<PXDCluster, PXDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
+          if (not std::isinf(m_useNLoops) and not isWithinNLoops<PXDCluster, PXDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -576,7 +576,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops<SVDCluster, SVDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
+          if (not std::isinf(m_useNLoops) and not isWithinNLoops<SVDCluster, SVDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -672,7 +672,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops<CDCHit, CDCSimHit>(Bz, cdcHit, m_useNLoops)) {
+          if (not std::isinf(m_useNLoops) and not isWithinNLoops<CDCHit, CDCSimHit>(Bz, cdcHit, m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 

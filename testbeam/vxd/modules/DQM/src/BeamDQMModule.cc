@@ -73,8 +73,8 @@ BeamDQMModule::BeamDQMModule() : HistoModule(),
 
 void BeamDQMModule::initialize()
 {
-  StoreArray<PXDTrueHit>::optional();
-  StoreArray<genfit::TrackCand>::optional();
+  StoreArray<PXDTrueHit> PXDTrueHit;  PXDTrueHit.isOptional()
+  StoreArray<genfit::TrackCand> TrackCand;  TrackCand.isOptional();
   //RbTupleManager::Instance().register_module(this);
   REG_HISTOGRAM
 }

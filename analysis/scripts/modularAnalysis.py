@@ -14,6 +14,7 @@ from vertex import *
 from analysisPath import *
 from variables import variables
 import basf2_mva
+import ROOT
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -139,8 +140,9 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     if environmentType in environToMagneticField:
         fieldType = environToMagneticField[environmentType]
         if fieldType is not None:
-            path.add_module('Gearbox')
-            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
+            field = ROOT.Belle2.MagneticField()
+            field.addComponent(ROOT.Belle2.MagneticFieldComponentConstant(ROOT.Belle2.B2Vector3D(0, 0, 1.5 * ROOT.Belle2.Unit.T)))
+            ROOT.Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:

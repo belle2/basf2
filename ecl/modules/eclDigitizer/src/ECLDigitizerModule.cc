@@ -304,7 +304,9 @@ void ECLDigitizerModule::event()
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
-      eclDigit->setChi(chi);
+      if (qualityFit == 2)
+        eclDigit->setChi(chi);
+      else eclDigit->setChi(0);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }

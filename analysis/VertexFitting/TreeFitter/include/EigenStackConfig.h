@@ -25,10 +25,15 @@
 */
 
 
-#ifdef __GNUC__
-#ifndef __clang__ //clang defines the GNU macros ...
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
+#if defined(__GNUC__) && !defined(__clang__)
+#define TREEFITTER_NO_STACK_WARNING \
+  _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Wstack-usage=\"")
+#define TREEFITTER_RESTORE_WARNINGS \
+  _Pragma("GCC diagnostic pop")
+#else
+#define TREEFITTER_NO_STACK_WARNING
+#define TREEFITTER_RESTORE_WARNINGS
 #endif
 
 #define MAX_MATRIX_SIZE 100

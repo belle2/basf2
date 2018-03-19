@@ -53,12 +53,12 @@ namespace TreeFitter {
     fitparams->getStateVector()(momindex) = recoP.X();
     fitparams->getStateVector()(momindex + 1) = recoP.Y();
     fitparams->getStateVector()(momindex + 2) = recoP.Z();
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::initCovariance(FitParams* fitparams) const
@@ -104,7 +104,7 @@ namespace TreeFitter {
     }
 
     m_cached = true;
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const

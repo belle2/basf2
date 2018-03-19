@@ -382,7 +382,7 @@ namespace TreeFitter {
     p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
     p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
@@ -406,13 +406,13 @@ namespace TreeFitter {
     p.getH()(0, momindex + 2) = 2.0 * pz;
     p.getH()(0, momindex + 3) = -2.0 * E;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode ParticleBase::projectConstraint(Constraint::Type, const FitParams&, Projection&) const
   {
     B2FATAL("Trying to project constraint of ParticleBase type. This is undefined.");
-    return ErrCode::badsetup;
+    return ErrCode(ErrCode::Status::badsetup);
   }
 
   double ParticleBase::bFieldOverC() //FT: (to do) BField is already called in RecoTrack, unify
@@ -442,7 +442,7 @@ namespace TreeFitter {
       fitparams->getStateVector()(tauindex) = value;
     }
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 } //end namespace TreeFitter
 

@@ -60,12 +60,12 @@ namespace TreeFitter {
 
     fitparams->getStateVector()(momindex + 3) = energy ;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::initCovariance(FitParams* fitparams) const
@@ -112,7 +112,7 @@ namespace TreeFitter {
     m_clusterPars(2) = cluster_pos.Z();
     m_clusterPars(3) = cluster->getEnergy();
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
@@ -192,7 +192,7 @@ namespace TreeFitter {
     p.getH()(2, momindex + i3) = -1. * p_vec[i3] / mom;
     p.getH()(2, momindex + 3) = -1;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
 }

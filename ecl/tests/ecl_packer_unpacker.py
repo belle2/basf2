@@ -6,8 +6,9 @@
 from basf2 import *
 from ROOT import Belle2
 from unittest import TestCase
-
+from ROOT import gRandom
 import simulation
+import itertools
 
 set_random_seed(42)
 
@@ -15,10 +16,56 @@ eclDigitsDatastoreName = 'ECLDigits'
 unpackerOutputDatastoreName = 'someECLUnpackerDatastoreName'
 
 
-class ECLPackerUnpackerTestModule(Module):
-
+class addECLDigitsModule(Module):
     """
-    module which checks if two collection of ECLDigits are equal
+    Adds ECLDigits with very large/small time/amplitude values
+    """
+
+    def __init__(self):
+        super().__init__()
+        amps = [0, 1, 100000, 200000]
+        times = [0, 1, 1000, 4095]
+        qualitys = [0, 1, 2, 3]
+        chis = [0, 1, 2, 3, 4, 5]
+        paramNames = ["amp", "time", "quality", "chi"]
+        self.digitParams = [dict(zip(paramNames, params)) for params in itertools.product(amps, times, qualitys, chis)]
+
+    def event(self):
+        """
+        event function
+        """
+        eclDigitsFromSimulation = Belle2.PyStoreArray(eclDigitsDatastoreName)
+
+        # Check for used cellIds
+        usedCellIds = list(map(lambda eclDigit: eclDigit.getCellId(), eclDigitsFromSimulation))
+
+        # Create new ECLDigits and add them to datastore
+        for digitParam in self.digitParams:
+
+            # Choose cellId that's not already used
+            cellId = int(gRandom.Uniform(1, 8736))
+            while cellId in usedCellIds:
+                cellId = int(gRandom.Uniform(1, 8736))
+
+            usedCellIds.append(cellId)
+            # Create new ECLDigit
+            eclDigit = Belle2.ECLDigit()
+
+            # Fill ECLDigit
+            eclDigit.setCellId(cellId)
+            eclDigit.setAmp(digitParam['amp'])
+            eclDigit.setTimeFit(digitParam['time'])
+            eclDigit.setQuality(digitParam['quality'])
+            eclDigit.setChi(digitParam['chi'])
+
+            # Add ECLDigit to datastore
+            newDigit = eclDigitsFromSimulation.appendNew()
+            newDigit.__assign__(eclDigit)
+
+
+class ECLPackerUnpackerTestModule(Module):
+    """
+    module which checks if two collections of ECLDigits are equal
     """
 
     def sortECLDigits(self, unsortedPyStoreArray):
@@ -57,6 +104,27 @@ class ECLPackerUnpackerTestModule(Module):
             digit = eclDigitsFromSimulation[idx]
             digitPackedUnpacked = eclDigitsPackedUnpacked[idx]
 
+            B2DEBUG(5, 'MC digit: cellid = ' +
+                    str(digit.getCellId()) +
+                    ', amp = ' +
+                    str(digit.getAmp()) +
+                    ', time = ' +
+                    str(digit.getTimeFit()) +
+                    ', quality = ' +
+                    str(digit.getQuality()) +
+                    ', getChi = ' +
+                    str(digit.getChi()) +
+                    '\nUnpackedDigit: cellid = ' +
+                    str(digitPackedUnpacked.getCellId()) +
+                    ', amp = ' +
+                    str(digitPackedUnpacked.getAmp()) +
+                    ', time = ' +
+                    str(digitPackedUnpacked.getTimeFit()) +
+                    ', quality = ' +
+                    str(digitPackedUnpacked.getQuality()) +
+                    ', getChi = ' +
+                    str(digitPackedUnpacked.getChi()))
+
             tc.assertEqual(digit.getCellId(), digitPackedUnpacked.getCellId())
             tc.assertEqual(digit.getAmp(), digitPackedUnpacked.getAmp())
             tc.assertEqual(digit.getTimeFit(), digitPackedUnpacked.getTimeFit())
@@ -79,6 +147,9 @@ main.add_module(particlegun)
 # add simulation for ECL only
 simulation.add_simulation(main, components=['ECL'])
 
+# Add ECLDigits with wide range of amp, time, quality, chi2
+# main.add_module(addECLDigitsModule())
+
 # add the packer which packs the ECLDigits from the simulation
 ecl_packer = register_module('ECLPacker')
 main.add_module(ecl_packer)
@@ -90,7 +161,10 @@ ecl_unpacker.param('ECLDigitsName', unpackerOutputDatastoreName)
 main.add_module(ecl_unpacker)
 
 # Run test module to check if the original ECLDigits and the ones that were packed and unpacked are identical
-main.add_module(ECLPackerUnpackerTestModule())
+eclPackUnpackerChecker = ECLPackerUnpackerTestModule()
+logLevel = LogLevel.INFO  # LogLevel.DEBUG
+main.add_module(eclPackUnpackerChecker, logLevel=logLevel)
+
 
 # Process events
 process(main)

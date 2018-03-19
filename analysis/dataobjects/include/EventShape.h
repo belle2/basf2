@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Michel Hernandez Villanueva                              *
+ * Contributors: Michel Hernandez Villanueva, Ami Rostomyan               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,7 +23,7 @@ namespace Belle2 {
   /**
    * Class for collecting variables related to the thrust of the event.
    *
-   * Mainly used to compute the thrust of a tau-taubar event.
+   * Mainly used to compute the thrust, missing momentum/energy/mass of qqbar continuum and tau-taubar events.
    */
 
   class EventShape : public RelationsObject {
@@ -34,7 +34,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_thrust(0.0), m_missingMomentum(0.0, 0.0, 0.0) {};
+    EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_thrust(0.0), m_missingMomentumCMS(0.0, 0.0, 0.0), m_missingMomentum(0.0, 0.0, 0.0) {};
 
     // setters
     /**
@@ -44,20 +44,26 @@ namespace Belle2 {
      */
     void addThrustAxis(TVector3 thrustAxis);
 
-    // setters
-    /**
-     * Add the missing momentum value.
-     *
-     * @param TVector3 missing momentum
-     */
-    void addMissingMomentum(TVector3 missingMomentum);
-
     /**
      * Add magnitude of thrust.
      *
      * @param Float magnitude of thrust
      */
     void addThrust(float thrust);
+
+    /**
+     * Add the missing momentum vector in CMS.
+     *
+     * @param TVector3 missing momentum
+     */
+    void addMissingMomentumCMS(TVector3 missingMomentumCMS);
+
+    /**
+     * Add the missing momentum vector in lab.
+     *
+     * @param TVector3 missing momentum
+     */
+    void addMissingMomentum(TVector3 missingMomentum);
 
     // getters
     /**
@@ -71,33 +77,43 @@ namespace Belle2 {
     }
 
     /**
-     * Get missing momentum vector.
-     *
-     * @return TVector3 missing momentum
-     */
-    TVector3 getMissingMomentum(void) const
-    {
-      return m_missingMomentum;
-    }
-
-    /**
-     * Get magnitude of thrust.
-     *
-     * @return Float magnitude of thrust
-     */
+        * Get magnitude of thrust.
+        *
+        * @return Float magnitude of thrust
+        */
     float getThrust(void) const
     {
       return m_thrust;
+    }
+
+    /**
+     * Get missing momentum vector in CMS.
+     *
+     * @return TVector3 missing momentum
+     */
+    TVector3 getMissingMomentumCMS(void) const
+    {
+      return m_missingMomentumCMS;
+    }
+
+    /**
+    * Get missing momentum vector in lab.
+    *
+    * @return TVector3 missing momentum
+    */
+    TVector3 getMissingMomentum(void) const
+    {
+      return m_missingMomentum;
     }
 
   private:
 
     // persistent data members
     TVector3 m_thrustAxis; /**< Thrust axis */
-
     float m_thrust;   /**< magnitude of thrust */
 
-    TVector3 m_missingMomentum; /**< Missing momentum of the event */
+    TVector3 m_missingMomentumCMS; /**< Missing momentum of the event in CMS*/
+    TVector3 m_missingMomentum; /**< Missing momentum of the event in lab*/
 
     ClassDef(EventShape, 1) /**< class definition */
 

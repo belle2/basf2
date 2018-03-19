@@ -47,7 +47,7 @@ namespace Belle2 {
     /** free memory */
     virtual ~EventShapeModule();
 
-    /** Define the physical parameters. llok for them in database. */
+    /** Define the physical parameters. look for them in database. */
     virtual void initialize();
 
     /** Define run parameters. */
@@ -68,10 +68,12 @@ namespace Belle2 {
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
     /** Get all momenta and then calculate the thrust for this event */
-    TVector3 getThrustOfEvent(std::vector<TVector3> forthrust);
-    TVector3 getMissingMomentum(std::vector<TVector3> forthrust);
-    std::vector<TVector3> getParticleList(std::vector<std::string> particleLists);
+    std::vector<TVector3> particleMomentumList, particleMomentumListCMS;
+    void getParticleMomentumLists(std::vector<std::string> particleLists);
 
+    TVector3 getThrustOfEvent();
+    TVector3 getMissingMomentumCMS();
+    TVector3 getMissingMomentum();
   };
 }
 

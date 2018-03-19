@@ -8,17 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ReferenceFrame.h>
+
 #include <analysis/modules/EventShape/EventShapeModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShape.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -68,14 +65,18 @@ void EventShapeModule::event()
 {
   StoreObjPtr<EventShape> eventShape;
   if (!eventShape) eventShape.create();
-  vector<TVector3> listOfParticles = EventShapeModule::getParticleList(m_particleLists);
+  EventShapeModule::getParticleMomentumLists(m_particleLists);
 
-  TVector3 thrustAxis = EventShapeModule::getThrustOfEvent(listOfParticles);
+  TVector3 thrustAxis = EventShapeModule::getThrustOfEvent();
   eventShape->addThrustAxis(thrustAxis);
   eventShape->addThrust(thrustAxis.Mag());
 
-  TVector3 missingMomentum = EventShapeModule::getMissingMomentum(listOfParticles);
-  B2INFO("Missing " << missingMomentum.Mag());
+  TVector3 missingMomentumCMS = EventShapeModule::getMissingMomentumCMS();
+//  B2INFO("Missing momentum in CMS" << missingMomentumCMS.Mag());
+  eventShape->addMissingMomentumCMS(missingMomentumCMS);
+
+  TVector3 missingMomentum = EventShapeModule::getMissingMomentum();
+//  B2INFO("Missing momentum in lab" << missingMomentum.Mag());
   eventShape->addMissingMomentum(missingMomentum);
 }
 
@@ -87,44 +88,60 @@ void EventShapeModule::terminate()
 {
 }
 
-vector<TVector3> EventShapeModule::getParticleList(vector<string> particleLists)
+void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
 {
-  int nParticleLists = particleLists.size();
-  B2INFO("Number of ParticleLists to calculate Event Shape variables: " << nParticleLists << " ");
   PCmsLabTransform T;
-  vector<TVector3> forthrust;
+  const auto& frame = ReferenceFrame::GetCurrent();
+
+  int nParticleLists = particleLists.size();
+  B2INFO("Number of ParticleLists to calculate Event Shape variables: " << nParticleLists);
+
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
-    string ParticleListName = particleLists[i_pl];
-    B2DEBUG(10, "ParticleList " << ParticleListName);
-    StoreObjPtr<ParticleList> plist(ParticleListName);
+    string particleListName = particleLists[i_pl];
+    B2DEBUG(10, "ParticleList " << particleListName);
+    StoreObjPtr<ParticleList> plist(particleListName);
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
-      B2DEBUG(19, "    Mdst source " << part->getMdstSource());
-      if (part->getTrack())
-        B2DEBUG(19, "    Track index: " << part->getTrack()->getArrayIndex());
-      TVector3 p = part->getMomentum();
+      double px = frame.getMomentum(part).Px();
+      double py = frame.getMomentum(part).Py();
+      double pz = frame.getMomentum(part).Pz();
+      TVector3 p(px, py, pz);
+
       TLorentzVector p_lab = part->get4Vector();
+      particleMomentumList.push_back(p_lab.Vect());
+
       TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-      forthrust.push_back(p_cms.Vect());
+      particleMomentumListCMS.push_back(p_cms.Vect());
     }
   }
-  return forthrust;
+  return;
 }
 
-
-TVector3 EventShapeModule::getThrustOfEvent(vector<TVector3> forthrust)
+TVector3 EventShapeModule::getThrustOfEvent()
 {
-  TVector3 th = Thrust::calculateThrust(forthrust);
+  TVector3 th = Thrust::calculateThrust(particleMomentumListCMS);
   return th;
 }
 
-TVector3 EventShapeModule::getMissingMomentum(vector<TVector3> forthrust)
+TVector3 EventShapeModule::getMissingMomentumCMS()
 {
   TVector3 beamMomentumCM(0., 0., 0.);
-  int nParticles = forthrust.size();
+  int nParticles = particleMomentumListCMS.size();
   for (int i = 0; i < nParticles; ++i) {
-    beamMomentumCM -= forthrust.at(i);
+    beamMomentumCM -= particleMomentumListCMS.at(i);
   }
   return beamMomentumCM;
+}
+
+TVector3 EventShapeModule::getMissingMomentum()
+{
+  PCmsLabTransform T;
+  TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+  TVector3 beamMomentum = beam.Vect();
+  int nParticles = particleMomentumList.size();
+  for (int i = 0; i < nParticles; ++i) {
+    beamMomentum -= particleMomentumList.at(i);
+  }
+  return beamMomentum;
 }

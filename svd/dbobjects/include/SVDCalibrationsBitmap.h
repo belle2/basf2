@@ -31,14 +31,14 @@ namespace Belle2 {
     ~SVDCalibrationsBitmap() {};
     static inline calibrationType get(const payloadContainerType& svdBitmap, unsigned int strip)
     {
-      bitset<nBitsInBundle> bundle = svdBitmap.at(strip / (nBitsInBundle));
+      std::bitset<nBitsInBundle> bundle = svdBitmap.at(strip / (nBitsInBundle));
       return bundle[strip % nBitsInBundle];
     }
 
     static inline void set(payloadContainerType& svdBitmap, unsigned int strip,
                            calibrationType value)
     {
-      bitset<nBitsInBundle> bundle = svdBitmap.at(strip / (nBitsInBundle));
+      std::bitset<nBitsInBundle> bundle = svdBitmap.at(strip / (nBitsInBundle));
       bundle[strip % nBitsInBundle] = value;
       svdBitmap.at(strip / (nBitsInBundle)) =  bundle.to_ulong();
     }

@@ -31,7 +31,7 @@ namespace {
   }
 
   /** test VariableManager. */
-  TEST(VariableTest, Manager)
+  TEST(VariableTest, ManagerDeathTest)
   {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("THISDOESNTEXIST"));

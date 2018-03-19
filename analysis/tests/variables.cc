@@ -1185,7 +1185,7 @@ namespace {
 
   }
 
-  TEST_F(MetaVariableTest, NBDeltaIfMissing)
+  TEST_F(MetaVariableTest, NBDeltaIfMissingDeathTest)
   {
     //Variable got removed, test for absence
     EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)"));

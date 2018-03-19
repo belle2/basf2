@@ -1203,6 +1203,36 @@ namespace Belle2 {
 
 
 // Recoil Kinematics related ---------------------------------------------
+    double recoilPx(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Px();
+    }
+
+    double recoilPy(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Py();
+    }
+
+    double recoilPz(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Pz();
+    }
+
 
     double recoilMomentum(const Particle* particle)
     {
@@ -1580,6 +1610,14 @@ namespace Belle2 {
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
+
+    REGISTER_VARIABLE("pxRecoil", recoilPx,
+                      "component x of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pyRecoil", recoilPy,
+                      "component y of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pzRecoil", recoilPz,
+                      "component z of 3-momentum recoiling against given Particle");
+
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,

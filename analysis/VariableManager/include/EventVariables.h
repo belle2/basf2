@@ -165,6 +165,35 @@ namespace Belle2 {
     */
     double thrustOfEvent_Pz(const Particle*);
 
+    /**
+    * return the x component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Pz(const Particle*);
+
+    /**
+        * return the x component of the missing momentum of the event in CMS
+        */
+    double CMSmissingMomentumOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the missing momentum of the event in CMS
+    */
+    double CMSmissingMomentumOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the missing momentum of the event in CMS
+    */
+    double CMSmissingMomentumOfEvent_Pz(const Particle*);
   }
 } // Belle2 namespace
 

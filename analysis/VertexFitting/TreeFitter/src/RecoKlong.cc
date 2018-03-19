@@ -82,7 +82,7 @@ namespace TreeFitter {
     fitparams->getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::initParams()
@@ -139,10 +139,10 @@ namespace TreeFitter {
     } else {
       B2ERROR("Could not estimate highest momentum for klong constraint. Aborting this fit.\n px: "
               << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
-      return ErrCode(ErrCode::klongdimerror);
+      return ErrCode(ErrCode::Status::klongdimerror);
     }
 
-    if (0 == p_vec[i1]) { return ErrCode(ErrCode::klongdimerror); }
+    if (0 == p_vec[i1]) { return ErrCode(ErrCode::Status::klongdimerror); }
 
     // p_vec[i1] must not be 0
     const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];

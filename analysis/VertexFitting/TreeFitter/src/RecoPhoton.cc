@@ -91,7 +91,7 @@ namespace TreeFitter {
     fitparams->getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoPhoton::initParams()

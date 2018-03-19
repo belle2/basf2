@@ -72,7 +72,7 @@ namespace TreeFitter {
       fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
@@ -83,7 +83,7 @@ namespace TreeFitter {
               fitparams.getStateVector()(posindexmother),
               fitparams.getStateVector()(posindexmother + 1));
     // FIX ME: use helix poca to get estimate of flightlength first
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   } ;
 
   ErrCode RecoTrack::updateParams(double flt)

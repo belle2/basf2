@@ -198,12 +198,8 @@ namespace Belle2 {
     // find rough t0
 
     TOP1Dpdf pdf1d(reco, topTrack.getModuleID(), 1.0); // ~1 ns bin size
-    double t0_min = pdf1d.getTminFot() - pdf1d.getTmaxPDF() - 2 * pdf1d.getBinSize();
-    double t0_max = pdf1d.getTmaxFot() - pdf1d.getTminPDF();
-    int numBins = std::max(int((t0_max - t0_min) / pdf1d.getBinSize()), 3);
-    t0_max = t0_min + numBins * pdf1d.getBinSize();
-
-    Chi2MinimumFinder1D roughFinder(numBins, t0_min, t0_max);
+    Chi2MinimumFinder1D roughFinder(pdf1d.getNumBinsT0(), pdf1d.getMinT0(),
+                                    pdf1d.getMaxT0());
     const auto& bins = roughFinder.getBinCenters();
     for (unsigned i = 0; i < bins.size(); i++) {
       double t0 = bins[i];

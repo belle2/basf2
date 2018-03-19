@@ -92,6 +92,24 @@ namespace Belle2 {
       double getTmaxFot() const {return m_tmaxFot;}
 
       /**
+       * Returns lower edge of the T0 search region
+       * @return lower edge
+       */
+      double getMinT0() const {return m_minT0;}
+
+      /**
+       * Returns upper edge of the T0 search region
+       * @return upper edge
+       */
+      double getMaxT0() const {return m_maxT0;}
+
+      /**
+       * Returns number of bins the T0 search region. Bin size is the same as for PDF.
+       * @return number of bins
+       */
+      int getNumBinsT0() const {return m_numBinsT0;}
+
+      /**
        * Returns log likelihood
        * @param timeShift time shift of PDF
        * @return log likelihood
@@ -111,6 +129,9 @@ namespace Belle2 {
       double m_tmaxPDF = 0; /**< maximal time of signal PDF */
       double m_tminFot = 0; /**< minimal time of photons */
       double m_tmaxFot = 0; /**< maximal time of photons */
+      double m_minT0 = 0;   /**< minimal T0 */
+      double m_maxT0 = 0;   /**< maximal T0 */
+      int m_numBinsT0 = 0;  /**< number of bins for T0 finder w/ same bin size as PDF */
       double m_bkg = 0;     /**< background [photons/bin] */
 
       double m_binSize = 0;        /**< bin size */

@@ -72,6 +72,12 @@ namespace Belle2 {
         }
       }
 
+      // T0 search region
+      m_minT0 = m_tminFot - m_tmaxPDF - 2 * m_binSize;
+      double maxT0 = m_tmaxFot - m_tminPDF;
+      m_numBinsT0 = std::max(int((maxT0 - m_minT0) / m_binSize), 3) + 1;
+      m_maxT0 = m_minT0 + m_binSize * m_numBinsT0;
+
     }
 
 

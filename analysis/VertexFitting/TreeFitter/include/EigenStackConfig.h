@@ -23,5 +23,12 @@
  * in the Kalman class beeing 300kb big.
  * 120x120 already exceeds the Eigen limit (for a single matrix).
 */
+
+
+#ifdef __GNUC__
+#ifndef __clang__ //clang defines the GNU macros ...
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
+#endif
+
 #define MAX_MATRIX_SIZE 100

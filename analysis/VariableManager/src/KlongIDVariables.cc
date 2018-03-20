@@ -157,8 +157,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("klong_isForwardEKLM"  , particleKLMisForwardEKLM     , "Is the corresponding KLM cluster from Forward EKLM.");
     REGISTER_VARIABLE("klong_isBackwardEKLM" , particleKLMisBackwardEKLM    , "Is the corresponding KLM cluster from Backward EKLM.");
     REGISTER_VARIABLE("klong_isBKLM"         , particleKLMisBKLM            , "Is the corresponding KLM cluster from BKLM.");
-    REGISTER_VARIABLE("klong_Phi"            , particleKLMgetPhi            , "Angle::Phi");
-    REGISTER_VARIABLE("klong_Theta"          , particleKLMgetTheta          , "Angle::Theta");
+    REGISTER_VARIABLE("klong_Phi"            , particleKLMgetPhi            , "get the phi coordinate of the corresponding KLMCluster");
+    REGISTER_VARIABLE("klong_Theta"          , particleKLMgetTheta          ,
+                      "get the theta component of the corresponding KLMCluster.");
     REGISTER_VARIABLE("klong_Nlayers"        , particleKLMgetNLayers        , "Number of Layers in the cluster.");
     REGISTER_VARIABLE("klong_InnermostLayer" , particleKLMgetInnermostLayer , "Number of the first hit layer");
     REGISTER_VARIABLE("klong_Time"           , particleKLMgetTime           ,

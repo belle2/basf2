@@ -273,7 +273,6 @@ def add_cdst_output(
         'TOPLikelihoods',
         'ECLDigits',
         'ECLCalDigits',
-        'ECLShowers',
         'ECLEventInformation',
         'TRGECLClusters',
         'BKLMHit2ds',

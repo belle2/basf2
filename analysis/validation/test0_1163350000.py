@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor: B0--> D*+ tau- nu with generic Btag decay
+# Descriptor: B0--> D*+ tau- nu with  Btag to D pi decay
 
 """
 <header>
@@ -31,7 +31,6 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
-# generate BBbar events
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/1163350000.dec'))
 main.add_module(evtgeninput)

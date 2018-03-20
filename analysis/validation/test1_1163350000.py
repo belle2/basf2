@@ -12,8 +12,8 @@
 #######################################################
 #
 # This script demonstrates how to reconstruct Btag using
-# generically trained FEI and how to validate D(*)+tau- v and D(*)
-#  Release required: release-01-00-01
+# generically trained FEI and how to validate D(*)+tau- v and D(*) modes. The Btag is forced to a hadronic mode.
+#  Release required: release-01-00-01 or later
 #
 ######################################################
 import sys

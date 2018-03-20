@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor: B+--> D*0 tau- nu with generic Btag decay
+# Descriptor: B+--> D*0 tau- nu with  Btag to D pi decay
 
 
 """

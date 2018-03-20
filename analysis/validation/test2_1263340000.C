@@ -22,7 +22,7 @@
 
 const char *contact = "rcheaib@olemiss.edu, mario.merola@na.infn.it"; 
 
-void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
+void plotUpsHad( TTree* ptree, TFile *outputFile){
 
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
@@ -169,7 +169,7 @@ void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
 }
 
 
-void plotDzero(TFile* pfile, TTree* ptree, TFile *outputFile){
+void plotDzero(TTree* ptree, TFile *outputFile){
 
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
@@ -233,8 +233,8 @@ void test2_1263340000(){
   TFile* outputFile = new TFile("1263340000_Validation.root","RECREATE");
   
   TString Cuts= "";
-  plotUpsHad(sample, treeUpsHad, outputFile );
-  plotDzero(sample,treeD0,outputFile);
+  plotUpsHad(treeUpsHad, outputFile );
+  plotDzero(treeD0,outputFile);
   outputFile->Close();
 
 }

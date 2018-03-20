@@ -24,7 +24,7 @@
 
 const char *contact = "rcheaib@olemiss.edu, mario.merola@na.infn.it"; 
 
-void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
+void plotUpsHad( TTree* ptree, TFile *outputFile){
 
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
@@ -223,7 +223,7 @@ void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
 }
 
 
-void plotDplus(TFile* pfile, TTree* ptree, TFile *outputFile){
+void plotDplus( TTree* ptree, TFile *outputFile){
 
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
@@ -286,7 +286,7 @@ void plotDplus(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode5->Write();
   h_DmassNoCut_Mode6->Write();
 }
-void plotDzero(TFile* pfile, TTree* ptree, TFile *outputFile){
+void plotDzero( TTree* ptree, TFile *outputFile){
 
   gStyle->SetOptStat(0);
   gStyle->SetHistMinimumZero();
@@ -351,9 +351,9 @@ void test2_1163350000(){
   TFile* outputFile = new TFile("1163350000_Validation.root","RECREATE");
   
   TString Cuts= "";
-  plotUpsHad(sample, treeUpsHad, outputFile );
-  plotDzero(sample,treeD0,outputFile);
-  plotDplus(sample,treeDplus,outputFile);
+  plotUpsHad( treeUpsHad, outputFile );
+  plotDzero(treeD0,outputFile);
+  plotDplus(treeDplus,outputFile);
   outputFile->Close();
 
 }

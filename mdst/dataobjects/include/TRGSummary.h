@@ -161,7 +161,7 @@ namespace Belle2 {
     unsigned int m_psnmBits[10] = {0};
 
     /** types of trigger timing source defined in b2tt firmware */
-    ETimingType m_timType;
+    ETimingType m_timType = 15;
 
     /** the prescale factor of each bit*/
     unsigned int m_prescaleBits[10][32] = {0};

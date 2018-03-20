@@ -47,5 +47,10 @@ namespace Belle2 {
     /** get timing */
     float particleKLMgetTime(const Particle* particle);
 
+    /** get theta of the correspondig KLMCluster */
+    float particleKLMgetTheta(const Particle* particle);
+
+    /** get phi of the correspondig KLMCluster */
+    float particleKLMgetPhi(const Particle* particle);
   }
 }

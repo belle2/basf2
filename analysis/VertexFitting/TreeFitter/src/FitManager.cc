@@ -102,12 +102,12 @@ namespace TreeFitter {
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
               m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
-              m_errCode = ErrCode::fastdivergingfit;
+              m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
-              m_errCode = ErrCode::slowdivergingfit;
+              m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
             } else if (deltachisq > 0) {
             }

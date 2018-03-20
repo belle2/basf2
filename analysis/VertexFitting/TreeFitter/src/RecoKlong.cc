@@ -60,12 +60,12 @@ namespace TreeFitter {
 
     fitparams->getStateVector()(momindex + 3) = energy ;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::initCovariance(FitParams* fitparams) const
@@ -82,7 +82,7 @@ namespace TreeFitter {
     fitparams->getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::initParams()
@@ -112,7 +112,7 @@ namespace TreeFitter {
     m_clusterPars(2) = cluster_pos.Z();
     m_clusterPars(3) = cluster->getEnergy();
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoKlong::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
@@ -139,10 +139,10 @@ namespace TreeFitter {
     } else {
       B2ERROR("Could not estimate highest momentum for klong constraint. Aborting this fit.\n px: "
               << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
-      return ErrCode(ErrCode::klongdimerror);
+      return ErrCode(ErrCode::Status::klongdimerror);
     }
 
-    if (0 == p_vec[i1]) { return ErrCode(ErrCode::klongdimerror); }
+    if (0 == p_vec[i1]) { return ErrCode(ErrCode::Status::klongdimerror); }
 
     // p_vec[i1] must not be 0
     const double elim = (m_clusterPars[i1] - x_vertex[i1]) / p_vec[i1];
@@ -192,7 +192,7 @@ namespace TreeFitter {
     p.getH()(2, momindex + i3) = -1. * p_vec[i3] / mom;
     p.getH()(2, momindex + 3) = -1;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
 }

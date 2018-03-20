@@ -91,8 +91,8 @@ void TreeFitterModule::terminate()
   if (m_nCandidatesAfter > 0) {
     plotFancyASCII();
   } else {
-    B2FATAL("Not a single candidate survived the fit. Candidates before fit: " << m_nCandidatesBeforeFit << " after: " <<
-            m_nCandidatesAfter);
+    B2WARNING("Not a single candidate survived the fit. Candidates before fit: " << m_nCandidatesBeforeFit << " after: " <<
+              m_nCandidatesAfter);
   }
 }
 

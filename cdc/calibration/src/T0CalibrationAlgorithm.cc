@@ -33,7 +33,7 @@ T0CalibrationAlgorithm::T0CalibrationAlgorithm(): CalibrationAlgorithm("CDCCalib
   );
 }
 
-void T0CalibrationAlgorithm::createHisto()
+void T0CalibrationAlgorithm::createHisto(StoreObjPtr<EventMetaData>& evtPtr)
 {
 
   B2INFO("CreateHisto");
@@ -57,6 +57,13 @@ void T0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("Pval", &Pval);
   double halfCSize[56];
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("T0 L0W63 " << cdcgeo.getT0(WireID(0, 63)));
+
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
     double nW = cdcgeo.nWiresInLayer(i);
@@ -110,18 +117,18 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     evtPtr.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     B2INFO("Creating EventMetaData object");
-    evtPtr.create();
+    const auto exprun = getRunList()[0];
+    evtPtr.construct(1,  exprun.second, exprun.first);
+
+    //    evtPtr.create();
   } else {
     B2INFO("A valid EventMetaData object already exists.");
   }
-  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
-  // the Database instance
   DBObjPtr<CDCGeometry> cdcGeometry;
   CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
   B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
 
-  createHisto();
-
+  createHisto(evtPtr);
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 100, -10, 10);
   TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, -2, 2);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();

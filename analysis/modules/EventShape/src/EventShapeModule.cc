@@ -91,22 +91,20 @@ void EventShapeModule::terminate()
 void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
 {
   PCmsLabTransform T;
-  const auto& frame = ReferenceFrame::GetCurrent();
+
+  particleMomentumList.clear();
+  particleMomentumListCMS.clear();
 
   int nParticleLists = particleLists.size();
-  B2INFO("Number of ParticleLists to calculate Event Shape variables: " << nParticleLists);
+  B2DEBUG(10, "Number of ParticleLists to calculate Event Shape variables: " << nParticleLists);
 
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
     string particleListName = particleLists[i_pl];
-    B2DEBUG(10, "ParticleList " << particleListName);
+    B2DEBUG(10, "ParticleList: " << particleListName);
     StoreObjPtr<ParticleList> plist(particleListName);
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
-      double px = frame.getMomentum(part).Px();
-      double py = frame.getMomentum(part).Py();
-      double pz = frame.getMomentum(part).Pz();
-      TVector3 p(px, py, pz);
 
       TLorentzVector p_lab = part->get4Vector();
       particleMomentumList.push_back(p_lab.Vect());

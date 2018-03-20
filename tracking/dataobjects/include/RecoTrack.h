@@ -909,16 +909,20 @@ namespace Belle2 {
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
 
     /**
-     * Add a new TrackRep to a genfit::Track and ensure that a TrackRep with the same PDG id
-     * (and its charge conjugate) is not already in the genfit::Track. If this is the case,
-     * a B2ASSERT is raised. By convention, only one TrackRep for one particle type can exist
+     * Checks if a TrackRap for the PDG id of the RecoTrack (and its charge conjugate) does
+     * already exit and returns it if available. If no TrackRep is available, a new RKTrackRep
+     * is added to the genfit::Track. This ensures that a TrackRep with the same PDG id
+     * (and its charge conjugate) is not available two times in the genfit::Track.
+     *
+     * By convention, only one TrackRep for one particle type can exist
      * inside of a RecoTrack, no matter the charge. So there can only be a electron or positron TrackRep,
      * but not both.
      *
      * @param recoTrack Track to add TrackRep to
-     * @param trackRep TrackRep to add
+     * @param PDG code of the hypothesis which is negative or positive, depending on
+     * the charge of the hypothesis particle.
      */
-    static void addTrackRep(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRep);
+    static genfit::AbsTrackRep* createOrReturnRKTrackRep(RecoTrack& recoTrack, int PDGcode);
   };
 
 }

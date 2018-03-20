@@ -10,11 +10,8 @@
 
 #include <beast/beamabort/modules/BeamDigitizerModule.h>
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>
-#include <beast/beamabort/dataobjects/BeamabortHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -71,7 +68,7 @@ BeamDigitizerModule::~BeamDigitizerModule()
 void BeamDigitizerModule::initialize()
 {
   B2INFO("BeamDigitizer: Initializing");
-  StoreArray<BeamabortHit>::registerPersistent();
+  m_beamabortHit.registerInDataStore();
 
 }
 

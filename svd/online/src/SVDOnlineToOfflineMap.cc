@@ -101,17 +101,10 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
-  if (chipIter == m_chips.end()) {
-    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip <<
-              " : combination not found in the SVD Off-line to On-line map ");
+  if (chipIter == m_chips.end())  B2FATAL(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
+                                            ", isU=" << side << ", strip=" << strip <<
+                                            " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
 
-    m_currentChipInfo.fadc = 0;
-    m_currentChipInfo.apv = 0;
-    m_currentChipInfo.stripFirst = 0;
-    m_currentChipInfo.stripLast = 0;
-    m_currentChipInfo.apvChannel = 0;
-    return m_currentChipInfo;
-  }
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
 
@@ -144,7 +137,11 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
   const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
 
-  return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  if (info.m_sensorID) {
+    return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  } else {
+    return NULL;
+  }
 }
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
@@ -161,7 +158,12 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
   SVDShaperDigit::APVRawSamples rawSamples;
   copy(samples, samples + SVDShaperDigit::c_nAPVSamples, rawSamples.begin());
 
-  return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  // create SVDShaperDigit only for existing sensor
+  if (info.m_sensorID) {
+    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  } else {
+    return NULL;
+  }
 }
 
 

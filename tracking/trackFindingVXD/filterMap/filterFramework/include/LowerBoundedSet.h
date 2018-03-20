@@ -32,7 +32,9 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    LowerBoundedSet(InfType inf): m_inf(inf) {};
+    explicit LowerBoundedSet(InfType inf): m_inf(inf) {};
+
+    /** Constructor without argument */
     LowerBoundedSet(): m_inf(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
@@ -63,6 +65,10 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    /** Setting the branch address for a filter in a TTree
+     * @param t : the TTree in which the branch address shall be set
+     * @param branchName : name of the branch
+     */
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
@@ -77,7 +83,7 @@ namespace Belle2 {
     @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
       and the actual pointers to the bounds, if equal to nullptr it will not be filled
     **/
-    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "X")
+    std::string getNameAndReference(std::vector<std::pair<char, void*>>* pointers = nullptr, const std::string& varname = "X")
     {
       std::string minVal = std::to_string(m_inf);
       // if pointer to vector is provided fill it
@@ -88,8 +94,5 @@ namespace Belle2 {
       }
       return ("(" + minVal + " < " + varname + ")");
     }
-
   };
-
-
 }

@@ -52,6 +52,7 @@
 #include <analysis/NtupleTools/NtupleKlongIDTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleEventShapeTool.h>
+#include <analysis/NtupleTools/NtupleXpTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -141,6 +142,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "KlongID") return new NtupleKlongIDTool(tree, d);
   else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName == "EventShape") return new NtupleEventShapeTool(tree, d);
+  else if (strToolName == "Xp") return new NtupleXpTool(tree, d);
+
   B2ERROR("NtupleTool \"" << strToolName << "\" is not available: no tool with that name could be found!");
   return NULL;
 }

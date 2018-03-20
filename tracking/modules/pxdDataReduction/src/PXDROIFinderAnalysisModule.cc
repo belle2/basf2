@@ -11,7 +11,6 @@
 #include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -24,11 +23,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
-#include <list>
-#include <iostream>
 #include <TVector3.h>
 
-//giulia
 #include <vxd/geometry/GeoCache.h>
 
 
@@ -240,10 +236,6 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
            "name of the list of ROIs", std::string(""));
 
   m_rootEvent = 0;
-}
-
-PXDROIFinderAnalysisModule::~PXDROIFinderAnalysisModule()
-{
 }
 
 
@@ -944,11 +936,6 @@ void PXDROIFinderAnalysisModule::event()
   cout << "" << endl;
 
 
-}
-
-
-void PXDROIFinderAnalysisModule::endRun()
-{
 }
 
 

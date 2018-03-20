@@ -20,6 +20,6 @@ namespace Belle2 {
   class SVDIntercept : public VXDIntercept {
 
     //! Needed to make the ROOT object storable
-    ClassDef(SVDIntercept, 1);
+    ClassDef(SVDIntercept, 2);
   };
 }

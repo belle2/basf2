@@ -41,8 +41,11 @@ namespace Belle2 {
    */
   class TrackFinderVXDCellOMatModule final : public Module {
   private:
+    /// Using NodeType for DirectedNode with Segments and CACells
     using NodeType = Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>;
+    /// Using NodeNetworkType for DirectedNodeNetwork with Segments and CACells
     using NodeNetworkType = Belle2::DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>;
+    /// Using Path for vector of pointers to NodeTypes
     using Path = std::vector<NodeType*>;
 
   public:

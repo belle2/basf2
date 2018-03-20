@@ -59,7 +59,9 @@ namespace Belle2 {
       /**  */
       virtual void terminate();
 
-      /** Defines the histograms*/
+      /**
+       * Defines the histograms
+       */
       virtual void defineHisto();
 
 
@@ -70,18 +72,21 @@ namespace Belle2 {
       /** Energy threshold */
       double m_Ethres;
 
+      // These histrograms are currently
+      // not used in the code, but just declared.
+      // Commented out by the SW shifter, March 14th 2018
       /** Energy deposited vs TOF */
-      TH2F* h_clawss_Evtof1[16];
+      //TH2F* h_clawss_Evtof1[16];
       /** Energy deposited vs TOF */
-      TH2F* h_clawss_Evtof2[16];
+      //TH2F* h_clawss_Evtof2[16];
       /** Energy deposited vs TOF */
-      TH2F* h_clawss_Evtof3[16];
+      //TH2F* h_clawss_Evtof3[16];
       /** Energy deposited vs TOF */
-      TH2F* h_clawss_Evtof4[16];
+      //TH2F* h_clawss_Evtof4[16];
       /** Energy deposited */
-      TH1F* h_clawss_edep[16];
+      //TH1F* h_clawss_edep[16];
       /** Energy deposited */
-      TH1F* h_Wclawss_edep[16];
+      //TH1F* h_Wclawss_edep[16];
 
       /** Energy deposited */
       TH1F* h_clawss_rate1[16];

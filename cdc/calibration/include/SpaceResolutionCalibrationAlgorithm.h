@@ -72,7 +72,7 @@ namespace Belle2 {
       /// save calibration, in text file or db
       virtual void write();
       /// Prepare the calibration of space resolution.
-      virtual void prepare();
+      void prepare(StoreObjPtr<EventMetaData>& evtPtr);
 
     private:
       static const int Max_nalpha = 18; /**< Maximum alpha bin.*/

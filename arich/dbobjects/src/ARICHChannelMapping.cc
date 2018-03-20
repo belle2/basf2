@@ -31,6 +31,7 @@ bool ARICHChannelMapping::getXYFromAsic(unsigned asicChn, int& xChn, int& yChn) 
     return false;
   }
   int chId = (int)m_asic2xy[asicChn];
+  if (chId == -1) return false;
   xChn = chId % N_XCHANNELS;
   yChn = chId / N_XCHANNELS;
   return true;

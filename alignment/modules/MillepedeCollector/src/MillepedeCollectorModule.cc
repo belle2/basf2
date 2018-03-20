@@ -565,8 +565,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   if (particle)
     currentPdgCode = particle->getPDGCode();
 
-  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
-  RecoTrackGenfitAccess::addTrackRep(recoTrack, trackRep);
+  genfit::AbsTrackRep* trackRep = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack, currentPdgCode);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
 
   if (particle) {

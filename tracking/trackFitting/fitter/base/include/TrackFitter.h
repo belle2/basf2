@@ -150,17 +150,10 @@ namespace Belle2 {
 
     /**
      * Fit a reco track with a given non-default track representation.
-     * You can either use a pointer to a track representation already in the reco track
-     * (use recoTrack.getRepresentations() to get a list of pointers) or create a new track representation
-     * on your own.The ownership of this created representation is handed over to the reco track.
+     * You have to use a pointer to a track representation already in the reco track
+     * (use recoTrack.getRepresentations() to get a list of pointers).
      *
-     * Please make sure, that a track representation is not doubled, because you created a new one although there
-     * is already one in the reco track.
-     *
-     * With this function, you can add a track representation. However, in every fit process ALL track representations are fitted,
-     * no matter if they were added before or in your function call.
-     *
-     * If no new track representation was added and the hit content did not change (indicated by the dirty flag of the reco track),
+     * If hit content did not change (indicated by the dirty flag of the reco track),
      * the track will not be refitted.
      *
      * This fit function is only to be used for non-standard expert use.

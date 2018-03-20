@@ -152,7 +152,7 @@ elif option == 'intel':
     global_env['LD'] = 'xild'
     global_env['LINK'] = 'icpc'
     global_env['SHLINK'] = 'icpc'
-    global_env.Append(CCFLAGS=['-wd383,981,1419','-Wshadow'])
+    global_env.Append(CCFLAGS=['-wd383,981,1292,1419', '-Wshadow'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

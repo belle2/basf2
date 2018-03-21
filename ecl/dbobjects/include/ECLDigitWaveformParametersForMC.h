@@ -14,7 +14,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <vector>
 #include <framework/logging/Logger.h>
 
 /** DB object to store photon, hadron and diode shape parameters used in simulations.  All crystals use same parameters in simulation. */
@@ -29,24 +28,25 @@ namespace Belle2 {
      */
     ECLDigitWaveformParametersForMC() {};
 
-    /** Get vector of photon template parameters. 11 entries. */
-    const std::vector<float>& getPhotonParameters() const {return m_PhotonPars;};
+    /** Get array of photon template parameters. 11 entries. */
+    const float* getPhotonParameters() const {return m_PhotonPars;};
 
-    /** Get vector of hadron template parameters. 11 entries. */
-    const std::vector<float>& getHadronParameters() const {return m_HadronPars;};
+    /** Get array of hadron template parameters. 11 entries. */
+    const float* getHadronParameters() const {return m_HadronPars;};
 
-    /** Get vector of diode template parameters. 11 entries. */
-    const std::vector<float>& getDiodeParameters() const {return m_DiodePars;};
+    /** Get array of diode template parameters. 11 entries. */
+    const float* getDiodeParameters() const {return m_DiodePars;};
 
     /** Set photon, hadron and diode template parameters.  11 entries per template. One photon, hadron and diode template. */
-    void setTemplateParameters(const std::vector<float>& photonInput,
-                               const std::vector<float>& hadronInput,
-                               const std::vector<float>& diodeInput)
+    void setTemplateParameters(const float photonInput[11],
+                               const float hadronInput[11],
+                               const float diodeInput[11])
     {
-      if (photonInput.size() != 11 || hadronInput.size() != 11 || diodeInput.size() != 11) {B2FATAL("ECLDigitWaveformParametersForMC: wrong size vector " << photonInput.size() << " " << hadronInput.size() << " " << diodeInput.size() << " instead of 11");}
-      m_PhotonPars = photonInput;
-      m_HadronPars = hadronInput;
-      m_DiodePars = diodeInput;
+      for (int i = 0; i < 11; i++) {
+        m_PhotonPars[i] = photonInput[i];
+        m_HadronPars[i] = hadronInput[i];
+        m_DiodePars[i] = diodeInput[i];
+      }
     };
 
     /**
@@ -55,9 +55,10 @@ namespace Belle2 {
     ~ECLDigitWaveformParametersForMC() {};
 
   private:
-    std::vector<float> m_PhotonPars;  /**< photon parameters for MC*/
-    std::vector<float> m_HadronPars;  /**< hadron parameters for MC*/
-    std::vector<float> m_DiodePars;   /**< diode parameters for MC*/
+
+    float m_PhotonPars[11];  /**< photon parameters for MC*/
+    float m_HadronPars[11];  /**< hadron parameters for MC*/
+    float m_DiodePars[11];   /**< diode parameters for MC*/
 
     //1 Initial Version
     ClassDef(ECLDigitWaveformParametersForMC, 1); /**< ClassDef */

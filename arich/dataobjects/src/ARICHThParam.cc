@@ -14,8 +14,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(ARICHThParam);
-
 double ARICHThParam::getVth() const
 {
   return m_th0 + m_index * m_dth;

@@ -36,7 +36,7 @@ namespace TreeFitter {
 
     fitparams->getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
 
-    return ErrCode::success ;
+    return ErrCode(ErrCode::Status::success) ;
   }
 
   void RecoComposite::updateParams()
@@ -90,7 +90,7 @@ namespace TreeFitter {
 
     p.getV().triangularView<Eigen::Lower>() = m_covariance.triangularView<Eigen::Lower>();
 
-    return ErrCode::success ;
+    return ErrCode(ErrCode::Status::success) ;
   }
 
   ErrCode RecoComposite::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const

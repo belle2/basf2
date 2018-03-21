@@ -188,7 +188,7 @@ namespace TreeFitter {
           B2ERROR("There are not sufficient geometric constraints to fit "
                   << "this decay tree. Perhaps you should add a beam constraint. "
                   << " This happend for a " << this->name() << " candidate.");
-          status |= ErrCode::badsetup;
+          status |= ErrCode(ErrCode::Status::badsetup);
         }
       }
     }
@@ -248,7 +248,7 @@ namespace TreeFitter {
       }
 
     }
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode InternalParticle::initCovariance(FitParams* fitparams) const
@@ -334,7 +334,7 @@ namespace TreeFitter {
 
     }
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
 

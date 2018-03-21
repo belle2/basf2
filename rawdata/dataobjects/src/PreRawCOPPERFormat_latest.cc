@@ -541,7 +541,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
-      const int packet_crcerr_bit = 8;
+      //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
                m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -575,7 +575,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
-      const int packet_crcerr_bit = 8;
+      //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
                m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -608,7 +608,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
-      const int packet_crcerr_bit = 8;
+      //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
                m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
@@ -641,7 +641,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
-      const int packet_crcerr_bit = 8;
+      //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
         printf("[FATAL] B2link down on slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
                m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],

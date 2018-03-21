@@ -64,7 +64,7 @@ namespace Belle2 {
   };
 
   /**
-   * The Class for Beast Materials between  barrel and endcap of ECL */
+   * The Class for Service Materials between  barrel and endcap of ECL */
   class ServiceGapsMaterialsEclPar: public TObject {
   public:
 
@@ -119,7 +119,7 @@ namespace Belle2 {
 
 
   /**
-   * The class for the  mother volume of the phase2 cables and services */
+   * The class for the  mother volume of the Service Materials */
   class ServiceGapsMomVolPar: public TObject {
 
   public:
@@ -211,17 +211,17 @@ namespace Belle2 {
 
 
   private:
-    double m_IRCDCB;    //segmentation in R of CDC backward
-    double m_IPhiCDCB;  //segmentation in Phi of CDC backward
-    double m_IRCDCF;    //segmentation in R of CDC forward
-    double m_IPhiCDCF;  //segmentation in Phi of CDC forward
-    double m_IRECLB;    //segmentation in R of ECL backward
-    double m_IPhiECLB;  //segmentation in Phi of ECL backward
-    double m_IRECLF;    //segmentation in R of ECL forward
-    double m_IPhiECLF;  //segmentation in Phi of ECL forward
-    double m_IRARICHF;    //segmentation in R of ARICH forward
-    double m_IPhiARICHF;  //segmentation in Phi of ARICH forward
-    double m_IPhiTOPF;  //segmentation in Phi of TOP forward
+    double m_IRCDCB;      /**< segmentation in R of CDC backward     */
+    double m_IPhiCDCB;    /**< segmentation in Phi of CDC backward   */
+    double m_IRCDCF;      /**< segmentation in R of CDC forward      */
+    double m_IPhiCDCF;    /**< segmentation in Phi of CDC forward    */
+    double m_IRECLB;      /**< segmentation in R of ECL backward     */
+    double m_IPhiECLB;    /**< segmentation in Phi of ECL backward   */
+    double m_IRECLF;      /**< segmentation in R of ECL forward      */
+    double m_IPhiECLF;    /**< segmentation in Phi of ECL forward    */
+    double m_IRARICHF;    /**< segmentation in R of ARICH forward    */
+    double m_IPhiARICHF;  /**< segmentation in Phi of ARICH forward  */
+    double m_IPhiTOPF;    /**< segmentation in Phi of TOP forward    */
     std::vector<double> m_thick; /**< Thickness list of CDC gap element cell. */
     std::vector<double> m_density; /**< Densities list of ECL, ARICH and top gap element cell. */
 
@@ -233,7 +233,7 @@ namespace Belle2 {
 
 
   /**
-   * The Class for phase 2 cables and services geometry */
+   * The Class for services materials geometry */
   class ServiceGapsMaterialsPar: public TObject {
 
   public:
@@ -267,17 +267,17 @@ namespace Belle2 {
     const ServiceGapsMomVolPar& getMomVolFor(void) const { return m_momvolfor; }
     /** Get Forward Gap MomVolume */
     ServiceGapsMomVolPar& getMomVolFor(void)  { return m_momvolfor; }
-    /** Get Beast Materials */
+    /** Get Service Materials */
     const std::vector<ServiceGapsMaterialsCdcArichTopPar>& getServiceGapsMaterials(void) const { return m_ServiceGapsMaterials; }
-    /** Get Beast Materials */
+    /** Get Service Materials */
     std::vector<ServiceGapsMaterialsCdcArichTopPar>& getServiceGapsMaterials(void)  { return m_ServiceGapsMaterials; }
-    /** Get Beast Materials at ECL */
+    /** Get Service Materials at ECL */
     const std::vector<ServiceGapsMaterialsEclPar>& getServiceGapsEclMaterials(void) const { return m_ServiceGapsEclMaterials; }
-    /** Get Beast Materials at ECL */
+    /** Get Service Materials at ECL */
     std::vector<ServiceGapsMaterialsEclPar>& getServiceGapsEclMaterials(void)  { return m_ServiceGapsEclMaterials; }
-    /** Get Gap element cell Thickness */
+    /** Get Gap element cell Thickness and Density */
     const ThicknessDensityPar& getthick(void) const { return m_thick; }
-    /** Get Gap element cell Thickness */
+    /** Get Gap element cell Thickness and Density */
     ThicknessDensityPar& getthick(void)  { return m_thick; }
 
 
@@ -287,12 +287,12 @@ namespace Belle2 {
     std::vector<double> m_rmin; /**< Rmin list of the mother volume. */
     std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
     std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
-    std::vector<ServiceGapsMaterialsCdcArichTopPar> m_ServiceGapsMaterials; /**< Vector with Beast Materials between CDC and ECL. */
+    std::vector<ServiceGapsMaterialsCdcArichTopPar> m_ServiceGapsMaterials; /**< Vector with Service Materials between CDC and ECL. */
     std::vector<ServiceGapsMaterialsEclPar>
-    m_ServiceGapsEclMaterials; /**< Vector with Beast Materials between barrel and endcap of ECL. */
-    ServiceGapsMomVolPar m_momvolback;
-    ServiceGapsMomVolPar m_momvolfor;
-    ThicknessDensityPar m_thick;
+    m_ServiceGapsEclMaterials; /**< Vector with Service Materials between barrel and endcap of ECL. */
+    ServiceGapsMomVolPar m_momvolback;  /**< Backward mother volume for Service Materials. */
+    ServiceGapsMomVolPar m_momvolfor;   /**< Backward mother volume for Service Materials. */
+    ThicknessDensityPar m_thick;        /**< Gap element cell Thickness and density for Service Materials. */
 
     ClassDef(ServiceGapsMaterialsPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

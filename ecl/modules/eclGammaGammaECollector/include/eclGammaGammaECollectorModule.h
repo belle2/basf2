@@ -41,6 +41,8 @@ namespace Belle2 {
     /** Parameters to control the job */
     double m_thetaLabMinDeg; /**< miniumum photon theta in lab (0 degrees) */
     double m_thetaLabMaxDeg; /**< maximum photon theta in lab (180 degrees) */
+    double m_minPairMass; /**< minimum invariant mass of the pair of photons (9 GeV/c^2) */
+    double m_mindPhi; /**< minimum delta phi between clusters (179 deg) */
     bool m_measureTrueEnergy; /**< use eclCalDigit to determine MC deposited energy (false) */
     bool m_requireL1; /**< require events to satisfy a level 1 trigger (true) */
 
@@ -52,10 +54,9 @@ namespace Belle2 {
 
 
     /** Some other useful quantities */
-    double degPerRad; /**< convert rad to degrees */
     double thetaLabMin;  /**< m_thetaLabMinDeg converted to radians */
     double thetaLabMax;  /**< m_thetaLabMaxDeg converted to radians */
-    int iEvent = 0; /**< event counter */
+    bool storeCalib = true;; /**< force the input calibration constants to be saved first event */
     std::vector<float> EperCrys; /**< ECL digit energy for each crystal */
 
     double minTrkpt = 0.3; /**< (GeV/c) minimum pt of a good track */
@@ -64,8 +65,6 @@ namespace Belle2 {
     double minpValue = 0.001; /**< minimum p value of a good track */
     int minCDChits = 5; /**< minimum CDC hits for a good track */
 
-    double minPairMass = 9.; /**< (GeV/c^2) minimum invariant mass of the pair of photons */
-    double mindPhi = 179.; /**< (deg) minimum delta phi between clusters */
 
     /** Expected energies from database */
     DBObjPtr<ECLCrystalCalib> m_ECLExpGammaGammaE;

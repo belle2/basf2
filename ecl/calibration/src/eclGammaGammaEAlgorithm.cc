@@ -56,18 +56,18 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 {
   /**-----------------------------------------------------------------------------------------------*/
   /** ranges of various fit parameters, and tolerance to determine that fit is at the limit */
-  double limitTol = 0.0005; /*< tolerance for checking if a parameter is at the limit */
-  double minFitLimit = 1e-25; /*< cut off for labeling a fit as poor */
-  double minFitProbIter = 1e-8; /*< cut off for labeling a fit as poor if it also has many iterations */
-  double constRatio = 0.5; /*< Novosibirsk normalization must be greater than constRatio x constant term */
-  double peakMin(0.4), peakMax(2.2); /*< range for peak of normalized energy distribution */
-  double peakTol = limitTol * (peakMax - peakMin); /*< fit is at limit if it is within peakTol of min or max */
-  double effSigMin(0.02), effSigMax(0.4); /*< range for effective sigma of normalized energy distribution */
-  double effSigTol = limitTol * (effSigMax - effSigMin); /*< fit is at limit if it is within effSigTol of min or max */
-  double etaNom(0.41); /*< Nominal tail parameter */
-  double etaMin(0.), etaMax(5.0); /*< Novosibirsk tail parameter range */
-  double etaTol = limitTol * (etaMax - etaMin); /*< fit is at limit if it is within etaTol of min or max */
-  double constTol = 0.001; /*< if constant is less than constTol, it will be fixed to 0 */
+  const double limitTol = 0.0005; /*< tolerance for checking if a parameter is at the limit */
+  const double minFitLimit = 1e-25; /*< cut off for labeling a fit as poor */
+  const double minFitProbIter = 1e-8; /*< cut off for labeling a fit as poor if it also has many iterations */
+  const double constRatio = 0.5; /*< Novosibirsk normalization must be greater than constRatio x constant term */
+  const double peakMin(0.4), peakMax(2.2); /*< range for peak of normalized energy distribution */
+  const double peakTol = limitTol * (peakMax - peakMin); /*< fit is at limit if it is within peakTol of min or max */
+  const double effSigMin(0.02), effSigMax(0.4); /*< range for effective sigma of normalized energy distribution */
+  const double effSigTol = limitTol * (effSigMax - effSigMin); /*< fit is at limit if it is within effSigTol of min or max */
+  const double etaNom(0.41); /*< Nominal tail parameter */
+  const double etaMin(0.), etaMax(5.0); /*< Novosibirsk tail parameter range */
+  const double etaTol = limitTol * (etaMax - etaMin); /*< fit is at limit if it is within etaTol of min or max */
+  const double constTol = 0.001; /*< if constant is less than constTol, it will be fixed to 0 */
 
   /** Put root into batch mode so that we don't try to open a graphics window */
   gROOT->SetBatch();

@@ -41,6 +41,8 @@ main.add_module("HistoManager", histoFileName=outputName)
 eclGammaGammaE = register_module('eclGammaGammaECollector')
 eclGammaGammaE.param('thetaLabMinDeg', 0.)
 eclGammaGammaE.param('thetaLabMaxDeg', 180.)
+eclGammaGammaE.param('minPairMass', 9.)
+eclGammaGammaE.param('mindPhi', 179.)
 # Can fill histograms with MC eclCalDigits to calculate true deposited energy
 eclGammaGammaE.param('measureTrueEnergy', False)
 eclGammaGammaE.param('requireL1', True)

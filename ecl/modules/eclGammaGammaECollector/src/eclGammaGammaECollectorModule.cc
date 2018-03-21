@@ -18,6 +18,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/datastore/RelationVector.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <TH2F.h>
 
@@ -46,6 +47,8 @@ eclGammaGammaECollectorModule::eclGammaGammaECollectorModule() : CalibrationColl
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum photon theta in lab (degrees)", 0.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum photon theta in lab (degrees)", 180.);
+  addParam("minPairMass", m_minPairMass, "minimum invariant mass of the pair of photons (GeV/c^2)", 9.);
+  addParam("mindPhi", m_mindPhi, "minimum delta phi between clusters (deg)", 179.);
   addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);
 }
@@ -95,9 +98,10 @@ void eclGammaGammaECollectorModule::prepare()
   B2INFO("Input parameters to eclGammaGammaECollector:");
   B2INFO("thetaLabMinDeg: " << m_thetaLabMinDeg);
   B2INFO("thetaLabMaxDeg: " << m_thetaLabMaxDeg);
-  degPerRad = 180. / TMath::Pi();
-  thetaLabMin = m_thetaLabMinDeg / degPerRad;
-  thetaLabMax = m_thetaLabMaxDeg / degPerRad;
+  thetaLabMin = m_thetaLabMinDeg / TMath::RadToDeg();
+  thetaLabMax = m_thetaLabMaxDeg / TMath::RadToDeg();
+  B2INFO("minPairMass: " << m_minPairMass);
+  B2INFO("mindPhi: " << m_mindPhi);
   B2INFO("measureTrueEnergy: " << m_measureTrueEnergy);
   B2INFO("requireL1: " << m_requireL1);
 
@@ -140,17 +144,15 @@ void eclGammaGammaECollectorModule::collect()
 {
 
   /** Record the input database constants for the first call */
-  if (iEvent == 0) {
+  if (storeCalib) {
     for (int crysID = 0; crysID < 8736; crysID++) {
       getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysID + 0.001, ExpGammaGammaE[crysID]);
       getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, GammaGammaECalib[crysID]);
       getObjectPtr<TH1F>("CalibEntriesvsCrys")->Fill(crysID + 0.001);
     }
+    storeCalib = false;
   }
-
-  if (iEvent % 1000 == 0) {B2INFO("eclGammaGammaECollector: iEvent = " << iEvent);}
-  iEvent++;
 
   /**----------------------------------------------------------------------------------------*/
   /** Check if DB objects have changed */
@@ -189,12 +191,12 @@ void eclGammaGammaECollectorModule::collect()
   if (nGoodTrk > 0) {return;}
 
   //------------------------------------------------------------------------
-  /** Find the two maximum energy photon (hypothesis == 5) clusters */
+  /** Find the two maximum energy photon clusters */
   int icMax[2] = { -1, -1};
   double maxClustE[2] = { -1., -1.};
   int nclust = eclClusterArray.getEntries();
   for (int ic = 0; ic < nclust; ic++) {
-    if (eclClusterArray[ic]->getHypothesisId() == 5) {
+    if (eclClusterArray[ic]->getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
       double eClust = eclClusterArray[ic]->getEnergy();
       if (eClust > maxClustE[0]) {
         maxClustE[1] = maxClustE[0];
@@ -221,35 +223,35 @@ void eclGammaGammaECollectorModule::collect()
   double t990 = eclClusterArray[icMax[0]]->getDeltaTime99();
   double t1 = eclClusterArray[icMax[1]]->getTime();
   double t991 = eclClusterArray[icMax[1]]->getDeltaTime99();
-  if (abs(t0) > t990 || abs(t1) > t991) {return;}
+  double taverage = (t0 / (t990 * t990) + t1 / (t991 * t991)) / (1. / (t990 * t990) + 1. / (t991 * t991));
+  if (abs(t0 - taverage) > t990 || abs(t1 - taverage) > t991) {return;}
 
   /** And that their invariant mass is greater than specified value */
+  ClusterUtils cUtil;
+  const TVector3 clustervertex = cUtil.GetIPPosition();
+
   double phi0 = eclClusterArray[icMax[0]]->getPhi();
   TVector3 p30(0., 0., maxClustE[0]);
   p30.SetTheta(theta0);
   p30.SetPhi(phi0);
-  TLorentzVector p40(p30, maxClustE[0]);
+  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(eclClusterArray[icMax[0]], clustervertex);
 
   double phi1 = eclClusterArray[icMax[1]]->getPhi();
   TVector3 p31(0., 0., maxClustE[1]);
   p31.SetTheta(theta1);
   p31.SetPhi(phi1);
-  TLorentzVector p41(p31, maxClustE[1]);
+  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(eclClusterArray[icMax[1]], clustervertex);
 
   double pairmass = (p40 + p41).M();
-  if (pairmass < minPairMass) {return;}
+  if (pairmass < m_minPairMass) {return;}
 
   /** And that they are back-to-back in phi */
   PCmsLabTransform boostrotate;
   TLorentzVector p40COM = boostrotate.rotateLabToCms() * p40;
   TLorentzVector p41COM = boostrotate.rotateLabToCms() * p41;
-  double dphi = abs(p41COM.Phi() - p40COM.Phi()) * degPerRad;
+  double dphi = abs(p41COM.Phi() - p40COM.Phi()) * TMath::RadToDeg();
   if (dphi > 180.) {dphi = 360. - dphi;}
-  double theta0COM = p40COM.Theta();
-  double theta1COM = p41COM.Theta();
-  double thetaMin = theta0COM;
-  if (theta1COM < theta0COM) {thetaMin = theta1COM;}
-  if (dphi < mindPhi) {return;}
+  if (dphi < m_mindPhi) {return;}
 
   //------------------------------------------------------------------------
   /** Record ECL digit amplitude as a function of CrysID */

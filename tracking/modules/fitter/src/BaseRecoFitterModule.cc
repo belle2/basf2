@@ -108,6 +108,11 @@ void BaseRecoFitterModule::event()
       const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
       const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
 
+      if (!trackRep) {
+        B2FATAL("TrackRepresentation for PDG id " << pdgCodeToUseForFitting << " not present in RecoTrack although it " <<
+                "should have been created.");
+      }
+
       B2DEBUG(99, "-----> Fit results:");
       if (wasFitSuccessful) {
         const genfit::FitStatus* fs = recoTrack.getTrackFitStatus(trackRep);

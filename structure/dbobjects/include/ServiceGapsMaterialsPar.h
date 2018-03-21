@@ -211,19 +211,32 @@ namespace Belle2 {
 
 
   private:
-    double m_IRCDCB;      /**< segmentation in R of CDC backward     */
-    double m_IPhiCDCB;    /**< segmentation in Phi of CDC backward   */
-    double m_IRCDCF;      /**< segmentation in R of CDC forward      */
-    double m_IPhiCDCF;    /**< segmentation in Phi of CDC forward    */
-    double m_IRECLB;      /**< segmentation in R of ECL backward     */
-    double m_IPhiECLB;    /**< segmentation in Phi of ECL backward   */
-    double m_IRECLF;      /**< segmentation in R of ECL forward      */
-    double m_IPhiECLF;    /**< segmentation in Phi of ECL forward    */
-    double m_IRARICHF;    /**< segmentation in R of ARICH forward    */
-    double m_IPhiARICHF;  /**< segmentation in Phi of ARICH forward  */
-    double m_IPhiTOPF;    /**< segmentation in Phi of TOP forward    */
-    std::vector<double> m_thick; /**< Thickness list of CDC gap element cell. */
-    std::vector<double> m_density; /**< Densities list of ECL, ARICH and top gap element cell. */
+    /**< segmentation in R of CDC backward     */
+    double m_IRCDCB;
+    /**< segmentation in Phi of CDC backward   */
+    double m_IPhiCDCB;
+    /**< segmentation in R of CDC forward      */
+    double m_IRCDCF;
+    /**< segmentation in Phi of CDC forward    */
+    double m_IPhiCDCF;
+    /**< segmentation in R of ECL backward     */
+    double m_IRECLB;
+    /**< segmentation in Phi of ECL backward   */
+    double m_IPhiECLB;
+    /**< segmentation in R of ECL forward      */
+    double m_IRECLF;
+    /**< segmentation in Phi of ECL forward    */
+    double m_IPhiECLF;
+    /**< segmentation in R of ARICH forward    */
+    double m_IRARICHF;
+    /**< segmentation in Phi of ARICH forward  */
+    double m_IPhiARICHF;
+    /**< segmentation in Phi of TOP forward    */
+    double m_IPhiTOPF;
+    /**< Thickness list of CDC gap element cell. */
+    std::vector<double> m_thick;
+    /**< Densities list of ECL, ARICH and top gap element cell. */
+    std::vector<double> m_density;
 
     ClassDef(ThicknessDensityPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
@@ -284,15 +297,22 @@ namespace Belle2 {
   private:
     /** Record background */
     bool m_recordBackground;
-    std::vector<double> m_rmin; /**< Rmin list of the mother volume. */
-    std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
-    std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
-    std::vector<ServiceGapsMaterialsCdcArichTopPar> m_ServiceGapsMaterials; /**< Vector with Service Materials between CDC and ECL. */
-    std::vector<ServiceGapsMaterialsEclPar>
-    m_ServiceGapsEclMaterials; /**< Vector with Service Materials between barrel and endcap of ECL. */
-    ServiceGapsMomVolPar m_momvolback;  /**< Backward mother volume for Service Materials. */
-    ServiceGapsMomVolPar m_momvolfor;   /**< Backward mother volume for Service Materials. */
-    ThicknessDensityPar m_thick;        /**< Gap element cell Thickness and density for Service Materials. */
+    /**< Rmin list of the mother volume. */
+    std::vector<double> m_rmin;
+    /**< Rmax list of the mother volume. */
+    std::vector<double> m_rmax;
+    /**< Z-cordinates list of the mother volume. */
+    std::vector<double> m_z;
+    /**< Vector with Service Materials between CDC and ECL. */
+    std::vector<ServiceGapsMaterialsCdcArichTopPar> m_ServiceGapsMaterials;
+    /**< Vector with Service Materials between barrel and end cap of ECL. */
+    std::vector<ServiceGapsMaterialsEclPar>  m_ServiceGapsEclMaterials;
+    /**< Backward mother volume for Service Materials. */
+    ServiceGapsMomVolPar m_momvolback;
+    /**< Backward mother volume for Service Materials. */
+    ServiceGapsMomVolPar m_momvolfor;
+    /**< Gap element cell Thickness and density for Service Materials. */
+    ThicknessDensityPar m_thick;
 
     ClassDef(ServiceGapsMaterialsPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

@@ -51,7 +51,7 @@ namespace Belle2 {
      * it throws std::out_of_range if the strip is unknown
      */
 
-    inline float getIstoMask(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    inline float isMasked(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
     {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),

@@ -43,9 +43,7 @@ double eclGammaGammaNovoConst(double* x, double* par)
 
 
 /**-----------------------------------------------------------------------------------------------*/
-eclGammaGammaEAlgorithm::eclGammaGammaEAlgorithm(): CalibrationAlgorithm("eclGammaGammaECollector"),
-  outputName("eclGammaGammaEAlgorithm.root"), cellIDLo(1), cellIDHi(8736), minEntries(150),
-  maxIterations(10), tRatioMin(0.45), tRatioMax(0.60), upperEdgeThresh(0.02), performFits(true), findExpValues(false), storeConst(0)
+eclGammaGammaEAlgorithm::eclGammaGammaEAlgorithm(): CalibrationAlgorithm("eclGammaGammaECollector")
 {
   setDescription(
     "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
@@ -75,17 +73,17 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Write out the job parameters */
   B2INFO("eclGammaGammaAlgorithm parameters:");
-  B2INFO("outputName = " << outputName);
-  B2INFO("cellIDLo = " << cellIDLo);
-  B2INFO("cellIDHi = " << cellIDHi);
-  B2INFO("minEntries = " << minEntries);
-  B2INFO("maxIterations = " << maxIterations);
-  B2INFO("tRatioMin = " << tRatioMin);
-  B2INFO("tRatioMax = " << tRatioMax);
-  B2INFO("upperEdgeThresh = " << upperEdgeThresh);
-  B2INFO("performFits = " << performFits);
-  B2INFO("findExpValues = " << findExpValues);
-  B2INFO("storeConst = " << storeConst);
+  B2INFO("outputName = " << m_outputName);
+  B2INFO("cellIDLo = " << m_cellIDLo);
+  B2INFO("cellIDHi = " << m_cellIDHi);
+  B2INFO("minEntries = " << m_minEntries);
+  B2INFO("maxIterations = " << m_maxIterations);
+  B2INFO("tRatioMin = " << m_tRatioMin);
+  B2INFO("tRatioMax = " << m_tRatioMax);
+  B2INFO("upperEdgeThresh = " << m_upperEdgeThresh);
+  B2INFO("performFits = " << m_performFits);
+  B2INFO("findExpValues = " << m_findExpValues);
+  B2INFO("storeConst = " << m_storeConst);
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Clean up existing histograms if necessary */
@@ -140,7 +138,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Write out the basic histograms in all cases */
-  TString fName = outputName;
+  TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
   EnVsCrysID->Write();
   IntegralVsCrysID->Write();
@@ -150,7 +148,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /** If we have not been asked to do fits, we can quit now */
-  if (!performFits) {
+  if (!m_performFits) {
     B2INFO("eclGammaGammaEAlgorithm has not been asked to perform fits; copying input histograms and quitting");
     histfile->Close();
     return c_NotEnoughData;
@@ -159,16 +157,16 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Check that every crystal has enough entries, if so requested */
   bool sufficientData = true;
-  for (int crysID = cellIDLo - 1; crysID < cellIDHi; crysID++) {
-    if (IntegralVsCrysID->GetBinContent(crysID + 1) < minEntries) {
-      if (storeConst == 1) {B2INFO("eclGammaGammaEAlgorithm: crystal " << crysID << " has insufficient statistics: " << IntegralVsCrysID->GetBinContent(crysID + 1) << ". Requirement is " << minEntries);}
+  for (int crysID = m_cellIDLo - 1; crysID < m_cellIDHi; crysID++) {
+    if (IntegralVsCrysID->GetBinContent(crysID + 1) < m_minEntries) {
+      if (m_storeConst == 1) {B2INFO("eclGammaGammaEAlgorithm: crystal " << crysID << " has insufficient statistics: " << IntegralVsCrysID->GetBinContent(crysID + 1) << ". Requirement is " << m_minEntries);}
       sufficientData = false;
       break;
     }
   }
 
   /** Insufficient data. Quit if we are required to have a successful fit for every crystal */
-  if (!sufficientData && storeConst == 1) {
+  if (!sufficientData && m_storeConst == 1) {
     histfile->Close();
     return c_NotEnoughData;
   }
@@ -204,7 +202,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Fits are requested and there is sufficient data. Loop over specified crystals and performs fits to the amplitude distributions */
   bool allFitsOK = true;
-  for (int crysID = cellIDLo - 1; crysID < cellIDHi; crysID++) {
+  for (int crysID = m_cellIDLo - 1; crysID < m_cellIDHi; crysID++) {
 
     /**  Project 1D histogram of energy in this crystal */
     TString name = "Enormalized";
@@ -249,7 +247,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
     double lowold(0.), lowoldold(0.);
     bool fixConst = false;
     int nIter = 0;
-    bool fitHist = IntegralVsCrysID->GetBinContent(crysID + 1) >= minEntries; /* fit only if enough events */
+    bool fitHist = IntegralVsCrysID->GetBinContent(crysID + 1) >= m_minEntries; /* fit only if enough events */
 
     /**---------------------------------------------------------------------------------------*/
     /** Iterate from this point */
@@ -278,8 +276,8 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
       /** The lower fit range should correspond the specified fraction of the peak. Iterate if necessary. */
       double peak = func->Eval(peakE) - constant;
       double tRatio = (func->Eval(fitlow) - constant) / peak;
-      if (tRatio < tRatioMin || tRatio > tRatioMax) {
-        double targetY = constant + 0.5 * (tRatioMin + tRatioMax) * peak;
+      if (tRatio < m_tRatioMin || tRatio > m_tRatioMax) {
+        double targetY = constant + 0.5 * (m_tRatioMin + m_tRatioMax) * peak;
         lowoldold = lowold;
         lowold = fitlow;
         fitlow = func->GetX(targetY, histMin, peakE);
@@ -289,7 +287,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
         if (abs(fitlow - lowoldold) < dIter) {fitlow = 0.5 * (lowold + lowoldold); }
 
         /** Many iterations may mean we are stuck in a loop. Try a different end point. */
-        if (nIter > maxIterations - 3) {fitlow = 0.33333 * (fitlow + lowold + lowoldold); }
+        if (nIter > m_maxIterations - 3) {fitlow = 0.33333 * (fitlow + lowold + lowoldold); }
       }
 
       /** Set the constant term to 0 if we are close to the limit */
@@ -300,7 +298,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
       }
 
       /** No more than specified number of iterations */
-      if (nIter == maxIterations) {fitHist = false;}
+      if (nIter == m_maxIterations) {fitHist = false;}
       B2DEBUG(10, crysID << " " << nIter << " " << peakE << " " << constant << " " << tRatio << " " << fitlow);
     }
 
@@ -335,7 +333,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
     /**-----------------------------------------------------------------------------------------*/
     /** Fit status */
     int iStatus = fitOK; // success
-    if (nIter == maxIterations) {iStatus = iterations;} // too many iterations
+    if (nIter == m_maxIterations) {iStatus = iterations;} // too many iterations
 
     /** No peak; normalization of Novo component is too small */
     if (normalization < constRatio * constant) {iStatus = noPeak;}
@@ -359,7 +357,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
     if (iStatus >= iterations) {
 
       /** Look for the fit to drop to specified fraction of peak. */
-      double targetY = constant + upperEdgeThresh * (func->Eval(peakE) - constant);
+      double targetY = constant + m_upperEdgeThresh * (func->Eval(peakE) - constant);
 
       /** bins on either side of this value */
       int iLow = hEnergy->GetXaxis()->FindBin(peakE) + 1;
@@ -440,14 +438,14 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
     if (fitstatus < 0) {
       upperEdge = -1.;
       fracEdgeUnc = 0.;
-      if (histbin >= cellIDLo && histbin <= cellIDHi) {
+      if (histbin >= m_cellIDLo && histbin <= m_cellIDHi) {
         B2INFO("eclGammaGammaEAlgorithm: cellID " << histbin << " is not a successful fit. Status = " << fitstatus);
         allFitsOK = false;
       }
     }
 
     /** Find expected energies from MC, if requested */
-    if (findExpValues) {
+    if (m_findExpValues) {
       double inputExpE = abs(AverageExpECrys->GetBinContent(histbin));
       ExpEnergyperCrys->SetBinContent(histbin, inputExpE * upperEdge);
       ExpEnergyperCrys->SetBinError(histbin, fracEdgeUnc * inputExpE * upperEdge);
@@ -463,9 +461,9 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Write output to DB if requested and successful */
   bool DBsuccess = false;
-  if (storeConst == 0 || (storeConst == 1 && allFitsOK)) {
+  if (m_storeConst == 0 || (m_storeConst == 1 && allFitsOK)) {
     DBsuccess = true;
-    if (findExpValues) {
+    if (m_findExpValues) {
 
       /** Store expected energies */
       std::vector<float> tempE;
@@ -513,7 +511,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   hStatus->Write();
 
   /** Histograms containing values written to DB */
-  if (findExpValues) {
+  if (m_findExpValues) {
     ExpEnergyperCrys->Write();
   } else {
     CalibVsCrysID->Write();
@@ -540,11 +538,11 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Set the return code appropriately */
-  if (storeConst == -1) {
+  if (m_storeConst == -1) {
     B2INFO("eclGammaGammaEAlgorithm performed fits but was not asked to store contants");
     return c_Failure;
   } else if (!DBsuccess) {
-    if (findExpValues) { B2INFO("eclGammaGammaEAlgorithm: failed to store expected values"); }
+    if (m_findExpValues) { B2INFO("eclGammaGammaEAlgorithm: failed to store expected values"); }
     else { B2INFO("eclGammaGammaEAlgorithm: failed to store calibration constants"); }
     return c_Failure;
   }

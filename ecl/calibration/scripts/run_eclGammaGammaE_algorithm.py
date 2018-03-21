@@ -42,18 +42,19 @@ if(narg == 2):
     fileNames = glob.glob(sys.argv[1])
 print("input fileNames = ", fileNames)
 algo.setInputFileNames(fileNames)
-algo.outputName = "eclGammaGammaE_algorithm.root"
+algo.setOutputName("eclGammaGammaE_algorithm.root")
 # barrel is [1153,7776]; range clear of cdc walls is [161,8608]
-algo.cellIDLo = 1
-algo.cellIDHi = 8736
-algo.minEntries = 150
-algo.maxIterations = 10
-algo.tRatioMin = 0.45
-algo.tRatioMax = 0.60
-algo.upperEdgeThresh = 0.02
-algo.performFits = True
-algo.findExpValues = False
-algo.storeConst = 0
+algo.setCellIDLo(1)
+algo.setCellIDHi(8736)
+algo.setMinEntries(150)
+algo.setMaxIterations(10)
+algo.setTRatioMin(0.45)
+algo.setTRatioMax(0.60)
+algo.setUpperEdgeThresh(0.02)
+algo.setPerformFits(True)
+algo.setFindExpValues(False)
+algo.setStoreConst(0)
+
 
 # Run algorithm after merging all input files, as opposed to one run at a time
 alg_result = algo.execute()

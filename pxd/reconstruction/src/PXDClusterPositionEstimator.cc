@@ -15,8 +15,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <cmath>
 
-
-
 using namespace std;
 
 //namespace Belle2 {
@@ -181,6 +179,25 @@ const std::string Belle2::PXD::PXDClusterPositionEstimator::getShortName(const s
 
   if (headPixel.getIndex() != tailPixel.getIndex()) {
     name += "D" + std::to_string(headPixel.getV() - vStart) + '.' + std::to_string(headPixel.getU() - uStart);
+  }
+  return name;
+}
+
+
+const std::string Belle2::PXD::PXDClusterPositionEstimator::getMirroredShortName(const std::set<Belle2::PXD::Pixel>& pixels,
+    int uStart,
+    int vStart, int vSize, double thetaU,
+    double thetaV) const
+{
+  const Belle2::PXD::Pixel& headPixel = getHeadPixel(pixels, vStart, vSize, thetaU, thetaV);
+  const Belle2::PXD::Pixel& tailPixel = getTailPixel(pixels, vStart, vSize, thetaU, thetaV);
+  int vmax = vSize - 1;
+
+  std::string name = "S";
+  name += "D" + std::to_string(vmax - tailPixel.getV() + vStart) + '.' + std::to_string(tailPixel.getU() - uStart);
+
+  if (headPixel.getIndex() != tailPixel.getIndex()) {
+    name += "D" + std::to_string(vmax - headPixel.getV() + vStart) + '.' + std::to_string(headPixel.getU() - uStart);
   }
   return name;
 }

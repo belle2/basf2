@@ -70,9 +70,13 @@ namespace Belle2 {
       /** Return the normed charge ratio between head and tail pixels. */
       float computeEta(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /** Return a name for the pixel set */
+      /** Return the name for the pixel set */
       const std::string getShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
                                      double thetaV) const;
+
+      /** Return the mirrored name for the pixel set */
+      const std::string getMirroredShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
+                                             double thetaV) const;
 
       /** Return a name for the pixel set. */
       const std::string getFullName(const std::set<Pixel>& pixels, int uStart, int vStart) const;

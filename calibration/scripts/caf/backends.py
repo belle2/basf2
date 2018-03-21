@@ -102,6 +102,9 @@ class Job:
             return None
 
         def ready(self):
+            """
+            Returns the ready() status from the result of this SubJob
+            """
             return self.result.ready()
 
         @property
@@ -131,6 +134,8 @@ class Job:
             return getattr(self.parent, attribute)
 
         def __repr__(self):
+            """
+            """
             return self.name
 
     def __init__(self, name, config_file=""):
@@ -234,6 +239,7 @@ class Job:
         if self.subjobs:
             job_status = self._get_overall_status_from_subjobs()
             if job_status != self._status:
+                #: Not a real attribute, it's a property
                 self.status = job_status
         return self._status
 
@@ -351,7 +357,8 @@ class Result():
     def ready(self):
         """
         Returns whether or not this job result is ready. Uses the derived class's `update_status`
-        method to check the status if `_is_ready` isn't True.
+        method to check the status. Only runs `update_status` if it has never returned True before,
+        otherwise it just returns True.
         """
         B2DEBUG(29, "Calling {}.result.ready()".format(self.job.name))
         if self._is_ready:

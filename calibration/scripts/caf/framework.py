@@ -496,6 +496,7 @@ class Calibration(CalibrationBase):
             try:
                 B2INFO("Attempting collector submission for calibration {}.".format(self.name))
                 self.machine.submit_collector()
+                #: State of Calibration
                 self.state = self.machine.state
             except Except as err:
                 B2FATAL(str(err))

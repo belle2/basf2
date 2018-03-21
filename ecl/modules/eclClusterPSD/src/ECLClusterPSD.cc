@@ -15,15 +15,18 @@
 
 // ECL
 #include <ecl/modules/eclClusterPSD/ECLClusterPSD.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <mdst/dataobjects/ECLCluster.h>
+
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+// MDST
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -117,4 +120,3 @@ void ECLClusterPSDModule::endRun()
 void ECLClusterPSDModule::terminate()
 {
 }
-

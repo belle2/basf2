@@ -13,17 +13,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <stdlib.h>
+#include <iostream>
+
 // ECL
 #include <ecl/modules/eclWaveformFit/ECLWaveformFit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include "ecl/utility/ECLChannelMapper.h"
 #include <ecl/digitization/OfflineFitFunction.h>
 #include <ecl/digitization/EclConfiguration.h>
-
-#include <stdlib.h>
-#include <iostream>
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -36,6 +35,9 @@
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
+
+//MDST
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -75,8 +77,8 @@ void ECLWaveformFitModule::initialize()
   eclDsps.registerInDataStore(eclDspArrayName());
   eclDigits.registerInDataStore(eclDigitArrayName());
 
-  StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
-  eclEventInformationPtr.registerInDataStore(eclEventInformationName());
+  StoreObjPtr<EventLevelClusteringInfo> eventLevelClusteringInfoPtr(eventLevelClusteringInfoName());
+  eventLevelClusteringInfoPtr.registerInDataStore(eventLevelClusteringInfoName());
 
 }
 

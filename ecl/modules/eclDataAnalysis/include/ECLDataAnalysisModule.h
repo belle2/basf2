@@ -21,7 +21,6 @@
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 // FRAMEWORK
@@ -109,8 +108,6 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusters;
     /** Store array: ECLLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
     /** Store object pointer: EventLevelClusteringInfo. */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
@@ -181,7 +178,7 @@ namespace Belle2 {
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
 
-    //EventLevelClusterInfo
+    //EventLevelClusteringInfo
     /** Number of out of time, energetic ECLCalDigits, FWD. */
     uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
     /** Number of out of time, energetic ECLCalDigits, Barrel. */

@@ -68,9 +68,9 @@ namespace Belle2 {
     virtual const char* eclDspArrayName() const
     { return "ECLDsps" ; }
 
-    /** Name of the ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name of the EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
   private:
     std::vector<double> FitWithROOT(double, std::vector<double>, std::vector<double>, int);  /** Fit with ROOT::Fit function.*/

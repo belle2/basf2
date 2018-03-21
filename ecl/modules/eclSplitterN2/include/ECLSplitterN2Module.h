@@ -11,15 +11,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSPLITTERN2MODULE_H_
-#define ECLSPLITTERN2MODULE_H_
+#pragma once
 
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -28,6 +26,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
+  class EventLevelClusteringInfo;
 
   /** Class to perform the shower correction */
   class ECLSplitterN2Module : public Module {
@@ -78,8 +77,8 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** Default name ECLCalDigits */
     virtual const char* eclCalDigitArrayName() const
@@ -97,9 +96,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
   }; // end of ECLSplitterN2Module
 
@@ -123,12 +122,10 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
   }; // end of ECLSplitterN2PureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

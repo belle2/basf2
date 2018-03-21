@@ -14,7 +14,7 @@
 #include <TTree.h>
 #include <TFile.h>
 
-#include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
+// FRAMEWORK
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -24,9 +24,13 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
+// MDST
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
+// ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
@@ -36,9 +40,7 @@
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
-
-//MDST
-#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
 
 using namespace std;
 using namespace Belle2;
@@ -859,7 +861,7 @@ void ECLDataAnalysisModule::event()
 
   B2DEBUG(1, "  ++++++++++++++ ECLDataAnalysisModule");
 
-  //EventLevelClusterInfo
+  //EventLevelClusteringInfo
   m_nECLCalDigitsOutOfTimeFWD = 0;
   m_nECLCalDigitsOutOfTimeBarrel = 0;
   m_nECLCalDigitsOutOfTimeBWD = 0;

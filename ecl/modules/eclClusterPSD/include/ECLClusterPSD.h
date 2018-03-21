@@ -57,9 +57,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name of the ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name of the EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
   private:
     double m_Chi2Threshold;   /** Two component fit chi square threshold .*/
@@ -79,9 +79,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** PureCsI Name of the ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
   };
 
 } // end Belle2 namespace

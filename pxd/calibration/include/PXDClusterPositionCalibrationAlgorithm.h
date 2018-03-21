@@ -10,6 +10,10 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
+#include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
+#include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
+
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -21,20 +25,38 @@ namespace Belle2 {
     /// Constructor set the prefix to PXDClusterPositionCalibrationAlgorithm
     PXDClusterPositionCalibrationAlgorithm();
 
-    /// Destructor
-    virtual ~PXDClusterPositionCalibrationAlgorithm() {}
-
     /// Minimum number of collected clusters for estimating shape likelyhood
     int minClusterForShapeLikelyhood;
 
-    /// Minimum number of collected clusters for estimating cluster position offset
+    /// Minimum number of collected clusters for estimating cluster position offsets
     int minClusterForPositionOffset;
+
+    /// Maximum number of eta bins for estimating cluster position offsets
+    int maxEtaBins;
+
+    /// Vector of clusterkinds to calibrate
+    std::vector<int> clusterKinds;
 
   protected:
 
     /// Run algo on data
     virtual EResult calibrate();
 
+  private:
+
+    /// Returns a new classifier and index trained on cluster tree
+    void createShapeClassifier(std::string treename, PXDClusterShapeClassifierPar* classifier, PXDClusterShapeIndexPar* index);
+
+    /** Name of cluster shape */
+    std::string m_shapeName;
+    /** Name of mirrored cluster shape */
+    std::string m_mirroredShapeName;
+    /** Eta value of cluster */
+    float m_clusterEta;
+    /** Position offset u of cluster */
+    float m_positionOffsetU;
+    /** Position offset v of cluster */
+    float m_positionOffsetV;
 
   };
 } // namespace Belle2

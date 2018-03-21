@@ -13,13 +13,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <calibration/CalibrationCollectorModule.h>
-#include <TClonesArray.h>
 #include <string>
 
 namespace Belle2 {
   /**
    * Calibration collector module for PXD cluster position estimation
-   *
    *
    */
   class PXDClusterPositionCollectorModule : public CalibrationCollectorModule {
@@ -40,11 +38,22 @@ namespace Belle2 {
     /** Name of the collection to use for PXDClusters */
     std::string m_storeClustersName;
 
-    /** Array of clusters related to a truehit (always has one entry). */
-    TClonesArray* m_rootPxdClusterArray;
-    /** Array of digits related to a cluster. */
-    TClonesArray* m_rootPxdDigitArray;
-    /** Array of truehits related to a cluster. */
-    TClonesArray* m_rootPxdTrueHitArray;
+    /** Collect data for Clusterkind  */
+    int m_clusterKind;
+    /** Number of bins for thetaU  */
+    int m_binsU;
+    /** Number of bins for thetaV  */
+    int m_binsV;
+
+    /** Name of cluster shape */
+    std::string m_shapeName;
+    /** Name of mirrored cluster shape */
+    std::string m_mirroredShapeName;
+    /** Eta value of cluster */
+    float m_clusterEta;
+    /** Position offset u of cluster */
+    float m_positionOffsetU;
+    /** Position offset v of cluster */
+    float m_positionOffsetV;
   };
 }

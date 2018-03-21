@@ -14,7 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
-#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <framework/database/DBObjPtr.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 
@@ -37,7 +36,7 @@ namespace Belle2 {
     typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
 
     static std::string threshold_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar< float > > t_threshold_payload;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_threshold_payload;
 
     /** Constructor, no input argument is required */
     SVDOccupancyCalibrations()

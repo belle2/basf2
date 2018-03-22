@@ -20,7 +20,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -315,16 +315,127 @@ namespace Belle2 {
       return T.getBeamParams().getCovVertex()(elementI, elementJ);
     }
 
-
+    // Event shape -> thrust, missing momentum in lab and CMS
     double thrustOfEvent(const Particle*)
     {
-      StoreObjPtr<ThrustOfEvent> thrust;
-      if (!thrust) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double th = thrust->getThrust();
+      double th = evtShape->getThrust();
       return th;
+    }
+
+    double thrustOfEvent_Px(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double th = evtShape->getThrustAxis().Px();
+      return th;
+    }
+
+    double thrustOfEvent_Py(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double th = evtShape->getThrustAxis().Py();
+      return th;
+    }
+
+    double thrustOfEvent_Pz(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double th = evtShape->getThrustAxis().Pz();
+      return th;
+    }
+
+    double missingMomentumOfEvent_Px(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentum().Px();
+      return missing;
+    }
+
+    double missingMomentumOfEvent_Py(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentum().Py();
+      return missing;
+    }
+
+    double missingMomentumOfEvent_Pz(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentum().Pz();
+      return missing;
+    }
+
+    double CMSmissingMomentumOfEvent_Px(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentumCMS().Px();
+      return missing;
+    }
+
+    double CMSmissingMomentumOfEvent_Py(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentumCMS().Py();
+      return missing;
+    }
+
+    double CMSmissingMomentumOfEvent_Pz(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentumCMS().Pz();
+      return missing;
+    }
+
+    double missingThetaOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      TVector3 missingMomentum = evtShape->getMissingMomentum();
+      double missingTheta = missingMomentum.Theta();
+      return missingTheta;
     }
 
 
@@ -375,7 +486,28 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
 
-    REGISTER_VARIABLE("thrustOfEvent", thrustOfEvent, "[Eventbased] Thrust of the event obtained with ThrustOfEvent module")
+    REGISTER_VARIABLE("thrustOfEvent", thrustOfEvent,
+                      "[Eventbased] The magnitude of the thrust axis of the event obtained with EventShape module")
+    REGISTER_VARIABLE("thrustOfEvent_Px", thrustOfEvent_Px,
+                      "[Eventbased] The x component of the thrust axis of the event obtained with EventShape module")
+    REGISTER_VARIABLE("thrustOfEvent_Py", thrustOfEvent_Py,
+                      "[Eventbased] The y component of the thrust axis of the event obtained with EventShape module")
+    REGISTER_VARIABLE("thrustOfEvent_Pz", thrustOfEvent_Pz,
+                      "[Eventbased] The z component of the thrust axis of the event obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEvent_Px", missingMomentumOfEvent_Px,
+                      "[Eventbased] The x component of the missing momentum in lab obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEvent_Py", missingMomentumOfEvent_Py,
+                      "[Eventbased] The y component of the missing momentum in lab obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz,
+                      "[Eventbased] The z component of the missing momentum in lab obtained with EventShape module")
+    REGISTER_VARIABLE("CMSmissingMomentumOfEvent_Px", CMSmissingMomentumOfEvent_Px,
+                      "[Eventbased] The x component of the missing momentum in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("CMSmissingMomentumOfEvent_Py", CMSmissingMomentumOfEvent_Py,
+                      "[Eventbased] The y component of the missing momentum in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("CMSmissingMomentumOfEvent_Pz", CMSmissingMomentumOfEvent_Pz,
+                      "[Eventbased] The z component of the missing momentum in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("missingThetaOfEvent", missingThetaOfEvent,
+                      "[Eventbased] Missing momentum theta of the event obtained with EventShape module in lab")
 
   }
 }

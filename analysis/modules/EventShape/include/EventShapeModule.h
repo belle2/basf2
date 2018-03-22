@@ -3,13 +3,13 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jorge Martinez, Michel Villanueva                        *                                                    *
+ * Contributors: Michel Villanueva, Ami Rostomyan, Jorge Martinez         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef THRUSTOFEVENTMODULE_H
-#define THRUSTOFEVENTMODULE_H
+#ifndef EVENTSHAPEMODULE_H
+#define EVENTSHAPEMODULE_H
 
 #include <cstdlib>
 #include <ctime>
@@ -20,7 +20,7 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
@@ -35,19 +35,19 @@ namespace Belle2 {
    *
    *    *
    */
-  class ThrustOfEventModule : public Module {
+  class EventShapeModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    ThrustOfEventModule();
+    EventShapeModule();
 
     /** free memory */
-    virtual ~ThrustOfEventModule();
+    virtual ~EventShapeModule();
 
-    /** Define the physical parameters. llok for them in database. */
+    /** Define the physical parameters. look for them in database. */
     virtual void initialize();
 
     /** Define run parameters. */
@@ -68,9 +68,13 @@ namespace Belle2 {
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
     /** Get all momenta and then calculate the thrust for this event */
-    TVector3 getThrustOfEvent(std::vector<std::string>  m_particleList);
+    std::vector<TVector3> particleMomentumList, particleMomentumListCMS;
+    void getParticleMomentumLists(std::vector<std::string> particleLists);
 
+    TVector3 getThrustOfEvent();
+    TVector3 getMissingMomentumCMS();
+    TVector3 getMissingMomentum();
   };
 }
 
-#endif /* THRUSTOFEVENTMODULE_H */
+#endif /* EVENTSHAPEMODULE_H */

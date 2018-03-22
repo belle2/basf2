@@ -437,12 +437,12 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      // TODO: can we get hypothesis enumerator instead of hard coded values
-      if (cluster->getHypothesisId() != 5 && cluster->getHypothesisId() != 1)
+      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons
+          && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_muonNPhotons)
         continue;
 
       // TODO: allow at some point
-      //cluster->getHypothesisId() != 3)
+      //cluster->getHypothesisId() != ECLCluster::Hypothesis::c_electronNPhotons)
 
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();

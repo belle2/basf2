@@ -47,7 +47,6 @@ int main(int argc, char* argv[])
     std::cerr << "If OUTPUT_FILE is not given, histograms will be drawn instead of being saved.\n";
     return 1;
   }
-  RootIOUtilities::loadDictionaries();
 
   const TString input_filename(argv[1]);
   TString output_filename;
@@ -116,7 +115,7 @@ int main(int argc, char* argv[])
             break;
           case Dedx::c_SVD:
             flayer_selection = TString::Format("%s < -2", flayer_var);
-            dedx_cutoff = 2e4;
+            dedx_cutoff = 5e6;
             break;
           case Dedx::c_CDC:
             break;

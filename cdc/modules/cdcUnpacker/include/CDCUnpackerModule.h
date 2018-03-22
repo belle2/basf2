@@ -15,11 +15,13 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
+#include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -148,6 +150,12 @@ namespace Belle2 {
        * Load FE channel to cell ID map.
        */
       void loadMap();
+
+      /**
+       * Set DBobject of ADC delta pedestal.
+       */
+      void setADCPedestal();
+
 
       /**
        * Getter of Wire ID.
@@ -311,7 +319,15 @@ namespace Belle2 {
        */
       DBArray<CDCChannelMap> m_channelMapFromDB;
 
+      /**
+       * ADC delta pedestal.
+       */
+      DBObjPtr<CDCADCDeltaPedestals>* m_adcPedestalFromDB = nullptr;
 
+      /**
+       * Whether pedestal is subtracted (true) or not (false).
+       */
+      bool m_pedestalSubtraction = false;
       /**
        * Input array for CDC Raw.
        */

@@ -5,6 +5,7 @@
 #include <TMath.h>
 
 using namespace Belle2;
+using namespace ECL;
 
 void ECLElectronPdf::init(const char* parametersFileName)
 {

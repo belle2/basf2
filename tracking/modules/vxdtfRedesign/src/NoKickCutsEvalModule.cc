@@ -12,14 +12,13 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <TFile.h>
-#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <tracking/modules/vxdtfRedesign/NoKickCutsEvalModule.h>
 
 
 #include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>
-#include "TFile.h"
 #include <TCanvas.h>
 #include <iostream>
 #include <fstream>
@@ -53,16 +52,8 @@ NoKickCutsEvalModule::NoKickCutsEvalModule() : Module()
   addParam("useFitMethod", c_fitMethod, "apply the method of double-gaussian fit to evaluate the cuts", false);
 }
 
-
-NoKickCutsEvalModule::~NoKickCutsEvalModule()
-{
-}
-
-
-
 void NoKickCutsEvalModule::initialize()
 {
-
   m_histoLim.push_back(0.4 * c_multLimit);
   m_histoLim.push_back(1. * c_multLimit);
   m_histoLim.push_back(0.3 * c_multLimit);
@@ -111,17 +102,10 @@ void NoKickCutsEvalModule::initialize()
   RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
   RelationArray recoTracksToMCParticles(recoTracks , storeMCParticles);
 
-
-
   /** inizialize output TFile with cuts-histograms */
   m_outputFile = new TFile("NoKickCuts.root", "RECREATE");
-
-
-
-
 }
 
-void NoKickCutsEvalModule::beginRun() {}
 
 void NoKickCutsEvalModule::event()
 {
@@ -166,8 +150,6 @@ void NoKickCutsEvalModule::event()
     }
   }
 }
-
-
 
 
 void NoKickCutsEvalModule::endRun()
@@ -492,12 +474,6 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EP
   int layer1 = hit1.m_sensorLayer;
   int layer2 = hit2.m_sensorLayer;
   double layerdiff = layer2 - layer1;
-  // bool zeroFlag = true;
-  // if(is0){
-  //   if(layer1>2){
-  //     zeroFlag = false;
-  //   }
-  // }
   if (layerdiff >= 0 && layerdiff < 3) {
     switch (par) {
       case NoKickCuts::c_Omega:

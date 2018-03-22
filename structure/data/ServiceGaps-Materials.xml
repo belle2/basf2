@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <!--Can switch the material of the gap beteewn ARICH and tOP, TOP and ECL, barrel and endcap of ECL.-->
+  <Material name="Arich_TopGapback">
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="Top_ECLGapback">
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="ECLGapback">
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="ECLGapfor">
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="CDCGapback">
+  <!--Can switch the material of the gap beteewn ECL and CDC backward.-->
+    <Components>
+    <!-- <Material>Al</Material> -->
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="CDCGapfor">
+  <!-- Can switch the material of the gap beteewn CDC and ARICH forward.-->
+    <Components>
+    <!-- <Material>Al</Material> -->
+      <Material>Air</Material>
+    </Components>
+  </Material>
+</Materials>

@@ -104,7 +104,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
 void MillepedeCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData>::required();
+  // required input
+  m_eventMetaData.isRequired();
 
   if (m_tracks.empty() && m_particles.empty() && m_vertices.empty() && m_primaryVertices.empty())
     B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");
@@ -480,10 +481,12 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
           } else {
             std::vector<double> weights = kalmanFitterInfo->getWeights();
             if (weights.size() == 2) {
-              if (weights.at(0) > weights.at(1))
+              if (weights.at(0) > weights.at(1) && weights.at(1) > 0.)
                 recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
-              else if (weights.at(0) < weights.at(1))
+              else if (weights.at(0) < weights.at(1) && weights.at(0) > 0.)
                 recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+              else
+                recoHitInformation.setUseInFit(false);
             }
           }
         }

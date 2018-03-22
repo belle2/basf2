@@ -4,6 +4,7 @@
 #include <TMath.h>
 
 using namespace Belle2;
+using namespace ECL;
 
 void ECLPionPdf::init(const char* parametersFileName)
 {

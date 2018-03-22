@@ -13,6 +13,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 #include <string>
@@ -62,6 +63,8 @@ namespace Belle2 {
     void eventInformation(PhysicsTriggerInformation& phy);
 
   private:
+    /// Array for PhysicsTriggerInformation.
+    StoreArray<PhysicsTriggerInformation> m_physicsTriggerInformation;
 
     /**Access users' cut */
     std::string m_hltcut;

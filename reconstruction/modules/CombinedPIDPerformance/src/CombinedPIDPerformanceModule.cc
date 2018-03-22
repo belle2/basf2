@@ -10,15 +10,9 @@
 
 #include <reconstruction/modules/CombinedPIDPerformance/CombinedPIDPerformanceModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <root/TTree.h>
 #include <root/TAxis.h>
@@ -57,11 +51,11 @@ void CombinedPIDPerformanceModule::initialize()
 
   B2INFO("Making PID Performance plots...");
 
-  // MCParticles, Tracks, PIDLikelihoods needed for this module
-  StoreArray<MCParticle>::required();
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
-  StoreArray<PIDLikelihood>::required();
+  // required input
+  m_tracks.isRequired();
+  m_trackFitResults.isRequired();
+  m_pidLikelihoods.isRequired();
+  m_mcParticles.isRequired();
 
   // create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -184,11 +178,9 @@ void CombinedPIDPerformanceModule::initialize()
 
 void CombinedPIDPerformanceModule::event()
 {
-  StoreArray<Track> tracks;
+  for (const auto& track : m_tracks) {
 
-  for (const auto& track : tracks) {
-
-    const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!trackFit) {
       B2WARNING("No track fit result... Skipping.");
       continue;

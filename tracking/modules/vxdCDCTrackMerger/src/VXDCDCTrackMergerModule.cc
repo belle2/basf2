@@ -160,7 +160,8 @@ void VXDCDCTrackMergerModule::event()
     }    //end loop on VXD tracks
 
     if (matched_track) {
-      m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack);
+      // -1 is the convention for "before the CDC track" in the related tracks combiner
+      m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack, -1);
     }
   }
 }

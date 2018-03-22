@@ -22,7 +22,8 @@ namespace Belle2 {
   /**
    * NtupleTool to write out ECL cluster quanties for a given Particle
    * - region : detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]
-   * - E9E25  : ratio of energies in inner 3x3 and 5x5 cells
+   * - E1E9   : ratio of energies in central cell and 3x3 cells
+   * - E9E21  : ratio of energies in inner 3x3 and 5x5-corner cells
    * - nHits  : number of hits associated to this cluster
    * - trackM : 1/0 if charged track is/is not Matched to this cluster
    */
@@ -50,11 +51,23 @@ namespace Belle2 {
     /** detection region in the ECL [1 - forward, 2 - barrel, 3 - backward] */
     int* m_region;
 
-    /**  ratio of energies in inner 3x3 and 5x5 cells */
-    float* m_e9e25;
+    /**  ratio of energies in central cell and 3x3 cells */
+    float* m_e1e9;
+
+    /**  cluster hadron scintillation component intensity*/
+    float* m_ClusterHadronIntensity;
+
+    /**  number of cluster digits with significant (>3 MeV) hadron component light output*/
+    float* m_NumberOfHadronDigits;
+
+    /**  ratio of energies in inner 3x3 and 5x5-corner cells */
+    float* m_e9e21;
 
     /** number of hits associated to this cluster */
     int* m_nHits;
+
+    /**  Status of pulse shape discrimination variables. 0 = no PSD  information (no waveforms), 1 = PSD cluster has PSD information */
+    int* m_ClusterHasPSD;
 
     /** 1/0 if charged track is/is not Matched to this cluster */
     int* m_trackM;

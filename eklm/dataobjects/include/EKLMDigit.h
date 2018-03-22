@@ -69,6 +69,18 @@ namespace Belle2 {
     void setCharge(uint16_t charge);
 
     /**
+     * Get CTIME.
+     * @return CTIME.
+     */
+    uint16_t getCTime() const;
+
+    /**
+     * Set CTIME.
+     * @param[in] ctime CTime
+     */
+    void setCTime(uint16_t ctime);
+
+    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
@@ -160,6 +172,9 @@ namespace Belle2 {
     /** Charge (integral of ADC signal). */
     uint16_t m_Charge;
 
+    /** CTIME (time provided by B2TT). */
+    uint16_t m_CTime;
+
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
 
@@ -170,7 +185,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 7);
+    ClassDef(Belle2::EKLMDigit, 8);
 
   };
 

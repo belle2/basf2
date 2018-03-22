@@ -8,65 +8,39 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/dataobjects/EventT0.h>
-#include <framework/logging/Logger.h>
-#include <cmath>
 
 using namespace Belle2;
 
-std::pair<double, double> EventT0::getEventT0WithUncertainty(const Const::DetectorSet& detectorSet) const
+// Final event t0
+/// Check if a final event t0 is set
+bool EventT0::hasEventT0() const
 {
-  std::pair<double, double> eventT0WithUncertainty = {0, 0};
-  double preFactor = 0;
-
-  bool found = false;
-
-  for (const EventT0Component& component : m_eventT0List) {
-    if (detectorSet.getIndex(component.detector) != -1 and component.eventT0.isDoubleStored()) {
-      found = true;
-      const double oneOverUncertaintySquared = 1.0f / component.eventT0.getDoubleUncertaintySquared();
-      eventT0WithUncertainty.first += component.eventT0.getDoubleValue()  * oneOverUncertaintySquared;
-      preFactor += oneOverUncertaintySquared;
-    }
-  }
-
-  if (!found) {
-    B2ERROR("No double EventT0 available for the given detector set. Returning 0, 0.");
-    return std::make_pair(0, 0);
-  }
-
-  eventT0WithUncertainty.first /= preFactor;
-  eventT0WithUncertainty.second = std::sqrt(1.0f / preFactor);
-
-  return eventT0WithUncertainty;
+  return m_hasEventT0;
 }
 
-int EventT0::getBinnedEventT0(const Const::DetectorSet& detectorSet) const
+/// Return the final event t0, if one is set. Else, return NAN.
+double EventT0::getEventT0() const
 {
-  for (const EventT0Component& component : m_eventT0List) {
-    if (detectorSet.getIndex(component.detector) != -1 and not component.eventT0.isDoubleStored()) {
-      return component.eventT0.getIntValue();
-    }
-  }
-
-  B2ERROR("No binned EventT0 available for the given detector set. Returning 0, 0.");
-  return 0;
+  return m_eventT0.eventT0;
 }
 
-Const::DetectorSet EventT0::getDetectors() const
+/// Return the final event t0 uncertainty, if one is set. Else, return NAN.
+double EventT0::getEventT0Uncertainty() const
 {
-  Const::DetectorSet detectorSet;
-
-  for (const EventT0Component& component : m_eventT0List) {
-    detectorSet += component.detector;
-  }
-
-  return detectorSet;
+  return m_eventT0.eventT0Uncertainty;
 }
 
-bool EventT0::hasEventT0(const Const::DetectorSet& detectorSet) const
+/// Replace/set the final double T0 estimation
+void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
 {
-  for (const EventT0Component& component : m_eventT0List) {
-    if (detectorSet.getIndex(component.detector) != -1) {
+  m_eventT0 = EventT0Component(eventT0, eventT0Uncertainty, detector);
+  m_hasEventT0 = true;
+}
+
+bool EventT0::hasTemporaryEventT0(const Const::DetectorSet& detectorSet) const
+{
+  for (const EventT0Component& eventT0Component : m_temporaryEventT0List) {
+    if (detectorSet.contains(eventT0Component.detector)) {
       return true;
     }
   }
@@ -74,24 +48,33 @@ bool EventT0::hasEventT0(const Const::DetectorSet& detectorSet) const
   return false;
 }
 
-bool EventT0::hasDoubleEventT0(const Const::DetectorSet& detectorSet) const
+const std::vector<EventT0::EventT0Component>& EventT0::getTemporaryEventT0s() const
 {
-  for (const EventT0Component& component : m_eventT0List) {
-    if (detectorSet.getIndex(component.detector) != -1 and component.eventT0.isDoubleStored()) {
-      return true;
-    }
-  }
-
-  return false;
+  return m_temporaryEventT0List;
 }
 
-bool EventT0::hasBinnedEventT0(const Const::DetectorSet& detectorSet) const
+Const::DetectorSet EventT0::getTemporaryDetectors() const
 {
-  for (const EventT0Component& component : m_eventT0List) {
-    if (detectorSet.getIndex(component.detector) != -1 and not component.eventT0.isDoubleStored()) {
-      return true;
-    }
+  Const::DetectorSet temporarySet;
+
+  for (const EventT0Component& eventT0Component : m_temporaryEventT0List) {
+    temporarySet += eventT0Component.detector;
   }
 
-  return false;
+  return temporarySet;
+}
+
+unsigned long EventT0::getNumberOfTemporaryEventT0s() const
+{
+  return m_temporaryEventT0List.size();
+}
+
+void EventT0::addTemporaryEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
+{
+  m_temporaryEventT0List.emplace_back(eventT0, eventT0Uncertainty, detector);
+}
+
+void EventT0::clearTemporaries()
+{
+  m_temporaryEventT0List.clear();
 }

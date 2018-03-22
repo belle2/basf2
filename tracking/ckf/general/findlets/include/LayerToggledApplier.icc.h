@@ -11,6 +11,7 @@
 
 #include <tracking/ckf/general/findlets/LayerToggledApplier.dcl.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
 
@@ -29,7 +30,8 @@ namespace Belle2 {
       const std::string& prefix)
   {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toggleOnLayer"),
-                                  m_param_toggleOnLayer, "", m_param_toggleOnLayer);
+                                  m_param_toggleOnLayer, "Where to toggle between low, equal and high filter",
+                                  m_param_toggleOnLayer);
 
     m_highLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "high"));
     m_equalLayerFindlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "equal"));
@@ -38,7 +40,7 @@ namespace Belle2 {
 
   /// The weight is calculated using the subfilter based on the geometrical layer of the state.
   template <class AState, class AFindlet>
-  void LayerToggledApplier<AState, AFindlet>::apply(const std::vector<const AState*>& currentPath,
+  void LayerToggledApplier<AState, AFindlet>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                                                     std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     const AState* previousState = currentPath.back();

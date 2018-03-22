@@ -26,8 +26,6 @@ namespace Belle2 {
       virtual ~T0CalibrationAlgorithm() {}
       /// turn on/off debug.
       virtual void setDebug(bool debug = false) {m_debug = debug; }
-      /// use DB or text mode.
-      virtual void setUseDB(bool useDB = true) {m_useDB = useDB; }
       /// store Hisotgram or not.
       virtual void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
@@ -39,16 +37,19 @@ namespace Belle2 {
       /// Maximum mean of dt of all channels distribution, condition to stop iterating
       void setMaxMeanDt(double maxMeanDt) {m_maxMeanDt = maxMeanDt;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
       /// output xt T0 file name (for text mode)
-      void outputT0FileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
+      void setOutputFileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
 
     protected:
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void createHisto();
+      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db
-      virtual void write();
+      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
@@ -57,8 +58,8 @@ namespace Belle2 {
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
       /*Condition to stop iterate minDt <m_maxDt and rmsDt<m_maxRMS*/
-      double m_maxMeanDt = 0.2;   /**< Mean of dT distribution  of all channels;*/
-      double m_maxRMSDt = 1;   /**< RMS of dT distribution  of all channels*/
+      double m_maxMeanDt = 0.05;   /**< Mean of dT distribution  of all channels;*/
+      double m_maxRMSDt = 0.8;   /**< RMS of dT distribution  of all channels*/
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/
@@ -66,7 +67,7 @@ namespace Belle2 {
 
       bool m_debug;   /**< debug. */
       bool m_storeHisto; /**< store histo or not*/
-      bool m_useDB; /**< use DB or text mode*/
+      bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
     };
   }// name space CDC

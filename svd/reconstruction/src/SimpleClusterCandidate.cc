@@ -34,6 +34,7 @@ namespace Belle2 {
       , m_positionError(0)
       , m_SNR(0)
       , m_seedSNR(0)
+      , m_seedIndex(-1)
       , m_strips(4) {m_strips.clear();};
 
     bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
@@ -71,6 +72,8 @@ namespace Belle2 {
     void SimpleClusterCandidate::finalizeCluster()
     {
 
+      m_stopCreationCluster = false;
+
       const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
 
@@ -92,9 +95,15 @@ namespace Belle2 {
         noise += aStrip.noise * aStrip.noise;
       }
 
+      if ((m_charge == 0) || (noise == 0)) {
+        m_stopCreationCluster = true;
+        return;
+      }
+
       noise = sqrt(noise);
       m_time /= m_charge;
       m_SNR = m_charge / noise;
+
 
       if (clusterSize < m_sizeHeadTail) { // COG, size = 1 or 2
         m_position /= m_charge;
@@ -105,16 +114,30 @@ namespace Belle2 {
           m_positionError = pitch * phantomCharge / (m_charge + phantomCharge);
         } else {
           double a = m_cutAdjacent;
+          if (m_strips.at(0).noise == 0) {
+            m_stopCreationCluster = true;
+            return;
+          }
           double sn = m_charge / m_strips.at(0).noise;
+          if (sn == 0) {
+            m_stopCreationCluster = true;
+            return;
+          }
           m_positionError = a * pitch / sn;
         }
       } else { // Head-tail
         double centreCharge = (m_charge - minStripCharge - maxStripCharge) / (clusterSize - 2);
+        if (centreCharge == 0) {
+          m_stopCreationCluster = true;
+          return;
+        }
+
         minStripCharge = (minStripCharge < centreCharge) ? minStripCharge : centreCharge;
         maxStripCharge = (maxStripCharge < centreCharge) ? maxStripCharge : centreCharge;
         double minPos = m_isUside ? info.getUCellPosition(minStripCellID) : info.getVCellPosition(minStripCellID);
         double maxPos = m_isUside ? info.getUCellPosition(maxStripCellID) : info.getVCellPosition(maxStripCellID);
         m_position = 0.5 * (minPos + maxPos + (maxStripCharge - minStripCharge) / centreCharge * pitch);
+
         double sn = centreCharge / m_cutAdjacent / noise;
         // Rough estimates of Landau noise
         double landauHead = minStripCharge / centreCharge;
@@ -135,6 +158,11 @@ namespace Belle2 {
     {
 
       bool isGood = false;
+
+      if (m_stopCreationCluster) {
+        B2WARNING("Something is wrong in the cluster creation, this cluster will not be created!");
+        return false;
+      }
 
       if (m_seedCharge > 0 && m_seedSNR >= m_cutSeed)
         isGood = true;

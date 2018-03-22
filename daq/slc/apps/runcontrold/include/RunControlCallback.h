@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual void ok(const char* nodename, const char* data) throw();
     virtual void error(const char* nodename, const char* data) throw();
     virtual void fatal(const char* nodename, const char* data) throw();
-    virtual void boot(const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual void stop() throw(RCHandlerException);
@@ -41,6 +41,8 @@ namespace Belle2 {
     virtual bool pause() throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
     virtual void monitor() throw(RCHandlerException);
+    virtual void vset(NSMCommunicator& com, const NSMVar& v) throw();
+    virtual void check() throw(RCHandlerException);
 
   public:
     void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }
@@ -71,6 +73,7 @@ namespace Belle2 {
     void setExpNumber(int expno) throw();
     bool setRCUsed(int used) throw();
     bool getRCUsed() throw();
+    void setGlobalAll(bool isglobal) throw();
 
   private:
     RCCallback* m_callback;

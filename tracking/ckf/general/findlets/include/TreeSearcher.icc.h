@@ -10,11 +10,14 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
 #include <framework/logging/Logger.h>
+
 #include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/ca/CellHolder.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
   template <class AState, class AStateRejecter, class AResult>
@@ -27,6 +30,10 @@ namespace Belle2 {
   void TreeSearcher<AState, AStateRejecter, AResult>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     m_stateRejecter.exposeParameters(moduleParamList, prefix);
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "endEarly"), m_param_endEarly,
+                                  "Make it possible to have all subresults in the end result vector.",
+                                  m_param_endEarly);
   }
 
   template <class AState, class AStateRejecter, class AResult>
@@ -42,11 +49,11 @@ namespace Belle2 {
     const std::vector<AState*>& statePointers = TrackFindingCDC::as_pointers<AState>(hitStates);
     m_automaton.applyTo(statePointers, relations);
 
-    std::vector<const AState*> path;
+    std::vector<TrackFindingCDC::WithWeight<const AState*>> path;
     for (const AState& state : seededStates) {
       B2DEBUG(50, "Starting with new seed...");
 
-      path.push_back(&state);
+      path.emplace_back(&state, 0);
       traverseTree(path, relations, results);
       path.pop_back();
       B2ASSERT("Something went wrong during the path traversal", path.empty());
@@ -56,12 +63,14 @@ namespace Belle2 {
   }
 
   template <class AState, class AStateRejecter, class AResult>
-  void TreeSearcher<AState, AStateRejecter, AResult>::traverseTree(std::vector<const AState*>& path,
+  void TreeSearcher<AState, AStateRejecter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>& path,
       const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
       std::vector<AResult>& results)
   {
-    // Make it possible to end earlier (with less hits)
-    results.emplace_back(path);
+    if (m_param_endEarly) {
+      // Make it possible to end earlier (with less hits)
+      results.emplace_back(path);
+    }
 
     // Implement only graph traversal logic and leave the extrapolation and selection to the
     // rejecter.
@@ -87,11 +96,14 @@ namespace Belle2 {
 
     // Do everything with child states, linking, extrapolation, teaching, discarding, what have
     // you.
-    const std::vector<const AState*>& constPath = path;
+    const std::vector<TrackFindingCDC::WithWeight<const AState*>>& constPath = path;
     m_stateRejecter.apply(constPath, childStates);
 
     if (childStates.empty()) {
       B2DEBUG(50, "Terminating this route, as there are no possible child states.");
+      if (not m_param_endEarly) {
+        results.emplace_back(path);
+      }
       return;
     }
 
@@ -102,8 +114,8 @@ namespace Belle2 {
     std::sort(childStates.begin(), childStates.end(), stateLess);
 
     B2DEBUG(50, "Having found " << childStates.size() << " child states.");
-    for (const AState* childState : childStates) {
-      path.push_back(childState);
+    for (const TrackFindingCDC::WithWeight<AState*>& childState : childStates) {
+      path.emplace_back(childState, childState.getWeight());
       traverseTree(path, relations, results);
       path.pop_back();
     }

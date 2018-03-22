@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -56,7 +56,7 @@ namespace Belle2 {
     std::set<hitXP, hitXP::timeCompare> m_setHitXP; /**< set of hit to order the hit in time */
     std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
-    double m_pmax = 2.; /**< range analyzed with cuts */
+    double m_pmax = 10.; /**< range analyzed with cuts */
     int m_numberOfCuts; /**< number of catastrophic interaction for each track */
     bool m_outputFlag; /**< true=produce validation output */
 
@@ -68,6 +68,12 @@ namespace Belle2 {
     TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
     TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
     TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
+    bool m_isCutted; /**< Indicator if cut is applied */
+    double m_pMag; /**< momentum magnitut */
+    double m_pt; /**< transverse momentum */
+    double m_pdgID; /**< pdg Code */
+    int m_Ncuts; /**< number of times the cut is applied on a particle */
+    TTree* m_noKickTree; /**< TTree to which the information is written */
 
     /** Constructor with input file for use specific cuts file and allows validation */
     NoKickRTSel(std::string fileName, bool outputHisto) :
@@ -142,6 +148,14 @@ namespace Belle2 {
 
         m_nCutHit = new TH1F("m_nCutHit", "m_nCutHit", 30, 0, 30);
 
+
+        m_noKickTree = new TTree("noKickTree", "noKickTree");
+        m_noKickTree->Branch("is_rejected", &m_isCutted);
+        m_noKickTree->Branch("p_mag", &m_pMag);
+        m_noKickTree->Branch("pt", &m_pt);
+        m_noKickTree->Branch("pdgID", &m_pdgID);
+        m_noKickTree->Branch("number_of_rejected_SP", &m_Ncuts);
+
         m_outputFlag = true;
       }
 
@@ -152,8 +166,7 @@ namespace Belle2 {
     */
     void produceHistoNoKick();
 
-
+    /// Making this class a ROOT class
     ClassDef(NoKickRTSel, 1);
   };
-
 } /** end namespace Belle2 */

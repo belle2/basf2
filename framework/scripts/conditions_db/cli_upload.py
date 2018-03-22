@@ -13,6 +13,7 @@ import os
 from basf2 import B2FATAL, B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from . import calculate_checksum
 from concurrent.futures import ThreadPoolExecutor
+from collections import defaultdict
 
 
 class LocalDatabaseEntry:
@@ -87,6 +88,11 @@ class LocalDatabaseEntry:
         """Provide hash function to be able to create a set"""
         return hash(self.__id)
 
+    @property
+    def iov_tuple(self):
+        """Return a tuple with the valid exp,run range"""
+        return self.firstRun['exp'], self.firstRun['run'], self.finalRun['exp'], self.finalRun['run']
+
 
 def parse_database_file(filename, payload_dir=None, check_existing=True):
     """
@@ -100,12 +106,15 @@ def parse_database_file(filename, payload_dir=None, check_existing=True):
     Comments can be started using "#", everything including this character to
     the end of the line will be ignored.
 
-    :param filename: filename of the local database file to parse
-    :param payload_dir: diretories where the payloads should be. In case of None
-                        the directory of the database file will be used.
-    :param check_existing: if True check if the payloads actually exist where they
-                           should be
-    :returns: a list of LocalDatabaseEntry objects or None if there were any errors
+    Parameters:
+      filename (str): filename of the local database file to parse
+      payload_dir (str): directories where the payloads should be. In case of
+            None the directory of the database file will be used.
+      check_existing (bool): if True check if the payloads actually exist where
+            they should be
+
+    Returns:
+        a list of LocalDatabaseEntry objects or None if there were any errors
     """
 
     # make sure the database file exists
@@ -198,7 +207,7 @@ def command_upload(args, db=None):
         return 1
 
     if not entries:
-        B2INFO("No payloads found in {}, exiting".format(args.dbfile))
+        B2INFO(f"No payloads found in {args.dbfile}, exiting")
         return 0
 
     # time to get the id for the global tag
@@ -211,74 +220,71 @@ def command_upload(args, db=None):
     # it again and remove duplicates but keep the last one for each
     entries = sorted(set(reversed(entries)))
 
+    # so let's have a list of all payloads (name, checksum) as some payloads
+    # might have multiple iovs. Each payload gets a list of all of those
+    payloads = defaultdict(list)
+    for e in entries:
+        payloads[(e.module, e.checksum)].append(e)
+
     existing_payloads = {}
     existing_iovs = {}
+
+    def upload_payload(item):
+        """Upload a payload file if necessary but first check list of existing payloads"""
+        key, entries = item
+        if key in existing_payloads:
+            B2INFO(f"{key[0]} (md5:{key[1]}) already existing in database, skipping.")
+            payload_id = existing_payloads[key]
+        else:
+            entry = entries[0]
+            payload_id = db.create_payload(entry.module, entry.filename, entry.checksum)
+            if payload_id is None:
+                return False
+
+            B2INFO(f"Created new payload {entry.payload} for {entry.module} (md5:{entry.md5})")
+
+        for entry in entries:
+            entry.payload = payload_id
+
+        return True
+
+    def create_iov(entry):
+        """Create an iov if necessary but first check the list of existing iovs"""
+        if entry.payload is None:
+            return None
+
+        iov_key = (entry.payload,) + entry.iov_tuple
+        if iov_key in existing_iovs:
+            entry.iov = existing_iovs[iov_key]
+            B2INFO(f"IoV {entry.iov_tuple} for {entry.module} (md5:{entry.checksum}) already existing in database, skipping.")
+        else:
+            entry.iov = db.create_iov(tagId, entry.payload, *entry.iov_tuple)
+            if entry.iov is None:
+                return False
+
+            B2INFO(f"Created IoV {entry.iov_tuple} for {entry.module} (md5:{entry.checksum})")
+
+        return True
+
     # multithreading for the win ...
     with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
         B2INFO("Downloading information about existing payloads and iovs...")
         # if we want to check for existing payloads/iovs we shedule the download of
         # the full payload list. And write a message as each completes
         if not args.ignore_existing:
-            payloads_future = pool.submit(db.get_payloads, args.tag)
+            payloads_future = pool.submit(db.check_payloads, payloads.keys())
             payloads_future.add_done_callback(lambda x: B2INFO("got info on existing payloads"))
             iovs_future = pool.submit(db.get_iovs, args.tag)
             iovs_future.add_done_callback(lambda x: B2INFO("got info on existing iovs"))
             existing_payloads = payloads_future.result()
             existing_iovs = iovs_future.result()
 
-    # Ok, so let's check all payloads and see if we need to upload, create iovs
-    # or do nothing for each entry.
+        failed_payloads = sum(0 if result else 1 for result in pool.map(upload_payload, payloads.items()))
+        if failed_payloads > 0:
+            B2ERROR(f"{failed_payloads} payloads could not be uploaded")
 
-    errors = 0
-    for entry in entries:
-        # check for existing payload using module,checksum as key
-        payload_key = (entry.module, entry.checksum)
-        if payload_key in existing_payloads:
-            entry.payload = existing_payloads[payload_key]
-            B2INFO("%s already existing in database, skipping upload" % entry.filename)
-        # check for existing iov using (payload id, first run id, final run id)
-        iov_key = (entry.payload, entry.firstRun["exp"], entry.firstRun["run"], entry.finalRun["exp"], entry.finalRun["run"])
-        if iov_key in existing_iovs:
-            entry.iov = existing_iovs[iov_key]
-            B2INFO("iov for %s already existing in database, skipping iov creation" % entry.filename)
+        failed_iovs = sum(0 if result else 1 for result in pool.map(create_iov, entries))
+        if failed_iovs > 0:
+            B2ERROR(f"{failed_iovs} IoVs could not be created")
 
-    # if we have errors we refuse to continue
-    if errors > 0:
-        B2ERROR("Errors when checking contents of database file, exiting")
-        return 1
-
-    # OK, finally we can do the upload. So let's define a function which uploads
-    # if needed and just call this function for all entries because
-    # multithreading
-
-    def upload(entry):
-        """Helper function to handle uploading and iov creation in multiple threads"""
-        # if the entry doesn't have a payload id then upload the file and obtain
-        # the new payload id
-        if entry.payload is None:
-            B2INFO("Uploading %s" % entry)
-            entry.payload = db.create_payload(entry.module, entry.filename, entry.checksum)
-            print(entry.payload)
-
-        # if upload was successful (or preexisting payload) but if we don't have an iov then create one
-        if entry.payload is not None and entry.iov is None:
-            B2INFO("Creating iov for %s" % entry)
-            entry.iov = db.create_iov(tagId, entry.payload,
-                                      entry.firstRun["exp"], entry.firstRun["run"],
-                                      entry.finalRun["exp"], entry.finalRun["run"])
-            print(repr(entry.iov))
-
-        # return the modified entry
-        return entry
-
-    failed = 0
-    # upload the payloads in multiple threads
-    with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
-        for entry in pool.map(upload, entries):
-            # and check if it was succesful
-            if entry.iov is None:
-                failed += 1
-
-    if failed > 0:
-        B2ERROR("{} out of {} payloads could not be uploaded".format(failed, len(entries)))
-        return 1
+        return failed_payloads + failed_iovs

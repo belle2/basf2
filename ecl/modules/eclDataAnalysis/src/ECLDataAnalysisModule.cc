@@ -10,6 +10,10 @@
 
 #include <list>
 #include <iostream>
+
+#include <TTree.h>
+#include <TFile.h>
+
 #include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -33,11 +37,12 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 
-//#include <ecl/dataobjects/ECLTrig.h>
+//MDST
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace std;
 using namespace Belle2;
-//using namespace ECL;
+using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -413,7 +418,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
 
 {
   //Set module properties
-
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
   addParam("writeToRoot", m_writeToRoot,
            "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
@@ -436,6 +440,8 @@ void ECLDataAnalysisModule::initialize()
 {
 
   B2INFO("[ECLDataAnalysis Module]: Starting initialization of ECLDataAnalysis Module.");
+
+  m_eventLevelClusteringInfo.registerInDataStore();
 
   m_eclSimHits.registerInDataStore(eclSimHitArrayName());
   m_eclHits.registerInDataStore(eclHitArrayName());
@@ -464,13 +470,12 @@ void ECLDataAnalysisModule::initialize()
     m_eclPureDigits.registerRelationTo(m_mcParticles);
     m_eclPureShowers.registerRelationTo(m_mcParticles);
     m_eclPureClusters.registerRelationTo(m_mcParticles);
-
   }
 
   if (m_doTracking == true) {
-    StoreArray<Track>::required();
-    StoreArray<TrackFitResult>::required();
-    StoreArray<ECLPidLikelihood>::required();
+    m_tracks.isRequired();
+    m_trackFitResults.isRequired();
+    m_eclPidLikelihoods.isRequired();
   }
 
   if (m_writeToRoot == true) {
@@ -485,10 +490,13 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
   m_tree->Branch("evtNo", &m_iEvent, "evtNo/I");
 
-  /*m_tree->Branch("eclTriggerMultip",     &m_eclTriggerMultip,         "eclTriggerMultip/I");
-  m_tree->Branch("eclTriggerIdx",     "std::vector<int>",       &m_eclTriggerIdx);
-  m_tree->Branch("eclTriggerCellId",     "std::vector<int>",       &m_eclTriggerCellId);
-  m_tree->Branch("eclTriggerTime",       "std::vector<double>",    &m_eclTriggerTime);*/
+  //EventLevelClusteringInfo
+  m_tree->Branch("eclNumOutOfTimeDigitsFwd",     &m_nECLCalDigitsOutOfTimeFWD,         "eclNumOutOfTimeDigitsFwd/s");
+  m_tree->Branch("eclNumOutOfTimeDigitsBrl",     &m_nECLCalDigitsOutOfTimeBarrel,         "eclNumOutOfTimeDigitsBrl/s");
+  m_tree->Branch("eclNumOutOfTimeDigitsBwd",     &m_nECLCalDigitsOutOfTimeBWD,         "eclNumOutOfTimeDigitsBwd/s");
+  m_tree->Branch("eclNumRejectedShowersFwd",     &m_nECLShowersRejectedFWD,         "eclNumRejectedShowersFwd/b");
+  m_tree->Branch("eclNumRejectedShowersBrl",     &m_nECLShowersRejectedBarrel,         "eclNumRejectedShowersBrl/b");
+  m_tree->Branch("eclNumRejectedShowersBwd",     &m_nECLShowersRejectedBWD,         "eclNumRejectedShowersBwd/b");
 
   m_tree->Branch("eclDigitMultip",     &m_eclDigitMultip,         "ecldigit_Multip/I");
   m_tree->Branch("eclDigitIdx",        "std::vector<int>",         &m_eclDigitIdx);
@@ -851,8 +859,13 @@ void ECLDataAnalysisModule::event()
 
   B2DEBUG(1, "  ++++++++++++++ ECLDataAnalysisModule");
 
-  // re-initialize vars
-  //m_eclTriggerMultip=0; m_eclTriggerCellId->clear();  m_eclTriggerTime->clear();   m_eclTriggerIdx->clear();
+  //EventLevelClusterInfo
+  m_nECLCalDigitsOutOfTimeFWD = 0;
+  m_nECLCalDigitsOutOfTimeBarrel = 0;
+  m_nECLCalDigitsOutOfTimeBWD = 0;
+  m_nECLShowersRejectedFWD = 0;
+  m_nECLShowersRejectedBarrel = 0;
+  m_nECLShowersRejectedBWD = 0;
 
   ///Digits
   m_eclDigitMultip = 0;
@@ -1222,15 +1235,13 @@ void ECLDataAnalysisModule::event()
     m_iEvent = -1;
   }
 
-  /* TRIGGER, NOT YET IMPLEMENTED
-  m_eclTriggerMultip=trgs.getEntries();
-  for (int itrgs = 0; itrgs < trgs.getEntries() ; itrgs++){
-    ECLTrig* aECLTrigs = trgs[itrgs];
-    m_eclTriggerIdx->push_back(itrgs);
-    m_eclTriggerCellId->push_back(aECLTrigs->getCellId());
-    m_eclTriggerTime->push_back(aECLTrigs->getTimeTrig());
-  }
-  */
+  //EventLevelClusteringInfo
+  m_nECLCalDigitsOutOfTimeFWD = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTimeFWD();
+  m_nECLCalDigitsOutOfTimeBarrel = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTimeBarrel();
+  m_nECLCalDigitsOutOfTimeBWD  = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTimeBWD();
+  m_nECLShowersRejectedFWD = m_eventLevelClusteringInfo->getNECLShowersRejectedFWD();
+  m_nECLShowersRejectedBarrel = m_eventLevelClusteringInfo->getNECLShowersRejectedBarrel();
+  m_nECLShowersRejectedBWD = m_eventLevelClusteringInfo->getNECLShowersRejectedBWD();
 
   //DIGITS
   m_eclDigitMultip = m_eclDigits.getEntries();
@@ -1508,7 +1519,6 @@ void ECLDataAnalysisModule::event()
     } else
       m_eclClusterToShower->push_back(-1);
 
-
     //Dump MC Info - Multiple Matching
     double sumHit = 0;
     int idx[10];
@@ -1624,9 +1634,6 @@ void ECLDataAnalysisModule::event()
         m_eclPureDigitToMC->push_back(mc_digit->getArrayIndex());
       } else
         m_eclPureDigitToMC->push_back(-1);
-
-
-
     }
 
     //PURE CAL DIGITS
@@ -1681,7 +1688,6 @@ void ECLDataAnalysisModule::event()
         }
         y++;
       }
-
 
       m_eclPureCalDigitToBkgWeight->push_back(aECLPureCalDigits->getEnergy() - sumHit);
       m_eclPureCalDigitSimHitSum->push_back(sumHit);
@@ -2297,10 +2303,8 @@ void ECLDataAnalysisModule::event()
   }
 
   if (m_doTracking == true) {
-    StoreArray<TrackFitResult> trks;
-    StoreArray<Track> tracks;
     m_trkMultip = 0;
-    for (const Track& itrk : tracks) {
+    for (const Track& itrk : m_tracks) {
       const TrackFitResult* atrk = itrk.getTrackFitResult(Const::pion);
       if (atrk == nullptr) continue;
 
@@ -2347,11 +2351,9 @@ void ECLDataAnalysisModule::event()
   m_tree->Fill();
 }
 
-
 void ECLDataAnalysisModule::endRun()
 {
 }
-
 
 void ECLDataAnalysisModule::terminate()
 {
@@ -2362,4 +2364,3 @@ void ECLDataAnalysisModule::terminate()
   }
 
 }
-

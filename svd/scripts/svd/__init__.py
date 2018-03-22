@@ -12,15 +12,12 @@ def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True
         add_svd_reconstruction_tb(path, isROIsimulation)
 
     elif(not useNN and not useCoG):
-        print("SVD Reconstruction algorithm: TB-quivalent")
         add_svd_reconstruction_tb(path, isROIsimulation)
 
     elif(useNN):
-        print("SVD Reconstruction algorithm: Neural Network")
         add_svd_reconstruction_nn(path, isROIsimulation)
 
     elif(useCoG):
-        print("SVD Reconstruction algorithm: Center Of Gravity")
         add_svd_reconstruction_CoG(path, isROIsimulation)
 
 
@@ -97,20 +94,24 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
         clusterName = '__ROIsvdClusters'
+        recoDigitsName = '__ROIsvdRecoDigits'
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
         clusterName = ""
+        recoDigitsName = ""
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
+        fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = register_module('SVDSimpleClusterizer')
         clusterizer.set_name(clusterizerName)
         clusterizer.param('Clusters', clusterName)
+        clusterizer.param('RecoDigits', recoDigitsName)
         path.add_module(clusterizer)
 
 
@@ -157,3 +158,18 @@ def add_svd_simulation(path, createDigits=False):
     if createDigits:
         digitizer.param('GenerateDigits', True)
     path.add_module(digitizer)
+
+
+def add_svd_unpacker(path):
+
+    unpacker = register_module('SVDUnpacker')
+    unpacker.param('GenerateOldDigits', False)
+    path.add_module(unpacker)
+
+
+def add_svd_packer(path):
+
+    path.add_module('SVDDigitSplitter')
+    path.add_module('SVDDigitSorter')
+    packer = register_module('SVDPacker')
+    path.add_module(packer)

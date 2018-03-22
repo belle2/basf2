@@ -62,10 +62,10 @@ namespace Belle2 {
     unsigned short doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos, unsigned short nIterations = 20);
 
   private:
-    float m_omega;
-    float m_T;
-    float m_Tmin;
-    float m_cmax;
+    float m_omega; /**< tuning parameter of the hopfield network */
+    float m_T; /**< start temperature of annealing */
+    float m_Tmin; /**< minimal temperature allowed */
+    float m_cmax; /**< maximal change of weights between iterations */
 
     //--- Structs to help simplify the process ------------------------------------------------------------------------
     /** Wrap TRandom to be useable as a uniform random number generator with std algorithms like std::shuffle. */

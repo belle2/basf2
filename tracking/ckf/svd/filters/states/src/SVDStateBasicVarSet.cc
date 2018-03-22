@@ -25,7 +25,7 @@ using namespace TrackFindingCDC;
 
 bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
 {
-  const std::vector<const CKFToSVDState*>& previousStates = pair->first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
   const RecoTrack* cdcTrack = previousStates.front()->getSeed();
@@ -38,6 +38,7 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   if (state->mSoPSet()) {
     firstMeasurement = state->getMeasuredStateOnPlane();
   } else {
+    B2ASSERT("Previous state was not fitted?", previousStates.back()->mSoPSet());
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 

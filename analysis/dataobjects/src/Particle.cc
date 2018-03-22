@@ -265,8 +265,8 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      m_identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      m_identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -289,8 +289,8 @@ int Particle::getMdstSource() const
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -711,7 +711,7 @@ std::string Particle::getName() const
 
 void Particle::print() const
 {
-  std::cout << getInfo();
+  B2INFO(getInfo());
 }
 
 std::string Particle::getInfoHTML() const

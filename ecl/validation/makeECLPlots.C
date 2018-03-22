@@ -38,42 +38,62 @@ void makeECLPlots()
   
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
-  // results/current -> ../
-  TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
-  TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
-  TFile* cluster_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
-  TTree* cluster_treeFWD = (TTree*) cluster_inputFWD->Get("m_tree");
-  TFile* clusterReso_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
-  TTree* clusterReso_treeFWD = (TTree*) clusterReso_inputFWD->Get("m_tree");
-  TFile* cd_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
-  TTree* cd_treeFWD = (TTree*) cd_inputFWD->Get("m_tree");
-  TFile* cluster_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
-  TTree* cluster_treeBarrel = (TTree*) cluster_inputBarrel->Get("m_tree");
-  TFile* clusterReso_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
-  TTree* clusterReso_treeBarrel = (TTree*) clusterReso_inputBarrel->Get("m_tree");
-  TFile* cd_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
-  TTree* cd_treeBarrel = (TTree*) cd_inputBarrel->Get("m_tree");
-  TFile* cluster_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
-  TTree* cluster_treeBWD = (TTree*) cluster_inputBWD->Get("m_tree");
-  TFile* clusterReso_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
-  TTree* clusterReso_treeBWD = (TTree*) clusterReso_inputBWD->Get("m_tree");
-  TFile* cd_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
-  TTree* cd_treeBWD = (TTree*) cd_inputBWD->Get("m_tree");
-  TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
-  TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
-
-  ECL2D(bkg_tree);
-  ECLBkg(bkg_tree);
-  ECLClusterFWD(cluster_treeFWD);
-  ECLClusterBarrel(cluster_treeBarrel);
-  ECLClusterBWD(cluster_treeBWD);
-  ECLCalDigitFWD(cd_treeFWD);
-  ECLCalDigitBarrel(cd_treeBarrel);
-  ECLCalDigitBWD(cd_treeBWD);
-  ECLMuon(muon_tree);
-  ECLClusterResoFWD(clusterReso_treeFWD);
-  ECLClusterResoBarrel(clusterReso_treeBarrel);
-  ECLClusterResoBWD(clusterReso_treeBWD);
+  if (TFile::Open("../ECLBkgOutput.root") != NULL) {
+    TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
+    TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
+    ECL2D(bkg_tree);
+    ECLBkg(bkg_tree);
+  }
+  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+    TFile* cluster_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
+    TTree* cluster_treeFWD = (TTree*) cluster_inputFWD->Get("m_tree");
+    ECLClusterFWD(cluster_treeFWD);
+  }
+  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+    TFile* clusterReso_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
+    TTree* clusterReso_treeFWD = (TTree*) clusterReso_inputFWD->Get("m_tree");
+    ECLClusterResoFWD(clusterReso_treeFWD);
+  }
+  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+    TFile* cd_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
+    TTree* cd_treeFWD = (TTree*) cd_inputFWD->Get("m_tree");
+    ECLCalDigitFWD(cd_treeFWD);
+  } 
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+    TFile* cluster_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
+    TTree* cluster_treeBarrel = (TTree*) cluster_inputBarrel->Get("m_tree");
+    ECLClusterBarrel(cluster_treeBarrel);
+  } 
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+    TFile* clusterReso_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
+    TTree* clusterReso_treeBarrel = (TTree*) clusterReso_inputBarrel->Get("m_tree");
+    ECLClusterResoBarrel(clusterReso_treeBarrel);
+  }
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+    TFile* cd_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
+    TTree* cd_treeBarrel = (TTree*) cd_inputBarrel->Get("m_tree");
+    ECLCalDigitBarrel(cd_treeBarrel);
+  }
+  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+    TFile* cluster_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
+    TTree* cluster_treeBWD = (TTree*) cluster_inputBWD->Get("m_tree");
+    ECLClusterBWD(cluster_treeBWD);
+  }
+  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+    TFile* clusterReso_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
+    TTree* clusterReso_treeBWD = (TTree*) clusterReso_inputBWD->Get("m_tree");
+    ECLClusterResoBWD(clusterReso_treeBWD);
+  }
+  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+    TFile* cd_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
+    TTree* cd_treeBWD = (TTree*) cd_inputBWD->Get("m_tree");
+    ECLCalDigitBWD(cd_treeBWD);
+  }
+  if (TFile::Open("../ECLMuonOutput.root") != NULL) {
+    TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
+    TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
+    ECLMuon(muon_tree);
+  }
 
 }
 
@@ -91,17 +111,17 @@ void ECLMuon(TTree* muon_tree)
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMuonsE->Write();
 
-  TH1F* hMuonsFake = new TH1F("hMuonsFake","Percentage of fake (non-bkg) neutral clusters", 2,0,2);
-  hMuonsFake->SetMaximum(150);
-  muon_tree->Draw("(eclClusterIsTrack)>>hMuonsFake","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
-  hMuonsFake->Scale(0.1);
+  TH1F* hMuonsFake = new TH1F("hMuonsFake","Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons", 20,-2,2);
+  hMuonsFake->SetMaximum(1100);
+  muon_tree->Draw("(2*eclClusterIsTrack-1)>>hMuonsFake","eclClusterToMC1==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
+  //hMuonsFake->Scale(0.1);
   hMuonsFake->GetXaxis()->SetTitle("Percentage of fake (non-bkg) neutral clusters");
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Percentage of fake gammas")); 
-  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be around/below 5%"));
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons")); 
+  hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Number of unmatched clusters should be around/below 5%"));
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFake->Write(); 
 
-  TH1F* hMuonsFakeTheta = new TH1F("hMuonsFakeTheta","#theta distribution for fake (non-bkg) neutral clusters", 25,-3.2,3.2);
+  TH1F* hMuonsFakeTheta = new TH1F("hMuonsFakeTheta","#theta distribution for fake (non-bkg) neutral clusters", 25, 0, 3.2);
 
   muon_tree->Draw("eclClusterTheta>>hMuonsFakeTheta","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
   hMuonsFakeTheta->GetXaxis()->SetTitle("#theta (rad)");
@@ -110,7 +130,7 @@ void ECLMuon(TTree* muon_tree)
   hMuonsFakeTheta->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
   hMuonsFakeTheta->Write(); 
 
-  TH1F* hMuonsFakePhi = new TH1F("hMuonsFakePhi","#phi distribution for fake (non-bkg) neutral clusters", 25,-3.2,3.2);
+  TH1F* hMuonsFakePhi = new TH1F("hMuonsFakePhi","#phi distribution for fake (non-bkg) neutral clusters", 25, -3.6, 3.6);
 
   muon_tree->Draw("eclClusterPhi>>hMuonsFakePhi","eclClusterToMC1==0&&eclClusterIsTrack==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
   hMuonsFakePhi->GetXaxis()->SetTitle("#phi (rad)");
@@ -1103,11 +1123,11 @@ void ECLBkg(TTree* bkg_tree)
   bkg_tree->Draw("eclClusterEnergy>>bkgClusterE","eclClusterEnergy>0&&eclClusterHypothesisId==5");
   bkgClusterE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for bkg clusters")); 
-  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 0."));
+  bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 20. (threshold value)"));
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterE->Write();
 
-  TH1F* bkgClusterTheta = new TH1F("bkgClusterTheta", "Cluster theta, bkg only", 50, 3.2, -3.2);
+  TH1F* bkgClusterTheta = new TH1F("bkgClusterTheta", "Cluster theta, bkg only", 50, 0, 3.2);
   bkg_tree->Draw("eclClusterTheta>>bkgClusterTheta","eclClusterEnergy>0&&eclClusterHypothesisId==5");
   bkgClusterTheta->GetXaxis()->SetTitle("#theta (rad)");
   bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster theta for bkg clusters")); 
@@ -1115,10 +1135,10 @@ void ECLBkg(TTree* bkg_tree)
   bkgClusterTheta->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterTheta->Write();
 
-  TH1F* bkgClusterPhi = new TH1F("bkgClusterPhi", "Cluster phi, bkg only", 50, 3.2, -3.2);
+  TH1F* bkgClusterPhi = new TH1F("bkgClusterPhi", "Cluster phi, bkg only", 50, -3.6, 3.6);
   bkg_tree->Draw("eclClusterPhi>>bkgClusterPhi","eclClusterEnergy>0&&eclClusterHypothesisId==5");
   bkgClusterPhi->GetXaxis()->SetTitle("#phi (rad)");
-  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster theta for bkg clusters")); 
+  bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster phi for bkg clusters")); 
   bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape."));
   bkgClusterPhi->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   bkgClusterPhi->Write();
@@ -1140,10 +1160,69 @@ void ECLBkg(TTree* bkg_tree)
 
   bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for bkg")); 
-  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2014)"));
+  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 55 (Feb 2018)"));
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   bkgClusterMultip->Write();
+
+  TH1F* bkgOutOfTimeDigitsFWD = new TH1F("bkgOutOfTimeDigitsFWD","# of out-of-time digits in FWD endcap", 100, 0., 100.);
+
+  bkgOutOfTimeDigitsFWD->GetXaxis()->SetTitle("# of out-of-time digits in FWD endcap");
+  bkg_tree->Draw("eclNumOutOfTimeDigitsFwd>>bkgOutOfTimeDigitsFWD");
+  bkgOutOfTimeDigitsFWD->GetListOfFunctions()->Add(new TNamed("Description","# of out-of-time digits in FWD endcap")); 
+  bkgOutOfTimeDigitsFWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 50 (Feb 2018)"));
+  bkgOutOfTimeDigitsFWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgOutOfTimeDigitsFWD->Write();
+
+ TH1F* bkgOutOfTimeDigitsBRL = new TH1F("bkgOutOfTimeDigitsBRL","# of out-of-time digits in barrel", 150, 200., 500.);
+
+  bkgOutOfTimeDigitsBRL->GetXaxis()->SetTitle("# of out-of-time digits in barrel");
+  bkg_tree->Draw("eclNumOutOfTimeDigitsBrl>>bkgOutOfTimeDigitsBRL");
+  bkgOutOfTimeDigitsBRL->GetListOfFunctions()->Add(new TNamed("Description","# of out-of-time digits in barrel")); 
+  bkgOutOfTimeDigitsBRL->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 340 (Feb 2018)"));
+  bkgOutOfTimeDigitsBRL->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgOutOfTimeDigitsBRL->Write();
+
+  TH1F* bkgOutOfTimeDigitsBWD = new TH1F("bkgOutOfTimeDigitsBWD","# of out-of-time digits in BWD endcap", 120, 60., 180.);
+
+  bkgOutOfTimeDigitsBWD->GetXaxis()->SetTitle("# of out-of-time digits in BWD endcap");
+  bkg_tree->Draw("eclNumOutOfTimeDigitsBwd>>bkgOutOfTimeDigitsBWD");
+  bkgOutOfTimeDigitsBWD->GetListOfFunctions()->Add(new TNamed("Description","# of out-of-time digits in BWD endcap")); 
+  bkgOutOfTimeDigitsBWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 100 (Feb 2018)"));
+  bkgOutOfTimeDigitsBWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgOutOfTimeDigitsBWD->Write();
+
+
+
+  TH1F* bkgRejectedShowersFWD = new TH1F("bkgRejectedShowersFWD","# of rejected showers in FWD endcap", 100, 0., 100.);
+
+  bkgRejectedShowersFWD->GetXaxis()->SetTitle("# of rejected ECL showers in FWD endcap");
+  bkg_tree->Draw("eclNumRejectedShowersFwd>>bkgRejectedShowersFWD");
+  bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Description","# of rejected ECL showers in FWD endcap")); 
+  bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 31 (Feb 2018)"));
+  bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgRejectedShowersFWD->Write();
+
+  TH1F* bkgRejectedShowersBRL = new TH1F("bkgRejectedShowersBRL","# of rejected showers in barrel", 150, 100., 250.);
+
+  bkgRejectedShowersBRL->GetXaxis()->SetTitle("# of rejected ECL showers in barrel");
+  bkg_tree->Draw("eclNumRejectedShowersBrl>>bkgRejectedShowersBRL");
+  bkgRejectedShowersBRL->GetListOfFunctions()->Add(new TNamed("Description","# of rejected ECL showers in barrel")); 
+  bkgRejectedShowersBRL->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 180 (Feb 2018)"));
+  bkgRejectedShowersBRL->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgRejectedShowersBRL->Write();
+
+  TH1F* bkgRejectedShowersBWD = new TH1F("bkgRejectedShowersBWD","# of rejected showers in BWD endcap", 100, 0., 100.);
+
+  bkgRejectedShowersBWD->GetXaxis()->SetTitle("# of rejected ECL showers in BWD endcap");
+  bkg_tree->Draw("eclNumRejectedShowersBwd>>bkgRejectedShowersBWD");
+  bkgRejectedShowersBWD->GetListOfFunctions()->Add(new TNamed("Description","# of rejected ECL showers in BWD endcap")); 
+  bkgRejectedShowersBWD->GetListOfFunctions()->Add(new TNamed("Check","Multiplicity should be around 43 (Feb 2018)"));
+  bkgRejectedShowersBWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
+  bkgRejectedShowersBWD->Write();
  
+
+
+
   output->Close();
   delete output;
 }

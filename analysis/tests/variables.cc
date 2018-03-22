@@ -221,13 +221,13 @@ namespace {
 
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Particle>::registerPersistent();
-      DataStore::Instance().setInitializeActive(false);
       StoreArray<Particle> particles;
+      particles.registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
       PCmsLabTransform T;
-      TLorentzVector vec0 = {0.0, 0.0, 0.0, 10.5794};
-      TLorentzVector vec1 = {0.0, +0.332174566, 0.0, 5.2897};
-      TLorentzVector vec2 = {0.0, -0.332174566, 0.0, 5.2897};
+      TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+      TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+      TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
       Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 22));
       Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 22, Particle::c_Unflavored, Particle::c_Undefined, 1));
       Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
@@ -235,7 +235,7 @@ namespace {
       p0->appendDaughter(p1->getArrayIndex());
       p0->appendDaughter(p2->getArrayIndex());
 
-      EXPECT_ALL_NEAR(missingMass(p0), 7.5625e-6, 1e-7);
+      EXPECT_ALL_NEAR(missingMass(p0), 0.0, 1e-7);
       EXPECT_ALL_NEAR(missingMomentum(p0), 0.0, 2e-7);
     }
 
@@ -311,14 +311,13 @@ namespace {
   TEST(TrackVariablesTest, Variable)
   {
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<Particle>::registerPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
     StoreArray<TrackFitResult> myResults;
     StoreArray<Track> myTracks;
     StoreArray<Particle> myParticles;
+    myResults.registerInDataStore();
+    myTracks.registerInDataStore();
+    myParticles.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
 
     TRandom3 generator;
 
@@ -359,13 +358,6 @@ namespace {
 
     StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<ECLCluster>::registerPersistent();
-    StoreArray<KLMCluster>::registerPersistent();
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<PIDLikelihood>::registerPersistent();
-    StoreArray<Particle>::registerPersistent();
-    StoreArray<RestOfEvent>::registerPersistent();
     pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
@@ -374,6 +366,13 @@ namespace {
     StoreArray<Particle> myParticles;
     StoreArray<RestOfEvent> myROEs;
     StoreArray<PIDLikelihood> myPIDLikelihoods;
+    myECLClusters.registerInDataStore();
+    myKLMClusters.registerInDataStore();
+    myTFRs.registerInDataStore();
+    myTracks.registerInDataStore();
+    myParticles.registerInDataStore();
+    myROEs.registerInDataStore();
+    myPIDLikelihoods.registerInDataStore();
     myParticles.registerRelationTo(myROEs);
     myTracks.registerRelationTo(myPIDLikelihoods);
     DataStore::Instance().setInitializeActive(false);
@@ -619,9 +618,10 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<MCParticle>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
+
     }
 
     /** clear datastore */
@@ -728,10 +728,10 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreObjPtr<EventExtraInfo>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+      StoreObjPtr<EventExtraInfo>().registerInDataStore();
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<MCParticle>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
     }
 
@@ -972,14 +972,15 @@ namespace {
   TEST_F(MetaVariableTest, nCleanedTracks)
   {
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
+    StoreArray<TrackFitResult> track_fit_results;
+    StoreArray<Track> tracks;
+    track_fit_results.registerInDataStore();
+    tracks.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
     Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
 
-    StoreArray<TrackFitResult> track_fit_results;
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
@@ -989,7 +990,6 @@ namespace {
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
 
-    StoreArray<Track> tracks;
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 1);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 2);
@@ -1185,13 +1185,11 @@ namespace {
 
   }
 
-  TEST_F(MetaVariableTest, NBDeltaIfMissing)
+  TEST_F(MetaVariableTest, NBDeltaIfMissingDeathTest)
   {
     //Variable got removed, test for absence
-    const Manager::Var* var = Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)");
-    ASSERT_EQ(var, nullptr);
-    var = Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, 11)");
-    ASSERT_EQ(var, nullptr);
+    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, 11)"));
   }
 
   TEST_F(MetaVariableTest, matchedMC)
@@ -1360,15 +1358,18 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<Track>::registerPersistent();
-      StoreArray<TrackFitResult>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
-      StoreArray<PIDLikelihood>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap> peim;
+      StoreArray<TrackFitResult> tfrs;
+      StoreArray<MCParticle> mcparticles;
       StoreArray<PIDLikelihood> likelihood;
       StoreArray<Particle> particles;
       StoreArray<Track> tracks;
+      peim.registerInDataStore();
+      tfrs.registerInDataStore();
+      mcparticles.registerInDataStore();
+      likelihood.registerInDataStore();
+      particles.registerInDataStore();
+      tracks.registerInDataStore();
       particles.registerRelationTo(likelihood);
       tracks.registerRelationTo(likelihood);
       DataStore::Instance().setInitializeActive(false);

@@ -37,8 +37,6 @@ TCConvertersTestModule::TCConvertersTestModule() :
            "WARNING: For this module provide two names! First is the name of the container with the genfit::TrackCands"\
            " which were used to create SpacePointTrackCands (e.g. from MCTrackFinderTruth), second are the genfit::TrackCands"\
            " obtaineed by the 'back conversion' from the SpacePointTrackCands!", emptyDefaultStringVec);
-  addParam("SpacePointArrayNames", m_SpacePointArrayNames, "SpacePoints collection name(s) WARNING: it is only checked if these"\
-           " exist. At the moment all StoreArray<SpacePoint> are searched for SpacePoints!", emptyDefaultStringVec);
 
   initializeCounters(); // NOTE: they get initialized in initialize again!!
 }
@@ -49,13 +47,14 @@ void TCConvertersTestModule::initialize()
   B2INFO("TCConvertersTest ---------------------------- initialize ------------------ ");
 
   // check if all StoreArrays are present
-  StoreArray<SpacePointTrackCand>::required(m_SPTCName);
-  for (string aName : m_genfitTCNames) { StoreArray<genfit::TrackCand>::required(aName); }
+  StoreArray<SpacePointTrackCand> SPTCs(m_SPTCName); SPTCs.isRequired(m_SPTCName);
+  for (string aName : m_genfitTCNames) {
+    StoreArray<genfit::TrackCand> TCs(aName);
+    TCs.isRequired(aName);
+  }
 
-  StoreArray<PXDCluster>::required(m_PXDClusterName);
-  StoreArray<SVDCluster>::required(m_SVDClusterName);
-
-  for (string aName : m_SpacePointArrayNames) { StoreArray<SpacePoint>::required(aName); }
+  StoreArray<PXDCluster> PXDClusters(m_PXDClusterName); PXDClusters.isRequired(m_PXDClusterName);
+  StoreArray<SVDCluster> SVDClusters(m_SVDClusterName); SVDClusters.isRequired(m_SVDClusterName);
 
   initializeCounters();
 }

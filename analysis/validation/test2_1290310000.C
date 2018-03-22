@@ -3,7 +3,7 @@
 <input>../1290310000.ntup.root</input>
 <output>1290310000_Validation.root</output>
 <contact>Mario Merola; mario.merola@na.infn.it</contact>
-<interval>release</interval>
+<interval>nightly</interval>
 </header>
 */
 

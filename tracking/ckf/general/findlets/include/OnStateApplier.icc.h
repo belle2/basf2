@@ -11,21 +11,11 @@
 
 #include <tracking/ckf/general/findlets/OnStateApplier.dcl.h>
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
   template <class AState>
-  OnStateApplier<AState>::OnStateApplier() : Super()
-  {
-  };
-
-  template <class AState>
-  void OnStateApplier<AState>::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                                const std::string& prefix __attribute__((unused)))
-  {
-  };
-
-  template <class AState>
-  void OnStateApplier<AState>::apply(const std::vector<const AState*>& currentPath,
+  void OnStateApplier<AState>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                                      std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     if (childStates.empty()) {

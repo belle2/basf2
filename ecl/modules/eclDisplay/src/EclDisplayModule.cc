@@ -32,7 +32,7 @@ EclDisplayModule::EclDisplayModule() : Module()
   addParam("displayEnergy", m_displayEnergy,
            "If true, energy distribution per channel (shaper, crate) is displayed. Otherwise, number of counts is displayed", false);
   addParam("displayMode", m_displayMode,
-           "Default display mode. Can be later changed in GUI.", 7);
+           "Default display mode. Can be later changed in GUI.", 9);
   addParam("autoDisplay", m_autoDisplay,
            "If true, events are displayed as soon as they are loaded.", true);
   addParam("InitFileName", m_eclMapperInitFileName,
@@ -47,7 +47,7 @@ EclDisplayModule::~EclDisplayModule()
 
 void EclDisplayModule::initialize()
 {
-  StoreArray<ECLDigit>::required();
+  eclarray.isRequired();
 
   // Loading code from ECLUnpacker
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -87,17 +87,14 @@ void EclDisplayModule::beginRun()
 
 void EclDisplayModule::event()
 {
-  StoreArray<ECLDigit> eclarray;
-//  B2DEBUG(150, "eclarray.getEntries() == " << eclarray.getEntries());
-
   // EclFrame is closed, skipping data reading.
   if (m_frame_closed) return;
 
   int added_entries = 0;
 
   for (int i = 0; i < eclarray.getEntries(); i++) {
-    ECLDigit* record = eclarray[i];
-    if (record->getAmp() > 20) {
+    ECLCalDigit* record = eclarray[i];
+    if (record->getEnergy() >= 1e-4) { //TODO: Move to constant ENERGY_THRESHOLD.
       if (m_data->addEvent(record, m_evtNum) == 0) {
         added_entries++;
       }

@@ -148,7 +148,7 @@ const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 //============================================================================
 
 LogSystem::LogSystem() :
-  m_logConfig(LogConfig::c_Info, 100),
+  m_logConfig(LogConfig::c_Info),
   m_moduleLogConfig(0),
   m_printErrorSummary(false)
 {
@@ -158,7 +158,7 @@ LogSystem::LogSystem() :
 void LogSystem::resetLogging()
 {
   m_logConfig.setLogLevel(LogConfig::c_Info);
-  m_logConfig.setDebugLevel(100);
+  m_logConfig.setDebugLevel(LogConfig::c_DefaultDebugLevel);
   m_moduleLogConfig = nullptr;
   m_packageLogConfigs.clear();
   constexpr unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;

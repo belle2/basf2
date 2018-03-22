@@ -23,7 +23,7 @@ using namespace TrackFindingCDC;
 namespace {
   /// Helper function to calculate the mean of a given function over all states in the list
   template<class APredicate>
-  double meanOver(const std::vector<const CKFToSVDState*>& states, const APredicate& t)
+  double meanOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
     double sum = 0;
     unsigned int numberOfHits = 0;
@@ -44,7 +44,7 @@ namespace {
 
   /// Helper function to calculate the min of a given function over all states in the list
   template<class APredicate>
-  double minOver(const std::vector<const CKFToSVDState*>& states, const APredicate& t)
+  double minOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
     double minimalValue = NAN;
 
@@ -68,7 +68,7 @@ namespace {
 
   /// Helper function to calculate the std of a given function over all states in the list
   template<class APredicate>
-  double stdOver(const std::vector<const CKFToSVDState*>& states, const APredicate& t)
+  double stdOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
     double sum = 0;
     double sumSquared = 0;
@@ -93,7 +93,7 @@ namespace {
 
 bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
 {
-  const std::vector<const CKFToSVDState*>& previousStates = pair->first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
   const RecoTrack* cdcTrack = previousStates.front()->getSeed();
@@ -102,8 +102,8 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const SpacePoint* spacePoint = state->getHit();
   B2ASSERT("Path without hit?", spacePoint);
 
-  std::vector<const CKFToSVDState*> allStates = previousStates;
-  allStates.push_back(state);
+  std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>> allStates = previousStates;
+  allStates.emplace_back(state, 0);
 
   const std::vector<CDCHit*>& cdcHits = cdcTrack->getSortedCDCHitList();
 
@@ -114,6 +114,7 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
   if (state->mSoPSet()) {
     firstMeasurement = state->getMeasuredStateOnPlane();
   } else {
+    B2ASSERT("Previous state was not fitted?", previousStates.back()->mSoPSet());
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 

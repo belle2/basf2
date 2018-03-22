@@ -29,6 +29,9 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
 // MVA package
 #include <mva/interface/Interface.h>
 
@@ -57,11 +60,11 @@ ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectio
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zernike_n1_rho0", m_zernike_n1_rho0,
-           "Scaling factor for radial distances in a plane perpendicular to direction to shower for the n1 hypothesis in Zernike moment calculation.",
+           "Scaling factor for radial distances in a plane perpendicular to direction to shower for the n photon hypothesis in Zernike moment calculation.",
            10.0 * Unit::cm);
 
   addParam("zernike_n2_rho0", m_zernike_n2_rho0,
-           "Scaling factor for radial distances in a plane perpendicular to direction to shower for the n2 hypothesis in Zernike moment calculation. ",
+           "Scaling factor for radial distances in a plane perpendicular to direction to shower for the neutral hadron hypothesis in Zernike moment calculation. ",
            20.0 * Unit::cm);
 
   addParam("zernike_useFarCrystals", m_zernike_useFarCrystals,
@@ -182,8 +185,8 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   //Choose rho0 according to shower hypothesis
   double rho0 = 0.0;
   const int hypothesisID = eclShower->getHypothesisId();
-  if (hypothesisID == ECLConnectedRegion::c_N1) rho0 = m_zernike_n1_rho0;
-  else if (hypothesisID == ECLConnectedRegion::c_N2) rho0 = m_zernike_n2_rho0;
+  if (hypothesisID == ECLCluster::c_nPhotons) rho0 = m_zernike_n1_rho0;
+  else if (hypothesisID == ECLCluster::c_neutralHadron) rho0 = m_zernike_n2_rho0;
 
   const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 0, rho0);
   const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
@@ -209,8 +212,8 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
     //Set Zernike moments that will be used in MVA calculation
     // m_dataset holds 22 entries, 11 Zernike moments of N2 shower, followed by 11 Zernike moments of N1 shower
     int indexOffset = 0;//Offset entries depending on hypothesis type
-    if (hypothesisID == ECLConnectedRegion::c_N1) indexOffset = (m_numZernikeMVAvariables / 2);
-    else if (hypothesisID == ECLConnectedRegion::c_N2) indexOffset = 0;
+    if (hypothesisID == ECLCluster::c_nPhotons) indexOffset = (m_numZernikeMVAvariables / 2);
+    else if (hypothesisID == ECLCluster::c_neutralHadron) indexOffset = 0;
 
     m_dataset->m_input[0 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 1, 1, rho0);
     m_dataset->m_input[1 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 2, 0, rho0);
@@ -225,7 +228,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
     m_dataset->m_input[10 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 5, rho0);
     //Set zernikeMVA for N1 showers
     //This assumes that the N2 zernike moments have already been set in m_dataset!!!!
-    if (hypothesisID == ECLConnectedRegion::c_N1) {
+    if (hypothesisID == ECLCluster::c_nPhotons) {
       //FWD
       if (eclShower->getTheta() < m_BRLthetaMin) eclShower->setZernikeMVA(m_expert_FWD->apply(*m_dataset)[0]);
       //BWD
@@ -245,8 +248,8 @@ void ECLShowerShapeModule::event()
     //Start by finding the N2 shower and calculating it's shower shape variables
     //Assumes that there is only 1 N2 Shower per CR!!!!!!
     ECLShower* N2shower = nullptr;
-    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>()) {
-      if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N2) {
+    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
+      if (eclShower.getHypothesisId() == ECLCluster::c_neutralHadron) {
         N2shower = &eclShower;
         setShowerShapeVariables(N2shower, true);
         break;
@@ -259,15 +262,16 @@ void ECLShowerShapeModule::event()
 
     double prodN1zernikeMVAs = 1.0;
     //Calculate shower shape variables for the rest of the showers
-    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>()) {
-      if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N2) continue; //shower shape variables already calculated for N2
+    for (auto& eclShower : eclCR.getRelationsWith<ECLShower>(eclShowerArrayName())) {
+      if (eclShower.getHypothesisId() == ECLCluster::c_neutralHadron)
+        continue; //shower shape variables already calculated for neutral hadrons
 
       bool calculateZernikeMVA = true;
-      if (!found_N2shower || eclShower.getHypothesisId() != ECLConnectedRegion::c_N1) calculateZernikeMVA = false;
+      if (!found_N2shower || eclShower.getHypothesisId() != ECLCluster::c_nPhotons) calculateZernikeMVA = false;
 
       setShowerShapeVariables(&eclShower, calculateZernikeMVA);
 
-      if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) prodN1zernikeMVAs *= eclShower.getZernikeMVA();
+      if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) prodN1zernikeMVAs *= eclShower.getZernikeMVA();
     }
 
     //Set zernikeMVA for the N2 shower
@@ -278,7 +282,7 @@ void ECLShowerShapeModule::event()
 std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::projectECLDigits(const ECLShower& shower) const
 {
   std::vector<ProjectedECLDigit> tmpProjectedECLDigits; //Will be returned at the end of the function
-  auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>();
+  auto showerDigitRelations = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 //   tmpProjectedECLDigits.resize( showerDigitRelations.size() );
   //---------------------------------------------------------------------
   // Get shower parameters.
@@ -484,7 +488,7 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
   double energy1 = 0.0; // to check: 'highest energy' data member may not always be the right one
   double energy9 = 0.0;
 
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto caldigit = relatedDigitsPairs.object(iRel);
@@ -522,7 +526,7 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
   double energy9 = 0.0;
   double energy21 = 0.0;
 
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
+  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
 
   for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
     const auto caldigit = relatedDigitsPairs.object(iRel);
@@ -568,10 +572,10 @@ void ECLShowerShapeModule::prepareSecondMomentCorrectionsCallback()
   }
 
   //   Check that all corrections are there
-  if (m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N1].GetN() == 0 or
-      m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N1].GetN() == 0 or
-      m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N2].GetN() == 0 or
-      m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N2].GetN() == 0) {
+  if (m_secondMomentCorrections[c_thetaType][ECLCluster::c_nPhotons].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLCluster::c_nPhotons].GetN() == 0 or
+      m_secondMomentCorrections[c_thetaType][ECLCluster::c_neutralHadron].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLCluster::c_neutralHadron].GetN() == 0) {
     B2FATAL("Missing corrections for second moments..");
   }
 }

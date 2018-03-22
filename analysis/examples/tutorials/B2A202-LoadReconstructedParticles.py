@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to load reconstructed
 # final state particles as Particles:
 # - Tracks are loaded as e/mu/pi/K/p Particles
@@ -126,7 +129,6 @@ toolsGamma = ['Kinematics', '^gamma']
 toolsGamma += ['MCKinematics', '^gamma']
 toolsGamma += ['MCTruth', '^gamma']
 toolsGamma += ['Cluster', '^gamma']
-toolsGamma += ['CustomFloats[goodGamma]', '^gamma']
 
 toolsK0 = ['EventMetaData', '^K_S0']
 toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']

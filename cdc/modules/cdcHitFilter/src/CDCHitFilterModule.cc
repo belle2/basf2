@@ -59,17 +59,14 @@ CDCHitFilterModule::~CDCHitFilterModule()
 
 void CDCHitFilterModule::initialize()
 {
-  StoreArray<CDCHit>::required(m_inputCDCHitListName);
-  StoreArray<CDCHit>::registerPersistent(m_outputCDCHitListName);
+  m_inputCDCHits.isRequired(m_inputCDCHitListName);
+  m_outputCDCHits.registerInDataStore(m_outputCDCHitListName);
 }
 
 void CDCHitFilterModule::event()
 {
 
-  StoreArray<CDCHit> inputHits(m_inputCDCHitListName);
-  StoreArray<CDCHit> outputHits(m_outputCDCHitListName);
-
-  for (auto const& hit : inputHits) {
+  for (auto const& hit : m_inputCDCHits) {
     // check if filtering for super-layers, layers or wires is active
     if ((m_filterSuperLayer >= 0)
         && (m_filterSuperLayer != hit.getISuperLayer())) {
@@ -82,6 +79,6 @@ void CDCHitFilterModule::event()
       continue;
     }
 
-    outputHits.appendNew(hit);
+    m_outputCDCHits.appendNew(hit);
   }
 }

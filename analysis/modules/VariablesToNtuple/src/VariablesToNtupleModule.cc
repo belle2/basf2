@@ -17,6 +17,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cmath>
 #include <algorithm>
@@ -58,7 +59,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 void VariablesToNtupleModule::initialize()
 {
   if (not m_particleList.empty())
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
 
   // Initializing the output root file

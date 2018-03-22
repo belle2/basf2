@@ -5,7 +5,6 @@ from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import fillParticleList
 from modularAnalysis import analysis_main
-from modularAnalysis import generateY4S
 from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 

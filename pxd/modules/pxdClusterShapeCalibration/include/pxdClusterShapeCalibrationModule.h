@@ -12,6 +12,8 @@
 #define pxdClusterShapeCalibrationModule_H
 
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/ClusterCache.h>
@@ -58,6 +60,7 @@ namespace Belle2 {
     virtual void finish();
 
   private:
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Required input for EventMetaData */
     /** Region close edge where remove cluster shape corrections */
     int m_EdgeClose = 2;
     /** To use real data without simulations or simulations, default=False */
@@ -103,8 +106,6 @@ namespace Belle2 {
     std::string m_relPXDClusterDigitName;
     /** PXDRecoHit to PXDTrueHit RelationArray name */
     std::string m_relPXDRecoHitTrueHitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
 
     /** Counter of events */
     int m_iEv;

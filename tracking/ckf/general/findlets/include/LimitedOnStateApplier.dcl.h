@@ -11,6 +11,7 @@
 
 #include <tracking/ckf/general/findlets/OnStateApplier.dcl.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <vector>
 #include <string>
@@ -18,6 +19,13 @@
 namespace Belle2 {
   class ModuleParamList;
 
+  /**
+   * Specialisation of the OnStateApplier, which
+   * (a) uses a filter for the () operator, which is configurable
+   * (b) does only allow for the best N candidates in the child states. All other states will be deleted.
+   *
+   * Id useNStates is 0, all states are used.
+   */
   template <class AState, class AFilter>
   class LimitedOnStateApplier : public OnStateApplier<AState> {
   private:
@@ -28,10 +36,11 @@ namespace Belle2 {
     using Object = typename Super::Object;
 
   public:
+    /// Constructor adding the findlet as a listener.
     LimitedOnStateApplier();
-    /**
-     */
-    void apply(const std::vector<const AState*>& currentPath,
+
+    /// Apply the filter to each pair of states and current path and let only pass the best N states.
+    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
 
     /// Copy the filter operator to this method

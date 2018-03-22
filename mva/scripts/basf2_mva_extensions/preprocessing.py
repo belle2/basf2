@@ -39,7 +39,7 @@ class fast_equal_frequency_binning():
         """
         for variable in range(len(x[0, :])):
             x[:, variable] = np.digitize(np.nan_to_num(x[:, variable]),
-                                         self.state['binning_array'][variable]) / self.state['number_of_bins']
+                                         self.state['binning_array'][variable][1:-1]) / self.state['number_of_bins']
         return x
 
     def export_state(self):

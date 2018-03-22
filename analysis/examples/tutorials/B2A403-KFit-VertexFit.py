@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform Vertex fits
 # using KFit. The following  decay chain (and c.c. decay
 # chain):
@@ -17,10 +19,11 @@
 # Note: This example is build upon
 # B2A301-Dstar2D0Pi-Reconstruction.py
 #
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
+# Note: This example uses the signal MC sample created with
+# release-01-00-00
 #
 # Contributors: A. Zupanc (June 2014)
+#               I. Komarov (December 2017)
 #
 ######################################################
 
@@ -34,12 +37,12 @@ from modularAnalysis import ntupleTree
 from modularAnalysis import vertexKFit
 from stdCharged import *
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/cc2dstar/mcprod1405/BGx1/mc35_cc2dstar_BGx1_s00/cc2dstar_e0001r001*_s00_BGx1.mdst.root'
-     ]
+# Add MC9 signal samples
+filelistSIG = [('/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002171\
+/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00002171_task00000001.root')]
 
-inputMdstList('MC5', filelistSIG)
+
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #

@@ -12,6 +12,9 @@
 #define DOSIDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/dosi/dataobjects/DosiHit.h>
 #include <string>
 #include <vector>
 
@@ -58,6 +61,7 @@ namespace Belle2 {
 
 
     private:
+      StoreArray<DosiHit> m_dosiHit; /** array for DosiHit */
 
       /** reads data from DOSI.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

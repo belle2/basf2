@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  CDC Group                                               *
+ * Contributors:  Makoto Uchida                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,9 +19,27 @@ namespace Belle2 {
   namespace CDC {
 
     /**
-     * Argument LR
+     * Argument LR.
      */
     enum {c_Left = 0, c_Right = 1};
+
+    /**
+     * Argument of fitting function.
+     */
+    enum {c_Polynomial = 0, c_Chebyshev = 1};
+
+    /**
+     * Fit Status.
+     * =-1: low statitic
+     * =1: good
+     * =0: Fit failure
+     * =2: Error Outer
+     * =3: Error Inner part;
+     */
+
+    enum FitStatus {c_lowStat = -1, c_fitFailure = 0, c_OK = 1,
+                    c_errorOuter = 2, c_errorInner = 3
+                   };
 
     /**
      * Class to perform xt calibration for drift chamber.
@@ -30,79 +48,85 @@ namespace Belle2 {
     public:
       /// Constructor
       XTCalibrationAlgorithm();
+
       /// Destructor
       virtual ~XTCalibrationAlgorithm() {}
+
       /// set to use BField
-      virtual void BField(bool bfield) {m_BField = bfield;}
+      virtual void setBField(bool bfield) {m_bField = bfield;}
+
       /// Run in debug or silent
       virtual void setDebug(bool debug = false) {m_debug = debug; }
+
       /// set minimum number of degree of freedom requirement
-      virtual void setMinimumNDF(double minndf) {m_ndfmin = minndf;}
+      virtual void setMinimumNDF(double ndf) {m_minNdf = ndf;}
+
       /// set minimum Prob(Chi2) requirement
-      virtual void setMinimumPval(double minPval) {m_Pvalmin = minPval;}
+      virtual void setMinimumPval(double pval) {m_minPval = pval;}
+
       /// set xt mode, 0 is polynimial, 1 is Chebshev polynomial
-      virtual void setMode(unsigned short mode = 1) {m_xtmode = mode;}
+      virtual void setXtMode(unsigned short mode = c_Chebyshev) {m_xtMode = mode;}
+
       /// set to store histogram or not.
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
+      /// output file name
+      void setOutputFileName(std::string outputname) {m_outputFileName.assign(outputname);}
+
+
+
     protected:
+
       /// Run algo on data
       virtual EResult calibrate();
+
       /// Create histogram for calibration
       virtual void createHisto();
-      /// read xt paramter (wrap text mode and database mode)
-      virtual void readXT();
+
       /// Store calibrated constand
       virtual void write();
+
       /// Store histogram to file
       virtual void storeHisto();
 
+      /// Prepare the calibration of XT.
+      void prepare(StoreObjPtr<EventMetaData>& evtPtr);
+
     private:
-      double m_ndfmin = 5;    /**< minimum ndf required */
-      double m_Pvalmin = 0.;  /**< minimum pvalue required */
+      double m_minNdf = 5;    /**< minimum ndf required */
+      double m_minPval = 0.;  /**< minimum pvalue required */
       bool m_debug = false;   /**< run in debug or silent*/
       bool m_storeHisto = true;  /**< Store histogram or not*/
-      bool m_useProfileXTFromInputXT = true; /**< use profile from text file or default in input xt*/
       bool m_LRseparate = true; /**< Separate LR in calibration or mix*/
+      bool m_bField = true;  /**< with b field or none*/
+
+      TProfile* m_hProf[56][2][20][10];      /**< Profile xt histo*/
+      TH2D* m_hist2d[56][2][20][10];         /**< 2D histo of xt*/
+      TH2D* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
+      TH1D* m_hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit */
+
+      TF1* m_xtFunc[56][2][20][10];         /**< XTFunction */
+
+      double m_xtPost[56][2][18][7][8];     /**< paremeters of XT before calibration */
+
+      int m_fitStatus[56][2][20][10];         /**< Fit flag */
       bool m_useSliceFit = false; /**< Use slice fit or profile */
-      bool m_BField = true;  /**< with b field or none*/
-
-      double m_XT_fit[56][2][18][7][8];  /**< Fitted parameter*/
-      double xtold[56][2][18][7][8];     /**< Old paremeter */
-      int fitflag[56][2][20][10];         /**< Fit flag */
-      TF1* xtf5r[56][2][20][10];          /**< XTFunction */
-
-      TProfile* hprof[56][2][20][10];     /**< Profile xt histo*/
-      TH2D* hist2d[56][2][20][10];        /**< 2D histo of xt*/
-      TH2D* hist2d_draw[56][20][10];       /**< 2d histo for draw*/
-      TH1D* hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit*/
-
-      /*********************************
-      Fit Flag
-      =-1: low statitic
-       =1: good
-      =0: Fit failure
-      =2: Error Outer
-      =3: Error Inner part;
-      **********************************/
-
-      std::string m_outputXTFileName = "xt_new.dat"; /**< Out put xt filename*/
-      int m_nAlpha; /**<number of alpha bins*/
-      int m_nTheta; /**<number of  theta bins*/
-      double l_alpha[18];/**< Lower boundays of alpha bins. */
-      double u_alpha[18];/**< Upper boundays of alpha bins. */
-      double ialpha[18]; /**< represented alphas of alpha bins. */
-      double l_theta[7]; /**< Lower boundays of theta bins. */
-      double u_theta[7];/**< Upper boundays of theta bins. */
-      double itheta[7]; /**< represented alphas of theta bins. */
-
-      unsigned short xtmode_old; /**< XT mode old, 0-polynomial, 1 Cheb*/
-      int m_MAXalpha = 18;        /**< max alpha bin*/
-      int m_MAXtheta = 7;         /**< max theta bin*/
-      unsigned short m_xtmode = 1; /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/
-      int m_smallestEntryRequire = 1000; /**< minimum number of hit per hitosgram. */
+      int m_minEntriesRequired = 1000; /**< minimum number of hit per hitosgram. */
+      int m_nAlphaBins; /**<number of alpha bins*/
+      int m_nThetaBins; /**<number of  theta bins*/
+      int m_xtMode = c_Chebyshev;  /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/
+      int m_xtModePost;  /**< Mode of xt before calibration; 0 is polynomial;1 is Chebyshev.*/
+      float m_lowerAlpha[18];/**< Lower boundays of alpha bins. */
+      float m_upperAlpha[18];/**< Upper boundays of alpha bins. */
+      float m_iAlpha[18]; /**< Represented alpha in alpha bins. */
+      float m_lowerTheta[7];/**< Lower boundays of theta bins. */
+      float m_upperTheta[7];/**< Upper boundays of theta bins. */
+      float m_iTheta[7]; /**< Represented theta in theta bins. */
       /// boundary parameter for fitting, semi-experiment number
-      double m_par6[56] = {89,   91,  94,  99,  104, 107, 110, 117,
+      double m_par6[56] = {89, 91, 94, 99, 104, 107, 110, 117,
                            126, 144, 150, 157, 170, 180,
                            160, 167, 183, 205, 200, 194,
                            177, 189, 192, 206, 224, 234,
@@ -113,6 +137,8 @@ namespace Belle2 {
                            231, 243, 246, 256, 263, 300
                           };
 
+      bool  m_textOutput = false; /**< output text file if true */
+      std::string m_outputFileName = "xt_new.dat"; /**< Out put xt filename*/
     };
   }
 }

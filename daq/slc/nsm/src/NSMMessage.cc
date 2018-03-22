@@ -5,11 +5,6 @@
 #include <errno.h>
 #include <stdlib.h>
 
-extern "C" {
-#include "nsm2/nsmlib2.h"
-#include "nsm2/belle2nsm.h"
-}
-
 #include <daq/slc/nsm/NSMData.h>
 
 #include <daq/slc/system/BufferedReader.h>

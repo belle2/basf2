@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'generators', 'mdst_dataobjects']
+
+Return('env')

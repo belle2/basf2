@@ -6,22 +6,27 @@
 #include <ecl/electronId/ECLMuonPdf.h>
 
 namespace Belle2 {
-  class ECLPionPdf : public ECLAbsPdf {
-  public:
-    double pdf(const double& eop, const double& p, const double& theta) const;
-    void init(const char* parametersFileName);
 
-  private:
+  namespace ECL {
 
-    struct Parameters {
-      double fraction;
-      double mu3;
-      double sigma3;
+    class ECLPionPdf : public ECLAbsPdf {
+    public:
+      double pdf(const double& eop, const double& p, const double& theta) const;
+      void init(const char* parametersFileName);
+
+    private:
+
+      struct Parameters {
+        double fraction;
+        double mu3;
+        double sigma3;
+      };
+
+      ECLMuonPdf m_muonlike;
+      std::vector<Parameters> m_params;
+      std::vector<double> m_integralPion;
+
     };
 
-    ECLMuonPdf m_muonlike;
-    std::vector<Parameters> m_params;
-    std::vector<double> m_integralPion;
-
-  };
+  }
 }

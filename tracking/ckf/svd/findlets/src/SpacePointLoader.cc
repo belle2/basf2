@@ -11,7 +11,8 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 using namespace Belle2;
@@ -23,12 +24,15 @@ SpacePointLoader::SpacePointLoader()
 
 void SpacePointLoader::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
+  Super::exposeParameters(moduleParamList, prefix);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAssignedHits"), m_param_useAssignedHits,
-                                "Use only already used hits",
+                                "Use only already assigned hits",
                                 m_param_useAssignedHits);
+
+  m_storeArrayLoader.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "hits"));
 }
 
-/// Do the space point retrieval.
 void SpacePointLoader::apply(std::vector<const SpacePoint*>& spacePoints)
 {
   m_storeArrayLoader.apply(spacePoints);

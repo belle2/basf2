@@ -32,9 +32,9 @@ void HitLevelInfoWriterModule::initialize()
   B2INFO("Creating a ROOT file for the hit level information...");
 
   // required inputs
-  StoreArray<CDCDedxTrack>::required();
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
+  m_dedxTracks.isRequired();
+  m_tracks.isRequired();
+  m_trackFitResults.isRequired();
 
   // register output root file
   m_file = new TFile(m_filename.c_str(), "RECREATE");
@@ -98,8 +98,8 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
-  m_tree->Branch("hTwodcor", &h_twodcor, "hTwodcor[hNHits]/D");
-  m_tree->Branch("hOnedcor", &h_onedcor, "hOnedcor[hNHits]/D");
+  m_tree->Branch("hTwodcor", h_twodcor, "hTwodcor[hNHits]/D");
+  m_tree->Branch("hOnedcor", h_onedcor, "hOnedcor[hNHits]/D");
 
 }
 
@@ -117,18 +117,20 @@ void HitLevelInfoWriterModule::event()
                           1.0000, 1.0000, 1.0000, 1.0000, 1.0000
                          };
 
-  StoreArray<CDCDedxTrack> dedxTracks;
-
   // **************************************************
   //
   //  LOOP OVER dE/dx measurements
   //
   // **************************************************
 
-  for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
-    CDCDedxTrack* dedxTrack = dedxTracks[idedx];
+  for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
+    CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
-    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    if (!track) {
+      B2WARNING("No related track...");
+      continue;
+    }
+    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;

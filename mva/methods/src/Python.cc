@@ -159,8 +159,8 @@ namespace Belle2 {
     {
 
       Weightfile weightfile;
-      std::string custom_weightfile = weightfile.getFileName();
-      std::string custom_steeringfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
+      std::string custom_steeringfile = weightfile.generateFileName();
 
       uint64_t numberOfFeatures = training_data.getNumberOfFeatures();
       uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
@@ -372,7 +372,7 @@ namespace Belle2 {
     void PythonExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       weightfile.getFile("Python_Weightfile", custom_weightfile);
       weightfile.getOptions(m_general_options);
       weightfile.getOptions(m_specific_options);
@@ -388,7 +388,7 @@ namespace Belle2 {
         m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
         if (weightfile.containsElement("Python_Steeringfile")) {
-          std::string custom_steeringfile = weightfile.getFileName();
+          std::string custom_steeringfile = weightfile.generateFileName();
           weightfile.getFile("Python_Steeringfile", custom_steeringfile);
           auto steeringfile = builtins.attr("open")(custom_steeringfile.c_str(), "rb");
           auto source_code = pickle.attr("load")(steeringfile);

@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <sstream>
+#include <vector>
 
 // Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
 #if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
@@ -37,6 +38,15 @@ namespace FastBDT {
 
 namespace Belle2 {
   namespace MVA {
+    bool isValidSignal(const std::vector<bool>& Signals)
+    {
+      const auto first = Signals.front();
+      for (const auto& value : Signals) {
+        if (value != first)
+          return true;
+      }
+      return false;
+    }
 
     void FastBDTOptions::load(const boost::property_tree::ptree& pt)
     {
@@ -186,6 +196,9 @@ namespace Belle2 {
 
       std::vector<std::vector<float>> X(numberOfFeatures + numberOfSpectators);
       const auto& y = training_data.getSignals();
+      if (not isValidSignal(y)) {
+        B2FATAL("The training data is not valid. It only contains one class instead of two.");
+      }
       const auto& w = training_data.getWeights();
       for (unsigned int i = 0; i < numberOfFeatures; ++i) {
         X[i] = training_data.getFeature(i);
@@ -195,7 +208,10 @@ namespace Belle2 {
       }
       classifier.fit(X, y, w);
 #else
-
+      const auto& y = training_data.getSignals();
+      if (not isValidSignal(y)) {
+        B2FATAL("The training data is not valid. It only contains one class instead of two.");
+      }
       std::vector<FastBDT::FeatureBinning<float>> featureBinnings;
       std::vector<unsigned int> nBinningLevels;
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
@@ -262,7 +278,7 @@ namespace Belle2 {
 
 
       Weightfile weightfile;
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       std::fstream file(custom_weightfile, std::ios_base::out | std::ios_base::trunc);
 
 #if FastBDT_VERSION_MAJOR >= 5
@@ -301,7 +317,7 @@ namespace Belle2 {
     void FastBDTExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       weightfile.getFile("FastBDT_Weightfile", custom_weightfile);
       std::fstream file(custom_weightfile, std::ios_base::in);
 

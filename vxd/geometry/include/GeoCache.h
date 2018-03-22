@@ -13,10 +13,12 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoTools.h>
 #include <vector>
 #include <set>
 #include <map>
 #include <unordered_map>
+#include <memory>
 
 #include <TMath.h>
 
@@ -137,6 +139,16 @@ namespace Belle2 {
       /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
 
+      /** Return a raw pointer to a GeoTools object.
+       * @return const GeoTools* : raw pointer, no onwership transfer
+       */
+      const GeoTools* getGeoTools()
+      {
+        if (!m_geoToolsPtr)
+          m_geoToolsPtr = std::unique_ptr<GeoTools>(new GeoTools());
+        return m_geoToolsPtr.get();
+      }
+
     private:
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */
       typedef std::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
@@ -169,6 +181,10 @@ namespace Belle2 {
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_sensorPlacements {};
       /** Map to find the SensorInfo for a given Sensor ID */
       SensorInfoMap m_sensorInfo;
+
+      /** Pointer to a GeoTools object */
+      std::unique_ptr<GeoTools> m_geoToolsPtr;
+
     };
   }
 } //Belle2 namespace

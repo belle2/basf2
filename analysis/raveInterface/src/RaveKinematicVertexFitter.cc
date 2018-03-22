@@ -11,8 +11,6 @@
 #include <analysis/raveInterface/RaveKinematicVertexFitter.h>
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <genfit/GFRaveVertexFactory.h>
-#include <genfit/RKTrackRep.h>
 //root
 #include <Math/ProbFunc.h>
 
@@ -32,7 +30,7 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <iostream>
-using std::cout; using std::endl; using std::cerr;
+
 using namespace Belle2;
 using namespace analysis;
 

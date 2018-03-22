@@ -56,11 +56,10 @@ namespace Belle2 {
       // TTS parameterization
       const auto& tts = geo->getNominalTTS().getTTS();
       std::vector<float> frac, mean, sigma;
-      double sigmaTDC = tdc.getTimeJitter();
       for (const auto& gauss : tts) {
         frac.push_back(gauss.fraction);
         mean.push_back(gauss.position);
-        sigma.push_back(sqrt(gauss.sigma * gauss.sigma + sigmaTDC * sigmaTDC));
+        sigma.push_back(gauss.sigma);
       }
       setTTS(tts.size(), frac.data(), mean.data(), sigma.data());
 

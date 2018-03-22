@@ -18,6 +18,7 @@
 #include <ecl/electronId/ECLElectronPdf.h>
 #include <ecl/electronId/ECLPionPdf.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -54,11 +55,12 @@ void ECLElectronIdModule::initialize()
     B2FATAL("Electron ID pdfs parameter files not found.");
   }
 
-  (m_pdf[Const::electron.getIndex()] = new ECLElectronPdf)->init(eParams.c_str());
-  (m_pdf[Const::muon.getIndex()]     = new ECLMuonPdf)->init(muParams.c_str());
+  (m_pdf[Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init(eParams.c_str());
+  (m_pdf[Const::muon.getIndex()]     = new ECL::ECLMuonPdf)->init(muParams.c_str());
   (m_pdf[Const::proton.getIndex()]   =
-     m_pdf[Const::kaon.getIndex()]   =
-       m_pdf[Const::pion.getIndex()]   = new ECLPionPdf)->init(piParams.c_str());
+     m_pdf[Const::kaon.getIndex()]     =
+       m_pdf[Const::pion.getIndex()]     = new ECL::ECLPionPdf)->init(piParams.c_str());
+
 }
 
 void ECLElectronIdModule::beginRun() {}
@@ -88,7 +90,7 @@ void ECLElectronIdModule::event()
 
     for (const auto& eclShower : relShowers) {
 
-      if (eclShower.getHypothesisId() != ECLConnectedRegion::c_N1) continue;
+      if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
       if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
 
       const double shEnergy = eclShower.getEnergy();
@@ -108,7 +110,7 @@ void ECLElectronIdModule::event()
     double eop = energy / p;
 
     for (const auto& hypo : Const::chargedStableSet) {
-      ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
+      Belle2::ECL::ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
       if (currentpdf == 0) {
         currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }

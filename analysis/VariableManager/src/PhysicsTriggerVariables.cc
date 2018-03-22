@@ -515,12 +515,12 @@ namespace Belle2 {
       for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
         Particle* p = pionshlt->getParticle(i);
         /*
-        const ECLCluster* shower = p->getECLCluster();
-        if(shower){
-        std::cout<<"++++"<<"find track Cluster"<<"++++"<<std::endl;
-        const Track* track = shower->getRelated<Track>();
+        const ECLCluster* cluster = p->getECLCluster();
+        if(cluster){
+        B2DEBUG(19,"++++"<<"find track Cluster"<<"++++");
+        const Track* track = cluster->getRelated<Track>();
         if(track)
-        std::cout<<"++++"<<"Track Match Cluster"<<"++++"<<std::endl;
+        B2DEBUG(19,"++++"<<"Track Match Cluster"<<"++++");
 
         }
         */
@@ -529,7 +529,7 @@ namespace Belle2 {
         if (!eclTrack) continue;
         if (eclTrack->getEnergy() > 0.1)
           result += eclTrack->getEnergy();
-//     std::cout<<"======="<<"Match Cluster"<<"======="<<std::endl;
+//     B2DEBUG(19,"======="<<"Match Cluster"<<"=======");
       }
 
       StoreObjPtr<ParticleList> gammahlt("gamma:HLT");

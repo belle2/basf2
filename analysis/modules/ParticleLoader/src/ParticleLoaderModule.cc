@@ -17,6 +17,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 // dataobjects
 #include <mdst/dataobjects/V0.h>
@@ -122,7 +123,7 @@ namespace Belle2 {
 
         int nProducts = m_decaydescriptor.getNDaughters();
         if (nProducts > 0)
-          B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString " << decayString
+          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
                   << ". DecayString should not contain any daughters, only the mother particle.");
 
         // Mother particle

@@ -22,6 +22,7 @@ N_EVENTS = 1000
 ACTIVE = True
 
 from simulation import add_simulation
+from svd import add_svd_reconstruction
 
 import basf2
 import ROOT
@@ -202,6 +203,7 @@ path = basf2.create_path()
 path.add_module('EventInfoSetter', evtNumList=N_EVENTS)
 path.add_module('EvtGenInput')
 add_simulation(path, usePXDDataReduction=False)
+add_svd_reconstruction(path, isROIsimulation=True)
 
 #    path.add_module('RootInput', inputFileName=INPUT_FILE, entrySequences=["0:{}".format(N_EVENTS-1)])
 # path.add_module('Gearbox')
@@ -212,7 +214,7 @@ pxd_filtered_digits = 'filteredPXDDigits'
 
 # SVD tracking
 svd_reco_tracks = '__ROIsvdRecoTracks'
-add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)  # CDC is not used at the moment!
+add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], '__ROIsvdClusters')  # CDC is not used at the moment!
 
 # ROI Finding
 pxdDataRed = basf2.register_module('PXDROIFinder')

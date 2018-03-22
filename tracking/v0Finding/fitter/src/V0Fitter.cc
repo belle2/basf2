@@ -1,7 +1,6 @@
 #include <tracking/v0Finding/fitter/V0Fitter.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -12,21 +11,31 @@
 #include <genfit/GFRaveVertex.h>
 #include <genfit/Track.h>
 #include <genfit/FieldManager.h>
+#include "genfit/MaterialEffects.h"
 #include <genfit/Exception.h>
 
 #include <framework/utilities/IOIntercept.h>
 
-#include <TVector3.h>
-
 using namespace Belle2;
 
-V0Fitter::V0Fitter(const std::string& trackFitResultColName, const std::string& v0ColName,
-                   const std::string& v0ValidationVertexColName, const std::string& gfTrackColName)
-  : m_validation(false), m_RecoTrackColName(gfTrackColName)
+V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
+                   const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
+                   bool enableValidation)
+  : m_validation(enableValidation), m_recoTracksName(recoTracksName)
 {
-  m_trackFitResults = StoreArray<TrackFitResult>(trackFitResultColName);
-  m_v0s = StoreArray<V0>(v0ColName);
-  m_validationV0s = StoreArray<V0ValidationVertex>(v0ValidationVertexColName);
+  m_trackFitResults.isRequired(trackFitResultsName);
+  m_v0s.registerInDataStore(v0sName, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  //Relation to RecoTracks from Tracks is already tested at the module level.
+
+  if (m_validation) {
+    B2DEBUG(300, "Register DataStore for validation.");
+    m_validationV0s.registerInDataStore(v0ValidationVerticesName, DataStore::c_ErrorIfAlreadyRegistered);
+  }
+
+  B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
+           "Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
+  B2ASSERT(genfit::FieldManager::getInstance()->isInitialized(),
+           "Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
 }
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
@@ -138,11 +147,9 @@ std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses
     return std::make_pair(Const::proton, Const::pion);
   } else if (v0Hypothesis == Const::antiLambda) {
     return std::make_pair(Const::pion, Const::proton);
-  } else {
-    B2FATAL("Given V0Hypothesis not available.");
-    return std::make_pair(Const::invalidParticle, Const::invalidParticle);
   }
-
+  B2FATAL("Given V0Hypothesis not available.");
+  return std::make_pair(Const::invalidParticle, Const::invalidParticle); // return something to avoid triggering cppcheck
 }
 
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
@@ -150,31 +157,20 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
-  RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_RecoTrackColName);
-  if (not recoTrackPlus) {
-    B2ERROR("No RecoTrack for Belle2::Track");
-    return false;
-  }
+  //Existence of corresponding RecoTrack already checked at the module level;
+  RecoTrack* recoTrackPlus = trackPlus->getRelated<RecoTrack>(m_recoTracksName);
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
-
   int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
-
   genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackPlus, *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
     B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
     return false;
   }
 
-  RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
-  if (not recoTrackMinus) {
-    B2ERROR("No RecoTrack for Belle2::Track");
-    return false;
-  }
-
+  //Existence of corresponding RecoTrack already checked at the module level;
+  RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
-
   int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
-
   genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackMinus, *recoTrackMinus);
   if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");

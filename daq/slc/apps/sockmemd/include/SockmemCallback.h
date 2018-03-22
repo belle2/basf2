@@ -1,7 +1,7 @@
 #ifndef _Belle2_SockmemCallback_h
 #define _Belle2_SockmemCallback_h
 
-#include "daq/slc/nsm/NSMCallback.h"
+#include "daq/slc/runcontrol/RCCallback.h"
 
 #include "daq/slc/base/ConfigFile.h"
 
@@ -9,7 +9,7 @@
 
 namespace Belle2 {
 
-  class SockmemCallback : public NSMCallback {
+  class SockmemCallback : public RCCallback {
 
     struct tx_t {
       std::string m_host;
@@ -37,11 +37,21 @@ namespace Belle2 {
     virtual ~SockmemCallback() throw();
 
   public:
-    virtual void init(NSMCommunicator& com) throw();
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void initialize(const DBObject& obj) throw(RCHandlerException);
+    virtual void configure(const DBObject& obj) throw(RCHandlerException);
+    virtual void load(const DBObject& obj) throw(RCHandlerException);
+    virtual void start(int expno, int runno) throw(RCHandlerException);
+    virtual void stop() throw(RCHandlerException);
+    virtual bool pause() throw(RCHandlerException);
+    virtual bool resume(int subno) throw(RCHandlerException);
+    virtual void recover(const DBObject& obj) throw(RCHandlerException);
+    virtual void abort() throw(RCHandlerException);
+    virtual void monitor() throw(RCHandlerException);
 
   private:
     std::map<std::string, tx_t> m_tx;
+    NSMNode m_rcnode;
+    bool m_aborted;
 
   };
 

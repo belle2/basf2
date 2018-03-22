@@ -7,8 +7,13 @@
 namespace Belle2 {
   class ECLElectronPdf : public ECLAbsPdf {
   public:
-    double pdf(double eop, double p, double costheta) const;
+    double pdf(const double& eop, const double& p, const double& theta) const;
     void init(const char* parametersFileName);
+
+    Parameters& pdfParams(const double& p, const double& theta) const
+    {
+      return m_params[index(p, theta)];
+    };
 
   private:
 

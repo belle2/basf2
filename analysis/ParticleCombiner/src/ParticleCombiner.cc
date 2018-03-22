@@ -15,6 +15,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <mdst/dataobjects/ECLCluster.h>
+
 #include <algorithm>
 
 namespace Belle2 {
@@ -51,6 +53,9 @@ namespace Belle2 {
 
     if (m_iCombination > 0) {
 
+      // TF SC this does not yet account for double counting so will produce:
+      // { 000, 100, 200, ... 010, 110, .... } event if the first and second
+      // place are the same particle list
       for (unsigned int i = 0; i < m_numberOfLists; i++) {
         indices[i]++;
         if (indices[i] < sizes[i]) break;
@@ -115,6 +120,9 @@ namespace Belle2 {
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
     for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      // Get the mother of the subdecaystring of the ith daughter
+      // eg. "B -> [D -> K pi] [tau -> pi pi pi]". The 0th daughter is the
+      // *decaystring* D -> K pi whose mother is the D.
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
@@ -301,6 +309,9 @@ namespace Belle2 {
           continue;
 
         if (not currentCombinationIsUnique()) continue;
+
+        if (not currentCombinationIsECLCRUnique()) continue;
+
         return true;
       }
 
@@ -340,6 +351,9 @@ namespace Belle2 {
           continue;
 
         if (not currentCombinationIsUnique()) continue;
+
+        if (not currentCombinationIsECLCRUnique()) continue;
+
         return true;
       }
 
@@ -386,6 +400,7 @@ namespace Belle2 {
     static std::vector<int> sources; // stack for particle sources
     sources.clear();
 
+    // recursively check all daughters and daughters of daughters
     while (!stack.empty()) {
       Particle* p = stack.back();
       stack.pop_back();
@@ -425,6 +440,61 @@ namespace Belle2 {
         return true;
 
     return false;
+  }
+
+  bool ParticleGenerator::currentCombinationIsECLCRUnique()
+  {
+    unsigned nECLSource = 0;
+    std::vector<Particle*> stack = m_particles;
+    static std::vector<int> connectedregions;
+    static std::vector<int> hypotheses;
+    connectedregions.clear();
+    hypotheses.clear();
+
+    // recursively check all daughters and daughters of daughters
+    while (!stack.empty()) {
+      Particle* p = stack.back();
+      stack.pop_back();
+      const std::vector<int>& daughters = p->getDaughterIndices();
+
+      if (daughters.empty()) {
+        // Only test if the particle was created from an ECLCluster at source.
+        // This can be changed if we change the cluster <--> track matching, in
+        // which case one needs to extend the check to ALL particles with an
+        // associated ECLCluster. Then replace the following active line with two lines...
+        //
+        // auto cluster = p->getECLCluster();
+        // if (cluster) { // then do stuff
+        if (p->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+          nECLSource++;
+          auto* cluster = p->getECLCluster();
+          int crid = cluster->getConnectedRegionId();
+          int hypo = cluster->getHypothesisId();
+          connectedregions.push_back(crid);
+          hypotheses.push_back(hypo);
+        }
+      } else {
+        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(m_particleArray[daughters[i]]);
+      }
+    }
+
+    // less than two particles from an ECL source is fine
+    // (unless cluster <--> track matching changes)
+    if (nECLSource < 2) return true;
+
+    // if all crs are unique the throw true (maybe a fast way to prechreck this)
+    // FIXME?
+
+    // if all hyps are the same the throw true (maybe a fast way to prechreck this)
+    // FIXME?
+
+    // yes this is a nested for loop but it's fast, we promise
+    for (unsigned icr = 0; icr < connectedregions.size(); ++icr)
+      for (unsigned jcr = icr + 1; jcr < connectedregions.size(); ++jcr)
+        if (connectedregions[icr] == connectedregions[jcr])
+          if (hypotheses[icr] != hypotheses[jcr]) return false;
+
+    return true;
   }
 
   int ParticleGenerator::getUniqueID(int index) const

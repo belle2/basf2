@@ -213,6 +213,15 @@ namespace Belle2 {
     bool currentCombinationIsUnique();
 
     /**
+     * Check that: if the current combination has at least two particles from an ECL source,
+     * then they are from different connected regions or from the same connected region but have
+     * the same hypothesis.
+     *
+     * #######     * @return true if indices not found in the stack; if true indices pushed to stack
+     */
+    bool currentCombinationIsECLCRUnique();
+
+    /**
      * In the case input daughter particle lists collide (two or more lists contain copies of Particles)
      * the Particle's Store Array index can not be longer used as its unique identifier, which is needed
      * to check for uniqueness of accpeted combinations. Instead unique identifier is created for all particles

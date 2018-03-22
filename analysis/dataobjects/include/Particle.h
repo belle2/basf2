@@ -166,8 +166,10 @@ namespace Belle2 {
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
+     * @param type the kind of ParticleType we want (photon by default)
      */
-    explicit Particle(const ECLCluster* eclCluster);
+    explicit Particle(const ECLCluster* eclCluster,
+                      const Const::ParticleType& type = Const::photon);
 
     /**
      * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
@@ -189,6 +191,15 @@ namespace Belle2 {
   public:
 
     // setters
+
+    /**
+     * Sets PDG code
+     * @param PDG code
+     */
+    void setPDGCode(const int pdgCode)
+    {
+      m_pdgCode = pdgCode;
+    }
 
     /**
      * Sets Lorentz vector

@@ -1854,7 +1854,7 @@ def printROEInfo(
     mask_names=[],
     which_mask='both',
     full_print=False,
-    path=analysis_main
+    path=None
 ):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
@@ -1871,6 +1871,8 @@ def printROEInfo(
     @param full_print   print out mask values for each Track/ECLCLuster in mask
     @param path         modules are added to this path
     """
+    if not path:
+        B2FATAL("Error from printROEInfo, please add this to the for_each path")
 
     printMask = register_module('RestOfEventPrinter')
     printMask.set_name('RestOfEventPrinter')

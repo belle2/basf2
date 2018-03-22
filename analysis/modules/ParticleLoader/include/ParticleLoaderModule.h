@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Marko Staric, Anze Zupanc, Sam Cunliffe, Torben Ferber   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -38,9 +38,9 @@ namespace Belle2 {
    *   - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
    *
    * o) neutral final state particles
-   *   - gamma                            (input MDST type = ECLCluster with hypothesis N1 only at the moment)
+   *   - gamma                            (input MDST type = ECLCluster with 'n photons' ECLCluster::Hypothesis::c_nPhotons)
    *   - K_S0, Lambda0, converted photons (input MDST type = V0)
-   *   - K_L0                             (input MDST type = KLMCluster)
+   *   - K_L0                             (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
    *
    * The following BASF2 relations are set by the ParticleLoader:
    *

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Marko Staric, Anze Zupanc, Sam Cunliffe, Torben Ferber   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,9 +40,9 @@ using namespace std;
 
 namespace Belle2 {
 
-  //-----------------------------------------------------------------
-  //                 Register module
-  //-----------------------------------------------------------------
+//-----------------------------------------------------------------
+//                 Register module
+//-----------------------------------------------------------------
 
   REG_MODULE(ParticleLoader)
 
@@ -167,7 +167,7 @@ namespace Belle2 {
           }
         } else {
           // TODO: test that this actually works
-          B2WARNING("Tha ParticleList with name " << listName << " already exists in the DataStore. Nothing to do.");
+          B2WARNING("The ParticleList with name " << listName << " already exists in the DataStore. Nothing to do.");
           continue;
         }
 
@@ -203,6 +203,8 @@ namespace Belle2 {
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
             B2INFO("   -> MDST source: KLMClusters");
             m_KLMClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            B2INFO("   -> MDST source: ECLClusters");
+            m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
@@ -477,8 +479,10 @@ namespace Belle2 {
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclCluster2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
+      if (!plist) { // create the list only if the klmClustersToParticles function has not already created it
+        plist.create();
+        plist->initialize(pdgCode, listName);
+      }
 
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);
@@ -496,11 +500,14 @@ namespace Belle2 {
     for (int i = 0; i < ECLClusters.getEntries(); i++) {
       const ECLCluster* cluster      = ECLClusters[i];
 
-      if (!cluster->isNeutral())
+      // ecl clusters can be photons or neutral hadrons (i.e. Klong)
+      if (!cluster->isNeutral()) continue;
+      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons
+          && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_neutralHadron)
         continue;
 
-      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-        continue;
+      // SAM: what happens if this is run on data? probably the RelationVector
+      // has length zero and we skip to "create Particle"
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles
@@ -522,38 +529,54 @@ namespace Belle2 {
       });
 
       // create Particle
-      Particle particle(cluster);
-      if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
+      for (auto eclCluster2Plist : m_ECLClusters2Plists) {
+        string listName = get<c_PListName>(eclCluster2Plist);
+        int listPdgCode = get<c_PListPDGCode>(eclCluster2Plist);
+        Const::ParticleType thisType(listPdgCode);
+
+        // don't fill photon list with clusters that don't have
+        // the nPhotons hypothesis (ECL people call this N1)
+        if (listPdgCode == Const::photon.getPDGCode()
+            && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+          continue;
+
+        // don't fill a KLong list with clusters that don't have the neutral
+        // hadron hypothesis set (ECL people call this N2)
+        if (listPdgCode == Const::Klong.getPDGCode()
+            && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_neutralHadron)
+          continue;
+
+        // create particle and check it before adding to list
+        Particle particle(cluster, thisType);
+        if (particle.getParticleType() != Particle::c_ECLCluster) {
+          B2WARNING("Particle created from ECLCluster does not have ECLCluster type: skipping");
+          continue;
+        }
         Particle* newPart = particles.appendNew(particle);
 
-        // set relation
+        // set relations to mcparticles
         for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
           const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
           double weight = weightsAndIndices[j].second;
 
           // TODO: study this further and avoid hardcoded values
-          // set the relation only if the MCParticle's energy contribution
-          // to this cluster ammounts to at least 25%
+          // set the relation only if the MCParticle(reconstructed Particle)'s
+          // energy contribution to this cluster ammounts to at least 30(20)%
           if (relMCParticle)
             if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
         }
 
-        // old way (to be removed)
-        //if (mcParticle)
-        //newPart->addRelationTo(mcParticle);
 
         // add particle to list if it passes the selection criteria
-        for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-          string listName = get<c_PListName>(eclCluster2Plist);
-          auto& cut = get<c_CutPointer>(eclCluster2Plist);
-          StoreObjPtr<ParticleList> plist(listName);
+        auto& cut = get<c_CutPointer>(eclCluster2Plist);
+        StoreObjPtr<ParticleList> plist(listName);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
-        }
-      }
-    }
+        if (cut->check(newPart))
+          plist->addParticle(newPart);
+
+      } // loop over particle lists to be filled by ECLClusters
+    } // loop over cluster
   }
 
   void ParticleLoaderModule::klmClustersToParticles()
@@ -569,8 +592,10 @@ namespace Belle2 {
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(klmCluster2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
+      if (!plist) { // create the list only if the eclClustersToParticle has not already created it
+        plist.create();
+        plist->initialize(pdgCode, listName);
+      }
 
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);

@@ -190,8 +190,8 @@
    fun:_ZN4TKey13ReadObjectAnyEPK6TClass
    fun:_ZN14TDirectoryFile16GetObjectCheckedEPKcPK6TClass
    fun:_ZNK6TCling7LoadPCME7TStringPPKcPFvvE
-   fun:_ZN6TCling14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairISsiESaIS7_EES2_b
-   fun:_ZN5TROOT14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairISsiESaIS7_EES2_
+   fun:_ZN6TCling14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEiESaISD_EES2_b
+   fun:_ZN5TROOT14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEiESaISD_EES2_
    ...
 }
 

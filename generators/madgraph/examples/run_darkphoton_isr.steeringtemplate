@@ -1,6 +1,6 @@
 import model MGMODEL
 generate MGGENERATE
-output MGOUTPUT
+output EE_ISR MGOUTPUT
 launch
 MGRUNDCARD
 
@@ -11,6 +11,8 @@ set ebeam1 MGBEAMENERGY
 set ebeam2 MGBEAMENERGY
 set nevents MGNEVENTS
 set iseed MGSEED
+set lpp1 MGlpp1
+set lpp2 MGlpp2
 
 set Ge   MGge
 set GChi MGgchi

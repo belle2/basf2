@@ -66,9 +66,22 @@ CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate(
     }
   }
 
-  /*
+  // Create a ShapeIndexer payload
+  PXDClusterShapeIndexPar* ShapeIndexer = new PXDClusterShapeIndexPar();
+
+  int globalShapeIndex = 0;
+  for (auto it = m_shapeSet.begin(); it != m_shapeSet.end(); ++it) {
+    ShapeIndexer->addShape(*it, globalShapeIndex);
+    globalShapeIndex++;
+  }
+
+  // FIXME: Mirror the shape classifiers
+
   // Create position estimator
-  estimator_payload = Belle2.PXDClusterPositionEstimatorPar();
+  PXDClusterPositionEstimatorPar* PositionEstimator = new PXDClusterPositionEstimatorPar();
+
+  /*
+  // FIXME
   for (auto clusterKind : clusterKinds) {
     grid = ROOT.TH2F("grid_{:d}".format(pixelkind), "grid_{:d}".format(pixelkind), 18, -90.0, +90.0, 18, -90.0, +90.0)
     estimator_payload.addGrid(pixelkind, grid)
@@ -96,11 +109,9 @@ CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate(
 
   // Save the cluster positions and index table to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
-  PXDClusterPositionEstimatorPar* PositionEstimator = new PXDClusterPositionEstimatorPar();
-  saveCalibration(PositionEstimator, "PXDClusterPositionEstimatorPar");
 
-  PXDClusterShapeIndexPar* ClusterShapeIndexer = new PXDClusterShapeIndexPar();
-  saveCalibration(ClusterShapeIndexer, "PXDClusterShapeIndexPar");
+  saveCalibration(PositionEstimator, "PXDClusterPositionEstimatorPar");
+  saveCalibration(ShapeIndexer, "PXDClusterShapeIndexPar");
 
   B2INFO("PXDClusterPosition Calibration Successful");
   return c_OK;
@@ -137,20 +148,22 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
     auto it = std::find_if(shapeList.begin(), shapeList.end(),
     [&](const pair<string, float>& element) { return element.first == shapeName;});
 
-    //Item exists in map
+    //Shape name exists in vector
     if (it != shapeList.end()) {
       //increment key in map
       it->second++;
     }
-    //Item does not exist
+    //Shape name does not exist
     else {
-      //Not found, insert in map
+      //Not found, insert in vector
       shapeList.push_back(pair<string, int>(shapeName, 1));
+      // Remember the relation between names
+      m_mirrorMap[shapeName] = m_mirroredShapeName;
     }
   }
 
   // Postprocessing of first loop: Enumerate shapes and compute their likelyhood
-  unsigned int shapeIndex = 0;
+  int shapeIndex = 0;
   double coverage = 0.0;
   vector< pair<string, TH1D> > etaHistos;
 
@@ -163,6 +176,11 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
     if (counter >=  minClusterForShapeLikelyhood) {
       index->addShape(name, shapeIndex);
       shapeIndex++;
+
+      // Add name of shape to global shape set
+      m_shapeSet.insert(name);
+      // Add name of mirrored shape as well
+      m_shapeSet.insert(m_mirrorMap[name]);
 
       B2INFO("Add shape " << name << " wiht shape likelyhood " << likelyhood << " and count " << counter);
 

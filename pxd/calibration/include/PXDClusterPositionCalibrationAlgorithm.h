@@ -14,6 +14,7 @@
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 
 #include <vector>
+#include <set>
 
 namespace Belle2 {
   /**
@@ -58,6 +59,9 @@ namespace Belle2 {
     /** Position offset v of cluster */
     float m_positionOffsetV;
 
+    /** Helper needed to map the name of a shape to the name of the mirrored shape */
+    std::map<std::string, std::string> m_mirrorMap;
+    std::set<std::string> m_shapeSet;
   };
 } // namespace Belle2
 

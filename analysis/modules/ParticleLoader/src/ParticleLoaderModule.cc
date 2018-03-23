@@ -437,13 +437,8 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons
-          && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_muonNPhotons)
+      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
         continue;
-
-      // TODO: allow at some point
-      //cluster->getHypothesisId() != ECLCluster::Hypothesis::c_electronNPhotons)
-
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles

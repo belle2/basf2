@@ -133,9 +133,8 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* cluster = eclClusters[i];
 
-    // allow only T1 (muon + n photons) and N1 (n photons) cluster hypotheses enter ROE
-    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_muonNPhotons &&
-        cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+    // allow only N1 (n photons) cluster hypotheses to enter the ROE
+    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
       continue;
 
     bool remainingCluster = true;

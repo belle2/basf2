@@ -101,10 +101,8 @@ namespace Belle2 {
       StoreArray<ECLCluster> eclClusters;
       double result = 0;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of T1 (muon + n photons) and N1 (n photons) ECLClusters
-        // other clusters are duplicates
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_muonNPhotons &&
-            eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        // sum only momentum of N1 (n photons) ECLClusters
+        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
           continue;
 
         result += eclClusters[i]->getEnergy();
@@ -141,10 +139,8 @@ namespace Belle2 {
       StoreArray<ECLCluster> eclClusters;
       ClusterUtils C;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of T1 (muon + n photons) and N1 (n photons) ECLClusters
-        // other clusters are duplicates
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_muonNPhotons &&
-            eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        // sum only momentum of N1 (n photons) ECLClusters
+        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
           continue;
 
         TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(eclClusters[i]);

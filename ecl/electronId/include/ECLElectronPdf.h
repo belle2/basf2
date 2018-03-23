@@ -14,13 +14,6 @@ namespace Belle2 {
       double pdf(const double& eop, const double& p, const double& theta) const;
       void init(const char* parametersFileName);
 
-      Parameters& pdfParams(const double& p, const double& theta) const
-      {
-        return m_params[index(p, theta)];
-      };
-
-    private:
-
       struct Parameters {
         double mu1;
         double sigma1;
@@ -30,6 +23,13 @@ namespace Belle2 {
         double alpha;
         double nn;
       };
+
+      Parameters* pdfParams(const double& p, const double& theta)
+      {
+        return &m_params[index(p, theta)];
+      };
+
+    private:
 
       std::vector<Parameters> m_params;
       std::vector<double> m_integral1;

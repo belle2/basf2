@@ -32,7 +32,7 @@ void ECLPionPdf::init(const char* parametersFileName)
 
       i = index(ip, ith);
 
-      //Build muon-like PDF (Bifurcated Gaussian+Gaussian)
+      // Build muon-like PDF (Bifurcated Gaussian+Gaussian)
       ECLMuonPdf::Parameters& prm = m_muonlike.m_params[i];
       prm.mu1 = map.param(name("pions_mu1_", ip, ith));
       prm.mu2 = map.param(name("pions_mu2_", ip, ith));
@@ -63,6 +63,6 @@ double ECLPionPdf::pdf(const double& eop, const double& p, const double& theta) 
 
   const Parameters& prm = m_params[i];
 
-  return prm.fraction * m_muonlike.pdf(eop , p, costheta) +
+  return prm.fraction * m_muonlike.pdf(eop, p, theta) +
          (1 - prm.fraction) * TMath::Gaus(eop, prm.mu3, prm.sigma3, true) / m_integralPion[i];
 }

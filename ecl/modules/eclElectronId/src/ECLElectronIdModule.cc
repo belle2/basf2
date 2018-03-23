@@ -110,29 +110,30 @@ void ECLElectronIdModule::event()
     double eop = energy / p;
 
     for (const auto& hypo : Const::chargedStableSet) {
-      Belle2::ECL::ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
+      ECL::ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
       if (currentpdf == 0) {
         currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }
       double pdfval = currentpdf->pdf(eop, p, theta);
 
-      // DEBUG
       if (hypo.getIndex() == Const::electron.getIndex()) {
-        std::cout << "" << std::endl;
-        std::cout << "Current hypothesis is ELECTRON (" << hypo.getIndex() << ")" << std::endl;
-        std::cout << "" << std::endl;
-        std::cout << "p = " << p << ", theta = " << theta << std::endl;
-        std::cout << "" << std::endl;
-        std::cout << "mu1 = " << currentpdf->pdfParams(p, theta).mu1;
-        std::cout << "sigma1 = " << currentpdf->pdfParams(p, theta).sigma1;
-        std::cout << "mu2 = " << currentpdf->pdfParams(p, theta).mu2;
-        std::cout << "sigma2 = " << currentpdf->pdfParams(p, theta).sigma2;
-        std::cout << "alpha = " << currentpdf->pdfParams(p, theta).alpha;
-        std::cout << "nn = " << currentpdf->pdfParams(p, theta).nn;
-        std::cout << "fraction = " << currentpdf->pdfParams(p, theta).fraction;
-        std::cout << "" << std::endl;
-        std::cout << "pdfval: " << pdfval << std::endl;
-        std::cout << "" << std::endl;
+        ECL::ECLElectronPdf* elpdf = dynamic_cast<ECL::ECLElectronPdf*>(currentpdf);
+        elpdf = elpdf; // get rid of warning
+        B2DEBUG(80, "");
+        B2DEBUG(80, "Current hypothesis is ELECTRON (" << hypo.getIndex() << ")");
+        B2DEBUG(80, "");
+        B2DEBUG(80, "p = " << p << ", theta = " << theta);
+        B2DEBUG(80, "");
+        B2DEBUG(80, "mu1 = " << elpdf->pdfParams(p, theta)->mu1);
+        B2DEBUG(80, "sigma1 = " << elpdf->pdfParams(p, theta)->sigma1);
+        B2DEBUG(80, "mu2 = " << elpdf->pdfParams(p, theta)->mu2);
+        B2DEBUG(80, "sigma2 = " << elpdf->pdfParams(p, theta)->sigma2);
+        B2DEBUG(80, "alpha = " << elpdf->pdfParams(p, theta)->alpha);
+        B2DEBUG(80, "nn = " << elpdf->pdfParams(p, theta)->nn);
+        B2DEBUG(80, "fraction = " << elpdf->pdfParams(p, theta)->fraction);
+        B2DEBUG(80, "");
+        B2DEBUG(80, "pdfval: " << pdfval);
+        B2DEBUG(80, "");
       }
 
       if (isnormal(pdfval) && pdfval > 0) likelihoods[hypo.getIndex()] = log(pdfval);

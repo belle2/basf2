@@ -497,17 +497,17 @@ void ECLChargedPIDModule::event()
         n1_eclShowerHypothesisId->push_back(i1shower.getHypothesisId());
 
         //get shower Zernike moments
-        n1_eclShowerAbsZernike11->push_back(i1shower.getAbsZernike11());
-        n1_eclShowerAbsZernike20->push_back(i1shower.getAbsZernike20());
-        n1_eclShowerAbsZernike22->push_back(i1shower.getAbsZernike22());
-        n1_eclShowerAbsZernike31->push_back(i1shower.getAbsZernike31());
-        n1_eclShowerAbsZernike33->push_back(i1shower.getAbsZernike33());
+        // n1_eclShowerAbsZernike11->push_back(i1shower.getAbsZernike11());
+        // n1_eclShowerAbsZernike20->push_back(i1shower.getAbsZernike20());
+        // n1_eclShowerAbsZernike22->push_back(i1shower.getAbsZernike22());
+        // n1_eclShowerAbsZernike31->push_back(i1shower.getAbsZernike31());
+        // n1_eclShowerAbsZernike33->push_back(i1shower.getAbsZernike33());
         n1_eclShowerAbsZernike40->push_back(i1shower.getAbsZernike40());
-        n1_eclShowerAbsZernike42->push_back(i1shower.getAbsZernike42());
-        n1_eclShowerAbsZernike44->push_back(i1shower.getAbsZernike44());
+        // n1_eclShowerAbsZernike42->push_back(i1shower.getAbsZernike42());
+        // n1_eclShowerAbsZernike44->push_back(i1shower.getAbsZernike44());
         n1_eclShowerAbsZernike51->push_back(i1shower.getAbsZernike51());
-        n1_eclShowerAbsZernike53->push_back(i1shower.getAbsZernike53());
-        n1_eclShowerAbsZernike55->push_back(i1shower.getAbsZernike55());
+        // n1_eclShowerAbsZernike53->push_back(i1shower.getAbsZernike53());
+        // n1_eclShowerAbsZernike55->push_back(i1shower.getAbsZernike55());
 
         n1_eclEoP->push_back((i1shower.getEnergy()) / (atrkF->getMomentum().Mag()));
 
@@ -527,17 +527,17 @@ void ECLChargedPIDModule::event()
         n2_eclShowerHypothesisId->push_back(i2shower.getHypothesisId());
 
         // get shower Zernike moments
-        n2_eclShowerAbsZernike11->push_back(i2shower.getAbsZernike11());
-        n2_eclShowerAbsZernike20->push_back(i2shower.getAbsZernike20());
-        n2_eclShowerAbsZernike22->push_back(i2shower.getAbsZernike22());
-        n2_eclShowerAbsZernike31->push_back(i2shower.getAbsZernike31());
-        n2_eclShowerAbsZernike33->push_back(i2shower.getAbsZernike33());
+        // n2_eclShowerAbsZernike11->push_back(i2shower.getAbsZernike11());
+        // n2_eclShowerAbsZernike20->push_back(i2shower.getAbsZernike20());
+        // n2_eclShowerAbsZernike22->push_back(i2shower.getAbsZernike22());
+        // n2_eclShowerAbsZernike31->push_back(i2shower.getAbsZernike31());
+        // n2_eclShowerAbsZernike33->push_back(i2shower.getAbsZernike33());
         n2_eclShowerAbsZernike40->push_back(i2shower.getAbsZernike40());
-        n2_eclShowerAbsZernike42->push_back(i2shower.getAbsZernike42());
-        n2_eclShowerAbsZernike44->push_back(i2shower.getAbsZernike44());
+        // n2_eclShowerAbsZernike42->push_back(i2shower.getAbsZernike42());
+        // n2_eclShowerAbsZernike44->push_back(i2shower.getAbsZernike44());
         n2_eclShowerAbsZernike51->push_back(i2shower.getAbsZernike51());
-        n2_eclShowerAbsZernike53->push_back(i2shower.getAbsZernike53());
-        n2_eclShowerAbsZernike55->push_back(i2shower.getAbsZernike55());
+        // n2_eclShowerAbsZernike53->push_back(i2shower.getAbsZernike53());
+        // n2_eclShowerAbsZernike55->push_back(i2shower.getAbsZernike55());
 
         n2_eclEoP->push_back((i2shower.getEnergy()) / (atrkF->getMomentum().Mag()));
 

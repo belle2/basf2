@@ -11,8 +11,10 @@ namespace Belle2 {
 
     class ECLAbsPdf {
     public:
-      virtual double pdf(double eop, double p, double costheta) const = 0;
+
+      virtual double pdf(const double& eop, const double& p, const double& theta) const = 0;
       virtual void init(const char* parametersFileName) = 0;
+
       std::string name(const char* base, int i, int j) const
       {
         std::ostringstream nm;
@@ -36,16 +38,16 @@ namespace Belle2 {
       {
 
         unsigned int ip(n_p_bins - 1);
-        for (unsigned int i(ip); i >= 0; --i) {
+        for (int i(ip); i >= 0; --i) {
           if (p > p_min[i]) {
-            ip = i;
+            ip = static_cast<unsigned int>(i);
             break;
           }
         }
         unsigned int ith(n_theta_bins - 1);
-        for (unsigned int i(ith); i >= 0; --i) {
+        for (int i(ith); i >= 0; --i) {
           if (TMath::Abs(theta) > theta_min[i]) {
-            ith = i;
+            ith = static_cast<unsigned int>(i);
             break;
           }
         }

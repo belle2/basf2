@@ -11,6 +11,7 @@ from collections import deque
 from collections import OrderedDict
 from collections import namedtuple
 from collections import defaultdict
+import pathlib
 import json
 from functools import singledispatch, update_wrapper
 import contextlib
@@ -446,12 +447,61 @@ def merge_local_databases(list_database_dirs, output_database_dir):
 def get_iov_from_file(file_path):
     """
     Returns an IoV of the exp/run contained within the given file.
-    Uses the showmetadata basf2 tool.
+    Uses the b2file-metadata-show basf2 tool.
     """
     import subprocess
-    metadata_output = subprocess.check_output(['showmetadata', '--json', file_path])
+    metadata_output = subprocess.check_output(['b2file-metadata-show', '--json', file_path])
     m = json.loads(metadata_output.decode('utf-8'))
     return IoV(m['experimentLow'], m['runLow'], m['experimentHigh'], m['runHigh'])
+
+
+def get_file_iov_tuple(file_path):
+    """
+    Simple little function to return both the input file path and the relevant IoV, instead of just the IoV
+    """
+    B2INFO("Finding IoV for {}".format(file_path))
+    return (file_path, get_iov_from_file(file_path))
+
+
+def make_files_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
+    """
+    Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
+    extract the IoV.
+
+    Paramters:
+        file_path_patterns (list[str]): The list of file path patterns you want to get IoVs for.
+
+    Keyword Arguments:
+        polling_time (int): Time between checking if our results are ready.
+        pool (Pool): Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
+            We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
+
+    Returns:
+        dict: Maping of matching input file paths (Key) to their IoV (Value)
+    """
+    absolute_file_paths = find_absolute_file_paths(file_path_patterns)
+    files_to_iov = {}
+    if not pool:
+        for file_path in absolute_file_paths:
+            B2INFO("Finding IoV for {}".format(file_path))
+            files_to_iov[file_path] = get_iov_from_file(file_path)
+    else:
+        import time
+        results = []
+        for file_path in absolute_file_paths:
+            results.append(pool.apply_async(get_file_iov_tuple, (file_path,)))
+
+        while True:
+            if all(map(lambda result: result.ready(), results)):
+                break
+            B2INFO("Still waiting for IoVs to be calculated.")
+            time.sleep(polling_time)
+
+        for result in results:
+            file_iov = result.get()
+            files_to_iov[file_iov[0]] = file_iov[1]
+
+    return files_to_iov
 
 
 def find_absolute_file_paths(file_path_patterns):
@@ -483,3 +533,34 @@ def find_absolute_file_paths(file_path_patterns):
 
     abs_file_paths = list(existing_file_paths)
     return abs_file_paths
+
+
+def parse_raw_data_iov(file_path):
+    """
+    For as long as the Raw data is stored using a  predictable directory/filename structure
+    we can take advantage of it to more quickly infer the IoV of the files.
+
+    Parameters:
+        file_path (str): The absolute file path of a Raw data file on KEKCC
+
+    Returns:
+        `IoV`: The Single Exp,Run IoV that the Raw data file corresponds to.
+    """
+    Path = pathlib.Path
+    file_path = Path(file_path)
+
+    # We'll try and extract the exp and run from both the directory and filename
+    # That wil let us check that everything is as we expect
+
+    reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
+    path_exp = int(reduced_path.parts[0][1:])
+    path_run = int(reduced_path.parts[1][1:])
+
+    split_filename = reduced_path.name.split(".")
+    filename_exp = int(split_filename[1])
+    filename_run = int(split_filename[2])
+
+    if path_exp == filename_exp and path_run == filename_run:
+        return IoV(path_exp, path_run, path_exp, path_run)
+    else:
+        raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))

@@ -110,7 +110,9 @@ namespace Belle2 {
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
         // Create particle from track with most probable hypothesis
-        const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
+        const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+        const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
+        // XXX Here we skip tracks with 0 charge
         if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
         Particle charged_particle(track, charged);
         if (charged_particle.getParticleType() == Particle::c_Track) {

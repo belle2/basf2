@@ -81,3 +81,13 @@ void LookupTable::printLookupTable()
     }
   }
 }
+
+KeyMap LookupTable::getKeyMap()
+{
+  return m_LookupTable.first;
+}
+
+WeightMap LookupTable::getWeightMap()
+{
+  return m_LookupTable.second;
+}

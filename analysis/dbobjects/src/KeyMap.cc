@@ -10,8 +10,8 @@
 
 #include <analysis/dbobjects/KeyMap.h>
 #include <framework/logging/Logger.h>
-//#include <analysis/VariableManager/Manager.h>
-//#include <analysis/VariableManager/Utility.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 
 using namespace Belle2;
 
@@ -150,6 +150,11 @@ std::vector<std::string> KeyMap::getNames()
     B2INFO("Axis name found: " << name);
   }
   return names;
+}
+
+std::vector<std::string> KeyMap::getVarManagerNames()
+{
+  return Variable::Manager::Instance().resolveCollections(m_3DkeyTable.first);
 }
 
 NDBin KeyMap::getNDBin(double key_ID)
@@ -314,110 +319,35 @@ double KeyMap::addKey(NDBin bin, double key_ID)
 }
 
 
-/*
-// Get kinematic key for the particle's momentum
-double KeyMap::getKey(const Particle* p)
+
+double KeyMap::getKey(double var1_val, double var2_val, double var3_val)
 {
-  int nDim = numberOfDimensions();
-  switch (nDim) {
-    case 1: {
-      double var1_val;
-      std::vector<std::string> variables = Variable::Manager::Instance().resolveCollections(m_1DkeyTable.first);
-      const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
-      if (!var1) {
-        B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var1_val = var1->function(p);
-      }
-      for (auto var1_minimax : m_1DkeyTable.second) {
-        if (var1_minimax.first.first <= var1_val && var1_minimax.first.second > var1_val) {
-          return var1_minimax.second;
-        }
-      }
-      B2WARNING("Particle is out of defined binning scheme. Returning default for this cases -1 key.");
-      return -1;
-      break;
-    }
-    case 2: {
-      double var1_val;
-      double var2_val;
-      std::vector<std::string> variables = Variable::Manager::Instance().resolveCollections(m_2DkeyTable.first);
-      const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
-      const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(variables[1]);
-      if (!var1) {
-        B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var1_val = var1->function(p);
-      }
-      if (!var2) {
-        B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var2_val = var2->function(p);
-      }
-      for (auto var1_minimax : m_2DkeyTable.second) {
-        if (var1_minimax.first.first <= var2_val && var1_minimax.first.second > var2_val) {
-          for (auto var2_minimax : var1_minimax.second) {
-            if (var2_minimax.first.first <= var1_val && var2_minimax.first.second > var1_val) {
-              return var2_minimax.second;
+  for (auto var1_minimax : m_3DkeyTable.second) {
+    if (var1_minimax.first.first <= var1_val && var1_minimax.first.second > var1_val) {
+      for (auto var2_minimax : var1_minimax.second) {
+        if (var2_minimax.first.first <= var2_val && var2_minimax.first.second > var2_val) {
+          for (auto var3_minimax : var2_minimax.second) {
+            if (var3_minimax.first.first <= var3_val && var3_minimax.first.second > var3_val) {
+              return var3_minimax.second;
             }
           }
         }
       }
-      B2WARNING("Particle is out of defined binning scheme. Returning default for this cases -1 key.");
-      return -1;
-      break;
     }
-    case 3: {
-      double var1_val;
-      double var2_val;
-      double var3_val;
-      std::vector<std::string> variables = Variable::Manager::Instance().resolveCollections(m_3DkeyTable.first);
-      const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
-      const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(variables[1]);
-      const Variable::Manager::Var* var3 = Variable::Manager::Instance().getVariable(variables[2]);
-      if (!var1) {
-        B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var1_val = var1->function(p);
-      }
-      if (!var2) {
-        B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var2_val = var2->function(p);
-      }
-      if (!var3) {
-        B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var3_val = var3->function(p);
-      }
-      for (auto var1_minimax : m_3DkeyTable.second) {
-        if (var1_minimax.first.first <= var1_val && var1_minimax.first.second > var1_val) {
-          for (auto var2_minimax : var1_minimax.second) {
-            if (var2_minimax.first.first <= var2_val && var2_minimax.first.second > var2_val) {
-              for (auto var3_minimax : var2_minimax.second) {
-                if (var3_minimax.first.first <= var3_val && var3_minimax.first.second > var3_val) {
-                  return var3_minimax.second;
-                }
-              }
-            }
-          }
-        }
-      }
-      B2WARNING("Particle is out of defined binning scheme. Returning default for this cases -1 key.");
-      return -1;
-      break;
-    }
-    default:
-      B2ERROR("Error in finding of the key due to dimensionality of the table");
   }
+  B2WARNING("Out of binning scheme. Reguring default key -1");
   return -1;
 }
-*/
+
+double KeyMap::getKey(double var1_val, double var2_val)
+{
+  return this->getKey(var1_val, var2_val, 0);
+}
+
+double KeyMap::getKey(double var1_val)
+{
+  return this->getKey(var1_val, 0);
+}
+
 
 

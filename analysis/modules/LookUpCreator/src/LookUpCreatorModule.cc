@@ -40,6 +40,7 @@ namespace Belle2 {
     addParam("tableIDNotSpec", m_tableIDNotSpec, "Bin:weight info map without specific bin-numbering scheme", empty_noid_list);
     listOfSpecificIDEntries empty_specificid_list;
     addParam("tableIDSpec", m_tableIDSpec, "Bin:weight info map with specific bin-numbering scheme", empty_specificid_list);
+    addParam("tableName", m_tableName, "Name of the lookup table");
     addParam("outOfRangeWeight", m_outOfRangeWeight, "Weight info for out-of-range partiles");
   }
 
@@ -89,7 +90,7 @@ namespace Belle2 {
     B2INFO("Printing Lookup table");
     table.printLookupTable();
 
-    Belle2::DBImportObjPtr<Belle2::LookupTable> importer;
+    Belle2::DBImportObjPtr<Belle2::LookupTable> importer{m_tableName};
     importer.construct(table);
     importer.import(Belle2::IntervalOfValidity(0, 0, 3, 14));
 

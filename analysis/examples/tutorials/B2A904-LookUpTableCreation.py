@@ -23,13 +23,12 @@ def make_3D_bin(bin_x, bin_y, bin_z):
     return bin_3d
 
 
-bins_x = [make_1D_bin("xvar", -1, 0),
-          make_1D_bin("xvar", 0, 1),
-          make_1D_bin("xvar", 1, 2)]
+bins_x = [make_1D_bin("P", 0, 2),
+          make_1D_bin("P", 2, 3),
+          make_1D_bin("P", 3, 4)]
 
-bins_y = [make_1D_bin("yvar", -1, 0),
-          make_1D_bin("yvar", 0, 1),
-          make_1D_bin("yvar", 1, 2)]
+bins_y = [make_1D_bin("PZ", 0, 1),
+          make_1D_bin("PZ", 1, 5)]
 
 tableIDNotSpec = []
 
@@ -38,15 +37,15 @@ random.seed()
 for xbin in bins_x:
     for ybin in bins_y:
         weightInfo = {}
-        weightInfo["infoA"] = float(random.randint(0, 100)) / 100
-        weightInfo["infoB"] = -float(random.randint(0, 100)) / 100
-        weightInfo["infoC"] = 0
+        weightInfo["Weight"] = float(random.randint(0, 100)) / 100
+        weightInfo["StatErr"] = float(random.randint(100, 200)) / 100
+        weightInfo["SystErr"] = 0
         tableIDNotSpec.append([weightInfo, make_2D_bin(xbin, ybin)])
 
 outOfRangeWeightInfo = {}
-outOfRangeWeightInfo["infoA"] = -1
-outOfRangeWeightInfo["infoB"] = -1
-outOfRangeWeightInfo["infoC"] = -1
+outOfRangeWeightInfo["Weight"] = -1
+outOfRangeWeightInfo["StatErr"] = -1
+outOfRangeWeightInfo["SystErr"] = -1
 
 
 print("Hi")
@@ -54,15 +53,14 @@ print("Hi")
 addtable = register_module('LookUpCreator')
 addtable.param('tableIDNotSpec', tableIDNotSpec)
 addtable.param('outOfRangeWeight', outOfRangeWeightInfo)
+addtable.param('tableName', "ParticleReweighting:TestMomentum")
 
 analysis_main.add_module(addtable)
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [0])
 analysis_main.add_module(eventinfosetter)
-
-# analysis_main.add_module('Interactive')
 
 process(analysis_main)

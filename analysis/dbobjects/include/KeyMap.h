@@ -50,18 +50,6 @@ namespace Belle2 {
   class KeyMap {
 
     /**
-     * 1D key table
-     * std::pair< std::string, std::map<std::pair<double, double>, double>>
-     */
-    Named1DMap m_1DkeyTable;
-
-    /**
-     * 2D key table
-     * std::pair< std::vector<std::string>, std::map<std::pair<double, double>, std::map<std::pair<double, double>, double>>>
-     */
-    Named2DMap m_2DkeyTable;
-
-    /**
      * 3D key table
      * std::pair< std::vector<std::string>, std::map<std::pair<double, double>, std::map<std::pair<double, double>, std::map<std::pair<double, double>, double>>>>
      */
@@ -173,6 +161,30 @@ namespace Belle2 {
      * @return added key ID
      */
     double getKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax);
+
+    /**
+     * Getting key ID from the 1D table for given variable value
+     * @param var1_val value of the variable
+     * @return key ID
+     */
+    double getKey(double var1_val);
+
+    /**
+     * Getting key ID from the 2D table for given variables value
+     * @param var1_val value of the variable 1
+     * @param var2_val value of the variable 2
+     * @return key ID
+     */
+    double getKey(double var1_val, double var2_val);
+
+    /**
+     * Getting key ID from the 3D table for given variables value
+     * @param var1_val value of the variable 1
+     * @param var2_val value of the variable 2
+     * @param var3_val value of the variable 3
+     * @return key ID
+     */
+    double getKey(double var1_val, double var2_val, double var3_val);
 
     /**
      * Check if a certain bin is a key for 1D table
@@ -288,6 +300,12 @@ namespace Belle2 {
     * Get vector of names keymap
     */
     std::vector<std::string> getNames();
+
+    /**
+    * Get vector variable names as in variablemanager
+    */
+    std::vector<std::string> getVarManagerNames();
+
 
     /**
     * Check that bin limits are defined correctly (min, max)

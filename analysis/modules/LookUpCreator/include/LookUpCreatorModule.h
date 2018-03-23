@@ -37,7 +37,7 @@ namespace Belle2 {
     listOfNoIdEntries m_tableIDNotSpec;
     listOfSpecificIDEntries m_tableIDSpec;
     WeightInfo m_outOfRangeWeight;
-
+    std::string m_tableName;
     /**
      * Currently, std::pair can not be retreived from python list
      * We will get LookUpTable entries with tuples and transform tuples to pairs here.

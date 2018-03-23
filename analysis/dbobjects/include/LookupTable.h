@@ -19,6 +19,7 @@
 namespace Belle2 {
 
   typedef std::map<std::string, double> WeightInfo;
+  typedef std::map<double, WeightInfo> WeightMap;
 
   /**
    * Class for handling lookup tables
@@ -28,7 +29,7 @@ namespace Belle2 {
     * Lookup table matches bins of the key map with the lookup info.
     * This matching is paired with the key map.
     */
-    std::pair<KeyMap, std::map<double, WeightInfo>> m_LookupTable;
+    std::pair<KeyMap, WeightMap> m_LookupTable;
 
     // We assign unique bin ID for out-of-range bin.
     const double m_OutOfRangeBinID = -1;
@@ -66,6 +67,17 @@ namespace Belle2 {
     * Printing content of the lookup table
     */
     void printLookupTable();
+
+
+    /**
+    * Get keymap
+    */
+    KeyMap getKeyMap();
+
+    /**
+    * Get weight map
+    */
+    WeightMap getWeightMap();
 
     /**
     * Get lookup information for the particle

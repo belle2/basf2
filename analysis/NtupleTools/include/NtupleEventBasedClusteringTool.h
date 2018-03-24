@@ -10,29 +10,26 @@
 
 #pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <TTree.h>
 
 namespace Belle2 {
   /** NtupleTool to write event based clustering quantities to a flat ntuple */
   class NtupleEventBasedClusteringTool : public NtupleFlatTool {
   private:
-    /** number of single crystal deposits that are out of time */
-    int m_nECLCrystalDepositsOutOfTime;
-    /** number of single crystal deposits that are out of time in the FWD endcap */
-    int m_nECLCrystalDepositsOutOfTimeFWD;
-    /** number of single crystal deposits that are out of time in the barrel */
-    int m_nECLCrystalDepositsOutOfTimeBarrel;
-    /** number of single crystal deposits that are out of time in the BWD endcap */
-    int m_nECLCrystalDepositsOutOfTimeBWD;
-    /** number of showers in the ECL that do not become showers */
+    /** number of crystals that are out of time */
+    int m_nECLOutOfTimeCrystals;
+    /** number of crystals that are out of time in the FWD endcap */
+    int m_nECLOutOfTimeCrystalsFWD;
+    /** number of crystals that are out of time in the barrel */
+    int m_nECLOutOfTimeCrystalsBarrel;
+    /** number of crystals that are out of time in the BWD endcap */
+    int m_nECLOutOfTimeCrystalsBWD;
+    /** number of showers in the ECL that do not become clusters */
     int m_nRejectedECLShowers;
-    /** number of showers in the ECL that do not become showers, FWD endcap */
+    /** number of showers in the ECL that do not become clusters, FWD endcap */
     int m_nRejectedECLShowersFWD;
-    /** number of showers in the ECL that do not become showers, barrel */
+    /** number of showers in the ECL that do not become clusters, barrel */
     int m_nRejectedECLShowersBarrel;
-    /** number of showers in the ECL that do not become showers, BW endcap */
+    /** number of showers in the ECL that do not become clusters, BW endcap */
     int m_nRejectedECLShowersBWD;
     /** declare branches */
     void setupTree();

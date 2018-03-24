@@ -603,61 +603,61 @@ namespace Belle2 {
     }
 
     /*************************************************************
-     * Event-based ECL clusterig information
+     * Event-based ECL clustering information
      */
-    double nECLCrystalDepositsOutOfTimeFWDEndcap(const Particle*)
+    double nECLOutOfTimeCrystalsFWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLCalDigitsOutOfTimeFWD();
     }
 
-    double nECLCrystalDepositsOutOfTimeBarrel(const Particle*)
+    double nECLOutOfTimeCrystalsBarrel(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLCalDigitsOutOfTimeBarrel();
     }
 
-    double nECLCrystalDepositsOutOfTimeBWDEndcap(const Particle*)
+    double nECLOutOfTimeCrystalsBWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLCalDigitsOutOfTimeBWD();
     }
 
-    double nECLCrystalDepositsOutOfTime(const Particle*)
+    double nECLOutOfTimeCrystals(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLCalDigitsOutOfTime();
     }
 
     double nRejectedECLShowersFWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLShowersRejectedFWD();
     }
 
     double nRejectedECLShowersBarrel(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLShowersRejectedBarrel();
     }
 
     double nRejectedECLShowersBWDEndcap(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLShowersRejectedBWD();
     }
 
     double nRejectedECLShowers(const Particle*)
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
-      if (!elci) return std::numeric_limits<float>::quiet_NaN();
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
       return (double)elci->getNECLShowersRejected();
     }
 
@@ -759,14 +759,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
 
-    REGISTER_VARIABLE("nECLCrystalDepositsOutOfTime", nECLCrystalDepositsOutOfTime,
-                      "[Eventbased] return the number of single crystal deposits (ECLCalDigits) that are out of time");
-    REGISTER_VARIABLE("nECLCrystalDepositsOutOfTimeFWDEndcap", nECLCrystalDepositsOutOfTimeFWDEndcap,
-                      "[Eventbased] return the number of single crystal deposits (ECLCalDigits) that are out of time in the FWD endcap");
-    REGISTER_VARIABLE("nECLCrystalDepositsOutOfTimeBarrel", nECLCrystalDepositsOutOfTimeBarrel,
-                      "[Eventbased] return the number of single crystal deposits (ECLCalDigits) that are out of time in the barrel");
-    REGISTER_VARIABLE("nECLCrystalDepositsOutOfTimeBWDEndcap", nECLCrystalDepositsOutOfTimeBWDEndcap,
-                      "[Eventbased] return the number of single crystal deposits (ECLCalDigits) that are out of time in the FWD endcap");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsFWDEndcap", nECLOutOfTimeCrystalsFWDEndcap,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsBarrel", nECLOutOfTimeCrystalsBarrel,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the barrel");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsBWDEndcap", nECLOutOfTimeCrystalsBWDEndcap,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap");
     REGISTER_VARIABLE("nRejectedECLShowers", nRejectedECLShowers,
                       "[Eventbased] return the number of showers in the ECL that do not become clusters");
     REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap,

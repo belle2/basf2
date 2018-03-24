@@ -31,7 +31,7 @@ namespace TreeFitter {
 
   ErrCode InteractionPoint::initParticleWithMother([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode InteractionPoint::initMotherlessParticle(FitParams* fitparams)
@@ -75,12 +75,7 @@ namespace TreeFitter {
       }
     }
 
-    // std::cout << "Beam Spot uncertainty : x "
-    //   << std::sqrt(m_ipCovariance(0, 0)) << " y: "
-    //   << std::sqrt(m_ipCovariance(1, 1)) << " z: "
-    //   << std::sqrt(m_ipCovariance(2, 2)) << std::endl;
-
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode InteractionPoint::initCovariance(FitParams* fitpar) const
@@ -112,7 +107,7 @@ namespace TreeFitter {
       }
     }
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode InteractionPoint::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const

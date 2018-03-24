@@ -41,12 +41,6 @@ ROISenderModule::ROISenderModule() :
 }
 
 
-ROISenderModule::~ROISenderModule()
-{
-
-}
-
-
 void
 ROISenderModule::initialize()
 {
@@ -64,13 +58,6 @@ ROISenderModule::initialize()
 
   //  unlinkMessageQueue("on initialize");
   openMessageQueue("on initialize");
-
-}
-
-void
-ROISenderModule::beginRun()
-{
-
 
 }
 
@@ -102,10 +89,6 @@ ROISenderModule::event()
 }
 
 
-void
-ROISenderModule::endRun()
-{
-}
 
 
 void

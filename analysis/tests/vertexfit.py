@@ -14,7 +14,7 @@ testFile = tempfile.NamedTemporaryFile()
 
 main = create_path()
 
-inputMdst('MC5', Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
+inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
 
 fillParticleList('K-', '', path=main)
 fillParticleList('pi+', '', path=main)

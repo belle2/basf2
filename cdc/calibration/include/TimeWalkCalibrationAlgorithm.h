@@ -56,14 +56,13 @@ namespace Belle2 {
       virtual void write();
 
       /// prepare calibration.
-      virtual void prepare();
-
+      virtual void prepare(StoreObjPtr<EventMetaData>& evtPtr);
       /// Apply slice fit.
       void doSliceFitY(int boardId, int minHitCut);
 
     private:
-      TH1D* m_h1[300]; /**<Mean of residual as function of ADC of each board*/
-      TH2D* m_h2[300]; /**<2D histogram of residual vs ADC for each board*/
+      TH1D* m_h1[300] = {nullptr}; /**<Mean of residual as function of ADC of each board*/
+      TH2D* m_h2[300] = {nullptr}; /**<2D histogram of residual vs ADC for each board*/
 
       double m_xmin = 0.07; /**< minimum value cut of drift length. */
       double m_minNdf = 5;  /**< minimum number of degree of freedom required for track. */

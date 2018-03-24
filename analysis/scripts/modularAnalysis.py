@@ -305,34 +305,65 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     path.add_module(r1)
 
 
-def generateY4S(noEvents, decayTable=None, path=analysis_main):
+def setupEventInfo(noEvents, path=analysis_main):
     """
-    Generated e+e- -> Y(4S) events with EvtGen event generator.
-    The Y(4S) decays according to the user specifed decay table.
+    Prepare to generate events. This function sets up the EventInfoSetter.
+    You should call this before adding a generator from generators.
+    The experiment and run numbers are set to 0 (run independent generic MC in phase 3).
+    https://confluence.desy.de/display/BI/Experiment+numbering
 
-    The experiment and run numbers are set to 1.
-
-    If the simulation and reconstruction is not performed in the sam job,
-    then the Gearbox needs to be loaded. Use loadGearbox(path) function
-    for this purpose.
-
-    @param noEvents   number of events to be generated
-    @param decayTable file name of the decay table to be used
-    @param path       modules are added to this path
+    Parameters:
+        noEvents (int): number of events to be generated
+        path (basf2.Path): modules are added to this path
     """
-
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
-    evtgeninput = register_module('EvtGenInput')
-    if decayTable is not None:
-        if os.path.exists(decayTable):
-            evtgeninput.param('userDECFile', decayTable)
-        else:
-            B2ERROR('The specifed decay table file does not exist:' + decayTable)
+    evtnumbers.param('runList', [0])
+    evtnumbers.param('expList', [0])
     path.add_module(evtnumbers)
-    path.add_module(evtgeninput)
+
+
+def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=False):
+    """
+    Warning:
+        This functions is deprecated. Please call ``setupEventInfo`` then
+        ``add_evtgen_generator`` from the `generators`` package.
+
+    ::
+        from modularAnalysis import setupEventInfo
+        from generators import add_evtgen_generator
+        setupEventInfo(noEvents, path)
+        add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)
+        # or, for example:
+        add_evtgen_generator(path=analysis_main, finalstate='mixed')
+
+    Parameters:
+        noEvents (int): number of events to be generated
+        decayTable (str): file name of the decay table to be used
+        path (basf2.Path): modules are added to this path
+        override_fatal (bool): force this function to run ignoring the deprecation
+    """
+
+    message = (
+        "The generateY4S function from modularAnalysis is deprecated.\n"
+        "This function will be removed after release - 02. Please update your scripts.\n"
+        "Please replace it with functions from generators. Here is some example code: \n"
+        "\n"
+        "    from modularAnalysis import setupEventInfo"
+        "    from generators import add_evtgen_generator\n"
+        "    setupEventInfo(noEvents)\n"
+        "    add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)\n"
+    )
+    if (override_fatal):
+        B2ERROR(message)
+    else:
+        B2FATAL(message)
+
+    from generators import add_evtgen_generator
+    setupEventInfo(noEvents, path)
+    if not os.path.exists(decayTable):
+        B2FATAL('The specifed decay table file does not exist:' + decayTable)
+    add_evtgen_generator(path, 'signal', decayTable)
 
 
 def generateContinuum(
@@ -341,38 +372,53 @@ def generateContinuum(
     decayTable,
     inclusiveT=2,
     path=analysis_main,
+    override_fatal=False,
 ):
     """
-    Generated e+e- -> gamma* -> qq-bar where light quarks hadronize
-    and decay in user specified way (via specified decay table).
+    Warning:
+        This functions is deprecated. Please call ``setupEventInfo`` then
+        ``add_continuum_generator`` from the `generators`` package.
 
-    The experiment and run numbers are set to 1.
+    ::
+        from modularAnalysis import setupEventInfo
+        from generators import add_continuum_generator, add_inclusive_continuum_generator
+        setupEventInfo(noEvents, path)
+        add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
-    If the simulation and reconstruction is not performed in the sam job,
-    then the Gearbox needs to be loaded. Use loadGearbox(path) function
-    for this purpose.
-
-    @param noEvents   number of events to be generated
-    @param inclusiveP each event will contain this particle
-    @param decayTable file name of the decay table to be used
-    @param inclusiveT whether (2) or not (1) charge conjugated inclusive Particles should be included
-    @param path       modules are added to this path
+    Parameters:
+        noEvents (int): number of events to be generated
+        inclusiveP (str): each event will contain this particle
+        decayTable (str): file name of the decay table to be used
+        inclusiveT (int) whether (2) or not (1) charge conjugated inclusive Particles should be included
+        path (basf2.Path): modules are added to this path
+        override_fatal (bool): force this function to run ignoring the deprecation
     """
-
-    evtnumbers = register_module('EventInfoSetter')
-    evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
-    evtgeninput = register_module('EvtGenInput')
-    if os.path.exists(decayTable):
-        evtgeninput.param('userDECFile', decayTable)
+    message = (
+        "The generateContinuum function from modularAnalysis is deprecated.\n"
+        "This function will be removed after release - 02. Please update your scripts.\n"
+        "Please replace it with functions from generators. Here is some example code: \n"
+        "\n"
+        "    from modularAnalysis import setupEventInfo\n"
+        "    from generators import add_continuum_generator, add_inclusive_continuum_generator\n"
+        "    setupEventInfo(noEvents)\n"
+        "    add_continuum_generator(path, \"ccbar\")  # for example"
+    )
+    if (override_fatal):
+        B2ERROR(message)
     else:
-        B2ERROR('The specifed decay table file does not exist:' + decayTable)
-    evtgeninput.param('ParentParticle', 'vpho')
-    evtgeninput.param('InclusiveParticle', inclusiveP)
-    evtgeninput.param('InclusiveType', inclusiveT)
-    path.add_module(evtnumbers)
-    path.add_module(evtgeninput)
+        B2FATAL(message)
+
+    from generators import add_inclusive_continuum_generator
+    setupEventInfo(noEvents)
+    for finalstate in ['uubar', 'ddbar', 'ssbar', 'ccbar']:
+        if decayTable.count(finalstate):
+            B2INFO("Have parsed your decfile and will generate %s" % finalstate)
+            add_inclusive_continuum_generator(path, finalstate, [inclusiveP], include_conjugates=inclusiveT - 1)
+            return
+
+    add_inclusive_continuum_generator(path, finalstate='', particles=[inclusiveP],
+                                      userdecfile=decayTable, include_conjugates=inclusiveT - 1)
+    return
 
 
 def loadGearbox(path=analysis_main):
@@ -2050,12 +2096,14 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_main):
+# FIXME: Make this EventShape (include missing)
+def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main):
     """
-    Calculates the Thrust of the event using ParticleLists provided. If no ParticleList is
+    Calculates the Thrust of the event and the missing information using ParticleLists provided. If no ParticleList is
     provided, default ParticleLists are used(all track and all hits in ECL without associated track).
 
-    The Thrust value is stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
+    The Thrust and missing values are
+    stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
     and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
     particle and the Thrust of the event in the CM system, are also created.
 
@@ -2087,7 +2135,7 @@ def buildThrustOfEvent(inputListNames=[], default_cleanup=True, path=analysis_ma
     else:
         particleLists = inputListNames
 
-    thrustModule = register_module('ThrustOfEvent')
-    thrustModule.set_name('ThrustOfEvent_')
-    thrustModule.param('particleLists', particleLists)
-    path.add_module(thrustModule)
+    eventShapeModule = register_module('EventShape')
+    eventShapeModule.set_name('EventShape_')
+    eventShapeModule.param('particleLists', particleLists)
+    path.add_module(eventShapeModule)

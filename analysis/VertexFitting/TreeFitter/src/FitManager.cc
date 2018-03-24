@@ -75,8 +75,8 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        //std::cout << m_niter << " ---------------------------------------------------------------------------------------------"  <<
-        //          std::endl;
+        //B2DEBUG(19, m_niter << "
+        //---------------------------------------------------------------------------------------------");
 
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
@@ -102,12 +102,12 @@ namespace TreeFitter {
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
               m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
-              m_errCode = ErrCode::fastdivergingfit;
+              m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
-              m_errCode = ErrCode::slowdivergingfit;
+              m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
             } else if (deltachisq > 0) {
             }

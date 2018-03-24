@@ -60,10 +60,6 @@ PXDROIFinderModule::PXDROIFinderModule() : Module()
 
 }
 
-PXDROIFinderModule::~PXDROIFinderModule()
-{
-}
-
 
 void PXDROIFinderModule::initialize()
 {
@@ -150,10 +146,5 @@ void PXDROIFinderModule::endRun()
 {
   delete m_thePixelTranslator;
   delete m_thePXDInterceptor;
-}
-
-
-void PXDROIFinderModule::terminate()
-{
 }
 

@@ -2872,7 +2872,7 @@ Decay B-
 #
 #   b -> l nu
 #
-0.000180000 tau-    anti-nu_tau                             SLN; #[Reconstructed PDG2011]
+0.000109000 tau-    anti-nu_tau                             SLN; #[Reconstructed PDG2011]
 0.000000   mu-  anti-nu_mu               PHOTOS   SLN;
 0.000000   e-   anti-nu_e                PHOTOS  SLN;
 #
@@ -3877,7 +3877,7 @@ Decay B+
 #
 #   b -> l nu
 #
-0.000180000 tau+    nu_tau                                  SLN; #[Reconstructed PDG2011]
+0.000109000 tau+    nu_tau                                  SLN; #[Reconstructed PDG2011]
 0.000000   mu+  nu_mu          PHOTOS     SLN;
 0.000000   e+   nu_e           PHOTOS    SLN;
 #

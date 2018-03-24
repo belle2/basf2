@@ -18,6 +18,7 @@
 // inverse() needs this, in the other classes we get away with just Eigen/Core
 #include <Eigen/Dense>
 
+
 namespace TreeFitter {
 
   /** does the calculation of the gain matrix, updates the cov and fitpars */

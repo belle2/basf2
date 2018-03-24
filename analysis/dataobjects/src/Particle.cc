@@ -711,7 +711,7 @@ std::string Particle::getName() const
 
 void Particle::print() const
 {
-  std::cout << getInfo();
+  B2INFO(getInfo());
 }
 
 std::string Particle::getInfoHTML() const

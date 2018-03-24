@@ -23,7 +23,7 @@ namespace Belle2 {
 
     };
 
-    void CalibSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
+    void CalibSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     {
       for (unsigned int i = 0; i < m_particlelist.size(); i++) {
         StoreObjPtr<ParticleList> plist(m_particlelist[i]);

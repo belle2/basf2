@@ -9,6 +9,7 @@ import pickle
 import multiprocessing
 import glob
 import shutil
+import time
 
 from basf2 import *
 import ROOT
@@ -25,6 +26,7 @@ from .utils import get_iov_from_file
 from .utils import find_absolute_file_paths
 from .utils import runs_overlapping_iov
 from .utils import runs_from_vector
+from .utils import B2INFO_MULTILINE
 from .backends import Job
 from .backends import LSF
 from .backends import PBS
@@ -410,6 +412,11 @@ class CalibrationMachine(Machine):
         #: root directory for this Calibration
         self.root_dir = os.path.join(os.getcwd(), calibration.name)
 
+        #: Times of various useful updates to the collector job e.g. start, elapsed, last update
+        #: Used to periodically call update_status on the collector job
+        #: and find out an overall number of jobs remaining + estimated remaining time
+        self._collector_timing = {}
+
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
@@ -417,11 +424,14 @@ class CalibrationMachine(Machine):
                                     self._build_iov_dict,
                                     self._create_collector_job,
                                     self._submit_collector])
-        self.add_transition("fail", "running_collector", "collector_failed")
+        self.add_transition("fail", "running_collector", "collector_failed",
+                            conditions=self._collector_job_failed)
         self.add_transition("complete", "running_collector", "collector_completed",
-                            conditions=self._collector_ready,
+                            conditions=[self._collector_ready,
+                                        self._collector_job_completed],
                             before=self._post_process_collector)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
+                            before=self._check_valid_collector_output,
                             after=[self._run_algorithms,
                                    self.automatic_transition])
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
@@ -500,6 +510,14 @@ class CalibrationMachine(Machine):
         """
         self.iteration += 1
 
+    def _collector_job_completed(self):
+        B2DEBUG(29, "Checking for failed collector job")
+        return self._collector_job.status == "completed"
+
+    def _collector_job_failed(self):
+        B2DEBUG(29, "Checking for failed collector job")
+        return self._collector_job.status == "failed"
+
     def _no_failed_iov(self):
         """
         Returns:
@@ -535,19 +553,43 @@ class CalibrationMachine(Machine):
 
     def _post_process_collector(self):
         """
-        Runs a merging job on the collector output ROOT files
+        Used to run a merging job on the collector output ROOT files. Now does nothing.
         """
         pass
 
     def _collector_ready(self):
         """
         """
+        since_last_update = time.time() - self._collector_timing["last_update"]
+        if since_last_update > self.calibration.collector_full_update_interval:
+            B2DEBUG(29, "Updating full set of collector job statuses.")
+            self._collector_job.update_status()
+            self._collector_timing["last_update"] = time.time()
+            if self._collector_job.subjobs:
+                num_completed = sum((subjob.status in subjob.exit_statuses) for subjob in self._collector_job.subjobs.values())
+                total_subjobs = len(self._collector_job.subjobs)
+                B2INFO("{}/{} Collector SubJobs finished in {}".format(num_completed, total_subjobs, self.calibration.name))
         return self._collector_job.ready()
 
     def _submit_collector(self):
         """
         """
         self.collector_backend.submit(self._collector_job)
+        self._collector_timing["start"] = time.time()
+        self._collector_timing["last_update"] = time.time()
+        if self._collector_job.subjobs:
+            extra_indent = "  "
+            for subjob in self._collector_job.subjobs.values():
+                info_lines = ["Collector SubJob({}) Details".format(subjob.name)]
+                info_lines.append("SubJob ID number: {}".format(subjob.id))
+                try:
+                    job_id = subjob.result.job_id
+                    info_lines.append("Batch Job ID: {}".format(job_id))
+                except AttributeError:
+                    pass
+                info_lines.append("Input Files:")
+                info_lines.extend(extra_indent+file_path for file_path in subjob.input_files)
+                B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):
         """
@@ -749,6 +791,23 @@ class CalibrationMachine(Machine):
         B2DEBUG(20, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))
         self._collector_job = job
 
+    def _check_valid_collector_output(self):
+        B2INFO("Checking that Collector output exists for all colector jobs "
+               "using {}.output_patterns.".format(self.calibration.name))
+        if not self._collector_job.subjobs:
+            output_files = []
+            for pattern in self._collector_job.output_patterns:
+                output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
+            if not output_files:
+                raise MachineError("No output files from Collector Job")
+        else:
+            for subjob in self._collector_job.subjobs.values():
+                output_files = []
+                for pattern in subjob.output_patterns:
+                    output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
+                if not output_files:
+                    raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
+
     def _run_algorithms(self):
         """
         Runs the Calibration Algorithms for this calibration machine.
@@ -764,12 +823,14 @@ class CalibrationMachine(Machine):
         algs_runner.output_database_dir = output_database_dir
         algs_runner.output_dir = os.path.join(self.root_dir, str(self.iteration), self.calibration.alg_output_dir)
         input_files = []
+
         if self._collector_job.subjobs:
             for subjob in self._collector_job.subjobs.values():
-                input_file = os.path.join(subjob.output_dir, "CollectorOutput.root")
-                input_files.append(input_file)
+                for pattern in subjob.output_patterns:
+                    input_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
         else:
-            input_files.append(os.path.join(self._collector_job.output_dir, "CollectorOutput.root"))
+            for pattern in self._collector_job.output_patterns:
+                input_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
         algs_runner.input_files = input_files
 
         # Add any user defined local database chain for this calibration

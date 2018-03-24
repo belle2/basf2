@@ -18,6 +18,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vector>
@@ -103,22 +104,24 @@ namespace Belle2 {
       //
       std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
-      const Const::ChargedStable charged = Const::pion;
-
       for (const Track* track : roeTracks) {
 
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
-        // Create particle from track with pion hypothesis
-        Particle pion_particle(track, charged);
-        if (pion_particle.getParticleType() == Particle::c_Track) {
-          TLorentzVector p_cms = T.rotateLabToCms() * pion_particle.get4Vector();
+        // Create particle from track with most probable hypothesis
+        const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+        const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
+        // XXX Here we skip tracks with 0 charge
+        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
+        Particle charged_particle(track, charged);
+        if (charged_particle.getParticleType() == Particle::c_Track) {
+          TLorentzVector p_cms = T.rotateLabToCms() * charged_particle.get4Vector();
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
-          p3_cms_q_roe.push_back({p_cms.Vect(), pion_particle.getCharge()});
+          p3_cms_q_roe.push_back({p_cms.Vect(), charged_particle.getCharge()});
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;

@@ -87,6 +87,7 @@ namespace Belle2 {
     Belle2::DecorrelationMatrix<Ndims> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
 
     // TODO: make this work with the externals -> tell Thomas Keck what is needed for this stuff to work in the externals
+    /// Making this Class a ROOT class
     ClassDef(FBDTClassifier, 2); // first version: only Forest and FeatureBinnings present
   };
 

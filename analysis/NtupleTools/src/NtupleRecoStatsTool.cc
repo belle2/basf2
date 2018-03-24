@@ -58,7 +58,7 @@ void NtupleRecoStatsTool::eval(const  Particle*)
     const ECLCluster* cluster      = ECLClusters[i];
 
     // Only use one hypothesis ID for ECLClusters
-    if (cluster->getHypothesisId() != 5) continue;
+    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons) continue;
 
     if (cluster->isNeutral()) {
       Particle* gamma = new Particle(cluster);

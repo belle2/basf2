@@ -142,7 +142,7 @@ namespace Belle2 {
      * arich/utility/ARICHAerogelHist histos
      * @param string with output name
      */
-    void dumpAOP(std::string outRootFileName = "ARICH_AOP.root");
+    void dumpAerogelOpticalProperties(std::string outRootFileName = "ARICH_AerogelOpticalProperties.root");
 
     /**
      * Import parameters of the cosmic test geometry configuration
